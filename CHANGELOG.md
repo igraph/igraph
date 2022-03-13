@@ -539,6 +539,12 @@
    argument instead of an `int`. In practice, it has always been treated as a
    boolean.
 
+ - `igraph_sparsemat_cholsol()`, `igraph_sparsemat_lusol()`, `igraph_sparsemat_symbqr`
+   and `igraph_sparsemat_symblu` now take an `igraph_integer_t` as their `order` parameter.
+
+ - `igraph_sparsemat_count_nonzero()` and `igraph_sparsemat_count_nonzerotol()` now
+   return an `igraph_integer_t`.
+
  - Functions that used an `igraph_vector_t` to represent cluster size
    and cluster membership now use an `igraph_vector_int_t` instead. These are:
    - `igraph_connected_components()` (used to be `igraph_clusters()` in 0.9 and before)

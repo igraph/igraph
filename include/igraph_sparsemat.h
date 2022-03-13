@@ -128,12 +128,12 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
                                            const igraph_vector_t *b,
                                            igraph_vector_t *res,
-                                           int order);
+                                           igraph_integer_t order);
 
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
                                          const igraph_vector_t *b,
                                          igraph_vector_t *res,
-                                         int order,
+                                         igraph_integer_t order,
                                          igraph_real_t tol);
 
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_print(const igraph_sparsemat_t *A,
@@ -196,10 +196,10 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_qrresol(const igraph_sparsemat_sym
                                            const igraph_vector_t *b,
                                            igraph_vector_t *res);
 
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_symbqr(igraph_integer_t order, const igraph_sparsemat_t *A,
                                           igraph_sparsemat_symbolic_t *dis);
 
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_symblu(long int order, const igraph_sparsemat_t *A,
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_symblu(igraph_integer_t order, const igraph_sparsemat_t *A,
                                           igraph_sparsemat_symbolic_t *dis);
 
 
@@ -211,8 +211,8 @@ IGRAPH_EXPORT igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_minmax(igraph_sparsemat_t *A,
                                           igraph_real_t *min, igraph_real_t *max);
 
-IGRAPH_EXPORT long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A);
-IGRAPH_EXPORT long int igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
+IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A);
+IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
                                                          igraph_real_t tol);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_rowsums(const igraph_sparsemat_t *A,
                                            igraph_vector_t *res);
