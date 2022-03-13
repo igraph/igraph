@@ -23,7 +23,10 @@
 */
 
 #include "infomap_Greedy.h"
+
+#include <algorithm>
 #include <iterator>
+#include <map>
 
 using namespace std;
 
@@ -316,36 +319,30 @@ void Greedy::apply(bool sort) {
 
     //old fct prepare(sort)
     vector<igraph_integer_t> modSnode;  // will give IDs of no-empty modules (nodes)
+    modSnode.reserve(Nnode);
+
     igraph_integer_t Nmod = 0;
+    for (igraph_integer_t i = 0; i < Nnode; i++) {
+        if (mod_members[i] > 0) {
+            Nmod++;
+            modSnode.push_back(i);
+        }
+    }
+
     if (sort) {
-        multimap<double, igraph_integer_t> Msize;
-        for (igraph_integer_t i = 0; i < Nnode; i++) {
-            if (mod_members[i] > 0) {
-                Nmod++;
-                Msize.insert(pair<const double, igraph_integer_t>(mod_size[i], i));
-            }
-        }
-        for (multimap<double, igraph_integer_t>::reverse_iterator it = Msize.rbegin();
-             it != Msize.rend(); it++) {
-            modSnode.push_back(it->second);
-        }
-    } else {
-        for (igraph_integer_t i = 0; i < Nnode; i++) {
-            if (mod_members[i] > 0) {
-                Nmod++;
-                modSnode.push_back(i);
-            }
-        }
+        // sort by mod_size
+        std::sort(modSnode.begin(), modSnode.end(),
+                  [&](double a, double b) { return mod_size[a] > mod_size[b]; } );
     }
     //modSnode[id_when_no_empty_node] = id_in_mod_tbl
 
     // Create the new graph
     FlowGraph tmp_fgraph(Nmod);
-    std::vector<Node> &node_tmp = tmp_fgraph.node ;
+    vector<Node> &node_tmp = tmp_fgraph.node ;
 
-    const std::vector<Node> &node = graph->node;
+    const vector<Node> &node = graph->node;
 
-    vector<igraph_integer_t> nodeInMod = vector<igraph_integer_t>(Nnode);
+    vector<igraph_integer_t> nodeInMod(Nnode);
 
     // creation of new nodes
     for (igraph_integer_t i = 0; i < Nmod; i++) {
@@ -362,7 +359,6 @@ void Greedy::apply(bool sort) {
 
     // Calculate outflow of links to different modules
     vector<map<igraph_integer_t, double> > outFlowNtoM(Nmod);
-    map<igraph_integer_t, double>::iterator it_M;
 
     for (igraph_integer_t i = 0; i < Nnode; i++) {
         igraph_integer_t i_M = nodeInMod[node_index[i]]; //final id of the module of the node i
@@ -375,21 +371,17 @@ void Greedy::apply(bool sort) {
             igraph_integer_t nb_M       = nodeInMod[node_index[nb]];
             double nb_flow = link.second;
             if (nb != i) {
-                it_M = outFlowNtoM[i_M].find(nb_M);
-                if (it_M != outFlowNtoM[i_M].end()) {
-                    it_M->second += nb_flow;
-                } else {
-                    outFlowNtoM[i_M].insert(make_pair(nb_M, nb_flow));
-                }
+                // inserts key nb_M if it does not exist
+                outFlowNtoM[i_M][nb_M] += nb_flow;
             }
         }
     }
 
     // Create outLinks at new level
     for (igraph_integer_t i = 0; i < Nmod; i++) {
-        for (it_M = outFlowNtoM[i].begin(); it_M != outFlowNtoM[i].end(); it_M++) {
-            if (it_M->first != i) {
-                node_tmp[i].outLinks.push_back(make_pair(it_M->first, it_M->second));
+        for (const auto &item : outFlowNtoM[i]) {
+            if (item.first != i) {
+                node_tmp[i].outLinks.push_back(item);
             }
         }
     }
@@ -404,21 +396,17 @@ void Greedy::apply(bool sort) {
             igraph_integer_t nb_M       = nodeInMod[node_index[nb]];
             double nb_flow = inLink.second;
             if (nb != i) {
-                it_M = inFlowNtoM[i_M].find(nb_M);
-                if (it_M != inFlowNtoM[i_M].end()) {
-                    it_M->second += nb_flow;
-                } else {
-                    inFlowNtoM[i_M].insert(make_pair(nb_M, nb_flow));
-                }
+                // inserts key nb_M if it does not exist
+                inFlowNtoM[i_M][nb_M] += nb_flow;
             }
         }
     }
 
     // Create inLinks at new level
     for (igraph_integer_t i = 0; i < Nmod; i++) {
-        for (it_M = inFlowNtoM[i].begin(); it_M != inFlowNtoM[i].end(); it_M++) {
-            if (it_M->first != i) {
-                node_tmp[i].inLinks.push_back(make_pair(it_M->first, it_M->second));
+        for (const auto &item : inFlowNtoM[i]) {
+            if (item.first != i) {
+                node_tmp[i].inLinks.push_back(item);
             }
         }
     }

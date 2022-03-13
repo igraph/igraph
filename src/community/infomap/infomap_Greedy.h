@@ -31,7 +31,6 @@
 #include "igraph_random.h"
 
 #include <vector>
-#include <map>
 
 class Greedy {
 public:

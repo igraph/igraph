@@ -153,7 +153,6 @@ add_library(
   community/fluid.c
   community/infomap/infomap_FlowGraph.cc
   community/infomap/infomap_Greedy.cc
-  community/infomap/infomap_Node.cc
   community/infomap/infomap.cc
   community/label_propagation.c
   community/leading_eigenvector.c

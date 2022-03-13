@@ -29,11 +29,13 @@
 
 #include <vector>
 
-class Node {
-public:
+struct Node {
 
-    Node();
-    Node(igraph_integer_t modulenr, double tpweight);
+    Node() : selfLink(0.0), exit(0.0), size(0.0) {}
+    Node(igraph_integer_t modulenr, double tpweight) : Node() {
+        teleportWeight = tpweight;
+        members.push_back(modulenr); // members = [nodenr]
+    }
 
     std::vector<igraph_integer_t> members;
     std::vector< std::pair<igraph_integer_t, double> > inLinks;
