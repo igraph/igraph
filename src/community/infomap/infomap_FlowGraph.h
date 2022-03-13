@@ -45,8 +45,6 @@ public:
     FlowGraph(const igraph_t *graph, const igraph_vector_t *e_weights,
               const igraph_vector_t *v_weights);
 
-    ~FlowGraph();
-
     void swap(FlowGraph &fgraph);
 
     void initiate();

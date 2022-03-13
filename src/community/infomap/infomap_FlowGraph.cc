@@ -37,11 +37,11 @@ void FlowGraph::init(igraph_integer_t n, const igraph_vector_t *v_weights) {
     node.reserve(Nnode);
     if (v_weights) {
         for (igraph_integer_t i = 0; i < Nnode; i++) {
-            node.push_back(Node(i, (double)VECTOR(*v_weights)[i]));
+            node.emplace_back(i, VECTOR(*v_weights)[i]);
         }
     } else {
         for (igraph_integer_t i = 0; i < Nnode; i++) {
-            node.push_back(Node(i, 1.0));
+            node.emplace_back(i, 1.0);
         }
     }
 }
@@ -56,7 +56,7 @@ FlowGraph::FlowGraph(igraph_integer_t n, const igraph_vector_t *v_weights) {
 
 /* Build the graph from igraph_t object
  */
-FlowGraph::FlowGraph(const igraph_t * graph,
+FlowGraph::FlowGraph(const igraph_t *graph,
                      const igraph_vector_t *e_weights,
                      const igraph_vector_t *v_weights) {
 
@@ -81,15 +81,15 @@ FlowGraph::FlowGraph(const igraph_t * graph,
                 igraph_edge(graph, (i - 1) / 2, &to,   &from);
             }
         } else {         // directed
-            linkWeight = e_weights ? (double)VECTOR(*e_weights)[i] : 1.0;
+            linkWeight = e_weights ? VECTOR(*e_weights)[i] : 1.0;
             igraph_edge(graph, i, &from, &to);
         }
 
         // Populate node from igraph_graph
         if (linkWeight > 0.0) {
             if (from != to) {
-                node[(int) from].outLinks.push_back(make_pair((int)to, linkWeight));
-                node[(int) to].inLinks.push_back(make_pair((int) from, linkWeight));
+                node[from].outLinks.push_back(make_pair(to, linkWeight));
+                node[to].inLinks.push_back(make_pair(from, linkWeight));
             }
         }
     }
@@ -181,11 +181,6 @@ FlowGraph::FlowGraph(const FlowGraph &fgraph, const vector<igraph_integer_t> &su
         }
         it_mem++;
     }
-}
-
-
-FlowGraph::~FlowGraph() {
-    //printf("delete FlowGraph !\n");
 }
 
 
@@ -347,7 +342,7 @@ void FlowGraph::eigenvector() {
     } while ((Niterations < 200) && (sqdiff > 1.0e-15 || Niterations < 50));
 
     danglingSize = 0.0;
-    for (int i = 0; i < Ndanglings; i++) {
+    for (igraph_integer_t i = 0; i < Ndanglings; i++) {
         danglingSize += size_tmp[danglings[i]];
     }
     // cout << "done! (the error is " << sqdiff << " after " << Niterations
@@ -382,16 +377,9 @@ void FlowGraph::calibrate() {
 /* Restore the data from the given FlowGraph object
  */
 void FlowGraph::back_to(const FlowGraph &fgraph) {
-    // delete current nodes
-    node.clear();
-
+    // delete current nodes and copy original ones
     Nnode = fgraph.Nnode;
-    node.reserve(Nnode);
-
-    // copy original ones
-    for (igraph_integer_t i = 0; i < Nnode; i++) {
-        node.push_back(Node(fgraph.node[i]));
-    }
+    node = fgraph.node;
 
     // restore atributs
     alpha = fgraph.alpha ;

@@ -40,9 +40,7 @@ public:
     Greedy(FlowGraph * fgraph);
     // initialise les attributs par rapport au graph
 
-    ~Greedy();
-
-    void setMove(igraph_integer_t *moveTo);
+    void setMove(const std::vector<igraph_integer_t> &moveTo);
     //virtual void determMove(int *moveTo);
 
     bool optimize();
@@ -55,6 +53,10 @@ public:
 
     /**************************************************************************/
 
+public:
+    double codeLength;
+
+private:
     FlowGraph * graph;
     igraph_integer_t Nnode;
 
@@ -63,8 +65,6 @@ public:
     double exit_log_exit;
     double size_log_size;
     double nodeSize_log_nodeSize;
-
-    double codeLength;
 
     double alpha, beta;
     // local copy of fgraph alpha, beta (=alpha -  Nnode = graph->Nnode;1)
