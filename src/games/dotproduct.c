@@ -226,7 +226,7 @@ igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_
 
 /**
  * \function igraph_sample_dirichlet
- * Sample points from a Dirichlet distribution
+ * \brief Sample points from a Dirichlet distribution.
  *
  * \param n The number of vectors to sample.
  * \param alpha The parameters of the Dirichlet distribution. They
@@ -253,16 +253,17 @@ igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t
     igraph_vector_t vec;
 
     if (n < 0) {
-        IGRAPH_ERROR("Number of samples should be non-negative",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of samples should be non-negative, got %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL, n);
     }
     if (len < 2) {
-        IGRAPH_ERROR("Dirichlet parameter vector too short, must "
-                     "have at least two entries", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Dirichlet parameter vector too short, must "
+                     "have at least two entries, got %" IGRAPH_PRId
+                     ".", IGRAPH_EINVAL, len);
     }
     if (igraph_vector_min(alpha) <= 0) {
-        IGRAPH_ERROR("Dirichlet concentration parameters must be positive",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Dirichlet concentration parameters must be positive, got %g.",
+                     IGRAPH_EINVAL, igraph_vector_min(alpha));
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, len, n));
