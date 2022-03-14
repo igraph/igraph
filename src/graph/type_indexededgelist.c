@@ -328,6 +328,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
  */
 igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     igraph_integer_t ec = igraph_ecount(graph);
+    igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t new_vc;
     igraph_integer_t i;
 
@@ -352,8 +353,24 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
 
     graph->n += nv;
 
+    /* Add attributes if necessary. This section is protected with
+     * FINALLY_ENTER/EXIT so that the graph would not be accidentally
+     * free upon error until it could be restored to a consistant state. */
+
     if (graph->attr) {
-        IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
+        igraph_error_t err;
+        IGRAPH_FINALLY_ENTER();
+        err = igraph_i_attribute_add_vertices(graph, nv, attr);
+        if (err != IGRAPH_SUCCESS) {
+            /* Restore original vertex count on failure */
+            graph->n = vc;
+            igraph_vector_int_resize(&graph->os, vc + 1); /* shrinks */
+            igraph_vector_int_resize(&graph->is, vc + 1); /* shrinks */
+        }
+        IGRAPH_FINALLY_EXIT();
+        if (err != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("Cannot add vertices.", err);
+        }
     }
 
     return IGRAPH_SUCCESS;
