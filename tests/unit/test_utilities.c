@@ -1,12 +1,10 @@
-#ifndef TEST_UTILITIES_INC
-#define TEST_UTILITIES_INC
 
 /*
  * This file contains functions that are useful when writing tests.
- * Include it in the test program using #include "test_utilities.inc"
+ * Add #include "test_utilities.h" to the test program to use them.
  */
 
-#include <igraph.h>
+#include "test_utilities.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -175,7 +173,7 @@ void print_lazy_inclist(igraph_lazy_inclist_t *inclist) {
     printf("}\n");
 }
 
-/* Edge comparisong function used for sorting in print_graph_canon(). */
+/* Edge comparison function used for sorting in print_graph_canon(). */
 int edge_compare(const void *e1, const void *e2) {
     const igraph_integer_t *edge1 = (igraph_integer_t *) e1;
     const igraph_integer_t *edge2 = (igraph_integer_t *) e2;
@@ -377,7 +375,7 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     igraph_matrix_complex_destroy(&copy);
 }
 
-void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, int *elem) {
+void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem) {
     igraph_integer_t c, r;
     size_t i_elem = 0;
     igraph_matrix_init(mat, nrow, ncol);
@@ -389,7 +387,7 @@ void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igra
     }
 }
 
-void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, int *elem) {
+void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem) {
     igraph_integer_t c, r;
     size_t i_elem = 0;
     igraph_matrix_int_init(mat, nrow, ncol);
@@ -401,7 +399,7 @@ void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_integer_t nr
     }
 }
 
-void matrix_init_real_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, igraph_real_t *elem) {
+void matrix_init_real_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const igraph_real_t *elem) {
     igraph_integer_t c, r;
     size_t i_elem = 0;
     igraph_matrix_init(mat, nrow, ncol);
@@ -430,35 +428,3 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff) {
         }
     }
 }
-
-#define VERIFY_FINALLY_STACK() \
-    if (!IGRAPH_FINALLY_STACK_EMPTY) { \
-        printf( \
-          "%s:%d : " \
-          "Finally stack is not empty (stack size is %d). " \
-          "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n", \
-          IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FINALLY_STACK_SIZE()); \
-        abort(); \
-    }
-
-/* Run a test in a separate function; return the return value of the function
- * if it is nonzero. Also verify the FINALLY stack and bail out if it is not
- * empty. Needs an integer variable named 'retval' in the local context. */
-#define RUN_TEST(func) \
-    { \
-        retval = func(); \
-        if (retval) { \
-            return retval; \
-        } \
-        VERIFY_FINALLY_STACK(); \
-    }
-
-#define CHECK_ERROR(funcall, expected_err) \
-    do { \
-        igraph_error_handler_t *handler; \
-        handler = igraph_set_error_handler(igraph_error_handler_ignore); \
-        IGRAPH_ASSERT(funcall == expected_err); \
-        igraph_set_error_handler(handler); \
-    } while (0)
-
-#endif /* TEST_UTILITIES_INC */

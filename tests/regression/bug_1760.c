@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 /* Regression test for https://github.com/igraph/igraph/issues/1760 */
 

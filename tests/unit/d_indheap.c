@@ -25,7 +25,7 @@
 
 #include "core/indheap.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 

@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* These is merely a smoke test for various random samplers.
  * It does not verify the correctness of the result, except

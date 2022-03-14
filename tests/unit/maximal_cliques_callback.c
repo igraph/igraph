@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 struct userdata {
     int i;

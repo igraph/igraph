@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 typedef struct cb2_data_t {
     igraph_matrix_t *A;

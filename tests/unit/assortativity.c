@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void assortativity_unnormalized(const igraph_t *graph, igraph_real_t *res, igraph_bool_t directed) {
     if (! igraph_is_directed(graph)) {

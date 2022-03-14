@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Direct test for undirected forests:
  * Decompose into connected components and check that each one is a tree */

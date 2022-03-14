@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define TEST_GRAPH(name) \
     igraph_automorphisms(&graph, NULL, IGRAPH_BLISS_F, &info); \

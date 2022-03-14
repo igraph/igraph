@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check(igraph_t *graph, igraph_es_t *es) {
     igraph_eit_t eit;

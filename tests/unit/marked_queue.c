@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include "core/marked_queue.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_marked_queue_int_t Q;

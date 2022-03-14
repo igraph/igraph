@@ -16,7 +16,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check_result(igraph_matrix_t *res, igraph_integer_t n)
 {

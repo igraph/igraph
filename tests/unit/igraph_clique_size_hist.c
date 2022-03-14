@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_and_destroy(igraph_t *g, int min, int max) {
     igraph_vector_t result;

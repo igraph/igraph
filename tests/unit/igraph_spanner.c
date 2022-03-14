@@ -18,7 +18,7 @@
 
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 #include <stdlib.h>
 
 void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch, igraph_vector_t *weights) {

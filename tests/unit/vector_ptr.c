@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 igraph_vector_ptr_t custom_destructor_stack;
 

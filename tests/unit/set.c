@@ -26,7 +26,7 @@
 
 #include "core/set.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_set(igraph_set_t *set, FILE *f) {
     igraph_integer_t state = 0;

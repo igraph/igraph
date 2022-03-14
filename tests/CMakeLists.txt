@@ -1,6 +1,10 @@
 include(test_helpers)
 include(benchmark_helpers)
 
+add_library(test_utilities OBJECT unit/test_utilities.c)
+target_link_libraries(test_utilities PRIVATE igraph)
+use_all_warnings(test_utilities)
+
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
 add_custom_target(build_tests)

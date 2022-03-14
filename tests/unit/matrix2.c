@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void byrow(igraph_matrix_t *m) {
     igraph_integer_t r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);

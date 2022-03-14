@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void test_and_destroy(igraph_rng_type_t *rng_type, igraph_rng_t *rng_def) {
     int i;

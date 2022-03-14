@@ -26,7 +26,7 @@
 
 #include "core/trie.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 

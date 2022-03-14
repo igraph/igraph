@@ -25,7 +25,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define sqr(x) ((x)*(x))
 

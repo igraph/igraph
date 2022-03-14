@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* How many "true" elements in the Boolean vector? */
 long vector_bool_count(const igraph_vector_bool_t *vec) {

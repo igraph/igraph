@@ -22,7 +22,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* test parameters structure */
 typedef struct {

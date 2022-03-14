@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Check that isoclass() and isoclass_create() are consistent with each other. */
 void verify_classes() {

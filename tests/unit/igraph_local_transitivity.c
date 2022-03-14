@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Compare the elements of two vectors for equality, handling NaN values. */
 igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {

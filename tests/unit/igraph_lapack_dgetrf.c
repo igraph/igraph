@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check_and_destroy(igraph_matrix_t *matrix, igraph_bool_t pivot) {
     igraph_vector_int_t pivot_indices;
