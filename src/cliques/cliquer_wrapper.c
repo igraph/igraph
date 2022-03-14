@@ -207,19 +207,20 @@ igraph_error_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
 
-    igraph_vector_resize(hist, max_size);
+    IGRAPH_CHECK(igraph_vector_resize(hist, max_size));
     igraph_vector_null(hist);
     igraph_cliquer_opt.user_data = hist;
     igraph_cliquer_opt.user_function = &count_cliques_callback;
 
     IGRAPH_CHECK(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt, NULL));
 
-    for (i = max_size; i > 0; --i)
+    for (i = max_size; i > 0; --i) {
         if (VECTOR(*hist)[i - 1] > 0) {
             break;
         }
-    igraph_vector_resize(hist, i);
-    igraph_vector_resize_min(hist);
+    }
+    IGRAPH_CHECK(igraph_vector_resize(hist, i));
+    igraph_vector_resize_min(hist); /* safe to ignore error since vector stays consistent on failure */
 
     graph_free(g);
     IGRAPH_FINALLY_CLEAN(1);
