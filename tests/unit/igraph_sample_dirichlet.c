@@ -23,24 +23,12 @@ void check_result(igraph_matrix_t *res, igraph_integer_t n)
     igraph_vector_t colsum;
     igraph_vector_init(&colsum, 0);
 
-    if (igraph_matrix_min(res) < 0) {
-        printf("ERROR: Found negative result.\n");
-        exit(1);
-    }
-    if (igraph_matrix_max(res) > 1.0) {
-        printf("ERROR: Found result over 1.0.\n");
-        exit(1);
-    }
+    IGRAPH_ASSERT(igraph_matrix_min(res) >= 0);
+    IGRAPH_ASSERT(igraph_matrix_max(res) <= 1.0);
     igraph_matrix_colsum(res, &colsum);
-    if (igraph_vector_size(&colsum) != n) {
-        printf("ERROR: Number of columns not equal to n.\n");
-        exit(1);
-    }
+    IGRAPH_ASSERT(igraph_vector_size(&colsum) == n);
     for (igraph_integer_t i = 0; i < igraph_vector_size(&colsum); i++) {
-        if (!igraph_almost_equals(VECTOR(colsum)[i], 1, 0.0000001)) {
-            printf("ERROR: Sum of result column not equal to 1.\n");
-            exit(1);
-        }
+        IGRAPH_ASSERT(igraph_almost_equals(VECTOR(colsum)[i], 1, 0.0000001));
     }
     igraph_vector_destroy(&colsum);
 }
