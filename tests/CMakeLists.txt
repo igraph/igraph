@@ -838,3 +838,9 @@ add_benchmarks(
   igraph_transitivity
   inc_vs_adj
 )
+
+# dot product
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_sample_dirichlet
+)
