@@ -377,9 +377,9 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     igraph_matrix_complex_destroy(&copy);
 }
 
-void matrix_init_int_row_major(igraph_matrix_t *mat, int nrow, int ncol, int* elem) {
-    int c, r;
-    int i_elem = 0;
+void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, int *elem) {
+    igraph_integer_t c, r;
+    size_t i_elem = 0;
     igraph_matrix_init(mat, nrow, ncol);
     for (r = 0; r < nrow; r++) {
         for (c = 0; c < ncol; c++) {
@@ -389,9 +389,9 @@ void matrix_init_int_row_major(igraph_matrix_t *mat, int nrow, int ncol, int* el
     }
 }
 
-void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, int nrow, int ncol, int* elem) {
-    int c, r;
-    int i_elem = 0;
+void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, int *elem) {
+    igraph_integer_t c, r;
+    size_t i_elem = 0;
     igraph_matrix_int_init(mat, nrow, ncol);
     for (r = 0; r < nrow; r++) {
         for (c = 0; c < ncol; c++) {
@@ -401,9 +401,9 @@ void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, int nrow, int ncol,
     }
 }
 
-void matrix_init_real_row_major(igraph_matrix_t *mat, int nrow, int ncol, igraph_real_t* elem) {
-    int c, r;
-    int i_elem = 0;
+void matrix_init_real_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, igraph_real_t *elem) {
+    igraph_integer_t c, r;
+    size_t i_elem = 0;
     igraph_matrix_init(mat, nrow, ncol);
     for (r = 0; r < nrow; r++) {
         for (c = 0; c < ncol; c++) {
@@ -414,8 +414,8 @@ void matrix_init_real_row_major(igraph_matrix_t *mat, int nrow, int ncol, igraph
 }
 
 void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff) {
-    int i;
-    for (i = 0; i < igraph_matrix_nrow(mat) * igraph_matrix_ncol(mat); i++) {
+    igraph_integer_t nelems = igraph_matrix_nrow(mat) * igraph_matrix_ncol(mat);
+    for (igraph_integer_t i = 0; i < nelems; i++) {
         if (fabs(VECTOR(mat->data)[i]) < cutoff) {
             VECTOR(mat->data)[i] = 0;
         }
@@ -423,8 +423,8 @@ void matrix_chop(igraph_matrix_t *mat, igraph_real_t cutoff) {
 }
 
 void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff) {
-    int i;
-    for (i = 0; i < igraph_vector_size(vec); i++) {
+    igraph_integer_t nelems = igraph_vector_size(vec);
+    for (igraph_integer_t i = 0; i < nelems; i++) {
         if (fabs(VECTOR(*vec)[i]) < cutoff) {
             VECTOR(*vec)[i] = 0;
         }
