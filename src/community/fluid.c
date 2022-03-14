@@ -59,8 +59,6 @@
  * \return Error code.
  *
  * Time complexity: O(|E|)
- *
- * \example examples/simple/igraph_community_fluid_communities.c
  */
 int igraph_community_fluid_communities(const igraph_t *graph,
                                        igraph_integer_t no_of_communities,
