@@ -54,6 +54,7 @@ int main() {
     igraph_layout_gem(&graph, &res, use_seed, maxiter, temp_max, temp_min, temp_init);
     igraph_matrix_print(&res);
     igraph_destroy(&graph);
+    igraph_matrix_destroy(&res);
 
     printf("Check 2-vertex graph.\n");
     maxiter = 100000;
@@ -70,6 +71,7 @@ int main() {
 
     VERIFY_FINALLY_STACK();
 
+    maxiter = 3;
     printf("Check negative maxiter.\n");
     CHECK_ERROR(igraph_layout_gem(&graph, &res, use_seed, -1, temp_max, temp_min, temp_init), IGRAPH_EINVAL);
     printf("Check negative temp_max.\n");
@@ -78,6 +80,16 @@ int main() {
     CHECK_ERROR(igraph_layout_gem(&graph, &res, use_seed, maxiter, temp_max, -1, temp_init), IGRAPH_EINVAL);
     printf("Check negative temp_init.\n");
     CHECK_ERROR(igraph_layout_gem(&graph, &res, use_seed, maxiter, temp_max, temp_min, -1), IGRAPH_EINVAL);
+    printf("Check temp_init not between min and max.\n");
+    CHECK_ERROR(igraph_layout_gem(&graph, &res, use_seed, maxiter, 1, 2, 1.5), IGRAPH_EINVAL);
+    printf("Check too many rows in seed.\n");
+    igraph_matrix_destroy(&res);
+    igraph_matrix_init(&res, 10, 2);
+    CHECK_ERROR(igraph_layout_gem(&graph, &res, use_seed, maxiter, temp_max, temp_min, temp_init), IGRAPH_EINVAL);
+    printf("Check too many columns in seed.\n");
+    igraph_matrix_destroy(&res);
+    igraph_matrix_init(&res, 2, 5);
+    CHECK_ERROR(igraph_layout_gem(&graph, &res, use_seed, maxiter, temp_max, temp_min, temp_init), IGRAPH_EINVAL);
 
     igraph_matrix_destroy(&res);
     igraph_destroy(&graph);
