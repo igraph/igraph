@@ -253,14 +253,15 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 
     for (i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        igraph_neighbors(graph, &vec, i, mode);
+        IGRAPH_CHECK(igraph_neighbors(graph, &vec, i, mode));
         memset(seen, 0, sizeof(igraph_bool_t) * (unsigned) al->length);
         n = al->length;
         if (!loops) {
             seen[i] = 1;
             n--;
         }
-        for (j = 0; j < igraph_vector_int_size(&vec); j++) {
+        igraph_integer_t vec_size = igraph_vector_int_size(&vec);
+        for (j = 0; j < vec_size; j++) {
             if (! seen [ VECTOR(vec)[j] ] ) {
                 n--;
                 seen[ VECTOR(vec)[j] ] = 1;
