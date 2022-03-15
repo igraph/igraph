@@ -122,8 +122,8 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
 
     /* Add a new node to the graph, plus edges from it to all the others. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2 + no_of_nodes * 2);
-    igraph_get_edgelist(graph, &edges, /*bycol=*/ 0);
-    igraph_vector_int_resize(&edges, no_of_edges * 2 + no_of_nodes * 2);
+    igraph_get_edgelist(graph, &edges, /*bycol=*/ 0); /* reserved */
+    igraph_vector_int_resize(&edges, no_of_edges * 2 + no_of_nodes * 2); /* reserved */
     for (i = 0, ptr = no_of_edges * 2; i < no_of_nodes; i++) {
         VECTOR(edges)[ptr++] = no_of_nodes;
         VECTOR(edges)[ptr++] = i;
@@ -133,8 +133,8 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_vector_reserve(&newweights, no_of_edges + no_of_nodes));
-    igraph_vector_update(&newweights, weights);
-    igraph_vector_resize(&newweights, no_of_edges + no_of_nodes);
+    igraph_vector_update(&newweights, weights); /* reserved */
+    igraph_vector_resize(&newweights, no_of_edges + no_of_nodes); /* reserved */
     for (i = no_of_edges; i < no_of_edges + no_of_nodes; i++) {
         VECTOR(newweights)[i] = 0;
     }
@@ -153,7 +153,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
        values from the BF algorithm. Instead of w(u,v) we will have
        w(u,v) + h(u) - h(v) */
 
-    igraph_vector_resize(&newweights, no_of_edges);
+    igraph_vector_resize(&newweights, no_of_edges); /* reserved */
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t ffrom = IGRAPH_FROM(graph, i);
         igraph_integer_t tto = IGRAPH_TO(graph, i);

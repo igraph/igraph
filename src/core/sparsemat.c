@@ -1239,8 +1239,8 @@ static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A
 
     IGRAPH_UNUSED(attr);
 
-    igraph_vector_int_resize(edges, no_of_edges * 2);
-    igraph_vector_resize(weights, no_of_edges);
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, no_of_edges * 2));
+    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
 
     while (*p < no_of_edges) {
         while (to < * (p + 1)) {

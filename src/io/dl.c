@@ -120,7 +120,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     n = igraph_vector_size(&context.weights);
     n2 = igraph_vector_int_size(&context.edges) / 2;
     if (n != 0) {
-        igraph_vector_resize(&context.weights, n2);
+        IGRAPH_CHECK(igraph_vector_resize(&context.weights, n2));
         for (; n < n2; n++) {
             VECTOR(context.weights)[n] = IGRAPH_NAN;
         }

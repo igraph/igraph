@@ -219,16 +219,16 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *vec = (igraph_vector_t*)rec->value;
             igraph_integer_t origsize = igraph_vector_size(vec);
-            igraph_vector_resize(vec, context.actedge);
+            IGRAPH_CHECK(igraph_vector_resize(vec, context.actedge));
             for (j = origsize; j < context.actedge; j++) {
                 VECTOR(*vec)[j] = IGRAPH_NAN;
             }
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
             igraph_integer_t origsize = igraph_strvector_size(strvec);
-            igraph_strvector_resize(strvec, context.actedge);
+            IGRAPH_CHECK(igraph_strvector_resize(strvec, context.actedge));
             for (j = origsize; j < context.actedge; j++) {
-                igraph_strvector_set(strvec, j, "");
+                IGRAPH_CHECK(igraph_strvector_set(strvec, j, ""));
             }
         }
     }
