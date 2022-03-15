@@ -66,7 +66,7 @@ IGRAPH_EXPORT igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_ve
 IGRAPH_EXPORT igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
                                        igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, int number);
+IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number);
 IGRAPH_EXPORT igraph_error_t igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
                                                const igraph_matrix_int_t *W, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);

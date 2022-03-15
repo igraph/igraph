@@ -578,6 +578,11 @@
    a consistent state by these functions, with all data intact, even if releasing
    unused storage is not successful.
 
+ - `igraph_atlas()` now uses `igraph_integer_t` for its `number` argument.
+
+ - `igraph_read_graph_graphml()` now uses `igraph_integer_t` for its `index` argument.
+
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.

@@ -1385,7 +1385,7 @@ static void igraph_i_libxml_structured_error_handler(void* ctx, xmlErrorPtr erro
  *
  * \example examples/simple/graphml.c
  */
-igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
+igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph_integer_t index) {
 
 #if HAVE_LIBXML == 1
     xmlParserCtxtPtr ctxt;
