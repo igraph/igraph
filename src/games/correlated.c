@@ -38,7 +38,7 @@
  * \param old_graph The original graph.
  * \param new_graph The new graph will be stored here.
  * \param corr A scalar in the unit interval, the target Pearson
- *        correlation between the adjacency matrices of the original the
+ *        correlation between the adjacency matrices of the original and the
  *        generated graph (the adjacency matrix being used as a vector).
  * \param p A numeric scalar, the probability of an edge between two
  *        vertices, it must in the open (0,1) interval.
