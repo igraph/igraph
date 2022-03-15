@@ -28,6 +28,8 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 /**
  * \function igraph_correlated_game
  * \brief Generates a random graph correlated to an existing graph.
@@ -173,18 +175,19 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     /* Now we can do the merge. Additional edges are tricky, because
        the code must be shifted by the edges in the original graph. */
 
-#define UPD_E()                             \
+#define UPD_E() \
     { if (p_e < no_of_edges) { next_e=CODEE(); } else { next_e = inf; } }
-#define UPD_A()                             \
-{ if (p_a < no_add) { \
+#define UPD_A() \
+    { if (p_a < no_add) { \
             next_a = VECTOR(add)[p_a] + p_e; } else { next_a = inf; } }
-#define UPD_D()                             \
-{ if (p_d < no_del) { \
+#define UPD_D() \
+    { if (p_d < no_del) { \
             next_d = VECTOR(delete)[p_d]; } else { next_d = inf; } }
 
     UPD_E(); UPD_A(); UPD_D();
 
     while (next_e != inf || next_a != inf || next_d != inf) {
+        IGRAPH_ALLOW_INTERRUPTION();
         if (next_e <= next_a && next_e < next_d) {
 
             /* keep an edge */
