@@ -87,8 +87,6 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v,
         const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *v,
         const char *value, igraph_integer_t len);
-IGRAPH_EXPORT void igraph_strvector_permdelete(
-    igraph_strvector_t *v, const igraph_vector_int_t *index, igraph_integer_t nremove);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                                          const char *sep);
 

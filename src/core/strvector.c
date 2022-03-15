@@ -504,35 +504,6 @@ igraph_error_t igraph_strvector_add(igraph_strvector_t *sv, const char *value) {
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_permdelete
- * \brief Removes elements from a string vector (for internal use)
- */
-
-void igraph_strvector_permdelete(igraph_strvector_t *sv, const igraph_vector_int_t *index,
-                                 igraph_integer_t nremove) {
-    igraph_integer_t i;
-    char **tmp;
-    IGRAPH_ASSERT(sv != NULL);
-    IGRAPH_ASSERT(sv->stor_begin != NULL);
-
-    for (i = 0; i < igraph_strvector_size(sv); i++) {
-        if (VECTOR(*index)[i] != 0) {
-            sv->stor_begin[VECTOR(*index)[i] - 1 ] = sv->stor_begin[i];
-        } else {
-            IGRAPH_FREE(sv->stor_begin[i]);
-        }
-    }
-    /* Try to make it shorter */
-    tmp = IGRAPH_REALLOC(sv->stor_begin, igraph_strvector_size(sv) - nremove ? (igraph_strvector_size(sv) - nremove) : 1, char*);
-    if (tmp != NULL) {
-        sv->stor_begin = tmp;
-    }
-    sv->stor_end -= nremove;
-    sv->end -= nremove;
-}
-
-/**
- * \ingroup strvector
  * \function igraph_strvector_print
  * \brief Prints a string vector.
  *
