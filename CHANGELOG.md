@@ -573,6 +573,11 @@
  - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use `IGRAPH_ALL`
    instead.
 
+ - `igraph_vector_resize_min()` and `igraph_matrix_resize_min()` no longer return an
+   error code (return type is now `void`). The vector or matrix is always left in
+   a consistent state by these functions, with all data intact, even if releasing
+   unused storage is not successful.
+
 ### Added
 
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.

@@ -175,15 +175,14 @@ igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_in
  * of a matrix.
  *
  * \param m Pointer to an initialized matrix.
- * \return Error code.
  *
  * \sa \ref igraph_matrix_resize().
  *
  * Time complexity: operating system dependent, O(n) at worst.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
-    return FUNCTION(igraph_vector, resize_min)(&m->data);
+void FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
+    FUNCTION(igraph_vector, resize_min)(&m->data);
 }
 
 

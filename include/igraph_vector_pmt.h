@@ -216,7 +216,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch2)(
 IGRAPH_EXPORT void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize)(
         TYPE(igraph_vector)* v, igraph_integer_t new_size);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reserve)(
         TYPE(igraph_vector)* v, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back)(TYPE(igraph_vector)* v, BASE e);

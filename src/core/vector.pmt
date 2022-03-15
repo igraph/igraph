@@ -1233,23 +1233,22 @@ igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_in
  * \brief Deallocate the unused memory of a vector.
  *
  * This function attempts to deallocate the unused reserved storage
- * of a vector. Currently it returns with \c IGRAPH_SUCCESS under all conditions.
- * If deallocation succeeded, \ref igraph_vector_size() and
- * \ref igraph_vector_capacity() will be the same.
+ * of a vector. If it succeeds, \ref igraph_vector_size() and
+ * \ref igraph_vector_capacity() will be the same. The data in the
+ * vector is always preserved, even if deallocation is not successful.
  *
  * \param v Pointer to an initialized vector.
- * \return Error code.
  *
  * \sa \ref igraph_vector_resize(), \ref igraph_vector_reserve().
  *
  * Time complexity: operating system dependent, O(n) at worst.
  */
 
-igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
+void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     igraph_integer_t size;
     BASE *tmp;
     if (v->stor_end == v->end) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     size = (v->end - v->stor_begin);
@@ -1258,8 +1257,6 @@ igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
         v->stor_begin = tmp;
         v->stor_end = v->end = v->stor_begin + size;
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOTORDERED

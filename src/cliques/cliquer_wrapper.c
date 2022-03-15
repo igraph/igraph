@@ -220,7 +220,7 @@ igraph_error_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t
         }
     }
     IGRAPH_CHECK(igraph_vector_resize(hist, i));
-    igraph_vector_resize_min(hist); /* safe to ignore error since vector stays consistent on failure */
+    igraph_vector_resize_min(hist);
 
     graph_free(g);
     IGRAPH_FINALLY_CLEAN(1);
