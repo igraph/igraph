@@ -171,36 +171,19 @@ igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_in
  * \function igraph_matrix_resize_min
  * \brief Deallocates unused memory for a matrix.
  *
- * </para><para>
- * Note that this function might fail if there is not enough memory
- * available.
+ * This function attempts to deallocate the unused reserved storage
+ * of a matrix.
  *
- * </para><para>
- * Also note, that this function leaves the matrix intact, i.e.
- * it does not destroy any of the elements. However, usually it involves
- * copying the matrix in memory.
  * \param m Pointer to an initialized matrix.
  * \return Error code.
  *
  * \sa \ref igraph_matrix_resize().
  *
- * Time complexity: operating system dependent.
+ * Time complexity: operating system dependent, O(n) at worst.
  */
 
 igraph_error_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
-    TYPE(igraph_vector) tmp;
-    igraph_integer_t size = FUNCTION(igraph_matrix, size)(m);
-    igraph_integer_t capacity = FUNCTION(igraph_matrix, capacity)(m);
-    if (size == capacity) {
-        return IGRAPH_SUCCESS;
-    }
-
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&tmp, size));
-    FUNCTION(igraph_vector, update)(&tmp, &m->data);
-    FUNCTION(igraph_vector, destroy)(&m->data);
-    m->data = tmp;
-
-    return IGRAPH_SUCCESS;
+    return FUNCTION(igraph_vector, resize_min)(&m->data);
 }
 
 

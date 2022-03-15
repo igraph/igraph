@@ -1223,15 +1223,17 @@ igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_in
  * \function igraph_vector_resize_min
  * \brief Deallocate the unused memory of a vector.
  *
- * </para><para>
- * Note that this function involves additional memory allocation and
- * may result an out-of-memory error.
+ * This function attempts to deallocate the unused reserved storage
+ * of a vector. Currently it returns with \c IGRAPH_SUCCESS under all conditions.
+ * If deallocation succeeded, \ref igraph_vector_size() and
+ * \ref igraph_vector_capacity() will be the same.
+ *
  * \param v Pointer to an initialized vector.
  * \return Error code.
  *
  * \sa \ref igraph_vector_resize(), \ref igraph_vector_reserve().
  *
- * Time complexity: operating system dependent.
+ * Time complexity: operating system dependent, O(n) at worst.
  */
 
 igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
@@ -1243,9 +1245,7 @@ igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
 
     size = (v->end - v->stor_begin);
     tmp = IGRAPH_REALLOC(v->stor_begin, size, BASE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot resize vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    } else {
+    if (tmp != NULL) {
         v->stor_begin = tmp;
         v->stor_end = v->end = v->stor_begin + size;
     }
