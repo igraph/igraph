@@ -472,9 +472,11 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     igraph_i_citing_cited_type_game_free(&str);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_create(graph, &edges, nodes, directed);
+    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+
     igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&sums);
     IGRAPH_FINALLY_CLEAN(2);
+
     return IGRAPH_SUCCESS;
 }

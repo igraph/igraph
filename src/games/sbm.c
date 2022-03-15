@@ -228,7 +228,8 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
     RNG_END();
 
-    igraph_create(graph, &edges, n, directed);
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 

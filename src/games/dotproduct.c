@@ -100,7 +100,8 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
 
     RNG_END();
 
-    igraph_create(graph, &edges, ncol, directed);
+    IGRAPH_CHECK(igraph_create(graph, &edges, ncol, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 

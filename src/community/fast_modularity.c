@@ -1056,7 +1056,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
 
     if (modularity) {
         VECTOR(*modularity)[no_of_joins] = q;
-        igraph_vector_resize(modularity, no_of_joins + 1);
+        IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_joins + 1));
     }
 
     debug("Freeing memory\n");

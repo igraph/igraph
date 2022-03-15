@@ -76,7 +76,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     /* TODO: handle not-connected graphs, multiple root vertices */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    igraph_vector_int_reserve(&edges, no_of_edges * 2);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_vertices, no_of_nodes);

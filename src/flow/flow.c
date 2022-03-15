@@ -573,7 +573,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 #define EXCESS(i)      (VECTOR(excess)[(i)])
 #define DIST(i)        (VECTOR(distance)[(i)])
 
-    igraph_dqueue_int_init(&bfsq,             no_of_nodes);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&bfsq, no_of_nodes));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &bfsq);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&to,       no_of_edges);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&rev,      no_of_edges);
