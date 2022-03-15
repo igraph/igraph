@@ -292,10 +292,9 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     igraph_integer_t len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
     igraph_integer_t i;
     igraph_bool_t error = 0;
-    IGRAPH_CHECK(igraph_strvector_resize(to, len1 + len2));
+    IGRAPH_CHECK(igraph_strvector_reserve(to, len1 + len2));
     for (i = 0; i < len2; i++) {
         if (from->stor_begin[i][0] != '\0') {
-            IGRAPH_FREE(to->stor_begin[len1 + i]);
             to->stor_begin[len1 + i] = strdup(from->stor_begin[i]);
             if (!to->stor_begin[len1 + i]) {
                 error = 1;
