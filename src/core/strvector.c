@@ -64,13 +64,13 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t si
     igraph_integer_t i;
     sv->stor_begin = IGRAPH_CALLOC(size, char*);
     if (sv->stor_begin == NULL) {
-        IGRAPH_ERROR("Strvector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("String vector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < size; i++) {
         sv->stor_begin[i] = IGRAPH_CALLOC(1, char);
         if (sv->stor_begin[i] == NULL) {
             igraph_strvector_destroy(sv);
-            IGRAPH_ERROR("Strvector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("String vector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->stor_begin[i][0] = '\0';
     }
@@ -151,7 +151,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
     value_len = strlen(value);
     tmp = IGRAPH_REALLOC(sv->stor_begin[idx], value_len + 1, char);
     if (tmp == NULL) {
-        IGRAPH_ERROR("Strvector set failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("String vector set failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     sv->stor_begin[idx] = tmp;
     strcpy(sv->stor_begin[idx], value);
@@ -188,7 +188,7 @@ igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_integer_t id
 
     tmp = IGRAPH_REALLOC(sv->stor_begin[idx], len + 1, char);
     if (tmp == NULL) {
-        IGRAPH_ERROR("Strvector set failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("String vector set failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     sv->stor_begin[idx] = tmp;
     memcpy(sv->stor_begin[idx], value, len * sizeof(char));
@@ -417,7 +417,7 @@ static igraph_error_t add_one_to_size(igraph_strvector_t *sv, igraph_integer_t o
         igraph_integer_t new_size;
         new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
         if (old_size == IGRAPH_INTEGER_MAX) {
-            IGRAPH_ERROR("Cannot add to strvector, already at maximum size.", IGRAPH_EOVERFLOW);
+            IGRAPH_ERROR("Cannot add to string vector, already at maximum size.", IGRAPH_EOVERFLOW);
         }
 
         if (new_size == 0) {
@@ -460,7 +460,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_push_back_len
+ * \function igraph_strvector_push_back2
  * \brief Adds string of given length to the back of a string vector.
  *
  * \param v The string vector.
@@ -472,7 +472,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
  * length of the new string.
  */
 
-igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *sv, const char *value,
+igraph_error_t igraph_strvector_push_back2(igraph_strvector_t *sv, const char *value,
         igraph_integer_t len) {
     igraph_integer_t old_size;
 
@@ -583,7 +583,7 @@ igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv, igraph_integer_t
 
     tmp = IGRAPH_REALLOC(sv->stor_begin, capacity, char *);
     if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot reserve space for string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     sv->end = tmp + (sv->end - sv->stor_begin);
