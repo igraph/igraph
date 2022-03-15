@@ -160,7 +160,8 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
  * Be sure that you \em don't ever call the destructor (\ref
  * igraph_vector_destroy()) on objects created by this constructor.
  * \param v Pointer to an uninitialized \type igraph_vector_t object.
- * \param data Pointer, the C array. It may not be \c NULL.
+ * \param data Pointer, the C array. It may not be \c NULL, except
+ *     when \p length is zero.
  * \param length The length of the C array.
  * \return Pointer to the vector object, the same as the
  *     \p v parameter, for convenience.
@@ -170,9 +171,17 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
 
 const TYPE(igraph_vector)*FUNCTION(igraph_vector, view) (const TYPE(igraph_vector) *v,
         const BASE *data, igraph_integer_t length) {
+    const static BASE dummy;
     TYPE(igraph_vector) *v2 = (TYPE(igraph_vector)*)v;
 
-    IGRAPH_ASSERT(data != 0);
+    /* When the length is zero, we allow 'data' to be NULL.
+     * An igraph_vector_t may never contain a NULL pointer,
+     * thus we use a pointer to a dummy variable in this case. */
+    if (length == 0) {
+        data = &dummy;
+    } else {
+        IGRAPH_ASSERT(data != NULL);
+    }
 
     v2->stor_begin = (BASE*)data;
     v2->stor_end = (BASE*)data + length;

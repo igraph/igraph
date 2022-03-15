@@ -604,6 +604,7 @@
     and edge-switching MCMC sampler.
  - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
  - igraph functions that take an ARPACK options object now also accept `NULL` in place of an options object, and they will fall back to using a default object provided by `igraph_arpack_options_get_default()`.
+ - `igraph_vector_view()` now allows `data` to be `NULL` in the special case when `length == 0`.
 
 ### Fixed
 
