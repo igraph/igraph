@@ -118,7 +118,7 @@ igraph_full_citation:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
 
 igraph_atlas:
-    PARAMS: OUT GRAPH graph, INT number=0
+    PARAMS: OUT GRAPH graph, INTEGER number=0
 
 igraph_extended_chordal_ring:
     PARAMS: OUT GRAPH graph, INTEGER nodes, MATRIX_INT W, BOOLEAN directed=False
@@ -1522,7 +1522,7 @@ igraph_read_graph_pajek:
     PARAMS: OUT GRAPH graph, INFILE instream
 
 igraph_read_graph_graphml:
-    PARAMS: OUT GRAPH graph, INFILE instream, INT index=0
+    PARAMS: OUT GRAPH graph, INFILE instream, INTEGER index=0
 
 igraph_read_graph_dimacs_flow:
     PARAMS: |-
