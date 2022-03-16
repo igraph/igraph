@@ -47,8 +47,8 @@ static int code_cmp(void *graph, const void *va, const void *vb) {
     const igraph_real_t *b = (const igraph_real_t *) vb;
     const long int no_of_nodes = igraph_vcount((igraph_t *) graph);
     const igraph_bool_t directed = igraph_is_directed((igraph_t *) graph);
-    igraph_real_t codea = CODE(a[0], a[1]);
-    igraph_real_t codeb = CODE(b[0], b[1]);
+    const igraph_real_t codea = CODE(a[0], a[1]);
+    const igraph_real_t codeb = CODE(b[0], b[1]);
     if (codea < codeb) {
         return -1;
     } else if (codea > codeb) {
@@ -72,11 +72,12 @@ static void sort_edges(igraph_vector_t *edges, const igraph_t *graph) {
  *
  * \param old_graph The original graph.
  * \param new_graph The new graph will be stored here.
- * \param corr A scalar in the unit interval, the target Pearson
- *        correlation between the adjacency matrices of the original the
+ * \param corr A scalar in the unit interval [0,1], the target Pearson
+ *        correlation between the adjacency matrices of the original and the
  *        generated graph (the adjacency matrix being used as a vector).
  * \param p A numeric scalar, the probability of an edge between two
- *        vertices, it must in the open (0,1) interval.
+ *        vertices, it must in the open (0,1) interval. Typically,
+ *        the density of \p old_graph.
  * \param permutation A permutation to apply to the vertices of the
  *        generated graph. It can also be a null pointer, in which case
  *        the vertices will not be permuted.
@@ -105,17 +106,15 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
     igraph_real_t next_e, next_a, next_d;
     long int i;
 
-    if (corr < -1 || corr > 1) {
-        IGRAPH_ERROR("Correlation must be in [-1,1] in correlated "
-                     "Erdos-Renyi game", IGRAPH_EINVAL);
+    if (corr < 0 || corr > 1) {
+        IGRAPH_ERROR("Correlation must be in [0,1] in correlated Erdos-Renyi game.", IGRAPH_EINVAL);
     }
     if (p <= 0 || p >= 1) {
-        IGRAPH_ERROR("Edge probability must be in (0,1) in correlated "
-                     "Erdos-Renyi game", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Edge probability must be in (0,1) in correlated Erdos-Renyi game.", IGRAPH_EINVAL);
     }
     if (permutation) {
         if (igraph_vector_size(permutation) != no_of_nodes) {
-            IGRAPH_ERROR("Invalid permutation length in correlated Erdos-Renyi game",
+            IGRAPH_ERROR("Invalid permutation length in correlated Erdos-Renyi game.",
                          IGRAPH_EINVAL);
         }
     }
