@@ -48,7 +48,7 @@
 /**
  * \ingroup strvector
  * \function igraph_strvector_init
- * \brief Initialize
+ * \brief Initializes a string vector.
  *
  * Reserves memory for the string vector, a string vector must be
  * first initialized before calling other functions on it.
@@ -91,7 +91,7 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t si
 /**
  * \ingroup strvector
  * \function igraph_strvector_destroy
- * \brief Free allocated memory
+ * \brief Frees the memory allocated for the string vector.
  *
  * Destroy a string vector. It may be reinitialized with \ref
  * igraph_strvector_init() later.
@@ -114,7 +114,7 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
 /**
  * \ingroup strvector
  * \function igraph_strvector_get
- * \brief Indexing
+ * \brief Retrieves an element of the string vector.
  *
  * Query an element of a string vector. See also the \ref STR macro
  * for an easier way.
@@ -134,7 +134,7 @@ char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
 /**
  * \ingroup strvector
  * \function igraph_strvector_set
- * \brief Sets an element from a string
+ * \brief Sets an element of the string vector from a string.
  *
  * The provided \p value is copied into the \p idx position in the
  * string vector.
@@ -155,7 +155,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
 /**
  * \ingroup strvector
  * \function igraph_strvector_set_len
- * \brief Sets an element given a buffer and its size
+ * \brief Sets an element of the string vector given a buffer and its size.
  *
  * This is almost the same as \ref igraph_strvector_set, but the new
  * value is not a zero terminated string, but its length is given.
@@ -282,7 +282,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
 
 /**
  * \function igraph_strvector_append
- * Concatenate two string vectors.
+ * \brief Concatenates two string vectors.
  *
  * \param to The first string vector, the result is stored here.
  * \param from The second string vector, it is kept unchanged.
@@ -323,7 +323,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
 
 /**
  * \function igraph_strvector_clear
- * Remove all elements
+ * \brief Removes all elements from a string vector.
  *
  * After this operation the string vector will be empty.
  * \param sv The string vector.
@@ -344,7 +344,7 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
 /**
  * \ingroup strvector
  * \function igraph_strvector_resize
- * \brief Resize a string vector.
+ * \brief Resizes a string vector.
  *
  * If the new size is bigger then empty strings are added, if it is
  * smaller then the unneeded elements are removed.
@@ -391,7 +391,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t *sv, igraph_integer_t 
 /**
  * \ingroup strvector
  * \function igraph_strvector_capacity
- * \brief Gives the capacity of a string vector.
+ * \brief Returns the capacity of a string vector.
  *
  * \param sv The string vector.
  * \return The capacity of the string vector.
@@ -455,7 +455,7 @@ igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv, igraph_integer_t
 /**
  * \ingroup strvector
  * \function igraph_strvector_size
- * \brief Gives the size of a string vector.
+ * \brief Returns the size of a string vector.
  *
  * \param sv The string vector.
  * \return The length of the string vector.
@@ -519,7 +519,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
 /**
  * \ingroup strvector
  * \function igraph_strvector_push_back_len
- * \brief Adds string of given length to the back of a string vector.
+ * \brief Adds a string of the given length to the back of a string vector.
  *
  * \param v The string vector.
  * \param value The start of the string to add. At most \p len characters will be copied.
