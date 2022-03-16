@@ -14,13 +14,15 @@
 <!-- doxrox-include STR -->
 <!-- doxrox-include igraph_strvector_get -->
 <!-- doxrox-include igraph_strvector_set -->
-<!-- doxrox-include igraph_strvector_set2 -->
+<!-- doxrox-include igraph_strvector_set_len -->
+<!-- doxrox-include igraph_strvector_push_back -->
+<!-- doxrox-include igraph_strvector_push_back_len -->
 <!-- doxrox-include igraph_strvector_remove -->
 <!-- doxrox-include igraph_strvector_append -->
 <!-- doxrox-include igraph_strvector_clear -->
 <!-- doxrox-include igraph_strvector_resize -->
+<!-- doxrox-include igraph_strvector_reserve -->
 <!-- doxrox-include igraph_strvector_size -->
-<!-- doxrox-include igraph_strvector_push_back -->
 
 <section id="igraph-Strvector-deprecated">
 <title>Deprecated functions</title>

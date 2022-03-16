@@ -161,7 +161,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_set2
+ * \function igraph_strvector_set_len
  * \brief Sets an element.
  *
  * This is almost the same as \ref igraph_strvector_set, but the new
@@ -175,7 +175,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
  * Time complexity: O(l), the length of the new string. Maybe more,
  * depending on the memory management, if reallocation is needed.
  */
-igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_integer_t idx,
+igraph_error_t igraph_strvector_set_len(igraph_strvector_t *sv, igraph_integer_t idx,
                           const char *value, size_t len) {
     char *tmp;
 
@@ -511,7 +511,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_push_back2
+ * \function igraph_strvector_push_back_len
  * \brief Adds string of given length to the back of a string vector.
  *
  * \param v The string vector.
@@ -523,7 +523,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
  * length of the new string.
  */
 
-igraph_error_t igraph_strvector_push_back2(igraph_strvector_t *sv, const char *value,
+igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *sv, const char *value,
         igraph_integer_t len) {
     igraph_integer_t old_size;
 
