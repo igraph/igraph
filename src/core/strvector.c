@@ -396,6 +396,58 @@ igraph_integer_t igraph_strvector_capacity(const igraph_strvector_t *sv) {
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_reserve
+ * \brief Reserves memory for a string vector.
+ *
+ * </para><para>
+ * \a igraph string vectors are flexible, they can grow and
+ * shrink. Growing
+ * however occasionally needs the data in the vector to be copied.
+ * In order to avoid this, you can call this function to reserve space for
+ * future growth of the vector.
+ *
+ * </para><para>
+ * Note that this function does \em not change the size of the
+ * string vector. Let us see a small example to clarify things: if you
+ * reserve space for 100 strings and the size of your
+ * vector was (and still is) 60, then you can surely add additional 40
+ * strings to your vector before it will be copied.
+ * \param sv The string vector object.
+ * \param capacity The new \em allocated size of the string vector.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, should be around
+ * O(n), n is the new allocated size of the vector.
+ */
+
+igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv, igraph_integer_t capacity) {
+    igraph_integer_t current_capacity;
+    char **tmp;
+
+    IGRAPH_ASSERT(sv != NULL);
+    IGRAPH_ASSERT(sv->stor_begin != NULL);
+
+    current_capacity = igraph_strvector_capacity(sv);
+
+    if (capacity <= current_capacity) {
+        return IGRAPH_SUCCESS;
+    }
+
+    tmp = IGRAPH_REALLOC(sv->stor_begin, capacity, char *);
+    if (tmp == 0) {
+        IGRAPH_ERROR("Cannot reserve space for string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    }
+
+    sv->end = tmp + (sv->end - sv->stor_begin);
+    sv->stor_begin = tmp;
+    sv->stor_end = sv->stor_begin + capacity;
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
  * \function igraph_strvector_size
  * \brief Gives the size of a string vector.
  *
@@ -536,58 +588,6 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *sv,
         char *str = igraph_strvector_get(sv, j);
         igraph_strvector_set(newv, i, str);
     }
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup strvector
- * \function igraph_strvector_reserve
- * \brief Reserves memory for a string vector.
- *
- * </para><para>
- * \a igraph string vectors are flexible, they can grow and
- * shrink. Growing
- * however occasionally needs the data in the vector to be copied.
- * In order to avoid this, you can call this function to reserve space for
- * future growth of the vector.
- *
- * </para><para>
- * Note that this function does \em not change the size of the
- * string vector. Let us see a small example to clarify things: if you
- * reserve space for 100 strings and the size of your
- * vector was (and still is) 60, then you can surely add additional 40
- * strings to your vector before it will be copied.
- * \param sv The string vector object.
- * \param capacity The new \em allocated size of the string vector.
- * \return Error code:
- *         \c IGRAPH_ENOMEM if there is not enough memory.
- *
- * Time complexity: operating system dependent, should be around
- * O(n), n is the new allocated size of the vector.
- */
-
-igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv, igraph_integer_t capacity) {
-    igraph_integer_t current_capacity;
-    char **tmp;
-
-    IGRAPH_ASSERT(sv != NULL);
-    IGRAPH_ASSERT(sv->stor_begin != NULL);
-
-    current_capacity = igraph_strvector_capacity(sv);
-
-    if (capacity <= current_capacity) {
-        return IGRAPH_SUCCESS;
-    }
-
-    tmp = IGRAPH_REALLOC(sv->stor_begin, capacity, char *);
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-
-    sv->end = tmp + (sv->end - sv->stor_begin);
-    sv->stor_begin = tmp;
-    sv->stor_end = sv->stor_begin + capacity;
 
     return IGRAPH_SUCCESS;
 }
