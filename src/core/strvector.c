@@ -211,19 +211,29 @@ igraph_error_t igraph_strvector_set_len(igraph_strvector_t *sv, igraph_integer_t
 
 void igraph_strvector_remove_section(
         igraph_strvector_t *sv, igraph_integer_t from, igraph_integer_t to) {
+    igraph_integer_t size = igraph_strvector_size(sv);
     igraph_integer_t i;
 
     IGRAPH_ASSERT(sv != NULL);
     IGRAPH_ASSERT(sv->stor_begin != NULL);
 
-    for (i = from; i < to; i++) {
-        IGRAPH_FREE(sv->stor_begin[i]);
-    }
-    for (char **p = sv->stor_begin; p < sv->end - to; p++) {
-        p[from] = p[to];
+    if (from < 0) {
+        from = 0;
     }
 
-    sv->end -= (to - from);
+    if (to > size) {
+        to = size;
+    }
+
+    if (to > from) {
+        for (i = from; i < to; i++) {
+            IGRAPH_FREE(sv->stor_begin[i]);
+        }
+
+        memmove(sv->stor_begin + from, sv->stor_begin + to,
+                sizeof(char*) * (sv->end - sv->stor_begin - to));
+        sv->end -= (to - from);
+    }
 }
 
 /**

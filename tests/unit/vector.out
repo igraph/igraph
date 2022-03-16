@@ -26,6 +26,9 @@ Test igraph_vector_init_seq, igraph_vector_sum, igraph_vector_prod
  15 120
 Test igraph_vector_remove_section
 ( 1 2 5 )
+Test igraph_vector_remove_section with invalid limits
+( 1 2 5 )
+( 1 )
 Test igraph_vector_remove
 ( 2 3 4 5 7 8 9 )
 Test igraph_vector_remove_fast
