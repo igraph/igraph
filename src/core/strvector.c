@@ -298,20 +298,26 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     igraph_integer_t len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
     igraph_integer_t i;
     igraph_bool_t error = 0;
+    char* tmp;
+
     IGRAPH_CHECK(igraph_strvector_reserve(to, len1 + len2));
+
     for (i = 0; i < len2; i++) {
-        if (from->stor_begin[i][0] != '\0') {
-            to->stor_begin[len1 + i] = strdup(from->stor_begin[i]);
-            if (!to->stor_begin[len1 + i]) {
-                error = 1;
-                break;
-            }
+        tmp = strdup(from->stor_begin[i]);
+        if (!tmp) {
+            error = 1;
+            break;
+        } else {
+            *(to->end) = tmp;
+            to->end++;
         }
     }
+
     if (error) {
-        igraph_strvector_resize(to, len1);
+        igraph_strvector_resize(to, len1); /* always shrinks */
         IGRAPH_ERROR("Cannot append string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
+
     return IGRAPH_SUCCESS;
 }
 
