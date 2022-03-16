@@ -174,11 +174,6 @@ igraph_error_t igraph_strvector_set_len(igraph_strvector_t *sv, igraph_integer_t
 
     IGRAPH_ASSERT(sv != NULL);
     IGRAPH_ASSERT(sv->stor_begin != NULL);
-
-    if (idx < 0 || idx >= sv->stor_end - sv->stor_begin) {
-        IGRAPH_FATAL("String vector index out of bounds.");
-    }
-
     IGRAPH_ASSERT(sv->stor_begin[idx] != NULL);
 
     tmp = IGRAPH_REALLOC(sv->stor_begin[idx], len + 1, char);
