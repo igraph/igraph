@@ -624,6 +624,9 @@
    for sake of consistency with other vector-like data structures; the old name
    is deprecated and will be removed in 0.11.
 
+ - `igraph_strvector_set2()` has been renamed to `igraph_strvector_set_len()`;
+   the old name is deprecated and will be removed in 0.11.
+
  - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
    deprecated and will be removed in 0.11.
 

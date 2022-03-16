@@ -551,6 +551,20 @@ igraph_error_t igraph_strvector_add(igraph_strvector_t *sv, const char *value) {
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_set2
+ * \brief Sets an element of the string vector given a buffer and its size (deprecated alias).
+ *
+ * \deprecated-by igraph_strvector_set_len 0.10.0
+ */
+
+igraph_error_t igraph_strvector_set2(
+    igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len
+) {
+    return igraph_strvector_set_len(sv, idx, value, len);
+}
+
+/**
+ * \ingroup strvector
  * \function igraph_strvector_print
  * \brief Prints a string vector.
  *

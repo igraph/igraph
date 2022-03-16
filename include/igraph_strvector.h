@@ -71,6 +71,9 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_set(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_set_len(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_set2(
+    igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len
+);
 IGRAPH_EXPORT void igraph_strvector_clear(igraph_strvector_t *sv);
 IGRAPH_EXPORT void igraph_strvector_remove_section(
     igraph_strvector_t *v, igraph_integer_t from, igraph_integer_t to);
