@@ -297,9 +297,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 void igraph_adjlist_destroy(igraph_adjlist_t *al) {
     long int i;
     for (i = 0; i < al->length; i++) {
-        if (&al->adjs[i]) {
-            igraph_vector_int_destroy(&al->adjs[i]);
-        }
+        igraph_vector_int_destroy(&al->adjs[i]);
     }
     IGRAPH_FREE(al->adjs);
 }
