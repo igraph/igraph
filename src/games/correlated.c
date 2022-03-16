@@ -26,8 +26,9 @@
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_random.h"
 #include "igraph_qsort.h"
+#include "igraph_random.h"
+#include "igraph_structural.h"
 
 #include "core/interruption.h"
 
@@ -68,9 +69,9 @@ static void sort_edges(igraph_vector_t *edges, const igraph_t *graph) {
  * \brief Generates a random graph correlated to an existing graph.
  *
  * Sample a new graph by perturbing the adjacency matrix of a
- * given graph and shuffling its vertices.
+ * given simple graph and shuffling its vertices.
  *
- * \param old_graph The original graph.
+ * \param old_graph The original graph, it must be simple.
  * \param new_graph The new graph will be stored here.
  * \param corr A scalar in the unit interval [0,1], the target Pearson
  *        correlation between the adjacency matrices of the original and the
@@ -105,18 +106,26 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
     igraph_real_t inf = IGRAPH_INFINITY;
     igraph_real_t next_e, next_a, next_d;
     long int i;
+    igraph_bool_t simple;
 
     if (corr < 0 || corr > 1) {
-        IGRAPH_ERROR("Correlation must be in [0,1] in correlated Erdos-Renyi game.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Correlation must be in [0,1] in correlated Erdos-Renyi game, got %g.",
+                      IGRAPH_EINVAL, corr);
     }
     if (p <= 0 || p >= 1) {
-        IGRAPH_ERROR("Edge probability must be in (0,1) in correlated Erdos-Renyi game.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Edge probability must be in (0,1) in correlated Erdos-Renyi game, got %g.",
+                      IGRAPH_EINVAL, p);
     }
     if (permutation) {
         if (igraph_vector_size(permutation) != no_of_nodes) {
             IGRAPH_ERROR("Invalid permutation length in correlated Erdos-Renyi game.",
                          IGRAPH_EINVAL);
         }
+    }
+    IGRAPH_CHECK(igraph_is_simple(old_graph, &simple));
+    if (! simple) {
+        IGRAPH_ERROR("The original graph must be simple for correlated Erdos-Renyi game.",
+                     IGRAPH_EINVAL);
     }
 
     /* Special cases */
