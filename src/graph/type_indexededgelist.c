@@ -26,6 +26,7 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
+#include "graph/caching.h"
 #include "graph/neighbors.h"
 #include "math/safe_intop.h"
 
@@ -99,6 +100,15 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->os, 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->is, 1);
 
+    /* init cache */
+    graph->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    if (! graph->cache) {
+        IGRAPH_ERROR("Cannot create graph.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, graph->cache);
+    IGRAPH_CHECK(igraph_i_property_cache_init(graph->cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, graph->cache);
+
     VECTOR(graph->os)[0] = 0;
     VECTOR(graph->is)[0] = 0;
 
@@ -109,7 +119,7 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     /* add the vertices */
     IGRAPH_CHECK(igraph_add_vertices(graph, n, 0));
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
 }
 
@@ -132,6 +142,9 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
 void igraph_destroy(igraph_t *graph) {
 
     IGRAPH_I_ATTRIBUTE_DESTROY(graph);
+
+    igraph_i_property_cache_destroy(graph->cache);
+    IGRAPH_FREE(graph->cache);
 
     igraph_vector_int_destroy(&graph->from);
     igraph_vector_int_destroy(&graph->to);
@@ -183,9 +196,17 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     IGRAPH_CHECK(igraph_vector_int_copy(&to->is, &from->is));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->is);
 
+    to->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    if (! to->cache) {
+        IGRAPH_ERROR("Cannot copy graph.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, to->cache);
+    IGRAPH_CHECK(igraph_i_property_cache_copy(to->cache, from->cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, to->cache);
+
     IGRAPH_I_ATTRIBUTE_COPY(to, from, 1, 1, 1); /* does IGRAPH_CHECK */
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
 }
 
@@ -605,10 +626,18 @@ igraph_error_t igraph_delete_vertices_idx(
     IGRAPH_CHECK(igraph_i_create_start(&newgraph.is, &newgraph.to,
                                        &newgraph.ii, remaining_vertices));
 
+    newgraph.cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    if (! newgraph.cache) {
+        IGRAPH_ERROR("Cannot delete vertices.", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, newgraph.cache);
+    IGRAPH_CHECK(igraph_i_property_cache_init(newgraph.cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, newgraph.cache);
+
     /* attributes */
     IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph,
                             /*graph=*/ 1, /*vertex=*/0, /*edge=*/0);
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(8);
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
     if (newgraph.attr) {

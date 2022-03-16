@@ -30,6 +30,18 @@
 
 __BEGIN_DECLS
 
+struct igraph_i_property_cache_t;
+typedef struct igraph_i_property_cache_t igraph_i_property_cache_t;
+
+typedef enum {
+    IGRAPH_PROP_HAS_LOOP = 0,        /* self-loops */
+    IGRAPH_PROP_HAS_MULTI,           /* multi-edges */
+    IGRAPH_PROP_HAS_RECIPROCAL,      /* reciprocal edges, valid in directed graph only */
+    IGRAPH_PROP_WEAKLY_CONNECTED,    /* weakly connected */
+    IGRAPH_PROP_STRONGLY_CONNECTED,  /* strongly connected */
+    IGRAPH_PROP_I_LAST               /* dummy value used to count enum values */
+} igraph_property_t;
+
 /**
  * \ingroup internal
  * \struct igraph_t
@@ -79,6 +91,7 @@ typedef struct igraph_s {
     igraph_vector_int_t os;
     igraph_vector_int_t is;
     void *attr;
+    igraph_i_property_cache_t *cache;
 } igraph_t;
 
 __END_DECLS

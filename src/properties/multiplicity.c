@@ -104,6 +104,8 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t ec = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
+    IGRAPH_TRY_CACHE(graph, IGRAPH_PROP_HAS_MULTI, res);
+
     if (vc == 0 || ec == 0) {
         *res = 0;
     } else {
@@ -136,6 +138,8 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
+    igraph_i_property_cache_set(graph, IGRAPH_PROP_HAS_MULTI, *res);
 
     return IGRAPH_SUCCESS;
 }
