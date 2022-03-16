@@ -26,11 +26,6 @@ int main() {
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    printf("No place to put the string.\n");
-    igraph_strvector_init(&sv, 0);
-    IGRAPH_ASSERT(igraph_strvector_set_len(&sv, 0, test_string, strlen(test_string)) == IGRAPH_EINVAL);
-    igraph_strvector_destroy(&sv);
-
     printf("Two strings in a vector.\n");
     igraph_strvector_init(&sv, 5);
     IGRAPH_ASSERT(igraph_strvector_set_len(&sv, 0, test_string, strlen(test_string)) == IGRAPH_SUCCESS);
