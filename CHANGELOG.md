@@ -694,6 +694,8 @@
  - Negative values returned by `igraph_rng_get_integer()` and `RNG_INTEGER()` were incorrect,
    one larger than they should have been.
  - `igraph_community_walktrap()` now checks its `steps` input argument.
+ - `igraph_correlated_game()` would return incorrect results, or exhaust the memory,
+    for most input graphs that were not generated with `igraph_erdos_renyi_game_gnp()`.
 
 ### Other
 
