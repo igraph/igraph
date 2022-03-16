@@ -61,19 +61,25 @@
  */
 
 igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t size) {
-    igraph_integer_t i;
+    igraph_integer_t i, j;
+
     sv->stor_begin = IGRAPH_CALLOC(size, char*);
     if (sv->stor_begin == NULL) {
         IGRAPH_ERROR("String vector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
+
     for (i = 0; i < size; i++) {
         sv->stor_begin[i] = IGRAPH_CALLOC(1, char);
         if (sv->stor_begin[i] == NULL) {
-            igraph_strvector_destroy(sv);
+            for (j = 0; j < i; j++) {
+                IGRAPH_FREE(sv->stor_begin[j]);
+            }
+            IGRAPH_FREE(sv->stor_begin);
             IGRAPH_ERROR("String vector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         sv->stor_begin[i][0] = '\0';
     }
+
     sv->stor_end = sv->stor_begin + size;
     sv->end = sv->stor_end;
 
@@ -126,7 +132,7 @@ char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
 /**
  * \ingroup strvector
  * \function igraph_strvector_set
- * \brief Set an element
+ * \brief Sets an element from a string
  *
  * The provided \p value is copied into the \p idx position in the
  * string vector.
@@ -162,7 +168,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
 /**
  * \ingroup strvector
  * \function igraph_strvector_set_len
- * \brief Sets an element.
+ * \brief Sets an element given a buffer and its size
  *
  * This is almost the same as \ref igraph_strvector_set, but the new
  * value is not a zero terminated string, but its length is given.
@@ -364,7 +370,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t *sv, igraph_integer_t 
             if (sv->stor_begin[oldsize + i] == NULL) {
                 /* LCOV_EXCL_START */
                 for (j = 0; j < i; j++) {
-                    IGRAPH_FREE(sv->stor_begin[oldsize + i]);
+                    IGRAPH_FREE(sv->stor_begin[oldsize + j]);
                 }
                 IGRAPH_ERROR("Cannot resize string vector.", IGRAPH_ENOMEM);
                 /* LCOV_EXCL_STOP */
