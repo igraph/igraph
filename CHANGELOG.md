@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [0.9.7] - 2022-03-16
 
 ### Changed
 
@@ -23,6 +23,8 @@
  - Negative values returned by `igraph_rng_get_integer()` and `RNG_INTEGER()` were incorrect,
    one larger than they should have been.
  - `igraph_community_walktrap()` now checks its `steps` input argument.
+ - The first modularity value reported by `igraph_community_walktrap()` was
+   incorrect (it was always zero). This is now fixed.
  - `igraph_correlated_game()` would return incorrect results, or exhaust the memory,
     for most input graphs that were not generated with `igraph_erdos_renyi_game_gnp()`.
 
@@ -550,7 +552,8 @@
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.6..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.7..HEAD
+[0.9.7]: https://github.com/igraph/igraph/compare/0.9.6...0.9.7
 [0.9.6]: https://github.com/igraph/igraph/compare/0.9.5...0.9.6
 [0.9.5]: https://github.com/igraph/igraph/compare/0.9.4...0.9.5
 [0.9.4]: https://github.com/igraph/igraph/compare/0.9.3...0.9.4
