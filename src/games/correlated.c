@@ -27,8 +27,41 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
+#include "igraph_qsort.h"
 
 #include "core/interruption.h"
+
+/* The "code" of an edge is a single index representing its location in the adjacency matrix,
+ * More specifically, the relevant parts of the adjacency matrix (i.e. non-diagonal in directed,
+ * upper triangular in undirecred) are column-wise concatenated into an array. The "code" is
+ * the index in this array. We use floating point numbers for the code, as it can easily
+ * exceed integers representable on 32 bits.
+ */
+#define D_CODE(f,t) (((t)==no_of_nodes-1 ? (f) : (t)) * no_of_nodes + (f))
+#define U_CODE(f,t) ((t) * ((t)-1) / 2 + (f))
+#define CODE(f,t) (directed ? D_CODE((double)(f),(double)(t)) : U_CODE((double)(f),(double)(t)))
+
+/* TODO: Slight speedup may be possible if repeated vertex count queries are avoided. */
+static int code_cmp(void *graph, const void *va, const void *vb) {
+    const igraph_real_t *a = (const igraph_real_t *) va;
+    const igraph_real_t *b = (const igraph_real_t *) vb;
+    const long int no_of_nodes = igraph_vcount((igraph_t *) graph);
+    const igraph_bool_t directed = igraph_is_directed((igraph_t *) graph);
+    igraph_real_t codea = CODE(a[0], a[1]);
+    igraph_real_t codeb = CODE(b[0], b[1]);
+    if (codea < codeb) {
+        return -1;
+    } else if (codea > codeb) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+/* Sort an edge vector by edge codes. */
+static void sort_edges(igraph_vector_t *edges, const igraph_t *graph) {
+    igraph_qsort_r(VECTOR(*edges), igraph_vector_size(edges) / 2, 2*sizeof(igraph_real_t), (void *) graph, code_cmp);
+}
 
 /**
  * \function igraph_correlated_game
@@ -117,6 +150,11 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
     IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
+    /* The samping method used is analogous to the one in igraph_erdos_renyi_game_gnp(),
+     * and assumes that the edge list of the old graph is in order of increasing "codes".
+     * Even IGRAPH_EDGEORDER_TO does not guarantee this, therefore we sort explicitly.
+     */
+    sort_edges(&edges, old_graph);
 
     RNG_BEGIN();
 
@@ -142,8 +180,6 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
 
     RNG_END();
 
-    IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
-
     /* Now we are merging the original edges, the edges that are removed,
        and the new edges. We have the following pointers:
        - p_a: the next edge to add
@@ -153,9 +189,6 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
        - next_a: the code of the next edge to add
        - next_d: the code of the next edge to delete */
 
-#define D_CODE(f,t) (((t)==no_of_nodes-1 ? f : t) * no_of_nodes + (f))
-#define U_CODE(f,t) ((t) * ((t)-1) / 2 + (f))
-#define CODE(f,t) (directed ? D_CODE(f,t) : U_CODE(f,t))
 #define CODEE() (CODE(VECTOR(edges)[2*p_e], VECTOR(edges)[2*p_e+1]))
 
     /* First we (re)code the edges to delete */
@@ -203,6 +236,7 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
 
             /* add an edge */
             long int to, from;
+            IGRAPH_ASSERT(igraph_finite(next_a));
             if (directed) {
                 to = (long int) floor(next_a / no_of_nodes);
                 from = (long int) (next_a - ((igraph_real_t)to) * no_of_nodes);
