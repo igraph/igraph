@@ -475,19 +475,26 @@ igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
     return sv->end - sv->stor_begin;
 }
 
-static igraph_error_t add_one_to_size(igraph_strvector_t *sv, igraph_integer_t old_size) {
-    if (sv->end == sv->stor_end) {
-        igraph_integer_t new_size;
-        new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
-        if (old_size == IGRAPH_INTEGER_MAX) {
-            IGRAPH_ERROR("Cannot add to string vector, already at maximum size.", IGRAPH_EOVERFLOW);
-        }
+/**
+ * Ensures that the vector has at least one extra slot at the end of its
+ * allocated storage area.
+ */
+static igraph_error_t igraph_i_strvector_expand_if_full(igraph_strvector_t *sv) {
+    IGRAPH_ASSERT(sv != NULL);
+    IGRAPH_ASSERT(sv->stor_begin != NULL);
 
+    if (sv->stor_end == sv->end) {
+        igraph_integer_t old_size = igraph_strvector_size(sv);
+        igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot add new item to string vector, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
         if (new_size == 0) {
             new_size = 1;
         }
         IGRAPH_CHECK(igraph_strvector_reserve(sv, new_size));
     }
+
     return IGRAPH_SUCCESS;
 }
 
@@ -511,7 +518,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
     IGRAPH_ASSERT(sv->stor_begin != NULL);
 
     old_size = igraph_strvector_size(sv);
-    IGRAPH_CHECK(add_one_to_size(sv, old_size));
+    IGRAPH_CHECK(igraph_i_strvector_expand_if_full(sv));
     sv->stor_begin[old_size] = strdup(value);
     if (sv->stor_begin[old_size] == NULL) {
         IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -543,7 +550,7 @@ igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *sv, const char
     IGRAPH_ASSERT(sv->stor_begin != NULL);
 
     old_size = igraph_strvector_size(sv);
-    IGRAPH_CHECK(add_one_to_size(sv, old_size));
+    IGRAPH_CHECK(igraph_i_strvector_expand_if_full(sv));
     sv->stor_begin[old_size] = strndup(value, len);
     if (sv->stor_begin[old_size] == NULL) {
         IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
