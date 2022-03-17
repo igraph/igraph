@@ -467,6 +467,36 @@ igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv, igraph_integer_t
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_resize_min
+ * \brief Deallocates the unused memory of a string vector.
+ *
+ * This function attempts to deallocate the unused reserved storage
+ * of a string vector. If it succeeds, \ref igraph_strvector_size() and
+ * \ref igraph_strvector_capacity() will be the same. The data in the
+ * string vector is always preserved, even if deallocation is not successful.
+ *
+ * \param sv The string vector.
+ *
+ * Time complexity: Operating system dependent, at most O(n).
+ */
+
+void igraph_strvector_resize_min(igraph_strvector_t *sv) {
+    igraph_integer_t size;
+    char **tmp;
+    if (sv->stor_end == sv->end) {
+        return;
+    }
+
+    size = (sv->end - sv->stor_begin);
+    tmp = IGRAPH_REALLOC(sv->stor_begin, size, char *);
+    if (tmp != NULL) {
+        sv->stor_begin = tmp;
+        sv->stor_end = sv->end = sv->stor_begin + size;
+    }
+}
+
+/**
+ * \ingroup strvector
  * \function igraph_strvector_size
  * \brief Returns the size of a string vector.
  *
