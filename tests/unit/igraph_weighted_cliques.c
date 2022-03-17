@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
     igraph_integer_t s1, s2, i;

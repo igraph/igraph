@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Vertices/edges with the same parity match */
 igraph_bool_t compat_parity(const igraph_t *graph1,

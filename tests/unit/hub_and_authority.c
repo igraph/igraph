@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 void print_hub_and_authority(igraph_t *g, igraph_vector_t *weights, igraph_bool_t scale, igraph_bool_t use_options) {

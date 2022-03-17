@@ -1,6 +1,10 @@
 include(test_helpers)
 include(benchmark_helpers)
 
+add_library(test_utilities OBJECT unit/test_utilities.c)
+target_link_libraries(test_utilities PRIVATE igraph)
+use_all_warnings(test_utilities)
+
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
 add_custom_target(build_tests)
@@ -140,7 +144,6 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
-#  igraph_es_fromto
   igraph_vs_nonadj
   igraph_vs_seq
   igraph_vs_vector
@@ -198,7 +201,6 @@ add_legacy_tests(
   igraph_growing_random_game
   igraph_k_regular_game
   igraph_lastcit_game
-  igraph_lattice
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
@@ -208,6 +210,7 @@ add_legacy_tests(
   igraph_recent_degree_game
   igraph_sbm_game
   igraph_simple_interconnected_islands_game
+  igraph_square_lattice
   igraph_static_power_law_game
   igraph_wheel
   kary_tree
@@ -272,6 +275,7 @@ add_legacy_tests(
   igraph_count_multiple
   igraph_density
   igraph_diversity
+  igraph_distances_johnson
   igraph_eccentricity
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
@@ -297,7 +301,6 @@ add_legacy_tests(
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
-  igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
@@ -533,7 +536,6 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
-  igraph_community_fluid_communities
   igraph_community_label_propagation
   igraph_community_leading_eigenvector
   igraph_community_leiden
@@ -549,6 +551,7 @@ add_legacy_tests(
   community_label_propagation2
   community_label_propagation3
   graphlets
+  igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
@@ -839,4 +842,10 @@ add_benchmarks(
   igraph_random_walk
   igraph_transitivity
   inc_vs_adj
+)
+
+# dot product
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_sample_dirichlet
 )

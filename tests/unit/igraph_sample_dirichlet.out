@@ -1,0 +1,10 @@
+Zero vectors to sample should return empty matrix:
+
+
+Check if result vectors add up to one.
+Distribution localized at 0.5, 0.5:
+0.5 0.5
+0.5 0.5
+Check if too short parameter vector is handled correctly.
+Check if negative number of samples is handled correctly.
+Check if negative alpha is handled correctly.

@@ -31,7 +31,7 @@
 
 #include <math.h>
 
-static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids, igraph_neimode_t mode,
                            igraph_vector_t *weights);
 
@@ -191,7 +191,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids,
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {

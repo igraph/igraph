@@ -47,22 +47,43 @@ IGRAPH_EXPORT igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                                            igraph_bool_t directed,
                                            igraph_bool_t unconn);
 
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
                                         const igraph_vs_t from, const igraph_vs_t to,
                                         igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                                                      igraph_matrix_t *res,
                                                      const igraph_vs_t from,
                                                      const igraph_vs_t to,
                                                      const igraph_vector_t *weights,
                                                      igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
                                                  igraph_matrix_t *res,
                                                  const igraph_vs_t from,
                                                  const igraph_vs_t to,
                                                  const igraph_vector_t *weights,
                                                  igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_distances_johnson(const igraph_t *graph,
+                                                igraph_matrix_t *res,
+                                                const igraph_vs_t from,
+                                                const igraph_vs_t to,
+                                                const igraph_vector_t *weights);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
+                                        const igraph_vs_t from, const igraph_vs_t to,
+                                        igraph_neimode_t mode);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+                                                     igraph_matrix_t *res,
+                                                     const igraph_vs_t from,
+                                                     const igraph_vs_t to,
+                                                     const igraph_vector_t *weights,
+                                                     igraph_neimode_t mode);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
+                                                 igraph_matrix_t *res,
+                                                 const igraph_vs_t from,
+                                                 const igraph_vs_t to,
+                                                 const igraph_vector_t *weights,
+                                                 igraph_neimode_t mode);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
                                                 igraph_matrix_t *res,
                                                 const igraph_vs_t from,
                                                 const igraph_vs_t to,

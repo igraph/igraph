@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void test_density(const igraph_t *graph, igraph_bool_t loops) {
     igraph_real_t density;

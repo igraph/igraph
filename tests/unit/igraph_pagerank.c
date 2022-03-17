@@ -21,7 +21,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int is_almost_one(igraph_real_t x) {
     /* 2^5 = 32 is 5 binary digits  of tolerance */

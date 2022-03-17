@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int test_from_prufer_back_to_prufer() {
     igraph_t graph;

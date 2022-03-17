@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {

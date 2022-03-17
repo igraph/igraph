@@ -101,7 +101,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 
     igraph_indheap_t heap;
 
-    igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v));
+    IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
     IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
 
     igraph_vector_clear(v);

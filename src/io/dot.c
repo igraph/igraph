@@ -29,7 +29,7 @@
 #include "igraph_version.h"
 
 #include "graph/attributes.h"
-#include "internal/hacks.h" /* strcasecmp */
+#include "internal/hacks.h" /* strcasecmp & strdup */
 
 #include <ctype.h>
 #include <string.h>

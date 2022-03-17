@@ -233,10 +233,10 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_vector_int_destroy(&coreness);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fulladjlist);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&PX, 20);

@@ -28,7 +28,7 @@
 
 #include "core/trie.h"
 #include "graph/attributes.h"
-#include "internal/hacks.h" /* strcasecmp */
+#include "internal/hacks.h" /* strcasecmp & strdup */
 
 #include "config.h"
 
@@ -681,7 +681,11 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     }
 
     /* add to trie, attribues */
-    igraph_trie_get(trie, rec->id, &id);
+    ret = igraph_trie_get(trie, rec->id, &id);
+    if (ret) {
+        GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot read GraphML file", ret);
+        return 0;
+    }
     if (id != igraph_trie_size(trie) - 1) {
         GRAPHML_PARSE_ERROR(state, "Cannot parse GraphML file, duplicate attribute");
         return 0;
@@ -1382,7 +1386,7 @@ static void igraph_i_libxml_structured_error_handler(void* ctx, xmlErrorPtr erro
  *
  * \example examples/simple/graphml.c
  */
-igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int index) {
+igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph_integer_t index) {
 
 #if HAVE_LIBXML == 1
     xmlParserCtxtPtr ctxt;
@@ -1390,6 +1394,8 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
     void* libxml_old_generic_error_context;
     xmlStructuredErrorFunc libxml_old_structured_error_handler;
     void* libxml_old_structured_error_context;
+    xmlDocPtr doc;
+
     struct igraph_i_graphml_parser_state state;
     int res;
     char buffer[4096];
@@ -1422,7 +1428,10 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
 
     /* Create a progressive parser context and use the first 4K to detect the
      * encoding */
-    res = (int) fread(buffer, 1, 4096, instream);
+    res = (int) fread(buffer, 1, sizeof(buffer), instream);
+    if (res < sizeof(buffer) && !feof(instream)) {
+        IGRAPH_ERROR("IO error while reading GraphML data.", IGRAPH_EFILE);
+    }
     ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
                                    &state,
                                    buffer,
@@ -1456,7 +1465,13 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, int in
 
     /* Free the context */
     if (ctxt) {
+        doc = ctxt->myDoc;
         xmlFreeParserCtxt(ctxt);
+        if (doc) {
+            /* In theory this should not be necessary, but it looks like certain malformed
+             * GraphML files leave a partially-parsed doc in memory */
+            xmlFreeDoc(doc);
+        }
     } else {
         /* We could not create the context earlier so no parsing was done */
         IGRAPH_ERROR("Cannot create XML parser context", IGRAPH_FAILURE);
@@ -1712,6 +1727,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             ret = fprintf(outstream, "    <data key=\"%s%s\">", gprefix,
                           name_escaped);
             IGRAPH_FREE(name_escaped);
+            if (ret < 0) {
+                IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
+            }
             IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
             s = igraph_strvector_get(&strv, 0);
             IGRAPH_CHECK(igraph_i_xml_escape(s, &s_escaped));
@@ -1776,6 +1794,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                 ret = fprintf(outstream, "      <data key=\"%s%s\">", vprefix,
                               name_escaped);
                 IGRAPH_FREE(name_escaped);
+                if (ret < 0) {
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
+                }
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                              igraph_vss_1(l), &strv));
                 s = igraph_strvector_get(&strv, 0);

@@ -98,10 +98,10 @@ igraph_star:
 igraph_wheel:
     PARAMS: OUT GRAPH graph, INTEGER n, WHEEL_MODE mode=OUT, INTEGER center=0
 
-igraph_lattice:
+igraph_square_lattice:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
-        BOOLEAN directed=False, BOOLEAN mutual=False, BOOLEAN circular=False
+        BOOLEAN directed=False, BOOLEAN mutual=False, OPTIONAL VECTOR_BOOL periodic
 
 igraph_ring:
     PARAMS: |-
@@ -118,7 +118,7 @@ igraph_full_citation:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
 
 igraph_atlas:
-    PARAMS: OUT GRAPH graph, INT number=0
+    PARAMS: OUT GRAPH graph, INTEGER number=0
 
 igraph_extended_chordal_ring:
     PARAMS: OUT GRAPH graph, INTEGER nodes, MATRIX_INT W, BOOLEAN directed=False
@@ -312,7 +312,7 @@ igraph_hsbm_list_game:
 igraph_correlated_game:
     PARAMS: |-
         GRAPH old_graph, OUT GRAPH new_graph,
-        REAL corr, REAL p=old.graph$p, OPTIONAL INDEX_VECTOR permutation=NULL
+        REAL corr, REAL p=edge_density(old.graph), OPTIONAL INDEX_VECTOR permutation=NULL
 
 igraph_correlated_pair_game:
     PARAMS: |-
@@ -383,7 +383,7 @@ igraph_closeness_cutoff:
         BOOLEAN normalized=False, REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
-igraph_shortest_paths:
+igraph_distances:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, NEIMODE mode=OUT
@@ -405,7 +405,7 @@ igraph_get_all_shortest_paths:
         VERTEX from, VERTEXSET to, NEIMODE mode=OUT
     DEPS: edges ON graph, from ON graph, to ON graph
 
-igraph_shortest_paths_dijkstra:
+igraph_distances_dijkstra:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
@@ -442,13 +442,13 @@ igraph_get_all_shortest_paths_dijkstra:
     DEPS: |-
         weights ON graph, from ON graph, to ON graph, vertices ON graph, edges ON graph
 
-igraph_shortest_paths_bellman_ford:
+igraph_distances_bellman_ford:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
-igraph_shortest_paths_johnson:
+igraph_distances_johnson:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
         VERTEXSET to=ALL, EDGEWEIGHTS weights
@@ -635,6 +635,12 @@ igraph_neighborhood_graphs:
 igraph_topological_sorting:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, NEIMODE mode=OUT
 
+igraph_feedback_arc_set:
+    # Default algorithm is the approximate method because it is faster and the
+    # function is _not_ called igraph_minimum_feedback_arc_set
+    PARAMS: GRAPH graph, OUT EDGESET result, EDGEWEIGHTS weights=NULL, FAS_ALGORITHM algo=APPROX_EADES
+    DEPS: result ON graph, weights ON graph
+
 igraph_is_loop:
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
     DEPS: es ON graph
@@ -651,6 +657,9 @@ igraph_is_simple:
 igraph_is_multiple:
     PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
     DEPS: es ON graph
+
+igraph_has_loop:
+    PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_has_multiple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
@@ -690,6 +699,12 @@ igraph_authority_score:
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
     DEPS: weights ON graph, vector ON graph
+
+igraph_hub_and_authority_scores:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_QTY hub_vector, OUT VERTEX_QTY authority_vector,
+        OUT REAL value, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
+        INOUT ARPACKOPT options=arpack_defaults
 
 igraph_arpack_rssolve:
     # TODO(ntamas): this should probably not be exposed to higher-level
@@ -832,6 +847,14 @@ igraph_pseudo_diameter:
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
 
+igraph_pseudo_diameter_dijkstra:
+    NAME-R: pseudo_diameter
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT REAL diameter, VERTEX start_vid,
+        OUT INTEGER from=NULL, OUT INTEGER to=NULL,
+        BOOLEAN directed=True, BOOLEAN unconnected=True
+
 igraph_diversity:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEX_QTY res,
@@ -851,18 +874,18 @@ igraph_random_edge_walk:
     DEPS: start ON graph, weights ON graph, edgewalk ON graph
 
 igraph_global_efficiency:
-    PARAMS: GRAPH graph, OUT REAL res, VERTEXWEIGHTS weights=NULL, BOOLEAN directed=True
+    PARAMS: GRAPH graph, OUT REAL res, EDGEWEIGHTS weights=NULL, BOOLEAN directed=True
     DEPS: weights ON graph
 
 igraph_local_efficiency:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
-        VERTEXWEIGHTS weights=NULL, BOOLEAN directed=True, NEIMODE mode=ALL
+        EDGEWEIGHTS weights=NULL, BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_average_local_efficiency:
     PARAMS: |-
-        GRAPH graph, OUT REAL res, VERTEXWEIGHTS weights=NULL,
+        GRAPH graph, OUT REAL res, EDGEWEIGHTS weights=NULL,
         BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: weights ON graph
 
@@ -1277,7 +1300,7 @@ igraph_community_spinglass_single:
 
 igraph_community_walktrap:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGEWEIGHTS weights, INT steps=4,
+        GRAPH graph, OPTIONAL EDGEWEIGHTS weights, INTEGER steps=4,
         OUT MATRIX_INT merges, OUT VECTOR modularity, OUT VECTOR_INT membership
 
 igraph_community_edge_betweenness:
@@ -1382,7 +1405,7 @@ igraph_split_join_distance:
 igraph_community_infomap:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS e_weights=NULL,
-        VERTEXWEIGHTS v_weights=NULL, INT nb_trials=10,
+        VERTEXWEIGHTS v_weights=NULL, INTEGER nb_trials=10,
         OUT VECTOR_INT membership, OUT REAL codelength
     DEPS: e_weights ON graph, v_weights ON graph
 
@@ -1499,7 +1522,7 @@ igraph_read_graph_pajek:
     PARAMS: OUT GRAPH graph, INFILE instream
 
 igraph_read_graph_graphml:
-    PARAMS: OUT GRAPH graph, INFILE instream, INT index=0
+    PARAMS: OUT GRAPH graph, INFILE instream, INTEGER index=0
 
 igraph_read_graph_dimacs_flow:
     PARAMS: |-

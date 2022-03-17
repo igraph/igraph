@@ -27,6 +27,7 @@
 #include "igraph_error.h"
 
 #include "core/trie.h"
+#include "internal/hacks.h" /* strdup */
 
 #include "config.h"
 
@@ -77,7 +78,8 @@ igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
 static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
     igraph_integer_t i;
     igraph_strvector_destroy(&t->strs);
-    for (i = 0; i < igraph_vector_ptr_size(&t->children); i++) {
+    igraph_integer_t children_size = igraph_vector_ptr_size(&t->children);
+    for (i = 0; i < children_size; i++) {
         igraph_trie_node_t *child = VECTOR(t->children)[i];
         if (child != 0) {
             igraph_i_trie_destroy_node_helper(child, 1);
@@ -140,7 +142,8 @@ static igraph_error_t igraph_i_trie_get_node(
      * for its existence */
     add = (newvalue >= 0);
 
-    for (i = 0; i < igraph_strvector_size(&t->strs); i++) {
+    igraph_integer_t strs_size = igraph_strvector_size(&t->strs);
+    for (i = 0; i < strs_size; i++) {
         size_t diff;
         str = igraph_strvector_get(&t->strs, i);
         diff = igraph_i_strdiff(str, key);

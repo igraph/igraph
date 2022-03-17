@@ -26,6 +26,8 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
+#include "internal/hacks.h" /* strdup */
+
 #include <string.h>
 
 /* An attribute is either a numeric vector (vector_t) or a string
@@ -2567,7 +2569,7 @@ const igraph_attribute_table_t igraph_cattribute_table = {
  * <para>It is not currently possible to have attribute handlers on a
  * per-graph basis. All graphs in an application must be managed with
  * the same attribute handler. (Including the default case when there
- * is no attribute handler at all.</para>
+ * is no attribute handler at all.)</para>
  *
  * <para>The C attribute handler supports attaching real numbers and
  * character strings as attributes. No vectors are allowed, i.e. every

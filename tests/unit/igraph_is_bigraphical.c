@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define BIGRAPHICAL_PRINT_DESTROY(deg1, deg2) \
     igraph_is_bigraphical(&(deg1), &(deg2), IGRAPH_SIMPLE_SW, &simple); \

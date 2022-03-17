@@ -464,8 +464,7 @@ static bool igraph_i_lad_matchVertex(igraph_integer_t u, bool induced, Tdomain* 
        return false if an inconsistency is detected by FC(Edges) or
        FC(diff); true otherwise; */
     igraph_vector_int_t toBeMatched;
-    igraph_vector_int_init(&toBeMatched, Gp->nbVertices);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &toBeMatched);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&toBeMatched, Gp->nbVertices);
     VECTOR(toBeMatched)[0] = u;
     IGRAPH_CHECK(igraph_i_lad_matchVertices(1, &toBeMatched, induced, D, Gp, Gt,
                                &invalid));

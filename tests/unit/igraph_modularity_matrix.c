@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void test_print_destroy(igraph_t *g, igraph_vector_t *weights, float resolution, igraph_matrix_t *modmat, igraph_bool_t directed) {
     int i, j;

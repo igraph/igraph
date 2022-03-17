@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t g_0, g_1, g_simple, g_ml;

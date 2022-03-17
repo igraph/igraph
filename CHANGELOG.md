@@ -122,6 +122,10 @@
    `igraph_community_leading_eigenvector()` now use an `igraph_vector_int_t`
    for their `merges` parameter.
 
+ - `igraph_community_walktrap()` now uses `igraph_integer_t` for its `steps` argument.
+
+ - `igraph_community_infomap()` now uses `igraph_integer_t` for its `nb_trials` argument.
+
  - `igraph_community_edge_betweenness()` now uses an `igraph_vector_int_t` to
    return the edge IDs in the order of their removal as well as the list of edge
    IDs whose removal broke a single component into two.
@@ -329,8 +333,8 @@
  - The `igraph_vector_ptr_t` res parameter in `igraph_largest_weighted_cliques()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
 
- - The dimension vector parameter for `igraph_lattice()` is now an
-   `igraph_vector_int_t` instead of `igraph_vector_t`.
+ - The dimension vector parameter for `igraph_square_lattice()` (used to be
+   `igraph_lattice()`) is now an `igraph_vector_int_t` instead of `igraph_vector_t`.
 
  - The maxiter parameter of `igraph_layout_bipartite()` is now an `igraph_integer_t`
    instead of `long int`.
@@ -535,6 +539,12 @@
    argument instead of an `int`. In practice, it has always been treated as a
    boolean.
 
+ - `igraph_sparsemat_cholsol()`, `igraph_sparsemat_lusol()`, `igraph_sparsemat_symbqr`
+   and `igraph_sparsemat_symblu` now take an `igraph_integer_t` as their `order` parameter.
+
+ - `igraph_sparsemat_count_nonzero()` and `igraph_sparsemat_count_nonzerotol()` now
+   return an `igraph_integer_t`.
+
  - Functions that used an `igraph_vector_t` to represent cluster size
    and cluster membership now use an `igraph_vector_int_t` instead. These are:
    - `igraph_connected_components()` (used to be `igraph_clusters()` in 0.9 and before)
@@ -562,6 +572,16 @@
 
  - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use `IGRAPH_ALL`
    instead.
+
+ - `igraph_vector_resize_min()` and `igraph_matrix_resize_min()` no longer return an
+   error code (return type is now `void`). The vector or matrix is always left in
+   a consistent state by these functions, with all data intact, even if releasing
+   unused storage is not successful.
+
+ - `igraph_atlas()` now uses `igraph_integer_t` for its `number` argument.
+
+ - `igraph_read_graph_graphml()` now uses `igraph_integer_t` for its `index` argument.
+
 
 ### Added
 
@@ -594,6 +614,7 @@
     and edge-switching MCMC sampler.
  - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
  - igraph functions that take an ARPACK options object now also accept `NULL` in place of an options object, and they will fall back to using a default object provided by `igraph_arpack_options_get_default()`.
+ - `igraph_vector_view()` now allows `data` to be `NULL` in the special case when `length == 0`.
 
 ### Fixed
 
@@ -611,6 +632,11 @@
  - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
    the old name is deprecated and will be removed in 0.11.
 
+ - `igraph_lattice()` has been renamed to `igraph_square_lattice()` to indicate
+   that this function generates square lattices only. The old name is deprecated
+   and will either be removed in 0.11 or will be changed to become a generic
+   lattice generator that also supports other types of lattices.
+
  - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
    `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
@@ -619,6 +645,11 @@
    the old name is deprecated and might be re-used as a generic DIMACS reader
    in the future. Also, the function now uses `igraph_integer_t` as the source
    and target vertex IDs instead of a `long int`.
+
+ - `igraph_shortest_paths()` and related functions were renamed to `igraph_distances()`;
+   the old name was unfortunate because these functions calculated _path lengths_
+   only and not the paths themselves. The old names are deprecated and will be
+   removed in 0.11.
 
  - `igraph_strvector_add()` has been renamed to `igraph_strvector_push_back()`
    for sake of consistency with other vector-like data structures; the old name
@@ -649,7 +680,9 @@
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
    to simplify the API. The deprecated variants will be removed in 0.11.
 
-## [Unreleased 0.9.7]
+## [Unreleased 0.9.8]
+
+## [0.9.7] - 2022-03-16
 
 ### Changed
 
@@ -671,6 +704,11 @@
  - Fixed incorrect partition results for walktrap algorithm (issue #1927)
  - Negative values returned by `igraph_rng_get_integer()` and `RNG_INTEGER()` were incorrect,
    one larger than they should have been.
+ - `igraph_community_walktrap()` now checks its `steps` input argument.
+ - The first modularity value reported by `igraph_community_walktrap()` was
+   incorrect (it was always zero). This is now fixed.
+ - `igraph_correlated_game()` would return incorrect results, or exhaust the memory,
+    for most input graphs that were not generated with `igraph_erdos_renyi_game_gnp()`.
 
 ### Other
 
@@ -1195,7 +1233,8 @@
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.6..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.7..HEAD
+[0.9.7]: https://github.com/igraph/igraph/compare/0.9.6...0.9.7
 [0.9.6]: https://github.com/igraph/igraph/compare/0.9.5...0.9.6
 [0.9.5]: https://github.com/igraph/igraph/compare/0.9.4...0.9.5
 [0.9.4]: https://github.com/igraph/igraph/compare/0.9.3...0.9.4

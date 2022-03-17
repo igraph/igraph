@@ -1,6 +1,6 @@
 #include <igraph.h>
 #include <stdio.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 void simple_test_case_no_weights_undirected() {

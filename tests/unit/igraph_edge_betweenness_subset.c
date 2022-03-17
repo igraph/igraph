@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 /* https://github.com/igraph/igraph/issues/950 */
@@ -281,7 +281,7 @@ int main() {
         VECTOR(dims)[0] = 37;
         VECTOR(dims)[1] = 37;
 
-        igraph_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+        igraph_square_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* periodic */ 0);
 
         igraph_vector_init(&bet, 0);
         igraph_vector_int_init_seq(&target_vec, 0, igraph_vcount(&g) - 1);

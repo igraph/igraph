@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 1);
         }
         return IGRAPH_SUCCESS;
@@ -129,7 +129,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
                 *value = 0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
                 igraph_vector_fill(vector, 1);
             }
             return IGRAPH_SUCCESS;
@@ -261,7 +261,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 1);
         }
         return IGRAPH_SUCCESS;
@@ -278,7 +278,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 0);
         }
         return IGRAPH_SUCCESS;
@@ -307,7 +307,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                 *value = 0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
                 igraph_vector_fill(vector, 1);
             }
             return IGRAPH_SUCCESS;

@@ -28,7 +28,7 @@
 #include "linalg/blas_internal.h"
 #include "linalg/arpack_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         const igraph_vector_t *v,

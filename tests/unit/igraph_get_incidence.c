@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *graph, igraph_vector_bool_t *types) {
     igraph_matrix_t result;

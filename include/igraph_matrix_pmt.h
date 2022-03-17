@@ -202,7 +202,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, search)(
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, resize)(
     TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, resize_min)(
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, resize_min)(
     TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, add_cols)(
     TYPE(igraph_matrix) *m, igraph_integer_t n);

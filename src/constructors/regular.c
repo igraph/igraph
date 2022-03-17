@@ -66,7 +66,7 @@
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
+ * \sa \ref igraph_square_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_star.c
@@ -186,7 +186,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star(),
+ * \sa \ref igraph_square_lattice(), \ref igraph_ring(), \ref igraph_star(),
  * \ref igraph_kary_tree() for creating other regular structures.
  *
  */
@@ -288,6 +288,29 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
 /**
  * \ingroup generators
  * \function igraph_lattice
+ * \brief Arbitrary dimensional square lattices (deprecated).
+ *
+ * \deprecated-by igraph_square_lattice 0.10.0
+ */
+igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector,
+                   igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
+                   igraph_bool_t circular) {
+    igraph_vector_bool_t periodic;
+
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&periodic, igraph_vector_int_size(dimvector));
+    igraph_vector_bool_fill(&periodic, circular);
+
+    IGRAPH_CHECK(igraph_square_lattice(graph, dimvector, nei, directed, mutual, &periodic));
+
+    igraph_vector_bool_destroy(&periodic);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_square_lattice
  * \brief Arbitrary dimensional square lattices.
  *
  * Creates d-dimensional square lattices of the given size. Optionally,
@@ -315,20 +338,23 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
  *        higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether
  *        to create all connections as mutual.
- * \param circular Boolean, defines whether the generated lattice is
- *        periodic.
+ * \param periodic Boolean vector, defines whether the generated lattice is
+ *        periodic along each dimension. The length of this vector must match
+ *        the length of \p dimvector. This parameter may also be \c NULL, which
+ *        implies that the lattice will not be periodic.
  * \return Error code:
- *         \c IGRAPH_EINVAL: invalid (negative)
- *         dimension vector.
+ *         \c IGRAPH_EINVAL: invalid (negative) dimension vector or mismatch
+ *         between the length of the dimension vector and the periodicity vector.
  *
  * Time complexity: If \p nei is less than two then it is O(|V|+|E|) (as
  * far as I remember), |V| and |E| are the number of vertices
  * and edges in the generated graph. Otherwise it is O(|V|*d^k+|E|), d
  * is the average degree of the graph, k is the \p nei argument.
  */
-igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector,
-                   igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
-                   igraph_bool_t circular) {
+igraph_error_t igraph_square_lattice(
+    igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
+    igraph_bool_t directed, igraph_bool_t mutual, const igraph_vector_bool_t *periodic
+) {
 
     igraph_integer_t dims = igraph_vector_int_size(dimvector);
     igraph_integer_t no_of_nodes;
@@ -339,6 +365,14 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 
     if (igraph_vector_int_any_smaller(dimvector, 0)) {
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
+    }
+
+    if (periodic && igraph_vector_bool_size(periodic) != dims) {
+        IGRAPH_ERRORF(
+            "Length of periodicity vector must match the length of the "
+            "dimension vector (%" IGRAPH_PRId ").",
+            IGRAPH_EINVAL, dims
+        );
     }
 
     /* compute no. of nodes in overflow-safe manner */
@@ -375,10 +409,16 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
     }
 
+#define IS_PERIODIC(dim) ((periodic && VECTOR(*periodic)[dim]))
+
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
+
+        /* Connect the current node to the "next" node along each dimension */
         for (j = 0; j < dims; j++) {
-            if (circular || coords[j] != VECTOR(*dimvector)[j] - 1) {
+            igraph_bool_t is_periodic = IS_PERIODIC(j);
+
+            if (is_periodic|| coords[j] != VECTOR(*dimvector)[j] - 1) {
                 igraph_integer_t new_nei;
                 if (coords[j] != VECTOR(*dimvector)[j] - 1) {
                     new_nei = i + weights[j] + 1;
@@ -390,8 +430,8 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
                     igraph_vector_int_push_back(&edges, i); /* reserved */
                     igraph_vector_int_push_back(&edges, new_nei - 1); /* reserved */
                 }
-            } /* if circular || coords[j] */
-            if (mutual && directed && (circular || coords[j] != 0)) {
+            } /* if is_periodic || coords[j] */
+            if (mutual && directed && (is_periodic || coords[j] != 0)) {
                 igraph_integer_t new_nei;
                 if (coords[j] != 0) {
                     new_nei = i - weights[j] + 1;
@@ -399,11 +439,11 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
                     new_nei = i + (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
-                    (VECTOR(*dimvector)[j] != 2 || !circular)) {
+                    (VECTOR(*dimvector)[j] != 2 || !is_periodic)) {
                     igraph_vector_int_push_back(&edges, i); /* reserved */
                     igraph_vector_int_push_back(&edges, new_nei - 1); /* reserved */
                 }
-            } /* if circular || coords[0] */
+            } /* if is_periodic || coords[0] */
         } /* for j<dims */
 
         /* increase coords */

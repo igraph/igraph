@@ -113,7 +113,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
+static igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -125,7 +125,7 @@ igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
+static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -276,64 +276,6 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-/* We don't use this, it is theoretically good, but practically not.
- */
-
-/* int igraph_transitivity_local_undirected3(const igraph_t *graph, */
-/*                    igraph_vector_t *res, */
-/*                    const igraph_vs_t vids) { */
-
-/*   igraph_vit_t vit; */
-/*   igraph_integer_t nodes_to_calc; */
-/*   igraph_lazy_adjlist_t adjlist; */
-/*   igraph_integer_t i, j; */
-
-/*   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit)); */
-/*   IGRAPH_FINALLY(igraph_vit_destroy, &vit); */
-/*   nodes_to_calc=IGRAPH_VIT_SIZE(vit); */
-
-/*   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, */
-/*                    IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE)); */
-/*   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist); */
-
-/*   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc)); */
-/*   for (i=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);  */
-/*        i++, IGRAPH_VIT_NEXT(vit)) { */
-/*     igraph_integer_t node=IGRAPH_VIT_GET(vit); */
-/*     igraph_vector_int_t *neis=igraph_lazy_adjlist_get(&adjlist, node); */
-/*     igraph_integer_t n1=igraph_vector_int_size(neis); */
-/*     igraph_real_t triangles=0; */
-/*     igraph_real_t triples=(double)n1*(n1-1); */
-/*     IGRAPH_ALLOW_INTERRUPTION(); */
-/*     for (j=0; j<n1; j++) { */
-/*       igraph_integer_t node2=VECTOR(*neis)[j]; */
-/*       igraph_vector_int_t *neis2=igraph_lazy_adjlist_get(&adjlist, node2); */
-/*       igraph_integer_t n2=igraph_vector_int_size(neis2); */
-/*       igraph_integer_t l1=0, l2=0; */
-/*       while (l1 < n1 && l2 < n2) { */
-/*  igraph_integer_t nei1=VECTOR(*neis)[l1]; */
-/*  igraph_integer_t nei2=VECTOR(*neis2)[l2]; */
-/*  if (nei1 < nei2) {  */
-/*    l1++; */
-/*  } else if (nei1 > nei2) { */
-/*    l2++; */
-/*  } else { */
-/*    triangles+=1; */
-/*    l1++; l2++; */
-/*  } */
-/*       } */
-/*     } */
-/*     /\* We're done with 'node' *\/ */
-/*     VECTOR(*res)[i] = triangles / triples;   */
-/*   } */
-
-/*   igraph_lazy_adjlist_destroy(&adjlist); */
-/*   igraph_vit_destroy(&vit); */
-/*   IGRAPH_FINALLY_CLEAN(2); */
-
-/*   return IGRAPH_SUCCESS; */
-/* } */
-
 /* This removes loop, multiple edges and edges that point
      "backwards" according to the rank vector. */
 /* Note: Also used in scan.c */
@@ -368,10 +310,9 @@ igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-
 }
 
-igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
+static igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -647,11 +588,12 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_transitivity_barrat1(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         const igraph_vs_t vids,
-                                         const igraph_vector_t *weights,
-                                         igraph_transitivity_mode_t mode) {
+static igraph_error_t igraph_i_transitivity_barrat1(
+        const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vs_t vids,
+        const igraph_vector_t *weights,
+        igraph_transitivity_mode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
@@ -736,10 +678,11 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_transitivity_barrat4(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         const igraph_vector_t *weights,
-                                         igraph_transitivity_mode_t mode) {
+static igraph_error_t igraph_i_transitivity_barrat4(
+        const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vector_t *weights,
+        igraph_transitivity_mode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t order;

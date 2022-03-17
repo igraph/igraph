@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check_and_destroy(igraph_matrix_t *a, igraph_matrix_t *b, igraph_vector_int_t *ipiv,
                        igraph_bool_t transpose, igraph_error_t error) {

@@ -50,8 +50,10 @@ IGRAPH_EXPORT igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, ig
                               igraph_integer_t center);
 IGRAPH_EXPORT igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
                               igraph_integer_t center);
-IGRAPH_EXPORT igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
                                  igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t circular);
+IGRAPH_EXPORT igraph_error_t igraph_square_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
+                                 igraph_bool_t directed, igraph_bool_t mutual, const igraph_vector_bool_t *circular);
 IGRAPH_EXPORT igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                               igraph_bool_t mutual, igraph_bool_t circular);
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
@@ -64,7 +66,7 @@ IGRAPH_EXPORT igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_ve
 IGRAPH_EXPORT igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
                                        igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, int number);
+IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number);
 IGRAPH_EXPORT igraph_error_t igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
                                                const igraph_matrix_int_t *W, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);

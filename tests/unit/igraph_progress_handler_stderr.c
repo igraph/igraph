@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_progress_handler_stderr("This is a message ", 10, NULL);

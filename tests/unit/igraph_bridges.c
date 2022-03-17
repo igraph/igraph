@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void sort_and_print_vector(igraph_vector_int_t *v) {
     igraph_integer_t i, n = igraph_vector_int_size(v);

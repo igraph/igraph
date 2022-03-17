@@ -18,7 +18,6 @@
 <!-- doxrox-include igraph_rng_init -->
 <!-- doxrox-include igraph_rng_destroy -->
 <!-- doxrox-include igraph_rng_seed -->
-<!-- doxrox-include igraph_rng_min -->
 <!-- doxrox-include igraph_rng_max -->
 <!-- doxrox-include igraph_rng_name -->
 </section>

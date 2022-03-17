@@ -21,7 +21,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 #include <stdlib.h>
 
 void check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,

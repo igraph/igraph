@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void realize1(igraph_vector_int_t *ods, igraph_vector_int_t *ids, igraph_edge_type_sw_t et, igraph_realize_degseq_t method) {
     igraph_t graph;

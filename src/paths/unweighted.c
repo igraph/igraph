@@ -29,8 +29,8 @@
 
 /**
  * \ingroup structural
- * \function igraph_shortest_paths
- * \brief The length of the shortest paths between vertices.
+ * \function igraph_distances
+ * \brief Length of the shortest paths between vertices.
  *
  * \param graph The graph object.
  * \param res The result of the calculation, a matrix. A pointer to an
@@ -73,9 +73,11 @@
  * edges in the graph.
  *
  * \sa \ref igraph_get_shortest_paths() to get the paths themselves,
- * \ref igraph_shortest_paths_dijkstra() for the weighted version.
+ * \ref igraph_distances_dijkstra() for the weighted version with non-negative
+ * weights, \ref igraph_distances_bellman_ford() if you also have negative
+ * weights.
  */
-igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
                           const igraph_vs_t from, const igraph_vs_t to,
                           igraph_neimode_t mode) {
 
@@ -190,6 +192,20 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
 }
 
 /**
+ * \function igraph_shortest_paths
+ * \brief Length of the shortest paths between vertices.
+ *
+ * \deprecated-by igraph_distances 0.10.0
+ */
+igraph_error_t igraph_shortest_paths(const igraph_t *graph,
+                                     igraph_matrix_t *res,
+                                     const igraph_vs_t from,
+                                     const igraph_vs_t to,
+                                     igraph_neimode_t mode) {
+    return igraph_distances(graph, res, from, to, mode);
+}
+
+/**
  * \ingroup structural
  * \function igraph_get_shortest_paths
  * \brief Shortest paths from a vertex.
@@ -256,7 +272,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res
  * |E| the number of edges in the
  * graph.
  *
- * \sa \ref igraph_shortest_paths() if you only need the path length but
+ * \sa \ref igraph_distances() if you only need the path lengths but
  * not the paths themselves.
  *
  * \example examples/simple/igraph_get_shortest_paths.c

@@ -593,7 +593,7 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
         return IGRAPH_UNIMPLEMENTED;
     }
 
-    igraph_create(graph, &edges, igraph_integer_t(node_count), false);
+    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_integer_t(node_count), false));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -651,7 +651,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
         IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
     }
 
-    igraph_create(graph, &edges, igraph_integer_t(node_count), true);
+    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_integer_t(node_count), true));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

@@ -24,7 +24,7 @@
 #include "igraph.h"
 #include <stdio.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 int test_file(const char* fname, igraph_bool_t should_parse) {
     FILE *ifile;

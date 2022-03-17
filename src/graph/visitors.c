@@ -181,9 +181,11 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
     /* Resize result vectors, and fill them with IGRAPH_NAN */
 
-# define VINIT(v, initial) if (v) {               \
-        igraph_vector_int_resize((v), no_of_nodes);   \
-        igraph_vector_int_fill((v), initial); }
+# define VINIT(v, initial) \
+    if (v) { \
+        IGRAPH_CHECK(igraph_vector_int_resize((v), no_of_nodes)); \
+        igraph_vector_int_fill((v), initial); \
+    }
 
     VINIT(order, -1);
     VINIT(rank, -1);

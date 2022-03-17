@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Matrix-vector multiplication: y = A.x */
 void matmul(const igraph_matrix_t *A, const igraph_vector_t *x, igraph_vector_t *y, igraph_real_t beta) {

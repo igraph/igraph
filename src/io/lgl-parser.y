@@ -116,11 +116,11 @@ edge :   edgeid NEWLINE             {
 
 edgeid : ALNUM  {
   igraph_integer_t trie_id;
-  igraph_trie_get2(context->trie,
+  IGRAPH_YY_CHECK(igraph_trie_get2(context->trie,
     igraph_lgl_yyget_text(scanner),
     igraph_lgl_yyget_leng(scanner),
     &trie_id
-  );
+  ));
   $$ = trie_id;
 };
 

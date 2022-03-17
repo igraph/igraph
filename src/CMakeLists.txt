@@ -17,13 +17,17 @@ foreach(FORMAT dl gml lgl ncol pajek)
     if (BISON_VERSION VERSION_GREATER_EQUAL 3)
       set(bison_no_deprecated -Wno-deprecated)
     endif()
+	if (NOT FLEX_KEEP_LINE_NUMBERS)
+      set(bison_hide_line_numbers --no-lines)
+      set(flex_hide_line_numbers --noline)
+    endif()
     bison_target(
       ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
-      COMPILE_FLAGS "--no-lines ${bison_no_deprecated}"
+      COMPILE_FLAGS "${bison_hide_line_numbers} ${bison_no_deprecated}"
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "--noline"
+      COMPILE_FLAGS "${flex_hide_line_numbers}"
       DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
@@ -149,7 +153,6 @@ add_library(
   community/fluid.c
   community/infomap/infomap_FlowGraph.cc
   community/infomap/infomap_Greedy.cc
-  community/infomap/infomap_Node.cc
   community/infomap/infomap.cc
   community/label_propagation.c
   community/leading_eigenvector.c

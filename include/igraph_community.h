@@ -90,7 +90,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_spinglass_single(const igraph_t *g
 
 IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                                             const igraph_vector_t *weights,
-                                            int steps,
+                                            igraph_integer_t steps,
                                             igraph_matrix_int_t *merges,
                                             igraph_vector_t *modularity,
                                             igraph_vector_int_t *membership);
@@ -98,7 +98,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            const igraph_vector_t *e_weights,
                                            const igraph_vector_t *v_weights,
-                                           int nb_trials,
+                                           igraph_integer_t nb_trials,
                                            igraph_vector_int_t *membership,
                                            igraph_real_t *codelength);
 

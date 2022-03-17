@@ -23,13 +23,13 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 typedef struct {
     int dim;
     int m;
     int nei;
-    igraph_bool_t directed, mutual, circular;
+    igraph_bool_t directed, mutual, periodic;
     igraph_integer_t *dimedges;
 } lat_test_t;
 
@@ -126,15 +126,19 @@ int check_lattice_properties(const igraph_t *lattice) {
 int check_lattice(const lat_test_t *test) {
     igraph_t graph, othergraph;
     igraph_vector_int_t otheredges;
-    igraph_vector_int_t otheredges_real;
     igraph_vector_int_t dimvector;
+    igraph_vector_bool_t periodic;
     igraph_bool_t iso;
     int ret;
 
     /* Create lattice */
     igraph_vector_int_view(&dimvector, test->dimedges, test->dim);
-    igraph_lattice(&graph, &dimvector, test->nei, test->directed,
-                   test->mutual, test->circular);
+    igraph_vector_bool_init(&periodic, test->dim);
+    igraph_vector_bool_fill(&periodic, test->periodic);
+    igraph_square_lattice(
+        &graph, &dimvector, test->nei, test->directed, test->mutual, &periodic
+    );
+    igraph_vector_bool_destroy(&periodic);
 
     /* Check its properties */
     if ((ret = check_lattice_properties(&graph))) {
@@ -145,15 +149,8 @@ int check_lattice(const lat_test_t *test) {
 
     /* Check that it is isomorphic to the stored graph */
     igraph_vector_int_view(&otheredges, test->dimedges + test->dim, test->m * 2);
-    // igraph_create requires a vector_t for its edges, so we switch from integer
-    // otheredges to real otheredges
-    igraph_vector_int_init(&otheredges_real, test->m * 2);
-    for (int i = 0; i < (test->m * 2); i++) {
-        VECTOR(otheredges_real)[i] = VECTOR(otheredges)[i];
-    }
-    igraph_create(&othergraph, &otheredges_real, igraph_vector_int_prod(&dimvector),
+    igraph_create(&othergraph, &otheredges, igraph_vector_int_prod(&dimvector),
                   test->directed);
-    igraph_vector_int_destroy(&otheredges_real);
     igraph_isomorphic(&graph, &othergraph, &iso);
     if (!iso) {
         printf("--\n");

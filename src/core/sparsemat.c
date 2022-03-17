@@ -1065,7 +1065,7 @@ igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
 igraph_error_t igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
                              const igraph_vector_t *b,
                              igraph_vector_t *res,
-                             int order) {
+                             igraph_integer_t order) {
 
     if (A->cs->m != A->cs->n) {
         IGRAPH_ERROR("Cannot perform sparse symmetric solve",
@@ -1105,7 +1105,7 @@ igraph_error_t igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
 igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
                            const igraph_vector_t *b,
                            igraph_vector_t *res,
-                           int order,
+                           igraph_integer_t order,
                            igraph_real_t tol) {
 
     if (A->cs->m != A->cs->n) {
@@ -1132,9 +1132,9 @@ static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparse
     CS_INT no_of_edges = A->cs->p[A->cs->n];
     CS_INT *p = A->cs->p;
     CS_INT *i = A->cs->i;
-    long int from = 0;
-    long int to = 0;
-    long int e = 0;
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
 
     if (no_of_nodes != A->cs->n) {
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
@@ -1171,7 +1171,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
     CS_INT no_of_edges = A->cs->nz;
     CS_INT *i = A->cs->p;
     CS_INT *j = A->cs->i;
-    long int e;
+    igraph_integer_t e;
 
     if (no_of_nodes != A->cs->n) {
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
@@ -1233,14 +1233,14 @@ static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A
     CS_INT *p = A->cs->p;
     CS_INT *i = A->cs->i;
     CS_ENTRY *x = A->cs->x;
-    long int from = 0;
-    long int to = 0;
-    long int e = 0, w = 0;
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0, w = 0;
 
     IGRAPH_UNUSED(attr);
 
-    igraph_vector_int_resize(edges, no_of_edges * 2);
-    igraph_vector_resize(weights, no_of_edges);
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, no_of_edges * 2));
+    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
 
     while (*p < no_of_edges) {
         while (to < * (p + 1)) {
@@ -1729,7 +1729,7 @@ igraph_error_t igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_symbqr(igraph_integer_t order, const igraph_sparsemat_t *A,
                             igraph_sparsemat_symbolic_t *dis) {
 
     dis->symbolic = cs_sqr(order, A->cs, /*qr=*/ 1);
@@ -1759,10 +1759,10 @@ igraph_error_t igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t 
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_sparsemat_symblu(long int order, const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_symblu(igraph_integer_t order, const igraph_sparsemat_t *A,
                             igraph_sparsemat_symbolic_t *dis) {
 
-    dis->symbolic = cs_sqr((int) order, A->cs, /*qr=*/ 0);
+    dis->symbolic = cs_sqr(order, A->cs, /*qr=*/ 0);
     if (!dis->symbolic) {
         IGRAPH_ERROR("Cannot do symbolic LU decomposition", IGRAPH_FAILURE);
     }
@@ -2206,10 +2206,10 @@ igraph_error_t igraph_sparsemat_minmax(igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
+igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
     CS_INT i, n;
     CS_ENTRY *ptr;
-    int res = 0;
+    igraph_integer_t res = 0;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2239,11 +2239,11 @@ long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  * Time complexity: TODO.
  */
 
-long int igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
+igraph_integer_t igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
         igraph_real_t tol) {
     CS_INT i, n;
     CS_ENTRY *ptr;
-    int res = 0;
+    igraph_integer_t res = 0;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2567,8 +2567,7 @@ static igraph_error_t igraph_i_sparsemat_which_min_rows_cc(igraph_sparsemat_t *A
     CS_ENTRY *px;
     CS_INT *pp;
     CS_INT *pi;
-    double inf = IGRAPH_INFINITY;
-    int j;
+    igraph_integer_t j;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2579,7 +2578,7 @@ static igraph_error_t igraph_i_sparsemat_which_min_rows_cc(igraph_sparsemat_t *A
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
     IGRAPH_CHECK(igraph_vector_int_resize(pos, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     igraph_vector_int_null(pos);
 
     for (j = 0; pp < A->cs->p + n; pp++, j++) {
@@ -3098,9 +3097,9 @@ igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
  * and one will give the elements.
  *
  * \param A A sparse matrix in either triplet or compressed form.
- * \param i An initialized int vector. This will store the rows of the
+ * \param i An initialized integer vector. This will store the rows of the
  *          returned elements.
- * \param j An initialized int vector. For a triplet matrix this will
+ * \param j An initialized integer vector. For a triplet matrix this will
  *          store the columns of the returned elements. For a compressed
  *          matrix, if the column index is \c k, then <code>j[k]</code>
  *          is the index in \p x of the start of the \c k-th column, and

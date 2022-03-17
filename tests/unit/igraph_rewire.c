@@ -21,7 +21,7 @@
 
 #include "operators/rewire_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, igraph_bool_t allow_loops, const char* description) {
 

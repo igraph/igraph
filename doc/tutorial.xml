@@ -166,9 +166,8 @@ generators. Stochastic (i.e. randomized) graph generators are called
 <command>igraph</command> can handle directed and undirected graphs. Most graph
 generators are able to create both types of graphs and most other
 functions are usually also capable of handling
-both. E.g. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
-which (surprisingly) calculates
-shortest paths from a vertex to other vertices can calculate
+both. E.g., <link linkend="igraph_get_shortest_paths"><function>igraph_get_shortest_paths()</function></link>,
+which calculates shortest paths from a vertex to other vertices, can calculate
 directed or undirected paths.
 </para>
 
@@ -177,7 +176,7 @@ directed or undirected paths.
 graphs are deterministic regular structures like star graphs
 (<link linkend="igraph_star"><function>igraph_star()</function></link>),
 ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices
-(<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>) or trees
+(<link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link>) or trees
 (<link linkend="igraph_kary_tree"><function>igraph_kary_tree()</function></link>).
 </para>
 
@@ -193,7 +192,8 @@ can reduce path lengths a lot.)
 <para>
 This example illustrates some new points. <command>igraph</command> uses
 <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>
-instead of plain C arrays. <type>igraph_vector_t</type> is superior to
+and its related types (<type>igraph_vector_int_t</type>, <type>igraph_vector_bool_t</type>
+and so on) instead of plain C arrays. <type>igraph_vector_t</type> is superior to
 regular arrays in almost every sense. Vectors are created by the
 <link linkend="igraph_vector_init"><function>igraph_vector_init()</function></link>
 function and, like graphs, they should be destroyed if not
@@ -201,17 +201,21 @@ needed any more by calling
 <link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
 on them. A vector can be indexed by the
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
-(right now it is a macro). Vectors
+(right now it is a macro). The elements of a vector are double-precision floats
+for <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>,
+32-bit or 64-bit integers for <type>igraph_vector_int_t</type> (depending on
+how igraph was compiled and whether you are using it on a 32-bit or 64-bit
+system), and booleans for <type>igraph_vector_bool_t</type>. Vectors
 can be resized, e.g. most <command>igraph</command> functions returning the result in a
 vector resize it to the size of the result.
 </para>
 
 <para>
-<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>
-takes a vector argument specifying the dimensions of
+<link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link>
+takes an integer vector argument specifying the dimensions of
 the lattice. In this example we generate a 30x30 two dimensional
 lattice. See the documentation of
-<link linkend="igraph_lattice"><function>igraph_lattice()</function></link> in
+<link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link> in
 the reference manual for the other arguments.
 </para>
 

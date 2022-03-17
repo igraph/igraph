@@ -128,7 +128,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
             key = igraph_strvector_get(predefnames, i);
-            igraph_trie_get(&trie, key, &id);
+            IGRAPH_CHECK(igraph_trie_get(&trie, key, &id));
             if (id != i) {
                 IGRAPH_WARNING("Reading NCOL file, duplicate entry in predefined names.");
                 no_predefined--;

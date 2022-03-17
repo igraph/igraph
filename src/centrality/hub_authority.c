@@ -343,7 +343,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
     if (authority_vector) {
         igraph_real_t norm;
-        igraph_vector_resize(authority_vector, no_of_nodes);
+        IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
         igraph_vector_null(authority_vector);
         if (weights == 0) {
             igraph_i_kleinberg_unweighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &inadjlist);

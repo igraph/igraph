@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void warning_handler_print_stdout(const char *reason, const char *file,
                                   int line) {

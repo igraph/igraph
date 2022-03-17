@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void sort_cliques(igraph_vector_int_list_t *cliques) {
     igraph_integer_t i, n = igraph_vector_int_list_size(cliques);

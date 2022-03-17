@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check(igraph_t *graph, igraph_vs_t *vs) {
     igraph_vit_t vit;

@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 int main() {
 

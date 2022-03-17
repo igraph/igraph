@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void chop_print_destroy(igraph_matrix_t *result) {
     matrix_chop(result, 1e-10);
