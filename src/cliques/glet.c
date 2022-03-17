@@ -82,25 +82,19 @@ static void igraph_i_subclique_next_free(void *ptr) {
     igraph_integer_t i;
     if (data->resultids) {
         for (i = 0; i < data->nc; i++) {
-            if (data->resultids + i) {
-                igraph_vector_int_destroy(data->resultids + i);
-            }
+            igraph_vector_int_destroy(&data->resultids[i]);
         }
         IGRAPH_FREE(data->resultids);
     }
     if (data->result) {
         for (i = 0; i < data->nc; i++) {
-            if (data->result + i) {
-                igraph_destroy(data->result + i);
-            }
+            igraph_destroy(&data->result[i]);
         }
         IGRAPH_FREE(data->result);
     }
     if (data->resultweights) {
         for (i = 0; i < data->nc; i++) {
-            if (data->resultweights + i) {
-                igraph_vector_destroy(data->resultweights + i);
-            }
+            igraph_vector_destroy(&data->resultweights[i]);
         }
         IGRAPH_FREE(data->resultweights);
     }
