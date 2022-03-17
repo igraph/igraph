@@ -311,10 +311,7 @@ int igraph_dl_yyerror(YYLTYPE* locp,
 
 static igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context) {
-  char tmp=newstr[length];
-  newstr[length]='\0';
-  IGRAPH_CHECK(igraph_strvector_push_back(&context->labels, newstr));
-  newstr[length]=tmp;
+  IGRAPH_CHECK(igraph_strvector_push_back_len(&context->labels, newstr, length));
   return IGRAPH_SUCCESS;
 }
 
