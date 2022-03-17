@@ -43,16 +43,15 @@ typedef struct s_igraph_trie_node {
 } igraph_trie_node_t;
 
 typedef struct s_igraph_trie {
-    igraph_strvector_t strs;
-    igraph_vector_ptr_t children;
-    igraph_vector_int_t values;
+    igraph_trie_node_t node;
     igraph_integer_t maxvalue;
     igraph_bool_t storekeys;
     igraph_strvector_t keys;
 } igraph_trie_t;
 
-#define IGRAPH_TRIE_NULL { IGRAPH_STRVECTOR_NULL, IGRAPH_VECTOR_PTR_NULL, \
-        IGRAPH_VECTOR_NULL, 0, 0, IGRAPH_STRVECTOR_NULL }
+#define IGRAPH_TRIE_NULL \
+        { { IGRAPH_STRVECTOR_NULL, IGRAPH_VECTOR_PTR_NULL, IGRAPH_VECTOR_NULL}, \
+            0, 0, IGRAPH_STRVECTOR_NULL }
 #define IGRAPH_TRIE_INIT_FINALLY(tr, sk) \
     do { IGRAPH_CHECK(igraph_trie_init(tr, sk)); \
         IGRAPH_FINALLY(igraph_trie_destroy, tr); } while (0)

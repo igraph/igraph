@@ -60,8 +60,8 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
 igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     t->maxvalue = -1;
     t->storekeys = storekeys;
-    IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *) t ));
-    IGRAPH_FINALLY(igraph_i_trie_destroy_node, (igraph_trie_node_t *) t );
+    IGRAPH_CHECK(igraph_i_trie_init_node(&t->node));
+    IGRAPH_FINALLY(igraph_i_trie_destroy_node, &t->node);
     if (storekeys) {
         IGRAPH_CHECK(igraph_strvector_init(&t->keys, 0));
     }
@@ -105,7 +105,7 @@ void igraph_trie_destroy(igraph_trie_t *t) {
     if (t->storekeys) {
         igraph_strvector_destroy(&t->keys);
     }
-    igraph_i_trie_destroy_node( (igraph_trie_node_t*) t);
+    igraph_i_trie_destroy_node(&t->node);
 }
 
 
@@ -302,7 +302,7 @@ static igraph_error_t igraph_i_trie_get_node(
 
 igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
     if (!t->storekeys) {
-        IGRAPH_CHECK(igraph_i_trie_get_node((igraph_trie_node_t*) t, key, t->maxvalue + 1, id));
+        IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id));
         if (*id > t->maxvalue) {
             t->maxvalue = *id;
         }
@@ -316,7 +316,7 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
             IGRAPH_FINALLY_EXIT();
             IGRAPH_ERROR("cannot get element from trie", ret);
         }
-        ret = igraph_i_trie_get_node((igraph_trie_node_t*) t, key, t->maxvalue + 1, id);
+        ret = igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id);
         if (ret != IGRAPH_SUCCESS) {
             igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1); /* shrinks, error safe */
             IGRAPH_FINALLY_EXIT();
@@ -369,7 +369,7 @@ igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_intege
  */
 
 igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
-    IGRAPH_CHECK(igraph_i_trie_get_node((igraph_trie_node_t*) t, key, -1, id));
+    IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, -1, id));
     return IGRAPH_SUCCESS;
 }
 
