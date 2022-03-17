@@ -84,7 +84,7 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t si
             }
             IGRAPH_FREE(sv->stor_begin);
             IGRAPH_ERROR("String vector init failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            /* LCOV_EXCL_END */
+            /* LCOV_EXCL_STOP */
         }
         sv->stor_begin[i][0] = '\0';
     }
