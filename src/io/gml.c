@@ -658,7 +658,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     if (!id) {
         igraph_bool_t found = 0;
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
-            char *n = igraph_strvector_get(&vnames, i);
+            const char *n = igraph_strvector_get(&vnames, i);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 found = 1; break;
             }
@@ -677,7 +677,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* Graph attributes first */
     for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
-        char *name, *newname;
+        const char *name;
+        char *newname;
         name = igraph_strvector_get(&gnames, i);
         IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
         IGRAPH_FINALLY(igraph_free, newname);
@@ -687,7 +688,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
             CHECK(fputc('\n', outstream));
         } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
-            char *s;
+            const char *s;
             IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
             s = igraph_strvector_get(&strv, 0);
             CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
@@ -711,7 +712,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         /* other attributes */
         for (j = 0; j < igraph_vector_int_size(&vtypes); j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(vtypes)[j];
-            char *name, *newname;
+            const char *name;
+            char *newname;
             name = igraph_strvector_get(&vnames, j);
             if (!strcmp(name, "id")) {
                 continue;
@@ -725,7 +727,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
                 CHECK(fputc('\n', outstream));
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-                char *s;
+                const char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                              igraph_vss_1(i), &strv));
                 s = igraph_strvector_get(&strv, 0);
@@ -759,7 +761,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         /* other attributes */
         for (j = 0; j < igraph_vector_int_size(&etypes); j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(etypes)[j];
-            char *name, *newname;
+            const char *name;
+            char *newname;
             name = igraph_strvector_get(&enames, j);
             if (!strcmp(name, "source") || !strcmp(name, "target")) {
                 continue;
@@ -773,7 +776,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
                 CHECK(fputc('\n', outstream));
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-                char *s;
+                const char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                              igraph_ess_1(i), &strv));
                 s = igraph_strvector_get(&strv, 0);

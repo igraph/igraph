@@ -132,7 +132,7 @@ static igraph_error_t igraph_i_trie_get_node(
     igraph_trie_node_t *t, const char *key, igraph_integer_t newvalue,
     igraph_integer_t *id
 ) {
-    char *str;
+    const char *str;
     igraph_integer_t i;
     igraph_bool_t add;
 
@@ -372,7 +372,7 @@ igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integ
  * \brief Get an element of a trie based on its index.
  */
 
-char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
+const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
     return igraph_strvector_get(&t->keys, idx);
 }
 

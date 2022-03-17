@@ -124,7 +124,7 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
  * Time complexity: O(1).
  */
 
-char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
+const char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
     IGRAPH_ASSERT(sv != NULL);
     IGRAPH_ASSERT(sv->stor_begin != NULL);
     IGRAPH_ASSERT(sv->stor_begin[idx] != NULL);
@@ -595,7 +595,7 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *sv,
 
     for (i = 0; i < newlen; i++) {
         igraph_integer_t j = VECTOR(*idx)[i];
-        char *str = igraph_strvector_get(sv, j);
+        const char *str = igraph_strvector_get(sv, j);
         igraph_strvector_set(newv, i, str);
     }
 

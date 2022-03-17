@@ -309,7 +309,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
             int ret = 0;
-            char *str1, *str2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str2 = igraph_strvector_get(&nvec, to);
 
@@ -370,7 +370,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
             int ret = 0, ret2;
-            char *str1, *str2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str2 = igraph_strvector_get(&nvec, to);
             if (from == actvertex) {
@@ -401,7 +401,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         int ret = 0;
         igraph_vector_int_t deg;
         igraph_strvector_t nvec;
-        char *str;
+        const char *str;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 1);
         IGRAPH_CHECK(igraph_strvector_init(&nvec, 1));
