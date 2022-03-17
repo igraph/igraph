@@ -19,7 +19,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void strvector_print(const igraph_strvector_t *sv) {
     igraph_integer_t i, s = igraph_strvector_size(sv);
