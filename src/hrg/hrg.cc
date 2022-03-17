@@ -269,10 +269,11 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
 
 /**
  * \function igraph_hrg_init
- * Allocate memory for a HRG.
+ * \brief Allocate memory for a HRG.
  *
  * This function must be called before passing an \ref igraph_hrg_t to
  * an igraph function.
+ *
  * \param hrg Pointer to the HRG data structure to initialize.
  * \param n The number of vertices in the graph that is modeled by
  *    this HRG. It can be zero, if this is not yet known.
@@ -284,7 +285,7 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
 igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->left,      n - 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->right,     n - 1);
-    IGRAPH_VECTOR_INIT_FINALLY(&hrg->prob,      n - 1);
+    IGRAPH_VECTOR_INIT_FINALLY    (&hrg->prob,      n - 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->edges,     n - 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->vertices,  n - 1);
     IGRAPH_FINALLY_CLEAN(5);
@@ -293,10 +294,11 @@ igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n) {
 
 /**
  * \function igraph_hrg_destroy
- * Deallocate memory for an HRG.
+ * \brief Deallocate memory for an HRG.
  *
  * The HRG data structure can be reinitialized again with an \ref
  * igraph_hrg_destroy call.
+ *
  * \param hrg Pointer to the HRG data structure to deallocate.
  *
  * Time complexity: operating system dependent.
@@ -312,7 +314,7 @@ void igraph_hrg_destroy(igraph_hrg_t *hrg) {
 
 /**
  * \function igraph_hrg_size
- * Returns the size of the HRG, the number of leaf nodes.
+ * \brief Returns the size of the HRG, the number of leaf nodes.
  *
  * \param hrg Pointer to the HRG.
  * \return The number of leaf nodes in the HRG.
@@ -326,7 +328,7 @@ igraph_integer_t igraph_hrg_size(const igraph_hrg_t *hrg) {
 
 /**
  * \function igraph_hrg_resize
- * Resize a HRG.
+ * \brief Resize a HRG.
  *
  * \param hrg Pointer to an initialized (see \ref igraph_hrg_init)
  *   HRG.
@@ -365,12 +367,14 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
     }
     IGRAPH_FINALLY_EXIT();
 
+#undef CHECK_ERR
+
     return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_hrg_fit
- * Fit a hierarchical random graph model to a network
+ * \brief Fit a hierarchical random graph model to a network.
  *
  * \param graph The igraph graph to fit the model to. Edge directions
  *   are ignored in directed graphs.
@@ -433,7 +437,7 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
 
 /**
  * \function igraph_hrg_sample
- * Sample from a hierarchical random graph model
+ * \brief Sample from a hierarchical random graph model.
  *
  * This function draws a single sample from a hierarchical random graph model.
  *
@@ -463,7 +467,7 @@ igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
 
 /**
  * \function igraph_hrg_sample_many
- * Draw multiple samples from a hierarchical random graph model
+ * \brief Draw multiple samples from a hierarchical random graph model.
  *
  * This function draws multiple samples from a hierarchical random graph
  * ensemble. The ensemble can be given as a graph (\c input_graph), or as an
@@ -516,7 +520,7 @@ igraph_error_t igraph_hrg_sample_many(
 
 /**
  * \function igraph_hrg_game
- * Generate a hierarchical random graph
+ * \brief Generate a hierarchical random graph.
  *
  * This function is a simple shortcut to \ref igraph_hrg_sample.
  * It creates a single graph from the given HRG.
@@ -536,10 +540,11 @@ igraph_error_t igraph_hrg_game(igraph_t *graph,
 
 /**
  * \function igraph_hrg_dendrogram
- * Create a dendrogram from a hierarchical random graph.
+ * \brief Create a dendrogram from a hierarchical random graph.
  *
  * Creates the igraph graph equivalent of an \ref igraph_hrg_t data
  * structure.
+ *
  * \param graph Pointer to an uninitialized graph, the result is
  *   stored here.
  * \param hrg The hierarchical random graph to convert.
@@ -603,7 +608,7 @@ igraph_error_t igraph_hrg_dendrogram(
 
 /**
  * \function igraph_hrg_consensus
- * Calculate a consensus tree for a HRG.
+ * \brief Calculate a consensus tree for a HRG.
  *
  * The calculation can be started from the given HRG (\c hrg), or (if
  * \c start is false), a HRG is first fitted to the given graph.
@@ -797,10 +802,11 @@ static igraph_error_t recordPredictions(pblock *br_list, igraph_vector_int_t *ed
 
 /**
  * \function igraph_hrg_predict
- * Predict missing edges in a graph, based on HRG models
+ * \brief Predict missing edges in a graph, based on HRG models.
  *
  * Samples HRG models for a network, and estimated the probability
  * that an edge was falsely observed as non-existent in the network.
+ *
  * \param graph The input graph.
  * \param edges The list of missing edges is stored here, the first
  *   two elements are the first edge, the next two the second edge,
@@ -876,7 +882,7 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
 
 /**
  * \function igraph_hrg_create
- * Create a HRG from an igraph graph.
+ * \brief Create a HRG from an igraph graph.
  *
  * \param hrg Pointer to an initialized \ref igraph_hrg_t. The result
  *    is stored here.
