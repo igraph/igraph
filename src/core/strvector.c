@@ -33,12 +33,18 @@
 
 /**
  * \section igraph_strvector_t
- * <para>The <type>igraph_strvector_t</type> type is a vector of strings.
- * The current implementation is very simple and not too efficient. It
- * works fine for not too many strings, e.g. the list of attribute
- * names is returned in a string vector by \ref
- * igraph_cattribute_list(). Do not expect great performance from this
- * type.</para>
+ * <para>
+ * The <type>igraph_strvector_t</type> type is a vector of null-terminated
+ * strings. It is used internally for storing graph attribute names as well as
+ * string attributes in the C attribute handler.
+ * </para>
+ *
+ * <para>
+ * This container automatically manages the memory of its elements.
+ * The strings within an <type>igraph_strvector_t</type> should be considered
+ * constant, and not modified directly. Functions that add new elements
+ * always make copies of the string passed to them.
+ * </para>
  *
  * <para>
  * \example examples/simple/igraph_strvector.c
@@ -53,6 +59,7 @@
  * Reserves memory for the string vector, a string vector must be
  * first initialized before calling other functions on it.
  * All elements of the string vector are set to the empty string.
+ *
  * \param sv Pointer to an initialized string vector.
  * \param len The (initial) length of the string vector.
  * \return Error code.
@@ -118,6 +125,7 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
  *
  * Query an element of a string vector. See also the \ref STR macro
  * for an easier way.
+ *
  * \param sv The input string vector.
  * \param idx The index of the element to query.
  *
@@ -138,6 +146,7 @@ const char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t 
  *
  * The provided \p value is copied into the \p idx position in the
  * string vector.
+ *
  * \param sv The string vector.
  * \param idx The position to set.
  * \param value The new value.
@@ -159,6 +168,7 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
  *
  * This is almost the same as \ref igraph_strvector_set, but the new
  * value is not a zero terminated string, but its length is given.
+ *
  * \param sv The string vector.
  * \param idx The position to set.
  * \param value The new value.
@@ -192,6 +202,12 @@ igraph_error_t igraph_strvector_set_len(igraph_strvector_t *sv, igraph_integer_t
  * \ingroup strvector
  * \function igraph_strvector_remove_section
  * \brief Removes a section from a string vector.
+ *
+ * This function removes the range <code>[from, to)</code> from the string vector.
+ *
+ * \param sv The string vector.
+ * \param from The position of the first element to remove.
+ * \param to   The position of the first element \em not to remove.
  */
 
 void igraph_strvector_remove_section(
@@ -224,7 +240,7 @@ void igraph_strvector_remove_section(
  * \brief Removes a single element from a string vector.
  *
  * The string will be one shorter.
- * \param v The string vector.
+ * \param sv The string vector.
  * \param elem The index of the element to remove.
  *
  * Time complexity: O(n), the length of the string.
@@ -240,6 +256,7 @@ void igraph_strvector_remove(igraph_strvector_t *sv, igraph_integer_t elem) {
  * \brief Initialization by copying.
  *
  * Initializes a string vector by copying another string vector.
+ *
  * \param to Pointer to an uninitialized string vector.
  * \param from The other string vector, to be copied.
  * \return Error code.
@@ -321,6 +338,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
  * \brief Removes all elements from a string vector.
  *
  * After this operation the string vector will be empty.
+ *
  * \param sv The string vector.
  *
  * Time complexity: O(l), the total length of strings, maybe less,
@@ -344,7 +362,7 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
  * If the new size is bigger then empty strings are added, if it is
  * smaller then the unneeded elements are removed.
  *
- * \param v The string vector.
+ * \param sv The string vector.
  * \param newsize The new size.
  * \return Error code.
  *
@@ -407,8 +425,7 @@ igraph_integer_t igraph_strvector_capacity(const igraph_strvector_t *sv) {
  *
  * </para><para>
  * \a igraph string vectors are flexible, they can grow and
- * shrink. Growing
- * however occasionally needs the data in the vector to be copied.
+ * shrink. Growing however occasionally needs the data in the vector to be copied.
  * In order to avoid this, you can call this function to reserve space for
  * future growth of the vector.
  *
@@ -418,6 +435,7 @@ igraph_integer_t igraph_strvector_capacity(const igraph_strvector_t *sv) {
  * reserve space for 100 strings and the size of your
  * vector was (and still is) 60, then you can surely add additional 40
  * strings to your vector before it will be copied.
+ *
  * \param sv The string vector object.
  * \param capacity The new \em allocated size of the string vector.
  * \return Error code:
@@ -492,7 +510,7 @@ static igraph_error_t igraph_i_strvector_expand_if_full(igraph_strvector_t *sv) 
  * \function igraph_strvector_push_back
  * \brief Adds an element to the back of a string vector.
  *
- * \param v The string vector.
+ * \param sv The string vector.
  * \param value The string to add; it will be copied.
  * \return Error code.
  *
@@ -516,7 +534,7 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
  * \function igraph_strvector_push_back_len
  * \brief Adds a string of the given length to the back of a string vector.
  *
- * \param v The string vector.
+ * \param sv The string vector.
  * \param value The start of the string to add. At most \p len characters will be copied.
  * \param len The length of the string.
  * \return Error code.
@@ -568,7 +586,7 @@ igraph_error_t igraph_strvector_set2(
  * \function igraph_strvector_print
  * \brief Prints a string vector.
  *
- * \param v The string vector.
+ * \param sv The string vector.
  * \param file The file to write to.
  * \param sep The separator to print between strings.
  * \return Error code.
@@ -586,6 +604,16 @@ igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_set
+ * \brief Takes elements at given positions from a string vector.
+ *
+ * \param sv   The string vector.
+ * \param newv An initialized string vector, it will be resized as needed.
+ * \param idx  An integer vector of indices to take from \p sv.
+ * \return Error code.
+ */
 igraph_error_t igraph_strvector_index(const igraph_strvector_t *sv,
                            igraph_strvector_t *newv,
                            const igraph_vector_int_t *idx) {
