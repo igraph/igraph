@@ -82,13 +82,14 @@ add_legacy_tests(
   igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
+  igraph_strvector
   igraph_vector_floor
   igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
   stack
-  strvector_set2_remove_print
+  strvector_set_len_remove_print
   vector
   vector2
   vector3

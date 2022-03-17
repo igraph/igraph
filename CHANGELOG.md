@@ -655,6 +655,15 @@
    for sake of consistency with other vector-like data structures; the old name
    is deprecated and will be removed in 0.11.
 
+ - `igraph_strvector_get()` now returns a `const char*` and not a `char*` to
+   indicate that you are not supposed to modify the string in the vector
+   directly. If you do want to modify it and you are aware of the implications
+   (i.e. the new string must not be longer than the original one), you can
+   cast away the constness of the return value before modifying it.
+
+ - `igraph_strvector_set2()` has been renamed to `igraph_strvector_set_len()`;
+   the old name is deprecated and will be removed in 0.11.
+
  - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
    deprecated and will be removed in 0.11.
 

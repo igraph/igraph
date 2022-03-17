@@ -309,12 +309,13 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 #define E_COLOR            22
 #define E_LAST             23
 
-static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
+static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     igraph_integer_t destlen = 0;
     igraph_bool_t need_escape = 0;
 
     /* Determine whether the string contains characters to be escaped */
-    char *s, *d;
+    const char *s;
+    char *d;
     for (s = src; *s; s++, destlen++) {
         if (*s == '\\') {
             need_escape = 1;
@@ -488,7 +489,8 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     igraph_vector_int_t vx_numa;
     igraph_vector_int_t vx_stra;
 
-    char *s, *escaped;
+    const char *s;
+    char *escaped;
 
     igraph_bool_t bipartite = 0;
     igraph_vector_int_t bip_index, bip_index2;

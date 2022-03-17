@@ -124,7 +124,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     /* Add the predefined names, if any */
     if (predefnames != 0) {
         igraph_integer_t i, id, n;
-        char *key;
+        const char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
             key = igraph_strvector_get(predefnames, i);
@@ -332,7 +332,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
             int ret = 0;
-            char *str1, *str2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str1 = igraph_strvector_get(&nvec, from);
             str2 = igraph_strvector_get(&nvec, to);
@@ -383,7 +383,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
             int ret = 0, ret2 = 0;
-            char *str1, *str2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             str1 = igraph_strvector_get(&nvec, from);
             str2 = igraph_strvector_get(&nvec, to);

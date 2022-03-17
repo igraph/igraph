@@ -28,7 +28,14 @@
 
 #include "config.h"
 
+#include <stdlib.h>
+
 __BEGIN_DECLS
+
+#ifndef HAVE_STRNDUP
+    #define strndup igraph_i_strndup
+    char* igraph_i_strndup(const char *s, size_t n);
+#endif
 
 #ifndef HAVE_STRDUP
     #define strdup igraph_i_strdup

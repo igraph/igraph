@@ -108,7 +108,7 @@ igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
 }
 
 igraph_error_t igraph_hashtable_get(igraph_hashtable_t *ht,
-                         const char *key, char **elem) {
+                         const char *key, const char **elem) {
     igraph_integer_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
     *elem = igraph_strvector_get(&ht->elements, newid);

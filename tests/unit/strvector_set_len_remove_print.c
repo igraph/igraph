@@ -26,15 +26,10 @@ int main() {
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    printf("No place to put the string.\n");
-    igraph_strvector_init(&sv, 0);
-    IGRAPH_ASSERT(igraph_strvector_set2(&sv, 0, test_string, strlen(test_string)) == IGRAPH_EINVAL);
-    igraph_strvector_destroy(&sv);
-
     printf("Two strings in a vector.\n");
     igraph_strvector_init(&sv, 5);
-    IGRAPH_ASSERT(igraph_strvector_set2(&sv, 0, test_string, strlen(test_string)) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(igraph_strvector_set2(&sv, 4, test_string2, strlen(test_string2)) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_strvector_set_len(&sv, 0, test_string, strlen(test_string)) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_strvector_set_len(&sv, 4, test_string2, strlen(test_string2)) == IGRAPH_SUCCESS);
     igraph_strvector_print(&sv, stdout, " | ");
 
     printf("\nRemove a nonexistent one.\n");
@@ -48,8 +43,8 @@ int main() {
 
     printf("\nOverwriting a string.\n");
     igraph_strvector_init(&sv, 5);
-    IGRAPH_ASSERT(igraph_strvector_set2(&sv, 2, test_string2, strlen(test_string2)) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(igraph_strvector_set2(&sv, 2, test_string, strlen(test_string)) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_strvector_set_len(&sv, 2, test_string2, strlen(test_string2)) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_strvector_set_len(&sv, 2, test_string, strlen(test_string)) == IGRAPH_SUCCESS);
     igraph_strvector_print(&sv, stdout, " | ");
     igraph_strvector_destroy(&sv);
 

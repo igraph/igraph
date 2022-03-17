@@ -1672,8 +1672,6 @@ igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
  * \brief Deletes a section from a vector.
  *
  * </para><para>
- * Note that this function does not do range checking. The result is
- * undefined if you supply invalid limits.
  * \param v The vector object.
  * \param from The position of the first element to remove.
  * \param to The position of the first element \em not to remove.
@@ -1685,14 +1683,24 @@ igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector, remove_section)(
         TYPE(igraph_vector) *v, igraph_integer_t from, igraph_integer_t to) {
+    igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
+
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
-    /* Not removing from the end? */
-    if (to < FUNCTION(igraph_vector, size)(v)) {
+
+    if (from < 0) {
+        from = 0;
+    }
+
+    if (to > size) {
+        to = size;
+    }
+
+    if (to > from) {
         memmove(v->stor_begin + from, v->stor_begin + to,
                 sizeof(BASE) * (v->end - v->stor_begin - to));
+        v->end -= (to - from);
     }
-    v->end -= (to - from);
 }
 
 /**

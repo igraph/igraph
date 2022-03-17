@@ -33,7 +33,7 @@ int main() {
     igraph_trie_t trie;
     igraph_integer_t id;
     igraph_integer_t i;
-    char *str;
+    const char *str;
 
     /* init */
     igraph_trie_init(&trie, 0);

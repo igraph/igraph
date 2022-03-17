@@ -219,6 +219,14 @@ int main() {
     printf("Test igraph_vector_remove_section\n");
     igraph_vector_remove_section(&v, 2, 4);
     print_vector_format(&v, stdout, "%g");
+
+    printf("Test igraph_vector_remove_section with invalid limits\n");
+    igraph_vector_remove_section(&v, -3, -1);
+    igraph_vector_remove_section(&v, 100, 120);
+    igraph_vector_remove_section(&v, 2, 0);
+    print_vector_format(&v, stdout, "%g");
+    igraph_vector_remove_section(&v, 1, 20);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_remove\n");
