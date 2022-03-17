@@ -596,7 +596,7 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *sv,
     for (i = 0; i < newlen; i++) {
         igraph_integer_t j = VECTOR(*idx)[i];
         const char *str = igraph_strvector_get(sv, j);
-        igraph_strvector_set(newv, i, str);
+        IGRAPH_CHECK(igraph_strvector_set(newv, i, str));
     }
 
     return IGRAPH_SUCCESS;
