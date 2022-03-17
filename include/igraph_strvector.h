@@ -42,7 +42,7 @@ typedef struct s_igraph_strvector {
 
 /**
  * \define STR
- * Indexing string vectors
+ * \brief Indexing string vectors.
  *
  * This is a macro that allows to query the elements of a string vector, just
  * like \ref igraph_strvector_get(), but without the overhead of a function
