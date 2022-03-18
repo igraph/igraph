@@ -180,6 +180,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  constructor-failure
   erdos_renyi_game
   erdos_renyi_game_gnp
   full
