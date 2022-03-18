@@ -140,6 +140,31 @@ static igraph_error_t igraph_i_cattributes_copy_attribute_record(igraph_attribut
     return IGRAPH_SUCCESS;
 }
 
+static void igraph_i_attribute_list_destroy(igraph_vector_ptr_t *attrlist) {
+    igraph_integer_t i;
+    igraph_integer_t n = igraph_vector_ptr_size(attrlist);
+    for (i = 0; i < n; i++) {
+        igraph_attribute_record_t *rec = VECTOR(*attrlist)[i];
+        if (rec) {
+            if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+                igraph_vector_t *num = (igraph_vector_t *) rec->value;
+                igraph_vector_destroy(num);
+                IGRAPH_FREE(num);
+            } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+                igraph_strvector_t *str = (igraph_strvector_t *) rec->value;
+                igraph_strvector_destroy(str);
+                IGRAPH_FREE(str);
+            } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+                igraph_vector_bool_t *boolvec = (igraph_vector_bool_t *) rec->value;
+                igraph_vector_bool_destroy(boolvec);
+                IGRAPH_FREE(boolvec);
+            }
+            IGRAPH_FREE(rec->name);
+            IGRAPH_FREE(rec);
+        }
+    }
+    igraph_vector_ptr_destroy(attrlist);
+}
 
 static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
     igraph_attribute_record_t *attr_rec;
@@ -155,11 +180,11 @@ static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_pt
     IGRAPH_FINALLY(igraph_free, nattr);
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, n));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
+    IGRAPH_FINALLY(igraph_i_attribute_list_destroy, &nattr->gal);
     IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->val, 0));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->val);
     IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->eal, 0));
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->eal);
 
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_i_cattributes_copy_attribute_record(
@@ -168,6 +193,7 @@ static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_pt
     }
 
     graph->attr = nattr;
+    IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
 }
@@ -175,38 +201,9 @@ static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_pt
 static void igraph_i_cattribute_destroy(igraph_t *graph) {
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *als[3] = { &attr->gal, &attr->val, &attr->eal };
-    igraph_integer_t i, n;
-    int a;
-    igraph_vector_t *num;
-    igraph_strvector_t *str;
-    igraph_vector_bool_t *boolvec;
-    igraph_attribute_record_t *rec;
-    for (a = 0; a < 3; a++) {
-        n = igraph_vector_ptr_size(als[a]);
-        for (i = 0; i < n; i++) {
-            rec = VECTOR(*als[a])[i];
-            if (rec) {
-                if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-                    num = (igraph_vector_t*)rec->value;
-                    igraph_vector_destroy(num);
-                    IGRAPH_FREE(num);
-                } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-                    str = (igraph_strvector_t*)rec->value;
-                    igraph_strvector_destroy(str);
-                    IGRAPH_FREE(str);
-                } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-                    boolvec = (igraph_vector_bool_t*)rec->value;
-                    igraph_vector_bool_destroy(boolvec);
-                    IGRAPH_FREE(boolvec);
-                }
-                IGRAPH_FREE(rec->name);
-                IGRAPH_FREE(rec);
-            }
-        }
+    for (int a = 0; a < 3; a++) {
+        igraph_i_attribute_list_destroy(als[a]);
     }
-    igraph_vector_ptr_destroy(&attr->gal);
-    igraph_vector_ptr_destroy(&attr->val);
-    igraph_vector_ptr_destroy(&attr->eal);
     IGRAPH_FREE(graph->attr); /* sets to NULL */
 }
 
