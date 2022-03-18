@@ -60,7 +60,7 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_b
 IGRAPH_PRIVATE_EXPORT void igraph_trie_destroy(igraph_trie_t *t);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_integer_t length,
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get_len(igraph_trie_t *t, const char *key, igraph_integer_t length,
                                            igraph_integer_t *id);
 IGRAPH_PRIVATE_EXPORT const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv);

@@ -353,7 +353,7 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
  * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
-igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_integer_t length,
+igraph_error_t igraph_trie_get_len(igraph_trie_t *t, const char *key, igraph_integer_t length,
                      igraph_integer_t *id) {
     char *tmp = IGRAPH_CALLOC(length + 1, char);
 

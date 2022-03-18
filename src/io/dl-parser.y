@@ -244,7 +244,7 @@ elabel: LABEL {
     }
     igraph_strvector_clear(&context->labels);
   }
-  IGRAPH_YY_CHECK(igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
+  IGRAPH_YY_CHECK(igraph_trie_get_len(&context->trie, igraph_dl_yyget_text(scanner),
                                    igraph_dl_yyget_leng(scanner), &trie_id));
   IGRAPH_ASSERT(0 <= trie_id && trie_id < IGRAPH_DL_MAX_VERTEX_COUNT);
   $$ = trie_id;
