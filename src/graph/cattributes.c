@@ -51,18 +51,29 @@ static igraph_bool_t igraph_i_cattribute_find(const igraph_vector_ptr_t *ptrvec,
     return l;
 }
 
-static void igraph_i_cattribute_revert_attribute_vector_sizes(igraph_vector_ptr_t *al, igraph_integer_t origlen) {
-    igraph_integer_t ano = igraph_vector_ptr_size(al);
-    for (igraph_integer_t i = 0; i < ano; i++) {
-        igraph_attribute_record_t *rec = VECTOR(*al)[i];
+/*
+ * Restores attribute vector lengths to their original size after a failure.
+ * This function assumes that none of the attribute vectors are shorter than origlen.
+ * Some may be longer due to a partially completed size extension: these will be
+ * shrunk to their original size.
+ */
+static void igraph_i_cattribute_revert_attribute_vector_sizes(
+        igraph_vector_ptr_t *attrlist, igraph_integer_t origlen) {
+
+    igraph_integer_t no_of_attrs = igraph_vector_ptr_size(attrlist);
+    for (igraph_integer_t i = 0; i < no_of_attrs; i++) {
+        igraph_attribute_record_t *rec = VECTOR(*attrlist)[i];
         if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *nvec = (igraph_vector_t *) rec->value;
+            IGRAPH_ASSERT(igraph_vector_capacity(nvec) >= origlen);
             igraph_vector_resize(nvec, origlen); /* shrinks */
         } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
             igraph_vector_bool_t *bvec = (igraph_vector_bool_t *) rec->value;
+            IGRAPH_ASSERT(igraph_vector_bool_capacity(bvec) >= origlen);
             igraph_vector_bool_resize(bvec, origlen); /* shrinks */
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *svec = (igraph_strvector_t *) rec->value;
+            IGRAPH_ASSERT(igraph_strvector_capacity(svec) >= origlen);
             igraph_strvector_resize(svec, origlen); /* shrinks */
         } else {
             /* Must never reach here */
