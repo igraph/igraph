@@ -48,10 +48,17 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
             igraph_vector_t *vec = (igraph_vector_t*) rec->value;
             igraph_vector_destroy(vec);
             IGRAPH_FREE(vec);
+        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            igraph_vector_bool_t *vec = (igraph_vector_bool_t*) rec->value;
+            igraph_vector_bool_destroy(vec);
+            IGRAPH_FREE(vec);
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
             igraph_strvector_destroy(strvec);
             IGRAPH_FREE(strvec);
+        } else {
+            /* Must never reach here */
+            IGRAPH_FATAL("Unknown attribute type encountered.");
         }
         IGRAPH_FREE(rec->name);
         IGRAPH_FREE(rec);
@@ -225,13 +232,22 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
             for (j = origsize; j < context.actedge; j++) {
                 VECTOR(*vec)[j] = IGRAPH_NAN;
             }
+        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            /* Boolean attributes are not currently added by the parser.
+             * This section is here for future-proofing. */
+            igraph_vector_bool_t *vec = (igraph_vector_bool_t*)rec->value;
+            igraph_integer_t origsize = igraph_vector_bool_size(vec);
+            IGRAPH_CHECK(igraph_vector_bool_resize(vec, context.actedge));
+            for (j = origsize; j < context.actedge; j++) {
+                VECTOR(*vec)[j] = 0;
+            }
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-            igraph_integer_t origsize = igraph_strvector_size(strvec);
+            /* strvector_resize() adds empty strings */
             IGRAPH_CHECK(igraph_strvector_resize(strvec, context.actedge));
-            for (j = origsize; j < context.actedge; j++) {
-                IGRAPH_CHECK(igraph_strvector_set(strvec, j, ""));
-            }
+        } else {
+            /* Must never reach here */
+            IGRAPH_FATAL("Unknown attribute type encountered.");
         }
     }
 
@@ -582,8 +598,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     }
     for (i = 0; i < (igraph_integer_t) (sizeof(vstrnames) / sizeof(vstrnames[0])); i++) {
         igraph_attribute_type_t type;
-        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
-                                        vstrnames[i])) {
+        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vstrnames[i])) {
             IGRAPH_CHECK(igraph_i_attribute_gettype(
                              graph, &type, IGRAPH_ATTRIBUTE_VERTEX, vstrnames[i]));
             if (type == IGRAPH_ATTRIBUTE_STRING) {
