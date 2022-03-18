@@ -329,8 +329,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_i
                     IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 IGRAPH_FINALLY(igraph_free, newbool);
-                IGRAPH_CHECK(igraph_vector_bool_init(newbool, origlen));
-                IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
+                IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, origlen);
                 newrec->value = newbool;
                 igraph_vector_bool_fill(newbool, 0);
             }
@@ -469,12 +468,13 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 if (!newnum) {
                     IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
+                IGRAPH_FINALLY(igraph_free, newnum);
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
                 igraph_vector_index(num, newnum, idx);
                 oldrec->value = newnum;
                 igraph_vector_destroy(num);
                 IGRAPH_FREE(num);
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 oldbool = (igraph_vector_bool_t*) oldrec->value;
@@ -482,13 +482,13 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 if (!newbool) {
                     IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
-                IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
-                igraph_vector_bool_index(oldbool, newbool, idx);
+                IGRAPH_FINALLY(igraph_free, newbool);
+                IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
+                IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
                 oldrec->value = newbool;
                 igraph_vector_bool_destroy(oldbool);
                 IGRAPH_FREE(oldbool);
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 str = (igraph_strvector_t*)oldrec->value;
@@ -496,13 +496,13 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 if (!newstr) {
                     IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
-                IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
-                igraph_strvector_index(str, newstr, idx);
+                IGRAPH_FINALLY(igraph_free, newstr);
+                IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
+                IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
                 oldrec->value = newstr;
                 igraph_strvector_destroy(str);
                 IGRAPH_FREE(str);
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             default:
                 IGRAPH_WARNING("Unknown edge attribute ignored");
@@ -551,10 +551,11 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 if (!newnum) {
                     IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
+                IGRAPH_FINALLY(igraph_free, newnum);
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
-                igraph_vector_index(num, newnum, idx);
+                IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
                 new_rec->value = newnum;
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 oldbool = (igraph_vector_bool_t*)oldrec->value;
@@ -562,11 +563,11 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 if (!newbool) {
                     IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
-                IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
-                igraph_vector_bool_index(oldbool, newbool, idx);
+                IGRAPH_FINALLY(igraph_free, newbool);
+                IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
+                IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
                 new_rec->value = newbool;
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 str = (igraph_strvector_t*)oldrec->value;
@@ -574,11 +575,11 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 if (!newstr) {
                     IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
-                IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
-                igraph_strvector_index(str, newstr, idx);
+                IGRAPH_FINALLY(igraph_free, newstr);
+                IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
+                IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
                 new_rec->value = newstr;
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             default:
                 IGRAPH_WARNING("Unknown vertex attribute ignored");
@@ -1437,12 +1438,16 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
 
         newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         if (!newrec) {
-            IGRAPH_ERROR("Cannot combine vertex attributes",
-                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Cannot combine vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
+        IGRAPH_FINALLY(igraph_free, newrec);
         newrec->name = strdup(name);
+        if (!newrec->name) {
+            IGRAPH_ERROR("Cannot combine vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        }
         newrec->type = type;
         VECTOR(*new_val)[j] = newrec;
+        IGRAPH_FINALLY_CLEAN(1); /* newrec */
 
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             switch (todo) {
@@ -1772,12 +1777,13 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 if (!newnum) {
                     IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
+                IGRAPH_FINALLY(igraph_free, newnum);
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
-                igraph_vector_index(num, newnum, idx);
+                IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
                 oldrec->value = newnum;
                 igraph_vector_destroy(num);
                 IGRAPH_FREE(num);
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 oldbool = (igraph_vector_bool_t*) oldrec->value;
@@ -1785,13 +1791,13 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 if (!newbool) {
                     IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
-                IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
-                igraph_vector_bool_index(oldbool, newbool, idx);
+                IGRAPH_FINALLY(igraph_free, newbool);
+                IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
+                IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
                 oldrec->value = newbool;
                 igraph_vector_bool_destroy(oldbool);
                 IGRAPH_FREE(oldbool);
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 str = (igraph_strvector_t*)oldrec->value;
@@ -1799,13 +1805,13 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 if (!newstr) {
                     IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
-                IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
-                igraph_strvector_index(str, newstr, idx);
+                IGRAPH_FINALLY(igraph_free, newstr);
+                IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
+                IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
                 oldrec->value = newstr;
                 igraph_strvector_destroy(str);
                 IGRAPH_FREE(str);
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             default:
                 IGRAPH_WARNING("Unknown edge attribute ignored");
@@ -1850,10 +1856,11 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 if (!newnum) {
                     IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
+                IGRAPH_FINALLY(igraph_free, newnum);
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
-                igraph_vector_index(num, newnum, idx);
+                IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
                 new_rec->value = newnum;
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 str = (igraph_strvector_t*)oldrec->value;
@@ -1861,11 +1868,11 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 if (!newstr) {
                     IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
-                IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
-                igraph_strvector_index(str, newstr, idx);
+                IGRAPH_FINALLY(igraph_free, newstr);
+                IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
+                IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
                 new_rec->value = newstr;
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 oldbool = (igraph_vector_bool_t*) oldrec->value;
@@ -1873,11 +1880,11 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 if (!newbool) {
                     IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
-                IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
-                IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
-                igraph_vector_bool_index(oldbool, newbool, idx);
+                IGRAPH_FINALLY(igraph_free, newbool);
+                IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
+                IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
                 new_rec->value = newbool;
-                IGRAPH_FINALLY_CLEAN(1);
+                IGRAPH_FINALLY_CLEAN(2);
                 break;
             default:
                 IGRAPH_WARNING("Unknown edge attribute ignored");
