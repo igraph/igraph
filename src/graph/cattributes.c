@@ -285,7 +285,7 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_vertices_i(igraph_t *graph, igraph_integer_t nv,
+static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, igraph_integer_t nv,
                                                          igraph_vector_ptr_t *nattr) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -455,7 +455,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_i
     igraph_integer_t origlen = igraph_vcount(graph) - nv;
 
     /* Attempt adding attributes */
-    igraph_error_t err = igraph_i_cattribute_add_vertices_i(graph, nv, nattr);
+    igraph_error_t err = igraph_i_cattribute_add_vertices_inner(graph, nv, nattr);
     if (err != IGRAPH_SUCCESS) {
         /* If unsuccessful, revert attribute vector sizes.
          * The following function assumes that all attributes vectors that
@@ -1635,7 +1635,7 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_edges_i(igraph_t *graph, const igraph_vector_int_t *edges,
+static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const igraph_vector_int_t *edges,
                                                       igraph_vector_ptr_t *nattr) {
 
     igraph_i_cattributes_t *attr = graph->attr;
@@ -1807,7 +1807,7 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
     igraph_integer_t origlen = igraph_ecount(graph) - ne;
 
     /* Attempt adding attributes */
-    igraph_error_t err = igraph_i_cattribute_add_edges_i(graph, edges, nattr);
+    igraph_error_t err = igraph_i_cattribute_add_edges_inner(graph, edges, nattr);
     if (err != IGRAPH_SUCCESS) {
         /* If unsuccessful, revert attribute vector sizes.
          * The following function assumes that all attributes vectors that
