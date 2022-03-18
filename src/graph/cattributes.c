@@ -51,6 +51,26 @@ static igraph_bool_t igraph_i_cattribute_find(const igraph_vector_ptr_t *ptrvec,
     return l;
 }
 
+static void igraph_i_cattribute_revert_attribute_vector_sizes(igraph_vector_ptr_t *al, igraph_integer_t origlen) {
+    igraph_integer_t ano = igraph_vector_ptr_size(al);
+    for (igraph_integer_t i = 0; i < ano; i++) {
+        igraph_attribute_record_t *rec = VECTOR(*al)[i];
+        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+            igraph_vector_t *nvec = (igraph_vector_t *) rec->value;
+            igraph_vector_resize(nvec, origlen); /* shrinks */
+        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            igraph_vector_bool_t *bvec = (igraph_vector_bool_t *) rec->value;
+            igraph_vector_bool_resize(bvec, origlen); /* shrinks */
+        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+            igraph_strvector_t *svec = (igraph_strvector_t *) rec->value;
+            igraph_strvector_resize(svec, origlen); /* shrinks */
+        } else {
+            /* Must never reach here */
+            IGRAPH_FATAL("Unknown attribute type encountered.");
+        }
+    }
+}
+
 typedef struct igraph_i_cattributes_t {
     igraph_vector_ptr_t gal;
     igraph_vector_ptr_t val;
@@ -1573,8 +1593,8 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
-                                         igraph_vector_ptr_t *nattr) {
+static igraph_error_t igraph_i_cattribute_add_edges_i(igraph_t *graph, const igraph_vector_int_t *edges,
+                                                      igraph_vector_ptr_t *nattr) {
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *eal = &attr->eal;
@@ -1605,7 +1625,7 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
         }
     }
 
-    /* Add NA/empty string vectors for the existing vertices */
+    /* Add NaN/FALSE/"" for the existing vertices for numeric, Boolean and string attributes. */
     if (newattrs != 0) {
         for (i = 0; i < newattrs; i++) {
             igraph_attribute_record_t *tmp = VECTOR(*nattr)[ VECTOR(news)[i] ];
@@ -1657,7 +1677,7 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
     /* Now append the new values */
     for (i = 0; i < ealno; i++) {
         igraph_attribute_record_t *oldrec = VECTOR(*eal)[i];
-        igraph_attribute_record_t *newrec = 0;
+        igraph_attribute_record_t *newrec = NULL;
         const char *name = oldrec->name;
         igraph_integer_t j = -1;
         igraph_bool_t l = 0;
@@ -1703,7 +1723,7 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
                 break;
             }
         } else {
-            /* No such attribute, append NA's */
+            /* No such attribute, append NaN/FALSE/"". */
             igraph_vector_t *oldnum = (igraph_vector_t *)oldrec->value;
             igraph_strvector_t *oldstr = (igraph_strvector_t*)oldrec->value;
             igraph_vector_bool_t *oldbool = (igraph_vector_bool_t *)oldrec->value;
@@ -1734,6 +1754,33 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
+                                                    igraph_vector_ptr_t *nattr) {
+    /* Record information needed to restore attribute vector sizes */
+    igraph_i_cattributes_t *attr = graph->attr;
+    igraph_vector_ptr_t *eal = &attr->eal;
+    igraph_integer_t ne = igraph_vector_int_size(edges) / 2;
+    igraph_integer_t origlen = igraph_ecount(graph) - ne;
+
+    /* Attempt adding attributes */
+    igraph_error_t err = igraph_i_cattribute_add_edges_i(graph, edges, nattr);
+    if (err != IGRAPH_SUCCESS) {
+        /* If uncusseddful, revert attribute vector sizes.
+         * The following function assumes that all attributes vectors that
+         * are present have a length at least as great as origlen.
+         * This is true at the moment because any new attributes that are
+         * added to the graph are created directly at 'origlen' instead of
+         * being created at smaller sizes and resized later.
+         *
+         * TODO: While this ensures that all attribute vector lengths are
+         * correct, it does not ensure that no extra attributes have
+         * been added to the graph.
+         */
+        igraph_i_cattribute_revert_attribute_vector_sizes(eal, origlen);
+    }
+    return err;
 }
 
 static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
