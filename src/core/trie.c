@@ -33,13 +33,15 @@
 
 #include <string.h>
 
-/**
- * \ingroup igraphtrie
- * \brief Creates a trie node (not to be called directly)
- * \return Error code: errors by igraph_strvector_init(),
- *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
+
+/*
+ * igraph_trie_t is a data structures that stores an ordered list of strings.
+ * It allows an efficient lookup of the index of a string. It has the capability
+ * to also store the list of strings directly for reverse lookup of strings
+ * by index.
  */
 
+/* Allocates memory for a trie node. */
 static igraph_error_t igraph_i_trie_init_node(igraph_trie_node_t *t) {
     IGRAPH_STRVECTOR_INIT_FINALLY(&t->strs, 0);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 0);
@@ -53,6 +55,9 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
 /**
  * \ingroup igraphtrie
  * \brief Creates a trie.
+ *
+ * \param t An uninitialized trie.
+ * \param storekeys Specifies whether keys are stored for reverse lookup.
  * \return Error code: errors by igraph_strvector_init(),
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
@@ -69,11 +74,6 @@ igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
-
-/**
- * \ingroup igraphtrie
- * \brief Destroys a node of a trie (not to be called directly).
- */
 
 static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
     igraph_integer_t i;
@@ -92,6 +92,7 @@ static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool
     }
 }
 
+/* Deallocates a trie node. */
 static void igraph_i_trie_destroy_node(igraph_trie_node_t *t) {
     igraph_i_trie_destroy_node_helper(t, 0);
 }
@@ -99,6 +100,8 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t) {
 /**
  * \ingroup igraphtrie
  * \brief Destroys a trie (frees allocated memory).
+ *
+ * \param t The trie.
  */
 
 void igraph_trie_destroy(igraph_trie_t *t) {
@@ -109,11 +112,7 @@ void igraph_trie_destroy(igraph_trie_t *t) {
 }
 
 
-/**
- * \ingroup igraphtrie
- * \brief Internal helping function for igraph_trie_t
- */
-
+/* Computes the location (index) of the first difference between 'str' and 'key' */
 static size_t igraph_i_strdiff(const char *str, const char *key) {
     size_t diff = 0;
     while (key[diff] != '\0' && str[diff] != '\0' && str[diff] == key[diff]) {
@@ -126,8 +125,7 @@ static size_t igraph_i_strdiff(const char *str, const char *key) {
  * \ingroup igraphtrie
  * \brief Search/insert in a trie (not to be called directly).
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
 static igraph_error_t igraph_i_trie_get_node(
@@ -297,7 +295,12 @@ static igraph_error_t igraph_i_trie_get_node(
 
 /**
  * \ingroup igraphtrie
- * \brief Search/insert in a trie.
+ * \brief Search/insert a null-terminated string in a trie.
+ *
+ * \param t The trie.
+ * \param key The string to search for. If not found, it will be inserted.
+ * \param id The index of the string is stored here.
+ * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
 igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
@@ -337,10 +340,17 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
 
 /**
  * \ingroup igraphtrie
- * \brief Search/insert in a trie (for internal use).
+ * \brief Search/insert a string of given length in a trie.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * This function is identical to \ref igraph_trie_get(), except that
+ * it takes a string of a given length as input instead of a null-terminated
+ * string.
+ *
+ * \param t The trie.
+ * \param key The string to search for. If not found, it will be inserted.
+ * \param length The length of \p key.
+ * \param id The index of the string is stored here.
+ * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
 igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_integer_t length,
@@ -364,8 +374,15 @@ igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_intege
 /**
  * \ingroup igraphtrie
  * \brief Search in a trie.
- * This variant does not add \c key to the trie if it does not exist.
- * In this case, a negative id is returned.
+ *
+ * This variant does not add \p key to the trie if it does not exist.
+ * In this case, a negative \p id is returned.
+ *
+ * \param t The trie.
+ * \param key The string to search for.
+ * \param id If \p key is found, its index is stored here. Otherwise,
+ *    a negative value is returned.
+ * \param Error code.
  */
 
 igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
@@ -376,15 +393,26 @@ igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integ
 /**
  * \ingroup igraphtrie
  * \brief Get an element of a trie based on its index.
+ *
+ * \param t The trie.
+ * \param idx The index of the string. It is not checked that it is within range.
+ * \return The string with the given index. If the trie does not store the keys for
+ *   reverse lookup, \c NULL is returned.
  */
 
 const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
+    if (! t->storekeys) {
+        return NULL;
+    }
     return igraph_strvector_get(&t->keys, idx);
 }
 
 /**
  * \ingroup igraphtrie
  * \brief Returns the size of a trie.
+ *
+ * \param t The trie.
+ * \return The size of the trie, i.e. one larger than the maximum index.
  */
 
 igraph_integer_t igraph_trie_size(igraph_trie_t *t) {
