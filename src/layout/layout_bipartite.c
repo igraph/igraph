@@ -62,7 +62,7 @@ igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                       IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
     if (hgap < 0) {
-        IGRAPH_ERRORF("The horizontal gap cannot be negative, got %f.", IGRAPH_EINVAL, hgap);
+        IGRAPH_ERRORF("The horizontal gap cannot be negative, got %g.", IGRAPH_EINVAL, hgap);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&layers, no_of_nodes);

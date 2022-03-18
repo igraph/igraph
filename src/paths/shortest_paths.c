@@ -1178,7 +1178,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERRORF("Weight vector must be non-negative, got %f.", IGRAPH_EINVAL, min);
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (igraph_is_nan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
