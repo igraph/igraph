@@ -30,13 +30,12 @@
 
 #include <string.h>
 
-/* An attribute is either a numeric vector (vector_t) or a string
-   vector (strvector_t). The attribute itself is stored in a
-   struct igraph_attribute_record_t, there is one such object for each
-   attribute. The igraph_t has a pointer to an array of three
-   vector_ptr_t's which contains pointers to
-   igraph_i_cattribute_t's. Graph attributes are first, then vertex
-   and edge attributes. */
+/* An attribute is either a numeric vector (vector_t), a boolean vector
+ * (vector_bool_t) or a string vector (strvector_t).
+ * The attribute itself is stored in a struct igraph_attribute_record_t.
+ * There is one such object for each attribute. The igraph_t has a pointer
+ * to an igraph_i_cattribute_t, which contains three vector_ptr_t's, each
+ * holding pointers to igraph_attribute_record_t objects. */
 
 static igraph_bool_t igraph_i_cattribute_find(const igraph_vector_ptr_t *ptrvec,
                                               const char *name, igraph_integer_t *idx) {
