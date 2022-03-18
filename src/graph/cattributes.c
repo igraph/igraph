@@ -159,26 +159,25 @@ static void igraph_i_cattribute_destroy(igraph_t *graph) {
                 if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     num = (igraph_vector_t*)rec->value;
                     igraph_vector_destroy(num);
-                    igraph_free(num);
+                    IGRAPH_FREE(num);
                 } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
                     str = (igraph_strvector_t*)rec->value;
                     igraph_strvector_destroy(str);
-                    igraph_free(str);
+                    IGRAPH_FREE(str);
                 } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                     boolvec = (igraph_vector_bool_t*)rec->value;
                     igraph_vector_bool_destroy(boolvec);
-                    igraph_free(boolvec);
+                    IGRAPH_FREE(boolvec);
                 }
-                igraph_free((char*)rec->name);
-                igraph_free(rec);
+                IGRAPH_FREE(rec->name);
+                IGRAPH_FREE(rec);
             }
         }
     }
     igraph_vector_ptr_destroy(&attr->gal);
     igraph_vector_ptr_destroy(&attr->val);
     igraph_vector_ptr_destroy(&attr->eal);
-    igraph_free(graph->attr);
-    graph->attr = 0;
+    IGRAPH_FREE(graph->attr); /* sets to NULL */
 }
 
 /* Almost the same as destroy, but we might have null pointers */
@@ -201,18 +200,18 @@ static void igraph_i_cattribute_copy_free(igraph_i_cattributes_t *attr) {
             if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 num = (igraph_vector_t*)rec->value;
                 igraph_vector_destroy(num);
-                igraph_free(num);
+                IGRAPH_FREE(num);
             } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 boolvec = (igraph_vector_bool_t*)rec->value;
                 igraph_vector_bool_destroy(boolvec);
-                igraph_free(boolvec);
+                IGRAPH_FREE(boolvec);
             } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
                 str = (igraph_strvector_t*)rec->value;
                 igraph_strvector_destroy(str);
-                igraph_free(str);
+                IGRAPH_FREE(str);
             }
-            igraph_free((char*)rec->name);
-            igraph_free(rec);
+            IGRAPH_FREE(rec->name);
+            IGRAPH_FREE(rec);
         }
     }
 }
@@ -1567,8 +1566,8 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
         j++;
     }
 
-    igraph_free(funcs);
-    igraph_free(TODO);
+    IGRAPH_FREE(funcs);
+    IGRAPH_FREE(TODO);
     igraph_i_cattribute_permute_free(new_val);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -2082,8 +2081,8 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
         j++;
     }
 
-    igraph_free(funcs);
-    igraph_free(TODO);
+    IGRAPH_FREE(funcs);
+    IGRAPH_FREE(TODO);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
