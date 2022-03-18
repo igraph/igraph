@@ -470,7 +470,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 }
                 IGRAPH_FINALLY(igraph_free, newnum);
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
-                igraph_vector_index(num, newnum, idx);
+                IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
                 oldrec->value = newnum;
                 igraph_vector_destroy(num);
                 IGRAPH_FREE(num);
@@ -2370,7 +2370,7 @@ static igraph_error_t igraph_i_cattribute_get_string_vertex_attr(const igraph_t 
     }
     str = (igraph_strvector_t*)rec->value;
     if (igraph_vs_is_all(&vs)) {
-        igraph_strvector_resize(value, 0);
+        igraph_strvector_clear(value);
         IGRAPH_CHECK(igraph_strvector_append(value, str));
     } else {
         igraph_vit_t it;
@@ -2451,7 +2451,7 @@ static igraph_error_t igraph_i_cattribute_get_string_edge_attr(const igraph_t *g
     }
     str = (igraph_strvector_t*)rec->value;
     if (igraph_es_is_all(&es)) {
-        igraph_strvector_resize(value, 0);
+        igraph_strvector_clear(value);
         IGRAPH_CHECK(igraph_strvector_append(value, str));
     } else {
         igraph_eit_t it;
