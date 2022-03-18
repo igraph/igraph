@@ -582,6 +582,9 @@
 
  - `igraph_read_graph_graphml()` now uses `igraph_integer_t` for its `index` argument.
 
+ - `igraph_read_graph_pajek()` now creates a Boolean "type" attribute for bipartite graphs.
+   Previously it created a numeric attribute.
+
 
 ### Added
 

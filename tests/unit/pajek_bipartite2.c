@@ -49,8 +49,13 @@ int print_attributes(const igraph_t *g) {
             if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_real_printf(VAN(g, STR(vnames, j), i));
                 putchar(' ');
-            } else {
+            } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+                printf("%d ", VAB(g, STR(vnames, j), i) ? 1 : 0);
+            } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
                 printf("\"%s\" ", VAS(g, STR(vnames, j), i));
+            } else {
+                fprintf(stderr, "\nUnknown attribute type!\n");
+                abort();
             }
         }
         printf("\n");
@@ -69,8 +74,13 @@ int print_attributes(const igraph_t *g) {
             if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_real_printf(EAN(g, STR(enames, j), i));
                 putchar(' ');
-            } else {
+            } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+                printf("%d ", VAB(g, STR(vnames, j), i) ? 1 : 0);
+            } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
                 printf("\"%s\" ", EAS(g, STR(enames, j), i));
+            } else {
+                fprintf(stderr, "\nUnknown attribute type!\n");
+                abort();
             }
         }
         printf("\n");

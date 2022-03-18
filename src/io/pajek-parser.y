@@ -755,7 +755,7 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
   igraph_integer_t i, n=context->vcount, n1=context->vcount2;
   igraph_integer_t attrid, attrsize = igraph_trie_size(names);
   igraph_attribute_record_t *rec;
-  igraph_vector_t *na;
+  igraph_vector_bool_t *na;
 
   if (n1 > n) {
     IGRAPH_ERROR("Invalid number of vertices in bipartite Pajek file.",
@@ -773,18 +773,18 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
     IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, rec);
-  na=IGRAPH_CALLOC(1, igraph_vector_t);
+  na=IGRAPH_CALLOC(1, igraph_vector_bool_t);
   if (! na) {
     IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, na);
-  IGRAPH_CHECK(igraph_vector_init(na, n));
+  IGRAPH_CHECK(igraph_vector_bool_init(na, n));
   rec->name=strdup(attrname);
   if (! rec->name) {
     IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(igraph_free, (void *) rec->name);
-  rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
+  IGRAPH_FINALLY(igraph_free, (char *) rec->name);
+  rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
   rec->value=na;
   IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
   IGRAPH_FINALLY_CLEAN(3); /* ownership of 'rec' transferred to 'attrs' */
