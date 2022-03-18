@@ -590,12 +590,16 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
             /* The record itself */
             igraph_attribute_record_t *new_rec =
                 IGRAPH_CALLOC(1, igraph_attribute_record_t);
-            if (!new_rec) {
+            if (! new_rec) {
                 IGRAPH_ERROR("Cannot create vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
+            IGRAPH_FINALLY(igraph_free, new_rec);
             new_rec->name = strdup(oldrec->name);
+            if (! new_rec->name) {
+                IGRAPH_ERROR("Cannot create vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            }
+            IGRAPH_FINALLY(igraph_free, (char *) new_rec->name);
             new_rec->type = oldrec->type;
-            VECTOR(*new_val)[i] = new_rec;
 
             /* The data */
             switch (type) {
@@ -609,7 +613,6 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
                 IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
                 new_rec->value = newnum;
-                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 oldbool = (igraph_vector_bool_t*)oldrec->value;
@@ -621,7 +624,6 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
                 IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
                 new_rec->value = newbool;
-                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 str = (igraph_strvector_t*)oldrec->value;
@@ -633,11 +635,13 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
                 IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
                 IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
                 new_rec->value = newstr;
-                IGRAPH_FINALLY_CLEAN(2);
                 break;
             default:
                 IGRAPH_WARNING("Unknown vertex attribute ignored");
             }
+
+            VECTOR(*new_val)[i] = new_rec;
+            IGRAPH_FINALLY_CLEAN(4);
         }
     }
 
@@ -1485,9 +1489,8 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
         if (!newrec->name) {
             IGRAPH_ERROR("Cannot combine vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
+        IGRAPH_FINALLY(igraph_free, (char *) newrec->name);
         newrec->type = type;
-        VECTOR(*new_val)[j] = newrec;
-        IGRAPH_FINALLY_CLEAN(1); /* newrec */
 
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             switch (todo) {
@@ -1617,6 +1620,9 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
             IGRAPH_ERROR("Unknown attribute type, this should not happen",
                          IGRAPH_UNIMPLEMENTED);
         }
+
+        VECTOR(*new_val)[j] = newrec;
+        IGRAPH_FINALLY_CLEAN(2); /* newrec->name and newrec */
 
         j++;
     }
@@ -1913,9 +1919,13 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
             if (!new_rec) {
                 IGRAPH_ERROR("Cannot create edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
+            IGRAPH_FINALLY(igraph_free, new_rec);
             new_rec->name = strdup(oldrec->name);
+            if (! new_rec->name) {
+                IGRAPH_ERROR("Cannot create edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            }
+            IGRAPH_FINALLY(igraph_free, (char *) new_rec->name);
             new_rec->type = oldrec->type;
-            VECTOR(*new_eal)[i] = new_rec;
 
             switch (type) {
             case IGRAPH_ATTRIBUTE_NUMERIC:
@@ -1928,7 +1938,6 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
                 IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
                 new_rec->value = newnum;
-                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 str = (igraph_strvector_t*)oldrec->value;
@@ -1940,7 +1949,6 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
                 IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
                 new_rec->value = newstr;
-                IGRAPH_FINALLY_CLEAN(2);
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 oldbool = (igraph_vector_bool_t*) oldrec->value;
@@ -1952,11 +1960,12 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                 IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
                 IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
                 new_rec->value = newbool;
-                IGRAPH_FINALLY_CLEAN(2);
                 break;
             default:
                 IGRAPH_WARNING("Unknown edge attribute ignored");
             }
+            VECTOR(*new_eal)[i] = new_rec;
+            IGRAPH_FINALLY_CLEAN(4);
         }
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -2026,12 +2035,15 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
 
         newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
         if (!newrec) {
-            IGRAPH_ERROR("Cannot combine edge attributes",
-                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Cannot combine edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
+        IGRAPH_FINALLY(igraph_free, newrec);
         newrec->name = strdup(name);
+        if (! newrec->name) {
+            IGRAPH_ERROR("Cannot combine edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        }
+        IGRAPH_FINALLY(igraph_free, (char *) newrec->name);
         newrec->type = type;
-        VECTOR(*new_eal)[j] = newrec;
 
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             switch (todo) {
@@ -2161,6 +2173,9 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
             IGRAPH_ERROR("Unknown attribute type, this should not happen",
                          IGRAPH_UNIMPLEMENTED);
         }
+
+        VECTOR(*new_eal)[j] = newrec;
+        IGRAPH_FINALLY_CLEAN(2); /* newrec and newrc->name */
 
         j++;
     }
