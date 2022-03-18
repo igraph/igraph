@@ -278,13 +278,13 @@ static igraph_error_t igraph_i_trie_get_node(
     /* Nothing matches */
 
     if (add) {
-        IGRAPH_CHECK(igraph_vector_ptr_reserve(&t->children,
-                                               igraph_vector_ptr_size(&t->children) + 1));
-        IGRAPH_CHECK(igraph_vector_int_reserve(&t->values, igraph_vector_int_size(&t->values) + 1));
+        /* Memory saving at the cost of performance may be possible by using the pattern
+         *     CHECK(reserve(vec, size(vec) + 1));
+         *     push_back(vec, value);
+         * This was the original pattern used before igraph 0.10. */
         IGRAPH_CHECK(igraph_strvector_push_back(&t->strs, key));
-
-        igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
-        igraph_vector_int_push_back(&t->values, newvalue); /* allocated */
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(&t->children, NULL));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&t->values, newvalue));
         *id = newvalue;
     } else {
         *id = -1;
