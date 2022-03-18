@@ -646,7 +646,7 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
       IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, na);
-    IGRAPH_CHECK(igraph_strvector_init(na, count));
+    IGRAPH_STRVECTOR_INIT_FINALLY(na, count);
     rec->name=strdup(attrname);
     if (! rec->name) {
       IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
@@ -655,16 +655,12 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
     rec->type=IGRAPH_ATTRIBUTE_STRING;
     rec->value=na;
     IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
-    IGRAPH_FINALLY_CLEAN(3); /* ownership of rec transferred to attrs */
+    IGRAPH_FINALLY_CLEAN(4); /* ownership of rec transferred to attrs */
   }
   rec=VECTOR(*attrs)[id];
   na=(igraph_strvector_t*)rec->value;
   if (igraph_strvector_size(na) <= vid) {
-    igraph_integer_t origsize=igraph_strvector_size(na);
     IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
-    for (;origsize<count; origsize++) {
-      IGRAPH_CHECK(igraph_strvector_set(na, origsize, ""));
-    }
   }
   IGRAPH_CHECK(igraph_strvector_set(na, vid, str));
 
