@@ -724,10 +724,10 @@ igraph_centralization_degree:
         BOOLEAN normalized=True
 
 igraph_centralization_degree_tmax:
+    # The general consensus is that the 'loops' argument of this function
+    # should not have a default value; see this comment from @torfason:
+    # https://github.com/igraph/rigraph/issues/369#issuecomment-939893681
     PARAMS: |-
-        # The general consensus is that the 'loops' argument of this function
-        # should not have a default value; see this comment from @torfason:
-        # https://github.com/igraph/rigraph/issues/369#issuecomment-939893681
         GRAPH_OR_0 graph=NULL, INTEGER nodes=0, NEIMODE mode=ALL,
         BOOLEAN loops, OUT REAL res
 
