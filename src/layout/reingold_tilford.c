@@ -48,7 +48,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis;
 
-    igraph_vector_int_resize(pnewedges, 0);
+    igraph_vector_int_clear(pnewedges);
 
     /* traverse from real_root and see what nodes you cannot reach */
     no_of_newedges = 0;

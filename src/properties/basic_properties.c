@@ -170,7 +170,7 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
             VECTOR(*res)[i] = (log(s) - ent / s) / log(k);
         }
     } else {
-        IGRAPH_CHECK(igraph_vector_resize(res, 0));
+        igraph_vector_clear(res);
         IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
