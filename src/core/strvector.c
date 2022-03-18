@@ -79,7 +79,7 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t si
         sv->stor_begin[i] = IGRAPH_CALLOC(1, char);
         if (sv->stor_begin[i] == NULL) {
             /* LCOV_EXCL_START */
-            for (j = 0; j < i - 1; j++) {
+            for (j = 0; j < i; j++) {
                 IGRAPH_FREE(sv->stor_begin[j]);
             }
             IGRAPH_FREE(sv->stor_begin);
@@ -277,7 +277,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
         to->stor_begin[i] = strdup(igraph_strvector_get(from, i));
         if (to->stor_begin[i] == NULL) {
             /* LCOV_EXCL_START */
-            for (j = 0; j < i - 1; j++) {
+            for (j = 0; j < i; j++) {
                 IGRAPH_FREE(to->stor_begin[j]);
             }
             IGRAPH_FREE(to->stor_begin);
@@ -387,7 +387,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t *sv, igraph_integer_t 
             sv->stor_begin[oldsize + i] = IGRAPH_CALLOC(1, char);
             if (sv->stor_begin[oldsize + i] == NULL) {
                 /* LCOV_EXCL_START */
-                for (j = 0; j < i - 1; j++) {
+                for (j = 0; j < i; j++) {
                     IGRAPH_FREE(sv->stor_begin[oldsize + j]);
                 }
                 IGRAPH_ERROR("Cannot resize string vector.", IGRAPH_ENOMEM);
