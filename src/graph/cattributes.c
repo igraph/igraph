@@ -277,8 +277,8 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_integer_t nv,
-                                            igraph_vector_ptr_t *nattr) {
+static igraph_error_t igraph_i_cattribute_add_vertices_i(igraph_t *graph, igraph_integer_t nv,
+                                                         igraph_vector_ptr_t *nattr) {
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *val = &attr->val;
@@ -437,6 +437,34 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_i
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_integer_t nv,
+                                                       igraph_vector_ptr_t *nattr) {
+    /* Record information needed to restore attribute vector sizes */
+    igraph_i_cattributes_t *attr = graph->attr;
+    igraph_vector_ptr_t *val = &attr->val;
+    igraph_integer_t origlen = igraph_vcount(graph) - nv;
+
+    /* Attempt adding attributes */
+    igraph_error_t err = igraph_i_cattribute_add_vertices_i(graph, nv, nattr);
+    if (err != IGRAPH_SUCCESS) {
+        /* If unsuccessful, revert attribute vector sizes.
+         * The following function assumes that all attributes vectors that
+         * are present have a length at least as great as origlen.
+         * This is true at the moment because any new attributes that are
+         * added to the graph are created directly at 'origlen' instead of
+         * being created at smaller sizes and resized later.
+         *
+         * NOTE: While this ensures that all attribute vector lengths are
+         * correct, it does not ensure that no extra attributes have
+         * been added to the graph. However, the presence of extra
+         * attributes does not make the attribute table inconsistent
+         * like the incorrect attribute vector lengths would.
+         */
+        igraph_i_cattribute_revert_attribute_vector_sizes(val, origlen);
+    }
+    return err;
 }
 
 static void igraph_i_cattribute_permute_free(igraph_vector_ptr_t *v) {
@@ -1767,16 +1795,18 @@ static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igrap
     /* Attempt adding attributes */
     igraph_error_t err = igraph_i_cattribute_add_edges_i(graph, edges, nattr);
     if (err != IGRAPH_SUCCESS) {
-        /* If uncusseddful, revert attribute vector sizes.
+        /* If unsuccessful, revert attribute vector sizes.
          * The following function assumes that all attributes vectors that
          * are present have a length at least as great as origlen.
          * This is true at the moment because any new attributes that are
          * added to the graph are created directly at 'origlen' instead of
          * being created at smaller sizes and resized later.
          *
-         * TODO: While this ensures that all attribute vector lengths are
+         * NOTE: While this ensures that all attribute vector lengths are
          * correct, it does not ensure that no extra attributes have
-         * been added to the graph.
+         * been added to the graph. However, the presence of extra
+         * attributes does not make the attribute table inconsistent
+         * like the incorrect attribute vector lengths would.
          */
         igraph_i_cattribute_revert_attribute_vector_sizes(eal, origlen);
     }
