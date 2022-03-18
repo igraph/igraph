@@ -524,7 +524,7 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
         igraph_vector_minmax(edges, &min_edge, &max_edge);
     }
     if (min_edge < 0 || max_edge >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid (negative or too large) vertex id", IGRAPH_EINVVID);
     }
 
     /* Check bipartiteness */
