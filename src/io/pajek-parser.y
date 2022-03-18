@@ -763,13 +763,9 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
   }
 
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &attrid));
+  /* It should not be possible for the "type" attribute to be already
+   * present at this point. */
   IGRAPH_ASSERT(attrid == attrsize);
-  /*
-  if (attrid != attrsize) {
-    IGRAPH_ERROR("Duplicate 'type' attribute in Pajek file, "
-                 "this should not happen.", IGRAPH_EINTERNAL);
-  }
-  */
 
   /* add a new attribute */
   rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
@@ -812,7 +808,7 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
     igraph_integer_t v1 = VECTOR(*edges)[i];
     igraph_integer_t v2 = VECTOR(*edges)[i+1];
     if ( (v1 < n1 && v2 < n1) || (v1 > n1 && v2 > n1) ) {
-      IGRAPH_WARNING("Invalid edge in bipartite graph");
+      IGRAPH_WARNING("Invalid edge in bipartite graph.");
     }
   }
 
