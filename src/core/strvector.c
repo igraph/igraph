@@ -550,10 +550,11 @@ static igraph_error_t igraph_i_strvector_expand_if_full(igraph_strvector_t *sv) 
 
 igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *value) {
     IGRAPH_CHECK(igraph_i_strvector_expand_if_full(sv));
-    *(sv->end) = strdup(value);
-    if (*(sv->end) == NULL) {
+    char *tmp = strdup(value);
+    if (! tmp) {
         IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
+    *sv->end = tmp;
     sv->end++;
 
     return IGRAPH_SUCCESS;
@@ -573,13 +574,16 @@ igraph_error_t igraph_strvector_push_back(igraph_strvector_t *sv, const char *va
  * length of the new string.
  */
 
-igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *sv, const char *value,
-        igraph_integer_t len) {
+igraph_error_t igraph_strvector_push_back_len(
+        igraph_strvector_t *sv,
+        const char *value, igraph_integer_t len) {
+
     IGRAPH_CHECK(igraph_i_strvector_expand_if_full(sv));
-    *(sv->end) = strndup(value, len);
-    if (*(sv->end) == NULL) {
+    char *tmp = strndup(value, len);
+    if (! tmp) {
         IGRAPH_ERROR("Cannot add string to string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
+    *sv->end = tmp;
     sv->end++;
 
     return IGRAPH_SUCCESS;
