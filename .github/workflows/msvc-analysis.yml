@@ -17,6 +17,7 @@ on:
     - cron: '29 3 * * 1'
 
 env:
+  BUILD_TYPE: Release
   # Path to the CMake build directory.
   build: '${{ github.workspace }}/build'
 
@@ -45,7 +46,7 @@ jobs:
 
       # Build parser sources
       - name: Build CMake
-        run: cmake --build ${{ env.build }} --target parsersources
+        run: cmake --build ${{ env.build }} --config ${{ env.BUILD_TYPE }} --target parsersources
 
       - name: Initialize MSVC Code Analysis
         uses: microsoft/msvc-code-analysis-action@main
