@@ -95,8 +95,6 @@ igraph_error_t igraph_hashtable_addset_len(igraph_hashtable_t *ht,
         IGRAPH_CHECK(igraph_strvector_set_len(&ht->elements, newid, elem, elemlen));
     }
 
-    IGRAPH_FINALLY_CLEAN(1);
-
     return IGRAPH_SUCCESS;
 }
 
