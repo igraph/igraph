@@ -28,7 +28,7 @@ int mf(const igraph_vector_t *input, igraph_real_t *output) {
     return 0;
 }
 
-static void simplifiy_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
+static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
     igraph_simplify(g, /*multiple=*/ 1, /*loops=*/ 1, comb);
     igraph_write_graph_graphml(g, stdout, /*prefixattr=*/ 1);
     igraph_attribute_combination_destroy(comb);
@@ -44,7 +44,7 @@ static void weight_test(igraph_t *g, igraph_attribute_combination_type_t weight_
                                  "weight", weight_attr,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    simplifiy_write_destroy(&g2, &comb);
+    simplify_write_destroy(&g2, &comb);
 }
 
 int main() {
@@ -79,7 +79,7 @@ int main() {
                                  "weight", IGRAPH_ATTRIBUTE_COMBINE_FUNCTION, mf,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    simplifiy_write_destroy(&g2, &comb);
+    simplify_write_destroy(&g2, &comb);
 
     /* ****************************************************** */
 
@@ -87,7 +87,7 @@ int main() {
     igraph_attribute_combination(&comb,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_MEAN,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    simplifiy_write_destroy(&g2, &comb);
+    simplify_write_destroy(&g2, &comb);
 
     /* ****************************************************** */
 

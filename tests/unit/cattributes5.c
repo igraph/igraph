@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-static void simplifiy_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
+static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
     igraph_simplify(g, /*multiple=*/ 1, /*loops=*/ 1, comb);
     igraph_write_graph_graphml(g, stdout, /*prefixattr=*/ 1);
     igraph_attribute_combination_destroy(comb);
@@ -41,7 +41,7 @@ static void type_test(igraph_t *g, igraph_attribute_combination_type_t type_attr
                                  "type", type_attr,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    simplifiy_write_destroy(&g2, &comb);
+    simplify_write_destroy(&g2, &comb);
 }
 
 int main() {
@@ -70,7 +70,7 @@ int main() {
                                  "type",   IGRAPH_ATTRIBUTE_COMBINE_FIRST,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    simplifiy_write_destroy(&g2, &comb);
+    simplify_write_destroy(&g2, &comb);
 
     /* ****************************************************** */
 
@@ -78,7 +78,7 @@ int main() {
     igraph_attribute_combination(&comb,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_LAST,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    simplifiy_write_destroy(&g2, &comb);
+    simplify_write_destroy(&g2, &comb);
 
     /* ****************************************************** */
 
