@@ -56,12 +56,16 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
                     igraph_vector_destroy(value);
                     IGRAPH_FREE(value);
                 }
-            } else {
+            } else if (atrec->type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *value = (igraph_strvector_t*)atrec->value;
                 if (value != 0) {
                     igraph_strvector_destroy(value);
                     IGRAPH_FREE(value);
                 }
+            } else {
+                /* Must not reach here: GML only supports numeric and string attributes,
+                 * and the GML parser must not create others. */
+                IGRAPH_FATAL("Non-numeric non-string attribute encoutered in GML reader.");
             }
             IGRAPH_FREE(atrec->name);
             IGRAPH_FREE(atrec);
@@ -306,16 +310,19 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     if (!atrec) {
                         IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
-                    IGRAPH_CHECK(igraph_vector_ptr_push_back(&vattrs, atrec));
+                    IGRAPH_FINALLY(igraph_free, atrec);
                     atrec->name = strdup(name);
                     if (! atrec->name) {
                         IGRAPH_ERROR("Out of memory while reading GML file.", IGRAPH_ENOMEM);
                     }
+                    IGRAPH_FINALLY(igraph_free, (char *) atrec->name);
                     if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
                         atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
                     } else {
                         atrec->type = IGRAPH_ATTRIBUTE_STRING;
                     }
+                    IGRAPH_CHECK(igraph_vector_ptr_push_back(&vattrs, atrec));
+                    IGRAPH_FINALLY_CLEAN(2);
                 } else {
                     /* already seen, should we update type? */
                     igraph_attribute_record_t *atrec = VECTOR(vattrs)[trieid];
@@ -373,16 +380,19 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         if (!atrec) {
                             IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                         }
-                        IGRAPH_CHECK(igraph_vector_ptr_push_back(&eattrs, atrec));
+                        IGRAPH_FINALLY(igraph_free, atrec);
                         atrec->name = strdup(name);
                         if (! atrec->name) {
                             IGRAPH_ERROR("Out of memory while reading GML file.", IGRAPH_ENOMEM);
                         }
+                        IGRAPH_FINALLY(igraph_free, (char *) atrec->name);
                         if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
                             atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
                         } else {
                             atrec->type = IGRAPH_ATTRIBUTE_STRING;
                         }
+                        IGRAPH_CHECK(igraph_vector_ptr_push_back(&eattrs, atrec));
+                        IGRAPH_FINALLY_CLEAN(2);
                     } else {
                         /* already seen, should we update type? */
                         igraph_attribute_record_t *atrec = VECTOR(eattrs)[trieid];
@@ -416,12 +426,22 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         igraph_attribute_type_t type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
-            atrec->value = p;
+            if (! p) {
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+            }
+            IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_vector_init(p, no_of_nodes));
+            atrec->value = p;
+            IGRAPH_FINALLY_CLEAN(1);
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
-            atrec->value = p;
+            if (! p) {
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+            }
+            IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_nodes));
+            atrec->value = p;
+            IGRAPH_FINALLY_CLEAN(1);
         } else {
             IGRAPH_WARNING("A composite attribute was ignored in the GML file.");
         }
@@ -432,12 +452,22 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         igraph_attribute_type_t  type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
-            atrec->value = p;
+            if (! p) {
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+            }
+            IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_vector_init(p, no_of_edges));
+            atrec->value = p;
+            IGRAPH_FINALLY_CLEAN(1);
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
-            atrec->value = p;
+            if (! p) {
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+            }
+            IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_edges));
+            atrec->value = p;
+            IGRAPH_FINALLY_CLEAN(1);
         } else {
             IGRAPH_WARNING("A composite attribute was ignored in the GML file.");
         }
