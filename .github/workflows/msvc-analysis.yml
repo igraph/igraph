@@ -10,13 +10,14 @@ name: Microsoft C++ Code Analysis
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ develop ]
   pull_request:
-    branches: [ master, develop ]
+    branches: [ develop ]
   schedule:
     - cron: '29 3 * * 1'
 
 env:
+  BUILD_TYPE: Release
   # Path to the CMake build directory.
   build: '${{ github.workspace }}/build'
 
@@ -34,6 +35,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Install dependencies
         run: choco install winflexbison3
@@ -43,17 +46,18 @@ jobs:
 
       # Build parser sources
       - name: Build CMake
-        run: cmake --build ${{ env.build }} --target parsersources
+        run: cmake --build ${{ env.build }} --config ${{ env.BUILD_TYPE }} --target parsersources
 
       - name: Initialize MSVC Code Analysis
-        uses: microsoft/msvc-code-analysis-action@04825f6d9e00f87422d6bf04e1a38b1f3ed60d99
+        uses: microsoft/msvc-code-analysis-action@main
         # Provide a unique ID to access the sarif output path
         id: run-analysis
         with:
           cmakeBuildDirectory: ${{ env.build }}
+          buildConfiguration: ${{ env.BUILD_TYPE }}
           # Ruleset file that will determine what checks will be run
           ruleset: NativeRecommendedRules.ruleset
-          ignoredTargetPaths: ${{ github.workspace }}/vendor;${{ github.workspace }}/tests;${{ github.workspace }}/examples;${{ github.workspace }}/fuzzing
+          ignoredTargetPaths: ${{ github.workspace }}/vendor;${{ github.workspace }}/tests;${{ github.workspace }}/examples;${{ github.workspace }}/fuzzing;${{ github.workspace }}/src/centrality/prpack;${{ github.workspace }}/src/centrality/prpack;${{ github.workspace }}/src/community/infomap;${{ github.workspace }}/src/community/walktrap;${{ github.workspace }}/src/community/spinglass;${{ github.workspace }}/src/layout/drl;${{ github.workspace }}/src/cliques/cliquer;${{ github.workspace }}/src/isomorphism/bliss
 
       # Upload SARIF file to GitHub Code Scanning Alerts
       - name: Upload SARIF to GitHub
