@@ -53,7 +53,7 @@ jobs:
           cmakeBuildDirectory: ${{ env.build }}
           # Ruleset file that will determine what checks will be run
           ruleset: NativeRecommendedRules.ruleset
-          ignoredPaths: ${{ github.workspace }}/vendored;${{ github.workspace }}/tests;${{ github.workspace }}/examples;${{ github.workspace }}/fuzzing
+          ignoredPaths: ${{ github.workspace }}/vendor;${{ github.workspace }}/tests;${{ github.workspace }}/examples;${{ github.workspace }}/fuzzing
 
       # Upload SARIF file to GitHub Code Scanning Alerts
       - name: Upload SARIF to GitHub
