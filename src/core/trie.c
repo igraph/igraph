@@ -353,16 +353,15 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
  * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
-igraph_error_t igraph_trie_get_len(igraph_trie_t *t, const char *key, igraph_integer_t length,
-                     igraph_integer_t *id) {
-    char *tmp = IGRAPH_CALLOC(length + 1, char);
+igraph_error_t igraph_trie_get_len(
+        igraph_trie_t *t, const char *key,
+        igraph_integer_t length,
+        igraph_integer_t *id) {
 
+    char *tmp = strndup(key, length);
     if (! tmp) {
         IGRAPH_ERROR("Cannot get from trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-
-    strncpy(tmp, key, length);
-    tmp[length] = '\0';
     IGRAPH_FINALLY(igraph_free, tmp);
     IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
     IGRAPH_FREE(tmp);

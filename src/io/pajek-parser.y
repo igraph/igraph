@@ -89,7 +89,8 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                         igraph_integer_t count,
                                         const char *attrname,
                                         igraph_integer_t vid,
-                                        const char *str);
+                                        const char *str,
+                                        igraph_integer_t strlen);
 
 static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
 static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
@@ -627,7 +628,8 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                                    igraph_integer_t count,
                                                    const char *attrname,
                                                    igraph_integer_t vid,
-                                                   const char *str) {
+                                                   const char *str,
+                                                   igraph_integer_t strlen) {
   igraph_integer_t attrsize=igraph_trie_size(names);
   igraph_integer_t id;
   igraph_strvector_t *na;
@@ -662,7 +664,7 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   if (igraph_strvector_size(na) <= vid) {
     IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
   }
-  IGRAPH_CHECK(igraph_strvector_set(na, vid, str));
+  IGRAPH_CHECK(igraph_strvector_set_len(na, vid, str, strlen));
 
   return IGRAPH_SUCCESS;
 }
@@ -671,76 +673,47 @@ static igraph_error_t igraph_i_pajek_add_string_vertex_attribute(const char *nam
                                                const char *value,
                                                size_t len,
                                                igraph_i_pajek_parsedata_t *context) {
-  char *tmp;
 
-  tmp=IGRAPH_CALLOC(len+1, char);
-  if (tmp==0) {
-    IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-  }
-  IGRAPH_FINALLY(igraph_free, tmp);
-  strncpy(tmp, value, len);
-  tmp[len]='\0';
 
-  IGRAPH_CHECK(igraph_i_pajek_add_string_attribute(context->vertex_attribute_names,
-                                                   context->vertex_attributes,
-                                                   context->vcount,
-                                                   name, context->actvertex-1,
-                                                   tmp));
-
-  IGRAPH_FREE(tmp);
-  IGRAPH_FINALLY_CLEAN(1);
-
-  return IGRAPH_SUCCESS;
+  return igraph_i_pajek_add_string_attribute(context->vertex_attribute_names,
+                                             context->vertex_attributes,
+                                             context->vcount,
+                                             name, context->actvertex-1,
+                                             value, len);
 }
 
 static igraph_error_t igraph_i_pajek_add_string_edge_attribute(const char *name,
                                              const char *value,
                                              size_t len,
                                              igraph_i_pajek_parsedata_t *context) {
-  char *tmp;
 
-  tmp=IGRAPH_CALLOC(len+1, char);
-  if (tmp==0) {
-    IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-  }
-  IGRAPH_FINALLY(igraph_free, tmp);
-  strncpy(tmp, value, len);
-  tmp[len]='\0';
-
-  IGRAPH_CHECK(igraph_i_pajek_add_string_attribute(context->edge_attribute_names,
-                                                   context->edge_attributes,
-                                                   context->actedge,
-                                                   name, context->actedge-1,
-                                                   tmp));
-
-  IGRAPH_FREE(tmp);
-  IGRAPH_FINALLY_CLEAN(1);
-
-  return IGRAPH_SUCCESS;
+  return igraph_i_pajek_add_string_attribute(context->edge_attribute_names,
+                                             context->edge_attributes,
+                                             context->actedge,
+                                             name, context->actedge-1,
+                                             value, len);
 }
 
 static igraph_error_t igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
                                                 igraph_real_t value,
                                                 igraph_i_pajek_parsedata_t *context) {
 
-  return
-    igraph_i_pajek_add_numeric_attribute(context->vertex_attribute_names,
-                                         context->vertex_attributes,
-                                         context->vcount,
-                                         name, context->actvertex-1,
-                                         value);
+  return     igraph_i_pajek_add_numeric_attribute(context->vertex_attribute_names,
+                                                  context->vertex_attributes,
+                                                  context->vcount,
+                                                  name, context->actvertex-1,
+                                                  value);
 }
 
 static igraph_error_t igraph_i_pajek_add_numeric_edge_attribute(const char *name,
                                               igraph_real_t value,
                                               igraph_i_pajek_parsedata_t *context) {
 
-  return
-    igraph_i_pajek_add_numeric_attribute(context->edge_attribute_names,
-                                         context->edge_attributes,
-                                         context->actedge,
-                                         name, context->actedge-1,
-                                         value);
+  return igraph_i_pajek_add_numeric_attribute(context->edge_attribute_names,
+                                              context->edge_attributes,
+                                              context->actedge,
+                                              name, context->actedge-1,
+                                              value);
 }
 
 static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
