@@ -313,7 +313,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     IGRAPH_FINALLY(igraph_free, atrec);
                     atrec->name = strdup(name);
                     if (! atrec->name) {
-                        IGRAPH_ERROR("Out of memory while reading GML file.", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     IGRAPH_FINALLY(igraph_free, (char *) atrec->name);
                     if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
@@ -383,7 +383,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         IGRAPH_FINALLY(igraph_free, atrec);
                         atrec->name = strdup(name);
                         if (! atrec->name) {
-                            IGRAPH_ERROR("Out of memory while reading GML file.", IGRAPH_ENOMEM);
+                            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                         }
                         IGRAPH_FINALLY(igraph_free, (char *) atrec->name);
                         if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
@@ -427,7 +427,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
             if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_vector_init(p, no_of_nodes));
@@ -436,7 +436,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
             if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_nodes));
@@ -453,7 +453,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
             if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_vector_init(p, no_of_edges));
@@ -462,7 +462,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
             if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_edges));
