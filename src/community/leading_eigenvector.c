@@ -802,7 +802,7 @@ igraph_error_t igraph_community_leading_eigenvector(
             IGRAPH_CHECK_CALLBACK(
                         callback(
                             mymembership, comm, storage.d[0], &vv, arpcb1,
-                        &extra, callback_extra
+                            &extra, callback_extra
                         ), &ret
                     );
 
