@@ -386,6 +386,11 @@ REWIRING_MODE:
     CTYPE: igraph_rewiring_t
     FLAGS: ENUM
 
+ROOTCHOICE:
+    # Enum for the heuristic of igraph_roots_for_tree_layout()
+    CTYPE: igraph_root_choice_t
+    FLAGS: ENUM
+
 RWSTUCK:
     # Enum that describes what igraph should do when a random walk gets stuck
     # in a sink vertex

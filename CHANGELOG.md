@@ -603,6 +603,7 @@
  - `igraph_wheel()` to create a wheel graph (#1938, thanks to @kwofach).
  - `igraph_stack_capacity()` to query the capacity of a stack.
  - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floats with an epsilon margin.
+ - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
 
 ### Removed
 

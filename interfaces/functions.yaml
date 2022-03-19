@@ -1164,6 +1164,11 @@ igraph_layout_reingold_tilford_circular:
         GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT,
         OPTIONAL VERTEX_INDICES roots, OPTIONAL VECTOR_INT rootlevel
 
+igraph_roots_for_tree_layout:
+    PARAMS: |-
+        GRAPH graph, NEIMODE mode=OUT, OUT VERTEXSET roots, ROOTCHOICE heuristic
+    DEPS: roots ON graph
+
 igraph_layout_random_3d:
     PARAMS: GRAPH graph, OUT MATRIX res
 
