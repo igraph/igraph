@@ -23,7 +23,6 @@
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_vector_ptr.h"
 
 #include "core/interruption.h"
 
@@ -301,75 +300,51 @@ static igraph_error_t cycle_add(const igraph_vector_int_t *a, const igraph_vecto
 }
 
 
-#define MATROW(m, i) ((igraph_vector_int_t *) VECTOR(m)[i])
+#define MATROW(m, i) (&VECTOR(m)[i])
 #define MATEL(m, i, j) VECTOR(*MATROW(m, i))[j]
-#define SWAPVECS(p1, p2) \
-    do { \
-        igraph_vector_int_t *t = p1; \
-        p1 = p2; \
-        p2 = t; \
-    } while (0)
-
-static void destroy_work_ptr(igraph_vector_int_t **ptr) {
-    igraph_vector_int_destroy(*ptr);
-    IGRAPH_FREE(*ptr);
-}
 
 /* Gaussian elimination for sparse cycle vectors. 'reduced_matrix' is always maintained
  * in row-echelon form. This function decides if 'cycle' is linearly independent of this
  * matrix, and if not, it adds it to the matrix. */
-static igraph_error_t gaussian_elimination(igraph_vector_ptr_t *reduced_matrix,
+static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_matrix,
                                 const igraph_vector_int_t *cycle,
                                 igraph_bool_t *independent) {
 
-    igraph_integer_t nrow = igraph_vector_ptr_size(reduced_matrix);
+    igraph_integer_t nrow = igraph_vector_int_list_size(reduced_matrix);
     igraph_integer_t i;
 
-    igraph_vector_int_t *work, *tmp;
+    igraph_vector_int_t work, tmp;
 
-    work = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (! work) {
-        IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, work);
-    IGRAPH_CHECK(igraph_vector_int_copy(work, cycle));
-    IGRAPH_FINALLY(destroy_work_ptr, &work);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_CHECK(igraph_vector_int_copy(&work, cycle));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &work);
 
-    tmp = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (! tmp) {
-        IGRAPH_ERROR("Insufficient memory for minimum cycle basis.", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, tmp);
-    IGRAPH_CHECK(igraph_vector_int_init(tmp, 0));
-    IGRAPH_FINALLY(destroy_work_ptr, &tmp);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
 
     for (i=0; i < nrow; ++i) {
         igraph_vector_int_t *row = MATROW(*reduced_matrix, i);
 
-        if ( VECTOR(*row)[0] < VECTOR(*work)[0] ) {
+        if ( VECTOR(*row)[0] < VECTOR(work)[0] ) {
             continue;
-        } else if ( VECTOR(*row)[0] == VECTOR(*work)[0] ) {
-            IGRAPH_CHECK(cycle_add(row, work, tmp));
-            if (igraph_vector_int_empty(tmp)) {
+        } else if ( VECTOR(*row)[0] == VECTOR(work)[0] ) {
+            IGRAPH_CHECK(cycle_add(row, &work, &tmp));
+            if (igraph_vector_int_empty(&tmp)) {
                 *independent = 0;
-                destroy_work_ptr(&work);
-                destroy_work_ptr(&tmp);
+                igraph_vector_int_destroy(&work);
+                igraph_vector_int_destroy(&tmp);
                 IGRAPH_FINALLY_CLEAN(2);
                 return IGRAPH_SUCCESS;
             }
-            SWAPVECS(work, tmp);
-        } else { /* VECTOR(*row)[0] > VECTOR(*work)[0] */
+            IGRAPH_CHECK(igraph_vector_int_swap(&work, &tmp));
+        } else { /* VECTOR(*row)[0] > VECTOR(work)[0] */
             break;
         }
     }
 
     /* 'cycle' was linearly independent, insert new row into matrix */
     *independent = 1;
-    IGRAPH_CHECK(igraph_vector_ptr_insert(reduced_matrix, i, work));
+    IGRAPH_CHECK(igraph_vector_int_list_insert(reduced_matrix, i, &work)); /* transfers ownership */
 
-    destroy_work_ptr(&tmp);
+    igraph_vector_int_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(2); /* +1, transferring ownership of 'work' to 'reduced_matrix' */
 
     return IGRAPH_SUCCESS;
@@ -377,7 +352,6 @@ static igraph_error_t gaussian_elimination(igraph_vector_ptr_t *reduced_matrix,
 
 #undef MATEL
 #undef MATROW
-#undef SWAPVECS
 
 
 /**
@@ -480,13 +454,10 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     /* This is typically the slowest part of the algorithm. */
     {
         igraph_integer_t cand_len = igraph_vector_int_list_size(&candidates);
-        igraph_vector_ptr_t reduced_matrix;
+        igraph_vector_int_list_t reduced_matrix;
         igraph_bool_t independent;        
 
-        IGRAPH_CHECK(igraph_vector_ptr_init(&reduced_matrix, 0));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &reduced_matrix);
-        IGRAPH_CHECK(igraph_vector_ptr_reserve(&reduced_matrix, rank));
-        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&reduced_matrix, igraph_vector_int_destroy);
+        IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&reduced_matrix, 0);
 
         for (i=0; i < cand_len; ++i) {
             const igraph_vector_int_t *cycle = igraph_vector_int_list_get_ptr(&candidates, i);
@@ -498,13 +469,13 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(result, cycle));
             }
 
-            if (igraph_vector_ptr_size(&reduced_matrix) == rank) {
+            if (igraph_vector_int_list_size(&reduced_matrix) == rank) {
                 /* We have a complete basis. */
                 break;
             }
         }
 
-        igraph_vector_ptr_destroy_all(&reduced_matrix);
+        igraph_vector_int_list_destroy(&reduced_matrix);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
