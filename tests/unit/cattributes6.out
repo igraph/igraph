@@ -1,0 +1,84 @@
+Graph attributes: 
+Vertex attributes: id (2) name (2) x (1) y (1) shape (2) xfact (1) yfact (1) 
+Edge attributes: weight (1) hook2 (1) edgewidth (1) color (2) arrowsize (1) angle1 (1) velocity1 (1) angle2 (1) velocity2 (1) arrowpos (1) label (2) labelcolor (2) fontsize (1) labelangle (1) labelpos (1) labeldegree (1) labelangle2 (1) linepattern (2) hook1 (1) 
+
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 
+
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 
+
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Vertex 5: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Vertex 6: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 
+
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Vertex 5: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Vertex 6: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 
+Edge 7 (1-1): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN 
+Edge 8 (2-5): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN 
+Edge 9 (3-6): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN 
+
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 
+Vertex 1: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 
+Vertex 2: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 
+Vertex 3: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 
+Edge 1 (1-2): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 3 (1-1): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 
+Edge 4 (2-4): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN 
+
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 
+Vertex 1: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 
+Vertex 2: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 
+Vertex 3: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN 
+Edge 0 (1-2): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 1 (0-1): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 
+Edge 2 (1-1): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 
+0 1 2 3 4 
+0 1 2 3 4 
+0 1 2 
+0 1 2 
