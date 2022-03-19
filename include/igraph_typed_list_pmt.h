@@ -94,6 +94,7 @@ IGRAPH_EXPORT ITEM_TYPE FUNCTION(pop_back)(TYPE* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
 IGRAPH_EXPORT igraph_error_t FUNCTION(remove_fast)(TYPE* v, igraph_integer_t index, ITEM_TYPE* e);
 IGRAPH_EXPORT void FUNCTION(replace)(TYPE* v, igraph_integer_t pos, ITEM_TYPE* e);
+IGRAPH_EXPORT void FUNCTION(remove_consecutive_duplicates)(TYPE *v, igraph_bool_t (*eq)(const ITEM_TYPE*, const ITEM_TYPE*));
 
 /*------------------*/
 /* Exchanging items */
