@@ -57,6 +57,7 @@ igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
                             const char *elem) {
     igraph_integer_t size = igraph_trie_size(&ht->keys);
     igraph_integer_t newid;
+
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
     if (newid == size) {
@@ -75,33 +76,25 @@ igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
 
 /* Previous comment also applies here */
 
-igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_addset_len(igraph_hashtable_t *ht,
                              const char *key, const char *def,
                              const char *elem, size_t elemlen) {
     igraph_integer_t size = igraph_trie_size(&ht->keys);
     igraph_integer_t newid;
-    char *tmp;
 
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
-    tmp = IGRAPH_CALLOC(elemlen + 1, char);
-    if (tmp == 0) {
-        IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_free, tmp);
-    strncpy(tmp, elem, elemlen);
-    tmp[elemlen] = '\0';
-
     if (newid == size) {
+        /* this is a new element */
         IGRAPH_CHECK(igraph_strvector_resize(&ht->defaults, newid + 1));
         IGRAPH_CHECK(igraph_strvector_resize(&ht->elements, newid + 1));
         IGRAPH_CHECK(igraph_strvector_set(&ht->defaults, newid, def));
-        IGRAPH_CHECK(igraph_strvector_set(&ht->elements, newid, tmp));
+        IGRAPH_CHECK(igraph_strvector_set_len(&ht->elements, newid, elem, elemlen));
     } else {
-        IGRAPH_CHECK(igraph_strvector_set(&ht->elements, newid, tmp));
+        /* set an already existing element */
+        IGRAPH_CHECK(igraph_strvector_set_len(&ht->elements, newid, elem, elemlen));
     }
 
-    IGRAPH_FREE(tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

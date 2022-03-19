@@ -95,10 +95,10 @@ int main() {
 
     /* addset2 */
     igraph_hashtable_init(&ht);
-    igraph_hashtable_addset2(&ht, "color", "green", "redddd", 3);
-    igraph_hashtable_addset2(&ht, "size", "", "4111", 1);
-    igraph_hashtable_addset2(&ht, "color", "", "greysdsdf", 4);
-    igraph_hashtable_addset2(&ht, "shape", "", "circle", 6);
+    igraph_hashtable_addset_len(&ht, "color", "green", "redddd", 3);
+    igraph_hashtable_addset_len(&ht, "size", "", "4111", 1);
+    igraph_hashtable_addset_len(&ht, "color", "", "greysdsdf", 4);
+    igraph_hashtable_addset_len(&ht, "shape", "", "circle", 6);
     igraph_hashtable_addset(&ht, "shape", "", "diamond");
 
     igraph_hashtable_get(&ht, "color", &str);

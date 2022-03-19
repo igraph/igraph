@@ -44,7 +44,7 @@ IGRAPH_PRIVATE_EXPORT void igraph_hashtable_destroy(igraph_hashtable_t *ht);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
                                                              const char *key, const char *def,
                                                              const char *elem);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_addset_len(igraph_hashtable_t *ht,
                                                               const char *key, const char *def,
                                                               const char *elem, size_t elemlen);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_hashtable_get(igraph_hashtable_t *ht,
