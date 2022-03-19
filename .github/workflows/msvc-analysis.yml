@@ -53,6 +53,7 @@ jobs:
         id: run-analysis
         with:
           cmakeBuildDirectory: ${{ env.build }}
+          buildConfiguration: ${{ env.BUILD_TYPE }}
           # Ruleset file that will determine what checks will be run
           ruleset: NativeRecommendedRules.ruleset
           ignoredTargetPaths: ${{ github.workspace }}/vendor;${{ github.workspace }}/tests;${{ github.workspace }}/examples;${{ github.workspace }}/fuzzing
