@@ -170,20 +170,6 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
 }
 
 
-static void destroy_and_free_cycles(igraph_vector_ptr_t *list) {
-    igraph_integer_t n = igraph_vector_ptr_size(list);
-    igraph_integer_t i;
-    igraph_vector_int_t **l = (igraph_vector_int_t **) VECTOR(*list);
-
-    for (i=0; i < n; ++i) {
-        if (l[i]) {
-            igraph_vector_int_destroy(l[i]);
-            IGRAPH_FREE(l[i]); /* also sets it to NULL */
-        }
-    }
-}
-
-
 /**
  * \function igraph_fundamental_cycles
  * \brief Finds a fundamental cycle basis.
@@ -393,27 +379,6 @@ static igraph_error_t gaussian_elimination(igraph_vector_ptr_t *reduced_matrix,
 #undef MATROW
 #undef SWAPVECS
 
-/* Remove duplicates from the list of candidate elements.
- * The list is assumed to be sorted. */
-static void remove_duplicate_candidates(igraph_vector_int_list_t *candidates) {
-    igraph_integer_t i, j, n = igraph_vector_int_list_size(candidates);
-    igraph_vector_int_t *c = VECTOR(*candidates);
-
-    if (n < 2) {
-        return;
-    }
-
-    for (i=0, j=0; i < n-1; ++i) {
-        if (igraph_vector_int_all_e(&c[i], &c[i+1])) {
-            igraph_vector_int_destroy(&c[i]);
-        } else {
-            c[j++] = c[i];
-        }
-    }
-    c[j++] = c[n-1];
-
-    candidates->end -= (n-j);
-}
 
 /**
  * \function igraph_minimum_cycle_basis
@@ -505,7 +470,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
             igraph_vector_int_sort(igraph_vector_int_list_get_ptr(&candidates, i));
         }
         igraph_vector_int_list_sort(&candidates, &cycle_cmp);
-        remove_duplicate_candidates(&candidates);
+        igraph_vector_int_list_remove_consecutive_duplicates(&candidates, igraph_vector_int_all_e);
     }
 
     igraph_vector_int_list_clear(result);
@@ -544,7 +509,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     }
 
     igraph_vector_int_list_destroy(&candidates);
-    IGRAPH_FINALLY_CLEAN(1); /* +1 for 'destroy_and_free_cycles' on 'result' */
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
