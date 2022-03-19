@@ -47,43 +47,50 @@ int print_attributes(const igraph_t *g) {
 
     /* Graph attributes */
     for (i = 0; i < igraph_strvector_size(&gnames); i++) {
+        if (i != 0)
+            putchar(' ');
         printf("%s=", STR(gnames, i));
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_real_printf(GAN(g, STR(gnames, i)));
-            putchar(' ');
+        } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            printf("%d", GAB(g, STR(gnames, i)));
         } else {
-            printf("\"%s\" ", GAS(g, STR(gnames, i)));
+            printf("\"%s\"", GAS(g, STR(gnames, i)));
         }
     }
-    printf("\n");
 
     for (i = 0; i < igraph_vcount(g); i++) {
-        printf("Vertex %" IGRAPH_PRId ": ", i);
+        printf("Vertex %" IGRAPH_PRId ":", i);
         for (j = 0; j < igraph_strvector_size(&vnames); j++) {
+            putchar(' ');
             printf("%s=", STR(vnames, j));
             if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_real_printf(VAN(g, STR(vnames, j), i));
-                putchar(' ');
+            } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+                printf("%d", VAB(g, STR(vnames, j), i));
             } else {
-                printf("\"%s\" ", VAS(g, STR(vnames, j), i));
+                printf("\"%s\"", VAS(g, STR(vnames, j), i));
             }
         }
         printf("\n");
     }
 
     for (i = 0; i < igraph_ecount(g); i++) {
-        printf("Edge %" IGRAPH_PRId " (%" IGRAPH_PRId "-%" IGRAPH_PRId "): ", i, IGRAPH_FROM(g, i), IGRAPH_TO(g, i));
+        printf("Edge %" IGRAPH_PRId " (%" IGRAPH_PRId "-%" IGRAPH_PRId "):", i, IGRAPH_FROM(g, i), IGRAPH_TO(g, i));
         for (j = 0; j < igraph_strvector_size(&enames); j++) {
+            putchar(' ');
             printf("%s=", STR(enames, j));
             if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_real_printf(EAN(g, STR(enames, j), i));
-                putchar(' ');
+            } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+                printf("%d", EAB(g, STR(enames, j), i));
             } else {
-                printf("\"%s\" ", EAS(g, STR(enames, j), i));
+                printf("\"%s\"", EAS(g, STR(enames, j), i));
             }
         }
         printf("\n");
     }
+    printf("\n");
 
     /* Check vector-based query functions */
     igraph_vector_init(&vec, 0);
@@ -99,7 +106,7 @@ int print_attributes(const igraph_t *g) {
                     exit(51);
                 }
             }
-        } else {
+        } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
             igraph_cattribute_VASV(g, STR(vnames, j), igraph_vss_all(), &svec);
             for (i = 0; i < igraph_vcount(g); i++) {
                 const char *str = VAS(g, STR(vnames, j), i);
@@ -121,7 +128,7 @@ int print_attributes(const igraph_t *g) {
                     exit(53);
                 }
             }
-        } else {
+        } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
             igraph_cattribute_EASV(g, STR(enames, j),
                                    igraph_ess_all(IGRAPH_EDGEORDER_ID), &svec);
             for (i = 0; i < igraph_ecount(g); i++) {
@@ -146,30 +153,10 @@ int print_attributes(const igraph_t *g) {
     return 0;
 }
 
-#define SET_AND_CHECK(g, type, name, index, value)\
-    do {\
-        SET ## type(g, name, index, value);\
-        if (type(g, name, index) != value) {\
-            printf("Attribute %s, index %d not set correctly.", name, index);\
-            exit(1);\
-        }\
-    } while (0)
-
-#define SET_AND_CHECK_STRING(g, type, name, index, value)\
-    do {\
-        SET ## type(g, name, index, value);\
-        if (strcmp(type(g, name, index), value)) {\
-            printf("Attribute %s, index %d not set correctly.", name, index);\
-            exit(1);\
-        }\
-    } while (0)
-
 int main() {
 
     igraph_t g, g2;
     FILE *ifile;
-    igraph_vector_int_t gtypes, vtypes, etypes;
-    igraph_strvector_t gnames, vnames, enames;
     igraph_integer_t i;
     igraph_vector_t y;
     igraph_strvector_t id;
@@ -185,33 +172,6 @@ int main() {
     }
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-
-    igraph_vector_int_init(&gtypes, 0);
-    igraph_vector_int_init(&vtypes, 0);
-    igraph_vector_int_init(&etypes, 0);
-    igraph_strvector_init(&gnames, 0);
-    igraph_strvector_init(&vnames, 0);
-    igraph_strvector_init(&enames, 0);
-
-    igraph_cattribute_list(&g, &gnames, &gtypes, &vnames, &vtypes,
-                           &enames, &etypes);
-
-    /* List attribute names and types */
-    printf("Graph attributes: ");
-    for (i = 0; i < igraph_strvector_size(&gnames); i++) {
-        printf("%s (%i) ", STR(gnames, i), (int)VECTOR(gtypes)[i]);
-    }
-    printf("\n");
-    printf("Vertex attributes: ");
-    for (i = 0; i < igraph_strvector_size(&vnames); i++) {
-        printf("%s (%i) ", STR(vnames, i), (int)VECTOR(vtypes)[i]);
-    }
-    printf("\n");
-    printf("Edge attributes: ");
-    for (i = 0; i < igraph_strvector_size(&enames); i++) {
-        printf("%s (%i) ", STR(enames, i), (int)VECTOR(etypes)[i]);
-    }
-    printf("\n");
 
     print_attributes(&g);
 
@@ -242,86 +202,61 @@ int main() {
 
     /* Set graph attributes */
     SETGAN(&g, "id", 10);
-    if (GAN(&g, "id") != 10) {
-        return 11;
-    }
     SETGAS(&g, "name", "toy");
-    if (strcmp(GAS(&g, "name"), "toy")) {
-        return 12;
-    }
     SETGAB(&g, "is_regular", 0);
-    if (GAB(&g, "is_regular") != 0) {
-        return 13;
-    }
 
+    printf("Before deleting some attributes:\n");
+    print_attributes(&g);
     /* Delete graph attributes */
     DELGA(&g, "id");
     DELGA(&g, "name");
     DELGA(&g, "is_regular");
-    igraph_cattribute_list(&g, &gnames, 0, 0, 0, 0, 0);
-    if (igraph_strvector_size(&gnames) != 0) {
-        return 14;
-    }
 
     /* Delete vertex attributes */
     DELVA(&g, "x");
     DELVA(&g, "shape");
     DELVA(&g, "xfact");
     DELVA(&g, "yfact");
-    igraph_cattribute_list(&g, 0, 0, &vnames, 0, 0, 0);
-    if (igraph_strvector_size(&vnames) != 3) {
-        return 15;
-    }
 
     /* Delete edge attributes */
-    igraph_cattribute_list(&g, 0, 0, 0, 0, &enames, 0);
-    i = igraph_strvector_size(&enames);
     DELEA(&g, "hook1");
     DELEA(&g, "hook2");
     DELEA(&g, "label");
-    igraph_cattribute_list(&g, 0, 0, 0, 0, &enames, 0);
-    if (igraph_strvector_size(&enames) != i - 3) {
-        return 16;
-    }
+
+    printf("After deleting some attributes:\n");
+    print_attributes(&g);
 
     /* Set vertex attributes */
-    SET_AND_CHECK(&g, VAN, "y", 0, -1);
-    SET_AND_CHECK(&g, VAN, "y", 1, 2.1);
+    SETVAN(&g, "y", 0, -1);
+    SETVAN(&g, "y", 1, 2.1);
 
-    SET_AND_CHECK_STRING(&g, VAS, "id", 0, "foo");
-    SET_AND_CHECK_STRING(&g, VAS, "id", 1, "bar");
+    SETVAS(&g, "id", 0, "foo");
+    SETVAS(&g, "id", 1, "bar");
 
-    SET_AND_CHECK(&g, VAB, "type", 0, 1);
-    SET_AND_CHECK(&g, VAB, "type", 1, 0);
+    SETVAB(&g, "type", 0, 1);
+    SETVAB(&g, "type", 1, 0);
 
     /* Set edge attributes */
-    SET_AND_CHECK(&g, EAN, "weight", 2, 100.0);
-    SET_AND_CHECK(&g, EAN, "weight", 0, -100.1);
+    SETEAN(&g, "weight", 2, 100.0);
+    SETEAN(&g, "weight", 0, -100.1);
 
-    SET_AND_CHECK_STRING(&g, EAS, "color", 2, "RED");
-    SET_AND_CHECK_STRING(&g, EAS, "color", 0, "Blue");
+    SETEAS(&g, "color", 2, "RED");
+    SETEAS(&g, "color", 0, "Blue");
 
-    SET_AND_CHECK(&g, EAB, "type", 0, 1);
-    SET_AND_CHECK(&g, EAB, "type", 2, 0);
+    SETEAB(&g, "type", 0, 1);
+    SETEAB(&g, "type", 2, 0);
 
+    printf("After setting vertex and edge attributes:\n");
+    print_attributes(&g);
     /* Set vertex attributes as vector */
     igraph_vector_init(&y, igraph_vcount(&g));
     igraph_vector_fill(&y, 1.23);
     SETVANV(&g, "y", &y);
     igraph_vector_destroy(&y);
-    for (i = 0; i < igraph_vcount(&g); i++) {
-        if (VAN(&g, "y", i) != 1.23) {
-            return 21;
-        }
-    }
+
     igraph_vector_init_seq(&y, 0, igraph_vcount(&g) - 1);
     SETVANV(&g, "foobar", &y);
     igraph_vector_destroy(&y);
-    for (i = 0; i < igraph_vcount(&g); i++) {
-        if (VAN(&g, "foobar", i) != i) {
-            return 22;
-        }
-    }
 
     igraph_vector_bool_init(&type, igraph_vcount(&g));
     for (i = 0; i < igraph_vcount(&g); i++) {
@@ -329,11 +264,6 @@ int main() {
     }
     SETVABV(&g, "type", &type);
     igraph_vector_bool_destroy(&type);
-    for (i = 0; i < igraph_vcount(&g); i++) {
-        if (VAB(&g, "type", i) != (i % 2 == 1)) {
-            return 28;
-        }
-    }
 
     igraph_strvector_init(&id, igraph_vcount(&g));
     for (i = 0; i < igraph_vcount(&g); i++) {
@@ -342,10 +272,7 @@ int main() {
     }
     SETVASV(&g, "foo", &id);
     igraph_strvector_destroy(&id);
-    for (i = 0; i < igraph_vcount(&g); i++) {
-        printf("%s ", VAS(&g, "foo", i));
-    }
-    printf("\n");
+
     igraph_strvector_init(&id, igraph_vcount(&g));
     for (i = 0; i < igraph_vcount(&g); i++) {
         snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
@@ -353,29 +280,16 @@ int main() {
     }
     SETVASV(&g, "id", &id);
     igraph_strvector_destroy(&id);
-    for (i = 0; i < igraph_vcount(&g); i++) {
-        printf("%s ", VAS(&g, "id", i));
-    }
-    printf("\n");
 
     /* Set edge attributes as vector */
     igraph_vector_init(&y, igraph_ecount(&g));
     igraph_vector_fill(&y, 12.3);
     SETEANV(&g, "weight", &y);
     igraph_vector_destroy(&y);
-    for (i = 0; i < igraph_ecount(&g); i++) {
-        if (EAN(&g, "weight", i) != 12.3) {
-            return 23;
-        }
-    }
+
     igraph_vector_init_seq(&y, 0, igraph_ecount(&g) - 1);
     SETEANV(&g, "foobar", &y);
     igraph_vector_destroy(&y);
-    for (i = 0; i < igraph_ecount(&g); i++) {
-        if (VAN(&g, "foobar", i) != i) {
-            return 24;
-        }
-    }
 
     igraph_vector_bool_init(&type, igraph_ecount(&g));
     for (i = 0; i < igraph_ecount(&g); i++) {
@@ -383,11 +297,6 @@ int main() {
     }
     SETEABV(&g, "type", &type);
     igraph_vector_bool_destroy(&type);
-    for (i = 0; i < igraph_ecount(&g); i++) {
-        if (EAB(&g, "type", i) != (i % 2 == 1)) {
-            return 29;
-        }
-    }
 
     igraph_strvector_init(&id, igraph_ecount(&g));
     for (i = 0; i < igraph_ecount(&g); i++) {
@@ -396,10 +305,7 @@ int main() {
     }
     SETEASV(&g, "foo", &id);
     igraph_strvector_destroy(&id);
-    for (i = 0; i < igraph_ecount(&g); i++) {
-        printf("%s ", EAS(&g, "foo", i));
-    }
-    printf("\n");
+
     igraph_strvector_init(&id, igraph_ecount(&g));
     for (i = 0; i < igraph_ecount(&g); i++) {
         snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
@@ -407,27 +313,14 @@ int main() {
     }
     SETEASV(&g, "color", &id);
     igraph_strvector_destroy(&id);
-    for (i = 0; i < igraph_ecount(&g); i++) {
-        printf("%s ", EAS(&g, "color", i));
-    }
-    printf("\n");
 
+    printf("After setting vertex and edge attributes by vector:\n");
+    print_attributes(&g);
     /* Delete all remaining attributes */
     DELALL(&g);
-    igraph_cattribute_list(&g, &gnames, &gtypes, &vnames, &vtypes, &enames, &etypes);
-    if (igraph_strvector_size(&gnames) != 0 ||
-        igraph_strvector_size(&vnames) != 0 ||
-        igraph_strvector_size(&enames) != 0) {
-        return 25;
-    }
 
-    /* Destroy */
-    igraph_vector_int_destroy(&gtypes);
-    igraph_vector_int_destroy(&vtypes);
-    igraph_vector_int_destroy(&etypes);
-    igraph_strvector_destroy(&gnames);
-    igraph_strvector_destroy(&vnames);
-    igraph_strvector_destroy(&enames);
+    printf("After deleting all attributes:\n");
+    print_attributes(&g);
 
     igraph_destroy(&g);
 
