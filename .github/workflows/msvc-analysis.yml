@@ -56,8 +56,8 @@ jobs:
           cmakeBuildDirectory: ${{ env.build }}
           buildConfiguration: ${{ env.BUILD_TYPE }}
           # Ruleset file that will determine what checks will be run
-          ruleset: NativeRecommendedRules.ruleset
-          ignoredTargetPaths: ${{ github.workspace }}/vendor;${{ github.workspace }}/tests;${{ github.workspace }}/examples;${{ github.workspace }}/fuzzing;${{ github.workspace }}/src/centrality/prpack;${{ github.workspace }}/src/centrality/prpack;${{ github.workspace }}/src/community/infomap;${{ github.workspace }}/src/community/walktrap;${{ github.workspace }}/src/community/spinglass;${{ github.workspace }}/src/layout/drl;${{ github.workspace }}/src/cliques/cliquer;${{ github.workspace }}/src/isomorphism/bliss
+          ruleset: NativeMinimumRules.ruleset
+          ignoredTargetPaths: ${{ github.workspace }}/vendor;${{ github.workspace }}/tests;${{ github.workspace }}/examples;${{ github.workspace }}/fuzzing;${{ github.workspace }}/src/centrality/prpack;${{ github.workspace }}/src/community/infomap;${{ github.workspace }}/src/community/walktrap;${{ github.workspace }}/src/community/spinglass;${{ github.workspace }}/src/layout/drl;${{ github.workspace }}/src/cliques/cliquer;${{ github.workspace }}/src/isomorphism/bliss;${{ github.workspace }}/src/hrg;${{ github.workspace }}/build/src/io/parsers
 
       # Upload SARIF file to GitHub Code Scanning Alerts
       - name: Upload SARIF to GitHub
