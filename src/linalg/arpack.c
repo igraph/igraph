@@ -675,6 +675,12 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
         sort[0] = 'L'; sort[1] = 'M';
     } else if (which('B', 'E')) {
         sort[0] = 'L'; sort[1] = 'A';
+    } else {
+        /* None of the above, no sorting. These 'X' values are
+         * ignored by ARPACK, but we set them anyway in order to
+         * avoid an uninitialized 'sort' which would trigger
+         * checkers such as MemorySanitizer. */
+        sort[0] = 'X'; sort[1] = 'X';
     }
 
     IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
@@ -760,6 +766,12 @@ igraph_error_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *ve
         sort[0] = 'S'; sort[1] = 'I';
     } else if (which('S', 'I')) {
         sort[0] = 'L'; sort[1] = 'I';
+    } else {
+        /* None of the above, no sorting. These 'X' values are
+         * ignored by ARPACK, but we set them anyway in order to
+         * avoid an uninitialized 'sort' which would trigger
+         * checkers such as MemorySanitizer. */
+        sort[0] = 'X'; sort[1] = 'X';
     }
 
 #undef which
