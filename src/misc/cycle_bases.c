@@ -235,7 +235,7 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
 
     igraph_vector_int_destroy(&visited);
     igraph_inclist_destroy(&inclist);
-    IGRAPH_FINALLY_CLEAN(3); /* +1 for 'destroy_and_free_cycles' on 'result' */
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
