@@ -39,7 +39,7 @@ struct vd_pair {
     igraph_integer_t vertex;
     igraph_integer_t degree;
 
-    vd_pair(long vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
+    vd_pair(igraph_integer_t vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
 };
 
 // (indegree, outdegree)
@@ -50,7 +50,7 @@ struct vbd_pair {
     igraph_integer_t vertex;
     bidegree degree;
 
-    vbd_pair(long vertex, bidegree degree) : vertex(vertex), degree(degree) {}
+    vbd_pair(igraph_integer_t vertex, bidegree degree) : vertex(vertex), degree(degree) {}
 };
 
 // Comparison function for vertex-degree pairs.
@@ -78,7 +78,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igra
 
     std::vector<vd_pair> vertices;
     vertices.reserve(n);
-    for (int i = 0; i < n; ++i) {
+    for (igraph_integer_t i = 0; i < n; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
     }
 
@@ -102,7 +102,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igra
         }
 
         if (largest) {
-            for (int i = 0; i < vd.degree; ++i) {
+            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
                 if (--(vertices[vertices.size() - 1 - i].degree) < 0) {
                     goto fail;
                 }
@@ -113,7 +113,7 @@ static igraph_error_t igraph_i_havel_hakimi(const igraph_vector_int_t *deg, igra
         } else {
             // this loop can only be reached if all zero-degree nodes have already been removed
             // therefore decrementing remaining degrees is safe
-            for (int i = 0; i < vd.degree; ++i) {
+            for (igraph_integer_t i = 0; i < vd.degree; ++i) {
                 vertices[i].degree--;
 
                 VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
@@ -139,7 +139,7 @@ static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg
 
     typedef std::list<vd_pair> vlist;
     vlist vertices;
-    for (int i = 0; i < n; ++i) {
+    for (igraph_integer_t i = 0; i < n; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
     }
 
@@ -159,7 +159,7 @@ static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg
             continue;
         }
 
-        int k;
+        igraph_integer_t k;
         vlist::iterator it;
         for (it = vertices.begin(), k = 0;
              k != vd.degree && it != vertices.end();
@@ -223,7 +223,7 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
 
     std::vector<vd_pair> vertices;
     vertices.reserve(vcount);
-    for (int i = 0; i < vcount; ++i) {
+    for (igraph_integer_t i = 0; i < vcount; ++i) {
         igraph_integer_t d = VECTOR(*deg)[i];
         vertices.push_back(vd_pair(i, d));
     }
@@ -247,7 +247,7 @@ static igraph_error_t igraph_i_realize_undirected_multi(const igraph_vector_int_
         // or throw an error, depending on the 'loops' setting.
         if (vertices.size() == 1) {
             if (loops) {
-                for (long i=0; i < w.degree/2; ++i) {
+                for (igraph_integer_t i=0; i < w.degree/2; ++i) {
                     VECTOR(*edges)[2*ec]   = w.vertex;
                     VECTOR(*edges)[2*ec+1] = w.vertex;
                     ec++;
@@ -297,7 +297,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
 
     typedef std::list<vd_pair> vlist;
     vlist vertices;
-    for (int i = 0; i < vcount; ++i) {
+    for (igraph_integer_t i = 0; i < vcount; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
     }
 
@@ -321,7 +321,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
             if (vertices.empty() || uit->degree == 0) {
                 // We are out of non-zero degree vertices to connect to.
                 if (loops) {
-                    for (long i=0; i < vd.degree/2; ++i) {
+                    for (igraph_integer_t i=0; i < vd.degree/2; ++i) {
                         VECTOR(*edges)[2*ec]   = vd.vertex;
                         VECTOR(*edges)[2*ec+1] = vd.vertex;
                         ec++;
@@ -378,7 +378,7 @@ static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, 
 
     std::vector<vbd_pair> vertices;
     vertices.reserve(n);
-    for (int i = 0; i < n; ++i) {
+    for (igraph_integer_t i = 0; i < n; ++i) {
         vertices.push_back(vbd_pair(i, bidegree(VECTOR(*indeg)[i], VECTOR(*outdeg)[i])));
     }
 
@@ -408,12 +408,12 @@ static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, 
         }
 
         // are there a sufficient number of other vertices to connect to?
-        if (static_cast<long>(vertices.size()) - 1 < vdp->degree.second) {
+        if (static_cast<igraph_integer_t>(vertices.size()) - 1 < vdp->degree.second) {
             goto fail;
         }
 
         // create the connections
-        int k = 0;
+        igraph_integer_t k = 0;
         for (std::vector<vbd_pair>::iterator it = vertices.begin();
              k < vdp->degree.second;
              ++it) {
@@ -449,7 +449,7 @@ static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *ou
 
     typedef std::list<vbd_pair> vlist;
     vlist vertices;
-    for (int i = 0; i < n; ++i) {
+    for (igraph_integer_t i = 0; i < n; ++i) {
         vertices.push_back(vbd_pair(i, bidegree(VECTOR(*indeg)[i], VECTOR(*outdeg)[i])));
     }
 
@@ -471,7 +471,7 @@ static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *ou
             continue;
         }
 
-        int k = 0;
+        igraph_integer_t k = 0;
         vlist::iterator it;
         for (it = vertices.begin();
              k != vd.degree.second && it != vertices.end();
