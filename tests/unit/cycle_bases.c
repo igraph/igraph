@@ -34,7 +34,51 @@ int main() {
 
     igraph_vector_int_list_init(&result, 0);
 
-    printf("Null graph\n");
+    printf("FUNDAMENTAL CYCLE BASIS\n");
+
+    printf("\nNull graph\n");
+    igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
+    igraph_fundamental_cycles(&graph, -1, -1, &result);
+    print_check_destroy(&graph, &result);
+
+    printf("\nSingleton graph\n");
+    igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
+    igraph_fundamental_cycles(&graph, -1, -1, &result);
+    print_check_destroy(&graph, &result);
+
+    printf("\nSingle vertex with loop\n");
+    igraph_small(&graph, 1, IGRAPH_UNDIRECTED,
+                 0,0,
+                 -1);
+    igraph_fundamental_cycles(&graph, -1, -1, &result);
+    print_check_destroy(&graph, &result);
+
+    printf("\nTree\n");
+    igraph_kary_tree(&graph, 3, 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_fundamental_cycles(&graph, -1, -1, &result);
+    print_check_destroy(&graph, &result);
+
+    printf("\n2-cycle\n");
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
+                 0,1, 0,1,
+                 -1);
+    igraph_fundamental_cycles(&graph, -1, -1, &result);
+    print_check_destroy(&graph, &result);
+
+    printf("\nDisconnected\n");
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
+                 1,2, 2,3, 3,1,
+                 4,5, 5,4, 4,5,
+                 6,7, 7,8, 8,9, 9,6, 6,8,
+                 10,10, 10,11,
+                 12,12,
+                 -1);
+    igraph_fundamental_cycles(&graph, -1, -1, &result);
+    print_check_destroy(&graph, &result);
+
+    printf("\nMINIMUM WEIGHT CYCLE BASIS\n");
+
+    printf("\nNull graph\n");
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
     igraph_minimum_cycle_basis(&graph, /* cutoff */ -1, /* complete */ 1, /* ordered */ 1, &result);
     print_check_destroy(&graph, &result);
