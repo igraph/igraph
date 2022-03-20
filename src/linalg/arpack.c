@@ -123,7 +123,7 @@ static igraph_error_t igraph_i_arpack_err_dneupd(int error) {
 /* Pristine ARPACK options object that is not exposed to the user; this is used
  * as a template for \c igraph_i_arpack_options_default when the user requests
  * a pointer to the default object */
-static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
+const static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
     /* .bmat = */ { 'I' },
     /* .n = */ 0,
     /* .which = */ { 'X', 'X' },
@@ -732,7 +732,7 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
     return IGRAPH_SUCCESS;
 }
 
-int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
+igraph_error_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
                          const igraph_arpack_options_t *options,
                          igraph_real_t *dr, igraph_real_t *di,
                          igraph_real_t *v) {
@@ -846,7 +846,7 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
