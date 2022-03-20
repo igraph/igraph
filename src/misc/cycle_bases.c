@@ -17,14 +17,16 @@
 */
 
 #include "igraph_cycles.h"
-#include "igraph_components.h"
+
 #include "igraph_adjlist.h"
+#include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+#include "misc/order_cycle.h"
 
 /**** Fundamental cycles *****/
 
@@ -42,12 +44,12 @@
  * been processed.
  */
 static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
-                                           igraph_integer_t start_vid,
-                                           const igraph_inclist_t *inclist,
-                                           igraph_vector_int_t *visited,
-                                           igraph_integer_t mark, /* mark used in 'visited' */
-                                           igraph_integer_t cutoff,
-                                           igraph_vector_int_list_t *result) {
+                                                      igraph_integer_t start_vid,
+                                                      const igraph_inclist_t *inclist,
+                                                      igraph_vector_int_t *visited,
+                                                      igraph_integer_t mark, /* mark used in 'visited' */
+                                                      igraph_integer_t cutoff,
+                                                      igraph_vector_int_list_t *result) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -181,23 +183,22 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
  *
  * \param graph The graph object.
  * \param start_vid If negative, a complete fundamental cycle basis is returned.
- *   If a vertex id, the fundamental cycles associated with the BFS tree rooted
+ *   If a vertex ID, the fundamental cycles associated with the BFS tree rooted
  *   in that vertex will be returned, only for the weakly connected component
  *   containing that vertex.
  * \param cutoff If negative, a complete cycle basis is returned. Otherwise, only
  *   cycles of length <code>2*cutoff + 1</code> or shorter are included. \p cutoff
  *   is used to limit the depth of the BFS tree when searching for cycle edges.
- * \param result An initialized pointer vector. The result will be stored here as
- *   a list of \type igraph_vector_int_t objects, each containing the edge ids of a
- *   basis element.
+ * \param result An initialized integer vector list. The result will be stored here,
+ *   each vector containing the edge IDs of a basis element.
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
-                              igraph_integer_t start_vid,
-                              igraph_integer_t cutoff,
-                              igraph_vector_int_list_t *result) {
+                                         igraph_integer_t start_vid,
+                                         igraph_integer_t cutoff,
+                                         igraph_vector_int_list_t *result) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -307,8 +308,8 @@ static igraph_error_t cycle_add(const igraph_vector_int_t *a, const igraph_vecto
  * in row-echelon form. This function decides if 'cycle' is linearly independent of this
  * matrix, and if not, it adds it to the matrix. */
 static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_matrix,
-                                const igraph_vector_int_t *cycle,
-                                igraph_bool_t *independent) {
+                                           const igraph_vector_int_t *cycle,
+                                           igraph_bool_t *independent) {
 
     igraph_integer_t nrow = igraph_vector_int_list_size(reduced_matrix);
     igraph_integer_t i;
@@ -369,13 +370,20 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  *   If true, a complete basis is returned. If false, only cycles not greater
  *   than <code>2*cutoff + 1</code> are returned. This may save computation
  *   time, however, the result will not span the entire cycle space.
- * \param result
+ * \param use_cycle_order If true, each cycle is returned in natural order:
+ *   the edge IDs will appear ordered along the cycle. This comes at a small
+ *   performance cost. If false, no guarantees are given about the ordering
+ *   of edge IDs within cycles. This parameter exists solely to control
+ *   performance tradeoffs
+ * \param result An initialized integer vector list, the elements of the cycle
+ *   basis will be stored here as vectors of edge IDs.
  * \return Error code.
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
-                               igraph_integer_t cutoff,
-                               igraph_bool_t complete,
-                               igraph_vector_int_list_t *result) {
+                                          igraph_integer_t cutoff,
+                                          igraph_bool_t complete,
+                                          igraph_bool_t use_cycle_order,
+                                          igraph_vector_int_list_t *result) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -481,6 +489,19 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
 
     igraph_vector_int_list_destroy(&candidates);
     IGRAPH_FINALLY_CLEAN(1);
+
+    if (use_cycle_order) {
+        igraph_integer_t result_size = igraph_vector_int_list_size(result);
+        igraph_vector_int_t tmp;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
+        for (i=0; i < result_size; ++i) {
+            igraph_vector_int_t *cycle = igraph_vector_int_list_get_ptr(result, i);
+            IGRAPH_CHECK(igraph_vector_int_update(&tmp, cycle));
+            IGRAPH_CHECK(igraph_i_order_cycle(graph, &tmp, cycle));
+        }
+        igraph_vector_int_destroy(&tmp);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
 
     return IGRAPH_SUCCESS;
 }
