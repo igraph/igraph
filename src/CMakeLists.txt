@@ -280,6 +280,7 @@ add_library(
   misc/microscopic_update.c
   misc/mixing.c
   misc/motifs.c
+  misc/order_cycle.cpp
   misc/other.c
   misc/scan.c
   misc/sir.c
