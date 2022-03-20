@@ -1,3 +1,28 @@
+FUNDAMENTAL CYCLE BASIS
+
+Null graph
+
+Singleton graph
+
+Single vertex with loop
+( 0 )
+
+Tree
+
+2-cycle
+( 0 1 )
+
+Disconnected
+( 1 0 2 )
+( 4 5 )
+( 3 5 )
+( 7 6 10 )
+( 8 10 9 )
+( 11 )
+( 13 )
+
+MINIMUM WEIGHT CYCLE BASIS
+
 Null graph
 
 Singleton graph
