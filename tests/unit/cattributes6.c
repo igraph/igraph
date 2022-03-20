@@ -25,14 +25,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-int print_attributes(const igraph_t *g) {
+void print_attributes(const igraph_t *g) {
 
     igraph_vector_int_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
     igraph_integer_t i;
 
-    igraph_vector_t vec;
-    igraph_strvector_t svec;
     igraph_integer_t j;
 
     igraph_vector_int_init(&gtypes, 0);
@@ -58,6 +56,8 @@ int print_attributes(const igraph_t *g) {
             printf("\"%s\"", GAS(g, STR(gnames, i)));
         }
     }
+    if (igraph_strvector_size(&gnames))
+        printf("\n");
 
     for (i = 0; i < igraph_vcount(g); i++) {
         printf("Vertex %" IGRAPH_PRId ":", i);
@@ -92,10 +92,35 @@ int print_attributes(const igraph_t *g) {
     }
     printf("\n");
 
-    /* Check vector-based query functions */
+    igraph_strvector_destroy(&enames);
+    igraph_strvector_destroy(&vnames);
+    igraph_strvector_destroy(&gnames);
+    igraph_vector_int_destroy(&etypes);
+    igraph_vector_int_destroy(&vtypes);
+    igraph_vector_int_destroy(&gtypes);
+
+}
+
+static void check_vector_queries(const igraph_t *g) {
+    igraph_vector_t vec;
+    igraph_strvector_t svec;
+    igraph_vector_bool_t bvec;
+    igraph_strvector_t vnames, enames;
+    igraph_vector_int_t vtypes, etypes;
+    igraph_integer_t i, j;
+
+    igraph_vector_int_init(&vtypes, 0);
+    igraph_vector_int_init(&etypes, 0);
+    igraph_strvector_init(&vnames, 0);
+    igraph_strvector_init(&enames, 0);
+
+
     igraph_vector_init(&vec, 0);
     igraph_strvector_init(&svec, 0);
+    igraph_vector_bool_init(&bvec, 0);
 
+    igraph_cattribute_list(g, 0, 0, &vnames, &vtypes,
+                           &enames, &etypes);
     for (j = 0; j < igraph_strvector_size(&vnames); j++) {
         if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_cattribute_VANV(g, STR(vnames, j), igraph_vss_all(), &vec);
@@ -114,6 +139,14 @@ int print_attributes(const igraph_t *g) {
                     exit(52);
                 }
             }
+        } else {
+            igraph_cattribute_VABV(g, STR(vnames, j), igraph_vss_all(), &bvec);
+            for (i = 0; i < igraph_vcount(g); i++) {
+                igraph_bool_t b = VAB(g, STR(vnames, j), i);
+                if (b != VECTOR(bvec)[i]) {
+                    exit(53);
+                }
+            }
         }
     }
 
@@ -125,7 +158,7 @@ int print_attributes(const igraph_t *g) {
                 igraph_real_t num = EAN(g, STR(enames, j), i);
                 if (num != VECTOR(vec)[i] &&
                     (!isnan(num) || !isnan(VECTOR(vec)[i]))) {
-                    exit(53);
+                    exit(54);
                 }
             }
         } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
@@ -134,7 +167,16 @@ int print_attributes(const igraph_t *g) {
             for (i = 0; i < igraph_ecount(g); i++) {
                 const char *str = EAS(g, STR(enames, j), i);
                 if (strcmp(str, STR(svec, i))) {
-                    exit(54);
+                    exit(55);
+                }
+            }
+        } else {
+            igraph_cattribute_EABV(g, STR(enames, j),
+                                   igraph_ess_all(IGRAPH_EDGEORDER_ID), &bvec);
+            for (i = 0; i < igraph_ecount(g); i++) {
+                igraph_bool_t b = EAB(g, STR(enames, j), i);
+                if (b != VECTOR(bvec)[i]) {
+                    exit(56);
                 }
             }
         }
@@ -142,15 +184,12 @@ int print_attributes(const igraph_t *g) {
 
     igraph_strvector_destroy(&svec);
     igraph_vector_destroy(&vec);
-
+    igraph_vector_bool_destroy(&bvec);
     igraph_strvector_destroy(&enames);
     igraph_strvector_destroy(&vnames);
-    igraph_strvector_destroy(&gnames);
     igraph_vector_int_destroy(&etypes);
     igraph_vector_int_destroy(&vtypes);
-    igraph_vector_int_destroy(&gtypes);
 
-    return 0;
 }
 
 int main() {
@@ -172,6 +211,10 @@ int main() {
     }
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
+
+    SETGAB(&g, "bool_graph_attr", 1);
+    SETEAB(&g, "bool_edge_attr", 0, 1);
+    SETVAB(&g, "bool_vertex_attr", 0, 1);
 
     print_attributes(&g);
 
@@ -248,6 +291,8 @@ int main() {
 
     printf("After setting vertex and edge attributes:\n");
     print_attributes(&g);
+    check_vector_queries(&g);
+
     /* Set vertex attributes as vector */
     igraph_vector_init(&y, igraph_vcount(&g));
     igraph_vector_fill(&y, 1.23);
