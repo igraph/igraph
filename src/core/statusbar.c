@@ -84,6 +84,7 @@ igraph_error_t igraph_statusf(const char *message, void *data, ...) {
     va_list ap;
     va_start(ap, data);
     vsnprintf(buffer, sizeof(buffer) - 1, message, ap);
+    va_end(ap);
     return igraph_status(buffer, data);
 }
 

@@ -96,6 +96,7 @@ igraph_error_t igraph_progressf(const char *message, igraph_real_t percent, void
     va_start(ap, data);
     vsnprintf(igraph_i_progressmsg_buffer,
               sizeof(igraph_i_progressmsg_buffer) / sizeof(char), message, ap);
+    va_end(ap);
     return igraph_progress(igraph_i_progressmsg_buffer, percent, data);
 }
 

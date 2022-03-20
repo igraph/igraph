@@ -181,6 +181,7 @@ igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
     va_start(ap, igraph_errno);
     vsnprintf(igraph_i_errormsg_buffer,
               sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
+    va_end(ap);
     return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
 }
 
@@ -366,6 +367,7 @@ void igraph_warningf(const char *reason, const char *file, int line,
     va_start(ap, line);
     vsnprintf(igraph_i_warningmsg_buffer,
               sizeof(igraph_i_warningmsg_buffer) / sizeof(char), reason, ap);
+    va_end(ap);
     igraph_warning(igraph_i_warningmsg_buffer, file, line);
 }
 
