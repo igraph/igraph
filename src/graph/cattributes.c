@@ -643,9 +643,9 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
             VECTOR(*new_val)[i] = new_rec;
             IGRAPH_FINALLY_CLEAN(4);
         }
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
