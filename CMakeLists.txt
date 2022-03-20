@@ -101,7 +101,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
     # Generated files are excluded; apparently the CodeCoverage script has some
     # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
-    # directory that somehow gets into the coverage resolts. /Applications is for
+    # directory that somehow gets into the coverage results. /Applications is for
     # macOS -- it excludes files from the macOS SDK.
     EXCLUDE "io/*.l" "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
   )
