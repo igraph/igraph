@@ -87,6 +87,9 @@ void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* 
  * part in each column has a positive real part. */
 void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matrix);
 
+/* print all graph, edge and vertex attributes of a graph */
+void print_attributes(const igraph_t *g);
+
 void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem);
 void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem);
 void matrix_init_real_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const igraph_real_t *elem);
