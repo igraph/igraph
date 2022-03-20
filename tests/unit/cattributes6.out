@@ -135,3 +135,18 @@ Edge 0 (1-2):
 Edge 1 (0-1):
 Edge 2 (1-1):
 
+Setting attributes on vertex 0, permuting with 2
+Permuting to different graph:
+Vertex 0: foo=NaN bar=0 baz=""
+Vertex 1: foo=NaN bar=0 baz=""
+Vertex 2: foo=5 bar=1 baz="foobar"
+Edge 0 (2-1):
+Edge 1 (1-0):
+
+Permuting to same graph:
+Vertex 0: foo=NaN bar=0 baz=""
+Vertex 1: foo=NaN bar=0 baz=""
+Vertex 2: foo=5 bar=1 baz="foobar"
+Edge 0 (0-1):
+Edge 1 (1-2):
+

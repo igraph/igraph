@@ -22,6 +22,7 @@
 */
 
 #include "test_utilities.h"
+#include "graph/attributes.h"
 #include <igraph.h>
 #include <string.h>
 #include <stdlib.h>
@@ -293,6 +294,29 @@ int main() {
     print_attributes(&g);
 
     igraph_destroy(&g);
+
+    printf("Setting attributes on vertex 0, permuting with 2\n");
+    {
+        igraph_t g2;
+        igraph_vector_int_t per;
+
+        igraph_vector_int_init_int(&per, 3, 2, 1, 0);
+
+        igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, -1);
+        SETVAN(&g, "foo", 0, 5);
+        SETVAB(&g, "bar", 0, 1);
+        SETVAS(&g, "baz", 0, "foobar");
+        printf("Permuting to different graph:\n");
+        igraph_permute_vertices(&g, &g2, &per);
+        print_attributes(&g2);
+        printf("Permuting to same graph:\n");
+        igraph_i_attribute_permute_vertices(&g, &g, &per);
+        print_attributes(&g);
+        igraph_destroy(&g);
+        igraph_destroy(&g2);
+        igraph_vector_int_destroy(&per);
+    }
+
 
     VERIFY_FINALLY_STACK();
     return 0;
