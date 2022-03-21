@@ -60,6 +60,10 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
         IGRAPH_ERROR("Invalid starting vertex id.", IGRAPH_EINVAL);
     }
 
+    if (mark > IGRAPH_INTEGER_MAX - 2) {
+        IGRAPH_ERROR("Graph too large for cycle basis.", IGRAPH_EOVERFLOW);
+    }
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&pred_edge, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&u_back, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&v_back, 0);
