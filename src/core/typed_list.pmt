@@ -956,15 +956,23 @@ igraph_error_t FUNCTION(sort_ind)(
  * \function igraph_vector_list_remove_consecutive_duplicates
  * \brief Removes consecutive duplicates from a vector list.
  *
- * Takes an unsorted list \p v as input and computes an array of
- * indices \p inds such that v[ inds[i] ], with i increasing from 0, is
- * an ordered array according to the comparison function \p cmp. The order of
- * indices for identical elements is not defined.
+ * Removes consecutive duplicate vectors from the list. Optionally, a custom
+ * equivalence relation may be used to determine when two vectors are
+ * considered to be the same.
+ *
+ * </para><para>
+ * An efficient way to remove all duplicates, not just consecutive ones,
+ * is to first sort the vector list using \ref igraph_vector_list_sort(),
+ * then use this function. This will of course re-order the list.
  *
  * \param v The list to remove consecutive duplicates from.
  * \param eq A comparison function that takes pointers to two vectors and
  *    returns true if they are equivalent. It is assumed that it implements
- *    a transitive, but not necessarily symmetric relation.
+ *    a transitive, but not necessarily symmetric relation. Supply \c NULL
+ *    here to consider vectors equivalent precisely when their contents
+ *    are identical, i.e. to use \ref igraph_vector_all_e().
+ *
+ * \sa igraph_vector_list_sort()
  *
  * Time complexity: O(n), the number of items in the list.
  */
@@ -976,6 +984,10 @@ void FUNCTION(remove_consecutive_duplicates)(
 
     if (n < 2) {
         return;
+    }
+
+    if (! eq) {
+        eq = ITEM_FUNCTION(all_e);
     }
 
     for (i=0, j=0; i < n-1; ++i) {
