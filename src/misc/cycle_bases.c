@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 /* Computes fundamental cycles for the connected component containing 'start_vid',
  * and appends them to 'result'.
  *
- * 'visited' must be a vector of length vertex_count.
+ * 'visited' must be a vector of length igraph_vcount(graph).
  * visited[u] will be set to mark+1 or mark+2 for each visited vertex 'u'.
  * No elements of 'visited' must have these values when calling this function.
  * 'mark' can be specified in order to be able to re-use a 'visited' vector
@@ -64,11 +64,10 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&u_back, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&v_back, 0);
 
-    igraph_dqueue_int_init(&q, 0);
-    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 0);
 
-    igraph_dqueue_int_push(&q, start_vid); /* vertex id */
-    igraph_dqueue_int_push(&q, 0); /* distance from start_vid*/
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, start_vid)); /* vertex id */
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0)); /* distance from start_vid*/
     VECTOR(*visited)[start_vid] = mark + 1; /* mark as seen */
     VECTOR(pred_edge)[start_vid] = -1; /* non-valid predecessor edge id for root vertex */
 
@@ -150,8 +149,8 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
                 /* Only queue vertices with distance at most 'cutoff' from the root. */
                 /* Negative 'cutoff' indicates no cutoff. */
                 if (cutoff < 0 || vdist < cutoff) {
-                    igraph_dqueue_int_push(&q, u);
-                    igraph_dqueue_int_push(&q, vdist + 1);
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, u));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, vdist + 1));
                     VECTOR(*visited)[u] = mark + 1;
                     VECTOR(pred_edge)[u] = e;
                 }
@@ -205,7 +204,7 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
     igraph_integer_t estimated_rank;
     igraph_integer_t i;
     igraph_inclist_t inclist;
-    igraph_vector_int_t visited;
+    igraph_vector_int_t visited; /* see comments before igraph_i_fundamental_cycles_bfs() */
 
     if (start_vid >= no_of_nodes) {
         IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVAL);
@@ -394,7 +393,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     /* Compute candidate elements for the minimum weight basis. */
     {
         igraph_inclist_t inclist;
-        igraph_vector_int_t visited;
+        igraph_vector_int_t visited; /* visited[v] % 3 is zero for unvisited vertices, see igraph_i_fundamental_cycles_bfs() */
         igraph_vector_int_t degrees;
         igraph_integer_t no_of_comps;
         igraph_integer_t mark;
@@ -419,7 +418,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
         mark = 0;
         for (i=0; i < no_of_nodes; ++i) {
             igraph_integer_t degree = VECTOR(degrees)[i];
-            igraph_bool_t vis = VECTOR(visited)[i] % 3;
+            igraph_bool_t vis = VECTOR(visited)[i] % 3; /* was vertex i visited already? */
 
             /* Generally, we only need to run a BFS from vertices of degree 3 or greater.
              * The exception is a connected component which is itself a cycle, and therefore
@@ -452,7 +451,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
             igraph_vector_int_sort(igraph_vector_int_list_get_ptr(&candidates, i));
         }
         igraph_vector_int_list_sort(&candidates, &cycle_cmp);
-        igraph_vector_int_list_remove_consecutive_duplicates(&candidates, NULL);
+        igraph_vector_int_list_remove_consecutive_duplicates(&candidates, igraph_vector_int_all_e);
     }
 
     igraph_vector_int_list_clear(result);
