@@ -297,9 +297,15 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
  * \function igraph_strvector_append
  * \brief Concatenates two string vectors.
  *
+ * Appends the contents of the \p from vector to the \p to vector.
+ * If the \p from vector is no longer needed after this operation,
+ * use \ref igraph_strvector_merge() for better performance.
+ *
  * \param to The first string vector, the result is stored here.
  * \param from The second string vector, it is kept unchanged.
  * \return Error code.
+ *
+ * \sa igraph_strvector_merge()
  *
  * Time complexity: O(n+l2), n is the number of strings in the new
  * string vector, l2 is the total length of strings in the \p from
@@ -332,6 +338,46 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
         igraph_strvector_resize(to, len1); /* always shrinks */
         IGRAPH_ERROR("Cannot append string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_merge
+ * \brief Moves the contents of a string vector to the end of another.
+ *
+ * Transfers the contents of the \p from vector to the end of \p to, clearing
+ * \p from in the process. If this operation fails, both vectors are left intact.
+ * This function does not copy or reallocate individual strings, therefore it
+ * performs better than \ref igraph_strvector_append().
+ *
+ * \param to   The target vector. The contents of \p from will be appended to it.
+ * \param from The source vector. It will be cleared.
+ * \return Error code.
+ *
+ * \sa igraph_strvector_append()
+ *
+ * Time complexity: O(l2) if \p to has sufficient capacity, O(2*l1+l2) otherwise,
+ *   where l1 and l2 are the lengths of \p to and \from respectively.
+ */
+igraph_error_t igraph_strvector_merge(igraph_strvector_t *to, igraph_strvector_t *from) {
+    char **p1, **p2, **pe;
+    igraph_integer_t newlen;
+
+    IGRAPH_SAFE_ADD(igraph_strvector_size(to), igraph_strvector_size(from), &newlen);
+    IGRAPH_CHECK(igraph_strvector_reserve(to, newlen));
+
+    /* transfer contents of 'from' to 'to */
+    for (p1 = to->end, p2 = from->stor_begin, pe = to->stor_begin + newlen;
+         p1 < pe; ++p1, ++p2)
+    {
+        *p1 = *p2;
+    }
+    to->end = pe;
+
+    /* clear 'from' */
+    from->end = from->stor_begin;
 
     return IGRAPH_SUCCESS;
 }
