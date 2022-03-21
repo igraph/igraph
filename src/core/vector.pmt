@@ -26,6 +26,8 @@
 #include "igraph_random.h"
 #include "igraph_qsort.h"
 
+#include "math/safe_intop.h"
+
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 #include <stdarg.h>     /* va_start & co */
@@ -2388,10 +2390,12 @@ igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
 igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     igraph_integer_t tosize, fromsize;
+    igraph_integer_t newsize;
 
     tosize = FUNCTION(igraph_vector, size)(to);
     fromsize = FUNCTION(igraph_vector, size)(from);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, tosize + fromsize));
+    IGRAPH_SAFE_ADD(tosize, fromsize, &newsize);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, newsize));
     memcpy(to->stor_begin + tosize, from->stor_begin,
            sizeof(BASE) * fromsize);
     to->end = to->stor_begin + tosize + fromsize;
