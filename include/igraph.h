@@ -98,7 +98,6 @@
 #include "igraph_coloring.h"
 #include "igraph_eulerian.h"
 #include "igraph_graphicality.h"
-
 #include "igraph_cycles.h"
 
 #endif
