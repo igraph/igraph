@@ -27,6 +27,7 @@
 #include "igraph_error.h"
 
 #include "internal/hacks.h" /* strdup */
+#include "math/safe_intop.h"
 
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
@@ -308,11 +309,13 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
 igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
                             const igraph_strvector_t *from) {
     igraph_integer_t len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
+    igraph_integer_t newlen;
     igraph_integer_t i;
     igraph_bool_t error = 0;
     char* tmp;
 
-    IGRAPH_CHECK(igraph_strvector_reserve(to, len1 + len2));
+    IGRAPH_SAFE_ADD(len1, len2, &newlen);
+    IGRAPH_CHECK(igraph_strvector_reserve(to, newlen));
 
     for (i = 0; i < len2; i++) {
         tmp = strdup(from->stor_begin[i]);
