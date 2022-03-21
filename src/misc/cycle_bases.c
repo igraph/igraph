@@ -452,7 +452,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
             igraph_vector_int_sort(igraph_vector_int_list_get_ptr(&candidates, i));
         }
         igraph_vector_int_list_sort(&candidates, &cycle_cmp);
-        igraph_vector_int_list_remove_consecutive_duplicates(&candidates, igraph_vector_int_all_e);
+        igraph_vector_int_list_remove_consecutive_duplicates(&candidates, NULL);
     }
 
     igraph_vector_int_list_clear(result);
