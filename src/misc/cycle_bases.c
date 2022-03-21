@@ -197,6 +197,8 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
+ *
+ * \experimental
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                          igraph_integer_t start_vid,
@@ -381,6 +383,10 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \param result An initialized integer vector list, the elements of the cycle
  *   basis will be stored here as vectors of edge IDs.
  * \return Error code.
+ *
+ * Time complexity: TODO.
+ *
+ * \experimental
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                           igraph_integer_t cutoff,
