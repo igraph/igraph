@@ -253,7 +253,7 @@ void igraph_strvector_remove(igraph_strvector_t *sv, igraph_integer_t elem) {
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_copy
+ * \function igraph_strvector_init_copy
  * \brief Initialization by copying.
  *
  * Initializes a string vector by copying another string vector.
@@ -265,7 +265,7 @@ void igraph_strvector_remove(igraph_strvector_t *sv, igraph_integer_t elem) {
  * Time complexity: O(l), the total length of the strings in \p from.
  */
 
-igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
+igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
                           const igraph_strvector_t *from) {
     igraph_integer_t i, j;
 
@@ -291,6 +291,19 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
     to->end = to->stor_end;
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_copy
+ * \brief Initialization by copying (deprecated alias).
+ *
+ * \deprecated-by igraph_strvector_init_copy 0.10.0
+ */
+
+igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
+                          const igraph_strvector_t *from) {
+    return igraph_strvector_init_copy(to, from);
 }
 
 /**

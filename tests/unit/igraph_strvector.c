@@ -79,12 +79,12 @@ int main() {
     strvector_print(&sv1);
 
     printf("igraph_strvector_copy\n");
-    igraph_strvector_copy(&sv2, &sv1);
+    igraph_strvector_init_copy(&sv2, &sv1);
     strvector_print(&sv1);
 
     igraph_strvector_resize(&sv1, 0);
     igraph_strvector_destroy(&sv2);
-    igraph_strvector_copy(&sv2, &sv1);
+    igraph_strvector_init_copy(&sv2, &sv1);
     if (igraph_strvector_size(&sv2) != 0) {
         return 2;
     }
@@ -144,8 +144,8 @@ int main() {
     igraph_strvector_set(&sv2, 0, "a");
     igraph_strvector_set(&sv2, 1, "b");
 
-    igraph_strvector_copy(&sv3, &sv1);
-    igraph_strvector_copy(&sv4, &sv2);
+    igraph_strvector_init_copy(&sv3, &sv1);
+    igraph_strvector_init_copy(&sv4, &sv2);
 
     igraph_strvector_merge(&sv1, &sv2);
     IGRAPH_ASSERT(igraph_strvector_size(&sv2) == 0);

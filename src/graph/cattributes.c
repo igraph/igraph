@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_cattributes_copy_attribute_record(igraph_attribut
             IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, newstr);
-        IGRAPH_CHECK(igraph_strvector_copy(newstr, str));
+        IGRAPH_CHECK(igraph_strvector_init_copy(newstr, str));
         IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
         (*newrec)->value = newstr;
     } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
@@ -3888,7 +3888,7 @@ igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, str);
         rec->value = str;
-        IGRAPH_CHECK(igraph_strvector_copy(str, sv));
+        IGRAPH_CHECK(igraph_strvector_init_copy(str, sv));
         IGRAPH_FINALLY(igraph_strvector_destroy, str);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
         IGRAPH_FINALLY_CLEAN(4);
@@ -4087,7 +4087,7 @@ igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, str);
         rec->value = str;
-        IGRAPH_CHECK(igraph_strvector_copy(str, sv));
+        IGRAPH_CHECK(igraph_strvector_init_copy(str, sv));
         IGRAPH_FINALLY(igraph_strvector_destroy, str);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
         IGRAPH_FINALLY_CLEAN(4);

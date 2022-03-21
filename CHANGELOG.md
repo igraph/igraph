@@ -659,6 +659,10 @@
    for sake of consistency with other vector-like data structures; the old name
    is deprecated and will be removed in 0.11.
 
+ - `igraph_strvector_copy()` has been renamed to `igraph_strvector_init_copy()`
+   for sake of consistency with other vector-like data structures; the old name
+   is deprecated and will be removed in 0.11.
+
  - `igraph_strvector_get()` now returns a `const char*` and not a `char*` to
    indicate that you are not supposed to modify the string in the vector
    directly. If you do want to modify it and you are aware of the implications
