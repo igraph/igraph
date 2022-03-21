@@ -238,11 +238,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     /* There must be no 0 labels in membership vector at this point */
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(*membership)[i] -= 1;
-        /* Something went wrong: At least one vertex has no community assigned */
-        if (VECTOR(*membership)[i] < 0) {
-            IGRAPH_ERROR("Something went wrong during execution. One or more vertices got "
-                         "no community assigned at algorithm convergence.", IGRAPH_EINTERNAL);
-        }
+        IGRAPH_ASSERT(VECTOR(*membership)[i] >= 0); /* all vertices must have a community assinged */
     }
 
     igraph_adjlist_destroy(&al);
