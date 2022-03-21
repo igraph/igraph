@@ -24,14 +24,14 @@
 void strvector_print(const igraph_strvector_t *sv) {
     igraph_integer_t i, s = igraph_strvector_size(sv);
     for (i = 0; i < s; i++) {
-        printf("---%s---\n", STR(*sv, i));
+        printf("\"%s\"\n", STR(*sv, i));
     }
     printf("\n");
 }
 
 int main() {
 
-    igraph_strvector_t sv1, sv2;
+    igraph_strvector_t sv1, sv2, sv3, sv4;
 
     printf("igraph_strvector_init, igraph_strvector_destroy\n");
     igraph_strvector_init(&sv1, 10);
@@ -105,22 +105,22 @@ int main() {
     strvector_print(&sv1);
     igraph_strvector_destroy(&sv1);
 
-    printf("append\n");
-    printf("---\n");
+    printf("igraph_strvector_append\n");
+    printf("===\n");
     igraph_strvector_init(&sv1, 0);
     igraph_strvector_init(&sv2, 0);
     igraph_strvector_append(&sv1, &sv2);
     strvector_print(&sv1);
-    printf("---\n");
+    printf("===\n");
 
     igraph_strvector_resize(&sv1, 3);
     igraph_strvector_append(&sv1, &sv2);
     strvector_print(&sv1);
-    printf("---\n");
+    printf("===\n");
 
     igraph_strvector_append(&sv2, &sv1);
     strvector_print(&sv2);
-    printf("---\n");
+    printf("===\n");
 
     igraph_strvector_set(&sv1, 0, "0");
     igraph_strvector_set(&sv1, 1, "1");
@@ -133,6 +133,34 @@ int main() {
 
     igraph_strvector_destroy(&sv1);
     igraph_strvector_destroy(&sv2);
+
+    printf("igraph_strvector_merge\n");
+    igraph_strvector_init(&sv1, 3);
+    igraph_strvector_set(&sv1, 0, "zero");
+    igraph_strvector_set(&sv1, 1, "one");
+    igraph_strvector_set(&sv1, 2, "two");
+
+    igraph_strvector_init(&sv2, 2);
+    igraph_strvector_set(&sv2, 0, "a");
+    igraph_strvector_set(&sv2, 1, "b");
+
+    igraph_strvector_copy(&sv3, &sv1);
+    igraph_strvector_copy(&sv4, &sv2);
+
+    igraph_strvector_merge(&sv1, &sv2);
+    IGRAPH_ASSERT(igraph_strvector_size(&sv2) == 0);
+
+    igraph_strvector_append(&sv3, &sv4);
+    IGRAPH_ASSERT(igraph_strvector_size(&sv1) == igraph_strvector_size(&sv3));
+
+    for (igraph_integer_t i=0; i < igraph_strvector_size(&sv1); ++i) {
+        IGRAPH_ASSERT(strcmp(STR(sv1, i), STR(sv3, i)) == 0);
+    }
+
+    igraph_strvector_destroy(&sv1);
+    igraph_strvector_destroy(&sv2);
+    igraph_strvector_destroy(&sv3);
+    igraph_strvector_destroy(&sv4);
 
     printf("clear\n");
     igraph_strvector_init(&sv1, 3);
