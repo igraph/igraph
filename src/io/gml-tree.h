@@ -44,7 +44,7 @@ typedef struct igraph_gml_tree_t {
 } igraph_gml_tree_t;
 
 typedef struct igraph_gml_string_t {
-    char *str;
+    const char *str;
     size_t len;
 } igraph_gml_string_t;
 

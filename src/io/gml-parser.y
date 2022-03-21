@@ -53,7 +53,7 @@
 #include "io/parsers/gml-parser.h"
 #include "io/parsers/gml-lexer.h"
 #include "io/parse_utils.h"
-#include "internal/hacks.h" /* strcasecmp */
+#include "internal/hacks.h" /* strcasecmp & strndup */
 
 #include <stdio.h>
 #include <math.h>
@@ -203,15 +203,13 @@ static igraph_error_t igraph_i_gml_make_numeric2(igraph_gml_string_t name,
                                           igraph_real_t sign,
                                           igraph_gml_tree_t **tree) {
 
-  char tmp = value.str[value.len];
-
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
   if (!t) {
     IGRAPH_ERROR("Cannot build GML tree.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
   }
   IGRAPH_FINALLY(igraph_free, t);
 
-  value.str[value.len]='\0';
+  IGRAPH_ASSERT(value.str[value.len] == '\0'); /* TODO remove if not triggered */
 
   /* if v == "inf" or v == "nan", the newly created tree node will take ownership
    * of s. If the creation fails, we need to free s and v as well in order not
@@ -231,7 +229,6 @@ static igraph_error_t igraph_i_gml_make_numeric2(igraph_gml_string_t name,
     IGRAPH_ERROR("Error while parsing GML.", IGRAPH_PARSEERROR);
   }
 
-  value.str[value.len]=tmp;
   igraph_gml_string_destroy(&value);
 
   *tree = t;
