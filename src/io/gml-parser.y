@@ -61,8 +61,8 @@
 
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
                        const char *s);
-static igraph_error_t igraph_i_gml_get_keyword(const char *s, size_t len, void *res);
-static igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, void *res);
+static igraph_error_t igraph_i_gml_get_keyword(const char *s, size_t len, igraph_gml_string_t *res);
+static igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, igraph_gml_string_t *res);
 static igraph_error_t igraph_i_gml_make_numeric(const igraph_gml_string_t name, igraph_real_t value, igraph_gml_tree_t **tree);
 static igraph_error_t igraph_i_gml_make_numeric2(igraph_gml_string_t name,
                                           igraph_gml_string_t value,
@@ -161,27 +161,21 @@ int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
   return 0;
 }
 
-static igraph_error_t igraph_i_gml_get_keyword(const char *s, size_t len, void *res) {
-  struct { char *s; size_t len; } *p=res;
-  p->s=IGRAPH_CALLOC(len+1, char);
-  if (!p->s) {
+static igraph_error_t igraph_i_gml_get_keyword(const char *s, size_t len, igraph_gml_string_t *res) {
+  res->str = strndup(s, len);
+  if (!res->str) {
     IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
   }
-  memcpy(p->s, s, sizeof(char)*len);
-  p->s[len]='\0';
-  p->len=len;
+  res->len=len;
   return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, void *res) {
-  struct { char *s; size_t len; } *p=res;
-  p->s=IGRAPH_CALLOC(len-1, char);
-  if (!p->s) {
+static igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, igraph_gml_string_t *res) {
+  res->str = strndup(s, len-2);
+  if (!res->str) {
     IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
   }
-  memcpy(p->s, s+1, sizeof(char)*(len-2));
-  p->s[len-2]='\0';
-  p->len=len-2;
+  res->len=len-2;
   return IGRAPH_SUCCESS;
 }
 
