@@ -156,7 +156,7 @@ void igraph_gml_tree_destroy(igraph_gml_tree_t *t) {
 
     igraph_integer_t i, n = igraph_vector_ptr_size(&t->children);
     for (i = 0; i < n; i++) {
-        int type = VECTOR(t->types)[i];
+        igraph_i_gml_tree_type_t type = VECTOR(t->types)[i];
         switch (type) {
         case IGRAPH_I_GML_TREE_TREE:
             igraph_gml_tree_destroy(VECTOR(t->children)[i]);
