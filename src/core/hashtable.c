@@ -108,7 +108,7 @@ igraph_error_t igraph_hashtable_get(igraph_hashtable_t *ht,
 
 igraph_error_t igraph_hashtable_reset(igraph_hashtable_t *ht) {
     igraph_strvector_destroy(&ht->elements);
-    IGRAPH_CHECK(igraph_strvector_copy(&ht->elements, &ht->defaults));
+    IGRAPH_CHECK(igraph_strvector_init_copy(&ht->elements, &ht->defaults));
     return IGRAPH_SUCCESS;
 }
 

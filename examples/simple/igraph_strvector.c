@@ -62,7 +62,7 @@ int main() {
     strvector_print(sv1);
 
     printf("Make a copy of the strvector and set the last element of the copy:\n");
-    igraph_strvector_copy(&sv2, &sv1);
+    igraph_strvector_init_copy(&sv2, &sv1);
     igraph_strvector_set(&sv2, 2, "copy two");
     strvector_print(sv2);
 
