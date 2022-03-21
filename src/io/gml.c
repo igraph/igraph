@@ -65,7 +65,7 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
             } else {
                 /* Must not reach here: GML only supports numeric and string attributes,
                  * and the GML parser must not create others. */
-                IGRAPH_FATAL("Non-numeric non-string attribute encoutered in GML reader.");
+                IGRAPH_FATAL("Non-numeric non-string attribute encoutered in GML reader.");  /* LCOV_EXCL_LINE */
             }
             IGRAPH_FREE(atrec->name);
             IGRAPH_FREE(atrec);
@@ -239,7 +239,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
          * returned in place of a Bison error code.
          * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
          */
-        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading GML file.", err);
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading GML file.", err);  /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
