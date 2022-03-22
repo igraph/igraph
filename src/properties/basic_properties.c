@@ -92,6 +92,31 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
     return 0;
 }
 
+static int igraph_i_diversity(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        long int vid, igraph_vector_t *incident, igraph_real_t *res) {
+
+    igraph_real_t s = 0.0, ent = 0.0;
+    long int k, j;
+
+    IGRAPH_CHECK(igraph_incident(graph, incident, vid, /*mode=*/ IGRAPH_ALL));
+    k = igraph_vector_size(incident);
+    if (k == 0) {
+        *res = IGRAPH_NAN;
+    } else if (k == 1) {
+        *res = 0.0;
+    } else {
+        for (j = 0; j < k; j++) {
+            igraph_real_t w = VECTOR(*weights)[(long int)VECTOR(*incident)[j]];
+            if (w == 0) continue;
+            s += w;
+            ent += (w * log(w));
+        }
+        *res = (log(s) - ent / s) / log(k);
+    }
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_diversity
  * Structural diversity index of the vertices
@@ -107,7 +132,8 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  * where p[i,j]=w[i,j]/sum(w[i,l], l=1..k[i]),  k[i] is the (total)
  * degree of vertex i, and w[i,j] is the weight of the edge(s) between
  * vertex i and j. The diversity of isolated vertices will be NaN
- * (not-a-number).
+ * (not-a-number), while that of vertices with a single connection
+ * will be zero.
  *
  * </para><para>
  * The measure works only if the graph is undirected and has no multiple edges.
@@ -117,7 +143,7 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  *
  * \param graph The undirected input graph.
  * \param weights The edge weights, in the order of the edge ids, must
- *    have appropriate length.
+ *    have appropriate length. Weights must be non-negative.
  * \param res An initialized vector, the results are stored here.
  * \param vids Vertex selector that specifies the vertices which to calculate
  *    the measure.
@@ -129,12 +155,10 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
 int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
-    int no_of_nodes = igraph_vcount(graph);
-    int no_of_edges = igraph_ecount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
+    long int i;
     igraph_vector_t incident;
-    igraph_vit_t vit;
-    igraph_real_t s, ent, w;
-    int i, j, k;
     igraph_bool_t has_multiple;
 
     if (igraph_is_directed(graph)) {
@@ -154,38 +178,34 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
         IGRAPH_ERROR("Diversity measure works only if the graph has no multiple edges.", IGRAPH_EINVAL);
     }
 
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
+        } else if (igraph_is_nan(minweight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
+    }
+
     IGRAPH_VECTOR_INIT_FINALLY(&incident, 10);
 
     if (igraph_vs_is_all(&vids)) {
         IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
-            s = ent = 0.0;
-            IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = (int) igraph_vector_size(&incident); j < k; j++) {
-                w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
-                s += w;
-                ent += (w * log(w));
-            }
-            VECTOR(*res)[i] = (log(s) - ent / s) / log(k);
+            IGRAPH_CHECK(igraph_i_diversity(graph, weights, i, &incident, &VECTOR(*res)[i]));
         }
     } else {
+        igraph_vit_t vit;
+
         IGRAPH_CHECK(igraph_vector_resize(res, 0));
         IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-        for (IGRAPH_VIT_RESET(vit), i = 0;
-             !IGRAPH_VIT_END(vit);
-             IGRAPH_VIT_NEXT(vit), i++) {
+        for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+            igraph_real_t d;
             long int v = IGRAPH_VIT_GET(vit);
-            s = ent = 0.0;
-            IGRAPH_CHECK(igraph_incident(graph, &incident, (igraph_integer_t) v,
-                                         /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = (int) igraph_vector_size(&incident); j < k; j++) {
-                w = VECTOR(*weights)[(long int)VECTOR(incident)[j]];
-                s += w;
-                ent += (w * log(w));
-            }
-            IGRAPH_CHECK(igraph_vector_push_back(res, (log(s) - ent / s) / log(k)));
+            IGRAPH_CHECK(igraph_i_diversity(graph, weights, v, &incident, &d));
+            IGRAPH_CHECK(igraph_vector_push_back(res, d));
         }
 
         igraph_vit_destroy(&vit);
@@ -195,7 +215,7 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
     igraph_vector_destroy(&incident);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
