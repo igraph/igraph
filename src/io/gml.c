@@ -200,7 +200,8 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_t eattrnames;
     igraph_trie_t gattrnames;
     igraph_vector_ptr_t gattrs = IGRAPH_VECTOR_PTR_NULL,
-                        vattrs = IGRAPH_VECTOR_PTR_NULL, eattrs = IGRAPH_VECTOR_PTR_NULL;
+                        vattrs = IGRAPH_VECTOR_PTR_NULL,
+                        eattrs = IGRAPH_VECTOR_PTR_NULL;
     igraph_vector_ptr_t *attrs[3];
     igraph_integer_t edgeptr = 0;
     igraph_i_gml_parsedata_t context;

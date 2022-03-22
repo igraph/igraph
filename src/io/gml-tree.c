@@ -38,8 +38,7 @@ igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
     igraph_integer_t *p;
 
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
-    IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&t->types, 1);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 1);
 
     /* names */
@@ -67,8 +66,7 @@ igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
     igraph_real_t *p;
 
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
-    IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&t->types, 1);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 1);
 
     /* names */
@@ -94,8 +92,7 @@ igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
                                 const igraph_gml_string_t value) {
 
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
-    IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&t->types, 1);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 1);
 
     /* names */
@@ -116,8 +113,7 @@ igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
                               igraph_gml_tree_t *value) {
 
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 1);
-    IGRAPH_CHECK(igraph_vector_char_init(&t->types, 1));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &t->types);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&t->types, 1);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 1);
 
     /* names */
@@ -141,8 +137,7 @@ igraph_error_t igraph_gml_tree_mergedest(igraph_gml_tree_t *t1, igraph_gml_tree_
     for (i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_vector_ptr_push_back(&t1->names, VECTOR(t2->names)[i]));
         IGRAPH_CHECK(igraph_vector_char_push_back(&t1->types, VECTOR(t2->types)[i]));
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(&t1->children,
-                     VECTOR(t2->children)[i]));
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(&t1->children, VECTOR(t2->children)[i]));
     }
 
     igraph_vector_ptr_destroy(&t2->names);
@@ -223,7 +218,7 @@ const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, igraph_integer_t po
 }
 
 igraph_integer_t igraph_gml_tree_get_integer(const igraph_gml_tree_t *t,
-        igraph_integer_t pos) {
+                                             igraph_integer_t pos) {
     igraph_integer_t *i = VECTOR(t->children)[pos];
     return *i;
 }
@@ -241,7 +236,7 @@ const char *igraph_gml_tree_get_string(const igraph_gml_tree_t *t,
 }
 
 igraph_gml_tree_t *igraph_gml_tree_get_tree(const igraph_gml_tree_t *t,
-        igraph_integer_t pos) {
+                                            igraph_integer_t pos) {
     igraph_gml_tree_t *tree = VECTOR(t->children)[pos];
     return tree;
 }
