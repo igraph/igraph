@@ -589,7 +589,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
     }
 
-    if (weights) {
+    if (weights && igraph_vector_size(weights) > 0) {
         igraph_vector_minmax(weights, &d_n, &d_p);
     } else {
         d_n = d_p = 1;
