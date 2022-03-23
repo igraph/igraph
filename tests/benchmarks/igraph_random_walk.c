@@ -31,7 +31,7 @@ int main() {
          );
 
     BENCH(" 3 Random vertex walk, directed,   unweighted, small graph  ",
-          igraph_random_walk(&graph, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_walk(&graph, NULL, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH(" 4 Random vertex walk, directed,   weighted, small graph  ",
@@ -47,7 +47,7 @@ int main() {
          );
 
     BENCH(" 7 Random vertex walk, undirected, unweighted, small graph  ",
-          igraph_random_walk(&graph, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_walk(&graph, NULL, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH(" 8 Random vertex walk, undirected, weighted, small graph  ",
@@ -74,7 +74,7 @@ int main() {
          );
 
     BENCH(" 11 Random vertex walk, directed,   unweighted, large graph  ",
-          igraph_random_walk(&graph, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_walk(&graph, NULL, &walk, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH(" 12 Random vertex walk, directed,   weighted, large graph  ",
@@ -90,7 +90,7 @@ int main() {
          );
 
     BENCH(" 15 Random vertex walk, undirected, unweighted, large graph  ",
-          igraph_random_walk(&graph, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
+          igraph_random_walk(&graph, NULL, &walk, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
 
     BENCH(" 16 Random vertex walk, undirected, weighted, large graph  ",
