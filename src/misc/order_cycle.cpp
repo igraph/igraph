@@ -28,9 +28,6 @@ struct eid_pair_t : public std::pair<igraph_integer_t, igraph_integer_t> {
     eid_pair_t() : std::pair<igraph_integer_t, igraph_integer_t>(-1, -1) { }
 };
 
-// Mapping from the vertices of the cycle to their two incident edges
-typedef std::map<igraph_integer_t, eid_pair_t> inclist_t;
-
 /**
  * \function igraph_i_order_cycle
  * \brief Reorders edges of a cycle in cycle order
@@ -44,12 +41,12 @@ extern "C" igraph_error_t igraph_i_order_cycle(
         const igraph_vector_int_t *cycle,
         igraph_vector_int_t *res) {
 
-    IGRAPH_HANDLE_EXCEPTIONS(
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     igraph_integer_t n = igraph_vector_int_size(cycle);
     IGRAPH_ASSERT(n > 0);
 
-    inclist_t inclist;
+    std::map<igraph_integer_t, eid_pair_t> inclist;
     for (igraph_integer_t i=0; i < n; ++i) {
         igraph_integer_t eid = VECTOR(*cycle)[i];
 
@@ -95,7 +92,7 @@ extern "C" igraph_error_t igraph_i_order_cycle(
         current_v = next_v;
     }
 
-    return IGRAPH_SUCCESS;
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
-    );
+    return IGRAPH_SUCCESS;
 }
