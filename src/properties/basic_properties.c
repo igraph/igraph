@@ -175,11 +175,24 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
         long int v = IGRAPH_VIT_GET(vit);
 
         IGRAPH_CHECK(igraph_incident(graph, &incident, v, /*mode=*/ IGRAPH_ALL));
-        k = igraph_vector_size(&incident);
+        k = igraph_vector_size(&incident); /* degree */
+
+        /*
+         * Non-normalized diversity is defined as
+         * d = -sum_i w_i/s log (w_i/s)
+         * where s = sum_i w_i. In order to avoid two passes through the w vector,
+         * we use the equivalent formulation of
+         * d = log s - (sum_i w_i log w_i) / s
+         * However, this formulation may not give an exact 0.0 for some w when k=1,
+         * due to roundoff errors (examples: w=3 or w=7). For this reason, we
+         * special-case the computation for k=1 even for the unnormalized diversity
+         * insted of just setting the normalization factor to 1 for this case.
+         */
         if (k == 0) {
             d = IGRAPH_NAN;
         } else if (k == 1) {
-            d = 0.0;
+            if (VECTOR(*weights)[0] > 0) d = 0.0; /* s > 0 */
+            else d = IGRAPH_NAN; /* s == 0 */
         } else {
             igraph_real_t s = 0.0, ent = 0.0;
             for (i = 0; i < k; i++) {
@@ -191,7 +204,7 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
             d = (log(s) - ent / s) / log(k);
         }
 
-        IGRAPH_CHECK(igraph_vector_push_back(res, d));
+        igraph_vector_push_back(res, d); /* reserved */
     }
 
     igraph_vit_destroy(&vit);
