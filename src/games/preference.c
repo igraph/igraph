@@ -125,7 +125,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
     {
         igraph_real_t lo, hi;
-        igraph_matrix_minmax(pref_matrix, &lo, &hi);
+        igraph_matrix_minmax(pref_matrix, &lo, &hi); /* matrix size is at least 1x1, safe to call minmax */
 
         if (lo < 0 || hi > 1) {
             IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
@@ -423,7 +423,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
 
     {
         igraph_real_t lo, hi;
-        igraph_matrix_minmax(pref_matrix, &lo, &hi);
+        igraph_matrix_minmax(pref_matrix, &lo, &hi); /* matrix size is at least 1x1, safe to call minmax */
 
         if (lo < 0 || hi > 1) {
             IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
