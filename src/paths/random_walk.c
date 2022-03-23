@@ -31,6 +31,14 @@
 
 #include "core/interruption.h"
 
+/* Used as item destructor for 'cdfs' in igraph_random_walk() and igraph_random_edge_walk(). */
+static void vec_destr(igraph_vector_t* vec) {
+    if (vec != NULL) {
+        igraph_vector_destroy(vec);
+    }
+}
+
+
 /**
  * \function igraph_random_walk
  * \brief Perform a random walk on a graph.
@@ -41,6 +49,11 @@
  *
  * \param graph The input graph, it can be directed or undirected.
  *   Multiple edges are respected, so are loop edges.
+ * \param weights A vector of non-negative edge weights. It is assumed
+ *   that at least one strictly positive weight is found among the
+ *   outgoing edges of each vertex. Additionally, no edge weight may
+ *   be NaN. If either case does not hold, an error is returned. If it
+ *   is a NULL pointer, all edges are considered to have equal weight.
  * \param walk An allocated vector, the result is stored here as
  *   a list of vertex IDs.
  *   It will be resized as needed.
@@ -59,12 +72,17 @@
  *   to contain the actual interrupted walk.
  * \return Error code.
  *
- * Time complexity: O(l + d), where \c l is the length of the
- * walk, and \c d is the total degree of the visited nodes.
+ * Time complexity:
+ *   For unweighted graph: O(l + d),
+ *   For weighted graph: O(l * log(k) + d),
+ *   where \c l is the length of the walk, \c d is the total degree of the visited nodes
+ *   and \c k is the average degree of vertices of the given graph.
  */
 
 
-igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *walk,
+igraph_error_t igraph_random_walk(const igraph_t *graph,
+                       const igraph_vector_t *weights,
+                       igraph_vector_int_t *walk,
                        igraph_integer_t start, igraph_neimode_t mode,
                        igraph_integer_t steps,
                        igraph_random_walk_stuck_t stuck) {
@@ -74,10 +92,18 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *wa
        - weights
     */
 
-    igraph_lazy_adjlist_t adj;
     igraph_integer_t vc = igraph_vcount(graph);
-    igraph_integer_t i;
+    igraph_integer_t ec = igraph_ecount(graph);
+    igraph_integer_t i, next;
+    igraph_vector_t weight_temp;
+    igraph_lazy_adjlist_t adj;
+    igraph_lazy_inclist_t il;
+    igraph_vector_ptr_t cdfs; /* cumulative distribution vectors for each node, used for weighted choice */
 
+    if (!(mode == IGRAPH_ALL || mode == IGRAPH_IN || mode == IGRAPH_OUT)) {
+        IGRAPH_ERROR("Invalid mode parameter.", IGRAPH_EINVMODE);
+    }
+    
     if (start < 0 || start >= vc) {
         IGRAPH_ERRORF("Starting vertex must be between 0 and the "
                       "number of vertices in the graph (%" IGRAPH_PRId
@@ -89,45 +115,130 @@ igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *wa
                       IGRAPH_PRId ".", IGRAPH_EINVAL, steps);
     }
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
-    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
-
-    IGRAPH_CHECK(igraph_vector_int_resize(walk, steps));
-
-    RNG_BEGIN();
-
-    VECTOR(*walk)[0] = start;
-    for (i = 1; i < steps; i++) {
-        igraph_vector_int_t *neis;
-        igraph_integer_t nn;
-        neis = igraph_lazy_adjlist_get(&adj, start);
-        nn = igraph_vector_int_size(neis);
-
-        if (IGRAPH_UNLIKELY(nn == 0)) {
-            igraph_vector_int_resize(walk, i);
-            if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
-                break;
-            } else {
-                IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
+    if (weights) {
+        if (igraph_vector_size(weights) != ec) {
+            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
+        }
+        if (ec > 0) {
+            igraph_real_t min = igraph_vector_min(weights);
+            if (min < 0) {
+                IGRAPH_ERROR("Weights must be non-negative.", IGRAPH_EINVAL);
+            }
+            else if (igraph_is_nan(min)) {
+                IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
-        start = VECTOR(*walk)[i] = VECTOR(*neis)[ RNG_INTEGER(0, nn - 1) ];
+        
+        IGRAPH_CHECK(igraph_vector_int_resize(walk, steps));
+
+        IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &il, mode, IGRAPH_LOOPS));
+        IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &il);
+
+        IGRAPH_VECTOR_INIT_FINALLY(&weight_temp, 0);
+
+        /* cdf vectors will be computed lazily; that's why we are still using
+         * igraph_vector_ptr_t as it does not require us to pre-initialize all
+         * the vectors in the vector list */
+        IGRAPH_CHECK(igraph_vector_ptr_init(&cdfs, vc));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &cdfs);
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&cdfs, vec_destr);
+        for (i = 0; i < vc; ++i) {
+            VECTOR(cdfs)[i] = NULL;
+        }
+
+        RNG_BEGIN();
+
+        for (i = 0; i < steps; ++i) {
+            igraph_integer_t degree, edge, idx;
+            igraph_vector_int_t *edges = igraph_lazy_inclist_get(&il, start);
+
+            degree = igraph_vector_int_size(edges);
+
+            /* are we stuck? */
+            if (IGRAPH_UNLIKELY(degree == 0)) {
+                igraph_vector_int_resize(walk, i); /* can't fail since size is reduced, skip IGRAPH_CHECK */
+                if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
+                    break;
+                }
+                else {
+                    IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
+                }
+            }
+
+            igraph_real_t r;
+            igraph_vector_t **cd = (igraph_vector_t **) & (VECTOR(cdfs)[start]);
+
+            /* compute out-edge cdf for this node if not already done */
+            if (IGRAPH_UNLIKELY(! *cd)) {
+                igraph_integer_t j;
+
+                *cd = IGRAPH_CALLOC(1, igraph_vector_t);
+                if (*cd == NULL) {
+                    IGRAPH_ERROR("Random walk failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+                }
+                IGRAPH_CHECK(igraph_vector_init(*cd, degree));
+
+                IGRAPH_CHECK(igraph_vector_resize(&weight_temp, degree));
+                for (j = 0; j < degree; ++j) {
+                    VECTOR(weight_temp)[j] = VECTOR(*weights)[VECTOR(*edges)[j]];
+                }
+
+                IGRAPH_CHECK(igraph_vector_cumsum(*cd, &weight_temp));
+            }
+
+            r = RNG_UNIF(0, VECTOR(**cd)[degree - 1]);
+            igraph_vector_binsearch(*cd, r, &idx);
+
+            edge = VECTOR(*edges)[idx];
+            next = IGRAPH_OTHER(graph, edge, start);
+            VECTOR(*walk)[i] = next;
+
+            start = next;
+
+            IGRAPH_ALLOW_INTERRUPTION();
+        }
+
+        RNG_END();
+
+        igraph_vector_ptr_destroy_all(&cdfs);
+        igraph_vector_destroy(&weight_temp);
+        igraph_lazy_inclist_destroy(&il);
+        IGRAPH_FINALLY_CLEAN(3);
     }
+    else {
+        IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+        IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
 
-    RNG_END();
+        IGRAPH_CHECK(igraph_vector_int_resize(walk, steps));
 
-    igraph_lazy_adjlist_destroy(&adj);
-    IGRAPH_FINALLY_CLEAN(1);
+        RNG_BEGIN();
 
+        VECTOR(*walk)[0] = start;
+        for (i = 1; i < steps; i++) {
+            igraph_vector_int_t* neis;
+            igraph_integer_t nn;
+            neis = igraph_lazy_adjlist_get(&adj, start);
+            nn = igraph_vector_int_size(neis);
+
+            if (IGRAPH_UNLIKELY(nn == 0)) {
+                igraph_vector_int_resize(walk, i);
+                if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
+                    break;
+                }
+                else {
+                    IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
+                }
+            }
+            start = VECTOR(*walk)[i] = VECTOR(*neis)[RNG_INTEGER(0, nn - 1)];
+        }
+
+        RNG_END();
+
+        igraph_lazy_adjlist_destroy(&adj);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+    
     return IGRAPH_SUCCESS;
-}
-
-
-/* Used as item destructor for 'cdfs' in igraph_random_edge_walk(). */
-static void vec_destr(igraph_vector_t *vec) {
-    if (vec != NULL) {
-        igraph_vector_destroy(vec);
-    }
 }
 
 
