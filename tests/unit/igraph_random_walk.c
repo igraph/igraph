@@ -84,6 +84,16 @@ int main() {
     igraph_random_walk(&graph, &weights, &walk, 0, IGRAPH_ALL, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     IGRAPH_ASSERT(igraph_vector_int_size(&walk) == 1000);
 
+    ec = igraph_ecount(&g_line);
+    igraph_vector_resize(&weights, ec);
+    for (i = 0; i < ec; ++i) {
+        VECTOR(weights)[i] = igraph_rng_get_unif01(igraph_rng_default());
+    }
+
+    /* weighted, directed line graph, 4 edges, 10 steps, returns on stuck */
+    igraph_random_walk(&g_line, &weights, &walk, 4, IGRAPH_IN, 10, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    IGRAPH_ASSERT(igraph_vector_int_size(&walk) == ec);
+    
     igraph_set_error_handler(igraph_error_handler_ignore);
     printf("Checking error handling:\n");
     printf("Line graph, 10 steps, errors on stuck.\n");
@@ -94,6 +104,20 @@ int main() {
 
     printf("Negative number of steps.\n");
     IGRAPH_ASSERT(igraph_random_walk(&g_1, NULL, &walk, 0, IGRAPH_OUT, -10, IGRAPH_RANDOM_WALK_STUCK_RETURN) == IGRAPH_EINVAL);
+
+    /* weighted, directed line graph, 4 edges, 10 steps, errors on stuck */
+    IGRAPH_ASSERT(igraph_random_walk(&g_line, &weights, &walk, 4, IGRAPH_IN, 10, IGRAPH_RANDOM_WALK_STUCK_ERROR) == IGRAPH_ERWSTUCK);
+
+    /* weighted, directed line graph, negative weight value for edge-0 */
+    VECTOR(weights)[0] = -10;
+    IGRAPH_ASSERT(igraph_random_walk(&g_line, &weights, &walk, 0, IGRAPH_OUT, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN) == IGRAPH_EINVAL);
+
+    /* weighted, directed line graph, invalid weight vector length (!= ec) */
+    igraph_vector_resize(&weights, 2 * ec);
+    for (i = 0; i < ec; ++i) {
+        VECTOR(weights)[i] = igraph_rng_get_unif01(igraph_rng_default());
+    }
+    IGRAPH_ASSERT(igraph_random_walk(&g_line, &weights, &walk, 0, IGRAPH_OUT, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN) == IGRAPH_EINVAL);
 
     igraph_destroy(&g_1);
     igraph_destroy(&g_line);
