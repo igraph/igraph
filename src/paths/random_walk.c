@@ -89,7 +89,6 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
 
     /* TODO:
        - multiple walks potentially from multiple start vertices
-       - weights
     */
 
     igraph_integer_t vc = igraph_vcount(graph);
@@ -190,9 +189,22 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
             igraph_vector_binsearch(*cd, r, &idx);
 
             edge = VECTOR(*edges)[idx];
-            next = IGRAPH_OTHER(graph, edge, start);
-            VECTOR(*walk)[i] = next;
 
+            /* travel along edge in a direction specified by 'mode' */
+            /* note: 'mode' is always set to IGRAPH_ALL for undirected graphs */
+            switch (mode) {
+            case IGRAPH_OUT:
+                next = IGRAPH_TO(graph, edge);
+                break;
+            case IGRAPH_IN:
+                next = IGRAPH_FROM(graph, edge);
+                break;
+            case IGRAPH_ALL:
+                next = IGRAPH_OTHER(graph, edge, start);
+                break;
+            }
+
+            VECTOR(*walk)[i] = next;
             start = next;
 
             IGRAPH_ALLOW_INTERRUPTION();
@@ -230,6 +242,8 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
                 }
             }
             start = VECTOR(*walk)[i] = VECTOR(*neis)[RNG_INTEGER(0, nn - 1)];
+
+            IGRAPH_ALLOW_INTERRUPTION();
         }
 
         RNG_END();
