@@ -43,13 +43,14 @@
  * queued for processing, but not processed yet. mark+2 indicates that it has
  * been processed.
  */
-static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
-                                                      igraph_integer_t start_vid,
-                                                      const igraph_inclist_t *inclist,
-                                                      igraph_vector_int_t *visited,
-                                                      igraph_integer_t mark, /* mark used in 'visited' */
-                                                      igraph_integer_t cutoff,
-                                                      igraph_vector_int_list_t *result) {
+static igraph_error_t igraph_i_fundamental_cycles_bfs(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *result,
+        igraph_integer_t cutoff,
+        igraph_integer_t start_vid,
+        const igraph_inclist_t *inclist,
+        igraph_vector_int_t *visited,
+        igraph_integer_t mark  /* mark used in 'visited' */) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -185,6 +186,8 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
  * Edge directions are ignored. Multi-edges and self-loops are supported.
  *
  * \param graph The graph object.
+ * \param result An initialized integer vector list. The result will be stored here,
+ *   each vector containing the edge IDs of a basis element.
  * \param start_vid If negative, a complete fundamental cycle basis is returned.
  *   If a vertex ID, the fundamental cycles associated with the BFS tree rooted
  *   in that vertex will be returned, only for the weakly connected component
@@ -192,8 +195,6 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
  * \param cutoff If negative, a complete cycle basis is returned. Otherwise, only
  *   cycles of length <code>2*cutoff + 1</code> or shorter are included. \p cutoff
  *   is used to limit the depth of the BFS tree when searching for cycle edges.
- * \param result An initialized integer vector list. The result will be stored here,
- *   each vector containing the edge IDs of a basis element.
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
@@ -201,9 +202,9 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(const igraph_t *graph,
  * \experimental
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
+                                         igraph_vector_int_list_t *result,
                                          igraph_integer_t start_vid,
-                                         igraph_integer_t cutoff,
-                                         igraph_vector_int_list_t *result) {
+                                         igraph_integer_t cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -231,11 +232,11 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
     if (start_vid < 0) {
         for (i=0; i < no_of_nodes; ++i) {
             if (! VECTOR(visited)[i]) {
-                IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, i, &inclist, &visited, /* mark */ 0, cutoff, result));
+                IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, result, cutoff, i, &inclist, &visited, /* mark */ 0));
             }
         }
     } else {
-        IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, start_vid, &inclist, &visited, /* mark */ 0, cutoff, result));
+        IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, result, cutoff, start_vid, &inclist, &visited, /* mark */ 0));
     }
 
     igraph_vector_int_destroy(&visited);
@@ -365,6 +366,8 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \brief Computes a minimum weight cycle basis.
  *
  * \param graph The graph object.
+ * \param result An initialized integer vector list, the elements of the cycle
+ *   basis will be stored here as vectors of edge IDs.
  * \param cutoff If negative, an exact minimum cycle basis is returned. Otherwise
  *   only those cycles in the result will be part of some minimum cycle basis which
  *   are of size <code>2*cutoff + 1</code> or smaller. Cycles longer than this limit
@@ -380,8 +383,6 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  *   performance cost. If false, no guarantees are given about the ordering
  *   of edge IDs within cycles. This parameter exists solely to control
  *   performance tradeoffs
- * \param result An initialized integer vector list, the elements of the cycle
- *   basis will be stored here as vectors of edge IDs.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -389,10 +390,10 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \experimental
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
+                                          igraph_vector_int_list_t *result,
                                           igraph_integer_t cutoff,
                                           igraph_bool_t complete,
-                                          igraph_bool_t use_cycle_order,
-                                          igraph_vector_int_list_t *result) {
+                                          igraph_bool_t use_cycle_order) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -443,7 +444,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
             /* TODO: BFS is only necessary from a feedback vertex set, find fast FVS approximation algorithm. */
 
             IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(
-                             graph, i, &inclist, &visited, mark, (vis || !complete) ? cutoff : -1, &candidates));
+                    graph, &candidates, (vis || !complete) ? cutoff : -1, i, &inclist, &visited, mark));
             mark += 3;
         }
 
