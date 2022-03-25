@@ -43,14 +43,15 @@
  * queued for processing, but not processed yet. mark+2 indicates that it has
  * been processed.
  */
-static igraph_error_t igraph_i_fundamental_cycles_bfs(
+static igraph_error_t
+igraph_i_fundamental_cycles_bfs(
         const igraph_t *graph,
         igraph_vector_int_list_t *result,
-        igraph_integer_t cutoff,
         igraph_integer_t start_vid,
+        igraph_integer_t bfs_cutoff,
         const igraph_inclist_t *inclist,
         igraph_vector_int_t *visited,
-        igraph_integer_t mark  /* mark used in 'visited' */) {
+        igraph_integer_t mark /* mark used in 'visited' */) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -151,9 +152,9 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(
             } else {
                 /* encountering u for the first time, queue it for processing */
 
-                /* Only queue vertices with distance at most 'cutoff' from the root. */
-                /* Negative 'cutoff' indicates no cutoff. */
-                if (cutoff < 0 || vdist < cutoff) {
+                /* Only queue vertices with distance at most 'bfs_cutoff' from the root. */
+                /* Negative 'bfs_cutoff' indicates no cutoff. */
+                if (bfs_cutoff < 0 || vdist < bfs_cutoff) {
                     IGRAPH_CHECK(igraph_dqueue_int_push(&q, u));
                     IGRAPH_CHECK(igraph_dqueue_int_push(&q, vdist + 1));
                     VECTOR(*visited)[u] = mark + 1;
@@ -192,8 +193,8 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(
  *   If a vertex ID, the fundamental cycles associated with the BFS tree rooted
  *   in that vertex will be returned, only for the weakly connected component
  *   containing that vertex.
- * \param cutoff If negative, a complete cycle basis is returned. Otherwise, only
- *   cycles of length <code>2*cutoff + 1</code> or shorter are included. \p cutoff
+ * \param bfs_cutoff If negative, a complete cycle basis is returned. Otherwise, only
+ *   cycles of length <code>2*bfs_cutoff + 1</code> or shorter are included. \p bfs_cutoff
  *   is used to limit the depth of the BFS tree when searching for cycle edges.
  * \return Error code.
  *
@@ -204,7 +205,7 @@ static igraph_error_t igraph_i_fundamental_cycles_bfs(
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                          igraph_vector_int_list_t *result,
                                          igraph_integer_t start_vid,
-                                         igraph_integer_t cutoff) {
+                                         igraph_integer_t bfs_cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -232,11 +233,13 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
     if (start_vid < 0) {
         for (i=0; i < no_of_nodes; ++i) {
             if (! VECTOR(visited)[i]) {
-                IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, result, cutoff, i, &inclist, &visited, /* mark */ 0));
+                IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, result, i, bfs_cutoff, &inclist,
+                                                             &visited, /* mark */ 0));
             }
         }
     } else {
-        IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, result, cutoff, start_vid, &inclist, &visited, /* mark */ 0));
+        IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(graph, result, start_vid, bfs_cutoff, &inclist,
+                                                     &visited, /* mark */ 0));
     }
 
     igraph_vector_int_destroy(&visited);
@@ -368,15 +371,15 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \param graph The graph object.
  * \param result An initialized integer vector list, the elements of the cycle
  *   basis will be stored here as vectors of edge IDs.
- * \param cutoff If negative, an exact minimum cycle basis is returned. Otherwise
+ * \param bfs_cutoff If negative, an exact minimum cycle basis is returned. Otherwise
  *   only those cycles in the result will be part of some minimum cycle basis which
- *   are of size <code>2*cutoff + 1</code> or smaller. Cycles longer than this limit
+ *   are of size <code>2*bfs_cutoff + 1</code> or smaller. Cycles longer than this limit
  *   may not be of the smallest possible size.
- *   \p cutoff is used to limit the depth of the BFS tree when computing candidate
- *   cycles. Specifying a cutoff can speed up the computation substantially.
- * \param complete Boolean value. Used only when \p cutoff was given.
+ *   \p bfs_cutoff is used to limit the depth of the BFS tree when computing candidate
+ *   cycles. Specifying a bfs_cutoff can speed up the computation substantially.
+ * \param complete Boolean value. Used only when \p bfs_cutoff was given.
  *   If true, a complete basis is returned. If false, only cycles not greater
- *   than <code>2*cutoff + 1</code> are returned. This may save computation
+ *   than <code>2*bfs_cutoff + 1</code> are returned. This may save computation
  *   time, however, the result will not span the entire cycle space.
  * \param use_cycle_order If true, each cycle is returned in natural order:
  *   the edge IDs will appear ordered along the cycle. This comes at a small
@@ -391,7 +394,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                           igraph_vector_int_list_t *result,
-                                          igraph_integer_t cutoff,
+                                          igraph_integer_t bfs_cutoff,
                                           igraph_bool_t complete,
                                           igraph_bool_t use_cycle_order) {
 
@@ -444,7 +447,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
             /* TODO: BFS is only necessary from a feedback vertex set, find fast FVS approximation algorithm. */
 
             IGRAPH_CHECK(igraph_i_fundamental_cycles_bfs(
-                    graph, &candidates, (vis || !complete) ? cutoff : -1, i, &inclist, &visited, mark));
+                    graph, &candidates, i, (vis || !complete) ? bfs_cutoff : -1, &inclist, &visited, mark));
             mark += 3;
         }
 
