@@ -366,7 +366,7 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
  * definition. This behaviour changed in igraph 0.9; earlier versions assumed
  * that the null graph is connected. See the following issue on Github for the
  * argument that led us to change the definition:
- * https://github.com/igraph/igraph/issues/1538
+ * https://github.com/igraph/igraph/issues/1539
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
@@ -390,7 +390,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes == 0) {
-        /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1538
+        /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1539
          * for the reasoning behind the change */
         *res = 0;
         return IGRAPH_SUCCESS;
