@@ -689,14 +689,15 @@ igraph_is_mutual:
     DEPS: es ON graph
 
 igraph_maximum_cardinality_search:
-    PARAMS: GRAPH graph, OUT VERTEXSET alpha, OUT VECTORM1_OR_0 alpham1
-    DEPS: alpha ON graph, alpham1 ON graph
+    PARAMS: GRAPH graph, OPTIONAL OUT VECTOR alpha, OPTIONAL OUT VERTEXSET alpham1
+    DEPS: alpham1 ON graph
 
 igraph_is_chordal:
     PARAMS: |-
-        GRAPH graph, VECTORM1_OR_0 alpha=NULL, VECTORM1_OR_0 alpham1=NULL,
+        GRAPH graph, VECTOR alpha=NULL, OPTIONAL VECTORM1 alpham1=NULL,
         OPTIONAL OUT BOOLEAN chordal, OUT VECTORM1_OR_0 fillin,
         OUT GRAPH_OR_0 newgraph
+    DEPS: alpham1 ON graph
 
 igraph_avg_nearest_neighbor_degree:
     PARAMS: |-
