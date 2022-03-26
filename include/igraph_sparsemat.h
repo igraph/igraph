@@ -35,6 +35,11 @@
 
 __BEGIN_DECLS
 
+/*
+ * These types are private to igraph, and customized to use igraph_integer_t.
+ * Do not attempt to access them using a separate copy of the CXSparse library.
+ * Use the public igraph_sparsemat_... types instead.
+ */
 struct cs_dl_sparse;
 struct cs_dl_symbolic;
 struct cs_dl_numeric;
