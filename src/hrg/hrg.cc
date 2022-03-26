@@ -21,15 +21,17 @@
 
 */
 
+#include "hrg/dendro.h"
+#include "hrg/graph.h"
+#include "hrg/graph_simp.h"
+
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_attributes.h"
 #include "igraph_hrg.h"
 #include "igraph_random.h"
 
-#include "hrg/dendro.h"
-#include "hrg/graph.h"
-#include "hrg/graph_simp.h"
+#include "core/exceptions.h"
 
 #include <climits>
 
@@ -397,6 +399,8 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                    igraph_bool_t start,
                    igraph_integer_t steps) {
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     dendro *d;
 
@@ -433,6 +437,7 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 /**
@@ -449,6 +454,7 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
  */
 
 igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
     dendro d;
 
     // TODO: error handling
@@ -463,6 +469,7 @@ igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
     RNG_END();
 
     return IGRAPH_SUCCESS;
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 /**
@@ -490,6 +497,7 @@ igraph_error_t igraph_hrg_sample_many(
     const igraph_hrg_t *hrg, igraph_graph_list_t *samples,
     igraph_integer_t num_samples
 ) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
     igraph_t g;
     dendro d;
 
@@ -516,6 +524,7 @@ igraph_error_t igraph_hrg_sample_many(
     RNG_END();
 
     return IGRAPH_SUCCESS;
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 /**
@@ -596,7 +605,7 @@ igraph_error_t igraph_hrg_dendrogram(
     IGRAPH_CHECK(igraph_empty(graph, 0, IGRAPH_DIRECTED));
     IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, &vattrs));
-    IGRAPH_CHECK(igraph_add_edges(graph, &edges, 0));
+    IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
 
     igraph_vector_ptr_destroy(&vattrs);
     igraph_vector_int_destroy(&edges);
@@ -640,6 +649,7 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
                          igraph_hrg_t *hrg,
                          igraph_bool_t start,
                          igraph_integer_t num_samples) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
 
     dendro *d;
 
@@ -672,6 +682,8 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
     RNG_END();
 
     return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 static igraph_error_t MCMCEquilibrium_Sample(dendro *d, igraph_integer_t num_samples) {
@@ -831,6 +843,7 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
                        igraph_bool_t start,
                        igraph_integer_t num_samples,
                        igraph_integer_t num_bins) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
 
     dendro *d;
     pblock *br_list;
@@ -878,6 +891,8 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
     RNG_END();
 
     return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 /**
