@@ -63,17 +63,23 @@ int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context,
                        const char *s);
 static igraph_error_t igraph_i_gml_get_keyword(const char *s, size_t len, char **res);
 static igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, char **res);
-static igraph_error_t igraph_i_gml_make_numeric(const char *name, igraph_real_t value, igraph_gml_tree_t **tree);
+static igraph_error_t igraph_i_gml_make_numeric(const char *name,
+                                                int line,
+                                                igraph_real_t value,
+                                                igraph_gml_tree_t **tree);
 static igraph_error_t igraph_i_gml_make_numeric2(char *name,
+                                                 int line,
                                                  char *value,
                                                  igraph_real_t sign,
                                                  igraph_gml_tree_t **tree);
 static igraph_error_t igraph_i_gml_make_string(const char *name,
+                                               int line,
                                                char *value,
                                                igraph_gml_tree_t **tree);
 static igraph_error_t igraph_i_gml_make_list(const char *name,
-                                      igraph_gml_tree_t *list,
-                                      igraph_gml_tree_t **tree);
+                                             int line,
+                                             igraph_gml_tree_t *list,
+                                             igraph_gml_tree_t **tree);
 static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2);
 
 #define scanner context->scanner
@@ -125,15 +131,15 @@ list:   keyvalue      { $$=$1; }
       | list keyvalue { IGRAPH_YY_CHECK(igraph_i_gml_merge($1, $2)); $$ = $1; };
 
 keyvalue:   key num
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric($1, $2, &$$)); }
+            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric($1, @1.first_line, $2, &$$)); }
           | key string
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_string($1, $2, &$$)); }
+            { IGRAPH_YY_CHECK(igraph_i_gml_make_string($1, @1.first_line, $2, &$$)); }
           | key LISTOPEN list LISTCLOSE
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_list($1, $3, &$$)); }
+            { IGRAPH_YY_CHECK(igraph_i_gml_make_list($1, @1.first_line, $3, &$$)); }
           | key key
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, $2, 1.0, &$$)); }
+            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, @1.first_line, $2, 1.0, &$$)); }
           | key MINUS key
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, $3, -1.0, &$$)); }
+            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, @1.first_line, $3, -1.0, &$$)); }
 ;
 
 key: KEYWORD { IGRAPH_YY_CHECK(igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner),
@@ -177,7 +183,11 @@ static igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, char **
   return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_gml_make_numeric(const char *name, igraph_real_t value, igraph_gml_tree_t **tree) {
+static igraph_error_t igraph_i_gml_make_numeric(const char *name,
+                                                int line,
+                                                igraph_real_t value,
+                                                igraph_gml_tree_t **tree) {
+
   igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
   if (!t) {
     IGRAPH_ERROR("Cannot build GML tree.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -185,9 +195,9 @@ static igraph_error_t igraph_i_gml_make_numeric(const char *name, igraph_real_t 
   IGRAPH_FINALLY(igraph_free, t);
 
   if (floor(value)==value) {
-    IGRAPH_CHECK(igraph_gml_tree_init_integer(t, name, value));
+    IGRAPH_CHECK(igraph_gml_tree_init_integer(t, name, line, value));
   } else {
-    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, value));
+    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, line, value));
   }
 
   *tree = t;
@@ -197,6 +207,7 @@ static igraph_error_t igraph_i_gml_make_numeric(const char *name, igraph_real_t 
 }
 
 static igraph_error_t igraph_i_gml_make_numeric2(char *name,
+                                                 int line,
                                                  char *value,
                                                  igraph_real_t sign,
                                                  igraph_gml_tree_t **tree) {
@@ -213,9 +224,9 @@ static igraph_error_t igraph_i_gml_make_numeric2(char *name,
   IGRAPH_FINALLY(igraph_free, name);
   IGRAPH_FINALLY(igraph_free, value);
   if (strcasecmp(value, "inf") == 0) {
-    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, sign * IGRAPH_INFINITY));
+    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, line, sign * IGRAPH_INFINITY));
   } else if (strcasecmp(value, "nan") == 0) {
-    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, IGRAPH_NAN));
+    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, line, IGRAPH_NAN));
   } else {
     IGRAPH_ERROR("Error while parsing GML.", IGRAPH_PARSEERROR);
   }
@@ -230,6 +241,7 @@ static igraph_error_t igraph_i_gml_make_numeric2(char *name,
 }
 
 static igraph_error_t igraph_i_gml_make_string(const char *name,
+                                               int line,
                                                char *value,
                                                igraph_gml_tree_t **tree) {
 
@@ -243,7 +255,7 @@ static igraph_error_t igraph_i_gml_make_string(const char *name,
    * ownership of 'value'. If it fails, we need to free 'value' ourselves in order
    * not to leak memory */
   IGRAPH_FINALLY(igraph_free, value);
-  IGRAPH_CHECK(igraph_gml_tree_init_string(t, name, value));
+  IGRAPH_CHECK(igraph_gml_tree_init_string(t, name, line, value));
 
   IGRAPH_FINALLY_CLEAN(1); /* value */
 
@@ -254,6 +266,7 @@ static igraph_error_t igraph_i_gml_make_string(const char *name,
 }
 
 static igraph_error_t igraph_i_gml_make_list(const char *name,
+                                             int line,
                                              igraph_gml_tree_t *list,
                                              igraph_gml_tree_t **tree) {
 
@@ -263,7 +276,7 @@ static igraph_error_t igraph_i_gml_make_list(const char *name,
   }
   IGRAPH_FINALLY(igraph_free, t);
 
-  IGRAPH_CHECK(igraph_gml_tree_init_tree(t, name, list));
+  IGRAPH_CHECK(igraph_gml_tree_init_tree(t, name, line, list));
 
   *tree = t;
   IGRAPH_FINALLY_CLEAN(1); /* t */
