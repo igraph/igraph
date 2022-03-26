@@ -110,6 +110,7 @@ int main() {
         CHECK_ERROR(igraph_contract_vertices(&g, &mapping, &comb), IGRAPH_EINVAL);
     }
 
+    igraph_attribute_combination_destroy(&comb);
     igraph_destroy(&g);
     VERIFY_FINALLY_STACK();
     return 0;
