@@ -380,7 +380,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bfs
   bfs_simple
-  igraph_random_edge_walk
 )
 
 # topology.at
