@@ -477,6 +477,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_contract_vertices
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
