@@ -873,15 +873,9 @@ igraph_diversity:
 
 igraph_random_walk:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXSET walk,
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXSET vertices, OUT EDGESET edgewalk,
         VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
-    DEPS: start ON graph, weights ON graph, walk ON graph
-
-igraph_random_edge_walk:
-    PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT EDGESET edgewalk,
-        VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
-    DEPS: start ON graph, weights ON graph, edgewalk ON graph
+    DEPS: start ON graph, weights ON graph, vertices ON graph, edges ON graph
 
 igraph_global_efficiency:
     PARAMS: GRAPH graph, OUT REAL res, EDGEWEIGHTS weights=NULL, BOOLEAN directed=True
