@@ -20,7 +20,6 @@
 
 <section id="random-walks"><title>Random walks</title>
 <!-- doxrox-include igraph_random_walk -->
-<!-- doxrox-include igraph_random_edge_walk -->
 </section>
 
 </chapter>
