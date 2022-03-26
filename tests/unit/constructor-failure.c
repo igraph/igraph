@@ -81,6 +81,9 @@ int main() {
     igraph_strvector_t svalues;
     igraph_strvector_init(&svalues, 0);
 
+    igraph_vector_bool_t bvalues;
+    igraph_vector_bool_init(&bvalues, 0);
+
     const igraph_vector_int_t edges; /* 2 edges */
     igraph_vector_int_init_int((igraph_vector_int_t *) &edges, 4, 0,1, 1,2);
 
@@ -96,6 +99,9 @@ int main() {
     igraph_vector_t vec_a1;
     igraph_vector_init_int(&vec_a1, 3, 1, 2, 3);
     a1.value = &vec_a1;
+
+    igraph_vs_t vs1;
+    igraph_vs_vector_small(&vs1, 0, 1, 2, -1);
 
     VECTOR(attr1)[0] = &a1;
 
@@ -116,6 +122,24 @@ int main() {
 
     VECTOR(attr2)[0] = &a2;
 
+    /* attr3, boolean, 2 values */
+
+    igraph_vector_ptr_t attr3;
+    igraph_vector_ptr_init(&attr3, 1);
+
+    igraph_attribute_record_t a3;
+    a3.name = "baz";
+    a3.type = IGRAPH_ATTRIBUTE_BOOLEAN;
+
+    igraph_vector_bool_t vec_a3;
+    igraph_vector_bool_init_int(&vec_a3, 2, 1, 0);
+    a3.value = &vec_a3;
+
+    igraph_vs_t vs3;
+    igraph_vs_vector_small(&vs3, 3, 4, -1);
+
+    VECTOR(attr3)[0] = &a3;
+
     /* Perform tests */
 
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
@@ -128,26 +152,31 @@ int main() {
     igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
     igraph_add_vertices(&graph, 3, &attr1);
     igraph_add_edges(&graph, &edges, &attr2);
+    igraph_add_vertices(&graph, 2, &attr3);
 
     CHECK1(igraph_add_vertices(&graph, 2, &attr1)); /* wrong number of vertices */
     /* Attribute handling still works and graph has correct attributes after failure to add vertices? */
-    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1.name, igraph_vss_all(), &nvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1.name, vs1, &nvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_all_e(&vec_a1, &nvalues));
     IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2.name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
     for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
         IGRAPH_ASSERT(strcmp(STR(vec_a2, i), STR(svalues, i)) == 0);
     }
+    IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3.name, vs3, &bvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vector_bool_all_e(&vec_a3, &bvalues));
 
     CHECK1(igraph_add_edges(&graph, &edges, &attr1)); /* wrong number of edges */
     /* Attribute handling still works and graph has correct attributes after failure to add vertices? */
-    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1.name, igraph_vss_all(), &nvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1.name, vs1, &nvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_all_e(&vec_a1, &nvalues));
     IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2.name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
     for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
         IGRAPH_ASSERT(strcmp(STR(vec_a2, i), STR(svalues, i)) == 0);
     }
+    IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3.name, vs3, &bvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_vector_bool_all_e(&vec_a3, &bvalues));
 
     igraph_destroy(&graph);
 
@@ -155,17 +184,25 @@ int main() {
 
     igraph_vector_destroy(&vec_a1);
     igraph_vector_ptr_destroy(&attr1);
+    igraph_vs_destroy(&vs1);
 
     /* Release attr2 */
 
     igraph_strvector_destroy(&vec_a2);
     igraph_vector_ptr_destroy(&attr2);
 
+    /* Release attr3 */
+
+    igraph_vector_bool_destroy(&vec_a3);
+    igraph_vector_ptr_destroy(&attr3);
+    igraph_vs_destroy(&vs3);
+
     /* Release helpers */
 
     igraph_vector_int_destroy((igraph_vector_int_t *) &edges);
     igraph_strvector_destroy(&svalues);
     igraph_vector_destroy(&nvalues);
+    igraph_vector_bool_destroy(&bvalues);
 
     VERIFY_FINALLY_STACK();
 
