@@ -629,6 +629,7 @@
    errors and other error conditions originating from the underlying `libxml2`
    library.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
+ - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
 
 ### Deprecated
 

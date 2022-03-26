@@ -1629,7 +1629,7 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
 
     IGRAPH_FREE(funcs);
     IGRAPH_FREE(TODO);
-    igraph_i_cattribute_permute_free(new_val);
+    igraph_i_cattribute_permute_free(val);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
