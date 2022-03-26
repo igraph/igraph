@@ -254,14 +254,15 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                       igraph_gml_tree_get_integer(context.tree, i));
     }
 
-    /* get the graph */
+    /* Get the graph */
     gidx = igraph_gml_tree_find(context.tree, "graph", 0);
     if (gidx == -1) {
         IGRAPH_ERROR("No 'graph' object in GML file.", IGRAPH_PARSEERROR);
     }
     if (igraph_gml_tree_type(context.tree, gidx) !=
         IGRAPH_I_GML_TREE_TREE) {
-        IGRAPH_ERROR("Invalid type for 'graph' object in GML file.", IGRAPH_PARSEERROR);
+        IGRAPH_ERRORF("Invalid type for 'graph' object in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                      igraph_gml_tree_line(context.tree, gidx));
     }
     gtree = igraph_gml_tree_get_tree(context.tree, gidx);
 
@@ -275,11 +276,22 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 0);
     IGRAPH_TRIE_INIT_FINALLY(&gattrnames, 0);
 
-    /* Is is directed? */
+    /* Is it directed? */
     i = igraph_gml_tree_find(gtree, "directed", 0);
-    if (i >= 0 && igraph_gml_tree_type(gtree, i) == IGRAPH_I_GML_TREE_INTEGER) {
-        if (igraph_gml_tree_get_integer(gtree, i) == 1) {
-            directed = IGRAPH_DIRECTED;
+    if (i >= 0) {
+        if (igraph_gml_tree_type(gtree, i) == IGRAPH_I_GML_TREE_INTEGER) {
+            igraph_integer_t dir = igraph_gml_tree_get_integer(gtree, i);
+            if (dir != 0 && dir != 1) {
+                IGRAPH_WARNINGF(
+                    "Invalid value %" IGRAPH_PRId " for 'directed' attribute on line %" IGRAPH_PRId ", should be 0 or 1.",
+                    dir, igraph_gml_tree_line(gtree, i));
+            }
+            if (dir) {
+                directed = IGRAPH_DIRECTED;
+            }
+        } else {
+            IGRAPH_WARNINGF("Invalid type for 'directed' attribute on line %" IGRAPH_PRId ", assuming undirected.",
+                            igraph_gml_tree_line(gtree, i));
         }
     }
 
@@ -294,7 +306,8 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             igraph_bool_t hasid;
             no_of_nodes++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
-                IGRAPH_ERROR("'node' is not a list in GML file.", IGRAPH_PARSEERROR);
+                IGRAPH_ERRORF("'node' is not a list in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                              igraph_gml_tree_line(gtree, i));
             }
             node = igraph_gml_tree_get_tree(gtree, i);
             hasid = 0;
@@ -335,7 +348,8 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 if (!hasid && !strcmp(name, "id")) {
                     igraph_integer_t id;
                     if (igraph_gml_tree_type(node, j) != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERROR("Non-integer node id in GML file.", IGRAPH_PARSEERROR);
+                        IGRAPH_ERRORF("Non-integer node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                                      igraph_gml_tree_line(node, j));
                     }
                     id = igraph_gml_tree_get_integer(node, j);
                     snprintf(cname, sizeof(cname) / sizeof(char) -1, "%" IGRAPH_PRId, id);
@@ -344,14 +358,16 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 }
             }
             if (!hasid) {
-                IGRAPH_ERROR("Node without 'id' while parsing GML file.", IGRAPH_PARSEERROR);
+                IGRAPH_ERRORF("Node without 'id' while parsing GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                              igraph_gml_tree_line(gtree, i));
             }
         } else if (!strcmp(name, "edge")) {
             igraph_gml_tree_t *edge;
             igraph_bool_t has_source = 0, has_target = 0;
             no_of_edges++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
-                IGRAPH_ERROR("'edge' is not a list in GML file.", IGRAPH_PARSEERROR);
+                IGRAPH_ERRORF("'edge' is not a list in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                              igraph_gml_tree_line(gtree, i));
             }
             edge = igraph_gml_tree_get_tree(gtree, i);
             has_source = has_target = 0;
@@ -360,14 +376,16 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 if (!strcmp(name, "source")) {
                     has_source = 1;
                     if (igraph_gml_tree_type(edge, j) != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERROR("Non-integer 'source' for an edge in GML file.",
-                                     IGRAPH_PARSEERROR);
+                        IGRAPH_ERRORF("Non-integer 'source' for an edge in GML file, line %" IGRAPH_PRId ".",
+                                      IGRAPH_PARSEERROR,
+                                      igraph_gml_tree_line(edge, j));
                     }
                 } else if (!strcmp(name, "target")) {
                     has_target = 1;
                     if (igraph_gml_tree_type(edge, j) != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERROR("Non-integer 'source' for an edge in GML file.",
-                                     IGRAPH_PARSEERROR);
+                        IGRAPH_ERRORF("Non-integer 'source' for an edge in GML file, line %" IGRAPH_PRId ".",
+                                      IGRAPH_PARSEERROR,
+                                      igraph_gml_tree_line(edge, j));
                     }
                 } else {
                     igraph_integer_t trieid, triesize = igraph_trie_size(&eattrnames);
@@ -404,10 +422,12 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 }
             } /* for */
             if (!has_source) {
-                IGRAPH_ERROR("No 'source' for edge in GML file.", IGRAPH_PARSEERROR);
+                IGRAPH_ERRORF("No 'source' for edge in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                              igraph_gml_tree_line(gtree, i));
             }
             if (!has_target) {
-                IGRAPH_ERROR("No 'target' for edge in GML file.", IGRAPH_PARSEERROR);
+                IGRAPH_ERRORF("No 'target' for edge in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                              igraph_gml_tree_line(gtree, i));
             }
         } else {
             /* anything to do? Maybe add as graph attribute.... */
