@@ -476,6 +476,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_contract_vertices
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
@@ -768,6 +769,12 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_is_graphical
   igraph_is_bigraphical
+)
+
+# cycle bases
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  cycle_bases
 )
 
 # handlers

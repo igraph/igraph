@@ -310,7 +310,7 @@ int main() {
         igraph_permute_vertices(&g, &g2, &per);
         print_attributes(&g2);
         printf("Permuting to same graph:\n");
-        igraph_i_attribute_permute_vertices(&g, &g, &per);
+        igraph_cattribute_table.permute_vertices(&g, &g, &per);
         print_attributes(&g);
         igraph_destroy(&g);
         igraph_destroy(&g2);

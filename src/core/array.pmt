@@ -25,6 +25,8 @@
 
 igraph_error_t FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a,
         igraph_integer_t n1, igraph_integer_t n2, igraph_integer_t n3) {
+
+    IGRAPH_ASSERT(n1 >= 0 && n2 >= 0 && n3 >= 0);
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&a->data, n1 * n2 * n3));
 
     a->n1 = n1;

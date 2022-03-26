@@ -735,14 +735,15 @@ igraph_is_mutual:
     DEPS: es ON graph
 
 igraph_maximum_cardinality_search:
-    PARAMS: GRAPH graph, OPTIONAL OUT VECTOR_INT alpha, OPTIONAL OUT INDEX_VECTOR alpham1
-    DEPS: alpha ON graph, alpham1 ON graph
+    PARAMS: GRAPH graph, OPTIONAL OUT INDEX_VECTOR alpha, OPTIONAL OUT VERTEX_INDICES alpham1
+    DEPS: alpham1 ON graph
 
 igraph_is_chordal:
     PARAMS: |-
-        GRAPH graph, OPTIONAL VECTOR_INT alpha=NULL, OPTIONAL INDEX_VECTOR alpham1=NULL,
+        GRAPH graph, OPTIONAL INDEX_VECTOR alpha=NULL, OPTIONAL VERTEX_INDICES alpham1=NULL,
         OPTIONAL OUT BOOLEAN chordal, OPTIONAL OUT VECTOR_INT fillin,
         OPTIONAL OUT GRAPH newgraph
+    DEPS: alpham1 ON graph
 
 igraph_avg_nearest_neighbor_degree:
     PARAMS: |-
@@ -2053,6 +2054,18 @@ igraph_eulerian_path:
 igraph_eulerian_cycle:
     PARAMS: GRAPH graph, OPTIONAL OUT EDGESET edge_res, OPTIONAL OUT VERTEXSET vertex_res
     DEPS: edge_res ON graph, vertex_res ON graph
+
+#######################################
+# Cycle bases
+#######################################
+
+igraph_fundamental_cycles:
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff
+    DEPS: basis ON graph, start ON graph
+
+igraph_minimum_cycle_basis:
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order
+    DEPS: basis ON graph
 
 #######################################
 # Trees

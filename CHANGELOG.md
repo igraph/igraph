@@ -604,6 +604,8 @@
  - `igraph_stack_capacity()` to query the capacity of a stack.
  - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floats with an epsilon margin.
  - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
+ - `igraph_fundamental_cycles()` computes a fundamental cycle basis (experimental).
+ - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
 
 ### Removed
 
@@ -627,6 +629,7 @@
    errors and other error conditions originating from the underlying `libxml2`
    library.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
+ - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
 
 ### Deprecated
 

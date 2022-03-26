@@ -951,6 +951,53 @@ igraph_error_t FUNCTION(sort_ind)(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_remove_consecutive_duplicates
+ * \brief Removes consecutive duplicates from a vector list.
+ *
+ * Removes consecutive duplicate vectors from the list. Optionally, a custom
+ * equivalence relation may be used to determine when two vectors are
+ * considered to be the same.
+ *
+ * </para><para>
+ * An efficient way to remove all duplicates, not just consecutive ones,
+ * is to first sort the vector list using \ref igraph_vector_list_sort(),
+ * then use this function. This will of course re-order the list.
+ *
+ * \param v The list to remove consecutive duplicates from.
+ * \param eq A comparison function that takes pointers to two vectors and
+ *    returns true if they are equivalent. It is assumed that it implements
+ *    a transitive, but not necessarily symmetric relation.
+ *    Use \ref igraph_vector_all_e() to consider vector equivalent only
+ *    when their contents are identical.
+ *
+ * \sa igraph_vector_list_sort()
+ *
+ * Time complexity: O(n), the number of items in the list.
+ */
+void FUNCTION(remove_consecutive_duplicates)(
+        TYPE *v, igraph_bool_t (*eq)(const ITEM_TYPE*, const ITEM_TYPE*)
+) {
+    igraph_integer_t i, j, n = FUNCTION(size)(v);
+    ITEM_TYPE *p = v->stor_begin;
+
+    if (n < 2) {
+        return;
+    }
+
+    for (i=0, j=0; i < n-1; ++i) {
+        if (eq(&p[i], &p[i+1])) {
+            INTERNAL_FUNCTION(destroy_item)(&p[i]);
+        } else {
+            p[j++] = p[i];
+        }
+    }
+    p[j++] = p[n-1];
+
+    v->end = p + j;
+}
+
 /* ************************************************************************ */
 
 #ifndef CUSTOM_INIT_DESTROY

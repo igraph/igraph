@@ -134,7 +134,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
     }
 
-    if (roots) {
+    if (roots && noroots > 0) {
         igraph_integer_t min, max;
         igraph_vector_int_minmax(roots, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
@@ -142,7 +142,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         }
     }
 
-    if (restricted) {
+    if (restricted && igraph_vector_int_size(restricted) > 0) {
         igraph_integer_t min, max;
         igraph_vector_int_minmax(restricted, &min, &max);
         if (min < 0 || max >= no_of_nodes) {

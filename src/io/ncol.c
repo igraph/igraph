@@ -114,8 +114,6 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     const char *namestr = "name", *weightstr = "weight";
     igraph_i_ncol_parsedata_t context;
 
-    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&trie, names);
@@ -182,6 +180,8 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         IGRAPH_WARNING("Unknown vertex/vertices found in NCOL file, predefined names extended.");
     }
 
+    /* Prepare attributes, if needed */
+
     if (names) {
         const igraph_strvector_t *namevec;
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
@@ -212,6 +212,9 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         no_of_nodes = igraph_vector_int_max(&edges) + 1;
     }
 
+    /* Create graph */
+    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
 

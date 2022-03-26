@@ -71,8 +71,9 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     igraph_integer_t no_new_vertices;
 
     if (igraph_vector_int_size(mapping) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid mapping vector length",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Mapping vector length (%" IGRAPH_PRId ") "
+                "not equal to number of nodes (%" IGRAPH_PRId ").",
+                IGRAPH_EINVAL, igraph_vector_int_size(mapping), no_of_nodes);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);

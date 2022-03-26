@@ -155,8 +155,7 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
         IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading LGL file.", err);
     }
 
-    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
+    /* Prepare attributes, if needed */
 
     if (names) {
         const igraph_strvector_t *namevec;
@@ -181,6 +180,9 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
+    /* Create graph */
+    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, igraph_trie_size(&trie), pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
 
