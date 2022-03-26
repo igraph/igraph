@@ -43,24 +43,17 @@ typedef struct igraph_gml_tree_t {
     igraph_vector_ptr_t children;
 } igraph_gml_tree_t;
 
-typedef struct igraph_gml_string_t {
-    const char *str;
-    size_t len;
-} igraph_gml_string_t;
-
-void igraph_gml_string_destroy(igraph_gml_string_t *str);
-
 igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
-                                 const igraph_gml_string_t name,
+                                 const char *name,
                                  igraph_integer_t value);
 igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
-                              const igraph_gml_string_t name,
+                              const char *name,
                               igraph_real_t value);
 igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
-                                const igraph_gml_string_t name,
-                                const igraph_gml_string_t value);
+                                const char *name,
+                                const char *value);
 igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
-                              const igraph_gml_string_t name,
+                              const char *name,
                               igraph_gml_tree_t *value);
 void igraph_gml_tree_destroy(igraph_gml_tree_t *t);
 
