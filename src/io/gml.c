@@ -84,7 +84,7 @@ static igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, igraph_integer
     default:
         /* Must never reach here, regardless of the contents of the GML file. */
         IGRAPH_FATALF("Unexpected node type in GML tree, line %" IGRAPH_PRId ".",
-                      igraph_gml_tree_line(node, pos));
+                      igraph_gml_tree_line(node, pos)); /* LCOV_EXCL_LINE */
     }
 }
 
@@ -113,7 +113,7 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_integer
     default:
         /* Must never reach here, regardless of the contents of the GML file. */
         IGRAPH_FATALF("Unexpected node type in GML tree, line %" IGRAPH_PRId ".",
-                      igraph_gml_tree_line(node, pos));
+                      igraph_gml_tree_line(node, pos)); /* LCOV_EXCL_LINE */
     }
 
     return p;
