@@ -74,31 +74,26 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     }
 }
 
-static igraph_error_t igraph_i_gml_toreal(igraph_gml_tree_t *node, igraph_integer_t pos, igraph_real_t *result) {
-
-    igraph_real_t value = 0.0;
+static igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, igraph_integer_t pos) {
     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
 
     switch (type) {
     case IGRAPH_I_GML_TREE_INTEGER:
-        value = (igraph_real_t) igraph_gml_tree_get_integer(node, pos);
-        break;
+        return igraph_gml_tree_get_integer(node, pos);
     case IGRAPH_I_GML_TREE_REAL:
-        value = igraph_gml_tree_get_real(node, pos);
-        break;
+        return igraph_gml_tree_get_real(node, pos);
+    case IGRAPH_I_GML_TREE_TREE:
+        return IGRAPH_NAN; /* default value of NaN when composite is ignored */
     default:
-        IGRAPH_ERROR("Internal error while parsing GML file.", IGRAPH_FAILURE);
-        break;
+        /* Must never reach here, regardless of the contents of the GML file. */
+        IGRAPH_FATALF("Unexpected node type in GML tree, line %" IGRAPH_PRId ".",
+                      igraph_gml_tree_line(node, pos));
     }
-
-    *result = value;
-    return IGRAPH_SUCCESS;
 }
 
 static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_integer_t pos) {
-
     igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, pos);
-    static char tmp[256];
+    static char tmp[100];
     const char *p = tmp;
     igraph_integer_t i;
     igraph_real_t d;
@@ -115,8 +110,13 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_integer
     case IGRAPH_I_GML_TREE_STRING:
         p = igraph_gml_tree_get_string(node, pos);
         break;
-    default:
+    case IGRAPH_I_GML_TREE_TREE:
+        tmp[0] = '\0'; /* default value of "" when composite is ignored */
         break;
+    default:
+        /* Must never reach here, regardless of the contents of the GML file. */
+        IGRAPH_FATALF("Unexpected node type in GML tree, line %" IGRAPH_PRId ".",
+                      igraph_gml_tree_line(node, pos));
     }
 
     return p;
@@ -191,6 +191,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     igraph_integer_t i, p;
     igraph_integer_t no_of_nodes = 0, no_of_edges = 0;
+    igraph_integer_t node_no;
     igraph_trie_t trie;
     igraph_vector_int_t edges;
     igraph_bool_t directed = IGRAPH_UNDIRECTED;
@@ -243,15 +244,14 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading GML file.", err);  /* LCOV_EXCL_LINE */
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-
     /* Check version, if present, integer and not '1' then ignored */
     i = igraph_gml_tree_find(context.tree, "Version", 0);
     if (i >= 0 &&
         igraph_gml_tree_type(context.tree, i) == IGRAPH_I_GML_TREE_INTEGER &&
         igraph_gml_tree_get_integer(context.tree, i) != 1) {
-        IGRAPH_WARNINGF("Unknown GML version: %" IGRAPH_PRId ". Parsing will continue, but may fail.",
-                      igraph_gml_tree_get_integer(context.tree, i));
+        IGRAPH_WARNINGF("Unknown GML version: %" IGRAPH_PRId ". "
+                        "Parsing will continue assuming GML version 1, but may fail.",
+                        igraph_gml_tree_get_integer(context.tree, i));
     }
 
     /* Get the graph */
@@ -296,14 +296,22 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
 
     /* Now we go over all objects in the graph and collect the attribute names and
-       types. Plus we collect node IDs. We also do some checks. */
+     * types. Plus we collect node IDs. We also do some checks.
+     *
+     * The 'id' fields of 'node' objects are converted into strings, so that they
+     * can be inserted into a trie and re-encoded as consecutive integers starting
+     * at 0. The GML spec allows isolated nodes with no 'id' field. These get a
+     * generated string id of the form "n123" consisting of "n" and their count
+     * (i.e. ordinal position) within the GML file.
+     */
+    node_no = 0;
     for (i = 0; i < igraph_gml_tree_length(gtree); i++) {
-        igraph_integer_t j;
         char cname[100];
         const char *name = igraph_gml_tree_name(gtree, i);
         if (!strcmp(name, "node")) {
             igraph_gml_tree_t *node;
             igraph_bool_t hasid;
+            node_no++;
             no_of_nodes++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
                 IGRAPH_ERRORF("'node' is not a list in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
@@ -311,7 +319,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             }
             node = igraph_gml_tree_get_tree(gtree, i);
             hasid = 0;
-            for (j = 0; j < igraph_gml_tree_length(node); j++) {
+            for (igraph_integer_t j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *name = igraph_gml_tree_name(node, j);
                 igraph_integer_t trieid, triesize = igraph_trie_size(&vattrnames);
                 IGRAPH_CHECK(igraph_trie_get(&vattrnames, name, &trieid));
@@ -345,21 +353,35 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     }
                 }
                 /* check id */
-                if (!hasid && !strcmp(name, "id")) {
-                    igraph_integer_t id;
+                if (!strcmp(name, "id")) {
+                    igraph_integer_t id, trie_id;
+                    igraph_integer_t trie_size =igraph_trie_size(&trie);
+                    if (hasid) {
+                        /* A 'node' must not have more than one 'id' field. */
+                        IGRAPH_ERRORF("Node has multiple id fields in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                                      igraph_gml_tree_line(node, j));
+                    }
                     if (igraph_gml_tree_type(node, j) != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERRORF("Non-integer node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
                     id = igraph_gml_tree_get_integer(node, j);
-                    snprintf(cname, sizeof(cname) / sizeof(char) -1, "%" IGRAPH_PRId, id);
-                    IGRAPH_CHECK(igraph_trie_get(&trie, cname, &id));
+                    snprintf(cname, sizeof(cname) / sizeof(char) - 1, "%" IGRAPH_PRId, id);
+                    IGRAPH_CHECK(igraph_trie_get(&trie, cname, &trie_id));
+                    if (trie_id != trie_size) {
+                        /* This id has already been seen in a previous node. */
+                        IGRAPH_ERRORF("Duplicate node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                                      igraph_gml_tree_line(node, j));
+                    }
                     hasid = 1;
                 }
             }
             if (!hasid) {
-                IGRAPH_ERRORF("Node without 'id' while parsing GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
-                              igraph_gml_tree_line(gtree, i));
+                /* Isolated nodes are allowed not to have an id.
+                 * We generate an "n"-prefixed string id to be used in the trie. */
+                igraph_integer_t trie_id;
+                snprintf(cname, sizeof(cname) / sizeof(char) - 1, "n%" IGRAPH_PRId, node_no);
+                IGRAPH_CHECK(igraph_trie_get(&trie, cname, &trie_id));
             }
         } else if (!strcmp(name, "edge")) {
             igraph_gml_tree_t *edge;
@@ -371,7 +393,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             }
             edge = igraph_gml_tree_get_tree(gtree, i);
             has_source = has_target = 0;
-            for (j = 0; j < igraph_gml_tree_length(edge); j++) {
+            for (igraph_integer_t j = 0; j < igraph_gml_tree_length(edge); j++) {
                 const char *name = igraph_gml_tree_name(edge, j);
                 if (!strcmp(name, "source")) {
                     has_source = 1;
@@ -383,7 +405,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 } else if (!strcmp(name, "target")) {
                     has_target = 1;
                     if (igraph_gml_tree_type(edge, j) != IGRAPH_I_GML_TREE_INTEGER) {
-                        IGRAPH_ERRORF("Non-integer 'source' for an edge in GML file, line %" IGRAPH_PRId ".",
+                        IGRAPH_ERRORF("Non-integer 'target' for an edge in GML file, line %" IGRAPH_PRId ".",
                                       IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(edge, j));
                     }
@@ -434,10 +456,10 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
     }
 
-    /* check vertex ID uniqueness */
-    if (igraph_trie_size(&trie) != no_of_nodes) {
-        IGRAPH_ERROR("Node 'id' not unique in GML file.", IGRAPH_PARSEERROR);
-    }
+    /* At this point, all nodes must have an id (from the file or generated) stored
+     * in the trie. Any condition that violates this should have been caught during
+     * the preceding checks. */
+    IGRAPH_ASSERT(igraph_trie_size(&trie) == no_of_nodes);
 
     /* now we allocate the vectors and strvectors for the attributes */
     for (i = 0; i < igraph_vector_ptr_size(&vattrs); i++) {
@@ -493,7 +515,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
 
     /* Ok, now the edges, attributes too */
-    IGRAPH_CHECK(igraph_vector_int_resize(&edges, no_of_edges * 2));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     p = -1;
     while ( (p = igraph_gml_tree_find(gtree, "edge", p + 1)) != -1) {
         igraph_gml_tree_t *edge;
@@ -516,10 +538,10 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 atrec = VECTOR(eattrs)[trieidx];
                 type = atrec->type;
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
-                    igraph_vector_t *v = (igraph_vector_t *)atrec->value;
-                    IGRAPH_CHECK(igraph_i_gml_toreal(edge, j, VECTOR(*v) + edgeid));
+                    igraph_vector_t *v = (igraph_vector_t *) atrec->value;
+                    VECTOR(*v)[edgeid] = igraph_i_gml_toreal(edge, j);
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-                    igraph_strvector_t *v = (igraph_strvector_t *)atrec->value;
+                    igraph_strvector_t *v = (igraph_strvector_t *) atrec->value;
                     const char *value = igraph_i_gml_tostring(edge, j);
                     IGRAPH_CHECK(igraph_strvector_set(v, edgeid, value));
                 }
@@ -527,9 +549,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
         from = igraph_gml_tree_get_integer(edge, fromidx);
         to = igraph_gml_tree_get_integer(edge, toidx);
-        snprintf(name, sizeof(name) / sizeof(char) -1, "%" IGRAPH_PRId, from);
+        snprintf(name, sizeof(name) / sizeof(char) - 1, "%" IGRAPH_PRId, from);
         IGRAPH_CHECK(igraph_trie_get(&trie, name, &from));
-        snprintf(name, sizeof(name) / sizeof(char) -1, "%" IGRAPH_PRId, to);
+        snprintf(name, sizeof(name) / sizeof(char) - 1, "%" IGRAPH_PRId, to);
         IGRAPH_CHECK(igraph_trie_get(&trie, name, &to));
         if (igraph_trie_size(&trie) != no_of_nodes) {
             IGRAPH_ERROR("Unknown node id found in an edge in GML file.", IGRAPH_PARSEERROR);
@@ -539,6 +561,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
 
     /* and add vertex attributes */
+    node_no = 0;
     for (i = 0; i < igraph_gml_tree_length(gtree); i++) {
         const char *n;
         char name[100];
@@ -547,9 +570,17 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         if (!strcmp(n, "node")) {
             igraph_gml_tree_t *node = igraph_gml_tree_get_tree(gtree, i);
             igraph_integer_t iidx = igraph_gml_tree_find(node, "id", 0);
-            igraph_integer_t id = igraph_gml_tree_get_integer(node, iidx);
-            snprintf(name, sizeof(name) / sizeof(char) -1, "%" IGRAPH_PRId, id);
-            IGRAPH_CHECK(igraph_trie_get(&trie, name, &id));
+            igraph_integer_t trie_id;
+            node_no++;
+            if (iidx < 0) {
+                /* Isolated node with no id field, use generated id */
+                snprintf(name, sizeof(name) / sizeof(char) - 1, "n%" IGRAPH_PRId, node_no);
+            } else {
+                igraph_integer_t id;
+                id = igraph_gml_tree_get_integer(node, iidx);
+                snprintf(name, sizeof(name) / sizeof(char) - 1, "%" IGRAPH_PRId, id);
+            }
+            IGRAPH_CHECK(igraph_trie_get(&trie, name, &trie_id));
             for (j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *aname = igraph_gml_tree_name(node, j);
                 igraph_attribute_record_t *atrec;
@@ -559,11 +590,11 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 type = atrec->type;
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     igraph_vector_t *v = (igraph_vector_t *)atrec->value;
-                    IGRAPH_CHECK(igraph_i_gml_toreal(node, j, VECTOR(*v) + id));
+                    VECTOR(*v)[trie_id] = igraph_i_gml_toreal(node, j);
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                     igraph_strvector_t *v = (igraph_strvector_t *)atrec->value;
                     const char *value = igraph_i_gml_tostring(node, j);
-                    IGRAPH_CHECK(igraph_strvector_set(v, id, value));
+                    IGRAPH_CHECK(igraph_strvector_set(v, trie_id, value));
                 }
             }
         }
@@ -581,8 +612,8 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
     IGRAPH_FINALLY_CLEAN(1); /* do not destroy 'graph', just pop it from the stack */
 
-    igraph_i_gml_destroy_attrs(attrs);
     igraph_vector_int_destroy(&edges);
+    igraph_i_gml_destroy_attrs(attrs);
     igraph_i_gml_parsedata_destroy(&context);
     IGRAPH_FINALLY_CLEAN(3);
 
