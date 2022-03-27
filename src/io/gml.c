@@ -704,7 +704,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
 
 /**
  * \function igraph_write_graph_gml
- * \brief Write the graph to a stream in GML format
+ * \brief Write the graph to a stream in GML format.
  *
  * GML is a quite general textual format, see
  * http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html for details.
@@ -722,11 +722,13 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * does not check this.
  *
  * </para><para> The <quote>id</quote> vertex attribute is treated specially.
- * If the <parameter>id</parameter> argument is not 0 then it should be a numeric
+ * If the <parameter>id</parameter> argument is not \c NULL then it should be a numeric
  * vector with the vertex IDs and the <quote>id</quote> vertex attribute is
- * ignored (if there is one). If <parameter>id</parameter> is 0 and there is a
- * numeric <quote>id</quote> vertex attribute that is used instead. If ids
+ * ignored (if there is one). If <parameter>id</parameter> is \c NULL and there is a
+ * numeric <quote>id</quote> vertex attribute, it will be used instead. If ids
  * are not specified in either way then the regular igraph vertex IDs are used.
+ * If some of the supplied id values are invalid (non-integer or NaN), all supplied
+ * id are ignored and igraph vertex IDs are used instead.
  *
  * </para><para> Note that whichever way vertex IDs are specified, their
  * uniqueness is not checked.
@@ -735,12 +737,13 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * or <quote>target</quote> they're silently ignored. GML uses these attributes
  * to specify the edges, so we cannot write them to the file. Rename them
  * before calling this function if you want to preserve them.
+ *
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.
  * \param id Either <code>NULL</code> or a numeric vector with the vertex IDs.
  *        See details above.
- * \param creator An optional string to write to the stream in the creator line.
- *        If this is 0 then the current date and time is added.
+ * \param creator An optional string to append to the creator line.
+ *        If this is \c NULL then the current date and time is added.
  * \return Error code.
  *
  * Time complexity: should be proportional to the number of characters written
@@ -808,7 +811,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         }
     }
 
-    /* Scan id vector for invaid values. If any are found, all ids are ignored.
+    /* Scan id vector for invalid values. If any are found, all ids are ignored.
      * Invalid values may occur as a result of reading a GML file in which some
      * nodes did not have an id. In this case, the "id" attribute created by
      * igraph will contain a NaN value.
