@@ -174,7 +174,7 @@ static igraph_error_t igraph_i_gml_get_keyword(const char *s, size_t len, char *
 }
 
 static igraph_error_t igraph_i_gml_get_string(const char *s, size_t len, char **res) {
-  *res = strndup(s, len-2);
+  *res = strndup(s+1, len-2);
   if (! *res) {
     IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
   }
