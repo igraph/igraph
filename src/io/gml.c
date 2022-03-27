@@ -808,6 +808,27 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         }
     }
 
+    /* Scan id vector for invaid values. If any are found, all ids are ignored.
+     * Invalid values may occur as a result of reading a GML file in which some
+     * nodes did not have an id. In this case, the "id" attribute created by
+     * igraph will contain a NaN value.
+     *
+     * TODO: Check that ids are unique?
+     */
+    if (myid) {
+        if (igraph_vector_size(myid) != no_of_nodes) {
+            IGRAPH_ERROR("Size of id vector must match vertex count.", IGRAPH_EINVAL);
+        }
+        for (i = 0; i < no_of_nodes; ++i) {
+            igraph_real_t val = VECTOR(*myid)[i];
+            if (val != (igraph_integer_t) val) {
+                IGRAPH_WARNINGF("%g is not a valid integer id for GML files, ignoring all supplied ids.", val);
+                myid = NULL;
+                break;
+            }
+        }
+    }
+
     /* directedness */
     CHECK(fprintf(outstream, "  directed %i\n", igraph_is_directed(graph) ? 1 : 0));
 
