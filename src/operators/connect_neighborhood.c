@@ -70,7 +70,8 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
     igraph_vector_int_t neis;
 
     if (order < 0) {
-        IGRAPH_ERROR("Negative order, cannot connect neighborhood", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Order can not be negative, found %" IGRAPH_PRId ".",
+                IGRAPH_EINVAL, order);
     }
 
     if (order < 2) {

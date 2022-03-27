@@ -440,6 +440,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  foreign_empty
   igraph_write_graph_leda
   igraph_write_graph_dimacs_flow
   lineendings
@@ -477,6 +478,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_contract_vertices
+  igraph_connect_neighborhood
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
@@ -494,6 +496,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
+  igraph_adjlist_init_complementer
   igraph_to_directed
   igraph_to_prufer
   inclist
