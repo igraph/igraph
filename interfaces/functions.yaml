@@ -873,7 +873,7 @@ igraph_diversity:
 
 igraph_random_walk:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXSET vertices, OUT EDGESET edgewalk,
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXSET vertices, OUT EDGESET edges,
         VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
     DEPS: start ON graph, weights ON graph, vertices ON graph, edges ON graph
 
