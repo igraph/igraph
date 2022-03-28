@@ -1730,9 +1730,9 @@ igraph_mincut:
 
 igraph_st_mincut:
     PARAMS: |-
-        GRAPH graph, OUT REAL value, OUT VECTORM1_OR_0 cut,
+        GRAPH graph, OUT REAL value, OUT EDGESET cut,
         OPTIONAL OUT VERTEXSET partition1, OPTIONAL OUT VERTEXSET partition2,
-        VERTEX source, VERTEX target, EDGECAPACITY capacity=NULL
+        VERTEX source, VERTEX target, OPTIONAL EDGE_CAPACITY capacity
     DEPS: |-
         capacity ON graph, source ON graph, target ON graph,
         partition1 ON graph, partition2 ON graph, cut ON graph
