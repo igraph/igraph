@@ -1,0 +1,80 @@
+===== graph1.gml =====
+Creator "igraph version @VERSION@ "
+Version 1
+graph
+[
+  directed 1
+  node
+  [
+    id 1
+    a NaN
+    b "2"
+    c 5.6
+    d NaN
+  ]
+  node
+  [
+    id 2
+    a 2
+    b "asd"
+    c NaN
+    d -Inf
+  ]
+  node
+  [
+    id 5
+    a NaN
+    b ""
+    c NaN
+    d NaN
+  ]
+  edge
+  [
+    source 5
+    target 1
+    weight -0.45
+    label "-0.45"
+  ]
+  edge
+  [
+    source 2
+    target 5
+    weight NaN
+    label "edge label"
+  ]
+]
+======================
+
+===== graph2.gml =====
+Creator "igraph version @VERSION@ "
+Version 1
+graph
+[
+  directed 1
+  node
+  [
+    id 0
+    Foo ""
+  ]
+  node
+  [
+    id 1
+    Foo ""
+  ]
+  node
+  [
+    id 2
+    Foo "bar"
+  ]
+]
+======================
+
+===== graph3.gml =====
+Creator "igraph version @VERSION@ "
+Version 1
+graph
+[
+  directed 0
+]
+======================
+

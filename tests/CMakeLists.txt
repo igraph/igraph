@@ -443,6 +443,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   foreign_empty
+  gml
   igraph_write_graph_leda
   igraph_write_graph_dimacs_flow
   lineendings
