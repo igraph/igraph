@@ -58,6 +58,7 @@ igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
                                          const char *name,
                                          igraph_integer_t line,
                                          igraph_gml_tree_t *value);
+igraph_error_t igraph_gml_tree_init_empty(igraph_gml_tree_t *t);
 void igraph_gml_tree_destroy(igraph_gml_tree_t *t);
 
 void igraph_gml_tree_delete(igraph_gml_tree_t *t, igraph_integer_t pos);

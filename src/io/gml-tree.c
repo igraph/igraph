@@ -144,6 +144,15 @@ igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
 
 }
 
+igraph_error_t igraph_gml_tree_init_empty(igraph_gml_tree_t *t) {
+    IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->names, 0);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&t->types, 0);
+    IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&t->lines, 0);
+    IGRAPH_FINALLY_CLEAN(4);
+    return IGRAPH_SUCCESS;
+}
+
 /* merge is destructive, the _second_ tree is destroyed */
 igraph_error_t igraph_gml_tree_mergedest(igraph_gml_tree_t *t1, igraph_gml_tree_t *t2) {
     igraph_integer_t i, n = igraph_vector_ptr_size(&t2->children);
