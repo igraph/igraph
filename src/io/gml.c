@@ -301,9 +301,9 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
      * generated string id of the form "n123" consisting of "n" and their count
      * (i.e. ordinal position) within the GML file.
      *
-     * We use an attribute type value of -1 to mark attribute records which
-     * correspond to composite GML values and must therefore be removed before
-     * creating the graph.
+     * We use an attribute type value of IGRAPH_ATTRIBUTE_DEFAULT to mark attribute
+     * records which correspond to composite GML values and must therefore be removed
+     * before creating the graph.
      */
     node_no = 0;
     for (i = 0; i < igraph_gml_tree_length(gtree); i++) {
@@ -342,7 +342,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     } else if (type == IGRAPH_I_GML_TREE_STRING) {
                         atrec->type = IGRAPH_ATTRIBUTE_STRING;
                     } else {
-                        atrec->type = -1;
+                        atrec->type = IGRAPH_ATTRIBUTE_DEFAULT;
                     }
                     IGRAPH_CHECK(igraph_vector_ptr_push_back(&vattrs, atrec));
                     IGRAPH_FINALLY_CLEAN(2);
@@ -352,7 +352,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     igraph_attribute_type_t type1 = atrec->type;
                     if (type == IGRAPH_I_GML_TREE_STRING) {
                         atrec->type = IGRAPH_ATTRIBUTE_STRING;
-                    } else if (type1 == -1) {
+                    } else if (type1 == IGRAPH_ATTRIBUTE_DEFAULT) {
                         if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
                             atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
                         }
@@ -436,7 +436,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         } else if (type == IGRAPH_I_GML_TREE_STRING) {
                             atrec->type = IGRAPH_ATTRIBUTE_STRING;
                         } else {
-                            atrec->type = -1;
+                            atrec->type = IGRAPH_ATTRIBUTE_DEFAULT;
                         }
                         IGRAPH_CHECK(igraph_vector_ptr_push_back(&eattrs, atrec));
                         IGRAPH_FINALLY_CLEAN(2);
@@ -446,7 +446,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         igraph_attribute_type_t type1 = atrec->type;
                         if (type == IGRAPH_I_GML_TREE_STRING) {
                             atrec->type = IGRAPH_ATTRIBUTE_STRING;
-                        } else if (type1 == -1) {
+                        } else if (type1 == IGRAPH_ATTRIBUTE_DEFAULT) {
                             if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
                                 atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
                             }
@@ -622,7 +622,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
         for (i = 0, j = 0; i < igraph_vector_ptr_size(&vattrs); i++) {
             igraph_attribute_record_t *atrec = VECTOR(vattrs)[i];
-            if (atrec->type == -1) {
+            if (atrec->type == IGRAPH_ATTRIBUTE_DEFAULT) {
                 IGRAPH_FREE(atrec->name);
                 IGRAPH_FREE(atrec);
             } else {
@@ -633,7 +633,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
         for (i = 0, j = 0; i < igraph_vector_ptr_size(&eattrs); i++) {
             igraph_attribute_record_t *atrec = VECTOR(eattrs)[i];
-            if (atrec->type == -1) {
+            if (atrec->type == IGRAPH_ATTRIBUTE_DEFAULT) {
                 IGRAPH_FREE(atrec->name);
                 IGRAPH_FREE(atrec);
             } else {
