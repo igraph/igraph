@@ -78,6 +78,7 @@ static igraph_error_t igraph_i_gml_make_list(const char *name,
                                              int line,
                                              igraph_gml_tree_t *list,
                                              igraph_gml_tree_t **tree);
+static igraph_error_t igraph_i_gml_make_empty(igraph_gml_tree_t **tree);
 static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2);
 
 #define scanner context->scanner
@@ -125,7 +126,8 @@ input:   list      { context->tree=$1; }
        | list EOFF { context->tree=$1; }
 ;
 
-list:   keyvalue      { $$=$1; }
+list:                 { IGRAPH_YY_CHECK(igraph_i_gml_make_empty(&$$)); }
+      | keyvalue      { $$=$1; }
       | list keyvalue { IGRAPH_YY_CHECK(igraph_i_gml_merge($1, $2)); $$ = $1; };
 
 keyvalue:   key num
@@ -280,6 +282,21 @@ static igraph_error_t igraph_i_gml_make_list(const char *name,
   IGRAPH_FINALLY_CLEAN(1); /* t */
 
   return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_gml_make_empty(igraph_gml_tree_t **tree) {
+    igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
+    if (!t) {
+      IGRAPH_ERROR("Cannot build GML tree.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    }
+    IGRAPH_FINALLY(igraph_free, t);
+
+    IGRAPH_CHECK(igraph_gml_tree_init_empty(t));
+
+    *tree = t;
+    IGRAPH_FINALLY_CLEAN(1); /* t */
+
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2) {
