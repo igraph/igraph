@@ -440,8 +440,11 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     igraph_integer_t id, trie_id;
                     igraph_integer_t trie_size = igraph_trie_size(&trie);
                     if (hasid) {
-                        /* A 'node' must not have more than one 'id' field. */
-                        IGRAPH_ERRORF("Node has multiple 'id' fields in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
+                        /* A 'node' must not have more than one 'id' field.
+                         * This error cannot be relaxed into a warning because all ids we find are
+                         * added to the trie, and eventually converted to igraph vertex ids. */
+                        IGRAPH_ERRORF("Node has multiple 'id' fields in GML file, line %" IGRAPH_PRId ".",
+                                      IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
@@ -478,6 +481,15 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 const char *name = igraph_gml_tree_name(edge, j);
                 igraph_i_gml_tree_type_t type = igraph_gml_tree_type(edge, j);
                 if (!strcmp(name, "source")) {
+                    if (has_source) {
+                        /* An edge must not have more than one 'source' field.
+                         * This could be relaxed to a warning, but we keep it as an error
+                         * for consistency with the handling of duplicate node 'id' field,
+                         * and because it indicates a serious corruption in the GML file. */
+                        IGRAPH_ERRORF("Duplicate 'source' in an edge in GML file, line %" IGRAPH_PRId ".",
+                                      IGRAPH_PARSEERROR,
+                                      igraph_gml_tree_line(edge, j));
+                    }
                     has_source = 1;
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERRORF("Non-integer 'source' for an edge in GML file, line %" IGRAPH_PRId ".",
@@ -485,6 +497,12 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                       igraph_gml_tree_line(edge, j));
                     }
                 } else if (!strcmp(name, "target")) {
+                    if (has_target) {
+                        /* An edge must not have more than one 'target' field. */
+                        IGRAPH_ERRORF("Duplicate 'target' in an edge in GML file, line %" IGRAPH_PRId ".",
+                                      IGRAPH_PARSEERROR,
+                                      igraph_gml_tree_line(edge, j));
+                    }
                     has_target = 1;
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERRORF("Non-integer 'target' for an edge in GML file, line %" IGRAPH_PRId ".",
