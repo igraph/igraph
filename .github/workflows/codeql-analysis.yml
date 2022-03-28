@@ -58,7 +58,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-        cmake -GNinja -B build
+        cmake -GNinja -B build -DFLEX_KEEP_LINE_NUMBERS=ON
         cmake --build build
         # Remove temporary CMake stuff so the code analysis does not run on
         # them
