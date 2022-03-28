@@ -1658,6 +1658,15 @@ igraph_mincut:
         GRAPH graph, OUT REAL value, OUT VECTORM1 partition1,
         OUT VECTORM1 partition2, OUT VECTORM1 cut, VECTOR_OR_0 capacity
 
+igraph_st_mincut:
+    PARAMS: |-
+        GRAPH graph, OUT REAL value, OUT VECTORM1_OR_0 cut,
+        OPTIONAL OUT VERTEXSET partition1, OPTIONAL OUT VERTEXSET partition2,
+        VERTEX source, VERTEX target, EDGECAPACITY capacity=NULL
+    DEPS: |-
+        capacity ON graph, source ON graph, target ON graph,
+        partition1 ON graph, partition2 ON graph, cut ON graph
+
 igraph_st_vertex_connectivity:
     PARAMS: |-
         GRAPH graph, OUT INTEGER res, VERTEX source, VERTEX target,
