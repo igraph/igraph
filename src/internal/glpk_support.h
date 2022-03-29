@@ -126,6 +126,8 @@ void igraph_i_glp_delete_prob(glp_prob *p);
                     } \
                     *igraph_i_glpk_error_info.msg_ptr = '\0'; \
                     igraph_error(igraph_i_glpk_error_info.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
+                } else if (igraph_i_glpk_error_info.is_error) { \
+                    igraph_error("Error while running GLPK solver", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
                 } \
                 return IGRAPH_EGLP; \
             } \
