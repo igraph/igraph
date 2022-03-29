@@ -36,8 +36,13 @@ IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
 
 /* glp_at_error() was added in GLPK 4.57. Due to the R interface, we need to
  * support ancient GLPK versions like GLPK 4.38 so we need to guard the
- * invocation of glp_at_error() */
-#define HAS_GLP_AT_ERROR (GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 57))
+ * invocation of glp_at_error(). Note that this is a temporary workaround only
+ * for sake of supporting R 4.1, so it is enabled only if USING_R is defined */
+#ifdef USING_R
+#  define HAS_GLP_AT_ERROR (GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 57))
+#else
+#  define HAS_GLP_AT_ERROR 1
+#endif
 
 int igraph_i_glpk_terminal_hook(void *info, const char *s) {
     IGRAPH_UNUSED(info);
