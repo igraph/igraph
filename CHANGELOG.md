@@ -731,6 +731,15 @@ Some of the highlights are:
 
 ## [Unreleased 0.9.8]
 
+### Fixed
+
+ - Assertion failure in `igraph_bfs()` when an empty `roots` or `restricted` vector was provided.
+ - `igraph_diversity()` now returns 0 for degree-1 vertices. Previously it incorrectly returned NaN or +-Inf depending on roundoff errors.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.9.7] - 2022-03-16
 
 ### Changed
@@ -762,7 +771,7 @@ Some of the highlights are:
 ### Other
 
  - The C attribute handler now verifies attribute types when retrieving attributes.
- - Documentation improvements
+ - Documentation improvements.
 
 ## [0.9.6] - 2022-01-05
 
