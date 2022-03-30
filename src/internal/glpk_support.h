@@ -127,7 +127,9 @@ void igraph_i_glp_delete_prob(glp_prob *p);
                     *igraph_i_glpk_error_info.msg_ptr = '\0'; \
                     igraph_error(igraph_i_glpk_error_info.msg, IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
                 } else if (igraph_i_glpk_error_info.is_error) { \
-                    igraph_error("Error while running GLPK solver", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
+                    /* This branch can never be reached unless compiled with USING_R and using */ \
+                    /* the hack to support pre-4.57 GLPK versions. See comments in glpk_support.c. */ \
+                    igraph_error("Error while running GLPK solver.", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EGLP); \
                 } \
                 return IGRAPH_EGLP; \
             } \
