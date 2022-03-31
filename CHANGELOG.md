@@ -8,7 +8,7 @@ This release focuses on infrastructural improvements, stability, and making the 
 
 Some of the highlights are:
 
- - A consistent use of `igraph_integer_t` for all indices and most integer quantities, both in the API and internally. This type is 64-bit by default on all 64-bit systems, bringing support for very large graphs with more than 2 billion vertices. 
+ - A consistent use of `igraph_integer_t` for all indices and most integer quantities, both in the API and internally. This type is 64-bit by default on all 64-bit systems, bringing support for very large graphs with more than 2 billion vertices. Previously, vertex and edge indices were often represented as `igraph_real_t`. The move to an `igraph_integer_t` also implies a change from `igraph_vector_t` to `igraph_vector_int_t` in many functions.
 
  - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most prevous uses of the non-managed `igraph_vector_ptr_t`.
 
@@ -64,8 +64,8 @@ Some of the highlights are:
  - `igraph_asymmetric_preferennce_game()` now uses an `igraph_vector_int_t` to
    return the types of the nodes in the generated graph.
 
- - `igraph_automorphism_group()` now returns the generators in a pointer vector
-   containing `igraph_vector_int_t` structs, not `igraph_vector_t`.
+ - `igraph_automorphism_group()` now returns the generators in an `igraph_vector_int_list_t`
+   instead of a pointer vector containing `igraph_vector_t` objects.
 
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`,
    `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` now use
@@ -80,9 +80,9 @@ Some of the highlights are:
    `layers` and `parents` arguments instead of an `igraph_vector_t`.
 
  - `igraph_biconnected_components()` now uses an `igraph_vector_int_t` to return
-   the list of articulation points, not an `igraph_vector_t`. Also, the members
-   of the pointer vectors containing the edges and vertices of the components
-   are now of type `igraph_vector_int_t`, not `igraph_vector_t`.
+   the list of articulation points, not an `igraph_vector_t`. Also, the container
+   used for the edges and vertices of the components is now an `igraph_vector_int_list_t`
+   instead of a pointer vector containing `igraph_vector_t` objects.
 
  - `igraph_bipartite_projection()` now uses `igraph_vector_int_t` to return
    `multiplicity1` and `multiplicity2`, not `igraph_vector_t`.
@@ -126,8 +126,8 @@ Some of the highlights are:
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
 
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
-   mapping from block indices to parent block indices, and the `cohesion`; also, it uses a pointer
-   vector of `igraph_vector_int_t`s to return the blocks themselves instead of
+   mapping from block indices to parent block indices, and the `cohesion`; also, 
+   it uses an `igraph_vector_int_list_t` to return the blocks themselves instead of
    a pointer vector of `igraph_vector_t`.
 
  - `igraph_community_walktrap()`, `igraph_community_edge_betweenness()`,
@@ -263,11 +263,12 @@ Some of the highlights are:
    to return the predecessors and inbound edges instead of an
    `igraph_vector_long_t`.
 
- - The pointer vectors in the argument lists of `igraph_get_all_shortest_paths()`,
+ - The functions `igraph_get_all_shortest_paths()`,
    `igraph_get_all_shortest_paths_dijkstra()`, `igraph_get_shortest_paths()`,
-   `igraph_get_shortesT_paths_bellman_ford()` and
-   `igraph_get_shortest_paths_dijkstra()` now contain `igraph_vector_int_t` vectors
-   instead of `igraph_vector_t`.
+   `igraph_get_shortest_paths_bellman_ford()` and
+   `igraph_get_shortest_paths_dijkstra()` now return paths in an
+   `igraph_vector_int_list_t` instead of a pointer vector containing
+   `igraph_vector_t` objects.
 
  - The `maps` parameters in `igraph_get_isomorphisms_vf2()` and
    `igraph_get_subisomorphisms_vf2()` are now of type `igraph_vector_int_list_t`.
@@ -316,8 +317,8 @@ Some of the highlights are:
  - `igraph_intersection()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
 
- - The `edgemaps` parameter of `igraph_intersection_many()` is now a vector of
-   `igraph_vector_int_t` pointers.
+ - The `edgemaps` parameter of `igraph_intersection_many()` is now an
+   `igraph_vector_int_list_t` instead of a pointer vector.
 
  - `igraph_is_chordal()` now uses an `igraph_vector_int_t` for its
    `alpha`, `alpham1` and `fill_in` parameters.
@@ -416,8 +417,7 @@ Some of the highlights are:
  - `igraph_neighborhood_size()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
- - The `res` parameter of `igraph_neighborhood()` is now a vector of pointers
-   to `igraph_vector_int_t`.
+ - The `res` parameter of `igraph_neighborhood()` is now an `igraph_vector_int_list_t`.
 
  - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
    `neis` parameter.
@@ -493,8 +493,8 @@ Some of the highlights are:
    now of type `igraph_vector_int_list_t`.
 
  - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its `map`
-   parameter. Also, its `domains` parameter is now a pointer vector containing
-   `igraph_vector_int_t` objects instead of `igraph_vector_t`.
+   parameter. Also, its `domains` parameter is now an `igraph_vector_int_list_t`
+   instead of a pointer vector containing `igraph_vector_t` objects.
 
  - `igraph_unfold_tree()` now uses an `igraph_vector_int_t` for its `vertex_index`
    and `roots` parameters.
@@ -502,8 +502,8 @@ Some of the highlights are:
  - `igraph_union()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
 
- - The `edgemaps` parameter of `igraph_union_many()` is now a vector of
-   `igraph_vector_int_t` pointers.
+ - The `edgemaps` parameter of `igraph_union_many()` is now an 
+   `igraph_vector_int_list_t` instead of a pointer vector.
 
  - `igraph_vs_vector()`, `igraph_vss_vector()` and `igraph_vs_vector_copy()` now
    all take an `igraph_vector_int_t` as the vector of vertex IDs, not an
@@ -584,8 +584,8 @@ Some of the highlights are:
    `igraph_community_multilevel()` additionaly uses a `igraph_matrix_int_t`
    instead of `igraph_matrix_t()` for its memberships parameter.
 
- - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use `IGRAPH_ALL`
-   instead.
+ - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use the equivalent
+   `IGRAPH_ALL` instead.
 
  - `igraph_vector_resize_min()` and `igraph_matrix_resize_min()` no longer return an
    error code (return type is now `void`). The vector or matrix is always left in
@@ -599,9 +599,9 @@ Some of the highlights are:
  - `igraph_read_graph_pajek()` now creates a Boolean "type" attribute for bipartite graphs.
    Previously it created a numeric attribute.
 
-
 ### Added
 
+ - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
  - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
@@ -620,6 +620,8 @@ Some of the highlights are:
  - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
  - `igraph_fundamental_cycles()` computes a fundamental cycle basis (experimental).
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
+ - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without
+   re-allocating them.
 
 ### Removed
 
