@@ -259,32 +259,31 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
  * \brief Read a graph in GML format.
  *
  * GML is a simple textual format, see
- * http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html for details.
+ * https://web.archive.org/web/20190207140002/http://www.fim.uni-passau.de/index.php?id=17297&L=1
+ * for details.
  *
  * </para><para>
  * Although all syntactically correct GML can be parsed,
  * we implement only a subset of this format, some attributes might be
  * ignored. Here is a list of all the differences:
  * \olist
- * \oli Only <code>node</code> and <code>edge</code> attributes are
- *      used, and only if they have a simple type: integer, real or
+ * \oli Only attributes with a simple type are used: integer, real or
  *      string. So if an attribute is an array or a record, then it is
- *      ignored. This is also true if only some values of the
- *      attribute are complex.
+ *      ignored. When some values of the attribute are simple and
+ *      some compound, the compound ones get a default value.
  * \oli Top level attributes except for <code>Version</code> and the
  *      first <code>graph</code> attribute are completely ignored.
- * \oli Graph attributes except for <code>node</code> and
- *      <code>edge</code> are completely ignored.
  * \oli There is no maximum line length.
  * \oli There is no maximum keyword length.
  * \oli Character entities in strings are not interpreted.
- * \oli We allow <code>inf</code> (infinity) and <code>nan</code>
+ * \oli We allow <code>inf</code>, <code>-inf</code> and <code>nan</code>
  *      (not a number) as a real number. This is case insensitive, so
- *      <code>nan</code>, <code>NaN</code> and <code>NAN</code> are equal.
+ *      <code>nan</code>, <code>NaN</code> and <code>NAN</code> are equivalent.
  * \endolist
  *
  * </para><para> Please contact us if you cannot live with these
  * limitations of the GML parser.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The stream to read the GML file from.
  * \return Error code.
@@ -304,6 +303,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_t trie;
     igraph_vector_int_t edges;
     igraph_bool_t directed = IGRAPH_UNDIRECTED;
+    igraph_bool_t has_directed = 0;
     igraph_gml_tree_t *gtree;
     igraph_integer_t gidx;
     igraph_trie_t vattrnames;
@@ -385,27 +385,11 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 0);
     IGRAPH_TRIE_INIT_FINALLY(&gattrnames, 0);
 
-    /* Is it directed? */
-    i = igraph_gml_tree_find(gtree, "directed", 0);
-    if (i >= 0) {
-        if (igraph_gml_tree_type(gtree, i) == IGRAPH_I_GML_TREE_INTEGER) {
-            igraph_integer_t dir = igraph_gml_tree_get_integer(gtree, i);
-            if (dir != 0 && dir != 1) {
-                IGRAPH_WARNINGF(
-                    "Invalid value %" IGRAPH_PRId " for 'directed' attribute on line %" IGRAPH_PRId ", should be 0 or 1.",
-                    dir, igraph_gml_tree_line(gtree, i));
-            }
-            if (dir) {
-                directed = IGRAPH_DIRECTED;
-            }
-        } else {
-            IGRAPH_WARNINGF("Invalid type for 'directed' attribute on line %" IGRAPH_PRId ", assuming undirected.",
-                            igraph_gml_tree_line(gtree, i));
-        }
-    }
-
-    /* Now we go over all objects in the graph and collect the attribute names and
-     * types. Plus we collect node IDs. We also do some checks.
+    /* Now we go over all objects in the graph to
+     *  - collect the attribute names and types
+     *  - collect node IDs
+     *  - set directedness
+     *  - do some checks which the following code relies on
      *
      * The 'id' fields of 'node' objects are converted into strings, so that they
      * can be inserted into a trie and re-encoded as consecutive integers starting
@@ -521,8 +505,33 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 IGRAPH_ERRORF("No 'target' for edge in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                               igraph_gml_tree_line(gtree, i));
             }
+        } else if (! strcmp(name, "directed")) {
+            /* Set directedness of graph. */
+            if (has_directed) {
+                /* Be tolerant of duplicate entries, but do show a warning. */
+                IGRAPH_WARNINGF("Duplicate 'directed' field in 'graph', line %" IGRAPH_PRId ". "
+                                "Ignoring previous 'directed' fields.",
+                                igraph_gml_tree_line(gtree, i));
+            }
+            if (igraph_gml_tree_type(gtree, i) == IGRAPH_I_GML_TREE_INTEGER) {
+                igraph_integer_t dir = igraph_gml_tree_get_integer(gtree, i);
+                if (dir != 0 && dir != 1) {
+                    IGRAPH_WARNINGF(
+                        "Invalid value %" IGRAPH_PRId " for 'directed' attribute on line %" IGRAPH_PRId ", should be 0 or 1.",
+                        dir, igraph_gml_tree_line(gtree, i));
+                }
+                if (dir) {
+                    directed = IGRAPH_DIRECTED;
+                }
+                has_directed = 1;
+            } else {
+                IGRAPH_WARNINGF("Invalid type for 'directed' attribute on line %" IGRAPH_PRId ", assuming undirected.",
+                                igraph_gml_tree_line(gtree, i));
+            }
         } else {
-            /* anything to do? Maybe add as graph attribute.... */
+            /* Add the rest of items as graph attributes. */
+            igraph_i_gml_tree_type_t type = igraph_gml_tree_type(gtree, i);
+            IGRAPH_CHECK(create_or_update_attribute(name, type, &gattrnames, &gattrs));
         }
     }
 
@@ -534,14 +543,15 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     /* Now we allocate the vectors and strvectors for the attributes */
     IGRAPH_CHECK(allocate_attributes(&vattrs, no_of_nodes, "vertex"));
     IGRAPH_CHECK(allocate_attributes(&eattrs, no_of_edges, "edge"));
+    IGRAPH_CHECK(allocate_attributes(&gattrs, 1, "graph"));
 
     /* Add edges, edge attributes and vertex attributes */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     node_no = 0;
     for (i = 0; i < igraph_gml_tree_length(gtree); i++) {
-        const char *n;
-        n = igraph_gml_tree_name(gtree, i);
-        if (!strcmp(n, "node")) {
+        const char *name;
+        name = igraph_gml_tree_name(gtree, i);
+        if (!strcmp(name, "node")) {
             igraph_gml_tree_t *node = igraph_gml_tree_get_tree(gtree, i);
             igraph_integer_t iidx = igraph_gml_tree_find(node, "id", 0);
             igraph_integer_t trie_id;
@@ -563,17 +573,17 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 atrec = VECTOR(vattrs)[ai];
                 type = atrec->type;
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
-                    igraph_vector_t *v = (igraph_vector_t *)atrec->value;
+                    igraph_vector_t *v = (igraph_vector_t *) atrec->value;
                     VECTOR(*v)[trie_id] = igraph_i_gml_toreal(node, j);
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-                    igraph_strvector_t *v = (igraph_strvector_t *)atrec->value;
+                    igraph_strvector_t *v = (igraph_strvector_t *) atrec->value;
                     const char *value = igraph_i_gml_tostring(node, j);
                     IGRAPH_CHECK(igraph_strvector_set(v, trie_id, value));
                 } else {
                     /* Ignored composite attribute */
                 }
             }
-        } else if (!strcmp(n, "edge")) {
+        } else if (!strcmp(name, "edge")) {
             igraph_gml_tree_t *edge;
             igraph_integer_t from, to, fromidx = 0, toidx = 0;
             edge = igraph_gml_tree_get_tree(gtree, i);
@@ -617,12 +627,33 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             }
             VECTOR(edges)[edgeptr++] = from;
             VECTOR(edges)[edgeptr++] = to;
+        } else if (! strcmp(name, "directed")) {
+            /* Nothing to do for 'directed' field, already handled earlier. */
+        } else {
+            /* Set the rest as graph attributes */
+            igraph_integer_t ai;
+            igraph_attribute_record_t *atrec;
+            igraph_attribute_type_t type;
+            IGRAPH_CHECK(igraph_trie_get(&gattrnames, name, &ai));
+            atrec = VECTOR(gattrs)[ai];
+            type = atrec->type;
+            if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
+                igraph_vector_t *v = (igraph_vector_t *) atrec->value;
+                VECTOR(*v)[0] = igraph_i_gml_toreal(gtree, i);
+            } else if (type == IGRAPH_ATTRIBUTE_STRING) {
+                igraph_strvector_t *v = (igraph_strvector_t *) atrec->value;
+                const char *value = igraph_i_gml_tostring(gtree, i);
+                IGRAPH_CHECK(igraph_strvector_set(v, 0, value));
+            } else {
+                /* Ignored composite attribute */
+            }
         }
     }
 
     /* Remove composite attributes */
     prune_unknown_attributes(&vattrs);
     prune_unknown_attributes(&eattrs);
+    prune_unknown_attributes(&gattrs);
 
     igraph_trie_destroy(&trie);
     igraph_trie_destroy(&gattrnames);
@@ -630,7 +661,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_destroy(&eattrnames);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_CHECK(igraph_empty_attrs(graph, 0, directed, 0)); /* TODO https://github.com/igraph/igraph/issues/174 */
+    IGRAPH_CHECK(igraph_empty_attrs(graph, 0, directed, &gattrs)); /* TODO https://github.com/igraph/igraph/issues/174 */
     IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, &vattrs));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));

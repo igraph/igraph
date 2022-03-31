@@ -7,4 +7,5 @@ Version 3
 graph [
     directed 2
     node [ ] node  [ ] node [ Foo "bar" ]
+    composite [ a 1 ]
 ]
