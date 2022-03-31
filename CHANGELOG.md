@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+### Release notes
+
+This release focuses on infrastructural improvements, stability, and making the igraph interface more consistent, more predictable and easier to use. It contains many API-breaking changes and function renamings, in preparation for a future 1.0 release, at which point the API will become stable. Changes in this direction are likely to continue through a 0.11 release. It is recommended that you migrate your code from 0.9 to 0.10 soon, to make the eventual transition to 1.0 easier.
+
+Some of the highlights are:
+
+ - A consistent use of `igraph_integer_t` for all indices and most integer quantities, both in the API and internally. This type is 64-bit by default on all 64-bit systems, bringing support for very large graphs with more than 2 billion vertices. 
+
+ - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most prevous uses of the non-managed `igraph_vector_ptr_t`.
+
+ - File format readers are much more robust and more tolerant of invalid input.
+
+ - Many improvements to robustness and reliability, made possible by internal refactorings.
+
 ### Breaking changes
 
  - igraph now requires CMake 3.18 or later.
