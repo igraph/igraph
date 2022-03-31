@@ -28,6 +28,9 @@ graph [
     edge [
         source 2 target 5
         label "edge label"
+# The 'sou_rce' attribute will be ignored by the GML writer as it would conflict with
+# 'source' after stripping the '_' character.
+        sou_rce 1.0
     ]
     AttOne 1
     AttOne "x"
