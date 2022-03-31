@@ -45,15 +45,15 @@ void random_walk(igraph_t *graph, igraph_vector_t *weights,
 }
 
 int main() {
-    igraph_t g_1, g_line, g_full, g_loop, graph;
+    igraph_t g_1, g_line, g_full, g_loop, g_de_bruijn;
     igraph_vector_int_t vertices, edges;
-    igraph_vector_t g_line_weights, graph_weights, error_weights;
+    igraph_vector_t g_line_weights, g_de_bruijn_weights, error_weights;
     igraph_integer_t ec, i;
 
     igraph_vector_int_init(&vertices, 0);
     igraph_vector_int_init(&edges, 0);
     igraph_vector_init(&g_line_weights, 0);
-    igraph_vector_init(&graph_weights, 0);
+    igraph_vector_init(&g_de_bruijn_weights, 0);
     igraph_vector_init(&error_weights, 0);
     igraph_rng_seed(igraph_rng_default(), 42);
     
@@ -64,25 +64,24 @@ int main() {
 
     /* This directed graph has loop edges.
        It also has multi-edges when considered as undirected. */
-    igraph_de_bruijn(&graph, 3, 2);
+    igraph_de_bruijn(&g_de_bruijn, 3, 2);
 
     /* Initialize de bruijn graph weights */
-    ec = igraph_ecount(&graph);
-    igraph_vector_resize(&graph_weights, ec);
+    igraph_rng_seed(igraph_rng_default(), 42);
+    ec = igraph_ecount(&g_de_bruijn);
+    igraph_vector_resize(&g_de_bruijn_weights, ec);
     for (i = 0; i < ec; ++i) {
-        VECTOR(graph_weights)[i] = igraph_rng_get_unif01(igraph_rng_default());
+        VECTOR(g_de_bruijn_weights)[i] = igraph_rng_get_unif01(igraph_rng_default());
     }
     
     /* Initialize g_line graph weights */
+    igraph_rng_seed(igraph_rng_default(), 42);
     ec = igraph_ecount(&g_line);
     igraph_vector_resize(&g_line_weights, ec);
     for (i = 0; i < ec; ++i) {
         VECTOR(g_line_weights)[i] = igraph_rng_get_unif01(igraph_rng_default());
     }
 
-
-    /* Length of the vertices vector -> (steps + 1) -> includes starting and ending vertices of the walk,
-       Length of the edges vector    -> steps */
 
     /* 1. only vertices required, edges = NULL
           unweighted -> igraph_i_random_walk_adjlist
@@ -106,16 +105,17 @@ int main() {
 
     printf("Loop at vertex 0:\n");
     random_vertex_walk(&g_loop, NULL, 0, IGRAPH_OUT, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN);
-    
+
+    igraph_rng_seed(igraph_rng_default(), 42);
     printf("Checking an actual random walk with seed 42:\n");
     random_vertex_walk(&g_full, NULL, 4, IGRAPH_IN, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN);
 
     /* weighted, directed */
-    igraph_random_walk(&graph, &graph_weights, &vertices, NULL, 0, IGRAPH_OUT, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    igraph_random_walk(&g_de_bruijn, &g_de_bruijn_weights, &vertices, NULL, 0, IGRAPH_OUT, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     IGRAPH_ASSERT(igraph_vector_int_size(&vertices) == 1001);
 
     /* weighted, undirecetd */
-    igraph_random_walk(&graph, &graph_weights, &vertices, NULL, 0, IGRAPH_ALL, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    igraph_random_walk(&g_de_bruijn, &g_de_bruijn_weights, &vertices, NULL, 0, IGRAPH_ALL, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     IGRAPH_ASSERT(igraph_vector_int_size(&vertices) == 1001);
 
     /* weighted, directed line graph, 4 edges, 10 steps, returns on stuck */
@@ -144,16 +144,17 @@ int main() {
     printf("Loop at vertex 0:\n");
     random_walk(&g_loop, NULL, 0, IGRAPH_OUT, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN);
 
+    igraph_rng_seed(igraph_rng_default(), 42);
     printf("Checking an actual random walk with seed 42:\n");
     random_walk(&g_full, NULL, 4, IGRAPH_IN, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     
     /* weighted, directed */
-    igraph_random_walk(&graph, &graph_weights, &vertices, &edges, 0, IGRAPH_OUT, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    igraph_random_walk(&g_de_bruijn, &g_de_bruijn_weights, &vertices, &edges, 0, IGRAPH_OUT, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     IGRAPH_ASSERT(igraph_vector_int_size(&vertices) == 1001);
     IGRAPH_ASSERT(igraph_vector_int_size(&edges) == 1000);
 
     /* weighted, undirecetd */
-    igraph_random_walk(&graph, &graph_weights, &vertices, &edges, 0, IGRAPH_ALL, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    igraph_random_walk(&g_de_bruijn, &g_de_bruijn_weights, &vertices, &edges, 0, IGRAPH_ALL, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     IGRAPH_ASSERT(igraph_vector_int_size(&vertices) == 1001);
     IGRAPH_ASSERT(igraph_vector_int_size(&edges) == 1000);
     
@@ -167,11 +168,11 @@ int main() {
     printf("\nOnly edges required, vertices = NULL:\n");
     
     /* weighted, directed */
-    igraph_random_walk(&graph, &graph_weights, NULL, &edges, 0, IGRAPH_OUT, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    igraph_random_walk(&g_de_bruijn, &g_de_bruijn_weights, NULL, &edges, 0, IGRAPH_OUT, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     IGRAPH_ASSERT(igraph_vector_int_size(&edges) == 1000);
 
     /* weighted, undirecetd */
-    igraph_random_walk(&graph, &graph_weights, NULL, &edges, 0, IGRAPH_ALL, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    igraph_random_walk(&g_de_bruijn, &g_de_bruijn_weights, NULL, &edges, 0, IGRAPH_ALL, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);
     IGRAPH_ASSERT(igraph_vector_int_size(&edges) == 1000);
 
 
@@ -220,9 +221,9 @@ int main() {
     igraph_destroy(&g_line);
     igraph_destroy(&g_loop);
     igraph_destroy(&g_full);
-    igraph_destroy(&graph);
+    igraph_destroy(&g_de_bruijn);
     
-    igraph_vector_destroy(&graph_weights);
+    igraph_vector_destroy(&g_de_bruijn_weights);
     igraph_vector_destroy(&g_line_weights);
     igraph_vector_destroy(&error_weights);
     igraph_vector_int_destroy(&vertices);

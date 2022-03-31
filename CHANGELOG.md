@@ -437,7 +437,9 @@ Some of the highlights are:
    types of the nodes in the generated graph.
 
  - `igraph_random_walk()` now uses an `igraph_vector_int_t` for its
-   `walk` parameter.
+   `walk` parameter. Also, the function now takes both vertices and edges as
+   parameters. It can return IDs of vertices and/or edges on the walk.
+   The function now takes weights as a parameter to support weighted graphs.
 
  - `igraph_random_edge_walk()` now uses an `igraph_vector_int_t` for its
    `edgewalk` parameter.
@@ -697,6 +699,10 @@ Some of the highlights are:
  - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
    `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
+
+- `igraph_random_edge_walk()` has been deprecated by `igraph_random_walk()`
+   to support edges and/or vertices for the random walk in a single function.
+   It will be removed in 0.11.
 
  - `igraph_read_graph_dimacs()` has been renamed to `igraph_read_graph_dimacs_flow()`;
    the old name is deprecated and might be re-used as a generic DIMACS reader
