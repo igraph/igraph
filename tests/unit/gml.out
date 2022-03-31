@@ -4,6 +4,8 @@ Version 1
 graph
 [
   directed 1
+  AttOne "x"
+  AttTwo 3.14
   node
   [
     id 1

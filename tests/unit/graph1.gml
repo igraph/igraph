@@ -29,6 +29,9 @@ graph [
         source 2 target 5
         label "edge label"
     ]
+    AttOne 1
+    AttOne "x"
+    AttTwo 3.14
 ]
 
 # second graph is ignored
