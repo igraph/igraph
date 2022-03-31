@@ -259,7 +259,7 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
  * \brief Read a graph in GML format.
  *
  * GML is a simple textual format, see
- * https://web.archive.org/web/20190207140002/http://www.fim.uni-passau.de/index.php?id=17297&L=1
+ * https://web.archive.org/web/20190207140002/http://www.fim.uni-passau.de/index.php?id=17297%26L=1
  * for details.
  *
  * </para><para>
@@ -713,7 +713,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * \brief Write the graph to a stream in GML format.
  *
  * GML is a quite general textual format, see
- * https://web.archive.org/web/20190207140002/http://www.fim.uni-passau.de/index.php?id=17297&L=1
+ * https://web.archive.org/web/20190207140002/http://www.fim.uni-passau.de/index.php?id=17297%26L=1
  * for details.
  *
  * </para><para> The graph, vertex and edges attributes are written to the
