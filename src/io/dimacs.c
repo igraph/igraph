@@ -206,7 +206,7 @@ igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
             if (problem_type == PROBLEM_MAX) {
                 str[0] = 'x';
                 read = fscanf(instream, "%" IGRAPH_PRId " %1s", &tmp, str);
-                EXPECT(read, 1);
+                EXPECT(read, 2);
                 if (str[0] == 's') {
                     if (tsource != -1) {
                         IGRAPH_ERROR("Reading DIMACS file: multiple source vertex line.",
