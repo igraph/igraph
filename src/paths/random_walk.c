@@ -52,12 +52,12 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
 
-    IGRAPH_CHECK(igraph_vector_int_resize(vertices, steps));
+    IGRAPH_CHECK(igraph_vector_int_resize(vertices, steps + 1));
 
     RNG_BEGIN();
 
     VECTOR(*vertices)[0] = start;
-    for (i = 1; i < steps; i++) {
+    for (i = 1; i <= steps; i++) {
         igraph_vector_int_t *neis;
         igraph_integer_t nn;
         neis = igraph_lazy_adjlist_get(&adj, start);
@@ -98,8 +98,8 @@ static void vec_destr(igraph_vector_t *vec) {
  * This function performs a random walk with a given length on a graph,
  * from the given start vertex.
  * It's used for igraph_random_walk: 
- *  - when edge IDs of the traversed edges are needed (weighted or unweighted graphs)
-      and/or when vertex IDs of the visited vertices are needed (weighted graphs)
+ *  - when weights are used or when edge IDs of the traversed edges
+ *    and/or vertex IDs of the visited vertices are requested.
  * \param weights A vector of non-negative edge weights. It is assumed
  *   that at least one strictly positive weight is found among the
  *   outgoing edges of each vertex. Additionally, no edge weight may
@@ -268,6 +268,7 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
  * \param steps The number of steps to take. If the random walk gets
  *   stuck, then the \p stuck argument specifies what happens.
  *   \p steps is the number of edges to traverse on the walk.
+ *   If \p steps is 0, the function returns without doing anything more.
  * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
@@ -296,10 +297,6 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
                        igraph_neimode_t mode,
                        igraph_integer_t steps,
                        igraph_random_walk_stuck_t stuck) {
-
-    /* TODO:
-       - multiple walks potentially from multiple start vertices
-    */
 
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
@@ -332,6 +329,10 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
                 IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
+    }
+
+    if (steps == 0) {
+        return IGRAPH_SUCCESS;
     }
 
     if (edges || weights) {
@@ -377,7 +378,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
  *
  * \return Error code.
  *
- * \deprecated-by igraph_strvector_set_len 0.10.0
+ * \deprecated-by igraph_random_walk 0.10.0
  */
 igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
     const igraph_vector_t *weights,

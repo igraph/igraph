@@ -4,19 +4,19 @@ Singleton graph with zero steps:
 Singleton graph with one step:
 ( 0 )
 Line graph:
-( 0 1 2 3 )
+( 0 1 2 3 4 )
 Line graph, 10 steps, returns on stuck:
 ( 0 1 2 3 4 )
 Line graph backward:
-( 4 3 2 1 )
+( 4 3 2 1 0 )
 Loop at vertex 0:
-( 0 0 0 0 )
+( 0 0 0 0 0 )
 Checking an actual random walk with seed 42:
-( 4 8 16 19 )
+( 4 8 16 19 3 )
 
 Both vertices and edges required:
 Singleton graph with zero steps:
-( 0 )
+( )
 Singleton graph with one step:
 ( 0 )
 Line graph:
