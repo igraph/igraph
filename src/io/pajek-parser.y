@@ -90,7 +90,7 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                         const char *attrname,
                                         igraph_integer_t vid,
                                         const char *str,
-                                        igraph_integer_t strlen);
+                                        igraph_integer_t str_len);
 
 static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
 static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
@@ -629,7 +629,7 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                                    const char *attrname,
                                                    igraph_integer_t vid,
                                                    const char *str,
-                                                   igraph_integer_t strlen) {
+                                                   igraph_integer_t str_len) {
   igraph_integer_t attrsize=igraph_trie_size(names);
   igraph_integer_t id;
   igraph_strvector_t *na;
@@ -664,7 +664,7 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   if (igraph_strvector_size(na) <= vid) {
     IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
   }
-  IGRAPH_CHECK(igraph_strvector_set_len(na, vid, str, strlen));
+  IGRAPH_CHECK(igraph_strvector_set_len(na, vid, str, str_len));
 
   return IGRAPH_SUCCESS;
 }
