@@ -22,6 +22,7 @@ make -j$(nproc)
 zip $OUT/read_gml_fuzzer_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.gml \
         $SRC/igraph/tests/regression/*.gml \
+        $SRC/igraph/tests/unit/*.gml \
         $SRC/igraph/fuzzing/test_inputs/*.gml
 
 zip $OUT/read_pajek_fuzzer_seed_corpus.zip \
