@@ -264,17 +264,21 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
  *
  * </para><para>
  * Although all syntactically correct GML can be parsed,
- * we implement only a subset of this format, some attributes might be
+ * we implement only a subset of this format. Some attributes might be
  * ignored. Here is a list of all the differences:
  * \olist
  * \oli Only attributes with a simple type are used: integer, real or
- *      string. So if an attribute is an array or a record, then it is
- *      ignored. When some values of the attribute are simple and
- *      some compound, the compound ones get a default value.
+ *      string. If an attribute is composite, i.e. an array or a record,
+ *      then it is ignored. When some values of the attribute are simple and
+ *      some compound, the compositve ones are replaced with a default value
+ *      (NaN for numeric, <code>""</code> for string).
+ * \oli <code>comment</code> fields are not ignored. They are treated as any
+ *      other field and converted to attributes.
  * \oli Top level attributes except for <code>Version</code> and the
  *      first <code>graph</code> attribute are completely ignored.
- * \oli There is no maximum line length.
- * \oli There is no maximum keyword length.
+ * \oli There is no maximum line length or maximum keyword length.
+ *      Integers are not generally limited to signed 32-bit. Instead, all
+ *      integers that fit into an \c igraph_integer_t are supported.
  * \oli Character entities in strings are not interpreted.
  * \oli We allow <code>inf</code>, <code>-inf</code> and <code>nan</code>
  *      (not a number) as a real number. This is case insensitive, so
