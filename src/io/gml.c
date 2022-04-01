@@ -717,7 +717,8 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * for details.
  *
  * </para><para> The graph, vertex and edges attributes are written to the
- * file as well, if they are numeric or string.
+ * file as well, if they are numeric or string. Boolean attributes are converted
+ * to numeric, with 0 and 1 used for false and true, respectively.
  *
  * </para><para> As igraph is more forgiving about attribute names, it might
  * be necessary to simplify the them before writing to the GML file.
@@ -750,8 +751,10 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * \param outstream The stream to write the file to.
  * \param id Either <code>NULL</code> or a numeric vector with the vertex IDs.
  *        See details above.
- * \param creator An optional string to append to the creator line.
- *        If this is \c NULL then the current date and time is added.
+ * \param creator An optional string to write to the stream in the creator line.
+ *        If \c NULL, the igraph version with the current date and time is added.
+ *        If <code>""</code>, the creator line is omitted. Otherwise, the
+ *        supplied string is used verbatim.
  * \return Error code.
  *
  * Time complexity: should be proportional to the number of characters written
@@ -764,7 +767,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  */
 
 igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
-                           const igraph_vector_t *id, const char *creator) {
+                                      const igraph_vector_t *id, const char *creator) {
     igraph_error_t ret;
     igraph_strvector_t gnames, vnames, enames;
     igraph_vector_int_t gtypes, vtypes, etypes;
@@ -779,13 +782,28 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     igraph_vector_t v_myid;
     const igraph_vector_t *myid = id;
 
-    time_t curtime = time(0);
-    char *timestr = ctime(&curtime);
-    timestr[strlen(timestr) - 1] = '\0'; /* nicely remove \n */
+    /* Creator line */
+    if (creator == NULL) {
+        time_t curtime = time(0);
+        char *timestr = ctime(&curtime);
+        timestr[strlen(timestr) - 1] = '\0'; /* nicely remove \n */
 
-    CHECK(fprintf(outstream,
-                  "Creator \"igraph version %s %s\"\nVersion 1\ngraph\n[\n",
-                  IGRAPH_VERSION, creator ? creator : timestr));
+        CHECK(fprintf(outstream,
+                      "Creator \"igraph version %s %s\"\n",
+                      IGRAPH_VERSION, timestr));
+    } else if (creator[0] == '\0') {
+        /* creator == "", omit Creator line */
+    } else {
+        CHECK(fprintf(outstream,
+                      "Creator \"%s\"\n",
+                      creator));
+    }
+
+    /* Version line */
+    CHECK(fprintf(outstream, "Version 1\n"));
+
+    /* The graph */
+    CHECK(fprintf(outstream, "graph\n[\n"));
 
     IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
     IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
