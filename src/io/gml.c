@@ -885,9 +885,9 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
                 CHECK(fprintf(outstream, "  %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
-                IGRAPH_WARNING("A boolean graph attribute was converted to numeric");
+                IGRAPH_WARNING("A boolean graph attribute was converted to numeric.");
             } else {
-                IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored");
+                IGRAPH_WARNING("A non-numeric, non-string, non-boolean graph attribute ignored.");
             }
         }
         IGRAPH_FREE(newname);
@@ -936,9 +936,9 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
                                  igraph_vss_1(i), &boolv));
                     CHECK(fprintf(outstream, "    %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
-                    IGRAPH_WARNING("A boolean vertex attribute was converted to numeric");
+                    IGRAPH_WARNING("A boolean vertex attribute was converted to numeric.");
                 } else {
-                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
+                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored.");
                 }
             }
             IGRAPH_FREE(newname);
@@ -991,9 +991,9 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,
                                  igraph_ess_1(i), &boolv));
                     CHECK(fprintf(outstream, "    %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
-                    IGRAPH_WARNING("A boolean edge attribute was converted to numeric");
+                    IGRAPH_WARNING("A boolean edge attribute was converted to numeric.");
                 } else {
-                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored");
+                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored.");
                 }
             }
             IGRAPH_FREE(newname);
