@@ -596,7 +596,7 @@ Some of the highlights are:
 
  - `igraph_read_graph_graphml()` now uses `igraph_integer_t` for its `index` argument.
 
- - `igraph_read_graph_pajek()` now creates a Boolean "type" attribute for bipartite graphs.
+ - `igraph_read_graph_pajek()` now creates a Boolean `type` attribute for bipartite graphs.
    Previously it created a numeric attribute.
 
 ### Added
@@ -637,6 +637,11 @@ Some of the highlights are:
  - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
  - igraph functions that take an ARPACK options object now also accept `NULL` in place of an options object, and they will fall back to using a default object provided by `igraph_arpack_options_get_default()`.
  - `igraph_vector_view()` now allows `data` to be `NULL` in the special case when `length == 0`.
+ - `igraph_write_graph_gml()` uses the `creator` parameter in a different way: the supplied
+   string is now written into the Creator line as-is instead of being appended to a default
+   value.
+ - `igraph_read_graph_gml()` now supports graph attributes (in addition to vertex and edge attributes).
+ - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute value instead of 0.
 
 ### Fixed
 
@@ -645,6 +650,8 @@ Some of the highlights are:
    errors and other error conditions originating from the underlying `libxml2`
    library.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
+ - The GML parser now supports nodes with no id field.
+ - The GML parser now performs more stringent checks on the input file, such as verifying that `id`, `source`, `target` and `directd` fields are not duplicated.
  - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
 
 ### Deprecated
@@ -706,6 +713,10 @@ Some of the highlights are:
  - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
    to simplify the API. The deprecated variants will be removed in 0.11.
+
+### Other
+
+ - Documentation improvements
 
 ## [Unreleased 0.9.8]
 
