@@ -794,6 +794,7 @@ AbstractGraph::search(const bool canonical,
     root.fp_extendable = TreeNode::MAYBE;
     root.in_best_path = false;
     root.cmp_to_best_path = 0;
+    root.needs_long_prune = false; /* patch in igraph only, to silence UBSan */
     root.long_prune_begin = 0;
 
     root.failure_recording_ival = 0;
