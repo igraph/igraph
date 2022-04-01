@@ -93,6 +93,7 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 %defines
 %locations
 %error-verbose
+%expect 2 /* from list rule */
 %parse-param { igraph_i_gml_parsedata_t* context }
 %lex-param { void *scanner }
 
@@ -127,6 +128,7 @@ input:   list      { context->tree=$1; }
 ;
 
 list:   /* empty */   { IGRAPH_YY_CHECK(igraph_i_gml_make_empty(&$$)); }
+      | keyvalue      { $$=$1; } /* redundant and causes shift/reduce conflict, but increases performance */
       | list keyvalue { IGRAPH_YY_CHECK(igraph_i_gml_merge($1, $2)); $$ = $1; };
 
 keyvalue:   key num
