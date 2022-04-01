@@ -769,15 +769,19 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
 igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                                       const igraph_vector_t *id, const char *creator) {
     igraph_error_t ret;
-    igraph_strvector_t gnames, vnames, enames;
-    igraph_vector_int_t gtypes, vtypes, etypes;
+    igraph_strvector_t gnames, vnames, enames; /* attribute names */
+    igraph_vector_int_t gtypes, vtypes, etypes; /* attribute types */
+    igraph_integer_t gattr_no, vattr_no, eattr_no; /* attribute counts */
     igraph_vector_t numv;
     igraph_strvector_t strv;
     igraph_vector_bool_t boolv;
     igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vector_bool_t ignore_warning_shown; /* used to avoid showing duplicate warnings */
+
+    /* Each element is a bit field used to prevent showing more
+     * than one warning for each vertex or edge attribute. */
+    igraph_vector_int_t warning_shown;
 
     igraph_vector_t v_myid;
     const igraph_vector_t *myid = id;
@@ -815,6 +819,9 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                  &gnames, &gtypes,
                  &vnames, &vtypes,
                  &enames, &etypes));
+    gattr_no = igraph_vector_int_size(&gtypes);
+    vattr_no = igraph_vector_int_size(&vtypes);
+    eattr_no = igraph_vector_int_size(&etypes);
 
     IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
     IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
@@ -863,7 +870,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     CHECK(fprintf(outstream, "  directed %i\n", igraph_is_directed(graph) ? 1 : 0));
 
     /* Graph attributes first */
-    for (i = 0; i < igraph_vector_int_size(&gtypes); i++) {
+    for (i = 0; i < gattr_no; i++) {
         const char *name;
         char *newname;
         name = igraph_strvector_get(&gnames, i);
@@ -894,15 +901,29 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
+    /* Macros used to work with the bit fiels in 'warning_shown',
+     * and avoid showing warnings more than once for each attribute. */
+#define GETBIT(k, i) ((k) & (1 << i))
+#define SETBIT(k, i) ((k) |= (1 << i))
+#define WARN_ONCE(attrno, bit, warn) \
+    do { \
+        igraph_integer_t *p = &VECTOR(warning_shown)[attrno]; \
+        if (! GETBIT(*p, bit)) { \
+            warn; \
+            SETBIT(*p, bit); \
+        } \
+    } while (0)
+
+
     /* Now come the vertices */
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&ignore_warning_shown, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&warning_shown, vattr_no);
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t j;
         CHECK(fprintf(outstream, "  node\n  [\n"));
         /* id */
         CHECK(fprintf(outstream, "    id %" IGRAPH_PRId "\n", myid ? (igraph_integer_t)VECTOR(*myid)[i] : i));
         /* other attributes */
-        for (j = 0; j < igraph_vector_int_size(&vtypes); j++) {
+        for (j = 0; j < vattr_no; j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(vtypes)[j];
             const char *name;
             char *newname;
@@ -915,10 +936,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             IGRAPH_FINALLY(igraph_free, newname);
             if (!strcmp(newname, "id")) {
                 /* In case an attribute name would conflict with 'id' only after encoding. */
-                if (! VECTOR(ignore_warning_shown)[j]) {
-                    IGRAPH_WARNINGF("The vertex attribute '%s' was ignored while writing GML format.", name);
-                    VECTOR(ignore_warning_shown)[j] = 1;
-                }
+                WARN_ONCE(j, 0,
+                          IGRAPH_WARNINGF("The vertex attribute '%s' was ignored while writing GML format.", name));
             } else {
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name,
@@ -936,9 +955,11 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
                                  igraph_vss_1(i), &boolv));
                     CHECK(fprintf(outstream, "    %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
-                    IGRAPH_WARNING("A boolean vertex attribute was converted to numeric.");
+                    WARN_ONCE(j, 1,
+                              IGRAPH_WARNINGF("The boolean vertex attribute '%s' was converted to numeric.", name));
                 } else {
-                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored.");
+                    WARN_ONCE(j, 2,
+                              IGRAPH_WARNINGF("The non-numeric, non-string, non-boolean vertex attribute '%s' was ignored.", name));
                 }
             }
             IGRAPH_FREE(newname);
@@ -948,8 +969,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     }
 
     /* The edges too */
-    IGRAPH_CHECK(igraph_vector_bool_resize(&ignore_warning_shown, no_of_edges));
-    igraph_vector_bool_fill(&ignore_warning_shown, 0);
+    IGRAPH_CHECK(igraph_vector_int_resize(&warning_shown, eattr_no));
+    igraph_vector_int_fill(&warning_shown, 0);
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t from = IGRAPH_FROM(graph, i);
         igraph_integer_t to = IGRAPH_TO(graph, i);
@@ -962,7 +983,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                       myid ? (igraph_integer_t)VECTOR(*myid)[to] : to));
 
         /* other attributes */
-        for (j = 0; j < igraph_vector_int_size(&etypes); j++) {
+        for (j = 0; j < eattr_no; j++) {
             igraph_attribute_type_t type = (igraph_attribute_type_t) VECTOR(etypes)[j];
             const char *name;
             char *newname;
@@ -970,10 +991,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
             IGRAPH_FINALLY(igraph_free, newname);
             if (!strcmp(newname, "source") || !strcmp(newname, "target")) {
-                if (! VECTOR(ignore_warning_shown)[j]) {
-                    IGRAPH_WARNINGF("The edge attribute '%s' was ignored while writing GML format.", name);
-                    VECTOR(ignore_warning_shown)[j] = 1;
-                }
+                WARN_ONCE(j, 0,
+                          IGRAPH_WARNINGF("The edge attribute '%s' was ignored while writing GML format.", name));
             } else {
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, name,
@@ -991,9 +1010,11 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,
                                  igraph_ess_1(i), &boolv));
                     CHECK(fprintf(outstream, "    %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
-                    IGRAPH_WARNING("A boolean edge attribute was converted to numeric.");
+                    WARN_ONCE(j, 1,
+                              IGRAPH_WARNINGF("The boolean edge attribute '%s' was converted to numeric.", name));
                 } else {
-                    IGRAPH_WARNING("A non-numeric, non-string, non-boolean edge attribute was ignored.");
+                    WARN_ONCE(j, 2,
+                              IGRAPH_WARNINGF("The non-numeric, non-string, non-boolean edge attribute '%s' was ignored.", name));
                 }
             }
             IGRAPH_FREE(newname);
@@ -1004,12 +1025,16 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     CHECK(fprintf(outstream, "]\n"));
 
+#undef GETBIT
+#undef SETBIT
+#undef WARN_ONCE
+
     if (&v_myid == myid) {
         igraph_vector_destroy(&v_myid);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_bool_destroy(&ignore_warning_shown);
+    igraph_vector_int_destroy(&warning_shown);
     igraph_vector_bool_destroy(&boolv);
     igraph_strvector_destroy(&strv);
     igraph_vector_destroy(&numv);
