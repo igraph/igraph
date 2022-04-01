@@ -126,8 +126,7 @@ input:   list      { context->tree=$1; }
        | list EOFF { context->tree=$1; }
 ;
 
-list:                 { IGRAPH_YY_CHECK(igraph_i_gml_make_empty(&$$)); }
-      | keyvalue      { $$=$1; }
+list:   /* empty */   { IGRAPH_YY_CHECK(igraph_i_gml_make_empty(&$$)); }
       | list keyvalue { IGRAPH_YY_CHECK(igraph_i_gml_merge($1, $2)); $$ = $1; };
 
 keyvalue:   key num
