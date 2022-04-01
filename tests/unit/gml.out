@@ -1,5 +1,5 @@
 ===== graph1.gml =====
-Creator "igraph version @VERSION@ "
+Creator "igraph"
 Version 1
 graph
 [
@@ -48,7 +48,7 @@ graph
 ======================
 
 ===== graph2.gml =====
-Creator "igraph version @VERSION@ "
+Creator "igraph"
 Version 1
 graph
 [
@@ -72,7 +72,7 @@ graph
 ======================
 
 ===== graph3.gml =====
-Creator "igraph version @VERSION@ "
+Creator "igraph"
 Version 1
 graph
 [
