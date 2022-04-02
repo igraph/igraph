@@ -29,6 +29,7 @@
     <edge source="n1" target="n2">
     </edge>
     <edge source="n2" target="n3">
+      <data key="weight">-Inf</data>
     </edge>
     <edge source="n3" target="n0">
     </edge>
