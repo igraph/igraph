@@ -23,7 +23,6 @@
 int main() {
     igraph_t g_in;
     igraph_t g_out;
-    char filename[] = "ncol.tmpXXXXXX";
     FILE *file;
     igraph_bool_t same;
 
@@ -34,28 +33,36 @@ int main() {
             1, 2, 2, 3, 3, 0,
             -1);
 
-    SETEAN(&g_in, "edge_attr", 0, 10);
+    SETEAN(&g_in, "edge_attr", 0, 12.3);
     SETVAS(&g_in, "vertex_attr", 0, "vertex_name0");
     SETVAS(&g_in, "vertex_attr", 1, "vertex_name1");
     SETVAS(&g_in, "vertex_attr", 2, "vertex_name2");
     SETVAS(&g_in, "vertex_attr", 3, "vertex_name3");
 
-    mktemp(filename);;
+    char filename[] = "ncol.tmp.XXXXXX"; /* XXXXXX is replaced by mktemp() */
+    mktemp(filename);
     file = fopen(filename, "w");
+    IGRAPH_ASSERT(file); /* make sure that the file was created successfully */
 
     igraph_write_graph_ncol(&g_in, file, "vertex_attr", "edge_attr");
     fclose(file);
 
 
     file = fopen(filename, "r");
+    IGRAPH_ASSERT(file);
     igraph_read_graph_ncol(&g_out, file, NULL, 1, IGRAPH_ADD_WEIGHTS_YES,
             IGRAPH_DIRECTED);
 
+    /* is_same_graph() checks that vertex and edge lists are the same,
+     * but does not verify attributes. */
     igraph_is_same_graph(&g_in, &g_out, &same);
     if (!same) {
-        printf("Written and read graph are not the same\n");
+        printf("Written and read graph are not the same.\n");
         abort();
     }
+
+    /* Simple way to verify that attributes are correct. */
+    igraph_write_graph_graphml(&g_out, stdout, 0);
 
     fclose(file);
     unlink(filename);
