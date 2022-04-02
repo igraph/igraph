@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 #include <unistd.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t g_in;
