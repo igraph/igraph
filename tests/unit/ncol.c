@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-   */
+ */
 
 #include <igraph.h>
 #include <unistd.h>
@@ -54,13 +54,15 @@ int main() {
     igraph_is_same_graph(&g_in, &g_out, &same);
     if (!same) {
         printf("Written and read graph are not the same\n");
-        return (1);
+        abort();
     }
 
     fclose(file);
     unlink(filename);
     igraph_destroy(&g_in);
     igraph_destroy(&g_out);
+ 
     VERIFY_FINALLY_STACK();
+ 
     return 0;
 }
