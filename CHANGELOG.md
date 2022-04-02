@@ -43,6 +43,12 @@ Some of the highlights are:
    generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int`
    variant of the same data type.
 
+ - Error handlers should no longer perform a `longjmp()`. Doing so will introduce
+   memory leaks, as resource cleanup is now done in multiple stages, through
+   multiple calls to the error handler. Thus, the error handler should either
+   abort execution immediately (as the default handler does), or report the error,
+   call `IGRAPH_FINALLY_FREE()`, and return normally.
+
  - `igraph_add_edges()` now uses an `igraph_vector_int_t` for its `edges`
    parameter.
 
