@@ -30,7 +30,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
-    igraph_set_error_handler(&igraph_error_handler_ignore);
+    igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     /* We work with small, up-to 16-vertex graphs, as the algorithms
      * tested here can be slow. Each byte is interpreted as an edge.
