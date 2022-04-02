@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Created by igraph -->
+  <key id="name" for="node" attr.name="name" attr.type="string"/>
+  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>
+  <graph id="G" edgedefault="directed">
+    <node id="n0">
+      <data key="name">vertex_name0</data>
+    </node>
+    <node id="n1">
+      <data key="name">vertex_name1</data>
+    </node>
+    <node id="n2">
+      <data key="name">vertex_name2</data>
+    </node>
+    <node id="n3">
+      <data key="name">vertex_name3</data>
+    </node>
+    <edge source="n0" target="n1">
+      <data key="weight">12.3</data>
+    </edge>
+    <edge source="n0" target="n1">
+    </edge>
+    <edge source="n0" target="n1">
+    </edge>
+    <edge source="n1" target="n2">
+    </edge>
+    <edge source="n2" target="n3">
+      <data key="weight">-Inf</data>
+    </edge>
+    <edge source="n3" target="n0">
+    </edge>
+  </graph>
+</graphml>
