@@ -276,7 +276,7 @@ static void igraph_i_mf_relabel(igraph_integer_t v, igraph_integer_t no_of_nodes
                                 igraph_vector_int_t *first,
                                 igraph_vector_t *rescap, igraph_vector_int_t *to,
                                 igraph_vector_int_t *current,
-                                igraph_maxflow_stats_t *stats, int *nrelabelsince) {
+                                igraph_maxflow_stats_t *stats, igraph_integer_t *nrelabelsince) {
 
     igraph_integer_t min = no_of_nodes;
     igraph_integer_t k, l, min_edge = 0;
@@ -302,7 +302,7 @@ static void igraph_i_mf_push(igraph_integer_t v, igraph_integer_t e, igraph_inte
                              igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
                              igraph_vector_int_t *distance,
                              igraph_vector_int_t *rev, igraph_maxflow_stats_t *stats,
-                             int *npushsince) {
+                             igraph_integer_t *npushsince) {
 
 
     IGRAPH_UNUSED(current);
@@ -333,7 +333,7 @@ static void igraph_i_mf_discharge(igraph_integer_t v,
                                   igraph_dbuckets_t *ibuckets,
                                   igraph_vector_int_t *rev,
                                   igraph_maxflow_stats_t *stats,
-                                  int *npushsince, int *nrelabelsince) {
+                                  igraph_integer_t *npushsince, igraph_integer_t *nrelabelsince) {
     do {
         igraph_integer_t i;
         igraph_integer_t start = CURRENT(v);
@@ -503,7 +503,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     igraph_dqueue_int_t bfsq;
 
     igraph_integer_t i, j, idx;
-    int npushsince = 0, nrelabelsince = 0;
+    igraph_integer_t npushsince = 0, nrelabelsince = 0;
 
     igraph_maxflow_stats_t local_stats;   /* used if the user passed a null pointer for stats */
 
@@ -1176,7 +1176,7 @@ igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 /* This is a flow-based version, but there is a better one
    for undirected graphs */
 
-/* int igraph_i_mincut_value_undirected(const igraph_t *graph, */
+/* igraph_error_t igraph_i_mincut_value_undirected(const igraph_t *graph, */
 /*                   igraph_real_t *res, */
 /*                   const igraph_vector_t *capacity) { */
 
@@ -1264,7 +1264,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                 igraph_vector_int_clear(cut);
             }
             if (partition) {
-                int j = 0;
+                igraph_integer_t j = 0;
                 IGRAPH_CHECK(igraph_vector_int_resize(partition,
                                                   VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {
@@ -1274,7 +1274,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                 }
             }
             if (partition2) {
-                int j = 0;
+                igraph_integer_t j = 0;
                 IGRAPH_CHECK(igraph_vector_int_resize(partition2, no_of_nodes -
                                                   VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {

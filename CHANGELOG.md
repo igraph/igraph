@@ -385,6 +385,8 @@ Some of the highlights are:
  - `igraph_maxflow()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
 
+ - The `igraph_maxflow_stats_t` struct now contains `igraph_integer_t` values instead of `int` ones.
+
  - The `res` parameters in `igraph_maximal_cliques()` and `igraph_maximal_cliques_subset()`
    are now of type `igraph_vector_int_list_t`.
 
