@@ -285,6 +285,20 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
     return igraph_i_finally_stack_size;
 }
 
+/**
+ * \function IGRAPH_FINALLY_ENTER
+ *
+ * For internal use only.
+ *
+ * Opens a new level in the finally stack. Must have a matching
+ * IGRAPH_FINALLY_EXIT() call that closes the level and exits it.
+ *
+ * The finally stack is divided into "levels". A call to IGRAPH_FINALLY_FREE()
+ * will only unwind the current level of the finally stack, not any of the lower
+ * levels. This mechanism is used to allow some functions to pause stack unwinding
+ * until they can restore their data structures into a consistent state.
+ * See igraph_add_edges() for an example usage.
+ */
 void IGRAPH_FINALLY_ENTER(void) {
     int no = igraph_i_finally_stack_size;
     /* Level indices must always be in increasing order in the finally stack */
@@ -296,6 +310,17 @@ void IGRAPH_FINALLY_ENTER(void) {
     igraph_i_finally_stack_level++;
 }
 
+/**
+ * \function IGRAPH_FINALLY_EXIT
+ *
+ * For internal use only.
+ *
+ * Exists the current level of the finally stack, see IGRAPH_FINALLY_ENTER()
+ * for details. If an error occured inbetween the last pair of
+ * IGRAPH_FINALLY_ENTER()/EXIT() calls, a call to igraph_error(), typically
+ * through IGRAPH_ERROR(), is mandatory directly after IGRAPH_FINALLY_EXIT().
+ * This ensures that resource cleanup will properly resume.
+ */
 void IGRAPH_FINALLY_EXIT(void) {
     igraph_i_finally_stack_level--;
     if (igraph_i_finally_stack_level < 0) {
