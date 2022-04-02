@@ -16,6 +16,7 @@
 */
 
 #include <igraph.h>
+#include "core/math.h"
 #include "test_utilities.h"
 
 int main() {
