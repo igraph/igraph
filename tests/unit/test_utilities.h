@@ -38,6 +38,10 @@ void print_matrix(const igraph_matrix_t *m);
 /* This is meant to be used when the elements of a matrix are integer values. */
 void print_matrix_round(const igraph_matrix_t *m);
 
+/* Round elements of a complex matrix to integers and print them. */
+/* This is meant to be used when the elements of a matrix are integer values. */
+void print_matrix_complex_round(const igraph_matrix_complex_t *m);
+
 /* Print an adjacency list. Use brackets around each vector and also use
  * brackets around the entire adjacency list to make it clear when the list
  * is empty.

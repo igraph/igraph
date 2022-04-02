@@ -110,6 +110,14 @@
 <!-- doxrox-include igraph_matrix_remove_col -->
 </section>
 
+<section id="complex-matrices"><title>Complex matrix operations</title>
+<!-- doxrox-include igraph_matrix_complex_real -->
+<!-- doxrox-include igraph_matrix_complex_imag -->
+<!-- doxrox-include igraph_matrix_complex_realimag -->
+<!-- doxrox-include igraph_matrix_complex_create -->
+<!-- doxrox-include igraph_matrix_complex_create_polar -->
+</section>
+
 <section id="matrix-deprecated"><title>Deprecated functions</title>
 <!-- doxrox-include igraph_matrix_e -->
 <!-- doxrox-include igraph_matrix_e_ptr -->

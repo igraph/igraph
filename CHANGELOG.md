@@ -664,6 +664,7 @@ Some of the highlights are:
  - The GML parser now supports nodes with no id field.
  - The GML parser now performs more stringent checks on the input file, such as verifying that `id`, `source`, `target` and `directd` fields are not duplicated.
  - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
+ - `igraph_matrix_complex_create()` and `igraph_matrix_complex_create_polar()` now set their sizes correctly.
 
 ### Deprecated
 
