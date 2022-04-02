@@ -388,29 +388,29 @@ static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, ig
             oldbool = (igraph_vector_bool_t*)oldrec->value;
             newbool = (igraph_vector_bool_t*)newrec->value;
             if (oldrec->type != newrec->type) {
-                IGRAPH_ERROR("Attribute types do not match", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Attribute types do not match.", IGRAPH_EINVAL);
             }
             switch (oldrec->type) {
             case IGRAPH_ATTRIBUTE_NUMERIC:
                 if (nv != igraph_vector_size(newnum)) {
-                    IGRAPH_ERROR("Invalid numeric attribute length", IGRAPH_EINVAL);
+                    IGRAPH_ERROR("Invalid numeric attribute length.", IGRAPH_EINVAL);
                 }
                 IGRAPH_CHECK(igraph_vector_append(oldnum, newnum));
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 if (nv != igraph_strvector_size(newstr)) {
-                    IGRAPH_ERROR("Invalid string attribute length", IGRAPH_EINVAL);
+                    IGRAPH_ERROR("Invalid string attribute length.", IGRAPH_EINVAL);
                 }
                 IGRAPH_CHECK(igraph_strvector_append(oldstr, newstr));
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 if (nv != igraph_vector_bool_size(newbool)) {
-                    IGRAPH_ERROR("Invalid Boolean attribute length", IGRAPH_EINVAL);
+                    IGRAPH_ERROR("Invalid boolean attribute length.", IGRAPH_EINVAL);
                 }
                 IGRAPH_CHECK(igraph_vector_bool_append(oldbool, newbool));
                 break;
             default:
-                IGRAPH_WARNING("Invalid attribute type");
+                IGRAPH_WARNING("Invalid attribute type.");
                 break;
             }
         } else {
@@ -1667,7 +1667,7 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
         }
     }
 
-    /* Add NaN/FALSE/"" for the existing vertices for numeric, Boolean and string attributes. */
+    /* Add NaN/FALSE/"" for the existing vertices for numeric, boolean and string attributes. */
     if (newattrs != 0) {
         for (i = 0; i < newattrs; i++) {
             igraph_attribute_record_t *tmp = VECTOR(*nattr)[ VECTOR(news)[i] ];
@@ -1739,29 +1739,29 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
             oldbool = (igraph_vector_bool_t*)oldrec->value;
             newbool = (igraph_vector_bool_t*)newrec->value;
             if (oldrec->type != newrec->type) {
-                IGRAPH_ERROR("Attribute types do not match", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Attribute types do not match.", IGRAPH_EINVAL);
             }
             switch (oldrec->type) {
             case IGRAPH_ATTRIBUTE_NUMERIC:
                 if (ne != igraph_vector_size(newnum)) {
-                    IGRAPH_ERROR("Invalid numeric attribute length", IGRAPH_EINVAL);
+                    IGRAPH_ERROR("Invalid numeric attribute length.", IGRAPH_EINVAL);
                 }
                 IGRAPH_CHECK(igraph_vector_append(oldnum, newnum));
                 break;
             case IGRAPH_ATTRIBUTE_STRING:
                 if (ne != igraph_strvector_size(newstr)) {
-                    IGRAPH_ERROR("Invalid string attribute length", IGRAPH_EINVAL);
+                    IGRAPH_ERROR("Invalid string attribute length.", IGRAPH_EINVAL);
                 }
                 IGRAPH_CHECK(igraph_strvector_append(oldstr, newstr));
                 break;
             case IGRAPH_ATTRIBUTE_BOOLEAN:
                 if (ne != igraph_vector_bool_size(newbool)) {
-                    IGRAPH_ERROR("Invalid Boolean attribute length", IGRAPH_EINVAL);
+                    IGRAPH_ERROR("Invalid boolean attribute length.", IGRAPH_EINVAL);
                 }
                 IGRAPH_CHECK(igraph_vector_bool_append(oldbool, newbool));
                 break;
             default:
-                IGRAPH_WARNING("Invalid attribute type");
+                IGRAPH_WARNING("Invalid attribute type.");
                 break;
             }
         } else {
@@ -2304,7 +2304,7 @@ static igraph_error_t igraph_i_cattribute_get_numeric_graph_attr(const igraph_t 
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The graph attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*gal)[j];
@@ -2329,7 +2329,7 @@ static igraph_error_t igraph_i_cattribute_get_bool_graph_attr(const igraph_t *gr
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The graph attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*gal)[j];
@@ -2354,7 +2354,7 @@ static igraph_error_t igraph_i_cattribute_get_string_graph_attr(const igraph_t *
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The graph attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*gal)[j];
@@ -2380,7 +2380,7 @@ static igraph_error_t igraph_i_cattribute_get_numeric_vertex_attr(const igraph_t
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The vertex attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*val)[j];
@@ -2421,7 +2421,7 @@ static igraph_error_t igraph_i_cattribute_get_bool_vertex_attr(const igraph_t *g
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The vertex attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*val)[j];
@@ -2459,7 +2459,7 @@ static igraph_error_t igraph_i_cattribute_get_string_vertex_attr(const igraph_t 
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The vertex attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*val)[j];
@@ -2500,7 +2500,7 @@ static igraph_error_t igraph_i_cattribute_get_numeric_edge_attr(const igraph_t *
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The edge attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*eal)[j];
@@ -2540,7 +2540,7 @@ static igraph_error_t igraph_i_cattribute_get_string_edge_attr(const igraph_t *g
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The edge attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*eal)[j];
@@ -2581,7 +2581,7 @@ static igraph_error_t igraph_i_cattribute_get_bool_edge_attr(const igraph_t *gra
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("The edge attribute '%s' does not exist.", IGRAPH_EINVAL, name);
     }
 
     rec = VECTOR(*eal)[j];
@@ -2712,7 +2712,7 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
  * \function igraph_cattribute_GAB
  * \brief Query a boolean graph attribute.
  *
- * Returns the value of the given Boolean graph attribute.
+ * Returns the value of the given boolean graph attribute.
  * If the attribute does not exist, a warning is issued
  * and false is returned.
  *
@@ -2734,7 +2734,7 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        IGRAPH_WARNINGF("Graph attribute '%s' does not exist, returning default Boolean attribute value.", name);
+        IGRAPH_WARNINGF("Graph attribute '%s' does not exist, returning default boolean attribute value.", name);
         return 0;
     }
 
@@ -2842,7 +2842,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        IGRAPH_WARNINGF("Vertex attribute '%s' does not exist, returning default Boolean attribute value.", name);
+        IGRAPH_WARNINGF("Vertex attribute '%s' does not exist, returning default boolean attribute value.", name);
         return 0;
     }
 
@@ -2952,7 +2952,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        IGRAPH_WARNINGF("Edge attribute '%s' does not exist, returning default Boolean attribute value.", name);
+        IGRAPH_WARNINGF("Edge attribute '%s' does not exist, returning default boolean attribute value.", name);
         return 0;
     }
 
