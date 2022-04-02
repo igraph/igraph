@@ -68,8 +68,8 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
     igraph_eit_t it;
     igraph_integer_t i = 0;
     int ret;
-    igraph_attribute_type_t vertex_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
-    igraph_attribute_type_t edge_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
+    igraph_attribute_type_t vertex_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
+    igraph_attribute_type_t edge_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
     igraph_integer_t from, to, rev;
 
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM),
@@ -87,7 +87,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                                 IGRAPH_ATTRIBUTE_VERTEX, vertex_attr_name));
         if (vertex_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             vertex_attr_type != IGRAPH_ATTRIBUTE_STRING) {
-            vertex_attr_name = 0; vertex_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
+            vertex_attr_name = 0; vertex_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
             IGRAPH_WARNING("specified vertex attribute must be numeric or string");
         }
     }
@@ -103,7 +103,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                                 IGRAPH_ATTRIBUTE_EDGE, edge_attr_name));
         if (edge_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             edge_attr_type != IGRAPH_ATTRIBUTE_STRING) {
-            edge_attr_name = 0; edge_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
+            edge_attr_name = 0; edge_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
             IGRAPH_WARNING("specified edge attribute must be numeric or string");
         }
     }

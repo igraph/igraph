@@ -143,12 +143,12 @@ void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context) {
 }
 
 /* Takes a vector of attribute records and removes those elements
- * whose type is unspecified, i.e. IGRAPH_ATTRIBUTE_DEFAULT. */
+ * whose type is unspecified, i.e. IGRAPH_ATTRIBUTE_UNSPECIFIED. */
 static void prune_unknown_attributes(igraph_vector_ptr_t *attrs) {
     igraph_integer_t i, j;
     for (i = 0, j = 0; i < igraph_vector_ptr_size(attrs); i++) {
         igraph_attribute_record_t *atrec = VECTOR(*attrs)[i];
-        if (atrec->type == IGRAPH_ATTRIBUTE_DEFAULT) {
+        if (atrec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             IGRAPH_FREE(atrec->name);
             IGRAPH_FREE(atrec);
         } else {
@@ -192,7 +192,7 @@ static igraph_error_t create_or_update_attribute(const char *name,
         } else if (type == IGRAPH_I_GML_TREE_STRING) {
             atrec->type = IGRAPH_ATTRIBUTE_STRING;
         } else {
-            atrec->type = IGRAPH_ATTRIBUTE_DEFAULT;
+            atrec->type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
         }
         IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, atrec));
         IGRAPH_FINALLY_CLEAN(2);
@@ -202,7 +202,7 @@ static igraph_error_t create_or_update_attribute(const char *name,
         igraph_attribute_type_t type1 = atrec->type;
         if (type == IGRAPH_I_GML_TREE_STRING) {
             atrec->type = IGRAPH_ATTRIBUTE_STRING;
-        } else if (type1 == IGRAPH_ATTRIBUTE_DEFAULT) {
+        } else if (type1 == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
                 atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
             }
@@ -244,7 +244,7 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_items));
             atrec->value = p;
             IGRAPH_FINALLY_CLEAN(1);
-        } else if (type == IGRAPH_ATTRIBUTE_DEFAULT) {
+        } else if (type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             IGRAPH_WARNINGF("Composite %s attribute '%s' ignored in GML file.", kind, atrec->name);
         } else {
             /* Must never reach here. */
@@ -401,7 +401,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
      * generated string id of the form "n123" consisting of "n" and their count
      * (i.e. ordinal position) within the GML file.
      *
-     * We use an attribute type value of IGRAPH_ATTRIBUTE_DEFAULT to mark attribute
+     * We use an attribute type value of IGRAPH_ATTRIBUTE_UNSPECIFIED to mark attribute
      * records which correspond to composite GML values and must therefore be removed
      * before creating the graph.
      */
