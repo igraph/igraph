@@ -1533,10 +1533,12 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
  * \function igraph_write_graph_graphml
  * \brief Writes the graph to a file in GraphML format.
  *
- * </para><para>
  * GraphML is an XML-based file format for representing various types of
  * graphs. See the GraphML Primer (http://graphml.graphdrawing.org/primer/graphml-primer.html)
  * for detailed format description.
+ *
+ * </para><para>
+ * When a numerical attribute value is NaN, it will be omitted from the file.
  *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
