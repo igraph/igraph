@@ -33,7 +33,8 @@ int main() {
             1, 2, 2, 3, 3, 0,
             -1);
 
-    SETEAN(&g_in, "edge_attr", 0, 12.3);
+    SETEAN(&g_in, "edge_attr", 0, 12.3); /* edge 0-1 */
+    SETEAN(&g_in, "edge_attr", 4, -IGRAPH_INFINITY); /* edge 2-3 */
     SETVAS(&g_in, "vertex_attr", 0, "vertex_name0");
     SETVAS(&g_in, "vertex_attr", 1, "vertex_name1");
     SETVAS(&g_in, "vertex_attr", 2, "vertex_name2");
