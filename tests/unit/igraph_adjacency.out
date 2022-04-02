@@ -1,0 +1,172 @@
+
+0x0 matrix:
+directed: true
+vcount: 0
+edges: {
+}
+
+1x1 matrix:
+directed: true
+vcount: 1
+edges: {
+0 0
+}
+
+3x3 matrix, IGRAP_ADJ_DIRECTED:
+directed: true
+vcount: 3
+edges: {
+0 0
+0 1
+0 1
+1 0
+1 0
+1 0
+1 2
+1 2
+1 2
+1 2
+2 1
+2 1
+2 1
+2 1
+2 1
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAP_ADJ_UNDIRECTED:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAP_ADJ_MAX:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAP_ADJ_MIN:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAP_ADJ_PLUS:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 1
+0 1
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAP_ADJ_UPPER:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAP_ADJ_LOWER:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+Check handling of non-square matrix error.
+
+Check handling of negative number of edges error.

@@ -132,7 +132,7 @@ Some of the highlights are:
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
 
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
-   mapping from block indices to parent block indices, and the `cohesion`; also, 
+   mapping from block indices to parent block indices, and the `cohesion`; also,
    it uses an `igraph_vector_int_list_t` to return the blocks themselves instead of
    a pointer vector of `igraph_vector_t`.
 
@@ -510,7 +510,7 @@ Some of the highlights are:
  - `igraph_union()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
 
- - The `edgemaps` parameter of `igraph_union_many()` is now an 
+ - The `edgemaps` parameter of `igraph_union_many()` is now an
    `igraph_vector_int_list_t` instead of a pointer vector.
 
  - `igraph_vs_vector()`, `igraph_vss_vector()` and `igraph_vs_vector_copy()` now
@@ -606,6 +606,9 @@ Some of the highlights are:
 
  - `igraph_read_graph_pajek()` now creates a Boolean `type` attribute for bipartite graphs.
    Previously it created a numeric attribute.
+
+ - `igraph_adjacency()` no longer accepts a negative number of edges in its adjacency matrix.
+   When negative entries are found, an error is generated.
 
 ### Added
 
