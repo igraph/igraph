@@ -184,6 +184,7 @@ add_legacy_tests(
   erdos_renyi_game
   erdos_renyi_game_gnp
   full
+  igraph_adjacency
   igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
