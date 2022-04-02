@@ -195,7 +195,11 @@ static igraph_error_t igraph_i_gml_make_numeric(const char *name,
   }
   IGRAPH_FINALLY(igraph_free, t);
 
-  if (floor(value)==value) {
+  /* The GML spec only requires support for 32-bit signed integers.
+   * We treat anything out of that range as real. These values end
+   * up as igraph_real_t anyway, as igraph does not currently support
+   * integer-typed attributes. */
+  if (floor(value) == value && value >= INT32_MIN && value <= INT32_MAX) {
     IGRAPH_CHECK(igraph_gml_tree_init_integer(t, name, line, value));
   } else {
     IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, line, value));

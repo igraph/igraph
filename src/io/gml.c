@@ -277,8 +277,6 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
  * \oli Top level attributes except for <code>Version</code> and the
  *      first <code>graph</code> attribute are completely ignored.
  * \oli There is no maximum line length or maximum keyword length.
- *      Integers are not generally limited to signed 32-bit. Instead, all
- *      integers that fit into an \c igraph_integer_t are supported.
  * \oli Character entities in strings are not interpreted.
  * \oli We allow <code>inf</code>, <code>-inf</code> and <code>nan</code>
  *      (not a number) as a real number. This is case insensitive, so
