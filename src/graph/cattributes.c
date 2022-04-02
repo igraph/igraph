@@ -2675,10 +2675,12 @@ const igraph_attribute_table_t igraph_cattribute_table = {
 
 /**
  * \function igraph_cattribute_GAN
- * Query a numeric graph attribute.
+ * \brief Query a numeric graph attribute.
  *
  * Returns the value of the given numeric graph attribute.
- * The attribute must exist, otherwise an error is triggered.
+ * If the attribute does not exist, a warning is issued
+ * and NaN is returned.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute to query.
  * \return The value of the attribute.
@@ -2697,8 +2699,8 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
-        return 0;
+        IGRAPH_WARNINGF("Graph attribute '%s' does not exist, returning default numeric attribute value.", name);
+        return IGRAPH_NAN;
     }
 
     rec = VECTOR(*gal)[j];
@@ -2708,10 +2710,12 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_GAB
- * Query a boolean graph attribute.
+ * \brief Query a boolean graph attribute.
  *
- * Returns the value of the given numeric graph attribute.
- * The attribute must exist, otherwise an error is triggered.
+ * Returns the value of the given Boolean graph attribute.
+ * If the attribute does not exist, a warning is issued
+ * and false is returned.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute to query.
  * \return The value of the attribute.
@@ -2730,7 +2734,7 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
+        IGRAPH_WARNINGF("Graph attribute '%s' does not exist, returning default Boolean attribute value.", name);
         return 0;
     }
 
@@ -2741,11 +2745,13 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_GAS
- * Query a string graph attribute.
+ * \brief Query a string graph attribute.
  *
  * Returns a <type>const</type> pointer to the string graph attribute
- * specified in \p name.
- * The attribute must exist, otherwise an error is triggered.
+ * specified in \p name. The value must not be modified.
+ * If the attribute does not exist, a warning is issued and
+ * an empty string is returned.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute to query.
  * \return The value of the attribute.
@@ -2754,7 +2760,7 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
  *
  * Time complexity: O(Ag), the number of graph attributes.
  */
-const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
+const char *igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *gal = &attr->gal;
@@ -2764,8 +2770,8 @@ const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
-        return 0;
+        IGRAPH_WARNINGF("Graph attribute '%s' does not exist, returning default string attribute value.", name);
+        return "";
     }
 
     rec = VECTOR(*gal)[j];
@@ -2775,9 +2781,12 @@ const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_VAN
- * Query a numeric vertex attribute.
+ * \brief Query a numeric vertex attribute.
  *
- * The attribute must exist, otherwise an error is triggered.
+ * If the attribute does not exist, a warning is issued and
+ * NaN is returned. See \ref igraph_cattribute_VANV() for
+ * an error-checked version.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute.
  * \param vid The id of the queried vertex.
@@ -2797,8 +2806,8 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
-        return 0;
+        IGRAPH_WARNINGF("Vertex attribute '%s' does not exist, returning default numeric attribute value.", name);
+        return IGRAPH_NAN;
     }
 
     rec = VECTOR(*val)[j];
@@ -2808,9 +2817,12 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAB
- * Query a boolean vertex attribute.
+ * \brief Query a boolean vertex attribute.
  *
- * The attribute must exist, otherwise an error is triggered.
+ * If the vertex attribute does not exist, a warning is issued
+ * and false is returned. See \ref igraph_cattribute_VABV() for
+ * an error-checked version.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute.
  * \param vid The id of the queried vertex.
@@ -2830,7 +2842,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
+        IGRAPH_WARNINGF("Vertex attribute '%s' does not exist, returning default Boolean attribute value.", name);
         return 0;
     }
 
@@ -2841,9 +2853,14 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAS
- * Query a string vertex attribute.
+ * \brief Query a string vertex attribute.
  *
- * The attribute must exist, otherwise an error is triggered.
+ * Returns a <type>const</type> pointer to the string vertex attribute
+ * specified in \p name. The value must not be modified.
+ * If the vertex attribute does not exist, a warning is issued and
+ * an empty string is returned. See \ref igraph_cattribute_VASV()
+ * for an error-checked version.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute.
  * \param vid The id of the queried vertex.
@@ -2853,7 +2870,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
  *
  * Time complexity: O(Av), the number of vertex attributes.
  */
-const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
+const char *igraph_cattribute_VAS(const igraph_t *graph, const char *name,
                                   igraph_integer_t vid) {
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *val = &attr->val;
@@ -2863,8 +2880,8 @@ const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
-        return 0;
+        IGRAPH_WARNINGF("Vertex attribute '%s' does not exist, returning default string attribute value.", name);
+        return "";
     }
 
     rec = VECTOR(*val)[j];
@@ -2874,9 +2891,12 @@ const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAN
- * Query a numeric edge attribute.
+ * \brief Query a numeric edge attribute.
  *
- * The attribute must exist, otherwise an error is triggered.
+ * If the attribute does not exist, a warning is issued and
+ * NaN is returned. See \ref igraph_cattribute_EANV() for
+ * an error-checked version.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute.
  * \param eid The id of the queried edge.
@@ -2896,8 +2916,8 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
-        return 0;
+        IGRAPH_WARNINGF("Edge attribute '%s' does not exist, returning default numeric attribute value.", name);
+        return IGRAPH_NAN;
     }
 
     rec = VECTOR(*eal)[j];
@@ -2907,9 +2927,12 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAB
- * Query a boolean edge attribute.
+ * \brief Query a boolean edge attribute.
  *
- * The attribute must exist, otherwise an error is triggered.
+ * If the edge attribute does not exist, a warning is issued and
+ * false is returned. See \ref igraph_cattribute_EABV() for
+ * an error-checked version.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute.
  * \param eid The id of the queried edge.
@@ -2929,7 +2952,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
+        IGRAPH_WARNINGF("Edge attribute '%s' does not exist, returning default Boolean attribute value.", name);
         return 0;
     }
 
@@ -2940,9 +2963,14 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAS
- * Query a string edge attribute.
+ * \brief Query a string edge attribute.
  *
- * The attribute must exist, otherwise an error is triggered.
+ * Returns a <type>const</type> pointer to the string edge attribute
+ * specified in \p name. The value must not be modified.
+ * If the edge attribute does not exist, a warning is issued and
+ * an empty string is returned. See \ref igraph_cattribute_EASV() for
+ * an error-checked version.
+ *
  * \param graph The input graph.
  * \param name The name of the attribute.
  * \param eid The id of the queried edge.
@@ -2952,7 +2980,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
  *
  * Time complexity: O(Ae), the number of edge attributes.
  */
-const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
+const char *igraph_cattribute_EAS(const igraph_t *graph, const char *name,
                                   igraph_integer_t eid) {
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *eal = &attr->eal;
@@ -2962,8 +2990,8 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_EINVAL);
-        return 0;
+        IGRAPH_WARNINGF("Edge attribute '%s' does not exist, returning default string attribute value.", name);
+        return "";
     }
 
     rec = VECTOR(*eal)[j];
@@ -2973,7 +3001,7 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VANV
- * Query a numeric vertex attribute for many vertices
+ * \brief Query a numeric vertex attribute for many vertices.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -2994,7 +3022,7 @@ igraph_error_t igraph_cattribute_VANV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VABV
- * Query a boolean vertex attribute for many vertices
+ * \brief Query a boolean vertex attribute for many vertices.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -3015,7 +3043,7 @@ igraph_error_t igraph_cattribute_VABV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EANV
- * Query a numeric edge attribute for many edges
+ * \brief Query a numeric edge attribute for many edges.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -3036,7 +3064,7 @@ igraph_error_t igraph_cattribute_EANV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EABV
- * Query a boolean edge attribute for many edges
+ * \brief Query a boolean edge attribute for many edges.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -3057,7 +3085,7 @@ igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VASV
- * Query a string vertex attribute for many vertices
+ * \brief Query a string vertex attribute for many vertices.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -3079,7 +3107,7 @@ igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EASV
- * Query a string edge attribute for many edges
+ * \brief Query a string edge attribute for many edges.
  *
  * \param graph The input graph.
  * \param name The name of the attribute.
@@ -3101,7 +3129,7 @@ igraph_error_t igraph_cattribute_EASV(const igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_list
- * List all attributes
+ * \brief List all attributes.
  *
  * See \ref igraph_attribute_type_t for the various attribute types.
  * \param graph The input graph.
@@ -3129,7 +3157,7 @@ igraph_error_t igraph_cattribute_list(const igraph_t *graph,
 
 /**
  * \function igraph_cattribute_has_attr
- * Checks whether a (graph, vertex or edge) attribute exists
+ * \brief Checks whether a (graph, vertex or edge) attribute exists.
  *
  * \param graph The graph.
  * \param type The type of the attribute, \c IGRAPH_ATTRIBUTE_GRAPH,
@@ -3148,7 +3176,7 @@ igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
 
 /**
  * \function igraph_cattribute_GAN_set
- * Set a numeric graph attribute
+ * \brief Set a numeric graph attribute.
  *
  * \param graph The graph.
  * \param name Name of the graph attribute. If there is no such
@@ -3206,7 +3234,7 @@ igraph_error_t igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_GAB_set
- * Set a boolean graph attribute
+ * \brief Set a boolean graph attribute.
  *
  * \param graph The graph.
  * \param name Name of the graph attribute. If there is no such
@@ -3264,7 +3292,7 @@ igraph_error_t igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_GAS_set
- * Set a string graph attribute.
+ * \brief Set a string graph attribute.
  *
  * \param graph The graph.
  * \param name Name of the graph attribute. If there is no such
@@ -3323,7 +3351,7 @@ igraph_error_t igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAN_set
- * Set a numeric vertex attribute
+ * \brief Set a numeric vertex attribute.
  *
  * The attribute will be added if not present already. If present it
  * will be overwritten. The same \p value is set for all vertices
@@ -3386,7 +3414,7 @@ igraph_error_t igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAB_set
- * Set a boolean vertex attribute
+ * \brief Set a boolean vertex attribute.
  *
  * The attribute will be added if not present already. If present it
  * will be overwritten. The same \p value is set for all vertices
@@ -3449,7 +3477,7 @@ igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAS_set
- * Set a string vertex attribute
+ * \brief Set a string vertex attribute.
  *
  * The attribute will be added if not present already. If present it
  * will be overwritten. The same \p value is set for all vertices
@@ -3512,7 +3540,7 @@ igraph_error_t igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAN_set
- * Set a numeric edge attribute
+ * \brief Set a numeric edge attribute.
  *
  * The attribute will be added if not present already. If present it
  * will be overwritten. The same \p value is set for all edges
@@ -3575,7 +3603,7 @@ igraph_error_t igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAB_set
- * Set a boolean edge attribute
+ * \brief Set a boolean edge attribute.
  *
  * The attribute will be added if not present already. If present it
  * will be overwritten. The same \p value is set for all edges
@@ -3638,7 +3666,7 @@ igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAS_set
- * Set a string edge attribute
+ * \brief Set a string edge attribute.
  *
  * The attribute will be added if not present already. If present it
  * will be overwritten. The same \p value is set for all edges
@@ -3701,7 +3729,7 @@ igraph_error_t igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAN_setv
- * Set a numeric vertex attribute for all vertices.
+ * \brief Set a numeric vertex attribute for all vertices.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -3766,7 +3794,7 @@ igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
 }
 /**
  * \function igraph_cattribute_VAB_setv
- * Set a boolean vertex attribute for all vertices.
+ * \brief Set a boolean vertex attribute for all vertices.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -3832,7 +3860,7 @@ igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAS_setv
- * Set a string vertex attribute for all vertices.
+ * \brief Set a string vertex attribute for all vertices.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -3899,7 +3927,7 @@ igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAN_setv
- * Set a numeric edge attribute for all edges.
+ * \brief Set a numeric edge attribute for all edges.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -3965,7 +3993,7 @@ igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAB_setv
- * Set a boolean edge attribute for all edges.
+ * \brief Set a boolean edge attribute for all edges.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -4031,7 +4059,7 @@ igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAS_setv
- * Set a string edge attribute for all edges.
+ * \brief Set a string edge attribute for all edges.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -4115,7 +4143,7 @@ static void igraph_i_cattribute_free_rec(igraph_attribute_record_t *rec) {
 
 /**
  * \function igraph_cattribute_remove_g
- * Remove a graph attribute
+ * \brief Remove a graph attribute.
  *
  * \param graph The graph object.
  * \param name Name of the graph attribute to remove.
@@ -4140,7 +4168,7 @@ void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_remove_v
- * Remove a vertex attribute
+ * \brief Remove a vertex attribute.
  *
  * \param graph The graph object.
  * \param name Name of the vertex attribute to remove.
@@ -4165,7 +4193,7 @@ void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_remove_e
- * Remove an edge attribute
+ * \brief Remove an edge attribute.
  *
  * \param graph The graph object.
  * \param name Name of the edge attribute to remove.
@@ -4190,7 +4218,7 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_remove_all
- * Remove all graph/vertex/edge attributes
+ * \brief Remove all graph/vertex/edge attributes.
  *
  * \param graph The graph object.
  * \param g Boolean, whether to remove graph attributes.
