@@ -93,6 +93,7 @@ add_legacy_tests(
   vector
   vector2
   vector3
+  vector4
   vector_list
   vector_ptr
   vector_ptr_sort_ind
