@@ -112,7 +112,6 @@ add_legacy_tests(
   2wheap
   cutheap
   d_indheap
-  hashtable
   marked_queue
   set
   trie

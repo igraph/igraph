@@ -47,7 +47,6 @@ add_library(
   core/estack.c
   core/fixed_vectorlist.c
   core/grid.c
-  core/hashtable.c
   core/heap.c
   core/indheap.c
   core/interruption.c
