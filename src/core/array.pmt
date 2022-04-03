@@ -23,16 +23,24 @@
 
 #include "igraph_types.h"
 
+#include "math/safe_intop.h"
+
 igraph_error_t FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a,
         igraph_integer_t n1, igraph_integer_t n2, igraph_integer_t n3) {
 
+    igraph_integer_t size, n1n2;
+
     IGRAPH_ASSERT(n1 >= 0 && n2 >= 0 && n3 >= 0);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&a->data, n1 * n2 * n3));
+
+    IGRAPH_SAFE_MULT(n1, n2, &n1n2);
+    IGRAPH_SAFE_MULT(n1n2, n3, &size);
+
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&a->data, size));
 
     a->n1 = n1;
     a->n2 = n2;
     a->n3 = n3;
-    a->n1n2 = n1 * n2;
+    a->n1n2 = n1n2;
 
     return IGRAPH_SUCCESS;
 }
@@ -60,12 +68,20 @@ igraph_integer_t FUNCTION(igraph_array3, n)(const TYPE(igraph_array3) *a, igraph
 igraph_error_t FUNCTION(igraph_array3, resize)(
         TYPE(igraph_array3) *a, igraph_integer_t n1, igraph_integer_t n2,
         igraph_integer_t n3) {
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&a->data, n1 * n2 * n3));
+
+    igraph_integer_t size, n1n2;
+
+    IGRAPH_ASSERT(n1 >= 0 && n2 >= 0 && n3 >= 0);
+
+    IGRAPH_SAFE_MULT(n1, n2, &n1n2);
+    IGRAPH_SAFE_MULT(n1n2, n3, &size);
+
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&a->data, size));
 
     a->n1 = n1;
     a->n2 = n2;
     a->n3 = n3;
-    a->n1n2 = n1 * n2;
+    a->n1n2 = n1n2;
 
     return IGRAPH_SUCCESS;
 }
