@@ -310,8 +310,6 @@ int main() {
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_permdelete\n");
-
     printf("Test order2\n");
     igraph_vector_init_int_end(&v, -1, 10, 9, 8, 7, 6, 7, 8, 9, 10, -1);
     igraph_vector_order2(&v);

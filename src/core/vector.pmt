@@ -1787,26 +1787,6 @@ igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
     return FUNCTION(igraph_vector, move_interval)(v, begin, end, to);
 }
 
-/**
- * \ingroup vector
- * \function igraph_vector_permdelete
- * \brief Remove elements of a vector (for internal use).
- */
-
-void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
-        const igraph_vector_int_t *index, igraph_integer_t nremove) {
-    igraph_integer_t i, n;
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    n = FUNCTION(igraph_vector, size)(v);
-    for (i = 0; i < n; i++) {
-        if (VECTOR(*index)[i] != 0) {
-            VECTOR(*v)[ VECTOR(*index)[i] - 1 ] = VECTOR(*v)[i];
-        }
-    }
-    v->end -= nremove;
-}
-
 #ifndef NOTORDERED
 
 /**
