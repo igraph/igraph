@@ -67,7 +67,6 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   heap
-  igraph_array
   igraph_complex
   igraph_psumtree
   igraph_sparsemat5

@@ -39,7 +39,6 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 # Declare the files needed to compile the igraph library
 add_library(
   igraph
-  core/array.c
   core/buckets.c
   core/cutheap.c
   core/dqueue.c

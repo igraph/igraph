@@ -28,13 +28,6 @@ types they currently support:
   (complex). The default is <type>igraph_real_t</type>.
 </para></glossdef></glossentry>
 
-<glossentry><glossterm>array3</glossterm><glossdef><para>
-  Array3 is currently defined for <type>igraph_real_t</type>,
-  <type>igraph_integer_t</type> (int), <type>char</type> (char) and
-  <type>igraph_bool_t</type> (bool). The default is
-  <type>igraph_real_t</type>.
-</para></glossdef></glossentry>
-
 <glossentry><glossterm>stack</glossterm><glossdef><para>
   Stack is currently defined for <type>igraph_real_t</type>,
   <type>igraph_integer_t</type> (int), <type>char</type> (char),
