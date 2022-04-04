@@ -94,6 +94,22 @@ void print_matrix_round(const igraph_matrix_t *m) {
     print_matrix_format(m, stdout, "%4.f");
 }
 
+void print_matrix_complex_round(const igraph_matrix_complex_t *m) {
+
+    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
+    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
+    igraph_integer_t i, j;
+    for (i = 0; i < nr; i++) {
+        for (j = 0; j < nc; j++) {
+            igraph_complex_t z = MATRIX(*m, i, j);
+            if (j != 0) {
+                putchar(' ');
+            }
+            printf("%.f%+.fi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+        }
+        printf("\n");
+    }
+}
 
 /* Print an adjacency list. Use brackets around each vector and also use
  * brackets around the entire adjacency list to make it clear when the list

@@ -88,6 +88,7 @@ add_legacy_tests(
   matrix
   matrix2
   matrix3
+  matrix_complex
   stack
   strvector_set_len_remove_print
   vector
