@@ -65,7 +65,7 @@ int main() {
   igraph_community_walktrap(&graph, NULL, 4, &merges, NULL, NULL);
   printf("Merges:\n");
   igraph_matrix_int_print(&merges);
-  igraph_matrix_destroy(&merges);
+  igraph_matrix_int_destroy(&merges);
 
   igraph_destroy(&graph);
 
