@@ -100,7 +100,7 @@ igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
  * \function igraph_matrix_complex_real
  * \brief Gives the real part of a complex matrix.
  *
- * \param v Pointer to a complex matrix.
+ * \param m Pointer to a complex matrix.
  * \param real Pointer to an initialized matrix. The result will be stored here.
  * \return Error code.
  *
@@ -109,12 +109,12 @@ igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
  * number of elements in the matrix.
  */
 
-igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *m,
                                igraph_matrix_t *real) {
-    igraph_integer_t nrow = igraph_matrix_complex_nrow(v);
-    igraph_integer_t ncol = igraph_matrix_complex_ncol(v);
+    igraph_integer_t nrow = igraph_matrix_complex_nrow(m);
+    igraph_integer_t ncol = igraph_matrix_complex_ncol(m);
     IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
-    IGRAPH_CHECK(igraph_vector_complex_real(&v->data, &real->data));
+    IGRAPH_CHECK(igraph_vector_complex_real(&m->data, &real->data));
     return IGRAPH_SUCCESS;
 }
 
@@ -123,7 +123,7 @@ igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
  * \function igraph_matrix_complex_imag
  * \brief Gives the imaginary part of a complex matrix.
  *
- * \param v Pointer to a complex matrix.
+ * \param m Pointer to a complex matrix.
  * \param imag Pointer to an initialized matrix. The result will be stored here.
  * \return Error code.
  *
@@ -132,12 +132,12 @@ igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
  * number of elements in the matrix.
  */
 
-igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *m,
                                igraph_matrix_t *imag) {
-    igraph_integer_t nrow = igraph_matrix_complex_nrow(v);
-    igraph_integer_t ncol = igraph_matrix_complex_ncol(v);
+    igraph_integer_t nrow = igraph_matrix_complex_nrow(m);
+    igraph_integer_t ncol = igraph_matrix_complex_ncol(m);
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
-    IGRAPH_CHECK(igraph_vector_complex_imag(&v->data, &imag->data));
+    IGRAPH_CHECK(igraph_vector_complex_imag(&m->data, &imag->data));
     return IGRAPH_SUCCESS;
 }
 
@@ -146,7 +146,7 @@ igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
  * \function igraph_matrix_complex_realimag
  * \brief Gives the real and imaginary parts of a complex matrix.
  *
- * \param v Pointer to a complex matrix.
+ * \param m Pointer to a complex matrix.
  * \param real Pointer to an initialized matrix. The real part will be stored here.
  * \param imag Pointer to an initialized matrix. The imaginary part will be stored here.
  * \return Error code.
@@ -156,14 +156,14 @@ igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
  * number of elements in the matrix.
  */
 
-igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *m,
                                    igraph_matrix_t *real,
                                    igraph_matrix_t *imag) {
-    igraph_integer_t nrow = igraph_matrix_complex_nrow(v);
-    igraph_integer_t ncol = igraph_matrix_complex_ncol(v);
+    igraph_integer_t nrow = igraph_matrix_complex_nrow(m);
+    igraph_integer_t ncol = igraph_matrix_complex_ncol(m);
     IGRAPH_CHECK(igraph_matrix_resize(real, nrow, ncol));
     IGRAPH_CHECK(igraph_matrix_resize(imag, nrow, ncol));
-    IGRAPH_CHECK(igraph_vector_complex_realimag(&v->data, &real->data,
+    IGRAPH_CHECK(igraph_vector_complex_realimag(&m->data, &real->data,
                  &imag->data));
     return IGRAPH_SUCCESS;
 }
@@ -173,7 +173,7 @@ igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
  * \function igraph_matrix_complex_create
  * \brief Creates a complex matrix from a real and imaginary part.
  *
- * \param v Pointer to an uninitialized complex matrix.
+ * \param m Pointer to an uninitialized complex matrix.
  * \param real Pointer to the real part of the complex matrix.
  * \param imag Pointer to the imaginary part of the complex matrix.
  * \return Error code.
@@ -183,7 +183,7 @@ igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
  * number of elements in the matrix.
  */
 
-igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *m,
                                  const igraph_matrix_t *real,
                                  const igraph_matrix_t *imag) {
     igraph_integer_t nrowr = igraph_matrix_nrow(real);
@@ -202,10 +202,10 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
                 IGRAPH_PRId ").", IGRAPH_EINVAL, ncolr, ncoli);
     }
 
-    igraph_matrix_complex_init(v, nrowr, ncolr);
+    igraph_matrix_complex_init(m, nrowr, ncolr);
 
     for (igraph_integer_t i = 0; i < nrowr * ncolr; i++) {
-        VECTOR(v->data)[i] = igraph_complex(VECTOR(real->data)[i], VECTOR(imag->data)[i]);
+        VECTOR(m->data)[i] = igraph_complex(VECTOR(real->data)[i], VECTOR(imag->data)[i]);
     }
 
     return IGRAPH_SUCCESS;
@@ -216,7 +216,7 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
  * \function igraph_matrix_complex_create_polar
  * \brief Creates a complex matrix from a magnitude and an angle.
  *
- * \param v Pointer to an uninitialized complex matrix.
+ * \param m Pointer to an uninitialized complex matrix.
  * \param r Pointer to the magnitude of the complex matrix.
  * \param theta Pointer to the angle of the complex matrix.
  * \return Error code.
@@ -226,7 +226,7 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
  * number of elements in the matrix.
  */
 
-igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
                                        const igraph_matrix_t *r,
                                        const igraph_matrix_t *theta) {
     igraph_integer_t nrowr = igraph_matrix_nrow(r);
@@ -245,10 +245,10 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
                 IGRAPH_PRId ").", IGRAPH_EINVAL, ncolr, ncoli);
     }
 
-    igraph_matrix_complex_init(v, nrowr, ncolr);
+    igraph_matrix_complex_init(m, nrowr, ncolr);
 
     for (igraph_integer_t i = 0; i < nrowr * ncolr; i++) {
-        VECTOR(v->data)[i] = igraph_complex_polar(VECTOR(r->data)[i], VECTOR(theta->data)[i]);
+        VECTOR(m->data)[i] = igraph_complex_polar(VECTOR(r->data)[i], VECTOR(theta->data)[i]);
     }
     return IGRAPH_SUCCESS;
 }
