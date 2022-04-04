@@ -191,15 +191,10 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *m,
     igraph_integer_t nrowi = igraph_matrix_nrow(imag);
     igraph_integer_t ncoli = igraph_matrix_ncol(imag);
 
-    if (nrowr != nrowi) {
-        IGRAPH_ERRORF("Number of rows in real matrix (%" IGRAPH_PRId
-                ") not equal to number of rows in imaginary matrix (%"
-                IGRAPH_PRId ").", IGRAPH_EINVAL, nrowr, nrowi);
-    }
-    if (ncolr != ncoli) {
-        IGRAPH_ERRORF("Number of columns in real matrix (%" IGRAPH_PRId
-                ") not equal to number of columns in imaginary matrix (%"
-                IGRAPH_PRId ").", IGRAPH_EINVAL, ncolr, ncoli);
+    if (nrowr != nrowi || ncolr != ncoli) {
+        IGRAPH_ERRORF("Dimensions of real (%" IGRAPH_PRId " by %" IGRAPH_PRId ") and "
+                "imaginary (%" IGRAPH_PRId " by %" IGRAPH_PRId ") matrices must match.",
+                IGRAPH_EINVAL, nrowr, ncolr, nrowi, ncoli);
     }
 
     igraph_matrix_complex_init(m, nrowr, ncolr);
@@ -234,15 +229,10 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
     igraph_integer_t nrowt = igraph_matrix_nrow(theta);
     igraph_integer_t ncolt = igraph_matrix_ncol(theta);
 
-    if (nrowr != nrowt) {
-        IGRAPH_ERRORF("Number of rows in magnitude matrix (%" IGRAPH_PRId
-                ") not equal to number of rows in angle matrix (%"
-                IGRAPH_PRId ").", IGRAPH_EINVAL, nrowr, nrowt);
-    }
-    if (ncolr != ncolt) {
-        IGRAPH_ERRORF("Number of columns in magnitude matrix (%" IGRAPH_PRId
-                ") not equal to number of columns in angle matrix (%"
-                IGRAPH_PRId ").", IGRAPH_EINVAL, ncolr, ncolt);
+    if (nrowr != nrowt || ncolr != ncolt) {
+        IGRAPH_ERRORF("Dimensions of magnitude (%" IGRAPH_PRId " by %" IGRAPH_PRId ") and "
+                "angle (%" IGRAPH_PRId " by %" IGRAPH_PRId ") matrices must match.",
+                IGRAPH_EINVAL, nrowr, ncolr, nrowt, ncolt);
     }
 
     igraph_matrix_complex_init(m, nrowr, ncolr);
