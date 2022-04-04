@@ -197,7 +197,7 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *m,
                 IGRAPH_EINVAL, nrowr, ncolr, nrowi, ncoli);
     }
 
-    igraph_matrix_complex_init(m, nrowr, ncolr);
+    IGRAPH_CHECK(igraph_matrix_complex_init(m, nrowr, ncolr));
 
     for (igraph_integer_t i = 0; i < nrowr * ncolr; i++) {
         VECTOR(m->data)[i] = igraph_complex(VECTOR(real->data)[i], VECTOR(imag->data)[i]);
@@ -235,7 +235,7 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
                 IGRAPH_EINVAL, nrowr, ncolr, nrowt, ncolt);
     }
 
-    igraph_matrix_complex_init(m, nrowr, ncolr);
+    IGRAPH_CHECK(igraph_matrix_complex_init(m, nrowr, ncolr));
 
     for (igraph_integer_t i = 0; i < nrowr * ncolr; i++) {
         VECTOR(m->data)[i] = igraph_complex_polar(VECTOR(r->data)[i], VECTOR(theta->data)[i]);
