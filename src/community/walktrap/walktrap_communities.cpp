@@ -488,7 +488,10 @@ Communities::Communities(Graph* graph, int random_walks_length,
         Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight) / G->total_weight;
       }
     }
-    VECTOR(*modularity)[mergeidx] = Q;
+
+    if (modularity) {
+        VECTOR(*modularity)[mergeidx] = Q;
+    }
 }
 
 Communities::~Communities() {

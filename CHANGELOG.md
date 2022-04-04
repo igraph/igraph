@@ -6,6 +6,8 @@
 
  - Assertion failure in `igraph_bfs()` when an empty `roots` or `restricted` vector was provided.
  - `igraph_diversity()` now returns 0 for degree-1 vertices. Previously it incorrectly returned NaN or +-Inf depending on roundoff errors.
+ - `igraph_community_walktrap()` does not crash any more when provided with
+   `modularity=NULL` and `membership=NULL`.
 
 ### Other
 
