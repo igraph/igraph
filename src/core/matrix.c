@@ -217,8 +217,8 @@ igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *m,
  * \brief Creates a complex matrix from a magnitude and an angle.
  *
  * \param m Pointer to an uninitialized complex matrix.
- * \param r Pointer to the magnitude of the complex matrix.
- * \param theta Pointer to the angle of the complex matrix.
+ * \param r Pointer to a real matrix containing magnitudes.
+ * \param theta Pointer to a real matrix containing arguments (phase angles).
  * \return Error code.
  *
  * Time complexity: O(n),
