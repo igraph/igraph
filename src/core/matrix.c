@@ -231,18 +231,18 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
                                        const igraph_matrix_t *theta) {
     igraph_integer_t nrowr = igraph_matrix_nrow(r);
     igraph_integer_t ncolr = igraph_matrix_ncol(r);
-    igraph_integer_t nrowi = igraph_matrix_nrow(theta);
-    igraph_integer_t ncoli = igraph_matrix_ncol(theta);
+    igraph_integer_t nrowt = igraph_matrix_nrow(theta);
+    igraph_integer_t ncolt = igraph_matrix_ncol(theta);
 
-    if (nrowr != nrowi) {
+    if (nrowr != nrowt) {
         IGRAPH_ERRORF("Number of rows in magnitude matrix (%" IGRAPH_PRId
                 ") not equal to number of rows in angle matrix (%"
-                IGRAPH_PRId ").", IGRAPH_EINVAL, nrowr, nrowi);
+                IGRAPH_PRId ").", IGRAPH_EINVAL, nrowr, nrowt);
     }
-    if (ncolr != ncoli) {
+    if (ncolr != ncolt) {
         IGRAPH_ERRORF("Number of columns in magnitude matrix (%" IGRAPH_PRId
                 ") not equal to number of columns in angle matrix (%"
-                IGRAPH_PRId ").", IGRAPH_EINVAL, ncolr, ncoli);
+                IGRAPH_PRId ").", IGRAPH_EINVAL, ncolr, ncolt);
     }
 
     igraph_matrix_complex_init(m, nrowr, ncolr);
