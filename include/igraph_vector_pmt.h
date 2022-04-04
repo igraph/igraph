@@ -281,8 +281,6 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, move_interval)(
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, move_interval2)(
         TYPE(igraph_vector) *v, igraph_integer_t begin, igraph_integer_t end,
         igraph_integer_t to);
-IGRAPH_EXPORT void FUNCTION(igraph_vector, permdelete)
-        (TYPE(igraph_vector) *v, const igraph_vector_int_t *index, igraph_integer_t nremove);
 #ifndef NOTORDERED
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v, BASE elem);
 #endif
