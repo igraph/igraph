@@ -1773,10 +1773,10 @@ igraph_cohesion:
 
 igraph_dominator_tree:
     PARAMS: |-
-        GRAPH graph, VERTEX root, OUT VERTEXSET dom,
+        GRAPH graph, VERTEX root, OUT INDEX_VECTOR dom,
         OPTIONAL OUT GRAPH domtree, OUT VERTEXSET leftout,
         NEIMODE mode=OUT
-    DEPS: root ON graph, dom ON graph, leftout ON graph
+    DEPS: root ON graph, leftout ON graph
 
 igraph_all_st_cuts:
     PARAMS: |-
