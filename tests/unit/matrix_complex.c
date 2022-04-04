@@ -89,5 +89,6 @@ int main() {
         CHECK_ERROR(igraph_matrix_complex_create_polar(&c, &real, &imag), IGRAPH_EINVAL);
     }
 
+    VERIFY_FINALLY_STACK();
     return 0;
 }
