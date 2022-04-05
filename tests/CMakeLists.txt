@@ -172,6 +172,7 @@ add_examples(
   igraph_grg_game
   igraph_kary_tree
   igraph_lcf
+  igraph_regular_tree
   igraph_ring
   igraph_small
   igraph_star
