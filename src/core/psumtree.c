@@ -27,6 +27,8 @@
 #include "igraph_psumtree.h"
 #include "igraph_error.h"
 
+#include "math/safe_intop.h"
+
 #include <math.h>
 
 /**
@@ -79,16 +81,26 @@
  * The tree is initialized with a fixed number of elements. After initialization,
  * the value corresponding to each element is zero.
  *
- * \param t The tree to initialize
- * \param size The number of elements in the tree
- * \return Error code, typically \c IGRAPH_ENOMEM if there is not enough memory
+ * \param t The tree to initialize.
+ * \param size The number of elements in the tree. It must be at least one.
+ * \return Error code, typically \c IGRAPH_ENOMEM if there is not enough memory.
  *
  * Time complexity: O(n) for a tree containing n elements
  */
 igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size) {
+    igraph_real_t offset_real = pow(2, ceil(log2(size))) - 1;
+    igraph_integer_t vecsize;
+
+    IGRAPH_ASSERT(size > 0);
+
     t->size = size;
-    t->offset = (pow(2, ceil(log2(size))) - 1);
-    IGRAPH_CHECK(igraph_vector_init(&t->v, t->offset + t->size));
+    t->offset = offset_real;
+    if (t->offset != offset_real) {
+        IGRAPH_ERROR("Cannot initialize psumtree.", IGRAPH_EOVERFLOW);
+    }
+    IGRAPH_SAFE_ADD(t->offset, t->size, &vecsize);
+    IGRAPH_CHECK(igraph_vector_init(&t->v, vecsize));
+
     return IGRAPH_SUCCESS;
 }
 
@@ -100,7 +112,7 @@ igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size)
  * \param t The tree to reset.
  */
 void igraph_psumtree_reset(igraph_psumtree_t *t) {
-    igraph_vector_fill(&(t->v), 0);
+    igraph_vector_null(&t->v);
 }
 
 /**
