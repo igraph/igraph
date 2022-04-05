@@ -88,20 +88,24 @@ void igraph_indheap_clear(igraph_indheap_t *h) {
 
 igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, igraph_real_t* data, igraph_integer_t len) {
     igraph_integer_t i;
+    igraph_integer_t alloc_size;
 
-    h->stor_begin = IGRAPH_CALLOC(len, igraph_real_t);
+    IGRAPH_ASSERT(len >= 0);
+    alloc_size = (len <= 0) ? 1 : len;
+
+    h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
     if (! h->stor_begin) {
         h->index_begin = 0;
         IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    h->index_begin = IGRAPH_CALLOC(len, igraph_integer_t);
+    h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
     if (! h->index_begin) {
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
         IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    h->stor_end = h->stor_begin + len;
-    h->end = h->stor_end;
+    h->stor_end = h->stor_begin + alloc_size;
+    h->end = h->stor_begin + len;
     h->destroy = 1;
 
     memcpy(h->stor_begin, data, (size_t) len * sizeof(igraph_real_t));
