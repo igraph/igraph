@@ -111,6 +111,12 @@ igraph_ring:
 igraph_kary_tree:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREE_MODE type=OUT
 
+igraph_symmetric_tree:
+    PARAMS: OUT GRAPH graph, VECTOR_INT branches, TREE_MODE type=OUT
+
+igraph_regular_tree:
+    PARAMS: OUT GRAPH graph, INTEGER h, INTEGER k=3, TREE_MODE type=UNDIRECTED
+
 igraph_full:
     PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN loops=False
 

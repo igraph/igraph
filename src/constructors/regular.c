@@ -685,7 +685,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * root have \p branching_counts[d] children.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param branching_counts Vector detailing the number of branches at each level.
+ * \param branches Vector detailing the number of branches at each level.
  * \param type Constant, gives whether to create a directed tree, and
  *        if this is the case, also its orientation. Possible values:
  *        \clist
@@ -705,24 +705,25 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_kary_tree() and \ref igraph_star() for creating regular tree
- * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \sa \ref igraph_kary_tree(), \ref igraph_regular_tree() and \ref igraph_star()
+ * for creating other regular tree structures;
+ * \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
  * \example examples/simple/igraph_symmetric_tree.c
  */
 
-igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branching_counts,
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t *branches,
                 igraph_tree_mode_t type) {
 
     igraph_vector_int_t edges;
     igraph_integer_t j, k, temp, no_of_nodes, idx, parent, child, level_end;
-    igraph_integer_t branching_counts_size = igraph_vector_int_size(branching_counts);
+    igraph_integer_t branching_counts_size = igraph_vector_int_size(branches);
 
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN && type != IGRAPH_TREE_UNDIRECTED) {
         IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
-    if (!igraph_vector_int_empty(branching_counts) && igraph_vector_int_min(branching_counts) <= 0) {
+    if (!igraph_vector_int_empty(branches) && igraph_vector_int_min(branches) <= 0) {
         IGRAPH_ERROR("The number of branches must be positive at each level.", IGRAPH_EINVAL);
     }
 
@@ -730,7 +731,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     no_of_nodes = 1;
     temp = 1;
     for (j = 0; j < branching_counts_size; ++j) {
-        IGRAPH_SAFE_MULT(temp, VECTOR(*branching_counts)[j], &temp);
+        IGRAPH_SAFE_MULT(temp, VECTOR(*branches)[j], &temp);
         IGRAPH_SAFE_ADD(no_of_nodes, temp, &no_of_nodes);
     }
 
@@ -750,7 +751,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     for (k = 0; k < branching_counts_size; ++k) {
         level_end = child; /* points to one past the last vertex of the current level of parents */
         while(parent < level_end) {
-            for (j = 0; j < VECTOR(*branching_counts)[k]; j++) {
+            for (j = 0; j < VECTOR(*branches)[k]; j++) {
                 if (type == IGRAPH_TREE_IN) {
                     VECTOR(edges)[idx++] = child++;
                     VECTOR(edges)[idx++] = parent;
@@ -766,6 +767,68 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, type != IGRAPH_TREE_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_regular_tree
+ * \brief Creates a regular tree.
+ *
+ * All vertices of a regular tree, except its leaves, have the same total degree \p k.
+ * This is different from a k-ary tree (\ref igraph_kary_tree()), where all
+ * vertices have the same number of children, thus the degre of the root is
+ * one less than the degree of the other internal vertices. Regular trees
+ * are also referred to as Bethe lattices.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param h The height of the tree, i.e. the distance between the root and the leaves.
+ * \param k The degree of the regular tree.
+ * \param type Constant, gives whether to create a directed tree, and
+ *        if this is the case, also its orientation. Possible values:
+ *        \clist
+ *        \cli IGRAPH_TREE_OUT
+ *          directed tree, the edges point
+ *          from the parents to their children,
+ *        \cli IGRAPH_TREE_IN
+ *          directed tree, the edges point from
+ *          the children to their parents.
+ *        \cli IGRAPH_TREE_UNDIRECTED
+ *          undirected tree.
+ *        \endclist
+ *
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_kary_tree() to create k-ary tree where each vertex has the same
+ * number of children, i.e. out-degree, instead of the same total degree.
+ * \ref igraph_symmetric_tree() to use a different number of children at each level.
+ *
+ * \example examples/simple/igraph_regular_tree.c
+ */
+
+igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_integer_t k, igraph_tree_mode_t type) {
+    igraph_vector_int_t branching_counts;
+
+    if (h < 1) {
+        IGRAPH_ERRORF("Height of regular tree must be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, h);
+    }
+    if (k < 2 ) {
+        IGRAPH_ERRORF("Degree of regular tree must be at least 2, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, k);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&branching_counts, h);
+    igraph_vector_int_fill(&branching_counts, k-1);
+    if (h > 0) {
+        VECTOR(branching_counts)[0] += 1;
+    }
+
+    IGRAPH_CHECK(igraph_symmetric_tree(graph, &branching_counts, type));
+
+    igraph_vector_int_destroy(&branching_counts);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
