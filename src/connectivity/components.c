@@ -1206,7 +1206,7 @@ static igraph_error_t igraph_i_bridges_rec(
     nc = igraph_vector_int_size(incedges);
     for (i = 0; i < nc; ++i) {
         igraph_integer_t edge = VECTOR(*incedges)[i];
-        igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
+        igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
 
         if (! VECTOR(*visited)[v]) {
             VECTOR(*incoming_edge)[v] = edge;
@@ -1255,28 +1255,20 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
-    IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&disc, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &disc);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&low, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&incoming_edge, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &incoming_edge);
-    for (i = 0; i < n; ++i) {
-        VECTOR(incoming_edge)[i] = -1;
-    }
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&disc, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incoming_edge, n);
+    igraph_vector_int_fill(&incoming_edge, -1);
 
     igraph_vector_int_clear(bridges);
 
     time = 0;
-    for (i = 0; i < n; ++i)
+    for (i = 0; i < n; ++i) {
         if (! VECTOR(visited)[i]) {
             IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &incoming_edge));
         }
+    }
 
     igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);
