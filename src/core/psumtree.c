@@ -88,16 +88,16 @@
  * Time complexity: O(n) for a tree containing n elements
  */
 igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size) {
-    igraph_real_t offset_real = pow(2, ceil(log2(size))) - 1;
     igraph_integer_t vecsize;
 
     IGRAPH_ASSERT(size > 0);
 
     t->size = size;
-    t->offset = offset_real;
-    if (t->offset != offset_real) {
-        IGRAPH_ERROR("Cannot initialize psumtree.", IGRAPH_EOVERFLOW);
-    }
+
+    /* offset = 2^ceiling(log2(size)) - 1 */
+    IGRAPH_CHECK(igraph_i_safe_next_pow_2(size, &t->offset));
+    t->offset -= 1;
+
     IGRAPH_SAFE_ADD(t->offset, t->size, &vecsize);
     IGRAPH_CHECK(igraph_vector_init(&t->v, vecsize));
 
