@@ -80,7 +80,7 @@ igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *re
         *res = k+1;
         return IGRAPH_SUCCESS;
     } else {
-        IGRAPH_ERRORF("Overflow when computing next power of 2 for % " IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Overflow when computing next power of 2 for %" IGRAPH_PRId ".",
                       IGRAPH_EOVERFLOW, k);
     }
 }
