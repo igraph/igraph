@@ -532,11 +532,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 /**
  * \function igraph_decompose
- * \brief Decompose a graph into connected components.
+ * \brief Decomposes a graph into connected components.
  *
- * Create separate graph for each component of a graph. Note that the
+ * Creates a separate graph for each component of a graph. Note that the
  * vertex IDs in the new graphs will be different than in the original
- * graph. (Except if there is only one component in the original graph.)
+ * graph, except when there is only a single component in the original graph.
  *
  * \param graph The original graph.
  * \param components This list of graphs will contain the individual components.
@@ -905,10 +905,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 /**
  * \function igraph_articulation_points
- * Find the articulation points in a graph.
+ * \brief Finds the articulation points in a graph.
  *
  * A vertex is an articulation point if its removal increases
  * the number of connected components in the graph.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the
  *    articulation points will be stored here.
@@ -926,7 +927,7 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
 
 /**
  * \function igraph_biconnected_components
- * Calculate biconnected components
+ * \brief Calculates biconnected components.
  *
  * A graph is biconnected if the removal of any single vertex (and
  * its incident edges) does not disconnect it.
@@ -1226,7 +1227,7 @@ static igraph_error_t igraph_i_bridges_rec(
 
 /**
  * \function igraph_bridges
- * Find all bridges in a graph.
+ * \brief Finds all bridges in a graph.
  *
  * An edge is a bridge if its removal increases the number of (weakly)
  * connected components in the graph.
