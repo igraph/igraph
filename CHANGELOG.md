@@ -733,7 +733,7 @@ Some of the highlights are:
 
  - Documentation improvements
 
-## [Unreleased 0.9.8]
+## [0.9.8] - 2022-04-08
 
 ### Fixed
 
@@ -1297,7 +1297,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.7..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.8..HEAD
+[0.9.8]: https://github.com/igraph/igraph/compare/0.9.7...0.9.8
 [0.9.7]: https://github.com/igraph/igraph/compare/0.9.6...0.9.7
 [0.9.6]: https://github.com/igraph/igraph/compare/0.9.5...0.9.6
 [0.9.5]: https://github.com/igraph/igraph/compare/0.9.4...0.9.5
