@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,72 +14,106 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph.h"
+#include "test_utilities.h"
 
 #include <math.h>
+
+void print_and_destroy(igraph_t *g, igraph_vector_t *weights)
+{
+    igraph_vector_t v;
+    igraph_real_t value;
+
+    igraph_vector_init(&v, 0);
+    igraph_eigenvector_centrality(g, &v, &value, /*directed*/1,
+                                  /*scale=*/1, weights,
+                                  /*options*/NULL);
+
+    printf("Eigenvalue: %g\n", value);
+    printf("Eigenvector:\n");
+    igraph_vector_print(&v);
+    printf("\n");
+
+    igraph_destroy(g);
+    igraph_vector_destroy(&v);
+}
 
 int main() {
 
     igraph_t g;
-    igraph_vector_t v, weights;
-    igraph_integer_t i;
-    igraph_real_t value;
-    igraph_arpack_options_t options;
+    igraph_vector_t weights;
 
-    igraph_star(&g, 100, IGRAPH_STAR_UNDIRECTED, 0);
+    printf("Undirected graph with no vertices:\n");
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
+    print_and_destroy(&g, NULL);
 
-    igraph_arpack_options_init(&options);
-    igraph_vector_init(&v, 0);
-    igraph_eigenvector_centrality(&g, &v, &value, /*directed=*/ 0,
-                                  /*scale=*/1, /*weights=*/0,
-                                  &options);
+    printf("Directed graph with no vertices:\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
+    print_and_destroy(&g, NULL);
 
-    if (options.info != 0) {
-        return 1;
-    }
+    printf("Undirected graph with no edges:\n");
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
+    print_and_destroy(&g, NULL);
 
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        printf(" %.4f", fabs(VECTOR(v)[i]));
-    }
-    printf("\n");
+    printf("Directed graph with no edges:\n");
+    igraph_small(&g, 5, IGRAPH_DIRECTED, -1);
+    print_and_destroy(&g, NULL);
 
-    igraph_destroy(&g);
+    printf("Undirected full graph:\n");
+    igraph_full(&g, 5, IGRAPH_UNDIRECTED, /*loops*/0);
+    print_and_destroy(&g, NULL);
 
-    /* Special cases: check for empty graph */
-    igraph_empty(&g, 10, 0);
-    igraph_eigenvector_centrality(&g, &v, &value, 0, 0, 0, &options);
-    if (value != 0.0) {
-        return 1;
-    }
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        printf(" %.2f", fabs(VECTOR(v)[i]));
-    }
-    printf("\n");
-    igraph_destroy(&g);
+    printf("Directed full graph:\n");
+    igraph_full(&g, 5, IGRAPH_DIRECTED, /*loops*/0);
+    print_and_destroy(&g, NULL);
 
-    /* Special cases: check for full graph, zero weights */
-    /* Note that it is not mandatory to supply ARPACK options */
-    igraph_full(&g, 10, 0, 0);
-    igraph_vector_init(&weights, 45);
-    igraph_vector_fill(&weights, 0);
-    igraph_eigenvector_centrality(&g, &v, &value, 0, 0, &weights, 0);
+    printf("Undirected full graph with weights:\n");
+    igraph_vector_init(&weights, 10);
+    igraph_vector_fill(&weights, 1);
+    igraph_full(&g, 5, IGRAPH_UNDIRECTED, /*loops*/0);
+    print_and_destroy(&g, &weights);
     igraph_vector_destroy(&weights);
-    if (value != 0.0) {
-        return 2;
-    }
-    for (i = 0; i < igraph_vector_size(&v); i++) {
-        printf(" %.2f", fabs(VECTOR(v)[i]));
-    }
-    printf("\n");
+
+    printf("Directed full graph with weights:\n");
+    igraph_full(&g, 5, IGRAPH_DIRECTED, /*loops*/0);
+    igraph_vector_init(&weights, 20);
+    igraph_vector_fill(&weights, 1);
+    print_and_destroy(&g, &weights);
+    igraph_vector_destroy(&weights);
+
+    printf("Undirected star graph with weights:\n");
+    igraph_vector_init(&weights, 4);
+    igraph_vector_fill(&weights, 1);
+    igraph_star(&g, 5, IGRAPH_STAR_UNDIRECTED, 0);
+    print_and_destroy(&g, &weights);
+    igraph_vector_destroy(&weights);
+
+    printf("Directed star graph with weights:\n");
+    igraph_star(&g, 5, IGRAPH_STAR_OUT, 0);
+    igraph_vector_init(&weights, 4);
+    igraph_vector_fill(&weights, 1);
+    print_and_destroy(&g, &weights);
+    igraph_vector_destroy(&weights);
+
+    VERIFY_FINALLY_STACK();
+
+    printf("Check handling of wrong number of weights.\n");
+    igraph_vector_init(&weights, 2);
+    igraph_vector_fill(&weights, 1);
+    igraph_full(&g, 5, IGRAPH_DIRECTED, /*loops*/0);
+    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /*directed*/1,
+                                  /*scale=*/1, &weights,
+                                  /*options*/NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /*directed*/0,
+                                  /*scale=*/1, &weights,
+                                  /*options*/NULL), IGRAPH_EINVAL);
+    igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&v);
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

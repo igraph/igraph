@@ -118,8 +118,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
@@ -288,8 +289,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         if (igraph_is_directed(graph)) {
             IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
