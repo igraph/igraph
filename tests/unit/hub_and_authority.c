@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 
-void print_hub_and_authority(igraph_t *g, igraph_vector_t *weights, igraph_bool_t scale, igraph_bool_t use_options) {
+void print_hub_and_authority(igraph_t *g, igraph_vector_t *weights, igraph_bool_t scale, igraph_bool_t use_options, igraph_bool_t split) {
     igraph_arpack_options_t options;
     igraph_vector_t hub_vector, authority_vector;
     igraph_real_t value;
@@ -30,8 +30,15 @@ void print_hub_and_authority(igraph_t *g, igraph_vector_t *weights, igraph_bool_
     igraph_vector_init(&authority_vector, 0);
 
     printf("--------------------------------------------------\n");
-    igraph_hub_and_authority_scores(g, &hub_vector, &authority_vector, &value,
-                                    scale, weights, use_options ? &options : 0);
+    if (split) {
+        igraph_hub_score(g, &hub_vector, &value,
+                scale, weights, use_options ? &options : 0);
+        igraph_authority_score(g, &authority_vector, &value,
+                scale, weights, use_options ? &options : 0);
+    } else {
+        igraph_hub_and_authority_scores(g, &hub_vector, &authority_vector, &value,
+                scale, weights, use_options ? &options : 0);
+    }
     vector_chop(&hub_vector, 10e-10);
     vector_chop(&authority_vector, 10e-10);
     printf("hub:\n");
@@ -56,17 +63,17 @@ int main() {
 
     printf("Null graph:\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
-    print_hub_and_authority(&g, NULL, 0, 1);
+    print_hub_and_authority(&g, NULL, 0, 1, 0);
     igraph_destroy(&g);
 
     printf("Singleton graph with loop:\n");
     igraph_small(&g, 1, IGRAPH_DIRECTED, 0,0, -1);
-    print_hub_and_authority(&g, NULL, 0, 1);
+    print_hub_and_authority(&g, NULL, 0, 1, 0);
     igraph_destroy(&g);
 
     printf("Three vertices, no links:\n");
     igraph_small(&g, 3, IGRAPH_DIRECTED, -1);
-    print_hub_and_authority(&g, NULL, 0, 1);
+    print_hub_and_authority(&g, NULL, 0, 1, 0);
     igraph_destroy(&g);
 
     printf("Two hubs and one authority:\n");
@@ -74,7 +81,7 @@ int main() {
         0,2, 1,2, -1);
     igraph_vector_init_int(&weights, 2,
         1, 1);
-    print_hub_and_authority(&g, &weights, 0, 1);
+    print_hub_and_authority(&g, &weights, 0, 1, 0);
     igraph_destroy(&g);
     igraph_vector_destroy(&weights);
 
@@ -87,7 +94,7 @@ int main() {
     igraph_vector_init_int(&weights, 14,
         1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
         1, 2, 1, 1);
-    print_hub_and_authority(&g, &weights, 0, 0);
+    print_hub_and_authority(&g, &weights, 0, 0, 0);
     igraph_destroy(&g);
     igraph_vector_destroy(&weights);
 
@@ -98,7 +105,7 @@ int main() {
     igraph_vector_init_int(&weights, 14,
         1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
         1, 2, 1, 1);
-    print_hub_and_authority(&g, &weights, 1, 0);
+    print_hub_and_authority(&g, &weights, 1, 0, 1);
     igraph_destroy(&g);
     igraph_vector_destroy(&weights);
 
