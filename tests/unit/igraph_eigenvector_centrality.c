@@ -29,30 +29,58 @@ int main() {
 
     igraph_t g;
     igraph_vector_t v, weights;
+    igraph_integer_t i;
     igraph_real_t value;
     igraph_arpack_options_t options;
 
-    igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-    igraph_vector_init(&weights, 9);
-    igraph_vector_fill(&weights, 1);
+    igraph_star(&g, 100, IGRAPH_STAR_UNDIRECTED, 0);
 
     igraph_arpack_options_init(&options);
     igraph_vector_init(&v, 0);
     igraph_eigenvector_centrality(&g, &v, &value, /*directed=*/ 0,
-                                  /*scale=*/1, &weights,
+                                  /*scale=*/1, /*weights=*/0,
                                   &options);
 
     if (options.info != 0) {
         return 1;
     }
 
-    printf("eigenvalue: %g\n", value);
-    printf("eigenvector:\n");
-    igraph_vector_print(&v);
+    for (i = 0; i < igraph_vector_size(&v); i++) {
+        printf(" %.4f", fabs(VECTOR(v)[i]));
+    }
+    printf("\n");
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&v);
+
+    /* Special cases: check for empty graph */
+    igraph_empty(&g, 10, 0);
+    igraph_eigenvector_centrality(&g, &v, &value, 0, 0, 0, &options);
+    if (value != 0.0) {
+        return 1;
+    }
+    for (i = 0; i < igraph_vector_size(&v); i++) {
+        printf(" %.2f", fabs(VECTOR(v)[i]));
+    }
+    printf("\n");
+    igraph_destroy(&g);
+
+    /* Special cases: check for full graph, zero weights */
+    /* Note that it is not mandatory to supply ARPACK options */
+    igraph_full(&g, 10, 0, 0);
+    igraph_vector_init(&weights, 45);
+    igraph_vector_fill(&weights, 0);
+    igraph_eigenvector_centrality(&g, &v, &value, 0, 0, &weights, 0);
     igraph_vector_destroy(&weights);
+    if (value != 0.0) {
+        return 2;
+    }
+    for (i = 0; i < igraph_vector_size(&v); i++) {
+        printf(" %.2f", fabs(VECTOR(v)[i]));
+    }
+    printf("\n");
+    igraph_destroy(&g);
+
+    igraph_vector_destroy(&v);
 
     return 0;
 }
