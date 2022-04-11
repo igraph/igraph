@@ -164,8 +164,8 @@ int moran_one_test() {
     igraph_vector_init_real(&wgt, nedge, 1.9, 0.8, 6.2, 2.4, 1.1, 5.2, 7.3, 8.8);
 
     /* play game */
-    igraph_vector_copy(&quantcp, &quant);
-    igraph_vector_int_copy(&stratcp, &strat);
+    igraph_vector_init_copy(&quantcp, &quant);
+    igraph_vector_int_init_copy(&stratcp, &strat);
     igraph_moran_process(&g, &wgt, &quantcp, &stratcp, IGRAPH_OUT);
 
     /* Determine which vertex was chosen for death. The original quantities */

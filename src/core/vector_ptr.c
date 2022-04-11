@@ -102,8 +102,9 @@ igraph_error_t igraph_vector_ptr_init(igraph_vector_ptr_t* v, igraph_integer_t s
 /**
  */
 
-const igraph_vector_ptr_t *igraph_vector_ptr_view(const igraph_vector_ptr_t *v, void *const *data,
-        igraph_integer_t length) {
+const igraph_vector_ptr_t *igraph_vector_ptr_view(
+    const igraph_vector_ptr_t *v, void *const *data, igraph_integer_t length
+) {
     igraph_vector_ptr_t *v2 = (igraph_vector_ptr_t*) v;
     v2->stor_begin = (void **)data;
     v2->stor_end = (void**)data + length;
@@ -463,14 +464,19 @@ igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_integer_t
  * \ingroup vectorptr
  * \brief Initializes a pointer vector from an array (constructor).
  *
+ * \param v Pointer to an uninitialized
+ *        <type>igraph_vector_ptr_t</type> object to be initialized.
+ * \param data The array of pointers that serves as the initial contents of the
+ *        pointer vector.
+ * \param length Integer, the length of the array.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if out of memory
  */
 
-igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, igraph_integer_t length) {
+igraph_error_t igraph_vector_ptr_init_array(igraph_vector_ptr_t *v, void *const *data, igraph_integer_t length) {
     v->stor_begin = IGRAPH_CALLOC(length, void*);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot initialize pointer vector from array", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + length;
     v->end = v->stor_end;
@@ -496,8 +502,8 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
 
 /**
  * \ingroup vectorptr
- * \function igraph_vector_ptr_copy
- * \brief Copy a pointer vector (constructor).
+ * \function igraph_vector_ptr_init_copy
+ * \brief Initializes a pointer vector from another one (constructor).
  *
  * </para><para>
  * This function creates a pointer vector by copying another one. This
@@ -520,7 +526,7 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  * done in O(n) time.
  */
 
-igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+igraph_error_t igraph_vector_ptr_init_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
     igraph_integer_t from_size;
 
     IGRAPH_ASSERT(from != NULL);
@@ -530,7 +536,7 @@ igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vect
 
     to->stor_begin = IGRAPH_CALLOC(from_size, void*);
     if (to->stor_begin == 0) {
-        IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot copy pointer vector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     to->stor_end = to->stor_begin + igraph_vector_ptr_size(from);
     to->end = to->stor_end;
@@ -539,6 +545,18 @@ igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vect
            (size_t) igraph_vector_ptr_size(from)*sizeof(void*));
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vectorptr
+ * \function igraph_vector_ptr_copy
+ * \brief Initializes a pointer vector from another one (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_ptr_init_copy 0.10
+ */
+
+igraph_error_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
+    return igraph_vector_ptr_init_copy(to, from);
 }
 
 /**

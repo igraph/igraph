@@ -194,7 +194,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                             }
 
                             IGRAPH_FINALLY(igraph_free, fixed_copy);
-                            IGRAPH_CHECK(igraph_vector_bool_copy(fixed_copy, fixed));
+                            IGRAPH_CHECK(igraph_vector_bool_init_copy(fixed_copy, fixed));
                             IGRAPH_FINALLY(igraph_vector_bool_destroy, fixed_copy);
                         }
 

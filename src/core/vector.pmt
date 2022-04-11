@@ -83,9 +83,9 @@
  * number of \type igraph_vector_t constructors, for your
  * convenience. \ref igraph_vector_init() is the basic constructor, it
  * creates a vector of the given length, filled with zeros.
- * \ref igraph_vector_copy() creates a new identical copy
+ * \ref igraph_vector_init_copy() creates a new identical copy
  * of an already existing and initialized vector. \ref
- * igraph_vector_init_copy() creates a vector by copying a regular C array.
+ * igraph_vector_init_array() creates a vector by copying a regular C array.
  * \ref igraph_vector_init_seq() creates a vector containing a regular
  * sequence with increment one.</para>
  *
@@ -389,7 +389,7 @@ igraph_error_t FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector) *v, int
  * </para><para>
  * All vectors initialized by \ref igraph_vector_init() should be properly
  * destroyed by this function. A destroyed vector needs to be
- * reinitialized by \ref igraph_vector_init(), \ref igraph_vector_init_copy() or
+ * reinitialized by \ref igraph_vector_init(), \ref igraph_vector_init_array() or
  * another constructor.
  * \param v Pointer to the (previously initialized) vector object to
  *        destroy.
@@ -1439,7 +1439,7 @@ igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v
 
 /**
  * \ingroup vector
- * \function igraph_vector_init_copy
+ * \function igraph_vector_init_array
  * \brief Initializes a vector from an ordinary C array (constructor).
  *
  * \param v Pointer to an uninitialized vector object.
@@ -1452,7 +1452,7 @@ igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v
  * O(\p length).
  */
 
-igraph_error_t FUNCTION(igraph_vector, init_copy)(
+igraph_error_t FUNCTION(igraph_vector, init_array)(
         TYPE(igraph_vector) *v, const BASE *data, igraph_integer_t length) {
 
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, length));
@@ -1506,8 +1506,9 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
  * n is the size of the vector.
  */
 
-igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
-                                  const TYPE(igraph_vector) *from) {
+igraph_error_t FUNCTION(igraph_vector, init_copy)(
+    TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from
+) {
     igraph_integer_t from_size;
 
     IGRAPH_ASSERT(from != NULL);
@@ -1520,6 +1521,19 @@ igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
            FUNCTION(igraph_vector, size)(from) * sizeof(BASE));
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_copy
+ * \brief Initializes a vector from another vector object (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_init_copy 0.10
+ */
+
+igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
+                                  const TYPE(igraph_vector) *from) {
+    return FUNCTION(igraph_vector, init_copy)(to, from);
 }
 
 /**

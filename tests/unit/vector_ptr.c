@@ -200,8 +200,8 @@ int main() {
         }
     }
 
-    /* igraph_vector_ptr_init_copy */
-    igraph_vector_ptr_init_copy(&v1, ptr, 5);
+    /* igraph_vector_ptr_init_array */
+    igraph_vector_ptr_init_array(&v1, ptr, 5);
     for (i = 0; i < igraph_vector_ptr_size(&v1); i++) {
         if ( *((int*)VECTOR(v1)[i]) != i + 1) {
             return 18;
@@ -225,7 +225,7 @@ int main() {
     igraph_vector_ptr_set(&v1, 2, &d3);
     igraph_vector_ptr_set(&v1, 3, &d4);
     igraph_vector_ptr_set(&v1, 4, &d5);
-    igraph_vector_ptr_copy(&v2, &v1);
+    igraph_vector_ptr_init_copy(&v2, &v1);
     igraph_vector_ptr_destroy(&v1);
     for (i = 0; i < igraph_vector_ptr_size(&v2); i++) {
         if ( *((int*)VECTOR(v2)[i]) != i + 1) {

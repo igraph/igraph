@@ -61,8 +61,7 @@ int doit(int which) {
     for (i = 0; i < N; i++) {
         VECTOR(vec)[i] = i;
     }
-    igraph_sparsemat_diag(&A, /*nzmax=*/ N, /*values=*/ &vec,
-                          /*compress=*/ 0);
+    igraph_sparsemat_init_diag(&A, /*nzmax=*/ N, /*values=*/ &vec, /*compress=*/ 0);
 
     igraph_vector_null(&vec);
     igraph_vector_int_null(&pos);
@@ -102,8 +101,7 @@ int doit(int which) {
     for (i = 0; i < N; i++) {
         VECTOR(vec)[i] = i;
     }
-    igraph_sparsemat_diag(&A, /*nzmax=*/ N, /*values=*/ &vec,
-                          /*compress=*/ 1);
+    igraph_sparsemat_init_diag(&A, /*nzmax=*/ N, /*values=*/ &vec, /*compress=*/ 1);
 
     igraph_vector_null(&vec);
     rowfun(&A, &vec, &pos);

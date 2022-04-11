@@ -1008,7 +1008,7 @@ static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* 
 }
 
 static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE* dest, const ITEM_TYPE* source) {
-    return ITEM_FUNCTION(copy)(dest, source);
+    return ITEM_FUNCTION(init_copy)(dest, source);
 }
 
 static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE* item) {

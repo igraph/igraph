@@ -200,7 +200,7 @@ int main() {
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
 
-    igraph_vector_copy(&result3, &result1);
+    igraph_vector_init_copy(&result3, &result1);
 
     igraph_transitivity_local_undirected(&g, &result2, vertices, IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result2);

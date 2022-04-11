@@ -74,10 +74,8 @@ int main() {
     printf("------------------------\n");
 
     /* Create unit matrices */
-    igraph_sparsemat_eye(&A, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0,
-                         /*compress=*/ 0);
-    igraph_sparsemat_eye(&B, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0,
-                         /*compress=*/ 1);
+    igraph_sparsemat_init_eye(&A, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0, /*compress=*/ 0);
+    igraph_sparsemat_init_eye(&B, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0, /*compress=*/ 1);
     igraph_sparsemat_print(&A, stdout);
     igraph_sparsemat_print(&B, stdout);
     igraph_sparsemat_destroy(&A);
@@ -90,8 +88,8 @@ int main() {
     for (i = 0; i < 5; i++) {
         VECTOR(vect)[i] = i;
     }
-    igraph_sparsemat_diag(&A, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 0);
-    igraph_sparsemat_diag(&B, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 1);
+    igraph_sparsemat_init_diag(&A, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 0);
+    igraph_sparsemat_init_diag(&B, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 1);
     igraph_vector_destroy(&vect);
     igraph_sparsemat_print(&A, stdout);
     igraph_sparsemat_print(&B, stdout);

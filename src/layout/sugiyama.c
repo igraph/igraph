@@ -336,7 +336,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
         IGRAPH_VECTOR_INT_INIT_FINALLY(&layers_own, no_of_nodes);
         IGRAPH_CHECK(igraph_i_layout_sugiyama_place_nodes_vertically(graph, weights, &layers_own));
     } else {
-        IGRAPH_CHECK(igraph_vector_int_copy(&layers_own, layers));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&layers_own, layers));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &layers_own);
     }
 

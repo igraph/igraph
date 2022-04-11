@@ -106,8 +106,8 @@ int test_weighted_graph_from_mit_notes() {
         VECTOR(types)[i] = (i >= 5);
     }
     igraph_vector_int_init(&matching, 0);
-    igraph_vector_init_copy(&weights, weight_array,
-                            sizeof(weight_array) / sizeof(weight_array[0]));
+    igraph_vector_init_array(&weights, weight_array,
+                             sizeof(weight_array) / sizeof(weight_array[0]));
 
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
@@ -155,8 +155,8 @@ int test_weighted_graph_generated() {
     /* Case 1 */
 
     igraph_small(&graph, 0, 0, 0, 8, 2, 7, 3, 7, 3, 8, 4, 5, 4, 9, -1);
-    igraph_vector_init_copy(&weights, weight_array_1,
-                            sizeof(weight_array_1) / sizeof(weight_array_1[0]));
+    igraph_vector_init_array(&weights, weight_array_1,
+                             sizeof(weight_array_1) / sizeof(weight_array_1[0]));
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 43) {
@@ -169,8 +169,8 @@ int test_weighted_graph_generated() {
     /* Case 2 */
 
     igraph_small(&graph, 0, 0, 0, 5, 0, 6, 1, 7, 2, 5, 3, 5, 3, 9, -1);
-    igraph_vector_init_copy(&weights, weight_array_2,
-                            sizeof(weight_array_2) / sizeof(weight_array_2[0]));
+    igraph_vector_init_array(&weights, weight_array_2,
+                             sizeof(weight_array_2) / sizeof(weight_array_2[0]));
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 41) {

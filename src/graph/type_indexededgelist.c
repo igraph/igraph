@@ -170,17 +170,17 @@ void igraph_destroy(igraph_t *graph) {
 igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     to->n = from->n;
     to->directed = from->directed;
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->from, &from->from));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->from, &from->from));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->from);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->to, &from->to));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->to, &from->to));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->to);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->oi, &from->oi));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->oi, &from->oi));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->oi);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->ii, &from->ii));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->ii, &from->ii));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->ii);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->os, &from->os));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->os, &from->os));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->os);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->is, &from->is));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->is, &from->is));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->is);
 
     IGRAPH_I_ATTRIBUTE_COPY(to, from, 1, 1, 1); /* does IGRAPH_CHECK */

@@ -170,9 +170,9 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
     if (vertex_color1) {
         igraph_bool_t ret = 0;
         igraph_vector_int_t tmp1, tmp2;
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, vertex_color1));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp1, vertex_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp2, vertex_color2));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp2, vertex_color2));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
         igraph_vector_int_sort(&tmp1);
         igraph_vector_int_sort(&tmp2);
@@ -189,9 +189,9 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
     if (edge_color1) {
         igraph_bool_t ret = 0;
         igraph_vector_int_t tmp1, tmp2;
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, edge_color1));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp1, edge_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp2, edge_color2));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp2, edge_color2));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
         igraph_vector_int_sort(&tmp1);
         igraph_vector_int_sort(&tmp2);

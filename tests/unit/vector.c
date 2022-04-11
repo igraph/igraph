@@ -189,10 +189,10 @@ int main() {
     IGRAPH_ASSERT(igraph_is_nan(VECTOR(v)[which_min2]));
     IGRAPH_ASSERT(igraph_is_nan(VECTOR(v)[which_max2]));
 
-    printf("Test igraph_vector_init_copy\n");
+    printf("Test igraph_vector_init_array\n");
     igraph_vector_destroy(&v);
     ptr = (igraph_real_t*) malloc(10 * sizeof(igraph_real_t));
-    igraph_vector_init_copy(&v, ptr, 10);
+    igraph_vector_init_array(&v, ptr, 10);
     free(ptr);
     for (i = 0; i < 10; i++) {
         VECTOR(v)[i] = 100 - i;

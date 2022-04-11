@@ -128,7 +128,7 @@ igraph_i_fundamental_cycles_bfs(
                     }
 
                     vpe = VECTOR(pred_edge)[vp];
-                    IGRAPH_CHECK(igraph_vector_int_push_back(&v_back, vpe));                    
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&v_back, vpe));
                     vp = IGRAPH_OTHER(graph, vpe, vp);
                 }
 
@@ -160,7 +160,7 @@ igraph_i_fundamental_cycles_bfs(
                     VECTOR(*visited)[u] = mark + 1;
                     VECTOR(pred_edge)[u] = e;
                 }
-            }            
+            }
         }
 
         VECTOR(*visited)[v] = mark + 2; /* mark v as processed */
@@ -325,7 +325,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
 
     igraph_vector_int_t work, tmp;
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&work, cycle));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&work, cycle));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &work);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
@@ -476,7 +476,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     {
         igraph_integer_t cand_len = igraph_vector_int_list_size(&candidates);
         igraph_vector_int_list_t reduced_matrix;
-        igraph_bool_t independent;        
+        igraph_bool_t independent;
 
         IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&reduced_matrix, 0);
 

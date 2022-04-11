@@ -365,7 +365,7 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
 
 /**
  * \ingroup matrix
- * \function igraph_matrix_copy
+ * \function igraph_matrix_init_copy
  * \brief Copies a matrix.
  *
  * </para><para>
@@ -379,11 +379,23 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
  * of elements in the matrix.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
-    IGRAPH_CHECK(FUNCTION(igraph_vector, copy)(&to->data, &from->data));
+igraph_error_t FUNCTION(igraph_matrix, init_copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init_copy)(&to->data, &from->data));
     to->nrow = from->nrow;
     to->ncol = from->ncol;
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup matrix
+ * \function igraph_matrix_copy
+ * \brief Copies a matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_matrix_init_copy 0.10
+ */
+
+igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
+    return FUNCTION(igraph_matrix, init_copy)(to, from);
 }
 
 #ifndef NOTORDERED

@@ -71,9 +71,6 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_set(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_set_len(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_set2(
-    igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len
-);
 IGRAPH_EXPORT void igraph_strvector_clear(igraph_strvector_t *sv);
 IGRAPH_EXPORT void igraph_strvector_remove_section(
     igraph_strvector_t *v, igraph_integer_t from, igraph_integer_t to);
@@ -81,15 +78,12 @@ IGRAPH_EXPORT void igraph_strvector_remove(
     igraph_strvector_t *v, igraph_integer_t elem);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_init_copy(
     igraph_strvector_t *to, const igraph_strvector_t *from);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_copy(
-    igraph_strvector_t *to, const igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_append(
     igraph_strvector_t *to, const igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_merge(
     igraph_strvector_t *to, igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_resize(
     igraph_strvector_t* v, igraph_integer_t newsize);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v,
         const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *v,
@@ -103,6 +97,13 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
 
 IGRAPH_EXPORT igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv,
                                                       igraph_integer_t capacity);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_copy(
+    igraph_strvector_t *to, const igraph_strvector_t *from);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_set2(
+    igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len
+);
 
 __END_DECLS
 

@@ -1515,7 +1515,7 @@ igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_mat
         }
     }
     igraph_matrix_destroy(vectors);
-    IGRAPH_CHECK(igraph_matrix_copy(vectors, &new_vectors));
+    IGRAPH_CHECK(igraph_matrix_init_copy(vectors, &new_vectors));
     igraph_matrix_destroy(&new_vectors);
     IGRAPH_FINALLY_CLEAN(1);
 

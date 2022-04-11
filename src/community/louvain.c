@@ -634,7 +634,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_destroy, &g);
 
     if (weights) {
-        IGRAPH_CHECK(igraph_vector_copy(&w, weights));
+        IGRAPH_CHECK(igraph_vector_init_copy(&w, weights));
         IGRAPH_FINALLY(igraph_vector_destroy, &w);
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&w, igraph_ecount(&g));

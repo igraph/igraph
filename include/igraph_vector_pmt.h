@@ -27,15 +27,17 @@
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init)(
         TYPE(igraph_vector)* v, igraph_integer_t size);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_copy)(
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_array)(
         TYPE(igraph_vector)* v, const BASE* data, igraph_integer_t length);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_copy)(
+        TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 
 #ifndef NOTORDERED
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
 #endif
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
-                                                const TYPE(igraph_vector) *from);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, copy)(
+        TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, destroy)(TYPE(igraph_vector)* v);
 
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);

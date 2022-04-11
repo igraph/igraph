@@ -44,7 +44,7 @@ static igraph_error_t igraph_i_matrix_list_init_item(
 static igraph_error_t igraph_i_matrix_list_copy_item(
     igraph_matrix_t* dest, const igraph_matrix_t* source
 ) {
-    return igraph_matrix_copy(dest, source);
+    return igraph_matrix_init_copy(dest, source);
 }
 
 static void igraph_i_matrix_list_destroy_item(igraph_matrix_t* item) {

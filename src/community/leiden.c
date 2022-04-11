@@ -345,7 +345,7 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
     }
 
     /* Shuffle nodes */
-    IGRAPH_CHECK(igraph_vector_int_copy(&node_order, node_subset));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&node_order, node_subset));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
     IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
 

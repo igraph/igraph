@@ -250,7 +250,7 @@ void print_vector_first_nonzero_element_positive(const igraph_vector_t *vector, 
     igraph_vector_t copy;
     igraph_integer_t i, n;
 
-    igraph_vector_copy(&copy, vector);
+    igraph_vector_init_copy(&copy, vector);
 
     n = igraph_vector_size(&copy);
 
@@ -277,7 +277,7 @@ void print_vector_complex_first_nonzero_real_part_positive(const igraph_vector_c
     igraph_vector_complex_t copy;
     igraph_integer_t i, n;
 
-    igraph_vector_complex_copy(&copy, vector);
+    igraph_vector_complex_init_copy(&copy, vector);
 
     n = igraph_vector_complex_size(&copy);
 
@@ -307,7 +307,7 @@ void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* 
     igraph_matrix_t copy;
     igraph_integer_t i, j, nrow, ncol;
 
-    igraph_matrix_copy(&copy, matrix);
+    igraph_matrix_init_copy(&copy, matrix);
 
     nrow = igraph_matrix_nrow(&copy);
     ncol = igraph_matrix_ncol(&copy);
@@ -340,7 +340,7 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     char buf[256];
     size_t len;
 
-    igraph_matrix_complex_copy(&copy, matrix);
+    igraph_matrix_complex_init_copy(&copy, matrix);
 
     nrow = igraph_matrix_complex_nrow(&copy);
     ncol = igraph_matrix_complex_ncol(&copy);

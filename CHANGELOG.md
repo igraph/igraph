@@ -513,6 +513,13 @@ Some of the highlights are:
  - The `edgemaps` parameter of `igraph_union_many()` is now an
    `igraph_vector_int_list_t` instead of a pointer vector.
 
+ - `igraph_vector_init_copy()` was refactored to take _another_ vector that the
+   newly initialized vector should copy. The old array-based initialization
+   function is now called `igraph_vector_init_array()`.
+
+ - `igraph_vector_ptr_init_copy()` was renamed to `igraph_vector_ptr_init_array()`
+   for sake of consistency.
+
  - `igraph_vs_vector()`, `igraph_vss_vector()` and `igraph_vs_vector_copy()` now
    all take an `igraph_vector_int_t` as the vector of vertex IDs, not an
    `igraph_vector_t`. Similarly, `igraph_vs_as_vector()` now returns the vector
@@ -682,6 +689,11 @@ Some of the highlights are:
    and will either be removed in 0.11 or will be changed to become a generic
    lattice generator that also supports other types of lattices.
 
+ - `igraph_matrix_copy()` is now deprecated; use `igraph_matrix_init_copy()`
+   instead. The new name emphasizes that the function _initializes_ the first
+   argument instead of expecting an already-initialized target matrix. The old
+   name will be removed in 0.11.
+
  - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
    `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
@@ -719,6 +731,11 @@ Some of the highlights are:
  - `igraph_vector_e()` and `igraph_vector_e_ptr()` have been renamed to
    `igraph_vector_get()` and `igraph_vector_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
+
+ - `igraph_vector_copy()` is now deprecated; use `igraph_vector_init_copy()`
+   instead. The new name emphasizes that the function _initializes_ the first
+   argument instead of expecting an already-initialized target vector. The old
+   name will be removed in 0.11.
 
  - `igraph_write_graph_dimacs()` has been renamed to `igraph_write_graph_dimacs_flow()`;
    the old name is deprecated and might be re-used as a generic DIMACS writer

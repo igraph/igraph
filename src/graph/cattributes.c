@@ -111,7 +111,7 @@ static igraph_error_t igraph_i_cattributes_copy_attribute_record(igraph_attribut
             IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, newnum);
-        IGRAPH_CHECK(igraph_vector_copy(newnum, num));
+        IGRAPH_CHECK(igraph_vector_init_copy(newnum, num));
         IGRAPH_FINALLY(igraph_vector_destroy, newnum);
         (*newrec)->value = newnum;
     } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
@@ -131,7 +131,7 @@ static igraph_error_t igraph_i_cattributes_copy_attribute_record(igraph_attribut
             IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, newlog);
-        IGRAPH_CHECK(igraph_vector_bool_copy(newlog, log));
+        IGRAPH_CHECK(igraph_vector_bool_init_copy(newlog, log));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, newlog);
         (*newrec)->value = newlog;
     }
@@ -3784,7 +3784,7 @@ igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, num);
         rec->value = num;
-        IGRAPH_CHECK(igraph_vector_copy(num, v));
+        IGRAPH_CHECK(igraph_vector_init_copy(num, v));
         IGRAPH_FINALLY(igraph_vector_destroy, num);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
         IGRAPH_FINALLY_CLEAN(4);
@@ -3849,7 +3849,7 @@ igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, log);
         rec->value = log;
-        IGRAPH_CHECK(igraph_vector_bool_copy(log, v));
+        IGRAPH_CHECK(igraph_vector_bool_init_copy(log, v));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
         IGRAPH_FINALLY_CLEAN(4);
@@ -3982,7 +3982,7 @@ igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, num);
         rec->value = num;
-        IGRAPH_CHECK(igraph_vector_copy(num, v));
+        IGRAPH_CHECK(igraph_vector_init_copy(num, v));
         IGRAPH_FINALLY(igraph_vector_destroy, num);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
         IGRAPH_FINALLY_CLEAN(4);
@@ -4048,7 +4048,7 @@ igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, log);
         rec->value = log;
-        IGRAPH_CHECK(igraph_vector_bool_copy(log, v));
+        IGRAPH_CHECK(igraph_vector_bool_init_copy(log, v));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
         IGRAPH_FINALLY_CLEAN(4);

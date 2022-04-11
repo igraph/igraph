@@ -568,7 +568,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
             IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
         }
 
-        IGRAPH_CHECK(igraph_vector_copy(&normalized_reset, reset));
+        IGRAPH_CHECK(igraph_vector_init_copy(&normalized_reset, reset));
         IGRAPH_FINALLY(igraph_vector_destroy, &normalized_reset);
 
         igraph_vector_scale(&normalized_reset, 1.0 / reset_sum);

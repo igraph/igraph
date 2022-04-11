@@ -116,7 +116,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
         /* Find a maximum weight spanning tree. igraph has a routine for minimum
          * spanning trees, so we negate the weights */
         igraph_vector_t vcopy;
-        IGRAPH_CHECK(igraph_vector_copy(&vcopy, weights));
+        IGRAPH_CHECK(igraph_vector_init_copy(&vcopy, weights));
         IGRAPH_FINALLY(igraph_vector_destroy, &vcopy);
         igraph_vector_scale(&vcopy, -1);
         IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, &edges, &vcopy));
