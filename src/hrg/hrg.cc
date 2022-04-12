@@ -252,6 +252,18 @@ static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
     return 0;
 }
 
+static void igraph_i_delete_dendrogram(dendro* d) {
+    delete d;
+}
+
+static void igraph_i_delete_simple_graph(simpleGraph* g) {
+    delete g;
+}
+
+static void igraph_i_clear_pblock_array(pblock* arr) {
+    delete [] arr;
+}
+
 /**
  * \function igraph_hrg_init
  * Allocate memory for a HRG.
@@ -378,12 +390,12 @@ int igraph_hrg_fit(const igraph_t *graph,
     RNG_BEGIN();
 
     d = new dendro;
+    IGRAPH_FINALLY(igraph_i_delete_dendrogram, d);
 
     // If we want to start from HRG
     if (start) {
         d->clearDendrograph();
         if (igraph_hrg_size(hrg) != no_of_nodes) {
-            delete d;
             IGRAPH_ERROR("Invalid HRG to start from", IGRAPH_EINVAL);
         }
         // Convert the igraph graph
@@ -403,6 +415,7 @@ int igraph_hrg_fit(const igraph_t *graph,
     }
 
     delete d;
+    IGRAPH_FINALLY_CLEAN(1);
 
     RNG_END();
 
@@ -488,6 +501,7 @@ int igraph_hrg_sample(const igraph_t *input_graph,
     RNG_BEGIN();
 
     d = new dendro;
+    IGRAPH_FINALLY(igraph_i_delete_dendrogram, d);
 
     // Need to find equilibrium first?
     if (start) {
@@ -527,6 +541,7 @@ int igraph_hrg_sample(const igraph_t *input_graph,
     }
 
     delete d;
+    IGRAPH_FINALLY_CLEAN(1);
 
     RNG_END();
 
@@ -666,6 +681,7 @@ int igraph_hrg_consensus(const igraph_t *graph,
     RNG_BEGIN();
 
     d = new dendro;
+    IGRAPH_FINALLY(igraph_i_delete_dendrogram, d);
 
     if (start) {
         d->clearDendrograph();
@@ -674,7 +690,7 @@ int igraph_hrg_consensus(const igraph_t *graph,
     } else {
         IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
         if (hrg) {
-            igraph_hrg_resize(hrg, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_hrg_resize(hrg, igraph_vcount(graph)));
         }
         IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
     }
@@ -684,6 +700,7 @@ int igraph_hrg_consensus(const igraph_t *graph,
     d->recordConsensusTree(parents, weights);
 
     delete d;
+    IGRAPH_FINALLY_CLEAN(1);
 
     RNG_END();
 
@@ -859,8 +876,10 @@ int igraph_hrg_predict(const igraph_t *graph,
     RNG_BEGIN();
 
     d = new dendro;
+    IGRAPH_FINALLY(igraph_i_delete_dendrogram, d);
 
     IGRAPH_CHECK(igraph_i_hrg_getsimplegraph(graph, d, &sg, num_bins));
+    IGRAPH_FINALLY(igraph_i_delete_simple_graph, sg);
 
     mk = sg->getNumNodes() * (sg->getNumNodes() - 1) / 2 - sg->getNumLinks() / 2;
     br_list = new pblock[mk];
@@ -869,6 +888,7 @@ int igraph_hrg_predict(const igraph_t *graph,
         br_list[i].i = -1;
         br_list[i].j = -1;
     }
+    IGRAPH_FINALLY(igraph_i_clear_pblock_array, br_list);
 
     if (start) {
         d->clearDendrograph();
@@ -877,7 +897,7 @@ int igraph_hrg_predict(const igraph_t *graph,
         d->importDendrogramStructure(hrg);
     } else {
         if (hrg) {
-            igraph_hrg_resize(hrg, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_hrg_resize(hrg, igraph_vcount(graph)));
         }
         IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
     }
@@ -889,6 +909,7 @@ int igraph_hrg_predict(const igraph_t *graph,
     delete d;
     delete sg;
     delete [] br_list;
+    IGRAPH_FINALLY_CLEAN(3);
 
     RNG_END();
 
@@ -1021,7 +1042,7 @@ int igraph_hrg_create(igraph_hrg_t *hrg,
         }
     }
 
-    igraph_hrg_resize(hrg, no_of_internal + 1);
+    IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_internal + 1));
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
     for (int i = 0; i < no_of_nodes; i++) {
         int ri = VECTOR(idx)[i];
