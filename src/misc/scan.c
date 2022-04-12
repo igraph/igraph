@@ -797,7 +797,7 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
  * \function igraph_local_scan_neighborhood_ecount
  * Local scan-statistics with pre-calculated neighborhoods
  *
- * Count the number of edges, or sum the edge weigths in
+ * Count the number of edges, or sum the edge weights in
  * neighborhoods given as a parameter.
  *
  * \param graph The graph to perform the counting/summing in.
