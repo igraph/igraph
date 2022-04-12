@@ -1490,7 +1490,7 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
 
 /**
  * \ingroup vector
- * \function igraph_vector_copy
+ * \function igraph_vector_init_copy
  * \brief Initializes a vector from another vector object (constructor).
  *
  * </para><para>

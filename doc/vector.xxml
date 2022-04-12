@@ -15,8 +15,8 @@
 <!-- doxrox-include igraph_vector_constructors_and_destructors -->
 <!-- doxrox-include igraph_vector_init -->
 <!-- doxrox-include igraph_vector_init_array -->
+<!-- doxrox-include igraph_vector_init_copy -->
 <!-- doxrox-include igraph_vector_init_seq -->
-<!-- doxrox-include igraph_vector_copy -->
 <!-- doxrox-include igraph_vector_destroy -->
 </section>
 
@@ -129,7 +129,7 @@
 <section id="about-vector-ptr">
 <!-- doxrox-include about_igraph_vector_ptr_objects -->
 <!-- doxrox-include igraph_vector_ptr_init -->
-<!-- doxrox-include igraph_vector_ptr_copy -->
+<!-- doxrox-include igraph_vector_ptr_init_copy -->
 <!-- doxrox-include igraph_vector_ptr_destroy -->
 <!-- doxrox-include igraph_vector_ptr_free_all -->
 <!-- doxrox-include igraph_vector_ptr_destroy_all -->
@@ -150,8 +150,10 @@
 </section>
 
 <section id="vector-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_vector_copy -->
 <!-- doxrox-include igraph_vector_e -->
 <!-- doxrox-include igraph_vector_e_ptr -->
+<!-- doxrox-include igraph_vector_ptr_copy -->
 <!-- doxrox-include igraph_vector_ptr_e -->
 </section>
 
