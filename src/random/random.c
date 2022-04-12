@@ -1120,7 +1120,6 @@ static double igraph_i_norm_rand(igraph_rng_t *rng) {
     double u1;
 
 #define BIG 134217728 /* 2^27 */
-    /* unif_rand() alone is not of high enough precision */
     u1 = igraph_rng_get_unif01(rng);
     u1 = (int)(BIG * u1) + igraph_rng_get_unif01(rng);
     return igraph_i_qnorm5(u1 / BIG, 0.0, 1.0, 1, 0);
