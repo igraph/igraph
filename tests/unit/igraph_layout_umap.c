@@ -17,7 +17,8 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+
+#include "test_utilities.h"
 
 
 void check_graph_twoclusters(const igraph_matrix_t *layout) {
