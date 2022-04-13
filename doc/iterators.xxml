@@ -57,7 +57,6 @@
 <!-- doxrox-include igraph_es_none -->
 <!-- doxrox-include igraph_es_1 -->
 <!-- doxrox-include igraph_es_vector -->
-<!-- doxrox-include igraph_es_fromto -->
 <!-- doxrox-include igraph_es_seq -->
 <!-- doxrox-include igraph_es_pairs -->
 <!-- doxrox-include igraph_es_pairs_small -->
@@ -94,8 +93,9 @@
 </section>
 
 
-<!-- <section id="examples"><title>Examples</title>
-	</section>
+<!--
+    <section id="examples"><title>Examples</title>
+    </section>
 -->
 
 </chapter>

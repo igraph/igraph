@@ -40,7 +40,6 @@
 #include "core/buckets.h"
 #include "core/cutheap.h"
 #include "core/interruption.h"
-#include "core/math.h"
 
 #include "config.h"
 
@@ -277,7 +276,7 @@ static void igraph_i_mf_relabel(igraph_integer_t v, igraph_integer_t no_of_nodes
                                 igraph_vector_int_t *first,
                                 igraph_vector_t *rescap, igraph_vector_int_t *to,
                                 igraph_vector_int_t *current,
-                                igraph_maxflow_stats_t *stats, int *nrelabelsince) {
+                                igraph_maxflow_stats_t *stats, igraph_integer_t *nrelabelsince) {
 
     igraph_integer_t min = no_of_nodes;
     igraph_integer_t k, l, min_edge = 0;
@@ -303,7 +302,7 @@ static void igraph_i_mf_push(igraph_integer_t v, igraph_integer_t e, igraph_inte
                              igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
                              igraph_vector_int_t *distance,
                              igraph_vector_int_t *rev, igraph_maxflow_stats_t *stats,
-                             int *npushsince) {
+                             igraph_integer_t *npushsince) {
 
 
     IGRAPH_UNUSED(current);
@@ -334,7 +333,7 @@ static void igraph_i_mf_discharge(igraph_integer_t v,
                                   igraph_dbuckets_t *ibuckets,
                                   igraph_vector_int_t *rev,
                                   igraph_maxflow_stats_t *stats,
-                                  int *npushsince, int *nrelabelsince) {
+                                  igraph_integer_t *npushsince, igraph_integer_t *nrelabelsince) {
     do {
         igraph_integer_t i;
         igraph_integer_t start = CURRENT(v);
@@ -504,7 +503,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     igraph_dqueue_int_t bfsq;
 
     igraph_integer_t i, j, idx;
-    int npushsince = 0, nrelabelsince = 0;
+    igraph_integer_t npushsince = 0, nrelabelsince = 0;
 
     igraph_maxflow_stats_t local_stats;   /* used if the user passed a null pointer for stats */
 
@@ -574,7 +573,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 #define EXCESS(i)      (VECTOR(excess)[(i)])
 #define DIST(i)        (VECTOR(distance)[(i)])
 
-    igraph_dqueue_int_init(&bfsq,             no_of_nodes);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&bfsq, no_of_nodes));
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &bfsq);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&to,       no_of_edges);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&rev,      no_of_edges);
@@ -1177,7 +1176,7 @@ igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 /* This is a flow-based version, but there is a better one
    for undirected graphs */
 
-/* int igraph_i_mincut_value_undirected(const igraph_t *graph, */
+/* igraph_error_t igraph_i_mincut_value_undirected(const igraph_t *graph, */
 /*                   igraph_real_t *res, */
 /*                   const igraph_vector_t *capacity) { */
 
@@ -1256,8 +1255,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         igraph_integer_t no;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&memb, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
-        IGRAPH_CHECK(igraph_clusters(graph, &memb, &csize, &no,
-                                     /*mode=*/ IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, &memb, &csize, &no, IGRAPH_WEAK));
         if (no != 1) {
             if (res) {
                 *res = 0;
@@ -1266,7 +1264,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                 igraph_vector_int_clear(cut);
             }
             if (partition) {
-                int j = 0;
+                igraph_integer_t j = 0;
                 IGRAPH_CHECK(igraph_vector_int_resize(partition,
                                                   VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {
@@ -1276,7 +1274,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                 }
             }
             if (partition2) {
-                int j = 0;
+                igraph_integer_t j = 0;
                 IGRAPH_CHECK(igraph_vector_int_resize(partition2, no_of_nodes -
                                                   VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {
@@ -1430,7 +1428,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         char *mark;
         mark = IGRAPH_CALLOC(no_of_nodes, char);
         if (!mark) {
-            IGRAPH_ERROR("Not enough memory for minimum cut", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Not enough memory for minimum cut", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, mark);
 
@@ -2290,23 +2288,22 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    igraph_are_connected(graph, source, target, &conn);
+    IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
     if (conn) {
         /* We need to remove every (possibly directed) edge between source
            and target and calculate the disjoint paths on the new
-           graph. Finally we add 1 for the removed connection(s).  */
+           graph. Finally we add 1 for each removed connection.  */
         igraph_es_t es;
-        igraph_vector_int_t v;
         igraph_t newgraph;
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&v, 2);
-        VECTOR(v)[0] = source;
-        VECTOR(v)[1] = target;
-        IGRAPH_CHECK(igraph_es_multipairs(&es, &v, IGRAPH_DIRECTED));
+        igraph_integer_t num_removed_edges;
+
+        IGRAPH_CHECK(igraph_es_all_between(&es, source, target, IGRAPH_DIRECTED));
         IGRAPH_FINALLY(igraph_es_destroy, &es);
 
         IGRAPH_CHECK(igraph_copy(&newgraph, graph));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         IGRAPH_CHECK(igraph_delete_edges(&newgraph, es));
+        num_removed_edges = igraph_ecount(graph) - igraph_ecount(&newgraph);
 
         if (igraph_is_directed(graph)) {
             IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(&newgraph, res,
@@ -2319,26 +2316,22 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
         }
 
         if (res) {
-            *res += 1;
+            *res += num_removed_edges;
         }
 
-        IGRAPH_FINALLY_CLEAN(3);
+        IGRAPH_FINALLY_CLEAN(2);
         igraph_destroy(&newgraph);
         igraph_es_destroy(&es);
-        igraph_vector_int_destroy(&v);
-    }
-
-    /* These do nothing if the two vertices are connected,
-       so it is safe to call them. */
-
-    if (igraph_is_directed(graph)) {
-        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
-                     source, target,
-                     IGRAPH_VCONN_NEI_IGNORE));
     } else {
-        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
-                     source, target,
-                     IGRAPH_VCONN_NEI_IGNORE));
+        if (igraph_is_directed(graph)) {
+            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
+                        source, target,
+                        IGRAPH_VCONN_NEI_IGNORE));
+        } else {
+            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
+                        source, target,
+                        IGRAPH_VCONN_NEI_IGNORE));
+        }
     }
 
     return IGRAPH_SUCCESS;

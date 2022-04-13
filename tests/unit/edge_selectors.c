@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check(igraph_t *graph, igraph_es_t *es) {
     igraph_eit_t eit;
@@ -55,9 +55,6 @@ int main() {
     IGRAPH_ASSERT(igraph_es_vector(&es, &v) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_eit_create(&g, es, &eit) == IGRAPH_EINVAL);
     igraph_vector_int_destroy(&v);
-
-    printf("Fromto not implemented.\n");
-    IGRAPH_ASSERT(igraph_es_fromto(&es, igraph_vss_all(), igraph_vss_all()) == IGRAPH_UNIMPLEMENTED);
 
     printf("Checking es_seq:\n");
     IGRAPH_ASSERT(igraph_es_seq(&es, 2, 4) == IGRAPH_SUCCESS);

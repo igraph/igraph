@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
     igraph_integer_t i, n;

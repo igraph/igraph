@@ -22,7 +22,7 @@
 */
 
 #include "igraph_complex.h"
-#include "core/math.h"
+
 #include <math.h>
 
 /**

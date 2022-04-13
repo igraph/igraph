@@ -25,6 +25,7 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
+#include "internal/hacks.h" /* strdup */
 
 #include "config.h"
 
@@ -80,7 +81,7 @@ igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
 
 igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
-                                        const igraph_vector_ptr_t *merges,
+                                        const igraph_vector_int_list_t *merges,
                                         const igraph_attribute_combination_t *comb) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_vertices(graph, newgraph,
@@ -112,7 +113,7 @@ igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
 
 igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
-                                     const igraph_vector_ptr_t *merges,
+                                     const igraph_vector_int_list_t *merges,
                                      const igraph_attribute_combination_t *comb) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_edges(graph, newgraph,
@@ -367,20 +368,26 @@ igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *
         /* This is a new attribute name */
         igraph_attribute_combination_record_t *rec =
             IGRAPH_CALLOC(1, igraph_attribute_combination_record_t);
-
-        if (!rec) {
-            IGRAPH_ERROR("Cannot create attribute combination data",
-                         IGRAPH_ENOMEM);
+        if (! rec) {
+            IGRAPH_ERROR("Cannot create attribute combination data.",
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        if (!name) {
+        IGRAPH_FINALLY(igraph_free, rec);
+        if (! name) {
             rec->name = NULL;
         } else {
             rec->name = strdup(name);
+            if (! rec->name) {
+                IGRAPH_ERROR("Cannot create attribute combination data.",
+                             IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            }
         }
+        IGRAPH_FINALLY(igraph_free, (char *) rec->name); /* free() is safe on NULL */
         rec->type = type;
         rec->func = func;
 
         IGRAPH_CHECK(igraph_vector_ptr_push_back(&comb->list, rec));
+        IGRAPH_FINALLY_CLEAN(2); /* ownership of 'rec' transferred to 'comb->list' */
 
     }
 
@@ -462,7 +469,30 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
+/**
+ * \function igraph_attribute_combination
+ * \brief Initialize attribute combination list and add records.
+ *
+ * \param comb The uninitialized attribute combination list.
+ * \param ...  A list of 'name, type[, func]', where:
+ * \param name The name of the attribute. If the name already exists
+ *             the attribute combination record will be replaced.
+ *             Use NULL to add a default combination record for all
+ *             atributes not in the list.
+ * \param type The type of the attribute combination. See \ref
+ *             igraph_attribute_combination_type_t for the options.
+ * \param func Function to be used if \p type is
+ *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ * The list is closed by IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ * \return Error code.
+ *
+ * Time complexity: O(n^2), where n is the number attribute
+ *                  combinations records to add.
+ *
+ * \example examples/simple/igraph_attribute_combination.c
+ */
+igraph_error_t igraph_attribute_combination(
+        igraph_attribute_combination_t *comb, ...) {
 
     va_list ap;
 

@@ -58,11 +58,11 @@ igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
     igraph_vector_int_t layers;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERRORF("The vertex type vector size (%ld) should be equal to the number of nodes (%ld).",
+        IGRAPH_ERRORF("The vertex type vector size (%" IGRAPH_PRId ") should be equal to the number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
     if (hgap < 0) {
-        IGRAPH_ERRORF("The horizontal gap cannot be negative, got %f.", IGRAPH_EINVAL, hgap);
+        IGRAPH_ERRORF("The horizontal gap cannot be negative, got %g.", IGRAPH_EINVAL, hgap);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&layers, no_of_nodes);

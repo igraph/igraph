@@ -25,6 +25,8 @@
 #include "igraph_random.h"
 #include "igraph_error.h"
 
+#include "math/safe_intop.h"
+
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
@@ -65,7 +67,10 @@
 
 igraph_error_t FUNCTION(igraph_matrix, init)(
         TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, nrow * ncol));
+    igraph_integer_t size;
+    IGRAPH_ASSERT(nrow >= 0 && ncol >= 0);
+    IGRAPH_SAFE_MULT(nrow, ncol, &size);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&m->data, size));
     m->nrow = nrow;
     m->ncol = ncol;
     return IGRAPH_SUCCESS;
@@ -75,7 +80,10 @@ const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(
         const TYPE(igraph_matrix) *m, const BASE *data,
         igraph_integer_t nrow, igraph_integer_t ncol) {
     TYPE(igraph_matrix) *m2 = (TYPE(igraph_matrix)*)m;
-    FUNCTION(igraph_vector, view)(&m2->data, data, nrow * ncol);
+    /* No oveflow checking, as this function does not return igraph_error_t.
+     * It is the caller's resposibility to ensure that the size of 'data'
+     * matches nrow*ncol, which also implies that nrow*ncol does not overflow. */
+    FUNCTION(igraph_vector, view)(&m2->data, data, ncol * nrow);
     m2->nrow = nrow;
     m2->ncol = ncol;
     return m;
@@ -149,7 +157,10 @@ igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m)
  */
 
 igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol) {
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol));
+    igraph_integer_t size;
+    IGRAPH_ASSERT(nrow >= 0 && ncol >= 0);
+    IGRAPH_SAFE_MULT(nrow, ncol, &size);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, size));
     m->nrow = nrow;
     m->ncol = ncol;
     return IGRAPH_SUCCESS;
@@ -160,36 +171,18 @@ igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_in
  * \function igraph_matrix_resize_min
  * \brief Deallocates unused memory for a matrix.
  *
- * </para><para>
- * Note that this function might fail if there is not enough memory
- * available.
+ * This function attempts to deallocate the unused reserved storage
+ * of a matrix.
  *
- * </para><para>
- * Also note, that this function leaves the matrix intact, i.e.
- * it does not destroy any of the elements. However, usually it involves
- * copying the matrix in memory.
  * \param m Pointer to an initialized matrix.
- * \return Error code.
  *
  * \sa \ref igraph_matrix_resize().
  *
- * Time complexity: operating system dependent.
+ * Time complexity: operating system dependent, O(n) at worst.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
-    TYPE(igraph_vector) tmp;
-    igraph_integer_t size = FUNCTION(igraph_matrix, size)(m);
-    igraph_integer_t capacity = FUNCTION(igraph_matrix, capacity)(m);
-    if (size == capacity) {
-        return IGRAPH_SUCCESS;
-    }
-
-    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&tmp, size));
-    FUNCTION(igraph_vector, update)(&tmp, &m->data);
-    FUNCTION(igraph_vector, destroy)(&m->data);
-    m->data = tmp;
-
-    return IGRAPH_SUCCESS;
+void FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
+    FUNCTION(igraph_vector, resize_min)(&m->data);
 }
 
 
@@ -291,7 +284,9 @@ void FUNCTION(igraph_matrix, null)(TYPE(igraph_matrix) *m) {
  */
 
 igraph_error_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_integer_t n) {
-    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow, m->ncol + n));
+    igraph_integer_t new_ncol;
+    IGRAPH_SAFE_ADD(m->ncol, n, &new_ncol);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(m, m->nrow, new_ncol));
     return IGRAPH_SUCCESS;
 }
 
@@ -309,13 +304,15 @@ igraph_error_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_
  */
 
 igraph_error_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_integer_t n) {
-    igraph_integer_t i;
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, (m->ncol) * (m->nrow + n)));
-    for (i = m->ncol - 1; i >= 0; i--) {
-        FUNCTION(igraph_vector, move_interval2)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),
-                                                (m->nrow + n)*i);
+    igraph_integer_t new_nrow, new_size;
+    IGRAPH_SAFE_ADD(m->nrow, n, &new_nrow);
+    IGRAPH_SAFE_MULT(m->ncol, new_nrow, &new_size);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&m->data, new_size));
+    for (igraph_integer_t i = m->ncol - 1; i >= 0; i--) {
+        FUNCTION(igraph_vector, move_interval)(&m->data, (m->nrow)*i, (m->nrow) * (i + 1),
+                                                new_nrow * i);
     }
-    m->nrow += n;
+    m->nrow = new_nrow;
     return IGRAPH_SUCCESS;
 }
 
@@ -368,7 +365,7 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
 
 /**
  * \ingroup matrix
- * \function igraph_matrix_copy
+ * \function igraph_matrix_init_copy
  * \brief Copies a matrix.
  *
  * </para><para>
@@ -382,11 +379,23 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
  * of elements in the matrix.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
-    IGRAPH_CHECK(FUNCTION(igraph_vector, copy)(&to->data, &from->data));
+igraph_error_t FUNCTION(igraph_matrix, init_copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init_copy)(&to->data, &from->data));
     to->nrow = from->nrow;
     to->ncol = from->ncol;
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup matrix
+ * \function igraph_matrix_copy
+ * \brief Copies a matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_matrix_init_copy 0.10
+ */
+
+igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
+    return FUNCTION(igraph_matrix, init_copy)(to, from);
 }
 
 #ifndef NOTORDERED
@@ -716,7 +725,7 @@ igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
 }
 
 /**
- * \function igraph_matrix_e
+ * \function igraph_matrix_get
  * Extract an element from a matrix.
  *
  * Use this if you need a function for some reason and cannot use the
@@ -729,13 +738,13 @@ igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
+BASE FUNCTION(igraph_matrix, get)(const TYPE(igraph_matrix) *m,
                                 igraph_integer_t row, igraph_integer_t col) {
     return MATRIX(*m, row, col);
 }
 
 /**
- * \function igraph_matrix_e_ptr
+ * \function igraph_matrix_get_ptr
  * Pointer to an element of a matrix.
  *
  * The function returns a pointer to an element. No range checking is
@@ -748,9 +757,33 @@ BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(1).
  */
 
+BASE* FUNCTION(igraph_matrix, get_ptr)(const TYPE(igraph_matrix) *m,
+                                       igraph_integer_t row, igraph_integer_t col) {
+    return &MATRIX(*m, row, col);
+}
+
+/**
+ * \function igraph_matrix_e
+ * Extract an element from a matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_matrix_get 0.10.0
+ */
+
+BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
+                                igraph_integer_t row, igraph_integer_t col) {
+    return FUNCTION(igraph_matrix, get)(m, row, col);
+}
+
+/**
+ * \function igraph_matrix_e_ptr
+ * Pointer to an element of a matrix.
+ *
+ * \deprecated-by igraph_matrix_get_ptr 0.10.0
+ */
+
 BASE* FUNCTION(igraph_matrix, e_ptr)(const TYPE(igraph_matrix) *m,
                                      igraph_integer_t row, igraph_integer_t col) {
-    return &MATRIX(*m, row, col);
+    return FUNCTION(igraph_matrix, get_ptr)(m, row, col);
 }
 
 /**
@@ -832,8 +865,10 @@ igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
         IGRAPH_ERROR("Cannot do rbind, number of columns do not match", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&to->data,
-                 tocols * (fromrows + torows)));
+    igraph_integer_t new_size; /* new_size = tocols * (fromrows + torows) */
+    IGRAPH_SAFE_ADD(fromrows, torows, &new_size);
+    IGRAPH_SAFE_MULT(tocols, new_size, &new_size);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(&to->data, new_size));
     to->nrow += fromrows;
 
     offset = (tocols - 1) * fromrows;
@@ -876,29 +911,42 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
     if (torows != fromrows) {
         IGRAPH_ERROR("Cannot do rbind, number of rows do not match", IGRAPH_EINVAL);
     }
-    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(to, torows, tocols + fromcols));
+
+    igraph_integer_t new_tocols;
+    IGRAPH_SAFE_ADD(tocols, fromcols, &new_tocols);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(to, torows, new_tocols));
+
     FUNCTION(igraph_vector, copy_to)(&from->data, VECTOR(to->data) + tocols * torows);
+
     return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_matrix_swap
- * Swap two matrices.
+ * \brief Swap two matrices.
  *
- * The contents of the two matrices will be swapped. They must have the
- * same dimensions.
+ * The contents of the two matrices will be swapped.
  * \param m1 The first matrix.
  * \param m2 The second matrix.
  * \return Error code.
  *
- * Time complexity: O(mn), the number of elements in the matrices.
+ * Time complexity: O(1).
  */
 
 igraph_error_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
-    if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
-        IGRAPH_ERROR("Cannot swap non-conformant matrices", IGRAPH_EINVAL);
-    }
-    return FUNCTION(igraph_vector, swap)(&m1->data, &m2->data);
+    igraph_integer_t tmp;
+
+    tmp = m1->nrow;
+    m1->nrow = m2->nrow;
+    m2->nrow = tmp;
+
+    tmp = m1->ncol;
+    m1->ncol = m2->ncol;
+    m2->ncol = tmp;
+
+    IGRAPH_CHECK(FUNCTION(igraph_vector, swap)(&m1->data, &m2->data));
+
+    return IGRAPH_SUCCESS;
 }
 
 /**

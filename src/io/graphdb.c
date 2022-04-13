@@ -24,8 +24,6 @@
 
 #include "igraph_constructors.h"
 
-#include "core/trie.h"
-
 static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
     int b1, b2;
     unsigned char c1, c2;
@@ -86,7 +84,11 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
 
     nodes = igraph_i_read_graph_graphdb_getword(instream);
     if (nodes < 0) {
-        IGRAPH_ERROR("Can't read from file", IGRAPH_EFILE);
+        if (feof(instream)) {
+            IGRAPH_ERROR("Unexpected end of file, truncated graphdb file.", IGRAPH_PARSEERROR);
+        } else {
+            IGRAPH_ERROR("Cannot read from file.", IGRAPH_EFILE);
+        }
     }
     for (i = 0; !end && i < nodes; i++) {
         igraph_integer_t len = igraph_i_read_graph_graphdb_getword(instream);
@@ -106,7 +108,11 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
     }
 
     if (end) {
-        IGRAPH_ERROR("Truncated graphdb file", IGRAPH_EFILE);
+        if (feof(instream)) {
+            IGRAPH_ERROR("Unexpected end of file, truncated graphdb file.", IGRAPH_PARSEERROR);
+        } else {
+            IGRAPH_ERROR("Cannot read from file.", IGRAPH_EFILE);
+        }
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));

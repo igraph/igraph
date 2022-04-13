@@ -24,6 +24,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \ingroup generators
  * \function igraph_full
@@ -55,7 +57,7 @@
  * O(|E|)=O(|V||V|)
  * here.
  *
- * \sa \ref igraph_lattice(), \ref igraph_star(), \ref igraph_tree()
+ * \sa \ref igraph_square_lattice(), \ref igraph_star(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_full.c
@@ -64,16 +66,20 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
                 igraph_bool_t loops) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t no_of_edges2;
     igraph_integer_t i, j;
 
     if (n < 0) {
-        IGRAPH_ERROR("invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (directed && loops) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * n));
+        /* ecount = n * n */
+        IGRAPH_SAFE_MULT(n, n, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
@@ -81,7 +87,10 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
             }
         }
     } else if (directed && !loops) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * (n - 1)));
+        /* ecount = n * (n - 1) */
+        IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = 0; j < i; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
@@ -93,7 +102,10 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
             }
         }
     } else if (!directed && loops) {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * (n + 1) / 2));
+        /* ecount = n * (n + 1) / 2 */
+        IGRAPH_SAFE_ADD(n, 1, &no_of_edges2);
+        IGRAPH_SAFE_MULT(n, no_of_edges2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = i; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
@@ -101,7 +113,9 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
             }
         }
     } else {
-        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, n * (n - 1) / 2));
+        /* ecount = n * (n - 1) / 2 */
+        IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = i + 1; j < n; j++) {
                 igraph_vector_int_push_back(&edges, i); /* reserved */
@@ -119,7 +133,7 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 
 /**
  * \function igraph_full_citation
- * Creates a full citation graph
+ * \brief Creates a full citation graph.
  *
  * This is a directed graph, where every <code>i->j</code> edge is
  * present if and only if <code>j&lt;i</code>.
@@ -139,7 +153,16 @@ igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
     igraph_vector_int_t edges;
     igraph_integer_t i, j, ptr = 0;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, n * (n - 1));
+    if (n < 0) {
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+    }
+
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(n, n-1, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
+
     for (i = 1; i < n; i++) {
         for (j = 0; j < i; j++) {
             VECTOR(edges)[ptr++] = i;

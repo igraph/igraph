@@ -1,7 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2011-2012  Gabor Csardi <csardi@rmki.kfki.hu>
-   334 Harvard street, Cambridge MA, 02139 USA
+   Copyright (C) 2011-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
 #include "igraph_error.h"
@@ -29,6 +27,7 @@ typedef struct {
     int eof;
     int depth;
     char errmsg[300];
+    igraph_error_t igraph_errno;
     igraph_gml_tree_t *tree;
 } igraph_i_gml_parsedata_t;
 

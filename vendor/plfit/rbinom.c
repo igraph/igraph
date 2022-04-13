@@ -44,12 +44,12 @@
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
-#include "sampling.h"
+#include "plfit_sampling.h"
 #include "platform.h"
 
 #define repeat for(;;)
 
-double plfit_rbinom(double nin, double pp, mt_rng_t* rng)
+double plfit_rbinom(double nin, double pp, plfit_mt_rng_t* rng)
 {
     /* FIXME: These should become THREAD_specific globals : */
 
@@ -206,4 +206,3 @@ double plfit_rbinom(double nin, double pp, mt_rng_t* rng)
 	 ix = n - ix;
   return (double)ix;
 }
-

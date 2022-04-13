@@ -187,7 +187,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
                     VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
                     /* printf("Adding: %ld -> %ld, %ld -> %ld\n",
                                 (long)a, (long)d, (long)c, (long)b); */
-                    igraph_add_edges(graph, &edgevec, 0);
+                    IGRAPH_CHECK(igraph_add_edges(graph, &edgevec, 0));
                 }
                 num_successful_swaps++;
             }

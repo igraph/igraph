@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 int main() {
@@ -77,7 +77,7 @@ int main() {
 
     printf("\nTree\n");
     printf("==========================================================\n");
-    igraph_tree(&g, 11111, 10, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 11111, 10, IGRAPH_TREE_UNDIRECTED);
 
     /* We are including the rightmost 200 vertices from the lowermost layer
      * (layer 5) of the tree. These have 20 parents in layer 4, 2 grandparents
@@ -328,7 +328,7 @@ int main() {
         VECTOR(dims)[0] = 37;
         VECTOR(dims)[1] = 37;
 
-        igraph_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+        igraph_square_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* periodic */ 0);
 
         igraph_vector_init(&bet, 0);
         igraph_vector_int_init_seq(&target_vec, 0, igraph_vcount(&g) - 1);

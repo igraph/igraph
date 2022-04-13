@@ -1,0 +1,19 @@
+Complex matrix:
+1+5i 2+6i
+3+7i 4+8i
+Real part:
+1 2
+3 4
+Imaginary part:
+5 6
+7 8
+Real and imaginary part:
+1 2
+3 4
+5 6
+7 8
+Complex matrix from polar:
+1+0i -3+0i
+0+2i -0-4i
+Check if unequal number of imaginary and real rows is handled correctly.
+Check if unequal number of imaginary and real columns is handled correctly.

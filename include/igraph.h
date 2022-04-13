@@ -45,13 +45,14 @@
 #include "igraph_heap.h"
 #include "igraph_psumtree.h"
 #include "igraph_strvector.h"
+#include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
-#include "igraph_spmatrix.h"
 #include "igraph_sparsemat.h"
 #include "igraph_qsort.h"
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_graph_list.h"
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
@@ -97,5 +98,6 @@
 #include "igraph_coloring.h"
 #include "igraph_eulerian.h"
 #include "igraph_graphicality.h"
+#include "igraph_cycles.h"
 
 #endif

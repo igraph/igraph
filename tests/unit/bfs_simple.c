@@ -22,7 +22,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t g;
@@ -41,7 +41,7 @@ int main() {
     igraph_destroy(&g);
 
     /* Test a tree graph */
-    igraph_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_bfs_simple(&g, 0, IGRAPH_ALL, &vids, &layers, &parents);
     print_vector_int(&vids);
     print_vector_int(&layers);
@@ -49,14 +49,14 @@ int main() {
     igraph_destroy(&g);
 
     /* Test th same graph with all arguments as nulls to see if we tolerate that */
-    igraph_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_bfs_simple(&g, 0, IGRAPH_ALL, 0, 0, 0);
     igraph_destroy(&g);
 
     /* Also test the case when 'layers' is not null and 'vids' is null to ensure
      * that we don't need 'vids' in the internal implementation to populate
      * 'layers' */
-    igraph_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 20, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_bfs_simple(&g, 0, IGRAPH_ALL, 0, &layers, 0);
     print_vector_int(&layers);
     igraph_destroy(&g);

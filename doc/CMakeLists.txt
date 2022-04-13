@@ -46,7 +46,6 @@ set(
   random.xxml
   separators.xxml
   sparsemat.xxml
-  spmatrix.xxml
   spatialgames.xxml
   stack.xxml
   status.xxml
@@ -54,6 +53,7 @@ set(
   strvector.xxml
   threading.xxml
   vector.xxml
+  vectorlist.xxml
   visitors.xxml
 )
 
@@ -187,11 +187,16 @@ if(DOC_BUILD_SUPPORTED)
     add_custom_command(
       OUTPUT ${DOCBOOK_EXAMPLE_OUTPUT}
       COMMAND ${CMAKE_COMMAND} -E make_directory ${DOCBOOK_EXAMPLE_OUTPUT_DIR}
+      COMMAND ${Python3_EXECUTABLE}
+      ARGS
+      ${CMAKE_SOURCE_DIR}/tools/strip_licenses_from_examples.py
+      ${CMAKE_SOURCE_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
+      ${CMAKE_BINARY_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
       COMMAND ${SOURCE_HIGHLIGHT_COMMAND}
       ARGS
       --src-lang c
       --out-format docbook
-      --input ${CMAKE_SOURCE_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
+      --input ${CMAKE_BINARY_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
       --output ${DOCBOOK_EXAMPLE_OUTPUT}
       --gen-references inline
       --ctags=""

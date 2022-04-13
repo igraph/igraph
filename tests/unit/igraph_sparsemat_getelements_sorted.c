@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_res_i_j(igraph_vector_t *result, igraph_vector_int_t *i, igraph_vector_int_t *j) {
     print_vector(result);

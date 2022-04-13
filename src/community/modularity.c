@@ -374,7 +374,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
         }
 
         /* Scaling one degree factor so every element gets scaled. */
-        igraph_vector_copy(&deg_unscaled, &deg);
+        igraph_vector_init_copy(&deg_unscaled, &deg);
         IGRAPH_FINALLY(igraph_vector_destroy, &deg_unscaled);
         scaling_factor = resolution / 2.0 / sw;
         igraph_vector_scale(&deg, scaling_factor);

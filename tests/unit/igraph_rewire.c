@@ -21,14 +21,14 @@
 
 #include "operators/rewire_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, igraph_bool_t allow_loops, const char* description) {
 
     igraph_t g;
     igraph_vector_int_t indegree_before, outdegree_before, indegree_after, outdegree_after;
 
-    igraph_tree(&g, 10, 3, tree_mode);
+    igraph_kary_tree(&g, 10, 3, tree_mode);
 
     igraph_vector_int_init(&indegree_before, 0);
     igraph_vector_int_init(&outdegree_before, 0);

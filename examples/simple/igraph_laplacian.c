@@ -65,7 +65,7 @@ int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
 
     if (w) {
         weights = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_copy(weights, w);
+        igraph_vector_init_copy(weights, w);
     }
 
     /* No loop or multiple edges */
@@ -142,7 +142,7 @@ int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
 
     if (w) {
         weights = (igraph_vector_t*) calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_copy(weights, w);
+        igraph_vector_init_copy(weights, w);
     }
 
     /* Undirected graph, no loop or multiple edges */

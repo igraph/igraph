@@ -1,7 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2007-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
 #ifndef REST_GML_TREE_H
@@ -41,20 +39,26 @@ typedef struct igraph_gml_tree_t {
     igraph_vector_ptr_t names;
     igraph_vector_char_t types;
     igraph_vector_ptr_t children;
+    igraph_vector_int_t lines; /* line numbers where names appear */
 } igraph_gml_tree_t;
 
 igraph_error_t igraph_gml_tree_init_integer(igraph_gml_tree_t *t,
-                                 const char *name, size_t namelen,
-                                 igraph_integer_t value);
+                                            const char *name,
+                                            igraph_integer_t line,
+                                            igraph_integer_t value);
 igraph_error_t igraph_gml_tree_init_real(igraph_gml_tree_t *t,
-                              const char *name, size_t namelen,
-                              igraph_real_t value);
+                                         const char *name,
+                                         igraph_integer_t line,
+                                         igraph_real_t value);
 igraph_error_t igraph_gml_tree_init_string(igraph_gml_tree_t *t,
-                                const char *name, size_t namelen,
-                                const char *value, size_t valuelen);
+                                           const char *name,
+                                           igraph_integer_t line,
+                                           const char *value);
 igraph_error_t igraph_gml_tree_init_tree(igraph_gml_tree_t *t,
-                              const char *name, size_t namelen,
-                              igraph_gml_tree_t *value);
+                                         const char *name,
+                                         igraph_integer_t line,
+                                         igraph_gml_tree_t *value);
+igraph_error_t igraph_gml_tree_init_empty(igraph_gml_tree_t *t);
 void igraph_gml_tree_destroy(igraph_gml_tree_t *t);
 
 void igraph_gml_tree_delete(igraph_gml_tree_t *t, igraph_integer_t pos);
@@ -67,6 +71,7 @@ igraph_integer_t igraph_gml_tree_findback(const igraph_gml_tree_t *t,
                                   const char *name, igraph_integer_t from);
 igraph_i_gml_tree_type_t igraph_gml_tree_type(const igraph_gml_tree_t *t, igraph_integer_t pos);
 const char *igraph_gml_tree_name(const igraph_gml_tree_t *t, igraph_integer_t pos);
+igraph_integer_t igraph_gml_tree_line(const igraph_gml_tree_t *t, igraph_integer_t pos);
 igraph_integer_t igraph_gml_tree_get_integer(const igraph_gml_tree_t *t,
         igraph_integer_t pos);
 igraph_real_t igraph_gml_tree_get_real(const igraph_gml_tree_t *t,

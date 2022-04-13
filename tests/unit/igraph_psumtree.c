@@ -25,7 +25,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_psumtree_t tree;
@@ -181,6 +181,7 @@ int main() {
     /* Error handling                                   */
     /****************************************************/
 
+    igraph_error_handler_t *oldhandler = igraph_set_error_handler(&igraph_error_handler_ignore);
     igraph_psumtree_init(&tree, 9);
     if (igraph_psumtree_update(&tree, 2, -2) == IGRAPH_SUCCESS) {
         return 12;
@@ -191,6 +192,7 @@ int main() {
     if (igraph_psumtree_update(&tree, 2, IGRAPH_NAN) == IGRAPH_SUCCESS) {
         return 14;
     }
+    igraph_set_error_handler(oldhandler);
     igraph_psumtree_destroy(&tree);
 
     VERIFY_FINALLY_STACK();

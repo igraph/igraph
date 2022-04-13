@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Vertices/edges with the same parity match */
 igraph_bool_t compat_parity(const igraph_t *graph1,
@@ -42,14 +42,9 @@ igraph_bool_t compat_not_arg(const igraph_t *graph1,
     return g1_num != *(int*)arg + g2_num;
 }
 
-void print_and_destroy_maps(igraph_vector_ptr_t *vp) {
-    igraph_integer_t i;
-    for (i = 0; i < igraph_vector_ptr_size(vp); i++) {
-        print_vector_int(VECTOR(*vp)[i]);
-        igraph_vector_int_destroy(VECTOR(*vp)[i]);
-        igraph_free(VECTOR(*vp)[i]);
-    }
-    igraph_vector_ptr_destroy(vp);
+void print_and_destroy_maps(igraph_vector_int_list_t *vp) {
+    print_vector_int_list(vp);
+    igraph_vector_int_list_destroy(vp);
 }
 
 void check_print_destroy(igraph_t *g1,
@@ -62,8 +57,8 @@ void check_print_destroy(igraph_t *g1,
                          igraph_isocompat_t *edge_compat_fn,
                          void *arg,
                          int error) {
-    igraph_vector_ptr_t maps;
-    igraph_vector_ptr_init(&maps, 0);
+    igraph_vector_int_list_t maps;
+    igraph_vector_int_list_init(&maps, 0);
     IGRAPH_ASSERT(igraph_get_subisomorphisms_vf2(g1, g2, vertex_color1, vertex_color2, edge_color1, edge_color2, &maps, node_compat_fn, edge_compat_fn, arg) == error);
     print_and_destroy_maps(&maps);
     printf("\n");

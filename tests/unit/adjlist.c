@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int test_simple_trees() {
     igraph_t g, g2;
@@ -26,7 +26,7 @@ int test_simple_trees() {
     igraph_bool_t iso;
 
     /* Directed, out */
-    igraph_tree(&g, 42, 3, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&g, 42, 3, IGRAPH_TREE_OUT);
     igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     igraph_adjlist(&g2, &adjlist, IGRAPH_OUT, /*duplicate=*/ 0);
     igraph_isomorphic(&g, &g2, &iso);
@@ -36,7 +36,7 @@ int test_simple_trees() {
     igraph_destroy(&g);
 
     /* Directed, in */
-    igraph_tree(&g, 42, 3, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&g, 42, 3, IGRAPH_TREE_OUT);
     igraph_adjlist_init(&g, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
     igraph_adjlist(&g2, &adjlist, IGRAPH_IN, /*duplicate=*/ 0);
     igraph_isomorphic(&g, &g2, &iso);
@@ -46,7 +46,7 @@ int test_simple_trees() {
     igraph_destroy(&g);
 
     /* Undirected */
-    igraph_tree(&g, 42, 3, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 42, 3, IGRAPH_TREE_UNDIRECTED);
     igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
     igraph_adjlist(&g2, &adjlist, IGRAPH_ALL, /*duplicate=*/ 1);
     igraph_isomorphic(&g, &g2, &iso);

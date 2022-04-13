@@ -28,29 +28,26 @@
 
 #include "graph/attributes.h"
 
-static void igraph_i_contract_vertices_free(igraph_vector_ptr_t *p) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(p);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = VECTOR(*p)[i];
-        if (v) {
-            igraph_vector_int_destroy(v);
-        }
-    }
-    igraph_vector_ptr_destroy(p);
-}
-
 /**
  * \function igraph_contract_vertices
- * Replace multiple vertices with a single one.
+ * \brief Replace multiple vertices with a single one.
  *
- * This function creates a new graph, by merging several
- * vertices into one. The vertices in the new graph correspond
- * to sets of vertices in the input graph.
- * \param graph The input graph, it can be directed or
- *        undirected.
+ * This function modifies the graph by merging several vertices
+ * into one. The vertices in the modified graph correspond
+ * to groups of vertices in the input graph. No edges are removed,
+ * thus the modified graph will typically have self-loops
+ * (corresponding to in-group edges) and multi-edges
+ * (corresponding to multiple connections between two groups).
+ * Use \ref igraph_simplify() to eliminate self-loops and
+ * merge multi-edges.
+ *
+ * \param graph The input graph. It will be modified in-place.
  * \param mapping A vector giving the mapping. For each
  *        vertex in the original graph, it should contain
- *        its id in the new graph.
+ *        its desired ID in the result graph. In order to create
+ *        "orphan vertices" that have no corresponding vertices
+ *        in the original graph, ensure that the IDs are consecutive
+ *        integers starting from zero.
  * \param vertex_comb What to do with the vertex attributes.
  *        \c NULL means that vertex attributes are not kept
  *        after the contraction (not even for unaffected
@@ -74,8 +71,9 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     igraph_integer_t no_new_vertices;
 
     if (igraph_vector_int_size(mapping) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid mapping vector length",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Mapping vector length (%" IGRAPH_PRId ") "
+                "not equal to number of nodes (%" IGRAPH_PRId ").",
+                IGRAPH_EINVAL, igraph_vector_int_size(mapping), no_of_nodes);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -119,33 +117,16 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
 
     if (vattr) {
         igraph_integer_t i;
-        igraph_vector_ptr_t merges;
+        igraph_vector_int_list_t merges;
         igraph_vector_int_t sizes;
-        igraph_vector_int_t *vecs;
 
-        vecs = IGRAPH_CALLOC(no_new_vertices, igraph_vector_int_t);
-        if (!vecs) {
-            IGRAPH_ERROR("Cannot combine attributes while contracting"
-                         " vertices", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, vecs);
-        IGRAPH_CHECK(igraph_vector_ptr_init(&merges, no_new_vertices));
-        IGRAPH_FINALLY(igraph_i_contract_vertices_free, &merges);
+        IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&merges, no_new_vertices);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, no_new_vertices);
 
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t to = VECTOR(*mapping)[i];
+            igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(&merges, to);
             VECTOR(sizes)[to] += 1;
-        }
-        for (i = 0; i < no_new_vertices; i++) {
-            igraph_vector_int_t *v = &vecs[i];
-            IGRAPH_CHECK(igraph_vector_int_init(v, VECTOR(sizes)[i]));
-            igraph_vector_int_clear(v);
-            VECTOR(merges)[i] = v;
-        }
-        for (i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t to = VECTOR(*mapping)[i];
-            igraph_vector_int_t *v = &vecs[to];
             IGRAPH_CHECK(igraph_vector_int_push_back(v, i));
         }
 
@@ -154,9 +135,8 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
                      vertex_comb));
 
         igraph_vector_int_destroy(&sizes);
-        igraph_i_contract_vertices_free(&merges);
-        igraph_free(vecs);
-        IGRAPH_FINALLY_CLEAN(3);
+        igraph_vector_int_list_destroy(&merges);
+        IGRAPH_FINALLY_CLEAN(2);
     }
 
     IGRAPH_FINALLY_CLEAN(1);

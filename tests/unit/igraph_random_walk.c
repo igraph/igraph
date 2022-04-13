@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void random_walk(igraph_t *graph, igraph_integer_t start, igraph_neimode_t mode,
     igraph_integer_t steps, igraph_random_walk_stuck_t stuck) {

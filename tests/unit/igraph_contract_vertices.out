@@ -1,0 +1,73 @@
+Graph with no vertices:
+Graph with loops and multiple edges:
+No contraction:
+Vertex 0: ab=0 an=0 as="zero"
+Vertex 1: ab=1 an=1 as="one"
+Vertex 2: ab=0 an=2 as="two"
+Vertex 3: ab=1 an=3 as="three"
+Vertex 4: ab=0 an=4 as="four"
+Vertex 5: ab=1 an=5 as="five"
+Edge 0 (0-1): ean=0
+Edge 1 (0-2): ean=1
+Edge 2 (1-1): ean=2
+Edge 3 (1-3): ean=3
+Edge 4 (2-0): ean=4
+Edge 5 (2-3): ean=5
+Edge 6 (3-4): ean=6
+Edge 7 (3-4): ean=7
+
+Contract 5 into 4:
+Vertex 0: ab=0 an=0 as="zero"
+Vertex 1: ab=1 an=1 as="one"
+Vertex 2: ab=0 an=2 as="two"
+Vertex 3: ab=1 an=3 as="three"
+Vertex 4: ab=0 an=9 as="five"
+Edge 0 (0-1): ean=0
+Edge 1 (0-2): ean=1
+Edge 2 (1-1): ean=2
+Edge 3 (1-3): ean=3
+Edge 4 (2-0): ean=4
+Edge 5 (2-3): ean=5
+Edge 6 (3-4): ean=6
+Edge 7 (3-4): ean=7
+
+Contract 4 into 3:
+Vertex 0: ab=0 an=0 as="zero"
+Vertex 1: ab=1 an=1 as="one"
+Vertex 2: ab=0 an=2 as="two"
+Vertex 3: ab=1 an=12 as="five"
+Edge 0 (0-1): ean=0
+Edge 1 (0-2): ean=1
+Edge 2 (1-1): ean=2
+Edge 3 (1-3): ean=3
+Edge 4 (2-0): ean=4
+Edge 5 (2-3): ean=5
+Edge 6 (3-3): ean=6
+Edge 7 (3-3): ean=7
+
+Contract 3 into 2:
+Vertex 0: ab=0 an=0 as="zero"
+Vertex 1: ab=1 an=1 as="one"
+Vertex 2: ab=0 an=14 as="five"
+Edge 0 (0-1): ean=0
+Edge 1 (0-2): ean=1
+Edge 2 (1-1): ean=2
+Edge 3 (1-2): ean=3
+Edge 4 (2-0): ean=4
+Edge 5 (2-2): ean=5
+Edge 6 (2-2): ean=6
+Edge 7 (2-2): ean=7
+
+Contract 2 into 0:
+Vertex 0: ab=0 an=14 as="five"
+Vertex 1: ab=1 an=1 as="one"
+Edge 0 (0-1): ean=0
+Edge 1 (0-0): ean=1
+Edge 2 (1-1): ean=2
+Edge 3 (1-0): ean=3
+Edge 4 (0-0): ean=4
+Edge 5 (0-0): ean=5
+Edge 6 (0-0): ean=6
+Edge 7 (0-0): ean=7
+
+Check incorrect mapping size error.

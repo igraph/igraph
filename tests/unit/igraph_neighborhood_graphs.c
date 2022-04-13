@@ -17,13 +17,13 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-void print_and_destroy(igraph_vector_ptr_t *result) {
+void print_and_clear(igraph_graph_list_t *result) {
     igraph_integer_t i;
     igraph_t *g;
-    for (i = 0; i < igraph_vector_ptr_size(result); i++) {
-        g = VECTOR(*result)[i];
+    for (i = 0; i < igraph_graph_list_size(result); i++) {
+        g = igraph_graph_list_get_ptr(result, i);
         if (igraph_vcount(g) == 0) {
             printf("null graph\n");
         } else if (igraph_ecount(g) == 0 && igraph_vcount(g) == 1) {
@@ -31,18 +31,17 @@ void print_and_destroy(igraph_vector_ptr_t *result) {
         } else {
             print_graph_canon(g);
         }
-        igraph_destroy(g);
-        igraph_free(g);
     }
     printf("\n");
+    igraph_graph_list_clear(result);
 }
 
 int main() {
     igraph_t g_empty, g_lm;
-    igraph_vector_ptr_t result;
+    igraph_graph_list_t result;
     igraph_vs_t vids;
 
-    igraph_vector_ptr_init(&result, 0);
+    igraph_graph_list_init(&result, 0);
     igraph_vs_all(&vids);
 
     igraph_small(&g_empty, 0, 0, -1);
@@ -51,37 +50,37 @@ int main() {
     printf("No vertices:\n");
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_empty, &result, vids, /*order*/ 1,
                   /*mode*/ IGRAPH_ALL, /*mindist*/ 0) == IGRAPH_SUCCESS);
-    print_and_destroy(&result);
+    print_and_clear(&result);
 
     printf("Directed graph with loops and multi-edges, order 0:\n");
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_lm, &result, vids, /*order*/ 0,
                   /*mode*/ IGRAPH_ALL, /*mindist*/ 0) == IGRAPH_SUCCESS);
-    print_and_destroy(&result);
+    print_and_clear(&result);
 
     printf("Directed graph with loops and multi-edges, order 1, ignoring direction:\n");
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_lm, &result, vids, /*order*/ 1,
                   /*mode*/ IGRAPH_ALL, /*mindist*/ 0) == IGRAPH_SUCCESS);
-    print_and_destroy(&result);
+    print_and_clear(&result);
 
     printf("Directed graph with loops and multi-edges, order 1, only checking IGRAPH_IN:\n");
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_lm, &result, vids, /*order*/ 1,
                   /*mode*/ IGRAPH_IN, /*mindist*/ 0) == IGRAPH_SUCCESS);
-    print_and_destroy(&result);
+    print_and_clear(&result);
 
     printf("Directed graph with loops and multi-edges, order 10, ignoring direction:\n");
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_lm, &result, vids, /*order*/ 10,
                   /*mode*/ IGRAPH_ALL, /*mindist*/ 0) == IGRAPH_SUCCESS);
-    print_and_destroy(&result);
+    print_and_clear(&result);
 
     printf("Directed graph with loops and multi-edges, order 2, mindist 2, IGRAPH_OUT:\n");
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_lm, &result, vids, /*order*/ 2,
                   /*mode*/ IGRAPH_OUT, /*mindist*/ 2) == IGRAPH_SUCCESS);
-    print_and_destroy(&result);
+    print_and_clear(&result);
 
     printf("Directed graph with loops and multi-edges, order 4, mindist 4, IGRAPH_ALL:\n");
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_lm, &result, vids, /*order*/ 4,
                   /*mode*/ IGRAPH_ALL, /*mindist*/ 4) == IGRAPH_SUCCESS);
-    print_and_destroy(&result);
+    print_and_clear(&result);
 
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
@@ -94,7 +93,7 @@ int main() {
     IGRAPH_ASSERT(igraph_neighborhood_graphs(&g_lm, &result, vids, /*order*/ 4,
                   /*mode*/ IGRAPH_ALL, /*mindist*/ -4) == IGRAPH_EINVAL);
 
-    igraph_vector_ptr_destroy(&result);
+    igraph_graph_list_destroy(&result);
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
 

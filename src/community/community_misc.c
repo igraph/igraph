@@ -46,10 +46,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef USING_R
-    #include <R.h>
-#endif
-
 /**
  * \function igraph_community_to_membership
  * \brief Create membership vector from community structure dendrogram
@@ -57,8 +53,8 @@
  * This function creates a membership vector from a community
  * structure dendrogram. A membership vector contains for each vertex
  * the id of its graph component, the graph components are numbered
- * from zero, see the same argument of \ref igraph_clusters() for an
- * example of a membership vector.
+ * from zero, see the same argument of \ref igraph_connected_components()
+ * for an example of a membership vector.
  *
  * </para><para>
  * Many community detection algorithms return with a \em merges
@@ -272,17 +268,17 @@ igraph_error_t igraph_reindex_membership(igraph_vector_int_t *membership,
 
         if (c < 0) {
             IGRAPH_ERRORF("Membership indices should non-negative. "
-            "Found member of cluster %ld.", IGRAPH_EINVAL, c);
+            "Found member of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c);
         }
 
         if (c < 0) {
             IGRAPH_ERRORF("Membership indices should be non-negative. "
-            "Found member of cluster %ld.", IGRAPH_EINVAL, c);
+            "Found member of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c);
         }
 
         if (c >= n) {
             IGRAPH_ERRORF("Membership indices should be less than total number of vertices. "
-            "Found member of cluster %ld, but only %ld vertices.", IGRAPH_EINVAL, c, n);
+            "Found member of cluster %" IGRAPH_PRId ", but only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL, c, n);
         }
 
         if (VECTOR(new_cluster)[c] == 0) {
@@ -386,10 +382,10 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c1, comm1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
@@ -485,15 +481,15 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
     igraph_vector_int_t c1, c2;
 
     if (igraph_vector_int_size(comm1) != igraph_vector_int_size(comm2)) {
-        IGRAPH_ERRORF("Community membership vectors have different lengths: %ld and %ld.",
+        IGRAPH_ERRORF("Community membership vectors have different lengths: %" IGRAPH_PRId " and %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, igraph_vector_int_size(comm1), igraph_vector_int_size(comm2));
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c1, comm1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
@@ -535,12 +531,12 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     k2 = igraph_vector_int_max(v2) + 1;
     p1 = IGRAPH_CALLOC(k1, double);
     if (p1 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, p1);
     p2 = IGRAPH_CALLOC(k2, double);
     if (p2 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, p2);
 
@@ -791,7 +787,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
 
     if (igraph_vector_int_size(v1) <= 1) {
         IGRAPH_ERRORF("Rand indices not defined for only zero or one vertices. "
-        "Found membership vector of size %ld", IGRAPH_EINVAL, igraph_vector_int_size(v1));
+        "Found membership vector of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, igraph_vector_int_size(v1));
     }
 
     /* Calculate the confusion matrix */

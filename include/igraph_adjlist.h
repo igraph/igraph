@@ -56,8 +56,6 @@ IGRAPH_EXPORT void igraph_adjlist_destroy(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_clear(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_sort(igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
-                                                                    igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
 IGRAPH_EXPORT igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed);
@@ -88,8 +86,6 @@ IGRAPH_EXPORT igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igr
 IGRAPH_EXPORT igraph_integer_t igraph_inclist_size(const igraph_inclist_t *al);
 IGRAPH_EXPORT void igraph_inclist_destroy(igraph_inclist_t *il);
 IGRAPH_EXPORT void igraph_inclist_clear(igraph_inclist_t *il);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph,
-                                                                    igraph_inclist_t *il);
 IGRAPH_EXPORT igraph_error_t igraph_inclist_print(const igraph_inclist_t *il);
 IGRAPH_EXPORT igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
@@ -115,7 +111,6 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_neimode_t mode;
     igraph_loops_t loops;
     igraph_multiple_t multiple;
-    igraph_vector_int_t dummy;
 } igraph_lazy_adjlist_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
@@ -135,9 +130,11 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlis
  * result is stored in the adjacency list and no further query
  * operations are needed when the neighbors of the same vertex are
  * queried again.
+ *
  * \param al The lazy adjacency list.
  * \param no The vertex ID to query.
- * \return Pointer to a vector. It is allowed to modify it and
+ * \return Pointer to a vector, or \c NULL upon error.
+ *   It is safe to modify this vector,
  *   modification does not affect the original graph.
  *
  * Time complexity: O(d), the number of neighbor vertices for the
@@ -153,7 +150,6 @@ typedef struct igraph_lazy_inclist_t {
     igraph_integer_t length;
     igraph_vector_int_t **incs;
     igraph_neimode_t mode;
-    igraph_vector_int_t dummy;
     igraph_loops_t loops;
 } igraph_lazy_inclist_t;
 
@@ -173,9 +169,11 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclis
  * result is stored in the incidence list and no further query
  * operations are needed when the incident edges of the same vertex are
  * queried again.
+ *
  * \param al The lazy incidence list object.
  * \param no The vertex ID to query.
- * \return Pointer to a vector. It is allowed to modify it and
+ * \return Pointer to a vector, or \c NULL upon error.
+ *   It is safe to modify this vector,
  *   modification does not affect the original graph.
  *
  * Time complexity: O(d), the number of incident edges for the first

@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void init_vm(igraph_vector_t *type_dist,
              int v0, int v1,

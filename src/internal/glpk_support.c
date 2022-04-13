@@ -34,6 +34,16 @@
 
 IGRAPH_THREAD_LOCAL igraph_i_glpk_error_info_t igraph_i_glpk_error_info;
 
+/* glp_at_error() was added in GLPK 4.57. Due to the R interface, we need to
+ * support ancient GLPK versions like GLPK 4.38 so we need to guard the
+ * invocation of glp_at_error(). Note that this is a temporary workaround only
+ * for sake of supporting R 4.1, so it is enabled only if USING_R is defined */
+#ifdef USING_R
+#  define HAS_GLP_AT_ERROR (GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 57))
+#else
+#  define HAS_GLP_AT_ERROR 1
+#endif
+
 int igraph_i_glpk_terminal_hook(void *info, const char *s) {
     IGRAPH_UNUSED(info);
 
@@ -45,6 +55,7 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
            and the error_hook. */
         igraph_i_glpk_error_info.is_interrupted = 1;
         glp_error("GLPK was interrupted."); /* This dummy message is never printed */
+#if HAS_GLP_AT_ERROR
     } else if (glp_at_error()) {
         /* Copy the error messages into a buffer for later reporting */
         /* We must use glp_at_error() instead of igraph_i_glpk_error_info.is_error
@@ -55,6 +66,7 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
             *(igraph_i_glpk_error_info.msg_ptr++) = *(s++);
         }
         *igraph_i_glpk_error_info.msg_ptr = '\0';
+#endif
     }
 
     return 1; /* Non-zero return value signals to GLPK not to print to the terminal */

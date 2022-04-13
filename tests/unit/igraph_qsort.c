@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int comp(const void *a, const void *b) {
     igraph_real_t *aa = (igraph_real_t *) a;

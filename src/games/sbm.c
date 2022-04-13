@@ -103,8 +103,8 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     }
 
     if (igraph_vector_int_size(block_sizes) != no_blocks) {
-        IGRAPH_ERRORF("Block size vector length (%ld) does not agree with "
-                      "preference matrix size (%ld).", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Block size vector length (%" IGRAPH_PRId ") does not agree with "
+                      "preference matrix size (%" IGRAPH_PRId  ").", IGRAPH_EINVAL,
                       igraph_vector_int_size(block_sizes), no_blocks);
     }
 
@@ -116,7 +116,7 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     }
 
     if (igraph_vector_int_sum(block_sizes) != n) {
-        IGRAPH_ERRORF("Sum of the block sizes (%ld) must equal the number of vertices (%ld).",
+        IGRAPH_ERRORF("Sum of the block sizes (%" IGRAPH_PRId ") must equal the number of vertices (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_sum(block_sizes), n);
     }
 
@@ -228,7 +228,8 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
     RNG_END();
 
-    igraph_create(graph, &edges, n, directed);
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -336,8 +337,8 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = last / fromsize;
                         igraph_integer_t vfrom = last - vto * fromsize;
-                        igraph_vector_int_push_back(&edges, offset + fromoff + vfrom);
-                        igraph_vector_int_push_back(&edges, offset + tooff + vto);
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
                         last += 1;
                     }
@@ -346,8 +347,8 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
                         igraph_integer_t vfrom = last - (vto * (vto - 1)) / 2;
-                        igraph_vector_int_push_back(&edges, offset + fromoff + vfrom);
-                        igraph_vector_int_push_back(&edges, offset + tooff + vto);
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
                         last += 1;
                     }
@@ -371,8 +372,8 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
             igraph_integer_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
-                    igraph_vector_int_push_back(&edges, fromoff + from);
-                    igraph_vector_int_push_back(&edges, tooff + to);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + from));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + to));
                 }
             }
             fromoff += m;
@@ -388,8 +389,8 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
             while (last < maxedges) {
                 igraph_integer_t vto = last / fromsize;
                 igraph_integer_t vfrom = last - vto * fromsize;
-                igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                igraph_vector_int_push_back(&edges, tooff + vto);
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                 last += RNG_GEOM(p);
                 last += 1;
             }
@@ -401,7 +402,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
 
     RNG_END();
 
-    igraph_create(graph, &edges, n, /*directed=*/ 0);
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, /*directed=*/ 0));
 
     igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&csizes);
@@ -423,7 +424,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
  * \param rholist A list of rho vectors (\c igraph_vector_t objects), one
  *        for each block.
  * \param Clist A list of square matrices (\c igraph_matrix_t objects),
- *        one for each block, giving the Bernoulli rates of connections
+ *        one for each block, specifying the Bernoulli rates of connections
  *        within the block.
  * \param p The Bernoulli rate of connections between
  *        vertices in different blocks.
@@ -435,11 +436,11 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
 
 igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                           const igraph_vector_int_t *mlist,
-                          const igraph_vector_ptr_t *rholist,
-                          const igraph_vector_ptr_t *Clist,
+                          const igraph_vector_list_t *rholist,
+                          const igraph_matrix_list_t *Clist,
                           igraph_real_t p) {
 
-    igraph_integer_t i, no_blocks = igraph_vector_ptr_size(rholist);
+    igraph_integer_t i, no_blocks = igraph_vector_list_size(rholist);
     igraph_real_t sq_dbl_epsilon = sqrt(DBL_EPSILON);
     igraph_vector_int_t edges;
     igraph_vector_t csizes;
@@ -451,7 +452,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     if (no_blocks == 0) {
         IGRAPH_ERROR("`rholist' empty for HSBM", IGRAPH_EINVAL);
     }
-    if (igraph_vector_ptr_size(Clist) != no_blocks &&
+    if (igraph_matrix_list_size(Clist) != no_blocks &&
         igraph_vector_int_size(mlist) != no_blocks) {
         IGRAPH_ERROR("`rholist' must have same length as `Clist' and `m' "
                      "for HSBM", IGRAPH_EINVAL);
@@ -468,7 +469,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
     /* Checks for the rhos */
     for (i = 0; i < no_blocks; i++) {
-        const igraph_vector_t *rho = VECTOR(*rholist)[i];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         if (!igraph_vector_isininterval(rho, 0, 1)) {
             IGRAPH_ERROR("`rho' must be between zero and one for HSBM",
                          IGRAPH_EINVAL);
@@ -479,7 +480,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
     /* Checks for the Cs */
     for (i = 0; i < no_blocks; i++) {
-        const igraph_matrix_t *C = VECTOR(*Clist)[i];
+        const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
         if (igraph_matrix_min(C) < 0 || igraph_matrix_max(C) > 1) {
             IGRAPH_ERROR("`C' must be between zero and one for HSBM",
                          IGRAPH_EINVAL);
@@ -490,8 +491,8 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
     /* Check that C and rho sizes match */
     for (i = 0; i < no_blocks; i++) {
-        const igraph_vector_t *rho = VECTOR(*rholist)[i];
-        const igraph_matrix_t *C = VECTOR(*Clist)[i];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
+        const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
         igraph_integer_t k = igraph_vector_size(rho);
         if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
             IGRAPH_ERROR("`C' dimensions must match `rho' dimensions in HSBM",
@@ -500,7 +501,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
     /* Check that rho * m is integer */
     for (i = 0; i < no_blocks; i++) {
-        const igraph_vector_t *rho = VECTOR(*rholist)[i];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         igraph_real_t m = VECTOR(*mlist)[i];
         igraph_integer_t j, k = igraph_vector_size(rho);
         for (j = 0; j < k; j++) {
@@ -520,12 +521,12 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
 
     for (b = 0; b < no_blocks; b++) {
         igraph_integer_t from, to, fromoff = 0;
-        const igraph_vector_t *rho = VECTOR(*rholist)[b];
-        const igraph_matrix_t *C = VECTOR(*Clist)[b];
+        const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, b);
+        const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
         igraph_real_t m = VECTOR(*mlist)[b];
         igraph_integer_t k = igraph_vector_size(rho);
 
-        igraph_vector_resize(&csizes, k);
+        IGRAPH_CHECK(igraph_vector_resize(&csizes, k));
         for (i = 0; i < k; i++) {
             VECTOR(csizes)[i] = round(VECTOR(*rho)[i] * m);
         }
@@ -546,8 +547,8 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = last / fromsize;
                         igraph_integer_t vfrom = last - vto * fromsize;
-                        igraph_vector_int_push_back(&edges, offset + fromoff + vfrom);
-                        igraph_vector_int_push_back(&edges, offset + tooff + vto);
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
                         last += 1;
                     }
@@ -556,8 +557,8 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
                         igraph_integer_t vfrom = last - (vto * (vto - 1)) / 2;
-                        igraph_vector_int_push_back(&edges, offset + fromoff + vfrom);
-                        igraph_vector_int_push_back(&edges, offset + tooff + vto);
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
                         last += 1;
                     }
@@ -581,8 +582,8 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
             igraph_integer_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
-                    igraph_vector_int_push_back(&edges, fromoff + from);
-                    igraph_vector_int_push_back(&edges, tooff + to);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + from));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + to));
                 }
             }
             fromoff += fromsize;
@@ -600,8 +601,8 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
             while (last < maxedges) {
                 igraph_integer_t vto = floor(last / fromsize);
                 igraph_integer_t vfrom = last - vto * fromsize;
-                igraph_vector_int_push_back(&edges, fromoff + vfrom);
-                igraph_vector_int_push_back(&edges, tooff + vto);
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                 last += RNG_GEOM(p);
                 last += 1;
             }
@@ -615,7 +616,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
 
     RNG_END();
 
-    igraph_create(graph, &edges, n, /*directed=*/ 0);
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, /*directed=*/ 0));
 
     igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&csizes);

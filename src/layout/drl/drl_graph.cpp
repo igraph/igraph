@@ -488,13 +488,12 @@ void graph::init_parms(const igraph_layout_drl_options_t *options) {
 //   real_in.close();
 // }
 
-int graph::read_real ( const igraph_matrix_t *real_mat,
-                       const igraph_vector_bool_t *fixed) {
+int graph::read_real(const igraph_matrix_t *real_mat) {
     igraph_integer_t n = igraph_matrix_nrow(real_mat);
     for (igraph_integer_t i = 0; i < n; i++) {
         positions[id_catalog[i]].x = MATRIX(*real_mat, i, 0);
         positions[id_catalog[i]].y = MATRIX(*real_mat, i, 1);
-        positions[id_catalog[i]].fixed = fixed ? VECTOR(*fixed)[i] : false;
+        positions[id_catalog[i]].fixed = false;
 
         if ( real_iterations > 0 ) {
             density_server.Add ( positions[id_catalog[i]], fineDensity );

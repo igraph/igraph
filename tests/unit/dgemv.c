@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Matrix-vector multiplication: y = A.x */
 void matmul(const igraph_matrix_t *A, const igraph_vector_t *x, igraph_vector_t *y, igraph_real_t beta) {
@@ -32,7 +32,7 @@ int main() {
 
     /* Fill with arbitrary values. Should be zeroes by beta. */
     igraph_vector_init_seq(&y1, 1, nr);
-    igraph_vector_copy(&y2, &y1);
+    igraph_vector_init_copy(&y2, &y1);
 
     for (i=0; i < nr; ++i) {
         for (j=0; j < nc; ++j) {

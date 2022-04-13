@@ -194,7 +194,7 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
         }
     }
 
-    igraph_vector_int_push_back(nextv, -1);
+    IGRAPH_CHECK(igraph_vector_int_push_back(nextv, -1));
     pivotvectneis = igraph_adjlist_get(adjlist, *pivot);
     pivotvectlen = igraph_vector_int_size(pivotvectneis);
 
@@ -214,7 +214,7 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
             }
         }
         if (!nei) {
-            igraph_vector_int_push_back(nextv, vcand);
+            IGRAPH_CHECK(igraph_vector_int_push_back(nextv, vcand));
         }
     }
 
@@ -359,10 +359,10 @@ static igraph_error_t igraph_i_maximal_cliques_up(
  * \example examples/simple/igraph_maximal_cliques.c
  */
 
-igraph_error_t igraph_maximal_cliques(const igraph_t *graph,
-                           igraph_vector_ptr_t *res,
-                           igraph_integer_t min_size,
-                           igraph_integer_t max_size);
+igraph_error_t igraph_maximal_cliques(
+    const igraph_t *graph, igraph_vector_int_list_t *res,
+    igraph_integer_t min_size, igraph_integer_t max_size
+);
 
 #define IGRAPH_MC_ORIG
 #include "maximal_cliques_template.h"
@@ -457,7 +457,7 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
  * \param graph The input graph.
  * \param subset Pointer to an \c  igraph_vector_int_t containing the
  *   subset of initial vertices
- * \param res Pointer to an \c igraph_ptr_t; the cliques will be
+ * \param res Pointer to a list of integer vectors; the cliques will be
  *   stored here
  * \param no Pointer to an \c igraph_integer_t; the number of maximal
  *   cliques will be stored here.
@@ -476,13 +476,11 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
  *
  */
 
-igraph_error_t igraph_maximal_cliques_subset(const igraph_t *graph,
-                                  igraph_vector_int_t *subset,
-                                  igraph_vector_ptr_t *res,
-                                  igraph_integer_t *no,
-                                  FILE *outfile,
-                                  igraph_integer_t min_size,
-                                  igraph_integer_t max_size);
+igraph_error_t igraph_maximal_cliques_subset(
+    const igraph_t *graph, igraph_vector_int_t *subset,
+    igraph_vector_int_list_t *res, igraph_integer_t *no,
+    FILE *outfile, igraph_integer_t min_size, igraph_integer_t max_size
+);
 
 #define IGRAPH_MC_FULL
 #include "maximal_cliques_template.h"
@@ -495,15 +493,13 @@ igraph_error_t igraph_maximal_cliques_subset(const igraph_t *graph,
  *
  * This function enumerates all maximal cliques within the given size range
  * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as a pointer to an \ref igraph_vector_int_t.  Destroying and
- * freeing this vector is left up to the user.  Use \ref igraph_vector_int_destroy()
- * to destroy it first, then free it using \ref igraph_free().
+ * callback function as a pointer to an \ref igraph_vector_int_t. The vector is
+ * owned by the maximal clique search routine so users are expected to make a
+ * copy of the vector usign \ref igraph_vector_int_copy() if they want to hold
+ * on to it.
  *
  * </para><para>
- *
  * Edge directions are ignored.
- *
- * </para><para>
  *
  * \param graph The input graph.
  * \param cliquehandler_fn Callback function to be called for each clique.

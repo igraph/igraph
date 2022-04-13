@@ -58,7 +58,7 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
     *res = 0;
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_added == 0) {
-        IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -179,7 +179,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%ld) does not match the number of edges (%ld).",
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match the number of edges (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {
@@ -446,6 +446,10 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
     igraph_integer_t i, j;
 
     igraph_dqueue_int_clear(q);
+
+    /* already_counted[i] is 0 iff vertex i was not reached so far, otherwise
+     * it is the index of the source vertex in vertex_neis that it was reached
+     * from, plus 1 */
     memset(already_counted, 0, no_of_nodes * sizeof(already_counted[0]));
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
@@ -479,11 +483,12 @@ static igraph_error_t igraph_i_local_efficiency_unweighted(
 
         if (VECTOR(*nei_mask)[source] == 2)
             continue;
+
         VECTOR(*nei_mask)[source] = 2; /* mark neighbour as already processed */
 
         IGRAPH_CHECK(igraph_dqueue_int_push(q, source));
         IGRAPH_CHECK(igraph_dqueue_int_push(q, 0));
-        already_counted[source] = source + 1;
+        already_counted[source] = i + 1;
 
         while (!igraph_dqueue_int_empty(q)) {
             igraph_vector_int_t *act_neis;
@@ -737,7 +742,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
 
         already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
         if (already_counted == 0) {
-            IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, already_counted);
 
@@ -973,7 +978,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     }
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_added == 0) {
-        IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -1173,7 +1178,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERRORF("Weight vector must be non-negative, got %f.", IGRAPH_EINVAL, min);
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (igraph_is_nan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);

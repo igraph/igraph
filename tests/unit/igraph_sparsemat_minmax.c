@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define N  10
 #define M  20
@@ -33,7 +33,7 @@
 #define MIN 0
 #define MAX 10
 
-typedef int fun(igraph_sparsemat_t *A, igraph_vector_t *res);
+typedef igraph_error_t fun(igraph_sparsemat_t *A, igraph_vector_t *res);
 
 int doit(int which) {
 
@@ -58,8 +58,7 @@ int doit(int which) {
     for (i = 0; i < N; i++) {
         VECTOR(vec)[i] = i;
     }
-    igraph_sparsemat_diag(&A, /*nzmax=*/ N, /*values=*/ &vec,
-                          /*compress=*/ 0);
+    igraph_sparsemat_init_diag(&A, /*nzmax=*/ N, /*values=*/ &vec, /*compress=*/ 0);
 
     igraph_vector_null(&vec);
     rowfun(&A, &vec);
@@ -86,8 +85,7 @@ int doit(int which) {
     for (i = 0; i < N; i++) {
         VECTOR(vec)[i] = i;
     }
-    igraph_sparsemat_diag(&A, /*nzmax=*/ N, /*values=*/ &vec,
-                          /*compress=*/ 1);
+    igraph_sparsemat_init_diag(&A, /*nzmax=*/ N, /*values=*/ &vec, /*compress=*/ 1);
 
     igraph_vector_null(&vec);
     rowfun(&A, &vec);

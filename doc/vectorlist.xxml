@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Vector-lists">
+<title>Lists of vectors, matrices and graphs</title>
+
+<section id="igraph_vector_list_t">
+<!-- doxrox-include about_igraph_vector_list_t_objects -->
+</section>
+
+<section id="vector-list-constructors-and-destructors">
+<!-- doxrox-include igraph_vector_list_constructors_and_destructors -->
+<!-- doxrox-include igraph_vector_list_init -->
+<!-- doxrox-include igraph_vector_list_destroy -->
+</section>
+
+<section id="vector-list-accessing-elements">
+<!-- doxrox-include igraph_vector_list_accessing_elements -->
+<!-- doxrox-include igraph_vector_list_get_ptr -->
+<!-- doxrox-include igraph_vector_list_tail_ptr -->
+<!-- doxrox-include igraph_vector_list_set -->
+<!-- doxrox-include igraph_vector_list_replace -->
+</section>
+
+<section id="vector-list-properties"><title>Vector properties</title>
+<!-- doxrox-include igraph_vector_list_empty -->
+<!-- doxrox-include igraph_vector_list_size -->
+<!-- doxrox-include igraph_vector_list_capacity -->
+</section>
+
+<section id="vector-list-resizing-operations"><title>Resizing operations</title>
+<!-- doxrox-include igraph_vector_list_clear -->
+<!-- doxrox-include igraph_vector_list_reserve -->
+<!-- doxrox-include igraph_vector_list_resize -->
+<!-- doxrox-include igraph_vector_list_push_back -->
+<!-- doxrox-include igraph_vector_list_push_back_copy -->
+<!-- doxrox-include igraph_vector_list_push_back_new -->
+<!-- doxrox-include igraph_vector_list_pop_back -->
+<!-- doxrox-include igraph_vector_list_insert -->
+<!-- doxrox-include igraph_vector_list_insert_copy -->
+<!-- doxrox-include igraph_vector_list_insert_new -->
+<!-- doxrox-include igraph_vector_list_remove -->
+<!-- doxrox-include igraph_vector_list_remove_fast -->
+<!-- doxrox-include igraph_vector_list_discard -->
+<!-- doxrox-include igraph_vector_list_discard_back -->
+<!-- doxrox-include igraph_vector_list_discard_fast -->
+</section>
+
+<section id="vector-list-sorting"><title>Sorting and reordering</title>
+<!-- doxrox-include igraph_vector_list_permute -->
+<!-- doxrox-include igraph_vector_list_sort -->
+<!-- doxrox-include igraph_vector_list_sort_ind -->
+<!-- doxrox-include igraph_vector_list_swap -->
+<!-- doxrox-include igraph_vector_list_swap_elements -->
+</section>
+
+</section>

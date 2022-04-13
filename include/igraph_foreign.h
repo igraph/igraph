@@ -48,8 +48,15 @@ IGRAPH_EXPORT igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instre
                                         igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream);
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
-                                            int index);
-IGRAPH_EXPORT igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+                                            igraph_integer_t index);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+                                           igraph_strvector_t *problem,
+                                           igraph_vector_int_t *label,
+                                           igraph_integer_t *source,
+                                           igraph_integer_t *target,
+                                           igraph_vector_t *capacity,
+                                           igraph_bool_t directed);
+IGRAPH_EXPORT igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
                                            igraph_strvector_t *problem,
                                            igraph_vector_int_t *label,
                                            igraph_integer_t *source,
@@ -71,7 +78,10 @@ IGRAPH_EXPORT igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE 
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                                              igraph_bool_t prefixattr);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream);
-IGRAPH_EXPORT igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+                                            igraph_integer_t source, igraph_integer_t target,
+                                            const igraph_vector_t *capacity);
+IGRAPH_EXPORT igraph_error_t igraph_write_graph_dimacs_flow(const igraph_t *graph, FILE *outstream,
                                             igraph_integer_t source, igraph_integer_t target,
                                             const igraph_vector_t *capacity);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,

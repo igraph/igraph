@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void compute_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_bool_t directed, igraph_bool_t unconn) {
     igraph_real_t result;

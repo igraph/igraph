@@ -23,7 +23,7 @@
 
 #define NCOMPLEX  /* to make it compile with MSVC on Windows */
 
-#include <cs/cs.h>
+#include <cs.h>
 #include <igraph.h>
 
 igraph_bool_t check_solution(const igraph_sparsemat_t *A,
@@ -35,7 +35,7 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
     igraph_integer_t j, p;
     igraph_real_t min, max;
 
-    igraph_vector_copy(&res, b);
+    igraph_vector_init_copy(&res, b);
 
     for (j = 0; j < dim; j++) {
         for (p = A->cs->p[j]; p < A->cs->p[j + 1]; p++) {

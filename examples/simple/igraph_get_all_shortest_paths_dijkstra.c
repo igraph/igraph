@@ -25,41 +25,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-/* Compares two paths based on their last elements. If they are equal, proceeds
- * with the ones preceding these elements, until we find a difference. If one
- * of the vectors is a suffix of the other, the shorter vector gets ordered
- * first.
- */
-int vector_tail_cmp(const void *path1, const void *path2) {
-    const igraph_vector_int_t *vec1 = *(const igraph_vector_int_t**)path1;
-    const igraph_vector_int_t *vec2 = *(const igraph_vector_int_t**)path2;
-    igraph_integer_t length1 = igraph_vector_int_size(vec1);
-    igraph_integer_t length2 = igraph_vector_int_size(vec2);
-    igraph_integer_t diff;
-
-    while (length1 > 0 && length2 > 0) {
-        length1--;
-        length2--;
-        diff = VECTOR(*vec1)[length1] - VECTOR(*vec2)[length2];
-        if (diff > 0) {
-            return 1;
-        }
-        if (diff < 0) {
-            return -1;
-        }
-    }
-
-    if (length1 == 0 && length2 == 0) {
-        return 0;
-    } else if (length1 == 0) {
-        return -1;
-    } else {
-        return 1;
-    }
-}
-
 void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
-                 const igraph_vector_ptr_t *paths,
+                 const igraph_vector_int_list_t *paths,
                  const igraph_vector_int_t *nrgeo) {
     igraph_integer_t i, n;
     igraph_vector_int_t nrgeo2, *path;
@@ -72,9 +39,9 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
         return;
     }
 
-    n = igraph_vector_ptr_size(paths);
+    n = igraph_vector_int_list_size(paths);
     for (i = 0; i < n; i++) {
-        path = VECTOR(*paths)[i];
+        path = igraph_vector_int_list_get_ptr(paths, i);
         if (path == 0) {
             printf("Null path found in result vector at index %" IGRAPH_PRId "\n", i);
             return;
@@ -99,22 +66,20 @@ void check_nrgeo(const igraph_t *graph, igraph_vs_t vs,
     igraph_vector_int_destroy(&nrgeo2);
 }
 
-void print_and_destroy_items(igraph_vector_ptr_t* vec) {
+void print_and_destroy_items(igraph_vector_int_list_t* vec) {
     igraph_integer_t i;
 
-    for (i = 0; i < igraph_vector_ptr_size(vec); i++) {
-        igraph_vector_int_print(VECTOR(*vec)[i]);
-        igraph_vector_int_destroy(VECTOR(*vec)[i]);
-        igraph_free(VECTOR(*vec)[i]);
+    for (i = 0; i < igraph_vector_int_list_size(vec); i++) {
+        igraph_vector_int_print(igraph_vector_int_list_get_ptr(vec, i));
     }
 
-    igraph_vector_ptr_clear(vec);
+    igraph_vector_int_list_clear(vec);
 }
 
 int main() {
 
     igraph_t g;
-    igraph_vector_ptr_t vertices, edges;
+    igraph_vector_int_list_t vertices, edges;
 
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
@@ -131,8 +96,8 @@ int main() {
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
 
-    igraph_vector_ptr_init(&vertices, 5);
-    igraph_vector_ptr_init(&edges, 5);
+    igraph_vector_int_list_init(&vertices, 0);
+    igraph_vector_int_list_init(&edges, 0);
     igraph_vs_vector_small(&vs, 1, 3, 4, 5, 2, 1,  -1);
 
     igraph_get_all_shortest_paths_dijkstra(
@@ -188,8 +153,8 @@ int main() {
 
     /* Sort the paths in a deterministic manner to avoid problems with
      * different qsort() implementations on different platforms */
-    igraph_vector_ptr_sort(&vertices, vector_tail_cmp);
-    igraph_vector_ptr_sort(&edges, vector_tail_cmp);
+    igraph_vector_int_list_sort(&vertices, igraph_vector_int_colex_cmp);
+    igraph_vector_int_list_sort(&edges, igraph_vector_int_colex_cmp);
     print_and_destroy_items(&vertices);
     print_and_destroy_items(&edges);
 
@@ -198,7 +163,7 @@ int main() {
 
     /* Regular lattice with some heavyweight edges */
     igraph_vector_int_view(&dim_vec, dim, sizeof(dim) / sizeof(dim[0]));
-    igraph_lattice(&g, &dim_vec, 1, 0, 0, 0);
+    igraph_square_lattice(&g, &dim_vec, 1, 0, 0, 0);
     igraph_vs_vector_small(&vs, 3, 12, 15, -1);
     igraph_vector_init(&weights_vec, 24);
     igraph_vector_fill(&weights_vec, 1);
@@ -217,8 +182,8 @@ int main() {
     printf("%" IGRAPH_PRId " ", VECTOR(nrgeo)[12]);
     printf("%" IGRAPH_PRId "\n", VECTOR(nrgeo)[15]);
 
-    igraph_vector_ptr_destroy(&vertices);
-    igraph_vector_ptr_destroy(&edges);
+    igraph_vector_int_list_destroy(&vertices);
+    igraph_vector_int_list_destroy(&edges);
     igraph_vector_int_destroy(&nrgeo);
 
     if (!IGRAPH_FINALLY_STACK_EMPTY) {

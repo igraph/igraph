@@ -28,6 +28,7 @@
 #include "igraph_components.h"
 
 #include "core/grid.h"
+#include "core/interruption.h"
 
 static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                               igraph_matrix_t *res,
@@ -50,7 +51,7 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
     igraph_bool_t conn = 1;
     igraph_real_t C = 0;
 
-    igraph_is_connected(graph, &conn, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
         C = no_nodes * sqrt(no_nodes);
     }
@@ -86,6 +87,8 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         /* calculate repulsive forces, we have a special version
            for unconnected graphs */
@@ -247,6 +250,8 @@ static igraph_error_t igraph_layout_i_grid_fr(
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         igraph_vector_null(&dispx);
         igraph_vector_null(&dispy);
@@ -543,7 +548,7 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         IGRAPH_ERROR("minz must not be greater than maxz", IGRAPH_EINVAL);
     }
 
-    igraph_is_connected(graph, &conn, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
         C = no_nodes * sqrt(no_nodes);
     }
@@ -571,6 +576,8 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         /* calculate repulsive forces, we have a special version
            for unconnected graphs */

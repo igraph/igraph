@@ -27,11 +27,9 @@
 #include "igraph_psumtree.h"
 #include "igraph_error.h"
 
-#include <math.h>
+#include "math/safe_intop.h"
 
-static double igraph_i_log2(double f) {
-    return log(f) / log(2.0);
-}
+#include <math.h>
 
 /**
  * \ingroup psumtree
@@ -83,16 +81,26 @@ static double igraph_i_log2(double f) {
  * The tree is initialized with a fixed number of elements. After initialization,
  * the value corresponding to each element is zero.
  *
- * \param t The tree to initialize
- * \param size The number of elements in the tree
- * \return Error code, typically \c IGRAPH_ENOMEM if there is not enough memory
+ * \param t The tree to initialize.
+ * \param size The number of elements in the tree. It must be at least one.
+ * \return Error code, typically \c IGRAPH_ENOMEM if there is not enough memory.
  *
  * Time complexity: O(n) for a tree containing n elements
  */
 igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size) {
+    igraph_integer_t vecsize;
+
+    IGRAPH_ASSERT(size > 0);
+
     t->size = size;
-    t->offset = (pow(2, ceil(igraph_i_log2(size))) - 1);
-    IGRAPH_CHECK(igraph_vector_init(&t->v, t->offset + t->size));
+
+    /* offset = 2^ceiling(log2(size)) - 1 */
+    IGRAPH_CHECK(igraph_i_safe_next_pow_2(size, &t->offset));
+    t->offset -= 1;
+
+    IGRAPH_SAFE_ADD(t->offset, t->size, &vecsize);
+    IGRAPH_CHECK(igraph_vector_init(&t->v, vecsize));
+
     return IGRAPH_SUCCESS;
 }
 
@@ -104,7 +112,7 @@ igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size)
  * \param t The tree to reset.
  */
 void igraph_psumtree_reset(igraph_psumtree_t *t) {
-    igraph_vector_fill(&(t->v), 0);
+    igraph_vector_null(&t->v);
 }
 
 /**
@@ -220,7 +228,7 @@ igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_integer_t idx
         return IGRAPH_SUCCESS;
     } else {
         /* caters for negative values and NaN */
-        return IGRAPH_EINVAL;
+        IGRAPH_ERRORF("Trying to add invalid (negative or NaN) value to psumtree: %g.", IGRAPH_EINVAL, new_value);
     }
 }
 

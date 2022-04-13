@@ -282,7 +282,7 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (neis == 0) {
-        IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
@@ -599,8 +599,8 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_
         IGRAPH_ERROR("k must be non-negative in k-scan.", IGRAPH_EINVAL);
     }
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERRORF("The weight vector length (%ld) in k-scan should equal "
-                      "the number of edges of the graph (%d).",
+        IGRAPH_ERRORF("The weight vector length (%" IGRAPH_PRId ") in k-scan should equal "
+                      "the number of edges of the graph (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_size(weights),
                       igraph_ecount(graph));
     }
@@ -797,7 +797,7 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
  * \function igraph_local_scan_neighborhood_ecount
  * Local scan-statistics with pre-calculated neighborhoods
  *
- * Count the number of edges, or sum the edge weigths in
+ * Count the number of edges, or sum the edge weights in
  * neighborhoods given as a parameter.
  *
  * \param graph The graph to perform the counting/summing in.
@@ -813,7 +813,7 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
 igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
-        const igraph_vector_ptr_t *neighborhoods) {
+        const igraph_vector_int_list_t *neighborhoods) {
 
     igraph_integer_t node, no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
@@ -823,7 +823,7 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length in local scan", IGRAPH_EINVAL);
     }
-    if (igraph_vector_ptr_size(neighborhoods) != no_of_nodes) {
+    if (igraph_vector_int_list_size(neighborhoods) != no_of_nodes) {
         IGRAPH_ERROR("Invalid neighborhood list length in local scan",
                      IGRAPH_EINVAL);
     }
@@ -836,7 +836,7 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
     igraph_vector_null(res);
 
     for (node = 0; node < no_of_nodes; node++) {
-        igraph_vector_int_t *nei = VECTOR(*neighborhoods)[node];
+        igraph_vector_int_t *nei = igraph_vector_int_list_get_ptr(neighborhoods, node);
         igraph_integer_t i, neilen = igraph_vector_int_size(nei);
         VECTOR(marked)[node] = node + 1;
         for (i = 0; i < neilen; i++) {

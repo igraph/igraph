@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define TEST_INCLIST(label, mode, loops) { \
     igraph_inclist_init(&g, &inclist, mode, loops); \

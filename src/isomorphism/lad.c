@@ -73,7 +73,7 @@
 #define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
         VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
-            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
+            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
         }  \
         IGRAPH_FINALLY(igraph_free, VAR);  \
     }
@@ -83,7 +83,7 @@
 #define ALLOC_ARRAY_IN_HISTORY(VAR, SIZE, TYPE, HISTORY) { \
         VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
-            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
+            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
         }  \
         IGRAPH_FINALLY(igraph_free, VAR);  \
         IGRAPH_CHECK(igraph_vector_ptr_push_back(HISTORY, VAR));  \
@@ -464,11 +464,10 @@ static bool igraph_i_lad_matchVertex(igraph_integer_t u, bool induced, Tdomain* 
        return false if an inconsistency is detected by FC(Edges) or
        FC(diff); true otherwise; */
     igraph_vector_int_t toBeMatched;
-    igraph_vector_int_init(&toBeMatched, Gp->nbVertices);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &toBeMatched);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&toBeMatched, Gp->nbVertices);
     VECTOR(toBeMatched)[0] = u;
-    igraph_i_lad_matchVertices(1, &toBeMatched, induced, D, Gp, Gt,
-                               &invalid);
+    IGRAPH_CHECK(igraph_i_lad_matchVertices(1, &toBeMatched, induced, D, Gp, Gt,
+                               &invalid));
     igraph_vector_int_destroy(&toBeMatched);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -505,7 +504,7 @@ static bool igraph_i_lad_compare(igraph_integer_t size_mu, igraph_integer_t* mu,
 }
 
 static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
-                                    const igraph_vector_ptr_t *domains, Tdomain *D,
+                                    const igraph_vector_int_list_t *domains, Tdomain *D,
                                     const Tgraph *Gp, const Tgraph *Gt, igraph_integer_t *empty) {
     /* for every pattern node u, initialize D(u) with every vertex v
        such that for every neighbor u' of u there exists a different
@@ -553,7 +552,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
         igraph_vector_int_t *Gp_uneis = igraph_adjlist_get(&Gp->succ, u);
         if (initialDomains) {
             /* read the list of target vertices which are compatible with u */
-            vec = VECTOR(*domains)[u];
+            vec = igraph_vector_int_list_get_ptr(domains, u);
             i = igraph_vector_int_size(vec);
             memset(dom, false, sizeof(bool) * (size_t)(Gt->nbVertices));
             for (j = 0; j < i; j++) {
@@ -577,12 +576,12 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                     mu = IGRAPH_CALLOC(VECTOR(Gp->nbSucc)[u], igraph_integer_t);
                     if (mu == 0) {
                         igraph_free(val); igraph_free(dom);
-                        IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     mv = IGRAPH_CALLOC(VECTOR(Gt->nbSucc)[v], igraph_integer_t);
                     if (mv == 0) {
                         igraph_free(mu); igraph_free(val); igraph_free(dom);
-                        IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     for (i = 0; i < VECTOR(Gp->nbSucc)[u]; i++) {
                         mu[i] = VECTOR(Gp->nbSucc)[VECTOR(*Gp_uneis)[i]];
@@ -1361,7 +1360,7 @@ static igraph_error_t igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, 
 static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstSol, bool induced,
                        Tdomain* D, Tgraph* Gp, Tgraph* Gt,
                        igraph_integer_t *invalid, igraph_bool_t *iso,
-                       igraph_vector_int_t *map, igraph_vector_ptr_t *maps,
+                       igraph_vector_int_t *vec, igraph_vector_int_t *map, igraph_vector_int_list_t *maps,
                        igraph_integer_t *nbNodes, igraph_integer_t *nbFail, igraph_integer_t *nbSol,
                        clock_t *begin, igraph_vector_ptr_t *alloc_history) {
     /* if firstSol then search for the first solution; otherwise search
@@ -1374,7 +1373,6 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
     igraph_integer_t* nbVal;
     igraph_integer_t* globalMatching;
     clock_t end = clock();
-    igraph_vector_int_t *vec;
     igraph_integer_t* val;
     bool result;
 
@@ -1423,18 +1421,11 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
             }
         }
         if (maps) {
-            vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-            if (!vec) {
-                IGRAPH_ERROR("LAD failed", IGRAPH_ENOMEM);
-            }
-            IGRAPH_FINALLY(igraph_free, vec);
-            IGRAPH_CHECK(igraph_vector_int_init(vec, Gp->nbVertices));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, vec);
+            IGRAPH_CHECK(igraph_vector_int_resize(vec, Gp->nbVertices));
             for (u = 0; u < Gp->nbVertices; u++) {
                 VECTOR(*vec)[u] = VECTOR(D->val)[ VECTOR(D->firstVal)[u] ];
             }
-            IGRAPH_CHECK(igraph_vector_ptr_push_back(maps, vec));
-            IGRAPH_FINALLY_CLEAN(2);
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(maps, vec));
         }
         igraph_i_lad_resetToFilter(D);
         *invalid = 0;
@@ -1458,7 +1449,7 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
             igraph_i_lad_resetToFilter(D);
         } else {
             IGRAPH_CHECK(igraph_i_lad_solve(timeLimit, firstSol, induced,
-                                            D, Gp, Gt, invalid, iso, map, maps,
+                                            D, Gp, Gt, invalid, iso, vec, map, maps,
                                             nbNodes, nbFail, nbSol, begin,
                                             alloc_history));
         }
@@ -1536,9 +1527,9 @@ cleanup:
  *    pointer and a subgraph isomorphism is found, the matching
  *    vertices from the target graph are listed here, for each vertex
  *    (in vertex ID order) from the pattern graph.
- * \param maps Pointer vector or a null pointer. If not a null
- *    pointer, then all subgraph isomorphisms are stored in the
- *    pointer vector, in \ref igraph_vector_int_t objects.
+ * \param maps Pointer to a list of integer vectors or a null pointer. If not
+ *    a null pointer, then all subgraph isomorphisms are stored in the
+ *    vector list, in \ref igraph_vector_int_t objects.
  * \param induced Boolean, whether to search for induced matching
  *    subgraphs.
  * \param time_limit Processor time limit in seconds. Supply zero
@@ -1554,9 +1545,9 @@ cleanup:
  */
 
 igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
-                             const igraph_vector_ptr_t *domains,
+                             const igraph_vector_int_list_t *domains,
                              igraph_bool_t *iso, igraph_vector_int_t *map,
-                             igraph_vector_ptr_t *maps,
+                             igraph_vector_int_list_t *maps,
                              igraph_bool_t induced, igraph_integer_t time_limit) {
 
     bool firstSol = maps == 0;
@@ -1566,6 +1557,8 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     igraph_integer_t invalidDomain;
     igraph_integer_t u, nbToMatch = 0;
     igraph_vector_int_t toMatch;
+    /* Helper vector in which we build the current subisomorphism mapping */
+    igraph_vector_int_t vec;
     /* Number of nodes in the search tree */
     igraph_integer_t nbNodes = 0;
     /* number of failed nodes in the search tree */
@@ -1578,7 +1571,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     igraph_vector_ptr_t alloc_history;
 
     if (!iso && !map && !maps) {
-        IGRAPH_ERROR("Please give least one of `iso', `map' or `maps'",
+        IGRAPH_ERROR("Please specify at least one of `iso', `map' or `maps'",
                      IGRAPH_EINVAL);
     }
 
@@ -1597,13 +1590,15 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
         igraph_vector_int_clear(map);
     }
     if (maps) {
-        igraph_vector_ptr_clear(maps);
+        igraph_vector_int_list_clear(maps);
     }
 
     if (igraph_vcount(pattern) == 0) {
         /* Special case for empty graphs */
         return IGRAPH_SUCCESS;
     }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
 
     IGRAPH_CHECK(igraph_i_lad_createGraph(pattern, &Gp));
     IGRAPH_FINALLY(igraph_i_lad_destroyGraph, &Gp);
@@ -1661,7 +1656,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &alloc_history);
 
     IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, (char) induced, &D,
-                                    &Gp, &Gt, &invalidDomain, iso, map, maps,
+                                    &Gp, &Gt, &invalidDomain, iso, &vec, map, maps,
                                     &nbNodes, &nbFail, &nbSol, &begin,
                                     &alloc_history));
 
@@ -1678,7 +1673,8 @@ exit3:
 
     igraph_i_lad_destroyGraph(&Gt);
     igraph_i_lad_destroyGraph(&Gp);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vector_int_destroy(&vec);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }

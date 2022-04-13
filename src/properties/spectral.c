@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_
             }
 
             for (i = 0; i < no_of_nodes; i++) {
-                int t = VECTOR(degree)[i] > 0 ? 1 : 0;
+                igraph_real_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
                 if (res) {
                     MATRIX(*res, i, i) = t;
                 }

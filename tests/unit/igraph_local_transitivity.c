@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Compare the elements of two vectors for equality, handling NaN values. */
 igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {
@@ -200,7 +200,7 @@ int main() {
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
 
-    igraph_vector_copy(&result3, &result1);
+    igraph_vector_init_copy(&result3, &result1);
 
     igraph_transitivity_local_undirected(&g, &result2, vertices, IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result2);

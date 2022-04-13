@@ -538,7 +538,7 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
         igraph_vector_int_minmax(edges, &min_edge, &max_edge);
     }
     if (min_edge < 0 || max_edge >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid (negative) vertex ID", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid (negative or too large) vertex ID", IGRAPH_EINVVID);
     }
 
     /* Check bipartiteness */
@@ -737,7 +737,7 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
     igraph_integer_t ignored_edges = 0;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERRORF("Vertex type vector size (%ld) not equal to number of vertices (%ld).",
+        IGRAPH_ERRORF("Vertex type vector size (%" IGRAPH_PRId ") not equal to number of vertices (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_bool_size(types), no_of_nodes);
     }
 
@@ -768,7 +768,7 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
         }
     }
     if (ignored_edges) {
-            IGRAPH_WARNINGF("%ld edges running within partitions were ignored.", ignored_edges);
+            IGRAPH_WARNINGF("%" IGRAPH_PRId " edges running within partitions were ignored.", ignored_edges);
     }
 
     if (row_ids) {
@@ -911,7 +911,6 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
                               igraph_real_t p, igraph_bool_t directed,
                               igraph_neimode_t mode) {
 
-    igraph_error_t retval = 0;
     igraph_vector_int_t edges, s;
     igraph_integer_t i;
 
@@ -928,9 +927,9 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
     }
 
     if (p == 0 || n1 * n2 < 1) {
-        IGRAPH_CHECK(retval = igraph_empty(graph, n1 + n2, directed));
+        IGRAPH_CHECK(igraph_empty(graph, n1 + n2, directed));
     } else if (p == 1.0) {
-        IGRAPH_CHECK(retval = igraph_full_bipartite(graph, types, n1, n2, directed,
+        IGRAPH_CHECK(igraph_full_bipartite(graph, types, n1, n2, directed,
                               mode));
     } else {
 
@@ -992,12 +991,12 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
 
         igraph_vector_int_destroy(&s);
         IGRAPH_FINALLY_CLEAN(1);
-        IGRAPH_CHECK(retval = igraph_create(graph, &edges, n1 + n2, directed));
+        IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
         igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
@@ -1006,7 +1005,6 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
                               igraph_neimode_t mode) {
     igraph_vector_int_t edges;
     igraph_vector_int_t s;
-    igraph_error_t retval = 0;
 
     if (n1 < 0 || n2 < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -1028,7 +1026,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
         if (m > 0) {
             IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
         }
-        IGRAPH_CHECK(retval = igraph_empty(graph, n1 + n2, directed));
+        IGRAPH_CHECK(igraph_empty(graph, n1 + n2, directed));
     } else {
 
 
@@ -1045,7 +1043,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
         }
 
         if (maxedges == m) {
-            IGRAPH_CHECK(retval = igraph_full_bipartite(graph, types, n1, n2,
+            IGRAPH_CHECK(igraph_full_bipartite(graph, types, n1, n2,
                                   directed, mode));
         } else {
 
@@ -1087,13 +1085,13 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
 
             igraph_vector_int_destroy(&s);
             IGRAPH_FINALLY_CLEAN(1);
-            IGRAPH_CHECK(retval = igraph_create(graph, &edges, n1 + n2, directed));
+            IGRAPH_CHECK(igraph_create(graph, &edges, n1 + n2, directed));
             igraph_vector_int_destroy(&edges);
             IGRAPH_FINALLY_CLEAN(1);
         }
     }
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 /**

@@ -24,6 +24,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_kautz
  * \brief Generate a Kautz graph.
@@ -61,7 +63,6 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
     /* m+1 - number of symbols */
     /* n+1 - length of strings */
 
-    igraph_integer_t mm = m;
     igraph_integer_t no_of_nodes, no_of_edges;
     igraph_integer_t allstrings;
     igraph_integer_t i, j, idx = 0;
@@ -83,9 +84,27 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         return igraph_empty(graph, 0, IGRAPH_DIRECTED);
     }
 
-    no_of_nodes = ((m + 1) * pow(m, n));
-    no_of_edges = no_of_nodes * m;
-    allstrings = pow(m + 1, n + 1);
+    /* no_of_nodes = ((m + 1) * pow(m, n)) */
+    {
+        igraph_real_t m_to_pow_n_real = pow(m, n);
+        igraph_integer_t m_to_pow_n = m_to_pow_n_real;
+        if (m_to_pow_n != m_to_pow_n_real) {
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Kautz graph.", IGRAPH_EINVAL,
+                          m, n);
+        }
+        IGRAPH_SAFE_MULT(m+1, m_to_pow_n, &no_of_nodes);
+    }
+    /* no_of_edges = m * no_of_nodes */
+    IGRAPH_SAFE_MULT(no_of_nodes, m, &no_of_edges);
+
+    {
+        igraph_real_t allstrings_real = pow(m + 1, n + 1);
+        allstrings = allstrings_real;
+        if (allstrings != allstrings_real) {
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Kautz graph.", IGRAPH_EINVAL,
+                          m, n);
+        }
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
@@ -149,13 +168,17 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
+    }
 
     /* Now come the edges at last */
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t fromvalue = VECTOR(index2)[i];
-        igraph_integer_t lastdigit = fromvalue % (mm + 1);
-        igraph_integer_t basis = (fromvalue * (mm + 1)) % allstrings;
+        igraph_integer_t lastdigit = fromvalue % (m + 1);
+        igraph_integer_t basis = (fromvalue * (m + 1)) % allstrings;
         for (j = 0; j <= m; j++) {
             igraph_integer_t tovalue, to;
             if (j == lastdigit) {

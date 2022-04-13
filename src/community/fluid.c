@@ -59,13 +59,10 @@
  * \return Error code.
  *
  * Time complexity: O(|E|)
- *
- * \example examples/simple/igraph_community_fluid_communities.c
  */
 igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                                        igraph_integer_t no_of_communities,
-                                       igraph_vector_int_t *membership,
-                                       igraph_real_t *modularity) {
+                                       igraph_vector_int_t *membership) {
     /* Declaration of variables */
     igraph_integer_t no_of_nodes, i, j, k, kv1;
     igraph_adjlist_t al;
@@ -84,9 +81,6 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
             igraph_vector_int_fill(membership, 0);
         }
-        if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
-        }
         return IGRAPH_SUCCESS;
     }
     if (no_of_communities < 1) {
@@ -96,11 +90,11 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
         IGRAPH_ERROR("Number of requested communities must not be greater than the number of nodes.",
                      IGRAPH_EINVAL);
     }
-    igraph_is_simple(graph, &res);
+    IGRAPH_CHECK(igraph_is_simple(graph, &res));
     if (!res) {
         IGRAPH_ERROR("Fluid community detection supports only simple graphs.", IGRAPH_EINVAL);
     }
-    igraph_is_connected(graph, &res, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &res, IGRAPH_WEAK));
     if (!res) {
         IGRAPH_ERROR("Fluid community detection supports only connected graphs.", IGRAPH_EINVAL);
     }
@@ -149,6 +143,8 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_init(&label_counters, no_of_communities));
     IGRAPH_FINALLY(igraph_vector_destroy, &label_counters);
+
+    RNG_BEGIN();
 
     /* running is the convergence boolean variable */
     running = 1;
@@ -205,7 +201,6 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                 }
             }
 
-            RNG_BEGIN();
             if (!igraph_vector_empty(&dominant_labels)) {
                 /* Maintain same label if it exists in dominant_labels */
                 same_label_in_dominant = igraph_vector_contains(&dominant_labels, kv1);
@@ -234,30 +229,20 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                     VECTOR(density)[k - 1] = max_density / VECTOR(com_to_numvertices)[k - 1];
                 }
             }
-            RNG_END();
         }
     }
 
+    RNG_END();
 
     /* Shift back the membership vector */
     /* There must be no 0 labels in membership vector at this point */
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(*membership)[i] -= 1;
-        /* Something went wrong: At least one vertex has no community assigned */
-        if (VECTOR(*membership)[i] < 0) {
-            IGRAPH_ERROR("Something went wrong during execution. One or more vertices got "
-                         "no community assigned at algorithm convergence.", IGRAPH_EINTERNAL);
-        }
+        IGRAPH_ASSERT(VECTOR(*membership)[i] >= 0); /* all vertices must have a community assinged */
     }
 
     igraph_adjlist_destroy(&al);
     IGRAPH_FINALLY_CLEAN(1);
-
-    if (modularity) {
-      IGRAPH_CHECK(igraph_modularity(graph, membership, NULL,
-                                     /* resolution */ 1,
-                                     /* only undirected */ 0, modularity));
-    }
 
     igraph_vector_int_destroy(&node_order);
     igraph_vector_destroy(&density);

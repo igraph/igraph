@@ -28,27 +28,38 @@ struct _clique_options {
 				 clique_options *);
 	FILE *output;
 
-	boolean (*user_function)(set_t,graph_t *,clique_options *);
+	igraph_error_t (*user_function)(set_t,graph_t *,clique_options *);
 	void *user_data;
 	set_t *clique_list;
 	int clique_list_length;
 };
 
 /* Weighted clique functions */
-extern int clique_max_weight(graph_t *g,clique_options *opts);
-extern set_t clique_find_single(graph_t *g,int min_weight,int max_weight,
-				boolean maximal, clique_options *opts);
-extern int clique_find_all(graph_t *g, int req_weight, boolean exact,
-			   boolean maximal, clique_options *opts);
+extern igraph_error_t clique_max_weight(
+	graph_t *g, clique_options *opts, int *weight_found
+);
+extern igraph_error_t clique_find_single(
+	graph_t *g, int min_weight, int max_weight, boolean maximal,
+	clique_options *opts, set_t *clique
+);
+extern igraph_error_t clique_find_all(
+	graph_t *g, int req_weight, boolean exact, boolean maximal,
+	clique_options *opts, int *num_found
+);
 
 /* Unweighted clique functions */
 #define clique_unweighted_max_size clique_unweighted_max_weight
-extern int clique_unweighted_max_weight(graph_t *g, clique_options *opts);
-extern set_t clique_unweighted_find_single(graph_t *g,int min_size,
-					   int max_size,boolean maximal,
-					   clique_options *opts);
-extern CLIQUER_LARGE_INT clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
-                                                    boolean maximal, clique_options *opts);
+extern igraph_error_t clique_unweighted_max_weight(
+	graph_t *g, clique_options *opts, int *weight_found
+);
+extern igraph_error_t clique_unweighted_find_single(
+	graph_t *g, int min_size, int max_size, boolean maximal,
+	clique_options *opts, set_t *clique
+);
+extern igraph_error_t clique_unweighted_find_all(
+	graph_t *g, int min_size, int max_size, boolean maximal,
+	clique_options *opts, CLIQUER_LARGE_INT *num_found
+);
 
 /* Time printing functions */
 /*

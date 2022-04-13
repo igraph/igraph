@@ -22,12 +22,12 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_nongraph.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "core/math.h"
 
 /*
  * We provide separate implementations of single-source shortest path searches,
@@ -59,15 +59,15 @@
  * \param  adjlist the adjacency list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static int igraph_i_sspf(
-    igraph_integer_t source,
-    igraph_vector_t *dist,
-    igraph_real_t *nrgeo,
-    igraph_stack_int_t *stack,
-    igraph_adjlist_t *fathers,
-    igraph_adjlist_t *adjlist,
-    igraph_real_t cutoff
-) {
+static igraph_error_t igraph_i_sspf(
+        igraph_integer_t source,
+        igraph_vector_t *dist,
+        igraph_real_t *nrgeo,
+        igraph_stack_int_t *stack,
+        igraph_adjlist_t *fathers,
+        igraph_adjlist_t *adjlist,
+        igraph_real_t cutoff) {
+
     igraph_dqueue_int_t queue;
     const igraph_vector_int_t *neis;
     igraph_vector_int_t *v;
@@ -139,16 +139,16 @@ static int igraph_i_sspf(
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static int igraph_i_sspf_edge(
-    const igraph_t *graph,
-    igraph_integer_t source,
-    igraph_vector_t *dist,
-    igraph_real_t *nrgeo,
-    igraph_stack_int_t *stack,
-    igraph_inclist_t *fathers,
-    const igraph_inclist_t *inclist,
-    igraph_real_t cutoff
-) {
+static igraph_error_t igraph_i_sspf_edge(
+        const igraph_t *graph,
+        igraph_integer_t source,
+        igraph_vector_t *dist,
+        igraph_real_t *nrgeo,
+        igraph_stack_int_t *stack,
+        igraph_inclist_t *fathers,
+        const igraph_inclist_t *inclist,
+        igraph_real_t cutoff) {
+
     igraph_dqueue_int_t queue;
     const igraph_vector_int_t *neis;
     igraph_vector_int_t *v;
@@ -222,17 +222,17 @@ static int igraph_i_sspf_edge(
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static int igraph_i_sspf_weighted(
-    const igraph_t *graph,
-    igraph_integer_t source,
-    igraph_vector_t *dist,
-    igraph_real_t *nrgeo,
-    const igraph_vector_t *weights,
-    igraph_stack_int_t *stack,
-    igraph_adjlist_t *fathers,
-    igraph_inclist_t *inclist,
-    igraph_real_t cutoff
-) {
+static igraph_error_t igraph_i_sspf_weighted(
+        const igraph_t *graph,
+        igraph_integer_t source,
+        igraph_vector_t *dist,
+        igraph_real_t *nrgeo,
+        const igraph_vector_t *weights,
+        igraph_stack_int_t *stack,
+        igraph_adjlist_t *fathers,
+        igraph_inclist_t *inclist,
+        igraph_real_t cutoff) {
+
     const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     int cmp_result;
@@ -331,17 +331,17 @@ static int igraph_i_sspf_weighted(
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
  */
-static int igraph_i_sspf_weighted_edge(
-    const igraph_t *graph,
-    igraph_integer_t source,
-    igraph_vector_t *dist,
-    igraph_real_t *nrgeo,
-    const igraph_vector_t *weights,
-    igraph_stack_int_t *stack,
-    igraph_inclist_t *fathers,
-    const igraph_inclist_t *inclist,
-    igraph_real_t cutoff
-) {
+static igraph_error_t igraph_i_sspf_weighted_edge(
+        const igraph_t *graph,
+        igraph_integer_t source,
+        igraph_vector_t *dist,
+        igraph_real_t *nrgeo,
+        const igraph_vector_t *weights,
+        igraph_stack_int_t *stack,
+        igraph_inclist_t *fathers,
+        const igraph_inclist_t *inclist,
+        igraph_real_t cutoff) {
+
     const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     int cmp_result;
@@ -576,15 +576,15 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
-    nrgeo = igraph_Calloc(no_of_nodes, igraph_real_t);
+    nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
-    tmpscore = igraph_Calloc(no_of_nodes, igraph_real_t);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -670,8 +670,8 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
 
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
 
-    igraph_Free(nrgeo);
-    igraph_Free(tmpscore);
+    IGRAPH_FREE(nrgeo);
+    IGRAPH_FREE(tmpscore);
     igraph_vector_destroy(&dist);
     igraph_stack_int_destroy(&S);
     igraph_adjlist_destroy(&fathers);
@@ -720,7 +720,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
  *     of the edges in a graph. See \ref igraph_edge_betweenness_cutoff() to
  *     compute the range-limited betweenness score of the edges in a graph.
  */
-int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed,
                             const igraph_vector_t *weights) {
     return igraph_edge_betweenness_cutoff(graph, result, directed,
@@ -761,7 +761,7 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_betweenness_cutoff() to compute the range-limited vertex betweenness.
  */
-int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
                                    igraph_bool_t directed,
                                    const igraph_vector_t *weights, igraph_real_t cutoff) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -784,15 +784,15 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
-    nrgeo = igraph_Calloc(no_of_nodes, igraph_real_t);
+    nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
-    tmpscore = igraph_Calloc(no_of_nodes, igraph_real_t);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -858,8 +858,8 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
     igraph_inclist_destroy(&inclist);
     igraph_inclist_destroy(&fathers);
     igraph_vector_destroy(&dist);
-    igraph_Free(tmpscore);
-    igraph_Free(nrgeo);
+    IGRAPH_FREE(tmpscore);
+    IGRAPH_FREE(nrgeo);
     IGRAPH_FINALLY_CLEAN(6);
 
     return IGRAPH_SUCCESS;
@@ -902,7 +902,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
  * \ref igraph_betweenness_cutoff() to calculate the range-limited vertex
  * betweenness.
  */
-int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_bool_t directed,
                               const igraph_vs_t sources, const igraph_vs_t targets,
                               const igraph_vector_t *weights) {
@@ -944,21 +944,21 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
-    nrgeo = igraph_Calloc(no_of_nodes, igraph_real_t);
+    nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
-    tmpscore = igraph_Calloc(no_of_nodes, igraph_real_t);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
-    is_target = igraph_Calloc(no_of_nodes, unsigned char);
+    is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
     if (is_target == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -1076,9 +1076,9 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
         igraph_vector_scale(res, 0.5);
     }
 
-    igraph_Free(is_target);
-    igraph_Free(tmpscore);
-    igraph_Free(nrgeo);
+    IGRAPH_FREE(is_target);
+    IGRAPH_FREE(tmpscore);
+    IGRAPH_FREE(nrgeo);
     igraph_vector_destroy(&dist);
     igraph_stack_int_destroy(&S);
     igraph_adjlist_destroy(&fathers);
@@ -1127,7 +1127,7 @@ int igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_edge_betweenness_cutoff() to compute the range-limited edge betweenness.
  */
-int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
                                    const igraph_es_t eids, igraph_bool_t directed,
                                    const igraph_vs_t sources, const igraph_vs_t targets,
                                    const igraph_vector_t *weights) {
@@ -1151,9 +1151,9 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
-    is_target = igraph_Calloc(no_of_nodes, unsigned char);
+    is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
     if (is_target == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -1172,15 +1172,15 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
-    nrgeo = igraph_Calloc(no_of_nodes, igraph_real_t);
+    nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
-    tmpscore = igraph_Calloc(no_of_nodes, igraph_real_t);
+    tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
     if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -1294,12 +1294,12 @@ int igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vector_t *res,
     }
 
     igraph_stack_int_destroy(&S);
-    igraph_Free(tmpscore);
-    igraph_Free(nrgeo);
+    IGRAPH_FREE(tmpscore);
+    IGRAPH_FREE(nrgeo);
     igraph_vector_destroy(&dist);
     igraph_inclist_destroy(&fathers);
     igraph_inclist_destroy(&inclist);
-    igraph_Free(is_target);
+    IGRAPH_FREE(is_target);
     IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;

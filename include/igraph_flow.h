@@ -28,7 +28,7 @@
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
-#include "igraph_vector_ptr.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
@@ -54,7 +54,7 @@ __BEGIN_DECLS
  */
 
 typedef struct {
-    int nopush, norelabel, nogap, nogapnodes, nobfs;
+    igraph_integer_t nopush, norelabel, nogap, nogapnodes, nobfs;
 } igraph_maxflow_stats_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
@@ -136,14 +136,14 @@ IGRAPH_EXPORT igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                                         igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
-                                     igraph_vector_ptr_t *cuts,
-                                     igraph_vector_ptr_t *partition1s,
+                                     igraph_vector_int_list_t *cuts,
+                                     igraph_vector_int_list_t *partition1s,
                                      igraph_integer_t source,
                                      igraph_integer_t target);
 
 IGRAPH_EXPORT igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
-                                        igraph_vector_ptr_t *cuts,
-                                        igraph_vector_ptr_t *partition1s,
+                                        igraph_vector_int_list_t *cuts,
+                                        igraph_vector_int_list_t *partition1s,
                                         igraph_integer_t source,
                                         igraph_integer_t target,
                                         const igraph_vector_t *capacity);

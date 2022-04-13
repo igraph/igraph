@@ -23,13 +23,13 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 typedef struct cb2_data_t {
     igraph_matrix_t *A;
 } cb2_data_t;
 
-int cb2(igraph_real_t *to, const igraph_real_t *from, int n, void *extra) {
+igraph_error_t cb2(igraph_real_t *to, const igraph_real_t *from, int n, void *extra) {
     IGRAPH_UNUSED(n);
     cb2_data_t *data = (cb2_data_t*) extra;
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
@@ -138,7 +138,7 @@ int main() {
 
     for (i = 0; i < DIM; i++) {
         for (j = 0; j < DIM; j++) {
-            MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), -10, 10);
+            MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), -12, 12);
         }
     }
 

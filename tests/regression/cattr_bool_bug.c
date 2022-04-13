@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 void check_attr(igraph_t *graph) {
     IGRAPH_ASSERT(igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "name"));

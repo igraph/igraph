@@ -25,14 +25,16 @@
 #define IGRAPH_LAYOUT_H
 
 #include "igraph_decls.h"
+
+#include "igraph_arpack.h"
 #include "igraph_constants.h"
+#include "igraph_datatype.h"
+#include "igraph_iterators.h"
+#include "igraph_matrix_list.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_matrix.h"
-#include "igraph_datatype.h"
-#include "igraph_arpack.h"
-#include "igraph_iterators.h"
 
 __BEGIN_DECLS
 
@@ -241,17 +243,15 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_drl_options_init(igraph_layout_drl_op
 IGRAPH_EXPORT igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                                     igraph_bool_t use_seed,
                                     const igraph_layout_drl_options_t *options,
-                                    const igraph_vector_t *weights,
-                                    const igraph_vector_bool_t *fixed);
+                                    const igraph_vector_t *weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
                                        igraph_bool_t use_seed,
                                        const igraph_layout_drl_options_t *options,
-                                       const igraph_vector_t *weights,
-                                       const igraph_vector_bool_t *fixed);
+                                       const igraph_vector_t *weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_merge_dla(const igraph_vector_ptr_t *graphs,
-                                          const igraph_vector_ptr_t *coords,
+                                          const igraph_matrix_list_t *coords,
                                           igraph_matrix_t *res);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
@@ -266,6 +266,25 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph,
                                                igraph_real_t weight_edge_lengths,
                                                igraph_real_t weight_edge_crossings,
                                                igraph_real_t weight_node_edge_dist);
+
+/**
+ * \typedef igraph_root_choice_t
+ * \brief Root choice heuristic for tree visualizations.
+ *
+ * Used with \ref igraph_roots_for_tree_layout().
+ */
+
+typedef enum {
+    IGRAPH_ROOT_CHOICE_DEGREE,
+    IGRAPH_ROOT_CHOICE_ECCENTRICITY
+} igraph_root_choice_t;
+
+IGRAPH_EXPORT igraph_error_t igraph_roots_for_tree_layout(
+        const igraph_t *graph,
+        igraph_neimode_t mode,
+        igraph_vector_int_t *roots,
+        igraph_root_choice_t use_eccentricity);
+
 
 __END_DECLS
 

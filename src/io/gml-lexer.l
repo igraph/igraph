@@ -1,7 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge, MA, 02138 USA
+   Copyright (C) 2007-2021  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
 %{
@@ -70,17 +68,19 @@
 %option reentrant
 %option bison-bridge
 %option bison-locations
+%option yylineno
 
 digit       [0-9]
-whitespace  [ \r\n\t]
+whitespace  [ \r\n\t\v\f]
 
 %%
 
-^#[^\n\r]*[\n]|[\r]     { /* comments ignored */ }
+^#[^\0\n\r]*            { /* comments ignored */ }
 
-\"[^\x00\"]*\"                                  { return STRING; }
+\"[^\0\"]*\"            { return STRING; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 [a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
+\-                      { return MINUS; }
 \[                      {
                           yyextra->depth++;
                           if (yyextra->depth >= 32) {
@@ -97,7 +97,6 @@ whitespace  [ \r\n\t]
                             return LISTCLOSE;
                           }
                         }
-\n\r|\r\n|\r|\n         { }
 {whitespace}            { /* other whitespace ignored */ }
 
 <<EOF>>                 {

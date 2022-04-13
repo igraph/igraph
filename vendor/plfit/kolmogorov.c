@@ -58,7 +58,7 @@ double plfit_kolmogorov(double z) {
 }
 
 double plfit_ks_test_one_sample_p(double d, size_t n) {
-    return plfit_kolmogorov(d * sqrt(n));
+    return plfit_kolmogorov(d * sqrt((double) n));
 }
 
 double plfit_ks_test_two_sample_p(double d, size_t n1, size_t n2) {

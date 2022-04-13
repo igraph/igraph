@@ -23,29 +23,20 @@
 
 #include <igraph.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 int main() {
-
     igraph_t graph;
-    igraph_vector_ptr_t separators;
-    int i, n;
+    igraph_vector_int_list_t separators;
 
     igraph_small(&graph, 0, /*directed=*/ 0,
                  0, 1, 0, 2, 1, 3, 1, 4, 2, 3, 2, 5, 3, 4, 3, 5, 4, 6, 5, 6, -1);
-    igraph_vector_ptr_init(&separators, 0);
+    igraph_vector_int_list_init(&separators, 0);
 
     igraph_all_minimal_st_separators(&graph, &separators);
 
-    n = igraph_vector_ptr_size(&separators);
-    for (i = 0; i < n; i++) {
-        igraph_vector_int_t *sep = VECTOR(separators)[i];
-        igraph_vector_int_print(sep);
-        igraph_vector_int_destroy(sep);
-        igraph_free(sep);
-    }
-
-    igraph_vector_ptr_destroy(&separators);
+    print_vector_int_list(&separators);
+    igraph_vector_int_list_destroy(&separators);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

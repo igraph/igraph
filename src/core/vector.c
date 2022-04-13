@@ -58,8 +58,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
-#include "core/math.h"
-
 #include "core/indheap.h"
 
 /**
@@ -103,7 +101,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 
     igraph_indheap_t heap;
 
-    igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v));
+    IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
     IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
 
     igraph_vector_clear(v);
@@ -189,10 +187,10 @@ igraph_error_t igraph_vector_int_pair_order(const igraph_vector_int_t* v,
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
             igraph_integer_t next = VECTOR(ptr)[i] - 1;
-            res->stor_begin[j++] = next;
+            VECTOR(*res)[j++] = next;
             while (VECTOR(rad)[next] != 0) {
                 next = VECTOR(rad)[next] - 1;
-                res->stor_begin[j++] = next;
+                VECTOR(*res)[j++] = next;
             }
         }
     }

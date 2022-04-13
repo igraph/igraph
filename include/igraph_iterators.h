@@ -24,8 +24,11 @@
 #ifndef IGRAPH_ITERATORS_H
 #define IGRAPH_ITERATORS_H
 
+#include "igraph_datatype.h"
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 __BEGIN_DECLS
 
@@ -52,7 +55,7 @@ typedef struct igraph_vs_t {
         struct {
             igraph_integer_t vid;
             igraph_neimode_t mode;
-        } adj;                  /* adjacent vertices  */
+        } adj;                              /* adjacent vertices  */
         struct {
             igraph_integer_t from;
             igraph_integer_t to;
@@ -140,7 +143,7 @@ typedef struct igraph_vit_t {
  * igraph_vs_adj(&amp;vs, 0, IGRAPH_ALL);
  * igraph_vit_create(&amp;graph, vs, &amp;vit);
  * while (!IGRAPH_VIT_END(vit)) {
- *   printf(" %li", (long int) IGRAPH_VIT_GET(vit));
+ *   printf(" %" IGRAPH_PRId, IGRAPH_VIT_GET(vit));
  *   IGRAPH_VIT_NEXT(vit);
  * }
  * printf("\n");
@@ -233,7 +236,8 @@ typedef enum {
     IGRAPH_ES_SEQ,
     IGRAPH_ES_PAIRS,
     IGRAPH_ES_PATH,
-    IGRAPH_ES_MULTIPAIRS,
+    IGRAPH_ES_UNUSED_WAS_MULTIPAIRS,  /* placeholder for deprecated IGRAPH_ES_MULTIPAIRS from igraph 0.10 */
+    IGRAPH_ES_ALL_BETWEEN,
 } igraph_es_type_t;
 
 typedef struct igraph_es_t {
@@ -254,6 +258,11 @@ typedef struct igraph_es_t {
             const igraph_vector_int_t *ptr;
             igraph_bool_t mode;
         } path;
+        struct {
+            igraph_integer_t from;
+            igraph_integer_t to;
+            igraph_bool_t directed;
+        } between;
     } data;
 } igraph_es_t;
 
@@ -274,9 +283,6 @@ IGRAPH_EXPORT igraph_error_t igraph_es_vector(igraph_es_t *es,
                                    const igraph_vector_int_t *v);
 IGRAPH_EXPORT igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_fromto(igraph_es_t *es,
-                                   igraph_vs_t from, igraph_vs_t to);
-
 IGRAPH_EXPORT igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
 IGRAPH_EXPORT igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
@@ -286,12 +292,14 @@ IGRAPH_EXPORT igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vecto
                                   igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_multipairs(igraph_es_t *es, const igraph_vector_int_t *v,
-                                       igraph_bool_t directed);
-
 IGRAPH_EXPORT igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
                                  igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...);
+
+IGRAPH_EXPORT igraph_error_t igraph_es_all_between(
+    igraph_es_t *es, igraph_integer_t from, igraph_integer_t to,
+    igraph_bool_t directed
+);
 
 IGRAPH_EXPORT void igraph_es_destroy(igraph_es_t *es);
 

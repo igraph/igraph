@@ -27,7 +27,7 @@
 
 #include "layout/layout_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main () {
     igraph_integer_t i;

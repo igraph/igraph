@@ -24,29 +24,20 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
-
-void free_complist(igraph_vector_ptr_t *complist) {
-    igraph_integer_t i;
-    for (i = 0; i < igraph_vector_ptr_size(complist); i++) {
-        igraph_destroy(VECTOR(*complist)[i]);
-        igraph_free(VECTOR(*complist)[i]);
-    }
-}
+#include "test_utilities.h"
 
 int main() {
 
     igraph_t ring, g;
-    igraph_vector_ptr_t complist;
+    igraph_graph_list_t complist;
     igraph_integer_t i;
+
+    igraph_graph_list_init(&complist, 0);
 
     /* A directed ring, a single strongly connected component */
     igraph_ring(&ring, 10, IGRAPH_DIRECTED, 0, 1);
-
-    igraph_vector_ptr_init(&complist, 0);
     igraph_decompose(&ring, &complist, IGRAPH_STRONG, -1, 0);
-    igraph_write_graph_edgelist(VECTOR(complist)[0], stdout);
-    free_complist(&complist);
+    igraph_write_graph_edgelist(igraph_graph_list_get_ptr(&complist, 0), stdout);
     igraph_destroy(&ring);
 
     /* a toy graph, three components maximum, with at least 2 vertices each */
@@ -59,13 +50,12 @@ int main() {
                  3, 4,
                  -1);
     igraph_decompose(&g, &complist, IGRAPH_STRONG, 3, 2);
-    for (i = 0; i < igraph_vector_ptr_size(&complist); i++) {
-        igraph_write_graph_edgelist(VECTOR(complist)[i], stdout);
+    for (i = 0; i < igraph_graph_list_size(&complist); i++) {
+        igraph_write_graph_edgelist(igraph_graph_list_get_ptr(&complist, i), stdout);
     }
-    free_complist(&complist);
     igraph_destroy(&g);
 
-    igraph_vector_ptr_destroy(&complist);
+    igraph_graph_list_destroy(&complist);
 
     VERIFY_FINALLY_STACK();
 

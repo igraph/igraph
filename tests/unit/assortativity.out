@@ -1,0 +1,33 @@
+Null graph nominal assortativity: NaN
+Null graph value assortativity: NaN
+Singleton graph nominal assortativity: NaN
+Singleton graph nominal assortativity, unnormalized: NaN
+Singleton graph value assortativity: NaN
+Singleton graph value assortativity, unnormalized: NaN
+Singleton graph with loop, nominal assortativity: NaN
+Singleton graph with loop, nominal assortativity, unnormalized: 0
+Singleton graph with loop, value assortativity: NaN
+Singleton graph with loop, value assortativity, unnormalized: 0
+
+Karate club, normalized assortativity based on degree categories: -0.077745
+Karate club, non-normalized assortativity based on degree categories: -0.0693623
+Assortativity based on values: 0.448049
+Assortativity based on values, unnormalized: 69.3478
+
+Degree assortativity, NORMALIZED
+Degree assortativity: -0.475613
+Degree assortativity, directed: -0.666667
+Degree assortativity, undirected, with self-loop: 0.166667
+Degree assortativity, directed, with self-loop: -0.707107
+Degree assortativity, undirected, with multi-edges: -0.111111
+Degree assortativity, directed, with multi-edges: -0.333333
+
+Degree assortativity, UNNORMALIZED
+Degree assortativity: -13.6943
+Degree assortativity, directed: -0.16
+Degree assortativity, undirected, with self-loop: 0.04
+Degree assortativity, directed, with self-loop: -0.333333
+Degree assortativity, undirected, with multi-edges: -0.04
+Degree assortativity, directed, with multi-edges: -0.333333
+
+Football network: 0.607938

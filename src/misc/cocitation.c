@@ -31,7 +31,7 @@
 
 #include <math.h>
 
-static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids, igraph_neimode_t mode,
                            igraph_vector_t *weights);
 
@@ -191,7 +191,7 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids,
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
@@ -231,14 +231,15 @@ static int igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 
         IGRAPH_ALLOW_INTERRUPTION();
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
+        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
         if (weights) {
             weight = VECTOR(*weights)[from];
         }
 
-        for (i = 0; i < igraph_vector_int_size(&neis) - 1; i++) {
+        for (i = 0; i < nei_count - 1; i++) {
             u = VECTOR(neis)[i];
             k = VECTOR(vid_reverse_index)[u];
-            for (j = i + 1; j < igraph_vector_int_size(&neis); j++) {
+            for (j = i + 1; j < nei_count; j++) {
                 v = VECTOR(neis)[j];
                 l = VECTOR(vid_reverse_index)[v];
                 if (k != -1) {
@@ -463,7 +464,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
         i = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(i, igraph_bool_t);
         if (seen == 0) {
-            IGRAPH_ERROR("cannot calculate Jaccard similarity", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot calculate Jaccard similarity", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, seen);
 

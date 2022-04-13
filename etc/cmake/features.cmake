@@ -17,3 +17,6 @@ if(IGRAPH_INTEGER_SIZE STREQUAL AUTO)
     set(IGRAPH_INTEGER_SIZE 32)
   endif()
 endif()
+
+option(FLEX_KEEP_LINE_NUMBERS "Keep references to the original line numbers in generated Flex/Bison parser files" OFF)
+mark_as_advanced(FLEX_KEEP_LINE_NUMBERS)

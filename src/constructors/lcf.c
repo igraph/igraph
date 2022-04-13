@@ -24,6 +24,8 @@
 
 #include "igraph_operators.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_lcf_vector
  * \brief Creates a graph from LCF notation.
@@ -52,11 +54,18 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t ptr = 0, i, sptr = 0;
     igraph_integer_t no_of_nodes = n;
     igraph_integer_t no_of_edges = n + no_of_shifts * repeats;
+    igraph_integer_t no_of_edges2;
 
     if (repeats < 0) {
-        IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of repeats must be positive.", IGRAPH_EINVAL);
     }
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * no_of_edges);
+
+    /* no_of_edges = n + no_of_shifts * repeats */
+    IGRAPH_SAFE_MULT(no_of_shifts, repeats, &no_of_edges);
+    IGRAPH_SAFE_ADD(no_of_edges, n, &no_of_edges);
+    IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges2);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
 
     if (no_of_nodes > 0) {
         /* Create a ring first */
@@ -120,12 +129,18 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
 
     va_start(ap, n);
     while (1) {
+        igraph_error_t err;
         int num = va_arg(ap, int);
         if (num == 0) {
             break;
         }
-        IGRAPH_CHECK(igraph_vector_int_push_back(&shifts, num));
+        err = igraph_vector_int_push_back(&shifts, num);
+        if (err != IGRAPH_SUCCESS) {
+            va_end(ap);
+            IGRAPH_ERROR("", err);
+        }
     }
+    va_end(ap);
     if (igraph_vector_int_size(&shifts) == 0) {
         repeats = 0;
     } else {

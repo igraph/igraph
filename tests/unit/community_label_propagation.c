@@ -24,7 +24,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t g;
@@ -32,7 +32,23 @@ int main() {
     igraph_vector_t weights;
     igraph_vector_int_t initial;
     igraph_vector_bool_t fixed;
-    igraph_integer_t i;
+    igraph_integer_t i, j;
+
+    /* Simple triangle graph, the output should be always one community */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0,  1,  0,  2,  1,  2, -1);
+    igraph_vector_int_init(&membership, 0);
+
+    for (j = 0; j < 100; j++) {
+        /* label propagation is a stochastic method */
+        igraph_rng_seed(igraph_rng_default(), j);
+
+        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
+
+        for (i = 0; i < 3; i++)
+            IGRAPH_ASSERT(VECTOR(membership)[i] == VECTOR(membership)[0]);
+    }
+
+    igraph_destroy(&g);
 
     /* label propagation is a stochastic method */
     igraph_rng_seed(igraph_rng_default(), 765);
@@ -57,9 +73,7 @@ int main() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_vector_int_init(&membership, 0);
-    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0,
-                                       /*modularity=*/ 0);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0);
 
     igraph_destroy(&g);
 
@@ -74,23 +88,20 @@ int main() {
     VECTOR(fixed)[4] = 1;
     VECTOR(fixed)[5] = 1;
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-                                       &initial, &fixed, /*modularity=*/ 0);
+                                       &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
-        if (VECTOR(membership)[i] != (i < 2 ? 0 : 1)) {
-            return 3;
-        }
+        IGRAPH_ASSERT(VECTOR(membership)[i] == (i < 2 ? 0 : 1));
+
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0,
-                                       &initial, &fixed, /*modularity=*/ 0);
+                                       &initial, &fixed);
     for (i = 0; i < igraph_vcount(&g); i++)
-        if (VECTOR(membership)[i] != 0) {
-            return 4;
-        }
+        IGRAPH_ASSERT(VECTOR(membership)[i] == 0);
 
     /* Check whether it works with no fixed vertices at all
      * while an initial configuration is given -- see bug
      * #570902 in Launchpad. This is a simple smoke test only. */
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-                                       &initial, 0, /*modularity=*/ 0);
+                                       &initial, 0);
 
     igraph_vector_bool_destroy(&fixed);
     igraph_vector_destroy(&weights);

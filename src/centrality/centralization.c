@@ -28,7 +28,7 @@
 
 /**
  * \function igraph_centralization
- * Calculate the centralization score from the node level scores
+ * \brief Calculate the centralization score from the node level scores.
  *
  * For a centrality score defined on the vertices of a graph, it is
  * possible to define a graph level centralization index, by
@@ -94,12 +94,13 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
 
 /**
  * \function igraph_centralization_degree
- * Calculate vertex degree and graph centralization
+ * \brief Calculate vertex degree and graph centralization.
  *
  * This function calculates the degree of the vertices by passing its
  * arguments to \ref igraph_degree(); and it calculates the graph
  * level centralization index based on the results by calling \ref
  * igraph_centralization().
+ *
  * \param graph The input graph.
  * \param res A vector if you need the node-level degree scores, or a
  *     null pointer otherwise.
@@ -160,7 +161,7 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
 
 /**
  * \function igraph_centralization_degree_tmax
- * Theoretical maximum for graph centralization based on degree
+ * \brief Theoretical maximum for graph centralization based on degree.
  *
  * This function returns the theoretical maximum graph centrality
  * based on vertex degree.
@@ -182,6 +183,7 @@ igraph_error_t igraph_centralization_degree(const igraph_t *graph, igraph_vector
  * The most centralized structure is the star. More specifically, for
  * undirected graphs it is the star, for directed graphs it is the
  * in-star or the out-star.
+ *
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
@@ -249,12 +251,13 @@ igraph_error_t igraph_centralization_degree_tmax(const igraph_t *graph,
 
 /**
  * \function igraph_centralization_betweenness
- * Calculate vertex betweenness and graph centralization
+ * \brief Calculate vertex betweenness and graph centralization.
  *
  * This function calculates the betweenness centrality of the vertices
  * by passing its arguments to \ref igraph_betweenness(); and it
  * calculates the graph level centralization index based on the
  * results by calling \ref igraph_centralization().
+ *
  * \param graph The input graph.
  * \param res A vector if you need the node-level betweenness scores, or a
  *     null pointer otherwise.
@@ -314,7 +317,7 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
 
 /**
  * \function igraph_centralization_betweenness_tmax
- * Theoretical maximum for graph centralization based on betweenness
+ * \brief Theoretical maximum for graph centralization based on betweenness.
  *
  * This function returns the theoretical maximum graph centrality
  * based on vertex betweenness.
@@ -334,6 +337,7 @@ igraph_error_t igraph_centralization_betweenness(const igraph_t *graph,
  *
  * </para><para>
  * The most centralized structure is the star.
+ *
  * \param graph A graph object or a null pointer, see the description
  *     above.
  * \param nodes The number of nodes. This is ignored if the
@@ -374,12 +378,13 @@ igraph_error_t igraph_centralization_betweenness_tmax(const igraph_t *graph,
 
 /**
  * \function igraph_centralization_closeness
- * Calculate vertex closeness and graph centralization
+ * \brief Calculate vertex closeness and graph centralization.
  *
  * This function calculates the closeness centrality of the vertices
  * by passing its arguments to \ref igraph_closeness(); and it
  * calculates the graph level centralization index based on the
  * results by calling \ref igraph_centralization().
+ *
  * \param graph The input graph.
  * \param res A vector if you need the node-level closeness scores, or a
  *     null pointer otherwise.
@@ -443,7 +448,7 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
 
 /**
  * \function igraph_centralization_closeness_tmax
- * Theoretical maximum for graph centralization based on closeness
+ * \brief Theoretical maximum for graph centralization based on closeness.
  *
  * This function returns the theoretical maximum graph centrality
  * based on vertex closeness.
@@ -507,7 +512,7 @@ igraph_error_t igraph_centralization_closeness_tmax(const igraph_t *graph,
 
 /**
  * \function igraph_centralization_eigenvector_centrality
- * Calculate eigenvector centrality scores and graph centralization
+ * \brief Calculate eigenvector centrality scores and graph centralization.
  *
  * This function calculates the eigenvector centrality of the vertices
  * by passing its arguments to \ref igraph_eigenvector_centrality);
@@ -592,7 +597,7 @@ igraph_error_t igraph_centralization_eigenvector_centrality(
 
 /**
  * \function igraph_centralization_eigenvector_centrality_tmax
- * Theoretical maximum centralization for eigenvector centrality
+ * \brief Theoretical maximum centralization for eigenvector centrality.
  *
  * This function returns the theoretical maximum graph centrality
  * based on vertex eigenvector centrality.

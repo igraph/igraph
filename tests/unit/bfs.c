@@ -22,9 +22,9 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-igraph_bool_t bfs_callback(const igraph_t *graph,
+igraph_error_t bfs_callback(const igraph_t *graph,
                            igraph_integer_t vid,
                            igraph_integer_t pred,
                            igraph_integer_t succ,
@@ -125,6 +125,15 @@ int main() {
     VECTOR(roots)[0] = 3;
     VECTOR(roots)[1] = 4;
     VECTOR(roots)[2] = 6;
+    printf("(");
+    igraph_bfs(&graph, /*root=*/ -1, &roots, /*neimode=*/ IGRAPH_OUT,
+               /*unreachable=*/ 0, &restricted,
+               0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+    printf(" )\n");
+
+    /* Empty root vertex vector */
+
+    igraph_vector_int_clear(&roots);
     printf("(");
     igraph_bfs(&graph, /*root=*/ -1, &roots, /*neimode=*/ IGRAPH_OUT,
                /*unreachable=*/ 0, &restricted,

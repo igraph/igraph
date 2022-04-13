@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 int main() {
 
@@ -32,7 +32,7 @@ int main() {
     FILE *f;
     igraph_matrix_t coords;
     igraph_vector_int_t roots;
-    long int i, n;
+    igraph_integer_t i, n;
 
     f = fopen("igraph_layout_reingold_tilford_bug_879.in", "r");
     igraph_read_graph_edgelist(&g, f, 0, 0);

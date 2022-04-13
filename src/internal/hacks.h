@@ -24,19 +24,18 @@
 #ifndef IGRAPH_HACKS_INTERNAL_H
 #define IGRAPH_HACKS_INTERNAL_H
 
+#include "igraph_decls.h"
+
 #include "config.h"
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
-#else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
-#endif
+#include <stdlib.h>
 
 __BEGIN_DECLS
+
+#ifndef HAVE_STRNDUP
+    #define strndup igraph_i_strndup
+    char* igraph_i_strndup(const char *s, size_t n);
+#endif
 
 #ifndef HAVE_STRDUP
     #define strdup igraph_i_strdup

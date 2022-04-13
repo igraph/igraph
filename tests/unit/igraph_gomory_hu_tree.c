@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {
@@ -91,7 +91,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
             IGRAPH_FINALLY(igraph_destroy, &copy);
 
             IGRAPH_CHECK(igraph_delete_edges(&copy, igraph_ess_1(min_weight_edge_index)));
-            IGRAPH_CHECK(igraph_clusters(&copy, &membership, 0, &no_of_clusters, IGRAPH_WEAK));
+            IGRAPH_CHECK(igraph_connected_components(&copy, &membership, 0, &no_of_clusters, IGRAPH_WEAK));
 
             if (no_of_clusters != 2) {
                 printf(
@@ -121,7 +121,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
             if (flow_value != VECTOR(*flow)[min_weight_edge_index]) {
                 printf(
                     "Edge %" IGRAPH_PRId " -- %" IGRAPH_PRId
-					" (index %" IGRAPH_PRId ") in the Gomory-Hu tree has weight = %.2f, but "
+                    " (index %" IGRAPH_PRId ") in the Gomory-Hu tree has weight = %.2f, but "
                     "the corresponding flow in the original graph has value = %.2f\n",
                     IGRAPH_FROM(tree, min_weight_edge_index),
                     IGRAPH_TO(tree, min_weight_edge_index),

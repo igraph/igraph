@@ -38,8 +38,9 @@ int main() {
 
     /* Convert a ring graph to a matrix, print it, compress, print again */
 #define VC 10
+    igraph_sparsemat_init(&A, 1, 1, 0);
     igraph_ring(&G, VC, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_get_sparsemat(&G, &A);
+    igraph_get_adjacency_sparse(&G, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&G);
 
     igraph_sparsemat_compress(&A, &B);
@@ -73,10 +74,8 @@ int main() {
     printf("------------------------\n");
 
     /* Create unit matrices */
-    igraph_sparsemat_eye(&A, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0,
-                         /*compress=*/ 0);
-    igraph_sparsemat_eye(&B, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0,
-                         /*compress=*/ 1);
+    igraph_sparsemat_init_eye(&A, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0, /*compress=*/ 0);
+    igraph_sparsemat_init_eye(&B, /*n=*/ 5, /*nzmax=*/ 5, /*value=*/ 1.0, /*compress=*/ 1);
     igraph_sparsemat_print(&A, stdout);
     igraph_sparsemat_print(&B, stdout);
     igraph_sparsemat_destroy(&A);
@@ -89,8 +88,8 @@ int main() {
     for (i = 0; i < 5; i++) {
         VECTOR(vect)[i] = i;
     }
-    igraph_sparsemat_diag(&A, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 0);
-    igraph_sparsemat_diag(&B, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 1);
+    igraph_sparsemat_init_diag(&A, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 0);
+    igraph_sparsemat_init_diag(&B, /*nzmax=*/ 5, /*values=*/ &vect, /*compress=*/ 1);
     igraph_vector_destroy(&vect);
     igraph_sparsemat_print(&A, stdout);
     igraph_sparsemat_print(&B, stdout);
@@ -100,8 +99,9 @@ int main() {
     printf("------------------------\n");
 
     /* Transpose matrices */
-    igraph_tree(&G, 10, /*children=*/ 2, IGRAPH_TREE_OUT);
-    igraph_get_sparsemat(&G, &A);
+    igraph_sparsemat_init(&A, 1, 1, 0);
+    igraph_kary_tree(&G, 10, /*children=*/ 2, IGRAPH_TREE_OUT);
+    igraph_get_adjacency_sparse(&G, &A, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&G);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_print(&B, stdout);
@@ -151,10 +151,12 @@ int main() {
 
     /* Add two matrices */
 
+    igraph_sparsemat_init(&A, 1, 1, 0);
+    igraph_sparsemat_init(&B, 1, 1, 0);
     igraph_star(&G, 10, IGRAPH_STAR_OUT, /*center=*/ 0);
     igraph_ring(&H, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_get_sparsemat(&G, &A);
-    igraph_get_sparsemat(&H, &B);
+    igraph_get_adjacency_sparse(&G, &A, IGRAPH_GET_ADJACENCY_BOTH);
+    igraph_get_adjacency_sparse(&H, &B, IGRAPH_GET_ADJACENCY_BOTH);
     igraph_destroy(&G);
     igraph_destroy(&H);
     igraph_sparsemat_compress(&A, &C);

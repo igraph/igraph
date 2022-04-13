@@ -189,7 +189,7 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
 
         if (neis == 0) {
             /* Most likely out of memory */
-            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
 
         VECTOR(*res)[i] = 0;
@@ -256,7 +256,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
 
         if (neis == 0) {
             /* Most likely out of memory */
-            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
 
         VECTOR(*res)[i] = 0;

@@ -25,7 +25,7 @@
 
 #include "core/cutheap.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_i_cutheap_t ch;

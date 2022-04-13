@@ -23,7 +23,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 static int compare_first_items(const void* a, const void* b) {
     igraph_vector_t *vec1 = (igraph_vector_t*) a;
@@ -51,7 +51,7 @@ int main() {
      * put them in a vector of pointers */
     igraph_vector_ptr_init(&vectors, 0);
     for (ptr = values; *ptr >= 0; ptr++) {
-        vec = igraph_Calloc(1, igraph_vector_t);
+        vec = IGRAPH_CALLOC(1, igraph_vector_t);
         igraph_vector_init(vec, 1);
         VECTOR(*vec)[0] = *ptr;
         igraph_vector_ptr_push_back(&vectors, vec);

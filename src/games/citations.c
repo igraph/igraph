@@ -101,17 +101,17 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
 
     if (agebins != igraph_vector_size(preference) - 1) {
         IGRAPH_ERRORF("The `preference' vector should be of length `agebins' plus one."
-                     "Number of agebins is %"IGRAPH_PRId", preference vector is of length %"IGRAPH_PRId"",
+                     "Number of agebins is %" IGRAPH_PRId ", preference vector is of length %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      agebins, igraph_vector_size(preference));
     }
     if (nodes < 0 ) {
-        IGRAPH_ERRORF("Number of nodes should be non-negative, received %"IGRAPH_PRId".",
+        IGRAPH_ERRORF("Number of nodes should be non-negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      nodes);
     }
     if (agebins < 1 ) {
-        IGRAPH_ERRORF("Number of age bins should be at least 1, received %"IGRAPH_PRId".",
+        IGRAPH_ERRORF("Number of age bins should be at least 1, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      agebins);
     }
@@ -136,13 +136,13 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
 
     lastcit = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (!lastcit) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, lastcit);
 
     index = IGRAPH_CALLOC(no_of_nodes + 1, igraph_integer_t);
     if (!index) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, index);
 
@@ -262,7 +262,7 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     /* the case of zero-length type vector is caught above, safe to call vector_min here */
     if (igraph_vector_int_min(types) < 0) {
-        IGRAPH_ERRORF("Types should be non-negative, but found %g.",
+        IGRAPH_ERRORF("Types should be non-negative, but found %" IGRAPH_PRId ".",
                       IGRAPH_EINVAL, igraph_vector_int_min(types));
     }
 
@@ -320,8 +320,8 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     return IGRAPH_SUCCESS;
 
 err_pref_too_short:
-    IGRAPH_ERRORF("Preference vector should have length at least %ld with the given types.", IGRAPH_EINVAL,
-                  (long) igraph_vector_int_max(types) + 1);
+    IGRAPH_ERRORF("Preference vector should have length at least %" IGRAPH_PRId " with the given types.", IGRAPH_EINVAL,
+                  igraph_vector_int_max(types) + 1);
 
 err_pref_neg:
     IGRAPH_ERRORF("Preferences should be non-negative, but found %g.", IGRAPH_EINVAL,
@@ -401,14 +401,14 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
 
     if (igraph_matrix_ncol(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix columns (%" IGRAPH_PRId ") not "
-                      "equal to number of types (%g).",
+                      "equal to number of types (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
                       igraph_matrix_ncol(pref),
                       no_of_types);
     }
     if (igraph_matrix_nrow(pref) != no_of_types) {
         IGRAPH_ERRORF("Number of preference matrix rows (%" IGRAPH_PRId ") not "
-                      "equal to number of types (%g).",
+                      "equal to number of types (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
                       igraph_matrix_nrow(pref),
                       no_of_types);
@@ -423,7 +423,7 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
 
     str.sumtrees = sumtrees = IGRAPH_CALLOC(no_of_types, igraph_psumtree_t);
     if (!sumtrees) {
-        IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_i_citing_cited_type_game_free, &str);
 
@@ -472,9 +472,11 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     igraph_i_citing_cited_type_game_free(&str);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_create(graph, &edges, nodes, directed);
+    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+
     igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&sums);
     IGRAPH_FINALLY_CLEAN(2);
+
     return IGRAPH_SUCCESS;
 }

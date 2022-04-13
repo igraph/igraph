@@ -14,9 +14,9 @@
 <section id="vector-constructors-and-destructors">
 <!-- doxrox-include igraph_vector_constructors_and_destructors -->
 <!-- doxrox-include igraph_vector_init -->
+<!-- doxrox-include igraph_vector_init_array -->
 <!-- doxrox-include igraph_vector_init_copy -->
 <!-- doxrox-include igraph_vector_init_seq -->
-<!-- doxrox-include igraph_vector_copy -->
 <!-- doxrox-include igraph_vector_destroy -->
 </section>
 
@@ -28,8 +28,8 @@
 <section id="vector-accessing-elements">
 <!-- doxrox-include igraph_vector_accessing_elements -->
 <!-- doxrox-include VECTOR -->
-<!-- doxrox-include igraph_vector_e -->
-<!-- doxrox-include igraph_vector_e_ptr -->
+<!-- doxrox-include igraph_vector_get -->
+<!-- doxrox-include igraph_vector_get_ptr -->
 <!-- doxrox-include igraph_vector_set -->
 <!-- doxrox-include igraph_vector_tail -->
 </section>
@@ -69,7 +69,9 @@
 <!-- doxrox-include igraph_vector_all_le -->
 <!-- doxrox-include igraph_vector_all_ge -->
 <!-- doxrox-include igraph_vector_lex_cmp -->
+<!-- doxrox-include igraph_vector_lex_cmp_untyped -->
 <!-- doxrox-include igraph_vector_colex_cmp -->
+<!-- doxrox-include igraph_vector_colex_cmp_untyped -->
 </section>
 
 <section id="vector-finding-minimum-and-maximum"><title>Finding minimum and maximum</title>
@@ -127,15 +129,16 @@
 <section id="about-vector-ptr">
 <!-- doxrox-include about_igraph_vector_ptr_objects -->
 <!-- doxrox-include igraph_vector_ptr_init -->
-<!-- doxrox-include igraph_vector_ptr_copy -->
+<!-- doxrox-include igraph_vector_ptr_init_copy -->
 <!-- doxrox-include igraph_vector_ptr_destroy -->
 <!-- doxrox-include igraph_vector_ptr_free_all -->
 <!-- doxrox-include igraph_vector_ptr_destroy_all -->
 <!-- doxrox-include igraph_vector_ptr_size -->
 <!-- doxrox-include igraph_vector_ptr_clear -->
 <!-- doxrox-include igraph_vector_ptr_push_back -->
+<!-- doxrox-include igraph_vector_ptr_pop_back -->
 <!-- doxrox-include igraph_vector_ptr_insert -->
-<!-- doxrox-include igraph_vector_ptr_e -->
+<!-- doxrox-include igraph_vector_ptr_get -->
 <!-- doxrox-include igraph_vector_ptr_set -->
 <!-- doxrox-include igraph_vector_ptr_resize -->
 <!-- doxrox-include igraph_vector_ptr_sort -->
@@ -144,6 +147,14 @@
 <!-- doxrox-include igraph_vector_ptr_get_item_destructor -->
 <!-- doxrox-include igraph_vector_ptr_set_item_destructor -->
 <!-- doxrox-include IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR -->
+</section>
+
+<section id="vector-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_vector_copy -->
+<!-- doxrox-include igraph_vector_e -->
+<!-- doxrox-include igraph_vector_e_ptr -->
+<!-- doxrox-include igraph_vector_ptr_copy -->
+<!-- doxrox-include igraph_vector_ptr_e -->
 </section>
 
 </section>

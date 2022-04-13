@@ -4,6 +4,7 @@ pool:
 variables:
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
+  ASAN_OPTIONS: color=always
 
 jobs:
   - job: linux_static_vendored
@@ -14,7 +15,17 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og"'
+
+  - job: linux_static_vendored_32
+    steps:
+      - script: sudo apt-get install ninja-build ccache -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og" -DIGRAPH_INTEGER_SIZE=32'
 
   - job: linux_static_external
     steps:
@@ -26,7 +37,6 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
@@ -50,7 +60,6 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'

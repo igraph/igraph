@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 /* Regression test for https://github.com/igraph/igraph/issues/1814 */
 
@@ -26,7 +26,7 @@ void test_igraph_to_undirected(igraph_to_undirected_t mode) {
     igraph_to_undirected(&g, mode, &comb);
     igraph_attribute_combination_destroy(&comb);
 
-    igraph_write_graph_gml(&g, stdout, 0, "unittest");
+    igraph_write_graph_gml(&g, stdout, 0, "");
 
     igraph_destroy(&g);
 

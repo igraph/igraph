@@ -107,7 +107,7 @@ igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trus
 
     // Get the edge IDs of the unpacked triangles. Note: a given eid can occur
     // multiple times in this list if it is in multiple triangles.
-    IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, 0, 0, 1));
+    IGRAPH_CHECK(igraph_get_eids(graph, &eid, &unpacked_triangles, /* directed = */ 0, /* error = */ 1));
     igraph_vector_int_destroy(&unpacked_triangles);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -167,14 +167,15 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
 
     // C++ data structures
     vector<bool> completed;
-    vector< unordered_set<long int> > vec;
-    unordered_set<long int>::iterator it;
+    vector< unordered_set<igraph_integer_t> > vec;
+    unordered_set<igraph_integer_t>::iterator it;
 
     // Allocate memory for result
     nedges = igraph_vector_int_size(support);
     IGRAPH_CHECK(igraph_vector_int_resize(trussness, nedges));
-    if (nedges == 0)
+    if (nedges == 0) {
         return IGRAPH_SUCCESS;
+    }
 
     // Get max possible value = max entry in support.
     // This cannot be computed if there are no edges, hence the above if

@@ -27,10 +27,9 @@
 #define DIM 10
 
 void igraph_print_warning(const char *reason, const char *file,
-                          int line, int igraph_errno) {
+                          int line) {
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
-    IGRAPH_UNUSED(igraph_errno);
     printf("Warning: %s\n", reason);
 }
 
@@ -49,7 +48,7 @@ int main() {
         MATRIX(B, i, 0) = i + 1;
     }
 
-    igraph_matrix_copy(&RHS, &B);
+    igraph_matrix_init_copy(&RHS, &B);
     igraph_lapack_dgesv(&A, /*ipiv=*/ 0, &RHS, &info);
 
     if (info != 0) {

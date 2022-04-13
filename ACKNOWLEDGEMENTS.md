@@ -87,13 +87,6 @@ Copyright (C) 2006-2008 Aaron Clauset.
 License: [GNU GPLv2][gpl2] or later
 
 
-#### SCGlib (Spectral Coarse Graining)
-
-Copyright (C) 2008 David Morton de Lachapelle <david.morton@a3.epfl.ch>
-
-License: [GNU GPLv2][gpl2] or later
-
-
 #### Spinglass community detection
 
 Copyright (C) 2004 by Joerg Reichardt.
@@ -185,12 +178,12 @@ use or performance of this software.
    License: [GNU LGPLv2.1][lgpl2] or later
 
 
-#### [GLPK (GNU Linear Programming Kit) Version 4.45](https://www.gnu.org/software/glpk/)
+#### [GLPK (GNU Linear Programming Kit) Version 5.0](https://www.gnu.org/software/glpk/)
 
-Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-2009, 2010 Andrew Makhorin, Department for Applied Informatics,
-Moscow Aviation Institute, Moscow, Russia. All rights reserved.
-E-mail: <mao@gnu.org>.
+Copyright (C) 2000-2020 Free Software Foundation, Inc. 
+
+Written by Andrew Makhorin, Department for Applied Informatics,
+Moscow Aviation Institute, Moscow, Russia. E-mail: <mao@gnu.org>.
 
 License: [GNU GPLv3][gpl3] or later
 

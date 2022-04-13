@@ -98,7 +98,7 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
 
     bag = IGRAPH_CALLOC(bagsize, igraph_integer_t);
     if (bag == 0) {
-        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bag);
 
@@ -631,7 +631,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
     igraph_vector_int_t degree;
 
     if (no_of_nodes < 0) {
-        IGRAPH_ERRORF("Number of nodes must not be negative, got %ld.", IGRAPH_EINVAL, no_of_nodes);
+        IGRAPH_ERRORF("Number of nodes must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_nodes);
     }
     if (outseq != 0 && igraph_vector_int_size(outseq) != 0 && igraph_vector_int_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("The length of the out-degree sequence (%" IGRAPH_PRId ") does not agree with the number of nodes (%" IGRAPH_PRId ").",
@@ -681,7 +681,8 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
     } else {
         no_of_edges = 0;
-        for (i = 1; i < igraph_vector_int_size(outseq); i++) {
+        /* the length of 'outseq' is verified to be no_of_nodes above */
+        for (i = 1; i < no_of_nodes; i++) {
             no_of_edges += VECTOR(*outseq)[i];
         }
     }

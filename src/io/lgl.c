@@ -119,29 +119,50 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     context.weights = &ws;
     context.trie = &trie;
     context.eof = 0;
+    context.errmsg[0] = '\0';
+    context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_lgl_yylex_init_extra(&context, &context.scanner);
     IGRAPH_FINALLY(igraph_lgl_yylex_destroy, context.scanner);
 
     igraph_lgl_yyset_in(instream, context.scanner);
 
-    if (igraph_lgl_yyparse(&context)) {
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
+    int err = igraph_lgl_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
+    switch (err) {
+    case 0: /* success */
+        break;
+    case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
-            IGRAPH_ERROR("Cannot read LGL file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Cannot read LGL file.", IGRAPH_PARSEERROR);
         }
+        break;
+    case 2: /* out of memory */
+        IGRAPH_ERROR("Cannot read LGL file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        break;
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading LGL file.", err);
     }
 
-    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
+    /* Prepare attributes, if needed */
 
     if (names) {
         const igraph_strvector_t *namevec;
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
         pname = &name;
-        igraph_trie_getkeys(&trie, &namevec); /* dirty */
+        IGRAPH_CHECK(igraph_trie_getkeys(&trie, &namevec)); /* dirty */
         namerec.name = namestr;
         namerec.type = IGRAPH_ATTRIBUTE_STRING;
         namerec.value = namevec;
@@ -159,6 +180,9 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
+    /* Create graph */
+    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, igraph_trie_size(&trie), pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
 
@@ -192,14 +216,16 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
  * Note that having multiple or loop edges in an
  * <code>.lgl</code> file breaks the  LGL software but \a igraph
  * does not check for this condition.
+ *
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
- * \param names The name of the vertex attribute, if symbolic names
- *        are written to the file. If not supply 0 here.
- * \param weights The name of the edge attribute, if they are also
- *        written to the file. If you don't want weights supply 0
- *        here.
+ * \param names The name of a string vertex attribute, if symbolic names
+ *        are to be written to the file. Supply \c NULL to write vertex
+ *        ids instead.
+ * \param weights The name of a numerical edge attribute, which will be
+ *        written as weights to the file. Supply \c NULL to skip writing
+ *        edge weights.
  * \param isolates Logical, if TRUE isolated vertices are also written
  *        to the file. If FALSE they will be omitted.
  * \return Error code:
@@ -230,30 +256,29 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     /* Check if we have the names attribute */
     if (names && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
             names)) {
-        names = 0;
-        IGRAPH_WARNING("names attribute does not exists");
+        IGRAPH_WARNINGF("Names attribute '%s' does not exists.", names);
+        names = NULL;
     }
     if (names) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
-        if (nametype != IGRAPH_ATTRIBUTE_NUMERIC && nametype != IGRAPH_ATTRIBUTE_STRING) {
-            IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
-            names = 0;
+        if (nametype != IGRAPH_ATTRIBUTE_STRING) {
+            IGRAPH_WARNINGF("Ignoring names attribute '%s', unknown attribute type.", names);
+            names = NULL;
         }
     }
 
     /* Check the weights as well */
-    if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
-            weights)) {
-        weights = 0;
-        IGRAPH_WARNING("weights attribute does not exists");
+    if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, weights)) {
+        IGRAPH_WARNINGF("Weights attribute '%s' does not exists.", weights);
+        weights = NULL;
     }
     if (weights) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
-        if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC && weighttype != IGRAPH_ATTRIBUTE_STRING) {
-            IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
-            weights = 0;
+        if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
+            IGRAPH_WARNINGF("Ignoring weights attribute '%s', unknown attribute type.", weights);
+            weights = NULL;
         }
     }
 
@@ -270,7 +295,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
                 ret = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId "\n", from, to);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
@@ -286,59 +311,58 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
             int ret = 0;
-            char *str1, *str2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, to, &str2);
+            str2 = igraph_strvector_get(&nvec, to);
 
             if (from == actvertex) {
                 ret = fprintf(outstream, "%s\n", str2);
             } else {
                 actvertex = from;
-                igraph_strvector_get(&nvec, from, &str1);
+                str1 = igraph_strvector_get(&nvec, from);
                 ret = fprintf(outstream, "# %s\n%s\n", str1, str2);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
         IGRAPH_FINALLY_CLEAN(1);
     } else if (names == 0) {
-        igraph_strvector_t wvec;
-        IGRAPH_CHECK(igraph_strvector_init(&wvec, igraph_ecount(graph)));
-        IGRAPH_FINALLY(igraph_strvector_destroy, &wvec);
-        IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, weights,
+        /* No names but weights */
+        igraph_vector_t wvec;
+        IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
+        IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, weights,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
-        /* No names but weights */
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
-            int ret = 0;
-            char *str1;
+            int ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&wvec, edge, &str1);
             if (from == actvertex) {
-                ret = fprintf(outstream, "%" IGRAPH_PRId " %s\n", to, str1);
+                ret1 = fprintf(outstream, "%" IGRAPH_PRId " ", to);
             } else {
                 actvertex = from;
-                ret = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId " %s\n", from, to, str1);
+                ret1 = fprintf(outstream, "# %" IGRAPH_PRId "\n%" IGRAPH_PRId " ", from, to);
             }
-            if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
+            ret3 = fputc('\n', outstream);
+            if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
-        igraph_strvector_destroy(&wvec);
+        igraph_vector_destroy(&wvec);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         /* Both names and weights */
-        igraph_strvector_t nvec, wvec;
-        IGRAPH_CHECK(igraph_strvector_init(&wvec, igraph_ecount(graph)));
-        IGRAPH_FINALLY(igraph_strvector_destroy, &wvec);
+        igraph_strvector_t nvec;
+        igraph_vector_t wvec;
+        IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
         IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
         IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
-        IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, weights,
+        IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, weights,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
         IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
@@ -347,29 +371,29 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
-            int ret = 0;
-            char *str1, *str2, *str3;
+            int ret = 0, ret2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, to, &str2);
-            igraph_strvector_get(&wvec, edge, &str3);
+            str2 = igraph_strvector_get(&nvec, to);
             if (from == actvertex) {
                 ret = fprintf(outstream, "%s ", str2);
             } else {
                 actvertex = from;
-                igraph_strvector_get(&nvec, from, &str1);
+                str1 = igraph_strvector_get(&nvec, from);
                 ret = fprintf(outstream, "# %s\n%s ", str1, str2);
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
-            ret = fprintf(outstream, "%s\n", str3);
-            if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[edge]);
+            ret2 = fputc('\n', outstream);
+            if (ret < 0 || ret2 == EOF) {
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
             IGRAPH_EIT_NEXT(it);
         }
         igraph_strvector_destroy(&nvec);
-        igraph_strvector_destroy(&wvec);
+        igraph_vector_destroy(&wvec);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -379,25 +403,25 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         int ret = 0;
         igraph_vector_int_t deg;
         igraph_strvector_t nvec;
-        char *str;
+        const char *str;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 1);
         IGRAPH_CHECK(igraph_strvector_init(&nvec, 1));
         IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
         for (i = 0; i < nov; i++) {
-            igraph_degree(graph, &deg, igraph_vss_1(i), IGRAPH_ALL, IGRAPH_LOOPS);
+            IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_1(i), IGRAPH_ALL, IGRAPH_LOOPS));
             if (VECTOR(deg)[0] == 0) {
                 if (names == 0) {
                     ret = fprintf(outstream, "# %" IGRAPH_PRId "\n", i);
                 } else {
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
                                  igraph_vss_1(i), &nvec));
-                    igraph_strvector_get(&nvec, 0, &str);
+                    str = igraph_strvector_get(&nvec, 0);
                     ret = fprintf(outstream, "# %s\n", str);
                 }
             }
             if (ret < 0) {
-                IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+                IGRAPH_ERROR("Write LGL file failed.", IGRAPH_EFILE);
             }
         }
         igraph_strvector_destroy(&nvec);

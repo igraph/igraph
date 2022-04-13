@@ -21,7 +21,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
@@ -76,7 +76,7 @@ int main() {
 
     printf("\nTree\n");
     printf("==========================================================\n");
-    igraph_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
 
     igraph_vector_init(&bet, 0);
 
@@ -138,7 +138,7 @@ int main() {
 
     printf("\nCorner case cutoff 0.0\n");
     printf("==========================================================\n");
-    igraph_tree(&g, 20, 3, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g, 20, 3, IGRAPH_TREE_UNDIRECTED);
 
     /* unweighted */
     igraph_vector_init(&bet, 0);
@@ -301,7 +301,7 @@ int main() {
         VECTOR(dims)[0] = 37;
         VECTOR(dims)[1] = 37;
 
-        igraph_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+        igraph_square_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* periodic */ 0);
 
         igraph_vector_init(&bet, 0);
         igraph_betweenness(&g, &bet, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL);

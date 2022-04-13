@@ -32,19 +32,26 @@ typedef struct TYPE(igraph_matrix) {
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init)(
     TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to,
-                                                const TYPE(igraph_matrix) *from);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init_copy)(
+    TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_matrix, copy)(
+    TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
 
 /*--------------------*/
 /* Accessing elements */
 /*--------------------*/
 
 /* MATRIX */
-IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, e)(
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_matrix, e)(
     const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
-IGRAPH_EXPORT BASE* FUNCTION(igraph_matrix, e_ptr)(
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_matrix, e_ptr)(
+    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
+IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, get)(
+    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
+IGRAPH_EXPORT BASE* FUNCTION(igraph_matrix, get_ptr)(
     const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, set)(
     TYPE(igraph_matrix)* m, igraph_integer_t row, igraph_integer_t col, BASE value);
@@ -198,7 +205,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, search)(
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, resize)(
     TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, resize_min)(
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, resize_min)(
     TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, add_cols)(
     TYPE(igraph_matrix) *m, igraph_integer_t n);

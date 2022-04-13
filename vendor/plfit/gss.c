@@ -20,7 +20,7 @@
 #include <float.h>
 #include <math.h>
 #include <string.h>
-#include "error.h"
+#include "plfit_error.h"
 #include "gss.h"
 #include "platform.h"
 

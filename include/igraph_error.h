@@ -35,20 +35,32 @@ __BEGIN_DECLS
  * prefix renamed to IGRAPH_), as I couldn't find a better way to do
  * them. */
 
-/* IGRAPH_NORETURN indicates to the compiler that a function does not return.
+/* With some compilers, we use function attributes to help diagnostics
+ * and optimizations. These are not part of the public API, do not use
+ * them outside of igraph itself.
+ *
+ * IGRAPH_FUNCATTR_NORETURN indicates to the compiler that a function does not return.
  * There are standard facilities for this, namely _Noreturn in C11 and [[noreturn]] in C++11.
  * However, since igraph is currently compiled with older standards, and since
  * the standard 'noreturn' specification would need to be diferent between C and C++,
  * we do not use these facilities.
+ *
+ * IGRAPH_FUNCATTR_PRINTFLIKE(string, first) marks a function as having a printf-like syntax,
+ * allowing the compiler to check that the format specifiers match argument types.
+ * 'string' is the index of the string-argument and 'first' is the index of the
+ * first argument to check against format specifiers.
  */
 #if defined(__GNUC__)
 /* Compilers that support the GNU C syntax. Use __noreturn__ instead of 'noreturn' as the latter is a macro in C11. */
-#define IGRAPH_NORETURN __attribute__((__noreturn__))
+#define IGRAPH_FUNCATTR_NORETURN __attribute__((__noreturn__))
+#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first) __attribute__((format(printf, string, first)))
 #elif defined(_MSC_VER)
 /* Compilers that support the MSVC syntax. */
-#define IGRAPH_NORETURN __declspec(noreturn)
+#define IGRAPH_FUNCATTR_NORETURN __declspec(noreturn)
+#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first)
 #else
-#define IGRAPH_NORETURN
+#define IGRAPH_FUNCATTR_NORETURN
+#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first)
 #endif
 
 /**
@@ -120,7 +132,8 @@ __BEGIN_DECLS
  * <para>
  * The contents of the rest of this chapter might be useful only
  * for those who want to create an interface to \a igraph from another
- * language. Most readers can safely skip to the next chapter.
+ * language, or use igraph from a GUI application. Most readers can
+ * safely skip to the next chapter.
  * </para>
  *
  * <para>
@@ -128,15 +141,27 @@ __BEGIN_DECLS
  * function of type \ref igraph_error_handler_t and calling
  * \ref igraph_set_error_handler(). This feature is useful for interface
  * writers, as \a igraph will have the chance to
- * signal errors the appropriate way, e.g. the R interface defines an
- * error handler which calls the <function>error()</function>
- * function, as required by R, while the Python interface has an error
- * handler which raises an exception according to the Python way.
+ * signal errors the appropriate way. For example, the R interface uses
+ * R's native printing facilities to communicate errors, while the Python
+ * interface converts them into Python exceptions.
  * </para>
+ *
  * <para>
- * If you want to write an error handler, your error handler should
- * call \ref IGRAPH_FINALLY_FREE() to deallocate all temporary memory to
- * prevent memory leaks.
+ * The two main tasks of the error handler are to report the error
+ * (i.e. print the error message) and ensure proper resource cleanup.
+ * This is ensured by calling \ref IGRAPH_FINALLY_FREE(), which deallocates
+ * some of the temporary memory to avoid memory leaks. Note that this may
+ * invalidate the error message buffer \p reason passed to the error handler.
+ * Do not access it after having called \ref IGRAPH_FINALLY_FREE().
+ * </para>
+ *
+ * <para>
+ * As of \a igraph 0.10, temporary memory is dellocated in stages, through
+ * multiple calls to the error handler (and indirectly to \ref IGRAPH_FINALLY_FREE()).
+ * Therefore, error handlers that do not abort the program
+ * immediately are expected to return. The error handler should not perform
+ * a <code>longjmp</code>, as this may lead to some of the memory not
+ * getting freed.
  * </para>
  */
 
@@ -197,87 +222,6 @@ __BEGIN_DECLS
  * restore the error handler before they return.
  * </para>
  */
-
-/**
- * \section error_handling_threads Error handling and threads
- *
- * <para>
- * It is likely that the \a igraph error handling
- * method is \em not thread-safe, mainly because of
- * the static global stack which is used to store the address of the
- * temporarily allocated objects. This issue might be addressed in a
- * later version of \a igraph.
- * </para>
- */
-
-/**
- * \typedef igraph_error_t
- * \brief Type alias for integers to indicate that the integer value is an error code.
- *
- * This type is used as the return type of igraph functions that return an
- * error code.
- */
-typedef int igraph_error_t;
-
-/**
- * \typedef igraph_error_handler_t
- * \brief The type of error handler functions.
- *
- * This is the type of the error handler functions.
- * \param reason Textual description of the error.
- * \param file The source file in which the error is noticed.
- * \param line The number of the line in the source file which triggered
- *   the error
- * \param igraph_errno The \a igraph error code.
- */
-
-typedef void igraph_error_handler_t (const char * reason, const char * file,
-                                     int line, igraph_error_t igraph_errno);
-
-/**
- * \var igraph_error_handler_abort
- * \brief Abort program in case of error.
- *
- * The default error handler, prints an error message and aborts the
- * program.
- */
-
-IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_abort;
-
-/**
- * \var igraph_error_handler_ignore
- * \brief Ignore errors.
- *
- * This error handler frees the temporarily allocated memory and returns
- * with the error code.
- */
-
-IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_ignore;
-
-/**
- * \var igraph_error_handler_printignore
- * \brief Print and ignore errors.
- *
- * Frees temporarily allocated memory, prints an error message to the
- * standard error and returns with the error code.
- */
-
-IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_printignore;
-
-/**
- * \function igraph_set_error_handler
- * \brief Sets a new error handler.
- *
- * Installs a new error handler. If called with 0, it installs the
- * default error handler (which is currently
- * \ref igraph_error_handler_abort).
- * \param new_handler The error handler function to install.
- * \return The old error handler function. This should be saved and
- *   restored if \p new_handler is not needed any
- *   more.
- */
-
-IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t* new_handler);
 
 /**
  * \typedef igraph_error_type_t
@@ -415,7 +359,8 @@ typedef enum {
     IGRAPH_CPUTIME           = 57,
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
-    IGRAPH_STOP              = 60  /* undocumented, used internally */
+    IGRAPH_STOP              = 60,
+    IGRAPH_ERANGE            = 61
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in core/error.c
@@ -423,6 +368,90 @@ typedef enum {
  * Information on undocumented codes:
  *  - IGRAPH_STOP signals a request to stop in functions like igraph_i_maximal_cliques_bk()
  */
+
+/**
+ * \section error_handling_threads Error handling and threads
+ *
+ * <para>
+ * It is likely that the \a igraph error handling
+ * method is \em not thread-safe, mainly because of
+ * the static global stack which is used to store the address of the
+ * temporarily allocated objects. This issue might be addressed in a
+ * later version of \a igraph.
+ * </para>
+ */
+
+/**
+ * \typedef igraph_error_t
+ * \brief Type alias because igraph_error_t used to be an integer, and was used
+ *          slightly differenly than igraph_error_type_t.
+ *
+ * This type is used as the return type of igraph functions that return an
+ * error code.
+ */
+typedef igraph_error_type_t igraph_error_t;
+
+/**
+ * \typedef igraph_error_handler_t
+ * \brief The type of error handler functions.
+ *
+ * This is the type of the error handler functions.
+ *
+ * \param reason Textual description of the error.
+ * \param file The source file in which the error is noticed.
+ * \param line The number of the line in the source file which triggered
+ *   the error
+ * \param igraph_errno The \a igraph error code.
+ */
+
+typedef void igraph_error_handler_t (const char *reason, const char *file,
+                                     int line, igraph_error_t igraph_errno);
+
+/**
+ * \var igraph_error_handler_abort
+ * \brief Abort program in case of error.
+ *
+ * The default error handler, prints an error message and aborts the
+ * program.
+ */
+
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_abort;
+
+/**
+ * \var igraph_error_handler_ignore
+ * \brief Ignore errors.
+ *
+ * This error handler frees the temporarily allocated memory and returns
+ * with the error code.
+ */
+
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_ignore;
+
+/**
+ * \var igraph_error_handler_printignore
+ * \brief Print and ignore errors.
+ *
+ * Frees temporarily allocated memory, prints an error message to the
+ * standard error and returns with the error code.
+ */
+
+IGRAPH_EXPORT igraph_error_handler_t igraph_error_handler_printignore;
+
+/**
+ * \function igraph_set_error_handler
+ * \brief Sets a new error handler.
+ *
+ * Installs a new error handler. If called with \c NULL, it installs the
+ * default error handler (which is currently \ref igraph_error_handler_abort).
+ *
+ * \param new_handler The error handler function to install.
+ * \return The old error handler function. This should be saved and
+ *   restored if \p new_handler is not needed any
+ *   more.
+ */
+
+IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t* new_handler);
+
 
 /* We use IGRAPH_FILE_BASENAME instead of __FILE__ to ensure that full
  * paths don't leak into the library code. IGRAPH_FILE_BASENAME is set up
@@ -445,6 +474,7 @@ typedef enum {
  * code. If for some (suspicious) reason you want to call the error
  * handler without returning from the current function, call
  * \ref igraph_error() directly.
+ *
  * \param reason Textual description of the error. This should be
  *   something more descriptive than the text associated with the error
  *   code. E.g. if the error code is \c IGRAPH_EINVAL,
@@ -498,6 +528,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, 
  * error code. If for some (suspicious) reason you want to call the
  * error handler without returning from the current function, call
  * \ref igraph_errorf() directly.
+ *
  * \param reason Textual description of the error, a template string
  *   with the same syntax as the standard printf C library function.
  *   This should be something more descriptive than the text associated
@@ -532,6 +563,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, 
  * \sa igraph_error().
  */
 
+IGRAPH_FUNCATTR_PRINTFLIKE(1,5)
 IGRAPH_EXPORT igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
                                 igraph_error_t igraph_errno, ...);
 
@@ -562,7 +594,7 @@ IGRAPH_EXPORT const char* igraph_strerror(const igraph_error_t igraph_errno);
  * information. We don't use the exception handling code though.  */
 
 struct igraph_i_protectedPtr {
-    int all;
+    int level;
     void *ptr;
     void (*func)(void*);
 };
@@ -576,8 +608,18 @@ IGRAPH_EXPORT void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
  * \brief Signals clean deallocation of objects.
  *
  * Removes the specified number of objects from the stack of
- * temporarily allocated objects. Most often this is called just
- * before returning from a function.
+ * temporarily allocated objects. It is typically called
+ * immediately after manually destroying the objects:
+ *
+ * <programlisting>
+ * igraph_vector_t vector;
+ * igraph_vector_init(&amp;vector, 10);
+ * IGRAPH_FINALLY(igraph_vector_destroy, &amp;vector);
+ * // use vector
+ * igraph_vector_destroy(&amp;vector);
+ * IGRAPH_FINALLY_CLEAN(1);
+ * </programlisting>
+ *
  * \param num The number of objects to remove from the bookkeeping
  *   stack.
  */
@@ -586,17 +628,22 @@ IGRAPH_EXPORT void IGRAPH_FINALLY_CLEAN(int num);
 
 /**
  * \function IGRAPH_FINALLY_FREE
- * \brief Deallocates all registered objects.
+ * \brief Deallocates objects registered at the current level.
  *
- * Calls the destroy function for all objects in the stack of
- * temporarily allocated objects. This is usually called only from an
- * error handler. It is \em not appropriate to use it
+ * Calls the destroy function for all objects in the current level
+ * of the stack of temporarily allocated objects, i.e. up to the
+ * nearest mark set by <code>IGRAPH_FINALLY_ENTER()</code>.
+ * This function must only be called from an error handler.
+ * It is \em not appropriate to use it
  * instead of destroying each unneeded object of a function, as it
  * destroys the temporary objects of the caller function (and so on)
  * as well.
  */
 
 IGRAPH_EXPORT void IGRAPH_FINALLY_FREE(void);
+
+IGRAPH_EXPORT void IGRAPH_FINALLY_ENTER(void);
+IGRAPH_EXPORT void IGRAPH_FINALLY_EXIT(void);
 
 /**
  * \function IGRAPH_FINALLY_STACK_SIZE
@@ -627,14 +674,16 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 /**
  * \define IGRAPH_FINALLY
  * \brief Registers an object for deallocation.
- * \param func The address of the function which is normally called to
- *   destroy the object.
- * \param ptr Pointer to the object itself.
  *
  * This macro places the address of an object, together with the
  * address of its destructor in a stack. This stack is used if an
  * error happens to deallocate temporarily allocated objects to
- * prevent memory leaks.
+ * prevent memory leaks. After manual deallocation, objects are removed
+ * from the stack using \ref IGRAPH_FINALLY_CLEAN().
+ *
+ * \param func The function which is normally called to
+ *   destroy the object.
+ * \param ptr Pointer to the object itself.
  */
 
 #define IGRAPH_FINALLY(func, ptr) \
@@ -662,7 +711,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
 #define IGRAPH_CHECK(a) \
         do { \
             int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
-            int igraph_i_ret=(a); \
+            igraph_error_t igraph_i_ret=(a); \
             if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
                 IGRAPH_ERROR("", igraph_i_ret); \
             } \
@@ -707,12 +756,6 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * \define IGRAPH_CHECK_CALLBACK
  * \brief Checks the return value of a callback.
  *
- * \param expr An expression, usually a call to a user-defined callback function.
- * It is guaranteed to be evaluated only once.
- * \param code Pointer to an optional variable of type \c igraph_error_t; the
- * value of this variable will be set to the error code if it is not a null
- * pointer.
- *
  * Identical to \ref IGRAPH_CHECK, but treats \c IGRAPH_STOP as a normal
  * (non-erroneous) return code. This macro is used in some igraph functions
  * that allow the user to hook into a long-running calculation with a callback
@@ -726,12 +769,18 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * Note that \c IGRAPH_CHECK_CALLBACK does not handle \c IGRAPH_STOP by any
  * means except returning it in the variable pointed to by \c code. It is the
  * responsibility of the caller to handle \c IGRAPH_STOP accordingly.
+ *
+ * \param expr An expression, usually a call to a user-defined callback function.
+ * It is guaranteed to be evaluated only once.
+ * \param code Pointer to an optional variable of type \c igraph_error_t; the
+ * value of this variable will be set to the error code if it is not a null
+ * pointer.
  */
 #define IGRAPH_CHECK_CALLBACK(expr, code) \
     do { \
         igraph_error_t igraph_i_ret = (expr); \
         if (code) { \
-            *code = igraph_i_ret; \
+            *(code) = igraph_i_ret; \
         } \
         if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS && igraph_i_ret != IGRAPH_STOP)) { \
             IGRAPH_ERROR("", igraph_i_ret); \
@@ -773,7 +822,7 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  * argument is not used.
  */
 
-typedef igraph_error_handler_t igraph_warning_handler_t;
+typedef void igraph_warning_handler_t (const char *reason, const char *file, int line);
 
 /**
  * \function igraph_set_warning_handler
@@ -806,8 +855,7 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file, int line,
-                                 igraph_error_t igraph_errno);
+IGRAPH_EXPORT void igraph_warning(const char *reason, const char *file, int line);
 
 /**
  * \define IGRAPH_WARNINGF
@@ -826,7 +874,7 @@ IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file
 #define IGRAPH_WARNINGF(reason, ...) \
     do { \
         igraph_warningf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
-                        -1, __VA_ARGS__); \
+                        __VA_ARGS__); \
     } while (0)
 
 
@@ -847,11 +895,10 @@ IGRAPH_EXPORT igraph_error_t igraph_warning(const char *reason, const char *file
  *        but this is currently not used in igraph.
  * \param ... The additional arguments to be substituted into the
  *        template string.
- * \return The supplied error code.
  */
 
-IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *file, int line,
-                                  igraph_error_t igraph_errno, ...);
+IGRAPH_FUNCATTR_PRINTFLIKE(1,4)
+IGRAPH_EXPORT void igraph_warningf(const char *reason, const char *file, int line, ...);
 
 /**
  * \define IGRAPH_WARNING
@@ -864,7 +911,7 @@ IGRAPH_EXPORT igraph_error_t igraph_warningf(const char *reason, const char *fil
 
 #define IGRAPH_WARNING(reason) \
     do { \
-        igraph_warning(reason, IGRAPH_FILE_BASENAME, __LINE__, -1); \
+        igraph_warning(reason, IGRAPH_FILE_BASENAME, __LINE__); \
     } while (0)
 
 
@@ -948,7 +995,7 @@ IGRAPH_EXPORT igraph_fatal_handler_t igraph_fatal_handler_abort;
  * \param line The number of line in the source file which triggered the error.
  */
 
-IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
 
 /**
  * \function igraph_fatalf
@@ -964,7 +1011,8 @@ IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *
  * \param ... The additional arguments to be substituted into the template string.
  */
 
-IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+IGRAPH_FUNCATTR_PRINTFLIKE(1,4)
+IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
 
 /**
  * \define IGRAPH_FATALF
@@ -1021,7 +1069,7 @@ IGRAPH_EXPORT IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char 
  * This macro is meant for internal use by \a igraph.
  *
  * </para><para>
- * Since a typial fatal error handler does a <code>longjmp()</code>, avoid using this
+ * Since a typical fatal error handler does a <code>longjmp()</code>, avoid using this
  * macro in C++ code. With most compilers, destructor will not be called when
  * <code>longjmp()</code> leaves the current scope.
  *

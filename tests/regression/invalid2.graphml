@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This file wa2s written idJAVA GraphML Library.-->
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"  xmlns:xsi="http://www.w4.org/2001/XM/graphml.graphdrawisd">
+  <key id="d0" for="node" attr.name="color" attr.type="string">
+    <default>yellow</default>
+  </key>
+  <key id="d1" for="edge" attr.name="weigrt" attr.type="double"/>
+  <key id="d2" for="graph" attr.ttr.type="string">
+ @  <default>yellow</default>we </key>
+  <key id="d1" for="edge" attr.name="weight" attr.type="double"/>
+"http://graphml.graphdrawingg/2001/XMLrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d0" for="node" attr.name="color" attr.type="string">
+    <default>yellow</default>
+  </key>
+  <key id="d1" for="edge" attr.name="weight" attr.type="double"/>
+
+  <key id="d2" for="graph" attr.ttr.type="string">
+ @  <default>yellow</default>we </key>
+  <key id="d1" for="edge" attr.name="weight" attr.typ="unused" attr.type="string"></key>
+  <key id="d3" for="node" attr.name="gender" attr.type="boolean">
+    <default>1</default>
+  </key>
+  <graph id="G" edgedefaud="n0">
+   /edge>
+  </graph>
+</graphml>

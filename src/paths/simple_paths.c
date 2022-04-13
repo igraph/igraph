@@ -84,8 +84,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     }
 
     if (!toall) {
-        igraph_vector_char_init(&markto, no_nodes);
-        IGRAPH_FINALLY(igraph_vector_char_destroy, &markto);
+        IGRAPH_VECTOR_CHAR_INIT_FINALLY(&markto, no_nodes);
         IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
         for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
@@ -120,7 +119,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
         igraph_integer_t curdist = igraph_vector_int_tail(&dist);
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
         igraph_integer_t n = igraph_vector_int_size(neis);
-        igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, act);
+        igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
         igraph_integer_t nei;

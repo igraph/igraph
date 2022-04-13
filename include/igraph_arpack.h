@@ -98,7 +98,7 @@ __BEGIN_DECLS
  * \struct igraph_arpack_options_t
  * \brief Options for ARPACK
  *
- * This data structure contains the options of thee ARPACK eigenvalue
+ * This data structure contains the options of the ARPACK eigenvalue
  * solver routines. It must be initialized by calling \ref
  * igraph_arpack_options_init() on it. Then it can be used for
  * multiple ARPACK calls, as the ARPACK solvers do not modify it.
@@ -289,6 +289,7 @@ typedef struct igraph_arpack_storage_t {
 } igraph_arpack_storage_t;
 
 IGRAPH_EXPORT void igraph_arpack_options_init(igraph_arpack_options_t *o);
+IGRAPH_EXPORT igraph_arpack_options_t* igraph_arpack_options_get_default();
 
 IGRAPH_EXPORT igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
                                              igraph_integer_t maxncv, igraph_integer_t maxldv, igraph_bool_t symm);
@@ -325,7 +326,7 @@ IGRAPH_EXPORT igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun
                                         igraph_matrix_t *values, igraph_matrix_t *vectors);
 
 IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                                               long int nev);
+                                               igraph_integer_t nev);
 
 __END_DECLS
 
