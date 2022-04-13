@@ -99,7 +99,6 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
 
     /* if the original graph is unweighted, probabilities are 1 throughout */
     if (distances == NULL) {
-        no_of_neis = igraph_vector_size(umap_weights);
         for (igraph_integer_t j = 0; j < no_of_edges; j++) {
             VECTOR(*umap_weights)[j] = 1;
         }
@@ -1026,6 +1025,8 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
  *
  * \return Error code.
+ *
+ * Added in version 0.10. This function is experimental and the API is not stable.
  *
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
