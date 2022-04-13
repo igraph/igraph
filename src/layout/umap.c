@@ -990,6 +990,7 @@ static igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_v
  *
  * \return Error code.
  *
+ * \experimental
  */
 igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   const igraph_vector_t *distances,
@@ -1026,8 +1027,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *
  * \return Error code.
  *
- * Added in version 0.10. This function is experimental and the API is not stable.
- *
+ * \experimental
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      const igraph_vector_t *distances,
