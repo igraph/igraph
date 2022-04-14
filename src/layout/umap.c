@@ -721,7 +721,10 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(const ig
 #endif
 
     /* Explicit avoidance of neighbor repulsion, only useful in small graphs
-     * which are never very sparse */
+     * which are never very sparse. This is because negative sampling as implemented
+     * relies on an approximation that only works if the graph is sparse, which is never
+     * quite true for small graphs (i.e. |V| << |E| << |V|^2 is hard to judge if
+     * |V| is small) */
     igraph_bool_t avoid_neighbor_repulsion = 0;
     if (igraph_vcount(graph) < 100) {
         avoid_neighbor_repulsion = 1;
