@@ -617,7 +617,12 @@ static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const i
 
     igraph_integer_t n_random_vertices = sqrt(no_of_nodes);
 
-    /* iterate over a random subsample of edges */
+    /* iterate over a random subsample of edges. We have an igraph_random_sample() function to
+     * do that, but that one would require the allocation of a separate vector and we don't
+     * need that, especially if `prob` is high */
+    /* TODO: check possible improvement with sampling from a geometric distribution if prob is
+     * known to be small; it would require the generation of only ceil(no_of_edges * prob)
+     * random numbers and not no_of_edges */
     for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
         if (RNG_UNIF01() > prob) {
             continue;
