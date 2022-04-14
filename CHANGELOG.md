@@ -437,7 +437,7 @@ Some of the highlights are:
    types of the nodes in the generated graph.
 
  - `igraph_random_walk()` now uses an `igraph_vector_int_t` for its
-   `walk` parameter. Also, the function now takes both vertices and edges as
+   results. Also, the function now takes both vertices and edges as
    parameters. It can return IDs of vertices and/or edges on the walk.
    The function now takes weights as a parameter to support weighted graphs.
 

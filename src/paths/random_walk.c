@@ -268,7 +268,6 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
  * \param steps The number of steps to take. If the random walk gets
  *   stuck, then the \p stuck argument specifies what happens.
  *   \p steps is the number of edges to traverse on the walk.
- *   If \p steps is 0, the function returns without doing anything more.
  * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
@@ -330,11 +329,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
             }
         }
     }
-
-    if (steps == 0) {
-        return IGRAPH_SUCCESS;
-    }
-
+    
     if (edges || weights) {
         return igraph_i_random_walk_inclist(graph, weights, vertices, edges,
                                             start, mode, steps, stuck);

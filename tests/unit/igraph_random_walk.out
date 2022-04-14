@@ -1,8 +1,8 @@
 Only vertices required, edges = NULL:
 Singleton graph with zero steps:
-( )
-Singleton graph with one step:
 ( 0 )
+Singleton graph with one step:
+( 0 1 )
 Line graph:
 ( 0 1 2 3 4 )
 Line graph, 10 steps, returns on stuck:
@@ -16,9 +16,9 @@ Checking an actual random walk with seed 42:
 
 Both vertices and edges required:
 Singleton graph with zero steps:
-( )
-Singleton graph with one step:
 ( 0 )
+Singleton graph with one step:
+( 0 1 )
 Line graph:
 ( 0 1 2 3 4 )
 Line graph, 10 steps, returns on stuck:

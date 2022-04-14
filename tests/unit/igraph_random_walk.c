@@ -92,7 +92,7 @@ int main() {
     random_vertex_walk(&g_1, NULL, 0, IGRAPH_OUT, 0, IGRAPH_RANDOM_WALK_STUCK_RETURN);
 
     printf("Singleton graph with one step:\n");
-    random_vertex_walk(&g_1, NULL, 0, IGRAPH_OUT, 1, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    random_vertex_walk(&g_line, NULL, 0, IGRAPH_OUT, 1, IGRAPH_RANDOM_WALK_STUCK_RETURN);
 
     printf("Line graph:\n");
     random_vertex_walk(&g_line, NULL, 0, IGRAPH_OUT, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN);
@@ -130,7 +130,7 @@ int main() {
     random_walk(&g_1, NULL, 0, IGRAPH_OUT, 0, IGRAPH_RANDOM_WALK_STUCK_RETURN);
 
     printf("Singleton graph with one step:\n");
-    random_walk(&g_1, NULL, 0, IGRAPH_OUT, 1, IGRAPH_RANDOM_WALK_STUCK_RETURN);
+    random_walk(&g_line, NULL, 0, IGRAPH_OUT, 1, IGRAPH_RANDOM_WALK_STUCK_RETURN);
 
     printf("Line graph:\n");
     random_walk(&g_line, NULL, 0, IGRAPH_OUT, 4, IGRAPH_RANDOM_WALK_STUCK_RETURN);
