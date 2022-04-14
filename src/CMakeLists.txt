@@ -214,6 +214,7 @@ add_library(
   layout/merge_grid.c
   layout/reingold_tilford.c
   layout/sugiyama.c
+  layout/umap.c
 
   operators/add_edge.c
   operators/complementer.c

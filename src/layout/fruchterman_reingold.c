@@ -440,7 +440,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  *
  * This is the 3D version of the force based
  * Fruchterman-Reingold layout (see \ref
- * igraph_layout_fruchterman_reingold for the 2D version
+ * igraph_layout_fruchterman_reingold() for the 2D version)
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will

@@ -359,6 +359,7 @@ add_legacy_tests(
   igraph_layout_reingold_tilford_extended
   igraph_layout_star
   igraph_layout_sugiyama
+  igraph_layout_umap
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES
