@@ -24,6 +24,8 @@
 #include "igraph_random.h"
 #include "igraph_nongraph.h"
 
+#include <math.h>
+
 
 /* rho is just the size of the distance from each vertex and its closest neighbor */
 /* sigma is the the decay from each vertex, depends on its rho and the rest of its neighbor
@@ -532,8 +534,9 @@ static igraph_error_t igraph_i_umap_clip_force(igraph_real_t *force, igraph_real
 /* NOTE: mu is the probability of a true edge in high dimensions, not affected
  * by the embedding (in particular, xd and yd), so it's a constant for the
  * derivative/force. Same applies for the repulsion */
-static igraph_error_t igraph_i_umap_attract(igraph_vector_t *delta, igraph_real_t mu,
-       igraph_real_t a, igraph_real_t b, igraph_vector_t *forces)
+static igraph_error_t igraph_i_umap_attract(
+        igraph_vector_t *delta, igraph_real_t mu,
+        igraph_real_t a, igraph_real_t b, igraph_vector_t *forces)
 {
     igraph_real_t dsq, phi, force;
     igraph_integer_t ndim = igraph_vector_size(delta);
@@ -559,8 +562,9 @@ static igraph_error_t igraph_i_umap_attract(igraph_vector_t *delta, igraph_real_
 }
 
 /*xd is difference in x direction, mu is a weight */
-static igraph_error_t igraph_i_umap_repel(igraph_vector_t *delta, igraph_real_t mu,
-       igraph_real_t a, igraph_real_t b, igraph_vector_t *forces)
+static igraph_error_t igraph_i_umap_repel(
+        igraph_vector_t *delta, igraph_real_t mu,
+        igraph_real_t a, igraph_real_t b, igraph_vector_t *forces)
 {
     igraph_real_t dsq, force;
     igraph_real_t min_dist = 0.01;
@@ -589,9 +593,10 @@ static igraph_error_t igraph_i_umap_repel(igraph_vector_t *delta, igraph_real_t 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_umap_apply_forces(const igraph_t *graph,  const igraph_vector_t *umap_weights,
-       igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t prob,
-       igraph_real_t learning_rate, igraph_bool_t avoid_neighbor_repulsion)
+static igraph_error_t igraph_i_umap_apply_forces(
+        const igraph_t *graph,  const igraph_vector_t *umap_weights,
+        igraph_matrix_t *layout, igraph_real_t a, igraph_real_t b, igraph_real_t prob,
+        igraph_real_t learning_rate, igraph_bool_t avoid_neighbor_repulsion)
 {
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(layout);
     igraph_integer_t ndim = igraph_matrix_ncol(layout);
@@ -816,9 +821,12 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
 }
 
 
-/* This is the main function that works for any dimensionality of the embedding (currently hard-constrained to 2 or 3 ONLY in the initialization) */
-static igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_vector_t *distances,
-        igraph_matrix_t *layout, igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob, igraph_integer_t ndim) {
+/* This is the main function that works for any dimensionality of the embedding
+ * (currently hard-constrained to 2 or 3 ONLY in the initialization). */
+static igraph_error_t igraph_i_layout_umap(
+        const igraph_t *graph, const igraph_vector_t *distances,
+        igraph_matrix_t *layout,
+        igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob, igraph_integer_t ndim) {
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -845,8 +853,8 @@ static igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_v
     }
 
     if ((ndim != 2) && (ndim != 3)) {
-        IGRAPH_ERRORF("Number of dimensions should be 2 or 3, found %d.",
-                IGRAPH_EINVAL, (int)ndim);
+        IGRAPH_ERRORF("Number of dimensions should be 2 or 3, found %" IGRAPH_PRId ".",
+                IGRAPH_EINVAL, ndim);
 
     }
 
@@ -856,9 +864,7 @@ static igraph_error_t igraph_i_layout_umap(const igraph_t *graph, const igraph_v
     /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
     if (no_of_nodes <= 1) {
         IGRAPH_CHECK(igraph_matrix_resize(layout, no_of_nodes, ndim));
-        if (no_of_nodes == 1) {
-            igraph_matrix_null(layout);
-        }
+        igraph_matrix_null(layout);
         return IGRAPH_SUCCESS;
     }
 
