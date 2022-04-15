@@ -142,6 +142,9 @@ int main() {
     printf("Check error for negative sampling probability.\n");
     CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, -1), IGRAPH_EINVAL);
 
+    printf("Check error for sampling probability above one.\n");
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, 1.1), IGRAPH_EINVAL);
+
     printf("Empty graph:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, NULL, &layout, 0.01, 500, 1) == IGRAPH_SUCCESS);
     igraph_matrix_print(&layout);

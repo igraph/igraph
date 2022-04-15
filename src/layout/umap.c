@@ -847,8 +847,8 @@ static igraph_error_t igraph_i_layout_umap(
                 IGRAPH_EINVAL, epochs);
     }
 
-    if (sampling_prob <= 0) {
-        IGRAPH_ERRORF("Sampling probability should be positive, but found %g.",
+    if ((sampling_prob <= 0) || (sampling_prob > 1)) {
+        IGRAPH_ERRORF("Sampling probability should be in ]0, 1], but found %g.",
                 IGRAPH_EINVAL, sampling_prob);
     }
 
