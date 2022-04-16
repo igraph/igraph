@@ -159,7 +159,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
 
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges)
-            IGRAPH_ERROR("Vector size differs from number of edges.",
+            IGRAPH_ERROR("Weight vector size differs from number of edges.",
                          IGRAPH_EINVAL);
         m = 0.0;
         for (i = 0; i < no_of_edges; i++) {
