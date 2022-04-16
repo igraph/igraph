@@ -1,0 +1,19 @@
+Check graph with no vertices:
+Bridges:
+Modularity:
+Membership:
+Merges:
+
+Check graph with one vertex:
+Bridges:
+Modularity:
+Membership:
+Merges:
+
+Check graph with two vertices, one edge:
+Bridges:0
+Modularity:-0.5 0
+Membership:0 0
+Merges:1 0
+
+

@@ -563,6 +563,7 @@ add_legacy_tests(
   community_label_propagation2
   community_label_propagation3
   graphlets
+  igraph_community_eb_get_merges
   igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
