@@ -837,23 +837,22 @@ static igraph_error_t igraph_i_layout_umap(
 
     /* Check input arguments */
     if (min_dist <= 0) {
-        IGRAPH_ERRORF("Minimum distance should be positive, but found %g.",
+        IGRAPH_ERRORF("Minimum distance must be positive, got %g.",
                 IGRAPH_EINVAL, min_dist);
     }
 
     if (epochs < 0) {
-        IGRAPH_ERRORF("Number of epochs should be non-negative, but found %"
-                IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Number of epochs must be non-negative, got %" IGRAPH_PRId ".",
                 IGRAPH_EINVAL, epochs);
     }
 
     if ((sampling_prob <= 0) || (sampling_prob > 1)) {
-        IGRAPH_ERRORF("Sampling probability should be in ]0, 1], but found %g.",
+        IGRAPH_ERRORF("Sampling probability must be in (0, 1], got %g.",
                 IGRAPH_EINVAL, sampling_prob);
     }
 
     if ((ndim != 2) && (ndim != 3)) {
-        IGRAPH_ERRORF("Number of dimensions should be 2 or 3, found %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Number of dimensions must be 2 or 3, got %" IGRAPH_PRId ".",
                 IGRAPH_EINVAL, ndim);
 
     }
