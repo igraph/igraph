@@ -42,6 +42,13 @@
 <!-- doxrox-include igraph_pseudo_diameter -->
 </section>
 
+<section id="widest-path-related-functions"><title>Widest-path related functions</title>
+<!-- doxrox-include igraph_get_widest_path -->
+<!-- doxrox-include igraph_get_widest_paths -->
+<!-- doxrox-include igraph_widest_paths_dijkstra -->
+<!-- doxrox-include igraph_widest_paths_floyd_warshall -->
+</section>
+
 <section id="efficiency-measures"><title>Efficiency measures</title>
 <!-- doxrox-include igraph_global_efficiency -->
 <!-- doxrox-include igraph_local_efficiency -->
