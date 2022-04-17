@@ -19,7 +19,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* initialise structures used in "get_widest_path(s)" algorithms */
 void init_vertices_and_edges(igraph_integer_t n, igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
