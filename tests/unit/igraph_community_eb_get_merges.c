@@ -28,7 +28,7 @@ void print_and_destroy(igraph_t *g, igraph_bool_t directed, igraph_vector_int_t 
     igraph_vector_print(modularity);
     printf("Membership:");
     igraph_vector_int_print(membership);
-    printf("Merges:");
+    printf("Merges:\n");
     igraph_matrix_int_print(res);
     printf("\n\n");
     igraph_destroy(g);
@@ -68,6 +68,22 @@ int main() {
         igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, -1);
         igraph_integer_t edge_array[] = {0};
         igraph_vector_int_view(&edges, edge_array, 1);
+        print_and_destroy(&g, 1, &edges, NULL, &res, &bridges, &modularity, &membership);
+    }
+
+    {
+        printf("Check graph with three vertices, two edges, remove one:\n");
+        igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
+        igraph_integer_t edge_array[] = {0};
+        igraph_vector_int_view(&edges, edge_array, 1);
+        print_and_destroy(&g, 1, &edges, NULL, &res, &bridges, &modularity, &membership);
+    }
+
+    {
+        printf("Check graph with three vertices, two edges, remove two:\n");
+        igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
+        igraph_integer_t edge_array[] = {0, 1};
+        igraph_vector_int_view(&edges, edge_array, 2);
         print_and_destroy(&g, 1, &edges, NULL, &res, &bridges, &modularity, &membership);
     }
 
