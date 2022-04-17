@@ -1,0 +1,7 @@
+graph with two unconnected vertices: 0
+graph with two connected vertices, IGRAPH_VCONN_NEI_NEGATIVE: -1
+graph with two connected vertices, IGRAPH_VCONN_NEI_NUMBER_OF_NODES: 2
+graph with two connected vertices, IGRAPH_VCONN_NEI_IGNORE: 0
+check error on graph with two connected vertices.
+check error on graph with no vertices.
+check error on graph with one vertex.
