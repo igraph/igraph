@@ -826,7 +826,9 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
 static igraph_error_t igraph_i_layout_umap(
         const igraph_t *graph, const igraph_vector_t *distances,
         igraph_matrix_t *layout,
-        igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob, igraph_integer_t ndim) {
+        igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob,
+        igraph_integer_t ndim,
+        igraph_bool_t skip_initialization) {
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -876,11 +878,13 @@ static igraph_error_t igraph_i_layout_umap(
     /* From now on everything lives in probability space, it does not matter whether
      * the original graph was weighted/distanced or unweighted */
 
-    /* Skip spectral embedding for now (see #1971), initialize at random */
-    if (ndim == 2) {
-        igraph_layout_random(graph, layout);
-    } else {
-        igraph_layout_random_3d(graph, layout);
+    if (!skip_initialization) {
+        /* Skip spectral embedding for now (see #1971), initialize at random */
+        if (ndim == 2) {
+            igraph_layout_random(graph, layout);
+        } else {
+            igraph_layout_random_3d(graph, layout);
+        }
     }
 
     /* Fit a and b parameter to find smooth approximation to
@@ -1000,6 +1004,9 @@ static igraph_error_t igraph_i_layout_umap(
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
+ * \param skip_initialization Whether to skip layout initialization and use the input
+ *   layout as the starting point of the minimization. If this argument is true, you
+ *   must ensure that the layout has the right dimensions before calling this function.
  *
  * \return Error code.
  *
@@ -1010,8 +1017,10 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   igraph_matrix_t *layout,
                                   igraph_real_t min_dist,
                                   igraph_integer_t epochs,
-                                  igraph_real_t sampling_prob) {
-    return igraph_i_layout_umap(graph, distances, layout, min_dist, epochs, sampling_prob, 2);
+                                  igraph_real_t sampling_prob,
+                                  igraph_bool_t skip_initialization) {
+    return igraph_i_layout_umap(graph, distances, layout,
+            min_dist, epochs, sampling_prob, 2, skip_initialization);
 }
 
 
@@ -1037,6 +1046,9 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
+ * \param skip_initialization Whether to skip layout initialization and use the input
+ *   layout as the starting point of the minimization. If this argument is true, you
+ *   must ensure that the layout has the right dimensions before calling this function.
  *
  * \return Error code.
  *
@@ -1047,6 +1059,8 @@ igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_matrix_t *layout,
                                      igraph_real_t min_dist,
                                      igraph_integer_t epochs,
-                                     igraph_real_t sampling_prob) {
-    return igraph_i_layout_umap(graph, distances, layout, min_dist, epochs, sampling_prob, 3);
+                                     igraph_real_t sampling_prob,
+                                     igraph_bool_t skip_initialization) {
+    return igraph_i_layout_umap(graph, distances, layout,
+            min_dist, epochs, sampling_prob, 3, skip_initialization);
 }
