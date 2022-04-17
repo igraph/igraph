@@ -641,6 +641,7 @@ Some of the highlights are:
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
  - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without
    re-allocating them.
+ - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
 
 ### Removed
 
