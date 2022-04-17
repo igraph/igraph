@@ -126,7 +126,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                 MATRIX(*res, midx, 1) = c2;
             }
             if (bridges) {
-                VECTOR(*bridges)[midx] = i + 1;
+                VECTOR(*bridges)[midx] = i;
             }
 
             /* The new cluster has id no_of_nodes+midx+1 */
@@ -284,7 +284,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                 MATRIX(*res, midx, 1) = c2;
             }
             if (bridges) {
-                VECTOR(*bridges)[midx] = i + 1;
+                VECTOR(*bridges)[midx] = i;
             }
 
             VECTOR(ptr)[c1] = no_of_nodes + midx + 1;

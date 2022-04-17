@@ -617,6 +617,8 @@ Some of the highlights are:
  - `igraph_adjacency()` no longer accepts a negative number of edges in its adjacency matrix.
    When negative entries are found, an error is generated.
 
+ - The `igraph_eb_get_merges()` bridges parameter now starts the edge indices at 0, not 1.
+
 ### Added
 
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
