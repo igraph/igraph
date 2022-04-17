@@ -15,3 +15,5 @@ Same graph, no distances:
 UMAP layout seems fine.
 Same graph, 3D layout:
 UMAP layout seems fine.
+Same graph, custom initial layout:
+UMAP layout seems fine.

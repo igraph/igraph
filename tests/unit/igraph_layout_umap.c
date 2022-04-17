@@ -177,6 +177,11 @@ int main() {
     IGRAPH_ASSERT(igraph_layout_umap_3d(&graph, NULL, &layout, 0.01, 500, 0.8, 0) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
+    printf("Same graph, custom initial layout:\n");
+    igraph_layout_random(&graph, &layout);
+    IGRAPH_ASSERT(igraph_layout_umap_3d(&graph, NULL, &layout, 0.01, 500, 0.8, 1) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout);
+
     igraph_matrix_destroy(&layout);
     igraph_destroy(&graph);
     VERIFY_FINALLY_STACK();
