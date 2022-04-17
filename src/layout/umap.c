@@ -869,6 +869,21 @@ static igraph_error_t igraph_i_layout_umap(
         return IGRAPH_SUCCESS;
     }
 
+    if (skip_initialization) {
+        if((igraph_matrix_nrow(layout) != no_of_nodes) || (igraph_matrix_ncol(layout) != ndim)) {
+          IGRAPH_ERRORF("Initial layout should be %d x %d, got %d x %d.",
+                  IGRAPH_EINVAL, no_of_nodes, ndim,
+                  igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
+        }
+    } else {
+        /* Skip spectral embedding for now (see #1971), initialize at random */
+        if (ndim == 2) {
+            igraph_layout_random(graph, layout);
+        } else {
+            igraph_layout_random_3d(graph, layout);
+        }
+    }
+
     RNG_BEGIN();
     IGRAPH_VECTOR_INIT_FINALLY(&umap_weights, no_of_edges);
 
@@ -877,15 +892,6 @@ static igraph_error_t igraph_i_layout_umap(
 
     /* From now on everything lives in probability space, it does not matter whether
      * the original graph was weighted/distanced or unweighted */
-
-    if (!skip_initialization) {
-        /* Skip spectral embedding for now (see #1971), initialize at random */
-        if (ndim == 2) {
-            igraph_layout_random(graph, layout);
-        } else {
-            igraph_layout_random_3d(graph, layout);
-        }
-    }
 
     /* Fit a and b parameter to find smooth approximation to
      * probability distribution in embedding space */
