@@ -1758,6 +1758,55 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_t *graph,
+                                                    igraph_integer_t *res,
+                                                    igraph_integer_t source,
+                                                    igraph_integer_t target,
+                                                    igraph_vconn_nei_t neighbors,
+                                                    igraph_bool_t *done) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_bool_t conn;
+    *done = 1;
+
+    if (source == target) {
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
+    }
+
+    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
+        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVAL);
+    }
+
+    switch (neighbors) {
+    case IGRAPH_VCONN_NEI_ERROR:
+        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        if (conn) {
+            IGRAPH_ERROR("Source and target vertices connected.", IGRAPH_EINVAL);
+        }
+        break;
+    case IGRAPH_VCONN_NEI_NEGATIVE:
+        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        if (conn) {
+            *res = -1;
+            return IGRAPH_SUCCESS;
+        }
+        break;
+    case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
+        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        if (conn) {
+            *res = no_of_nodes;
+            return IGRAPH_SUCCESS;
+        }
+        break;
+    case IGRAPH_VCONN_NEI_IGNORE:
+        break;
+    default:
+        IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'.", IGRAPH_EINVAL);
+        break;
+    }
+    *done = 0;
+    return IGRAPH_SUCCESS;
+}
+
 static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
                                                     igraph_integer_t *res,
                                                     igraph_integer_t source,
@@ -1770,38 +1819,11 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
     igraph_real_t real_res;
     igraph_t newgraph;
     igraph_integer_t i;
-    igraph_bool_t conn1;
+    igraph_bool_t done;
 
-    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
-    }
-
-    switch (neighbors) {
-    case IGRAPH_VCONN_NEI_ERROR:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-        if (conn1) {
-            IGRAPH_ERROR("vertices connected", IGRAPH_EINVAL);
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NEGATIVE:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-        if (conn1) {
-            *res = -1;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-        if (conn1) {
-            *res = no_of_nodes;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_IGNORE:
-        break;
-    default:
-        IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'", IGRAPH_EINVAL);
-        break;
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done));
+    if (done) {
+        return (IGRAPH_SUCCESS);
     }
 
     /* Create the new graph */
@@ -1847,41 +1869,12 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
                                                       igraph_integer_t source,
                                                       igraph_integer_t target,
                                                       igraph_vconn_nei_t neighbors) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_t newgraph;
-    igraph_bool_t conn;
+    igraph_bool_t done;
 
-    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
-    }
-
-    switch (neighbors) {
-    case IGRAPH_VCONN_NEI_ERROR:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-        if (conn) {
-            IGRAPH_ERROR("vertices connected", IGRAPH_EINVAL);
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NEGATIVE:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-        if (conn) {
-            *res = -1;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-        if (conn) {
-            *res = no_of_nodes;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_IGNORE:
-        break;
-    default:
-        IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'", IGRAPH_EINVAL);
-        break;
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done));
+    if (done) {
+        return (IGRAPH_SUCCESS);
     }
 
     IGRAPH_CHECK(igraph_copy(&newgraph, graph));
@@ -1941,11 +1934,6 @@ igraph_error_t igraph_st_vertex_connectivity(const igraph_t *graph,
                                   igraph_integer_t source,
                                   igraph_integer_t target,
                                   igraph_vconn_nei_t neighbors) {
-
-    if (source == target) {
-        IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
-    }
-
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
                      source, target,
