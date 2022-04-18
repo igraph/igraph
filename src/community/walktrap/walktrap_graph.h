@@ -67,7 +67,7 @@ namespace walktrap {
 class Edge {            // code an edge of a given vertex
 public:
     int neighbor;         // the number of the neighbor vertex
-    float weight;         // the weight of the edge
+    double weight;         // the weight of the edge
 };
 bool operator<(const Edge& E1, const Edge& E2);
 
@@ -76,7 +76,7 @@ class Vertex {
 public:
     Edge* edges;          // the edges of the vertex
     int degree;           // number of neighbors
-    float total_weight;       // the total weight of the vertex
+    double total_weight;       // the total weight of the vertex
 
     Vertex();         // creates empty vertex
     ~Vertex();            // destructor
@@ -86,7 +86,7 @@ class Graph {
 public:
     int nb_vertices;      // number of vertices
     int nb_edges;         // number of edges
-    float total_weight;       // total weight of the edges
+    double total_weight;       // total weight of the edges
     Vertex* vertices;     // array of the vertices
 
     long memory();            // the total memory used in Bytes
