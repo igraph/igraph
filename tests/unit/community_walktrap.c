@@ -134,7 +134,7 @@ int main() {
 
   igraph_destroy(&graph);
 
-  printf("\nSmall weighted graph\n");
+  printf("\nSmall weighted graph\n\n");
 
   igraph_ring(&graph, 6, IGRAPH_UNDIRECTED, 0, 1);
 
@@ -161,6 +161,33 @@ int main() {
   igraph_matrix_destroy(&merges);
 
   igraph_destroy(&graph);
+
+  printf("\nIsolated vertices\n\n");
+
+  igraph_empty(&graph, 5, IGRAPH_UNDIRECTED);
+
+  igraph_matrix_init(&merges, 0, 0);
+  igraph_vector_init(&modularity, 0);
+  igraph_vector_init(&membership, 0);
+
+  igraph_community_walktrap(&graph, NULL, 4, &merges, &modularity, &membership);
+  printf("Merges:\n");
+  print_matrix(&merges);
+
+  printf("Modularity: ");
+  fixup_modularity(&modularity);
+  print_vector(&modularity);
+
+  printf("Membership: ");
+  print_vector(&membership);
+
+  igraph_vector_destroy(&weights);
+  igraph_vector_destroy(&membership);
+  igraph_vector_destroy(&modularity);
+  igraph_matrix_destroy(&merges);
+
+  igraph_destroy(&graph);
+
 
   VERIFY_FINALLY_STACK();
 
