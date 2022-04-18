@@ -1005,7 +1005,7 @@ static igraph_error_t igraph_i_layout_umap(
  * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
- * \param res Pointer to the n x 2 matrix where the layout coordinates will be stored.
+ * \param res Pointer to the n by 2 matrix where the layout coordinates will be stored.
  * \param use_seed Logical, if true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
@@ -1046,7 +1046,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * igraph_layout_umap() for the 2D version).
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
- * \param res Pointer to the n x 3 matrix where the layout coordinates will be stored.
+ * \param res Pointer to the n by 3 matrix where the layout coordinates will be stored.
  * \param use_seed Logical, if true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
