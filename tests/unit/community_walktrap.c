@@ -23,7 +23,23 @@
 
 #include <igraph.h>
 
+#include <math.h>
+
 #include "test_utilities.inc"
+
+/* Replace modularity values which are very close to zero
+ * by exact zeros, so that we can have consistent test outputs
+ * across platforms. */
+void fixup_modularity(igraph_vector_t *modularity) {
+    igraph_integer_t i;
+    igraph_integer_t len = igraph_vector_size(modularity);
+
+    for (i=0; i < len; ++i) {
+        if (fabs(VECTOR(*modularity)[i]) < 1e-15) {
+            VECTOR(*modularity)[i] = 0.0;
+        }
+    }
+}
 
 int main() {
   igraph_t graph;
@@ -51,6 +67,7 @@ int main() {
   print_matrix(&merges);
 
   printf("Modularity: ");
+  fixup_modularity(&modularity);
   print_vector(&modularity);
 
   printf("Membership: ");
@@ -81,6 +98,7 @@ int main() {
   igraph_vector_init(&modularity, 0);
   igraph_community_walktrap(&graph, NULL, 4, NULL, &modularity, NULL);
   printf("Modularity:\n");
+  fixup_modularity(&modularity);
   print_vector(&modularity);
   igraph_vector_destroy(&modularity);
 
@@ -103,6 +121,7 @@ int main() {
   print_matrix(&merges);
 
   printf("Modularity: ");
+  fixup_modularity(&modularity);
   print_vector(&modularity);
 
   printf("Membership: ");
@@ -130,6 +149,7 @@ int main() {
   print_matrix(&merges);
 
   printf("Modularity: ");
+  fixup_modularity(&modularity);
   print_vector(&modularity);
 
   printf("Membership: ");
