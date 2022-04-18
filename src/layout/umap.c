@@ -824,11 +824,14 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
 /* This is the main function that works for any dimensionality of the embedding
  * (currently hard-constrained to 2 or 3 ONLY in the initialization). */
 static igraph_error_t igraph_i_layout_umap(
-        const igraph_t *graph, const igraph_vector_t *distances,
-        igraph_matrix_t *layout,
-        igraph_real_t min_dist, igraph_integer_t epochs, igraph_real_t sampling_prob,
-        igraph_integer_t ndim,
-        igraph_bool_t skip_initialization) {
+        const igraph_t *graph,
+        igraph_matrix_t *res,
+        igraph_bool_t use_seed,
+        const igraph_vector_t *distances,
+        igraph_real_t min_dist,
+        igraph_integer_t epochs,
+        igraph_real_t sampling_prob,
+        igraph_integer_t ndim) {
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -862,25 +865,31 @@ static igraph_error_t igraph_i_layout_umap(
     /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */
     IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
 
-    /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
-    if (no_of_nodes <= 1) {
-        IGRAPH_CHECK(igraph_matrix_resize(layout, no_of_nodes, ndim));
-        igraph_matrix_null(layout);
-        return IGRAPH_SUCCESS;
-    }
-
-    if (skip_initialization) {
-        if((igraph_matrix_nrow(layout) != no_of_nodes) || (igraph_matrix_ncol(layout) != ndim)) {
-          IGRAPH_ERRORF("Initial layout should be %d x %d, got %d x %d.",
+    if (use_seed) {
+        if((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
+          IGRAPH_ERRORF("Seed layout should have %d points in %d dimensions, got %d points in %d dimensions.",
                   IGRAPH_EINVAL, no_of_nodes, ndim,
-                  igraph_matrix_nrow(layout), igraph_matrix_ncol(layout));
+                  igraph_matrix_nrow(res),
+                  igraph_matrix_ncol(res));
         }
+
+        /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
+        if (no_of_nodes <= 1)
+            return IGRAPH_SUCCESS;
+        
     } else {
+         /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
+         if (no_of_nodes <= 1) {
+             IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, ndim));
+             igraph_matrix_null(res);
+             return IGRAPH_SUCCESS;
+         }
+
         /* Skip spectral embedding for now (see #1971), initialize at random */
         if (ndim == 2) {
-            igraph_layout_random(graph, layout);
+            igraph_layout_random(graph, res);
         } else {
-            igraph_layout_random_3d(graph, layout);
+            igraph_layout_random_3d(graph, res);
         }
     }
 
@@ -900,14 +909,14 @@ static igraph_error_t igraph_i_layout_umap(
     /* Minimize cross-entropy between high-d and low-d probability
      * distributions */
     IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(graph, &umap_weights, a, b,
-                layout, epochs, sampling_prob));
+                res, epochs, sampling_prob));
 
     igraph_vector_destroy(&umap_weights);
     IGRAPH_FINALLY_CLEAN(1);
     RNG_END();
 
     /* Center layout */
-    IGRAPH_CHECK(igraph_i_umap_center_layout(layout));
+    IGRAPH_CHECK(igraph_i_umap_center_layout(res));
 
     return IGRAPH_SUCCESS;
 }
@@ -996,11 +1005,13 @@ static igraph_error_t igraph_i_layout_umap(
  * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
+ * \param res Pointer to the n x 2 matrix where the layout coordinates will be stored.
+ * \param use_seed Logical, if true the supplied values in the \p res argument are used
+ *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
  *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
  *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
- * \param layout Pointer to the n x 2 matrix where the layout coordinates will be stored.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
  *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
  *   number.
@@ -1019,14 +1030,14 @@ static igraph_error_t igraph_i_layout_umap(
  * \experimental
  */
 igraph_error_t igraph_layout_umap(const igraph_t *graph,
+                                  igraph_matrix_t *res,
+                                  igraph_bool_t use_seed,
                                   const igraph_vector_t *distances,
-                                  igraph_matrix_t *layout,
                                   igraph_real_t min_dist,
                                   igraph_integer_t epochs,
-                                  igraph_real_t sampling_prob,
-                                  igraph_bool_t skip_initialization) {
-    return igraph_i_layout_umap(graph, distances, layout,
-            min_dist, epochs, sampling_prob, 2, skip_initialization);
+                                  igraph_real_t sampling_prob) {
+    return igraph_i_layout_umap(graph, res, use_seed,
+            distances, min_dist, epochs, sampling_prob, 2);
 }
 
 
@@ -1038,11 +1049,13 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * igraph_layout_umap() for the 2D version).
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
+ * \param res Pointer to the n x 3 matrix where the layout coordinates will be stored.
+ * \param use_seed Logical, if true the supplied values in the \p res argument are used
+ *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
  *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
  *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
- * \param layout Pointer to the n x 3 matrix where the layout coordinates will be stored.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
  *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
  *   number.
@@ -1061,12 +1074,12 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \experimental
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
+                                     igraph_matrix_t *res,
+                                     igraph_bool_t use_seed,
                                      const igraph_vector_t *distances,
-                                     igraph_matrix_t *layout,
                                      igraph_real_t min_dist,
                                      igraph_integer_t epochs,
-                                     igraph_real_t sampling_prob,
-                                     igraph_bool_t skip_initialization) {
-    return igraph_i_layout_umap(graph, distances, layout,
-            min_dist, epochs, sampling_prob, 3, skip_initialization);
+                                     igraph_real_t sampling_prob) {
+    return igraph_i_layout_umap(graph, res, use_seed,
+            distances, min_dist, epochs, sampling_prob, 2);
 }
