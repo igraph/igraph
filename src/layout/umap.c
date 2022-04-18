@@ -1021,9 +1021,6 @@ static igraph_error_t igraph_i_layout_umap(
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
- * \param skip_initialization Whether to skip layout initialization and use the input
- *   layout as the starting point of the minimization. If this argument is true, you
- *   must ensure that the layout has the right dimensions before calling this function.
  *
  * \return Error code.
  *
@@ -1065,9 +1062,6 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
- * \param skip_initialization Whether to skip layout initialization and use the input
- *   layout as the starting point of the minimization. If this argument is true, you
- *   must ensure that the layout has the right dimensions before calling this function.
  *
  * \return Error code.
  *
