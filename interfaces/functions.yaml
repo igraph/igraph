@@ -1321,7 +1321,7 @@ igraph_community_walktrap:
 igraph_community_edge_betweenness:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT result, OPTIONAL OUT VECTOR edge_betweenness,
-        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT VERTEXSET bridges,
+        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership,
         BOOLEAN directed=True, OPTIONAL EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph
@@ -1329,7 +1329,7 @@ igraph_community_edge_betweenness:
 igraph_community_eb_get_merges:
     PARAMS: |-
         GRAPH graph, BOOLEAN directed, EDGE_INDICES edges, OPTIONAL EDGEWEIGHTS weights,
-        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT VECTOR_INT bridges,
+        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership
     DEPS: weights ON graph
 
