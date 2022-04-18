@@ -57,7 +57,7 @@ int main() {
   igraph_vector_destroy(&modularity);
   igraph_matrix_destroy(&merges);
 
-  /* Test the case when modularity=0 and membership=0 as this caused a crash in
+  /* Test the case when modularity=NULL and membership=NULL as this caused a crash in
    * the R interface, see https://github.com/igraph/rigraph/issues/289 */
 
   igraph_matrix_init(&merges, 0, 0);
@@ -66,6 +66,12 @@ int main() {
   printf("Merges:\n");
   igraph_matrix_print(&merges);
   igraph_matrix_destroy(&merges);
+
+  igraph_vector_init(&modularity, 0);
+  igraph_community_walktrap(&graph, NULL, 4, NULL, &modularity, NULL);
+  printf("Modularity:\n");
+  print_vector(&modularity);
+  igraph_vector_destroy(&modularity);
 
   igraph_destroy(&graph);
 

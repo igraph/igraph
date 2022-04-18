@@ -900,8 +900,9 @@ double Communities::merge_nearest_communities() {
     if (merges) {
         MATRIX(*merges, mergeidx, 0) = N->community1;
         MATRIX(*merges, mergeidx, 1) = N->community2;
-        mergeidx++;
     }
+
+    mergeidx++;
 
     if (modularity) {
         float Q = 0.;
