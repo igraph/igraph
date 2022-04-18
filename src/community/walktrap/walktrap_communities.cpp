@@ -484,15 +484,9 @@ Communities::Communities(Graph* graph, int random_walks_length,
 
     if (modularity) {
         double Q = 0.0;
-        double c = 0.0;
         for (int i = 0; i < nb_communities; i++) {
-            double q, y, t;
             if (communities[i].sub_community_of == 0) {
-                q = (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight);
-                y = (q - c);
-                t = Q + y;
-                c = (t - Q) - y;
-                Q = t;
+                Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight);
             }
         }
         Q /= G->total_weight;
@@ -912,15 +906,9 @@ double Communities::merge_nearest_communities() {
 
     if (modularity) {
         double Q = 0.0;
-        double c = 0.0;
         for (int i = 0; i < nb_communities; i++) {
-            double q, t, y;
             if (communities[i].sub_community_of == 0) {
-                q = (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight);
-                y = (q - c);
-                t = Q + y;
-                c = (t - Q) - y;
-                Q = t;
+                Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight);
             }
         }
         Q /= G->total_weight;
