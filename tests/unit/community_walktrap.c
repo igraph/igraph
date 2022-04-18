@@ -31,9 +31,12 @@ int main() {
   igraph_matrix_t merges;
   igraph_vector_t modularity;
   igraph_vector_t membership;
+  igraph_vector_t weights;
 
   /* Set default seed to get reproducible results */
   igraph_rng_seed(igraph_rng_default(), 42);
+
+  printf("Basic test\n\n");
 
   /* Simple unweighted graph */
   igraph_small(&graph, 3, IGRAPH_UNDIRECTED,
@@ -60,6 +63,8 @@ int main() {
   /* Test the case when modularity=NULL and membership=NULL as this caused a crash in
    * the R interface, see https://github.com/igraph/rigraph/issues/289 */
 
+  printf("\nWithout modularity and membership calculation\n\n");
+
   igraph_matrix_init(&merges, 0, 0);
 
   igraph_community_walktrap(&graph, NULL, 4, &merges, NULL, NULL);
@@ -71,11 +76,42 @@ int main() {
    * as the result was previously invalid due to not incrementing
    * the "merge index" during computation. */
 
+  printf("\nWithout merges matrix calculation\n\n");
+
   igraph_vector_init(&modularity, 0);
   igraph_community_walktrap(&graph, NULL, 4, NULL, &modularity, NULL);
   printf("Modularity:\n");
   print_vector(&modularity);
   igraph_vector_destroy(&modularity);
+
+  igraph_destroy(&graph);
+
+  /* Test for bug https://github.com/igraph/igraph/issues */
+
+  printf("\nBug 2042\n\n");
+
+  igraph_small(&graph, 3, IGRAPH_UNDIRECTED,
+               0,1, -1);
+
+  igraph_matrix_init(&merges, 0, 0);
+  igraph_vector_init(&modularity, 0);
+  igraph_vector_init(&membership, 0);
+  igraph_vector_init_real(&weights, 1, 0.2);
+
+  igraph_community_walktrap(&graph, &weights, 4, &merges, &modularity, &membership);
+  printf("Merges:\n");
+  print_matrix(&merges);
+
+  printf("Modularity: ");
+  print_vector(&modularity);
+
+  printf("Membership: ");
+  print_vector(&membership);
+
+  igraph_vector_destroy(&weights);
+  igraph_vector_destroy(&membership);
+  igraph_vector_destroy(&modularity);
+  igraph_matrix_destroy(&merges);
 
   igraph_destroy(&graph);
 

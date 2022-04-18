@@ -131,6 +131,7 @@ int igraph_community_walktrap(const igraph_t *graph,
         long int no_of_nodes = (long int)igraph_vcount(graph);
         int length = steps;
         long max_memory = -1;
+        igraph_integer_t comp_count;
 
         if (steps <= 0) {
             IGRAPH_ERROR("Length of random walks must be positive for walktrap community detection.", IGRAPH_EINVAL);
@@ -146,14 +147,15 @@ int igraph_community_walktrap(const igraph_t *graph,
             IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
         }
 
-        if (merges) {
-            igraph_integer_t no;
+        if (merges || modularity) {
             IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0,
-                                         &no, IGRAPH_WEAK));
-            IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes - no, 2));
+                                         &comp_count, IGRAPH_WEAK));
+        }
+        if (merges) {
+            IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes - comp_count, 2));
         }
         if (modularity) {
-            IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
+            IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes - comp_count + 1));
             igraph_vector_null(modularity);
         }
         Communities C(&G, length, max_memory, merges, modularity);
