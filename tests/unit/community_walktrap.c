@@ -45,13 +45,13 @@ int main() {
 
   igraph_community_walktrap(&graph, NULL, 4, &merges, &modularity, &membership);
   printf("Merges:\n");
-  igraph_matrix_print(&merges);
+  print_matrix(&merges);
 
   printf("Modularity: ");
-  igraph_vector_print(&modularity);
+  print_vector(&modularity);
 
   printf("Membership: ");
-  igraph_vector_print(&membership);
+  print_vector(&membership);
 
   igraph_vector_destroy(&membership);
   igraph_vector_destroy(&modularity);
@@ -64,8 +64,12 @@ int main() {
 
   igraph_community_walktrap(&graph, NULL, 4, &merges, NULL, NULL);
   printf("Merges:\n");
-  igraph_matrix_print(&merges);
+  print_matrix(&merges);
   igraph_matrix_destroy(&merges);
+
+  /* Test the case when merges=NULL but modularity is requested,
+   * as the result was previously invalid due to not incrementing
+   * the "merge index" during computation. */
 
   igraph_vector_init(&modularity, 0);
   igraph_community_walktrap(&graph, NULL, 4, NULL, &modularity, NULL);
