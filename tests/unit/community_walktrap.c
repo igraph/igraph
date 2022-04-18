@@ -155,6 +155,15 @@ int main() {
   printf("Membership: ");
   print_vector(&membership);
 
+  /* Negative weights are not allowed */
+  VECTOR(weights)[0] = -0.1;
+  CHECK_ERROR(igraph_community_walktrap(&graph, &weights, 4, &merges, &modularity, &membership), IGRAPH_EINVAL);
+
+  /* Invalid weight vector size */
+  VECTOR(weights)[0] = 0.1;
+  igraph_vector_pop_back(&weights);
+  CHECK_ERROR(igraph_community_walktrap(&graph, &weights, 4, &merges, &modularity, &membership), IGRAPH_EINVAL);
+
   igraph_vector_destroy(&weights);
   igraph_vector_destroy(&membership);
   igraph_vector_destroy(&modularity);
