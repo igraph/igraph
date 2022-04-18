@@ -115,6 +115,33 @@ int main() {
 
   igraph_destroy(&graph);
 
+  printf("\nSmall weighted graph\n");
+
+  igraph_ring(&graph, 6, IGRAPH_UNDIRECTED, 0, 1);
+
+  igraph_matrix_init(&merges, 0, 0);
+  igraph_vector_init(&modularity, 0);
+  igraph_vector_init(&membership, 0);
+  igraph_vector_init_real(&weights, 6,
+                          1.0, 1.0, 0.1, 1.0, 1.0, 0.1);
+
+  igraph_community_walktrap(&graph, &weights, 4, &merges, &modularity, &membership);
+  printf("Merges:\n");
+  print_matrix(&merges);
+
+  printf("Modularity: ");
+  print_vector(&modularity);
+
+  printf("Membership: ");
+  print_vector(&membership);
+
+  igraph_vector_destroy(&weights);
+  igraph_vector_destroy(&membership);
+  igraph_vector_destroy(&modularity);
+  igraph_matrix_destroy(&merges);
+
+  igraph_destroy(&graph);
+
   VERIFY_FINALLY_STACK();
 
   return 0;
