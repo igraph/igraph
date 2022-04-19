@@ -793,7 +793,6 @@ AbstractGraph::search(const bool canonical,
     root.fp_cert_equal = true;
     root.fp_extendable = TreeNode::MAYBE;
     root.in_best_path = false;
-    root.needs_long_prune = false;
     root.cmp_to_best_path = 0;
     root.long_prune_begin = 0;
 
