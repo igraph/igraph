@@ -867,7 +867,7 @@ static igraph_error_t igraph_i_layout_umap(
 
     if (use_seed) {
         if((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
-          IGRAPH_ERRORF("Seed layout should have %d points in %d dimensions, got %d points in %d dimensions.",
+          IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
                   IGRAPH_EINVAL, no_of_nodes, ndim,
                   igraph_matrix_nrow(res),
                   igraph_matrix_ncol(res));
