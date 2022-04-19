@@ -1050,6 +1050,14 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         igraph_vector_resize(modularity, no_of_joins + 1);
     }
 
+    /* Internally, the algorithm does not create NaN values.
+     * If the graph has no edges, the final modularity will be zero.
+     * We change this to NaN for consistency. */
+    if (modularity && no_of_edges == 0) {
+        IGRAPH_ASSERT(no_of_joins == 0);
+        VECTOR(*modularity)[0] = IGRAPH_NAN;
+    }
+
     debug("Freeing memory\n");
     IGRAPH_FREE(pairs);
     IGRAPH_FREE(dq);
