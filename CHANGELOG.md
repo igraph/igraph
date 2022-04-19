@@ -757,6 +757,14 @@ Some of the highlights are:
 
  - Documentation improvements
 
+## [Unreleased 0.9]
+
+### Fixed
+
+ - `igraph_preference_game()` now works correctly when `fixed_size` is true and
+   `type_dist` is not given; earlier versions had a bug where more than half of
+   the vertices mistakenly ended up in group 0.
+
 ## [0.9.8] - 2022-04-08
 
 ### Fixed
