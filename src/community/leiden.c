@@ -958,7 +958,8 @@ static int igraph_i_community_leiden(
  * \param graph The input graph. It must be an undirected graph.
  * \param edge_weights Numeric vector containing edge weights. If \c NULL, every edge
  *    has equal weight of 1. The weights need not be non-negative.
- * \param node_weights Numeric vector containing node weights.
+ * \param node_weights Numeric vector containing node weights. If \c NULL, every node
+ *    has equal weight of 1.
  * \param resolution_parameter The resolution parameter used, which is
  *    represented by gamma in the objective function mentioned in the
  *    documentation.
@@ -972,8 +973,8 @@ static int igraph_i_community_leiden(
  *    must hence be properly initialized. When finding clusters from scratch it
  *    is typically started using a singleton clustering. This can be achieved
  *    using \c igraph_vector_init_seq.
- * \param nb_clusters The number of clusters contained in \c membership. Must
- *    not be a \c NULL pointer.
+ * \param nb_clusters The number of clusters contained in \c membership.
+ *    If \c NULL, the number of clusters will not be returned.
  * \param quality The quality of the partition, in terms of the objective
  *    function as included in the documentation. If \c NULL the quality will
  *    not be calculated.
@@ -988,7 +989,12 @@ int igraph_community_leiden(const igraph_t *graph,
                             const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
                             igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_vector_t *i_edge_weights, *i_node_weights;
+    igraph_integer_t i_nb_clusters;
     igraph_integer_t n = igraph_vcount(graph);
+
+    if (!nb_clusters) {
+        nb_clusters = &i_nb_clusters;
+    }
 
     if (start) {
         if (!membership) {
