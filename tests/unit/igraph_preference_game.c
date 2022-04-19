@@ -44,7 +44,7 @@ int main() {
     igraph_vector_t types, in_types, out_types;
     igraph_bool_t connected, has_loop, has_multi;
     igraph_vector_bool_t is_loop;
-    long i;
+    igraph_integer_t i, j, count;
 
     igraph_vector_init(&types, 0);
 
@@ -140,6 +140,37 @@ int main() {
 
     igraph_has_multiple(&g, &has_multi);
     IGRAPH_ASSERT(! has_multi);
+
+    igraph_destroy(&g);
+
+    /* fixed sizes, divide evenly */
+    IGRAPH_CHECK(igraph_matrix_resize(&pref_mat, 9, 9));
+    for (i = 0; i < 9; i++) {
+        for (j = 0; j < 9; j++) {
+            MATRIX(pref_mat, i, j) = (j == i + 1 || j == i - 1) ? 0.1 : 0;
+        }
+    }
+    IGRAPH_CHECK(igraph_preference_game(&g, 50, 9, /*type_dist=*/ 0, /*fixed_sizes=*/ 1,
+                                        &pref_mat, &types, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS));
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 50);
+    IGRAPH_ASSERT(!igraph_is_directed(&g));
+
+    igraph_has_loop(&g, &has_loop);
+    IGRAPH_ASSERT(! has_loop);
+
+    igraph_has_multiple(&g, &has_multi);
+    IGRAPH_ASSERT(! has_multi);
+
+    for (i = 0; i < 9; i++) {
+        count = 0;
+        for (j = 0; j < 50; j++) {
+            if (VECTOR(types)[j] == i) {
+                count++;
+            }
+        }
+        IGRAPH_ASSERT(count == 5 || count == 6);
+    }
 
     igraph_destroy(&g);
 

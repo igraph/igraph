@@ -226,11 +226,17 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 }
             }
         } else {
-            long int fixno = (long int) ceil( (double)nodes / types);
+            igraph_integer_t size_of_one_group = (igraph_integer_t) floor( (double)nodes / types);
+            igraph_integer_t num_groups_with_one_extra_node = nodes - size_of_one_group * types;
             for (i = 0; i < types; i++) {
                 igraph_vector_t *v = VECTOR(vids_by_type)[i];
-                for (j = 0; j < fixno && an < nodes; j++) {
-                    VECTOR(*nodetypes)[an++] = i;
+                for (j = 0; j < size_of_one_group; j++) {
+                    VECTOR(*nodetypes)[an] = i;
+                    IGRAPH_CHECK(igraph_vector_push_back(v, an));
+                    an++;
+                }
+                if (i < num_groups_with_one_extra_node) {
+                    VECTOR(*nodetypes)[an] = i;
                     IGRAPH_CHECK(igraph_vector_push_back(v, an));
                     an++;
                 }
