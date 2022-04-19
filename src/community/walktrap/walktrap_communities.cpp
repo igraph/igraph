@@ -482,14 +482,14 @@ Communities::Communities(Graph* graph, int random_walks_length,
         /*     } */
     }
 
-    double Q = 0.;
-    for (int i = 0; i < nb_communities; i++) {
-      if (communities[i].sub_community_of == 0) {
-        Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight) / G->total_weight;
-      }
-    }
-
     if (modularity) {
+        double Q = 0.0;
+        for (int i = 0; i < nb_communities; i++) {
+            if (communities[i].sub_community_of == 0) {
+                Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight);
+            }
+        }
+        Q /= G->total_weight;
         VECTOR(*modularity)[mergeidx] = Q;
     }
 }
@@ -900,16 +900,18 @@ double Communities::merge_nearest_communities() {
     if (merges) {
         MATRIX(*merges, mergeidx, 0) = N->community1;
         MATRIX(*merges, mergeidx, 1) = N->community2;
-        mergeidx++;
     }
 
+    mergeidx++;
+
     if (modularity) {
-        double Q = 0.;
+        double Q = 0.0;
         for (int i = 0; i < nb_communities; i++) {
             if (communities[i].sub_community_of == 0) {
-                Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight) / G->total_weight;
+                Q += (communities[i].internal_weight - communities[i].total_weight * communities[i].total_weight / G->total_weight);
             }
         }
+        Q /= G->total_weight;
         VECTOR(*modularity)[mergeidx] = Q;
     }
 
