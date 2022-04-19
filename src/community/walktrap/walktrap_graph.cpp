@@ -204,6 +204,13 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     for (int i = 0; i < G.nb_vertices; i++) {
+        /* Check for zero strength, as it may lead to crashed in walktrap algorithm.
+         * See https://github.com/igraph/igraph/pull/2043 */
+        if (G.vertices[i].total_weight == 0) {
+            /* G.vertices will be destroyed by Graph::~Graph() */
+            IGRAPH_ERROR("Vertex with zero strength found: all vertices must have positive strength for walktrap",
+                         IGRAPH_EINVAL);
+        }
         sort(G.vertices[i].edges, G.vertices[i].edges + G.vertices[i].degree);
     }
 
@@ -219,7 +226,7 @@ int Graph::convert_from_igraph(const igraph_t *graph,
         G.vertices[i].degree = a + 1;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 long Graph::memory() {

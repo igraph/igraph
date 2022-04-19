@@ -159,9 +159,7 @@ int igraph_community_walktrap(const igraph_t *graph,
         }
 
         Graph G;
-        if (G.convert_from_igraph(graph, weights)) {
-            IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
-        }
+        IGRAPH_CHECK(G.convert_from_igraph(graph, weights));
 
         if (merges || modularity) {
             IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0,
