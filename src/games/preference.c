@@ -210,12 +210,12 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(&vids_by_type, i);
                 for (j = 0; j < size_of_one_group; j++) {
                     VECTOR(*nodetypes)[an] = i;
-                    IGRAPH_CHECK(igraph_vector_push_back(v, an));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(v, an));
                     an++;
                 }
                 if (i < num_groups_with_one_extra_node) {
                     VECTOR(*nodetypes)[an] = i;
-                    IGRAPH_CHECK(igraph_vector_push_back(v, an));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(v, an));
                     an++;
                 }
             }
