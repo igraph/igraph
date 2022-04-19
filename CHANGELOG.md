@@ -759,8 +759,15 @@ Some of the highlights are:
 
 ## [Unreleased 0.9]
 
+### Changed
+
+ - `igraph_community_walktrap()` now uses double precision floating point operations internally instead of single precision.
+
 ### Fixed
 
+ - `igraph_community_walktrap()` would return an invalid `modularity` vector when the `merges` matrix was not requested.
+ - `igraph_community_walktrap()` would return a `modularity` vector that was too long for disconnected graphs. This would cause a failure in some weighted graphs when the `membership` vector was requested.
+ - `igraph_community_walktrap()` now checks the weight vector: only non-negative weights are accepted, and all vertices must have non-zero strength.
  - `igraph_preference_game()` now works correctly when `fixed_size` is true and
    `type_dist` is not given; earlier versions had a bug where more than half of
    the vertices mistakenly ended up in group 0.
