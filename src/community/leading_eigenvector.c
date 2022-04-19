@@ -398,7 +398,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    community <quote>p</quote>, the merge in the second line forms
  *    community <quote>p+1</quote>, etc. The matrix should be
  *    initialized before calling and will be resized as needed.
- *    This argument is ignored of it is \c NULL.
+ *    This argument is ignored if it is \c NULL.
  * \param membership The membership of the vertices after all the
  *    splits were performed will be stored here. The vector must be
  *    initialized  before calling and will be resized as needed.
