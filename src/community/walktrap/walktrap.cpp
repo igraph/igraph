@@ -195,6 +195,13 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                         /*csize=*/ NULL));
         }
 
+        /* The walktrap implementation cannot work with NaN values internally,
+         * and produces 0 for the modularity of edgeless graphs. We correct
+         * this to NaN in the last step for consistency. */
+        if (modularity && no_of_edges == 0) {
+            VECTOR(*modularity)[0] = IGRAPH_NAN;
+        }
+
         return IGRAPH_SUCCESS;
     )
 }

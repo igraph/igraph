@@ -562,6 +562,7 @@ add_legacy_tests(
   community_label_propagation
   community_label_propagation2
   community_label_propagation3
+  community_walktrap
   graphlets
   igraph_community_fluid_communities
   igraph_community_infomap
@@ -572,8 +573,8 @@ add_legacy_tests(
   igraph_modularity_matrix
   igraph_split_join_distance
   levc-stress
+  null_communities
   spinglass
-  community_walktrap
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES
