@@ -27,7 +27,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_operators.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
@@ -35,8 +34,6 @@
 
 #include "core/interruption.h"
 #include "operators/subgraph.h"
-
-#include <limits.h>
 
 static igraph_error_t igraph_i_connected_components_weak(
     const igraph_t *graph, igraph_vector_int_t *membership,

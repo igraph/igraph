@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     while (!igraph_dqueue_int_empty(&unstable_nodes)) {
         igraph_integer_t v = igraph_dqueue_int_pop(&unstable_nodes);
         igraph_integer_t best_cluster, current_cluster = VECTOR(*membership)[v];
-        igraph_integer_t degree, i;
+        igraph_integer_t degree;
         igraph_vector_int_t *edges;
 
         /* Remove node from current cluster */

@@ -3,7 +3,7 @@
 
 #include "test_utilities.h"
 
-/* Testing community detection on null graph:
+/* Testing community detection on the null graph:
  *
  *  - The modularity should be NaN.
  *  - In hierarchical methods, the modularity vector should have size 1.
@@ -57,7 +57,7 @@ int main() {
 
     /* InfoMAP */
 
-	m = 2;
+    m = 2;
     igraph_vector_int_resize(&membership, 1);
 
     igraph_community_infomap(&g, NULL, NULL, 3, &membership, &m);

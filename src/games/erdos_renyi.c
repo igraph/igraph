@@ -25,7 +25,6 @@
 
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_nongraph.h"
 #include "igraph_random.h"
 
 #include "random/random_internal.h"
