@@ -235,6 +235,7 @@ add_examples(
   bellman_ford
   dijkstra
   igraph_assortativity_degree
+  igraph_assortativity_nominal
   igraph_average_path_length
   igraph_cocitation
   igraph_diameter
