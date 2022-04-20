@@ -94,7 +94,9 @@
  * \sa \ref igraph_assortativity() for computing the assortativity
  * based on continuous vertex values instead of discrete categories.
  * \ref igraph_modularity() to compute generalized modularity.
- */
+ *
+ * \example examples/simple/igraph_assortativity_nominal.c
+*/
 
 igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
                                             const igraph_vector_int_t *types,
