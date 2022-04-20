@@ -5,7 +5,7 @@
 ### Changed
 
  - `igraph_community_walktrap()` now uses double precision floating point operations internally instead of single precision.
- - `igraph_community_leiden()` now allows the `nb_clusters` parameter to be `NULL`.
+ - In `igraph_community_leiden()`, the `nb_clusters` output parameter is now optional (i.e. it can be `NULL`).
 
 ### Fixed
 
