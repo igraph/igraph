@@ -115,26 +115,40 @@ igraph_error_t igraph_i_layout_random_bounded(
     igraph_real_t dminx = -width/2,  dmaxx = width/2,
                   dminy = -height/2, dmaxy = height/2; /* default values */
 
+    /* Caller should ensure that minx, etc. do not contain NaN. */
+
     if (minx && !igraph_vector_empty(minx)) {
         igraph_real_t m = igraph_vector_max(minx);
+        if (m == IGRAPH_POSINFINITY) {
+            IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m > dmaxx) {
             dmaxx += m;
         }
     }
     if (maxx && !igraph_vector_empty(maxx)) {
         igraph_real_t m = igraph_vector_min(maxx);
+        if (m == IGRAPH_NEGINFINITY) {
+            IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m < dminx) {
             dminx -= m;
         }
     }
     if (miny && !igraph_vector_empty(miny)) {
         igraph_real_t m = igraph_vector_max(miny);
+        if (m == IGRAPH_POSINFINITY) {
+            IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m > dmaxy) {
             dmaxy += m;
         }
     }
     if (maxy && !igraph_vector_empty(maxy)) {
         igraph_real_t m = igraph_vector_min(maxy);
+        if (m == IGRAPH_NEGINFINITY) {
+            IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m < dminy) {
             dminy -= m;
         }
@@ -147,16 +161,16 @@ igraph_error_t igraph_i_layout_random_bounded(
         igraph_real_t y1 = miny ? VECTOR(*miny)[i] : dminy;
         igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] : dmaxy;
         if (!igraph_finite(x1)) {
-            x1 = -sqrt(no_nodes) / 2;
+            x1 = -width / 2;
         }
         if (!igraph_finite(x2)) {
-            x2 =  sqrt(no_nodes) / 2;
+            x2 =  width / 2;
         }
         if (!igraph_finite(y1)) {
-            y1 = -sqrt(no_nodes) / 2;
+            y1 = -height / 2;
         }
         if (!igraph_finite(y2)) {
-            y2 =  sqrt(no_nodes) / 2;
+            y2 =  height / 2;
         }
         MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
         MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
@@ -178,38 +192,58 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
                   dminy = -height/2, dmaxy = height/2,
                   dminz = -depth/2,  dmaxz = depth/2; /* default values */
 
+    /* Caller should ensure that minx, etc. do not contain NaN. */
+
     if (minx && !igraph_vector_empty(minx)) {
         igraph_real_t m = igraph_vector_max(minx);
+        if (m == IGRAPH_POSINFINITY) {
+            IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m > dmaxx) {
             dmaxx += m;
         }
     }
     if (maxx && !igraph_vector_empty(maxx)) {
         igraph_real_t m = igraph_vector_min(maxx);
+        if (m == IGRAPH_NEGINFINITY) {
+            IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m < dminx) {
             dminx -= m;
         }
     }
     if (miny && !igraph_vector_empty(miny)) {
         igraph_real_t m = igraph_vector_max(miny);
+        if (m == IGRAPH_POSINFINITY) {
+            IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m > dmaxy) {
             dmaxy += m;
         }
     }
     if (maxy && !igraph_vector_empty(maxy)) {
         igraph_real_t m = igraph_vector_min(maxy);
+        if (m == IGRAPH_NEGINFINITY) {
+            IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m < dminy) {
             dminy -= m;
         }
     }
     if (minz && !igraph_vector_empty(minz)) {
         igraph_real_t m = igraph_vector_max(minz);
+        if (m == IGRAPH_POSINFINITY) {
+            IGRAPH_ERROR("Infinite lower coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m > dmaxz) {
             dmaxz += m;
         }
     }
     if (maxz && !igraph_vector_empty(maxz)) {
         igraph_real_t m = igraph_vector_min(maxz);
+        if (m == IGRAPH_NEGINFINITY) {
+            IGRAPH_ERROR("Negative infinite upper coordinate bound for graph layout.", IGRAPH_EINVAL);
+        }
         if (m < dminz) {
             dminz -= m;
         }
@@ -224,22 +258,22 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         igraph_real_t z1 = minz ? VECTOR(*minz)[i] : dminz;
         igraph_real_t z2 = maxz ? VECTOR(*maxz)[i] : dmaxz;
         if (!igraph_finite(x1)) {
-            x1 = -sqrt(no_nodes) / 2;
+            x1 = -width / 2;
         }
         if (!igraph_finite(x2)) {
-            x2 =  sqrt(no_nodes) / 2;
+            x2 =  width / 2;
         }
         if (!igraph_finite(y1)) {
-            y1 = -sqrt(no_nodes) / 2;
+            y1 = -height / 2;
         }
         if (!igraph_finite(y2)) {
-            y2 =  sqrt(no_nodes) / 2;
+            y2 =  height / 2;
         }
         if (!igraph_finite(z1)) {
-            z1 = -sqrt(no_nodes) / 2;
+            z1 = -depth / 2;
         }
         if (!igraph_finite(z2)) {
-            z2 =  sqrt(no_nodes) / 2;
+            z2 =  depth / 2;
         }
         MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
         MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
