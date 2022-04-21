@@ -163,7 +163,7 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
                                 /* restricted = */ 0,
                                 /* order = */ 0,
                                 /* rank = */ 0,
-                                /* father = */ 0,
+                                /* parents = */ 0,
                                 /* pred = */ 0,
                                 /* succ = */ 0,
                                 /* dist = */ layering,

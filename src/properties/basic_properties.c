@@ -64,8 +64,8 @@
 igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
                    igraph_bool_t loops) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_real_t no_of_edges = igraph_ecount(graph);
+    igraph_real_t no_of_nodes = (igraph_real_t) igraph_vcount(graph);
+    igraph_real_t no_of_edges = (igraph_real_t) igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (no_of_nodes == 0) {
@@ -268,7 +268,7 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
     if (mode != IGRAPH_RECIPROCITY_DEFAULT &&
         mode != IGRAPH_RECIPROCITY_RATIO) {
-        IGRAPH_ERROR("Invalid reciprocity type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid reciprocity type.", IGRAPH_EINVAL);
     }
 
     /* THIS IS AN EXIT HERE !!!!!!!!!!!!!! */

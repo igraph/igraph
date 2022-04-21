@@ -60,7 +60,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <limits.h>
 
 
 /* define boolean type as char */

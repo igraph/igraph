@@ -303,9 +303,9 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
 
         num1 /= no_of_edges;
         if (normalized) {
-            den1 /= no_of_edges * 2;
+            den1 /= no_of_edges * 2.0;
         }
-        num2 /= no_of_edges * 2;
+        num2 /= no_of_edges * 2.0;
         num2 = num2 * num2;
 
         if (normalized) {

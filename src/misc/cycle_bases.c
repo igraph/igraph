@@ -23,7 +23,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 
 #include "core/interruption.h"
 #include "misc/order_cycle.h"

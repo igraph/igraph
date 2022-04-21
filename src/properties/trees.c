@@ -32,11 +32,12 @@
 
 /**
  * \function igraph_unfold_tree
- * Unfolding a graph into a tree, by possibly multiplicating its vertices.
+ * \brief Unfolding a graph into a tree, by possibly multiplicating its vertices.
  *
  * A graph is converted into a tree (or forest, if it is unconnected),
  * by performing a breadth-first search on it, and replicating
  * vertices that were found a second, third, etc. time.
+ *
  * \param graph The input graph, it can be either directed or
  *   undirected.
  * \param tree Pointer to an uninitialized graph object, the result is
