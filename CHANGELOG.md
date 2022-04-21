@@ -237,6 +237,10 @@ Some of the highlights are:
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
+ - `igraph_get_adjacency()` no longer has the `eids` argument, which would produce
+   an adjacency matrix where non-zero values were 1-based (not 0-based) edge IDs.
+   If you need a matrix with edge IDs, create it manually.
+
  - `igraph_get_adjacency_sparse()` now returns the sparse adjacency matrix in
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
    _initialized_ for sake of consistency with other igraph functions.
@@ -684,8 +688,15 @@ Some of the highlights are:
  - `igraph_clusters()` has been renamed to `igraph_connected_components()`; the
    old name is deprecated and will be removed in 0.11.
 
- - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
-   the old name is deprecated and will be removed in 0.11.
+ - `igraph_get_sparsemat()` is deprecated in favour of `igraph_get_adjacency_sparse()`,
+   and will be removed in 0.11. Note that `igraph_get_adjacency_sparse()` takes an 
+   _initialized_ sparse matrix as input, unlike `igraph_get_sparsemat()` which takes
+   an uninitialized one.
+
+ - `igraph_get_stochastic_sparsemat()` is deprecated in favour of `igraph_get_stochastic_sparse()`,
+   and will be removed in 0.11. Note that `igraph_get_stochastic_sparse()` takes an
+   _initialized_ sparse matrix as input, unlike `igraph_get_stochastic_sparsemat()` which
+   takes an uninitialized one.
 
  - `igraph_lattice()` has been renamed to `igraph_square_lattice()` to indicate
    that this function generates square lattices only. The old name is deprecated
