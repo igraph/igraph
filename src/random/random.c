@@ -284,6 +284,7 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
 
 long int igraph_rng_get_integer(igraph_rng_t *rng,
                                 long int l, long int h) {
+    assert(h >= l);
     const igraph_rng_type_t *type = rng->type;
     /* We require the random integer to be in the range [l, h]. We do so by
      * first casting (truncate toward zero) to the range [0, h - l] and then add
