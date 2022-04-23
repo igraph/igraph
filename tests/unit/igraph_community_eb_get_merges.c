@@ -22,15 +22,23 @@ void print_and_destroy(igraph_t *g, igraph_bool_t directed, igraph_vector_int_t 
         igraph_vector_t *weights, igraph_matrix_int_t *res, igraph_vector_int_t *bridges,
         igraph_vector_t *modularity, igraph_vector_int_t *membership) {
     igraph_community_eb_get_merges(g, 1, edges, weights, res, bridges, modularity, membership);
-    printf("Bridges:");
-    igraph_vector_int_print(bridges);
-    printf("Modularity:");
-    igraph_vector_print(modularity);
-    printf("Membership:");
-    igraph_vector_int_print(membership);
-    printf("Merges:\n");
-    igraph_matrix_int_print(res);
-    printf("\n\n");
+    if (bridges) {
+        printf("Bridges:");
+        igraph_vector_int_print(bridges);
+    }
+    if (modularity) {
+        printf("Modularity:");
+        igraph_vector_print(modularity);
+    }
+    if (membership) {
+        printf("Membership:");
+        igraph_vector_int_print(membership);
+    }
+    if (res) {
+        printf("Merges:\n");
+        igraph_matrix_int_print(res);
+    }
+    printf("\n");
     igraph_destroy(g);
 }
 
@@ -77,6 +85,13 @@ int main() {
         igraph_integer_t edge_array[] = {0};
         igraph_vector_int_view(&edges, edge_array, 1);
         print_and_destroy(&g, 1, &edges, NULL, &res, &bridges, &modularity, &membership);
+    }
+    {
+        printf("Triangle, remove one edge, only check merges:\n");
+        igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
+        igraph_integer_t edge_array[] = {0};
+        igraph_vector_int_view(&edges, edge_array, 1);
+        print_and_destroy(&g, 1, &edges, NULL, &res, NULL, NULL, NULL);
     }
 
     {

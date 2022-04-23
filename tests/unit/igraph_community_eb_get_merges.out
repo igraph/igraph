@@ -1,19 +1,38 @@
-Check graph with no vertices:
+Graph with no vertices:
 Bridges:
 Modularity:
 Membership:
 Merges:
 
-Check graph with one vertex:
+Graph with one vertex:
 Bridges:
 Modularity:
 Membership:
 Merges:
 
-Check graph with two vertices, one edge:
+Graph with two vertices, one edge:
 Bridges:0
 Modularity:-0.5 0
 Membership:0 0
-Merges:1 0
+Merges:
+1 0
 
+Triangle, remove one edge:
+Bridges:0
+Modularity:-0.333333 -0.222222
+Membership:0 0 1
+Merges:
+1 0
+
+Triangle, remove one edge, only check merges:
+Merges:
+0 1
+
+Triangle, remove two edges:
+Bridges:1 0
+Modularity:-0.333333 -0.222222 0
+Membership:0 0 0
+Merges:
+2 0
+1 3
 
