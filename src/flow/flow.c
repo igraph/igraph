@@ -1763,10 +1763,12 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
                                                     igraph_integer_t source,
                                                     igraph_integer_t target,
                                                     igraph_vconn_nei_t neighbors,
-                                                    igraph_bool_t *done) {
+                                                    igraph_bool_t *done,
+                                                    igraph_integer_t *no_conn) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_bool_t conn;
     *done = 1;
+    *no_conn = 0;
 
     if (source == target) {
         IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
@@ -1798,7 +1800,19 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
         }
         break;
     case IGRAPH_VCONN_NEI_IGNORE:
-        break;
+        {
+            igraph_vector_int_t neis;
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, source, IGRAPH_OUT));
+            for (igraph_integer_t i = 0; i < igraph_vector_int_size(&neis); i++) {
+                if (VECTOR(neis)[i] == target) {
+                    (*no_conn)++;
+                }
+            }
+            igraph_vector_int_destroy(&neis);
+            IGRAPH_FINALLY_CLEAN(1);
+            break;
+        }
     default:
         IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'.", IGRAPH_EINVAL);
         break;
@@ -1820,8 +1834,9 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
     igraph_t newgraph;
     igraph_integer_t i;
     igraph_bool_t done;
+    igraph_integer_t no_conn;
 
-    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done));
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
     if (done) {
         return (IGRAPH_SUCCESS);
     }
@@ -1858,6 +1873,8 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
                                       source, target, 0, 0));
     *res = (igraph_integer_t)real_res;
 
+    *res -= no_conn;
+
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -1871,8 +1888,9 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
                                                       igraph_vconn_nei_t neighbors) {
     igraph_t newgraph;
     igraph_bool_t done;
+    igraph_integer_t no_conn;
 
-    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done));
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
     if (done) {
         return (IGRAPH_SUCCESS);
     }

@@ -42,7 +42,11 @@ int main() {
     print_and_destroy(&g, 0, 1, IGRAPH_VCONN_NEI_NUMBER_OF_NODES);
 
     printf("graph with two connected vertices, IGRAPH_VCONN_NEI_IGNORE: ");
-    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, -1);
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, 0,1, 0,1, -1);
+    print_and_destroy(&g, 0, 1, IGRAPH_VCONN_NEI_IGNORE);
+
+    printf("directed graph with two connected vertices, IGRAPH_VCONN_NEI_IGNORE: ");
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, 0,1, 0,1, 1,0, 1,0, -1);
     print_and_destroy(&g, 0, 1, IGRAPH_VCONN_NEI_IGNORE);
 
     printf("line graph with 6 vertices: ");

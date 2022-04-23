@@ -2,6 +2,7 @@ graph with two unconnected vertices: 0
 graph with two connected vertices, IGRAPH_VCONN_NEI_NEGATIVE: -1
 graph with two connected vertices, IGRAPH_VCONN_NEI_NUMBER_OF_NODES: 2
 graph with two connected vertices, IGRAPH_VCONN_NEI_IGNORE: 0
+directed graph with two connected vertices, IGRAPH_VCONN_NEI_IGNORE: 0
 line graph with 6 vertices: 1
 full graph with 6 vertices: IGRAPH_VCONN_NEI_IGNORE: 4
 full graph with 6 vertices: IGRAPH_VCONN_NEI_IGNORE, directed: 4
