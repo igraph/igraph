@@ -50,21 +50,21 @@ int main() {
     igraph_vector_int_init(&membership, 0);
 
     {
-        printf("Check graph with no vertices:\n");
+        printf("Graph with no vertices:\n");
         igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
         igraph_vector_int_view(&edges, NULL, 0);
         print_and_destroy(&g, 1, &edges, &weights, &res, &bridges, &modularity, &membership);
     }
 
     {
-        printf("Check graph with one vertex:\n");
+        printf("Graph with one vertex:\n");
         igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
         igraph_vector_int_view(&edges, NULL, 0);
         print_and_destroy(&g, 1, &edges, &weights, &res, &bridges, &modularity, &membership);
     }
 
     {
-        printf("Check graph with two vertices, one edge:\n");
+        printf("Graph with two vertices, one edge:\n");
         igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, -1);
         igraph_integer_t edge_array[] = {0};
         igraph_vector_int_view(&edges, edge_array, 1);
@@ -72,7 +72,7 @@ int main() {
     }
 
     {
-        printf("Check graph with three vertices, two edges, remove one:\n");
+        printf("Triangle, remove one edge:\n");
         igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
         igraph_integer_t edge_array[] = {0};
         igraph_vector_int_view(&edges, edge_array, 1);
@@ -80,7 +80,7 @@ int main() {
     }
 
     {
-        printf("Check graph with three vertices, two edges, remove two:\n");
+        printf("Triangle, remove two edges:\n");
         igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
         igraph_integer_t edge_array[] = {0, 1};
         igraph_vector_int_view(&edges, edge_array, 2);
