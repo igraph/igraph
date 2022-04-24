@@ -206,7 +206,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * may come from the \ref igraph_community_edge_betweenness()
  * function, but this is not necessary. Note that \ref
  * igraph_community_edge_betweenness() can also calculate the
- * dendrogram, via its \p merges argument.
+ * dendrogram, via its \p merges argument. Merges happen when the
+ * edge removal process is run backwards and two components become
+ * connected.
  *
  * \param graph The input graph.
  * \param edges Vector containing the edges to be removed from the
@@ -230,9 +232,10 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
  *    component \c n+1, etc. The matrix will be resized as needed.
- * \param bridges Pointer to an initialized vector or \c NULL. If not
- *    null then the index of the edge removals which split the network
- *    will be stored here. The vector will be resized as needed.
+ * \param bridges Pointer to an initialized vector of \c NULL. If not
+ *     NULL then the indices into \p edges of all edges which caused
+ *     one of the merges will be put here. This is equal to all edge removals
+ *     which separated the network into more components, in reverse order.
  * \param modularity If not a null pointer, then the modularity values
  *    for the different divisions, corresponding to the merges matrix,
  *    will be stored here.
@@ -261,6 +264,18 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     igraph_integer_t no_comps;
     igraph_integer_t no_removed_edges = igraph_vector_int_size(edges);
     igraph_integer_t max_merges;
+    igraph_integer_t min;
+    igraph_integer_t max;
+
+    if (no_removed_edges > 0) {
+        igraph_vector_int_minmax(edges, &min, &max);
+        if (min < 0) {
+            IGRAPH_ERRORF("Edge ids should not be negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, min);
+        }
+        if (max > igraph_ecount(graph)) {
+            IGRAPH_ERRORF("Edge id %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVAL, max);
+        }
+    }
 
     /* catch null graph early */
     if (no_of_nodes == 0) {
@@ -398,8 +413,9 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  *     igraph_community_walktrap() for details. The matrix will be
  *     resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
- *     NULL then all edge removals which separated the network into
- *     more components are marked here.
+ *     NULL then the indices into \p result of all edges which caused
+ *     one of the \p merges will be put here. This is equal to all edge removals
+ *      which separated the network into more components, in reverse order.
  * \param modularity If not a null pointer, then the modularity values
  *     of the different divisions are stored here, in the order
  *     corresponding to the merge matrix. The modularity values will
