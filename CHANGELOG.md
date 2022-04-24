@@ -617,7 +617,10 @@ Some of the highlights are:
  - `igraph_adjacency()` no longer accepts a negative number of edges in its adjacency matrix.
    When negative entries are found, an error is generated.
 
- - The `igraph_eb_get_merges()` bridges parameter now starts the indices into the edge removal vector at 0, not 1.
+ - The `igraph_eb_get_merges()` bridges parameter now starts the indices into the
+   edge removal vector at 0, not 1.
+ - The `igraph_eb_get_merges()` now reports an error when not all edges in the graph are
+   removed, instead of a nonsensical result.
 
 ### Added
 
