@@ -1,25 +1,25 @@
 Graph with no vertices:
 Bridges:
-Modularity:
+Modularity:( NaN )
 Membership:
 Merges:
 
 Graph with one vertex:
 Bridges:
-Modularity:
+Modularity:( NaN )
 Membership:
 Merges:
 
 Graph with two vertices, one edge:
 Bridges:0
-Modularity:-0.5 0
+Modularity:( -0.5 0 )
 Membership:0 0
 Merges:
 1 0
 
 Triangle, remove three edges:
 Bridges:2 1
-Modularity:-0.333333 -0.222222 0
+Modularity:( -0.333333 -0.222222 0 )
 Membership:0 0 0
 Merges:
 2 1

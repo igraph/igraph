@@ -28,7 +28,7 @@ void print_and_destroy(igraph_t *g, igraph_bool_t directed, igraph_vector_int_t 
     }
     if (modularity) {
         printf("Modularity:");
-        igraph_vector_print(modularity);
+        print_vector(modularity);
     }
     if (membership) {
         printf("Membership:");
