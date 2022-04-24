@@ -1801,16 +1801,13 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
         break;
     case IGRAPH_VCONN_NEI_IGNORE:
         {
-            igraph_vector_int_t neis;
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, source, IGRAPH_OUT));
-            for (igraph_integer_t i = 0; i < igraph_vector_int_size(&neis); i++) {
-                if (VECTOR(neis)[i] == target) {
-                    (*no_conn)++;
-                }
+            igraph_integer_t eid;
+            igraph_vector_int_t multi;
+            igraph_get_eid(graph, &eid, source, target, /*directed=*/1, /*error=*/ 0);
+            if (eid >= 0) {
+                igraph_vector_int_view(&multi, no_conn, 1);
+                igraph_count_multiple(graph, &multi, igraph_ess_1(eid));
             }
-            igraph_vector_int_destroy(&neis);
-            IGRAPH_FINALLY_CLEAN(1);
             break;
         }
     default:
