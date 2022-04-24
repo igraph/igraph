@@ -59,27 +59,6 @@ static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *me
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_community_eb_resize_matrix(
-        igraph_matrix_int_t *res,
-        igraph_integer_t max_merges,
-        igraph_integer_t midx) {
-    igraph_integer_t no_to_remove = max_merges - midx;
-    igraph_integer_t *to_remove;
-
-    if (no_to_remove == 0) {
-        return IGRAPH_SUCCESS;
-    }
-
-    to_remove  = IGRAPH_CALLOC(no_to_remove, igraph_integer_t);
-    for (igraph_integer_t i = 0; i < no_to_remove; i++) {
-        to_remove[i] = midx = i;
-    }
-
-    IGRAPH_CHECK(igraph_matrix_int_permdelete_rows(res, to_remove, no_to_remove));
-    IGRAPH_FREE(to_remove);
-    return IGRAPH_SUCCESS;
-}
-
 static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              const igraph_bool_t directed,
                                              const igraph_vector_int_t *edges,
@@ -96,7 +75,6 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
     igraph_integer_t midx = 0;
     igraph_integer_t no_comps;
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
-    igraph_integer_t no_removed_edges = igraph_vector_int_size(edges);
     igraph_integer_t max_merges;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&mymembership, no_of_nodes);
@@ -106,8 +84,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
     }
     if (modularity || res || bridges) {
         IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
-        max_merges = (no_of_nodes - no_comps) < no_removed_edges ?
-            (no_of_nodes - no_comps) : no_removed_edges;
+        max_merges = no_of_nodes - no_comps;
 
         if (modularity) {
             IGRAPH_CHECK(igraph_vector_resize(modularity,
@@ -178,15 +155,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         }
     }
 
-    if (bridges)
-        IGRAPH_CHECK(igraph_vector_int_resize(bridges, midx));
-    if (modularity)
-        IGRAPH_CHECK(igraph_vector_resize(modularity, midx + 1));
     if (membership) {
         IGRAPH_CHECK(igraph_i_rewrite_membership_vector(membership));
     }
-    if (res)
-        IGRAPH_CHECK(igraph_i_community_eb_resize_matrix(res, max_merges, midx));
 
     igraph_vector_int_destroy(&mymembership);
     IGRAPH_FINALLY_CLEAN(1);
@@ -309,8 +280,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
 
-    max_merges = (no_of_nodes - no_comps) < no_removed_edges ?
-        (no_of_nodes - no_comps) : no_removed_edges;
+    max_merges = no_of_nodes - no_comps;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, no_of_nodes * 2 - 1);
     if (res) {
         IGRAPH_CHECK(igraph_matrix_int_resize(res, max_merges, 2));
@@ -350,11 +320,6 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
             midx++;
         }
     }
-
-    if (bridges)
-        IGRAPH_CHECK(igraph_vector_int_resize(bridges, midx));
-    if (res)
-        IGRAPH_CHECK(igraph_i_community_eb_resize_matrix(res, max_merges, midx));
 
     igraph_vector_int_destroy(&ptr);
     IGRAPH_FINALLY_CLEAN(1);
