@@ -259,6 +259,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    igraph_vector_int_t *membership) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t ptr;
     igraph_integer_t i, midx = 0;
     igraph_integer_t no_comps;
@@ -272,9 +273,14 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
         if (min < 0) {
             IGRAPH_ERRORF("Edge ids should not be negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, min);
         }
-        if (max > igraph_ecount(graph)) {
+        if (max > no_of_edges) {
             IGRAPH_ERRORF("Edge id %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVAL, max);
         }
+    }
+    if (no_removed_edges < no_of_edges) {
+            IGRAPH_ERRORF("Number of removed edges (%" IGRAPH_PRId ") should be equal to "
+                    "number of edges in graph (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    no_removed_edges, igraph_ecount(graph));
     }
 
     /* catch null graph early */
