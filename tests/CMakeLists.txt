@@ -531,6 +531,7 @@ add_legacy_tests(
   igraph_edge_disjoint_paths
   igraph_st_edge_connectivity
   igraph_st_mincut
+  igraph_st_vertex_connectivity
 )
 
 add_legacy_tests(
