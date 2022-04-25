@@ -694,14 +694,17 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
            the first call. */
         {
             int i;
+            int retval;
             igraph_error_handler_t *errh =
                 igraph_set_error_handler(igraph_i_error_handler_none);
             igraph_warning_handler_t *warnh =
                 igraph_set_warning_handler(igraph_warning_handler_ignore);
-            igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
-                                  /*values=*/ 0, /*vectors=*/ 0);
+            retval = igraph_arpack_rssolve(arpcb2, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
             igraph_set_warning_handler(warnh);
+            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
+                IGRAPH_ERROR(igraph_strerror(retval), retval);
+            }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. Note that we cannot use a
                  * fixed all-1 starting vector as sometimes ARPACK would return a
@@ -741,11 +744,14 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
         {
             int i;
+            int retval;
             igraph_error_handler_t *errh =
                 igraph_set_error_handler(igraph_i_error_handler_none);
-            igraph_arpack_rssolve(arpcb1, &extra, options, &storage,
-                                  /*values=*/ 0, /*vectors=*/ 0);
+            retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
+            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
+                IGRAPH_ERROR(igraph_strerror(retval), retval);
+            }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. See the comment a few lines
                  * above about the exact choice of this starting vector */
