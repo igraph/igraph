@@ -625,6 +625,12 @@ Some of the highlights are:
 
  - `igraph_st_vertex_connectivity()` now ignores edges between source and target for `IGRAPH_VCONN_NEI_IGNORE`
 
+ - The `igraph_community_eb_get_merges()` bridges parameter now starts the indices into the
+   edge removal vector at 0, not 1.
+
+ - The `igraph_community_eb_get_merges()` now reports an error when not all edges in the graph are
+   removed, instead of a nonsensical result.
+
 ### Added
 
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.

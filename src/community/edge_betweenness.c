@@ -75,26 +75,27 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
     igraph_integer_t midx = 0;
     igraph_integer_t no_comps;
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
+    igraph_integer_t max_merges;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&mymembership, no_of_nodes);
 
     if (membership) {
         IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
     }
-
     if (modularity || res || bridges) {
         IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
+        max_merges = no_of_nodes - no_comps;
 
         if (modularity) {
             IGRAPH_CHECK(igraph_vector_resize(modularity,
-                                              no_of_nodes - no_comps + 1));
+                                              max_merges + 1));
         }
         if (res) {
-            IGRAPH_CHECK(igraph_matrix_int_resize(res, no_of_nodes - no_comps,
+            IGRAPH_CHECK(igraph_matrix_int_resize(res, max_merges,
                                               2));
         }
         if (bridges) {
-            IGRAPH_CHECK(igraph_vector_int_resize(bridges, no_of_nodes - no_comps));
+            IGRAPH_CHECK(igraph_vector_int_resize(bridges, max_merges));
         }
     }
 
@@ -126,7 +127,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                 MATRIX(*res, midx, 1) = c2;
             }
             if (bridges) {
-                VECTOR(*bridges)[midx] = i + 1;
+                VECTOR(*bridges)[midx] = i;
             }
 
             /* The new cluster has id no_of_nodes+midx+1 */
@@ -176,7 +177,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * may come from the \ref igraph_community_edge_betweenness()
  * function, but this is not necessary. Note that \ref
  * igraph_community_edge_betweenness() can also calculate the
- * dendrogram, via its \p merges argument.
+ * dendrogram, via its \p merges argument. Merges happen when the
+ * edge removal process is run backwards and two components become
+ * connected.
  *
  * \param graph The input graph.
  * \param edges Vector containing the edges to be removed from the
@@ -200,9 +203,10 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
  *    component \c n+1, etc. The matrix will be resized as needed.
- * \param bridges Pointer to an initialized vector or \c NULL. If not
- *    null then the index of the edge removals which split the network
- *    will be stored here. The vector will be resized as needed.
+ * \param bridges Pointer to an initialized vector of \c NULL. If not
+ *     NULL then the indices into \p edges of all edges which caused
+ *     one of the merges will be put here. This is equal to all edge removals
+ *     which separated the network into more components, in reverse order.
  * \param modularity If not a null pointer, then the modularity values
  *    for the different divisions, corresponding to the merges matrix,
  *    will be stored here.
@@ -226,9 +230,29 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    igraph_vector_int_t *membership) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t ptr;
     igraph_integer_t i, midx = 0;
     igraph_integer_t no_comps;
+    igraph_integer_t no_removed_edges = igraph_vector_int_size(edges);
+    igraph_integer_t max_merges;
+    igraph_integer_t min;
+    igraph_integer_t max;
+
+    if (no_removed_edges > 0) {
+        igraph_vector_int_minmax(edges, &min, &max);
+        if (min < 0) {
+            IGRAPH_ERRORF("Edge ids should not be negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, min);
+        }
+        if (max > no_of_edges) {
+            IGRAPH_ERRORF("Edge id %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVAL, max);
+        }
+    }
+    if (no_removed_edges < no_of_edges) {
+            IGRAPH_ERRORF("Number of removed edges (%" IGRAPH_PRId ") should be equal to "
+                    "number of edges in graph (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    no_removed_edges, igraph_ecount(graph));
+    }
 
     /* catch null graph early */
     if (no_of_nodes == 0) {
@@ -257,12 +281,13 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
 
+    max_merges = no_of_nodes - no_comps;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, no_of_nodes * 2 - 1);
     if (res) {
-        IGRAPH_CHECK(igraph_matrix_int_resize(res, no_of_nodes - no_comps, 2));
+        IGRAPH_CHECK(igraph_matrix_int_resize(res, max_merges, 2));
     }
     if (bridges) {
-        IGRAPH_CHECK(igraph_vector_int_resize(bridges, no_of_nodes - no_comps));
+        IGRAPH_CHECK(igraph_vector_int_resize(bridges, max_merges));
     }
 
     for (i = igraph_vector_int_size(edges) - 1; i >= 0; i--) {
@@ -285,7 +310,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                 MATRIX(*res, midx, 1) = c2;
             }
             if (bridges) {
-                VECTOR(*bridges)[midx] = i + 1;
+                VECTOR(*bridges)[midx] = i;
             }
 
             VECTOR(ptr)[c1] = no_of_nodes + midx + 1;
@@ -360,8 +385,9 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  *     igraph_community_walktrap() for details. The matrix will be
  *     resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
- *     NULL then all edge removals which separated the network into
- *     more components are marked here.
+ *     NULL then the indices into \p result of all edges which caused
+ *     one of the \p merges will be put here. This is equal to all edge removals
+ *      which separated the network into more components, in reverse order.
  * \param modularity If not a null pointer, then the modularity values
  *     of the different divisions are stored here, in the order
  *     corresponding to the merge matrix. The modularity values will
