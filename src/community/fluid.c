@@ -128,7 +128,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     for (i = 0; i < no_of_communities; i++) {
         /* Initialize membership at initial nodes for each community
          * where 0 refers to have no label*/
-        VECTOR(*membership)[VECTOR(node_order)[i]] = i + 1.0;
+        VECTOR(*membership)[VECTOR(node_order)[i]] = i + 1;
         /* Initialize com_to_numvertices list: Number of vertices for each community */
         VECTOR(com_to_numvertices)[i] = 1;
     }

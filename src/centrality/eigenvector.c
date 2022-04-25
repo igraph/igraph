@@ -28,8 +28,6 @@
 
 #include "centrality/centrality_internal.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
@@ -383,7 +381,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     if (vector) {
         igraph_real_t amax = 0;
         igraph_integer_t which = 0;
-        igraph_integer_t i;
+
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
 
         if (MATRIX(values, 0, 0) <= 0) {

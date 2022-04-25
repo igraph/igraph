@@ -34,6 +34,8 @@ void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format);
 
 void print_matrix(const igraph_matrix_t *m);
 
+void print_matrix_int(const igraph_matrix_int_t *m);
+
 /* Round elements of a matrix to integers and print them. */
 /* This is meant to be used when the elements of a matrix are integer values. */
 void print_matrix_round(const igraph_matrix_t *m);

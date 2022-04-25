@@ -27,12 +27,6 @@
 #include "centrality/centrality_internal.h"
 #include "centrality/prpack_internal.h"
 
-#include "config.h"
-
-#include <limits.h>
-#include <math.h>
-#include <string.h>    /* memset */
-
 static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
                                                  igraph_vector_t *vector,
                                                  igraph_real_t *value, const igraph_vs_t vids,
@@ -693,7 +687,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     }
 
     if (vector) {
-        igraph_integer_t i;
         igraph_vit_t vit;
         igraph_integer_t nodes_to_calc;
         igraph_real_t sum = 0;

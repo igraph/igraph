@@ -873,9 +873,9 @@ igraph_diversity:
 
 igraph_random_walk:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSET walk, VERTEX start, NEIMODE mode=OUT,
-        INTEGER steps, RWSTUCK stuck=RETURN
-    DEPS: start ON graph, walk ON graph
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXSET vertices, OUT EDGESET edges,
+        VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
+    DEPS: start ON graph, weights ON graph, vertices ON graph, edges ON graph
 
 igraph_random_edge_walk:
     PARAMS: |-
@@ -1321,7 +1321,7 @@ igraph_community_walktrap:
 igraph_community_edge_betweenness:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT result, OPTIONAL OUT VECTOR edge_betweenness,
-        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT VERTEXSET bridges,
+        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership,
         BOOLEAN directed=True, OPTIONAL EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph
@@ -1329,7 +1329,7 @@ igraph_community_edge_betweenness:
 igraph_community_eb_get_merges:
     PARAMS: |-
         GRAPH graph, BOOLEAN directed, EDGE_INDICES edges, OPTIONAL EDGEWEIGHTS weights,
-        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT VERTEXSET bridges,
+        OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT INDEX_VECTOR bridges,
         OPTIONAL OUT VECTOR modularity, OPTIONAL OUT VECTOR_INT membership
     DEPS: weights ON graph
 

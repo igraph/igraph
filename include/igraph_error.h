@@ -712,11 +712,11 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
         do { \
             int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
             igraph_error_t igraph_i_ret=(a); \
-            if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
+            if (IGRAPH_UNLIKELY(igraph_i_ret != IGRAPH_SUCCESS)) {\
                 IGRAPH_ERROR("", igraph_i_ret); \
             } \
             if (IGRAPH_UNLIKELY(enter_stack_size != IGRAPH_FINALLY_STACK_SIZE())) { \
-                IGRAPH_ERROR("Non-matching number of IGRAPH_FINALLY and IGRAPH_FINALLY_CLEAN", IGRAPH_FAILURE); \
+                IGRAPH_FATAL("Non-matching number of IGRAPH_FINALLY and IGRAPH_FINALLY_CLEAN."); \
             } \
         } while (0)
 #else

@@ -200,7 +200,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
     igraph_integer_t no_of_vids;
     igraph_integer_t from, i, j, k, l, u, v;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
-    igraph_vector_t vid_reverse_index;
+    igraph_vector_int_t vid_reverse_index;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -210,8 +210,8 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
     /* Create a mapping from vertex IDs to the row of the matrix where
      * the result for this vertex will appear */
-    IGRAPH_VECTOR_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
-    igraph_vector_fill(&vid_reverse_index, -1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
+    igraph_vector_int_fill(&vid_reverse_index, -1);
     for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         v = IGRAPH_VIT_GET(vit);
         if (v < 0 || v >= no_of_nodes) {
@@ -254,7 +254,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
     /* Clean up */
     igraph_vector_int_destroy(&neis);
-    igraph_vector_destroy(&vid_reverse_index);
+    igraph_vector_int_destroy(&vid_reverse_index);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
 

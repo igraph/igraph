@@ -237,6 +237,10 @@ Some of the highlights are:
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
+ - `igraph_get_adjacency()` no longer has the `eids` argument, which would produce
+   an adjacency matrix where non-zero values were 1-based (not 0-based) edge IDs.
+   If you need a matrix with edge IDs, create it manually.
+
  - `igraph_get_adjacency_sparse()` now returns the sparse adjacency matrix in
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
    _initialized_ for sake of consistency with other igraph functions.
@@ -437,7 +441,9 @@ Some of the highlights are:
    types of the nodes in the generated graph.
 
  - `igraph_random_walk()` now uses an `igraph_vector_int_t` for its
-   `walk` parameter.
+   results. Also, the function now takes both vertices and edges as
+   parameters. It can return IDs of vertices and/or edges on the walk.
+   The function now takes weights as a parameter to support weighted graphs.
 
  - `igraph_random_edge_walk()` now uses an `igraph_vector_int_t` for its
    `edgewalk` parameter.
@@ -617,8 +623,11 @@ Some of the highlights are:
  - `igraph_adjacency()` no longer accepts a negative number of edges in its adjacency matrix.
    When negative entries are found, an error is generated.
 
+ - `igraph_st_vertex_connectivity()` now ignores edges between source and target for `IGRAPH_VCONN_NEI_IGNORE`
+
  - The `igraph_community_eb_get_merges()` bridges parameter now starts the indices into the
    edge removal vector at 0, not 1.
+
  - The `igraph_community_eb_get_merges()` now reports an error when not all edges in the graph are
    removed, instead of a nonsensical result.
 
@@ -646,6 +655,7 @@ Some of the highlights are:
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
  - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without
    re-allocating them.
+ - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
 
 ### Removed
 
@@ -686,8 +696,15 @@ Some of the highlights are:
  - `igraph_clusters()` has been renamed to `igraph_connected_components()`; the
    old name is deprecated and will be removed in 0.11.
 
- - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
-   the old name is deprecated and will be removed in 0.11.
+ - `igraph_get_sparsemat()` is deprecated in favour of `igraph_get_adjacency_sparse()`,
+   and will be removed in 0.11. Note that `igraph_get_adjacency_sparse()` takes an
+   _initialized_ sparse matrix as input, unlike `igraph_get_sparsemat()` which takes
+   an uninitialized one.
+
+ - `igraph_get_stochastic_sparsemat()` is deprecated in favour of `igraph_get_stochastic_sparse()`,
+   and will be removed in 0.11. Note that `igraph_get_stochastic_sparse()` takes an
+   _initialized_ sparse matrix as input, unlike `igraph_get_stochastic_sparsemat()` which
+   takes an uninitialized one.
 
  - `igraph_lattice()` has been renamed to `igraph_square_lattice()` to indicate
    that this function generates square lattices only. The old name is deprecated
@@ -702,6 +719,10 @@ Some of the highlights are:
  - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
    `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
+
+- `igraph_random_edge_walk()` has been deprecated by `igraph_random_walk()`
+   to support edges and/or vertices for the random walk in a single function.
+   It will be removed in 0.11.
 
  - `igraph_read_graph_dimacs()` has been renamed to `igraph_read_graph_dimacs_flow()`;
    the old name is deprecated and might be re-used as a generic DIMACS reader
@@ -754,6 +775,25 @@ Some of the highlights are:
 ### Other
 
  - Documentation improvements
+
+## [Unreleased 0.9]
+
+### Changed
+
+ - `igraph_community_walktrap()` now uses double precision floating point operations internally instead of single precision.
+ - In `igraph_community_leiden()`, the `nb_clusters` output parameter is now optional (i.e. it can be `NULL`).
+
+### Fixed
+
+ - `igraph_community_walktrap()` would return an invalid `modularity` vector when the `merges` matrix was not requested.
+ - `igraph_community_walktrap()` would return a `modularity` vector that was too long for disconnected graphs. This would cause a failure in some weighted graphs when the `membership` vector was requested.
+ - `igraph_community_walktrap()` now checks the weight vector: only non-negative weights are accepted, and all vertices must have non-zero strength.
+ - `igraph_community_walktrap()` now returns a modularity core of NaN for graphs with no edges.
+ - `igraph_community_fast_greedy()` now returns a modularity core of NaN for graphs with no edges.
+ - `igraph_community_edge_betweenness()` now returns a modularity vector with a single NaN entry for graph with no edges. Previously it returned a zero-length vector.
+ - `igraph_preference_game()` now works correctly when `fixed_size` is true and
+   `type_dist` is not given; earlier versions had a bug where more than half of
+   the vertices mistakenly ended up in group 0.
 
 ## [0.9.8] - 2022-04-08
 

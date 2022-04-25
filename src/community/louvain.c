@@ -27,7 +27,6 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
-#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -702,7 +701,6 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     if (modularity && igraph_vector_size(modularity) == 0) {
         igraph_vector_int_t tmp;
         igraph_real_t mod;
-        int i;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, vcount);
         for (i = 0; i < vcount; i++) {
             VECTOR(tmp)[i] = i;

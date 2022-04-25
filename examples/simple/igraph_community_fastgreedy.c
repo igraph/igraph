@@ -32,7 +32,9 @@ void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_int_t *merges
 
     if (mod != 0) {
         i = igraph_vector_which_max(mod);
-        fprintf(f, "Modularity:  %f\n", VECTOR(*mod)[i]);
+        fprintf(f, "Modularity:  ");
+        igraph_real_fprintf(f, VECTOR(*mod)[i]);
+        fprintf(f, "\n");
     } else {
         fprintf(f, "Modularity:  ---\n");
     }

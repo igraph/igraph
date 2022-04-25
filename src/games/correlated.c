@@ -94,8 +94,8 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     igraph_integer_t no_of_nodes = igraph_vcount(old_graph);
     igraph_integer_t no_of_edges = igraph_ecount(old_graph);
     igraph_bool_t directed = igraph_is_directed(old_graph);
-    igraph_real_t no_of_all = directed ? no_of_nodes * (no_of_nodes - 1) :
-                              no_of_nodes * (no_of_nodes - 1) / 2;
+    igraph_real_t no_of_all = directed ? ((igraph_real_t) no_of_nodes) * (no_of_nodes - 1) :
+                              ((igraph_real_t) no_of_nodes) * (no_of_nodes - 1) / 2;
     igraph_real_t no_of_missing = no_of_all - no_of_edges;
     igraph_real_t q = p + corr * (1 - p);
     igraph_real_t p_del = 1 - q;

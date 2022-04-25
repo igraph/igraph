@@ -308,6 +308,7 @@ add_legacy_tests(
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
+  igraph_widest_paths
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
@@ -385,7 +386,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bfs
   bfs_simple
-  igraph_random_edge_walk
 )
 
 # topology.at
@@ -531,6 +531,7 @@ add_legacy_tests(
   igraph_edge_disjoint_paths
   igraph_st_edge_connectivity
   igraph_st_mincut
+  igraph_st_vertex_connectivity
 )
 
 add_legacy_tests(
@@ -562,6 +563,7 @@ add_legacy_tests(
   community_label_propagation
   community_label_propagation2
   community_label_propagation3
+  community_walktrap
   graphlets
   igraph_community_eb_get_merges
   igraph_community_fluid_communities
@@ -573,8 +575,8 @@ add_legacy_tests(
   igraph_modularity_matrix
   igraph_split_join_distance
   levc-stress
+  null_communities
   spinglass
-  community_walktrap
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES

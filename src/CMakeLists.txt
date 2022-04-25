@@ -242,8 +242,9 @@ add_library(
   paths/random_walk.c
   paths/shortest_paths.c
   paths/simple_paths.c
-  paths/unweighted.c
   paths/sparsifier.c
+  paths/unweighted.c
+  paths/widest_paths.c
 
   properties/basic_properties.c
   properties/constraint.c

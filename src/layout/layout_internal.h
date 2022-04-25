@@ -23,6 +23,7 @@
 #ifndef IGRAPH_LAYOUT_INTERNAL_H
 #define IGRAPH_LAYOUT_INTERNAL_H
 
+#include "igraph_datatype.h"
 #include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_matrix.h"
@@ -51,6 +52,17 @@ IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_i_layout_segments_intersect(float p0_
                                                                        float p1_x, float p1_y,
                                                                        float p2_x, float p2_y,
                                                                        float p3_x, float p3_y);
+
+igraph_error_t igraph_i_layout_random_bounded(
+        const igraph_t *graph, igraph_matrix_t *res,
+        const igraph_vector_t *minx, const igraph_vector_t *maxx,
+        const igraph_vector_t *miny, const igraph_vector_t *maxy);
+
+igraph_error_t igraph_i_layout_random_bounded_3d(
+        const igraph_t *graph, igraph_matrix_t *res,
+        const igraph_vector_t *minx, const igraph_vector_t *maxx,
+        const igraph_vector_t *miny, const igraph_vector_t *maxy,
+        const igraph_vector_t *minz, const igraph_vector_t *maxz);
 
 __END_DECLS
 

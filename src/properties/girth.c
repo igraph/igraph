@@ -30,8 +30,6 @@
 
 #include "core/interruption.h"
 
-#include <limits.h>
-
 /**
  * \function igraph_girth
  * \brief The girth of a graph is the length of the shortest cycle in it.

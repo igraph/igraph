@@ -24,12 +24,9 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_stack.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-
-#include <string.h>
 
 /**
  * \function igraph_distances_bellman_ford

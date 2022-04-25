@@ -88,6 +88,18 @@ void print_matrix(const igraph_matrix_t *m) {
     print_matrix_format(m, stdout, "%8g");
 }
 
+void print_matrix_int(const igraph_matrix_int_t *m) {
+    igraph_integer_t i, j, nrow = igraph_matrix_int_nrow(m), ncol = igraph_matrix_int_ncol(m);
+    for (i = 0; i < nrow; i++) {
+        printf(i == 0 ? "[" : " ");
+        for (j = 0; j < ncol; j++) {
+            printf(" ");
+            printf("%8" IGRAPH_PRId, MATRIX(*m, i, j));
+        }
+        printf(i == nrow-1 ? " ]\n" : "\n");
+    }
+}
+
 /* Round elements of a matrix to integers and print them. */
 /* This is meant to be used when the elements of a matrix are integer values. */
 void print_matrix_round(const igraph_matrix_t *m) {

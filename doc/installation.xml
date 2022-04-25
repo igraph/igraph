@@ -15,7 +15,7 @@
   <itemizedlist>
     <listitem>
       <para>
-        <ulink url="https://cmake.org">CMake</ulink> 3.16 or later
+        <ulink url="https://cmake.org">CMake</ulink> 3.18 or later
       </para>
     </listitem>
     <listitem>
