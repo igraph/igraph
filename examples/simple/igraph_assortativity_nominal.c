@@ -1,7 +1,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main(){
+int main() {
     igraph_t g;
     igraph_integer_t nodes = 1000, types = 50;
     igraph_vector_int_t node_type_vec;
