@@ -48,7 +48,7 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
                                     igraph_random_walk_stuck_t stuck) {
     igraph_integer_t i;
     igraph_lazy_adjlist_t adj;
-    
+
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
 
@@ -97,7 +97,7 @@ static void vec_destr(igraph_vector_t *vec) {
 /**
  * This function performs a random walk with a given length on a graph,
  * from the given start vertex.
- * It's used for igraph_random_walk: 
+ * It's used for igraph_random_walk:
  *  - when weights are used or when edge IDs of the traversed edges
  *    and/or vertex IDs of the visited vertices are requested.
  * \param weights A vector of non-negative edge weights. It is assumed
@@ -124,7 +124,7 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
     igraph_vector_t weight_temp;
     igraph_lazy_inclist_t il;
     igraph_vector_ptr_t cdfs; /* cumulative distribution vectors for each node, used for weighted choice */
-    
+
     if (vertices) {
         IGRAPH_CHECK(igraph_vector_int_resize(vertices, steps + 1)); /* size: steps + 1 because vertices includes start vertex */
     }
@@ -299,11 +299,11 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
 
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
-    
+
     if (!(mode == IGRAPH_ALL || mode == IGRAPH_IN || mode == IGRAPH_OUT)) {
         IGRAPH_ERROR("Invalid mode parameter.", IGRAPH_EINVMODE);
     }
-    
+
     if (start < 0 || start >= vc) {
         IGRAPH_ERRORF("Starting vertex must be between 0 and the "
                       "number of vertices in the graph (%" IGRAPH_PRId
@@ -329,12 +329,15 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
             }
         }
     }
-    
+
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
     if (edges || weights) {
         return igraph_i_random_walk_inclist(graph, weights, vertices, edges,
                                             start, mode, steps, stuck);
-    }
-    else {
+    } else {
         return igraph_i_random_walk_adjlist(graph, vertices,
                                             start, mode, steps, stuck);
     }
@@ -381,7 +384,7 @@ igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
     igraph_integer_t start, igraph_neimode_t mode,
     igraph_integer_t steps,
     igraph_random_walk_stuck_t stuck) {
-    
+
     return igraph_random_walk(graph, weights, NULL, edgewalk,
                               start, mode, steps, stuck);
 }
