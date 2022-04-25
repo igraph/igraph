@@ -15,7 +15,7 @@ int main() {
     /* Generate preference matrix giving connection probabilities for different vertex types */
     for (igraph_integer_t i = 0; i < types; i++) {
         for (igraph_integer_t j = i; j < types; j++) {
-            MATRIX(pref_matrix, i, j) = igraph_rng_get_unif(igraph_rng_default(), 0, 1);
+            MATRIX(pref_matrix, i, j) = RNG_UNIF01();
             MATRIX(pref_matrix, j, i) = MATRIX(pref_matrix, i, j);
         }
     }
