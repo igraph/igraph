@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-    igraph_integer_t nodes = 1000, types = 50;
+    igraph_integer_t nodes = 250, types = 5;
 
     igraph_matrix_t pref_matrix;
     igraph_matrix_init(&pref_matrix, types, types);
