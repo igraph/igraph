@@ -691,7 +691,7 @@ Some of the highlights are:
    old name is deprecated and will be removed in 0.11.
 
  - `igraph_get_sparsemat()` is deprecated in favour of `igraph_get_adjacency_sparse()`,
-   and will be removed in 0.11. Note that `igraph_get_adjacency_sparse()` takes an 
+   and will be removed in 0.11. Note that `igraph_get_adjacency_sparse()` takes an
    _initialized_ sparse matrix as input, unlike `igraph_get_sparsemat()` which takes
    an uninitialized one.
 
@@ -775,7 +775,7 @@ Some of the highlights are:
 ### Changed
 
  - `igraph_community_walktrap()` now uses double precision floating point operations internally instead of single precision.
- - `igraph_community_leiden()` now allows the `nb_clusters` parameter to be `NULL`.
+ - In `igraph_community_leiden()`, the `nb_clusters` output parameter is now optional (i.e. it can be `NULL`).
 
 ### Fixed
 
