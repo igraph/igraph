@@ -13,8 +13,8 @@ int main() {
     printf("Randomly generated graph with 1000 nodes and 50 vertex types\n\n");
 
     /* Generate preference matrix giving connection probabilities for different vertex types */
-    for(igraph_integer_t i = 0; i < types; i++){
-        for(igraph_integer_t j = i; j < types; j++){
+    for (igraph_integer_t i = 0; i < types; i++) {
+        for (igraph_integer_t j = i; j < types; j++) {
             MATRIX(pref_matrix, i, j) = igraph_rng_get_unif(igraph_rng_default(), 0, 1);
             MATRIX(pref_matrix, j, i) = MATRIX(pref_matrix, i, j);
         }
