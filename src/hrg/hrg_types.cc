@@ -1124,10 +1124,6 @@ void dendro::clearDendrograph() {
     // importDendrogramStructure call so as to avoid memory leaks and
     // overwriting the references therein.
 
-    if (g        != NULL) {
-        delete    g;           // O(m)
-        g        = NULL;
-    }
     if (leaf     != NULL) {
         delete [] leaf;        // O(n)
         leaf     = NULL;

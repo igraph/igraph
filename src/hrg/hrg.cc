@@ -394,12 +394,12 @@ int igraph_hrg_fit(const igraph_t *graph,
 
     // If we want to start from HRG
     if (start) {
-        d->clearDendrograph();
         if (igraph_hrg_size(hrg) != no_of_nodes) {
             IGRAPH_ERROR("Invalid HRG to start from", IGRAPH_EINVAL);
         }
         // Convert the igraph graph
         IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+        d->clearDendrograph();
         d->importDendrogramStructure(hrg);
     } else {
         // Convert the igraph graph
@@ -684,8 +684,8 @@ int igraph_hrg_consensus(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_delete_dendrogram, d);
 
     if (start) {
-        d->clearDendrograph();
         IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+        d->clearDendrograph();
         d->importDendrogramStructure(hrg);
     } else {
         IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
@@ -892,8 +892,6 @@ int igraph_hrg_predict(const igraph_t *graph,
 
     if (start) {
         d->clearDendrograph();
-        // this has cleared the graph as well.... bug?
-        IGRAPH_CHECK(igraph_i_hrg_getsimplegraph(graph, d, &sg, num_bins));
         d->importDendrogramStructure(hrg);
     } else {
         if (hrg) {
