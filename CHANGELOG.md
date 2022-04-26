@@ -12,17 +12,17 @@
  - `igraph_community_walktrap()` would return an invalid `modularity` vector when the `merges` matrix was not requested.
  - `igraph_community_walktrap()` would return a `modularity` vector that was too long for disconnected graphs. This would cause a failure in some weighted graphs when the `membership` vector was requested.
  - `igraph_community_walktrap()` now checks the weight vector: only non-negative weights are accepted, and all vertices must have non-zero strength.
- - `igraph_community_walktrap()` now returns a modularity core of NaN for graphs with no edges.
- - `igraph_community_fast_greedy()` now returns a modularity core of NaN for graphs with no edges.
+ - `igraph_community_walktrap()` now returns a modularity score of NaN for graphs with no edges.
+ - `igraph_community_fast_greedy()` now returns a modularity score of NaN for graphs with no edges.
  - `igraph_community_edge_betweenness()` now returns a modularity vector with a single NaN entry for graph with no edges. Previously it returned a zero-length vector.
  - `igraph_preference_game()` now works correctly when `fixed_size` is true and
    `type_dist` is not given; earlier versions had a bug where more than half of
    the vertices mistakenly ended up in group 0.
- - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinates bound (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
+ - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinate bounds (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
 
 ### Other
 
- - Documentation improvements
+ - Documentation improvements.
 
 ## [0.9.8] - 2022-04-08
 
