@@ -18,6 +18,11 @@
  - `igraph_preference_game()` now works correctly when `fixed_size` is true and
    `type_dist` is not given; earlier versions had a bug where more than half of
    the vertices mistakenly ended up in group 0.
+ - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinates bound (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
+
+### Other
+
+ - Documentation improvements
 
 ## [0.9.8] - 2022-04-08
 
