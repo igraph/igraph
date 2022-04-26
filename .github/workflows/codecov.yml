@@ -37,4 +37,4 @@ jobs:
       run: cmake --build . --target coverage --parallel
 
     - name: Codecov.io
-      uses: codecov/codecov-action@v1.2.1
+      uses: codecov/codecov-action@v3
