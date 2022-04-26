@@ -25,9 +25,9 @@
 typedef struct {
     void *scanner;
     int eof;
-    int depth;
     char errmsg[300];
     igraph_error_t igraph_errno;
+    int depth;
     igraph_gml_tree_t *tree;
 } igraph_i_gml_parsedata_t;
 
