@@ -791,6 +791,7 @@ Some of the highlights are:
  - `igraph_community_walktrap()` now returns a modularity score of NaN for graphs with no edges.
  - `igraph_community_fast_greedy()` now returns a modularity score of NaN for graphs with no edges.
  - `igraph_community_edge_betweenness()` now returns a modularity vector with a single NaN entry for graph with no edges. Previously it returned a zero-length vector.
+ - `igraph_community_leading_eigenvector()` does not ignore non-ARPACK-related errors from `igraph_arpack_rssolve()` any more.
  - `igraph_preference_game()` now works correctly when `fixed_size` is true and
    `type_dist` is not given; earlier versions had a bug where more than half of
    the vertices mistakenly ended up in group 0.

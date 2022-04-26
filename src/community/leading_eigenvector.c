@@ -700,7 +700,7 @@ igraph_error_t igraph_community_leading_eigenvector(
             igraph_set_error_handler(errh);
             igraph_set_warning_handler(warnh);
             if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
-                IGRAPH_ERROR(igraph_strerror(retval), retval);
+                IGRAPH_ERROR("ARPACK call failed", retval);
             }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. Note that we cannot use a
@@ -746,7 +746,7 @@ igraph_error_t igraph_community_leading_eigenvector(
             retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
             if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
-                IGRAPH_ERROR(igraph_strerror(retval), retval);
+                IGRAPH_ERROR("ARPACK call failed", retval);
             }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. See the comment a few lines
