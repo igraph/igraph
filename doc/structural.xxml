@@ -172,7 +172,8 @@
 </section>
 
 <section id="spectral-properties"><title>Spectral properties</title>
-<!-- doxrox-include igraph_laplacian -->
+<!-- doxrox-include igraph_get_laplacian -->
+<!-- doxrox-include igraph_get_laplacian_sparse -->
 </section>
 
 <section id="non-simple-graphs-multiple-and-loop-edges"><title>Non-simple graphs: Multiple and loop edges</title>
@@ -236,6 +237,7 @@
 <!-- doxrox-include igraph_shortest_paths_johnson -->
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_sparsemat -->
+<!-- doxrox-include igraph_laplacian -->
 </section>
 
 </chapter>

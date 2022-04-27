@@ -497,7 +497,8 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   adjlist
-  igraph_laplacian
+  igraph_get_laplacian
+  igraph_get_laplacian_sparse
   igraph_to_undirected
 )
 

@@ -989,10 +989,15 @@ igraph_bipartite_game_gnm:
 # Spectral properties
 #######################################
 
-igraph_laplacian:
+igraph_get_laplacian:
     PARAMS: |-
-        GRAPH graph, OPTIONAL OUT MATRIX res,
-        OPTIONAL OUT SPARSEMAT sparseres, BOOLEAN normalized=False,
+        GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False,
+        EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
+
+igraph_get_laplacian_sparse:
+    PARAMS: |-
+        GRAPH graph, OUT SPARSEMAT sparseres, BOOLEAN normalized=False,
         EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph
 
