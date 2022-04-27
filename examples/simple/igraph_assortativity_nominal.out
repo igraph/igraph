@@ -1,4 +1,4 @@
-Randomly generated graph with 1000 nodes and 50 vertex types
+Randomly generated graph with 250 nodes and 5 vertex types
 
 Assortativity before rewiring = 0.00585046
 Assortativity after rewiring = -0.00811945
