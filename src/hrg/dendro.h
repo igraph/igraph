@@ -74,8 +74,6 @@
 #include <string>
 #include <cmath>
 
-using namespace fitHRG;
-
 namespace fitHRG {
 
 // ***********************************************************************

@@ -31,17 +31,18 @@
 //
 // ***********************************************************************
 
+#include "igraph_hrg.h"
+#include "igraph_constructors.h"
+#include "igraph_random.h"
+
 #include "hrg/rbtree.h"
 #include "hrg/dendro.h"
 #include "hrg/graph.h"
 #include "hrg/splittree_eq.h"
 #include "hrg/graph_simp.h"
 
-#include "igraph_hrg.h"
-#include "igraph_constructors.h"
-#include "igraph_random.h"
+using std::string;
 
-using namespace std;
 using namespace fitHRG;
 
 // ******** Red-Black Tree Methods ***************************************
