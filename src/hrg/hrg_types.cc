@@ -92,7 +92,7 @@ void rbtree::deleteSubTree(elementrb *z) {
 // with key=searchKey, it returns TRUE and foundNode is set to point
 // to the found node; otherwise, it sets foundNode=nullptr and returns
 // FALSE
-elementrb* rbtree::findItem(const int searchKey) {
+elementrb* rbtree::findItem(const int searchKey) const {
     elementrb *current = root;
 
     // empty tree; bail out
@@ -141,7 +141,7 @@ int rbtree::returnValue(const int searchKey) {
 
 // ******** Return Item Functions ****************************************
 
-int* rbtree::returnArrayOfKeys() {
+int* rbtree::returnArrayOfKeys() const {
     int* array;
     array = new int [support];
     bool flag_go = true;
@@ -198,7 +198,7 @@ int* rbtree::returnArrayOfKeys() {
     return array;
 }
 
-list* rbtree::returnListOfKeys() {
+list* rbtree::returnListOfKeys() const {
     keyValuePair *curr, *prev;
     list *head = nullptr, *tail = nullptr, *newlist;
 
@@ -219,9 +219,13 @@ list* rbtree::returnListOfKeys() {
     return head;
 }
 
-keyValuePair* rbtree::returnTreeAsList() {
+keyValuePair* rbtree::returnTreeAsList() const {
+    if (root->key == -1) {
+        return nullptr; /* empty tree */
+    }
+
     // pre-order traversal
-    keyValuePair  *head, *tail;
+    keyValuePair *head, *tail;
 
     head = new keyValuePair;
     head->x = root->key;
@@ -235,14 +239,10 @@ keyValuePair* rbtree::returnTreeAsList() {
         tail = returnSubtreeAsList(root->right, tail);
     }
 
-    if (head->x == -1) {
-        return nullptr; /* empty tree */
-    } else {
-        return head;
-    }
+    return head;
 }
 
-keyValuePair* rbtree::returnSubtreeAsList(elementrb *z, keyValuePair *head) {
+keyValuePair* rbtree::returnSubtreeAsList(const elementrb *z, keyValuePair *head) const {
     keyValuePair *newnode, *tail;
 
     newnode = new keyValuePair;
@@ -261,7 +261,7 @@ keyValuePair* rbtree::returnSubtreeAsList(elementrb *z, keyValuePair *head) {
     return tail;
 }
 
-keyValuePair rbtree::returnMaxKey() {
+keyValuePair rbtree::returnMaxKey() const {
     keyValuePair themax;
     elementrb *current;
     current  = root;
@@ -276,7 +276,7 @@ keyValuePair rbtree::returnMaxKey() {
     return themax;
 }
 
-keyValuePair rbtree::returnMinKey() {
+keyValuePair rbtree::returnMinKey() const {
     keyValuePair themin;
     elementrb *current;
     current = root;
@@ -292,7 +292,7 @@ keyValuePair rbtree::returnMinKey() {
 
 // private functions for deleteItem() (although these could easily be
 // made public, I suppose)
-elementrb* rbtree::returnMinKey(elementrb *z) {
+elementrb* rbtree::returnMinKey(elementrb *z) const {
     elementrb *current;
 
     current = z;
@@ -303,7 +303,7 @@ elementrb* rbtree::returnMinKey(elementrb *z) {
     return current;
 }
 
-elementrb* rbtree::returnSuccessor(elementrb *z) {
+elementrb* rbtree::returnSuccessor(elementrb *z) const {
     elementrb *current, *w;
 
     w = z;
