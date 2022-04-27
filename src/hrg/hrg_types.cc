@@ -62,11 +62,9 @@ rbtree::~rbtree() {
         (root->left != leaf || root->right != leaf)) {
         deleteSubTree(root);
     }
-    delete root;
-    delete leaf;
+    delete root; root = nullptr;
+    delete leaf; leaf = nullptr;
     support = 0;
-    root = nullptr;
-    leaf = nullptr;
 }
 
 void rbtree::deleteTree() {
@@ -1581,13 +1579,11 @@ void dendro::makeRandomGraph() {
     }
     delete [] paths; // delete paths data structure O(n log n)
     paths = nullptr;
-
-    return;
 }
 
 // **********************************************************************
 
-bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
+bool dendro::monteCarloMove(double &delta, bool &ftaken, const double T) {
     // A single MC move begins with the selection of a random internal
     // edge (a,b) of the dendrogram. This also determines the three
     // subtrees i, j, k that we will rearrange, and we choose uniformly

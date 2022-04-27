@@ -87,7 +87,7 @@ public:
 
 class vert {
 public:
-    std::string name;           // (external) name of vertex
+    std::string name;      // (external) name of vertex
     int degree;            // degree of this vertex
 
     vert(): name(""), degree(0) { }

@@ -255,7 +255,7 @@ public:
 
     void setGraph(const igraph_t *igraph);
     void setGraph(graph *ig) { g = ig; }
-    const graph *getGraph() { return g; }
+    const graph *getGraph() const { return g; }
 
     // build dendrogram from g
     void buildDendrogram();
@@ -278,7 +278,7 @@ public:
     // make random G from D
     void makeRandomGraph();
     // make single MCMC move
-    bool monteCarloMove(double&, bool&, double);
+    bool monteCarloMove(double &, bool &, double);
     // record consensus tree from splithist
     void recordConsensusTree(igraph_vector_t *parents,
                              igraph_vector_t *weights);
@@ -293,7 +293,7 @@ public:
     // reset the dendrograph structures
     void resetDendrograph();
     // sample dendrogram's splits and update the split histogram
-    bool sampleSplitLikelihoods(int&);
+    bool sampleSplitLikelihoods(int &);
 };
 
 } // namespace fitHRG
