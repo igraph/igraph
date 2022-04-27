@@ -27,6 +27,8 @@
 #include "igraph_hrg.h"
 #include "igraph_random.h"
 
+#include "core/exceptions.h"
+
 #include "hrg/dendro.h"
 #include "hrg/graph.h"
 #include "hrg/graph_simp.h"
@@ -369,6 +371,8 @@ int igraph_hrg_fit(const igraph_t *graph,
                    igraph_bool_t start,
                    int steps) {
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
+
     int no_of_nodes = igraph_vcount(graph);
 
     RNG_BEGIN();
@@ -400,6 +404,8 @@ int igraph_hrg_fit(const igraph_t *graph,
     RNG_END();
 
     return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 /**
@@ -440,6 +446,8 @@ int igraph_hrg_sample(const igraph_t *input_graph,
                       igraph_integer_t no_samples,
                       igraph_hrg_t *hrg,
                       igraph_bool_t start) {
+
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
 
     int i;
 
@@ -519,7 +527,9 @@ int igraph_hrg_sample(const igraph_t *input_graph,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 /**
@@ -647,6 +657,8 @@ int igraph_hrg_consensus(const igraph_t *graph,
                          igraph_bool_t start,
                          int num_samples) {
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
+
     if (start && !hrg) {
         IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
     }
@@ -674,6 +686,8 @@ int igraph_hrg_consensus(const igraph_t *graph,
     RNG_END();
 
     return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 static void MCMCEquilibrium_Sample(dendro &d, int num_samples) {
@@ -799,6 +813,8 @@ int igraph_hrg_predict(const igraph_t *graph,
                        int num_samples,
                        int num_bins) {
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
+
     if (start && !hrg) {
         IGRAPH_ERROR("`hrg' must be given when `start' is true", IGRAPH_EINVAL);
     }
@@ -834,6 +850,8 @@ int igraph_hrg_predict(const igraph_t *graph,
     RNG_END();
 
     return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END
 }
 
 /**
