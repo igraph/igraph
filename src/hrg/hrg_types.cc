@@ -59,18 +59,21 @@ rbtree::rbtree() {
 }
 
 rbtree::~rbtree() {
-    if (root != nullptr &&
-        (root->left != leaf || root->right != leaf)) {
-        deleteSubTree(root);
+    if (root != nullptr) {
+        if (root->left != leaf || root->right != leaf) {
+            deleteSubTree(root);
+        } else {
+            delete root;
+        }
+        root = nullptr;
     }
-    delete root; root = nullptr;
     delete leaf; leaf = nullptr;
     support = 0;
 }
 
 void rbtree::deleteTree() {
     if (root != nullptr) {
-        deleteSubTree(root);
+        deleteSubTree(root); root = nullptr;
     }
 } // does not leak memory
 
