@@ -656,6 +656,7 @@ Some of the highlights are:
  - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without
    re-allocating them.
  - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
+ - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
 
 ### Removed
 
@@ -710,6 +711,10 @@ Some of the highlights are:
    that this function generates square lattices only. The old name is deprecated
    and will either be removed in 0.11 or will be changed to become a generic
    lattice generator that also supports other types of lattices.
+
+ - `igraph_laplacian()` is now deprecated; use `igraph_get_laplacian()` or
+   `igraph_get_laplacian_sparse()` depending on whether you need a dense or a
+   sparse matrix.
 
  - `igraph_matrix_copy()` is now deprecated; use `igraph_matrix_init_copy()`
    instead. The new name emphasizes that the function _initializes_ the first
