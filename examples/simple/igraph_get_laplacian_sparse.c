@@ -127,7 +127,6 @@ int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
     igraph_vector_int_t vec;
     igraph_vector_t *weights = 0;
     igraph_bool_t ok = 1;
-    igraph_matrix_init(&m, 1, 1);
     igraph_sparsemat_init(&sm, 0, 0, 0);
 
     if (w) {
