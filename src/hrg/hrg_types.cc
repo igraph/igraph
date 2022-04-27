@@ -58,21 +58,19 @@ rbtree::rbtree() {
 }
 
 rbtree::~rbtree() {
-    if (root != NULL &&
+    if (root != nullptr &&
         (root->left != leaf || root->right != leaf)) {
         deleteSubTree(root);
     }
-    if (root) {
-        delete root;
-    }
+    delete root;
     delete leaf;
     support = 0;
-    root = 0;
-    leaf = 0;
+    root = nullptr;
+    leaf = nullptr;
 }
 
 void rbtree::deleteTree() {
-    if (root != NULL) {
+    if (root != nullptr) {
         deleteSubTree(root);
     }
 } // does not leak memory
@@ -90,14 +88,14 @@ void rbtree::deleteSubTree(elementrb *z) {
 // ******** Search Functions *********************************************
 // public search function - if there exists a elementrb in the tree
 // with key=searchKey, it returns TRUE and foundNode is set to point
-// to the found node; otherwise, it sets foundNode=NULL and returns
+// to the found node; otherwise, it sets foundNode=nullptr and returns
 // FALSE
 elementrb* rbtree::findItem(const int searchKey) {
     elementrb *current = root;
 
     // empty tree; bail out
     if (current->key == -1) {
-        return NULL;
+        return nullptr;
     }
 
     while (current != leaf) {
@@ -108,7 +106,7 @@ elementrb* rbtree::findItem(const int searchKey) {
                 current = current->left;
             } else {
                 //   failure; bail out
-                return NULL;
+                return nullptr;
             }
         } else {
             // left-or-right?
@@ -118,7 +116,7 @@ elementrb* rbtree::findItem(const int searchKey) {
                     current = current->right;
                 } else {
                     // failure; bail out
-                    return NULL;
+                    return nullptr;
                 }
             } else {
                 // found (searchKey==current->key)
@@ -126,11 +124,11 @@ elementrb* rbtree::findItem(const int searchKey) {
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int rbtree::returnValue(const int searchKey) {
-    elementrb* test = findItem(searchKey);
+    const elementrb* test = findItem(searchKey);
     if (!test) {
         return 0;
     } else {
@@ -188,7 +186,7 @@ int* rbtree::returnArrayOfKeys() {
                 curr->mark = 0;
                 array[index++] = curr->key;
                 curr = curr->parent;
-                if (curr == NULL) {
+                if (curr == nullptr) {
                     flag_go = false;
                 }
             }
@@ -200,13 +198,13 @@ int* rbtree::returnArrayOfKeys() {
 
 list* rbtree::returnListOfKeys() {
     keyValuePair *curr, *prev;
-    list *head = 0, *tail = 0, *newlist;
+    list *head = nullptr, *tail = nullptr, *newlist;
 
     curr = returnTreeAsList();
-    while (curr != NULL) {
+    while (curr != nullptr) {
         newlist = new list;
         newlist->x = curr->x;
-        if (head == NULL) {
+        if (head == nullptr) {
             head       = newlist; tail = head;
         } else {
             tail->next = newlist; tail = newlist;
@@ -214,7 +212,7 @@ list* rbtree::returnListOfKeys() {
         prev = curr;
         curr = curr->next;
         delete prev;
-        prev = NULL;
+        prev = nullptr;
     }
     return head;
 }
@@ -236,7 +234,7 @@ keyValuePair* rbtree::returnTreeAsList() {
     }
 
     if (head->x == -1) {
-        return NULL; /* empty tree */
+        return nullptr; /* empty tree */
     } else {
         return head;
     }
@@ -313,7 +311,7 @@ elementrb* rbtree::returnSuccessor(elementrb *z) {
     }
     // else search up in tree
     current = w->parent;
-    while ((current != NULL) && (w == current->right)) {
+    while ((current != nullptr) && (w == current->right)) {
         w = current;
         // move up in tree until find a non-right-child
         current = current->parent;
@@ -321,7 +319,7 @@ elementrb* rbtree::returnSuccessor(elementrb *z) {
     return current;
 }
 
-int rbtree::returnNodecount() {
+int rbtree::returnNodecount() const {
     return support;
 }
 
@@ -336,12 +334,12 @@ void rbtree::insertItem(int newKey, int newValue) {
 
     // find newKey in tree; return pointer to it O(log k)
     current = findItem(newKey);
-    if (current == NULL) {
+    if (current == nullptr) {
         newNode = new elementrb;    // elementrb for the rbtree
         newNode->key = newKey;
         newNode->value = newValue;
         newNode->color = true;  // new nodes are always RED
-        newNode->parent = NULL; // new node initially has no parent
+        newNode->parent = nullptr; // new node initially has no parent
         newNode->left = leaf;   // left leaf
         newNode->right = leaf;  // right leaf
         support++;          // increment node count in rbtree
@@ -387,14 +385,13 @@ void rbtree::insertItem(int newKey, int newValue) {
         // properties
         insertCleanup(newNode);
     }
-    return;
 }
 
 // private house-keeping function for insertion
 void rbtree::insertCleanup(elementrb *z) {
 
     // fix now if z is root
-    if (z->parent == NULL) {
+    if (z->parent == nullptr) {
         z->color = false;
         return;
     }
@@ -402,7 +399,7 @@ void rbtree::insertCleanup(elementrb *z) {
     elementrb *temp;
 
     // while z is not root and z's parent is RED
-    while (z->parent != NULL && z->parent->color) {
+    while (z->parent != nullptr && z->parent->color) {
         if (z->parent == z->parent->parent->left) {
 
             // z's parent is LEFT-CHILD
@@ -447,7 +444,6 @@ void rbtree::insertCleanup(elementrb *z) {
     }
 
     root->color = false;               // color the root BLACK
-    return;
 }
 
 // ******** Delete
@@ -457,14 +453,12 @@ void rbtree::replaceItem(int key, int newValue) {
     elementrb* ptr;
     ptr = findItem(key);
     ptr->value = newValue;
-    return;
 }
 
 void rbtree::incrementValue(int key) {
     elementrb* ptr;
     ptr = findItem(key);
     ptr->value = 1 + ptr->value;
-    return;
 }
 
 // public delete function
@@ -472,7 +466,7 @@ void rbtree::deleteItem(int killKey) {
     elementrb *x, *y, *z;
 
     z = findItem(killKey);
-    if (z == NULL) {
+    if (z == nullptr) {
         return;    // item not present; bail out
     }
 
@@ -480,14 +474,14 @@ void rbtree::deleteItem(int killKey) {
         root->key = -1;       // restore root node to default state
         root->value = -1;
         root->color = false;
-        root->parent = NULL;
+        root->parent = nullptr;
         root->left = leaf;
         root->right = leaf;
         support--;            // set support to zero
         return;           // exit - no more work to do
     }
 
-    if (z != NULL) {
+    if (z != nullptr) {
         support--;            // decrement node count
         if ((z->left == leaf) || (z->right == leaf)) {
             y = z;                      // case of less than two children,
@@ -503,7 +497,7 @@ void rbtree::deleteItem(int killKey) {
         }
         x->parent = y->parent;        // make y's child's parent be y's parent
 
-        if (y->parent == NULL) {
+        if (y->parent == nullptr) {
             root = x;           // if y is the root, x is now root
         } else {
             if (y == y->parent->left) { // decide y's relationship with y's parent
@@ -524,10 +518,8 @@ void rbtree::deleteItem(int killKey) {
         }
 
         delete y;
-        y = NULL;
+        y = nullptr;
     }
-
-    return;
 }
 
 void rbtree::deleteCleanup(elementrb *x) {
@@ -590,8 +582,6 @@ void rbtree::deleteCleanup(elementrb *x) {
         }
     }
     x->color = false;          // color x (the root) BLACK (exit)
-
-    return;
 }
 
 // ******** Rotation Functions ******************************************
@@ -604,7 +594,7 @@ void rbtree::rotateLeft(elementrb *x) {
     y->left->parent = x;       // make x be y's LEFT-CHILD's parent
     y->parent = x->parent;     // make y's new parent be x's old parent
 
-    if (x->parent == NULL) {
+    if (x->parent == nullptr) {
         root = y;           // if x was root, make y root
     } else {
         // if x is LEFT-CHILD, make y be x's parent's
@@ -616,8 +606,6 @@ void rbtree::rotateLeft(elementrb *x) {
     }
     y->left   = x;        // make x be y's LEFT-CHILD
     x->parent = y;        // make y be x's parent
-
-    return;
 }
 
 void rbtree::rotateRight(elementrb *y) {
@@ -630,7 +618,7 @@ void rbtree::rotateRight(elementrb *y) {
     x->parent = y->parent;  // make x's new parent be y's old parent
 
     // if y was root, make x root
-    if (y->parent == NULL) {
+    if (y->parent == nullptr) {
         root = x;
     } else {
         // if y is RIGHT-CHILD, make x be y's parent's
@@ -644,8 +632,6 @@ void rbtree::rotateRight(elementrb *y) {
     }
     x->right  = y;        // make y be x's RIGHT-CHILD
     y->parent = x;        // make x be y's parent
-
-    return;
 }
 
 // ***********************************************************************
@@ -691,30 +677,28 @@ void rbtree::rotateRight(elementrb *y) {
 
 // ******** Dendrogram Methods *******************************************
 
-dendro::dendro(): root(0), internal(0), leaf(0), d(0), splithist(0),
-    paths(0), ctree(0), cancestor(0), g(0) { }
 dendro::~dendro() {
     list *curr, *prev;
 
     if (g)        {
         delete    g;            // O(m)
-        g        = 0;
+        g        = nullptr;
     }
     if (internal) {
         delete [] internal;     // O(n)
-        internal = 0;
+        internal = nullptr;
     }
     if (leaf)     {
         delete [] leaf;         // O(n)
-        leaf     = 0;
+        leaf     = nullptr;
     }
     if (d)        {
         delete    d;            // O(n)
-        d        = 0;
+        d        = nullptr;
     }
     if (splithist) {
         delete    splithist;    // potentially long
-        splithist = 0;
+        splithist = nullptr;
     }
 
     if (paths) {
@@ -724,21 +708,21 @@ dendro::~dendro() {
                 prev = curr;
                 curr = curr->next;
                 delete prev;
-                prev = 0;
+                prev = nullptr;
             }
-            paths[i] = 0;
+            paths[i] = nullptr;
         }
         delete [] paths;
     }
-    paths = 0;
+    paths = nullptr;
 
     if (ctree)    {
         delete [] ctree;        // O(n)
-        ctree     = 0;
+        ctree     = nullptr;
     }
     if (cancestor) {
         delete [] cancestor;    // O(n)
-        cancestor = 0;
+        cancestor = nullptr;
     }
 }
 
@@ -746,7 +730,7 @@ dendro::~dendro() {
 
 void dendro::binarySearchInsert(elementd* x, elementd* y) {
     if (y->p < x->p) {        // go to left subtree
-        if (x->L == NULL) {     // check if left subtree is empty
+        if (x->L == nullptr) {     // check if left subtree is empty
             x->L = y;         // make x left child
             y->M = x;         // make y parent of child
             return;
@@ -754,7 +738,7 @@ void dendro::binarySearchInsert(elementd* x, elementd* y) {
             binarySearchInsert(x->L, y);
         }
     } else {          // go to right subtree
-        if (x->R == NULL) {     // check if right subtree is empty
+        if (x->R == nullptr) {     // check if right subtree is empty
             x->R = y;         // make x right child
             y->M = x;         // make y parent of child
             return;
@@ -762,13 +746,12 @@ void dendro::binarySearchInsert(elementd* x, elementd* y) {
             binarySearchInsert(x->R, y);
         }
     }
-    return;
 }
 
 // **********************************************************************
 
 list* dendro::binarySearchFind(const double v) {
-    list *head = NULL, *tail = NULL, *newlist;
+    list *head = nullptr, *tail = nullptr, *newlist;
     elementd *current = root;
     bool flag_stopSearch = false;
 
@@ -799,7 +782,7 @@ list* dendro::binarySearchFind(const double v) {
 
 // ***********************************************************************
 
-string dendro::buildSplit(elementd* thisNode) {
+string dendro::buildSplit(elementd* thisNode) const {
     // A "split" is defined as the bipartition of vertices into the sets
     // of leaves below the internal vertex in the tree (denoted by "C"),
     // and those above it (denoted as "M"). For simplicity, we represent
@@ -839,8 +822,8 @@ string dendro::buildSplit(elementd* thisNode) {
             curr->type = k + 1;
         } else {              // - else go up a level
             curr->type = DENDRO;
-            if (curr->index == thisNode->index || curr->M == NULL) {
-                flag_go = false; curr = NULL;
+            if (curr->index == thisNode->index || curr->M == nullptr) {
+                flag_go = false; curr = nullptr;
             } else {
                 curr = curr->M;
             }
@@ -927,12 +910,12 @@ void dendro::buildDendrogram() {
 
     int k = 0;        // replace NULLs with leaf nodes, and
     for (int i = 0; i < (n - 1); i++) { // maintain binary search property, O(n)
-        if (internal[i].L == NULL) {
+        if (internal[i].L == nullptr) {
             internal[i].L = &leaf[array[k].y];
             leaf[array[k].y].M = &internal[i];
             leaf[array[k++].y].p = internal[i].p - 0.0000000000001;
         }
-        if (internal[i].R == NULL) {
+        if (internal[i].R == nullptr) {
             internal[i].R = &leaf[array[k].y];
             leaf[array[k].y].M = &internal[i];
             leaf[array[k++].y].p = internal[i].p + 0.0000000000001;
@@ -946,21 +929,21 @@ void dendro::buildDendrogram() {
     // of internal node indices that the search crossed, in the order of
     // root -> ... -> leaf, for use in the subsequent few operations.
 
-    if (paths != NULL) {
+    if (paths != nullptr) {
         list *curr, *prev;
         for (int i = 0; i < n; i++) {
             curr = paths[i];
-            while (curr != NULL) {
+            while (curr != nullptr) {
                 prev = curr;
                 curr = curr->next;
                 delete prev;
-                prev = NULL;
+                prev = nullptr;
             }
-            paths[i] = NULL;
+            paths[i] = nullptr;
         }
         delete [] paths;
     }
-    paths = NULL;
+    paths = nullptr;
     paths = new list* [n];
     for (int i = 0; i < n; i++) {
         paths[i] = binarySearchFind(leaf[i].p);
@@ -978,14 +961,15 @@ void dendro::buildDendrogram() {
     // symmetric, we overcount each e by a factor of 2, so we need to
     // correct this after.
 
-    elementd* ancestor; edge* curr;
+    elementd* ancestor;
+    const edge* curr;
     for (int i = 0; i < (n - 1); i++) {
         internal[i].e = 0;
         internal[i].label = -1;
     }
     for (int i = 0; i < n; i++) {
         curr = g->getNeighborList(i);
-        while (curr != NULL) {
+        while (curr != nullptr) {
             ancestor = findCommonAncestor(paths, i, curr->x);
             ancestor->e += 1;
             curr = curr->next;
@@ -1001,7 +985,7 @@ void dendro::buildDendrogram() {
     for (int i = 0; i < n; i++) {
         ancestor = &leaf[i];
         ancestor = ancestor->M;
-        while (ancestor != NULL) {
+        while (ancestor != nullptr) {
             ancestor->n++;
             ancestor = ancestor->M;
         }
@@ -1019,7 +1003,7 @@ void dendro::buildDendrogram() {
 
     for (int i = 0; i < n; i++) {
         ancestor = &leaf[i];
-        while (ancestor != NULL) {
+        while (ancestor != nullptr) {
             if (ancestor->label == -1 || ancestor->label > leaf[i].label) {
                 ancestor->label = leaf[i].label;
             }
@@ -1073,12 +1057,12 @@ void dendro::buildDendrogram() {
             previous = current;
             current = current->next;
             delete previous;
-            previous = NULL;
+            previous = nullptr;
         }
-        paths[i] = NULL;
+        paths[i] = nullptr;
     }
     delete [] paths;
-    paths = NULL;
+    paths = nullptr;
 
     // --- Compute p_i for each internal node O(n)
     // Each internal node's p_i = e_i / (nL_i*nR_i), and now that we
@@ -1124,21 +1108,19 @@ void dendro::clearDendrograph() {
     // importDendrogramStructure call so as to avoid memory leaks and
     // overwriting the references therein.
 
-    if (leaf     != NULL) {
+    if (leaf     != nullptr) {
         delete [] leaf;        // O(n)
-        leaf     = NULL;
+        leaf     = nullptr;
     }
-    if (internal != NULL) {
+    if (internal != nullptr) {
         delete [] internal;    // O(n)
-        internal = NULL;
+        internal = nullptr;
     }
-    if (d        != NULL) {
+    if (d        != nullptr) {
         delete    d;        // O(n)
-        d           = NULL;
+        d           = nullptr;
     }
-    root = NULL;
-
-    return;
+    root = nullptr;
 }
 
 // **********************************************************************
@@ -1202,7 +1184,7 @@ int dendro::computeEdgeCount(const int a, const short int atype,
                 } else {              // - else go up a level
                     curr->type = DENDRO;
                     curr       = curr->M;
-                    if (curr == NULL) {
+                    if (curr == nullptr) {
                         flag_go = false;
                     }
                 }
@@ -1249,7 +1231,7 @@ int dendro::computeEdgeCount(const int a, const short int atype,
                 } else {              // - else go up a level
                     curr->type = DENDRO;
                     curr       = curr->M;
-                    if (curr == NULL) {
+                    if (curr == nullptr) {
                         flag_go = false;
                     }
                 }
@@ -1261,7 +1243,7 @@ int dendro::computeEdgeCount(const int a, const short int atype,
     // emerging edges have their partner in the other subtree. O(|A| log
     // |A|) time
 
-    edge* current;
+    const edge* current;
     int*  treeList;
     if (nA < nB) {
         // subtreeL is smaller
@@ -1269,9 +1251,9 @@ int dendro::computeEdgeCount(const int a, const short int atype,
         for (int i = 0; i < nA; i++) {
             current = g->getNeighborList(treeList[i]);
             // loop over each of its neighbors v_j
-            while (current != NULL) {
+            while (current != nullptr) {
                 // to see if v_j is in A
-                if (subtreeR.findItem(current->x) != NULL) {
+                if (subtreeR.findItem(current->x) != nullptr) {
                     count++;
                 }
                 current = current->next;
@@ -1290,9 +1272,9 @@ int dendro::computeEdgeCount(const int a, const short int atype,
         for (int i = 0; i < nB; i++) {
             current = g->getNeighborList(treeList[i]);
             // loop over each of its neighbors v_j
-            while (current != NULL) {
+            while (current != nullptr) {
                 // to see if v_j is in B
-                if (subtreeL.findItem(current->x) != NULL) {
+                if (subtreeL.findItem(current->x) != nullptr) {
                     count++;
                 }
                 current = current->next;
@@ -1312,7 +1294,7 @@ int dendro::computeEdgeCount(const int a, const short int atype,
 
 // ***********************************************************************
 
-int dendro::countChildren(const string s) {
+int dendro::countChildren(const string &s) {
     int len = s.size();
     int numC = 0;
     for (int i = 0; i < len; i++) {
@@ -1337,9 +1319,7 @@ void dendro::cullSplitHist() {
             splithist->deleteItem(array[i]);
         }
     }
-    delete [] array; array = NULL;
-
-    return;
+    delete [] array; array = nullptr;
 }
 
 // **********************************************************************
@@ -1347,12 +1327,12 @@ void dendro::cullSplitHist() {
 elementd* dendro::findCommonAncestor(list** paths_, const int i, const int j) {
     list* headOne = paths_[i];
     list* headTwo = paths_[j];
-    elementd* lastStep = NULL;
+    elementd* lastStep = nullptr;
     while (headOne->x == headTwo->x) {
         lastStep = &internal[headOne->x];
         headOne  = headOne->next;
         headTwo  = headTwo->next;
-        if (headOne == NULL || headTwo == NULL) {
+        if (headOne == nullptr || headTwo == nullptr) {
             break;
         }
     }
@@ -1375,7 +1355,7 @@ int dendro::getConsensusSize() {
             numCons++;
         }
     }
-    delete [] array; array = NULL;
+    delete [] array; array = nullptr;
     return numCons;
 }
 
@@ -1401,7 +1381,7 @@ splittree* dendro::getConsensusSplits() const {
             consensusTree->insertItem(array[i], value / tot);
         }
     }
-    delete [] array; array = NULL;
+    delete [] array; array = nullptr;
     return consensusTree;
 }
 
@@ -1421,7 +1401,6 @@ void dendro::getSplitList(splittree* split_tree) const {
             split_tree->insertItem(sp, 0.0);
         }
     }
-    return;
 }
 
 // ***********************************************************************
@@ -1549,21 +1528,21 @@ bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
 // ***********************************************************************
 
 void dendro::makeRandomGraph() {
-    if (g != NULL) {
-        delete g;
-    } g = NULL; g = new graph(n);
+    delete g;
+    g = nullptr;
+    g = new graph(n);
 
     list *curr, *prev;
     if (paths) {
         for (int i = 0; i < n; i++) {
             curr = paths[i];
-            while (curr != NULL) {
+            while (curr != nullptr) {
                 prev = curr;
                 curr = curr->next;
                 delete prev;
-                prev = NULL;
+                prev = nullptr;
             }
-            paths[i] = NULL;
+            paths[i] = nullptr;
         }
         delete [] paths;
     }
@@ -1592,16 +1571,16 @@ void dendro::makeRandomGraph() {
 
     for (int i = 0; i < n; i++) {
         curr = paths[i];
-        while (curr != NULL) {
+        while (curr != nullptr) {
             prev = curr;
             curr = curr->next;
             delete prev;
-            prev = NULL;
+            prev = nullptr;
         }
-        paths[i] = NULL;
+        paths[i] = nullptr;
     }
     delete [] paths; // delete paths data structure O(n log n)
-    paths = NULL;
+    paths = nullptr;
 
     return;
 }
@@ -1918,7 +1897,6 @@ void dendro::refreshLikelihood() {
         internal[i].logL = dL;
         L += dL;
     }
-    return;
 }
 
 // **********************************************************************
@@ -1930,7 +1908,6 @@ void dendro::QsortMain (block* array, int left, int right) {
         QsortMain(array, left,   part - 1);
         QsortMain(array, part + 1, right  );
     }
-    return;
 }
 
 int dendro::QsortPartition (block* array, int left, int right, int index) {
@@ -2006,7 +1983,7 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
         curr = splithist->returnTheseSplits(i);
 
         // Now we loop over that list
-        while (curr != NULL) {
+        while (curr != nullptr) {
             splithist->deleteItem(curr->x);
             // add weight to this internal node
             ctree[ii].weight = curr->y;
@@ -2019,9 +1996,9 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
                         newChild        = new child;
                         newChild->type  = GRAPH;
                         newChild->index = j;
-                        newChild->next  = NULL;
+                        newChild->next  = nullptr;
                         // - attach child to list
-                        if (ctree[ii].lastChild == NULL) {
+                        if (ctree[ii].lastChild == nullptr) {
                             ctree[ii].children  = newChild;
                             ctree[ii].lastChild = newChild;
                             ctree[ii].degree    = 1;
@@ -2043,9 +2020,9 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
                             newChild        = new child;
                             newChild->type  = DENDRO;
                             newChild->index = cancestor[j];
-                            newChild->next  = NULL;
+                            newChild->next  = nullptr;
                             // - attach child to list
-                            if (ctree[ii].lastChild == NULL) {
+                            if (ctree[ii].lastChild == nullptr) {
                                 ctree[ii].children  = newChild;
                                 ctree[ii].lastChild = newChild;
                                 ctree[ii].degree    = 1;
@@ -2089,7 +2066,7 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
         if (weights) {
             VECTOR(*weights)[i] = ctree[i].weight;
         }
-        ctree[i].children = 0;
+        ctree[i].children = nullptr;
     }
 
     // Plus the isolate nodes
@@ -2126,7 +2103,7 @@ void dendro::recordGraphStructure(igraph_t *graph) {
     IGRAPH_FINALLY(igraph_vector_destroy, &edges);
 
     for (int i = 0; i < n; i++) {
-        edge *curr = g->getNeighborList(i);
+        const edge *curr = g->getNeighborList(i);
         while (curr) {
             if (i < curr->x) {
                 VECTOR(edges)[idx++] = i;
@@ -2146,16 +2123,16 @@ void dendro::recordGraphStructure(igraph_t *graph) {
 
 list* dendro::reversePathToRoot(const int leafIndex) {
     list *head, *subhead, *newlist;
-    head = subhead = newlist = NULL;
+    head = subhead = newlist = nullptr;
     elementd *current = &leaf[leafIndex];
 
     // continue until we're finished
-    while (current != NULL) {
+    while (current != nullptr) {
         // add this node to the path
         newlist = new list;
         newlist->x = current->index;
-        newlist->next = NULL;
-        if (head == NULL) {
+        newlist->next = nullptr;
+        if (head == nullptr) {
             head    = newlist;
         } else {
             subhead = head;
@@ -2192,7 +2169,7 @@ bool dendro::sampleSplitLikelihoods(int &sample_num) {
     // is had, we insert them into the split histogram, which tracks the
     // cumulative weight for each respective split observed.
 
-    if (splithist == NULL) {
+    if (splithist == nullptr) {
         splithist = new splittree;
     }
     for (int i = 0; i < (n - 1); i++) {
@@ -2228,7 +2205,7 @@ bool dendro::sampleSplitLikelihoods(int &sample_num) {
                     splithist->deleteItem(array[i]);
                 }
             }
-            delete [] array; array = NULL;
+            delete [] array; array = nullptr;
             k++;
         }
     }
@@ -2252,20 +2229,20 @@ void dendro::sampleAdjacencyLikelihoods() {
     }
     elementd* ancestor;
     list *currL, *prevL;
-    if (paths != NULL) {
+    if (paths != nullptr) {
         for (int i = 0; i < n; i++) {
             currL = paths[i];
-            while (currL != NULL) {
+            while (currL != nullptr) {
                 prevL = currL;
                 currL = currL->next;
                 delete prevL;
-                prevL = NULL;
+                prevL = nullptr;
             }
-            paths[i] = NULL;
+            paths[i] = nullptr;
         }
         delete [] paths;
     }
-    paths = NULL;
+    paths = nullptr;
     paths = new list* [n];
     for (int i = 0; i < n; i++) {
         // construct paths from root, O(n^2) at worst
@@ -2287,43 +2264,39 @@ void dendro::sampleAdjacencyLikelihoods() {
 
     // finish-up: upate total weight in histograms
     g->addAdjacencyEnd();
-
-    return;
 }
 
 void dendro::resetDendrograph() {
     // Reset the dendrograph structure for the next trial
-    if (leaf      != NULL) {
+    if (leaf      != nullptr) {
         delete [] leaf;        // O(n)
-        leaf      = NULL;
+        leaf      = nullptr;
     }
-    if (internal  != NULL) {
+    if (internal  != nullptr) {
         delete [] internal;    // O(n)
-        internal  = NULL;
+        internal  = nullptr;
     }
-    if (d         != NULL) {
+    if (d         != nullptr) {
         delete d;              // O(n)
-        d         = NULL;
+        d         = nullptr;
     }
-    root = NULL;
-    if (paths != NULL) {
+    root = nullptr;
+    if (paths != nullptr) {
         list *curr, *prev;
         for (int i = 0; i < n; i++) {
             curr = paths[i];
-            while (curr != NULL) {
+            while (curr != nullptr) {
                 prev = curr;
                 curr = curr->next;
                 delete prev;
-                prev = NULL;
+                prev = nullptr;
             }
-            paths[i] = NULL;
+            paths[i] = nullptr;
         }
         delete [] paths;
     }
-    paths = NULL;
+    paths = nullptr;
     L = 1.0;
-
-    return;
 }
 
 // **********************************************************************
@@ -2375,8 +2348,8 @@ graph::graph(const int size, bool predict) : predict(predict)  {
     nodeLink = new edge* [n];
     nodeLinkTail   = new edge* [n];
     for (int i = 0; i < n; i++) {
-        nodeLink[i] = NULL;
-        nodeLinkTail[i] = NULL;
+        nodeLink[i] = nullptr;
+        nodeLinkTail[i] = nullptr;
     }
     if (predict) {
         A = new double** [n];
@@ -2394,15 +2367,15 @@ graph::~graph() {
     edge *curr, *prev;
     for (int i = 0; i < n; i++) {
         curr = nodeLink[i];
-        while (curr != NULL) {
+        while (curr != nullptr) {
             prev = curr;
             curr = curr->next;
             delete prev;
         }
     }
-    delete [] nodeLink; nodeLink = NULL;
-    delete [] nodeLinkTail;  nodeLinkTail   = NULL;
-    delete [] nodes; nodes = NULL;
+    delete [] nodeLink; nodeLink = nullptr;
+    delete [] nodeLinkTail;  nodeLinkTail   = nullptr;
+    delete [] nodes; nodes = nullptr;
 
     if (predict) {
         for (int i = 0; i < n; i++) {
@@ -2411,7 +2384,7 @@ graph::~graph() {
             }
             delete [] A[i];
         }
-        delete [] A; A = NULL;
+        delete [] A; A = nullptr;
     }
 }
 
@@ -2423,7 +2396,7 @@ bool graph::addLink(const int i, const int j) {
     if (i >= 0 && i < n && j >= 0 && j < n) {
         newedge  = new edge;
         newedge->x = j;
-        if (nodeLink[i] == NULL) {
+        if (nodeLink[i] == nullptr) {
             // first neighbor
             nodeLink[i]  = newedge;
             nodeLinkTail[i] = newedge;
@@ -2480,7 +2453,6 @@ void graph::addAdjacencyEnd() {
     } else {
         total_weight += 1.0; obs_count++;
     }
-    return;
 }
 
 bool graph::doesLinkExist(const int i, const int j) const {
@@ -2489,7 +2461,7 @@ bool graph::doesLinkExist(const int i, const int j) const {
     edge* curr;
     if (i >= 0 && i < n && j >= 0 && j < n) {
         curr = nodeLink[i];
-        while (curr != NULL) {
+        while (curr != nullptr) {
             if (curr->x == j) {
                 return true;
             }
@@ -2518,11 +2490,11 @@ string graph::getName(const int i) const {
 }
 
 // NOTE: Returns address; deallocation of returned object is dangerous
-edge* graph::getNeighborList(const int i) const {
+const edge* graph::getNeighborList(const int i) const {
     if (i >= 0 && i < n) {
         return nodeLink[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -2530,7 +2502,7 @@ double* graph::getAdjacencyHist(const int i, const int j) const {
     if (i >= 0 && i < n && j >= 0 && j < n) {
         return A[i][j];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -2580,7 +2552,6 @@ void graph::resetAllAdjacencies() {
     }
     obs_count    = 0;
     total_weight = 0.0;
-    return;
 }
 
 // **********************************************************************
@@ -2591,7 +2562,6 @@ void graph::resetAdjacencyHistogram(const int i, const int j) {
             A[i][j][k] = 0.0;
         }
     }
-    return;
 }
 
 // **********************************************************************
@@ -2600,17 +2570,16 @@ void graph::resetLinks() {
     edge *curr, *prev;
     for (int i = 0; i < n; i++) {
         curr = nodeLink[i];
-        while (curr != NULL) {
+        while (curr != nullptr) {
             prev = curr;
             curr = curr->next;
             delete prev;
         }
-        nodeLink[i]     = NULL;
-        nodeLinkTail[i] = NULL;
+        nodeLink[i]     = nullptr;
+        nodeLinkTail[i] = nullptr;
         nodes[i].degree = 0;
     }
     m = 0;
-    return;
 }
 
 // **********************************************************************
@@ -2627,10 +2596,9 @@ void graph::setAdjacencyHistograms(const int bin_count) {
             }
         }
     }
-    return;
 }
 
-bool graph::setName(const int i, const string text) {
+bool graph::setName(const int i, const string &text) {
     if (i >= 0 && i < n) {
         nodes[i].name = text;
         return true;
@@ -2714,7 +2682,7 @@ bool interns::addEdge(const int new_x, const int new_y,
 
 // **********************************************************************
 
-bool interns::replaceSplit(const int i, const string sp) {
+bool interns::replaceSplit(const int i, const string &sp) {
     // When an internal edge is changed, its split must be replaced as
     // well. This function provides that access; it stores the split
     // defined by an internal edge (x,y) at the location [y], which
@@ -2830,41 +2798,37 @@ splittree::splittree() {
 }
 
 splittree::~splittree() {
-    if (root != NULL && (root->left != leaf || root->right != leaf)) {
-        deleteSubTree(root); root = NULL;
+    if (root != nullptr && (root->left != leaf || root->right != leaf)) {
+        deleteSubTree(root); root = nullptr;
     }
     support      = 0;
     total_weight = 0.0;
     total_count  = 0;
-    if (root) {
-        delete root;
-    }
+    delete root;
     delete leaf;
-    root    = NULL;
-    leaf    = NULL;
+    root    = nullptr;
+    leaf    = nullptr;
 }
 
 void splittree::deleteTree() {
-    if (root != NULL) {
+    if (root != nullptr) {
         deleteSubTree(root);
-        root = NULL;
+        root = nullptr;
     }
-    return;
 }
 
 void splittree::deleteSubTree(elementsp *z) {
     if (z->left  != leaf) {
         deleteSubTree(z->left);
-        z->left = NULL;
+        z->left = nullptr;
     }
     if (z->right != leaf) {
         deleteSubTree(z->right);
-        z->right = NULL;
+        z->right = nullptr;
     }
     delete z;
-    /* No point in setting z to NULL here because z is passed by value */
-    /* z = NULL; */
-    return;
+    /* No point in setting z to nullptr here because z is passed by value */
+    /* z = nullptr; */
 }
 
 // ******** Reset Functions *********************************************
@@ -2876,19 +2840,18 @@ void splittree::clearTree() {
         deleteItem(array[i]);
     }
     delete [] array;
-    return;
 }
 
 // ******** Search Functions *********************************************
 // public search function - if there exists a elementsp in the tree
 // with key=searchKey, it returns TRUE and foundNode is set to point
-// to the found node; otherwise, it sets foundNode=NULL and returns
+// to the found node; otherwise, it sets foundNode=nullptr and returns
 // FALSE
-elementsp* splittree::findItem(const string searchKey) {
+elementsp* splittree::findItem(const string &searchKey) {
 
     elementsp *current = root;
     if (current->split.empty()) {
-        return NULL;    // empty tree; bail out
+        return nullptr;    // empty tree; bail out
     }
     while (current != leaf) {
         if (searchKey.compare(current->split) < 0) { // left-or-right?
@@ -2897,7 +2860,7 @@ elementsp* splittree::findItem(const string searchKey) {
                 current = current->left;
             } else {
                 // failure; bail out
-                return NULL;
+                return nullptr;
             }
         } else {
             if (searchKey.compare(current->split) > 0) {
@@ -2907,7 +2870,7 @@ elementsp* splittree::findItem(const string searchKey) {
                     current = current->right;
                 } else {
                     //   failure; bail out
-                    return NULL;
+                    return nullptr;
                 }
             } else {
                 // found (searchKey==current->split)
@@ -2915,12 +2878,12 @@ elementsp* splittree::findItem(const string searchKey) {
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
-double splittree::returnValue(const string searchKey) {
+double splittree::returnValue(const string &searchKey) {
     elementsp* test = findItem(searchKey);
-    if (test == NULL) {
+    if (test == nullptr) {
         return 0.0;
     } else {
         return test->weight;
@@ -2977,7 +2940,7 @@ string* splittree::returnArrayOfKeys() {
                 curr->mark = 0;
                 array[index++] = curr->split;
                 curr = curr->parent;
-                if (curr == NULL) {
+                if (curr == nullptr) {
                     flag_go = false;
                 }
             }
@@ -2989,13 +2952,13 @@ string* splittree::returnArrayOfKeys() {
 
 slist* splittree::returnListOfKeys() {
     keyValuePairSplit *curr, *prev;
-    slist *head = NULL, *tail = NULL, *newlist;
+    slist *head = nullptr, *tail = nullptr, *newlist;
 
     curr = returnTreeAsList();
-    while (curr != NULL) {
+    while (curr != nullptr) {
         newlist = new slist;
         newlist->x = curr->x;
-        if (head == NULL) {
+        if (head == nullptr) {
             head = newlist; tail = head;
         } else {
             tail->next = newlist; tail = newlist;
@@ -3003,7 +2966,7 @@ slist* splittree::returnListOfKeys() {
         prev = curr;
         curr = curr->next;
         delete prev;
-        prev = NULL;
+        prev = nullptr;
     }
     return head;
 }
@@ -3026,7 +2989,7 @@ keyValuePairSplit* splittree::returnTreeAsList() {
     }
 
     if (head->x.empty()) {
-        return NULL; /* empty tree */
+        return nullptr; /* empty tree */
     } else {
         return head;
     }
@@ -3106,7 +3069,7 @@ elementsp* splittree::returnSuccessor(elementsp *z) {
     // else search up in tree
     // move up in tree until find a non-right-child
     current = w->parent;
-    while ((current != NULL) && (w == current->right)) {
+    while ((current != nullptr) && (w == current->right)) {
         w = current;
         current = current->parent;
     }
@@ -3122,10 +3085,10 @@ keyValuePairSplit* splittree::returnTheseSplits(const int target) {
     int count, len;
 
     head = returnTreeAsList();
-    prev = newhead = newtail = newpair = NULL;
+    prev = newhead = newtail = newpair = nullptr;
     curr = head;
 
-    while (curr != NULL) {
+    while (curr != nullptr) {
         count = 0;
         len   = curr->x.size();
         for (int i = 0; i < len; i++) {
@@ -3137,8 +3100,8 @@ keyValuePairSplit* splittree::returnTheseSplits(const int target) {
             newpair       = new keyValuePairSplit;
             newpair->x    = curr->x;
             newpair->y    = curr->y;
-            newpair->next = NULL;
-            if (newhead == NULL) {
+            newpair->next = nullptr;
+            if (newhead == nullptr) {
                 newhead = newpair; newtail = newpair;
             } else {
                 newtail->next = newpair; newtail = newpair;
@@ -3147,7 +3110,7 @@ keyValuePairSplit* splittree::returnTheseSplits(const int target) {
         prev = curr;
         curr = curr->next;
         delete prev;
-        prev = NULL;
+        prev = nullptr;
     }
 
     return newhead;
@@ -3167,20 +3130,19 @@ void splittree::finishedThisRound() {
     } else {
         total_weight += 1.0; total_count++;
     }
-    return;
 }
 
 // public insert function
-bool splittree::insertItem(string newKey, double newValue) {
+bool splittree::insertItem(const string &newKey, double newValue) {
 
     // first we check to see if newKey is already present in the tree;
     // if so, we do nothing; if not, we must find where to insert the
     // key
     elementsp *newNode, *current;
 
-// find newKey in tree; return pointer to it O(log k)
+    // find newKey in tree; return pointer to it O(log k)
     current = findItem(newKey);
-    if (current != NULL) {
+    if (current != nullptr) {
         current->weight += 1.0;
         // And finally, we keep track of how many observations went into
         // the histogram
@@ -3191,7 +3153,7 @@ bool splittree::insertItem(string newKey, double newValue) {
         newNode->split = newKey;    //  store newKey
         newNode->weight = newValue; //  store newValue
         newNode->color = true;  //  new nodes are always RED
-        newNode->parent = NULL; //  new node initially has no parent
+        newNode->parent = nullptr; //  new node initially has no parent
         newNode->left = leaf;   //  left leaf
         newNode->right = leaf;  //  right leaf
         newNode->count = 1;
@@ -3246,12 +3208,13 @@ bool splittree::insertItem(string newKey, double newValue) {
 void splittree::insertCleanup(elementsp *z) {
 
     // fix now if z is root
-    if (z->parent == NULL) {
-        z->color = false; return;
+    if (z->parent == nullptr) {
+        z->color = false;
+        return;
     }
     elementsp *temp;
     // while z is not root and z's parent is RED
-    while (z->parent != NULL && z->parent->color) {
+    while (z->parent != nullptr && z->parent->color) {
         if (z->parent == z->parent->parent->left) {  // z's parent is LEFT-CHILD
             temp = z->parent->parent->right;       // grab z's uncle
             if (temp->color) {
@@ -3288,16 +3251,15 @@ void splittree::insertCleanup(elementsp *z) {
     }
 
     root->color = false; // color the root BLACK
-    return;
 }
 
 // ******** Delete Functions ********************************************
 // public delete function
-void splittree::deleteItem(string killKey) {
+void splittree::deleteItem(const string &killKey) {
     elementsp *x, *y, *z;
 
     z = findItem(killKey);
-    if (z == NULL) {
+    if (z == nullptr) {
         return;    // item not present; bail out
     }
 
@@ -3305,7 +3267,7 @@ void splittree::deleteItem(string killKey) {
         root->split = "";       // restore root node to default state
         root->weight = 0.0;     //
         root->color = false;    //
-        root->parent = NULL;    //
+        root->parent = nullptr;    //
         root->left = leaf;      //
         root->right = leaf;     //
         support--;          // set support to zero
@@ -3314,7 +3276,7 @@ void splittree::deleteItem(string killKey) {
         return;         // exit - no more work to do
     }
 
-    if (z != NULL) {
+    if (z != nullptr) {
         support--;          // decrement node count
         if ((z->left == leaf) || (z->right == leaf)) {
             // case of less than two children
@@ -3330,7 +3292,7 @@ void splittree::deleteItem(string killKey) {
         }
         x->parent = y->parent;       // make y's child's parent be y's parent
 
-        if (y->parent == NULL) {
+        if (y->parent == nullptr) {
             root = x;          // if y is the root, x is now root
         } else {
             if (y == y->parent->left) {// decide y's relationship with y's parent
@@ -3351,10 +3313,8 @@ void splittree::deleteItem(string killKey) {
             deleteCleanup(x);
         }
         delete y;            // deallocate y
-        y = NULL;            // point y to NULL for safety
-    }              //
-
-    return;
+        y = nullptr;            // point y to nullptr for safety
+    }
 }
 
 void splittree::deleteCleanup(elementsp *x) {
@@ -3416,21 +3376,18 @@ void splittree::deleteCleanup(elementsp *x) {
         }
     }
     x->color = false;          // color x (the root) BLACK (exit)
-
-    return;
 }
 
 // ******** Rotation Functions *******************************************
 
 void splittree::rotateLeft(elementsp *x) {
-    elementsp *y;
     // do pointer-swapping operations for left-rotation
-    y = x->right;             // grab right child
+    elementsp *y = x->right;             // grab right child
     x->right = y->left;           // make x's RIGHT-CHILD be y's LEFT-CHILD
     y->left->parent = x;          // make x be y's LEFT-CHILD's parent
     y->parent = x->parent;        // make y's new parent be x's old parent
 
-    if (x->parent == NULL) {
+    if (x->parent == nullptr) {
         root = y;               // if x was root, make y root
     } else {              //
         if (x == x->parent->left) { // if x is LEFT-CHILD, make y be x's parent's
@@ -3441,19 +3398,16 @@ void splittree::rotateLeft(elementsp *x) {
     }
     y->left   = x;        // make x be y's LEFT-CHILD
     x->parent = y;        // make y be x's parent
-
-    return;
 }
 
 void splittree::rotateRight(elementsp *y) {
-    elementsp *x;
     // do pointer-swapping operations for right-rotation
-    x = y->left;               // grab left child
+    elementsp *x = y->left;               // grab left child
     y->left = x->right;            // replace left child yith x's right subtree
     x->right->parent = y;          // replace y as x's right subtree's parent
 
     x->parent = y->parent;         // make x's new parent be y's old parent
-    if (y->parent == NULL) {
+    if (y->parent == nullptr) {
         root = x;            // if y was root, make x root
     } else {
         if (y == y->parent->right) { // if y is R-CHILD, make x be y's parent's
@@ -3464,8 +3418,6 @@ void splittree::rotateRight(elementsp *y) {
     }
     x->right  = y;         // make y be x's RIGHT-CHILD
     y->parent = x;         // make x be y's parent
-
-    return;
 }
 
 // ***********************************************************************
@@ -3509,13 +3461,13 @@ simpleGraph::simpleGraph(const int size): n(size), m(0), num_groups(0) {
     nodeLinkTail = new simpleEdge* [n];
     A = new double* [n];
     for (int i = 0; i < n; i++) {
-        nodeLink[i] = NULL; nodeLinkTail[i] = NULL;
+        nodeLink[i] = nullptr; nodeLinkTail[i] = nullptr;
         A[i] = new double [n];
         for (int j = 0; j < n; j++) {
             A[i][j] = 0.0;
         }
     }
-    E = NULL;
+    E = nullptr;
 }
 
 simpleGraph::~simpleGraph() {
@@ -3523,21 +3475,21 @@ simpleGraph::~simpleGraph() {
     for (int i = 0; i < n; i++) {
         curr = nodeLink[i];
         delete [] A[i];
-        while (curr != NULL) {
+        while (curr != nullptr) {
             prev = curr;
             curr = curr->next;
             delete prev;
         }
     }
-    curr = NULL; prev = NULL;
-    if (E != NULL) {
+    curr = nullptr; prev = nullptr;
+    if (E != nullptr) {
         delete [] E;
-        E = NULL;
+        E = nullptr;
     }
-    delete [] A; A = NULL;
-    delete [] nodeLink; nodeLink = NULL;
-    delete [] nodeLinkTail;  nodeLinkTail   = NULL;
-    delete [] nodes; nodes = NULL;
+    delete [] A; A = nullptr;
+    delete [] nodeLink; nodeLink = nullptr;
+    delete [] nodeLinkTail;  nodeLinkTail   = nullptr;
+    delete [] nodes; nodes = nullptr;
 }
 
 // ***********************************************************************
@@ -3560,7 +3512,7 @@ bool simpleGraph::addLink(const int i, const int j) {
         A[i][j] = 1.0;
         newedge  = new simpleEdge;
         newedge->x = j;
-        if (nodeLink[i] == NULL) {  // first neighbor
+        if (nodeLink[i] == nullptr) {  // first neighbor
             nodeLink[i]  = newedge;
             nodeLinkTail[i] = newedge;
             nodes[i].degree = 1;
@@ -3570,7 +3522,7 @@ bool simpleGraph::addLink(const int i, const int j) {
             nodes[i].degree++;
         }
         m++;            // increment edge count
-        newedge = NULL;
+        newedge = nullptr;
         return true;
     } else {
         return false;
@@ -3633,7 +3585,7 @@ const simpleEdge* simpleGraph::getNeighborList(const int i) const {
     if (i >= 0 && i < n) {
         return nodeLink[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 // END-NOTE
@@ -3653,13 +3605,13 @@ const simpleVert* simpleGraph::getNode(const int i) const {
     if (i >= 0 && i < n) {
         return &nodes[i];
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
 // **********************************************************************
 
-bool simpleGraph::setName(const int i, const string text) {
+bool simpleGraph::setName(const int i, const string &text) {
     if (i >= 0 && i < n) {
         nodes[i].name = text;
         return true;

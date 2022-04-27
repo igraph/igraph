@@ -72,8 +72,7 @@ class slist {
 public:
     std::string x;         // stored elementd in linked-list
     slist* next;          // pointer to next elementd
-    slist(): x(""), next(0) { }
-    ~slist() { }
+    slist(): x(""), next(nullptr) { }
 };
 
 class keyValuePairSplit {
@@ -82,8 +81,7 @@ public:
     double y;         // stored weight   (double)
     int c;            // stored count    (int)
     keyValuePairSplit* next;  // linked-list pointer
-    keyValuePairSplit(): x(""), y(0.0), c(0), next(0) { }
-    ~keyValuePairSplit() { }
+    keyValuePairSplit(): x(""), y(0.0), c(0), next(nullptr) { }
 };
 
 // ******** Tree elementsp Class *****************************************
@@ -102,8 +100,7 @@ public:
     elementsp *right;     // pointer for right subtree
 
     elementsp(): split(""), weight(0.0), count(0), color(false), mark(0),
-        parent(0), left(0), right(0) { }
-    ~elementsp() { }
+        parent(nullptr), left(nullptr), right(nullptr) { }
 };
 
 // ******** Red-Black Tree Class *****************************************
@@ -144,17 +141,17 @@ public:
     // default constructor/destructor
     splittree(); ~splittree();
     // returns value associated with searchKey
-    double returnValue(const std::string);
+    double returnValue(const std::string &);
     // returns T if searchKey found, and points foundNode at the
     // corresponding node
-    elementsp* findItem(const std::string);
+    elementsp* findItem(const std::string &);
     // update total_count and total_weight
     void finishedThisRound();
     // insert a new key with stored value
-    bool insertItem(std::string, double);
+    bool insertItem(const std::string &, double);
     void clearTree();
     // delete a node with given key
-    void deleteItem(std::string);
+    void deleteItem(const std::string &);
     // delete the entire tree
     void deleteTree();
     // return array of keys in tree
@@ -170,7 +167,7 @@ public:
     // returns number of items in tree
     int returnNodecount();
     // returns list of splits with given number of Ms
-    keyValuePairSplit* returnTheseSplits(const int);
+    keyValuePairSplit* returnTheseSplits(int);
     // returns sum of stored values
     double returnTotal();
 };

@@ -77,8 +77,7 @@ public:
     int x;            // index of edge terminator
     simpleEdge* next;     // pointer to next elementd
 
-    simpleEdge(): x(-1), next(0) { }
-    ~simpleEdge() { }
+    simpleEdge(): x(-1), next(nullptr) { }
 };
 
 class simpleVert {
@@ -88,7 +87,6 @@ public:
     int group_true;       // index of vertex's true group
 
     simpleVert(): name(""), degree(0), group_true(-1) { }
-    ~simpleVert() { }
 };
 
 class twoEdge {
@@ -97,33 +95,33 @@ public:
     int x;            // index of edge terminator
 
     twoEdge(): o(-1), x(-1) { }
-    ~twoEdge() { }
 };
 
 // ******** Graph Class with Edge Statistics *****************************
 
 class simpleGraph {
 public:
-    simpleGraph(const int); ~simpleGraph();
+    explicit simpleGraph(int);
+    ~simpleGraph();
 
     // add group label to vertex i
-    bool addGroup(const int, const int);
+    bool addGroup(int, int);
     // add (i,j) to graph
-    bool addLink(const int, const int);
+    bool addLink(int, int);
     // true if (i,j) is already in graph
-    bool doesLinkExist(const int, const int) const;
+    bool doesLinkExist(int, int) const;
     // returns A(i,j)
-    double getAdjacency(const int, const int) const;
+    double getAdjacency(int, int) const;
     // returns degree of vertex i
-    int getDegree(const int) const;
+    int getDegree(int) const;
     // returns group label of vertex i
-    int getGroupLabel(const int) const;
+    int getGroupLabel(int) const;
     // returns name of vertex i
-    std::string getName(const int) const;
+    std::string getName(int) const;
     // returns edge list of vertex i
-    const simpleEdge* getNeighborList(const int) const;
+    const simpleEdge* getNeighborList(int) const;
     // return pointer to a node
-    const simpleVert* getNode(const int) const;
+    const simpleVert* getNode(int) const;
     // returns num_groups
     int getNumGroups() const;
     // returns m
@@ -131,7 +129,7 @@ public:
     // returns n
     int getNumNodes() const;
     // set name of vertex i
-    bool setName(const int, const std::string);
+    bool setName(int i, const std::string &text);
 
 private:
     simpleVert* nodes;        // list of nodes

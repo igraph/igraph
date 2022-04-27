@@ -161,7 +161,7 @@ static int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
     igraph_real_t oldMeanL;
     igraph_real_t newMeanL = -1e-49;
 
-    while (1) {
+    while (true) {
         oldMeanL = newMeanL;
         newMeanL = 0.0;
         for (int i = 0; i < 65536; i++) {
@@ -562,8 +562,8 @@ int igraph_hrg_sample(const igraph_t *input_graph,
 
 int igraph_hrg_game(igraph_t *graph,
                     const igraph_hrg_t *hrg) {
-    return igraph_hrg_sample(/* input_graph= */ 0, /* sample= */ graph,
-            /* samples= */ 0, /* no_samples=*/ 1,
+    return igraph_hrg_sample(/* input_graph= */ NULL, /* sample= */ graph,
+            /* samples= */ NULL, /* no_samples=*/ 1,
             /* hrg= */ (igraph_hrg_t*) hrg,
             /* start= */ 1);
 }
@@ -790,7 +790,6 @@ static void QsortMain (pblock* array, int left, int right) {
         QsortMain(array, left,   part - 1);
         QsortMain(array, part + 1, right  );
     }
-    return;
 }
 
 static int rankCandidatesByProbability(simpleGraph *sg, dendro *d,

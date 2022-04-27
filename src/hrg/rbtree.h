@@ -63,8 +63,7 @@ class list {
 public:
     int x;            // stored elementd in linked-list
     list* next;           // pointer to next elementd
-    list(): x(-1), next(0) { }
-    ~list() { }
+    list(): x(-1), next(nullptr) { }
 };
 
 class keyValuePair {
@@ -72,8 +71,7 @@ public:
     int x;            // elementrb key (int)
     int y;            // stored value (int)
     keyValuePair* next;       // linked-list pointer
-    keyValuePair(): x(-1), y(-1), next(0) { }
-    ~keyValuePair() { }
+    keyValuePair(): x(-1), y(-1), next(nullptr) { }
 };
 
 // ******** Tree elementrb Class *****************************************
@@ -90,9 +88,9 @@ public:
     elementrb *left;      // pointer for left subtree
     elementrb *right;     // pointer for right subtree
 
-    elementrb(): key(-1), value(-1), color(false), mark(0), parent(0),
-        left(0), right(0) { }
-    ~elementrb() { }
+    elementrb() :
+        key(-1), value(-1), color(false), mark(0),
+        parent(nullptr), left(nullptr), right(nullptr) { }
 };
 
 // ******** Red-Black Tree Class *****************************************
@@ -124,10 +122,10 @@ public:
     rbtree(); ~rbtree(); // default constructor/destructor
 
     // returns value associated with searchKey
-    int returnValue(const int searchKey);
+    int returnValue(int searchKey);
     // returns T if searchKey found, and points foundNode at the
     // corresponding node
-    elementrb* findItem(const int searchKey);
+    elementrb* findItem(int searchKey);
     // insert a new key with stored value
     void insertItem(int newKey, int newValue);
     // selete a node with given key
@@ -149,7 +147,7 @@ public:
     // returns the minimum key in the tree
     keyValuePair returnMinKey();
     // returns number of items in tree
-    int returnNodecount();
+    int returnNodecount() const;
 };
 
 }
