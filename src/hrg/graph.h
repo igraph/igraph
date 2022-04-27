@@ -110,27 +110,27 @@ public:
     // add to obs_count and total_weight
     void addAdjacencyEnd();
     // true if (i,j) is already in graph
-    bool doesLinkExist(const int, const int);
+    bool doesLinkExist(const int, const int) const;
     // returns degree of vertex i
-    int getDegree(const int);
+    int getDegree(const int) const;
     // returns name of vertex i
-    std::string getName(const int);
+    std::string getName(const int) const;
     // returns edge list of vertex i
-    edge* getNeighborList(const int);
+    edge* getNeighborList(const int) const;
     // return ptr to histogram of edge (i,j)
-    double* getAdjacencyHist(const int, const int);
+    double* getAdjacencyHist(const int, const int) const;
     // return average value of adjacency A(i,j)
-    double getAdjacencyAverage(const int, const int);
+    double getAdjacencyAverage(const int, const int) const;
     // returns bin_resolution
-    double getBinResolution();
+    double getBinResolution() const;
     // returns num_bins
-    int getNumBins();
+    int getNumBins() const;
     // returns m
-    int numLinks();
+    int numLinks() const;
     // returns n
-    int numNodes();
+    int numNodes() const;
     // returns total_weight
-    double getTotalWeight();
+    double getTotalWeight() const;
     // reset edge (i,j)'s histogram
     void resetAdjacencyHistogram(const int, const int);
     // reset all edge histograms

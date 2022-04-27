@@ -242,16 +242,22 @@ private:
     elementd* findCommonAncestor(list**, const int, const int);
     // return reverse of path to leaf from root
     list* reversePathToRoot(const int);
-// quicksort functions
+    // quicksort functions
     void QsortMain(block*, int, int);
     int QsortPartition(block*, int, int, int);
 
-public:
     // underlying G (dangerously accessible)
     graph* g;
 
+public:
+
     // constructor / destructor
     dendro(); ~dendro();
+
+    void setGraph(const igraph_t *igraph);
+    void setGraph(graph *ig) { g = ig; }
+    const graph *getGraph() { return g; }
+
     // build dendrogram from g
     void buildDendrogram();
     // delete dendrograph in prep for importDendrogramStructure
@@ -263,13 +269,13 @@ public:
     // return size of consensus split
     int getConsensusSize();
     // return split tree with consensus splits
-    splittree* getConsensusSplits();
+    splittree* getConsensusSplits() const;
     // return likelihood of G given D
-    double getLikelihood();
+    double getLikelihood() const;
     // store splits in this splittree
-    void getSplitList(splittree*);
+    void getSplitList(splittree*) const;
     // return total weight of splittree
-    double getSplitTotalWeight();
+    double getSplitTotalWeight() const;
     // make random G from D
     void makeRandomGraph();
     // make single MCMC move

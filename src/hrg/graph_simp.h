@@ -63,6 +63,8 @@
 #include "hrg/rbtree.h"
 #include "hrg/dendro.h"
 
+#include <string>
+
 #include <cstring>
 #include <cstdlib>
 
@@ -109,25 +111,25 @@ public:
     // add (i,j) to graph
     bool addLink(const int, const int);
     // true if (i,j) is already in graph
-    bool doesLinkExist(const int, const int);
+    bool doesLinkExist(const int, const int) const;
     // returns A(i,j)
-    double getAdjacency(const int, const int);
+    double getAdjacency(const int, const int) const;
     // returns degree of vertex i
-    int getDegree(const int);
+    int getDegree(const int) const;
     // returns group label of vertex i
-    int getGroupLabel(const int);
+    int getGroupLabel(const int) const;
     // returns name of vertex i
-    std::string getName(const int);
+    std::string getName(const int) const;
     // returns edge list of vertex i
-    simpleEdge* getNeighborList(const int);
+    const simpleEdge* getNeighborList(const int) const;
     // return pointer to a node
-    simpleVert* getNode(const int);
+    const simpleVert* getNode(const int) const;
     // returns num_groups
-    int getNumGroups();
+    int getNumGroups() const;
     // returns m
-    int getNumLinks();
+    int getNumLinks() const;
     // returns n
-    int getNumNodes();
+    int getNumNodes() const;
     // set name of vertex i
     bool setName(const int, const std::string);
 

@@ -1381,7 +1381,7 @@ int dendro::getConsensusSize() {
 
 // **********************************************************************
 
-splittree* dendro::getConsensusSplits() {
+splittree* dendro::getConsensusSplits() const {
     string    *array;
     splittree *consensusTree;
     double     value, tot;
@@ -1407,13 +1407,13 @@ splittree* dendro::getConsensusSplits() {
 
 // ***********************************************************************
 
-double dendro::getLikelihood() {
+double dendro::getLikelihood() const {
     return L;
 }
 
 // ***********************************************************************
 
-void dendro::getSplitList(splittree* split_tree) {
+void dendro::getSplitList(splittree* split_tree) const {
     string sp;
     for (int i = 0; i < (n - 1); i++) {
         sp = d->getSplit(i);
@@ -1426,7 +1426,7 @@ void dendro::getSplitList(splittree* split_tree) {
 
 // ***********************************************************************
 
-double dendro::getSplitTotalWeight() {
+double dendro::getSplitTotalWeight() const {
     if (splithist) {
         return splithist->returnTotal();
     } else {
@@ -2483,7 +2483,7 @@ void graph::addAdjacencyEnd() {
     return;
 }
 
-bool graph::doesLinkExist(const int i, const int j) {
+bool graph::doesLinkExist(const int i, const int j) const {
     // This function determines if the edge (i,j) already exists in the
     // adjacency list of v_i
     edge* curr;
@@ -2501,7 +2501,7 @@ bool graph::doesLinkExist(const int i, const int j) {
 
 // **********************************************************************
 
-int graph::getDegree(const int i) {
+int graph::getDegree(const int i) const {
     if (i >= 0 && i < n) {
         return nodes[i].degree;
     } else {
@@ -2509,7 +2509,7 @@ int graph::getDegree(const int i) {
     }
 }
 
-string graph::getName(const int i)  {
+string graph::getName(const int i) const {
     if (i >= 0 && i < n) {
         return nodes[i].name;
     } else {
@@ -2518,7 +2518,7 @@ string graph::getName(const int i)  {
 }
 
 // NOTE: Returns address; deallocation of returned object is dangerous
-edge* graph::getNeighborList(const int i) {
+edge* graph::getNeighborList(const int i) const {
     if (i >= 0 && i < n) {
         return nodeLink[i];
     } else {
@@ -2526,7 +2526,7 @@ edge* graph::getNeighborList(const int i) {
     }
 }
 
-double* graph::getAdjacencyHist(const int i, const int j) {
+double* graph::getAdjacencyHist(const int i, const int j) const {
     if (i >= 0 && i < n && j >= 0 && j < n) {
         return A[i][j];
     } else {
@@ -2536,7 +2536,7 @@ double* graph::getAdjacencyHist(const int i, const int j) {
 
 // **********************************************************************
 
-double graph::getAdjacencyAverage(const int i, const int j) {
+double graph::getAdjacencyAverage(const int i, const int j) const {
     double average = 0.0;
     if (i != j) {
         for (int k = 0; k < num_bins; k++) {
@@ -2548,23 +2548,23 @@ double graph::getAdjacencyAverage(const int i, const int j) {
     return average;
 }
 
-int graph::numLinks() {
+int graph::numLinks() const {
     return m;
 }
 
-int graph::numNodes() {
+int graph::numNodes() const {
     return n;
 }
 
-double graph::getBinResolution() {
+double graph::getBinResolution() const {
     return bin_resolution;
 }
 
-int graph::getNumBins() {
+int graph::getNumBins() const {
     return num_bins;
 }
 
-double graph::getTotalWeight() {
+double graph::getTotalWeight() const {
     return total_weight;
 }
 
@@ -3579,7 +3579,7 @@ bool simpleGraph::addLink(const int i, const int j) {
 
 // ***********************************************************************
 
-bool simpleGraph::doesLinkExist(const int i, const int j) {
+bool simpleGraph::doesLinkExist(const int i, const int j) const {
     // This function determines if the edge (i,j) already exists in the
     // adjacency list of v_i
     if (i >= 0 && i < n && j >= 0 && j < n) {
@@ -3595,7 +3595,7 @@ bool simpleGraph::doesLinkExist(const int i, const int j) {
 
 // **********************************************************************
 
-double simpleGraph::getAdjacency(const int i, const int j) {
+double simpleGraph::getAdjacency(const int i, const int j) const {
     if (i >= 0 && i < n && j >= 0 && j < n) {
         return A[i][j];
     } else {
@@ -3603,7 +3603,7 @@ double simpleGraph::getAdjacency(const int i, const int j) {
     }
 }
 
-int simpleGraph::getDegree(const int i) {
+int simpleGraph::getDegree(const int i) const {
     if (i >= 0 && i < n) {
         return nodes[i].degree;
     } else {
@@ -3611,7 +3611,7 @@ int simpleGraph::getDegree(const int i) {
     }
 }
 
-int simpleGraph::getGroupLabel(const int i) {
+int simpleGraph::getGroupLabel(const int i) const {
     if (i >= 0 && i < n) {
         return nodes[i].group_true;
     } else {
@@ -3619,7 +3619,7 @@ int simpleGraph::getGroupLabel(const int i) {
     }
 }
 
-string simpleGraph::getName(const int i) {
+string simpleGraph::getName(const int i) const {
     if (i >= 0 && i < n) {
         return nodes[i].name;
     } else {
@@ -3629,7 +3629,7 @@ string simpleGraph::getName(const int i) {
 
 // NOTE: The following three functions return addresses; deallocation
 // of returned object is dangerous
-simpleEdge* simpleGraph::getNeighborList(const int i) {
+const simpleEdge* simpleGraph::getNeighborList(const int i) const {
     if (i >= 0 && i < n) {
         return nodeLink[i];
     } else {
@@ -3640,16 +3640,16 @@ simpleEdge* simpleGraph::getNeighborList(const int i) {
 
 // *********************************************************************
 
-int simpleGraph::getNumGroups() {
+int simpleGraph::getNumGroups() const {
     return num_groups;
 }
-int simpleGraph::getNumLinks()  {
+int simpleGraph::getNumLinks() const {
     return m;
 }
-int simpleGraph::getNumNodes()  {
+int simpleGraph::getNumNodes() const {
     return n;
 }
-simpleVert* simpleGraph::getNode(const int i) {
+const simpleVert* simpleGraph::getNode(const int i) const {
     if (i >= 0 && i < n) {
         return &nodes[i];
     } else {
@@ -3677,7 +3677,6 @@ void simpleGraph::QsortMain (block* array, int left, int right) {
         QsortMain(array, left,   part - 1);
         QsortMain(array, part + 1, right  );
     }
-    return;
 }
 
 int simpleGraph::QsortPartition (block* array, int left, int right,

@@ -120,8 +120,8 @@ static int markovChainMonteCarlo(dendro *d, unsigned int period,
 
 static int markovChainMonteCarlo2(dendro *d, int num_samples) {
     bool flag_taken;
-    double dL, ptest = 1.0 / (50.0 * (double)(d->g->numNodes()));
-    int sample_num = 0, t = 1, thresh = 200 * d->g->numNodes();
+    double dL, ptest = 1.0 / (50.0 * (double)(d->getGraph()->numNodes()));
+    int sample_num = 0, t = 1, thresh = 200 * d->getGraph()->numNodes();
 
     // Since we're sampling uniformly at random over the equilibrium
     // walk, we just need to do a bunch of MCMC moves and let the
@@ -184,34 +184,29 @@ static int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
     return 0;
 }
 
-static int igraph_i_hrg_getgraph(const igraph_t *igraph,
-                                 dendro *d) {
-
-    int no_of_nodes = igraph_vcount(igraph);
-    int no_of_edges = igraph_ecount(igraph);
-    int i;
+void dendro::setGraph(const igraph_t *igraph) {
+    igraph_integer_t no_of_nodes = igraph_vcount(igraph);
+    igraph_integer_t no_of_edges = igraph_ecount(igraph);
 
     // Create graph
-    d->g = new graph(no_of_nodes);
+    g = new graph(no_of_nodes);
 
     // Add edges
-    for (i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         int from = IGRAPH_FROM(igraph, i);
         int to = IGRAPH_TO(igraph, i);
         if (from == to) {
             continue;
         }
-        if (!d->g->doesLinkExist(from, to)) {
-            d->g->addLink(from, to);
+        if (!g->doesLinkExist(from, to)) {
+            g->addLink(from, to);
         }
-        if (!d->g->doesLinkExist(to, from)) {
-            d->g->addLink(to, from);
+        if (!g->doesLinkExist(to, from)) {
+            g->addLink(to, from);
         }
     }
 
-    d->buildDendrogram();
-
-    return 0;
+    buildDendrogram();
 }
 
 static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
@@ -223,8 +218,9 @@ static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
     int i;
 
     // Create graphs
-    d->g = new graph(no_of_nodes, true);
-    d->g->setAdjacencyHistograms(num_bins);
+    graph *g = new graph(no_of_nodes, true);
+    g->setAdjacencyHistograms(num_bins);
+
     (*sg) = new simpleGraph(no_of_nodes);
 
     for (i = 0; i < no_of_edges; i++) {
@@ -233,11 +229,11 @@ static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
         if (from == to) {
             continue;
         }
-        if (!d->g->doesLinkExist(from, to)) {
-            d->g->addLink(from, to);
+        if (!g->doesLinkExist(from, to)) {
+            g->addLink(from, to);
         }
-        if (!d->g->doesLinkExist(to, from)) {
-            d->g->addLink(to, from);
+        if (!g->doesLinkExist(to, from)) {
+            g->addLink(to, from);
         }
         if (!(*sg)->doesLinkExist(from, to)) {
             (*sg)->addLink(from, to);
@@ -247,6 +243,7 @@ static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
         }
     }
 
+    d->setGraph(g);
     d->buildDendrogram();
 
     return 0;
@@ -398,12 +395,12 @@ int igraph_hrg_fit(const igraph_t *graph,
             IGRAPH_ERROR("Invalid HRG to start from", IGRAPH_EINVAL);
         }
         // Convert the igraph graph
-        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+        d->setGraph(graph);
         d->clearDendrograph();
         d->importDendrogramStructure(hrg);
     } else {
         // Convert the igraph graph
-        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+        d->setGraph(graph);
         IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_nodes));
     }
 
@@ -684,11 +681,11 @@ int igraph_hrg_consensus(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_delete_dendrogram, d);
 
     if (start) {
-        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+        d->setGraph(graph);
         d->clearDendrograph();
         d->importDendrogramStructure(hrg);
     } else {
-        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+        d->setGraph(graph);
         if (hrg) {
             IGRAPH_CHECK(igraph_hrg_resize(hrg, igraph_vcount(graph)));
         }
@@ -723,8 +720,8 @@ static int MCMCEquilibrium_Sample(dendro *d, int num_samples) {
     double dL;
     bool flag_taken;
     int sample_num = 0;
-    int t = 1, thresh = 100 * d->g->numNodes();
-    double ptest = 1.0 / 10.0 / d->g->numNodes();
+    int t = 1, thresh = 100 * d->getGraph()->numNodes();
+    double ptest = 1.0 / 10.0 / d->getGraph()->numNodes();
 
     while (sample_num < num_samples) {
         d->monteCarloMove(dL, flag_taken, 1.0);
@@ -803,7 +800,7 @@ static int rankCandidatesByProbability(simpleGraph *sg, dendro *d,
     for (int i = 0; i < n; i++) {
         for (int j = i + 1; j < n; j++) {
             if (sg->getAdjacency(i, j) < 0.5) {
-                double temp = d->g->getAdjacencyAverage(i, j);
+                double temp = d->getGraph()->getAdjacencyAverage(i, j);
                 br_list[mkk].L = temp * (1.0 + RNG_UNIF01() / 1000.0);
                 br_list[mkk].i = i;
                 br_list[mkk].j = j;
