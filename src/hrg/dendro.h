@@ -81,18 +81,6 @@ namespace fitHRG {
 // ***********************************************************************
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_LIST
-#define IGRAPH_HRG_LIST
-
-class list {
-public:
-    int x;            // stored elementd in linked-list
-    list* next;           // pointer to next elementd
-    list::list(): x(-1), next(0) { }
-    list::~list() { }
-};
-#endif
-
 enum {DENDRO, GRAPH, LEFT, RIGHT};
 struct block {
     double x;
@@ -113,8 +101,6 @@ struct child {
 // ***********************************************************************
 // ******** Cnode Class **************************************************
 
-#ifndef IGRAPH_HRG_CNODE
-#define IGRAPH_HRG_CNODE
 class cnode {
 public:
     int index;            // array index of this node
@@ -137,7 +123,6 @@ public:
         lastChild = NULL;
     }
 };
-#endif
 
 // ***********************************************************************
 // ******** Split Class **************************************************

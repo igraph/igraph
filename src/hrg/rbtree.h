@@ -59,9 +59,6 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_LIST
-#define IGRAPH_HRG_LIST
-
 class list {
 public:
     int x;            // stored elementd in linked-list
@@ -69,7 +66,6 @@ public:
     list(): x(-1), next(0) { }
     ~list() { }
 };
-#endif
 
 class keyValuePair {
 public:

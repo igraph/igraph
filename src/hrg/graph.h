@@ -71,8 +71,6 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_EDGE
-#define IGRAPH_HRG_EDGE
 class edge {
 public:
     int x;            // stored integer value  (edge terminator)
@@ -88,10 +86,7 @@ public:
         h = NULL;
     }
 };
-#endif
 
-#ifndef IGRAPH_HRG_VERT
-#define IGRAPH_HRG_VERT
 class vert {
 public:
     std::string name;           // (external) name of vertex
@@ -100,7 +95,6 @@ public:
     vert(): name(""), degree(0) { }
     ~vert() { }
 };
-#endif
 
 // ******** Graph Class with Edge Statistics *****************************
 

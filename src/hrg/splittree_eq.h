@@ -68,8 +68,6 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_SLIST
-#define IGRAPH_HRG_SLIST
 class slist {
 public:
     std::string x;         // stored elementd in linked-list
@@ -77,7 +75,6 @@ public:
     slist(): x(""), next(0) { }
     ~slist() { }
 };
-#endif
 
 class keyValuePairSplit {
 public:

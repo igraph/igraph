@@ -70,8 +70,6 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-#ifndef IGRAPH_HRG_SIMPLEEDGE
-#define IGRAPH_HRG_SIMPLEEDGE
 class simpleEdge {
 public:
     int x;            // index of edge terminator
@@ -80,10 +78,7 @@ public:
     simpleEdge(): x(-1), next(0) { }
     ~simpleEdge() { }
 };
-#endif
 
-#ifndef IGRAPH_HRG_SIMPLEVERT
-#define IGRAPH_HRG_SIMPLEVERT
 class simpleVert {
 public:
     std::string name;          // (external) name of vertex
@@ -93,10 +88,7 @@ public:
     simpleVert(): name(""), degree(0), group_true(-1) { }
     ~simpleVert() { }
 };
-#endif
 
-#ifndef IGRAPH_HRG_TWOEDGE
-#define IGRAPH_HRG_TWOEDGE
 class twoEdge {
 public:
     int o;            // index of edge originator
@@ -105,7 +97,6 @@ public:
     twoEdge(): o(-1), x(-1) { }
     ~twoEdge() { }
 };
-#endif
 
 // ******** Graph Class with Edge Statistics *****************************
 
