@@ -68,7 +68,7 @@ int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
 
     /* No loop or multiple edges */
     igraph_ring(&g, 5, dir, 0, 1);
-    igraph_get_laplacian(&g, &m, 0, weights);
+    igraph_get_laplacian(&g, &m, IGRAPH_LAPLACIAN_UNNORMALIZED, weights);
     igraph_matrix_print(&m);
     printf("===\n");
 
@@ -81,7 +81,7 @@ int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
         igraph_vector_push_back(weights, 2);
     }
 
-    igraph_get_laplacian(&g, &m, 0, weights);
+    igraph_get_laplacian(&g, &m, IGRAPH_LAPLACIAN_UNNORMALIZED, weights);
     igraph_matrix_print(&m);
     printf("===\n");
 
@@ -94,7 +94,7 @@ int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
         igraph_vector_push_back(weights, 3);
     }
 
-    igraph_get_laplacian(&g, &m, 0, weights);
+    igraph_get_laplacian(&g, &m, IGRAPH_LAPLACIAN_UNNORMALIZED, weights);
     igraph_matrix_print(&m);
 
     igraph_destroy(&g);
@@ -108,7 +108,7 @@ int test_unnormalized_laplacian(const igraph_vector_t* w, igraph_bool_t dir) {
     return 0;
 }
 
-int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
+int test_symmetric_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
     igraph_t g;
     igraph_matrix_t m;
     igraph_vector_int_t vec;
@@ -123,7 +123,7 @@ int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
 
     /* Undirected graph, no loop or multiple edges */
     igraph_ring(&g, 5, dir, 0, 1);
-    igraph_get_laplacian(&g, &m, 1, weights);
+    igraph_get_laplacian(&g, &m, IGRAPH_LAPLACIAN_SYMMETRIC, weights);
     ok = ok && check_laplacian(&g, &m, weights);
 
     /* Add some loop edges */
@@ -135,7 +135,7 @@ int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
         igraph_vector_push_back(weights, 2);
     }
 
-    igraph_get_laplacian(&g, &m, 1, weights);
+    igraph_get_laplacian(&g, &m, IGRAPH_LAPLACIAN_SYMMETRIC, weights);
     ok = ok && check_laplacian(&g, &m, weights);
 
     /* Duplicate some edges */
@@ -147,7 +147,7 @@ int test_normalized_laplacian(const igraph_vector_t *w, igraph_bool_t dir) {
         igraph_vector_push_back(weights, 3);
     }
 
-    igraph_get_laplacian(&g, &m, 1, weights);
+    igraph_get_laplacian(&g, &m, IGRAPH_LAPLACIAN_SYMMETRIC, weights);
     ok = ok && check_laplacian(&g, &m, weights);
 
     igraph_destroy(&g);
@@ -184,7 +184,7 @@ int main() {
               );
 
         if (is_normalized) {
-            res = test_normalized_laplacian(v, dir);
+            res = test_symmetric_normalized_laplacian(v, dir);
         } else {
             res = test_unnormalized_laplacian(v, dir);
         }

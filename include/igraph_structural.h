@@ -123,12 +123,29 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igra
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
 
+/**
+ * \typedef igraph_laplacian_normalization_t
+ * \brief Normalization methods for a Laplacian matrix.
+ *
+ * Normalization methods for \ref igraph_get_laplacian() and
+ * \ref igraph_get_laplacian_sparse()
+ *
+ * \enumval IGRAPH_LAPLACIAN_UNNORMALIZED Unnormalized Laplacian matrix.
+ * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetric normalized Laplacian matrix.
+ */
+typedef enum {
+    IGRAPH_LAPLACIAN_UNNORMALIZED = 0,
+    IGRAPH_LAPLACIAN_SYMMETRIC = 1
+} igraph_laplacian_normalization_t;
+
 IGRAPH_EXPORT igraph_error_t igraph_get_laplacian(
-   const igraph_t *graph, igraph_matrix_t *res, igraph_bool_t normalized,
+   const igraph_t *graph, igraph_matrix_t *res,
+   igraph_laplacian_normalization_t normalization,
    const igraph_vector_t *weights
 );
 IGRAPH_EXPORT igraph_error_t igraph_get_laplacian_sparse(
-   const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_bool_t normalized,
+   const igraph_t *graph, igraph_sparsemat_t *sparseres,
+   igraph_laplacian_normalization_t normalization,
    const igraph_vector_t *weights
 );
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_laplacian(
