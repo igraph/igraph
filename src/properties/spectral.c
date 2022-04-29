@@ -511,41 +511,9 @@ igraph_error_t igraph_get_laplacian_sparse(
 
 /**
  * \function igraph_laplacian
- * \brief Returns the Laplacian matrix of a graph
+ * \brief Returns the Laplacian matrix of a graph (deprecated).
  *
- * </para><para>
- * The graph Laplacian matrix is similar to an adjacency matrix but
- * contains -1's instead of 1's and the vertex degrees are included in
- * the diagonal. So the result for edge i--j is -1 if i!=j and is equal
- * to the degree of vertex i if i==j. igraph_laplacian will work on a
- * directed graph; in this case, the diagonal will contain the out-degrees.
- * Loop edges will be ignored.
- *
- * </para><para>
- * The normalized version of the Laplacian matrix has 1 in the diagonal and
- * -1/sqrt(d[i]d[j]) if there is an edge from i to j.
- *
- * </para><para>
- * The first version of this function was written by Vincent Matossian.
- * \param graph Pointer to the graph to convert.
- * \param res Pointer to an initialized matrix object, the result is
- *        stored here. It will be resized if needed.
- *        If it is a null pointer, then it is ignored.
- *        At least one of \p res and \p sparseres must be a non-null pointer.
- * \param sparseres Pointer to an initialized sparse matrix object, the
- *        result is stored here, if it is not a null pointer.
- *        At least one of \p res and \p sparseres must be a non-null pointer.
- * \param normalized Whether to create a normalized Laplacian matrix.
- * \param weights An optional vector containing edge weights, to calculate
- *        the weighted Laplacian matrix. Set it to a null pointer to
- *        calculate the unweighted Laplacian.
- * \return Error code.
- *
- * Time complexity: O(|V||V|),
- * |V| is the
- * number of vertices in the graph.
- *
- * \example examples/simple/igraph_laplacian.c
+ * \deprecated-by igraph_get_laplacian 0.10.0
  */
 
 igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
