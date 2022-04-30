@@ -40,8 +40,7 @@ int main() {
     SETVAS(&g_in, "vertex_attr", 2, "vertex_name2");
     SETVAS(&g_in, "vertex_attr", 3, "vertex_name3");
 
-    char filename[] = "ncol.tmp.XXXXXX"; /* XXXXXX is replaced by mktemp() */
-    mktemp(filename);
+    char filename[] = "ncol.tmp";
     file = fopen(filename, "w");
     IGRAPH_ASSERT(file); /* make sure that the file was created successfully */
 
@@ -69,8 +68,8 @@ int main() {
     unlink(filename);
     igraph_destroy(&g_in);
     igraph_destroy(&g_out);
- 
+
     VERIFY_FINALLY_STACK();
- 
+
     return 0;
 }
