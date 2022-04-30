@@ -19,11 +19,15 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void check(igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius, igraph_bool_t positive) {
+void check(igraph_bool_t volume, igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius, igraph_bool_t positive) {
     igraph_matrix_t samples;
 
     igraph_matrix_init(&samples, 0, 0);
-    igraph_sample_sphere_surface(dim, n, radius, positive, &samples);
+    if (volume) {
+        igraph_sample_sphere_volume(dim, n, radius, positive, &samples);
+    } else {
+        igraph_sample_sphere_surface(dim, n, radius, positive, &samples);
+    }
     IGRAPH_ASSERT(igraph_matrix_ncol(&samples) == n);
     IGRAPH_ASSERT(igraph_matrix_nrow(&samples) == dim);
     for (igraph_integer_t col = 0; col < n; col++) {
@@ -34,7 +38,11 @@ void check(igraph_integer_t dim, igraph_integer_t n, igraph_real_t radius, igrap
             }
             sum += powf(MATRIX(samples, row, col), 2);
         }
-        IGRAPH_ASSERT(igraph_almost_equals(sum, radius * radius, 0.00001));
+        if (volume) {
+            IGRAPH_ASSERT(sum <= radius * radius);
+        } else {
+            IGRAPH_ASSERT(igraph_almost_equals(sum, radius * radius, 0.00001));
+        }
     }
     igraph_matrix_destroy(&samples);
 }
@@ -44,11 +52,14 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     //No samples
-    check(2, 0, 1, 0);
+    check(0, 2, 0, 1, 0);
+    check(1, 2, 0, 1, 0);
     //Five samples, four-dimensions, radius 2
-    check(4, 5, 2, 0);
+    check(0, 4, 5, 2, 0);
+    check(1, 4, 5, 2, 0);
     //Same, positive orthant
-    check(4, 5, 2, 1);
+    check(0, 4, 5, 2, 1);
+    check(1, 4, 5, 2, 1);
 
     VERIFY_FINALLY_STACK();
     return 0;

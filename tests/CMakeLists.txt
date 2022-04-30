@@ -874,5 +874,5 @@ add_benchmarks(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_sample_dirichlet
-  igraph_sample_sphere_surface
+  igraph_sample_sphere
 )
