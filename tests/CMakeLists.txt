@@ -194,6 +194,7 @@ add_legacy_tests(
   igraph_cited_type_game
   igraph_citing_cited_type_game
   igraph_correlated_game
+  igraph_correlated_pair_game
   igraph_degree_sequence_game
   igraph_establishment_game
   igraph_extended_chordal_ring
