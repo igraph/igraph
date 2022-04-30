@@ -196,6 +196,7 @@ add_legacy_tests(
   igraph_correlated_game
   igraph_correlated_pair_game
   igraph_degree_sequence_game
+  igraph_dot_product_game
   igraph_establishment_game
   igraph_extended_chordal_ring
   igraph_forest_fire_game
