@@ -61,8 +61,7 @@ int main() {
         abort();
     }
 
-    /* Simple way to verify that attributes are correct. */
-    igraph_write_graph_graphml(&g_out, stdout, 0);
+    print_attributes(&g_out);
 
     fclose(file);
     unlink(filename);
