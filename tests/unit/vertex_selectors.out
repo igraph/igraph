@@ -19,4 +19,12 @@ Edgeless graph:
 2
 3
 4
+Copy of vs:
+2
+3
+4
 Graph without vertices should fail.
+As vector should give all 5 vertices:
+0 1 2 3 4
+As vector should give 0 vertices:
+
