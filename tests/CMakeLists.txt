@@ -136,6 +136,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_edges
   igraph_is_same_graph
   igraph_i_incident
   igraph_i_neighbors
