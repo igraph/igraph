@@ -23,6 +23,7 @@
  - Fixed a memory leak in `igraph_hrg_fit()` when using `start=1`.
  - `igraph_write_graph_dot()` now outputs NaN values unchanged.
  - `igraph_write_graph_dot()` no longer produces invalid DOT files when empty string attributes are present.
+ - The initial coordinates of the Kamada-Kawai layout (`igraph_layout_kamada_kawai()` and `igraph_layout_kamada_kawai_3d()`) are chosen to be more in line with the original publication, improving the stability of the result. See isse #963. This changes the output of the function for the same graph, compared with previous versions. To obtain the same layout, initialize coordinates with `igraph_layout_circle()` (in 2D) or `igraph_layout_sphere()` (in 3D).
 
 ### Other
 
