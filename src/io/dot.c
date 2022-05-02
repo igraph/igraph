@@ -73,7 +73,7 @@ static int igraph_i_dot_escape(const char *orig, char **result) {
             is_number = 0; need_quote = 1; newlen++;
         }
     }
-    if (is_number && orig[len - 1] == '.') {
+    if (is_number && len > 0 && orig[len - 1] == '.') {
         is_number = 0;
     }
     if (!is_number && isdigit(orig[0])) {
@@ -117,9 +117,8 @@ static int igraph_i_dot_escape(const char *orig, char **result) {
  * http://www.graphviz.org for details. The grammar of the DOT format
  * can be found here: http://www.graphviz.org/doc/info/lang.html
  *
- * </para><para>This is only a preliminary implementation, only the vertices
- * and the edges are written but not the attributes or any visualization
- * information.
+ * </para><para>This is only a preliminary implementation, no visualization
+ * information is written.
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.
@@ -216,9 +215,9 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                    IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name, igraph_vss_1((igraph_integer_t) i), &numv));
-                    if (VECTOR(numv)[0] == (long)VECTOR(numv)[0]) {
-                        CHECK(fprintf(outstream, "    %s=%ld\n", newname, (long)VECTOR(numv)[0]));
+                    IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name, igraph_vss_1(i), &numv));
+                    if (VECTOR(numv)[0] == floor(VECTOR(numv)[0])) {
+                        CHECK(fprintf(outstream, "    %s=%g\n", newname, VECTOR(numv)[0]));
                     } else {
                         CHECK(fprintf(outstream, "    %s=", newname));
                         CHECK(igraph_real_fprintf_precise(outstream,
@@ -264,9 +263,9 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph,
-                                 name, igraph_ess_1((igraph_integer_t) i), &numv));
-                    if (VECTOR(numv)[0] == (long)VECTOR(numv)[0]) {
-                        CHECK(fprintf(outstream, "    %s=%ld\n", newname, (long)VECTOR(numv)[0]));
+                                 name, igraph_ess_1(i), &numv));
+                    if (VECTOR(numv)[0] == floor(VECTOR(numv)[0])) {
+                        CHECK(fprintf(outstream, "    %s=%g\n", newname, VECTOR(numv)[0]));
                     } else {
                         CHECK(fprintf(outstream, "    %s=", newname));
                         CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
