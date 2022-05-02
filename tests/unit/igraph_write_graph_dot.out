@@ -12,22 +12,22 @@ graph {
   ];
   2 [
     VAN=NaN
-    VAS=
+    VAS=""
     VAB=0
   ];
   3 [
     VAN=NaN
-    VAS=
+    VAS=""
     VAB=0
   ];
   4 [
     VAN=NaN
-    VAS=
+    VAS=""
     VAB=0
   ];
   5 [
     VAN=NaN
-    VAS=
+    VAS=""
     VAB=0
   ];
 
@@ -38,7 +38,7 @@ graph {
   ];
   2 -- 0 [
     EAN=NaN
-    EAS=
+    EAS=""
     EAB=0
   ];
   1 -- 1 [
@@ -48,27 +48,27 @@ graph {
   ];
   3 -- 1 [
     EAN=NaN
-    EAS=
+    EAS=""
     EAB=0
   ];
   2 -- 0 [
     EAN=NaN
-    EAS=
+    EAS=""
     EAB=0
   ];
   3 -- 2 [
     EAN=NaN
-    EAS=
+    EAS=""
     EAB=0
   ];
   4 -- 3 [
     EAN=NaN
-    EAS=
+    EAS=""
     EAB=0
   ];
   4 -- 3 [
     EAN=NaN
-    EAS=
+    EAS=""
     EAB=0
   ];
 }
