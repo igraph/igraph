@@ -41,10 +41,10 @@ static int igraph_i_dot_escape(const char *orig, char **result) {
     long int i, j, len = (long int) strlen(orig), newlen = 0;
     igraph_bool_t need_quote = 0, is_number = 1;
 
-    /* first, check whether the string is equal to some reserved word */
+    /* first, check whether the string is equal to some reserved word, or empty */
     if (!strcasecmp(orig, "graph") || !strcasecmp(orig, "digraph") ||
         !strcasecmp(orig, "node") || !strcasecmp(orig, "edge") ||
-        !strcasecmp(orig, "strict") || !strcasecmp(orig, "subgraph")) {
+        !strcasecmp(orig, "strict") || !strcasecmp(orig, "subgraph") || len == 0) {
         need_quote = 1;
         is_number = 0;
     }
@@ -93,6 +93,11 @@ static int igraph_i_dot_escape(const char *orig, char **result) {
         (*result)[0] = '"';
         (*result)[newlen + 1] = '"';
         (*result)[newlen + 2] = '\0';
+        /* Escape quotes, backslashes and newlines.
+         * Even though the format spec at https://graphviz.org/doc/info/lang.html
+         * claims that only quotes need escaping, escaping backslashes appears to
+         * be necessary as well for GraphViz to render labels correctly.
+         * Tested with GraphViz 2.50. */
         for (i = 0, j = 1; i < len; i++) {
             if (orig[i] == '\n') {
                 (*result)[j++] = '\\';
