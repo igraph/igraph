@@ -453,6 +453,7 @@ add_legacy_tests(
   gml
   igraph_write_graph_leda
   igraph_write_graph_dimacs_flow
+  igraph_write_graph_dot
   lineendings
   ncol
   pajek
