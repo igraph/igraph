@@ -71,14 +71,29 @@ static igraph_error_t igraph_i_get_laplacian_unweighted(
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, 0));
 
+    switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+        default:
+            for (i = 0; i < no_of_nodes; i++) {
+                MATRIX(*res, i, i) = VECTOR(degree)[i];
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            for (i = 0; i < no_of_nodes; i++) {
+                if (VECTOR(degree)[i] > 0) {
+                    MATRIX(*res, i, i) = 1;
+                    VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
+                }
+            }
+            break;
+    }
+
     if (directed) {
 
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
                     MATRIX(*res, from, to) -= 1;
@@ -86,12 +101,6 @@ static igraph_error_t igraph_i_get_laplacian_unweighted(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    if (VECTOR(degree)[i] > 0) {
-                        MATRIX(*res, i, i) = 1;
-                        VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
-                    }
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
                     MATRIX(*res, from, to) -= VECTOR(degree)[from] * VECTOR(degree)[to];
@@ -104,9 +113,6 @@ static igraph_error_t igraph_i_get_laplacian_unweighted(
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
                     MATRIX(*res, to, from) -= 1;
@@ -115,15 +121,9 @@ static igraph_error_t igraph_i_get_laplacian_unweighted(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    if (VECTOR(degree)[i] > 0) {
-                        MATRIX(*res, i, i) = 1;
-                        VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
-                    }
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
-                    diff = 1.0 / (VECTOR(degree)[from] * VECTOR(degree)[to]);
+                    diff = VECTOR(degree)[from] * VECTOR(degree)[to];
                     MATRIX(*res, from, to) -= diff;
                     MATRIX(*res, to, from) -= diff;
                 }
@@ -158,14 +158,29 @@ static igraph_error_t igraph_i_get_laplacian_unweighted_sparse(
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, 0));
 
+    switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+        default:
+            for (i = 0; i < no_of_nodes; i++) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            for (i = 0; i < no_of_nodes; i++) {
+                if (VECTOR(degree)[i] > 0) {
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
+                    VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
+                }
+            }
+            break;
+    }
+
     if (directed) {
 
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
                     IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -1.0));
@@ -173,12 +188,6 @@ static igraph_error_t igraph_i_get_laplacian_unweighted_sparse(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    if (VECTOR(degree)[i] > 0) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
-                        VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
-                    }
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
                     IGRAPH_CHECK(
@@ -193,10 +202,6 @@ static igraph_error_t igraph_i_get_laplacian_unweighted_sparse(
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i,
-                                                        VECTOR(degree)[i]));
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
                     IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -1.0));
@@ -205,15 +210,9 @@ static igraph_error_t igraph_i_get_laplacian_unweighted_sparse(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    if (VECTOR(degree)[i] > 0) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
-                        VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
-                    }
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_edge(graph, i, &from, &to);
-                    diff = 1.0 / (VECTOR(degree)[from] * VECTOR(degree)[to]);
+                    diff = VECTOR(degree)[from] * VECTOR(degree)[to];
                     IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -diff));
                     IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -diff));
                 }
@@ -246,14 +245,29 @@ static igraph_error_t igraph_i_get_laplacian_weighted(
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
 
+    switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+        default:
+            for (i = 0; i < no_of_nodes; i++) {
+                MATRIX(*res, i, i) = VECTOR(degree)[i];
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            for (i = 0; i < no_of_nodes; i++) {
+                if (VECTOR(degree)[i] > 0) {
+                    MATRIX(*res, i, i) = 1;
+                    VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
+                }
+            }
+            break;
+    }
+
     if (directed) {
 
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
@@ -263,17 +277,11 @@ static igraph_error_t igraph_i_get_laplacian_weighted(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    if (VECTOR(degree)[i] > 0) {
-                        MATRIX(*res, i, i) = 1;
-                        VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
-                    }
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
                     igraph_real_t weight  = VECTOR(*weights)[i];
-                    MATRIX(*res, from, to) -= weight / (VECTOR(degree)[from] * VECTOR(degree)[to]);
+                    MATRIX(*res, from, to) -= weight * VECTOR(degree)[from] * VECTOR(degree)[to];
                 }
                 break;
         }
@@ -283,9 +291,6 @@ static igraph_error_t igraph_i_get_laplacian_weighted(
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
@@ -296,17 +301,11 @@ static igraph_error_t igraph_i_get_laplacian_weighted(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    if (VECTOR(degree)[i] > 0) {
-                        MATRIX(*res, i, i) = 1;
-                        VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
-                    }
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
                     igraph_real_t weight  = VECTOR(*weights)[i];
-                    igraph_real_t diff = weight / (VECTOR(degree)[from] * VECTOR(degree)[to]);
+                    igraph_real_t diff = weight * (VECTOR(degree)[from] * VECTOR(degree)[to]);
                     MATRIX(*res, from, to) -= diff;
                     MATRIX(*res, to, from) -= diff;
                 }
@@ -343,14 +342,29 @@ static igraph_error_t igraph_i_get_laplacian_weighted_sparse(
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
 
+    switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+        default:
+            for (i = 0; i < no_of_nodes; i++) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            for (i = 0; i < no_of_nodes; i++) {
+                if (VECTOR(degree)[i] > 0) {
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
+                    VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
+                }
+            }
+            break;
+    }
+
     if (directed) {
 
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
@@ -360,17 +374,13 @@ static igraph_error_t igraph_i_get_laplacian_weighted_sparse(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i] > 0 ? 1 : 0));
-                    VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
                     igraph_real_t weight  = VECTOR(*weights)[i];
                     IGRAPH_CHECK(igraph_sparsemat_entry(
                         sparseres, from, to,
-                        -weight / (VECTOR(degree)[from] * VECTOR(degree)[to])
+                        -weight * VECTOR(degree)[from] * VECTOR(degree)[to]
                     ));
                 }
                 break;
@@ -381,9 +391,6 @@ static igraph_error_t igraph_i_get_laplacian_weighted_sparse(
         switch (normalization) {
             case IGRAPH_LAPLACIAN_UNNORMALIZED:
             default:
-                for (i = 0; i < no_of_nodes; i++) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
@@ -394,19 +401,13 @@ static igraph_error_t igraph_i_get_laplacian_weighted_sparse(
                 break;
 
             case IGRAPH_LAPLACIAN_SYMMETRIC:
-                for (i = 0; i < no_of_nodes; i++) {
-                    if (VECTOR(degree)[i] > 0) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
-                        VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
-                    }
-                }
                 for (i = 0; i < no_of_edges; i++) {
                     igraph_integer_t from = IGRAPH_FROM(graph, i);
                     igraph_integer_t to   = IGRAPH_TO(graph, i);
                     igraph_real_t weight  = VECTOR(*weights)[i];
-                    igraph_real_t diff = weight / (VECTOR(degree)[from] * VECTOR(degree)[to]);
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -diff));
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -diff));
+                    igraph_real_t diff = -weight * (VECTOR(degree)[from] * VECTOR(degree)[to]);
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, diff));
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, diff));
                 }
                 break;
         }
