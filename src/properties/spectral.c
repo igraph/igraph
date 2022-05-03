@@ -39,15 +39,16 @@ static igraph_error_t igraph_i_laplacian_validate_weights(
     no_of_edges = igraph_ecount(graph);
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
-    }
-
-    if (igraph_vector_any_smaller(weights, 0)) {
-        IGRAPH_ERROR("Weights must be positive", IGRAPH_EINVAL);
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
+        } else if (igraph_is_nan(minweight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
     }
 
     return IGRAPH_SUCCESS;
