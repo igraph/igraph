@@ -28,7 +28,7 @@
 #include <math.h>
 
 static igraph_error_t igraph_i_get_laplacian_unweighted(
-    const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_t *graph, igraph_matrix_t *res, igraph_neimode_t mode,
     igraph_laplacian_normalization_t normalization
 ) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -43,7 +43,7 @@ static igraph_error_t igraph_i_get_laplacian_unweighted(
     igraph_matrix_null(res);
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, 0));
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, 0));
 
     if (directed) {
 
@@ -113,7 +113,7 @@ static igraph_error_t igraph_i_get_laplacian_unweighted(
 }
 
 static igraph_error_t igraph_i_get_laplacian_unweighted_sparse(
-    const igraph_t *graph, igraph_sparsemat_t *sparseres,
+    const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
     igraph_laplacian_normalization_t normalization
 ) {
 
@@ -130,7 +130,7 @@ static igraph_error_t igraph_i_get_laplacian_unweighted_sparse(
     IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes, no_of_nodes, nz));
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, 0));
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, 0));
 
     if (directed) {
 
@@ -203,7 +203,7 @@ static igraph_error_t igraph_i_get_laplacian_unweighted_sparse(
 }
 
 static igraph_error_t igraph_i_get_laplacian_weighted(
-    const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_t *graph, igraph_matrix_t *res, igraph_neimode_t mode,
     igraph_laplacian_normalization_t normalization,
     const igraph_vector_t *weights
 ) {
@@ -222,7 +222,7 @@ static igraph_error_t igraph_i_get_laplacian_weighted(
     igraph_matrix_null(res);
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
 
     if (directed) {
 
@@ -300,7 +300,7 @@ static igraph_error_t igraph_i_get_laplacian_weighted(
 }
 
 static igraph_error_t igraph_i_get_laplacian_weighted_sparse(
-    const igraph_t *graph, igraph_sparsemat_t *sparseres,
+    const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
     igraph_laplacian_normalization_t normalization,
     const igraph_vector_t *weights
 ) {
@@ -319,7 +319,7 @@ static igraph_error_t igraph_i_get_laplacian_weighted_sparse(
     IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes, no_of_nodes, nz));
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
 
     if (directed) {
 
@@ -432,15 +432,15 @@ static igraph_error_t igraph_i_get_laplacian_weighted_sparse(
  */
 
 igraph_error_t igraph_get_laplacian(
-    const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_t *graph, igraph_matrix_t *res, igraph_neimode_t mode,
     igraph_laplacian_normalization_t normalization,
     const igraph_vector_t *weights
 ) {
     IGRAPH_ASSERT(res != NULL);
     if (weights) {
-        return igraph_i_get_laplacian_weighted(graph, res, normalization, weights);
+        return igraph_i_get_laplacian_weighted(graph, res, mode, normalization, weights);
     } else {
-        return igraph_i_get_laplacian_unweighted(graph, res, normalization);
+        return igraph_i_get_laplacian_unweighted(graph, res, mode, normalization);
     }
 }
 
@@ -470,15 +470,15 @@ igraph_error_t igraph_get_laplacian(
  */
 
 igraph_error_t igraph_get_laplacian_sparse(
-    const igraph_t *graph, igraph_sparsemat_t *sparseres,
+    const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
     igraph_laplacian_normalization_t normalization,
     const igraph_vector_t *weights
 ) {
     IGRAPH_ASSERT(sparseres != NULL);
     if (weights) {
-        return igraph_i_get_laplacian_weighted_sparse(graph, sparseres, normalization, weights);
+        return igraph_i_get_laplacian_weighted_sparse(graph, sparseres, mode, normalization, weights);
     } else {
-        return igraph_i_get_laplacian_unweighted_sparse(graph, sparseres, normalization);
+        return igraph_i_get_laplacian_unweighted_sparse(graph, sparseres, mode, normalization);
     }
 }
 
@@ -489,21 +489,21 @@ igraph_error_t igraph_get_laplacian_sparse(
  * \deprecated-by igraph_get_laplacian 0.10.0
  */
 
-igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-                     igraph_sparsemat_t *sparseres,
-                     igraph_bool_t normalized,
-                     const igraph_vector_t *weights) {
+igraph_error_t igraph_laplacian(
+    const igraph_t *graph, igraph_matrix_t *res, igraph_sparsemat_t *sparseres,
+    igraph_bool_t normalized, const igraph_vector_t *weights
+) {
     if (!res && !sparseres) {
         IGRAPH_ERROR("Laplacian: specify at least one of `res' or `sparseres'",
                      IGRAPH_EINVAL);
     }
 
     if (res) {
-        IGRAPH_CHECK(igraph_get_laplacian(graph, res, normalized, weights));
+        IGRAPH_CHECK(igraph_get_laplacian(graph, res, IGRAPH_OUT, normalized, weights));
     }
 
     if (sparseres) {
-        IGRAPH_CHECK(igraph_get_laplacian_sparse(graph, sparseres, normalized, weights));
+        IGRAPH_CHECK(igraph_get_laplacian_sparse(graph, sparseres, IGRAPH_OUT, normalized, weights));
     }
 
     return IGRAPH_SUCCESS;

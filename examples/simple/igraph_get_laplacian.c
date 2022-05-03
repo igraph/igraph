@@ -28,6 +28,8 @@ int test_laplacian(const igraph_vector_t *w, igraph_bool_t dir, igraph_laplacian
     igraph_matrix_t m;
     igraph_vector_int_t vec;
     igraph_vector_t *weights = 0;
+    igraph_neimode_t mode = IGRAPH_OUT;
+
     igraph_matrix_init(&m, 1, 1);
 
     if (w) {
@@ -37,7 +39,7 @@ int test_laplacian(const igraph_vector_t *w, igraph_bool_t dir, igraph_laplacian
 
     /* Base graph, no loop or multiple edges */
     igraph_ring(&g, 5, dir, 0, 1);
-    igraph_get_laplacian(&g, &m, normalization, weights);
+    igraph_get_laplacian(&g, &m, mode, normalization, weights);
     igraph_matrix_print(&m);
     printf("===\n");
 
@@ -50,7 +52,7 @@ int test_laplacian(const igraph_vector_t *w, igraph_bool_t dir, igraph_laplacian
         igraph_vector_push_back(weights, 2);
     }
 
-    igraph_get_laplacian(&g, &m, normalization, weights);
+    igraph_get_laplacian(&g, &m, mode, normalization, weights);
     igraph_matrix_print(&m);
     printf("===\n");
 
@@ -63,13 +65,13 @@ int test_laplacian(const igraph_vector_t *w, igraph_bool_t dir, igraph_laplacian
         igraph_vector_push_back(weights, 3);
     }
 
-    igraph_get_laplacian(&g, &m, normalization, weights);
+    igraph_get_laplacian(&g, &m, mode, normalization, weights);
     igraph_matrix_print(&m);
     printf("===\n");
 
     /* Add an isolated vertex */
     igraph_add_vertices(&g, 1, NULL);
-    igraph_get_laplacian(&g, &m, normalization, weights);
+    igraph_get_laplacian(&g, &m, mode, normalization, weights);
     igraph_matrix_print(&m);
 
     igraph_destroy(&g);

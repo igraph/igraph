@@ -139,12 +139,12 @@ typedef enum {
 } igraph_laplacian_normalization_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_get_laplacian(
-   const igraph_t *graph, igraph_matrix_t *res,
+   const igraph_t *graph, igraph_matrix_t *res, igraph_neimode_t mode,
    igraph_laplacian_normalization_t normalization,
    const igraph_vector_t *weights
 );
 IGRAPH_EXPORT igraph_error_t igraph_get_laplacian_sparse(
-   const igraph_t *graph, igraph_sparsemat_t *sparseres,
+   const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
    igraph_laplacian_normalization_t normalization,
    const igraph_vector_t *weights
 );
