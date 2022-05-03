@@ -27,6 +27,32 @@
 
 #include <math.h>
 
+static igraph_error_t igraph_i_laplacian_validate_weights(
+    const igraph_t* graph,  const igraph_vector_t* weights
+) {
+    igraph_integer_t no_of_edges;
+
+    if (weights == NULL) {
+        return IGRAPH_SUCCESS;
+    }
+
+    no_of_edges = igraph_ecount(graph);
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_is_any_nan(weights)) {
+        IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_any_smaller(weights, 0)) {
+        IGRAPH_ERROR("Weights must be positive", IGRAPH_EINVAL);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 static igraph_error_t igraph_i_get_laplacian_unweighted(
     const igraph_t *graph, igraph_matrix_t *res, igraph_neimode_t mode,
     igraph_laplacian_normalization_t normalization
@@ -213,10 +239,6 @@ static igraph_error_t igraph_i_get_laplacian_weighted(
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_t degree;
     igraph_integer_t i;
-
-    if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
-    }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_null(res);
@@ -437,6 +459,7 @@ igraph_error_t igraph_get_laplacian(
     const igraph_vector_t *weights
 ) {
     IGRAPH_ASSERT(res != NULL);
+    IGRAPH_CHECK(igraph_i_laplacian_validate_weights(graph, weights));
     if (weights) {
         return igraph_i_get_laplacian_weighted(graph, res, mode, normalization, weights);
     } else {
@@ -475,6 +498,7 @@ igraph_error_t igraph_get_laplacian_sparse(
     const igraph_vector_t *weights
 ) {
     IGRAPH_ASSERT(sparseres != NULL);
+    IGRAPH_CHECK(igraph_i_laplacian_validate_weights(graph, weights));
     if (weights) {
         return igraph_i_get_laplacian_weighted_sparse(graph, sparseres, mode, normalization, weights);
     } else {
