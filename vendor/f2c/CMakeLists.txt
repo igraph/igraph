@@ -45,22 +45,12 @@ if(IGRAPH_PRINT_ARITH_HEADER)
   )
 endif()
 
-# Declare the files needed to compile our vendored f2c copy.
-#
-# We exclude files that contains references to abort() or exit() if we don't
-# need them to compile igraph itself. These files are as follows:
-#
-# - abort_.c
-# - exit_.c
-# - s_paus.c
-# - s_stop.c
-# - sig_die.c
-# - uninit.c
+# Declare the files needed to compile our vendored f2c copy
 add_library(
   f2c_vendored
   OBJECT
   EXCLUDE_FROM_ALL
-  dolio.c       r_sin.c
+  abort_.c    dolio.c       r_sin.c
   dummy.c     dtime_.c      iio.c         r_sinh.c
   backspac.c      due.c     ilnw.c        r_sqrt.c
   c_abs.c     ef1asc_.c     inquire.c     r_tan.c
@@ -70,21 +60,21 @@ add_library(
   c_log.c     erfc_.c       l_lt.c        rsfe.c
   c_sin.c     err.c     lbitbits.c    rsli.c
   c_sqrt.c    etime_.c      lbitshft.c    rsne.c
-  cabs.c      lread.c       s_cat.c
+  cabs.c      exit_.c       lread.c       s_cat.c
   close.c     f77_aloc.c    lwrite.c      s_cmp.c
   ctype.c     f77vers.c     s_copy.c
-  d_abs.c     fmt.c     open.c
+  d_abs.c     fmt.c     open.c        s_paus.c
   d_acos.c    fmtlib.c      pow_ci.c      s_rnge.c
-  d_asin.c    ftell_.c      pow_dd.c
+  d_asin.c    ftell_.c      pow_dd.c      s_stop.c
   d_atan.c    pow_di.c      sfe.c
-  d_atn2.c    getenv_.c     pow_hh.c
+  d_atn2.c    getenv_.c     pow_hh.c      sig_die.c
   d_cnjg.c    h_abs.c       pow_ii.c      signal_.c
   d_cos.c     h_dim.c       pow_ri.c      signbit.c
   d_cosh.c    h_dnnt.c      pow_zi.c      sue.c
   d_dim.c     h_indx.c      pow_zz.c      system_.c
   d_exp.c     h_len.c       r_abs.c       typesize.c
   d_imag.c    h_mod.c       r_acos.c      uio.c
-  d_int.c     h_nint.c      r_asin.c
+  d_int.c     h_nint.c      r_asin.c      uninit.c
   d_lg10.c    h_sign.c      r_atan.c      util.c
   d_log.c     hl_ge.c       r_atn2.c      wref.c
   d_mod.c     hl_gt.c       r_cnjg.c      wrtfmt.c
