@@ -109,19 +109,36 @@ igraph_error_t igraph_get_laplacian(
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
 
+    /* Value of 'mode' is validated in igraph_strength() call above. */
+    if (! directed) {
+        mode = IGRAPH_ALL;
+    } else if (mode == IGRAPH_ALL) {
+        directed = 0;
+    }
+
     for (i = 0; i < no_of_nodes; i++) {
         switch (normalization) {
-            case IGRAPH_LAPLACIAN_UNNORMALIZED:
-            default:
-                MATRIX(*res, i, i) = VECTOR(degree)[i];
-                break;
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            MATRIX(*res, i, i) = VECTOR(degree)[i];
+            break;
 
-            case IGRAPH_LAPLACIAN_SYMMETRIC:
-                if (VECTOR(degree)[i] > 0) {
-                    MATRIX(*res, i, i) = 1;
-                    VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
-                }
-                break;
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            if (VECTOR(degree)[i] > 0) {
+                MATRIX(*res, i, i) = 1;
+                VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_LEFT:
+        case IGRAPH_LAPLACIAN_RIGHT:
+            if (VECTOR(degree)[i] > 0) {
+                MATRIX(*res, i, i) = 1;
+                VECTOR(degree)[i] = 1.0 / VECTOR(degree)[i];
+            }
+            break;
+
+        default:
+            IGRAPH_ERROR("Invalid Laplacian normalization method.", IGRAPH_EINVAL);
         }
     }
 
@@ -129,15 +146,47 @@ igraph_error_t igraph_get_laplacian(
         igraph_integer_t from = IGRAPH_FROM(graph, i);
         igraph_integer_t to   = IGRAPH_TO(graph, i);
         igraph_real_t weight  = weights ? VECTOR(*weights)[i] : 1.0;
+        igraph_real_t norm;
 
         switch (normalization) {
-            case IGRAPH_LAPLACIAN_UNNORMALIZED:
-            default:
-                break;
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            break;
 
-            case IGRAPH_LAPLACIAN_SYMMETRIC:
-                weight *= VECTOR(degree)[from] * VECTOR(degree)[to];
-                break;
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            norm = VECTOR(degree)[from] * VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero %s-%s, "
+                    "cannot perform symmetric normalization of Laplacian with '%s' mode.",
+                    IGRAPH_EINVAL,
+                    mode == IGRAPH_OUT ? "out" : "in", weights ? "strength" : "degree", mode == IGRAPH_OUT ? "out" : "in");
+            }
+            weight *= norm;
+            break;
+
+        case IGRAPH_LAPLACIAN_LEFT:
+            norm = VECTOR(degree)[from];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero in-%s, "
+                    "cannot perform left stochastic normalization of Laplacian with 'in' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
+            }
+            weight *= norm;
+            break;
+
+        case IGRAPH_LAPLACIAN_RIGHT:
+            norm = VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero out-%s, "
+                    "cannot perform right stochastic normalization of Laplacian with 'out' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
+            }
+            weight *= norm;
+            break;
         }
 
         MATRIX(*res, from, to) -= weight;
@@ -200,17 +249,27 @@ igraph_error_t igraph_get_laplacian_sparse(
 
     for (i = 0; i < no_of_nodes; i++) {
         switch (normalization) {
-            case IGRAPH_LAPLACIAN_UNNORMALIZED:
-            default:
-                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
-                break;
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
+            break;
 
-            case IGRAPH_LAPLACIAN_SYMMETRIC:
-                if (VECTOR(degree)[i] > 0) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
-                    VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
-                }
-                break;
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            if (VECTOR(degree)[i] > 0) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
+                VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_LEFT:
+        case IGRAPH_LAPLACIAN_RIGHT:
+            if (VECTOR(degree)[i] > 0) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
+                VECTOR(degree)[i] = 1.0 / VECTOR(degree)[i];
+            }
+            break;
+
+        default:
+            IGRAPH_ERROR("Invalid Laplacian normalization method.", IGRAPH_EINVAL);
         }
     }
 
@@ -218,15 +277,47 @@ igraph_error_t igraph_get_laplacian_sparse(
         igraph_integer_t from = IGRAPH_FROM(graph, i);
         igraph_integer_t to   = IGRAPH_TO(graph, i);
         igraph_real_t weight  = weights ? VECTOR(*weights)[i] : 1.0;
+        igraph_real_t norm;
 
         switch (normalization) {
-            case IGRAPH_LAPLACIAN_UNNORMALIZED:
-            default:
-                break;
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            break;
 
-            case IGRAPH_LAPLACIAN_SYMMETRIC:
-                weight *= VECTOR(degree)[from] * VECTOR(degree)[to];
-                break;
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            norm = VECTOR(degree)[from] * VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero %s-%s, "
+                    "cannot perform symmetric normalization of Laplacian with '%s' mode.",
+                    IGRAPH_EINVAL,
+                    mode == IGRAPH_OUT ? "out" : "in", weights ? "strength" : "degree", mode == IGRAPH_OUT ? "out" : "in");
+            }
+            weight *= norm;
+            break;
+
+        case IGRAPH_LAPLACIAN_LEFT:
+            norm = VECTOR(degree)[from];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero in-%s, "
+                    "cannot perform left stochastic normalization of Laplacian with 'in' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
+            }
+            weight *= norm;
+            break;
+
+        case IGRAPH_LAPLACIAN_RIGHT:
+            norm = VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero out-%s, "
+                    "cannot perform right stochastic normalization of Laplacian with 'out' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
+            }
+            weight *= norm;
+            break;
         }
 
         IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight));

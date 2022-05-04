@@ -135,7 +135,9 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igra
  */
 typedef enum {
     IGRAPH_LAPLACIAN_UNNORMALIZED = 0,
-    IGRAPH_LAPLACIAN_SYMMETRIC = 1
+    IGRAPH_LAPLACIAN_SYMMETRIC = 1,
+    IGRAPH_LAPLACIAN_LEFT = 2,
+    IGRAPH_LAPLACIAN_RIGHT = 3
 } igraph_laplacian_normalization_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_get_laplacian(
