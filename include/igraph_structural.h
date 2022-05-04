@@ -128,10 +128,15 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igra
  * \brief Normalization methods for a Laplacian matrix.
  *
  * Normalization methods for \ref igraph_get_laplacian() and
- * \ref igraph_get_laplacian_sparse()
+ * \ref igraph_get_laplacian_sparse(). In the following, \c A refers to the
+ * (possibly weighted) adjacency matrix and \c D is a diagonal matrix containing
+ * degrees (unweighted case) or strengths (weighted case). Out-, in- or total degrees
+ * are used according to the \p mode parameter.
  *
- * \enumval IGRAPH_LAPLACIAN_UNNORMALIZED Unnormalized Laplacian matrix.
- * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetric normalized Laplacian matrix.
+ * \enumval IGRAPH_LAPLACIAN_UNNORMALIZED Unnormalized Laplacian, <code>L = D - A</code>.
+ * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetric normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
+ * \enumval IGRAPH_LAPLACIAN_LEFT Left-stochastic normalized Laplacian, <code>L = I - D^-1 A</code>.
+ * \enumval IGRAPH_LAPLACIAN_RIGHT Right-stochastic normalized Laplacian, <code>L = I - A D^-1</code>.
  */
 typedef enum {
     IGRAPH_LAPLACIAN_UNNORMALIZED = 0,
