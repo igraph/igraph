@@ -52,6 +52,7 @@ endif()
 #
 # - abort_.c
 # - exit_.c
+# - f77_aloc.c
 # - s_paus.c
 # - s_stop.c
 # - sig_die.c
@@ -71,7 +72,7 @@ add_library(
   c_sin.c     err.c     lbitbits.c    rsli.c
   c_sqrt.c    etime_.c      lbitshft.c    rsne.c
   cabs.c      lread.c       s_cat.c
-  close.c     f77_aloc.c    lwrite.c      s_cmp.c
+  close.c     lwrite.c      s_cmp.c
   ctype.c     f77vers.c     s_copy.c
   d_abs.c     fmt.c     open.c
   d_acos.c    fmtlib.c      pow_ci.c      s_rnge.c
