@@ -83,8 +83,8 @@ int igraph_ncol_yyerror(YYLTYPE* locp,
 %type <edgenum>   edgeid
 %type <weightnum> weight
 
-%token ALNUM
-%token NEWLINE
+%token ALNUM    "alphanumeric"
+%token NEWLINE  "end of line"
 %token ERROR
 
 %%

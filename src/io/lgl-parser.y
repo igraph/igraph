@@ -82,9 +82,9 @@ int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
 %type <edgenum>   edgeid
 %type <weightnum> weight
 
-%token ALNUM
-%token NEWLINE
-%token HASH
+%token ALNUM    "alphanumeric"
+%token NEWLINE  "end of line"
+%token HASH     "#"
 %token ERROR
 
 %%
