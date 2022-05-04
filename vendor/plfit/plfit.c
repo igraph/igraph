@@ -540,7 +540,7 @@ static int plfit_i_continuous_xmin_opt_linear_scan(
                         local_opt_data.last.xmin, local_opt_data.last.D);
 #endif
                 local_best_result = local_opt_data.last;
-                local_best_n = local_opt_data.end - local_opt_data.probes[i] + 1;
+                local_best_n = local_opt_data.end - local_opt_data.probes[i];
             }
         }
 
@@ -1220,7 +1220,7 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
     if (options->finite_size_correction)
         plfit_i_perform_finite_size_correction(result, best_n);
 
-    PLFIT_CHECK(plfit_log_likelihood_discrete(xs_copy+(n-best_n), best_n,
+    PLFIT_CHECK(plfit_log_likelihood_discrete(xs_copy + n - best_n, best_n,
                 result->alpha, result->xmin, &result->L));
     PLFIT_CHECK(plfit_i_calculate_p_value_discrete(xs_copy, n, options, 0, result));
 
