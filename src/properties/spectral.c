@@ -58,17 +58,23 @@ static igraph_error_t igraph_i_laplacian_validate_weights(
  * \function igraph_get_laplacian
  * \brief Returns the Laplacian matrix of a graph.
  *
- * </para><para>
- * The graph Laplacian matrix is similar to an adjacency matrix but
- * contains -1's instead of 1's and the vertex degrees are included in
- * the diagonal. So the result for edge i--j is -1 if i!=j and is equal
- * to the degree of vertex i if i==j. This function will work on a
- * directed graph; in this case, the diagonal will contain the out-degrees.
- * Loop edges will be ignored.
+ * The Laplacian matrix \c L of a graph is defined as
+ * <code>L_ij = - A_ij</code> when <code>i != j</code> and
+ * <code>L_ii = d_i - A_ii</code>. Here \c A denotes the (possibly weighted)
+ * adjacency matrix and <code>d_i</code> is the degree (or strength, if weighted)
+ * of vertex \c i. In directed graphs, the \p mode parameter controls whether to use
+ * out- or in-degrees. Correspondingly, the rows or columns will sum to zero.
+ * In undirected graphs, <code>A_ii</code> is taken to be \em twice the number
+ * (or total weight) of self-loops, ensuring that <code>d_i = \sum_j A_ij</code>.
+ * Thus, the Laplacian of an undirected graph is the same as the Laplacian
+ * of a directed one obtained by replacing each undirected edge with two reciprocal
+ * directed ones.
  *
  * </para><para>
- * The normalized version of the Laplacian matrix has 1 in the diagonal and
- * -1/sqrt(d[i]d[j]) if there is an edge from i to j.
+ * More compactly, <code>L = D - A</code> where the \c D is a diagonal matrix
+ * containing the degrees. The Laplacian matrix can also be normalized, with several
+ * conventional normalization methods. See \ref igraph_laplacian_normalization_t for
+ * the methods available in igraph.
  *
  * </para><para>
  * The first version of this function was written by Vincent Matossian.
@@ -76,14 +82,17 @@ static igraph_error_t igraph_i_laplacian_validate_weights(
  * \param graph Pointer to the graph to convert.
  * \param res Pointer to an initialized matrix object, the result is
  *        stored here. It will be resized if needed.
+ * \param mode Controls whether to use out- or in-degrees in directed graphs.
+ *        If set to \c IGRAPH_ALL, edge directions will be ignored.
  * \param normalization The normalization method to use when calculating the
- *        Laplacian matrix.
- * \param weights An optional vector containing edge weights, to calculate
- *        the weighted Laplacian matrix. Set it to a null pointer to
+ *        Laplacian matrix. See \ref igraph_laplacian_normalization_t for
+ *        possible values.
+ * \param weights An optional vector containing non-negative edge weights,
+ *        to calculate the weighted Laplacian matrix. Set it to a null pointer to
  *        calculate the unweighted Laplacian.
  * \return Error code.
  *
- * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
+ * Time complexity: O(|V|^2), |V| is the number of vertices in the graph.
  *
  * \example examples/simple/igraph_get_laplacian.c
  */
@@ -204,9 +213,8 @@ igraph_error_t igraph_get_laplacian(
 
 /**
  * \function igraph_get_laplacian_sparse
- * \brief Returns the Laplacian matrix of a graph in a sparse matrix format.
+ * \brief Returns the Laplacian of a graph in a sparse matrix format.
  *
- * </para><para>
  * See \ref igraph_get_laplacian() for the definition of the Laplacian matrix.
  *
  * </para><para>
@@ -214,10 +222,13 @@ igraph_error_t igraph_get_laplacian(
  * \param graph Pointer to the graph to convert.
  * \param sparseres Pointer to an initialized sparse matrix object, the
  *        result is stored here.
+ * \param mode Controls whether to use out- or in-degrees in directed graphs.
+ *        If set to \c IGRAPH_ALL, edge directions will be ignored.
  * \param normalization The normalization method to use when calculating the
- *        Laplacian matrix.
- * \param weights An optional vector containing edge weights, to calculate
- *        the weighted Laplacian matrix. Set it to a null pointer to
+ *        Laplacian matrix. See \ref igraph_laplacian_normalization_t for
+ *        possible values.
+ * \param weights An optional vector containing non-negative edge weights,
+ *        to calculate the weighted Laplacian matrix. Set it to a null pointer to
  *        calculate the unweighted Laplacian.
  * \return Error code.
  *
