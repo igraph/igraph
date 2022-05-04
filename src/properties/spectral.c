@@ -354,17 +354,27 @@ igraph_error_t igraph_laplacian(
     const igraph_t *graph, igraph_matrix_t *res, igraph_sparsemat_t *sparseres,
     igraph_bool_t normalized, const igraph_vector_t *weights
 ) {
+    igraph_laplacian_normalization_t norm_method = IGRAPH_LAPLACIAN_UNNORMALIZED;
+
     if (!res && !sparseres) {
         IGRAPH_ERROR("Laplacian: specify at least one of `res' or `sparseres'",
                      IGRAPH_EINVAL);
     }
 
+    if (normalized) {
+        if (igraph_is_directed(graph)) {
+            norm_method = IGRAPH_LAPLACIAN_LEFT;
+        } else {
+            norm_method = IGRAPH_LAPLACIAN_SYMMETRIC;
+        }
+    }
+
     if (res) {
-        IGRAPH_CHECK(igraph_get_laplacian(graph, res, IGRAPH_OUT, normalized, weights));
+        IGRAPH_CHECK(igraph_get_laplacian(graph, res, IGRAPH_OUT, norm_method, weights));
     }
 
     if (sparseres) {
-        IGRAPH_CHECK(igraph_get_laplacian_sparse(graph, sparseres, IGRAPH_OUT, normalized, weights));
+        IGRAPH_CHECK(igraph_get_laplacian_sparse(graph, sparseres, IGRAPH_OUT, norm_method, weights));
     }
 
     return IGRAPH_SUCCESS;
