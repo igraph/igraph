@@ -29,7 +29,7 @@ void print_result(const igraph_plfit_result_t* result) {
     printf("xmin = %.5f\n", result->xmin);
     printf("L = %.5f\n", result->L);
     printf("D = %.5f\n", result->D);
-    printf("p = %.5f\n", result->p);
+    printf("p = %.4f\n", result->p);
     printf("====================\n");
 }
 
@@ -299,6 +299,9 @@ int test_discrete() {
 
 int main() {
     int retval;
+
+    /* Seed random number generator to ensure reproducibility. */
+    igraph_rng_seed(igraph_rng_default(), 42);
 
     retval = test_continuous();
     if (retval) {
