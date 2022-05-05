@@ -273,28 +273,28 @@ int test_discrete() {
     if (igraph_power_law_fit(&vector, &result, -1, 0)) {
         return 3;
     }
-    IGRAPH_ASSERT(result.data == &vector && igraph_is_nan(result.p));
+    IGRAPH_ASSERT(result.data == &vector);
     print_result(&result);
 
     /* determining alpha only */
     if (igraph_power_law_fit(&vector, &result, 2, 0)) {
         return 4;
     }
-    IGRAPH_ASSERT(result.data == &vector && igraph_is_nan(result.p));
+    IGRAPH_ASSERT(result.data == &vector);
     print_result(&result);
 
     /* forcing continuous fitting */
     if (igraph_power_law_fit(&vector, &result, -1, 1)) {
         return 5;
     }
-    IGRAPH_ASSERT(result.data == &vector && igraph_is_nan(result.p));
+    IGRAPH_ASSERT(result.data == &vector);
     print_result(&result);
 
     /* forcing continuous fitting, xmin given */
     if (igraph_power_law_fit(&vector, &result, 2, 1)) {
         return 6;
     }
-    IGRAPH_ASSERT(result.data == &vector && igraph_is_nan(result.p));
+    IGRAPH_ASSERT(result.data == &vector);
     print_result(&result);
 
     return 0;

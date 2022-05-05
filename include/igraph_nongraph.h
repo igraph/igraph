@@ -81,11 +81,10 @@ typedef void igraph_vector_function_t(const igraph_vector_t *var,
  */
 typedef struct igraph_plfit_result_t {
     igraph_bool_t continuous;
-    double alpha;
-    double xmin;
-    double L;
-    double D;
-    double p;
+    igraph_real_t alpha;
+    igraph_real_t xmin;
+    igraph_real_t L;
+    igraph_real_t D;
     const igraph_vector_t* data;
 } igraph_plfit_result_t;
 
@@ -103,10 +102,16 @@ IGRAPH_EXPORT igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin
                               igraph_integer_t maxit, igraph_integer_t trace,
                               igraph_real_t abstol, igraph_real_t reltol, igraph_integer_t nREPORT, void *ex,
                               igraph_integer_t *fncount, igraph_integer_t *grcount);
-IGRAPH_EXPORT igraph_error_t igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
-                                       igraph_real_t xmin, igraph_bool_t force_continuous);
 IGRAPH_EXPORT igraph_bool_t igraph_almost_equals(double a, double b, double eps);
 IGRAPH_EXPORT int igraph_cmp_epsilon(double a, double b, double eps);
+
+IGRAPH_EXPORT igraph_error_t igraph_power_law_fit(
+    const igraph_vector_t* vector, igraph_plfit_result_t* result,
+    igraph_real_t xmin, igraph_bool_t force_continuous
+);
+IGRAPH_EXPORT igraph_error_t igraph_plfit_result_calculate_p_value(
+    igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
+) {
 
 __END_DECLS
 

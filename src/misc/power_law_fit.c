@@ -43,6 +43,43 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
     igraph_i_plfit_error_message = reason;
 }
 
+static igraph_error_t igraph_i_handle_plfit_error(plfit_error_t code) {
+    switch (code) {
+    case PLFIT_SUCCESS:
+        return IGRAPH_SUCCESS;
+
+    case PLFIT_FAILURE:
+        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_FAILURE);
+        break;
+
+    case PLFIT_EINVAL:
+        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EINVAL);
+        break;
+
+    case PLFIT_UNDRFLOW:
+        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EUNDERFLOW); /* LCOV_EXCL_LINE */
+        break;
+
+    case PLFIT_OVERFLOW:
+        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EOVERFLOW); /* LCOV_EXCL_LINE */
+        break;
+
+    case PLFIT_ENOMEM:
+        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        break;
+
+    case PLFIT_EMAXITER:
+        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_DIVERGED); /* LCOV_EXCL_LINE */
+        break;
+
+    default:
+        IGRAPH_ERRORF("Unknown error code returned from plfit (%d)", IGRAPH_FAILURE);
+        break;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \ingroup nongraph
  * \function igraph_power_law_fit
@@ -168,30 +205,7 @@ igraph_error_t igraph_power_law_fit(
 
     RNG_END();
 
-    switch (retval) {
-    case PLFIT_FAILURE:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_FAILURE);
-        break;
-
-    case PLFIT_EINVAL:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EINVAL);
-        break;
-
-    case PLFIT_UNDRFLOW:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EUNDERFLOW);
-        break;
-
-    case PLFIT_OVERFLOW:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EOVERFLOW);
-        break;
-
-    case PLFIT_ENOMEM:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        break;
-
-    default:
-        break;
-    }
+    IGRAPH_CHECK(igraph_i_handle_plfit_error(retval));
 
     if (result) {
         result->data = data;
@@ -200,7 +214,57 @@ igraph_error_t igraph_power_law_fit(
         result->xmin = plfit_result.xmin;
         result->L = plfit_result.L;
         result->D = plfit_result.D;
-        result->p = IGRAPH_NAN;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup nongraph
+ * \function igraph_plfit_result_calculate_p_value
+ * \brief Calculates the p-value of a fitter power-law model
+ *
+ * </para><para>
+ * The p-value is calculated by resampling the input data many times in a way
+ * that the part below the fitted \c x_min threshold is resampled from the
+ * input data itself, while the part above the fitted \c x_min threshold is
+ * drawn from the fitted power-law function. A Kolmogorov-Smirnov test is then
+ * performed for each resampled dataset and its test statistic is compared with the
+ * observed test statistic from the original dataset. The fraction of resampled
+ * datasets that have a \em higher test statistic is the returned p-value.
+ *
+ * </para><para>
+ * Note that the precision of the returned p-value depends on the number of
+ * resampling attempts. The number of resampling trials is determined by
+ * 0.25 divided by the square of the required precision. For instance, a required
+ * precision of 0.01 means that 2500 samples will be drawn.
+ *
+ * \param model The fitted power-law model from the \ref igraph_power_law_fit()
+ *        function
+ * \param result The calculated p-value is returned here
+ * \param precision The desired precision of the p-value. Higher values correspond
+ *        to longer calculation time.
+ * @return igraph_error_t
+ */
+igraph_error_t igraph_plfit_result_calculate_p_value(
+    igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
+) {
+    plfit_error_handler_t* plfit_stored_error_handler;
+    plfit_error_t retval;
+    plfit_result_t plfit_result;
+
+    RNG_BEGIN();
+
+    plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
+
+    plfit_set_error_handler(plfit_stored_error_handler);
+
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_i_handle_plfit_error(retval));
+
+    if (result) {
+        *result = plfit_result.p;
     }
 
     return IGRAPH_SUCCESS;
