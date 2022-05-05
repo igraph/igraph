@@ -85,7 +85,7 @@ whitespace  [ \r\n\t\v\f]
 <VALUE>(\+|\-)?((?i:nan)|(?i:inf)) { BEGIN(INITIAL); return NUM; }
 (\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { BEGIN(INITIAL); return NUM; }
 [a-zA-Z_][a-zA-Z_0-9]*  { BEGIN(VALUE); return KEYWORD; }
-\[               {
+\[                      {
                           BEGIN(INITIAL);
                           yyextra->depth++;
                           if (yyextra->depth >= 32) {

@@ -117,7 +117,7 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 %token EOFF
 %token ERROR
 
-%destructor { free($$); } string key KEYWORD;
+%destructor { free($$); } string key;
 %destructor { igraph_gml_tree_destroy($$); } list keyvalue;
 
 %%
