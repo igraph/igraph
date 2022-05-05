@@ -24,7 +24,6 @@
 
 typedef struct {
     void *scanner;
-    int eof;
     char errmsg[300];
     igraph_error_t igraph_errno;
     int depth;

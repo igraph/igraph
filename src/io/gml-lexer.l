@@ -96,21 +96,9 @@ whitespace  [ \r\n\t\v\f]
                         }
 \]                      {
                           yyextra->depth--;
-                          if (yyextra->depth < 0) {
-                            return ERROR;
-                          } else {
-                            return LISTCLOSE;
-                          }
+                          return LISTCLOSE;
                         }
 {whitespace}            { /* other whitespace ignored */ }
 
-<<EOF>>                 {
-                          if (yyextra->eof) {
-                            yyterminate();
-                          } else {
-                            yyextra->eof=1;
-                            return EOFF;
-                          }
-                        }
 .                       { return ERROR; }
 %%

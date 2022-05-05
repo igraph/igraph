@@ -114,7 +114,6 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 %token <str>    KEYWORD "keyword"
 %token LISTOPEN         "["
 %token LISTCLOSE        "]"
-%token EOFF
 %token ERROR
 
 %destructor { free($$); } string key;
@@ -122,9 +121,7 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 
 %%
 
-input:   list      { context->tree=$1; }
-       | list EOFF { context->tree=$1; }
-;
+input:   list      { context->tree=$1; };
 
 list:   /* empty */   { IGRAPH_YY_CHECK(igraph_i_gml_make_empty(&$$)); }
       | keyvalue      { $$=$1; } /* redundant and causes shift/reduce conflict, but increases performance */
