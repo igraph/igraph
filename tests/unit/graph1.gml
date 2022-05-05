@@ -5,7 +5,7 @@ graph [
     node [
         id 1
         a [ b 1 ]
-        b 2
+        b +2
         c 5.6
         graphics [ x 0 y 0 ]
     ]
@@ -21,6 +21,7 @@ graph [
         source 5 target 1 
         weight -0.45
         label -0.45
+        num1 NAN
     ]
     node [ 
         id 5
@@ -32,6 +33,7 @@ graph [
 # The 'sou_rce' attribute will be ignored by the GML writer as it would conflict with
 # 'source' after stripping the '_' character.
         sou_rce 1.0
+        num1 +inF
     ]
     AttOne 1
     AttOne "x"

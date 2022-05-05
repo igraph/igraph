@@ -39,6 +39,7 @@ graph
     target 1
     weight -0.45
     label "-0.45"
+    num1 NaN
   ]
   edge
   [
@@ -46,6 +47,7 @@ graph
     target 5
     weight NaN
     label "edge label"
+    num1 Inf
   ]
 ]
 ======================
