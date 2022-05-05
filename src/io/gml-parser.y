@@ -112,9 +112,9 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 %token STRING           "string"
 %token NUM              "number"
 %token <str>    KEYWORD "keyword"
-%token MINUS            "'-'"
-%token LISTOPEN         "'['"
-%token LISTCLOSE        "']'"
+%token MINUS            "-"
+%token LISTOPEN         "["
+%token LISTCLOSE        "]"
 %token EOFF
 %token ERROR
 
