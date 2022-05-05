@@ -134,14 +134,14 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
 %token ALNUM
 %token QSTR
 %token PSTR
-%token NETWORKLINE
+%token NETWORKLINE   "'*network' line"
 %token NET_TITLE
-%token VERTICESLINE
-%token ARCSLINE
-%token EDGESLINE
-%token ARCSLISTLINE
-%token EDGESLISTLINE
-%token MATRIXLINE
+%token VERTICESLINE  "'*vertices' line"
+%token ARCSLINE      "'*arcs' line"
+%token EDGESLINE     "'*edges' line"
+%token ARCSLISTLINE  "'*arcslist' line"
+%token EDGESLISTLINE "'*edgeslist' line"
+%token MATRIXLINE    "'*matrix' line"
 %token ERROR
 
 %token VP_X_FACT

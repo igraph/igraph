@@ -85,18 +85,18 @@ static igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
 %type <integer> integer elabel;
 %type <real> weight;
 
-%token NUM
+%token NUM              "number"
 %token NEWLINE
-%token DL
-%token NEQ
+%token DL               "'DL'"
+%token NEQ              "'n=vertexcount'"
 %token DATA
-%token LABELS
-%token LABELSEMBEDDED
+%token LABELS           "'labels:'"
+%token LABELSEMBEDDED   "'labels embedded:'"
 %token FORMATFULLMATRIX
 %token FORMATEDGELIST1
 %token FORMATNODELIST1
 %token DIGIT
-%token LABEL
+%token LABEL            "label"
 %token EOFF
 %token ERROR
 
