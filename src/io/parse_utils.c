@@ -71,6 +71,8 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
  * The input is a not-necesarily-null-terminated string that must contain only the number.
  * Any additional characters at the end of the string, such as whitespace, will trigger
  * a parsing error.
+ *
+ * NaN and Inf are supported.
  */
 igraph_error_t igraph_i_parse_real(const char *str, size_t length, igraph_real_t *value) {
     char buffer[128];
