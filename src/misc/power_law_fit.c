@@ -43,7 +43,7 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
     igraph_i_plfit_error_message = reason;
 }
 
-static igraph_error_t igraph_i_handle_plfit_error(plfit_error_t code) {
+static igraph_error_t igraph_i_handle_plfit_error(int code) {
     switch (code) {
     case PLFIT_SUCCESS:
         return IGRAPH_SUCCESS;
@@ -73,7 +73,7 @@ static igraph_error_t igraph_i_handle_plfit_error(plfit_error_t code) {
         break;
 
     default:
-        IGRAPH_ERRORF("Unknown error code returned from plfit (%d)", IGRAPH_FAILURE);
+        IGRAPH_ERRORF("Unknown error code returned from plfit (%d)", IGRAPH_FAILURE, code);
         break;
     }
 
@@ -247,10 +247,10 @@ igraph_error_t igraph_power_law_fit(
  * @return igraph_error_t
  */
 igraph_error_t igraph_plfit_result_calculate_p_value(
-    igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
+    const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
 ) {
     plfit_error_handler_t* plfit_stored_error_handler;
-    plfit_error_t retval;
+    int retval;
     plfit_result_t plfit_result;
 
     RNG_BEGIN();
@@ -258,6 +258,7 @@ igraph_error_t igraph_plfit_result_calculate_p_value(
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
 
     plfit_set_error_handler(plfit_stored_error_handler);
+    retval = PLFIT_SUCCESS;
 
     RNG_END();
 

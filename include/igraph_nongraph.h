@@ -110,8 +110,8 @@ IGRAPH_EXPORT igraph_error_t igraph_power_law_fit(
     igraph_real_t xmin, igraph_bool_t force_continuous
 );
 IGRAPH_EXPORT igraph_error_t igraph_plfit_result_calculate_p_value(
-    igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
-) {
+    const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
+);
 
 __END_DECLS
 

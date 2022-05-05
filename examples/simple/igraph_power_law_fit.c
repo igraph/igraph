@@ -224,6 +224,8 @@ int test_continuous() {
 int test_discrete() {
     igraph_plfit_result_t result;
     igraph_vector_t vector;
+    igraph_real_t p;
+
     double data[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 1, 1, 1, 1, 1, 1, 1,
                       1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1,
                       2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -296,6 +298,12 @@ int test_discrete() {
     }
     IGRAPH_ASSERT(result.data == &vector);
     print_result(&result);
+
+    /* Calculating p-value for the fit */
+    if (igraph_plfit_result_calculate_p_value(&result, &p, 0.1)) {
+        return 7;
+    }
+    printf("p = %.2f\n", p);
 
     return 0;
 }
