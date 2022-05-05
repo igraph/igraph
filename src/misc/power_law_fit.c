@@ -43,6 +43,28 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
     igraph_i_plfit_error_message = reason;
 }
 
+static void igraph_i_plfit_prepare_continuous_options(
+    plfit_continuous_options_t* options, igraph_bool_t finite_size_correction
+) {
+    plfit_continuous_options_init(options);
+    options->p_value_method = PLFIT_P_VALUE_SKIP;
+    options->xmin_method = PLFIT_STRATIFIED_SAMPLING;
+    options->finite_size_correction = (plfit_bool_t) finite_size_correction;
+}
+
+static void igraph_i_plfit_prepare_discrete_options(
+    plfit_discrete_options_t* options, igraph_bool_t finite_size_correction
+) {
+    plfit_discrete_options_init(options);
+    options->p_value_method = PLFIT_P_VALUE_SKIP;
+    options->finite_size_correction = (plfit_bool_t) finite_size_correction;
+}
+
+/* Decides whether to use finite size correction for the given input data */
+static igraph_bool_t igraph_i_plfit_should_use_finite_size_correction(const igraph_vector_t* data) {
+    return igraph_vector_size(data) < 50;
+}
+
 static igraph_error_t igraph_i_handle_plfit_error(int code) {
     switch (code) {
     case PLFIT_SUCCESS:
@@ -158,11 +180,12 @@ igraph_error_t igraph_power_law_fit(
     plfit_discrete_options_t disc_options;
     igraph_bool_t discrete = force_continuous ? 0 : 1;
     igraph_bool_t finite_size_correction;
+
     int retval;
     size_t i, n;
 
+    finite_size_correction = igraph_i_plfit_should_use_finite_size_correction(data);
     n = (size_t) igraph_vector_size(data);
-    finite_size_correction = (n < 50);
 
     if (discrete) {
         /* Does the vector contain discrete values only? */
@@ -178,10 +201,7 @@ igraph_error_t igraph_power_law_fit(
 
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
     if (discrete) {
-        plfit_discrete_options_init(&disc_options);
-        disc_options.p_value_method = PLFIT_P_VALUE_SKIP;
-        disc_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
-
+        igraph_i_plfit_prepare_discrete_options(&disc_options, finite_size_correction);
         if (xmin >= 0) {
             retval = plfit_estimate_alpha_discrete(VECTOR(*data), n, xmin,
                                                    &disc_options, &plfit_result);
@@ -189,11 +209,7 @@ igraph_error_t igraph_power_law_fit(
             retval = plfit_discrete(VECTOR(*data), n, &disc_options, &plfit_result);
         }
     } else {
-        plfit_continuous_options_init(&cont_options);
-        cont_options.p_value_method = PLFIT_P_VALUE_SKIP;
-        cont_options.xmin_method = PLFIT_STRATIFIED_SAMPLING;
-        cont_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
-
+        igraph_i_plfit_prepare_continuous_options(&cont_options, finite_size_correction);
         if (xmin >= 0) {
             retval = plfit_estimate_alpha_continuous(VECTOR(*data), n, xmin,
                      &cont_options, &plfit_result);
@@ -249,16 +265,43 @@ igraph_error_t igraph_power_law_fit(
 igraph_error_t igraph_plfit_result_calculate_p_value(
     const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
 ) {
-    plfit_error_handler_t* plfit_stored_error_handler;
     int retval;
+    plfit_continuous_options_t cont_options;
+    plfit_discrete_options_t disc_options;
     plfit_result_t plfit_result;
+    plfit_error_handler_t* plfit_stored_error_handler;
+    igraph_bool_t finite_size_correction;
+
+    IGRAPH_ASSERT(model != NULL);
+
+    plfit_result.alpha = model->alpha;
+    plfit_result.xmin = model->xmin;
+    plfit_result.L = model->L;
+    plfit_result.D = model->D;
+
+    finite_size_correction = igraph_i_plfit_should_use_finite_size_correction(model->data);
 
     RNG_BEGIN();
 
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
-
+    if (model->continuous) {
+        igraph_i_plfit_prepare_continuous_options(&cont_options, finite_size_correction);
+        cont_options.p_value_method = PLFIT_P_VALUE_EXACT;
+        cont_options.p_value_precision = precision;
+        retval = plfit_calculate_p_value_continuous(
+            VECTOR(*model->data), (size_t) igraph_vector_size(model->data),
+            &cont_options, /* xmin_fixed = */ 0, &plfit_result
+        );
+    } else {
+        igraph_i_plfit_prepare_discrete_options(&disc_options, finite_size_correction);
+        disc_options.p_value_method = PLFIT_P_VALUE_EXACT;
+        disc_options.p_value_precision = precision;
+        retval = plfit_calculate_p_value_discrete(
+            VECTOR(*model->data), (size_t) igraph_vector_size(model->data),
+            &disc_options, /* xmin_fixed = */ 0, &plfit_result
+        );
+    }
     plfit_set_error_handler(plfit_stored_error_handler);
-    retval = PLFIT_SUCCESS;
 
     RNG_END();
 
