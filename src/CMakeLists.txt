@@ -283,6 +283,7 @@ add_library(
   misc/motifs.c
   misc/order_cycle.cpp
   misc/other.c
+  misc/power_law_fit.c
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c
