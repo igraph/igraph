@@ -15,6 +15,7 @@ graph [
         a 2
         b "asd"
         d -Inf
+        nan "foo"
     ]
     edge [ 
         source 5 target 1 
