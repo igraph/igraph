@@ -112,7 +112,6 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 %token STRING           "string"
 %token NUM              "number"
 %token <str>    KEYWORD "keyword"
-%token MINUS            "-"
 %token LISTOPEN         "["
 %token LISTCLOSE        "]"
 %token EOFF
@@ -137,10 +136,6 @@ keyvalue:   key num
             { IGRAPH_YY_CHECK(igraph_i_gml_make_string($1, @1.first_line, $2, &$$)); }
           | key LISTOPEN list LISTCLOSE
             { IGRAPH_YY_CHECK(igraph_i_gml_make_list($1, @1.first_line, $3, &$$)); }
-          | key key
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, @1.first_line, $2, 1.0, &$$)); }
-          | key MINUS key
-            { IGRAPH_YY_CHECK(igraph_i_gml_make_numeric2($1, @1.first_line, $3, -1.0, &$$)); }
 ;
 
 key: KEYWORD { IGRAPH_YY_CHECK(igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner),
@@ -207,40 +202,6 @@ static igraph_error_t igraph_i_gml_make_numeric(const char *name,
 
   *tree = t;
   IGRAPH_FINALLY_CLEAN(1); /* t */
-
-  return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_gml_make_numeric2(char *name,
-                                                 int line,
-                                                 char *value,
-                                                 igraph_real_t sign,
-                                                 igraph_gml_tree_t **tree) {
-
-  igraph_gml_tree_t *t = IGRAPH_CALLOC(1, igraph_gml_tree_t);
-  if (!t) {
-    IGRAPH_ERROR("Cannot build GML tree.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-  }
-  IGRAPH_FINALLY(igraph_free, t);
-
-  /* if v == "inf" or v == "nan", the newly created tree node will take ownership
-   * of s. If the creation fails, we need to free s and v as well in order not
-   * to leak memory */
-  IGRAPH_FINALLY(igraph_free, name);
-  IGRAPH_FINALLY(igraph_free, value);
-  if (strcasecmp(value, "inf") == 0) {
-    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, line, sign * IGRAPH_INFINITY));
-  } else if (strcasecmp(value, "nan") == 0) {
-    IGRAPH_CHECK(igraph_gml_tree_init_real(t, name, line, IGRAPH_NAN));
-  } else {
-    IGRAPH_ERROR("Error while parsing GML.", IGRAPH_PARSEERROR);
-  }
-
-  IGRAPH_FREE(value);
-
-  *tree = t;
-
-  IGRAPH_FINALLY_CLEAN(3); /* +name, +t */
 
   return IGRAPH_SUCCESS;
 }

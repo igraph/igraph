@@ -73,15 +73,20 @@
 digit       [0-9]
 whitespace  [ \r\n\t\v\f]
 
+/* Use to parse inf/nan as number only when expecting a value, i.e. after a keyword.
+ * Otherwise they are parsed as a keyword. */
+%s VALUE
+
 %%
 
 ^#[^\0\n\r]*            { /* comments ignored */ }
 
-\"[^\0\"]*\"            { return STRING; }
-\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
-[a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
-\-                      { return MINUS; }
-\[                      {
+\"[^\0\"]*\"            { BEGIN(INITIAL); return STRING; }
+<VALUE>(\+|\-)?((?i:nan)|(?i:inf)) { BEGIN(INITIAL); return NUM; }
+(\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { BEGIN(INITIAL); return NUM; }
+[a-zA-Z_][a-zA-Z_0-9]*  { BEGIN(VALUE); return KEYWORD; }
+\[               {
+                          BEGIN(INITIAL);
                           yyextra->depth++;
                           if (yyextra->depth >= 32) {
                             return ERROR;
