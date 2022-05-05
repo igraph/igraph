@@ -349,7 +349,10 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
  *             \ref igraph_degree directly as an input argument to
  *             \ref igraph_power_law_fit
  * \param result the result of the fitting algorithm. See \ref igraph_plfit_result_t
- *             for more details.
+ *             for more details. Note that the p-value of the fit is \em not
+ *             calculated by default as it is time-consuming; you need to call
+ *             \ref igraph_plfit_result_calculate_p_value() to calculate the
+ *             p-value itself
  * \param xmin the minimum value in the sample vector where the power-law
  *             behaviour is expected to kick in. Samples smaller than \c xmin
  *             will be ignored by the algorithm. Pass zero here if you want to
@@ -377,8 +380,10 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
  *
  * \example examples/simple/igraph_power_law_fit.c
  */
-igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* result,
-                         igraph_real_t xmin, igraph_bool_t force_continuous) {
+igraph_error_t igraph_power_law_fit(
+    const igraph_vector_t* data, igraph_plfit_result_t* result,
+    igraph_real_t xmin, igraph_bool_t force_continuous
+) {
     plfit_error_handler_t* plfit_stored_error_handler;
     plfit_result_t plfit_result;
     plfit_continuous_options_t cont_options;
@@ -406,7 +411,7 @@ igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_re
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
     if (discrete) {
         plfit_discrete_options_init(&disc_options);
-        disc_options.p_value_method = PLFIT_P_VALUE_EXACT;
+        disc_options.p_value_method = PLFIT_P_VALUE_SKIP;
         disc_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
         if (xmin >= 0) {
@@ -417,7 +422,7 @@ igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_re
         }
     } else {
         plfit_continuous_options_init(&cont_options);
-        cont_options.p_value_method = PLFIT_P_VALUE_EXACT;
+        cont_options.p_value_method = PLFIT_P_VALUE_SKIP;
         cont_options.xmin_method = PLFIT_STRATIFIED_SAMPLING;
         cont_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
@@ -458,12 +463,13 @@ igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_re
     }
 
     if (result) {
+        result->data = data;
         result->continuous = !discrete;
         result->alpha = plfit_result.alpha;
         result->xmin = plfit_result.xmin;
         result->L = plfit_result.L;
         result->D = plfit_result.D;
-        result->p = plfit_result.p;
+        result->p = IGRAPH_NAN;
     }
 
     return IGRAPH_SUCCESS;

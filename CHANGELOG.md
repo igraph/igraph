@@ -437,12 +437,17 @@ Some of the highlights are:
  - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
    permutation vector.
 
- - `igraph_power_law_fit()` now uses a different method to calculate the
-   p-value, which gives more accurate results and matches the proposal of the
-   original paper of Clauset, Shalizi and Newman (2009). The selection of the
-   x_min cutoff also uses a faster method. As a consequence, results might be
-   slightly different from earlier igraph versions. The new behaviour is now
-   consistent with the defaults of the underlying `plfit` library.
+ - `igraph_power_law_fit()` does not calculate the p-value automatically any
+   more because the previous estimation method did not match the results from
+   the original paper of Clauset, Shalizi and Newman (2009) and the
+   implementation of the method outlined in the paper runs slower than the
+   previous naive estimate. A separate function named
+   `igraph_plfit_result_calculate_p_value()` is now provided for calculating
+   the p-value. The automatic selection of the `x_min` cutoff also uses a
+   different method than earlier versions. As a consequence, results might be
+   slightly different if you used tests where the `x_min` cutoff was selected
+   automatically. The new behaviour is now consistent with the defaults of the
+   underlying `plfit` library.
 
  - `igraph_preference_game()` now uses an `igraph_vector_int_t` to return the
    types of the nodes in the generated graph.

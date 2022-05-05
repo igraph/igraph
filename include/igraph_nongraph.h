@@ -71,10 +71,13 @@ typedef void igraph_vector_function_t(const igraph_vector_t *var,
  * \member D     The test statistic of a Kolmogorov-Smirnov test that compares
  *               the fitted distribution with the input vector. Smaller scores
  *               denote better fit.
- * \member p     The p-value of the Kolmogorov-Smirnov test. Small p-values
- *               (less than 0.05) indicate that the test rejected the hypothesis
- *               that the original data could have been drawn from the fitted
- *               power-law distribution.
+ * \member p     The p-value of the Kolmogorov-Smirnov test; \c NaN if it has
+ *               not been calculated yet. Small p-values (less than 0.05)
+ *               indicate that the test rejected the hypothesis that the
+ *               original data could have been drawn from the fitted power-law
+ *               distribution.
+ * \member data  The vector containing the original input data. May not be valid
+ *               any more if the caller already destroyed the vector.
  */
 typedef struct igraph_plfit_result_t {
     igraph_bool_t continuous;
@@ -83,6 +86,7 @@ typedef struct igraph_plfit_result_t {
     double L;
     double D;
     double p;
+    const igraph_vector_t* data;
 } igraph_plfit_result_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
