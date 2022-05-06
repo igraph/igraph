@@ -57,5 +57,8 @@ int main() {
     printf("xmin = %.5f\n", model.xmin);
     printf("log-likelihood = %.5f\n", model.L);
 
+    igraph_vector_destroy(&degree);
+    igraph_destroy(&g);
+
     return 0;
 }
