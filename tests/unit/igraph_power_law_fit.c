@@ -22,6 +22,7 @@
 */
 
 #include <igraph.h>
+#include "test_utilities.h"
 
 void print_result(const igraph_plfit_result_t* result) {
     printf("continuous = %s\n", result->continuous ? "true" : "false");
@@ -323,6 +324,8 @@ int main() {
     if (retval) {
         return retval;
     }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
