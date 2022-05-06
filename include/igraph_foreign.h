@@ -39,7 +39,7 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
-                                             igraph_integer_t n, igraph_bool_t directed);
+                                             igraph_integer_t n, igraph_bool_t directed, igraph_bool_t onebased);
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
                                          const igraph_strvector_t *predefnames, igraph_bool_t names,
                                          igraph_add_weights_t weights, igraph_bool_t directed);
@@ -69,7 +69,8 @@ IGRAPH_EXPORT igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instre
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                                        igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream);
+IGRAPH_EXPORT igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream,
+                                                         igraph_bool_t onebased);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                                           const char *names, const char *weights);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,

@@ -39,7 +39,7 @@ int main() {
         VECTOR(types)[i] = i % 2;
     }
     igraph_create_bipartite(&g, &types, &edges, /*directed=*/ 1);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_vector_bool_destroy(&types);
     igraph_destroy(&g);
 

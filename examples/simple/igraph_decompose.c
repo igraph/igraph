@@ -20,7 +20,7 @@ int main() {
 
     igraph_decompose(&ring, &complist, IGRAPH_WEAK, -1, 0);
     component = igraph_graph_list_get_ptr(&complist, 0);
-    igraph_write_graph_edgelist(component, stdout);
+    igraph_write_graph_edgelist(component, stdout, /* onebased */ 0);
     igraph_destroy(&ring);
     igraph_graph_list_clear(&complist);
 
@@ -41,7 +41,7 @@ int main() {
     igraph_decompose(&g, &complist, IGRAPH_WEAK, 3, 2);
     for (i = 0; i < igraph_graph_list_size(&complist); i++) {
         component = igraph_graph_list_get_ptr(&complist, i);
-        igraph_write_graph_edgelist(component, stdout);
+        igraph_write_graph_edgelist(component, stdout, /* onebased */ 0);
     }
     igraph_destroy(&g);
 

@@ -44,7 +44,7 @@ int main() {
     printf("Vertices: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Edges: %" IGRAPH_PRId "\n", igraph_ecount(&g));
     printf("Directed: %i\n", igraph_is_directed(&g) ? 1 : 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     return 0;

@@ -32,7 +32,7 @@ int main() {
     igraph_square_lattice(&g, &v, 1, IGRAPH_DIRECTED, 1 /*mutual*/, 0 /*periodic*/);
     igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_COLLAPSE,
                          /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
 
     igraph_destroy(&g);
     igraph_vector_int_destroy(&v);
@@ -45,7 +45,7 @@ int main() {
                  -1);
     igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_MUTUAL,
                          /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     return 0;

@@ -36,7 +36,7 @@ void dump_graph(const char* header, const igraph_t* g) {
     printf("Vertices: %" IGRAPH_PRId "\n", igraph_vcount(g));
     printf("Edges: %" IGRAPH_PRId "\n", igraph_ecount(g));
     printf("Directed: %i\n", igraph_is_directed(g) ? 1 : 0);
-    igraph_write_graph_edgelist(g, stdout);
+    igraph_write_graph_edgelist(g, stdout, /* onebased */ 0);
 }
 
 void dump_vertex_attribute_bool(const char* name, const igraph_t* g) {

@@ -30,7 +30,7 @@ int main() {
     /* complementer of the empty graph */
     igraph_empty(&g1, 5, IGRAPH_DIRECTED);
     igraph_complementer(&g2, &g1, IGRAPH_LOOPS);
-    igraph_write_graph_edgelist(&g2, stdout);
+    igraph_write_graph_edgelist(&g2, stdout, /* onebased */ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
@@ -39,7 +39,7 @@ int main() {
     /* the same without loops */
     igraph_empty(&g1, 5, IGRAPH_DIRECTED);
     igraph_complementer(&g2, &g1, IGRAPH_NO_LOOPS);
-    igraph_write_graph_edgelist(&g2, stdout);
+    igraph_write_graph_edgelist(&g2, stdout, /* onebased */ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
@@ -59,7 +59,7 @@ int main() {
     /* complementer of the full graph, results loops only */
     igraph_full(&g1, 5, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
     igraph_complementer(&g2, &g1, IGRAPH_LOOPS);
-    igraph_write_graph_edgelist(&g2, stdout);
+    igraph_write_graph_edgelist(&g2, stdout, /* onebased */ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
@@ -72,7 +72,7 @@ int main() {
     /* complementer of the empty graph */
     igraph_empty(&g1, 5, IGRAPH_UNDIRECTED);
     igraph_complementer(&g2, &g1, IGRAPH_LOOPS);
-    igraph_write_graph_edgelist(&g2, stdout);
+    igraph_write_graph_edgelist(&g2, stdout, /* onebased */ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
@@ -81,7 +81,7 @@ int main() {
     /* the same without loops */
     igraph_empty(&g1, 5, IGRAPH_UNDIRECTED);
     igraph_complementer(&g2, &g1, IGRAPH_NO_LOOPS);
-    igraph_write_graph_edgelist(&g2, stdout);
+    igraph_write_graph_edgelist(&g2, stdout, /* onebased */ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
@@ -101,7 +101,7 @@ int main() {
     /* complementer of the full graph, results loops only */
     igraph_full(&g1, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_complementer(&g2, &g1, IGRAPH_LOOPS);
-    igraph_write_graph_edgelist(&g2, stdout);
+    igraph_write_graph_edgelist(&g2, stdout, /* onebased */ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 

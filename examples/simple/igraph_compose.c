@@ -86,7 +86,7 @@ int main() {
     igraph_vector_int_destroy(&v);
 
     igraph_compose(&res, &g1, &g2, &map1, &map2);
-    igraph_write_graph_edgelist(&res, stdout);
+    igraph_write_graph_edgelist(&res, stdout, /* onebased */ 0);
     igraph_vector_int_print(&map1);
     igraph_vector_int_print(&map2);
     igraph_destroy(&res);
@@ -103,7 +103,7 @@ int main() {
     igraph_vector_int_destroy(&v);
 
     igraph_compose(&res, &g1, &g2, &map1, &map2);
-    igraph_write_graph_edgelist(&res, stdout);
+    igraph_write_graph_edgelist(&res, stdout, /* onebased */ 0);
     igraph_vector_int_print(&map1);
     igraph_vector_int_print(&map2);
     igraph_destroy(&res);

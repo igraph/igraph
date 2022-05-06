@@ -41,7 +41,7 @@ int main() {
     if (!igraph_is_directed(&g)) {
         return 2;
     }
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     /* With names and weights */

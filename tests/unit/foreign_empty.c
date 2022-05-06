@@ -33,7 +33,7 @@ int main() {
     /* Formats for which an emtpy file is valid */
 
     /* Edge list */
-    IGRAPH_ASSERT(igraph_read_graph_edgelist(&graph, file, 0, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_read_graph_edgelist(&graph, file, 0, IGRAPH_UNDIRECTED, /* onebased */ 0) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vcount(&graph) == 0);
     igraph_destroy(&graph);
     rewind(file);

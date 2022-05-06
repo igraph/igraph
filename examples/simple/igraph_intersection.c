@@ -113,7 +113,7 @@ int main() {
     VECTOR(glist)[1] = &g2;
     VECTOR(glist)[2] = &g3;
     igraph_intersection_many(&isec, &glist, 0);
-    igraph_write_graph_edgelist(&isec, stdout);
+    igraph_write_graph_edgelist(&isec, stdout, /* onebased */ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
     igraph_destroy(&g3);

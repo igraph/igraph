@@ -49,7 +49,7 @@ int doit(igraph_t *g) {
     printf("Parents:\n  ");
     igraph_vector_int_print(&parent);
     printf("Block graph:\n");
-    igraph_write_graph_edgelist(&block_tree, stdout);
+    igraph_write_graph_edgelist(&block_tree, stdout, /* onebased */ 0);
 
     igraph_vector_int_list_destroy(&blocks);
     igraph_vector_int_destroy(&cohesion);

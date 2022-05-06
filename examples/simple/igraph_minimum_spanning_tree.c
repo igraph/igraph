@@ -56,7 +56,7 @@ int main() {
     }
 
     igraph_minimum_spanning_tree_prim(&g, &tree, &eb);
-    igraph_write_graph_edgelist(&tree, stdout);
+    igraph_write_graph_edgelist(&tree, stdout, /* onebased */ 0);
 
     igraph_vector_int_init(&edges, 0);
     igraph_minimum_spanning_tree(&g, &edges, &eb);

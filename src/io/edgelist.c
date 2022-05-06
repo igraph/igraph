@@ -46,11 +46,10 @@
  * \function igraph_read_graph_edgelist
  * \brief Reads an edge list from a file and creates a graph.
  *
- * </para><para>
- * This format is simply a series of an even number of non-negative integers separated by
- * whitespace. The integers represent vertex IDs. Placing each edge (i.e. pair of integers)
- * on a separate line is not required, but it is recommended for readability.
- * Edges of directed graphs are assumed to be in "from, to" order.
+ * This format is simply a series of an even number of integers separated by
+ * whitespace. The integers represent vertex indices. Placing each edge
+ * (i.e. pair of integers) on a separate line is not required, but it is recommended
+ * for readability. Edges of directed graphs are assumed to be in "from, to" order.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
@@ -59,6 +58,10 @@
  *        safe to supply zero here.
  * \param directed Logical, if true the graph is directed, if false it
  *        will be undirected.
+ * \param onebased Logical, if true the file is assumed to contain 1-based
+ *        vertex indices between 1 and \p n. If false, vertex indices are assumed
+ *        to be between 0 and <code>n - 1</code>. Prior to igraph 0.10,
+ *        only 0-based indices were supported.
  * \return Error code:
  *         \c IGRAPH_PARSEERROR: if there is a
  *         problem reading the file, or the file is syntactically
@@ -67,16 +70,20 @@
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges. It is assumed that
  * reading an integer requires O(1) time.
+ *
+ * \sa igraph_write_graph_edgelist() for writing the same format.
  */
-igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
-                               igraph_integer_t n, igraph_bool_t directed) {
+igraph_error_t igraph_read_graph_edgelist(
+        igraph_t *graph, FILE *instream,
+        igraph_integer_t n, igraph_bool_t directed, igraph_bool_t onebased) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t from, to;
+    igraph_integer_t offset = onebased ? 1 : 0;
     int c;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 100));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 128));
 
     /* skip all whitespace */
     do {
@@ -97,8 +104,8 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
         if (read != 1) {
             IGRAPH_ERROR("Parsing edgelist file failed.", IGRAPH_PARSEERROR);
         }
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from - offset));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to - offset));
 
         /* skip all whitespace */
         do {
@@ -119,12 +126,17 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
  * \brief Writes the edge list of a graph to a file.
  *
  * </para><para>
- * Edges are represented as pairs of 0-based vertex indices.
+ * Edges are represented as pairs of 0-based or 1-based vertex indices.
  * One edge is written per line, separated by a single space.
  * For directed graphs edges are written in from, to order.
  *
  * \param graph The graph object to write.
  * \param outstream Pointer to a stream, it should be writable.
+ * \param onebased Logical, if true then 1-based vertex indices
+ *        are written (ranging between 1 and \c n). Otherwise
+ *        0-based indices are used (ranging between 0 and
+ *        <code>n-1</code>). Prior to igraph 0.10, only 0-based
+ *        indices were supported.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error writing the
  *         file.
@@ -133,10 +145,15 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
  * number of edges in the  graph. It is assumed that writing an
  * integer to the file requires O(1)
  * time.
+ *
+ * \sa \ref igraph_read_graph_edgelist() for reading the same format.
  */
-igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
+igraph_error_t igraph_write_graph_edgelist(
+        const igraph_t *graph, FILE *outstream,
+        igraph_bool_t onebased) {
 
     igraph_eit_t it;
+    igraph_integer_t offset = onebased ? 1 : 0;
 
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM),
                                    &it));
@@ -147,8 +164,8 @@ igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstrea
         int ret;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
         ret = fprintf(outstream, "%" IGRAPH_PRId " %" IGRAPH_PRId "\n",
-                      from,
-                      to);
+                      from + offset,
+                      to + offset);
         if (ret < 0) {
             IGRAPH_ERROR("Failed writing edgelist.", IGRAPH_EFILE);
         }

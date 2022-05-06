@@ -31,7 +31,7 @@ int main() {
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, -1);
     igraph_simplify(&g, 1, 1, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, -1);
@@ -45,39 +45,39 @@ int main() {
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 0, 1, 1, 2, 2, 1, 2, -1);
     igraph_simplify(&g, 1, 1, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0, 0, 1, 1, 2, 2, 1, 2, -1);
     igraph_simplify(&g, 1, 1, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     /* Loop & multiple edges */
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, -1);
     igraph_simplify(&g, 1 /* multiple */, 0 /* loop */, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, -1);
     igraph_simplify(&g, 1 /* multiple */, 0 /* loop */, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 2, 2, 2, 2, 2, 2, 3, 2, -1);
     igraph_simplify(&g, 0 /* multiple */, 1 /* loop */, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 3, 3, 3, 3, 3, 4, -1);
     igraph_simplify(&g, 0 /* multiple */, 1 /* loop */, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, -1);
     igraph_simplify(&g, 1, 1, /*edge_comb=*/ 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,

@@ -59,7 +59,7 @@ int main() {
     /* Tree calculation */
     igraph_dominator_tree(&g, /*root=*/ 0, /*dom=*/ 0, /*domtree=*/ &domtree,
                           /*leftout=*/ 0, /*mode=*/ IGRAPH_OUT);
-    igraph_write_graph_edgelist(&domtree, stdout);
+    igraph_write_graph_edgelist(&domtree, stdout, /* onebased */ 0);
 
     igraph_vector_int_destroy(&dom);
     igraph_destroy(&domtree);
@@ -96,7 +96,7 @@ int main() {
     /* Tree calculation */
     igraph_dominator_tree(&g, /*root=*/ 0, /*dom=*/ 0, /*domtree=*/ &domtree,
                           /*leftout=*/ 0, /*mode=*/ IGRAPH_IN);
-    igraph_write_graph_edgelist(&domtree, stdout);
+    igraph_write_graph_edgelist(&domtree, stdout, /* onebased */ 0);
 
     igraph_vector_int_destroy(&dom);
     igraph_destroy(&domtree);
@@ -128,7 +128,7 @@ int main() {
                           &leftout, /*mode=*/ IGRAPH_OUT);
     igraph_vector_int_print(&dom);
     igraph_vector_int_print(&leftout);
-    igraph_write_graph_edgelist(&domtree, stdout);
+    igraph_write_graph_edgelist(&domtree, stdout, /* onebased */ 0);
 
     igraph_vector_int_destroy(&dom);
     igraph_vector_int_destroy(&leftout);
@@ -155,7 +155,7 @@ int main() {
                           &leftout, /*mode=*/ IGRAPH_IN);
     igraph_vector_int_print(&dom);
     igraph_vector_int_print(&leftout);
-    igraph_write_graph_edgelist(&domtree, stdout);
+    igraph_write_graph_edgelist(&domtree, stdout, /* onebased */ 0);
 
     igraph_vector_int_destroy(&dom);
     igraph_vector_int_destroy(&leftout);

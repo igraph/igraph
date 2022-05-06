@@ -35,7 +35,7 @@ int main() {
     igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &orig);
-    igraph_write_graph_edgelist(&diff, stdout);
+    igraph_write_graph_edgelist(&diff, stdout, /* onebased */ 0);
     if (igraph_ecount(&diff) != 0 ||
         igraph_vcount(&diff) != igraph_vcount(&orig)) {
         return 1;
@@ -55,7 +55,7 @@ int main() {
     igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
-    igraph_write_graph_edgelist(&diff, stdout);
+    igraph_write_graph_edgelist(&diff, stdout, /* onebased */ 0);
     if (igraph_ecount(&diff) != 0 ||
         igraph_vcount(&diff) != igraph_vcount(&orig)) {
         return 2;
@@ -73,7 +73,7 @@ int main() {
 
     igraph_empty(&sub, 3, IGRAPH_DIRECTED);
     igraph_difference(&diff, &orig, &sub);
-    igraph_write_graph_edgelist(&diff, stdout);
+    igraph_write_graph_edgelist(&diff, stdout, /* onebased */ 0);
     if (igraph_ecount(&diff) != igraph_ecount(&orig) ||
         igraph_vcount(&diff) != igraph_vcount(&orig)) {
         return 3;
@@ -94,7 +94,7 @@ int main() {
     igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
-    igraph_write_graph_edgelist(&diff, stdout);
+    igraph_write_graph_edgelist(&diff, stdout, /* onebased */ 0);
 
     igraph_destroy(&diff);
     igraph_destroy(&orig);
@@ -111,7 +111,7 @@ int main() {
     igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
-    igraph_write_graph_edgelist(&diff, stdout);
+    igraph_write_graph_edgelist(&diff, stdout, /* onebased */ 0);
 
     igraph_destroy(&diff);
     igraph_destroy(&orig);
@@ -128,7 +128,7 @@ int main() {
     igraph_vector_int_destroy(&v);
 
     igraph_difference(&diff, &orig, &sub);
-    igraph_write_graph_edgelist(&diff, stdout);
+    igraph_write_graph_edgelist(&diff, stdout, /* onebased */ 0);
 
     igraph_destroy(&diff);
     igraph_destroy(&orig);

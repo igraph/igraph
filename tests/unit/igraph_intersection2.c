@@ -38,7 +38,7 @@ int main() {
 
     igraph_intersection(&result, &uni, &star, /*edge_map1*/ 0,
                         /*edge_map2=*/ 0);
-    igraph_write_graph_edgelist(&result, stdout);
+    igraph_write_graph_edgelist(&result, stdout, /* onebased */ 0);
 
     igraph_destroy(&result);
 
@@ -50,7 +50,7 @@ int main() {
 
     igraph_intersection_many(&result, &glist, /*edgemaps=*/ 0);
     printf("--\n");
-    igraph_write_graph_edgelist(&result, stdout);
+    igraph_write_graph_edgelist(&result, stdout, /* onebased */ 0);
 
     igraph_vector_ptr_destroy(&glist);
     igraph_destroy(&result);

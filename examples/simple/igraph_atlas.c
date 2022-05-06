@@ -29,17 +29,17 @@ int main() {
     int ret;
 
     igraph_atlas(&g, 45);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     printf("\n");
     igraph_destroy(&g);
 
     igraph_atlas(&g, 0);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     printf("\n");
     igraph_destroy(&g);
 
     igraph_atlas(&g, 1252);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     printf("\n");
     igraph_destroy(&g);
 

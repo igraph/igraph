@@ -44,14 +44,14 @@ igraph_bool_t has_multiple(const igraph_t *graph) {
     return res;
 }
 
-#define ERR() do {              \
-        printf("Seed: %d\n", seed);           \
-        igraph_write_graph_edgelist(&ws, stdout); \
+#define ERR() do { \
+        printf("Seed: %d\n", seed); \
+        igraph_write_graph_edgelist(&ws, stdout, /* onebased */ 0); \
     } while (0)
 
-#define SEED() do {                         \
-        seed=igraph_rng_get_integer(igraph_rng_default(), 1, 10000);        \
-        igraph_rng_seed(igraph_rng_default(), seed);                \
+#define SEED() do { \
+        seed=igraph_rng_get_integer(igraph_rng_default(), 1, 10000); \
+        igraph_rng_seed(igraph_rng_default(), seed); \
     } while (0)
 
 int main() {

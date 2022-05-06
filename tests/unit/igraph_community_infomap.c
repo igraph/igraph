@@ -255,7 +255,7 @@ int main() {
      * this is more reliable. */
     printf("# Wiktionary english verbs (synonymy 2008)\n");
     wikt = fopen("wikti_en_V_syn.elist", "r");
-    igraph_read_graph_edgelist(&g, wikt, 0, 0);
+    igraph_read_graph_edgelist(&g, wikt, 0, IGRAPH_UNDIRECTED, /* onebased */ 0);
     fclose(wikt);
     gsummary(&g);
     codelength = infomap_test(&g, /* smoke_test = */ 1);

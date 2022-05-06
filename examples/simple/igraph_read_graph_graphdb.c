@@ -34,7 +34,7 @@ int main() {
     }
     igraph_read_graph_graphdb(&g, input, IGRAPH_DIRECTED);
     fclose(input);
-    igraph_write_graph_edgelist(&g, stdout);
+    igraph_write_graph_edgelist(&g, stdout, /* onebased */ 0);
     igraph_destroy(&g);
 
     return 0;

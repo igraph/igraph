@@ -29,7 +29,7 @@ int main() {
     igraph_small(&right, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,4, -1);
 
     igraph_disjoint_union(&uni, &left, &right);
-    igraph_write_graph_edgelist(&uni, stdout);
+    igraph_write_graph_edgelist(&uni, stdout, /* onebased */ 0);
     printf("\n");
 
     igraph_destroy(&left);
@@ -57,7 +57,7 @@ int main() {
     }
 
     igraph_disjoint_union_many(&uni, &glist);
-    igraph_write_graph_edgelist(&uni, stdout);
+    igraph_write_graph_edgelist(&uni, stdout, /* onebased */ 0);
     printf("\n");
 
     /* Destroy and free the graph list. */

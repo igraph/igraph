@@ -26,7 +26,7 @@ int main() {
     igraph_star(&graph, 7, IGRAPH_STAR_UNDIRECTED, 0);
 
     /* Output the edge list of the graph. */
-    igraph_write_graph_edgelist(&graph, stdout);
+    igraph_write_graph_edgelist(&graph, stdout, /* onebased */ 0);
 
     /* Destroy the graph when we are done using it. */
     igraph_destroy(&graph);

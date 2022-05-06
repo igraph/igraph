@@ -1526,7 +1526,7 @@ igraph_get_stochastic_sparse:
 #######################################
 
 igraph_read_graph_edgelist:
-    PARAMS: OUT GRAPH graph, INFILE instream, INTEGER n=0, BOOLEAN directed=True
+    PARAMS: OUT GRAPH graph, INFILE instream, INTEGER n=0, BOOLEAN directed=True, BOOLEAN onebased=False
 
 igraph_read_graph_ncol:
     PARAMS: |-
@@ -1561,7 +1561,7 @@ igraph_read_graph_dl:
     PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=True
 
 igraph_write_graph_edgelist:
-    PARAMS: GRAPH graph, OUTFILE outstream
+    PARAMS: GRAPH graph, OUTFILE outstream, BOOLEAN onbased=False
 
 igraph_write_graph_ncol:
     PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight"

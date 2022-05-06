@@ -40,7 +40,7 @@ int main() {
 
     /* Output as edge list */
     printf("\n-----------------\n");
-    igraph_write_graph_edgelist(&graph, stdout);
+    igraph_write_graph_edgelist(&graph, stdout, /* onebased */ 0);
 
     /* Output as GML */
     printf("\n-----------------\n");

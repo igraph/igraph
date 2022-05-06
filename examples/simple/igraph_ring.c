@@ -27,7 +27,7 @@ int main() {
 
     /* Output the edge list of the graph. */
     printf("10-path graph:\n");
-    igraph_write_graph_edgelist(&graph, stdout);
+    igraph_write_graph_edgelist(&graph, stdout, /* onebased */ 0);
 
     /* Destroy the graph. */
     igraph_destroy(&graph);
@@ -37,7 +37,7 @@ int main() {
 
     /* Output the edge list of the graph. */
     printf("\n4-cycle graph:\n");
-    igraph_write_graph_edgelist(&graph, stdout);
+    igraph_write_graph_edgelist(&graph, stdout, /* onebased */ 0);
 
     /* Destroy the graph. */
     igraph_destroy(&graph);
