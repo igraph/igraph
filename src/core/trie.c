@@ -420,7 +420,19 @@ igraph_integer_t igraph_trie_size(igraph_trie_t *t) {
 
 /* Hmmm, very dirty.... */
 
-igraph_error_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
-    *strv = &t->keys;
-    return IGRAPH_SUCCESS;
+/**
+ * \ingroup igraphtrie
+ * \brief Retrieves all the keys from the trie.
+ *
+ * </para><para>
+ * Note that the returned pointer is a \em borrowed reference into the internal
+ * string vector of the trie. Do \em not modify it and do \em not use it after
+ * the trie was destroyed.
+ *
+ * \param t The trie.
+ * \return The borrowed reference.
+ */
+
+const igraph_strvector_t* igraph_i_trie_borrow_keys(igraph_trie_t *t) {
+    return &t->keys;
 }

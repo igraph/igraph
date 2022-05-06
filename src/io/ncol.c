@@ -183,14 +183,12 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     /* Prepare attributes, if needed */
 
     if (names) {
-        const igraph_strvector_t *namevec;
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
         IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
         pname = &name;
-        IGRAPH_CHECK(igraph_trie_getkeys(&trie, &namevec)); /* dirty */
         namerec.name = namestr;
         namerec.type = IGRAPH_ATTRIBUTE_STRING;
-        namerec.value = namevec;
+        namerec.value = igraph_i_trie_borrow_keys(&trie);
         VECTOR(name)[0] = &namerec;
     }
 

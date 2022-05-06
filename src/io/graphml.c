@@ -368,7 +368,6 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     igraph_bool_t already_has_vertex_id = 0, already_has_edge_id = 0;
     igraph_vector_ptr_t vattr, eattr, gattr;
     igraph_integer_t esize;
-    const void **tmp;
 
     IGRAPH_ASSERT(state->successful);
 
@@ -429,8 +428,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     if (!already_has_vertex_id) {
         idrec.name = idstr;
         idrec.type = IGRAPH_ATTRIBUTE_STRING;
-        tmp = &idrec.value;
-        IGRAPH_CHECK(igraph_trie_getkeys(&state->node_trie, (const igraph_strvector_t **)tmp));
+        idrec.value = igraph_i_trie_borrow_keys(&state->node_trie);
         VECTOR(vattr)[i] = &idrec;
     } else {
         igraph_vector_ptr_pop_back(&vattr);

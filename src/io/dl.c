@@ -143,7 +143,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     if (igraph_strvector_size(&context.labels) != 0) {
         namevec = (const igraph_strvector_t*) &context.labels;
     } else if (igraph_trie_size(&context.trie) != 0) {
-        igraph_trie_getkeys(&context.trie, &namevec);
+        namevec = igraph_i_trie_borrow_keys(&context.trie);
     }
     if (namevec) {
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
