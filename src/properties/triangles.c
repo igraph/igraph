@@ -428,6 +428,11 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
  * \function igraph_list_triangles
  * \brief Find all triangles in a graph.
  *
+ * </para><para>
+ * The triangles are reported as a long list of vertex ID triplets. Use
+ * \ref igraph_matrix_int_view_from_vector() to create a matrix view into
+ * the vector where each triangle is stored in a column of the matrix.
+ *
  * \param graph The input graph, edge directions are ignored.
  *        Multiple edges are ignored.
  * \param res Pointer to an initialized integer vector, the result
@@ -442,6 +447,8 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
  *
  * Time complexity: O(d^2 n), d is the average degree, n is the number
  * of vertices.
+ *
+ * \example examples/simple/igraph_list_triangles.c
  */
 
 igraph_error_t igraph_list_triangles(const igraph_t *graph,

@@ -247,6 +247,7 @@ add_examples(
   igraph_has_multiple
   igraph_is_loop
   igraph_is_multiple
+  igraph_list_triangles
   igraph_knn
   igraph_minimum_spanning_tree
   igraph_pagerank
