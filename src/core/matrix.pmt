@@ -60,9 +60,7 @@
  * \param ncol The number of columns in the matrix.
  * \return Error code.
  *
- * Time complexity: usually O(n),
- * n is the
- * number of elements in the matrix.
+ * Time complexity: usually O(n), n is the number of elements in the matrix.
  */
 
 igraph_error_t FUNCTION(igraph_matrix, init)(
@@ -76,16 +74,102 @@ igraph_error_t FUNCTION(igraph_matrix, init)(
     return IGRAPH_SUCCESS;
 }
 
-const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(
+/**
+ * \ingroup matrix
+ * \function igraph_matrix_view
+ * \brief Creates a matrix view into an existing array.
+ *
+ * </para><para>
+ * This function lets you treat an existing C array as a matrix. The elements
+ * of the matrix are assumed to be stored in column-major order in the array,
+ * i.e. the elements of the first column are stored first, followed by the
+ * second column and so on.
+ *
+ * </para><para>
+ * Since this function creates a view into an existing array, you must \em not
+ * destroy the \c igraph_matrix_t object when you are done with it. Similarly,
+ * you must \em not call any function on it that may attempt to modify the size
+ * of the matrix. Modifying an element in the matrix will modify the underlying
+ * array as the two share the same memory block.
+ *
+ * \param m Pointer to a not yet initialized matrix object where the view will
+ *        be created.
+ * \param data The array that the matrix provides a view into.
+ * \param nrow The number of rows in the matrix.
+ * \param ncol The number of columns in the matrix.
+ * \return Pointer to the matrix object, the same as the \p m parameter, for
+ *         convenience.
+ *
+ * Time complexity: O(1).
+ */
+
+const TYPE(igraph_matrix)* FUNCTION(igraph_matrix, view)(
         const TYPE(igraph_matrix) *m, const BASE *data,
         igraph_integer_t nrow, igraph_integer_t ncol) {
+    /* temporarily cast away the constness */
     TYPE(igraph_matrix) *m2 = (TYPE(igraph_matrix)*)m;
-    /* No oveflow checking, as this function does not return igraph_error_t.
+
+    /* No overflow checking, as this function does not return igraph_error_t.
      * It is the caller's resposibility to ensure that the size of 'data'
      * matches nrow*ncol, which also implies that nrow*ncol does not overflow. */
+
     FUNCTION(igraph_vector, view)(&m2->data, data, ncol * nrow);
     m2->nrow = nrow;
     m2->ncol = ncol;
+
+    return m;
+}
+
+/**
+ * \ingroup matrix
+ * \function igraph_matrix_view_from_vector
+ * \brief Creates a matrix view that treats an existing vector as a matrix.
+ *
+ * </para><para>
+ * This function lets you treat an existing igraph vector as a matrix. The
+ * elements of the matrix are assumed to be stored in column-major order in the
+ * vector, i.e. the elements of the first column are stored first, followed by
+ * the second column and so on.
+ *
+ * </para><para>
+ * Since this function creates a view into an existing vector, you must \em not
+ * destroy the \c igraph_matrix_t object when you are done with it. Similarly,
+ * you must \em not call any function on it that may attempt to modify the size
+ * of the vector. Modifying an element in the matrix will modify the underlying
+ * vector as the two share the same memory block.
+ *
+ * </para><para>
+ * Additionally, you must \em not attempt to grow the underlying vector by any
+ * vector operation as that may result in a re-allocation of the backing memory
+ * block of the vector, and the matrix view will not be informed about the
+ * re-allocation so it will point to an invalid memory area afterwards.
+ *
+ * \param m Pointer to a not yet initialized matrix object where the view will
+ *        be created.
+ * \param v The vector that the matrix will provide a view into.
+ * \param nrow The number of rows in the matrix. The number of columns will be
+ *        derived implicitly from the size of the vector. If the number of
+ *        items in the vector is not divisible by the number of rows, the
+ *        last few elements of the vector will not be covered by the view.
+ * \return Error code.
+ *
+ * Time complexity: O(1).
+ */
+
+IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
+    const TYPE(igraph_matrix) *m, const TYPE(igraph_vector) *v,
+    igraph_integer_t nrow
+) {
+    /* temporarily cast away the constness */
+    TYPE(igraph_matrix) *m2 = (TYPE(igraph_matrix)*)m;
+
+    igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
+    igraph_integer_t ncol = nrow > 0 ? size / nrow : 0;
+
+    FUNCTION(igraph_vector, view)(&m2->data, VECTOR(*v), ncol * nrow);
+    m2->nrow = nrow;
+    m2->ncol = ncol;
+
     return m;
 }
 

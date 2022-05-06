@@ -23,18 +23,23 @@
 <!-- doxrox-include igraph_matrix_fill -->
 </section>
 
-<section id="copying-matrices"><title>Copying matrices</title>
-<!-- doxrox-include igraph_matrix_copy_to -->
-<!-- doxrox-include igraph_matrix_update -->
-<!-- doxrox-include igraph_matrix_swap -->
-</section>
-
 <section id="matrix-accessing-elements">
 <!-- doxrox-include igraph_matrix_accessing_elements -->
 <!-- doxrox-include MATRIX -->
 <!-- doxrox-include igraph_matrix_get -->
 <!-- doxrox-include igraph_matrix_get_ptr -->
 <!-- doxrox-include igraph_matrix_set -->
+</section>
+
+<section id="matrix-views"><title>Matrix views</title>
+<!-- doxrox-include igraph_matrix_view -->
+<!-- doxrox-include igraph_matrix_view_from_vector -->
+</section>
+
+<section id="copying-matrices"><title>Copying matrices</title>
+<!-- doxrox-include igraph_matrix_copy_to -->
+<!-- doxrox-include igraph_matrix_update -->
+<!-- doxrox-include igraph_matrix_swap -->
 </section>
 
 <section id="operations-on-rows-and-columns"><title>Operations on rows and columns</title>

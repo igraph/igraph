@@ -70,6 +70,10 @@ IGRAPH_EXPORT void FUNCTION(igraph_matrix, fill)(TYPE(igraph_matrix) *m, BASE e)
 IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(
     const TYPE(igraph_matrix) *m, const BASE *data,
     igraph_integer_t nrow, igraph_integer_t ncol);
+IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
+    const TYPE(igraph_matrix) *m, const TYPE(igraph_vector) *v,
+    igraph_integer_t ncol
+);
 
 /*------------------*/
 /* Copying matrices */
