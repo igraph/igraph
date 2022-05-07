@@ -144,6 +144,7 @@ extern long int igraph_i_pajek_actedge;
 %token ARCSLISTLINE
 %token EDGESLISTLINE
 %token MATRIXLINE
+%token END 0            "end of file" /* friendly name for $end */
 %token ERROR
 
 %token VP_X_FACT

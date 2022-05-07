@@ -109,6 +109,7 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 %token LISTOPEN
 %token LISTCLOSE
 %token EOFF
+%token END 0            "end of file" /* friendly name for $end */
 %token ERROR
 
 %destructor { IGRAPH_FREE($$.s); } string key KEYWORD;

@@ -85,7 +85,8 @@ igraph_real_t igraph_lgl_get_number(const char *str, long int len);
 
 %token ALNUM
 %token NEWLINE
-%token HASH
+%token HASH             "#"
+%token END 0            "end of file" /* friendly name for $end */
 %token ERROR
 
 %%

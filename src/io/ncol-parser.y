@@ -86,6 +86,7 @@ igraph_real_t igraph_ncol_get_number(const char *str, long int len);
 
 %token ALNUM
 %token NEWLINE
+%token END 0            "end of file" /* friendly name for $end */
 %token ERROR
 
 %%
