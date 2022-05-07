@@ -114,7 +114,10 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 %token <str>    KEYWORD "keyword"
 %token LISTOPEN         "["
 %token LISTCLOSE        "]"
-%token END 0            "end of file" /* friendly name for $end, see https://lists.gnu.org/archive/html/help-bison/2022-05/msg00001.html */
+/* The following ensures that the special $end token is shown with a friendly name
+ * even in older Bison versions. 
+ * See https://www.gnu.org/software/bison/manual/bison.html#Token-I18n for more details. */
+%token END 0            "end of file" /* friendly name for $end */
 %token ERROR
 
 %destructor { free($$); } string key;
