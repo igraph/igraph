@@ -894,6 +894,10 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
                 /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
                 if (! igraph_is_nan(VECTOR(numv)[0])) {
+                    if (! igraph_finite(VECTOR(numv)[0])) {
+                        IGRAPH_WARNINGF("Infinite value in numeric graph attribute '%s'. "
+                                        "Produced GML file will not be conformant.", name);
+                    }
                     CHECK(fprintf(outstream, "  %s ", newname));
                     CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
                     CHECK(fputc('\n', outstream));
@@ -958,6 +962,11 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                                  igraph_vss_1(i), &numv));
                     /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
                     if (! igraph_is_nan(VECTOR(numv)[0])) {
+                        if (! igraph_finite(VECTOR(numv)[0])) {
+                            WARN_ONCE(j, 3,
+                                      IGRAPH_WARNINGF("Infinite value in numeric vertex attribute '%s'. "
+                                                      "Produced GML file will not be conformant.", name));
+                        }
                         CHECK(fprintf(outstream, "    %s ", newname));
                         CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
                         CHECK(fputc('\n', outstream));
@@ -1016,6 +1025,11 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                                  igraph_ess_1(i), &numv));
                     /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
                     if (! igraph_is_nan(VECTOR(numv)[0])) {
+                        if (! igraph_finite(VECTOR(numv)[0])) {
+                            WARN_ONCE(j, 3,
+                                      IGRAPH_WARNINGF("Infinite value in numeric edge attribute '%s'. "
+                                                      "Produced GML file will not be conformant.", name));
+                        }
                         CHECK(fprintf(outstream, "    %s ", newname));
                         CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
                         CHECK(fputc('\n', outstream));
