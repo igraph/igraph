@@ -31,7 +31,7 @@
 #include "core/interruption.h"
 #include "layout/layout_internal.h"
 
-static int igraph_layout_i_fr(const igraph_t *graph,
+static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                               igraph_matrix_t *res,
                               igraph_bool_t use_seed,
                               igraph_integer_t niter,
@@ -45,15 +45,15 @@ static int igraph_layout_i_fr(const igraph_t *graph,
     igraph_integer_t no_nodes = igraph_vcount(graph);
     igraph_integer_t no_edges = igraph_ecount(graph);
     igraph_integer_t i;
-    igraph_vector_float_t dispx, dispy;
+    igraph_vector_t dispx, dispy;
     igraph_real_t temp = start_temp;
     igraph_real_t difftemp = start_temp / niter;
     igraph_bool_t conn = 1;
-    float C = 0;
+    igraph_real_t C = 0;
 
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        C = no_nodes * sqrtf(no_nodes);
+        C = no_nodes * sqrt(no_nodes);
     }
 
     RNG_BEGIN();
@@ -62,10 +62,8 @@ static int igraph_layout_i_fr(const igraph_t *graph,
         igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
     }
 
-    IGRAPH_CHECK(igraph_vector_float_init(&dispx, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &dispx);
-    IGRAPH_CHECK(igraph_vector_float_init(&dispy, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &dispy);
+    IGRAPH_VECTOR_INIT_FINALLY(&dispx, no_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&dispy, no_nodes);
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
@@ -74,14 +72,14 @@ static int igraph_layout_i_fr(const igraph_t *graph,
 
         /* calculate repulsive forces, we have a special version
            for unconnected graphs */
-        igraph_vector_float_null(&dispx);
-        igraph_vector_float_null(&dispy);
+        igraph_vector_null(&dispx);
+        igraph_vector_null(&dispy);
         if (conn) {
             for (v = 0; v < no_nodes; v++) {
                 for (u = v + 1; u < no_nodes; u++) {
-                    float dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
-                    float dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-                    float dlen = dx * dx + dy * dy;
+                    igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+                    igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+                    igraph_real_t dlen = dx * dx + dy * dy;
 
                     if (dlen == 0) {
                         dx = RNG_UNIF01() * 1e-9;
@@ -98,9 +96,9 @@ static int igraph_layout_i_fr(const igraph_t *graph,
         } else {
             for (v = 0; v < no_nodes; v++) {
                 for (u = v + 1; u < no_nodes; u++) {
-                    float dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
-                    float dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-                    float dlen, rdlen;
+                    igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+                    igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+                    igraph_real_t dlen, rdlen;
 
                     dlen = dx * dx + dy * dy;
                     if (dlen == 0) {
@@ -121,13 +119,13 @@ static int igraph_layout_i_fr(const igraph_t *graph,
 
         /* calculate attractive forces */
         for (e = 0; e < no_edges; e++) {
-            /* each edge is an ordered pair of vertices v and u */
+            /* each edges is an ordered pair of vertices v and u */
             igraph_integer_t v = IGRAPH_FROM(graph, e);
             igraph_integer_t u = IGRAPH_TO(graph, e);
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t w = weight ? VECTOR(*weight)[e] : 1.0;
-            igraph_real_t dlen = sqrt(dx * dx + dy * dy) * w;
+            igraph_real_t dlen = hypot(dx, dy) * w;
             VECTOR(dispx)[v] -= (dx * dlen);
             VECTOR(dispy)[v] -= (dy * dlen);
             VECTOR(dispx)[u] += (dx * dlen);
@@ -139,7 +137,7 @@ static int igraph_layout_i_fr(const igraph_t *graph,
         for (v = 0; v < no_nodes; v++) {
             igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+            igraph_real_t displen = hypot(dx, dy);
             igraph_real_t mx = fabs(dx) < temp ? dx : temp;
             igraph_real_t my = fabs(dy) < temp ? dy : temp;
             if (displen > 0) {
@@ -165,14 +163,14 @@ static int igraph_layout_i_fr(const igraph_t *graph,
 
     RNG_END();
 
-    igraph_vector_float_destroy(&dispx);
-    igraph_vector_float_destroy(&dispy);
+    igraph_vector_destroy(&dispx);
+    igraph_vector_destroy(&dispy);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_layout_i_grid_fr(
+static igraph_error_t igraph_layout_i_grid_fr(
         const igraph_t *graph,
         igraph_matrix_t *res, igraph_bool_t use_seed,
         igraph_integer_t niter, igraph_real_t start_temp,
@@ -182,14 +180,14 @@ static int igraph_layout_i_grid_fr(
 
     igraph_integer_t no_nodes = igraph_vcount(graph);
     igraph_integer_t no_edges = igraph_ecount(graph);
-    float width = sqrtf(no_nodes), height = width;
+    igraph_real_t width = sqrt(no_nodes), height = width;
     igraph_2dgrid_t grid;
-    igraph_vector_float_t dispx, dispy;
+    igraph_vector_t dispx, dispy;
     igraph_real_t temp = start_temp;
     igraph_real_t difftemp = start_temp / niter;
     igraph_2dgrid_iterator_t vidit;
     igraph_integer_t i;
-    const float cellsize = 2.0;
+    const igraph_real_t cellsize = 2.0;
 
     RNG_BEGIN();
 
@@ -207,26 +205,24 @@ static int igraph_layout_i_grid_fr(
         igraph_2dgrid_add2(&grid, i);
     }
 
-    IGRAPH_CHECK(igraph_vector_float_init(&dispx, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &dispx);
-    IGRAPH_CHECK(igraph_vector_float_init(&dispy, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &dispy);
+    IGRAPH_VECTOR_INIT_FINALLY(&dispx, no_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&dispy, no_nodes);
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        igraph_vector_float_null(&dispx);
-        igraph_vector_float_null(&dispy);
+        igraph_vector_null(&dispx);
+        igraph_vector_null(&dispy);
 
         /* repulsion */
         igraph_2dgrid_reset(&grid, &vidit);
         while ( (v = igraph_2dgrid_next(&grid, &vidit) - 1) != -1) {
             while ( (u = igraph_2dgrid_next_nei(&grid, &vidit) - 1) != -1) {
-                float dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
-                float dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-                float dlen = dx * dx + dy * dy;
+                igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+                igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+                igraph_real_t dlen = dx * dx + dy * dy;
                 if (dlen < cellsize * cellsize) {
                     VECTOR(dispx)[v] += dx / dlen;
                     VECTOR(dispy)[v] += dy / dlen;
@@ -243,7 +239,7 @@ static int igraph_layout_i_grid_fr(
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t w = weight ? VECTOR(*weight)[e] : 1.0;
-            igraph_real_t dlen = sqrt(dx * dx + dy * dy) * w;
+            igraph_real_t dlen = hypot(dx, dy) * w;
             VECTOR(dispx)[v] -= (dx * dlen);
             VECTOR(dispy)[v] -= (dy * dlen);
             VECTOR(dispx)[u] += (dx * dlen);
@@ -254,7 +250,7 @@ static int igraph_layout_i_grid_fr(
         for (v = 0; v < no_nodes; v++) {
             igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+            igraph_real_t displen = hypot(dx, dy);
             igraph_real_t mx = fabs(dx) < temp ? dx : temp;
             igraph_real_t my = fabs(dy) < temp ? dy : temp;
             if (displen > 0) {
@@ -278,11 +274,11 @@ static int igraph_layout_i_grid_fr(
         temp -= difftemp;
     }
 
-    igraph_vector_float_destroy(&dispx);
-    igraph_vector_float_destroy(&dispy);
+    igraph_vector_destroy(&dispx);
+    igraph_vector_destroy(&dispy);
     igraph_2dgrid_destroy(&grid);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -291,26 +287,10 @@ static int igraph_layout_i_grid_fr(
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  *
  * </para><para>
- * This is a force-directed layout that simulates an attractive force \c f_a between
- * connected vertex pairs and a repulsive force \c f_r between all vertex pairs.
- * The forces are computed as a function of the distance \c d between the two vertices as
- *
- * </para><para>
- * <code>f_a(d) = -w * d^2</code> and <code>f_r(d) = 1/d</code>,
- *
- * </para><para>
- * where \c w represents the edge weight. The equilibrium distance of two connected
- * vertices is thus <code>1/w^3</code>, assuming no other forces acting on them.
- *
- * </para><para>
- * Reference:
- *
- * </para><para>
- * Fruchterman, T.M.J. and Reingold, E.M.:
- * Graph Drawing by Force-directed Placement.
+ * This is a force-directed layout, see Fruchterman, T.M.J. and
+ * Reingold, E.M.: Graph Drawing by Force-directed Placement.
  * Software -- Practice and Experience, 21/11, 1129--1164,
- * 1991. https://doi.org/10.1002/spe.4380211102
- *
+ * 1991.
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
@@ -349,7 +329,7 @@ static int igraph_layout_i_grid_fr(
  * vertices in the graph.
  */
 
-int igraph_layout_fruchterman_reingold(const igraph_t *graph,
+igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        igraph_bool_t use_seed,
                                        igraph_integer_t niter,
@@ -418,8 +398,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \function igraph_layout_fruchterman_reingold_3d
  * \brief 3D Fruchterman-Reingold algorithm.
  *
- * This is the 3D version of the force based Fruchterman-Reingold layout.
- * See \ref igraph_layout_fruchterman_reingold() for the 2D version.
+ * This is the 3D version of the force based
+ * Fruchterman-Reingold layout (see \ref
+ * igraph_layout_fruchterman_reingold() for the 2D version)
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
@@ -461,7 +442,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
  *
  */
 
-int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
+igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         igraph_matrix_t *res,
         igraph_bool_t use_seed,
         igraph_integer_t niter,
@@ -477,11 +458,11 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     const igraph_integer_t no_nodes = igraph_vcount(graph);
     const igraph_integer_t no_edges = igraph_ecount(graph);
     igraph_integer_t i;
-    igraph_vector_float_t dispx, dispy, dispz;
+    igraph_vector_t dispx, dispy, dispz;
     igraph_real_t temp = start_temp;
     igraph_real_t difftemp = start_temp / niter;
     igraph_bool_t conn = 1;
-    float C = 0;
+    igraph_real_t C = 0;
 
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
@@ -528,7 +509,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        C = no_nodes * sqrtf(no_nodes);
+        C = no_nodes * sqrt(no_nodes);
     }
 
     RNG_BEGIN();
@@ -537,12 +518,9 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         igraph_i_layout_random_bounded_3d(graph, res, minx, maxx, miny, maxy, minz, maxz);
     }
 
-    IGRAPH_CHECK(igraph_vector_float_init(&dispx, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &dispx);
-    IGRAPH_CHECK(igraph_vector_float_init(&dispy, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &dispy);
-    IGRAPH_CHECK(igraph_vector_float_init(&dispz, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_float_destroy, &dispz);
+    IGRAPH_VECTOR_INIT_FINALLY(&dispx, no_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&dispy, no_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&dispz, no_nodes);
 
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
@@ -551,16 +529,16 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
         /* calculate repulsive forces, we have a special version
            for unconnected graphs */
-        igraph_vector_float_null(&dispx);
-        igraph_vector_float_null(&dispy);
-        igraph_vector_float_null(&dispz);
+        igraph_vector_null(&dispx);
+        igraph_vector_null(&dispy);
+        igraph_vector_null(&dispz);
         if (conn) {
             for (v = 0; v < no_nodes; v++) {
                 for (u = v + 1; u < no_nodes; u++) {
-                    float dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
-                    float dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-                    float dz = MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
-                    float dlen = dx * dx + dy * dy + dz * dz;
+                    igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+                    igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+                    igraph_real_t dz = MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
+                    igraph_real_t dlen = dx * dx + dy * dy + dz * dz;
 
                     if (dlen == 0) {
                         dx = RNG_UNIF01() * 1e-9;
@@ -580,10 +558,10 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         } else {
             for (v = 0; v < no_nodes; v++) {
                 for (u = v + 1; u < no_nodes; u++) {
-                    float dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
-                    float dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-                    float dz = MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
-                    float dlen, rdlen;
+                    igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+                    igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+                    igraph_real_t dz = MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
+                    igraph_real_t dlen, rdlen;
 
                     dlen = dx * dx + dy * dy + dz * dz;
                     if (dlen == 0) {
@@ -663,10 +641,10 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
     RNG_END();
 
-    igraph_vector_float_destroy(&dispx);
-    igraph_vector_float_destroy(&dispy);
-    igraph_vector_float_destroy(&dispz);
+    igraph_vector_destroy(&dispx);
+    igraph_vector_destroy(&dispy);
+    igraph_vector_destroy(&dispz);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
