@@ -681,6 +681,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_get_incidence
+  igraph_incidence
 )
 
 # centralization.at

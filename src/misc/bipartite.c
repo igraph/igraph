@@ -615,6 +615,11 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
+    if (n1 > 0 && n2 > 0 && igraph_matrix_min(incidence) < 0) {
+        IGRAPH_ERRORF("Incidence matrix elements should be non-negative, found %g.",
+                IGRAPH_EINVAL, igraph_matrix_min(incidence));
+    }
+
     if (multiple) {
 
         for (i = 0; i < n1; i++) {

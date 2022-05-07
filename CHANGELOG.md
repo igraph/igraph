@@ -643,6 +643,8 @@ Some of the highlights are:
  - The `igraph_community_eb_get_merges()` now reports an error when not all edges in the graph are
    removed, instead of a nonsensical result.
 
+ - `igraph_incidence()` does not accept negative incidences anymore.
+
 ### Added
 
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
