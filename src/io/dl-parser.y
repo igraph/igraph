@@ -86,18 +86,19 @@ static igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
 %type <real> weight;
 
 %token NUM              "number"
-%token NEWLINE
+%token NEWLINE          "end of line"
 %token DL               "DL"
 %token NEQ              "n=vertexcount"
-%token DATA
+%token DATA             "data:"
 %token LABELS           "labels:"
 %token LABELSEMBEDDED   "labels embedded:"
 %token FORMATFULLMATRIX
 %token FORMATEDGELIST1
 %token FORMATNODELIST1
-%token DIGIT
+%token DIGIT            "binary digit"
 %token LABEL            "label"
 %token EOFF
+%token END 0            "end of file" /* friendly name for $end */
 %token ERROR
 
 %%

@@ -129,8 +129,8 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
 %type <string>   epwordpar;
 %type <intnum>   vertex;
 
-%token NEWLINE
-%token NUM
+%token NEWLINE       "end of line"
+%token NUM           "number"
 %token ALNUM
 %token QSTR
 %token PSTR
@@ -142,6 +142,7 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
 %token ARCSLISTLINE  "*arcslist line"
 %token EDGESLISTLINE "*edgeslist line"
 %token MATRIXLINE    "*matrix line"
+%token END 0         "end of file" /* friendly name for $end */
 %token ERROR
 
 %token VP_X_FACT

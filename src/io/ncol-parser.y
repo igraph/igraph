@@ -85,6 +85,7 @@ int igraph_ncol_yyerror(YYLTYPE* locp,
 
 %token ALNUM    "alphanumeric"
 %token NEWLINE  "end of line"
+%token END 0    "end of file" /* friendly name for $end */
 %token ERROR
 
 %%
