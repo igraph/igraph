@@ -717,11 +717,19 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * https://web.archive.org/web/20190207140002/http://www.fim.uni-passau.de/index.php?id=17297%26L=1
  * for details.
  *
- * </para><para> The graph, vertex and edges attributes are written to the
+ * </para><para>
+ * The graph, vertex and edges attributes are written to the
  * file as well, if they are numeric or string. Boolean attributes are converted
  * to numeric, with 0 and 1 used for false and true, respectively.
+ * NaN values of numeric attributes are skipped, as NaN is not part of the GML
+ * specification and other software may not be able to read files containing them.
+ * This is consistent with \ref igraph_read_graph_gml(), which produces NaN
+ * when an attribute value is missing. In contrast with NaN, infinite values
+ * are retained. Ensure that none of the numeric attributes values are infinite
+ * to produce a conformant GML file that can be read by other software.
  *
- * </para><para> As igraph is more forgiving about attribute names, it might
+ * </para><para>
+ * As igraph is more forgiving about attribute names, it might
  * be necessary to simplify the them before writing to the GML file.
  * This way we'll have a syntactically correct GML file. The following
  * simple procedure is performed on each attribute name: first the alphanumeric
@@ -730,7 +738,8 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * Note that this might result identical names for two attributes, igraph
  * does not check this.
  *
- * </para><para> The <quote>id</quote> vertex attribute is treated specially.
+ * </para><para>
+ * The <quote>id</quote> vertex attribute is treated specially.
  * If the <parameter>id</parameter> argument is not \c NULL then it should be a numeric
  * vector with the vertex IDs and the <quote>id</quote> vertex attribute is
  * ignored (if there is one). If <parameter>id</parameter> is \c NULL and there is a
@@ -739,10 +748,11 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * If some of the supplied id values are invalid (non-integer or NaN), all supplied
  * id are ignored and igraph vertex IDs are used instead.
  *
- * </para><para> Note that whichever way vertex IDs are specified, their
- * uniqueness is not checked.
+ * </para><para>
+ * Note that whichever way vertex IDs are specified, their uniqueness is not checked.
  *
- * </para><para> If the graph has edge attributes that become <quote>source</quote>
+ * </para><para>
+ * If the graph has edge attributes that become <quote>source</quote>
  * or <quote>target</quote> after encoding, or the graph has an attribute that becomes
  * <quote>directed</quote>, they will be ignored with a warning. GML uses these attributes
  * to specify the edge endpoints, and the graph directedness, so we cannot write them
@@ -882,9 +892,12 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         } else {
             if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
-                CHECK(fprintf(outstream, "  %s ", newname));
-                CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
-                CHECK(fputc('\n', outstream));
+                /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
+                if (! igraph_is_nan(VECTOR(numv)[0])) {
+                    CHECK(fprintf(outstream, "  %s ", newname));
+                    CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
+                    CHECK(fputc('\n', outstream));
+                }
             } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
                 const char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
@@ -943,9 +956,12 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name,
                                  igraph_vss_1(i), &numv));
-                    CHECK(fprintf(outstream, "    %s ", newname));
-                    CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
-                    CHECK(fputc('\n', outstream));
+                    /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
+                    if (! igraph_is_nan(VECTOR(numv)[0])) {
+                        CHECK(fprintf(outstream, "    %s ", newname));
+                        CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
+                        CHECK(fputc('\n', outstream));
+                    }
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                     const char *s;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
@@ -998,9 +1014,12 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, name,
                                  igraph_ess_1(i), &numv));
-                    CHECK(fprintf(outstream, "    %s ", newname));
-                    CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
-                    CHECK(fputc('\n', outstream));
+                    /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
+                    if (! igraph_is_nan(VECTOR(numv)[0])) {
+                        CHECK(fprintf(outstream, "    %s ", newname));
+                        CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
+                        CHECK(fputc('\n', outstream));
+                    }
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                     const char *s;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
