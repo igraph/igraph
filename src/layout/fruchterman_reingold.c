@@ -121,7 +121,7 @@ static int igraph_layout_i_fr(const igraph_t *graph,
 
         /* calculate attractive forces */
         for (e = 0; e < no_edges; e++) {
-            /* each edges is an ordered pair of vertices v and u */
+            /* each edge is an ordered pair of vertices v and u */
             igraph_integer_t v = IGRAPH_FROM(graph, e);
             igraph_integer_t u = IGRAPH_TO(graph, e);
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
@@ -291,10 +291,26 @@ static int igraph_layout_i_grid_fr(
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  *
  * </para><para>
- * This is a force-directed layout, see Fruchterman, T.M.J. and
- * Reingold, E.M.: Graph Drawing by Force-directed Placement.
+ * This is a force-directed layout that simulates an attractive force \c f_a between
+ * connected vertex pairs and a repulsive force \c f_r between all vertex pairs.
+ * The forces are computed as a function of the distance \c d between the two vertices as
+ *
+ * </para><para>
+ * <code>f_a(d) = -w * d^2</code> and <code>f_r(d) = 1/d</code>,
+ *
+ * </para><para>
+ * where \c w represents the edge weight. The equilibrium distance of two connected
+ * vertices is thus <code>1/w^3</code>, assuming no other forces acting on them.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Fruchterman, T.M.J. and Reingold, E.M.:
+ * Graph Drawing by Force-directed Placement.
  * Software -- Practice and Experience, 21/11, 1129--1164,
- * 1991.
+ * 1991. https://doi.org/10.1002/spe.4380211102
+ *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
@@ -402,9 +418,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \function igraph_layout_fruchterman_reingold_3d
  * \brief 3D Fruchterman-Reingold algorithm.
  *
- * This is the 3D version of the force based
- * Fruchterman-Reingold layout (see \ref
- * igraph_layout_fruchterman_reingold for the 2D version
+ * This is the 3D version of the force based Fruchterman-Reingold layout.
+ * See \ref igraph_layout_fruchterman_reingold() for the 2D version.
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will

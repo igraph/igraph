@@ -44,6 +44,10 @@
  * far-apart veritces will have a smaller effect on the layout.
  *
  * </para><para>
+ * This layout works particularly well for locally connected spatial networks
+ * such as lattices.
+ *
+ * </para><para>
  * This layout algorithm is not suitable for large graphs. The memory
  * requirements are of the order O(|V|^2).
  *
@@ -337,7 +341,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_layout_kamada_kawai_3d
  * \brief 3D version of the Kamada-Kawai layout generator.
  *
- * This is the 3D version of igraph_layout_kamada_kawai().
+ * This is the 3D version of \ref igraph_layout_kamada_kawai().
  * See the documentation of that function for more information.
  *
  * </para><para>
