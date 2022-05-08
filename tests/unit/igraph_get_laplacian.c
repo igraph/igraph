@@ -66,6 +66,43 @@ int main() {
     igraph_destroy(&g_un);
     igraph_destroy(&g_dir);
 
+    VERIFY_FINALLY_STACK()
+
+    {
+        igraph_t g;
+        igraph_matrix_t m;
+        igraph_sparsemat_t m_sparse;
+
+        igraph_matrix_init(&m, 0, 0);
+        igraph_sparsemat_init(&m_sparse, 0, 0, 0);
+
+        printf("Check errors for zero out/in and non-zero in/out degree.\n");
+        /* For IGRAPH_OUT, SYMMETRIC and RIGHT should fail,
+           for IGRAPH_IN, SYMMETRIC and LEFT should fail. */
+
+        igraph_small(&g, 2, IGRAPH_DIRECTED, 0,1, -1);
+        for (int mode_n = 0; mode_n < 2; mode_n++) {
+            for (int lsr = mode_n; lsr < 2 + mode_n; lsr++) {
+                igraph_neimode_t mode = mode_n ? IGRAPH_OUT : IGRAPH_IN;
+                igraph_laplacian_normalization_t normalization;
+                if (lsr == 0) {
+                    normalization = IGRAPH_LAPLACIAN_LEFT;
+                } else if (lsr == 1) {
+                    normalization = IGRAPH_LAPLACIAN_SYMMETRIC;
+                } else {
+                    normalization = IGRAPH_LAPLACIAN_RIGHT;
+                }
+                CHECK_ERROR(igraph_get_laplacian(&g, &m, mode,
+                            normalization, NULL), IGRAPH_EINVAL);
+                CHECK_ERROR(igraph_get_laplacian_sparse(&g, &m_sparse, mode,
+                            normalization, NULL), IGRAPH_EINVAL);;
+            }
+        }
+        igraph_destroy(&g);
+        igraph_matrix_destroy(&m);
+        igraph_sparsemat_destroy(&m_sparse);
+    }
+
     VERIFY_FINALLY_STACK();
 
     return 0;
