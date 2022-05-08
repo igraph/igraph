@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,85 +14,32 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 #include "test_utilities.h"
 
-int test_laplacian(const igraph_vector_t *w, igraph_bool_t dir, igraph_laplacian_normalization_t normalization) {
-    igraph_t g;
+void test_laplacian(igraph_t *g, const igraph_vector_t *w, igraph_bool_t dir, igraph_laplacian_normalization_t normalization) {
     igraph_matrix_t m;
-    igraph_vector_int_t vec;
-    igraph_vector_t *weights = 0;
-    igraph_neimode_t mode = IGRAPH_OUT;
 
-    igraph_matrix_init(&m, 1, 1);
+    igraph_matrix_init(&m, 0, 0);
 
-    if (w) {
-        weights = (igraph_vector_t*) calloc(1, sizeof(igraph_vector_t));
-        igraph_vector_init_copy(weights, w);
-    }
-
-    /* Base graph, no loop or multiple edges */
-    igraph_ring(&g, 5, dir, 0, 1);
-    igraph_get_laplacian(&g, &m, mode, normalization, weights);
+    igraph_get_laplacian(g, &m, IGRAPH_OUT, normalization, w);
     igraph_matrix_print(&m);
-    printf("===\n");
-
-    /* Add some loop edges */
-    igraph_vector_int_init_int(&vec, 4, 1, 1, 2, 2);
-    igraph_add_edges(&g, &vec, 0);
-    igraph_vector_int_destroy(&vec);
-    if (weights) {
-        igraph_vector_push_back(weights, 2);
-        igraph_vector_push_back(weights, 2);
-    }
-
-    igraph_get_laplacian(&g, &m, mode, normalization, weights);
-    igraph_matrix_print(&m);
-    printf("===\n");
-
-    /* Duplicate some edges */
-    igraph_vector_int_init_int(&vec, 4, 1, 2, 3, 4);
-    igraph_add_edges(&g, &vec, 0);
-    igraph_vector_int_destroy(&vec);
-    if (weights) {
-        igraph_vector_push_back(weights, 3);
-        igraph_vector_push_back(weights, 3);
-    }
-
-    igraph_get_laplacian(&g, &m, mode, normalization, weights);
-    igraph_matrix_print(&m);
-    printf("===\n");
-
-    /* Add an isolated vertex */
-    igraph_add_vertices(&g, 1, NULL);
-    igraph_get_laplacian(&g, &m, mode, normalization, weights);
-    igraph_matrix_print(&m);
-
-    igraph_destroy(&g);
 
     igraph_matrix_destroy(&m);
-    if (weights) {
-        igraph_vector_destroy(weights);
-        free(weights);
-    }
-
-    return 0;
 }
 
 int main() {
-    int res;
-    int i;
+    igraph_t g_un, g_dir;
     igraph_vector_t weights;
 
-    igraph_vector_init_int(&weights, 5, 1, 2, 3, 4, 5);
+    igraph_vector_init_int(&weights, 9, 1, 2, 3, 4, 5, 2, 2, 3, 3);
+    igraph_small(&g_un, 6, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, 3,4, 4,0, 1,1, 2,2, 1,2, 3,4, -1);
+    igraph_small(&g_dir, 6, IGRAPH_DIRECTED, 0,1, 1,2, 2,3, 3,4, 4,0, 1,1, 2,2, 1,2, 3,4, -1);
 
-    for (i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) {
         igraph_bool_t is_normalized = i / 4;
         igraph_vector_t* v = ((i & 2) / 2 ? &weights : 0);
         igraph_bool_t dir = (i % 2 ? IGRAPH_DIRECTED : IGRAPH_UNDIRECTED);
@@ -104,14 +50,12 @@ int main() {
                (dir == IGRAPH_DIRECTED ? "" : "un")
               );
 
-        res = test_laplacian(v, dir, is_normalized ? IGRAPH_LAPLACIAN_SYMMETRIC : IGRAPH_LAPLACIAN_UNNORMALIZED);
-
-        if (res) {
-            // return i + 1;
-        }
+        test_laplacian(dir ? &g_dir : &g_un, v, dir, is_normalized ? IGRAPH_LAPLACIAN_SYMMETRIC : IGRAPH_LAPLACIAN_UNNORMALIZED);
     }
 
     igraph_vector_destroy(&weights);
+    igraph_destroy(&g_un);
+    igraph_destroy(&g_dir);
 
     VERIFY_FINALLY_STACK();
 
