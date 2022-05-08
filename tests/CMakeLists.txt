@@ -511,6 +511,7 @@ add_legacy_tests(
   adjlist
   igraph_adjlist_init_complementer
   igraph_adjlist_simplify
+  igraph_get_laplacian
   igraph_to_directed
   igraph_to_prufer
   inclist
