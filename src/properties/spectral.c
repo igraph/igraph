@@ -159,6 +159,10 @@ igraph_error_t igraph_get_laplacian(
 
         switch (normalization) {
         case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            MATRIX(*res, from, to) -= weight;
+            if (!directed) {
+                MATRIX(*res, to, from) -= weight;
+            }
             break;
 
         case IGRAPH_LAPLACIAN_SYMMETRIC:
@@ -171,6 +175,10 @@ igraph_error_t igraph_get_laplacian(
                     mode == IGRAPH_OUT ? "out" : "in", weights ? "strength" : "degree", mode == IGRAPH_OUT ? "out" : "in");
             }
             weight *= norm;
+            MATRIX(*res, from, to) -= weight;
+            if (!directed) {
+                MATRIX(*res, to, from) -= weight;
+            }
             break;
 
         case IGRAPH_LAPLACIAN_LEFT:
@@ -182,7 +190,10 @@ igraph_error_t igraph_get_laplacian(
                     IGRAPH_EINVAL,
                     weights ? "strength" : "degree");
             }
-            weight *= norm;
+            MATRIX(*res, from, to) -= weight * norm;
+            if (!directed) {
+                MATRIX(*res, to, from) -= weight * VECTOR(degree)[to];
+            }
             break;
 
         case IGRAPH_LAPLACIAN_RIGHT:
@@ -194,13 +205,11 @@ igraph_error_t igraph_get_laplacian(
                     IGRAPH_EINVAL,
                     weights ? "strength" : "degree");
             }
-            weight *= norm;
+            MATRIX(*res, from, to) -= weight * norm;
+            if (!directed) {
+                MATRIX(*res, to, from) -= weight * VECTOR(degree)[from];
+            }
             break;
-        }
-
-        MATRIX(*res, from, to) -= weight;
-        if (!directed) {
-            MATRIX(*res, to, from) -= weight;
         }
     }
 
@@ -292,6 +301,10 @@ igraph_error_t igraph_get_laplacian_sparse(
 
         switch (normalization) {
         case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight));
+            if (!directed) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight));
+            }
             break;
 
         case IGRAPH_LAPLACIAN_SYMMETRIC:
@@ -304,6 +317,10 @@ igraph_error_t igraph_get_laplacian_sparse(
                     mode == IGRAPH_OUT ? "out" : "in", weights ? "strength" : "degree", mode == IGRAPH_OUT ? "out" : "in");
             }
             weight *= norm;
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight));
+            if (!directed) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight));
+            }
             break;
 
         case IGRAPH_LAPLACIAN_LEFT:
@@ -315,7 +332,10 @@ igraph_error_t igraph_get_laplacian_sparse(
                     IGRAPH_EINVAL,
                     weights ? "strength" : "degree");
             }
-            weight *= norm;
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight * norm));
+            if (!directed) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight * VECTOR(degree)[to]));
+            }
             break;
 
         case IGRAPH_LAPLACIAN_RIGHT:
@@ -327,13 +347,11 @@ igraph_error_t igraph_get_laplacian_sparse(
                     IGRAPH_EINVAL,
                     weights ? "strength" : "degree");
             }
-            weight *= norm;
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight * norm));
+            if (!directed) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight * VECTOR(degree)[from]));
+            }
             break;
-        }
-
-        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight));
-        if (!directed) {
-            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight));
         }
     }
 
