@@ -347,6 +347,12 @@ igraph_error_t igraph_get_laplacian_sparse(
  * \function igraph_laplacian
  * \brief Returns the Laplacian matrix of a graph (deprecated).
  *
+ * This function produces the Laplacian matrix of a graph in either dense or
+ * sparse format. When \p normalized is set to true, the type of normalization
+ * used depends on the directnedness of the graph: symmetric normalization
+ * is used for undirected graphs and left stochastic normalization for
+ * directed graphs.
+ *
  * \deprecated-by igraph_get_laplacian 0.10.0
  */
 
