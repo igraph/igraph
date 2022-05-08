@@ -192,6 +192,7 @@ igraph_error_t igraph_get_laplacian(
             }
             MATRIX(*res, from, to) -= weight * norm;
             if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
                 MATRIX(*res, to, from) -= weight * VECTOR(degree)[to];
             }
             break;
@@ -207,6 +208,7 @@ igraph_error_t igraph_get_laplacian(
             }
             MATRIX(*res, from, to) -= weight * norm;
             if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
                 MATRIX(*res, to, from) -= weight * VECTOR(degree)[from];
             }
             break;
@@ -334,6 +336,7 @@ igraph_error_t igraph_get_laplacian_sparse(
             }
             IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight * norm));
             if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
                 IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight * VECTOR(degree)[to]));
             }
             break;
@@ -349,6 +352,7 @@ igraph_error_t igraph_get_laplacian_sparse(
             }
             IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight * norm));
             if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
                 IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight * VECTOR(degree)[from]));
             }
             break;
