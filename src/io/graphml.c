@@ -815,15 +815,13 @@ exit:
         xmlFree(xmlStr); xmlStr = NULL;
     }
 
-    if (result != IGRAPH_SUCCESS) {
-        *record = NULL;
-        if (rec != NULL && !rec_stored) {
-            igraph_i_graphml_attribute_record_destroy(rec);
-            igraph_free(rec);
-        }
-    } else {
-        *record = rec;
+    if (rec != NULL && !rec_stored) {
+        igraph_i_graphml_attribute_record_destroy(rec);
+        igraph_free(rec);
+        rec = NULL;
     }
+
+    *record = result == IGRAPH_SUCCESS ? rec : NULL;
 
     return result;
 }
