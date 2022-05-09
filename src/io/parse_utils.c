@@ -3,9 +3,24 @@
 
 #include "igraph_memory.h"
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Trims whitespace from the beginning and the end of a string with a specified length.
+ * A pointer to the first character of the result substring, as well as its length, are returned.
+ *
+ * If you have a null-terminated string, call this function as
+ *     igraph_i_trim_whitespace(str, strlen(str), &res, &len);
+ */
+void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res, size_t *res_len) {
+    const char *beg = str, *end = str + str_len;
+    while (beg < end && isspace(beg[0]) ) beg++;
+    while (end > str && isspace(end[-1])) end--;
+    *res = beg;
+    *res_len = end - beg;
+}
 
 /* TODO: Support for reporting line number where parse error occurred. */
 
