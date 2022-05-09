@@ -29,9 +29,11 @@
 #include "core/trie.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strcasecmp & strdup */
+#include "io/parse_utils.h"
 
 #include "config.h"
 
+#include <ctype.h>
 #include <locale.h>
 #include <math.h>    /* isnan */
 #include <string.h>
@@ -97,8 +99,6 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
         return;                                                     \
     } while (1)
 
-/* TODO: proper error handling */
-
 typedef struct igraph_i_graphml_attribute_record_t {
     const char *id;           /* GraphML id */
     enum { I_GRAPHML_BOOLEAN, I_GRAPHML_INTEGER, I_GRAPHML_LONG,
@@ -154,6 +154,8 @@ static igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
                                                     igraph_real_t default_value,
                                                     igraph_bool_t* successful) {
     double result;
+    const char* trimmed;
+    size_t trimmed_length;
 
     if (successful) {
         *successful = 1;
@@ -163,7 +165,9 @@ static igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
         return default_value;
     }
 
-    if (sscanf(char_data, "%lf", &result) == 0) {
+    igraph_i_trim_whitespace(char_data, strlen(char_data), &trimmed, &trimmed_length);
+
+    if (igraph_i_parse_real(trimmed, trimmed_length, &result) != IGRAPH_SUCCESS) {
         if (successful) {
             *successful = 0;
         }
@@ -176,32 +180,51 @@ static igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
 static igraph_bool_t igraph_i_graphml_parse_boolean(const char* char_data,
                                                     igraph_bool_t default_value,
                                                     igraph_bool_t* successful) {
-    int value;
+    igraph_integer_t value;
+    const char* trimmed;
+    size_t trimmed_length;
+
     if (successful) {
         *successful = 1;
     }
+
     if (char_data == 0) {
         return default_value;
     }
-    if (!strcasecmp("true", char_data)) {
+
+    igraph_i_trim_whitespace(char_data, strlen(char_data), &trimmed, &trimmed_length);
+
+    if (trimmed_length == 4 &&
+        tolower(trimmed[0]) == 't' && tolower(trimmed[1]) == 'r' &&
+        tolower(trimmed[2]) == 'u' && tolower(trimmed[3]) == 'e'
+    ) {
         return 1;
     }
-    if (!strcasecmp("yes", char_data)) {
+    if (trimmed_length == 3 &&
+        tolower(trimmed[0]) == 'y' && tolower(trimmed[1]) == 'e' &&
+        tolower(trimmed[2]) == 's'
+    ) {
         return 1;
     }
-    if (!strcasecmp("false", char_data)) {
+    if (trimmed_length == 5 &&
+        tolower(trimmed[0]) == 'f' && tolower(trimmed[1]) == 'a' &&
+        tolower(trimmed[2]) == 'l' && tolower(trimmed[3]) == 's' &&
+        tolower(trimmed[4]) == 'e'
+    ) {
         return 0;
     }
-    if (!strcasecmp("no", char_data)) {
+    if (trimmed_length == 2 && tolower(trimmed[0]) == 'n' && tolower(trimmed[1]) == 'o') {
         return 0;
     }
-    if (sscanf(char_data, "%d", &value) == 0) {
+
+    if (igraph_i_parse_integer(trimmed, trimmed_length, &value) != IGRAPH_SUCCESS) {
         if (successful) {
             *successful = 0;
         }
         return default_value;
+    } else {
+        return value != 0;
     }
-    return value != 0;
 }
 
 static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute_record_t* rec) {

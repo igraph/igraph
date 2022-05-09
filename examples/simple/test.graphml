@@ -14,10 +14,11 @@ xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdr
   <graph id="G" edgedefault="undirected">
     <data key="d2">2006-11-12</data>
     <node id="n0">
+      <!-- d3 is incorrect attribute key for nodes, should issue a warning -->
+      <!-- d4 includes whitespace, which should be trimmed -->
       <data key="d0">green</data>
       <data key="d3">incorrect</data>
-      <!-- incorrect attribute key, should issue a warning -->
-      <data key="d4">true</data>
+      <data key="d4">  true   </data>
     </node>
     <node id="n1"/>
     <node id="n2">
@@ -42,13 +43,13 @@ xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdr
       <data key="d1">1.0</data>
     </edge>
     <edge id="e2" source="n1" target="n3">
-      <data key="d1">2.0</data>
+      <data key="d1">  2.0</data>
     </edge>
     <edge id="e3" source="n3" target="n2"/>
     <edge id="e4" source="n2" target="n4"/>
     <edge id="e5" source="n3" target="n5"/>
     <edge id="e6" source="n5" target="n4">
-      <data key="d1">1.1</data>
+      <data key="d1">1.1    </data>
     </edge>
   </graph>
 </graphml>
