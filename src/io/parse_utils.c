@@ -12,12 +12,16 @@
  * A pointer to the first character of the result substring, as well as its length, are returned.
  *
  * If you have a null-terminated string, call this function as
+ *
  *     igraph_i_trim_whitespace(str, strlen(str), &res, &len);
+ *
+ * This does not carry a performance penalty, as the end of the string would need to be
+ * determinted anyway.
  */
 void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res, size_t *res_len) {
     const char *beg = str, *end = str + str_len;
     while (beg < end && isspace(beg[0]) ) beg++;
-    while (end > str && isspace(end[-1])) end--;
+    while (end > beg && isspace(end[-1])) end--;
     *res = beg;
     *res_len = end - beg;
 }
