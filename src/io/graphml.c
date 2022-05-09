@@ -578,43 +578,48 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
 #define XML_ATTR_VALUE_END(it) (*(it+4))
 #define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
 
-static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
-        const xmlChar** attrs, int nb_attrs,
-        struct igraph_i_graphml_parser_state *state) {
+static igraph_error_t igraph_i_graphml_add_attribute_key(
+    igraph_i_graphml_attribute_record_t** record,
+    const xmlChar** attrs, int nb_attrs,
+    struct igraph_i_graphml_parser_state *state
+) {
 
     /* This function must return in three possible ways:
      *
-     * - a proper newly allocated attribute record is returned and the parser
-     *   will process the attribute
-     * - NULL is returned and an error is triggered in the parser
-     * - NULL is returned but no error is triggered; this may happen for attributes
-     *   with unknown types that we skip over
+     * - a proper newly allocated attribute record is returned in 'record' and
+     *   the function returns IGRAPH_SUCCESS; the parser will process the attribute
+     * - NULL is returned in 'record' and the function returns an igraph error
+     *   code; the parser will handle the error
+     * - NULL is returned in 'record', but the function itself returns
+     *   IGRAPH_SUCCESS; the parser will skip the attribute
      *
      * The caller should be prepared to handle all three cases.
      */
 
     xmlChar **it;
     xmlChar *localname;
+    xmlChar *xmlStr = NULL;
+    char *str = NULL;
     igraph_trie_t *trie = NULL;
     igraph_vector_ptr_t *ptrvector = NULL;
     igraph_integer_t id;
-    unsigned short int skip = 0;
-    int i, ret;
-    igraph_i_graphml_attribute_record_t *rec;
+    int i;
+    igraph_i_graphml_attribute_record_t *rec = NULL;
+    igraph_bool_t rec_stored = 0;
+    igraph_bool_t skip = 0;
+    igraph_error_t result = IGRAPH_SUCCESS;
 
     if (!state->successful) {
         /* Parser is already in an error state */
-        return 0;
+        *record = NULL;
+        goto exit;
     }
 
     rec = IGRAPH_CALLOC(1, igraph_i_graphml_attribute_record_t);
-    if (rec == 0) {
-        GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        return 0;
+    if (rec == NULL) {
+        result = IGRAPH_ENOMEM;
+        goto exit;
     }
-
-    IGRAPH_FINALLY(igraph_free, rec);
-    IGRAPH_FINALLY(igraph_i_graphml_attribute_record_destroy, rec);
 
     rec->type = I_GRAPHML_UNKNOWN_TYPE;
 
@@ -627,18 +632,36 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         localname = XML_ATTR_LOCALNAME(it);
 
         if (xmlStrEqual(localname, toXmlChar("id"))) {
-            rec->id = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
+            xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
+            if (xmlStr == NULL) {
+                result = IGRAPH_ENOMEM;
+                goto exit;
+            }
+            rec->id = fromXmlChar(xmlStr);
+            xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
-            rec->record.name = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
+            xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
+            if (xmlStr == NULL) {
+                result = IGRAPH_ENOMEM;
+                goto exit;
+            }
+            rec->record.name = fromXmlChar(xmlStr);
+            xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
             if (!xmlStrncmp(toXmlChar("boolean"), XML_ATTR_VALUE(it))) {
                 rec->type = I_GRAPHML_BOOLEAN;
                 rec->record.type = IGRAPH_ATTRIBUTE_BOOLEAN;
                 rec->default_value.as_boolean = 0;
             } else if (!xmlStrncmp(toXmlChar("string"), XML_ATTR_VALUE(it))) {
+                str = strdup("");
+                if (!str) {
+                    result = IGRAPH_ENOMEM;
+                    goto exit;
+                }
                 rec->type = I_GRAPHML_STRING;
                 rec->record.type = IGRAPH_ATTRIBUTE_STRING;
-                rec->default_value.as_string = strdup("");
+                rec->default_value.as_string = str;
+                str = NULL;
             } else if (!xmlStrncmp(toXmlChar("float"), XML_ATTR_VALUE(it))) {
                 rec->type = I_GRAPHML_FLOAT;
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
@@ -658,7 +681,8 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
             } else {
                 GRAPHML_PARSE_ERROR(state,
                                     "Cannot parse GraphML file, unknown attribute type");
-                return 0;
+                result = IGRAPH_PARSEERROR;
+                goto exit;
             }
         } else if (xmlStrEqual(*it, toXmlChar("for"))) {
             /* graph, vertex or edge attribute? */
@@ -690,7 +714,8 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
             } else {
                 GRAPHML_PARSE_ERROR(state,
                                     "Cannot parse GraphML file, unknown value in the 'for' attribute of a <key> tag");
-                return 0;
+                result = IGRAPH_PARSEERROR;
+                goto exit;
             }
         }
     }
@@ -699,15 +724,16 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
      * DTD */
     if (rec->id == 0) {
         GRAPHML_PARSE_ERROR(state, "Found <key> tag with no 'id' attribute");
-        return 0;
+        result = IGRAPH_PARSEERROR;
+        goto exit;
     }
 
     /* in case of a missing attr.name attribute, use the id as the attribute name */
     if (rec->record.name == 0) {
         rec->record.name = strdup(rec->id);
         if (rec->record.name == 0) {
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot read GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            return 0;
+            result = IGRAPH_ENOMEM;
+            goto exit;
         }
     }
 
@@ -721,38 +747,29 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     if (!skip && trie == 0) {
         GRAPHML_PARSE_ERROR(state,
                             "Cannot parse GraphML file, missing 'for' attribute in a <key> tag");
-        return 0;
+        result = IGRAPH_PARSEERROR;
+        goto exit;
     }
 
     /* if the code above requested skipping the attribute, free everything and
      * return */
     if (skip) {
-        igraph_i_graphml_attribute_record_destroy(rec);
-        igraph_free(rec);
-        IGRAPH_FINALLY_CLEAN(2);
-        return 0;
+        goto exit;
     }
 
-    /* add to trie, attribues */
-    ret = igraph_trie_get(trie, rec->id, &id);
-    if (ret) {
-        GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot read GraphML file", ret);
-        return 0;
-    }
+    /* add to trie, attributes */
+    GRAPHML_CHECK(igraph_trie_get(trie, rec->id, &id));
     if (id != igraph_trie_size(trie) - 1) {
         GRAPHML_PARSE_ERROR(state, "Cannot parse GraphML file, duplicate attribute");
-        return 0;
+        result = IGRAPH_PARSEERROR;
+        goto exit;
     }
 
-    ret = igraph_vector_ptr_push_back(ptrvector, rec);
-    if (ret) {
-        GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot read GraphML file", ret);
-        return 0;
-    }
+    GRAPHML_CHECK(igraph_vector_ptr_push_back(ptrvector, rec));
 
-    /* Ownership of 'rec' is now taken by ptrvector so we can clean the
-     * finally stack */
-    IGRAPH_FINALLY_CLEAN(2);  /* rec, destructor + igraph_free */
+    /* Ownership of 'rec' is now taken by ptrvector so we can drop the strong
+     * reference to 'rec' */
+    rec_stored = 1;
 
     /* create the attribute values */
     switch (rec->record.type) {
@@ -762,46 +779,53 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     case IGRAPH_ATTRIBUTE_BOOLEAN:
         boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (boolvec == 0) {
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            return 0;
+            result = IGRAPH_ENOMEM;
+            goto exit;
         }
-        if (igraph_vector_bool_init(boolvec, 0)) {
-            IGRAPH_FREE(boolvec);
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            return 0;
-        }
+        GRAPHML_CHECK(igraph_vector_bool_init(boolvec, 0));
         rec->record.value = boolvec;
         break;
     case IGRAPH_ATTRIBUTE_NUMERIC:
         vec = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vec == 0) {
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            return 0;
+            result = IGRAPH_ENOMEM;
+            goto exit;
         }
-        if (igraph_vector_init(vec, 0)) {
-            IGRAPH_FREE(vec);
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            return 0;
-        }
+        GRAPHML_CHECK(igraph_vector_init(vec, 0));
         rec->record.value = vec;
         break;
     case IGRAPH_ATTRIBUTE_STRING:
         strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (strvec == 0) {
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            return 0;
+            result = IGRAPH_ENOMEM;
+            goto exit;
         }
-        if (igraph_strvector_init(strvec, 0)) {
-            IGRAPH_FREE(strvec);
-            GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            return 0;
-        }
+        GRAPHML_CHECK(igraph_strvector_init(strvec, 0));
         rec->record.value = strvec;
         break;
     default: break;
     }
 
-    return rec;
+exit:
+    if (str != NULL) {
+        free(str); str = NULL;
+    }
+
+    if (xmlStr != NULL) {
+        xmlFree(xmlStr); xmlStr = NULL;
+    }
+
+    if (result != IGRAPH_SUCCESS) {
+        *record = NULL;
+        if (rec != NULL && !rec_stored) {
+            igraph_i_graphml_attribute_record_destroy(rec);
+            igraph_free(rec);
+        }
+    } else {
+        *record = rec;
+    }
+
+    return result;
 }
 
 static igraph_error_t igraph_i_graphml_attribute_data_setup(
@@ -992,21 +1016,22 @@ exit:
     }
 }
 
-static void igraph_i_graphml_attribute_default_value_finish(
-        struct igraph_i_graphml_parser_state *state) {
+static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igraph_i_graphml_parser_state *state) {
     igraph_i_graphml_attribute_record_t *graphmlrec = state->current_attr_record;
     igraph_bool_t parsed;
+    igraph_error_t result = IGRAPH_SUCCESS;
+    char* str = 0;
 
     if (graphmlrec == 0) {
         IGRAPH_FATAL(
             "state->current_attr_record was null where it should have been "
             "non-null; please report as a bug."
         );
-        return;
+        return IGRAPH_SUCCESS;
     }
 
     if (state->data_char == 0) {
-        return;
+        return IGRAPH_SUCCESS;
     }
 
     switch (graphmlrec->record.type) {
@@ -1025,18 +1050,28 @@ static void igraph_i_graphml_attribute_default_value_finish(
         }
         break;
     case IGRAPH_ATTRIBUTE_STRING:
+        str = strdup(state->data_char);
+        if (str == NULL) {
+            result = IGRAPH_ENOMEM;
+            goto exit;
+        }
+
         if (graphmlrec->default_value.as_string != 0) {
             free(graphmlrec->default_value.as_string);
         }
-        graphmlrec->default_value.as_string = strdup(state->data_char);
+        graphmlrec->default_value.as_string = str;
+        str = NULL;
         break;
     default:
         break;
     }
 
+exit:
     if (state->data_char) {
         IGRAPH_FREE(state->data_char);
     }
+
+    return result;
 }
 
 static void igraph_i_graphml_sax_handler_start_element_ns(
@@ -1123,8 +1158,12 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
             }
             state->index--;
         } else if (xmlStrEqual(localname, toXmlChar("key"))) {
-            state->current_attr_record =
-                igraph_i_graphml_add_attribute_key(attributes, nb_attributes, state);
+            GRAPHML_CHECK(
+                igraph_i_graphml_add_attribute_key(
+                    &state->current_attr_record,
+                    attributes, nb_attributes, state
+                )
+            );
             /* NULL is okay here for state->current_attr_record -- we should have
              * triggered an error in the parser already if we returned NULL, and
              * the rest of the code is prepared to handle NULLs */
@@ -1303,6 +1342,7 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
         const xmlChar* uri) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
+    igraph_error_t result = IGRAPH_SUCCESS;
 
     if (!state->successful) {
         return;
@@ -1327,7 +1367,7 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
         break;
 
     case INSIDE_DEFAULT:
-        igraph_i_graphml_attribute_default_value_finish(state);
+        result = igraph_i_graphml_attribute_default_value_finish(state);
         state->st = INSIDE_KEY;
         break;
 
@@ -1355,6 +1395,10 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
 
     default:
         break;
+    }
+
+    if (result != IGRAPH_SUCCESS) {
+        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
     }
 }
 
