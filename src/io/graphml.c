@@ -1616,13 +1616,21 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
     xmlInitParser();
 
     IGRAPH_CHECK(igraph_i_graphml_parser_state_init(&state, graph, index));
+    IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy, &state);
+
+    /* Create a progressive parser context and use the first 4K to detect the
+     * encoding */
+    res = (int) fread(buffer, 1, sizeof(buffer), instream);
+    if (res < sizeof(buffer) && !feof(instream)) {
+        IGRAPH_ERROR("IO error while reading GraphML data.", IGRAPH_EFILE);
+    }
 
     /* Okay, parsing will start now. The parser might do things that eventually
      * trigger the igraph error handler, but we want the parser state to
-     * survive whatever happens here. So, we do _not_ put
-     * igraph_i_graphml_parser_state_destroy() on the stack, and temporarily
-     * assume responsibility for calling it ourselves until we are back from the
-     * parser */
+     * survive whatever happens here. So, we put a barrier on the FINALLY stack
+     * that prevents IGRAPH_ERROR() from freeing the parser state, and then we
+     * do this ourselves when needed */
+    IGRAPH_FINALLY_ENTER();
 
     /* Retrieve the current libxml2 error handlers and temporarily replace them
      * with ones that do not print anything to stdout/stderr */
@@ -1633,12 +1641,6 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
     xmlSetGenericErrorFunc(&state, &igraph_i_libxml_generic_error_handler);
     xmlSetStructuredErrorFunc(&state, &igraph_i_libxml_structured_error_handler);
 
-    /* Create a progressive parser context and use the first 4K to detect the
-     * encoding */
-    res = (int) fread(buffer, 1, sizeof(buffer), instream);
-    if (res < sizeof(buffer) && !feof(instream)) {
-        IGRAPH_ERROR("IO error while reading GraphML data.", IGRAPH_EFILE);
-    }
     ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
                                    &state,
                                    buffer,
@@ -1666,6 +1668,8 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
         xmlParseChunk(ctxt, buffer, res, 1);
     }
 
+    IGRAPH_FINALLY_EXIT();
+
     /* Restore error handlers */
     xmlSetGenericErrorFunc(libxml_old_generic_error_context, libxml_old_generic_error_handler);
     xmlSetStructuredErrorFunc(libxml_old_structured_error_context, libxml_old_structured_error_handler);
@@ -1689,10 +1693,6 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
      * error */
     parsing_successful = state.successful;
     error_message = parsing_successful || state.error_message == NULL ? NULL : strdup(state.error_message);
-
-    /* Now that we have lifted error_message out of the parser state, we can
-     * put the destructor of the parser state back on the FINALLY stack */
-    IGRAPH_FINALLY(igraph_i_graphml_parser_state_destroy, &state);
 
     /* ...and we can also put the error message pointer on the FINALLY stack */
     if (error_message != NULL) {
