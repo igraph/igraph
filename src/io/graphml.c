@@ -796,15 +796,15 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     return rec;
 }
 
-static void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state *state,
-                                                  const xmlChar **attrs,
-                                                  int nb_attrs,
-                                                  igraph_attribute_elemtype_t type) {
+static igraph_error_t igraph_i_graphml_attribute_data_setup(
+    struct igraph_i_graphml_parser_state *state, const xmlChar **attrs,
+    int nb_attrs, igraph_attribute_elemtype_t type
+) {
     xmlChar **it;
     int i;
 
     if (!state->successful) {
-        return;
+        return IGRAPH_SUCCESS;
     }
 
     for (i = 0, it = (xmlChar**)attrs; i < nb_attrs; i++, it += 5) {
@@ -819,7 +819,7 @@ static void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser
             }
             state->data_key = xmlStrndup(XML_ATTR_VALUE(it));
             if (state->data_key == 0) {
-                RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+                return IGRAPH_ENOMEM;
             }
             if (state->data_char) {
                 free(state->data_char);
@@ -830,6 +830,8 @@ static void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser
             /* ignore */
         }
     }
+
+    return IGRAPH_SUCCESS;
 }
 
 static void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_state *state,
@@ -1049,10 +1051,11 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
     xmlChar** it;
-    char* attr_value;
+    xmlChar* attr_value = 0;
     igraph_integer_t id1, id2;
     int i;
     igraph_bool_t tag_is_unknown = 0;
+    igraph_error_t result = IGRAPH_SUCCESS;
 
     IGRAPH_UNUSED(prefix);
     IGRAPH_UNUSED(nb_namespaces);
@@ -1082,8 +1085,8 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
     }
 
     if (tag_is_unknown) {
-        igraph_i_graphml_handle_unknown_start_tag(state);
-        return;
+        result = igraph_i_graphml_handle_unknown_start_tag(state);
+        goto exit;
     }
 
     switch (state->st) {
@@ -1096,7 +1099,10 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
             }
             state->st = INSIDE_GRAPHML;
         } else {
-            igraph_i_graphml_handle_unknown_start_tag(state);
+            result = igraph_i_graphml_handle_unknown_start_tag(state);
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
         }
         break;
 
@@ -1132,7 +1138,10 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
              * the rest of the code is prepared to handle NULLs */
             state->st = INSIDE_KEY;
         } else {
-            igraph_i_graphml_handle_unknown_start_tag(state);
+            result = igraph_i_graphml_handle_unknown_start_tag(state);
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
         }
         break;
 
@@ -1142,13 +1151,19 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
         if (state->current_attr_record != NULL && xmlStrEqual(localname, toXmlChar("default"))) {
             state->st = INSIDE_DEFAULT;
         } else {
-            igraph_i_graphml_handle_unknown_start_tag(state);
+            result = igraph_i_graphml_handle_unknown_start_tag(state);
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
         }
         break;
 
     case INSIDE_DEFAULT:
         /* If we are in the INSIDE_DEFAULT state, every further tag will be unknown */
-        igraph_i_graphml_handle_unknown_start_tag(state);
+        result = igraph_i_graphml_handle_unknown_start_tag(state);
+        if (result != IGRAPH_SUCCESS) {
+            goto exit;
+        }
         break;
 
     case INSIDE_GRAPH:
@@ -1162,28 +1177,73 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
                     continue;
                 }
                 if (xmlStrEqual(*it, toXmlChar("source"))) {
-                    attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
-                    igraph_trie_get(&state->node_trie, attr_value, &id1);
-                    free(attr_value);
+                    attr_value = xmlStrndup(XML_ATTR_VALUE(it));
+                    if (attr_value == 0) {
+                        result = IGRAPH_ENOMEM;
+                        goto exit;
+                    }
+
+                    result = igraph_trie_get(&state->node_trie, fromXmlChar(attr_value), &id1);
+                    xmlFree(attr_value);
+                    attr_value = NULL;
+
+                    if (result != IGRAPH_SUCCESS) {
+                        goto exit;
+                    }
                 } else if (xmlStrEqual(*it, toXmlChar("target"))) {
-                    attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
-                    igraph_trie_get(&state->node_trie, attr_value, &id2);
-                    free(attr_value);
+                    attr_value = xmlStrndup(XML_ATTR_VALUE(it));
+                    if (attr_value == 0) {
+                        result = IGRAPH_ENOMEM;
+                        goto exit;
+                    }
+
+                    result = igraph_trie_get(&state->node_trie, fromXmlChar(attr_value), &id2);
+                    xmlFree(attr_value);
+                    attr_value = NULL;
+
+                    if (result != IGRAPH_SUCCESS) {
+                        goto exit;
+                    }
                 } else if (xmlStrEqual(*it, toXmlChar("id"))) {
                     igraph_integer_t edges = igraph_vector_int_size(&state->edgelist) / 2 + 1;
                     igraph_integer_t origsize = igraph_strvector_size(&state->edgeids);
-                    attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
-                    igraph_strvector_resize(&state->edgeids, edges);
-                    for (; origsize < edges - 1; origsize++) {
-                        igraph_strvector_set(&state->edgeids, origsize, "");
+                    attr_value = xmlStrndup(XML_ATTR_VALUE(it));
+                    if (attr_value == 0) {
+                        result = IGRAPH_ENOMEM;
+                        goto exit;
                     }
-                    igraph_strvector_set(&state->edgeids, edges - 1, attr_value);
-                    free(attr_value);
+
+                    result = igraph_strvector_resize(&state->edgeids, edges);
+                    if (result != IGRAPH_SUCCESS) {
+                        goto exit;
+                    }
+
+                    for (; origsize < edges - 1; origsize++) {
+                        result = igraph_strvector_set(&state->edgeids, origsize, "");
+                        if (result != IGRAPH_SUCCESS) {
+                            goto exit;
+                        }
+                    }
+
+                    result = igraph_strvector_set(&state->edgeids, edges - 1, fromXmlChar(attr_value));
+                    xmlFree(attr_value);
+                    attr_value = NULL;
+
+                    if (result != IGRAPH_SUCCESS) {
+                        goto exit;
+                    }
                 }
             }
             if (id1 >= 0 && id2 >= 0) {
-                igraph_vector_int_push_back(&state->edgelist, id1);
-                igraph_vector_int_push_back(&state->edgelist, id2);
+                result = igraph_vector_int_push_back(&state->edgelist, id1);
+                if (result != IGRAPH_SUCCESS) {
+                    goto exit;
+                }
+
+                result = igraph_vector_int_push_back(&state->edgelist, id2);
+                if (result != IGRAPH_SUCCESS) {
+                    goto exit;
+                }
             } else {
                 igraph_i_graphml_sax_handler_error(state, "Edge with missing source or target encountered");
                 return;
@@ -1198,9 +1258,19 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
                     continue;
                 }
                 if (xmlStrEqual(XML_ATTR_LOCALNAME(it), toXmlChar("id"))) {
-                    attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
-                    igraph_trie_get(&state->node_trie, attr_value, &id1);
-                    free(attr_value);
+                    attr_value = xmlStrndup(XML_ATTR_VALUE(it));
+                    if (attr_value == 0) {
+                        result = IGRAPH_ENOMEM;
+                        goto exit;
+                    }
+
+                    result = igraph_trie_get(&state->node_trie, fromXmlChar(attr_value), &id1);
+                    xmlFree(attr_value);
+                    attr_value = NULL;
+
+                    if (result != IGRAPH_SUCCESS) {
+                        goto exit;
+                    }
                     break;
                 }
             }
@@ -1213,44 +1283,86 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
             }
             state->st = INSIDE_NODE;
         } else if (xmlStrEqual(localname, toXmlChar("data"))) {
-            igraph_i_graphml_attribute_data_setup(state, attributes, nb_attributes,
-                                                  IGRAPH_ATTRIBUTE_GRAPH);
-            igraph_vector_int_push_back(&state->prev_state_stack, state->st);
+            result = igraph_i_graphml_attribute_data_setup(
+                state, attributes, nb_attributes, IGRAPH_ATTRIBUTE_GRAPH
+            );
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
+
+            result = igraph_vector_int_push_back(&state->prev_state_stack, state->st);
             state->st = INSIDE_DATA;
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
         } else {
-            igraph_i_graphml_handle_unknown_start_tag(state);
+            result = igraph_i_graphml_handle_unknown_start_tag(state);
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
         }
         break;
 
     case INSIDE_NODE:
         if (xmlStrEqual(localname, toXmlChar("data"))) {
-            igraph_i_graphml_attribute_data_setup(state, attributes, nb_attributes,
-                                                  IGRAPH_ATTRIBUTE_VERTEX);
-            igraph_vector_int_push_back(&state->prev_state_stack, state->st);
+            result = igraph_i_graphml_attribute_data_setup(
+                state, attributes, nb_attributes, IGRAPH_ATTRIBUTE_VERTEX
+            );
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
+
+            result = igraph_vector_int_push_back(&state->prev_state_stack, state->st);
             state->st = INSIDE_DATA;
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
         }
         break;
 
     case INSIDE_EDGE:
         if (xmlStrEqual(localname, toXmlChar("data"))) {
-            igraph_i_graphml_attribute_data_setup(state, attributes, nb_attributes,
-                                                  IGRAPH_ATTRIBUTE_EDGE);
-            igraph_vector_int_push_back(&state->prev_state_stack, state->st);
+            result = igraph_i_graphml_attribute_data_setup(
+                state, attributes, nb_attributes, IGRAPH_ATTRIBUTE_EDGE
+            );
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
+
+            result = igraph_vector_int_push_back(&state->prev_state_stack, state->st);
             state->st = INSIDE_DATA;
+            if (result != IGRAPH_SUCCESS) {
+                goto exit;
+            }
         }
         break;
 
     case INSIDE_DATA:
         /* We do not expect any new tags within a <data> tag */
-        igraph_i_graphml_handle_unknown_start_tag(state);
+        result = igraph_i_graphml_handle_unknown_start_tag(state);
+        if (result != IGRAPH_SUCCESS) {
+            goto exit;
+        }
         break;
 
     case UNKNOWN:
-        igraph_i_graphml_handle_unknown_start_tag(state);
+        result = igraph_i_graphml_handle_unknown_start_tag(state);
+        if (result != IGRAPH_SUCCESS) {
+            goto exit;
+        }
         break;
 
     default:
         break;
+    }
+
+exit:
+    if (attr_value == 0) {
+        xmlFree(attr_value);
+    }
+
+    if (result != IGRAPH_SUCCESS) {
+        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
     }
 }
 
