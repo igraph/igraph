@@ -75,14 +75,6 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
 #define toXmlChar(a)   (BAD_CAST(a))
 #define fromXmlChar(a) ((char *)(a)) /* not the most elegant way... */
 
-#define GRAPHML_CHECK(func) { \
-    igraph_error_t __result = (func); \
-    if (__result != IGRAPH_SUCCESS) { \
-        result = __result; \
-        goto exit; \
-    } \
-}
-
 #define GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) do {  \
         if (state->successful) {                                    \
             igraph_i_graphml_sax_handler_error(state, msg);           \
@@ -627,7 +619,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
 
     rec = IGRAPH_CALLOC(1, igraph_i_graphml_attribute_record_t);
     if (rec == NULL) {
-        IGRAPH_ERROR("Cannot allocate attribute record.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot allocate attribute record.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, rec);
     IGRAPH_FINALLY(igraph_i_graphml_attribute_record_destroy, rec);
@@ -645,14 +637,14 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         if (xmlStrEqual(localname, toXmlChar("id"))) {
             xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
             if (xmlStr == NULL) {
-                IGRAPH_ERROR("Cannot duplicate value of 'id' attribute.", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot duplicate value of 'id' attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             rec->id = fromXmlChar(xmlStr);
             xmlStr = NULL;
         } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
             xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
             if (xmlStr == NULL) {
-                IGRAPH_ERROR("Cannot duplicate value of 'attr.name' attribute.", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot duplicate value of 'attr.name' attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             rec->record.name = fromXmlChar(xmlStr);
             xmlStr = NULL;
@@ -664,7 +656,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
             } else if (!xmlStrncmp(toXmlChar("string"), XML_ATTR_VALUE(it))) {
                 str = strdup("");
                 if (!str) {
-                    IGRAPH_ERROR("Cannot allocate new empty string.", IGRAPH_ENOMEM);
+                    IGRAPH_ERROR("Cannot allocate new empty string.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
                 rec->type = I_GRAPHML_STRING;
                 rec->record.type = IGRAPH_ATTRIBUTE_STRING;
@@ -732,7 +724,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     if (rec->record.name == 0) {
         rec->record.name = strdup(rec->id);
         if (rec->record.name == 0) {
-            IGRAPH_ERROR("Cannot duplicate attribute ID as name.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot duplicate attribute ID as name.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
     }
 
@@ -779,7 +771,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     case IGRAPH_ATTRIBUTE_BOOLEAN:
         boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
         if (boolvec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for Boolean attribute.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot allocate value vector for Boolean attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, boolvec);
         IGRAPH_CHECK(igraph_vector_bool_init(boolvec, 0));
@@ -789,7 +781,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     case IGRAPH_ATTRIBUTE_NUMERIC:
         vec = IGRAPH_CALLOC(1, igraph_vector_t);
         if (vec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for numeric attribute.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot allocate value vector for numeric attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_init(vec, 0));
@@ -799,7 +791,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     case IGRAPH_ATTRIBUTE_STRING:
         strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
         if (strvec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for string attribute.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot allocate value vector for string attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, strvec);
         IGRAPH_CHECK(igraph_strvector_init(strvec, 0));
@@ -837,7 +829,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
             }
             state->data_key = xmlStrndup(XML_ATTR_VALUE(it));
             if (state->data_key == 0) {
-                return IGRAPH_ENOMEM;
+                return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
             }
             if (state->data_char) {
                 free(state->data_char);
@@ -872,7 +864,7 @@ static igraph_error_t igraph_i_graphml_append_to_data_char(
 
     if (new_data_char == 0) {
         /* state->data_char is left untouched here so that's good */
-        return IGRAPH_ENOMEM;
+        return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
     }
 
     state->data_char = new_data_char;
@@ -1027,8 +1019,7 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
     case IGRAPH_ATTRIBUTE_STRING:
         str = strdup(state->data_char);
         if (str == NULL) {
-            result = IGRAPH_ENOMEM;
-            goto exit;
+            IGRAPH_ERROR("Cannot allocate memory for string attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
 
         if (graphmlrec->default_value.as_string != 0) {
@@ -1041,7 +1032,6 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
         break;
     }
 
-exit:
     if (state->data_char) {
         IGRAPH_FREE(state->data_char);
     }
@@ -1300,37 +1290,27 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
         int nb_attributes, int nb_defaulted, const xmlChar** attributes) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
-    igraph_error_t result = IGRAPH_SUCCESS;
+    igraph_error_t result;
 
     if (!state->successful) {
         return;
     }
 
-    GRAPHML_CHECK(
-        igraph_i_graphml_sax_handler_start_element_ns_inner(
-            state, localname, prefix, uri, nb_namespaces, namespaces,
-            nb_attributes, nb_defaulted, attributes
-        )
+    result = igraph_i_graphml_sax_handler_start_element_ns_inner(
+        state, localname, prefix, uri, nb_namespaces, namespaces,
+        nb_attributes, nb_defaulted, attributes
     );
 
-exit:
     if (result != IGRAPH_SUCCESS) {
         RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
     }
 }
 
-static void igraph_i_graphml_sax_handler_end_element_ns(
-        void *state0,
+static igraph_error_t igraph_i_graphml_sax_handler_end_element_ns_inner(
+        struct igraph_i_graphml_parser_state* state,
         const xmlChar* localname, const xmlChar* prefix,
-        const xmlChar* uri) {
-    struct igraph_i_graphml_parser_state *state =
-        (struct igraph_i_graphml_parser_state*)state0;
-    igraph_error_t result = IGRAPH_SUCCESS;
-
-    if (!state->successful) {
-        return;
-    }
-
+        const xmlChar* uri
+) {
     IGRAPH_UNUSED(localname);
     IGRAPH_UNUSED(prefix);
     IGRAPH_UNUSED(uri);
@@ -1350,7 +1330,7 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
         break;
 
     case INSIDE_DEFAULT:
-        result = igraph_i_graphml_attribute_default_value_finish(state);
+        IGRAPH_CHECK(igraph_i_graphml_attribute_default_value_finish(state));
         state->st = INSIDE_KEY;
         break;
 
@@ -1363,7 +1343,7 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
         break;
 
     case INSIDE_DATA:
-        GRAPHML_CHECK(igraph_i_graphml_attribute_data_finish(state));
+        IGRAPH_CHECK(igraph_i_graphml_attribute_data_finish(state));
         IGRAPH_ASSERT(!igraph_vector_int_empty(&state->prev_state_stack));
         state->st = (igraph_i_graphml_parser_state_index_t) igraph_vector_int_pop_back(&state->prev_state_stack);
         break;
@@ -1380,7 +1360,25 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
         break;
     }
 
-exit:
+    return IGRAPH_SUCCESS;
+}
+
+static void igraph_i_graphml_sax_handler_end_element_ns(
+        void *state0,
+        const xmlChar* localname, const xmlChar* prefix,
+        const xmlChar* uri) {
+    struct igraph_i_graphml_parser_state *state =
+        (struct igraph_i_graphml_parser_state*)state0;
+    igraph_error_t result;
+
+    if (!state->successful) {
+        return;
+    }
+
+    result = igraph_i_graphml_sax_handler_end_element_ns_inner(
+        state, localname, prefix, uri
+    );
+
     if (result != IGRAPH_SUCCESS) {
         RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
     }
@@ -1401,7 +1399,7 @@ static void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, 
 
     case INSIDE_DATA:
     case INSIDE_DEFAULT:
-        GRAPHML_CHECK(igraph_i_graphml_append_to_data_char(state, ch, len));
+        result = igraph_i_graphml_append_to_data_char(state, ch, len);
         break;
 
     default:
@@ -1409,7 +1407,6 @@ static void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, 
         break;
     }
 
-exit:
     if (result != IGRAPH_SUCCESS) {
         RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
     }
