@@ -352,8 +352,8 @@ static void igraph_i_graphml_parser_state_set_error_from_xmlerror(
     /* we need to guard against state->error_message == 0, which may happen
      * if the memory allocation for the error message itself failed */
     if (state->error_message != 0) {
-        snprintf(state->error_message, max_error_message_length, "%s:%d : %s",
-            error->file, error->line, error->message);
+        snprintf(state->error_message, max_error_message_length, "Line %d: %s",
+            error->line, error->message);
     }
 }
 
