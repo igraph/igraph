@@ -992,13 +992,7 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
     igraph_error_t result = IGRAPH_SUCCESS;
     char* str = 0;
 
-    if (graphmlrec == NULL) {
-        IGRAPH_FATAL(
-            "state->current_attr_record was null where it should have been "
-            "non-null; please report as a bug."
-        );
-        return IGRAPH_SUCCESS;
-    }
+    IGRAPH_ASSERT(state->current_attr_record != NULL);
 
     if (state->data_char == 0) {
         return IGRAPH_SUCCESS;
