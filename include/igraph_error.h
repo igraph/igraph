@@ -1078,7 +1078,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason, co
 
 #define IGRAPH_ASSERT(condition) \
     do { \
-        if (!(condition)) { \
+        if (IGRAPH_UNLIKELY(!(condition))) { \
             igraph_fatal("Assertion failed: " #condition, IGRAPH_FILE_BASENAME, __LINE__); \
         } \
     } while (0)
