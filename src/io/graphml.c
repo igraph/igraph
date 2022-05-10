@@ -139,7 +139,7 @@ struct igraph_i_graphml_parser_state {
 static void igraph_i_report_unhandled_attribute_target(const char* target,
         const char* file, int line) {
     igraph_warningf("Attribute target '%s' is not handled; ignoring corresponding "
-                    "attribute specifications", file, line, target);
+                    "attribute specifications.", file, line, target);
 }
 
 static igraph_error_t igraph_i_graphml_parse_numeric(
@@ -377,7 +377,7 @@ static xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
     }
 
     entityName = fromXmlChar(name);
-    IGRAPH_WARNINGF("unknown XML entity found: '%s'\n", entityName);
+    IGRAPH_WARNINGF("Unknown XML entity found: '%s'.", entityName);
 
     return blankEntity;
 }
@@ -528,8 +528,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
             VECTOR(eattr)[igraph_vector_ptr_size(&eattr) - 1] = &eidrec;
         } else {
             igraph_vector_ptr_pop_back(&eattr);
-            IGRAPH_WARNING("Could not add edge ids, "
-                            "there is already an 'id' edge attribute");
+            IGRAPH_WARNING("Could not add edge ids, there is already an 'id' edge attribute.");
         }
     }
 
@@ -730,7 +729,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
 
     /* if the attribute type is missing, throw an error */
     if (!skip && rec->type == I_GRAPHML_UNKNOWN_TYPE) {
-        IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute", rec->id);
+        IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute.", rec->id);
         skip = 1;
     }
 
@@ -908,7 +907,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_finish(struct igraph_i_gra
 
     if (key == 0) {
         /* no key specified, issue a warning */
-        IGRAPH_WARNING("missing attribute key in a <data> tag, ignoring attribute");
+        IGRAPH_WARNING("Missing attribute key in a <data> tag, ignoring attribute.");
         goto exit;
     }
 
@@ -916,7 +915,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_finish(struct igraph_i_gra
     if (recid < 0) {
         /* no such attribute key, issue a warning */
         IGRAPH_WARNINGF(
-            "unknown attribute key '%s' in a <data> tag, ignoring attribute",
+            "Unknown attribute key '%s' in a <data> tag, ignoring attribute.",
             key
         );
         goto exit;
@@ -1470,15 +1469,12 @@ static igraph_error_t igraph_i_xml_escape(const char* src, char** dest) {
         } else if (ch == '\'') {
             destlen += 5;
         } else if (IS_FORBIDDEN_CONTROL_CHAR(ch)) {
-            char msg[4096];
-            snprintf(msg, 4096, "Forbidden control character 0x%02X found in igraph_i_xml_escape",
-                     ch);
-            IGRAPH_ERROR(msg, IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Forbidden control character 0x%02X found in igraph_i_xml_escape.", IGRAPH_EINVAL, ch);
         }
     }
     *dest = IGRAPH_CALLOC(destlen + 1, char);
     if (!*dest) {
-        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Not enough memory.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (s = src, d = *dest; *s; s++, d++) {
         ch = (unsigned char)(*s);
@@ -1567,7 +1563,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
     char* error_message;
 
     if (index < 0) {
-        IGRAPH_ERROR("Graph index must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Graph index must be non-negative.", IGRAPH_EINVAL);
     }
 
     xmlInitParser();
@@ -1642,7 +1638,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
         }
     } else {
         /* We could not create the context earlier so no parsing was done */
-        IGRAPH_ERROR("Cannot create XML parser context", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Cannot create XML parser context.", IGRAPH_FAILURE);
     }
 
     /* Extract the error message from the parser state (if any), and make a
@@ -1665,14 +1661,14 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
             }
             IGRAPH_ERROR(error_message, IGRAPH_PARSEERROR);
         } else {
-            IGRAPH_ERROR("Malformed GraphML file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Malformed GraphML file.", IGRAPH_PARSEERROR);
         }
     }
 
     /* Did we actually manage to reach the graph to be parsed, given its index?
      * If not, that's an error as well. */
     if (state.index >= 0) {
-        IGRAPH_ERROR("Graph index was too large", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Graph index was too large.", IGRAPH_EINVAL);
     }
 
     /* Okay, everything seems good. We can now take the parser state and
