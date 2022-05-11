@@ -55,6 +55,14 @@ __BEGIN_DECLS
     #endif
 #endif
 
+#ifndef HAVE_STRNCASECMP
+    #ifdef HAVE__STRNICMP
+        #define strncasecmp _strnicmp
+    #else
+        #error "igraph needs strncasecmp() or _strnicmp()"
+    #endif
+#endif
+
 __END_DECLS
 
 #endif
