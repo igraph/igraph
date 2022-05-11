@@ -9,6 +9,9 @@ on:
       - '!travis/**'
   pull_request:
 
+env:
+  OMP_NUM_THREADS: 1
+
 jobs:
   build:
     runs-on: windows-latest

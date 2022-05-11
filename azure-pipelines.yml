@@ -5,6 +5,7 @@ variables:
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   ASAN_OPTIONS: color=always
+  OMP_NUM_THREADS: 1
 
 jobs:
   - job: linux_static_vendored
