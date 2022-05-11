@@ -177,38 +177,33 @@ static igraph_error_t igraph_i_graphml_parse_boolean(
 
     igraph_i_trim_whitespace(char_data, strlen(char_data), &trimmed, &trimmed_length);
 
-    if (trimmed_length == 4 &&
-        tolower(trimmed[0]) == 't' && tolower(trimmed[1]) == 'r' &&
-        tolower(trimmed[2]) == 'u' && tolower(trimmed[3]) == 'e'
-    ) {
+    if (trimmed_length == 4 && !strncasecmp(trimmed, "true", trimmed_length)) {
         *result = 1;
         return IGRAPH_SUCCESS;
     }
 
-    if (trimmed_length == 3 &&
-        tolower(trimmed[0]) == 'y' && tolower(trimmed[1]) == 'e' &&
-        tolower(trimmed[2]) == 's'
-    ) {
+    if (trimmed_length == 3 && !strncasecmp(trimmed, "yes", trimmed_length)) {
         *result = 1;
         return IGRAPH_SUCCESS;
     }
 
-    if (trimmed_length == 5 &&
-        tolower(trimmed[0]) == 'f' && tolower(trimmed[1]) == 'a' &&
-        tolower(trimmed[2]) == 'l' && tolower(trimmed[3]) == 's' &&
-        tolower(trimmed[4]) == 'e'
-    ) {
+    if (trimmed_length == 5 && !strncasecmp(trimmed, "false", trimmed_length)) {
         *result = 0;
         return IGRAPH_SUCCESS;
     }
 
-    if (trimmed_length == 2 && tolower(trimmed[0]) == 'n' && tolower(trimmed[1]) == 'o') {
+    if (trimmed_length == 2 && !strncasecmp(trimmed, "no", trimmed_length)) {
         *result = 0;
         return IGRAPH_SUCCESS;
     }
 
     if (trimmed_length > 0) {
-        IGRAPH_CHECK(igraph_i_parse_integer(trimmed, trimmed_length, &value));
+        if (isdigit(trimmed[0])) {
+            IGRAPH_CHECK(igraph_i_parse_integer(trimmed, trimmed_length, &value));
+        } else {
+            IGRAPH_ERRORF("Cannot parse '%.*s' as Boolean value.", IGRAPH_PARSEERROR,
+                          (int) trimmed_length, trimmed);
+        }
     } else {
         *result = default_value;
         return IGRAPH_SUCCESS;
