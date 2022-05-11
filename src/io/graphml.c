@@ -585,6 +585,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
 #define XML_ATTR_VALUE_START(it) (*(it+3))
 #define XML_ATTR_VALUE_END(it) (*(it+4))
 #define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
+#define XML_ATTR_VALUE_PF(it) (int)((*(it+4))-(*(it+3))), *(it+3) /* for use in printf-style function with "%.*s" */
 
 static igraph_error_t igraph_i_graphml_add_attribute_key(
     igraph_i_graphml_attribute_record_t** record,
@@ -682,7 +683,8 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
                 rec->default_value.as_numeric = IGRAPH_NAN;
             } else {
-                IGRAPH_ERROR("Unknown attribute type.", IGRAPH_PARSEERROR);
+                IGRAPH_ERRORF("Unknown attribute type '%.*s'.", IGRAPH_PARSEERROR,
+                              XML_ATTR_VALUE_PF(it));
             }
         } else if (xmlStrEqual(*it, toXmlChar("for"))) {
             /* graph, vertex or edge attribute? */
@@ -712,7 +714,8 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
                 igraph_i_report_unhandled_attribute_target("all", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
             } else {
-                IGRAPH_ERROR("Unknown value in the 'for' attribute of a <key> tag.", IGRAPH_PARSEERROR);
+                IGRAPH_ERRORF("Unknown value '%.*s' in the 'for' attribute of a <key> tag.", IGRAPH_PARSEERROR,
+                              XML_ATTR_VALUE_PF(it));
             }
         }
     }
@@ -731,7 +734,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         }
     }
 
-    /* if the attribute type is missing, throw an error */
+    /* if the attribute type is missing, ignore the attribute with a warnign */
     if (!skip && rec->type == I_GRAPHML_UNKNOWN_TYPE) {
         IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute.", rec->id);
         skip = 1;
