@@ -55,3 +55,9 @@ Directed: 0
 Vertex attribute 'type': true false true true true
 Vertex attribute 'name': 'spam' '  ' '  ham' 'bacon  ' '  eggs '
 Vertex attribute 'weight': 1 NaN 3 4 5
+Graph from yEd:
+Vertices: 3
+Edges: 2
+Directed: 1
+1 0
+2 1

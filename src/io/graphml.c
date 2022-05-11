@@ -1256,6 +1256,8 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
             ));
             IGRAPH_CHECK(igraph_vector_int_push_back(&state->prev_state_stack, state->st));
             state->st = INSIDE_DATA;
+        } else {
+            IGRAPH_CHECK(igraph_i_graphml_handle_unknown_start_tag(state));
         }
         break;
 
@@ -1266,6 +1268,8 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
             ));
             IGRAPH_CHECK(igraph_vector_int_push_back(&state->prev_state_stack, state->st));
             state->st = INSIDE_DATA;
+        } else {
+            IGRAPH_CHECK(igraph_i_graphml_handle_unknown_start_tag(state));
         }
         break;
 
