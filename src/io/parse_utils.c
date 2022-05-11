@@ -33,6 +33,8 @@ void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res,
  * The input is a not-necesarily-null-terminated string that must contain only the number.
  * Any additional characters at the end of the string, such as whitespace, will trigger
  * a parsing error.
+ *
+ * An error is returned if the input is an empty string.
  */
 igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_integer_t *value) {
     char buffer[128];
@@ -40,6 +42,10 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
     char last_char;
     igraph_bool_t out_of_range, dynamic_alloc;
     long long val;
+
+    if (length == 0) {
+        IGRAPH_ERROR("Cannot parse integer from empty string.", IGRAPH_PARSEERROR);
+    }
 
     dynamic_alloc = length+1 > sizeof(buffer) / sizeof(buffer[0]);
 
@@ -91,13 +97,17 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
  * Any additional characters at the end of the string, such as whitespace, will trigger
  * a parsing error.
  *
- * NaN and Inf are supported.
+ * NaN and Inf are supported. An error is returned if the input is an empty string.
  */
 igraph_error_t igraph_i_parse_real(const char *str, size_t length, igraph_real_t *value) {
     char buffer[128];
     char *tmp, *end;
     char last_char;
     igraph_bool_t out_of_range, dynamic_alloc;
+
+    if (length == 0) {
+        IGRAPH_ERROR("Cannot parse real number from empty string.", IGRAPH_PARSEERROR);
+    }
 
     dynamic_alloc = length+1 > sizeof(buffer) / sizeof(buffer[0]);
 
