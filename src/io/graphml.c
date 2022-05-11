@@ -154,7 +154,11 @@ static igraph_error_t igraph_i_graphml_parse_numeric(
     }
 
     igraph_i_trim_whitespace(char_data, strlen(char_data), &trimmed, &trimmed_length);
-    IGRAPH_CHECK(igraph_i_parse_real(trimmed, trimmed_length, result));
+    if (trimmed_length > 0) {
+        IGRAPH_CHECK(igraph_i_parse_real(trimmed, trimmed_length, result));
+    } else {
+        *result = default_value;
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -203,7 +207,12 @@ static igraph_error_t igraph_i_graphml_parse_boolean(
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_i_parse_integer(trimmed, trimmed_length, &value));
+    if (trimmed_length > 0) {
+        IGRAPH_CHECK(igraph_i_parse_integer(trimmed, trimmed_length, &value));
+    } else {
+        *result = default_value;
+        return IGRAPH_SUCCESS;
+    }
 
     *result = value != 0;
     return IGRAPH_SUCCESS;

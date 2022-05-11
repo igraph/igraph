@@ -53,7 +53,8 @@ void dump_vertex_attribute_numeric(const char* name, const igraph_t* g) {
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {
-        printf(" %g", (float)VAN(g, name, i));
+        printf(" ");
+        igraph_real_printf_precise(VAN(g, name, i));
     }
     printf("\n");
 }
@@ -63,7 +64,7 @@ void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
 
     printf("Vertex attribute '%s':", name);
     for (i = 0; i < n; i++) {
-        printf(" %s", VAS(g, name, i));
+        printf(" '%s'", VAS(g, name, i));
     }
     printf("\n");
 }
@@ -107,7 +108,7 @@ int main() {
         fclose(ofile);
         unlink("test2.graphml");
     }
-    dump_graph("The directed graph:\n", &g);
+    dump_graph("Directed graph:\n", &g);
     igraph_destroy(&g);
 
     /* The same with undirected graph */
@@ -117,7 +118,7 @@ int main() {
         return 1;
     }
     fclose(ifile);
-    dump_graph("The undirected graph:\n", &g);
+    dump_graph("Undirected graph:\n", &g);
     igraph_destroy(&g);
 
     /* Test a GraphML file with default attributes */
@@ -127,7 +128,7 @@ int main() {
         return 1;
     }
     fclose(ifile);
-    dump_graph("The directed graph:\n", &g);
+    dump_graph("Graph with default attributes:\n", &g);
     dump_vertex_attribute_bool("type", &g);
     dump_vertex_attribute_string("gender", &g);
     dump_vertex_attribute_numeric("age", &g);
@@ -141,7 +142,7 @@ int main() {
         return 1;
     }
     fclose(ifile);
-    dump_graph("The undirected graph:\n", &g);
+    dump_graph("Graph with namespace:\n", &g);
     igraph_destroy(&g);
 
     /* Test a not-really-valid GraphML file as it has no namespace information */
@@ -151,7 +152,21 @@ int main() {
         return 1;
     }
     fclose(ifile);
-    dump_graph("The undirected graph:\n", &g);
+    dump_graph("Graph without namespace information:\n", &g);
+    igraph_destroy(&g);
+
+    /* Test a GraphML file with excess whitespace around attribute values
+     * (which we attempt to handle gracefully) */
+    ifile = fopen("graphml-whitespace.xml", "r");
+    if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
+        printf("Received unexpected return code: %d\n", result);
+        return 1;
+    }
+    fclose(ifile);
+    dump_graph("Graph with whitespace in attributes:\n", &g);
+    dump_vertex_attribute_bool("type", &g);
+    dump_vertex_attribute_string("name", &g);
+    dump_vertex_attribute_numeric("weight", &g);
     igraph_destroy(&g);
 
     /* Restore the old error handler */
