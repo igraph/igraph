@@ -479,13 +479,13 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
         } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             continue; /* skipped attribute */
         }
-        igraph_vector_ptr_push_back(&vattr, rec);
+        igraph_vector_ptr_push_back(&vattr, rec); /* reserved */
     }
     if (!already_has_vertex_id) {
         idrec.name = idstr;
         idrec.type = IGRAPH_ATTRIBUTE_STRING;
         idrec.value = igraph_i_trie_borrow_keys(&state->node_trie);
-        igraph_vector_ptr_push_back(&vattr, &idrec);
+        igraph_vector_ptr_push_back(&vattr, &idrec); /* reserved */
     } else {
         IGRAPH_WARNING("Could not add vertex ids, there is already an 'id' vertex attribute.");
     }
@@ -526,7 +526,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
         } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             continue; /* skipped attribute */
         }
-        igraph_vector_ptr_push_back(&eattr, rec);
+        igraph_vector_ptr_push_back(&eattr, rec); /* reserved */
     }
     if (igraph_strvector_size(&state->edgeids) != 0) {
         if (!already_has_edge_id) {
@@ -538,7 +538,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
                 IGRAPH_CHECK(igraph_strvector_set(&state->edgeids, origsize, ""));
             }
             eidrec.value = &state->edgeids;
-            igraph_vector_ptr_push_back(&eattr, &eidrec);
+            igraph_vector_ptr_push_back(&eattr, &eidrec); /* reserved */
         } else {
             IGRAPH_WARNING("Could not add edge ids, there is already an 'id' edge attribute.");
         }
@@ -572,7 +572,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
         } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
             continue; /* skipped attribute */
         }
-        igraph_vector_ptr_push_back(&gattr, rec);
+        igraph_vector_ptr_push_back(&gattr, rec); /* reserved */
     }
 
     IGRAPH_CHECK(igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr));
