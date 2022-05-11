@@ -232,6 +232,8 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
             igraph_vector_bool_destroy((igraph_vector_bool_t*)rec->record.value);
             IGRAPH_FREE(rec->record.value);
         }
+    } else if (rec->record.type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+        /* no value was set */
     }
     if (rec->id != 0) {
         IGRAPH_FREE(rec->id);
@@ -423,8 +425,9 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     /* check that we have found and parsed the graph the user is interested in */
     IGRAPH_ASSERT(state->index < 0);
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&vattr, igraph_vector_ptr_size(&state->v_attrs) + 1));
+    IGRAPH_CHECK(igraph_vector_ptr_init(&vattr, igraph_vector_ptr_size(&state->v_attrs) + 1)); /* +1 for 'id' */
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vattr);
+    igraph_vector_ptr_resize(&vattr, 0); /* will be filled with push_back() */
 
     esize = igraph_vector_ptr_size(&state->e_attrs);
     if (igraph_strvector_size(&state->edgeids) != 0) {
@@ -432,9 +435,11 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     }
     IGRAPH_CHECK(igraph_vector_ptr_init(&eattr, esize));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &eattr);
+    igraph_vector_ptr_resize(&eattr, 0); /* will be filled with push_back() */
 
     IGRAPH_CHECK(igraph_vector_ptr_init(&gattr, igraph_vector_ptr_size(&state->g_attrs)));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &gattr);
+    igraph_vector_ptr_resize(&gattr, 0); /* will be filled with push_back() */
 
     for (i = 0; i < igraph_vector_ptr_size(&state->v_attrs); i++) {
         igraph_i_graphml_attribute_record_t *graphmlrec =
@@ -442,7 +447,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
         igraph_attribute_record_t *rec = &graphmlrec->record;
 
         /* Check that the name of the vertex attribute is not 'id'.
-        If it is then we cannot the complimentary 'id' attribute. */
+         * If it is then we cannot add the complementary 'id' attribute. */
         if (! strcmp(rec->name, idstr)) {
             already_has_vertex_id = 1;
         }
@@ -471,16 +476,18 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
             for (l = origsize; l < nodes; l++) {
                 VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
             }
+        } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+            continue; /* skipped attribute */
         }
-        VECTOR(vattr)[i] = rec;
+        igraph_vector_ptr_push_back(&vattr, rec);
     }
     if (!already_has_vertex_id) {
         idrec.name = idstr;
         idrec.type = IGRAPH_ATTRIBUTE_STRING;
         idrec.value = igraph_i_trie_borrow_keys(&state->node_trie);
-        VECTOR(vattr)[i] = &idrec;
+        igraph_vector_ptr_push_back(&vattr, &idrec);
     } else {
-        igraph_vector_ptr_pop_back(&vattr);
+        IGRAPH_WARNING("Could not add vertex ids, there is already an 'id' vertex attribute.");
     }
 
     for (i = 0; i < igraph_vector_ptr_size(&state->e_attrs); i++) {
@@ -516,8 +523,10 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
             for (l = origsize; l < edges; l++) {
                 VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
             }
+        } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+            continue; /* skipped attribute */
         }
-        VECTOR(eattr)[i] = rec;
+        igraph_vector_ptr_push_back(&eattr, rec);
     }
     if (igraph_strvector_size(&state->edgeids) != 0) {
         if (!already_has_edge_id) {
@@ -529,9 +538,8 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
                 IGRAPH_CHECK(igraph_strvector_set(&state->edgeids, origsize, ""));
             }
             eidrec.value = &state->edgeids;
-            VECTOR(eattr)[igraph_vector_ptr_size(&eattr) - 1] = &eidrec;
+            igraph_vector_ptr_push_back(&eattr, &eidrec);
         } else {
-            igraph_vector_ptr_pop_back(&eattr);
             IGRAPH_WARNING("Could not add edge ids, there is already an 'id' edge attribute.");
         }
     }
@@ -561,8 +569,10 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
             for (l = origsize; l < 1; l++) {
                 VECTOR(*boolvec)[l] = graphmlrec->default_value.as_boolean;
             }
+        } else if (rec->type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+            continue; /* skipped attribute */
         }
-        VECTOR(gattr)[i] = rec;
+        igraph_vector_ptr_push_back(&gattr, rec);
     }
 
     IGRAPH_CHECK(igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr));
@@ -720,8 +730,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         }
     }
 
-    /* throw an error if there is no ID; this is a clear violation of the GraphML
-     * DTD */
+    /* throw an error if there is no ID; this is a clear violation of the GraphML DTD */
     if (rec->id == 0) {
         IGRAPH_ERROR("Found <key> tag with no 'id' attribute.", IGRAPH_PARSEERROR);
     }
@@ -734,7 +743,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         }
     }
 
-    /* if the attribute type is missing, ignore the attribute with a warnign */
+    /* if the attribute type is missing, ignore the attribute with a warning */
     if (!skip && rec->type == I_GRAPHML_UNKNOWN_TYPE) {
         IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing 'attr.type' attribute.", rec->id);
         skip = 1;
@@ -745,15 +754,24 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         IGRAPH_ERROR("Missing 'for' attribute in a <key> tag.", IGRAPH_PARSEERROR);
     }
 
-    /* if the code above requested skipping the attribute, free everything and return */
+    /* If attribute is skipped, proceed according to the type of the associated graph element. */
     if (skip) {
-        if (rec) {
-            igraph_i_graphml_attribute_record_destroy(rec);
-            igraph_free(rec);
-            rec = NULL;
+        if (trie == 0) {
+            /* Attribute was skipped because it is not for a node, edge or the graph.
+             * Free everything and return. */
+            if (rec) {
+                igraph_i_graphml_attribute_record_destroy(rec);
+                igraph_free(rec);
+                rec = NULL;
+            }
+            IGRAPH_FINALLY_CLEAN(2);
+            goto exit;
+        } else {
+            /* If the skipped attribute was for a supported graph element, we add it
+             * as "UNSPECIFIED" so that we can avoid reporting "unknown attribute" warnings
+             * later. */
+            rec->record.type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
         }
-        IGRAPH_FINALLY_CLEAN(2);
-        goto exit;
     }
 
     /* add to trie, attributes */
@@ -803,7 +821,11 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         rec->record.value = strvec;
         IGRAPH_FINALLY_CLEAN(1);
         break;
-    default: break;
+    case IGRAPH_ATTRIBUTE_UNSPECIFIED:
+        rec->record.value = NULL;
+        break;
+    default:
+        IGRAPH_FATAL("Unexpected attribute type.");
     }
 
 exit:
@@ -907,8 +929,7 @@ static igraph_error_t igraph_i_graphml_attribute_data_finish(struct igraph_i_gra
         id = igraph_vector_int_size(&state->edgelist) / 2 - 1; /* hack */
         break;
     default:
-        /* impossible */
-        break;
+        IGRAPH_FATAL("Unexpected attribute element type.");
     }
 
     if (key == 0) {
@@ -980,8 +1001,10 @@ static igraph_error_t igraph_i_graphml_attribute_data_finish(struct igraph_i_gra
         }
         IGRAPH_CHECK(igraph_strvector_set(strvec, id, strvalue));
         break;
-    default:
+    case IGRAPH_ATTRIBUTE_UNSPECIFIED:
         break;
+    default:
+        IGRAPH_FATAL("Unexpected attribute type.");
     }
 
 exit:
@@ -1027,8 +1050,10 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
         graphmlrec->default_value.as_string = str;
         str = NULL;
         break;
-    default:
+    case IGRAPH_ATTRIBUTE_UNSPECIFIED:
         break;
+    default:
+        IGRAPH_FATAL("Unexpected attribute type.");
     }
 
     if (state->data_char) {
