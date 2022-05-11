@@ -4,6 +4,7 @@ pool:
 variables:
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
+  OMP_NUM_THREADS: 1
 
 jobs:
   - job: linux_static_vendored

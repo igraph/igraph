@@ -14,6 +14,7 @@ env:
     - CMAKE_GENERATOR=Ninja   # build with ninja instead of make
     - CTEST_PARALLEL_LEVEL=2  # run tests in parallel
     - PATH="/snap/bin:$PATH"  # needed in order to run the cmake installed with snap
+    - OMP_NUM_THREADS=1       # reproducibility for plfit
 
 git:
   depth: 200    # to make sure we find the latest tag when building. Increase if not enough.
