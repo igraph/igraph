@@ -60,6 +60,7 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     IGRAPH_ALLOW_INTERRUPTION();
 
     neis1 = igraph_lazy_adjlist_get(&adjlist, node);
+    IGRAPH_CHECK_OOM(neis1, "Failed to query neighbors.");
     neilen1 = igraph_vector_int_size(neis1);
     for (j = 0; j < neilen1; j++) {
         neis[ VECTOR(*neis1)[j] ] = i + 1;
@@ -69,6 +70,7 @@ for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     for (j = 0; j < neilen1; j++) {
         igraph_integer_t v = VECTOR(*neis1)[j];
         neis2 = igraph_lazy_adjlist_get(&adjlist, v);
+        IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
         neilen2 = igraph_vector_int_size(neis2);
         for (k = 0; k < neilen2; k++) {
             igraph_integer_t v2 = VECTOR(*neis2)[k];

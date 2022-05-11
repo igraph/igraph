@@ -788,6 +788,24 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
     } while (0)
 
 /**
+ * \define IGRAPH_CHECK_OOM
+ * \brief Checks for out-of-memory conditions after a memory allocation.
+ *
+ * This function should be called on pointers after memory allocations. The
+ * function checks whether the returned pointer is NULL, and if so, sets an
+ * error message with the \c IGRAPH_ENOMEM error code.
+ *
+ * \param ptr The pointer to check.
+ * \param message The error message to use when the pointer is \c NULL.
+ */
+#define IGRAPH_CHECK_OOM(ptr, message) \
+    do { \
+        if (IGRAPH_UNLIKELY(!ptr)) { \
+            IGRAPH_ERROR(message, IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
+        } \
+    } while (0)
+
+/**
  * \section about_igraph_warnings Warning messages
  *
  * <para>

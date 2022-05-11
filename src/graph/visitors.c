@@ -236,9 +236,11 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
             igraph_integer_t actvect = igraph_dqueue_int_pop(&Q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&Q);
             igraph_integer_t succ_vec;
-            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                                                actvect);
-            igraph_integer_t i, n = igraph_vector_int_size(neis);
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
+            igraph_integer_t i, n;
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+            n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -606,6 +608,8 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
             igraph_integer_t n = igraph_vector_int_size(neis);
             igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, actvect);
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
             /* Search for a neighbor that was not yet visited */
             igraph_bool_t any = 0;

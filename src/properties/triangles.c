@@ -162,6 +162,8 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
         }
 
         neis2 = igraph_lazy_adjlist_get(&adjlist, v);
+        IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
+
         neilen = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis2)[j];
@@ -181,6 +183,7 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
         igraph_vector_int_t *neis2;
         igraph_integer_t deg;
         neis2 = igraph_lazy_adjlist_get(&adjlist, v);
+        IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
         VECTOR(degree)[i] = deg = igraph_vector_int_size(neis2);
         if (deg > maxdegree) {
             maxdegree = deg;
@@ -211,6 +214,8 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
         IGRAPH_ALLOW_INTERRUPTION();
 
         neis1 = igraph_lazy_adjlist_get(&adjlist, node);
+        IGRAPH_CHECK_OOM(neis1, "Failed to query neighbors.");
+
         neilen1 = igraph_vector_int_size(neis1);
         for (i = 0; i < neilen1; i++) {
             igraph_integer_t nei = VECTOR(*neis1)[i];
@@ -225,6 +230,7 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
             /*        neiindex, neirank); */
             if (neirank > noderank) {
                 neis2 = igraph_lazy_adjlist_get(&adjlist, nei);
+                IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
                 neilen2 = igraph_vector_int_size(neis2);
                 for (j = 0; j < neilen2; j++) {
                     igraph_integer_t nei2 = VECTOR(*neis2)[j];
@@ -252,9 +258,12 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
     for (i = 0; i < nodes_to_calc; i++, IGRAPH_VIT_NEXT(vit)) {
         igraph_integer_t node = IGRAPH_VIT_GET(vit);
         igraph_integer_t idx = VECTOR(indexv)[node] - 1;
-        igraph_vector_int_t *neis2 =
-            igraph_lazy_adjlist_get(&adjlist, node);
-        igraph_integer_t deg = igraph_vector_int_size(neis2);
+        igraph_vector_int_t *neis2 = igraph_lazy_adjlist_get(&adjlist, node);
+        igraph_integer_t deg;
+
+        IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
+
+        deg = igraph_vector_int_size(neis2);
         if (mode == IGRAPH_TRANSITIVITY_ZERO && deg < 2) {
             VECTOR(*res)[i] = 0.0;
         } else {
@@ -644,6 +653,7 @@ static igraph_error_t igraph_i_transitivity_barrat1(
         IGRAPH_ALLOW_INTERRUPTION();
 
         adj1 = igraph_lazy_inclist_get(&incident, node);
+        IGRAPH_CHECK_OOM(adj1, "Failed to query incident edges.");
         adjlen1 = igraph_vector_int_size(adj1);
         /* Mark the neighbors of the node */
         for (j = 0; j < adjlen1; j++) {
@@ -660,6 +670,7 @@ static igraph_error_t igraph_i_transitivity_barrat1(
             igraph_real_t weight1 = VECTOR(*weights)[edge1];
             igraph_integer_t v = IGRAPH_OTHER(graph, edge1, node);
             adj2 = igraph_lazy_inclist_get(&incident, v);
+            IGRAPH_CHECK_OOM(adj2, "Failed to query incident edges.");
             adjlen2 = igraph_vector_int_size(adj2);
             for (k = 0; k < adjlen2; k++) {
                 igraph_integer_t edge2 = VECTOR(*adj2)[k];

@@ -356,6 +356,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
         for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
             i = IGRAPH_VIT_GET(vit);
             v1 = igraph_lazy_adjlist_get(&al, i);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, i, &k)) {
                 igraph_vector_int_insert(v1, k, i);
             }
@@ -372,7 +373,9 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
             }
             v1 = igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
             v2 = igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
-            igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(v2, "Failed to query neighbors.");
+            IGRAPH_CHECK(igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection));
             if (len_union > 0) {
                 MATRIX(*res, i, j) = ((igraph_real_t)len_intersection) / len_union;
             } else {
@@ -475,8 +478,9 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
             }
             seen[j] = 1;
             v1 = igraph_lazy_adjlist_get(&al, j);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, j, &u)) {
-                igraph_vector_int_insert(v1, u, j);
+                IGRAPH_CHECK(igraph_vector_int_insert(v1, u, j));
             }
         }
 
@@ -495,6 +499,8 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
 
         v1 = igraph_lazy_adjlist_get(&al, u);
         v2 = igraph_lazy_adjlist_get(&al, v);
+        IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
+        IGRAPH_CHECK_OOM(v2, "Failed to query neighbors.");
         IGRAPH_CHECK(igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection));
         if (len_union > 0) {
             VECTOR(*res)[j] = ((igraph_real_t)len_intersection) / len_union;

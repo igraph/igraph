@@ -117,6 +117,8 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
             }
 
             neis = igraph_lazy_adjlist_get(&adjlist, actnode);
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+
             n = igraph_vector_int_size(neis);
             for (i = 0; i < n; i++) {
                 igraph_integer_t nei = VECTOR(*neis)[i];
@@ -172,6 +174,7 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
             while (FATHER(t1) == 0 || FATHER(t2) == 0) {
                 igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
                 neis = igraph_lazy_adjlist_get(&adjlist, actnode);
+                IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
                 n = igraph_vector_int_size(neis);
                 for (i = 0; i < n; i++) {
                     igraph_integer_t nei = VECTOR(*neis)[i];

@@ -61,8 +61,10 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
         igraph_vector_int_t *neis;
         igraph_integer_t nn;
         neis = igraph_lazy_adjlist_get(&adj, start);
-        nn = igraph_vector_int_size(neis);
 
+        IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+
+        nn = igraph_vector_int_size(neis);
         if (IGRAPH_UNLIKELY(nn == 0)) {
             igraph_vector_int_resize(vertices, i);
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
@@ -156,6 +158,7 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
         igraph_integer_t degree, edge, idx;
         igraph_vector_int_t* inc_edges = igraph_lazy_inclist_get(&il, start);
 
+        IGRAPH_CHECK_OOM(inc_edges, "Failed to query incident edges.");
         degree = igraph_vector_int_size(inc_edges);
 
         /* are we stuck? */

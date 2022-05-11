@@ -161,6 +161,8 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
             }
 
             neis = igraph_lazy_inclist_get(&inclist, j);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
             nlen = igraph_vector_int_size(neis);
 
             for (k = 0; k < nlen; k++) {
@@ -376,6 +378,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         }
 
         neis = igraph_lazy_inclist_get(&inclist, j);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
         nlen = igraph_vector_int_size(neis);
 
         for (k = 0; k < nlen; k++) {

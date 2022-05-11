@@ -216,6 +216,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
 
         /* Now check all neighbors of 'maxnei' for a wider path */
         neis = igraph_lazy_inclist_get(&inclist, maxnei);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             igraph_integer_t edge = VECTOR(*neis)[i];
@@ -501,7 +502,11 @@ igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, i);
-        igraph_integer_t nlen = igraph_vector_int_size(neis);
+        igraph_integer_t nlen;
+
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
+        nlen = igraph_vector_int_size(neis);
         for (j = 0; j < nlen; j++) {
             igraph_integer_t edge = VECTOR(*neis)[j];
             igraph_integer_t tto = IGRAPH_OTHER(graph, edge, i);
@@ -706,6 +711,7 @@ igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
 
             /* Now check all neighbors of 'maxnei' for a wider path*/
             neis = igraph_lazy_inclist_get(&inclist, maxnei);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_integer_t edge = VECTOR(*neis)[j];

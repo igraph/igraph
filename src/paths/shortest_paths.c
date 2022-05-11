@@ -232,6 +232,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(&inclist, minnei);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_integer_t edge = VECTOR(*neis)[j];
@@ -610,6 +611,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(inclist, minnei);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_real_t altdist, curdist;
