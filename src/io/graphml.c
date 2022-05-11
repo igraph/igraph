@@ -736,7 +736,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
 
     /* if the attribute type is missing, ignore the attribute with a warnign */
     if (!skip && rec->type == I_GRAPHML_UNKNOWN_TYPE) {
-        IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute.", rec->id);
+        IGRAPH_WARNINGF("Ignoring <key id=\"%s\"> because of a missing 'attr.type' attribute.", rec->id);
         skip = 1;
     }
 
@@ -745,8 +745,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         IGRAPH_ERROR("Missing 'for' attribute in a <key> tag.", IGRAPH_PARSEERROR);
     }
 
-    /* if the code above requested skipping the attribute, free everything and
-     * return */
+    /* if the code above requested skipping the attribute, free everything and return */
     if (skip) {
         if (rec) {
             igraph_i_graphml_attribute_record_destroy(rec);
