@@ -690,7 +690,9 @@ Some of the highlights are:
    string is now written into the Creator line as-is instead of being appended to a default
    value.
  - `igraph_read_graph_gml()` now supports graph attributes (in addition to vertex and edge attributes).
- - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute value instead of 0.
+ - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
+   `igraph_write_graph_gml()` skips writing NaN values. These two changes ensure consistent round-tripping.
+ - Foreign format readers now present more informative error messages.
 
 ### Fixed
 
