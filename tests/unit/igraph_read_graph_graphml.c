@@ -169,6 +169,18 @@ int main() {
     dump_vertex_attribute_numeric("weight", &g);
     igraph_destroy(&g);
 
+    /* Test a GraphML file from yEd -- we should be able to parse the nodes and
+     * edges */
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
+    ifile = fopen("graphml-yed.xml", "r");
+    if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
+        printf("Received unexpected return code: %d\n", result);
+        return 1;
+    }
+    fclose(ifile);
+    dump_graph("Graph from yEd:\n", &g);
+    igraph_destroy(&g);
+
     /* Restore the old error handler */
     igraph_set_error_handler(igraph_error_handler_abort);
 
