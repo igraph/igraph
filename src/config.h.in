@@ -10,6 +10,9 @@
 #cmakedefine HAVE__STRNICMP 1
 #cmakedefine HAVE_STRDUP 1
 #cmakedefine HAVE_STRNDUP 1
+#cmakedefine HAVE_USELOCALE 1
+#cmakedefine HAVE_XLOCALE 1
+#cmakedefine HAVE__CONFIGTHREADLOCALE 1
 
 #cmakedefine HAVE_GLPK 1
 #cmakedefine HAVE_LIBXML 1

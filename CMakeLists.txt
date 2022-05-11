@@ -75,6 +75,7 @@ find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
+include(CheckIncludeFiles)
 include(CMakePushCheckState)
 
 # First we check for some functions and symbols
@@ -89,7 +90,21 @@ check_symbol_exists(_stricmp string.h HAVE__STRICMP)
 check_symbol_exists(_strnicmp string.h HAVE__STRNICMP)
 check_symbol_exists(strdup string.h HAVE_STRDUP)
 check_symbol_exists(strndup string.h HAVE_STRNDUP)
+check_include_files(xlocale.h HAVE_XLOCALE)
+if(HAVE_XLOCALE)
+  # On BSD, uselocale() is in xlocale.h insted of locale.h.
+  # Some systems provide xlocale.h, but uselocale() is still in locale.h,
+  # thus we try both.
+  check_symbol_exists(uselocale "xlocale.h;locale.h" HAVE_USELOCALE)
+else()
+  check_symbol_exists(uselocale locale.h HAVE_USELOCALE)
+endif()
+check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
+
+if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)
+  message(WARNING "igraph cannot set per-thread locale on this platform. igraph_enter_safelocale() and igraph_exit_safelocale() will not be safe to use in multithreaded programs.")
+endif()
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)

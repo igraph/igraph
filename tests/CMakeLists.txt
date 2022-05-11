@@ -447,6 +447,7 @@ add_examples(
   igraph_read_graph_lgl
   igraph_write_graph_lgl
   igraph_write_graph_pajek
+  safelocale
 )
 
 add_legacy_tests(

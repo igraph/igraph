@@ -47,6 +47,11 @@
 <!-- doxrox-include igraph_write_graph_dot -->
 </section>
 
+<section id="locale-helpers"><title>Convenience functions for locale change</title>
+<!-- doxrox-include igraph_enter_safelocale -->
+<!-- doxrox-include igraph_exit_safelocale -->
+</section>
+
 <section id="deprecated-formats"><title>Deprecated functions</title>
 <!-- doxrox-include igraph_read_graph_dimacs -->
 <!-- doxrox-include igraph_write_graph_dimacs -->

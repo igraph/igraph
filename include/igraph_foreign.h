@@ -90,6 +90,15 @@ IGRAPH_EXPORT igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE 
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                           const char* vertex_attr_name, const char* edge_attr_name);
 
+/* -------------------------------------------------- */
+/* Convenience functions for temporary locale setting */
+/* -------------------------------------------------- */
+
+typedef struct igraph_safelocale_s *igraph_safelocale_t;
+
+IGRAPH_EXPORT igraph_error_t igraph_enter_safelocale(igraph_safelocale_t *loc);
+IGRAPH_EXPORT void  igraph_exit_safelocale(igraph_safelocale_t *loc);
+
 __END_DECLS
 
 #endif
