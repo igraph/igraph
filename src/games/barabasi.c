@@ -492,7 +492,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     if (algo != IGRAPH_BARABASI_BAG &&
         algo != IGRAPH_BARABASI_PSUMTREE &&
         algo != IGRAPH_BARABASI_PSUMTREE_MULTIPLE) {
-        IGRAPH_ERROR("Invalid algorithm", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid algorithm.", IGRAPH_EINVAL);
     }
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
