@@ -120,9 +120,8 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
     }
 
     tmp = IGRAPH_REALLOC(set->stor_begin, capacity, igraph_integer_t);
-    if (! tmp) {
-        IGRAPH_ERROR("Cannot reserve space for set.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for set.");
+
     set->stor_begin = tmp;
     set->stor_end = set->stor_begin + capacity;
     set->end = set->stor_begin + actual_size;

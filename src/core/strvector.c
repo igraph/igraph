@@ -188,9 +188,7 @@ igraph_error_t igraph_strvector_set_len(igraph_strvector_t *sv, igraph_integer_t
     IGRAPH_ASSERT(sv->stor_begin[idx] != NULL);
 
     tmp = IGRAPH_REALLOC(sv->stor_begin[idx], len + 1, char);
-    if (tmp == NULL) {
-        IGRAPH_ERROR("String vector set failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for new items in string vector.");
 
     sv->stor_begin[idx] = tmp;
     memcpy(sv->stor_begin[idx], value, len * sizeof(char));
@@ -516,9 +514,7 @@ igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv, igraph_integer_t
     }
 
     tmp = IGRAPH_REALLOC(sv->stor_begin, capacity, char *);
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for new items in string vector.");
 
     sv->end = tmp + (sv->end - sv->stor_begin);
     sv->stor_begin = tmp;
@@ -551,6 +547,7 @@ void igraph_strvector_resize_min(igraph_strvector_t *sv) {
 
     size = (sv->end - sv->stor_begin);
     tmp = IGRAPH_REALLOC(sv->stor_begin, size, char *);
+
     if (tmp != NULL) {
         sv->stor_begin = tmp;
         sv->stor_end = sv->end = sv->stor_begin + size;

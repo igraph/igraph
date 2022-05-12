@@ -208,9 +208,7 @@ igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, capacity, ITEM_TYPE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for list.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for list.");
 
     v->end = tmp + (v->end - v->stor_begin);
     v->stor_begin = tmp;

@@ -471,9 +471,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_i
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, capacity, BASE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for vector.");
 
     v->end = tmp + (v->end - v->stor_begin);
     v->stor_begin = tmp;
@@ -1255,6 +1253,7 @@ void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
 
     size = (v->end - v->stor_begin);
     tmp = IGRAPH_REALLOC(v->stor_begin, size, BASE);
+
     if (tmp != NULL) {
         v->stor_begin = tmp;
         v->stor_end = v->end = v->stor_begin + size;

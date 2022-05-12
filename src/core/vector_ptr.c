@@ -222,9 +222,8 @@ igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, void*);
-    if (tmp == 0) {
-        IGRAPH_ERROR("vector ptr reserve failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for pointer vector.");
+
     v->stor_begin = tmp;
     v->stor_end = v->stor_begin + size;
     v->end = v->stor_begin + actual_size;
