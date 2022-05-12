@@ -41,7 +41,6 @@
 #define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 
 #if HAVE_LIBXML == 1
-#include <libxml/encoding.h>
 #include <libxml/globals.h>
 #include <libxml/parser.h>
 
@@ -74,21 +73,17 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
 #define toXmlChar(a)   (BAD_CAST(a))
 #define fromXmlChar(a) ((char *)(a)) /* not the most elegant way... */
 
-#define GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) do {  \
-        if (state->successful) {                                    \
-            igraph_i_graphml_sax_handler_error(state, msg);           \
-        }                                                           \
+#define GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) \
+    do {  \
+        if (state->successful) { \
+            igraph_i_graphml_sax_handler_error(state, msg); \
+        } \
     } while (0)
-#define GRAPHML_PARSE_ERROR(state, msg) \
-    GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, IGRAPH_PARSEERROR)
-#define RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) do {  \
-        GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code);            \
-        return;                                                     \
-    } while (1)
-#define RETURN_GRAPHML_PARSE_ERROR(state, msg) do {           \
-        GRAPHML_PARSE_ERROR(state, msg);                            \
-        return;                                                     \
-    } while (1)
+#define RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) \
+    do { \
+        GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code); \
+        return; \
+    } while (0)
 
 typedef struct igraph_i_graphml_attribute_record_t {
     const char *id;           /* GraphML id */
@@ -1332,7 +1327,7 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
     );
 
     if (result != IGRAPH_SUCCESS) {
-        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
+        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file.", result);
     }
 }
 
@@ -1413,7 +1408,7 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
     );
 
     if (result != IGRAPH_SUCCESS) {
-        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
+        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file.", result);
     }
 }
 
@@ -1441,7 +1436,7 @@ static void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, 
     }
 
     if (result != IGRAPH_SUCCESS) {
-        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file", result);
+        RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, "Cannot parse GraphML file.", result);
     }
 }
 
