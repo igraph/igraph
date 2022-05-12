@@ -509,11 +509,21 @@ igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_
         IGRAPH_ERROR("New edge already exists.", IGRAPH_EINVAL);
     }
 
-    igraph_vector_int_remove(oldfromvec, oldpos);
-    if (oldfromvec == newfromvec && oldpos < newpos) {
-        --newpos;
+    if (oldfromvec != newfromvec) {
+        /* grow the new vector first and then remove the item from the old one
+         * to ensure that we don't end up in a situation where the removal
+         * succeeds but the addition does not */
+        IGRAPH_CHECK(igraph_vector_int_insert(newfromvec, newpos, newto));
+        igraph_vector_int_remove(oldfromvec, oldpos);
+    } else {
+        /* moving item within the same vector; here we can safely remove first
+         * and insert afterwards because there is no need to re-allocate memory */
+        igraph_vector_int_remove(oldfromvec, oldpos);
+        if (oldpos < newpos) {
+            --newpos;
+        }
+        IGRAPH_CHECK(igraph_vector_int_insert(newfromvec, newpos, newto));
     }
-    IGRAPH_CHECK(igraph_vector_int_insert(newfromvec, newpos, newto));
 
     return IGRAPH_SUCCESS;
 
