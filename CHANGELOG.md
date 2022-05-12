@@ -6,7 +6,7 @@
 
  - `igraph_community_walktrap()` now uses double precision floating point operations internally instead of single precision.
  - In `igraph_community_leiden()`, the `nb_clusters` output parameter is now optional (i.e. it can be `NULL`).
- - `igraph_read_graph_graphml()` no longer attempts to temporarily set the C locale.
+ - `igraph_read_graph_graphml()` no longer attempts to temporarily set the C locale, and will therefore not work correctly if the current locale uses a decimal comma.
 
 ### Fixed
 
