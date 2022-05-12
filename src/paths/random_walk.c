@@ -69,8 +69,7 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
             igraph_vector_int_resize(vertices, i);
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
-            }
-            else {
+            } else {
                 IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
             }
         }
@@ -113,14 +112,16 @@ static void vec_destr(igraph_vector_t *vec) {
  * \param edges An initialized vector, the indices of traversed
  *   edges are stored here. It will be resized as needed.
  */
-static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
-                                    const igraph_vector_t *weights,
-                                    igraph_vector_int_t *vertices,
-                                    igraph_vector_int_t *edges,
-                                    igraph_integer_t start,
-                                    igraph_neimode_t mode,
-                                    igraph_integer_t steps,
-                                    igraph_random_walk_stuck_t stuck) {
+static igraph_error_t igraph_i_random_walk_inclist(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_vector_int_t *vertices,
+        igraph_vector_int_t *edges,
+        igraph_integer_t start,
+        igraph_neimode_t mode,
+        igraph_integer_t steps,
+        igraph_random_walk_stuck_t stuck) {
+
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t i, next;
     igraph_vector_t weight_temp;
@@ -156,7 +157,7 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
     }
     for (i = 0; i < steps; ++i) {
         igraph_integer_t degree, edge, idx;
-        igraph_vector_int_t* inc_edges = igraph_lazy_inclist_get(&il, start);
+        igraph_vector_int_t *inc_edges = igraph_lazy_inclist_get(&il, start);
 
         IGRAPH_CHECK_OOM(inc_edges, "Failed to query incident edges.");
         degree = igraph_vector_int_size(inc_edges);
@@ -172,15 +173,14 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
             }
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
-            }
-            else {
+            } else {
                 IGRAPH_ERROR("Random walk got stuck.", IGRAPH_ERWSTUCK);
             }
         }
 
         if (weights) { /* weighted: choose an out-edge with probability proportional to its weight */
             igraph_real_t r;
-            igraph_vector_t** cd = (igraph_vector_t**)&(VECTOR(cdfs)[start]);
+            igraph_vector_t **cd = (igraph_vector_t**) &(VECTOR(cdfs)[start]);
 
             /* compute out-edge cdf for this node if not already done */
             if (IGRAPH_UNLIKELY(! *cd)) {
@@ -247,7 +247,7 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
 
 /**
  * \function igraph_random_walk
- * \brief Perform a random walk on a graph and return the traversed edges and/or vertices
+ * \brief Performs a random walk on a graph.
  *
  * Performs a random walk with a given length on a graph, from the given
  * start vertex. Edge directions are (potentially) considered, depending on
@@ -259,10 +259,10 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
  *   that at least one strictly positive weight is found among the
  *   outgoing edges of each vertex. Additionally, no edge weight may
  *   be NaN. If either case does not hold, an error is returned. If it
- *   is a NULL pointer, all edges are considered to have equal weight.
+ *   is \c NULL, all edges are considered to have equal weight.
  * \param vertices An allocated vector, the result is stored here as
  *   a list of vertex IDs. It will be resized as needed.
- *   It includes vertex ids of starting and ending vertices.
+ *   It includes the vertex IDs of starting and ending vertices.
  *   Length of the vertices vector: \p steps + 1
  * \param edges An initialized vector, the indices of traversed
  *   edges are stored here. It will be resized as needed.
@@ -270,22 +270,22 @@ static igraph_error_t igraph_i_random_walk_inclist(const igraph_t *graph,
  * \param start The start vertex for the walk.
  * \param steps The number of steps to take. If the random walk gets
  *   stuck, then the \p stuck argument specifies what happens.
- *   \p steps is the number of edges to traverse on the walk.
+ *   \p steps is the number of edges to traverse during the walk.
  * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
  *   edge directions. This argument is ignored for undirected graphs.
  * \param stuck What to do if the random walk gets stuck.
  *   \c IGRAPH_RANDOM_WALK_STUCK_RETURN means that the function returns
- *   with a shorter walk (for \p vertices and \p edges);
- *   \c IGRAPH_RANDOM_WALK_STUCK_ERROR means that an error is reported;
- *   In both cases \p vertices and \p edges are truncated to contain
+ *   with a shorter walk; \c IGRAPH_RANDOM_WALK_STUCK_ERROR means
+ *   that an \c IGRAPH_ERWSTUCK error is reported.
+ *   In both cases, \p vertices and \p edges are truncated to contain
  *   the actual interrupted walk.
- * \return Error code.
+ * \return Error code: \c IGRAPH_ERWSTUCK if the walk got stuck.
  *
  * Time complexity:
- *   For unweighted graph: O(l + d),
- *   For weighted graph: O(l * log(k) + d),
+ *   O(l + d) for unweighted graphs and
+ *   O(l * log(k) + d) for weighted graphs,
  *   where \c l is the length of the walk, \c d is the total degree of the visited nodes
  *   and \c k is the average degree of vertices of the given graph.
  */
@@ -326,8 +326,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
                 IGRAPH_ERROR("Weights must be non-negative.", IGRAPH_EINVAL);
-            }
-            else if (igraph_is_nan(min)) {
+            } else if (igraph_is_nan(min)) {
                 IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
@@ -349,7 +348,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
 
 /**
  * \function igraph_random_edge_walk
- * \brief Perform a random walk on a graph and return the traversed edges
+ * \brief Performs a random walk on a graph and returns the traversed edges.
  *
  * Performs a random walk with a given length on a graph, from the given
  * start vertex. Edge directions are (potentially) considered, depending on
@@ -374,19 +373,20 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
  * \param stuck What to do if the random walk gets stuck.
  *   \c IGRAPH_RANDOM_WALK_STUCK_RETURN means that the function returns
  *   with a shorter walk; \c IGRAPH_RANDOM_WALK_STUCK_ERROR means
- *   that an error is reported. In both cases, \p edgewalk is truncated
- *   to contain the actual interrupted walk.
+ *   that an \c IGRAPH_ERWSTUCK error is reported. In both cases,
+ *   \p edgewalk is truncated to contain the actual interrupted walk.
  *
  * \return Error code.
  *
  * \deprecated-by igraph_random_walk 0.10.0
  */
-igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
-    const igraph_vector_t *weights,
-    igraph_vector_int_t *edgewalk,
-    igraph_integer_t start, igraph_neimode_t mode,
-    igraph_integer_t steps,
-    igraph_random_walk_stuck_t stuck) {
+igraph_error_t igraph_random_edge_walk(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_vector_int_t *edgewalk,
+        igraph_integer_t start, igraph_neimode_t mode,
+        igraph_integer_t steps,
+        igraph_random_walk_stuck_t stuck) {
 
     return igraph_random_walk(graph, weights, NULL, edgewalk,
                               start, mode, steps, stuck);
