@@ -1304,8 +1304,11 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
         IGRAPH_CHECK(igraph_i_graphml_handle_unknown_start_tag(state));
         break;
 
-    default:
+    case FINISH:
         break;
+
+    default:
+        IGRAPH_FATALF("Unexpected GraphML reader state %d.", (int) state->st);
     }
 
 exit:
@@ -1384,8 +1387,11 @@ static igraph_error_t igraph_i_graphml_sax_handler_end_element_ns_inner(
         }
         break;
 
-    default:
+    case FINISH:
         break;
+
+    default:
+        IGRAPH_FATALF("Unexpected GraphML reader state %d.", (int) state->st);
     }
 
     return IGRAPH_SUCCESS;
