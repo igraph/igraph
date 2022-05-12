@@ -694,7 +694,6 @@ Some of the highlights are:
  - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
    `igraph_write_graph_gml()` skips writing NaN values. These two changes ensure consistent round-tripping.
  - Foreign format readers now present more informative error messages.
- - The GraphML parser is now only guaranteed to work correctly in locales that use a decimal point. This change only affects programs that explicitly change the locale away from the default C locale active on program startup.
 
 ### Fixed
 
@@ -806,6 +805,7 @@ Some of the highlights are:
 
  - `igraph_community_walktrap()` now uses double precision floating point operations internally instead of single precision.
  - In `igraph_community_leiden()`, the `nb_clusters` output parameter is now optional (i.e. it can be `NULL`).
+ - `igraph_read_graph_graphml()` no longer attempts to temporarily set the C locale, and will therefore not work correctly if the current locale uses a decimal comma.
 
 ### Fixed
 
