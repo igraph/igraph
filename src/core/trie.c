@@ -181,13 +181,14 @@ static igraph_error_t igraph_i_trie_get_node(
                 IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
                 IGRAPH_VECTOR_INT_INIT_FINALLY(&node->values, 1);
                 IGRAPH_CHECK(igraph_strvector_set(&node->strs, 0, key + diff));
+                IGRAPH_FINALLY_CLEAN(4);
+
                 VECTOR(node->children)[0] = 0;
                 VECTOR(node->values)[0] = newvalue;
 
                 VECTOR(t->children)[i] = node;
 
                 *id = newvalue;
-                IGRAPH_FINALLY_CLEAN(4);
                 return IGRAPH_SUCCESS;
             } else {
                 *id = -1;
@@ -214,12 +215,13 @@ static igraph_error_t igraph_i_trie_get_node(
             VECTOR(node->values)[0] = VECTOR(t->values)[i];
 
             str2 = strdup(str);
-            if (! str2) {
-                IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(str2, "Cannot add to trie.");
+
             str2[diff] = '\0';
             IGRAPH_FINALLY(igraph_free, str2);
+
             IGRAPH_CHECK(igraph_strvector_set(&t->strs, i, str2));
+
             IGRAPH_FREE(str2);
             IGRAPH_FINALLY_CLEAN(5);
 
@@ -251,12 +253,13 @@ static igraph_error_t igraph_i_trie_get_node(
             VECTOR(node->values)[1] = newvalue;
 
             str2 = strdup(str);
-            if (! str2) {
-                IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(str2, "Cannot add to trie.");
+
             str2[diff] = '\0';
             IGRAPH_FINALLY(igraph_free, str2);
+
             IGRAPH_CHECK(igraph_strvector_set(&t->strs, i, str2));
+
             IGRAPH_FREE(str2);
             IGRAPH_FINALLY_CLEAN(5);
 
