@@ -1502,14 +1502,6 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
     const char *vprefix = prefixattr ? "v_" : "";
     const char *eprefix = prefixattr ? "e_" : "";
 
-    /* set standard C locale lest we sometimes get commas instead of dots */
-    char *saved_locale = strdup(setlocale(LC_NUMERIC, NULL));
-    if (saved_locale == NULL) {
-        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, saved_locale);
-    setlocale(LC_NUMERIC, "C");
-
     ret = fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     if (ret < 0) {
         IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -1842,10 +1834,6 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
         IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
     }
 
-    /* reset locale to whatever was before this function */
-    setlocale(LC_NUMERIC, saved_locale);
-
-    igraph_free(saved_locale);
     igraph_strvector_destroy(&gnames);
     igraph_strvector_destroy(&vnames);
     igraph_strvector_destroy(&enames);
@@ -1855,7 +1843,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
     igraph_vector_destroy(&numv);
     igraph_strvector_destroy(&strv);
     igraph_vector_bool_destroy(&boolv);
-    IGRAPH_FINALLY_CLEAN(10);
+    IGRAPH_FINALLY_CLEAN(9);
 
     return 0;
 }

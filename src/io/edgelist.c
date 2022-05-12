@@ -36,6 +36,9 @@
  * <para>These functions can write a graph to a file, or read a graph
  * from a file.</para>
  *
+ * <para>They assume that the current locale uses a decimal point and not
+ * a decimal comma.</para>
+ *
  * <para>Note that as \a igraph uses the traditional C streams, it is
  * possible to read/write files from/to memory, at least on GNU
  * operating systems supporting \quote non-standard\endquote streams.</para>
