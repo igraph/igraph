@@ -232,6 +232,8 @@ igraph_error_t igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatri
     case IGRAPH_ADJ_PLUS:
         IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges));
         break;
+    default:
+        IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
@@ -554,6 +556,8 @@ igraph_error_t igraph_weighted_adjacency(igraph_t *graph, const igraph_matrix_t 
         IGRAPH_CHECK(igraph_i_weighted_adjacency_plus(adjmatrix, &edges,
                      &weights, loops));
         break;
+    default:
+        IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
 
     /* Prepare attribute record */
