@@ -693,6 +693,7 @@ Some of the highlights are:
  - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
    `igraph_write_graph_gml()` skips writing NaN values. These two changes ensure consistent round-tripping.
  - Foreign format readers now present more informative error messages.
+ - The GraphML parser is now only guaranteed to work correctly in locales that use a decimal point. This change only affects programs that explicitly change the locale away from the default C locale active on program startup.
 
 ### Fixed
 
@@ -700,9 +701,10 @@ Some of the highlights are:
  - The GraphML parser does not print to stderr any more in case of encoding
    errors and other error conditions originating from the underlying `libxml2`
    library.
+ - The GraphML parser would omit some edges and vertices when reading files with custom attribute types, such as those produced by yEd. This is now corrected.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
  - The GML parser now supports nodes with no id field.
- - The GML parser now performs more stringent checks on the input file, such as verifying that `id`, `source`, `target` and `directd` fields are not duplicated.
+ - The GML parser now performs more stringent checks on the input file, such as verifying that `id`, `source`, `target` and `directed` fields are not duplicated.
  - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
  - `igraph_matrix_complex_create()` and `igraph_matrix_complex_create_polar()` now set their sizes correctly.
  - The core data structures (vector, etc.) have overflow checks now.
@@ -824,6 +826,7 @@ Some of the highlights are:
 
 ### Other
 
+ - Greatly improved error reporting from foregin format parsers.
  - Documentation improvements.
 
 ## [0.9.8] - 2022-04-08
