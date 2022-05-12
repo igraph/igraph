@@ -6,16 +6,19 @@
 
 int main() {
     const char *filename = "weighted.gml";
-    FILE *file;
     igraph_t graph;
     igraph_safelocale_t loc;
 
     /* Attempt to set a locale that uses a decimal comma. Locale names
      * differ between platforms, and not all locales are available,
      * so the locale change may not be successful. */
-    setlocale(LC_ALL, "de_DE");
+    const char *locname = setlocale(LC_ALL, "de_DE");
+    struct lconv *lc = localeconv();
+    fprintf(stderr, "setlocale() returned '%s', decimal point is '%s'\n",
+            locname ? locname : "NULL",
+            lc->decimal_point);
 
-    file = fopen(filename, "r");
+    FILE *file = fopen(filename, "r");
     if (! file) {
         fprintf(stderr, "Cannot open %s file.\n", filename);
         exit(1);
