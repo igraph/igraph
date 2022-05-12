@@ -211,6 +211,8 @@ struct igraph_safelocale_s {
  *     locale will be stored here, so that it can be restored using
  *     \ref igraph_exit_safelocale().
  * \return Error code.
+ *
+ * \example examples/simple/safelocale.c
  */
 
 igraph_error_t igraph_enter_safelocale(igraph_safelocale_t *loc) {
