@@ -34,7 +34,6 @@
 #include "config.h"
 
 #include <ctype.h>
-#include <locale.h>
 #include <math.h>    /* isnan */
 #include <string.h>
 #include <stdarg.h>  /* va_start & co */
