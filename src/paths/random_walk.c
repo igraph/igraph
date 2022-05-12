@@ -49,6 +49,11 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
     igraph_integer_t i;
     igraph_lazy_adjlist_t adj;
 
+    if (vertices == NULL) {
+        /* Nothing to do */
+        return IGRAPH_SUCCESS;
+    }
+
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adj, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adj);
 
