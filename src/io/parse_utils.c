@@ -197,10 +197,10 @@ struct igraph_safelocale_s {
  * best-effort basis. Restricting the locale change to a single thread is not
  * supported on all platforms. In these cases, this function falls back to using
  * the standard <code>setlocale()</code> function, which affects the entire process
- * and is not safe to use fro concurrent threads.
+ * and is not safe to use from concurrent threads.
  *
  * </para><para>
- * It is generally recommended to run igraph within a thread which has been
+ * It is generally recommended to run igraph within a thread that has been
  * permanently set to the C locale using system-specific means. This is a convenience
  * function for situations when this is not easily possible because the programmer
  * is not in control of the process, such as when developing plugins/extensions.

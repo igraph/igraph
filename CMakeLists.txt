@@ -92,7 +92,7 @@ check_symbol_exists(strdup string.h HAVE_STRDUP)
 check_symbol_exists(strndup string.h HAVE_STRNDUP)
 check_include_files(xlocale.h HAVE_XLOCALE)
 if(HAVE_XLOCALE)
-  # On BSD, uselocale() is in xlocale.h insted of locale.h.
+  # On BSD, uselocale() is in xlocale.h instead of locale.h.
   # Some systems provide xlocale.h, but uselocale() is still in locale.h,
   # thus we try both.
   check_symbol_exists(uselocale "xlocale.h;locale.h" HAVE_USELOCALE)
