@@ -1603,7 +1603,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
     /* Create a progressive parser context and use the first 4K to detect the
      * encoding */
     res = (int) fread(buffer, 1, sizeof(buffer), instream);
-    if (res < sizeof(buffer) && !feof(instream)) {
+    if (res < (int) sizeof buffer && !feof(instream)) {
         IGRAPH_ERROR("IO error while reading GraphML data.", IGRAPH_EFILE);
     }
 
@@ -1624,16 +1624,16 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
     IGRAPH_FINALLY_ENTER();
     {
         ctxt = xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
-                                    &state,
-                                    buffer,
-                                    res,
-                                    NULL);
+                                       &state,
+                                       buffer,
+                                       res,
+                                       NULL);
         if (ctxt) {
             if (xmlCtxtUseOptions(ctxt,
-                                XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
-                                XML_PARSE_NONET | XML_PARSE_NSCLEAN |
-                                XML_PARSE_NOCDATA | XML_PARSE_HUGE
-                                )) {
+                                  XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
+                                  XML_PARSE_NONET | XML_PARSE_NSCLEAN |
+                                  XML_PARSE_NOCDATA | XML_PARSE_HUGE
+                                  )) {
                 xmlFreeParserCtxt(ctxt);
                 ctxt = NULL;
             }
@@ -1641,7 +1641,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
 
         /* Do the parsing */
         if (ctxt) {
-            while ((res = (int) fread(buffer, 1, 4096, instream)) > 0) {
+            while ((res = (int) fread(buffer, 1, sizeof buffer, instream)) > 0) {
                 xmlParseChunk(ctxt, buffer, res, 0);
                 if (!state.successful) {
                     break;
