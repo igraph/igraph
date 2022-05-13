@@ -1551,7 +1551,8 @@ static void igraph_i_libxml_structured_error_handler(void* ctx, xmlErrorPtr erro
  * graphs. Currently only the most basic import functionality is implemented
  * in igraph: it can read GraphML files without nested graphs and hyperedges.
  * Attributes of the graph are loaded only if an attribute interface
- * is attached, i.e. if you use igraph from R or Python.
+ * is attached, see \ref igraph_set_attribute_table(). String attrribute values
+ * are returned in UTF-8 encoding.
  *
  * </para><para>
  * Graph attribute names are taken from the <code>attr.name</code> attributes of the
