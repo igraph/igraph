@@ -407,7 +407,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_eit_t eit;
 
     igraph_vector_int_t newfrom, newto;
-    igraph_vector_int_t newoi;
+    igraph_vector_int_t newoi, newii;
 
     igraph_bool_t *mark;
     igraph_integer_t i, j;
@@ -448,8 +448,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     /* Create index, this might require additional memory */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&newoi, remaining_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&newii, remaining_edges);
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newfrom, &newto, &newoi, no_of_nodes));
-    IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &graph->ii, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &newii, no_of_nodes));
 
     /* Edge attributes, we need an index that gives the IDs of the
        original edges for every new edge.
@@ -471,10 +472,12 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_vector_int_destroy(&graph->from);
     igraph_vector_int_destroy(&graph->to);
     igraph_vector_int_destroy(&graph->oi);
+    igraph_vector_int_destroy(&graph->ii);
     graph->from = newfrom;
     graph->to = newto;
     graph->oi = newoi;
-    IGRAPH_FINALLY_CLEAN(3);
+    graph->ii = newii;
+    IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_FREE(mark);
     IGRAPH_FINALLY_CLEAN(1);
