@@ -1397,7 +1397,7 @@ igraph_error_t igraph_k_shortest_paths(
     igraph_integer_t i, n;
     igraph_vector_t weights_old;
     igraph_vector_int_t edges_removed;
-    igraph_bool_t null_weights;
+    igraph_bool_t weights_missing;
     igraph_integer_t nr_edges = igraph_ecount(graph);
     igraph_bool_t infinite_path, already_in_potential_paths;
     igraph_vector_int_t *path_0;
@@ -1435,11 +1435,11 @@ igraph_error_t igraph_k_shortest_paths(
     IGRAPH_VECTOR_INIT_FINALLY(&weights_old, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_removed, 0);
 
-    /* If weights are NULL we use weights of 1, which then later can be replaced
-     * with infinite weights.
+    /* If weights are NULL we use weights of 1, which can then be replaced
+     * later with infinite weights.
      */
-    null_weights = !weights;
-    if (null_weights) {
+    weights_missing = !weights;
+    if (weights_missing) {
         weights = IGRAPH_CALLOC(1, igraph_vector_t);
         IGRAPH_FINALLY(igraph_free, weights);
         IGRAPH_VECTOR_INIT_FINALLY(weights, nr_edges);
@@ -1587,7 +1587,7 @@ igraph_error_t igraph_k_shortest_paths(
         IGRAPH_CHECK(igraph_vector_int_list_push_back(paths, &path_shortest));
     }
 
-    if (null_weights) {
+    if (weights_missing) {
         igraph_vector_destroy(weights);
         IGRAPH_FREE(weights);
         IGRAPH_FINALLY_CLEAN(2);
