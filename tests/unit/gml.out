@@ -38,7 +38,7 @@ graph
   [
     source 2
     target 5
-    label "edge label"
+    label "Tom &amp; Jerry's &quot;friendship&quot;"
     num1 Inf
   ]
 ]
