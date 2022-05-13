@@ -18,10 +18,6 @@
 </section>
 
 <section id="shortest-path-related-functions"><title>(Shortest)-path related functions</title>
-<!-- doxrox-include igraph_shortest_paths -->
-<!-- doxrox-include igraph_shortest_paths_dijkstra -->
-<!-- doxrox-include igraph_shortest_paths_bellman_ford -->
-<!-- doxrox-include igraph_shortest_paths_johnson -->
 <!-- doxrox-include igraph_distances -->
 <!-- doxrox-include igraph_distances_dijkstra -->
 <!-- doxrox-include igraph_distances_bellman_ford -->
