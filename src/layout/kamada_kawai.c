@@ -25,9 +25,9 @@
 
 #include "igraph_interface.h"
 #include "igraph_paths.h"
-#include "igraph_random.h"
 
 #include "core/interruption.h"
+#include "layout/layout_internal.h"
 
 /**
  * \ingroup layout
@@ -41,6 +41,10 @@
  * the weight between two vertices pushes them apart. The Young modulus of springs
  * is inversely proportional to the graph distance, ensuring that springs between
  * far-apart veritces will have a smaller effect on the layout.
+ *
+ * </para><para>
+ * This layout works particularly well for locally connected spatial networks
+ * such as lattices.
  *
  * </para><para>
  * This layout algorithm is not suitable for large graphs. The memory
@@ -144,32 +148,14 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
 
     if (!use_seed) {
         if (minx || maxx || miny || maxy) {
-            const igraph_real_t width = sqrt(no_nodes), height = width;
-            IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
-            RNG_BEGIN();
-            for (i = 0; i < no_nodes; i++) {
-                igraph_real_t x1 = minx ? VECTOR(*minx)[i] : -width / 2;
-                igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] :  width / 2;
-                igraph_real_t y1 = miny ? VECTOR(*miny)[i] : -height / 2;
-                igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] :  height / 2;
-                if (!igraph_finite(x1)) {
-                    x1 = -width / 2;
-                }
-                if (!igraph_finite(x2)) {
-                    x2 =  width / 2;
-                }
-                if (!igraph_finite(y1)) {
-                    y1 = -height / 2;
-                }
-                if (!igraph_finite(y2)) {
-                    y2 =  height / 2;
-                }
-                MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
-                MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
-            }
-            RNG_END();
+            igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
         } else {
             igraph_layout_circle(graph, res, /* order= */ igraph_vss_all());
+            /* The original paper recommends using a radius of 0.5*L0 here.
+             * The coefficient of 0.36 was chosen empirically so that this initial
+             * layout would be as close as possible to the equilibrium layout
+             * when the graph is a cycle graph. */
+            igraph_matrix_scale(res, 0.36 * L0);
         }
     }
 
@@ -182,12 +168,12 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
 
     if (weights && no_edges > 0 && igraph_vector_min(weights) < 0) {
-        IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(graph, &dij, igraph_vss_all(),
+        IGRAPH_CHECK(igraph_distances_bellman_ford(graph, &dij, igraph_vss_all(),
                      igraph_vss_all(), weights,
                      IGRAPH_ALL));
     } else {
 
-        IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, &dij, igraph_vss_all(),
+        IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
                      igraph_vss_all(), weights,
                      IGRAPH_ALL));
     }
@@ -354,7 +340,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  * \function igraph_layout_kamada_kawai_3d
  * \brief 3D version of the Kamada-Kawai layout generator.
  *
- * This is the 3D version of igraph_layout_kamada_kawai().
+ * This is the 3D version of \ref igraph_layout_kamada_kawai().
  * See the documentation of that function for more information.
  *
  * </para><para>
@@ -409,8 +395,8 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
                                   const igraph_vector_t *miny, const igraph_vector_t *maxy,
                                   const igraph_vector_t *minz, const igraph_vector_t *maxz) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_integer_t no_edges = igraph_ecount(graph);
+    const igraph_integer_t no_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_edges = igraph_ecount(graph);
     igraph_real_t L, L0 = sqrt(no_nodes);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
@@ -465,41 +451,13 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
 
     if (!use_seed) {
         if (minx || maxx || miny || maxy || minz || maxz) {
-            const igraph_real_t width = sqrt(no_nodes), height = width, depth = width;
-            IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 3));
-            RNG_BEGIN();
-            for (i = 0; i < no_nodes; i++) {
-                igraph_real_t x1 = minx ? VECTOR(*minx)[i] : -width / 2;
-                igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] :  width / 2;
-                igraph_real_t y1 = miny ? VECTOR(*miny)[i] : -height / 2;
-                igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] :  height / 2;
-                igraph_real_t z1 = minz ? VECTOR(*minz)[i] : -depth / 2;
-                igraph_real_t z2 = maxz ? VECTOR(*maxz)[i] :  depth / 2;
-                if (!igraph_finite(x1)) {
-                    x1 = -width / 2;
-                }
-                if (!igraph_finite(x2)) {
-                    x2 =  width / 2;
-                }
-                if (!igraph_finite(y1)) {
-                    y1 = -height / 2;
-                }
-                if (!igraph_finite(y2)) {
-                    y2 =  height / 2;
-                }
-                if (!igraph_finite(z1)) {
-                    z1 = -depth / 2;
-                }
-                if (!igraph_finite(z2)) {
-                    z2 =  depth / 2;
-                }
-                MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
-                MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
-                MATRIX(*res, i, 2) = RNG_UNIF(z1, z2);
-            }
-            RNG_END();
+            igraph_i_layout_random_bounded_3d(graph, res, minx, maxx, miny, maxy, minz, maxz);
         } else {
             igraph_layout_sphere(graph, res);
+            /* The coefficient of 0.36 was chosen empirically so that this initial layout
+             * would be as close as possible to the equilibrium layout when the graph is
+             * a Goldberg polyhedron, i.e. having a naturally spherical layout. */
+            igraph_matrix_scale(res, 0.36*L0);
         }
     }
 
@@ -510,7 +468,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
     IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
     IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
-    IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, &dij, igraph_vss_all(),
+    IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
                  igraph_vss_all(), weights,
                  IGRAPH_ALL));
 

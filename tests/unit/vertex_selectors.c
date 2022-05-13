@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check(igraph_t *graph, igraph_vs_t *vs) {
     igraph_vit_t vit;
@@ -30,7 +30,7 @@ void check(igraph_t *graph, igraph_vs_t *vs) {
 
 int main() {
     igraph_t g, g_no_vertices, g_no_edges;
-    igraph_vs_t vs;
+    igraph_vs_t vs, vs_copy;
     igraph_vector_int_t v;
     igraph_vit_t vit;
 
@@ -70,14 +70,31 @@ int main() {
     check(&g, &vs);
     printf("Edgeless graph:\n");
     check(&g_no_edges, &vs);
+    printf("Copy of vs:\n");
+    igraph_vs_copy(&vs_copy, &vs);
+    check(&g_no_edges, &vs_copy);
+    igraph_vs_destroy(&vs_copy);
+
     printf("Graph without vertices should fail.\n");
     IGRAPH_ASSERT(igraph_vit_create(&g_no_vertices, vs, &vit) == IGRAPH_EINVVID);
     IGRAPH_ASSERT(igraph_vs_type(&vs) == IGRAPH_VS_VECTOR);
-    igraph_vector_int_destroy(&v);
+    igraph_vs_destroy(&vs);
+
+    printf("As vector should give all 5 vertices:\n");
+    igraph_vs_all(&vs);
+    igraph_vs_as_vector(&g, vs, &v);
+    igraph_vector_int_print(&v);
+
+    printf("As vector should give 0 vertices:\n");
+    igraph_vs_as_vector(&g_no_vertices, vs, &v);
+    igraph_vector_int_print(&v);
 
     igraph_destroy(&g);
     igraph_destroy(&g_no_vertices);
     igraph_destroy(&g_no_edges);
+
+    igraph_vector_int_destroy(&v);
+    igraph_vs_destroy(&vs);
 
     VERIFY_FINALLY_STACK();
     return 0;

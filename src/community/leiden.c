@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     while (!igraph_dqueue_int_empty(&unstable_nodes)) {
         igraph_integer_t v = igraph_dqueue_int_pop(&unstable_nodes);
         igraph_integer_t best_cluster, current_cluster = VECTOR(*membership)[v];
-        igraph_integer_t degree, i;
+        igraph_integer_t degree;
         igraph_vector_int_t *edges;
 
         /* Remove node from current cluster */
@@ -345,7 +345,7 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
     }
 
     /* Shuffle nodes */
-    IGRAPH_CHECK(igraph_vector_int_copy(&node_order, node_subset));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&node_order, node_subset));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
     IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
 
@@ -950,7 +950,8 @@ static igraph_error_t igraph_i_community_leiden(
  * \param graph The input graph. It must be an undirected graph.
  * \param edge_weights Numeric vector containing edge weights. If \c NULL, every edge
  *    has equal weight of 1. The weights need not be non-negative.
- * \param node_weights Numeric vector containing node weights.
+ * \param node_weights Numeric vector containing node weights. If \c NULL, every node
+ *    has equal weight of 1.
  * \param resolution_parameter The resolution parameter used, which is
  *    represented by gamma in the objective function mentioned in the
  *    documentation.
@@ -964,8 +965,8 @@ static igraph_error_t igraph_i_community_leiden(
  *    must hence be properly initialized. When finding clusters from scratch it
  *    is typically started using a singleton clustering. This can be achieved
  *    using \c igraph_vector_init_seq.
- * \param nb_clusters The number of clusters contained in \c membership. Must
- *    not be a \c NULL pointer.
+ * \param nb_clusters The number of clusters contained in \c membership.
+ *    If \c NULL, the number of clusters will not be returned.
  * \param quality The quality of the partition, in terms of the objective
  *    function as included in the documentation. If \c NULL the quality will
  *    not be calculated.
@@ -980,7 +981,12 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
                             const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
                             igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_vector_t *i_edge_weights, *i_node_weights;
+    igraph_integer_t i_nb_clusters;
     igraph_integer_t n = igraph_vcount(graph);
+
+    if (!nb_clusters) {
+        nb_clusters = &i_nb_clusters;
+    }
 
     if (start) {
         if (!membership) {
@@ -1011,7 +1017,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     if (!edge_weights) {
         i_edge_weights = IGRAPH_CALLOC(1, igraph_vector_t);
         if (i_edge_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for edge weights", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for edge weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, i_edge_weights);
         IGRAPH_CHECK(igraph_vector_init(i_edge_weights, igraph_ecount(graph)));
@@ -1025,7 +1031,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     if (!node_weights) {
         i_node_weights = IGRAPH_CALLOC(1, igraph_vector_t);
         if (i_node_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, i_node_weights);
         IGRAPH_CHECK(igraph_vector_init(i_node_weights, n));

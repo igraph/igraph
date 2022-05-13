@@ -17,7 +17,7 @@
 */
 
 #include <igraph_paths.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 igraph_error_t test_path_expansion() {
     igraph_vector_int_t path;

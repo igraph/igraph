@@ -27,7 +27,6 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "core/math.h"
 
 /***** Closeness centrality *****/
 
@@ -134,7 +133,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
                                                 const igraph_vector_t *weights,
                                                 igraph_bool_t normalized) {
 
-    /* See igraph_shortest_paths_dijkstra() for the implementation
+    /* See igraph_distances_dijkstra() for the implementation
        details and the dirty tricks. */
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -204,8 +203,11 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
             igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
             igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
-            igraph_integer_t nlen = igraph_vector_int_size(neis);
+            igraph_integer_t nlen;
 
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
+            nlen = igraph_vector_int_size(neis);
             mindist = -igraph_2wheap_delete_max(&Q);
 
             if (cutoff >= 0 && (mindist - 1.0) > cutoff) {
@@ -551,7 +553,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
                                                  igraph_bool_t normalized,
                                                  igraph_real_t cutoff) {
 
-    /* See igraph_shortest_paths_dijkstra() for the implementation
+    /* See igraph_distances_dijkstra() for the implementation
        details and the dirty tricks. */
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -611,8 +613,11 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
             igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             /* Now check all neighbors of minnei for a shorter path */
             igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, minnei);
-            igraph_integer_t nlen = igraph_vector_int_size(neis);
+            igraph_integer_t nlen;
 
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
+            nlen = igraph_vector_int_size(neis);
             mindist = -igraph_2wheap_delete_max(&Q);
 
             if (cutoff >= 0 && (mindist - 1.0) > cutoff) {

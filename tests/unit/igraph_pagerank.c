@@ -21,7 +21,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int is_almost_one(igraph_real_t x) {
     /* 2^5 = 32 is 5 binary digits  of tolerance */
@@ -105,9 +105,10 @@ int main() {
     printf("PRPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
-    /* Check twice more for consistency */
+    /* Check twice more for consistency, this time without explicitly
+     * supplied ARPACK options */
     igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
@@ -117,7 +118,7 @@ int main() {
     IGRAPH_ASSERT(is_almost_one(value));
 
     igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 

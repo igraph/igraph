@@ -28,7 +28,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define ARE 4
 #define AIM 5

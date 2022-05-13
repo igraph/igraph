@@ -447,7 +447,7 @@ igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                       igraph_bool_t use_seed,
                       const igraph_layout_drl_options_t *options,
                       const igraph_vector_t *weights) {
-    const char msg[] = "Damping multipliers cannot be negative, got %f.";
+    const char msg[] = "Damping multipliers cannot be negative, got %g.";
 
     if (options->init_damping_mult < 0) {
         IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->init_damping_mult);

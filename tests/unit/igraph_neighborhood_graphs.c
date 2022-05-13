@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_and_clear(igraph_graph_list_t *result) {
     igraph_integer_t i;

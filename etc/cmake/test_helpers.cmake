@@ -13,6 +13,9 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   use_all_warnings(${TARGET_NAME})
   add_dependencies(build_tests ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
+  if (NAMESPACE STREQUAL "test")
+    target_link_libraries(${TARGET_NAME} PRIVATE test_utilities)
+  endif()
 
   if (NOT BUILD_SHARED_LIBS)
     # Add a compiler definition required to compile igraph in static mode

@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *graph, igraph_vector_int_t *alpha, igraph_vector_int_t *alpham1,
                     igraph_bool_t fill, igraph_bool_t ng) {

@@ -134,7 +134,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
     }
 
-    if (roots) {
+    if (roots && noroots > 0) {
         igraph_integer_t min, max;
         igraph_vector_int_minmax(roots, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
@@ -142,7 +142,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         }
     }
 
-    if (restricted) {
+    if (restricted && igraph_vector_int_size(restricted) > 0) {
         igraph_integer_t min, max;
         igraph_vector_int_minmax(restricted, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
@@ -181,9 +181,11 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
 
     /* Resize result vectors, and fill them with IGRAPH_NAN */
 
-# define VINIT(v, initial) if (v) {               \
-        igraph_vector_int_resize((v), no_of_nodes);   \
-        igraph_vector_int_fill((v), initial); }
+# define VINIT(v, initial) \
+    if (v) { \
+        IGRAPH_CHECK(igraph_vector_int_resize((v), no_of_nodes)); \
+        igraph_vector_int_fill((v), initial); \
+    }
 
     VINIT(order, -1);
     VINIT(rank, -1);
@@ -234,9 +236,11 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
             igraph_integer_t actvect = igraph_dqueue_int_pop(&Q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&Q);
             igraph_integer_t succ_vec;
-            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                                                actvect);
-            igraph_integer_t i, n = igraph_vector_int_size(neis);
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
+            igraph_integer_t i, n;
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+            n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -358,7 +362,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_
     /* temporary storage */
     added = IGRAPH_CALLOC(no_of_nodes, char);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
@@ -603,7 +607,9 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             igraph_integer_t actvect = igraph_stack_int_top(&stack);
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
             igraph_integer_t n = igraph_vector_int_size(neis);
-            igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, actvect);
+            igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, actvect);
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
             /* Search for a neighbor that was not yet visited */
             igraph_bool_t any = 0;

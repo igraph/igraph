@@ -187,7 +187,7 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
                     VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
                     /* printf("Adding: %ld -> %ld, %ld -> %ld\n",
                                 (long)a, (long)d, (long)c, (long)b); */
-                    igraph_add_edges(graph, &edgevec, 0);
+                    IGRAPH_CHECK(igraph_add_edges(graph, &edgevec, 0));
                 }
                 num_successful_swaps++;
             }
@@ -225,14 +225,14 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
 /**
  * \ingroup structural
  * \function igraph_rewire
- * \brief Randomly rewires a graph while preserving the degree distribution.
+ * \brief Randomly rewires a graph while preserving its degree sequence.
  *
  * </para><para>
  * This function generates a new graph based on the original one by randomly
- * rewiring edges while preserving the original graph's degree distribution.
- * Please note that the rewiring is done "in place", so no new graph will
+ * rewiring edges while preserving the original graph's degree sequence.
+ * The rewiring is done "in place", so no new graph will
  * be allocated. If you would like to keep the original graph intact, use
- * \ref igraph_copy() beforehand.
+ * \ref igraph_copy() beforehand. All graph attributes will be lost.
  *
  * \param graph The graph object to be rewired.
  * \param n Number of rewiring trials to perform.

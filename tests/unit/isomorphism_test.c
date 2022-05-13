@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void random_permutation(igraph_vector_int_t *vec) {
     /* We just do size(vec) * 2 swaps */

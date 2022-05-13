@@ -26,6 +26,8 @@
 #include "igraph_random.h"
 #include "igraph_qsort.h"
 
+#include "math/safe_intop.h"
+
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 #include <stdarg.h>     /* va_start & co */
@@ -50,7 +52,7 @@
  * numbers or infinities.</para>
  *
  * <para>The \type igraph_vector_t type and its variants usually use O(n) space
- * to store n elements. Sometimes they uses more, this is because vectors can
+ * to store n elements. Sometimes they use more, this is because vectors can
  * shrink, but even if they shrink, the current implementation does not free a
  * single bit of memory.</para>
  *
@@ -63,7 +65,7 @@
  * with standard mathematical libraries, like the GNU Scientific
  * Library.</para>
  *
- * <para>Almost all of the functions desccribed below for \type igraph_vector_t
+ * <para>Almost all of the functions described below for \type igraph_vector_t
  * also exist for all the other vector type variants. These variants are not
  * documented separately; you can simply replace \c vector with \c vector_int,
  * \c vector_bool or something similar if you need a function for another
@@ -81,9 +83,9 @@
  * number of \type igraph_vector_t constructors, for your
  * convenience. \ref igraph_vector_init() is the basic constructor, it
  * creates a vector of the given length, filled with zeros.
- * \ref igraph_vector_copy() creates a new identical copy
+ * \ref igraph_vector_init_copy() creates a new identical copy
  * of an already existing and initialized vector. \ref
- * igraph_vector_init_copy() creates a vector by copying a regular C array.
+ * igraph_vector_init_array() creates a vector by copying a regular C array.
  * \ref igraph_vector_init_seq() creates a vector containing a regular
  * sequence with increment one.</para>
  *
@@ -134,9 +136,14 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
     igraph_integer_t alloc_size;
     IGRAPH_ASSERT(size >= 0);
     alloc_size = size > 0 ? size : 1;
+
+    /* When this function fails, it should leave stor_begin set to NULL,
+     * so that vector_destroy() is still safe to call on the vector.
+     * This simplifies freeing partially initialized data structures,
+     * such as adjacency lists, when an error occurs mid-initialization. */
     v->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (v->stor_begin == NULL) {
-        IGRAPH_ERROR("Cannot initialize vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot initialize vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -155,7 +162,8 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
  * Be sure that you \em don't ever call the destructor (\ref
  * igraph_vector_destroy()) on objects created by this constructor.
  * \param v Pointer to an uninitialized \type igraph_vector_t object.
- * \param data Pointer, the C array. It may not be \c NULL.
+ * \param data Pointer, the C array. It may not be \c NULL, except
+ *     when \p length is zero.
  * \param length The length of the C array.
  * \return Pointer to the vector object, the same as the
  *     \p v parameter, for convenience.
@@ -163,11 +171,19 @@ igraph_error_t FUNCTION(igraph_vector, init)(TYPE(igraph_vector)* v, igraph_inte
  * Time complexity: O(1)
  */
 
-const TYPE(igraph_vector)*FUNCTION(igraph_vector, view) (const TYPE(igraph_vector) *v,
+const TYPE(igraph_vector)* FUNCTION(igraph_vector, view) (const TYPE(igraph_vector) *v,
         const BASE *data, igraph_integer_t length) {
+    const static BASE dummy;
     TYPE(igraph_vector) *v2 = (TYPE(igraph_vector)*)v;
 
-    IGRAPH_ASSERT(data != 0);
+    /* When the length is zero, we allow 'data' to be NULL.
+     * An igraph_vector_t may never contain a NULL pointer,
+     * thus we use a pointer to a dummy variable in this case. */
+    if (length == 0) {
+        data = &dummy;
+    } else {
+        IGRAPH_ASSERT(data != NULL);
+    }
 
     v2->stor_begin = (BASE*)data;
     v2->stor_end = (BASE*)data + length;
@@ -373,7 +389,7 @@ igraph_error_t FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector) *v, int
  * </para><para>
  * All vectors initialized by \ref igraph_vector_init() should be properly
  * destroyed by this function. A destroyed vector needs to be
- * reinitialized by \ref igraph_vector_init(), \ref igraph_vector_init_copy() or
+ * reinitialized by \ref igraph_vector_init(), \ref igraph_vector_init_array() or
  * another constructor.
  * \param v Pointer to the (previously initialized) vector object to
  *        destroy.
@@ -383,6 +399,8 @@ igraph_error_t FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector) *v, int
 
 void FUNCTION(igraph_vector, destroy)   (TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
+    /* vector_init() will leave stor_begin set to NULL when it fails.
+     * We handle these cases gracefully. */
     if (v->stor_begin != NULL) {
         IGRAPH_FREE(v->stor_begin);
         v->stor_begin = NULL;
@@ -453,9 +471,7 @@ igraph_error_t FUNCTION(igraph_vector, reserve)(TYPE(igraph_vector)* v, igraph_i
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, capacity, BASE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot reserve space for vector.", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for vector.");
 
     v->end = tmp + (v->end - v->stor_begin);
     v->stor_begin = tmp;
@@ -584,9 +600,7 @@ igraph_error_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE 
 igraph_error_t FUNCTION(igraph_vector, insert)(
         TYPE(igraph_vector) *v, igraph_integer_t pos, BASE value) {
     igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
-    if (pos < 0) {
-        return IGRAPH_EINVAL;
-    }
+    IGRAPH_ASSERT(0 <= pos && pos <= size);
     if (size == IGRAPH_INTEGER_MAX) {
         IGRAPH_ERROR("Cannot insert to vector, already at maximum size.", IGRAPH_EOVERFLOW);
     }
@@ -606,8 +620,8 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
  * <para>The simplest way to access an element of a vector is to use the
  * \ref VECTOR macro. This macro can be used both for querying and setting
  * \type igraph_vector_t elements. If you need a function, \ref
- * igraph_vector_e() queries and \ref igraph_vector_set() sets an element of a
- * vector. \ref igraph_vector_e_ptr() returns the address of an element.</para>
+ * igraph_vector_get() queries and \ref igraph_vector_set() sets an element of a
+ * vector. \ref igraph_vector_get_ptr() returns the address of an element.</para>
  *
  * <para>\ref igraph_vector_tail() returns the last element of a non-empty
  * vector. There is no <function>igraph_vector_head()</function> function
@@ -617,21 +631,52 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
 
 /**
  * \ingroup vector
- * \function igraph_vector_e
+ * \function igraph_vector_get
  * \brief Access an element of a vector.
  * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the index of the first
  *    element is zero.
  * \return The desired element.
- * \sa \ref igraph_vector_e_ptr() and the \ref VECTOR macro.
+ * \sa \ref igraph_vector_get_ptr() and the \ref VECTOR macro.
  *
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
+BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     return * (v->stor_begin + pos);
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_get_ptr
+ * \brief Get the address of an element of a vector
+ * \param v The \type igraph_vector_t object.
+ * \param pos The position of the element, the position of the first
+ *   element is zero.
+ * \return Pointer to the desired element.
+ * \sa \ref igraph_vector_get() and the \ref VECTOR macro.
+ *
+ * Time complexity: O(1).
+ */
+
+BASE* FUNCTION(igraph_vector, get_ptr)  (const TYPE(igraph_vector)* v, igraph_integer_t pos) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->stor_begin + pos;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_e
+ * \brief Access an element of a vector (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_get 0.10.0
+ */
+
+BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos) {
+    return FUNCTION(igraph_vector, get)(v, pos);
 }
 
 /**
@@ -642,15 +687,13 @@ BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t p
  * \param pos The position of the element, the position of the first
  *   element is zero.
  * \return Pointer to the desired element.
- * \sa \ref igraph_vector_e() and the \ref VECTOR macro.
+ * \sa \ref igraph_vector_get() and the \ref VECTOR macro.
  *
  * Time complexity: O(1).
  */
 
 BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_integer_t pos) {
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    return v->stor_begin + pos;
+    return FUNCTION(igraph_vector, get_ptr)(v, pos);
 }
 
 /**
@@ -660,7 +703,7 @@ BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_inte
  * \param v The \type igraph_vector_t element.
  * \param pos Position of the element to set.
  * \param value New value of the element.
- * \sa \ref igraph_vector_e().
+ * \sa \ref igraph_vector_get().
  */
 
 void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE value) {
@@ -963,7 +1006,7 @@ igraph_error_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
     }
     vind = IGRAPH_CALLOC(n, BASE*);
     if (vind == 0) {
-        IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     for (i = 0; i < n; i++) {
         vind[i] = &VECTOR(*v)[i];
@@ -1189,34 +1232,32 @@ igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_in
  * \function igraph_vector_resize_min
  * \brief Deallocate the unused memory of a vector.
  *
- * </para><para>
- * Note that this function involves additional memory allocation and
- * may result an out-of-memory error.
+ * This function attempts to deallocate the unused reserved storage
+ * of a vector. If it succeeds, \ref igraph_vector_size() and
+ * \ref igraph_vector_capacity() will be the same. The data in the
+ * vector is always preserved, even if deallocation is not successful.
+ *
  * \param v Pointer to an initialized vector.
- * \return Error code.
  *
  * \sa \ref igraph_vector_resize(), \ref igraph_vector_reserve().
  *
- * Time complexity: operating system dependent.
+ * Time complexity: operating system dependent, O(n) at worst.
  */
 
-igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
+void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     igraph_integer_t size;
     BASE *tmp;
     if (v->stor_end == v->end) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     size = (v->end - v->stor_begin);
     tmp = IGRAPH_REALLOC(v->stor_begin, size, BASE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot resize vector.", IGRAPH_ENOMEM);
-    } else {
+
+    if (tmp != NULL) {
         v->stor_begin = tmp;
         v->stor_end = v->end = v->stor_begin + size;
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 #ifndef NOTORDERED
@@ -1397,7 +1438,7 @@ igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v
 
 /**
  * \ingroup vector
- * \function igraph_vector_init_copy
+ * \function igraph_vector_init_array
  * \brief Initializes a vector from an ordinary C array (constructor).
  *
  * \param v Pointer to an uninitialized vector object.
@@ -1410,7 +1451,7 @@ igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v
  * O(\p length).
  */
 
-igraph_error_t FUNCTION(igraph_vector, init_copy)(
+igraph_error_t FUNCTION(igraph_vector, init_array)(
         TYPE(igraph_vector) *v, const BASE *data, igraph_integer_t length) {
 
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, length));
@@ -1448,7 +1489,7 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
 
 /**
  * \ingroup vector
- * \function igraph_vector_copy
+ * \function igraph_vector_init_copy
  * \brief Initializes a vector from another vector object (constructor).
  *
  * </para><para>
@@ -1464,8 +1505,9 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
  * n is the size of the vector.
  */
 
-igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
-                                  const TYPE(igraph_vector) *from) {
+igraph_error_t FUNCTION(igraph_vector, init_copy)(
+    TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from
+) {
     igraph_integer_t from_size;
 
     IGRAPH_ASSERT(from != NULL);
@@ -1478,6 +1520,19 @@ igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
            FUNCTION(igraph_vector, size)(from) * sizeof(BASE));
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_copy
+ * \brief Initializes a vector from another vector object (deprecated alias).
+ *
+ * \deprecated-by igraph_vector_init_copy 0.10
+ */
+
+igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
+                                  const TYPE(igraph_vector) *from) {
+    return FUNCTION(igraph_vector, init_copy)(to, from);
 }
 
 /**
@@ -1632,8 +1687,6 @@ igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
  * \brief Deletes a section from a vector.
  *
  * </para><para>
- * Note that this function does not do range checking. The result is
- * undefined if you supply invalid limits.
  * \param v The vector object.
  * \param from The position of the first element to remove.
  * \param to The position of the first element \em not to remove.
@@ -1645,14 +1698,24 @@ igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector, remove_section)(
         TYPE(igraph_vector) *v, igraph_integer_t from, igraph_integer_t to) {
+    igraph_integer_t size = FUNCTION(igraph_vector, size)(v);
+
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
-    /* Not removing from the end? */
-    if (to < FUNCTION(igraph_vector, size)(v)) {
+
+    if (from < 0) {
+        from = 0;
+    }
+
+    if (to > size) {
+        to = size;
+    }
+
+    if (to > from) {
         memmove(v->stor_begin + from, v->stor_begin + to,
                 sizeof(BASE) * (v->end - v->stor_begin - to));
+        v->end -= (to - from);
     }
-    v->end -= (to - from);
 }
 
 /**
@@ -1710,8 +1773,8 @@ void FUNCTION(igraph_vector, remove_fast)(TYPE(igraph_vector) *v, igraph_integer
  * \brief Copies a section of a vector.
  *
  * </para><para>
- * The result of this function is undefined if the source and target
- * intervals overlap.
+ * The source and the destination sections are allowed to overlap; this will
+ * be handled internally by the function.
  * \param v The vector object.
  * \param begin The position of the first element to move.
  * \param end The position of the first element \em not to move.
@@ -1726,40 +1789,18 @@ igraph_error_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
         igraph_integer_t begin, igraph_integer_t end, igraph_integer_t to) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
-    memcpy(v->stor_begin + to, v->stor_begin + begin,
+    memmove(v->stor_begin + to, v->stor_begin + begin,
            sizeof(BASE) * (end - begin));
 
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \deprecated-by igraph_vector_move_interval 0.10.0
+ */
 igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
         igraph_integer_t begin, igraph_integer_t end, igraph_integer_t to) {
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    memmove(v->stor_begin + to, v->stor_begin + begin,
-            sizeof(BASE) * (end - begin));
-
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_permdelete
- * \brief Remove elements of a vector (for internal use).
- */
-
-void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
-        const igraph_vector_int_t *index, igraph_integer_t nremove) {
-    igraph_integer_t i, n;
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    n = FUNCTION(igraph_vector, size)(v);
-    for (i = 0; i < n; i++) {
-        if (VECTOR(*index)[i] != 0) {
-            VECTOR(*v)[ VECTOR(*index)[i] - 1 ] = VECTOR(*v)[i];
-        }
-    }
-    v->end -= nremove;
+    return FUNCTION(igraph_vector, move_interval)(v, begin, end, to);
 }
 
 #ifndef NOTORDERED
@@ -2345,10 +2386,12 @@ igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
 igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     igraph_integer_t tosize, fromsize;
+    igraph_integer_t newsize;
 
     tosize = FUNCTION(igraph_vector, size)(to);
     fromsize = FUNCTION(igraph_vector, size)(from);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, tosize + fromsize));
+    IGRAPH_SAFE_ADD(tosize, fromsize, &newsize);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, newsize));
     memcpy(to->stor_begin + tosize, from->stor_begin,
            sizeof(BASE) * fromsize);
     to->end = to->stor_begin + tosize + fromsize;
@@ -2436,32 +2479,23 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
 
 /**
  * \function igraph_vector_swap
- * \brief Swap elements of two vectors.
+ * \brief Swap all elements of two vectors.
  *
- * The two vectors must have the same length, otherwise an error
- * happens.
  * \param v1 The first vector.
  * \param v2 The second vector.
  * \return Error code.
  *
- * Time complexity: O(n), the length of the vectors.
+ * Time complexity: O(1).
  */
 
 igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
 
-    igraph_integer_t i, n1 = FUNCTION(igraph_vector, size)(v1);
-    igraph_integer_t n2 = FUNCTION(igraph_vector, size)(v2);
-    if (n1 != n2) {
-        IGRAPH_ERROR("Vectors must have the same number of elements for swapping.",
-                     IGRAPH_EINVAL);
-    }
+    TYPE(igraph_vector) tmp;
 
-    for (i = 0; i < n1; i++) {
-        BASE tmp;
-        tmp = VECTOR(*v1)[i];
-        VECTOR(*v1)[i] = VECTOR(*v2)[i];
-        VECTOR(*v2)[i] = tmp;
-    }
+    tmp = *v1;
+    *v1 = *v2;
+    *v2 = tmp;
+
     return IGRAPH_SUCCESS;
 }
 
@@ -3109,7 +3143,7 @@ igraph_error_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
 
     tmp = IGRAPH_CALLOC(n, BASE);
     if (!tmp) {
-        IGRAPH_ERROR("Cannot index vector.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot index vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     for (i = 0; i < n; i++) {

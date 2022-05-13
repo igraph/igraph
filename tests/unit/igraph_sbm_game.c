@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_integer_t n, igraph_matrix_t *pref_matrix, igraph_vector_int_t *block_sizes, igraph_bool_t directed, igraph_bool_t loops) {
     igraph_t result;

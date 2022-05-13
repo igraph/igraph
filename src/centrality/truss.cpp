@@ -1,5 +1,4 @@
 /*
-
   Copyright 2017 The Johns Hopkins University Applied Physics Laboratory LLC. All Rights Reserved.
   Copyright 2021 The igraph team.
 
@@ -198,7 +197,7 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     // of any triangles, so there's not much to do and we "complete" them
     for (it = vec[0].begin(); it != vec[0].end(); ++it) {
         VECTOR(*trussness)[*it] = 2;
-        completed[*it] = 1;
+        completed[*it] = true;
     }
 
     // Initialize variables needed below.
@@ -267,7 +266,7 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
             }
             // Record this edge; its level is its trussness.
             VECTOR(*trussness)[seed] = level + 2;
-            completed[seed] = 1; // mark as complete
+            completed[seed] = true; // mark as complete
             igraph_vector_int_clear(&commonNeighbors);
         }  // end while
     }  // end for-loop over levels

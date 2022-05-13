@@ -309,13 +309,13 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
 
     subg = IGRAPH_CALLOC(no_of_nodes, char);
     if (subg == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, subg);
 
@@ -588,7 +588,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
 
@@ -601,7 +601,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     if (parsample == NULL) {
         sample = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (sample == NULL) {
-            IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, sample);
         IGRAPH_VECTOR_INT_INIT_FINALLY(sample, 0);
@@ -788,7 +788,7 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
     }
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
 

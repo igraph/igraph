@@ -34,8 +34,7 @@ __BEGIN_DECLS
  * https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard
  */
 
-/* TODO: re-enable implementations in terms of GCC intrinsics */
-#if /* defined(__GNUC__) */ 0
+#if defined(__GNUC__)
 
 #define IGRAPH_SAFE_ADD(a, b, res) \
     do { \
@@ -106,6 +105,8 @@ __BEGIN_DECLS
 
 #endif
 
+igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res);
+igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res);

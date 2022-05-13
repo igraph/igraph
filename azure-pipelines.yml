@@ -4,12 +4,20 @@ pool:
 variables:
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
+  ASAN_OPTIONS: color=always
+  OMP_NUM_THREADS: 1
 
 jobs:
+  # In this test we install and generate locales so that igraph_enter/exist_safelocale() can be tested
   - job: linux_static_vendored
     steps:
-      - script: sudo apt-get install ninja-build ccache -y
+      - script: sudo apt-get install ninja-build ccache language-pack-de -y
         displayName: Install dependencies
+
+      - script: |
+          sudo locale-gen de_DE
+          sudo update-locale
+        displayName: Generate locales
 
       - template: .azure/build.yml
         parameters:
@@ -36,7 +44,6 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
@@ -60,7 +67,6 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
@@ -79,6 +85,7 @@ jobs:
     steps:
       # https://github.com/alpinelinux/alpine-chroot-install
       - bash: |
+          set -e
           wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.13.2/alpine-chroot-install && echo '60c7e0b5d82e21d1a549fc9a46ba3b36688c09dc  alpine-chroot-install' | sha1sum -c || exit 1
           alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
           sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex gmp-dev'

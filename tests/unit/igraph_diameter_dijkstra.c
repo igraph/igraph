@@ -19,7 +19,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn, igraph_bool_t directed) {
     igraph_vector_int_t path_vertex, path_edge;

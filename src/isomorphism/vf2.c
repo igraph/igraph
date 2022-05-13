@@ -25,7 +25,6 @@
 
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_stack.h"
 
 #include "core/interruption.h"
@@ -170,9 +169,9 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
     if (vertex_color1) {
         igraph_bool_t ret = 0;
         igraph_vector_int_t tmp1, tmp2;
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, vertex_color1));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp1, vertex_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp2, vertex_color2));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp2, vertex_color2));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
         igraph_vector_int_sort(&tmp1);
         igraph_vector_int_sort(&tmp2);
@@ -189,9 +188,9 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
     if (edge_color1) {
         igraph_bool_t ret = 0;
         igraph_vector_int_t tmp1, tmp2;
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp1, edge_color1));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp1, edge_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
-        IGRAPH_CHECK(igraph_vector_int_copy(&tmp2, edge_color2));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp2, edge_color2));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp2);
         igraph_vector_int_sort(&tmp1);
         igraph_vector_int_sort(&tmp2);
@@ -353,6 +352,8 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, last1);
+                IGRAPH_CHECK_OOM(inneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -361,7 +362,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         in_1_size -= 1;
                     }
                 }
+
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, last1);
+                IGRAPH_CHECK_OOM(outneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -370,7 +374,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         out_1_size -= 1;
                     }
                 }
+
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, last2);
+                IGRAPH_CHECK_OOM(inneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -379,7 +386,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         in_2_size -= 1;
                     }
                 }
+
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, last2);
+                IGRAPH_CHECK_OOM(outneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -398,10 +408,16 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
             /* step forward if worth, check if worth first */
             igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
             igraph_bool_t end = 0;
+
             inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
             outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
             inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
             outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
+            IGRAPH_CHECK_OOM(inneis_1, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(outneis_1, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(inneis_2, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(outneis_2, "Failed to query neighbors.");
+
             if (VECTOR(indeg1)[cand1] != VECTOR(indeg2)[cand2] ||
                 VECTOR(outdeg1)[cand1] != VECTOR(outdeg2)[cand2]) {
                 end = 1;
@@ -566,6 +582,8 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
+                IGRAPH_CHECK_OOM(inneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -574,7 +592,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         in_1_size += 1;
                     }
                 }
+
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
+                IGRAPH_CHECK_OOM(outneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -583,7 +604,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         out_1_size += 1;
                     }
                 }
+
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
+                IGRAPH_CHECK_OOM(inneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -592,7 +616,10 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         in_2_size += 1;
                     }
                 }
+
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
+                IGRAPH_CHECK_OOM(outneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -601,6 +628,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                         out_2_size += 1;
                     }
                 }
+
                 last1 = -1; last2 = -1;       /* this the first time here */
             } else {
                 last1 = cand1;
@@ -1204,6 +1232,8 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, last1);
+                IGRAPH_CHECK_OOM(inneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -1212,7 +1242,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         in_1_size -= 1;
                     }
                 }
+
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, last1);
+                IGRAPH_CHECK_OOM(outneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -1221,7 +1254,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         out_1_size -= 1;
                     }
                 }
+
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, last2);
+                IGRAPH_CHECK_OOM(inneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -1230,7 +1266,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         in_2_size -= 1;
                     }
                 }
+
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, last2);
+                IGRAPH_CHECK_OOM(outneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -1249,10 +1288,16 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             /* step forward if worth, check if worth first */
             igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
             igraph_bool_t end = 0;
+
             inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
             outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
             inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
             outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
+            IGRAPH_CHECK_OOM(inneis_1, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(outneis_1, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(inneis_2, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(outneis_2, "Failed to query neighbors.");
+
             if (VECTOR(indeg1)[cand1] < VECTOR(indeg2)[cand2] ||
                 VECTOR(outdeg1)[cand1] < VECTOR(outdeg2)[cand2]) {
                 end = 1;
@@ -1377,6 +1422,8 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
+                IGRAPH_CHECK_OOM(inneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_1)[i];
@@ -1385,7 +1432,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         in_1_size += 1;
                     }
                 }
+
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
+                IGRAPH_CHECK_OOM(outneis_1, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_1);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_1)[i];
@@ -1394,7 +1444,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         out_1_size += 1;
                     }
                 }
+
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, cand2);
+                IGRAPH_CHECK_OOM(inneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(inneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*inneis_2)[i];
@@ -1403,7 +1456,10 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         in_2_size += 1;
                     }
                 }
+
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, cand2);
+                IGRAPH_CHECK_OOM(outneis_2, "Failed to query neighbors.");
+
                 vsize = igraph_vector_int_size(outneis_2);
                 for (i = 0; i < vsize; i++) {
                     igraph_integer_t node = VECTOR(*outneis_2)[i];
@@ -1412,6 +1468,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                         out_2_size += 1;
                     }
                 }
+
                 last1 = -1; last2 = -1;       /* this the first time here */
             } else {
                 last1 = cand1;

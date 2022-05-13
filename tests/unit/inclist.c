@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define TEST_INCLIST(label, mode, loops) { \
     igraph_inclist_init(&g, &inclist, mode, loops); \
@@ -176,11 +176,14 @@ int test_adjlist_from_inclist() {
     igraph_inclist_init(&g, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE);
     igraph_adjlist_init_from_inclist(&g, &adjlist, &inclist);
 
-    printf("Incidence list: ");
-    print_inclist(&inclist);
+    printf("Incidence list (printed with igraph_inclist_fprint):\n");
+    igraph_inclist_fprint(&inclist, stdout);
     printf("\nCorresponding adjacency list: ");
     print_adjlist(&adjlist);
     printf("\n");
+    printf("Cleared incidence list (printed with igraph_inclist_print):\n");
+    igraph_inclist_clear(&inclist);
+    igraph_inclist_print(&inclist);
 
     igraph_adjlist_destroy(&adjlist);
     igraph_inclist_destroy(&inclist);

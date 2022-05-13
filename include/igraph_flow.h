@@ -54,7 +54,7 @@ __BEGIN_DECLS
  */
 
 typedef struct {
-    int nopush, norelabel, nogap, nogapnodes, nobfs;
+    igraph_integer_t nopush, norelabel, nogap, nogapnodes, nobfs;
 } igraph_maxflow_stats_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,

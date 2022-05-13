@@ -49,14 +49,12 @@ static igraph_error_t igraph_i_graph_list_init_item(
     return igraph_empty(item, 0, list->directed);
 }
 
-static igraph_error_t igraph_i_graph_list_init_item_from(
-    const igraph_graph_list_t* list, igraph_t* item, const igraph_t* other
+static igraph_error_t igraph_i_graph_list_copy_item(
+    igraph_t* dest, const igraph_t* source
 ) {
-    return igraph_copy(item, other);
+    return igraph_copy(dest, source);
 }
 
-static void igraph_i_graph_list_destroy_item(
-    const igraph_graph_list_t* list, igraph_t* item
-) {
+static void igraph_i_graph_list_destroy_item(igraph_t* item) {
     igraph_destroy(item);
 }

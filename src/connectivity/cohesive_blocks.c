@@ -278,7 +278,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     /* Put the input graph in the queue */
     graph_copy = IGRAPH_CALLOC(1, igraph_t);
     if (!graph_copy) {
-        IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_CHECK(igraph_copy(graph_copy, graph));
     VECTOR(Q)[0] = graph_copy;
@@ -362,7 +362,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
             newgraph = IGRAPH_CALLOC(1, igraph_t);
             if (!newgraph) {
-                IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, newgraph);
             IGRAPH_CHECK(igraph_induced_subgraph_map(mygraph, newgraph,

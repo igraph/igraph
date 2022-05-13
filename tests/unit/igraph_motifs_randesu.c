@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
                           igraph_integer_t isoclass, void* extra) {

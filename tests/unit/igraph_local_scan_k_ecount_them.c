@@ -16,7 +16,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *us, igraph_t *them, int k, igraph_vector_t *weights, igraph_neimode_t mode) {
     igraph_vector_t result;

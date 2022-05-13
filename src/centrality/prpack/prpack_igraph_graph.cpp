@@ -1,4 +1,6 @@
 #include "prpack_igraph_graph.h"
+#include <stdexcept>
+#include <climits>
 #include <cstdlib>
 #include <cstring>
 
@@ -15,14 +17,22 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     igraph_es_t es;
     igraph_eit_t eit;
     igraph_vector_int_t neis;
-    long int i, j, eid, sum, temp, num_ignored_es;
+    igraph_integer_t vcount = igraph_vcount(g), ecount = igraph_ecount(g);
+    igraph_error_t err;
     int *p_head, *p_head_copy;
     double* p_weight = 0;
 
+    if (vcount > INT_MAX) {
+        throw std::domain_error("Too many vertices for PRPACK.");
+    }
+    if (ecount > (treat_as_directed ? INT_MAX : INT_MAX/2)) {
+        throw std::domain_error("Too many edges for PRPACK.");
+    }
+
     // Get the number of vertices and edges. For undirected graphs, we add
     // an edge in both directions.
-    num_vs = (int) igraph_vcount(g);
-    num_es = (int) igraph_ecount(g);
+    num_vs = (int) vcount;
+    num_es = (int) ecount;
     num_self_es = 0;
     if (!treat_as_directed) {
         num_es *= 2;
@@ -39,7 +49,7 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     }
 
     // Count the number of ignored edges (those with negative or zero weight)
-    num_ignored_es = 0;
+    int num_ignored_es = 0;
 
     if (treat_as_directed) {
         // Select all the edges and iterate over them by the source vertices
@@ -48,7 +58,7 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
         // Add the edges
         igraph_eit_create(g, es, &eit);
         while (!IGRAPH_EIT_END(eit)) {
-            eid = IGRAPH_EIT_GET(eit);
+            igraph_integer_t eid = IGRAPH_EIT_GET(eit);
             IGRAPH_EIT_NEXT(eit);
 
             // Handle the weight
@@ -75,15 +85,22 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
         igraph_eit_destroy(&eit);
     } else {
         // Select all the edges and iterate over them by the target vertices
-        igraph_vector_int_init(&neis, 0);
+        err = igraph_vector_int_init(&neis, 0);
+        if (err != IGRAPH_SUCCESS) {
+            throw std::runtime_error("Failed to convert graph for PRPACK.");
+        }
 
-        for (i = 0; i < num_vs; i++) {
-            igraph_incident(g, &neis, i, IGRAPH_ALL);
-            temp = igraph_vector_int_size(&neis);
+        for (int i = 0; i < num_vs; i++) {
+            err = igraph_incident(g, &neis, i, IGRAPH_ALL);
+            if (err != IGRAPH_SUCCESS) {
+                throw std::runtime_error("Failed to convert graph for PRPACK.");
+            }
+
+            int temp = igraph_vector_int_size(&neis);
 
             // TODO: should loop edges be added in both directions?
             p_head_copy = p_head;
-            for (j = 0; j < temp; j++) {
+            for (int j = 0; j < temp; j++) {
                 if (weights != 0) {
                     if (VECTOR(*weights)[VECTOR(neis)[j]] <= 0) {
                         // Ignore
@@ -111,8 +128,8 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     num_es -= num_ignored_es;
 
     // Finalize the tails vector
-    for (i = 0, sum = 0; i < num_vs; ++i) {
-        temp = sum;
+    for (int i = 0, sum = 0; i < num_vs; ++i) {
+        int temp = sum;
         sum += tails[i];
         tails[i] = temp;
     }

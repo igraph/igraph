@@ -40,6 +40,8 @@ typedef enum { IGRAPH_DL_MATRIX,
 typedef struct {
     void *scanner;
     int eof;
+    char errmsg[300];
+    igraph_error_t igraph_errno;
     int mode;
     igraph_integer_t n;
     igraph_integer_t from, to;
@@ -48,6 +50,4 @@ typedef struct {
     igraph_strvector_t labels;
     igraph_trie_t trie;
     igraph_i_dl_type_t type;
-    char errmsg[300];
-    igraph_error_t igraph_errno;
 } igraph_i_dl_parsedata_t;

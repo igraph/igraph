@@ -40,9 +40,10 @@ __BEGIN_DECLS
 #include "igraph_error.h"
 
 #include <inttypes.h>
-#include <stddef.h>
 #include <math.h>
+#include <stddef.h>
 #include <stdio.h>
+
 
 #if !defined(IGRAPH_INTEGER_SIZE)
 #  error "igraph integer size not defined; check the value of IGRAPH_INTEGER_SIZE when compiling"

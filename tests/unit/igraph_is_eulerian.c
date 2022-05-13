@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 #include <stdio.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 

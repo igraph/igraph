@@ -98,7 +98,7 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
 
     bag = IGRAPH_CALLOC(bagsize, igraph_integer_t);
     if (bag == 0) {
-        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bag);
 
@@ -492,7 +492,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     if (algo != IGRAPH_BARABASI_BAG &&
         algo != IGRAPH_BARABASI_PSUMTREE &&
         algo != IGRAPH_BARABASI_PSUMTREE_MULTIPLE) {
-        IGRAPH_ERROR("Invalid algorithm", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid algorithm.", IGRAPH_EINVAL);
     }
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);

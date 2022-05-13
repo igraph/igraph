@@ -186,6 +186,7 @@ static igraph_error_t igraph_i_adjacency_min(const igraph_matrix_t *adjmatrix, i
  *       \endclist
  * \return Error code,
  *         \c IGRAPH_NONSQUARE: non-square matrix.
+ *         \c IGRAPH_EINVAL: Negative entry found in adjacency matrix.
  *
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
@@ -196,11 +197,16 @@ igraph_error_t igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatri
                      igraph_adjacency_t mode) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes;
+    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+    }
+
+    if (no_of_nodes != 0 && igraph_matrix_min(adjmatrix) < 0) {
+        IGRAPH_ERRORF("Edge counts should be non-negative, found %g.", IGRAPH_EINVAL,
+                igraph_matrix_min(adjmatrix));
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -226,6 +232,8 @@ igraph_error_t igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatri
     case IGRAPH_ADJ_PLUS:
         IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges));
         break;
+    default:
+        IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
@@ -548,6 +556,8 @@ igraph_error_t igraph_weighted_adjacency(igraph_t *graph, const igraph_matrix_t 
         IGRAPH_CHECK(igraph_i_weighted_adjacency_plus(adjmatrix, &edges,
                      &weights, loops));
         break;
+    default:
+        IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
 
     /* Prepare attribute record */

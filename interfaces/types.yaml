@@ -325,6 +325,11 @@ EIGENWHICHPOS:
     CTYPE: igraph_eigen_which_position_t
     FLAGS: ENUM
 
+FAS_ALGORITHM:
+    # Enum representing feedback arc set algorithms
+    CTYPE: igraph_fas_algorithm_t
+    FLAGS: ENUM
+
 GETADJACENCY:
     # Enum storing how to retrieve the adjacency matrix from a graph
     CTYPE: igraph_get_adjacency_t
@@ -333,6 +338,12 @@ GETADJACENCY:
 GREEDY_COLORING_HEURISTIC:
     # Enum representing different heuristics for a greedy vertex coloring
     CTYPE: igraph_coloring_greedy_t
+    FLAGS: ENUM
+
+LAPLACIAN_NORMALIZATION:
+    # Enum representing the possible normalization methods of a Laplacian
+    # matrix
+    CTYPE: igraph_laplacian_normalization_t
     FLAGS: ENUM
 
 LAYOUT_GRID:
@@ -379,6 +390,11 @@ RECIP:
 REWIRING_MODE:
     # Enum for the rewiring modes of igraph_rewire()
     CTYPE: igraph_rewiring_t
+    FLAGS: ENUM
+
+ROOTCHOICE:
+    # Enum for the heuristic of igraph_roots_for_tree_layout()
+    CTYPE: igraph_root_choice_t
     FLAGS: ENUM
 
 RWSTUCK:

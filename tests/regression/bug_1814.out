@@ -1,7 +1,6 @@
 to_undirected(COLLAPSE)
 =======================
 
-Creator "igraph version @VERSION@ unittest"
 Version 1
 graph
 [
@@ -39,7 +38,6 @@ graph
 to_undirected(MUTUAL)
 =====================
 
-Creator "igraph version @VERSION@ unittest"
 Version 1
 graph
 [
@@ -83,7 +81,6 @@ graph
 to_undirected(EACH)
 ===================
 
-Creator "igraph version @VERSION@ unittest"
 Version 1
 graph
 [

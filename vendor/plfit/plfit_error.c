@@ -28,7 +28,8 @@ static char *plfit_i_error_strings[] = {
     "Invalid value",
     "Underflow",
     "Overflow",
-    "Not enough memory"
+    "Not enough memory",
+    "Maximum number of iterations exceeded"
 };
 
 #ifndef USING_R

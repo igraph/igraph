@@ -24,21 +24,18 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_stack.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
 
-#include <string.h>
-
 /**
- * \function igraph_shortest_paths_bellman_ford
+ * \function igraph_distances_bellman_ford
  * \brief Weighted shortest path lengths between vertices, allowing negative weights.
  *
  * This function implements the Bellman-Ford algorithm to find the weighted
  * shortest paths to all vertices from a single source, allowing negative weights.
  * It is run independently for the given sources. If there are no negative
- * weights, you are better off with \ref igraph_shortest_paths_dijkstra() .
+ * weights, you are better off with \ref igraph_distances_dijkstra() .
  *
  * \param graph The input graph, can be directed.
  * \param res The result, a matrix. A pointer to an initialized matrix
@@ -55,7 +52,7 @@
  *    vertex of this loop infinitely). Additionally, no edge weight may
  *    be NaN. If either case does not hold, an error is returned. If this
  *    is a null pointer, then the unweighted version,
- *    \ref igraph_shortest_paths() is called.
+ *    \ref igraph_distances() is called.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -65,13 +62,13 @@
  * Time complexity: O(s*|E|*|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_shortest_paths() for a faster unweighted version
- * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
+ * \sa \ref igraph_distances() for a faster unweighted version
+ * or \ref igraph_distances_dijkstra() if you do not have negative
  * edge weights.
  *
  * \example examples/simple/bellman_ford.c
  */
-igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        const igraph_vs_t from,
                                        const igraph_vs_t to,
@@ -99,7 +96,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
          n times.
     */
     if (!weights) {
-        return igraph_shortest_paths(graph, res, from, to, mode);
+        return igraph_distances(graph, res, from, to, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -164,6 +161,8 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
             }
 
             neis = igraph_lazy_inclist_get(&inclist, j);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
             nlen = igraph_vector_int_size(neis);
 
             for (k = 0; k < nlen; k++) {
@@ -210,6 +209,20 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_shortest_paths_bellman_ford
+ * \brief Weighted shortest path lengths between vertices, allowing negative weights (deprecated).
+ *
+ * \deprecated-by igraph_distances_bellman_ford 0.10.0
+ */
+igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+                                       igraph_matrix_t *res,
+                                       const igraph_vs_t from,
+                                       const igraph_vs_t to,
+                                       const igraph_vector_t *weights,
+                                       igraph_neimode_t mode) {
+    return igraph_distances_bellman_ford(graph, res, from, to, weights, mode);
+}
 
 /**
  * \ingroup structural
@@ -241,7 +254,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
  *    vertex of this loop infinitely). If this is a null pointer, then the
- *    unweighted version, \ref igraph_shortest_paths() is called.
+ *    unweighted version, \ref igraph_get_shortest_paths() is called.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -279,8 +292,8 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * Time complexity: O(|E|*|V|), where |V| is the number of
  * vertices, |E| the number of edges.
  *
- * \sa \ref igraph_shortest_paths() for a faster unweighted version
- * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
+ * \sa \ref igraph_get_shortest_paths() for a faster unweighted version
+ * or \ref igraph_get_shortest_paths_dijkstra() if you do not have negative
  * edge weights.
  */
 
@@ -332,7 +345,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parents == 0) {
-        IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, parents);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
@@ -365,6 +378,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         }
 
         neis = igraph_lazy_inclist_get(&inclist, j);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
         nlen = igraph_vector_int_size(neis);
 
         for (k = 0; k < nlen; k++) {

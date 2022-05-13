@@ -22,6 +22,13 @@
 
 #include <igraph.h>
 
+static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
+    igraph_simplify(g, /*multiple=*/ 1, /*loops=*/ 1, comb);
+    igraph_write_graph_graphml(g, stdout, /*prefixattr=*/ 1);
+    igraph_attribute_combination_destroy(comb);
+    igraph_destroy(g);
+}
+
 int main() {
 
     igraph_t g, g2;
@@ -41,39 +48,32 @@ int main() {
     SETEAS(&g, "color", 4, "black");
 
     /* ****************************************************** */
+
     igraph_copy(&g2, &g);
     igraph_attribute_combination(&comb,
                                  "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
                                  "color",  IGRAPH_ATTRIBUTE_COMBINE_FIRST,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
+    simplify_write_destroy(&g2, &comb);
 
     /* ****************************************************** */
+
     igraph_copy(&g2, &g);
     igraph_attribute_combination(&comb,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_LAST,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
+    simplify_write_destroy(&g2, &comb);
 
     /* ****************************************************** */
+
     igraph_copy(&g2, &g);
     igraph_attribute_combination(&comb,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  "color",  IGRAPH_ATTRIBUTE_COMBINE_CONCAT,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
+    simplify_write_destroy(&g2, &comb);
+
     /* ****************************************************** */
 
     igraph_destroy(&g);

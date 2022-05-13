@@ -27,18 +27,18 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_nongraph.h"
 #include "igraph_stack.h"
 #include "igraph_qsort.h"
 #include "igraph_vector_ptr.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "core/math.h"
 
 #include <string.h>   /* memset */
 
 /**
- * \function igraph_shortest_paths_dijkstra
+ * \function igraph_distances_dijkstra
  * \brief Weighted shortest path lengths between vertices.
  *
  * This function implements Dijkstra's algorithm, which can find
@@ -62,7 +62,7 @@
  *    non-negative for Dijkstra's algorithm to work. Additionally, no
  *    edge weight may be NaN. If either case does not hold, an error
  *    is returned. If this is a null pointer, then the unweighted
- *    version, \ref igraph_shortest_paths() is called.
+ *    version, \ref igraph_distances() is called.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -72,14 +72,14 @@
  * Time complexity: O(s*|E|log|E|+|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_shortest_paths() for a (slightly) faster unweighted
- * version or \ref igraph_shortest_paths_bellman_ford() for a weighted
+ * \sa \ref igraph_distances() for a (slightly) faster unweighted
+ * version or \ref igraph_distances_bellman_ford() for a weighted
  * variant that works in the presence of negative edge weights (but no
- * negative loops).
+ * negative loops)
  *
  * \example examples/simple/dijkstra.c
  */
-igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
@@ -113,7 +113,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_int_t indexv;
 
     if (!weights) {
-        return igraph_shortest_paths(graph, res, from, to, mode);
+        return igraph_distances(graph, res, from, to, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -191,6 +191,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(&inclist, minnei);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_integer_t edge = VECTOR(*neis)[j];
@@ -224,6 +225,22 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_shortest_paths_dijkstra
+ * \brief Weighted shortest path lengths between vertices (deprecated).
+ *
+ * \deprecated-by igraph_distances_dijkstra 0.10.0
+ */
+igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
+                                       igraph_matrix_t *res,
+                                       const igraph_vs_t from,
+                                       const igraph_vs_t to,
+                                       const igraph_vector_t *weights,
+                                       igraph_neimode_t mode) {
+    return igraph_distances_dijkstra(graph, res, from, to, weights, mode);
 }
 
 /**
@@ -296,7 +313,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
- * \sa \ref igraph_shortest_paths_dijkstra() if you only need the path length but
+ * \sa \ref igraph_distances_dijkstra() if you only need the path length but
  * not the paths themselves, \ref igraph_get_shortest_paths() if all edge
  * weights are equal.
  *
@@ -378,12 +395,12 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
     parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parents == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, parents);
     is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
     if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -415,6 +432,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_lazy_inclist_get(&inclist, minnei);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             igraph_integer_t edge = VECTOR(*neis)[i];
@@ -668,7 +686,7 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
- * \sa \ref igraph_shortest_paths_dijkstra() if you only need the path
+ * \sa \ref igraph_distances_dijkstra() if you only need the path
  * length but not the paths themselves, \ref igraph_get_all_shortest_paths()
  * if all edge weights are equal.
  *
@@ -739,18 +757,18 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     for (i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *parent_vec, *parent_edge_vec;
 
-        parent_vec = igraph_Calloc(1, igraph_vector_int_t);
+        parent_vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (parent_vec == 0) {
-            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, parent_vec);
         IGRAPH_CHECK(igraph_vector_int_init(parent_vec, 0));
         VECTOR(parents)[i] = parent_vec;
         IGRAPH_FINALLY_CLEAN(1);
 
-        parent_edge_vec = igraph_Calloc(1, igraph_vector_int_t);
+        parent_edge_vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (parent_edge_vec == 0) {
-            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, parent_edge_vec);
         IGRAPH_CHECK(igraph_vector_int_init(parent_edge_vec, 0));
@@ -769,7 +787,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     /* boolean array to mark whether a given vertex is a target or not */
     is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
     if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, is_target);
 
@@ -815,6 +833,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_lazy_inclist_get(&inclist, minnei);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             igraph_integer_t edge = VECTOR(*neis)[i];
@@ -986,9 +1005,9 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         } else {
             /* If the 'vertices' vector doesn't exist, then create one, in order
              * for the algorithm to work. */
-            vertices = igraph_Calloc(1, igraph_vector_int_list_t);
+            vertices = IGRAPH_CALLOC(1, igraph_vector_int_list_t);
             if (vertices == 0) {
-                IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM);
+                IGRAPH_ERROR("cannot run igraph_get_all_shortest_paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
             IGRAPH_FINALLY(igraph_free, vertices);
             IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(vertices, 0);

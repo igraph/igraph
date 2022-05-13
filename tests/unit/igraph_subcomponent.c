@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *graph, igraph_integer_t vertex, igraph_neimode_t mode) {
     igraph_vector_int_t result;

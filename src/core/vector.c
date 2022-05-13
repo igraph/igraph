@@ -58,8 +58,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
-#include "core/math.h"
-
 #include "core/indheap.h"
 
 /**
@@ -67,7 +65,6 @@
  * \function igraph_vector_floor
  * \brief Transform a real vector to an integer vector by flooring each element.
  *
- * </para><para>
  * Flooring means rounding down to the nearest integer.
  *
  * \param from The original real vector object.
@@ -103,7 +100,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 
     igraph_indheap_t heap;
 
-    igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v));
+    IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
     IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
 
     igraph_vector_clear(v);
@@ -123,14 +120,14 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
  * \brief Calculate the order of the elements in a pair of integer vectors of
  * equal length.
  *
- * </para><para>
  * The smallest element will have order zero, the second smallest
  * order one, etc.
+ *
  * \param v The original \ref igraph_vector_int_t object.
  * \param v2 A secondary key, another \ref igraph_vector_int_t object.
  * \param res An initialized \ref igraph_vector_int_t object, it will be
- *    resized to match the size of \p v. The
- *    result of the computation will be stored here.
+ *    resized to match the size of \p v. The result of the computation will
+ *    be stored here.
  * \param nodes Hint, the largest element in \p v.
  * \return Error code:
  *         \c IGRAPH_ENOMEM: out of memory
@@ -463,14 +460,14 @@ igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
  * \function igraph_vector_is_nan
  * \brief Check for each element if it is NaN.
  *
- * </para><para>
  * \param v The \type igraph_vector_t object to check.
  * \param is_nan The resulting boolean vector indicating for each element
  *               whether it is NaN or not.
  * \return Error code,
- *         \c IGRAPH_ENOMEM if there is not enough
- *         memory. Note that this function \em never returns an error
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *         Note that this function \em never returns an error
  *         if the vector \p is_nan will already be large enough.
+ *
  * Time complexity: O(n), the number of elements.
  */
 igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool_t *is_nan)
@@ -493,7 +490,6 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
  * \function igraph_vector_is_any_nan
  * \brief Check if any element is NaN.
  *
- * </para><para>
  * \param v The \type igraph_vector_t object to check.
  * \return 1 if any element is NaN, 0 otherwise.
  *

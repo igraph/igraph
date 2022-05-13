@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
     igraph_integer_t s1, s2, i;
@@ -42,7 +42,7 @@ void print_weighted_clique(const igraph_vector_int_t *clique, const igraph_vecto
     igraph_real_t clique_weight = 0.0;
     for (i = 0; i < n; i++) {
         int v = VECTOR(*clique)[i];
-        clique_weight += vertex_weights ? igraph_vector_e(vertex_weights, v) : 1;
+        clique_weight += vertex_weights ? igraph_vector_get(vertex_weights, v) : 1;
         printf(" %d", v);
     }
     printf(" w=%.1f\n", clique_weight);
@@ -88,11 +88,11 @@ int main() {
 
 
     /* create graph */
-    igraph_vector_int_init_copy(&edges, edge_data, (sizeof edge_data) / sizeof(edge_data[0]));
+    igraph_vector_int_init_array(&edges, edge_data, (sizeof edge_data) / sizeof(edge_data[0]));
     igraph_create(&graph, &edges, n, /* directed= */ 0);
 
     /* set up vertex weight vector */
-    igraph_vector_init_copy(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(vertex_weight_data[0]));
+    igraph_vector_init_array(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(vertex_weight_data[0]));
 
     /* initialize result vector_ptr */
     igraph_vector_int_list_init(&result, 0);

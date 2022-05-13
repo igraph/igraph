@@ -1,0 +1,20 @@
+Check error for negative min_dist.
+Check error for negative epochs.
+Check error for negative sampling probability.
+Check error for sampling probability above one.
+Check error for seed layout with wrong dimensions.
+Empty graph:
+Singleton graph:
+UMAP layout seems fine.
+layout of two clusters of vertices with 2 articulation points:
+UMAP layout seems fine.
+same graph, different negative sampling probability:
+UMAP layout seems fine.
+same graph, different epochs:
+UMAP layout seems fine.
+Same graph, no distances:
+UMAP layout seems fine.
+Same graph, 3D layout:
+UMAP layout seems fine.
+Same graph, custom initial layout:
+UMAP layout seems fine.

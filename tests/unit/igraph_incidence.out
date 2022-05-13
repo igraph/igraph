@@ -1,0 +1,115 @@
+Incidence matrix with no rows and no columns:
+directed: true
+vcount: 0
+edges: {
+}
+types: 
+
+Incidence matrix for two vertices:
+directed: true
+vcount: 2
+edges: {
+0 1
+1 0
+}
+types: 0 1
+
+Incidence matrix for two vertices, multiple = true:
+directed: true
+vcount: 2
+edges: {
+0 1
+0 1
+0 1
+0 1
+0 1
+1 0
+1 0
+1 0
+1 0
+1 0
+}
+types: 0 1
+
+Incidence matrix for five vertices:
+directed: true
+vcount: 5
+edges: {
+0 3
+0 4
+0 4
+1 2
+1 2
+1 2
+1 3
+1 3
+1 3
+1 3
+1 4
+1 4
+1 4
+1 4
+1 4
+2 1
+2 1
+2 1
+3 0
+3 1
+3 1
+3 1
+3 1
+4 0
+4 0
+4 1
+4 1
+4 1
+4 1
+4 1
+}
+types: 0 0 1 1 1
+
+Same graph, IGRAPH_OUT:
+directed: true
+vcount: 5
+edges: {
+0 3
+0 4
+0 4
+1 2
+1 2
+1 2
+1 3
+1 3
+1 3
+1 3
+1 4
+1 4
+1 4
+1 4
+1 4
+}
+types: 0 0 1 1 1
+
+Same graph, undirected:
+directed: false
+vcount: 5
+edges: {
+0 3
+0 4
+0 4
+1 2
+1 2
+1 2
+1 3
+1 3
+1 3
+1 3
+1 4
+1 4
+1 4
+1 4
+1 4
+}
+types: 0 0 1 1 1
+
+Check error for negative element.

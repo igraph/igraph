@@ -27,7 +27,7 @@
 #include "igraph_interface.h"
 
 /**
- * \function igraph_shortest_paths_johnson
+ * \function igraph_distances_johnson
  * \brief Weighted shortest path lengths between vertices, using Johnson's algorithm.
  *
  * See Wikipedia at http://en.wikipedia.org/wiki/Johnson's_algorithm
@@ -37,12 +37,12 @@
  *
  * </para><para>
  * If no edge weights are supplied, then the unweighted
- * version, \ref igraph_shortest_paths() is called.
+ * version, \ref igraph_distances() is called.
  *
  * </para><para>
  * If all the supplied edge weights are non-negative,
  * then Dijkstra's algorithm is used by calling
- * \ref igraph_shortest_paths_dijkstra().
+ * \ref igraph_distances_dijkstra().
  *
  * \param graph The input graph. If negative weights are present, it
  *   should be directed.
@@ -53,19 +53,19 @@
  * \param to The target vertices. It is not allowed to include a
  *   vertex twice or more.
  * \param weights Optional edge weights. If it is a null-pointer, then
- *   the unweighted breadth-first search based \ref
- *   igraph_shortest_paths() will be called.
+ *   the unweighted breadth-first search based \ref igraph_distances() will
+ *   be called.
  * \return Error code.
  *
  * Time complexity: O(s|V|log|V|+|V||E|), |V| and |E| are the number
  * of vertices and edges, s is the number of source vertices.
  *
- * \sa \ref igraph_shortest_paths() for a faster unweighted version
- * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
- * edge weights, \ref igraph_shortest_paths_bellman_ford() if you only
+ * \sa \ref igraph_distances() for a faster unweighted version,
+ * \ref igraph_distances_dijkstra() if you do not have negative
+ * edge weights, \ref igraph_distances_bellman_ford() if you only
  * need to calculate shortest paths from a couple of sources.
  */
-igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
+igraph_error_t igraph_distances_johnson(const igraph_t *graph,
                                   igraph_matrix_t *res,
                                   const igraph_vs_t from,
                                   const igraph_vs_t to,
@@ -83,7 +83,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
 
     /* If no weights, then we can just run the unweighted version */
     if (!weights) {
-        return igraph_shortest_paths(graph, res, from, to, IGRAPH_OUT);
+        return igraph_distances(graph, res, from, to, IGRAPH_OUT);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -92,7 +92,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
 
     /* If no edges, then we can just run the unweighted version */
     if (no_of_edges == 0) {
-        return igraph_shortest_paths(graph, res, from, to, IGRAPH_OUT);
+        return igraph_distances(graph, res, from, to, IGRAPH_OUT);
     }
 
     /* If no negative weights, then we can run Dijkstra's algorithm */
@@ -102,8 +102,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
             IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
         }
         if (min_weight >= 0) {
-            return igraph_shortest_paths_dijkstra(graph, res, from, to,
-                                                  weights, IGRAPH_OUT);
+            return igraph_distances_dijkstra(graph, res, from, to, weights, IGRAPH_OUT);
         }
     }
 
@@ -123,8 +122,8 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
 
     /* Add a new node to the graph, plus edges from it to all the others. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2 + no_of_nodes * 2);
-    igraph_get_edgelist(graph, &edges, /*bycol=*/ 0);
-    igraph_vector_int_resize(&edges, no_of_edges * 2 + no_of_nodes * 2);
+    igraph_get_edgelist(graph, &edges, /*bycol=*/ 0); /* reserved */
+    igraph_vector_int_resize(&edges, no_of_edges * 2 + no_of_nodes * 2); /* reserved */
     for (i = 0, ptr = no_of_edges * 2; i < no_of_nodes; i++) {
         VECTOR(edges)[ptr++] = no_of_nodes;
         VECTOR(edges)[ptr++] = i;
@@ -134,16 +133,16 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_vector_reserve(&newweights, no_of_edges + no_of_nodes));
-    igraph_vector_update(&newweights, weights);
-    igraph_vector_resize(&newweights, no_of_edges + no_of_nodes);
+    igraph_vector_update(&newweights, weights); /* reserved */
+    igraph_vector_resize(&newweights, no_of_edges + no_of_nodes); /* reserved */
     for (i = no_of_edges; i < no_of_edges + no_of_nodes; i++) {
         VECTOR(newweights)[i] = 0;
     }
 
-    /* Run Bellmann-Ford algorithm on the new graph, starting from the
+    /* Run Bellman-Ford algorithm on the new graph, starting from the
        new vertex.  */
 
-    IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(&newgraph, &bfres,
+    IGRAPH_CHECK(igraph_distances_bellman_ford(&newgraph, &bfres,
                  igraph_vss_1(no_of_nodes),
                  igraph_vss_all(), &newweights, IGRAPH_OUT));
 
@@ -154,7 +153,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
        values from the BF algorithm. Instead of w(u,v) we will have
        w(u,v) + h(u) - h(v) */
 
-    igraph_vector_resize(&newweights, no_of_edges);
+    igraph_vector_resize(&newweights, no_of_edges); /* reserved */
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t ffrom = IGRAPH_FROM(graph, i);
         igraph_integer_t tto = IGRAPH_TO(graph, i);
@@ -162,7 +161,7 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     }
 
     /* Run Dijkstra's algorithm on the new weights */
-    IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, res, from,
+    IGRAPH_CHECK(igraph_distances_dijkstra(graph, res, from,
                  to, &newweights,
                  IGRAPH_OUT));
 
@@ -204,4 +203,18 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_shortest_paths_johnson
+ * \brief Weighted shortest path lengths between vertices, using Johnson's algorithm (deprecated).
+ *
+ * \deprecated-by igraph_distances_johnson 0.10.0
+ */
+igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
+                                  igraph_matrix_t *res,
+                                  const igraph_vs_t from,
+                                  const igraph_vs_t to,
+                                  const igraph_vector_t *weights) {
+    return igraph_distances_johnson(graph, res, from, to, weights);
 }

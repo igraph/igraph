@@ -1,45 +1,59 @@
 No vertices:
+{
+}
 Directed graph with loops and multi-edges, order 0:
-( 0 )
-( 1 )
-( 2 )
-( 3 )
-( 4 )
-( 5 )
+{
+  0: ( 0 )
+  1: ( 1 )
+  2: ( 2 )
+  3: ( 3 )
+  4: ( 4 )
+  5: ( 5 )
+}
 Directed graph with loops and multi-edges, order 1, ignoring direction:
-( 0 1 2 )
-( 1 0 3 )
-( 2 0 3 )
-( 3 1 2 4 )
-( 4 3 )
-( 5 )
+{
+  0: ( 0 1 2 )
+  1: ( 1 0 3 )
+  2: ( 2 0 3 )
+  3: ( 3 1 2 4 )
+  4: ( 4 3 )
+  5: ( 5 )
+}
 Directed graph with loops and multi-edges, order 1, only checking IGRAPH_IN:
-( 0 2 )
-( 1 0 )
-( 2 0 )
-( 3 1 2 )
-( 4 3 )
-( 5 )
+{
+  0: ( 0 2 )
+  1: ( 1 0 )
+  2: ( 2 0 )
+  3: ( 3 1 2 )
+  4: ( 4 3 )
+  5: ( 5 )
+}
 Directed graph with loops and multi-edges, order 10, ignoring direction:
-( 0 1 2 3 4 )
-( 1 0 3 2 4 )
-( 2 0 3 1 4 )
-( 3 1 2 4 0 )
-( 4 3 1 2 0 )
-( 5 )
+{
+  0: ( 0 1 2 3 4 )
+  1: ( 1 0 3 2 4 )
+  2: ( 2 0 3 1 4 )
+  3: ( 3 1 2 4 0 )
+  4: ( 4 3 1 2 0 )
+  5: ( 5 )
+}
 Directed graph with loops and multi-edges, order 2, mindist 2, IGRAPH_OUT:
-( 3 )
-( 4 )
-( 1 4 )
-( )
-( )
-( )
+{
+  0: ( 3 )
+  1: ( 4 )
+  2: ( 1 4 )
+  3: ( )
+  4: ( )
+  5: ( )
+}
 Directed graph with loops and multi-edges, order 4, mindist 4, IGRAPH_ALL:
-( )
-( )
-( )
-( )
-( )
-( )
+{
+  0: ( )
+  1: ( )
+  2: ( )
+  3: ( )
+  4: ( )
+  5: ( )
+}
 Negative order.
 Negative mindist.

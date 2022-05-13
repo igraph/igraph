@@ -46,7 +46,6 @@ set(
   random.xxml
   separators.xxml
   sparsemat.xxml
-  spmatrix.xxml
   spatialgames.xxml
   stack.xxml
   status.xxml
@@ -54,6 +53,7 @@ set(
   strvector.xxml
   threading.xxml
   vector.xxml
+  vectorlist.xxml
   visitors.xxml
 )
 

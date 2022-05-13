@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 int main() {
     igraph_t graph;

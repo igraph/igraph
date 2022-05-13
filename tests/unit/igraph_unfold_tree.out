@@ -1,0 +1,80 @@
+Graph with no vertices
+Tree:
+directed: false
+vcount: 0
+edges: {
+}
+Vertex indices:
+
+
+Graph with loops, multiple edges and isolated vertex:
+Tree:
+directed: true
+vcount: 10
+edges: {
+0 1
+0 2
+1 3
+2 7
+2 8
+3 4
+3 9
+6 1
+}
+Vertex indices:
+0 1 2 3 4 5 1 0 3 4
+
+Same graph, undirected:
+Tree:
+directed: false
+vcount: 10
+edges: {
+0 1
+0 2
+0 6
+1 3
+1 7
+2 8
+3 4
+3 9
+}
+Vertex indices:
+0 1 2 3 4 5 2 1 3 4
+
+Almost same graph, two roots:
+Tree:
+directed: true
+vcount: 12
+edges: {
+0 1
+0 2
+1 3
+2 7
+2 8
+3 4
+3 9
+6 1
+10 5
+11 5
+}
+Vertex indices:
+0 1 2 3 4 5 1 0 3 4 5 5
+
+Same graph, multiple roots in same tree:
+Tree:
+directed: true
+vcount: 10
+edges: {
+0 1
+0 2
+1 3
+2 7
+2 8
+3 4
+3 9
+6 1
+}
+Vertex indices:
+0 1 2 3 4 5 1 0 3 4
+
+Check error for root out of bounds.

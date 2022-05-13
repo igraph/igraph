@@ -100,7 +100,8 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
 
     RNG_END();
 
-    igraph_create(graph, &edges, ncol, directed);
+    IGRAPH_CHECK(igraph_create(graph, &edges, ncol, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -109,7 +110,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
 
 /**
  * \function igraph_sample_sphere_surface
- * Sample points uniformly from the surface of a sphere
+ * \brief Sample points uniformly from the surface of a sphere.
  *
  * The center of the sphere is at the origin.
  *
@@ -138,13 +139,13 @@ igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer
 
     if (dim < 2) {
         IGRAPH_ERROR("Sphere must be at least two dimensional to sample from "
-                     "surface", IGRAPH_EINVAL);
+                     "surface.", IGRAPH_EINVAL);
     }
     if (n < 0) {
-        IGRAPH_ERROR("Number of samples must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of samples must be non-negative.", IGRAPH_EINVAL);
     }
     if (radius <= 0) {
-        IGRAPH_ERROR("Sphere radius must be positive", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Sphere radius must be positive.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, dim, n));
@@ -176,7 +177,7 @@ igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer
 
 /**
  * \function igraph_sample_sphere_volume
- * Sample points uniformly from the volume of a sphere
+ * \brief Sample points uniformly from the volume of a sphere.
  *
  * The center of the sphere is at the origin.
  *
@@ -226,7 +227,7 @@ igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_
 
 /**
  * \function igraph_sample_dirichlet
- * Sample points from a Dirichlet distribution
+ * \brief Sample points from a Dirichlet distribution.
  *
  * \param n The number of vectors to sample.
  * \param alpha The parameters of the Dirichlet distribution. They
@@ -253,16 +254,17 @@ igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t
     igraph_vector_t vec;
 
     if (n < 0) {
-        IGRAPH_ERROR("Number of samples should be non-negative",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of samples should be non-negative, got %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL, n);
     }
     if (len < 2) {
-        IGRAPH_ERROR("Dirichlet parameter vector too short, must "
-                     "have at least two entries", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Dirichlet parameter vector too short, must "
+                     "have at least two entries, got %" IGRAPH_PRId
+                     ".", IGRAPH_EINVAL, len);
     }
     if (igraph_vector_min(alpha) <= 0) {
-        IGRAPH_ERROR("Dirichlet concentration parameters must be positive",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Dirichlet concentration parameters must be positive, got %g.",
+                     IGRAPH_EINVAL, igraph_vector_min(alpha));
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, len, n));

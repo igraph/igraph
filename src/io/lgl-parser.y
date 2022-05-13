@@ -44,20 +44,19 @@
 
 */
 
-#include <stdio.h>
-#include <string.h>
-
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
 
-#include "core/math.h"
 #include "io/lgl-header.h"
 #include "io/parsers/lgl-parser.h"
 #include "io/parsers/lgl-lexer.h"
 #include "io/parse_utils.h"
 #include "internal/hacks.h"
+
+#include <stdio.h>
+#include <string.h>
 
 int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
                        const char *s);
@@ -83,9 +82,10 @@ int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
 %type <edgenum>   edgeid
 %type <weightnum> weight
 
-%token ALNUM
-%token NEWLINE
-%token HASH
+%token ALNUM    "alphanumeric"
+%token NEWLINE  "end of line"
+%token HASH     "#"
+%token END 0    "end of file" /* friendly name for $end */
 %token ERROR
 
 %%
@@ -117,11 +117,11 @@ edge :   edgeid NEWLINE             {
 
 edgeid : ALNUM  {
   igraph_integer_t trie_id;
-  igraph_trie_get2(context->trie,
+  IGRAPH_YY_CHECK(igraph_trie_get_len(context->trie,
     igraph_lgl_yyget_text(scanner),
     igraph_lgl_yyget_leng(scanner),
     &trie_id
-  );
+  ));
   $$ = trie_id;
 };
 
