@@ -667,8 +667,8 @@ Some of the highlights are:
  - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
  - `igraph_fundamental_cycles()` computes a fundamental cycle basis (experimental).
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
- - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without
-   re-allocating them.
+ - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without re-allocating them.
+ - `igraph_get_k_shortest_paths()` to find at most k alternative shortest paths between a source and a target vertex (#1763, thanks to @GroteGnoom)
  - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
  - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
  - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
