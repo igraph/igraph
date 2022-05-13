@@ -63,7 +63,7 @@ graph
   node
   [
     id 2
-    Foo "bar"
+    Foo "bar &amp; baz"
   ]
 ]
 ======================
