@@ -35,11 +35,10 @@
 #include <time.h>
 #include <string.h>
 
-int igraph_gml_yylex_init_extra (igraph_i_gml_parsedata_t* user_defined,
-                                 void* scanner);
-void igraph_gml_yylex_destroy (void *scanner );
-int igraph_gml_yyparse (igraph_i_gml_parsedata_t* context);
-void igraph_gml_yyset_in  (FILE * in_str, void* yyscanner );
+int igraph_gml_yylex_init_extra(igraph_i_gml_parsedata_t *user_defined, void *scanner);
+void igraph_gml_yylex_destroy(void *scanner);
+int igraph_gml_yyparse(igraph_i_gml_parsedata_t *context);
+void igraph_gml_yyset_in(FILE *in_str, void *yyscanner);
 
 static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     igraph_integer_t i;
@@ -119,7 +118,7 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_integer
     return p;
 }
 
-igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context) {
+igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t *context) {
     context->depth = 0;
     context->scanner = 0;
     context->tree = 0;
@@ -129,7 +128,7 @@ igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context) {
     return IGRAPH_SUCCESS;
 }
 
-void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context) {
+void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t *context) {
     if (context->tree != 0) {
         igraph_gml_tree_destroy(context->tree);
         context->tree = 0;
