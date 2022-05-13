@@ -468,7 +468,7 @@ igraph_get_all_simple_paths:
 
 igraph_get_k_shortest_paths:
     PARAMS: |-
-        GRAPH graph, OPTIONAL INOUT EDGEWEIGHTS weights, OUT VERTEXSET_LIST paths,
+        GRAPH graph, OPTIONAL EDGEWEIGHTS weights, OUT VERTEXSET_LIST paths,
         INTEGER k, VERTEX from, VERTEX to, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph, paths ON graph
 

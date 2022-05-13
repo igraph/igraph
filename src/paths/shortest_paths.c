@@ -1283,8 +1283,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
 
 static igraph_error_t igraph_i_semidelete_vertex(
     const igraph_t *graph, igraph_vector_t *weights,
-    igraph_integer_t vid, igraph_vector_int_t *edges_removed,
-    igraph_vector_t *weights_old
+    igraph_integer_t vid, igraph_vector_int_t *edges_removed
 ) {
     igraph_vector_int_t eids;
     igraph_integer_t j, n;
@@ -1297,7 +1296,6 @@ static igraph_error_t igraph_i_semidelete_vertex(
     for (j = 0; j < n; j++) {
         igraph_integer_t eid  = VECTOR(eids)[j];
         IGRAPH_CHECK(igraph_vector_int_push_back(edges_removed, eid));
-        IGRAPH_CHECK(igraph_vector_push_back(weights_old, VECTOR(*weights)[eid]));
         VECTOR(*weights)[eid] = IGRAPH_INFINITY;
     }
 
@@ -1386,7 +1384,7 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *                  and |E| is the number of edges.
  */
 igraph_error_t igraph_get_k_shortest_paths(
-    const igraph_t *graph, igraph_vector_t *weights, igraph_vector_int_list_t *paths,
+    const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_int_list_t *paths,
     igraph_integer_t k, igraph_integer_t from, igraph_integer_t to,
     igraph_neimode_t mode
 ) {
@@ -1395,9 +1393,8 @@ igraph_error_t igraph_get_k_shortest_paths(
     igraph_vector_int_t path_spur, path_root, path_total, path_shortest;
     igraph_integer_t nr_edges_root, i_path_current, i_path, edge_path_root, vertex_root_del;
     igraph_integer_t i, n;
-    igraph_vector_t weights_old;
+    igraph_vector_t current_weights;
     igraph_vector_int_t edges_removed;
-    igraph_bool_t weights_missing;
     igraph_integer_t nr_edges = igraph_ecount(graph);
     igraph_bool_t infinite_path, already_in_potential_paths;
     igraph_vector_int_t *path_0;
@@ -1432,18 +1429,18 @@ igraph_error_t igraph_get_k_shortest_paths(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&path_spur, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&path_root, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&path_total, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&weights_old, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_removed, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&current_weights, nr_edges);
 
-    /* If weights are NULL we use weights of 1, which can then be replaced
-     * later with infinite weights.
+    /* If weights are NULL we use a uniform weight vector where each edge has
+     * a weight of 1. Later on, we replace the weights of removed edges with
+     * infinities. Note that we work on a copy of the weight vector so the
+     * original vector remains intact.
      */
-    weights_missing = !weights;
-    if (weights_missing) {
-        weights = IGRAPH_CALLOC(1, igraph_vector_t);
-        IGRAPH_FINALLY(igraph_free, weights);
-        IGRAPH_VECTOR_INIT_FINALLY(weights, nr_edges);
-        igraph_vector_fill(weights, 1);
+    if (weights) {
+        igraph_vector_update(&current_weights, weights);
+    } else {
+        igraph_vector_fill(&current_weights, 1);
     }
 
     for (i_path_current = 1; i_path_current < k; i_path_current++) {
@@ -1493,8 +1490,7 @@ igraph_error_t igraph_get_k_shortest_paths(
                 }
                 if (equal) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges_removed, VECTOR(*path_check)[nr_edges_root]));
-                    IGRAPH_CHECK(igraph_vector_push_back(&weights_old, VECTOR(*weights)[VECTOR(*path_check)[nr_edges_root]]));
-                    VECTOR(*weights)[VECTOR(*path_check)[nr_edges_root]] = IGRAPH_INFINITY;
+                    VECTOR(current_weights)[VECTOR(*path_check)[nr_edges_root]] = IGRAPH_INFINITY;
                 }
             }
 
@@ -1521,7 +1517,7 @@ igraph_error_t igraph_get_k_shortest_paths(
                 }
                 /* Remove vertex by setting incident edges to infinity */
                 IGRAPH_CHECK(igraph_i_semidelete_vertex(
-                    graph, weights, vertex_root_del, &edges_removed, &weights_old
+                    graph, &current_weights, vertex_root_del, &edges_removed
                 ));
             }
 
@@ -1531,9 +1527,9 @@ igraph_error_t igraph_get_k_shortest_paths(
                                                            &path_spur,
                                                            vertex_spur,
                                                            to,
-                                                           weights,
+                                                           &current_weights,
                                                            mode));
-            infinite_path = igraph_i_has_edge_with_infinite_weight(&path_spur, weights);
+            infinite_path = igraph_i_has_edge_with_infinite_weight(&path_spur, &current_weights);
 
             /* Add total (root + spur) path to potential paths if it's not in there yet. */
             if (!infinite_path) {
@@ -1556,11 +1552,11 @@ igraph_error_t igraph_get_k_shortest_paths(
 
             /* Cleanup */
             n = igraph_vector_int_size(&edges_removed);
-            for (i = n-1; i >= 0; i--) {
-                VECTOR(*weights)[VECTOR(edges_removed)[i]] = VECTOR(weights_old)[i];
+            for (i = 0; i < n; i++) {
+                VECTOR(current_weights)[VECTOR(edges_removed)[i]] =
+                    weights ? VECTOR(*weights)[VECTOR(edges_removed)[i]] : 1;
             }
             igraph_vector_int_clear(&edges_removed);
-            igraph_vector_clear(&weights_old);
         }
 
         /* Add shortest potential path to shortest paths */
@@ -1587,14 +1583,8 @@ igraph_error_t igraph_get_k_shortest_paths(
         IGRAPH_CHECK(igraph_vector_int_list_push_back(paths, &path_shortest));
     }
 
-    if (weights_missing) {
-        igraph_vector_destroy(weights);
-        IGRAPH_FREE(weights);
-        IGRAPH_FINALLY_CLEAN(2);
-    }
-
+    igraph_vector_destroy(&current_weights);
     igraph_vector_int_destroy(&edges_removed);
-    igraph_vector_destroy(&weights_old);
     igraph_vector_int_destroy(&path_total);
     igraph_vector_int_destroy(&path_root);
     igraph_vector_int_destroy(&path_spur);
