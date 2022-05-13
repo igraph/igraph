@@ -1283,24 +1283,19 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
 
 static igraph_error_t igraph_i_semidelete_vertex(
     const igraph_t *graph, igraph_vector_t *weights,
-    igraph_integer_t vid, igraph_vector_int_t *edges_removed
+    igraph_integer_t vid, igraph_vector_int_t *edges_removed,
+    igraph_vector_int_t *eids
 ) {
-    igraph_vector_int_t eids;
     igraph_integer_t j, n;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
-    IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_incident(graph, eids, vid, IGRAPH_ALL));
 
-    n = igraph_vector_int_size(&eids);
-
+    n = igraph_vector_int_size(eids);
     for (j = 0; j < n; j++) {
-        igraph_integer_t eid  = VECTOR(eids)[j];
+        igraph_integer_t eid = VECTOR(*eids)[j];
         IGRAPH_CHECK(igraph_vector_int_push_back(edges_removed, eid));
         VECTOR(*weights)[eid] = IGRAPH_INFINITY;
     }
-
-    igraph_vector_int_destroy(&eids);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -1398,6 +1393,7 @@ igraph_error_t igraph_get_k_shortest_paths(
     igraph_integer_t nr_edges = igraph_ecount(graph);
     igraph_bool_t infinite_path, already_in_potential_paths;
     igraph_vector_int_t *path_0;
+    igraph_vector_int_t eids;
     igraph_real_t path_weight, shortest_path_weight;
 
     igraph_vector_int_list_clear(paths);
@@ -1430,6 +1426,7 @@ igraph_error_t igraph_get_k_shortest_paths(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&path_root, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&path_total, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_removed, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&current_weights, nr_edges);
 
     /* If weights are NULL we use a uniform weight vector where each edge has
@@ -1517,7 +1514,8 @@ igraph_error_t igraph_get_k_shortest_paths(
                 }
                 /* Remove vertex by setting incident edges to infinity */
                 IGRAPH_CHECK(igraph_i_semidelete_vertex(
-                    graph, &current_weights, vertex_root_del, &edges_removed
+                    graph, &current_weights, vertex_root_del, &edges_removed,
+                    &eids
                 ));
             }
 
@@ -1584,12 +1582,13 @@ igraph_error_t igraph_get_k_shortest_paths(
     }
 
     igraph_vector_destroy(&current_weights);
+    igraph_vector_int_destroy(&eids);
     igraph_vector_int_destroy(&edges_removed);
     igraph_vector_int_destroy(&path_total);
     igraph_vector_int_destroy(&path_root);
     igraph_vector_int_destroy(&path_spur);
     igraph_vector_int_list_destroy(&paths_pot);
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
