@@ -289,6 +289,7 @@ add_legacy_tests(
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
+  igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
@@ -296,7 +297,6 @@ add_legacy_tests(
   igraph_is_chordal
   igraph_is_mutual
   igraph_is_tree
-  igraph_k_shortest_paths
   igraph_is_forest
   igraph_is_forest2
   igraph_is_acyclic

@@ -26,7 +26,7 @@ void call_and_print(
     igraph_vector_int_list_t paths;
 
     igraph_vector_int_list_init(&paths, 0);
-    IGRAPH_ASSERT(igraph_k_shortest_paths(graph, weights, &paths, k, from, to, mode) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(graph, weights, &paths, k, from, to, mode) == IGRAPH_SUCCESS);
     printf("result: \n");
     print_vector_int_list(&paths);
     igraph_vector_int_list_destroy(&paths);
@@ -88,13 +88,13 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Zero vertices, from and to don't exist:\n");
-    IGRAPH_ASSERT(igraph_k_shortest_paths(&g_0, &weights, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_0, &weights, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
 
     printf("Wrong weights length:\n");
-    IGRAPH_ASSERT(igraph_k_shortest_paths(&g_wiki, &weights, &paths, 4, 0, 5, IGRAPH_ALL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_wiki, &weights, &paths, 4, 0, 5, IGRAPH_ALL) == IGRAPH_EINVAL);
 
     printf("Non-existent mode:\n");
-    IGRAPH_ASSERT(igraph_k_shortest_paths(&g_1, &weights, &paths, 4, 0, 0, 100) == IGRAPH_EINVMODE);
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_1, &weights, &paths, 4, 0, 0, 100) == IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

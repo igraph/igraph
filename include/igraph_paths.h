@@ -214,7 +214,7 @@ IGRAPH_EXPORT igraph_error_t igraph_random_walk(const igraph_t *graph,
                                      igraph_integer_t steps,
                                      igraph_random_walk_stuck_t stuck);
 
-IGRAPH_EXPORT igraph_error_t igraph_k_shortest_paths(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_get_k_shortest_paths(const igraph_t *graph,
                                           igraph_vector_t *weights,
                                           igraph_vector_int_list_t *paths,
                                           igraph_integer_t k,
