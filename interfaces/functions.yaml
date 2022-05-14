@@ -991,14 +991,14 @@ igraph_bipartite_game_gnm:
 
 igraph_get_laplacian:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, LAPLACIAN_NORMALIZATION normalization=UNNORMALIZED,
-        EDGEWEIGHTS weights=NULL
+        GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT,
+        LAPLACIAN_NORMALIZATION normalization=UNNORMALIZED, EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph
 
 igraph_get_laplacian_sparse:
     PARAMS: |-
-        GRAPH graph, OUT SPARSEMAT sparseres, LAPLACIAN_NORMALIZATION normalization=UNNORMALIZED,
-        EDGEWEIGHTS weights=NULL
+        GRAPH graph, OUT SPARSEMAT sparseres, NEIMODE mode=OUT,
+        LAPLACIAN_NORMALIZATION normalization=UNNORMALIZED, EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph
 
 #######################################
