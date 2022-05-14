@@ -1349,8 +1349,7 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *         \p from and \p to vertex, where k is the pointer vector index.
  * \param k The number of paths.
  * \param from The ID of the vertex from which the paths are calculated.
- * \param to The id of the vertex to which the geodesics are
- *        calculated.
+ * \param to The ID of the vertex to which the paths are calculated.
  * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
