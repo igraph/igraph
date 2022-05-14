@@ -1873,9 +1873,9 @@ igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
  *
  * \param lhs The first vector.
  * \param rhs The second vector.
- * \return Positive integer (=true) if the elements in the \p lhs are all
- *    equal to the corresponding elements in \p rhs. Returns \c 0
- *    (=false) if the lengths of the vectors don't match.
+ * \return True if the elements in the \p lhs are all
+ *    equal to the corresponding elements in \p rhs. Returns
+ *    false if the lengths of the vectors don't match.
  *
  * Time complexity: O(n), the length of the vectors.
  */
