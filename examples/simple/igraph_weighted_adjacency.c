@@ -24,26 +24,34 @@
 #include <igraph.h>
 #include <stdarg.h>
 
-void print(igraph_t *g) {
+void print_and_destroy(const igraph_matrix_t *adjmatrix,
+        igraph_adjacency_t mode, igraph_bool_t loops) {
     igraph_vector_int_t el;
+    igraph_vector_t weights;
+    igraph_t g;
     igraph_integer_t i, j, n;
-    char ch = igraph_is_directed(g) ? '>' : '-';
+    char ch = (mode == IGRAPH_ADJ_DIRECTED) ? '>' : '-';
 
     igraph_vector_int_init(&el, 0);
-    igraph_get_edgelist(g, &el, 0);
-    n = igraph_ecount(g);
+    igraph_vector_init(&weights, 0);
+
+    igraph_weighted_adjacency(&g, adjmatrix, mode, &weights, loops);
+
+    igraph_get_edgelist(&g, &el, 0);
+    n = igraph_ecount(&g);
 
     for (i = 0, j = 0; i < n; i++, j += 2) {
-        printf("%" IGRAPH_PRId " --%c %" IGRAPH_PRId ": %" IGRAPH_PRId "\n",
-               VECTOR(el)[j], ch, VECTOR(el)[j + 1], (igraph_integer_t)EAN(g, "weight", i));
+        printf("%" IGRAPH_PRId " --%c %" IGRAPH_PRId ": %g\n",
+               VECTOR(el)[j], ch, VECTOR(el)[j + 1], VECTOR(weights)[i]);
     }
     printf("\n");
 
     igraph_vector_int_destroy(&el);
+    igraph_destroy(&g);
+    igraph_vector_destroy(&weights);
 }
 
 int main() {
-    igraph_t g;
     igraph_matrix_t mat;
     int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 1, 0 }, { 0, 1, 0, 0 } };
     igraph_integer_t i, j;
@@ -52,55 +60,42 @@ int main() {
     for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) {
             MATRIX(mat, i, j) = m[i][j];
         }
-    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* [ 0 1 2 0 ]
        [ 2 0 0 1 ]
        [ 0 0 1 0 ]
        [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&mat, IGRAPH_ADJ_DIRECTED, /*loops=*/ 1);
 
     /* [ 0 1 2 0 ]
        [ - 0 0 1 ]
        [ - - 1 0 ]
        [ - - - 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_UPPER, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&mat, IGRAPH_ADJ_UPPER, /*loops=*/ 1);
 
     /* [ 0 - - - ]
        [ 2 0 - - ]
        [ 0 0 1 - ]
        [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_LOWER, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&mat, IGRAPH_ADJ_LOWER, /*loops=*/ 1);
 
     /* [ 0 1 0 0 ]
        [ 1 0 0 1 ]
        [ 0 0 1 0 ]
        [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MIN, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&mat, IGRAPH_ADJ_MIN, /*loops=*/ 1);
 
     /* [ 0 2 2 0 ]
        [ 2 0 0 1 ]
        [ 2 0 1 0 ]
        [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MAX, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&mat, IGRAPH_ADJ_MAX, /*loops=*/ 1);
 
     /* [ 0 3 2 0 ]
        [ 3 0 0 2 ]
        [ 2 0 1 0 ]
        [ 0 2 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_PLUS, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&mat, IGRAPH_ADJ_PLUS, /*loops=*/ 1);
 
     igraph_matrix_destroy(&mat);
 
