@@ -1350,13 +1350,13 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  * \param k The number of paths.
  * \param from The ID of the vertex from which the paths are calculated.
  * \param to The ID of the vertex to which the paths are calculated.
- * \param mode The type of shortest paths to be used for the
+ * \param mode The type of paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
  *        \cli IGRAPH_OUT
- *          The shortest outgoing paths are calculated.
+ *          The outgoing paths of \p from are calculated.
  *        \cli IGRAPH_IN
- *          The shortest incoming paths are calculated.
+ *          The incoming paths of \p from are calculated.
  *        \cli IGRAPH_ALL
  *          The directed graph is considered as an
  *          undirected one for the computation.
