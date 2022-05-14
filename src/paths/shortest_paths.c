@@ -1348,8 +1348,7 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *        object contains the edges along the k-th shortest path between the
  *         \p from and \p to vertex, where k is the pointer vector index.
  * \param k The number of paths.
- * \param from The id of the vertex from which the geodesics are
- *        calculated.
+ * \param from The ID of the vertex from which the paths are calculated.
  * \param to The id of the vertex to which the geodesics are
  *        calculated.
  * \param mode The type of shortest paths to be used for the
