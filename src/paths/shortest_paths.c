@@ -1345,8 +1345,8 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *        edges.
  * \param paths Pointer to an initialized list of integer vectors, the result
  *        will be stored here in \ref igraph_vector_int_t objects. Each vector
- *        object contains the edges along the k-th shortest path between the
- *         \p from and \p to vertex, where k is the pointer vector index.
+ *        object contains the edges along the <code>k</code>th shortest path between
+ *         \p from and \p to, where \c k is the vector list index.
  * \param k The number of paths.
  * \param from The ID of the vertex from which the paths are calculated.
  * \param to The ID of the vertex to which the paths are calculated.
