@@ -1337,7 +1337,7 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
 
 /**
  * \function igraph_get_k_shortest_paths
- * \brief K shortest paths (geodesics) between two vertices.
+ * \brief k shortest paths between two vertices.
  *
  * \param graph The graph object.
  * \param weights The edge weights of the graph. Can be \c NULL for an
