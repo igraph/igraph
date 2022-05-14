@@ -44,12 +44,12 @@ int main() {
 
     igraph_vector_int_list_init(&paths, 0);
 
-    igraph_small(&g_0, 0, 0, -1);
-    igraph_small(&g_1, 1, 0, -1);
-    igraph_small(&g_2, 2, 0, -1);
-    igraph_small(&g_2c, 2, 0, 0,1, -1);
-    igraph_small(&g_wiki, 6, 1, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
-    igraph_small(&g_wiki_u, 6, 0, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
+    igraph_small(&g_0, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&g_1, 1, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&g_2, 2, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&g_2c, 2, IGRAPH_UNDIRECTED, 0,1, -1);
+    igraph_small(&g_wiki, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
+    igraph_small(&g_wiki_u, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
 
     igraph_vector_init(&weights, 0);
     igraph_vector_init_int(&weights_wiki, 9, 3, 2, 4, 1, 2, 3, 2, 1, 2);
