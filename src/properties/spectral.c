@@ -230,6 +230,7 @@ igraph_error_t igraph_get_laplacian(
  *
  * </para><para>
  * The first version of this function was written by Vincent Matossian.
+ *
  * \param graph Pointer to the graph to convert.
  * \param sparseres Pointer to an initialized sparse matrix object, the
  *        result is stored here.
@@ -375,6 +376,19 @@ igraph_error_t igraph_get_laplacian_sparse(
  * is used for undirected graphs and left stochastic normalization for
  * directed graphs.
  *
+ * \param graph Pointer to the graph to convert.
+ * \param res Pointer to an initialized matrix object or \c NULL. The dense matrix
+ *        result will be stored here.
+ * \param sparseres Pointer to an initialized sparse matrix object or \c NULL.
+ *        The sparse matrix result will be stored here.
+ * \param mode Controls whether to use out- or in-degrees in directed graphs.
+ *        If set to \c IGRAPH_ALL, edge directions will be ignored.
+ * \param normalized Boolean, whether to normalize the result.
+ * \param weights An optional vector containing non-negative edge weights,
+ *        to calculate the weighted Laplacian matrix. Set it to a null pointer to
+ *        calculate the unweighted Laplacian.
+ * \return Error code.
+ *
  * \deprecated-by igraph_get_laplacian 0.10.0
  */
 
@@ -385,7 +399,7 @@ igraph_error_t igraph_laplacian(
     igraph_laplacian_normalization_t norm_method = IGRAPH_LAPLACIAN_UNNORMALIZED;
 
     if (!res && !sparseres) {
-        IGRAPH_ERROR("Laplacian: specify at least one of `res' or `sparseres'",
+        IGRAPH_ERROR("Laplacian: specify at least one of 'res' or 'sparseres'",
                      IGRAPH_EINVAL);
     }
 
