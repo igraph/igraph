@@ -289,6 +289,7 @@ add_legacy_tests(
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
+  igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_bellman_ford
   igraph_is_bipartite
