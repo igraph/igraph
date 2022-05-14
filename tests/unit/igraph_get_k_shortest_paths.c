@@ -38,7 +38,7 @@ void call_and_print(
 
 int main() {
     /* Wiki example taken from https://en.wikipedia.org/wiki/Yen's_algorithm */
-    igraph_t g_0, g_1, g_2, g_2c, g_wiki, g_wiki_u;
+    igraph_t g_0, g_1, g_2, g_2c, g_wiki, g_wiki_u, g_sz;
     igraph_vector_t weights, weights_wiki, weights_inf;
     igraph_vector_int_list_t paths;
 
@@ -50,6 +50,7 @@ int main() {
     igraph_small(&g_2c, 2, IGRAPH_UNDIRECTED, 0,1, -1);
     igraph_small(&g_wiki, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
     igraph_small(&g_wiki_u, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
+    igraph_small(&g_sz, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 2, 2, 0, 0, 3, 3, 4, 4, 2, 2, 2, 2, 4, 0, 4, -1);
 
     igraph_vector_init(&weights, 0);
     igraph_vector_init_int(&weights_wiki, 9, 3, 2, 4, 1, 2, 3, 2, 1, 2);
@@ -85,6 +86,9 @@ int main() {
     printf("Wiki example, no weights:\n");
     call_and_print(&g_wiki, NULL, 10, 0, 5, IGRAPH_OUT);
 
+    printf("Directed unweighted graph:\n");
+    call_and_print(&g_sz, NULL, 4, 0, 4, IGRAPH_OUT);
+
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Zero vertices, from and to don't exist:\n");
@@ -102,6 +106,7 @@ int main() {
     igraph_destroy(&g_2c);
     igraph_destroy(&g_wiki);
     igraph_destroy(&g_wiki_u);
+    igraph_destroy(&g_sz);
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&weights_wiki);
     igraph_vector_destroy(&weights_inf);
