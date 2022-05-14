@@ -1373,7 +1373,7 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *           Invalid argument.
  *        \endclist
  *
- * Time complexity: K|V|(|V|log|V| + |E|), where |V| is the number of vertices,
+ * Time complexity:  k |V| (|V| log|V| + |E|), where |V| is the number of vertices,
  *                  and |E| is the number of edges.
  */
 igraph_error_t igraph_get_k_shortest_paths(
