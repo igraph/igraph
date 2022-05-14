@@ -40,11 +40,14 @@ void test_laplacian(igraph_t *g, const igraph_vector_t *w, igraph_bool_t dir, ig
 }
 
 int main() {
-    igraph_t g_un, g_dir;
-    igraph_vector_t weights;
+    igraph_t g_e_un, g_e_dir, g_un, g_dir;
+    igraph_vector_t weights, weights_e;
     char *n[]  = {"none", "symmetric", "left", "right"};
 
     igraph_vector_init_int(&weights, 9, 1, 2, 3, 4, 5, 2, 2, 3, 3);
+    igraph_vector_init_int(&weights_e, 0);
+    igraph_small(&g_e_un, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_small(&g_e_dir, 0, IGRAPH_DIRECTED, -1);
     igraph_small(&g_un, 6, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, 3,4, 4,0, 1,1, 2,2, 1,2, 3,4, -1);
     igraph_small(&g_dir, 6, IGRAPH_DIRECTED, 0,1, 1,2, 2,3, 3,4, 4,0, 1,1, 2,2, 1,2, 3,4, -1);
 
@@ -57,11 +60,15 @@ int main() {
                         (directed ? "" : "un")
                       );
 
+                test_laplacian(directed ? &g_e_dir : &g_e_un, weighted ? &weights_e : NULL, directed, normalization);
                 test_laplacian(directed ? &g_dir : &g_un, weighted ? &weights : NULL, directed, normalization);
             }
         }
     }
 
+    igraph_vector_destroy(&weights_e);
+    igraph_destroy(&g_e_un);
+    igraph_destroy(&g_e_dir);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g_un);
     igraph_destroy(&g_dir);
