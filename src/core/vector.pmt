@@ -1871,6 +1871,9 @@ igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
  * \function igraph_vector_all_e
  * \brief Are all elements equal?
  *
+ * Checks element-wise equality of two vectors. For vectors containing floating
+ * point values, consider using \ref igraph_matrix_all_almost_e().
+ *
  * \param lhs The first vector.
  * \param rhs The second vector.
  * \return True if the elements in the \p lhs are all

@@ -638,6 +638,9 @@ BASE FUNCTION(igraph_matrix, sum)(const TYPE(igraph_matrix) *m) {
  * \function igraph_matrix_all_e
  * \brief Are all elements equal?
  *
+ * Checks element-wise equality of two matrices. For matrices containing floating
+ * point values, consider using \ref igraph_matrix_all_almost_e().
+ *
  * \param lhs The first matrix.
  * \param rhs The second matrix.
  * \return Positive integer (=true) if the elements in the \p lhs are all

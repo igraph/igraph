@@ -64,6 +64,7 @@
 
 <section id="vector-comparisons"><title>Vector comparisons</title>
 <!-- doxrox-include igraph_vector_all_e -->
+<!-- doxrox-include igraph_vector_all_almost_e -->
 <!-- doxrox-include igraph_vector_all_l -->
 <!-- doxrox-include igraph_vector_all_g -->
 <!-- doxrox-include igraph_vector_all_le -->
@@ -113,6 +114,15 @@
 <!-- doxrox-include igraph_vector_insert -->
 <!-- doxrox-include igraph_vector_remove -->
 <!-- doxrox-include igraph_vector_remove_section -->
+</section>
+
+<section id="complex-vectors"><title>Complex vector operations</title>
+<!-- doxrox-include igraph_vector_complex_real -->
+<!-- doxrox-include igraph_vector_complex_imag -->
+<!-- doxrox-include igraph_vector_complex_realimag -->
+<!-- doxrox-include igraph_vector_complex_create -->
+<!-- doxrox-include igraph_vector_complex_create_polar -->
+<!-- doxrox-include igraph_vector_complex_all_almost_e -->
 </section>
 
 <section id="vector-sorting"><title>Sorting</title>

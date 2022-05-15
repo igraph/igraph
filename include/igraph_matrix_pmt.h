@@ -233,18 +233,22 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_m
 #ifdef BASE_COMPLEX
 
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
-                               igraph_matrix_t *real);
+                                                        igraph_matrix_t *real);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
-                               igraph_matrix_t *imag);
+                                                        igraph_matrix_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
-                                   igraph_matrix_t *real,
-                                   igraph_matrix_t *imag);
+                                                            igraph_matrix_t *real,
+                                                            igraph_matrix_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
-                                 const igraph_matrix_t *real,
-                                 const igraph_matrix_t *imag);
+                                                          const igraph_matrix_t *real,
+                                                          const igraph_matrix_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
-                                       const igraph_matrix_t *r,
-                                       const igraph_matrix_t *theta);
+                                                                const igraph_matrix_t *r,
+                                                                const igraph_matrix_t *theta);
+
+IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
+                                                                igraph_matrix_complex_t *rhs,
+                                                                igraph_real_t eps);
 
 #endif
 
