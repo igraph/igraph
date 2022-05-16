@@ -23,13 +23,48 @@ void call_and_print(
     igraph_t *graph, igraph_vector_t *weights, igraph_integer_t k,
     igraph_integer_t from, igraph_integer_t to, igraph_neimode_t mode
 ) {
-    igraph_vector_int_list_t paths;
+    igraph_vector_int_list_t vertex_paths;
+    igraph_vector_int_list_t edge_paths;
+    igraph_vector_int_list_t paths_for_verification;
+    igraph_integer_t i, n;
 
-    igraph_vector_int_list_init(&paths, 0);
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(graph, weights, &paths, k, from, to, mode) == IGRAPH_SUCCESS);
-    printf("result: \n");
-    print_vector_int_list(&paths);
-    igraph_vector_int_list_destroy(&paths);
+    igraph_vector_int_list_init(&vertex_paths, 0);
+    igraph_vector_int_list_init(&edge_paths, 0);
+    igraph_vector_int_list_init(&paths_for_verification, 0);
+
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(graph, weights, &vertex_paths, &edge_paths, k, from, to, mode) == IGRAPH_SUCCESS);
+
+    printf("result (vertex IDs): \n");
+    print_vector_int_list(&vertex_paths);
+
+    printf("result (edge IDs): \n");
+    print_vector_int_list(&edge_paths);
+
+    /* now we execute the same test but with only one of vertex_paths or edge_paths,
+     * and we check that we get the same result */
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(graph, weights, NULL, &paths_for_verification, k, from, to, mode) == IGRAPH_SUCCESS);
+    n = igraph_vector_int_list_size(&paths_for_verification);
+    IGRAPH_ASSERT(n == igraph_vector_int_list_size(&edge_paths));
+    for (i = 0; i < n; i++) {
+        IGRAPH_ASSERT(igraph_vector_int_is_equal(
+            igraph_vector_int_list_get_ptr(&edge_paths, i),
+            igraph_vector_int_list_get_ptr(&paths_for_verification, i)
+        ));
+    }
+
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(graph, weights, &paths_for_verification, NULL, k, from, to, mode) == IGRAPH_SUCCESS);
+    n = igraph_vector_int_list_size(&paths_for_verification);
+    IGRAPH_ASSERT(n == igraph_vector_int_list_size(&vertex_paths));
+    for (i = 0; i < n; i++) {
+        IGRAPH_ASSERT(igraph_vector_int_is_equal(
+            igraph_vector_int_list_get_ptr(&vertex_paths, i),
+            igraph_vector_int_list_get_ptr(&paths_for_verification, i)
+        ));
+    }
+
+    igraph_vector_int_list_destroy(&paths_for_verification);
+    igraph_vector_int_list_destroy(&vertex_paths);
+    igraph_vector_int_list_destroy(&edge_paths);
     printf("\n");
 
     VERIFY_FINALLY_STACK();
@@ -92,13 +127,13 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Zero vertices, from and to don't exist:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_0, &weights, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_0, &weights, NULL, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
 
     printf("Wrong weights length:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_wiki, &weights, &paths, 4, 0, 5, IGRAPH_ALL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_wiki, &weights, NULL, &paths, 4, 0, 5, IGRAPH_ALL) == IGRAPH_EINVAL);
 
     printf("Non-existent mode:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_1, &weights, &paths, 4, 0, 0, 100) == IGRAPH_EINVMODE);
+    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_1, &weights, NULL, &paths, 4, 0, 0, 100) == IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
