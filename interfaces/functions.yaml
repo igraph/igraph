@@ -89,7 +89,7 @@ igraph_adjacency:
 igraph_weighted_adjacency:
     PARAMS: |-
         OUT GRAPH graph, MATRIX adjmatrix,
-        ADJACENCY_MODE mode=DIRECTED, CSTRING attr="weight",
+        ADJACENCY_MODE mode=DIRECTED, OUT VECTOR weights,
         BOOLEAN loops
 
 igraph_star:
