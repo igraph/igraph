@@ -28,19 +28,19 @@ int main() {
 
     printf("Graph with no vertices:\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
-    igraph_get_stochastic_sparse(&g, &res, 0);
+    igraph_get_stochastic_sparse(&g, &res, /* column_wise = */ 0, /* weights = */ NULL);
     igraph_sparsemat_print(&res, stdout);
     igraph_destroy(&g);
 
     printf("\nGraph with 4 vertices, rowwise:\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED, 0,1, 1,3, 1,3, 2,2, 2,2, 2,3, 3,0, -1);
-    igraph_get_stochastic_sparse(&g, &res, 0);
+    igraph_get_stochastic_sparse(&g, &res, /* column_wise = */ 0, /* weights = */ NULL);
     igraph_sparsemat_print(&res, stdout);
     igraph_destroy(&g);
 
     printf("\nColumnwise:\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED, 0,1, 1,3, 1,3, 2,2, 2,2, 2,3, 3,0, -1);
-    igraph_get_stochastic_sparse(&g, &res, 1);
+    igraph_get_stochastic_sparse(&g, &res, /* column_wise = */ 1, /* weights = */ NULL);
     igraph_sparsemat_print(&res, stdout);
     igraph_destroy(&g);
 

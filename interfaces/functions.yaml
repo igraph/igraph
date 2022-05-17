@@ -1520,6 +1520,20 @@ igraph_get_adjacency_sparse:
 igraph_get_edgelist:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, BOOLEAN bycol=False
 
+igraph_get_stochastic:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False,
+        EDGEWEIGHTS weights=NULL
+    DEPS:
+        weights ON graph
+
+igraph_get_stochastic_sparse:
+    PARAMS: |-
+        GRAPH graph, OUT SPARSEMAT sparsemat, BOOLEAN column_wise=False,
+        EDGEWEIGHTS weights=NULL
+    DEPS:
+        weights ON graph
+
 igraph_to_directed:
     PARAMS: INOUT GRAPH graph, TODIRECTED mode=MUTUAL
 
@@ -1527,14 +1541,6 @@ igraph_to_undirected:
     PARAMS: |-
         INOUT GRAPH graph, TOUNDIRECTED mode=COLLAPSE,
         EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
-
-igraph_get_stochastic:
-    PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False
-
-igraph_get_stochastic_sparse:
-    PARAMS: |-
-        GRAPH graph, OUT SPARSEMAT sparsemat,
-        BOOLEAN column_wise=False
 
 #######################################
 # Read and write foreign formats

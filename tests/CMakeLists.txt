@@ -520,6 +520,7 @@ add_legacy_tests(
   igraph_get_adjacency
   igraph_get_adjacency_sparse
   igraph_get_laplacian
+  igraph_get_stochastic
   igraph_get_stochastic_sparse
   igraph_to_directed
   igraph_to_prufer

@@ -68,9 +68,7 @@
  *
  * \sa igraph_get_adjacency_sparse() if you want a sparse matrix representation
  *
- * Time complexity: O(|V||V|),
- * |V| is the
- * number of vertices in the graph.
+ * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  */
 
 #define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
@@ -79,7 +77,6 @@ igraph_error_t igraph_get_adjacency(
     const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,
     const igraph_vector_t *weights
 ) {
-
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -731,6 +728,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+#define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
+
 /**
  * \function igraph_get_stochastic
  * Stochastic adjacency matrix of a graph
@@ -738,53 +737,69 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise or column-wise, such that
  * the sum of each row (or column) is one.
+ *
  * \param graph The input graph.
- * \param matrix Pointer to an initialized matrix, the result is stored here.
+ * \param res Pointer to an initialized matrix, the result is stored here.
  *   It will be resized as needed.
- * \param column_wise Whether to normalize column-wise. For undirected
- *    graphs this argument does not have any effect.
+ * \param column_wise Whether to normalize column-wise.
  * \return Error code.
  *
- * Time complexity: O(|V||V|), quadratic in the number of vertices.
+ * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  *
- * \sa igraph_get_stochastic_sparsemat(), the sparse version of this
+ * \sa igraph_get_stochastic_sparse(), the sparse version of this
  * function.
  */
 
-igraph_error_t igraph_get_stochastic(const igraph_t *graph,
-                          igraph_matrix_t *matrix,
-                          igraph_bool_t column_wise) {
-
+igraph_error_t igraph_get_stochastic(
+    const igraph_t *graph, igraph_matrix_t *res, igraph_bool_t column_wise,
+    const igraph_vector_t *weights
+) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_integer_t i, from, to;
+    igraph_vector_t sums;
     igraph_real_t sum;
-    igraph_integer_t i, j;
 
-    IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, IGRAPH_GET_ADJACENCY_BOTH, NULL));
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
+    igraph_matrix_null(res);
 
-    if (!column_wise) {
-        for (i = 0; i < no_of_nodes; i++) {
-            sum = 0.0;
-            for (j = 0; j < no_of_nodes; j++) {
-                sum += MATRIX(*matrix, i, j);
-            }
-            for (j = 0; j < no_of_nodes; j++) {
-                MATRIX(*matrix, i, j) /= sum;
-            }
+    IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_nodes);
+
+    if (directed) {
+        IGRAPH_CHECK(igraph_strength(
+            graph, &sums, igraph_vss_all(),
+            column_wise ? IGRAPH_IN : IGRAPH_OUT,
+            /* loops = */ 1, weights
+        ));
+
+        for (i = 0; i < no_of_edges; i++) {
+            from = IGRAPH_FROM(graph, i);
+            to = IGRAPH_TO(graph, i);
+            sum = VECTOR(sums)[column_wise ? to : from];
+            MATRIX(*res, from, to) += WEIGHT_OF(i) / sum;
         }
     } else {
-        for (i = 0; i < no_of_nodes; i++) {
-            sum = 0.0;
-            for (j = 0; j < no_of_nodes; j++) {
-                sum += MATRIX(*matrix, j, i);
-            }
-            for (j = 0; j < no_of_nodes; j++) {
-                MATRIX(*matrix, j, i) /= sum;
-            }
+        IGRAPH_CHECK(igraph_strength(
+            graph, &sums, igraph_vss_all(), IGRAPH_ALL,
+            /* loops = */ IGRAPH_LOOPS_TWICE, weights
+        ));
+
+        for (i = 0; i < no_of_edges; i++) {
+            from = IGRAPH_FROM(graph, i);
+            to = IGRAPH_TO(graph, i);
+            MATRIX(*res, from, to) += WEIGHT_OF(i) / VECTOR(sums)[column_wise ? to : from];
+            MATRIX(*res, to, from) += WEIGHT_OF(i) / VECTOR(sums)[column_wise ? from: to];
         }
     }
 
+    igraph_vector_destroy(&sums);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
+
+#undef WEIGHT_OF
 
 /**
  * \function igraph_get_stochastic_sparse
@@ -807,11 +822,11 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
  * \sa igraph_get_stochastic(), the dense version of this function.
  */
 
-igraph_error_t igraph_get_stochastic_sparse(const igraph_t *graph,
-                                    igraph_sparsemat_t *res,
-                                    igraph_bool_t column_wise) {
-
-    IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, NULL));
+igraph_error_t igraph_get_stochastic_sparse(
+    const igraph_t *graph, igraph_sparsemat_t *res, igraph_bool_t column_wise,
+    const igraph_vector_t *weights
+) {
+    IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, weights));
 
     if (column_wise) {
         IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ 0));
@@ -850,7 +865,7 @@ igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
     IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_stochastic_sparse(graph, res, column_wise);
+    return igraph_get_stochastic_sparse(graph, res, column_wise, NULL);
 }
 
 

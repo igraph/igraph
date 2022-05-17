@@ -283,9 +283,13 @@ Some of the highlights are:
  - The `maps` parameters in `igraph_get_isomorphisms_vf2()` and
    `igraph_get_subisomorphisms_vf2()` are now of type `igraph_vector_int_list_t`.
 
+ - `igraph_get_stochastic()` now has an additional `weights` argument for edge
+   weights.
+
  - `igraph_get_stochastic_sparse()` now returns the sparse adjacency matrix in
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
-   _initialized_ for sake of consistency with other igraph functions.
+   _initialized_ for sake of consistency with other igraph functions. It also
+   received an additional `weights` argument for edge weights.
 
  - `igraph_girth()` now uses an `igraph_vector_int_t` for its
    `circle` parameter.
