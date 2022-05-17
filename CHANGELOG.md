@@ -695,6 +695,7 @@ Some of the highlights are:
  - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
    `igraph_write_graph_gml()` skips writing NaN values. These two changes ensure consistent round-tripping.
  - Foreign format readers now present more informative error messages.
+ - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
 
 ### Fixed
 

@@ -41,7 +41,10 @@
  *
  * </para><para>
  * The result is an adjacency matrix. Entry i, j of the matrix
- * contains the number of edges connecting vertex i to vertex j.
+ * contains the number of edges connecting vertex i to vertex j in the unweighted
+ * case, or the total weight of edges connecting vertex i to vertex j in the
+ * weighted case.
+ *
  * \param graph Pointer to the graph to convert
  * \param res Pointer to an initialized matrix object, it will be
  *        resized if needed.
@@ -57,6 +60,9 @@
  *          the whole matrix is used, a symmetric matrix is returned
  *          if the graph is undirected.
  *        \endclist
+ * \param weights An optional vector containing the weight of each edge
+ *        in the graph. Supply a null pointer here to make all edges have
+ *        the same weight of 1.
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
@@ -67,8 +73,11 @@
  * number of vertices in the graph.
  */
 
+#define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
+
 igraph_error_t igraph_get_adjacency(
-    const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type
+    const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,
+    const igraph_vector_t *weights
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -83,16 +92,16 @@ igraph_error_t igraph_get_adjacency(
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            MATRIX(*res, from, to) += 1;
+            MATRIX(*res, from, to) += WEIGHT_OF(i);
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                MATRIX(*res, to, from) += 1;
+                MATRIX(*res, to, from) += WEIGHT_OF(i);
             } else {
-                MATRIX(*res, from, to) += 1;
+                MATRIX(*res, from, to) += WEIGHT_OF(i);
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
@@ -100,19 +109,17 @@ igraph_error_t igraph_get_adjacency(
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                MATRIX(*res, from, to) += 1;
+                MATRIX(*res, from, to) += WEIGHT_OF(i);
             } else {
-                MATRIX(*res, to, from) += 1;
+                MATRIX(*res, to, from) += WEIGHT_OF(i);
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            MATRIX(*res, from, to) += 1;
-            if (from != to) {
-                MATRIX(*res, to, from) += 1;
-            }
+            MATRIX(*res, from, to) += WEIGHT_OF(i);
+            MATRIX(*res, to, from) += WEIGHT_OF(i);
         }
     } else {
         IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
@@ -149,7 +156,8 @@ igraph_error_t igraph_get_adjacency(
  */
 
 igraph_error_t igraph_get_adjacency_sparse(
-    const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type
+    const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type,
+    const igraph_vector_t *weights
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -164,16 +172,16 @@ igraph_error_t igraph_get_adjacency_sparse(
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
+            IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, WEIGHT_OF(i)));
             } else {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
@@ -181,19 +189,17 @@ igraph_error_t igraph_get_adjacency_sparse(
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
             } else {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, WEIGHT_OF(i)));
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
-            if (from != to) {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
-            }
+            IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
+            IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, WEIGHT_OF(i)));
         }
     } else {
         IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
@@ -202,6 +208,7 @@ igraph_error_t igraph_get_adjacency_sparse(
     return IGRAPH_SUCCESS;
 }
 
+#undef WEIGHT_OF
 
 /**
  * \function igraph_get_sparsemat
@@ -228,7 +235,7 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
     IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
-    return igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH);
+    return igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, NULL);
 }
 
 /**
@@ -752,7 +759,7 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
     igraph_real_t sum;
     igraph_integer_t i, j;
 
-    IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, IGRAPH_GET_ADJACENCY_BOTH));
+    IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, IGRAPH_GET_ADJACENCY_BOTH, NULL));
 
     if (!column_wise) {
         for (i = 0; i < no_of_nodes; i++) {
@@ -804,7 +811,7 @@ igraph_error_t igraph_get_stochastic_sparse(const igraph_t *graph,
                                     igraph_sparsemat_t *res,
                                     igraph_bool_t column_wise) {
 
-    IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH));
+    IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, NULL));
 
     if (column_wise) {
         IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ 0));

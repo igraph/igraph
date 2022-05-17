@@ -1,0 +1,56 @@
+Undirected, unweighted, upper:
+0 2 0 1 1
+0 0 1 0 0
+0 0 1 1 0
+0 0 0 0 1
+0 0 0 0 0
+========
+Undirected, unweighted, lower:
+0 0 0 0 0
+2 0 0 0 0
+0 1 1 0 0
+1 0 1 0 0
+1 0 0 1 0
+========
+Undirected, unweighted, both:
+0 2 0 1 1
+2 0 1 0 0
+0 1 2 1 0
+1 0 1 0 1
+1 0 0 1 0
+========
+Undirected, weighted, upper:
+0 7 0 6 1
+0 0 4 0 0
+0 0 3 3 0
+0 0 0 0 2
+0 0 0 0 0
+========
+Undirected, weighted, lower:
+0 0 0 0 0
+7 0 0 0 0
+0 4 3 0 0
+6 0 3 0 0
+1 0 0 2 0
+========
+Undirected, weighted, both:
+0 7 0 6 1
+7 0 4 0 0
+0 4 6 3 0
+6 0 3 0 2
+1 0 0 2 0
+========
+Directed, unweighted:
+0 2 0 1 0
+0 0 1 0 0
+0 0 1 1 0
+0 0 0 0 1
+1 0 0 0 0
+========
+Directed, weighted:
+0 7 0 6 0
+0 0 4 0 0
+0 0 3 3 0
+0 0 0 0 2
+1 0 0 0 0
+========

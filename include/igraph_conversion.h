@@ -39,9 +39,13 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_get_adjacency(
-   const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type);
+   const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,
+   const igraph_vector_t *weights
+);
 IGRAPH_EXPORT igraph_error_t igraph_get_adjacency_sparse(
-   const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type);
+   const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type,
+   const igraph_vector_t *weights
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_stochastic(const igraph_t *graph,
                                         igraph_matrix_t *matrix,
