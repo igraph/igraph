@@ -1619,7 +1619,7 @@ igraph_error_t igraph_get_k_shortest_paths(
         for (i = 0; i < no_of_edge_paths; i++) {
             igraph_vector_int_t* edge_path = igraph_vector_int_list_get_ptr(edge_paths, i);
             igraph_vector_int_t* vertex_path = igraph_vector_int_list_get_ptr(vertex_paths, i);
-            IGRAPH_CHECK(igraph_convert_edge_to_vertex_path(graph, from, edge_path, vertex_path, mode));
+            IGRAPH_CHECK(igraph_vertex_path_from_edge_path(graph, from, edge_path, vertex_path, mode));
         }
     }
 

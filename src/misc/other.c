@@ -296,7 +296,7 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
 }
 
 /**
- * \function igraph_convert_edge_to_vertex_path
+ * \function igraph_vertex_path_from_edge_path
  * \brief Converts a path of edge IDs to the traversed vertex IDs.
  *
  * </para><para>
@@ -315,7 +315,7 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
  *         or if there is at least one edge whose start vertex does not match
  *         the end vertex of the previous edge
  */
-igraph_error_t igraph_convert_edge_to_vertex_path(
+igraph_error_t igraph_vertex_path_from_edge_path(
    const igraph_t *graph, igraph_integer_t start,
    const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
    igraph_neimode_t mode
