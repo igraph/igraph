@@ -195,6 +195,8 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     igraph_integer_t order_next_pos = 0, order_next_neg = -1;
     igraph_real_t diff, maxdiff;
 
+    IGRAPH_ASSERT(igraph_is_directed(graph));
+
     ordering = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     IGRAPH_FINALLY(igraph_free, ordering);
 

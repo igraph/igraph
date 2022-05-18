@@ -148,6 +148,10 @@ igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  *          computation. Every node is weighted according to its undirected
  *          degree.
  *        \endclist
+ *        For undirected graphs, this argument has no effect on the treatment
+ *        of vertices without loop edges. Loop edges are counted \em once if
+ *        \p mode is \c IGRAPH_IN or \c IGRAPH_OUT and \em twice if \p mode is
+ *        \c IGRAPH_ALL .
  * \return Error code:
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *

@@ -39,14 +39,13 @@
  *        will be stored here.
  * \param vids Vector giving the vertex IDs for which the maximum degree will
  *        be calculated.
- * \param mode Defines the type of the degree.
- *        \c IGRAPH_OUT, out-degree,
- *        \c IGRAPH_IN, in-degree,
- *        \c IGRAPH_ALL, total degree (sum of the
- *        in- and out-degree).
- *        This parameter is ignored for undirected graphs.
- * \param loops Boolean, gives whether the self-loops should be
- *        counted.
+ * \param mode Defines the type of the degree. \c IGRAPH_OUT is the out-degree,
+ *        \c IGRAPH_IN is the in-degree, \c IGRAPH_ALL is the total degree (sum
+ *        of the in- and out-degree). For undirected graphs, this argument only
+ *        has effect on the treatment of vertices with loop edges. Loop edges
+ *        are counted \em once if \p mode is \c IGRAPH_IN or \c IGRAPH_OUT and
+ *        \em twice if \p mode is \c IGRAPH_ALL .
+ * \param loops Boolean, specifies whether the self-loops should be counted at all.
  * \return Error code:
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
