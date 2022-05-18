@@ -30,11 +30,12 @@ void call_and_print(igraph_t *graph, igraph_integer_t pnode, igraph_neimode_t mo
 
 
 int main() {
-    igraph_t g_1, g_lm, g_lmu, g_s1, g_s2;
+    igraph_t g_1, g_lm, g_lmu, g_lmu2, g_s1, g_s2;
 
     igraph_small(&g_1, 1, 0, -1);
     igraph_small(&g_lm, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
     igraph_small(&g_lmu, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, -1);
+    igraph_small(&g_lmu2, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,0, 2,3, 3,4, 3,4, 1,1, -1);
     igraph_small(&g_s1, 2, 1, 0,1, 0,1, 1,0, 1,0, -1);
     igraph_small(&g_s2, 2, 1, 0,1, 1,0, 1,0, -1);
 
@@ -92,6 +93,12 @@ int main() {
     printf("Vertex 1 with loop, undirected, IGRAPH_LOOPS_TWICE:\n");
     call_and_print(&g_lmu, 1, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
 
+    printf("Vertex 1 with two loops, undirected, IGRAPH_LOOPS_ONCE:\n");
+    call_and_print(&g_lmu2, 1, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+
+    printf("Vertex 1 with two loops, undirected, IGRAPH_LOOPS_TWICE:\n");
+    call_and_print(&g_lmu2, 1, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+
     printf("Graph with 2 edges from 0 to 1, and 2 from 1 to 0, IGRAPH_ALL, IGRAPH_MULTIPLE:\n");
     call_and_print(&g_s1, 0, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
 
@@ -113,6 +120,7 @@ int main() {
     igraph_destroy(&g_1);
     igraph_destroy(&g_lm);
     igraph_destroy(&g_lmu);
+    igraph_destroy(&g_lmu2);
     igraph_destroy(&g_s1);
     igraph_destroy(&g_s2);
     igraph_vector_int_destroy(&neis);

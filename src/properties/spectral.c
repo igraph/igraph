@@ -115,13 +115,15 @@ igraph_error_t igraph_get_laplacian(
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_null(res);
 
+    if (!directed) {
+        mode = IGRAPH_ALL;
+    }
+
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
 
     /* Value of 'mode' is validated in igraph_strength() call above. */
-    if (! directed) {
-        mode = IGRAPH_ALL;
-    } else if (mode == IGRAPH_ALL) {
+    if (mode == IGRAPH_ALL) {
         directed = 0;
     }
 
@@ -266,6 +268,10 @@ igraph_error_t igraph_get_laplacian_sparse(
     IGRAPH_CHECK(igraph_i_laplacian_validate_weights(graph, weights));
 
     IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes, no_of_nodes, nz));
+
+    if (!directed) {
+        mode = IGRAPH_ALL;
+    }
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));

@@ -102,7 +102,6 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
 igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
 
     if (vc == 0 || ec == 0) {
         *res = 0;
@@ -112,23 +111,11 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         igraph_bool_t found = 0;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc && !found; i++) {
-            IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,
-                                          IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
             n = igraph_vector_int_size(&neis);
             for (j = 1; j < n; j++) {
                 if (VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
-                    /* If the graph is undirected, loop edges appear twice in the neighbor
-                     * list, so check the next item as well */
-                    if (directed) {
-                        /* Directed, so this is a real multiple edge */
-                        found = 1; break;
-                    } else if (VECTOR(neis)[j - 1] != i) {
-                        /* Undirected, but not a loop edge */
-                        found = 1; break;
-                    } else if (j < n - 1 && VECTOR(neis)[j] == VECTOR(neis)[j + 1]) {
-                        /* Undirected, loop edge, multiple times */
-                        found = 1; break;
-                    }
+                    found = 1; break;
                 }
             }
         }

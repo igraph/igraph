@@ -168,56 +168,26 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
     for (i = 0; i < no_of_new_nodes; i++) {
         igraph_integer_t old_vid = VECTOR(*my_vids_new2old)[i];
         igraph_integer_t new_vid = i;
-        igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
         n = igraph_vector_int_size(&nei_edges);
 
-        if (directed) {
-            /* directed graph; this is easier */
-            for (j = 0; j < n; j++) {
-                eid = VECTOR(nei_edges)[j];
+        for (j = 0; j < n; j++) {
+            eid = VECTOR(nei_edges)[j];
 
-                to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
-                if (!to) {
-                    continue;
-                }
-
-                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to - 1));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
+            if (!directed && IGRAPH_FROM(graph, eid) != old_vid) {
+                /* avoid processing edges twice */
+                continue;
             }
-        } else {
-            /* undirected graph. We need to be careful with loop edges as each
-             * loop edge will appear twice. We use a boolean flag to skip every
-             * second loop edge */
-            skip_loop_edge = 0;
-            for (j = 0; j < n; j++) {
-                eid = VECTOR(nei_edges)[j];
 
-                if (IGRAPH_FROM(graph, eid) != old_vid) {
-                    /* avoid processing edges twice */
-                    continue;
-                }
-
-                to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
-                if (!to) {
-                    continue;
-                }
-                to -= 1;
-
-                if (new_vid == to) {
-                    /* this is a loop edge; check whether we need to skip it */
-                    skip_loop_edge = !skip_loop_edge;
-                    if (skip_loop_edge) {
-                        continue;
-                    }
-                }
-
-                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
+            to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
+            if (!to) {
+                continue;
             }
+
+            IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, new_vid));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to - 1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
         }
     }
 

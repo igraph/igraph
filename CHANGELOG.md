@@ -193,6 +193,10 @@ Some of the highlights are:
    takes an `igraph_vector_t`), use `igraph_strength()` instead with a null
    weight vector.
 
+ - `igraph_degree()` now counts loop edges _twice_ in undirected graphs if
+   `mode` is set to `IGRAPH_ALL`, otherwise it counts them only _once_. Earlier
+   versions counted loop edges twice in undirected graphs unconditionally.
+
  - `igraph_degree_sequence_game()` now takes degree sequences represented as
    `igraph_vector_int_t` instead of `igraph_vector_t`.
 
@@ -322,6 +326,11 @@ Some of the highlights are:
  - `igraph_incident()` now uses an `igraph_vector_int_t` for its
    `eids` parameter.
 
+ - `igraph_incident()` now returns the IDs of loop edges _twice_ in undirected
+   graphs if `mode` is set to `IGRAPH_ALL`, otherwise it returns them only
+   _once_. Earlier versions counted loop edges twice in undirected graphs
+   unconditionally.
+
  - The `res` parameter in `igraph_independent_vertex_sets()` is now an
    `igraph_vector_int_list_t`.
 
@@ -438,6 +447,12 @@ Some of the highlights are:
  - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
    `neis` parameter.
 
+ - When loop edges are incident on a vertex, `igraph_neighbors()` returns the
+   same vertex ID _twice_ in undirected graphs for each loop edge if `mode` is
+   set to `IGRAPH_ALL`, otherwise it returns the vertex ID only _once_ per loop
+   edge. Earlier versions counted loop edges twice in undirected graphs
+   unconditionally.
+
  - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
    permutation vector.
 
@@ -504,6 +519,11 @@ Some of the highlights are:
 
  - `igraph_st_mincut()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
+
+ - `igraph_strength()` now counts the weights of loop edges _twice_ in undirected
+   graphs if `mode` is set to `IGRAPH_ALL`, otherwise it counts the weights only
+   _once_. Earlier versions counted loop edges twice in undirected graphs
+   unconditionally.
 
  - `igraph_strvector_get()` now returns strings in the return value, not in an
    output argument.

@@ -159,9 +159,9 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
-                                 IGRAPH_IN, IGRAPH_LOOPS, weights));
+                                 directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS, weights));
     IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(),
-                                 IGRAPH_OUT, IGRAPH_LOOPS, weights));
+                                 directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS, weights));
 
     IGRAPH_GLPK_SETUP();
 
