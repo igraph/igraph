@@ -42,33 +42,93 @@ void test_undirected() {
 
     igraph_sparsemat_init(&m, 2, 2, 0);
 
-    printf("Undirected, unweighted, upper:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, NULL);
+    printf("Undirected, unweighted, upper, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, NULL, IGRAPH_NO_LOOPS);
     print_sparse_matrix(&m);
     printf("========\n");
 
-    printf("Undirected, unweighted, lower:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, NULL);
+    printf("Undirected, unweighted, upper, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, NULL, IGRAPH_LOOPS_ONCE);
     print_sparse_matrix(&m);
     printf("========\n");
 
-    printf("Undirected, unweighted, both:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL);
+    printf("Undirected, unweighted, upper, loops twice:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, NULL, IGRAPH_LOOPS_TWICE);
     print_sparse_matrix(&m);
     printf("========\n");
 
-    printf("Undirected, weighted, upper:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, &weights);
+    printf("Undirected, unweighted, lower, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, NULL, IGRAPH_NO_LOOPS);
     print_sparse_matrix(&m);
     printf("========\n");
 
-    printf("Undirected, weighted, lower:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, &weights);
+    printf("Undirected, unweighted, lower, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, NULL, IGRAPH_LOOPS_ONCE);
     print_sparse_matrix(&m);
     printf("========\n");
 
-    printf("Undirected, weighted, both:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights);
+    printf("Undirected, unweighted, lower, loops twice:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, NULL, IGRAPH_LOOPS_TWICE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, unweighted, both, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_NO_LOOPS);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, unweighted, both, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, unweighted, both, loops twice:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_TWICE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, upper, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, &weights, IGRAPH_NO_LOOPS);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, upper, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, &weights, IGRAPH_LOOPS_ONCE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, upper, loops twice:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, &weights, IGRAPH_LOOPS_TWICE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, lower, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, &weights, IGRAPH_NO_LOOPS);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, lower, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, &weights, IGRAPH_LOOPS_ONCE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, lower, loops twice:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, &weights, IGRAPH_LOOPS_TWICE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, both, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights, IGRAPH_NO_LOOPS);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, both, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights, IGRAPH_LOOPS_ONCE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, both, loops twice:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights, IGRAPH_LOOPS_TWICE);
     print_sparse_matrix(&m);
     printf("========\n");
 
@@ -89,13 +149,33 @@ void test_directed() {
 
     igraph_sparsemat_init(&m, 2, 2, 0);
 
-    printf("Directed, unweighted:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL);
+    printf("Directed, unweighted, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_NO_LOOPS);
     print_sparse_matrix(&m);
     printf("========\n");
 
-    printf("Directed, weighted:\n");
-    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights);
+    printf("Directed, unweighted, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Directed, unweighted, loops twice (same as once):\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_TWICE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Directed, weighted, no loops:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights, IGRAPH_NO_LOOPS);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Directed, weighted, loops once:\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights, IGRAPH_LOOPS_ONCE);
+    print_sparse_matrix(&m);
+    printf("========\n");
+
+    printf("Directed, weighted, loops twice (same as once):\n");
+    igraph_get_adjacency_sparse(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, &weights, IGRAPH_LOOPS_TWICE);
     print_sparse_matrix(&m);
     printf("========\n");
 
@@ -113,7 +193,7 @@ void test_errors() {
     igraph_sparsemat_init(&m, 2, 2, 0);
 
     igraph_set_error_handler(&igraph_error_handler_ignore);
-    IGRAPH_ASSERT(igraph_get_adjacency_sparse(&graph, &m, 42, NULL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_get_adjacency_sparse(&graph, &m, 42, NULL, IGRAPH_LOOPS_ONCE) == IGRAPH_EINVAL);
     igraph_set_error_handler(&igraph_error_handler_abort);
 
     igraph_sparsemat_destroy(&m);

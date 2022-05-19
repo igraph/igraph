@@ -1506,14 +1506,14 @@ igraph_hrg_create:
 igraph_get_adjacency:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH,
-        EDGEWEIGHTS weights=NULL
+        EDGEWEIGHTS weights=NULL, LOOPS loops=ONCE
     DEPS:
         weights ON graph
 
 igraph_get_adjacency_sparse:
     PARAMS: |-
         GRAPH graph, OUT SPARSEMAT sparsemat, GETADJACENCY type=BOTH,
-        EDGEWEIGHTS weights=NULL
+        EDGEWEIGHTS weights=NULL, LOOPS loops=ONCE
     DEPS:
         weights ON graph
 

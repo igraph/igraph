@@ -245,6 +245,9 @@ Some of the highlights are:
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
    _initialized_ for sake of consistency with other igraph functions.
 
+ - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now has a
+   `loops` argument that lets the user specify how loop edges should be handled.
+
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
