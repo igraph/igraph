@@ -79,6 +79,7 @@
  *          are still counted as 1. Essentially, this means that the function is
  *          counting the incident edge \em stems , which makes more sense when
  *          using the adjacency matrix in linear algebra.
+ *        \endclist
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
