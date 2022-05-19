@@ -140,8 +140,8 @@ static int igraph_layout_i_fr(const igraph_t *graph,
             igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t displen = sqrt(dx * dx + dy * dy);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
+            igraph_real_t mx = fabs(dx) < temp ? fabs(dx) : temp;
+            igraph_real_t my = fabs(dy) < temp ? fabs(dy) : temp;
             if (displen > 0) {
                 MATRIX(*res, v, 0) += (dx / displen) * mx;
                 MATRIX(*res, v, 1) += (dy / displen) * my;
@@ -255,8 +255,8 @@ static int igraph_layout_i_grid_fr(
             igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t displen = sqrt(dx * dx + dy * dy);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
+            igraph_real_t mx = fabs(dx) < temp ? fabs(dx) : temp;
+            igraph_real_t my = fabs(dy) < temp ? fabs(dy) : temp;
             if (displen > 0) {
                 MATRIX(*res, v, 0) += (dx / displen) * mx;
                 MATRIX(*res, v, 1) += (dy / displen) * my;
@@ -630,9 +630,9 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
             igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t dz = VECTOR(dispz)[v] + RNG_UNIF01() * 1e-9;
             igraph_real_t displen = sqrt(dx * dx + dy * dy + dz * dz);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
-            igraph_real_t mz = fabs(dz) < temp ? dz : temp;
+            igraph_real_t mx = fabs(dx) < temp ? fabs(dx) : temp;
+            igraph_real_t my = fabs(dy) < temp ? fabs(dy) : temp;
+            igraph_real_t mz = fabs(dz) < temp ? fabs(dz) : temp;
             if (displen > 0) {
                 MATRIX(*res, v, 0) += (dx / displen) * mx;
                 MATRIX(*res, v, 1) += (dy / displen) * my;
