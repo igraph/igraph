@@ -228,7 +228,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
  * Time complexity: usually O(1), but may depend on the type of the
  * RNG.
  */
-igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
+igraph_error_t igraph_rng_seed(igraph_rng_t *rng, uint64_t seed) {
     const igraph_rng_type_t *type = rng->type;
     rng->def = 0;
     IGRAPH_CHECK(type->seed(rng->state, seed));
@@ -246,7 +246,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
  * Time complexity: O(1).
  */
 
-unsigned long int igraph_rng_max(const igraph_rng_t *rng) {
+uint64_t igraph_rng_max(const igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
     return type->max;
 }
@@ -282,16 +282,17 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
  * O(1).
  */
 
-long int igraph_rng_get_integer(igraph_rng_t *rng,
-                                long int l, long int h) {
+igraph_integer_t igraph_rng_get_integer(
+    igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h
+) {
     assert(h >= l);
     const igraph_rng_type_t *type = rng->type;
     /* We require the random integer to be in the range [l, h]. We do so by
      * first casting (truncate toward zero) to the range [0, h - l] and then add
      * l to arrive at the range [l, h]. That is, we calculate
-     * (long)( r * (h - l + 1) ) + l
+     * (igraph_integer_t)( r * (h - l + 1) ) + l
      * instead of
-     * (long)( r * (h - l + 1) + l),
+     * (igraph_integer_t)( r * (h - l + 1) + l),
      * please note the difference in the parentheses.
      *
      * In the latter formulation, if l is negative, this would incorrectly lead
@@ -300,10 +301,12 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
      * real in the range (-5, -4] would get cast to -4, not to -5.
      */
     if (type->get_real) {
-        return (long int)(type->get_real(rng->state) * (h - l + 1)) + l;
+        return (igraph_integer_t)(type->get_real(rng->state) * (h - l + 1)) + l;
     } else if (type->get) {
-        unsigned long int max = type->max;
-        return (long int)(type->get(rng->state) / ((double)max + 1) * (h - l + 1)) + l;
+        uint64_t max = type->max;
+        /* TODO: doubles can represent integers only up to 2^53-1 so this is
+         * not good enough if we allow 64-bit integers */
+        return (igraph_integer_t)(type->get(rng->state) / ((double)max + 1) * (h - l + 1)) + l;
     }
     IGRAPH_FATAL("Internal random generator error");
 }
@@ -352,7 +355,7 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
     if (type->get_real) {
         return type->get_real(rng->state) * (h - l) + l;
     } else if (type->get) {
-        unsigned long int max = type->max;
+        uint64_t max = type->max;
         return type->get(rng->state) / ((double)max + 1) * (double)(h - l) + l;
     }
     IGRAPH_FATAL("Internal random generator error");
@@ -374,7 +377,9 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
     if (type->get_real) {
         return type->get_real(rng->state);
     } else if (type->get) {
-        unsigned long int max = type->max;
+        uint64_t max = type->max;
+        /* TODO: get rid of (double) cast because not all 64-bit numbers can
+         * be represented exactly in a double */
         return type->get(rng->state) / ((double)max + 1);
     }
     IGRAPH_FATAL("Internal random generator error");
@@ -415,8 +420,7 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
  * Time complexity: depends on the type of the RNG.
  */
 
-igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
-                                   igraph_real_t p) {
+igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, igraph_integer_t n, igraph_real_t p) {
     const igraph_rng_type_t *type = rng->type;
     if (type->get_binom) {
         return type->get_binom(rng->state, n, p);
@@ -448,15 +452,22 @@ igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
     }
 }
 
-unsigned long int igraph_rng_get_int31(igraph_rng_t *rng) {
+uint32_t igraph_rng_get_int31(igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
-    unsigned long int max = type->max;
+    uint64_t max = type->max;
+
+    /* cater for the common cases of RNGs generating 31, 32 or 64 random bits
+     * with a single call */
     if (type->get && max == 0x7FFFFFFFUL) {
         return type->get(rng->state);
+    } else if (type->get && max == 0xFFFFFFFFUL) {
+        return type->get(rng->state) & 0x7FFFFFFFUL;
+    } else if (type->get && max == 0xFFFFFFFFFFFFFFFFULL) {
+        return type->get(rng->state) & 0x7FFFFFFFUL;
     } else if (type->get_real) {
-        return (unsigned long int) (type->get_real(rng->state) * 0x7FFFFFFFUL);
+        return (uint32_t) (type->get_real(rng->state) * 0x7FFFFFFFUL);
     } else {
-        return (unsigned long int) (igraph_rng_get_unif01(rng) * 0x7FFFFFFFUL);
+        return (uint32_t) (igraph_rng_get_unif01(rng) * 0x7FFFFFFFUL);
     }
 }
 

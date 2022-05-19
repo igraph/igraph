@@ -28,6 +28,7 @@
 
 __BEGIN_DECLS
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -36,10 +37,25 @@ __BEGIN_DECLS
 
 /* The new RNG interface is (somewhat) modelled based on the GSL */
 
+/* When implementing your own RNG in igraph, the following methods must be
+ * supplied in the corresponding igraph_rng_type_t structure:
+ *
+ * - init()
+ * - destroy()
+ * - seed()
+ *
+ * and you also need to provide at least one of:
+ *
+ * - get()
+ * - get_real()
+ *
+ * The remaining methods have default implementations that rely on get() or
+ * get_real() if no specialized implementation is provided.
+ */
 typedef struct igraph_rng_type_t {
     const char *name;
-    unsigned long int min; /* 'min' must always be set to 0 */
-    unsigned long int max;
+    uint64_t min; /* 'min' must always be set to 0 */
+    uint64_t max;
     igraph_error_t (*init)(void **state);
     void (*destroy)(void *state);
     igraph_error_t (*seed)(void *state, unsigned long int seed);
@@ -47,7 +63,7 @@ typedef struct igraph_rng_type_t {
     igraph_real_t (*get_real)(void *state);
     igraph_real_t (*get_norm)(void *state);
     igraph_real_t (*get_geom)(void *state, igraph_real_t p);
-    igraph_real_t (*get_binom)(void *state, long int n, igraph_real_t p);
+    igraph_real_t (*get_binom)(void *state, igraph_integer_t n, igraph_real_t p);
     igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
     igraph_real_t (*get_gamma)(void *state, igraph_real_t shape,
                                igraph_real_t scale);
@@ -64,24 +80,29 @@ typedef struct igraph_rng_t {
 IGRAPH_EXPORT igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
 IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
-IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
-IGRAPH_EXPORT unsigned long int igraph_rng_max(const igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, uint64_t seed);
+IGRAPH_EXPORT uint64_t igraph_rng_max(const igraph_rng_t *rng);
 IGRAPH_EXPORT const char *igraph_rng_name(const igraph_rng_t *rng);
 
-IGRAPH_EXPORT long int igraph_rng_get_integer(igraph_rng_t *rng,
-                                              long int l, long int h);
-IGRAPH_EXPORT igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
-                                                  igraph_real_t m, igraph_real_t s);
-IGRAPH_EXPORT igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
-                                                igraph_real_t l, igraph_real_t h);
+IGRAPH_EXPORT igraph_integer_t igraph_rng_get_integer(
+    igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h
+);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_normal(
+    igraph_rng_t *rng, igraph_real_t m, igraph_real_t s
+);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_unif(
+    igraph_rng_t *rng, igraph_real_t l, igraph_real_t h
+);
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
-IGRAPH_EXPORT igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
-                                                 igraph_real_t p);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_binom(
+    igraph_rng_t *rng, igraph_integer_t n, igraph_real_t p
+);
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
-IGRAPH_EXPORT unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
-IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
-                                                 igraph_real_t scale);
+IGRAPH_EXPORT uint32_t igraph_rng_get_int31(igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(
+    igraph_rng_t *rng, igraph_real_t shape, igraph_real_t scale
+);
 IGRAPH_EXPORT igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
                                            const igraph_vector_t *alpha,
                                            igraph_vector_t *result);

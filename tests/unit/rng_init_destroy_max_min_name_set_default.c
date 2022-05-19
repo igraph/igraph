@@ -28,14 +28,14 @@ void test_and_destroy(igraph_rng_type_t *rng_type, igraph_rng_t *rng_def) {
 
     igraph_rng_seed(&rng, 42);
     for (i = 0; i < 5; i++) {
-        printf("%ld\n", igraph_rng_get_integer(&rng, 0, 100));
+        printf("%" IGRAPH_PRId "\n", igraph_rng_get_integer(&rng, 0, 100));
     }
     printf("\n");
 
     igraph_rng_set_default(&rng);
     igraph_rng_seed(igraph_rng_default(), 42);
     for (i = 0; i < 5; i++) {
-        printf("%ld\n", igraph_rng_get_integer(igraph_rng_default(), 0, 100));
+        printf("%" IGRAPH_PRId "\n", igraph_rng_get_integer(igraph_rng_default(), 0, 100));
     }
     printf("\n");
 

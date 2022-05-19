@@ -28,7 +28,7 @@ int main() {
     /* Seed the RNG, generate 10 random integers */
     igraph_rng_seed(igraph_rng_default(), 42);
     for (i = 0; i < 10; i++) {
-        printf("%ld\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
+        printf("%" IGRAPH_PRId "\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
     }
 
     printf("========\n");
@@ -37,7 +37,7 @@ int main() {
      * numbers */
     igraph_rng_seed(igraph_rng_default(), 42);
     for (i = 0; i < 10; i++) {
-        printf("%ld\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
+        printf("%" IGRAPH_PRId "\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
     }
 
     printf("========\n");
@@ -46,7 +46,7 @@ int main() {
      * numbers */
     igraph_rng_seed(igraph_rng_default(), 84);
     for (i = 0; i < 10; i++) {
-        printf("%ld\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
+        printf("%" IGRAPH_PRId "\n", igraph_rng_get_integer(igraph_rng_default(), 10, 100));
     }
 
     printf("========\n");
