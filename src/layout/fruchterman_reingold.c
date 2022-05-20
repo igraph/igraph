@@ -303,6 +303,11 @@ static int igraph_layout_i_grid_fr(
  * vertices is thus <code>1/w^3</code>, assuming no other forces acting on them.
  *
  * </para><para>
+ * In disconnected graphs, igraph effectively inserts a weak connection of weight
+ * <code>n^(-3/2)</code> between all pairs of vertices, where \c n is the vertex count.
+ * This ensures that components are kept near each other.
+ *
+ * </para><para>
  * Reference:
  *
  * </para><para>
