@@ -667,6 +667,9 @@ Some of the highlights are:
 
  - `igraph_incidence()` does not accept negative incidences anymore.
 
+ - `igraph_write_graph_gml()` takes an additional bitfield parameter controlling some aspects of writing
+   the GML file.
+
 ### Added
 
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
@@ -716,6 +719,7 @@ Some of the highlights are:
  - `igraph_read_graph_gml()` now supports graph attributes (in addition to vertex and edge attributes).
  - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
    `igraph_write_graph_gml()` skips writing NaN values. These two changes ensure consistent round-tripping.
+ - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
  - Foreign format readers now present more informative error messages.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
 
@@ -729,6 +733,7 @@ Some of the highlights are:
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
  - The GML parser now supports nodes with no id field.
  - The GML parser now performs more stringent checks on the input file, such as verifying that `id`, `source`, `target` and `directed` fields are not duplicated.
+ - `igraph_write_graph_gml()` no longer produces corrupt output when some string attribute values contain `"` characters.
  - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
  - `igraph_matrix_complex_create()` and `igraph_matrix_complex_create_polar()` now set their sizes correctly.
  - The core data structures (vector, etc.) have overflow checks now.
