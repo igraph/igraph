@@ -5,23 +5,30 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     env:
-      STIMULUS_VERSION: "0.10.4"
+      STIMULUS_VERSION: "0.11.0"
     steps:
+      # Use Clang for more informative error messages
+      - name: Install Clang
+        run: sudo apt-get install clang
+
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Configure igraph
-        run: |
-          mkdir build && cd build
-          cmake ..
+
       - name: Install stimulus
         run: |
           cd interfaces
           python3 -m venv .venv
           .venv/bin/pip install 'git+https://github.com/igraph/stimulus.git@${{ env.STIMULUS_VERSION }}#egg=stimulus'
+
+      - name: Configure igraph
+        run: |
+          mkdir build && cd build
+          cmake ..
+
       - name: Validate functions.yaml
         run: |
           cd interfaces
           .venv/bin/stimulus -f functions.yaml -t types.yaml -l ci:validate -o test.cpp
-          c++ -std=c++14 -c test.cpp -I ../include -I ../build/include
+          clang++ -std=c++14 -c test.cpp -I ../include -I ../build/include
