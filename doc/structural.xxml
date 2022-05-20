@@ -41,6 +41,7 @@
 <!-- doxrox-include igraph_eccentricity -->
 <!-- doxrox-include igraph_radius -->
 <!-- doxrox-include igraph_pseudo_diameter -->
+<!-- doxrox-include igraph_vertex_path_from_edge_path -->
 </section>
 
 <section id="widest-path-related-functions"><title>Widest-path related functions</title>

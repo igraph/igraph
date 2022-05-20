@@ -35,7 +35,7 @@ int main() {
         MATRIX(mat, i, j) = m[i][j];
     }
 
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, &weights, /*loops*/1);
+    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, &weights, IGRAPH_LOOPS_ONCE);
 
     igraph_get_edgelist(&g, &el, 0);
     n = igraph_ecount(&g);

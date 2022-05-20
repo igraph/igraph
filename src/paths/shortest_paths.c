@@ -1343,10 +1343,16 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  * \param weights The edge weights of the graph. Can be \c NULL for an
  *        unweighted graph. Infinite weights will be treated as missing
  *        edges.
- * \param paths Pointer to an initialized list of integer vectors, the result
+ * \param vertex_paths Pointer to an initialized list of integer vectors, the result
  *        will be stored here in \ref igraph_vector_int_t objects. Each vector
- *        object contains the edges along the <code>k</code>th shortest path between
- *         \p from and \p to, where \c k is the vector list index.
+ *        object contains the vertex IDs along the <code>k</code>th shortest path
+ *        between \p from and \p to, where \c k is the vector list index. May
+ *        be \c NULL if the vertex paths are not needed.
+ * \param edge_paths Pointer to an initialized list of integer vectors, the result
+ *        will be stored here in \ref igraph_vector_int_t objects. Each vector
+ *        object contains the edge IDs along the <code>k</code>th shortest path
+ *        between \p from and \p to, where \c k is the vector list index. May be
+ *        \c NULL if the edge paths are not needed.
  * \param k The number of paths.
  * \param from The ID of the vertex from which the paths are calculated.
  * \param to The ID of the vertex to which the paths are calculated.
@@ -1377,7 +1383,9 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *                  and |E| is the number of edges.
  */
 igraph_error_t igraph_get_k_shortest_paths(
-    const igraph_t *graph, const igraph_vector_t *weights, igraph_vector_int_list_t *paths,
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_vector_int_list_t *vertex_paths,
+    igraph_vector_int_list_t *edge_paths,
     igraph_integer_t k, igraph_integer_t from, igraph_integer_t to,
     igraph_neimode_t mode
 ) {
@@ -1393,15 +1401,31 @@ igraph_error_t igraph_get_k_shortest_paths(
     igraph_vector_int_t *path_0;
     igraph_vector_int_t eids;
     igraph_real_t path_weight, shortest_path_weight;
+    igraph_integer_t edge_paths_owned = 0;
 
-    igraph_vector_int_list_clear(paths);
-
-    if (k == 0) {
-        return IGRAPH_SUCCESS;
+    if (vertex_paths) {
+        igraph_vector_int_list_clear(vertex_paths);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_list_resize(paths, 1));
-    path_0 = igraph_vector_int_list_get_ptr(paths, 0);
+    if (!edge_paths) {
+        /* We will need our own instance */
+        edge_paths = IGRAPH_CALLOC(1, igraph_vector_int_list_t);
+        IGRAPH_CHECK_OOM(edge_paths, "Cannot allocate vector for storing edge paths.");
+        IGRAPH_FINALLY(igraph_free, edge_paths);
+        edge_paths_owned = 1;
+
+        IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(edge_paths, 0);
+        edge_paths_owned = 2;
+    }
+
+    igraph_vector_int_list_clear(edge_paths);
+
+    if (k == 0) {
+        goto cleanup;
+    }
+
+    IGRAPH_CHECK(igraph_vector_int_list_resize(edge_paths, 1));
+    path_0 = igraph_vector_int_list_get_ptr(edge_paths, 0);
 
     IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
                                                    NULL,
@@ -1415,8 +1439,8 @@ igraph_error_t igraph_get_k_shortest_paths(
     infinite_path = igraph_i_has_edge_with_infinite_weight(path_0, weights);
     if (infinite_path || (from != to && igraph_vector_int_size(path_0) == 0)) {
         /* No path found. */
-        igraph_vector_int_list_clear(paths);
-        return IGRAPH_SUCCESS;
+        igraph_vector_int_list_clear(edge_paths);
+        goto cleanup;
     }
 
     IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&paths_pot, 0);
@@ -1439,7 +1463,7 @@ igraph_error_t igraph_get_k_shortest_paths(
     }
 
     for (i_path_current = 1; i_path_current < k; i_path_current++) {
-        igraph_vector_int_t *path_previous = igraph_vector_int_list_tail_ptr(paths);
+        igraph_vector_int_t *path_previous = igraph_vector_int_list_tail_ptr(edge_paths);
         igraph_integer_t path_previous_length = igraph_vector_int_size(path_previous);
         for (nr_edges_root = 0; nr_edges_root < path_previous_length; nr_edges_root++) {
             /* Determine spur node. */
@@ -1475,7 +1499,7 @@ igraph_error_t igraph_get_k_shortest_paths(
 
             /* Remove edges that are part of the previous shortest paths which share the same root path. */
             for (i_path = 0; i_path < i_path_current; i_path++) {
-                igraph_vector_int_t *path_check = igraph_vector_int_list_get_ptr(paths, i_path);
+                igraph_vector_int_t *path_check = igraph_vector_int_list_get_ptr(edge_paths, i_path);
                 igraph_bool_t equal = 1;
                 for (i = 0; i < nr_edges_root; i++) {
                     if (VECTOR(path_root)[i] != VECTOR(*path_check)[i]) {
@@ -1576,7 +1600,7 @@ igraph_error_t igraph_get_k_shortest_paths(
         }
 
         IGRAPH_CHECK(igraph_vector_int_list_remove_fast(&paths_pot, i_path, &path_shortest));
-        IGRAPH_CHECK(igraph_vector_int_list_push_back(paths, &path_shortest));
+        IGRAPH_CHECK(igraph_vector_int_list_push_back(edge_paths, &path_shortest));
     }
 
     igraph_vector_destroy(&current_weights);
@@ -1587,6 +1611,27 @@ igraph_error_t igraph_get_k_shortest_paths(
     igraph_vector_int_destroy(&path_spur);
     igraph_vector_int_list_destroy(&paths_pot);
     IGRAPH_FINALLY_CLEAN(7);
+
+    if (vertex_paths) {
+        igraph_integer_t no_of_edge_paths = igraph_vector_int_list_size(edge_paths);
+
+        IGRAPH_CHECK(igraph_vector_int_list_resize(vertex_paths, no_of_edge_paths));
+        for (i = 0; i < no_of_edge_paths; i++) {
+            igraph_vector_int_t* edge_path = igraph_vector_int_list_get_ptr(edge_paths, i);
+            igraph_vector_int_t* vertex_path = igraph_vector_int_list_get_ptr(vertex_paths, i);
+            IGRAPH_CHECK(igraph_vertex_path_from_edge_path(graph, from, edge_path, vertex_path, mode));
+        }
+    }
+
+cleanup:
+    if (edge_paths_owned >= 2) {
+        igraph_vector_int_list_destroy(edge_paths);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+    if (edge_paths_owned >= 1) {
+        igraph_free(edge_paths);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
 
     return IGRAPH_SUCCESS;
 }

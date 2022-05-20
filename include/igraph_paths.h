@@ -216,7 +216,8 @@ IGRAPH_EXPORT igraph_error_t igraph_random_walk(const igraph_t *graph,
 
 IGRAPH_EXPORT igraph_error_t igraph_get_k_shortest_paths(const igraph_t *graph,
                                           const igraph_vector_t *weights,
-                                          igraph_vector_int_list_t *paths,
+                                          igraph_vector_int_list_t *vertex_paths,
+                                          igraph_vector_int_list_t *edge_paths,
                                           igraph_integer_t k,
                                           igraph_integer_t from,
                                           igraph_integer_t to,
@@ -258,6 +259,11 @@ IGRAPH_EXPORT igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
 
 IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
 
+IGRAPH_EXPORT igraph_error_t igraph_vertex_path_from_edge_path(
+   const igraph_t *graph, igraph_integer_t start,
+   const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
+   igraph_neimode_t mode
+);
 
 /* Deprecated functions: */
 

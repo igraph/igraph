@@ -468,9 +468,12 @@ igraph_get_all_simple_paths:
 
 igraph_get_k_shortest_paths:
     PARAMS: |-
-        GRAPH graph, OPTIONAL EDGEWEIGHTS weights, OUT VERTEXSET_LIST paths,
+        GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
+        OPTIONAL OUT VERTEXSET_LIST vertex_paths,
+        OPTIONAL OUT EDGESET_LIST edge_paths,
         INTEGER k, VERTEX from, VERTEX to, NEIMODE mode=OUT
-    DEPS: from ON graph, to ON graph, weights ON graph, paths ON graph
+    DEPS: |-
+        from ON graph, to ON graph, weights ON graph, vertex_paths ON graph, edge_paths ON graph
 
 igraph_spanner:
     PARAMS: |-
@@ -1502,14 +1505,34 @@ igraph_hrg_create:
 
 igraph_get_adjacency:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH
+        GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH,
+        EDGEWEIGHTS weights=NULL, LOOPS loops=ONCE
+    DEPS:
+        weights ON graph
 
 igraph_get_adjacency_sparse:
     PARAMS: |-
-        GRAPH graph, OUT SPARSEMAT sparsemat, GETADJACENCY type=BOTH
+        GRAPH graph, OUT SPARSEMAT sparsemat, GETADJACENCY type=BOTH,
+        EDGEWEIGHTS weights=NULL, LOOPS loops=ONCE
+    DEPS:
+        weights ON graph
 
 igraph_get_edgelist:
     PARAMS: GRAPH graph, OUT VECTOR_INT res, BOOLEAN bycol=False
+
+igraph_get_stochastic:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False,
+        EDGEWEIGHTS weights=NULL
+    DEPS:
+        weights ON graph
+
+igraph_get_stochastic_sparse:
+    PARAMS: |-
+        GRAPH graph, OUT SPARSEMAT sparsemat, BOOLEAN column_wise=False,
+        EDGEWEIGHTS weights=NULL
+    DEPS:
+        weights ON graph
 
 igraph_to_directed:
     PARAMS: INOUT GRAPH graph, TODIRECTED mode=MUTUAL
@@ -1518,14 +1541,6 @@ igraph_to_undirected:
     PARAMS: |-
         INOUT GRAPH graph, TOUNDIRECTED mode=COLLAPSE,
         EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
-
-igraph_get_stochastic:
-    PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False
-
-igraph_get_stochastic_sparse:
-    PARAMS: |-
-        GRAPH graph, OUT SPARSEMAT sparsemat,
-        BOOLEAN column_wise=False
 
 #######################################
 # Read and write foreign formats

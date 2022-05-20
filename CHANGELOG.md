@@ -245,6 +245,9 @@ Some of the highlights are:
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
    _initialized_ for sake of consistency with other igraph functions.
 
+ - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now has a
+   `loops` argument that lets the user specify how loop edges should be handled.
+
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
@@ -283,9 +286,13 @@ Some of the highlights are:
  - The `maps` parameters in `igraph_get_isomorphisms_vf2()` and
    `igraph_get_subisomorphisms_vf2()` are now of type `igraph_vector_int_list_t`.
 
+ - `igraph_get_stochastic()` now has an additional `weights` argument for edge
+   weights.
+
  - `igraph_get_stochastic_sparse()` now returns the sparse adjacency matrix in
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
-   _initialized_ for sake of consistency with other igraph functions.
+   _initialized_ for sake of consistency with other igraph functions. It also
+   received an additional `weights` argument for edge weights.
 
  - `igraph_girth()` now uses an `igraph_vector_int_t` for its
    `circle` parameter.
@@ -632,8 +639,17 @@ Some of the highlights are:
  - `igraph_read_graph_pajek()` now creates a Boolean `type` attribute for bipartite graphs.
    Previously it created a numeric attribute.
 
- - `igraph_adjacency()` no longer accepts a negative number of edges in its adjacency matrix.
-   When negative entries are found, an error is generated.
+ - `igraph_adjacency()` no longer accepts a negative number of edges in its
+   adjacency matrix. When negative entries are found, an error is generated.
+
+ - `igraph_adjacency()` gained an additional `loops` argument that lets you
+   specify whether the diagonal entries should be ignored or should be interpreted
+   as raw edge counts or _twice_ the number of edges (which is common in linear
+   algebra contexts).
+
+ - The `loops` argument of `igraph_weighted_adjacency()` was converted to an
+   `igraph_loops_t` for sake of consistency with `igraph_adjacency()` and
+   `igraph_get_adjacency()`.
 
  - `igraph_st_vertex_connectivity()` now ignores edges between source and target for `IGRAPH_VCONN_NEI_IGNORE`
 
@@ -672,6 +688,7 @@ Some of the highlights are:
  - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
  - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix, with various kinds of normalizations. They replace the now-deprecated `igraph_laplacian()`. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
  - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
+ - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
 
 ### Removed
 
@@ -694,6 +711,7 @@ Some of the highlights are:
  - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
    `igraph_write_graph_gml()` skips writing NaN values. These two changes ensure consistent round-tripping.
  - Foreign format readers now present more informative error messages.
+ - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
 
 ### Fixed
 
@@ -819,11 +837,12 @@ Some of the highlights are:
  - `igraph_preference_game()` now works correctly when `fixed_size` is true and
    `type_dist` is not given; earlier versions had a bug where more than half of
    the vertices mistakenly ended up in group 0.
- - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinate bounds (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
  - Fixed a memory leak in `igraph_hrg_fit()` when using `start=1`.
  - `igraph_write_graph_dot()` now outputs NaN values unchanged.
  - `igraph_write_graph_dot()` no longer produces invalid DOT files when empty string attributes are present.
+ - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinate bounds (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
  - The initial coordinates of the Kamada-Kawai layout (`igraph_layout_kamada_kawai()` and `igraph_layout_kamada_kawai_3d()`) are chosen to be more in line with the original publication, improving the stability of the result. See isse #963. This changes the output of the function for the same graph, compared with previous versions. To obtain the same layout, initialize coordinates with `igraph_layout_circle()` (in 2D) or `igraph_layout_sphere()` (in 3D).
+ - Corrected a problem in the calculation of displacements in `igraph_layout_fruchterman_reingold()` and its 3D version. This fixes using the "grid" variant of the algorithm on disconnected graphs.
 
 ### Other
 

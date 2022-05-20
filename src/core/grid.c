@@ -193,7 +193,7 @@ igraph_real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid,
     igraph_real_t x = MATRIX(*grid->coords, e1, 0) - MATRIX(*grid->coords, e2, 0);
     igraph_real_t y = MATRIX(*grid->coords, e1, 1) - MATRIX(*grid->coords, e2, 1);
 
-    return hypot(x, y);
+    return sqrt(x*x + y*y);
 }
 
 igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid,
