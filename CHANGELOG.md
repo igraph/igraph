@@ -828,11 +828,12 @@ Some of the highlights are:
  - `igraph_preference_game()` now works correctly when `fixed_size` is true and
    `type_dist` is not given; earlier versions had a bug where more than half of
    the vertices mistakenly ended up in group 0.
- - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinate bounds (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
  - Fixed a memory leak in `igraph_hrg_fit()` when using `start=1`.
  - `igraph_write_graph_dot()` now outputs NaN values unchanged.
  - `igraph_write_graph_dot()` no longer produces invalid DOT files when empty string attributes are present.
+ - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinate bounds (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
  - The initial coordinates of the Kamada-Kawai layout (`igraph_layout_kamada_kawai()` and `igraph_layout_kamada_kawai_3d()`) are chosen to be more in line with the original publication, improving the stability of the result. See isse #963. This changes the output of the function for the same graph, compared with previous versions. To obtain the same layout, initialize coordinates with `igraph_layout_circle()` (in 2D) or `igraph_layout_sphere()` (in 3D).
+ - Corrected a problem in the calculation of displacements in `igraph_layout_fruchterman_reingold()` and its 3D version. This fixes using the "grid" variant of the algorithm on disconnected graphs.
 
 ### Other
 

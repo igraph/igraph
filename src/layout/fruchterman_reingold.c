@@ -81,9 +81,9 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                     igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
                     igraph_real_t dlen = dx * dx + dy * dy;
 
-                    if (dlen == 0) {
-                        dx = RNG_UNIF01() * 1e-9;
-                        dy = RNG_UNIF01() * 1e-9;
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy;
                     }
 
@@ -101,9 +101,9 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                     igraph_real_t dlen, rdlen;
 
                     dlen = dx * dx + dy * dy;
-                    if (dlen == 0) {
-                        dx = RNG_UNIF(0, 1e-6);
-                        dy = RNG_UNIF(0, 1e-6);
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy;
                     }
 
@@ -135,14 +135,18 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
         /* limit max displacement to temperature t and prevent from
            displacement outside frame */
         for (v = 0; v < no_nodes; v++) {
-            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = hypot(dx, dy);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
+            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+
+            if (displen > temp) {
+                dx *= temp/displen;
+                dy *= temp/displen;
+            }
+
             if (displen > 0) {
-                MATRIX(*res, v, 0) += (dx / displen) * mx;
-                MATRIX(*res, v, 1) += (dy / displen) * my;
+                MATRIX(*res, v, 0) += dx;
+                MATRIX(*res, v, 1) += dy;
             }
             if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
                 MATRIX(*res, v, 0) = VECTOR(*minx)[v];
@@ -223,6 +227,11 @@ static igraph_error_t igraph_layout_i_grid_fr(
                 igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
                 igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
                 igraph_real_t dlen = dx * dx + dy * dy;
+                while (dlen == 0) {
+                    dx = RNG_UNIF(-1e-9, 1e-9);
+                    dy = RNG_UNIF(-1e-9, 1e-9);
+                    dlen = dx * dx + dy * dy;
+                }
                 if (dlen < cellsize * cellsize) {
                     VECTOR(dispx)[v] += dx / dlen;
                     VECTOR(dispy)[v] += dy / dlen;
@@ -248,14 +257,18 @@ static igraph_error_t igraph_layout_i_grid_fr(
 
         /* update */
         for (v = 0; v < no_nodes; v++) {
-            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = hypot(dx, dy);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
+            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+
+            if (displen > temp) {
+                dx *= temp/displen;
+                dy *= temp/displen;
+            }
+
             if (displen > 0) {
-                MATRIX(*res, v, 0) += (dx / displen) * mx;
-                MATRIX(*res, v, 1) += (dy / displen) * my;
+                MATRIX(*res, v, 0) += dx;
+                MATRIX(*res, v, 1) += dy;
             }
             if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
                 MATRIX(*res, v, 0) = VECTOR(*minx)[v];
@@ -297,6 +310,11 @@ static igraph_error_t igraph_layout_i_grid_fr(
  * </para><para>
  * where \c w represents the edge weight. The equilibrium distance of two connected
  * vertices is thus <code>1/w^3</code>, assuming no other forces acting on them.
+ *
+ * </para><para>
+ * In disconnected graphs, igraph effectively inserts a weak connection of weight
+ * <code>n^(-3/2)</code> between all pairs of vertices, where \c n is the vertex count.
+ * This ensures that components are kept near each other.
  *
  * </para><para>
  * Reference:
@@ -555,10 +573,10 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
                     igraph_real_t dz = MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
                     igraph_real_t dlen = dx * dx + dy * dy + dz * dz;
 
-                    if (dlen == 0) {
-                        dx = RNG_UNIF01() * 1e-9;
-                        dy = RNG_UNIF01() * 1e-9;
-                        dz = RNG_UNIF01() * 1e-9;
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
+                        dz = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy + dz * dz;
                     }
 
@@ -579,10 +597,10 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
                     igraph_real_t dlen, rdlen;
 
                     dlen = dx * dx + dy * dy + dz * dz;
-                    if (dlen == 0) {
-                        dx = RNG_UNIF01() * 1e-9;
-                        dy = RNG_UNIF01() * 1e-9;
-                        dz = RNG_UNIF01() * 1e-9;
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
+                        dz = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy + dz * dz;
                     }
 
@@ -619,17 +637,21 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         /* limit max displacement to temperature t and prevent from
            displacement outside frame */
         for (v = 0; v < no_nodes; v++) {
-            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dz = VECTOR(dispz)[v] + RNG_UNIF01() * 1e-9;
+            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dz = VECTOR(dispz)[v] + RNG_UNIF(-1e-9, 1e-9);
             igraph_real_t displen = sqrt(dx * dx + dy * dy + dz * dz);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
-            igraph_real_t mz = fabs(dz) < temp ? dz : temp;
+
+            if (displen > temp) {
+                dx *= temp/displen;
+                dy *= temp/displen;
+                dz *= temp/displen;
+            }
+
             if (displen > 0) {
-                MATRIX(*res, v, 0) += (dx / displen) * mx;
-                MATRIX(*res, v, 1) += (dy / displen) * my;
-                MATRIX(*res, v, 2) += (dz / displen) * mz;
+                MATRIX(*res, v, 0) += dx;
+                MATRIX(*res, v, 1) += dy;
+                MATRIX(*res, v, 2) += dz;
             }
             if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
                 MATRIX(*res, v, 0) = VECTOR(*minx)[v];
