@@ -36,7 +36,7 @@ void test_input(const char *filename) {
     printf("===== %s =====\n", filename);
 
     IGRAPH_ASSERT(igraph_read_graph_gml(&graph, ifile) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(igraph_write_graph_gml(&graph, stdout, NULL, "igraph") == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_write_graph_gml(&graph, stdout, IGRAPH_WRITE_GML_DEFAULT_SW, NULL, "igraph") == IGRAPH_SUCCESS);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

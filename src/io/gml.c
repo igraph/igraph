@@ -62,7 +62,7 @@ static igraph_bool_t needs_coding(const char *str) {
 /* Encode & and " character in 'src' to &amp; and &quot;
  * '*dest' must be deallocated by the caller.
  */
-static igraph_error_t entity_encode(const char *src, char **dest) {
+static igraph_error_t entity_encode(const char *src, char **dest, igraph_bool_t only_quot) {
     igraph_integer_t destlen = 0;
     const char *s;
     char *d;
@@ -70,7 +70,10 @@ static igraph_error_t entity_encode(const char *src, char **dest) {
     for (s = src; *s != '\0'; s++, destlen++) {
         switch (*s) {
         case '&': /* &amp; */
-            destlen += 4; break;
+            if (! only_quot) {
+                destlen += 4;
+            }
+            break;
         case '"': /* &quot; */
             destlen += 5; break;
         }
@@ -80,7 +83,13 @@ static igraph_error_t entity_encode(const char *src, char **dest) {
     for (s = src, d = *dest; *s != '\0'; s++, d++) {
         switch (*s) {
         case '&':
-            strcpy(d, "&amp;"); d += 4; break;
+            if (! only_quot) {
+                strcpy(d, "&amp;");
+                d += 4;
+            } else {
+                *d = *s;
+            }
+            break;
         case '"':
             strcpy(d, "&quot;"); d += 5; break;
         default:
@@ -899,6 +908,18 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.
+ * \param options Set of <code>|</code>-combinable boolean flags for writing the GML file.
+ *        \clist
+ *          \cli 0
+ *               All options turned off.
+ *          \cli IGRAPH_WRITE_GML_DEFAULT_SW
+ *               Default options, currently equivalent to 0. May change in future versions.
+ *          \cli IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW
+ *               Do not encode any other characters than " as entities. Specifically, this
+ *               option prevents the encoding of &amp;. Useful when re-exporting a graph
+ *               that was read from a GML file in which igraph could not interpret all entities,
+ *               and thus passed them through without decoding.
+ *        \endclist
  * \param id Either <code>NULL</code> or a numeric vector with the vertex IDs.
  *        See details above.
  * \param creator An optional string to write to the stream in the creator line.
@@ -918,6 +939,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  */
 
 igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
+                                      igraph_write_gml_sw_t options,
                                       const igraph_vector_t *id, const char *creator) {
     igraph_error_t ret;
     igraph_strvector_t gnames, vnames, enames; /* attribute names */
@@ -1048,7 +1070,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 s = igraph_strvector_get(&strv, 0);
                 if (needs_coding(s)) {
                     char *d;
-                    IGRAPH_CHECK(entity_encode(s, &d));
+                    IGRAPH_CHECK(entity_encode(s, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
                     IGRAPH_FINALLY(igraph_free, d);
                     CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, d));
                     IGRAPH_FREE(d);
@@ -1127,7 +1149,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     s = igraph_strvector_get(&strv, 0);
                     if (needs_coding(s)) {
                         char *d;
-                        IGRAPH_CHECK(entity_encode(s, &d));
+                        IGRAPH_CHECK(entity_encode(s, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
                         IGRAPH_FINALLY(igraph_free, d);
                         CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, d));
                         IGRAPH_FREE(d);
@@ -1199,7 +1221,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     s = igraph_strvector_get(&strv, 0);
                     if (needs_coding(s)) {
                         char *d;
-                        IGRAPH_CHECK(entity_encode(s, &d));
+                        IGRAPH_CHECK(entity_encode(s, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
                         IGRAPH_FINALLY(igraph_free, d);
                         CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, d));
                         IGRAPH_FREE(d);

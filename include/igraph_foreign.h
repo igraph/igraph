@@ -69,6 +69,13 @@ IGRAPH_EXPORT igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instre
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                                        igraph_bool_t directed);
 
+typedef unsigned int igraph_write_gml_sw_t;
+
+enum {
+    IGRAPH_WRITE_GML_DEFAULT_SW          = 0x0, /* default settings */
+    IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW = 0x1  /* only encode " characters, nothing else */
+};
+
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                                           const char *names, const char *weights);
@@ -85,7 +92,8 @@ IGRAPH_EXPORT igraph_error_t igraph_write_graph_dimacs_flow(const igraph_t *grap
                                             igraph_integer_t source, igraph_integer_t target,
                                             const igraph_vector_t *capacity);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
-                                         const igraph_vector_t *id, const char *creator);
+                                                    igraph_write_gml_sw_t options,
+                                                    const igraph_vector_t *id, const char *creator);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE *outstream);
 IGRAPH_EXPORT igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                           const char* vertex_attr_name, const char* edge_attr_name);

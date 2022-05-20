@@ -471,6 +471,11 @@ EDGE_TYPE_SW:
     CTYPE: igraph_edge_type_sw_t
     FLAGS: BITS
 
+WRITE_GML_SW:
+    # Flag bitfield that specifies how to write GML files.
+    CTYPE: igraph_write_gml_sw_t
+    FLAGS: BITS
+
 ###############################################################################
 # Callbacks
 ###############################################################################
