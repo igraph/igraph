@@ -84,13 +84,12 @@ igraph_create:
     PARAMS: OUT GRAPH graph, VECTOR_INT edges, INTEGER n=0, BOOLEAN directed=True
 
 igraph_adjacency:
-    PARAMS: OUT GRAPH graph, MATRIX adjmatrix, ADJACENCY_MODE mode=DIRECTED
+    PARAMS: OUT GRAPH graph, MATRIX adjmatrix, ADJACENCY_MODE mode=DIRECTED, LOOPS loops=ONCE
 
 igraph_weighted_adjacency:
     PARAMS: |-
-        OUT GRAPH graph, MATRIX adjmatrix,
-        ADJACENCY_MODE mode=DIRECTED, OUT VECTOR weights,
-        BOOLEAN loops
+        OUT GRAPH graph, MATRIX adjmatrix, ADJACENCY_MODE mode=DIRECTED,
+        OUT VECTOR weights, LOOPS loops=ONCE
 
 igraph_star:
     PARAMS: OUT GRAPH graph, INTEGER n, STAR_MODE mode=OUT, INTEGER center=0
