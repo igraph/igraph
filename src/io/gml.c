@@ -923,7 +923,6 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  * \param id Either <code>NULL</code> or a numeric vector with the vertex IDs.
  *        See details above.
  * \param creator An optional string to write to the stream in the creator line.
- *        It must not contain the <code>"</code> character.
  *        If \c NULL, the igraph version with the current date and time is added.
  *        If <code>""</code>, the creator line is omitted. Otherwise, the
  *        supplied string is used verbatim.
@@ -971,9 +970,20 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     } else if (creator[0] == '\0') {
         /* creator == "", omit Creator line */
     } else {
-        CHECK(fprintf(outstream,
-                      "Creator \"%s\"\n",
-                      creator));
+        if (needs_coding(creator)) {
+            char *d;
+            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW | options));
+            IGRAPH_FINALLY(igraph_free, d);
+            CHECK(fprintf(outstream,
+                          "Creator \"%s\"\n",
+                          creator));
+            IGRAPH_FREE(d);
+            IGRAPH_FINALLY_CLEAN(1);
+        } else {
+            CHECK(fprintf(outstream,
+                          "Creator \"%s\"\n",
+                          creator));
+        }
     }
 
     /* Version line */
