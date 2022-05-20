@@ -240,12 +240,6 @@ cmake --build . --target check --config Release
           with dynamic runtime linking using the
           <literal>x64-windows-static-md</literal> triplet.
         </para>
-        <para>
-          There are some known issues with igraph when using certain external packages
-          from vcpkg. When building against OpenBLAS, this results in a few differences
-          in some unit tests, see issue
-          <ulink url="https://github.com/igraph/igraph/issues/1491">#1491</ulink>.
-        </para>
       </section>
     </section>
       <section id="igraph-Installation-msys2">
