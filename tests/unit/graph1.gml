@@ -25,11 +25,11 @@ graph [
     ]
     node [ 
         id 5
-        c [ str "foo" ]
+        c [ str "bar" ]
     ]
     edge [
         source 2 target 5
-        label "edge label"
+        label "Tom &amp; Jerry&apos;s &quot;friendship&quot;"
 # The 'sou_rce' attribute will be ignored by the GML writer as it would conflict with
 # 'source' after stripping the '_' character.
         sou_rce 1.0

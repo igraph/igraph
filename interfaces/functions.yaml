@@ -1606,7 +1606,7 @@ igraph_write_graph_dimacs_flow:
         VECTOR capacity
 
 igraph_write_graph_gml:
-    PARAMS: GRAPH graph, OUTFILE outstream, VECTOR id, CSTRING creator="igraph"
+    PARAMS: GRAPH graph, OUTFILE outstream, WRITE_GML_SW options=DEFAULT, VECTOR id, CSTRING creator=NULL
 
 igraph_write_graph_dot:
     PARAMS: GRAPH graph, OUTFILE outstream

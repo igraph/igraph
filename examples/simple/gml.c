@@ -44,7 +44,7 @@ int main() {
 
     /* Output as GML */
     printf("\n-----------------\n");
-    igraph_write_graph_gml(&graph, stdout, 0, "");
+    igraph_write_graph_gml(&graph, stdout,IGRAPH_WRITE_GML_DEFAULT_SW,  0, "");
 
     igraph_destroy(&graph);
 

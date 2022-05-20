@@ -28,7 +28,7 @@
 
 #include "core/trie.h"
 #include "graph/attributes.h"
-#include "internal/hacks.h" /* strdup */
+#include "internal/hacks.h" /* strdup, strncasecmp */
 #include "io/gml-header.h"
 
 #include <ctype.h>
@@ -39,6 +39,125 @@ int igraph_gml_yylex_init_extra(igraph_i_gml_parsedata_t *user_defined, void *sc
 void igraph_gml_yylex_destroy(void *scanner);
 int igraph_gml_yyparse(igraph_i_gml_parsedata_t *context);
 void igraph_gml_yyset_in(FILE *in_str, void *yyscanner);
+
+/* Checks if a null-terminated string needs encoding or decoding.
+ *
+ * Encoding is needed when an " or & character is present.
+ *
+ * Decoding is needed when an &xyz; style entity is present, so it's sufficient to look
+ * for & characters. " characters are never present in the raw strings returned by the
+ * GML parser, so we can use the same function to detect the need for either encoding
+ * or decoding.
+ */
+static igraph_bool_t needs_coding(const char *str) {
+    while (*str) {
+        if (*str == '&' || *str == '"') {
+            return 1;
+        }
+        str++;
+    }
+    return 0;
+}
+
+/* Encode & and " character in 'src' to &amp; and &quot;
+ * '*dest' must be deallocated by the caller.
+ */
+static igraph_error_t entity_encode(const char *src, char **dest, igraph_bool_t only_quot) {
+    igraph_integer_t destlen = 0;
+    const char *s;
+    char *d;
+
+    for (s = src; *s != '\0'; s++, destlen++) {
+        switch (*s) {
+        case '&': /* &amp; */
+            if (! only_quot) {
+                destlen += 4;
+            }
+            break;
+        case '"': /* &quot; */
+            destlen += 5; break;
+        }
+    }
+    *dest = IGRAPH_CALLOC(destlen + 1, char);
+    IGRAPH_CHECK_OOM(dest, "Not enough memory to encode string for GML export.");
+    for (s = src, d = *dest; *s != '\0'; s++, d++) {
+        switch (*s) {
+        case '&':
+            if (! only_quot) {
+                strcpy(d, "&amp;");
+                d += 4;
+            } else {
+                *d = *s;
+            }
+            break;
+        case '"':
+            strcpy(d, "&quot;"); d += 5; break;
+        default:
+            *d = *s;
+        }
+    }
+    *d = '\0';
+    return IGRAPH_SUCCESS;
+}
+
+/* Decode the five standard predefined XML entities. Unknown entities or stray & characters
+ * will be passed through unchanged. '*dest' must be deallocated by the caller.
+ * If '*warned' is false, warnings will be issued for unsupported entities and
+ * '*warned' will be set to true. This is to prevent a flood of warnings in some files.
+ */
+static igraph_error_t entity_decode(const char *src, char **dest, igraph_bool_t *warned) {
+    const char *entity_names[] = {
+        "&quot;", "&amp;", "&apos;", "&lt;", "&gt;"
+    };
+
+    const char entity_values[] = {
+        '"', '&', '\'', '<', '>'
+    };
+
+    const int entity_count = sizeof entity_values / sizeof entity_values[0];
+
+    const char *s;
+    char *d;
+    size_t len = strlen(src);
+    *dest = IGRAPH_CALLOC(len+1, char); /* at most as much storage needed as for 'src' */
+    IGRAPH_CHECK_OOM(dest, "Not enough memory to decode string during GML import.");
+
+    for (s = src, d = *dest; *s != '\0';) {
+        if (*s == '&') {
+            int i;
+            for (i=0; i < entity_count; i++) {
+                size_t entity_len = strlen(entity_names[i]);
+                if (!strncasecmp(s, entity_names[i], entity_len)) {
+                    *d++ = entity_values[i];
+                    s += entity_len;
+                    break;
+                }
+            }
+            /* None of the known entities match, report warning and pass through unchanged. */
+            if (i == entity_count) {
+                if (! *warned) {
+                    const int max_entity_name_length = 34;
+                    int j = 0;
+                    while (s[j] != '\0' && s[j] != ';' && j < max_entity_name_length) {
+                        j++;
+                    }
+                    if (s[j] == '\0' || j == max_entity_name_length) {
+                        IGRAPH_WARNING("Unterminated entity or stray & character found, will be returned verbatim.");
+                    } else {
+                        IGRAPH_WARNINGF("One or more unknown entities will be returned verbatim (%.*s).", j+1, s);
+                    }
+                    *warned = 1; /* warn only once */
+                }
+                *d++ = *s++;
+            }
+        } else {
+            *d++ = *s++;
+        }
+    }
+    *d = '\0';
+
+    return IGRAPH_SUCCESS;
+}
 
 static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     igraph_integer_t i;
@@ -275,7 +394,9 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
  * \oli Top level attributes except for <code>Version</code> and the
  *      first <code>graph</code> attribute are completely ignored.
  * \oli There is no maximum line length or maximum keyword length.
- * \oli Character entities in strings are not interpreted.
+ * \oli Only the \c quot, \c amp, \c apos, \c lt and \c gt character entities
+ *      are supported. Any other entity is passed through unchanged by the reader
+ *      after issuing a warning, and is expected to be decoded by the user.
  * \oli We allow <code>inf</code>, <code>-inf</code> and <code>nan</code>
  *      (not a number) as a real number. This is case insensitive, so
  *      <code>nan</code>, <code>NaN</code> and <code>NAN</code> are equivalent.
@@ -315,6 +436,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_vector_ptr_t *attrs[3];
     igraph_integer_t edgeptr = 0;
     igraph_i_gml_parsedata_t context;
+    igraph_bool_t entity_warned = 0; /* used to warn at most once about unsupported entities */
 
     attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
 
@@ -578,7 +700,16 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                     igraph_strvector_t *v = (igraph_strvector_t *) atrec->value;
                     const char *value = igraph_i_gml_tostring(node, j);
-                    IGRAPH_CHECK(igraph_strvector_set(v, trie_id, value));
+                    if (needs_coding(value)) {
+                        char *value_decoded;
+                        IGRAPH_CHECK(entity_decode(value, &value_decoded, &entity_warned));
+                        IGRAPH_FINALLY(igraph_free, value_decoded);
+                        IGRAPH_CHECK(igraph_strvector_set(v, trie_id, value_decoded));
+                        IGRAPH_FREE(value_decoded);
+                        IGRAPH_FINALLY_CLEAN(1);
+                    } else {
+                        IGRAPH_CHECK(igraph_strvector_set(v, trie_id, value));
+                    }
                 } else {
                     /* Ignored composite attribute */
                 }
@@ -607,7 +738,16 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                     } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                         igraph_strvector_t *v = (igraph_strvector_t *) atrec->value;
                         const char *value = igraph_i_gml_tostring(edge, j);
-                        IGRAPH_CHECK(igraph_strvector_set(v, edgeid, value));
+                        if (needs_coding(value)) {
+                            char *value_decoded;
+                            IGRAPH_CHECK(entity_decode(value, &value_decoded, &entity_warned));
+                            IGRAPH_FINALLY(igraph_free, value_decoded);
+                            IGRAPH_CHECK(igraph_strvector_set(v, edgeid, value_decoded));
+                            IGRAPH_FREE(value_decoded);
+                            IGRAPH_FINALLY_CLEAN(1);
+                        } else {
+                            IGRAPH_CHECK(igraph_strvector_set(v, edgeid, value));
+                        }
                     } else {
                         /* Ignored composite attribute */
                     }
@@ -643,7 +783,16 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *v = (igraph_strvector_t *) atrec->value;
                 const char *value = igraph_i_gml_tostring(gtree, i);
-                IGRAPH_CHECK(igraph_strvector_set(v, 0, value));
+                if (needs_coding(value)) {
+                    char *value_decoded;
+                    IGRAPH_CHECK(entity_decode(value, &value_decoded, &entity_warned));
+                    IGRAPH_FINALLY(igraph_free, value_decoded);
+                    IGRAPH_CHECK(igraph_strvector_set(v, 0, value_decoded));
+                    IGRAPH_FREE(value_decoded);
+                    IGRAPH_FINALLY_CLEAN(1);
+                } else {
+                    IGRAPH_CHECK(igraph_strvector_set(v, 0, value));
+                }
             } else {
                 /* Ignored composite attribute */
             }
@@ -759,6 +908,18 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.
+ * \param options Set of <code>|</code>-combinable boolean flags for writing the GML file.
+ *        \clist
+ *          \cli 0
+ *               All options turned off.
+ *          \cli IGRAPH_WRITE_GML_DEFAULT_SW
+ *               Default options, currently equivalent to 0. May change in future versions.
+ *          \cli IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW
+ *               Do not encode any other characters than " as entities. Specifically, this
+ *               option prevents the encoding of &amp;. Useful when re-exporting a graph
+ *               that was read from a GML file in which igraph could not interpret all entities,
+ *               and thus passed them through without decoding.
+ *        \endclist
  * \param id Either <code>NULL</code> or a numeric vector with the vertex IDs.
  *        See details above.
  * \param creator An optional string to write to the stream in the creator line.
@@ -777,6 +938,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
  */
 
 igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
+                                      igraph_write_gml_sw_t options,
                                       const igraph_vector_t *id, const char *creator) {
     igraph_error_t ret;
     igraph_strvector_t gnames, vnames, enames; /* attribute names */
@@ -808,9 +970,20 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     } else if (creator[0] == '\0') {
         /* creator == "", omit Creator line */
     } else {
-        CHECK(fprintf(outstream,
-                      "Creator \"%s\"\n",
-                      creator));
+        if (needs_coding(creator)) {
+            char *d;
+            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW | options));
+            IGRAPH_FINALLY(igraph_free, d);
+            CHECK(fprintf(outstream,
+                          "Creator \"%s\"\n",
+                          creator));
+            IGRAPH_FREE(d);
+            IGRAPH_FINALLY_CLEAN(1);
+        } else {
+            CHECK(fprintf(outstream,
+                          "Creator \"%s\"\n",
+                          creator));
+        }
     }
 
     /* Version line */
@@ -905,7 +1078,16 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 const char *s;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
                 s = igraph_strvector_get(&strv, 0);
-                CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
+                if (needs_coding(s)) {
+                    char *d;
+                    IGRAPH_CHECK(entity_encode(s, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
+                    IGRAPH_FINALLY(igraph_free, d);
+                    CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, d));
+                    IGRAPH_FREE(d);
+                    IGRAPH_FINALLY_CLEAN(1);
+                } else {
+                    CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
+                }
             } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
                 CHECK(fprintf(outstream, "  %s %d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
@@ -975,7 +1157,16 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
                                  igraph_vss_1(i), &strv));
                     s = igraph_strvector_get(&strv, 0);
-                    CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+                    if (needs_coding(s)) {
+                        char *d;
+                        IGRAPH_CHECK(entity_encode(s, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
+                        IGRAPH_FINALLY(igraph_free, d);
+                        CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, d));
+                        IGRAPH_FREE(d);
+                        IGRAPH_FINALLY_CLEAN(1);
+                    } else {
+                        CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+                    }
                 } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name,
                                  igraph_vss_1(i), &boolv));
@@ -1038,7 +1229,16 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                                  igraph_ess_1(i), &strv));
                     s = igraph_strvector_get(&strv, 0);
-                    CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+                    if (needs_coding(s)) {
+                        char *d;
+                        IGRAPH_CHECK(entity_encode(s, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
+                        IGRAPH_FINALLY(igraph_free, d);
+                        CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, d));
+                        IGRAPH_FREE(d);
+                        IGRAPH_FINALLY_CLEAN(1);
+                    } else {
+                        CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+                    }
                 } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph, name,
                                  igraph_ess_1(i), &boolv));

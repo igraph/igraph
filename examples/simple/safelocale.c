@@ -35,7 +35,7 @@ int main() {
         fprintf(stderr, "Reading %s failed.\n", filename);
         abort();
     }
-    igraph_write_graph_gml(&graph, stdout, NULL, "");
+    igraph_write_graph_gml(&graph, stdout, IGRAPH_WRITE_GML_DEFAULT_SW, NULL, "");
     igraph_exit_safelocale(&loc);
 
     igraph_destroy(&graph);

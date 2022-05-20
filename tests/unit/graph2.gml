@@ -6,6 +6,6 @@
 Version 3
 graph [
     directed 2
-    node [ ] node  [ ] node [ Foo "bar" ]
+    node [ ] node  [ ] node [ Foo "bar & baz" ]
     composite [ a 1 ]
 ]
