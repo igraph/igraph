@@ -219,6 +219,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_square_lattice
   igraph_static_power_law_game
+  igraph_weighted_adjacency
   igraph_wheel
   kary_tree
   symmetric_tree

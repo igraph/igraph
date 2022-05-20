@@ -639,8 +639,17 @@ Some of the highlights are:
  - `igraph_read_graph_pajek()` now creates a Boolean `type` attribute for bipartite graphs.
    Previously it created a numeric attribute.
 
- - `igraph_adjacency()` no longer accepts a negative number of edges in its adjacency matrix.
-   When negative entries are found, an error is generated.
+ - `igraph_adjacency()` no longer accepts a negative number of edges in its
+   adjacency matrix. When negative entries are found, an error is generated.
+
+ - `igraph_adjacency()` gained an additional `loops` argument that lets you
+   specify whether the diagonal entries should be ignored or should be interpreted
+   as raw edge counts or _twice_ the number of edges (which is common in linear
+   algebra contexts).
+
+ - The `loops` argument of `igraph_weighted_adjacency()` was converted to an
+   `igraph_loops_t` for sake of consistency with `igraph_adjacency()` and
+   `igraph_get_adjacency()`.
 
  - `igraph_st_vertex_connectivity()` now ignores edges between source and target for `IGRAPH_VCONN_NEI_IGNORE`
 

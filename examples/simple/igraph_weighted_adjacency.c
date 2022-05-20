@@ -37,7 +37,6 @@ void print(igraph_t *g) {
         printf("%" IGRAPH_PRId " --%c %" IGRAPH_PRId ": %" IGRAPH_PRId "\n",
                VECTOR(el)[j], ch, VECTOR(el)[j + 1], (igraph_integer_t)EAN(g, "weight", i));
     }
-    printf("\n");
 
     igraph_vector_int_destroy(&el);
 }
@@ -45,68 +44,27 @@ void print(igraph_t *g) {
 int main() {
     igraph_t g;
     igraph_matrix_t mat;
-    int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 1, 0 }, { 0, 1, 0, 0 } };
-    igraph_integer_t i, j;
+    igraph_real_t m[4][4] = {
+       { 0, 2, 0, 0 },
+       { 1, 0, 0, 1 },
+       { 2, 0, 1, 0 },
+       { 0, 1, 0, 0 }
+    };
 
-    igraph_matrix_init(&mat, 4, 4);
-    for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) {
-            MATRIX(mat, i, j) = m[i][j];
-        }
+    /* Set up an attribute handler */
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    /* [ 0 1 2 0 ]
-       [ 2 0 0 1 ]
-       [ 0 0 1 0 ]
-       [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, 0, /*loops=*/ 1);
+    /* Create a matrix view of the 'm' array. Note that C uses column-major
+     * ordering, therefore m[0] is the first column, m[1] is the second etc */
+    igraph_matrix_view(&mat, m[0], 4, 4);
+
+    /* Create a graph from the weighted adjacency matrix */
+    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, 0, IGRAPH_LOOPS_ONCE);
+
+    /* Print and destroy the graph. The matrix view does not need to be
+     * destroyed */
     print(&g);
     igraph_destroy(&g);
-
-    /* [ 0 1 2 0 ]
-       [ - 0 0 1 ]
-       [ - - 1 0 ]
-       [ - - - 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_UPPER, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
-
-    /* [ 0 - - - ]
-       [ 2 0 - - ]
-       [ 0 0 1 - ]
-       [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_LOWER, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
-
-    /* [ 0 1 0 0 ]
-       [ 1 0 0 1 ]
-       [ 0 0 1 0 ]
-       [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MIN, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
-
-    /* [ 0 2 2 0 ]
-       [ 2 0 0 1 ]
-       [ 2 0 1 0 ]
-       [ 0 1 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_MAX, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
-
-    /* [ 0 3 2 0 ]
-       [ 3 0 0 2 ]
-       [ 2 0 1 0 ]
-       [ 0 2 0 0 ] */
-    igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_PLUS, 0, /*loops=*/ 1);
-    print(&g);
-    igraph_destroy(&g);
-
-    igraph_matrix_destroy(&mat);
-
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 1;
-    }
 
     return 0;
 }

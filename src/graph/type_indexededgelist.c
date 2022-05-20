@@ -231,7 +231,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         IGRAPH_ERROR("Invalid (odd) length of edges vector.", IGRAPH_EINVEVECTOR);
     }
     if (!igraph_vector_int_isininterval(edges, 0, igraph_vcount(graph) - 1)) {
-        IGRAPH_ERROR("Out-of-range edge IDs when adding edges.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Out-of-range vertex IDs when adding edges.", IGRAPH_EINVVID);
     }
 
     /* from & to */
