@@ -688,7 +688,9 @@ Some of the highlights are:
  - `igraph_blas_dgemm()` to multiply two matrices.
  - `igraph_wheel()` to create a wheel graph (#1938, thanks to @kwofach).
  - `igraph_stack_capacity()` to query the capacity of a stack.
- - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floats with an epsilon margin.
+ - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floating point numbers with a relative tolerance.
+ - `igraph_complex_almost_equals()` to compare complex numbers with a relative tolerance.
+ - `igraph_vector_all_almost_e()`, `igraph_vector_complex_all_almost_e()`, `igraph_matrix_all_almost_e()`, `igraph_matrix_complex_all_almost_e()` for elementwise comparisons of floating point vector and matrices with a relative tolerance.
  - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
  - `igraph_fundamental_cycles()` computes a fundamental cycle basis (experimental).
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
@@ -741,6 +743,8 @@ Some of the highlights are:
 
 ### Deprecated
 
+ - `igraph_complex_eq_tol()` is now deprecated in favour of `igraph_complex_almost_equals()`.
+
  - `igraph_clusters()` has been renamed to `igraph_connected_components()`; the
    old name is deprecated and will be removed in 0.11.
 
@@ -762,6 +766,8 @@ Some of the highlights are:
  - `igraph_laplacian()` is now deprecated; use `igraph_get_laplacian()` or
    `igraph_get_laplacian_sparse()` depending on whether you need a dense or a
    sparse matrix.
+
+ - `igraph_matrix_all_e_tol()` is now deprecated in favour of `igraph_matrix_all_almost_e()`.
 
  - `igraph_matrix_copy()` is now deprecated; use `igraph_matrix_init_copy()`
    instead. The new name emphasizes that the function _initializes_ the first
@@ -809,6 +815,8 @@ Some of the highlights are:
  - `igraph_vector_e()` and `igraph_vector_e_ptr()` have been renamed to
    `igraph_vector_get()` and `igraph_vector_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
+
+ - `igraph_vector_e_tol()` is now deprecated in favour of `igraph_vector_all_almost_e()`.
 
  - `igraph_vector_copy()` is now deprecated; use `igraph_vector_init_copy()`
    instead. The new name emphasizes that the function _initializes_ the first
