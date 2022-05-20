@@ -47,7 +47,7 @@ IGRAPH_EXPORT igraph_error_t igraph_adjacency(
 );
 IGRAPH_EXPORT igraph_error_t igraph_weighted_adjacency(
    igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
-   const char* attr, igraph_loops_t loops
+   igraph_vector_t* weights, igraph_loops_t loops
 );
 IGRAPH_EXPORT igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
                               igraph_integer_t center);

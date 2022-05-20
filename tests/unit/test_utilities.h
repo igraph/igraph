@@ -53,8 +53,12 @@ void print_adjlist(const igraph_adjlist_t *adjlist);
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph);
 
-/* Print a graph with edge weights. Use brackets to make it obvious when the
- * edge list is empty. */
+/* Print a graph with edge weights from a vector. Use brackets to make it
+ * obvious when the edge list is empty. */
+void print_weighted_graph(const igraph_t *graph, const igraph_vector_t* weights);
+
+/* Print a graph with edge weights from an edge attribute. Use brackets to make
+ * it obvious when the edge list is empty. */
 void print_weighted_graph_attr(const igraph_t *graph, const char* attr);
 
 /* Print an incidence list. Use brackets around each vector and also use

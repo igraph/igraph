@@ -647,6 +647,12 @@ Some of the highlights are:
    as raw edge counts or _twice_ the number of edges (which is common in linear
    algebra contexts).
 
+ - `igraph_weighted_adjacency()` now returns the weights in a separate vector
+   instead of storing it in a vertex attribute. The reason is twofold: first,
+   the previous solution worked only with the C attribute handler (not the ones
+   from the higher-level interfaces), and second, it wasn't consistent with
+   other igraph functions that use weights provided as separate arguments.
+
  - The `loops` argument of `igraph_weighted_adjacency()` was converted to an
    `igraph_loops_t` for sake of consistency with `igraph_adjacency()` and
    `igraph_get_adjacency()`.

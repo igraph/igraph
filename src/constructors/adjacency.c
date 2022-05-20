@@ -387,9 +387,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
         igraph_loops_t loops
 );
 
-static void igraph_i_adjust_loop_edge_weight(
-    igraph_real_t* weight, igraph_loops_t loops
-) {
+static void igraph_i_adjust_loop_edge_weight(igraph_real_t* weight, igraph_loops_t loops) {
     /* The compiler should be smart enough to figure out that this can be
      * inlined */
     switch (loops) {
@@ -675,8 +673,7 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *          only the lower left triangle (including the diagonal) is
  *          used for the edge weights.
  *       \endclist
- * \param attr the name of the attribute that will store the edge weights.
- *         If \c NULL , it will use \c weight as the attribute name.
+ * \param weights Pointer to an initialized vector, the weights will be stored here.
  * \param loops Constant to specify how the diagonal of the matrix should be
  *        treated when creating loop edges.
  *        \clist
@@ -699,14 +696,10 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  */
 igraph_error_t igraph_weighted_adjacency(
     igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
-    const char* attr, igraph_loops_t loops
+    igraph_vector_t *weights, igraph_loops_t loops
 ) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_vector_t weights = IGRAPH_VECTOR_NULL;
-    const char* default_attr = "weight";
-    igraph_vector_ptr_t attr_vec;
-    igraph_attribute_record_t attr_rec;
     igraph_integer_t no_of_nodes;
 
     /* Some checks */
@@ -715,59 +708,50 @@ igraph_error_t igraph_weighted_adjacency(
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&weights, 0);
-    IGRAPH_VECTOR_PTR_INIT_FINALLY(&attr_vec, 1);
+    igraph_vector_clear(weights);
 
     /* Collect the edges */
     no_of_nodes = igraph_matrix_nrow(adjmatrix);
     switch (mode) {
     case IGRAPH_ADJ_DIRECTED:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_directed(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_MAX:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_max(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_UPPER:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_upper(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_LOWER:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_lower(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_MIN:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_min(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_PLUS:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_plus(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     default:
         IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
 
-    /* Prepare attribute record */
-    attr_rec.name = attr ? attr : default_attr;
-    attr_rec.type = IGRAPH_ATTRIBUTE_NUMERIC;
-    attr_rec.value = &weights;
-    VECTOR(attr_vec)[0] = &attr_rec;
-
     /* Create graph */
     IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
     IGRAPH_FINALLY(igraph_destroy, graph);
     if (igraph_vector_int_size(&edges) > 0) {
-        IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
+        IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
     }
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Cleanup */
     igraph_vector_int_destroy(&edges);
-    igraph_vector_destroy(&weights);
-    igraph_vector_ptr_destroy(&attr_vec);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
