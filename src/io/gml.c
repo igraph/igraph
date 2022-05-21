@@ -810,7 +810,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_destroy(&eattrnames);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_CHECK(igraph_empty_attrs(graph, 0, directed, &gattrs)); /* TODO https://github.com/igraph/igraph/issues/174 */
+    IGRAPH_CHECK(igraph_empty_attrs(graph, 0, directed, &gattrs));
     IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, &vattrs));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
@@ -851,6 +851,35 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
         }
     }
     (*key)[newlen] = '\0';
+
+    return IGRAPH_SUCCESS;
+}
+
+/* Checks if a vector is free of duplicates. Since NaN == NaN is false, duplicate NaN values
+ * will not be detected. */
+igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v, igraph_bool_t *res) {
+    igraph_vector_t u;
+    igraph_integer_t n = igraph_vector_size(v);
+
+    if (n < 2) {
+        *res = 1;
+        return IGRAPH_SUCCESS;
+    }
+
+    IGRAPH_CHECK(igraph_vector_init_copy(&u, v));
+    IGRAPH_FINALLY(igraph_vector_destroy, &u);
+    igraph_vector_sort(&u);
+
+    *res = 1;
+    for (igraph_integer_t i=1; i < n; i++) {
+        if (VECTOR(u)[i-1] == VECTOR(u)[i]) {
+            *res = 0;
+            break;
+        }
+    }
+
+    igraph_vector_destroy(&u);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -1030,10 +1059,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* Scan id vector for invalid values. If any are found, all ids are ignored.
      * Invalid values may occur as a result of reading a GML file in which some
-     * nodes did not have an id. In this case, the "id" attribute created by
-     * igraph will contain a NaN value.
-     *
-     * TODO: Check that ids are unique?
+     * nodes did not have an id, or by adding new vertices to a graph with an "id"
+     * attribute. In this case, the "id" attribute will contain NaN values.
      */
     if (myid) {
         if (igraph_vector_size(myid) != no_of_nodes) {
@@ -1046,6 +1073,15 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                 myid = NULL;
                 break;
             }
+        }
+    }
+
+    if (myid) {
+        igraph_bool_t duplicate_free;
+        IGRAPH_CHECK(igraph_i_vector_is_duplicate_free(myid, &duplicate_free));
+        if (! duplicate_free) {
+            IGRAPH_WARNING("Duplicate id values found, ignoring supplies ids.");
+            myid = NULL;
         }
     }
 
