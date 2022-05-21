@@ -74,7 +74,7 @@ int main() {
 
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;
-    igraph_vector_int_t pred, inbound;
+    igraph_vector_int_t parents, inbound;
     igraph_integer_t i;
     igraph_vs_t vs;
 
@@ -82,12 +82,12 @@ int main() {
 
     igraph_vector_int_list_init(&vecs, 0);
     igraph_vector_int_list_init(&evecs, 0);
-    igraph_vector_int_init(&pred, 0);
+    igraph_vector_int_init(&parents, 0);
     igraph_vector_int_init(&inbound, 0);
 
     igraph_vs_vector_small(&vs, 1, 3, 5, 2, 1,  -1);
 
-    igraph_get_shortest_paths(&g, &vecs, &evecs, 0, vs, IGRAPH_OUT, &pred, &inbound);
+    igraph_get_shortest_paths(&g, &vecs, &evecs, 0, vs, IGRAPH_OUT, &parents, &inbound);
 
     check_evecs(&g, &vecs, &evecs, 10);
 
@@ -95,12 +95,12 @@ int main() {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&vecs, i));
     }
 
-    igraph_vector_int_print(&pred);
+    igraph_vector_int_print(&parents);
     igraph_vector_int_print(&inbound);
 
     igraph_vector_int_list_destroy(&vecs);
     igraph_vector_int_list_destroy(&evecs);
-    igraph_vector_int_destroy(&pred);
+    igraph_vector_int_destroy(&parents);
     igraph_vector_int_destroy(&inbound);
 
     igraph_vs_destroy(&vs);
