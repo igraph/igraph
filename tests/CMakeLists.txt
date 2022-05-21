@@ -478,6 +478,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  all_almost_e
   igraph_almost_equals
   igraph_power_law_fit
   overflow
