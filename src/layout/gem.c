@@ -101,15 +101,15 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
                 IGRAPH_EINVAL, igraph_matrix_ncol(res));
     }
     if (temp_max <= 0) {
-        IGRAPH_ERRORF("Maximum temperature should be positive in GEM layout, got %f.",
+        IGRAPH_ERRORF("Maximum temperature should be positive in GEM layout, got %g.",
                 IGRAPH_EINVAL, temp_max);
     }
     if (temp_min <= 0) {
-        IGRAPH_ERRORF("Minimum temperature should be positive in GEM layout, got %f.",
+        IGRAPH_ERRORF("Minimum temperature should be positive in GEM layout, got %g.",
                 IGRAPH_EINVAL, temp_min);
     }
     if (temp_init <= 0) {
-        IGRAPH_ERRORF("Initial temperature should be positive in GEM layout, got %f.",
+        IGRAPH_ERRORF("Initial temperature should be positive in GEM layout, got %g.",
                 IGRAPH_EINVAL, temp_init);
     }
     if (temp_max < temp_init || temp_init < temp_min) {
