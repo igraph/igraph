@@ -857,7 +857,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
 
 /* Checks if a vector is free of duplicates. Since NaN == NaN is false, duplicate NaN values
  * will not be detected. */
-igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v, igraph_bool_t *res) {
+static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v, igraph_bool_t *res) {
     igraph_vector_t u;
     igraph_integer_t n = igraph_vector_size(v);
 
