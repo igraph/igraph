@@ -20,11 +20,29 @@
 
 void print_destroy(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops) {
     igraph_t g;
+    igraph_t g_sparse;
+    igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
+    igraph_bool_t same;
 
     igraph_adjacency(&g, adjmatrix, mode, loops);
+
+    igraph_matrix_as_sparsemat(&sparse_adjmatrix, adjmatrix, 0.0001);
+    igraph_sparsemat_compress(&sparse_adjmatrix, &sparse_adjmatrix_comp);
+    igraph_sparse_adjacency(&g_sparse, &sparse_adjmatrix_comp, mode, loops);
     print_graph_canon(&g);
+
+    igraph_is_same_graph(&g, &g_sparse, &same);
+    if (!same) {
+        printf("Sparse graph differs from non-sparse:\n");
+        print_graph_canon(&g_sparse);
+        exit(1);
+    }
+
     igraph_matrix_destroy(adjmatrix);
+    igraph_sparsemat_destroy(&sparse_adjmatrix);
+    igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
     igraph_destroy(&g);
+    igraph_destroy(&g_sparse);
 }
 
 int main() {
