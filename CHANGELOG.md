@@ -670,8 +670,8 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` takes an additional bitfield parameter controlling some aspects of writing
    the GML file.
 
- - The vector of parents in `igraph_get_shortest_paths()` now uses
-   -1 to represent the starting vertex, and -2 for unreachable vertices.
+ - The vector of parents in `igraph_get_shortest_paths()` and `igraph_get_shortest_paths_dijkstra()` now
+   use -1 to represent the starting vertex, and -2 for unreachable vertices.
 
 ### Added
 

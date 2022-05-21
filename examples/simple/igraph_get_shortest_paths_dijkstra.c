@@ -79,16 +79,18 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
         exit(error_code);
     }
 
-    if (VECTOR(*pred)[start] != start || VECTOR(*inbound)[start] != -1) {
+    if (VECTOR(*pred)[start] != -1 || VECTOR(*inbound)[start] != -1) {
+        printf("%lld\n", VECTOR(*pred)[start]);
+        printf("%lld\n", VECTOR(*inbound)[start]);
         exit(error_code + 1);
     }
 
     for (i = 0; i < n; i++) {
-        if (VECTOR(*pred)[i] == -1) {
+        if (VECTOR(*pred)[i] == -2) {
             if (VECTOR(*inbound)[i] != -1) {
                 exit(error_code + 2);
             }
-        } else if (VECTOR(*pred)[i] == i) {
+        } else if (VECTOR(*pred)[i] == -1) {
             if (i != start) {
                 exit(error_code + 3);
             }
