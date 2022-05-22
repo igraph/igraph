@@ -271,9 +271,25 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
         myD1 = VECTOR(D1)[m];
         myD2 = VECTOR(D2)[m];
 
-        /* Need to solve some linear equations */
-        delta_y = (B * myD1 - myD2 * A) / (C * A - B * B);
-        delta_x = - (myD1 + B * delta_y) / A;
+        /* Need to solve the linear equations:
+         *
+         * A * delta_x + B * delta_y == myD1
+         * B * delta_x + C * delta_y == myD2
+         *
+         * We catch the equilibrium case (energy derivatives myD1 == myD2 == 0)
+         * and skip solving the equations using the general formula. When there
+         * are two vertices and equilibrium has been reached already, the determinant
+         * will be zero for some spring orientations, causing the general formula to
+         * fail.
+         */
+        if (fabs(myD1) < 1e-14 && fabs(myD2) < 1e-14) {
+            delta_x = 0;
+            delta_y = 0;
+        } else {
+            igraph_real_t det = C * A - B * B;
+            delta_y = (B * myD1 - A * myD2) / det;
+            delta_x = (B * myD2 - C * myD1) / det;
+        }
 
         new_x = old_x + delta_x;
         new_y = old_y + delta_y;
