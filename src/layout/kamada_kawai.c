@@ -30,6 +30,9 @@
 #include "core/interruption.h"
 #include "layout/layout_internal.h"
 
+/* Energy gradient values below this threshold are considered to be zero. */
+#define KK_EPS 1e-13
+
 /**
  * \ingroup layout
  * \function igraph_layout_kamada_kawai
@@ -271,18 +274,18 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
         myD1 = VECTOR(D1)[m];
         myD2 = VECTOR(D2)[m];
 
-        /* Need to solve the linear equations:
+        /* We need to solve the following linear equations, corresponding to
+         * eqs. (11) and (12) in the paper.
          *
          * A * delta_x + B * delta_y == myD1
          * B * delta_x + C * delta_y == myD2
          *
-         * We catch the equilibrium case (energy derivatives myD1 == myD2 == 0)
-         * and skip solving the equations using the general formula. When there
-         * are two vertices and equilibrium has been reached already, the determinant
-         * will be zero for some spring orientations, causing the general formula to
-         * fail.
+         * We special-case the equilibrium case, i.e. when the energy gradient
+         * is zero and no displacement is necessary. This is important for the
+         * case of path graphs, where the determinant of the LHS will be
+         * zero in equilibrium, causing numerical problems.
          */
-        if (fabs(myD1) < 1e-14 && fabs(myD2) < 1e-14) {
+        if (myD1*myD1 + myD2*myD2 < KK_EPS*KK_EPS) {
             delta_x = 0;
             delta_y = 0;
         } else {
@@ -550,7 +553,6 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t Axx = 0.0, Axy = 0.0, Axz = 0.0, Ayy = 0.0, Ayz = 0.0, Azz = 0.0;
         igraph_real_t max_delta, delta_x, delta_y, delta_z;
         igraph_real_t old_x, old_y, old_z, new_x, new_y, new_z;
-        igraph_real_t detnum;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -599,16 +601,15 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
         /* Need to solve some linear equations, we just use Cramer's rule */
 #define DET(a,b,c,d,e,f,g,h,i) ((a*e*i+b*f*g+c*d*h)-(c*e*g+b*d*i+a*f*h))
 
-        detnum  = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Axz, Ayz, Azz);
-        if (detnum != 0) {
+        /* See comments in 2D version for the reason for this check */
+        if (Ax*Ax + Ay*Ay + Az*Az < KK_EPS*KK_EPS) {
+            delta_x = delta_y = delta_z = 0;
+        } else {
+            igraph_real_t detnum;
+            detnum  = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Axz, Ayz, Azz);
             delta_x = DET(Ax, Ay, Az, Axy, Ayy, Ayz, Axz, Ayz, Azz) / detnum;
             delta_y = DET(Axx, Axy, Axz, Ax, Ay, Az, Axz, Ayz, Azz) / detnum;
             delta_z = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Ax, Ay, Az ) / detnum;
-        } else {
-            /* No new stable position for node m; this can happen in rare
-             * cases, e.g., if the graph has two nodes only. It's best to leave
-             * the node where it is. */
-            delta_x = delta_y = delta_z = 0;
         }
 
         new_x = old_x + delta_x;
