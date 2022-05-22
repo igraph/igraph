@@ -92,19 +92,19 @@ int main() {
     }
     printf("\n3x3 matrix, IGRAPH_ADJ_UNDIRECTED, no loops:\n");
     {
-        int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
+        int e[] = {4, 2, 0, 2, 0, 4, 0, 4, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_NO_LOOPS);
     }
     printf("\n3x3 matrix, IGRAPH_ADJ_UNDIRECTED, loops once:\n");
     {
-        int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
+        int e[] = {4, 2, 0, 2, 0, 4, 0, 4, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_ONCE);
     }
     printf("\n3x3 matrix, IGRAPH_ADJ_UNDIRECTED, loops twice:\n");
     {
-        int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
+        int e[] = {4, 2, 0, 2, 0, 4, 0, 4, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_TWICE);
     }
@@ -227,6 +227,13 @@ int main() {
         int e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         CHECK_ERROR(igraph_adjacency(&g, &adjmatrix, 42, IGRAPH_LOOPS_TWICE), IGRAPH_EINVAL);
+        igraph_matrix_destroy(&adjmatrix);
+    }
+    printf("\nCheck handling of non-symmetric matrix for IGRAPH_ADJ_UNDIRECTED.\n");
+    {
+        int e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
+        matrix_init_int_row_major(&adjmatrix, 3, 3, e);
+        CHECK_ERROR(igraph_adjacency(&g, &adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_ONCE), IGRAPH_EINVAL);
         igraph_matrix_destroy(&adjmatrix);
     }
 

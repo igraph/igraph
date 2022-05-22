@@ -60,7 +60,7 @@ typedef enum { IGRAPH_RECIPROCITY_DEFAULT = 0,
              } igraph_reciprocity_t;
 
 typedef enum { IGRAPH_ADJ_DIRECTED = 0,
-               IGRAPH_ADJ_UNDIRECTED = 1, IGRAPH_ADJ_MAX = 1,
+               IGRAPH_ADJ_UNDIRECTED, IGRAPH_ADJ_MAX,
                IGRAPH_ADJ_UPPER, IGRAPH_ADJ_LOWER, IGRAPH_ADJ_MIN,
                IGRAPH_ADJ_PLUS
              } igraph_adjacency_t;

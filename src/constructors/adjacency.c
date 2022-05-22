@@ -38,6 +38,10 @@ static igraph_error_t igraph_i_adjacency_max(
     const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 );
+static igraph_error_t igraph_i_adjacency_undirected(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+);
 static igraph_error_t igraph_i_adjacency_upper(
     const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
@@ -132,6 +136,17 @@ static igraph_error_t igraph_i_adjacency_max(
     }
 
     return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_adjacency_undirected(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
+    if (!igraph_matrix_is_symmetric(adjmatrix)) {
+        IGRAPH_ERROR("Adjacency matrix should be symmetric for IGRAPH_ADJ_UNDIRECTED.",
+                IGRAPH_EINVAL);
+    }
+    return igraph_i_adjacency_max(adjmatrix, edges, loops);
 }
 
 static igraph_error_t igraph_i_adjacency_upper(
@@ -260,9 +275,304 @@ static igraph_error_t igraph_i_sparse_adjacency_directed(
                 }
             }
             for (igraph_integer_t count = 0; count < multi; count++) {
-                //edge directions are reverse of igraph_sparsemat()
+                //TODO edge directions are reverse of igraph_sparsemat(), why?
                 VECTOR(*edges)[e++] = (*i);
                 VECTOR(*edges)[e++] = from;
+            }
+            to++;
+            i++;
+            entry++;
+        }
+        from++;
+        p++;
+    }
+    igraph_vector_int_resize(edges, e);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_sparse_adjacency_max(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
+    CS_INT *p = adjmatrix->cs->p;
+    CS_INT *i = adjmatrix->cs->i;
+    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
+    CS_ENTRY *entry = adjmatrix->cs->x;
+
+    while (*p < no_of_edges) {
+        while (to < * (p + 1)) {
+            if (from >= *i) {
+                igraph_real_t other;
+                igraph_vector_int_t x, y;
+                igraph_vector_int_view(&x, &from, 1);
+                igraph_vector_int_view(&y, i, 1);
+                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+                igraph_integer_t multi = *entry > other ? *entry : other;
+                if (from == *i) {
+                    if (loops == IGRAPH_NO_LOOPS) {
+                        multi = 0;
+                    }
+                    if (loops == IGRAPH_LOOPS_TWICE) {
+                        if ((igraph_integer_t)*entry % 2) {
+                            IGRAPH_ERROR("Odd diagonal entry found while IGRAPH_LOOPS_TWICE.",
+                                    IGRAPH_EINVAL);
+                        }
+                        multi /= 2;
+                    }
+                }
+                for (igraph_integer_t count = 0; count < multi; count++) {
+                    //edge directions are reverse of igraph_sparsemat()
+                    VECTOR(*edges)[e++] = (*i);
+                    VECTOR(*edges)[e++] = from;
+                }
+            }
+            to++;
+            i++;
+            entry++;
+        }
+        from++;
+        p++;
+    }
+    igraph_vector_int_resize(edges, e);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_sparse_adjacency_min(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
+    CS_INT *p = adjmatrix->cs->p;
+    CS_INT *i = adjmatrix->cs->i;
+    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
+    CS_ENTRY *entry = adjmatrix->cs->x;
+
+    while (*p < no_of_edges) {
+        while (to < * (p + 1)) {
+            if (from >= *i) {
+                igraph_real_t other;
+                igraph_vector_int_t x, y;
+                igraph_vector_int_view(&x, &from, 1);
+                igraph_vector_int_view(&y, i, 1);
+                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+                igraph_integer_t multi = *entry < other ? *entry : other;
+                if (from == *i) {
+                    if (loops == IGRAPH_NO_LOOPS) {
+                        multi = 0;
+                    }
+                    if (loops == IGRAPH_LOOPS_TWICE) {
+                        if ((igraph_integer_t)*entry % 2) {
+                            IGRAPH_ERROR("Odd diagonal entry found while IGRAPH_LOOPS_TWICE.",
+                                    IGRAPH_EINVAL);
+                        }
+                        multi /= 2;
+                    }
+                }
+                for (igraph_integer_t count = 0; count < multi; count++) {
+                    //edge directions are reverse of igraph_sparsemat()
+                    VECTOR(*edges)[e++] = (*i);
+                    VECTOR(*edges)[e++] = from;
+                }
+            }
+            to++;
+            i++;
+            entry++;
+        }
+        from++;
+        p++;
+    }
+    igraph_vector_int_resize(edges, e);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_sparse_adjacency_plus(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
+    CS_INT *p = adjmatrix->cs->p;
+    CS_INT *i = adjmatrix->cs->i;
+    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
+    CS_ENTRY *entry = adjmatrix->cs->x;
+
+    while (*p < no_of_edges) {
+        while (to < * (p + 1)) {
+            if (from >= *i) {
+                igraph_real_t other;
+                igraph_vector_int_t x, y;
+                igraph_vector_int_view(&x, &from, 1);
+                igraph_vector_int_view(&y, i, 1);
+                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+                igraph_integer_t multi = *entry + other;
+                if (from == *i) {
+                    if (loops == IGRAPH_NO_LOOPS) {
+                        multi = 0;
+                    }
+                    if (loops == IGRAPH_LOOPS_TWICE) {
+                        if ((igraph_integer_t)*entry % 2) {
+                            IGRAPH_ERROR("Odd diagonal entry found while IGRAPH_LOOPS_TWICE.",
+                                    IGRAPH_EINVAL);
+                        }
+                        multi /= 2;
+                    }
+                }
+                for (igraph_integer_t count = 0; count < multi; count++) {
+                    //edge directions are reverse of igraph_sparsemat()
+                    VECTOR(*edges)[e++] = (*i);
+                    VECTOR(*edges)[e++] = from;
+                }
+            }
+            to++;
+            i++;
+            entry++;
+        }
+        from++;
+        p++;
+    }
+    igraph_vector_int_resize(edges, e);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_sparse_adjacency_upper(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
+    CS_INT *p = adjmatrix->cs->p;
+    CS_INT *i = adjmatrix->cs->i;
+    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
+    CS_ENTRY *entry = adjmatrix->cs->x;
+
+    while (*p < no_of_edges) {
+        while (to < * (p + 1)) {
+            if (from >= *i) {
+                igraph_integer_t multi = *entry;
+                if (from == *i) {
+                    if (loops == IGRAPH_NO_LOOPS) {
+                        multi = 0;
+                    }
+                    if (loops == IGRAPH_LOOPS_TWICE) {
+                        if ((igraph_integer_t)*entry % 2) {
+                            IGRAPH_ERROR("Odd diagonal entry found while IGRAPH_LOOPS_TWICE.",
+                                    IGRAPH_EINVAL);
+                        }
+                        multi /= 2;
+                    }
+                }
+                for (igraph_integer_t count = 0; count < multi; count++) {
+                    //edge directions are reverse of igraph_sparsemat()
+                    VECTOR(*edges)[e++] = (*i);
+                    VECTOR(*edges)[e++] = from;
+                }
+            }
+            to++;
+            i++;
+            entry++;
+        }
+        from++;
+        p++;
+    }
+    igraph_vector_int_resize(edges, e);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+static igraph_error_t igraph_i_sparse_adjacency_lower(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
+    CS_INT *p = adjmatrix->cs->p;
+    CS_INT *i = adjmatrix->cs->i;
+    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
+    CS_ENTRY *entry = adjmatrix->cs->x;
+
+    while (*p < no_of_edges) {
+        while (to < * (p + 1)) {
+            if (from <= *i) {
+                igraph_integer_t multi = *entry;
+                if (from == *i) {
+                    if (loops == IGRAPH_NO_LOOPS) {
+                        multi = 0;
+                    }
+                    if (loops == IGRAPH_LOOPS_TWICE) {
+                        if ((igraph_integer_t)*entry % 2) {
+                            IGRAPH_ERROR("Odd diagonal entry found while IGRAPH_LOOPS_TWICE.",
+                                    IGRAPH_EINVAL);
+                        }
+                        multi /= 2;
+                    }
+                }
+                for (igraph_integer_t count = 0; count < multi; count++) {
+                    //edge directions are reverse of igraph_sparsemat()
+                    VECTOR(*edges)[e++] = (*i);
+                    VECTOR(*edges)[e++] = from;
+                }
+            }
+            to++;
+            i++;
+            entry++;
+        }
+        from++;
+        p++;
+    }
+    igraph_vector_int_resize(edges, e);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_sparse_adjacency_undirected(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
+    CS_INT *p = adjmatrix->cs->p;
+    CS_INT *i = adjmatrix->cs->i;
+    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
+    CS_ENTRY *entry = adjmatrix->cs->x;
+
+    if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
+        IGRAPH_ERROR("Adjacency matrix should be symmetric for IGRAPH_ADJ_UNDIRECTED.",
+                IGRAPH_EINVAL);
+    }
+    while (*p < no_of_edges) {
+        while (to < * (p + 1)) {
+            if (from >= *i) {
+                igraph_integer_t multi = *entry;
+                if (from == *i) {
+                    if (loops == IGRAPH_NO_LOOPS) {
+                        multi = 0;
+                    }
+                    if (loops == IGRAPH_LOOPS_TWICE) {
+                        if ((igraph_integer_t)*entry % 2) {
+                            IGRAPH_ERROR("Odd diagonal entry found while IGRAPH_LOOPS_TWICE.",
+                                    IGRAPH_EINVAL);
+                        }
+                        multi /= 2;
+                    }
+                }
+                for (igraph_integer_t count = 0; count < multi; count++) {
+                    VECTOR(*edges)[e++] = (*i);
+                    VECTOR(*edges)[e++] = from;
+                }
             }
             to++;
             i++;
@@ -306,23 +616,24 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
     case IGRAPH_ADJ_DIRECTED:
         IGRAPH_CHECK(igraph_i_sparse_adjacency_directed(adjmatrix, &edges, loops));
         break;
-        /*
     case IGRAPH_ADJ_MAX:
-        IGRAPH_CHECK(igraph_i_adjacency_max(adjmatrix, &edges, loops));
+        IGRAPH_CHECK(igraph_i_sparse_adjacency_max(adjmatrix, &edges, loops));
+        break;
+    case IGRAPH_ADJ_UNDIRECTED:
+        IGRAPH_CHECK(igraph_i_sparse_adjacency_undirected(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_UPPER:
-        IGRAPH_CHECK(igraph_i_adjacency_upper(adjmatrix, &edges, loops));
+        IGRAPH_CHECK(igraph_i_sparse_adjacency_upper(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_LOWER:
-        IGRAPH_CHECK(igraph_i_adjacency_lower(adjmatrix, &edges, loops));
+        IGRAPH_CHECK(igraph_i_sparse_adjacency_lower(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_MIN:
-        IGRAPH_CHECK(igraph_i_adjacency_min(adjmatrix, &edges, loops));
+        IGRAPH_CHECK(igraph_i_sparse_adjacency_min(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_PLUS:
-        IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges, loops));
+        IGRAPH_CHECK(igraph_i_sparse_adjacency_directed(adjmatrix, &edges, loops));
         break;
-        */
     default:
         IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
@@ -434,6 +745,9 @@ igraph_error_t igraph_adjacency(
         break;
     case IGRAPH_ADJ_MAX:
         IGRAPH_CHECK(igraph_i_adjacency_max(adjmatrix, &edges, loops));
+        break;
+    case IGRAPH_ADJ_UNDIRECTED:
+        IGRAPH_CHECK(igraph_i_adjacency_undirected(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_UPPER:
         IGRAPH_CHECK(igraph_i_adjacency_upper(adjmatrix, &edges, loops));
