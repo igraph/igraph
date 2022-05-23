@@ -288,7 +288,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t *parent;
+    igraph_integer_t *parent_eids;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
@@ -318,43 +318,43 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_list_resize(edges, IGRAPH_VIT_SIZE(vit)));
     }
 
-    parent = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parent == 0) {
+    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    if (parent_eids == 0) {
         IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    IGRAPH_FINALLY(igraph_free, parent);
+    IGRAPH_FINALLY(igraph_free, parent_eids);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (parent[ IGRAPH_VIT_GET(vit) ] == 0) {
-            parent[ IGRAPH_VIT_GET(vit) ] = -1;
+        if (parent_eids[ IGRAPH_VIT_GET(vit) ] == 0) {
+            parent_eids[ IGRAPH_VIT_GET(vit) ] = -1;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
     }
 
-    /* Meaning of parent[i]:
+    /* Meaning of parent_eids[i]:
      *
-     * - If parent[i] < 0, it means that vertex i has to be reached and has not
+     * - If parent_eids[i] < 0, it means that vertex i has to be reached and has not
      *   been reached yet.
      *
-     * - If parent[i] = 0, it means that vertex i does not have to be reached and
+     * - If parent_eids[i] = 0, it means that vertex i does not have to be reached and
      *   it has not been reached yet.
      *
-     * - If parent[i] = 1, it means that vertex i is the start vertex.
+     * - If parent_eids[i] = 1, it means that vertex i is the start vertex.
      *
-     * - Otherwise, parent[i] is the ID of the edge from which vertex i was
+     * - Otherwise, parent_eids[i] is the ID of the edge from which vertex i was
      *   reached plus 2.
      */
 
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, from + 1));
-    if (parent[ from ] < 0) {
+    if (parent_eids[ from ] < 0) {
         reached++;
     }
-    parent[ from ] = 1;
+    parent_eids[ from ] = 1;
 
     while (!igraph_dqueue_int_empty(&q) && reached < to_reach) {
         igraph_integer_t act = igraph_dqueue_int_pop(&q) - 1;
@@ -364,12 +364,12 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         for (j = 0; j < vsize; j++) {
             igraph_integer_t edge = VECTOR(tmp)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, act);
-            if (parent[neighbor] > 0) {
+            if (parent_eids[neighbor] > 0) {
                 continue;
-            } else if (parent[neighbor] < 0) {
+            } else if (parent_eids[neighbor] < 0) {
                 reached++;
             }
-            parent[neighbor] = edge + 2;
+            parent_eids[neighbor] = edge + 2;
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor + 1));
         }
     }
@@ -383,15 +383,15 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
-            if (parent[i] <= 0) {
+            if (parent_eids[i] <= 0) {
                 /* i was not reached */
                 VECTOR(*parents)[i] = -2;
-            } else if (parent[i] == 1) {
+            } else if (parent_eids[i] == 1) {
                 /* i is the start vertex */
                 VECTOR(*parents)[i] = -1;
             } else {
-                /* i was reached via the edge with ID = parent[i] - 2 */
-                VECTOR(*parents)[i] = IGRAPH_OTHER(graph, parent[i] - 2, i);
+                /* i was reached via the edge with ID = parent_eids[i] - 2 */
+                VECTOR(*parents)[i] = IGRAPH_OTHER(graph, parent_eids[i] - 2, i);
             }
         }
     }
@@ -401,12 +401,12 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
-            if (parent[i] <= 1) {
+            if (parent_eids[i] <= 1) {
                 /* i was not reached or i is the start vertex */
                 VECTOR(*inbound_edges)[i] = -1;
             } else {
-                /* i was reached via the edge with ID = parent[i] - 2 */
-                VECTOR(*inbound_edges)[i] = parent[i] - 2;
+                /* i was reached via the edge with ID = parent_eids[i] - 2 */
+                VECTOR(*inbound_edges)[i] = parent_eids[i] - 2;
             }
         }
     }
@@ -429,13 +429,13 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
 
             IGRAPH_ALLOW_INTERRUPTION();
 
-            if (parent[node] > 0) {
+            if (parent_eids[node] > 0) {
                 igraph_integer_t act = node;
                 igraph_integer_t size = 0;
                 igraph_integer_t edge;
-                while (parent[act] > 1) {
+                while (parent_eids[act] > 1) {
                     size++;
-                    edge = parent[act] - 2;
+                    edge = parent_eids[act] - 2;
                     act = IGRAPH_OTHER(graph, edge, act);
                 }
                 if (vvec) {
@@ -446,9 +446,9 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                     IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
                 }
                 act = node;
-                while (parent[act] > 1) {
+                while (parent_eids[act] > 1) {
                     size--;
-                    edge = parent[act] - 2;
+                    edge = parent_eids[act] - 2;
                     act = IGRAPH_OTHER(graph, edge, act);
                     if (vvec) {
                         VECTOR(*vvec)[size] = act;
@@ -462,7 +462,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     }
 
     /* Clean */
-    IGRAPH_FREE(parent);
+    IGRAPH_FREE(parent_eids);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&tmp);
     igraph_vit_destroy(&vit);
