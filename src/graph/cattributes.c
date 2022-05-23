@@ -2659,19 +2659,23 @@ const igraph_attribute_table_t igraph_cattribute_table = {
  * attributes and an active attribute handler, which might cause
  * unexpected program behaviour. The rule is that you attach the
  * attribute handler in the beginning of your
- * <function>main()</function> and never touch it again. (Detaching
- * the attribute handler might lead to memory leaks.)</para>
+ * <function>main()</function> and never touch it again. Detaching
+ * the attribute handler might lead to memory leaks.</para>
  *
  * <para>It is not currently possible to have attribute handlers on a
  * per-graph basis. All graphs in an application must be managed with
- * the same attribute handler. (Including the default case when there
- * is no attribute handler at all.</para>
+ * the same attribute handler. This also applies to the default case
+ * when there is no attribute handler at all.</para>
  *
- * <para>The C attribute handler supports attaching real numbers and
- * character strings as attributes. No vectors are allowed, i.e. every
- * vertex might have an attribute called <code>name</code>, but it is
- * not possible to have a <code>coords</code> graph (or other)
- * attribute which is a vector of numbers.</para>
+ * <para>The C attribute handler supports attaching real numbers, boolean
+ * values and character strings as attributes. No vector values are allowed.
+ * For example, vertices have a <code>name</code> attribute holding a single
+ * string value for each vertex, but it is not possible to have a <code>coords</code>
+ * attribute which is a vector of numbers per vertex.</para>
+ *
+ * <para>The functions documented in this section are specific to the C
+ * attribute handler. Code using these functions will not function when
+ * a different attribute handler is attached.</para>
  *
  * \example examples/simple/cattributes.c
  * \example examples/simple/cattributes2.c
