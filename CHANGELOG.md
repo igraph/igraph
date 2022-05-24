@@ -652,8 +652,11 @@ Some of the highlights are:
 
  - `igraph_incidence()` does not accept negative incidences anymore.
 
+ - `igraph_rng_seed()` now requires an `igraph_uint_t` as its seed arguments. RNG implementations are free to use only the lower bits of the seed if they do not support 64-bit seeds.
+
 ### Added
 
+ - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and th3ey are always consistent in size.
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
  - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.

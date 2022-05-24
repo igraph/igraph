@@ -25,7 +25,7 @@ typedef struct {
     unsigned long int x;
 } igraph_i_rng_rand_state_t;
 
-static unsigned long int igraph_rng_rand_get(void *vstate) {
+static igraph_uint_t igraph_rng_rand_get(void *vstate) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = (1103515245 * state->x + 12345) & 0x7fffffffUL;
     return state->x;
@@ -35,9 +35,9 @@ static igraph_real_t igraph_rng_rand_get_real(void *vstate) {
     return igraph_rng_rand_get (vstate) / 2147483648.0 ;
 }
 
-static igraph_error_t igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_rand_seed(void *vstate, igraph_uint_t seed) {
     igraph_i_rng_rand_state_t *state = vstate;
-    state->x = seed;
+    state->x = (unsigned long) seed;
     return IGRAPH_SUCCESS;
 }
 

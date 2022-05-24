@@ -228,7 +228,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
  * Time complexity: usually O(1), but may depend on the type of the
  * RNG.
  */
-igraph_error_t igraph_rng_seed(igraph_rng_t *rng, uint64_t seed) {
+igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
     const igraph_rng_type_t *type = rng->type;
     rng->def = 0;
     IGRAPH_CHECK(type->seed(rng->state, seed));

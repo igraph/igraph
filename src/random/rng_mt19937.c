@@ -40,10 +40,10 @@ typedef struct {
     int mti;
 } igraph_i_rng_mt19937_state_t;
 
-static unsigned long int igraph_rng_mt19937_get(void *vstate) {
+static igraph_uint_t igraph_rng_mt19937_get(void *vstate) {
     igraph_i_rng_mt19937_state_t *state = vstate;
 
-    unsigned long k ;
+    unsigned long k;
     unsigned long int *const mt = state->mt;
 
 #define MAGIC(y) (((y)&0x1) ? 0x9908b0dfUL : 0)
@@ -88,7 +88,7 @@ static igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
     return igraph_rng_mt19937_get (vstate) / 4294967296.0 ;
 }
 
-static igraph_error_t igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_mt19937_seed(void *vstate, igraph_uint_t seed) {
     igraph_i_rng_mt19937_state_t *state = vstate;
     int i;
 

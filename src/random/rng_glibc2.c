@@ -45,7 +45,7 @@ static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int
     return k;
 }
 
-static unsigned long int igraph_rng_glibc2_get(void *vstate) {
+static igraph_uint_t igraph_rng_glibc2_get(void *vstate) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     return igraph_i_rng_glibc2_get(&state->i, &state->j, 31, state->x);
@@ -79,12 +79,12 @@ static void igraph_i_rng_glibc2_init(long int *x, int n,
     }
 }
 
-static igraph_error_t igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_glibc2_seed(void *vstate, igraph_uint_t seed) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     int i;
 
-    igraph_i_rng_glibc2_init(state->x, 31, seed);
+    igraph_i_rng_glibc2_init(state->x, 31, (unsigned long) seed);
 
     state->i = 3;
     state->j = 0;

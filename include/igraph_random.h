@@ -58,8 +58,8 @@ typedef struct igraph_rng_type_t {
     uint64_t max;
     igraph_error_t (*init)(void **state);
     void (*destroy)(void *state);
-    igraph_error_t (*seed)(void *state, unsigned long int seed);
-    unsigned long int (*get)(void *state);
+    igraph_error_t (*seed)(void *state, igraph_uint_t seed);
+    igraph_uint_t (*get)(void *state);
     igraph_real_t (*get_real)(void *state);
     igraph_real_t (*get_norm)(void *state);
     igraph_real_t (*get_geom)(void *state, igraph_real_t p);
@@ -80,7 +80,7 @@ typedef struct igraph_rng_t {
 IGRAPH_EXPORT igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
 IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
-IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, uint64_t seed);
+IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed);
 IGRAPH_EXPORT uint64_t igraph_rng_max(const igraph_rng_t *rng);
 IGRAPH_EXPORT const char *igraph_rng_name(const igraph_rng_t *rng);
 
