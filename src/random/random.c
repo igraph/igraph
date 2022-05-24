@@ -272,9 +272,9 @@ IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
 igraph_uint_t igraph_rng_max(const igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
 #if IGRAPH_INTEGER_SIZE == 64
-    return (type->bits >= 64) ? (1ULL << 63) : (1ULL << type->bits);
+    return (type->bits >= 64) ? 0xFFFFFFFFFFFFFFFFULL : ((1ULL << type->bits) - 1);
 #else
-    return (type->bits >= 32) ? (1ULL << 31) : (1ULL << type->bits);
+    return (type->bits >= 32) ? 0xFFFFFFFFUL : ((1ULL << type->bits) - 1);
 #endif
 }
 
