@@ -87,8 +87,7 @@ static void igraph_rng_rand_destroy(void *vstate) {
 
 const igraph_rng_type_t igraph_rngtype_rand = {
     /* name= */      "RAND",
-    /* min=  */      0,
-    /* max=  */      0x7fffffffUL,
+    /* bits=  */     31,
     /* init= */      igraph_rng_rand_init,
     /* destroy= */   igraph_rng_rand_destroy,
     /* seed= */      igraph_rng_rand_seed,

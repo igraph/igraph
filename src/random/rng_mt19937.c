@@ -167,8 +167,7 @@ static void igraph_rng_mt19937_destroy(void *vstate) {
 
 const igraph_rng_type_t igraph_rngtype_mt19937 = {
     /* name= */      "MT19937",
-    /* min=  */      0,
-    /* max=  */      0xffffffffUL,
+    /* bits=  */     32,
     /* init= */      igraph_rng_mt19937_init,
     /* destroy= */   igraph_rng_mt19937_destroy,
     /* seed= */      igraph_rng_mt19937_seed,

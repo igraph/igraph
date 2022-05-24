@@ -54,8 +54,7 @@ __BEGIN_DECLS
  */
 typedef struct igraph_rng_type_t {
     const char *name;
-    uint64_t min; /* 'min' must always be set to 0 */
-    uint64_t max;
+    uint8_t bits;
     igraph_error_t (*init)(void **state);
     void (*destroy)(void *state);
     igraph_error_t (*seed)(void *state, igraph_uint_t seed);
@@ -81,7 +80,8 @@ IGRAPH_EXPORT igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng
 IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed);
-IGRAPH_EXPORT uint64_t igraph_rng_max(const igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng);
+IGRAPH_EXPORT igraph_uint_t igraph_rng_max(const igraph_rng_t *rng);
 IGRAPH_EXPORT const char *igraph_rng_name(const igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_integer_t igraph_rng_get_integer(
@@ -99,7 +99,6 @@ IGRAPH_EXPORT igraph_real_t igraph_rng_get_binom(
     igraph_rng_t *rng, igraph_integer_t n, igraph_real_t p
 );
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
-IGRAPH_EXPORT uint32_t igraph_rng_get_int31(igraph_rng_t *rng);
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(
     igraph_rng_t *rng, igraph_real_t shape, igraph_real_t scale
 );
@@ -145,7 +144,6 @@ void PutRNGstate(void);
 #define RNG_EXP(rate)    (igraph_rng_get_exp(igraph_rng_default(),(rate)))
 #define RNG_GAMMA(shape, scale) \
                          (igraph_rng_get_gamma(igraph_rng_default(), (shape), (scale)))
-#define RNG_INT31()      (igraph_rng_get_int31(igraph_rng_default()))
 
 __END_DECLS
 
