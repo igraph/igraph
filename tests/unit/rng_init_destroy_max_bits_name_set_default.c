@@ -39,7 +39,9 @@ void test_and_destroy(igraph_rng_type_t *rng_type, igraph_rng_t *rng_def) {
     }
     printf("\n");
 
-    IGRAPH_ASSERT(igraph_rng_max(&rng) >= 32767);
+    IGRAPH_ASSERT(igraph_rng_max(&rng) >= 0x7fffffff);
+    IGRAPH_ASSERT(igraph_rng_bits(&rng) >= 31);
+
     igraph_rng_set_default(rng_def);
     igraph_rng_destroy(&rng);
 }

@@ -774,7 +774,7 @@ add_legacy_tests(
   mt
   random_sampling
   rng_reproducibility
-  rng_init_destroy_max_min_name_set_default
+  rng_init_destroy_max_bits_name_set_default
 )
 
 # qsort.at
