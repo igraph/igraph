@@ -18,12 +18,12 @@ int main() {
     }
 
     // igraph_matrix_print(&pref_matrix);
+    igraph_t g;
     igraph_vector_int_t node_type_vec;
+    igraph_vector_int_init(&node_type_vec, nodes);
 
     for (int i = 0; i < 5; i++) {
-        igraph_t g;
         igraph_real_t assortativity;
-        igraph_vector_int_init(&node_type_vec, nodes);
 
         /* Generate undirected graph with 1000 nodes and 50 vertex types */
         igraph_preference_game(&g, nodes, types, /* type_dist= */ NULL, /* fixed_sizes= */ 1, &pref_matrix, &node_type_vec, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
@@ -36,10 +36,9 @@ int main() {
 
         igraph_assortativity_nominal(&g, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
         printf("Assortativity after rewiring = %g\n\n", assortativity);
-
-        igraph_destroy(&g);
     }
-    
+
+    igraph_destroy(&g);    
     igraph_vector_int_destroy(&node_type_vec);
     igraph_matrix_destroy(&pref_matrix);
 }
