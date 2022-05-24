@@ -175,6 +175,7 @@ igraph_rng_t *igraph_rng_default() {
 
 /* ------------------------------------ */
 
+static igraph_uint_t igraph_i_rng_get_integer(igraph_rng_t *rng, igraph_uint_t range);
 static double igraph_i_norm_rand(igraph_rng_t *rng);
 static double igraph_i_rgeom(igraph_rng_t *rng, double p);
 static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp);
@@ -295,6 +296,26 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
 }
 
 /**
+ * Generates a random integer in the range [0; range) (upper bound inclusive).
+ *
+ * \param rng The RNG.
+ * \param range The upper bound (inclusive).
+ * \return The random integer.
+ */
+static igraph_uint_t igraph_i_rng_get_integer(igraph_rng_t *rng, igraph_uint_t range) {
+    const igraph_rng_type_t *type = rng->type;
+    if (type->get_real) {
+        return type->get_real(rng->state) * range;
+    } else if (type->get) {
+        igraph_uint_t max = igraph_rng_max(rng);
+        /* TODO: doubles can represent integers only up to 2^53-1 so this is
+         * not good enough if we allow 64-bit integers */
+        return type->get(rng->state) / ((double)max + 1) * range;
+    }
+    IGRAPH_FATAL("Internal random generator error");
+}
+
+/**
  * \function igraph_rng_get_integer
  * \brief Generate an integer random number from an interval.
  *
@@ -312,8 +333,6 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
 igraph_integer_t igraph_rng_get_integer(
     igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h
 ) {
-    assert(h >= l);
-    const igraph_rng_type_t *type = rng->type;
     /* We require the random integer to be in the range [l, h]. We do so by
      * first casting (truncate toward zero) to the range [0, h - l] and then add
      * l to arrive at the range [l, h]. That is, we calculate
@@ -327,15 +346,30 @@ igraph_integer_t igraph_rng_get_integer(
      * numbers are truncated towards zero when cast. For example, if l = -5, any
      * real in the range (-5, -4] would get cast to -4, not to -5.
      */
-    if (type->get_real) {
-        return (igraph_integer_t)(type->get_real(rng->state) * (h - l + 1)) + l;
-    } else if (type->get) {
-        igraph_uint_t max = igraph_rng_max(rng);
-        /* TODO: doubles can represent integers only up to 2^53-1 so this is
-         * not good enough if we allow 64-bit integers */
-        return (igraph_integer_t)(type->get(rng->state) / ((double)max + 1) * (h - l + 1)) + l;
+    assert(h >= l);
+
+    if (l >= 0 || h < 0) {
+        /* This is the easier path as (h - l) cannot overflow an igraph_integer_t.
+         * Casting to (igraph_uint_t) after the subtraction ensures that the
+         * addition does not overflow either */
+        return l + igraph_i_rng_get_integer(rng, ((igraph_uint_t)(h - l)) + 1);
+    } else if (l == IGRAPH_INTEGER_MIN) {
+        if (h == IGRAPH_INTEGER_MAX) {
+            /* Full uint range is needed, we can just grab a random number from
+             * the uint range and cast it to a signed integer */
+            return (igraph_integer_t) igraph_i_rng_get_integer(rng, IGRAPH_UINT_MAX);
+        } else {
+            /* This is to ensure that we don't calculate -IGRAPH_INTEGER_MIN
+             * in the third branch because that is not representable in an
+             * igraph_integer_t */
+            return igraph_rng_get_integer(rng, l + 1, h + 1) - 1;
+        }
+    } else {
+        /* l is negative, h is non-negative. We can promote h into unsigned
+         * without loss of precision, and then we can safely add -l on top
+         * of it. */
+        return l + igraph_i_rng_get_integer(rng, ((igraph_uint_t)(h)) + ((igraph_uint_t)(-l)) + 1);
     }
-    IGRAPH_FATAL("Internal random generator error");
 }
 
 /**
