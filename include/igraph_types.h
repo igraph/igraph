@@ -49,8 +49,10 @@ __BEGIN_DECLS
 #  error "igraph integer size not defined; check the value of IGRAPH_INTEGER_SIZE when compiling"
 #elif IGRAPH_INTEGER_SIZE == 64
 typedef int64_t igraph_integer_t;
+typedef uint64_t igraph_uint_t;
 #elif IGRAPH_INTEGER_SIZE == 32
 typedef int32_t igraph_integer_t;
+typedef uint32_t igraph_uint_t;
 #else
 #  error "Invalid igraph integer size; check the value of IGRAPH_INTEGER_SIZE when compiling"
 #endif
