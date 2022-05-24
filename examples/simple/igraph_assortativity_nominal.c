@@ -8,7 +8,7 @@ int main() {
     igraph_matrix_init(&pref_matrix, types, types);
 
     igraph_rng_seed(igraph_rng_default(), 42);
-    printf("Randomly generated graph with %ld nodes and %ld vertex types\n\n", nodes, types);
+    printf("Randomly generated graph with %lld nodes and %lld vertex types\n\n", nodes, types);
 
     /* Generate preference matrix giving connection probabilities for different vertex types */
     for (igraph_integer_t i = 0; i < types; i++) {
