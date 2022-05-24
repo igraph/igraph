@@ -1,17 +1,17 @@
-Randomly generated graph with 250 nodes and 5 vertex types
+Randomly generated graph with 120 nodes and 4 vertex types
 
-Assortativity before rewiring = 0.00585046
-Assortativity after rewiring = -0.00811945
+Assortativity before rewiring = 0.691229
+Assortativity after rewiring = 0.0847146
 
-Assortativity before rewiring = -0.000373488
-Assortativity after rewiring = -0.00575999
+Assortativity before rewiring = 0.724321
+Assortativity after rewiring = 0.0864765
 
-Assortativity before rewiring = 0.00347426
-Assortativity after rewiring = -0.00328873
+Assortativity before rewiring = 0.672891
+Assortativity after rewiring = -0.0307029
 
-Assortativity before rewiring = 0.0085769
-Assortativity after rewiring = -0.0127907
+Assortativity before rewiring = 0.702714
+Assortativity after rewiring = 0.0376004
 
-Assortativity before rewiring = 0.00636642
-Assortativity after rewiring = -0.00840506
+Assortativity before rewiring = 0.698315
+Assortativity after rewiring = 0.0653689
 
