@@ -48,7 +48,7 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
     igraph_vector_minmax(&res, &min, &max);
     igraph_vector_destroy(&res);
 
-    return fabs(min) < 1e-15 && fabs(max) < 1e-15;
+    return fabs(min) < 1e-12 && fabs(max) < 1e-12;
 }
 
 int main() {
@@ -56,6 +56,8 @@ int main() {
     igraph_sparsemat_t A, B, C;
     igraph_vector_t b, x;
     igraph_integer_t i;
+
+    RNG_BEGIN();
 
     /* lsolve */
 
@@ -293,6 +295,8 @@ int main() {
 
 #undef DIM
 #undef EDGES
+
+    RNG_END();
 
     return 0;
 }

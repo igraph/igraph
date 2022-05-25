@@ -1,17 +1,17 @@
 Forest fire model network with 1000 vertices and 0.2 forward burning probability.
 
-Assortativity before rewiring = 0.202122
-Assortativity after rewiring = -0.0411268
+Assortativity before rewiring = 0.145256
+Assortativity after rewiring = -0.0100168
 
-Assortativity before rewiring = 0.217066
-Assortativity after rewiring = 0.00838012
+Assortativity before rewiring = 0.195818
+Assortativity after rewiring = -0.00240226
 
-Assortativity before rewiring = 0.165968
-Assortativity after rewiring = -0.0193408
+Assortativity before rewiring = 0.189883
+Assortativity after rewiring = 7.80415e-05
 
-Assortativity before rewiring = 0.199449
-Assortativity after rewiring = 0.0052581
+Assortativity before rewiring = 0.142749
+Assortativity after rewiring = 0.00987213
 
-Assortativity before rewiring = 0.20196
-Assortativity after rewiring = -0.0257474
+Assortativity before rewiring = 0.184366
+Assortativity after rewiring = 0.00337023
 

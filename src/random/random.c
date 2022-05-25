@@ -454,8 +454,7 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
 igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
                                   igraph_real_t l, igraph_real_t h) {
     assert(h >= l);
-    const igraph_rng_type_t *type = rng->type;
-    return igraph_rng_get_unif01(rng->state) * (h - l) + l;
+    return igraph_rng_get_unif01(rng) * (h - l) + l;
 }
 
 /**

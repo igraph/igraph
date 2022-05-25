@@ -55,10 +55,6 @@ static igraph_uint_t igraph_rng_glibc2_get(void *vstate) {
     return igraph_i_rng_glibc2_get(&state->i, &state->j, 31, state->x);
 }
 
-static igraph_real_t igraph_rng_glibc2_get_real(void *state) {
-    return igraph_rng_glibc2_get(state) / 2147483648.0;
-}
-
 /* this function is independent of the bit size */
 
 static void igraph_i_rng_glibc2_init(long int *x, int n,
@@ -139,7 +135,7 @@ const igraph_rng_type_t igraph_rngtype_glibc2 = {
     /* destroy= */   igraph_rng_glibc2_destroy,
     /* seed= */      igraph_rng_glibc2_seed,
     /* get= */       igraph_rng_glibc2_get,
-    /* get_real= */  igraph_rng_glibc2_get_real,
+    /* get_real= */  0,
     /* get_norm= */  0,
     /* get_geom= */  0,
     /* get_binom= */ 0,

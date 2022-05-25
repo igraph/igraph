@@ -132,8 +132,5 @@ int main() {
     igraph_rng_set_default(def);
     igraph_rng_destroy(&rng);
 
-    igraph_rng_set_default(def);
-    igraph_rng_destroy(&rng);
-
     return 0;
 }
