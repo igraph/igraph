@@ -344,6 +344,7 @@ static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uin
     } while (l < t);
     return m >> 32;
 #else
+    __uint128_t m;
     do {
         x = igraph_i_rng_get_uint(rng);
         m = (__uint128_t)(x) * (__uint128_t)(range);
@@ -454,15 +455,7 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
                                   igraph_real_t l, igraph_real_t h) {
     assert(h >= l);
     const igraph_rng_type_t *type = rng->type;
-    if (type->get_real) {
-        return type->get_real(rng->state) * (h - l) + l;
-    } else if (type->get) {
-        igraph_uint_t max = igraph_rng_max(rng);
-        /* TODO: get rid of (double) cast because not all 64-bit numbers can
-         * be represented exactly in a double */
-        return type->get(rng->state) / ((double)max + 1) * (double)(h - l) + l;
-    }
-    IGRAPH_FATAL("Internal random generator error");
+    return igraph_rng_get_unif01(rng->state) * (h - l) + l;
 }
 
 /**
@@ -480,13 +473,9 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
     if (type->get_real) {
         return type->get_real(rng->state);
-    } else if (type->get) {
-        igraph_uint_t max = igraph_rng_max(rng);
-        /* TODO: get rid of (double) cast because not all 64-bit numbers can
-         * be represented exactly in a double */
-        return type->get(rng->state) / ((double)max + 1);
+    } else {
+        return ldexp(type->get(rng->state), -igraph_rng_bits(rng));
     }
-    IGRAPH_FATAL("Internal random generator error");
 }
 
 /**
