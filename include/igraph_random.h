@@ -43,14 +43,20 @@ __BEGIN_DECLS
  * - init()
  * - destroy()
  * - seed()
- *
- * and you also need to provide at least one of:
- *
  * - get()
- * - get_real()
  *
- * The remaining methods have default implementations that rely on get() or
- * get_real() if no specialized implementation is provided.
+ * Optionally, you can provide specialized routines for several distributions
+ * in the following functions:
+ *
+ * - get_real()
+ * - get_norm()
+ * - get_geom()
+ * - get_binom()
+ * - get_exp()
+ * - get_gamma()
+ *
+ * The best is probably to define get() and get_real() and leave the others as
+ * NULL; igraph will use default implementations for these.
  */
 typedef struct igraph_rng_type_t {
     const char *name;

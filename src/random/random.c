@@ -175,7 +175,8 @@ igraph_rng_t *igraph_rng_default() {
 
 /* ------------------------------------ */
 
-static igraph_uint_t igraph_i_rng_get_integer(igraph_rng_t *rng, igraph_uint_t range);
+static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng);
+static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uint_t hi);
 static double igraph_i_norm_rand(igraph_rng_t *rng);
 static double igraph_i_rgeom(igraph_rng_t *rng, double p);
 static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp);
@@ -296,23 +297,60 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
 }
 
 /**
- * Generates a random integer in the range [0; range) (upper bound inclusive).
+ * Generates a random integer in the full range of the \c igraph_uint_t
+ * data type.
  *
  * \param rng The RNG.
  * \param range The upper bound (inclusive).
  * \return The random integer.
  */
-static igraph_uint_t igraph_i_rng_get_integer(igraph_rng_t *rng, igraph_uint_t range) {
+static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
-    if (type->get_real) {
-        return type->get_real(rng->state) * range;
-    } else if (type->get) {
-        igraph_uint_t max = igraph_rng_max(rng);
-        /* TODO: doubles can represent integers only up to 2^53-1 so this is
-         * not good enough if we allow 64-bit integers */
-        return type->get(rng->state) / ((double)max + 1) * range;
+    igraph_integer_t num_bits = igraph_rng_bits(rng);
+    igraph_integer_t bits_needed = sizeof(igraph_uint_t) * 8;
+    igraph_uint_t result = 0;
+
+    if (num_bits >= bits_needed) {
+        /* this is easy and we want to avoid a shift with num_bits to the left
+         * if it is the same as sizeof(igraph_uint_t) */
+        return type->get(rng->state);
     }
-    IGRAPH_FATAL("Internal random generator error");
+
+    while (bits_needed > 0) {
+        result = (result << num_bits) + type->get(rng->state);
+        bits_needed -= num_bits;
+    }
+
+    return result;
+}
+
+/**
+ * Generates a random integer in the range [0; range) (upper bound exclusive).
+ *
+ * \param rng The RNG.
+ * \param range The upper bound (exclusive).
+ * \return The random integer.
+ */
+static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uint_t range) {
+    /* Debiased integer multiplication -- Lemire's method
+     * from https://www.pcg-random.org/posts/bounded-rands.html */
+    igraph_uint_t x, l, t = (-range) % range;
+#if IGRAPH_INTEGER_SIZE == 32
+    uint64_t m;
+    do {
+        x = igraph_i_rng_get_uint(rng);
+        m = (uint64_t)(x) * (uint64_t)(range);
+        l = (igraph_uint_t)m;
+    } while (l < t);
+    return m >> 32;
+#else
+    do {
+        x = igraph_i_rng_get_uint(rng);
+        m = (__uint128_t)(x) * (__uint128_t)(range);
+        l = (igraph_integer_t)m;
+    } while (l < t);
+    return m >> 64;
+#endif
 }
 
 /**
@@ -333,13 +371,19 @@ static igraph_uint_t igraph_i_rng_get_integer(igraph_rng_t *rng, igraph_uint_t r
 igraph_integer_t igraph_rng_get_integer(
     igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h
 ) {
+    igraph_uint_t range;
+
     /* We require the random integer to be in the range [l, h]. We do so by
      * first casting (truncate toward zero) to the range [0, h - l] and then add
      * l to arrive at the range [l, h]. That is, we calculate
+     *
      * (igraph_integer_t)( r * (h - l + 1) ) + l
+     *
      * instead of
+     *
      * (igraph_integer_t)( r * (h - l + 1) + l),
-     * please note the difference in the parentheses.
+     *
+     * Please note the difference in the parentheses.
      *
      * In the latter formulation, if l is negative, this would incorrectly lead
      * to the range [l + 1, h] instead of the desired [l, h] because negative
@@ -348,28 +392,25 @@ igraph_integer_t igraph_rng_get_integer(
      */
     assert(h >= l);
 
-    if (l >= 0 || h < 0) {
-        /* This is the easier path as (h - l) cannot overflow an igraph_integer_t.
-         * Casting to (igraph_uint_t) after the subtraction ensures that the
-         * addition does not overflow either */
-        return l + igraph_i_rng_get_integer(rng, ((igraph_uint_t)(h - l)) + 1);
-    } else if (l == IGRAPH_INTEGER_MIN) {
-        if (h == IGRAPH_INTEGER_MAX) {
-            /* Full uint range is needed, we can just grab a random number from
-             * the uint range and cast it to a signed integer */
-            return (igraph_integer_t) igraph_i_rng_get_integer(rng, IGRAPH_UINT_MAX);
-        } else {
-            /* This is to ensure that we don't calculate -IGRAPH_INTEGER_MIN
-             * in the third branch because that is not representable in an
-             * igraph_integer_t */
-            return igraph_rng_get_integer(rng, l + 1, h + 1) - 1;
-        }
-    } else {
-        /* l is negative, h is non-negative. We can promote h into unsigned
-         * without loss of precision, and then we can safely add -l on top
-         * of it. */
-        return l + igraph_i_rng_get_integer(rng, ((igraph_uint_t)(h)) + ((igraph_uint_t)(-l)) + 1);
+    if (h == l) {
+        return l;
     }
+
+    if (IGRAPH_UNLIKELY(l == IGRAPH_INTEGER_MIN && h == IGRAPH_INTEGER_MAX)) {
+        /* Full uint range is needed, we can just grab a random number from
+         * the uint range and cast it to a signed integer */
+        return (igraph_integer_t) igraph_i_rng_get_uint(rng);
+    } else if (l >= 0 || h < 0) {
+        /* this is okay, (h - l) will not overflow an igraph_integer_t */
+        range = (igraph_uint_t)(h - l) + 1;
+    } else {
+        /* (h - l) could potentially overflow so we need to play it safe. If we
+         * are here, l < 0 and h >= 0 so we can cast -l into an igraph_uint_t
+         * safely and do the subtraction that way */
+        range = ((igraph_uint_t)(h)) + ((igraph_uint_t)(-l)) + 1;
+    }
+
+    return l + igraph_i_rng_get_uint_bounded(rng, range);
 }
 
 /**

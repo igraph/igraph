@@ -31,3 +31,23 @@
 100
 76
 ========
+RNG: MT19937
+Generating random numbers from 0 to 5 (inclusive)
+Generating random numbers from 8 to 13 (inclusive)
+Generating random numbers from -2048 to 2047 (inclusive)
+Generating random numbers from 0 to 2147483647 (inclusive)
+Generating random numbers from -5 to 2147483642 (inclusive)
+Generating random numbers from -5 to 2147483647 (inclusive)
+Generating random numbers from -2147483648 to -5 (inclusive)
+Generating random numbers from -2147483648 to 2147483647 (inclusive)
+
+RNG: LIBC
+Generating random numbers from 0 to 5 (inclusive)
+Generating random numbers from 8 to 13 (inclusive)
+Generating random numbers from -2048 to 2047 (inclusive)
+Generating random numbers from 0 to 2147483647 (inclusive)
+Generating random numbers from -5 to 2147483642 (inclusive)
+Generating random numbers from -5 to 2147483647 (inclusive)
+Generating random numbers from -2147483648 to -5 (inclusive)
+Generating random numbers from -2147483648 to 2147483647 (inclusive)
+

@@ -29,7 +29,11 @@ typedef struct {
 static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int *x) {
     unsigned long int k;
 
-    x[*i] += x[*j];
+    /* The original implementation used x[*i] += x[*j] here. Considering that
+     * x is signed, this is undefined behaviour according to the C standard.
+     * Therefore, we temporarily cast to unsigned long int to achieve what the
+     * original intention was */
+    x[*i] = ((unsigned long int)x[*i]) + ((unsigned long int)x[*j]);
     k = (x[*i] >> 1) & 0x7FFFFFFF;
 
     (*i)++;

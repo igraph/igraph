@@ -57,6 +57,7 @@ void generate_random_vector(
 ) {
     igraph_integer_t i, n = igraph_vector_int_size(numbers);
 
+    printf("Generating random numbers from %" IGRAPH_PRId " to %" IGRAPH_PRId " (inclusive)\n", lo, hi);
     for (i = 0; i < n; i++) {
         VECTOR(*numbers)[i] = igraph_rng_get_integer(rng, lo, hi);
     }
@@ -88,6 +89,8 @@ void stress_tests() {
         igraph_rng_init(&rng, rng_types[i]);
         igraph_rng_seed(&rng, 42);
 
+        printf("RNG: %s\n", igraph_rng_name(&rng));
+
         /* We are going to test multiple ranges. In each range, we generate
          * 1000 random numbers and test whether all the values are in the
          * specified range. For the small ranges, we also test whether each
@@ -101,6 +104,9 @@ void stress_tests() {
         /* Test integer generation in a small non-0-based range */
         generate_random_vector(&rng, &numbers, 8, 13);
         check_occurrences(&numbers, 8, 13);
+
+        /* Test integer generation in a larger non-0-based range */
+        generate_random_vector(&rng, &numbers, -2048, 2047);
 
         /* Test integer generation in [0; IGRAPH_INTEGER_MAX] */
         generate_random_vector(&rng, &numbers, 0, IGRAPH_INTEGER_MAX);
@@ -118,6 +124,8 @@ void stress_tests() {
         generate_random_vector(&rng, &numbers, IGRAPH_INTEGER_MIN, IGRAPH_INTEGER_MAX);
 
         igraph_rng_destroy(&rng);
+
+        printf("\n");
     }
 
     igraph_vector_int_destroy(&numbers);
