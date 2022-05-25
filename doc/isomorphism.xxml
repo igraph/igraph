@@ -48,11 +48,12 @@
 <!-- doxrox-include igraph_subisomorphic_lad -->
 </section>
 
-<section id="functions-for-graphs-with-3-or-4-vertices"><title>Functions for graphs with 3 or 4 vertices</title>
+<section id="functions-for-graphs-with-3-or-4-vertices"><title>Functions for small graphs</title>
 <!-- doxrox-include igraph_isomorphic_34 -->
 <!-- doxrox-include igraph_isoclass -->
 <!-- doxrox-include igraph_isoclass_subgraph -->
 <!-- doxrox-include igraph_isoclass_create -->
+<!-- doxrox-include igraph_graph_count -->
 </section>
 
 <section id="isomorphism-utility-functions"><title>Utility functions</title>
