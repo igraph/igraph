@@ -106,34 +106,45 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
 
 void test_motifs() {
     igraph_t graph;
+    igraph_integer_t count;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_erdos_renyi_game_gnm(&graph, 30, 400, /* directed = */ 1, /* loops = */ 0);
 
-    test_k_motifs(&graph, 3, 16, /* directed= */ 1); /* there are 16 size-3 directed graphs */
-    test_k_motifs(&graph, 4, 218, /* directed= */ 1); /* there are 218 size-4 directed graphs */
+    igraph_graph_count(3, IGRAPH_DIRECTED, &count);
+    test_k_motifs(&graph, 3, count, IGRAPH_DIRECTED);
+
+    igraph_graph_count(4, IGRAPH_DIRECTED, &count);
+    test_k_motifs(&graph, 4, count, IGRAPH_DIRECTED);
 
     igraph_destroy(&graph);
 }
 
 void test_motifs_undirected() {
     igraph_t graph;
+    igraph_integer_t count;
 
     igraph_rng_seed(igraph_rng_default(), 137);
 
     igraph_erdos_renyi_game_gnm(&graph, 18, 100, /* directed = */ 0, /* loops = */ 0);
 
-    test_k_motifs(&graph, 3, 4,   /* directed= */ 0);  /* there are 4   size-3 undirected graphs */
-    test_k_motifs(&graph, 4, 11,  /* directed= */ 0);  /* there are 11  size-4 undirected graphs */
+    igraph_graph_count(3, IGRAPH_UNDIRECTED, &count);
+    test_k_motifs(&graph, 3, count, IGRAPH_UNDIRECTED);
+
+    igraph_graph_count(4, IGRAPH_UNDIRECTED, &count);
+    test_k_motifs(&graph, 4, count, IGRAPH_UNDIRECTED);
 
     igraph_destroy(&graph);
 
     /* Use a smaller graph so that the test would not take too long. */
     igraph_erdos_renyi_game_gnm(&graph, 9, 36, /* directed = */ 0, /* loops = */ 0);
 
-    test_k_motifs(&graph, 5, 34,  /* directed= */ 0);  /* there are 34  size-5 undirected graphs */
-    test_k_motifs(&graph, 6, 156, /* directed= */ 0);  /* there are 156 size-6 undirected graphs */
+    igraph_graph_count(5, IGRAPH_UNDIRECTED, &count);
+    test_k_motifs(&graph, 5, count, IGRAPH_UNDIRECTED);
+
+    igraph_graph_count(6, IGRAPH_UNDIRECTED, &count);
+    test_k_motifs(&graph, 6, count, IGRAPH_UNDIRECTED);
 
     igraph_destroy(&graph);
 }
