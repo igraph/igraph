@@ -79,7 +79,6 @@ add_library(
 
   random/random.c
   random/rng_glibc2.c
-  random/rng_rand.c
   random/rng_mt19937.c
 
   graph/adjlist.c

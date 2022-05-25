@@ -190,8 +190,8 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double shape, double scale);
  * the given type, and sets its seed to the default.
  *
  * \param rng Pointer to an uninitialized RNG.
- * \param type The type of the RNG, like \ref igraph_rngtype_glibc2,
- * \ref igraph_rngtype_mt19937 or \ref igraph_rngtype_rand.
+ * \param type The type of the RNG, like \ref igraph_rngtype_mt19937 or
+ * \ref igraph_rngtype_glibc2.
  * \return Error code.
  *
  * Time complexity: depends on the type of the generator, but usually

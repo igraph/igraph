@@ -132,14 +132,6 @@ int main() {
     igraph_rng_set_default(def);
     igraph_rng_destroy(&rng);
 
-    printf("\nRAND\n\n");
-
-    igraph_rng_init(&rng, &igraph_rngtype_rand);
-    igraph_rng_set_default(&rng);
-    igraph_rng_seed(igraph_rng_default(), 5381);
-
-    sample();
-
     igraph_rng_set_default(def);
     igraph_rng_destroy(&rng);
 
