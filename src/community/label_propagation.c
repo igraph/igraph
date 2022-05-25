@@ -75,9 +75,12 @@
  *   in the future; please do not rely on it.
  * \param fixed Boolean vector denoting which labels are fixed. Of course
  *   this makes sense only if you provided an initial state, otherwise
- *   this element will be ignored. Also note that vertices without labels
- *   cannot be fixed. If they are, this vector will be modified to
- *   make it consistent with \p initial.
+ *   this element will be ignored. Note that vertices without labels
+ *   cannot be fixed. The fixed status will be ignord for these with a
+ *   warning. Also note that label numbers by themselves have no meaning,
+ *   and igraph may renumber labels. However, co-membership constraints
+ *   will be respected: two vertices can be fixed to be in the same or in
+ *   different communities.
  * \param modularity If not a null pointer, then it must be a pointer
  *   to a real number. The modularity score of the detected community
  *   structure is stored here.
@@ -107,7 +110,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
      * away the constness, and promise ourselves that we will make a proper
      * copy of 'fixed' into 'fixed_copy' as soon as we start mutating it */
-    igraph_vector_bool_t* fixed_copy = (igraph_vector_bool_t*) fixed;
+    igraph_vector_bool_t *fixed_copy = (igraph_vector_bool_t *) fixed;
 
     /* The implementation uses a trick to avoid negative array indexing:
      * elements of the membership vector are increased by 1 at the start
