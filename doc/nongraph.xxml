@@ -36,8 +36,9 @@
 </section>
 
 <section id="compare-floats-with-tolerance"><title>Comparing floats with a tolerance</title>
-<!-- doxrox-include igraph_almost_equals -->
 <!-- doxrox-include igraph_cmp_epsilon -->
+<!-- doxrox-include igraph_almost_equals -->
+<!-- doxrox-include igraph_complex_almost_equals -->
 </section>
 
 </chapter>

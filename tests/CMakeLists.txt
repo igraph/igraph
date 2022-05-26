@@ -220,6 +220,7 @@ add_legacy_tests(
   igraph_square_lattice
   igraph_static_power_law_game
   igraph_wheel
+  igraph_weighted_adjacency
   kary_tree
   symmetric_tree
   tree_game

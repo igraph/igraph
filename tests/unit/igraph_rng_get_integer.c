@@ -22,6 +22,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.h"
+
 void simple_tests() {
     int i;
 
@@ -57,7 +59,6 @@ void generate_random_vector(
 ) {
     igraph_integer_t i, n = igraph_vector_int_size(numbers);
 
-    printf("Generating random numbers from %" IGRAPH_PRId " to %" IGRAPH_PRId " (inclusive)\n", lo, hi);
     for (i = 0; i < n; i++) {
         VECTOR(*numbers)[i] = igraph_rng_get_integer(rng, lo, hi);
     }
@@ -65,11 +66,69 @@ void generate_random_vector(
     IGRAPH_ASSERT(igraph_vector_int_max(numbers) <= hi);
 }
 
+/* Checks whether a given vector of numbers contains all numbers between `lo'
+ * and `hi' */
 void check_occurrences(const igraph_vector_int_t* numbers, igraph_integer_t lo, igraph_integer_t hi) {
     igraph_integer_t i;
 
     for (i = lo; i <= hi; i++) {
         IGRAPH_ASSERT(igraph_vector_int_contains(numbers, i));
+    }
+}
+
+/* Checks whether each X consecutive bits of the given numbers contain all
+ * possible combinations of (0, 1) as a quick proxy for randomness, for X = 1..4 */
+void check_consecutive_bits(const igraph_vector_int_t* numbers, uint8_t num_bits) {
+    igraph_uint_t i, j, k, masked, n, mask, still_needed;
+    igraph_vector_bool_t seen;
+
+    n = igraph_vector_int_size(numbers);
+
+    for (j = 0; j < 4; j++) {
+        mask = (1 << (j + 1)) - 1;
+        igraph_vector_bool_init(&seen, mask + 1);
+        for (i = 0; i < num_bits - j; i++, mask <<= 1) {
+            still_needed = (1 << (j + 1));
+            igraph_vector_bool_fill(&seen, 0);
+            for (k = 0; k < n; k++) {
+                masked = (VECTOR(*numbers)[k] & mask) >> i;
+                if (!VECTOR(seen)[masked]) {
+                    VECTOR(seen)[masked] = 1;
+                    still_needed--;
+                    if (!still_needed) {
+                        break;
+                    }
+                }
+            }
+
+            if (still_needed) {
+                if (j > 0) {
+                    printf(
+                        "Expected %" IGRAPH_PRIu " consecutive bit(s) of random integers with "
+                        "%d bits to contain all bit combinations.\n",
+                        (j + 1), num_bits
+                    );
+                    printf(
+                        "Missing %" IGRAPH_PRIu " combination(s) in bits %" IGRAPH_PRIu "-%" IGRAPH_PRIu "\n",
+                        still_needed, (i + j), i
+                    );
+                } else {
+                    printf(
+                        "Expected every bit of random integers with "
+                        "%d bits to contain at least one 0 and at least one 1.\n",
+                        num_bits
+                    );
+                    printf(
+                        "This does not hold for bit %" IGRAPH_PRIu " in this vector:\n",
+                        i
+                    );
+                }
+                printf("\n");
+                print_vector_int(numbers);
+                IGRAPH_ASSERT(!still_needed);
+            }
+        }
+        igraph_vector_bool_destroy(&seen);
     }
 }
 
@@ -89,8 +148,6 @@ void stress_tests() {
         igraph_rng_init(&rng, rng_types[i]);
         igraph_rng_seed(&rng, 42);
 
-        printf("RNG: %s\n", igraph_rng_name(&rng));
-
         /* We are going to test multiple ranges. In each range, we generate
          * 1000 random numbers and test whether all the values are in the
          * specified range. For the small ranges, we also test whether each
@@ -107,9 +164,11 @@ void stress_tests() {
 
         /* Test integer generation in a larger non-0-based range */
         generate_random_vector(&rng, &numbers, -2048, 2047);
+        check_consecutive_bits(&numbers, 12);
 
         /* Test integer generation in [0; IGRAPH_INTEGER_MAX] */
         generate_random_vector(&rng, &numbers, 0, IGRAPH_INTEGER_MAX);
+        check_consecutive_bits(&numbers, sizeof(igraph_integer_t) * 8 - 1);
 
         /* Test integer generation in [-5; IGRAPH_INTEGER_MAX-5] */
         generate_random_vector(&rng, &numbers, -5, IGRAPH_INTEGER_MAX-5);
@@ -122,10 +181,9 @@ void stress_tests() {
 
         /* Test integer generation in [IGRAPH_INTEGER_MIN; IGRAPH_INTEGER_MAX] */
         generate_random_vector(&rng, &numbers, IGRAPH_INTEGER_MIN, IGRAPH_INTEGER_MAX);
+        check_consecutive_bits(&numbers, sizeof(igraph_integer_t) * 8);
 
         igraph_rng_destroy(&rng);
-
-        printf("\n");
     }
 
     igraph_vector_int_destroy(&numbers);

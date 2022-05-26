@@ -257,18 +257,22 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_v
 #ifdef BASE_COMPLEX
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
-                                       igraph_vector_t *real);
+                                                        igraph_vector_t *real);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
-                                       igraph_vector_t *imag);
+                                                        igraph_vector_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
-        igraph_vector_t *real,
-        igraph_vector_t *imag);
+                                                            igraph_vector_t *real,
+                                                            igraph_vector_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
-        const igraph_vector_t *real,
-        const igraph_vector_t *imag);
+                                                          const igraph_vector_t *real,
+                                                          const igraph_vector_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
-        const igraph_vector_t *r,
-        const igraph_vector_t *theta);
+                                                                const igraph_vector_t *r,
+                                                                const igraph_vector_t *theta);
+
+IGRAPH_EXPORT igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *lhs,
+                                                               const igraph_vector_complex_t *rhs,
+                                                               igraph_real_t eps);
 
 #endif
 

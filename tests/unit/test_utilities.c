@@ -141,6 +141,39 @@ void print_adjlist(const igraph_adjlist_t *adjlist) {
 
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph) {
+    print_weighted_graph(graph, NULL);
+}
+
+/* Print a graph with edge weights from a vector. Use brackets to make it
+ * obvious when the edge list is empty. */
+void print_weighted_graph(const igraph_t *graph, const igraph_vector_t* weights) {
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t i;
+
+    printf("directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
+    printf("vcount: %" IGRAPH_PRId "\n", vcount);
+    printf("edges: {\n");
+    for (i=0; i < ecount; ++i) {
+        if (weights) {
+            printf(
+                "%" IGRAPH_PRId " %" IGRAPH_PRId ": %g\n",
+                IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i),
+                VECTOR(*weights)[i]
+            );
+        } else {
+            printf(
+                "%" IGRAPH_PRId " %" IGRAPH_PRId "\n",
+                IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i)
+            );
+        }
+    }
+    printf("}\n");
+}
+
+/* Print a graph with edge weights from an edge attribute. Use brackets to make
+ * it obvious when the edge list is empty. */
+void print_weighted_graph_attr(const igraph_t *graph, const char* attr) {
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t i;
@@ -149,7 +182,11 @@ void print_graph(const igraph_t *graph) {
     printf("vcount: %" IGRAPH_PRId "\n", vcount);
     printf("edges: {\n");
     for (i=0; i < ecount; ++i)
-        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
+        printf
+            ("%" IGRAPH_PRId " %" IGRAPH_PRId ": %g\n",
+            IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i),
+            EAN(graph, attr, i)
+        );
     printf("}\n");
 }
 

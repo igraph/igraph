@@ -38,7 +38,7 @@ void validate_sums(igraph_matrix_t* m, igraph_bool_t column_wise) {
     igraph_vector_fill(&expected, 1);
     VECTOR(expected)[igraph_vector_size(&expected) - 1] = 0;
 
-    IGRAPH_ASSERT(igraph_vector_e_tol(&v, &expected, 1e-7));
+    IGRAPH_ASSERT(igraph_vector_all_almost_e(&v, &expected, 1e-7));
 
     igraph_vector_destroy(&expected);
     igraph_vector_destroy(&v);

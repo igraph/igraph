@@ -243,10 +243,56 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_matrix_complex_all_almost_e
+ * \brief Are all elements almost equal?
+ *
+ * Checks if the elements of two complex matrices are equal within a relative tolerance.
+ *
+ * \param lhs The first matrix.
+ * \param rhs The second matrix.
+ * \param eps Relative tolerance, see \ref igraph_complex_almost_equals() for details.
+ * \return True if the two matrices are almost equal, false if there is at least
+ *     one differing element or if the matrices are not of the same dimensions.
+ */
+igraph_error_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
+                                                  igraph_matrix_complex_t *rhs,
+                                                  igraph_real_t eps) {
+    return lhs->ncol == rhs->ncol && lhs->nrow == rhs->nrow &&
+            igraph_vector_complex_all_almost_e(&lhs->data, &rhs->data, eps);
+}
+
+/**
+ * Deprecated in favour of \ref igraph_matrix_all_almost_e() which uses
+ * relative tolerances. Will be removed in 0.11.
+ *
+ * Checks if two matrices are equal within an absolute tolerance.
+ */
 igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
                                       const igraph_matrix_t *rhs,
                                       igraph_real_t tol) {
-    return igraph_vector_e_tol(&lhs->data, &rhs->data, tol);
+    return lhs->ncol == rhs->ncol && lhs->nrow == rhs->nrow &&
+            igraph_vector_e_tol(&lhs->data, &rhs->data, tol);
+}
+
+
+/**
+ * \function igraph_matrix_all_almost_e
+ * \brief Are all elements almost equal?
+ *
+ * Checks if the elements of two matrices are equal within a relative tolerance.
+ *
+ * \param lhs The first matrix.
+ * \param rhs The second matrix.
+ * \param eps Relative tolerance, see \ref igraph_almost_equals() for details.
+ * \return True if the two matrices are almost equal, false if there is at least
+ *     one differing element or if the matrices are not of the same dimensions.
+ */
+igraph_bool_t igraph_matrix_all_almost_e(const igraph_matrix_t *lhs,
+                                         const igraph_matrix_t *rhs,
+                                         igraph_real_t eps) {
+    return lhs->ncol == rhs->ncol && lhs->nrow == rhs->nrow &&
+            igraph_vector_all_almost_e(&lhs->data, &rhs->data, eps);
 }
 
 igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol) {

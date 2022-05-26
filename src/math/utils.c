@@ -21,8 +21,9 @@
 
 */
 
-#include "igraph_types.h"
+#include "igraph_complex.h"
 #include "igraph_nongraph.h"
+#include "igraph_types.h"
 
 #include "core/math.h"
 
@@ -129,6 +130,40 @@ int igraph_cmp_epsilon(double a, double b, double eps) {
         return (abs_diff < (eps * fabs(a) + eps * fabs(b))) ? 0 : (diff < 0 ? -1 : 1);
     } else {
         return (abs_diff / sum < eps) ? 0 : (diff < 0 ? -1 : 1);
+    }
+}
+
+/**
+ * \function igraph_complex_almost_equals
+ * \brief Compare two complex numbers with a tolerance.
+ *
+ * Determines whether two complex numbers are "almost equal"
+ * to each other with a given level of tolerance on the relative error.
+ *
+ * \param  a  The first complex number.
+ * \param  b  The second complex number.
+ * \param  eps  The level of tolerance on the relative error. The relative
+ *         error is defined as <code>abs(a-b) / (abs(a) + abs(b))</code>. The
+ *         two numbers are considered equal if this is less than \c eps.
+ *
+ * \return True if the two complex numbers are nearly equal to each other within
+ *         the given level of tolerance, false otherwise.
+ */
+igraph_bool_t igraph_complex_almost_equals(igraph_complex_t a,
+                                           igraph_complex_t b,
+                                           igraph_real_t eps) {
+
+    igraph_real_t a_abs = igraph_complex_abs(a);
+    igraph_real_t b_abs = igraph_complex_abs(b);
+    igraph_real_t sum = a_abs + b_abs;
+    igraph_real_t abs_diff = igraph_complex_abs(igraph_complex_sub(a, b));
+
+    if (a_abs == 0 || b_abs == 0 || sum < DBL_MIN) {
+        return abs_diff < eps * DBL_MIN;
+    } else if (! isfinite(sum)) {
+        return abs_diff < (eps * a_abs + eps * b_abs);
+    } else {
+        return abs_diff/ sum < eps;
     }
 }
 

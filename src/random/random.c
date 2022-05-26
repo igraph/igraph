@@ -175,8 +175,19 @@ igraph_rng_t *igraph_rng_default() {
 
 /* ------------------------------------ */
 
+static igraph_uint_t igraph_i_rng_get_random_bits(igraph_rng_t *rng, uint8_t bits);
+
 static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng);
-static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uint_t hi);
+static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uint_t range);
+
+static uint32_t igraph_i_rng_get_uint32(igraph_rng_t *rng);
+static uint32_t igraph_i_rng_get_uint32_bounded(igraph_rng_t *rng, uint32_t range);
+
+#if IGRAPH_INTEGER_SIZE == 64
+static uint64_t igraph_i_rng_get_uint64(igraph_rng_t *rng);
+static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t range);
+#endif
+
 static double igraph_i_norm_rand(igraph_rng_t *rng);
 static double igraph_i_rgeom(igraph_rng_t *rng, double p);
 static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp);
@@ -297,6 +308,41 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
 }
 
 /**
+ * Generates a given number of random bits, possibly invoking the underlying
+ * RNG multiple times if needed.
+ *
+ * \param rng The RNG.
+ * \param bits The number of random bits needed. Must be smaller than the size
+ *        of the \c igraph_uint_t data type. Passing a value larger than the
+ *        size of \c igraph_uint_t will throw away random bits except the last
+ *        few that are needed to fill an \c igraph_uint_t .
+ * \return The random bits, packed into the low bits of an \c igraph_uint_t .
+ *         The upper, unused bits of \c igraph_uint_t will be set to zero.
+ */
+static igraph_uint_t igraph_i_rng_get_random_bits(igraph_rng_t *rng, uint8_t bits) {
+    const igraph_rng_type_t *type = rng->type;
+    igraph_integer_t rng_bitwidth = igraph_rng_bits(rng);
+    igraph_uint_t result;
+
+    if (rng_bitwidth >= bits) {
+        /* keep the high bits as RNGs sometimes tend to have lower entropy in
+         * low bits than in high bits */
+        result = type->get(rng->state) >> (rng_bitwidth - bits);
+    } else {
+        result = 0;
+        do {
+            result = (result << rng_bitwidth) + type->get(rng->state);
+            bits -= rng_bitwidth;
+        } while (bits > rng_bitwidth);
+
+        /* and now the last piece */
+        result = (result << bits) + (type->get(rng->state) >> (rng_bitwidth - bits));
+    }
+
+    return result;
+}
+
+/**
  * Generates a random integer in the full range of the \c igraph_uint_t
  * data type.
  *
@@ -305,24 +351,76 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
  * \return The random integer.
  */
 static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng) {
-    const igraph_rng_type_t *type = rng->type;
-    igraph_integer_t num_bits = igraph_rng_bits(rng);
-    igraph_integer_t bits_needed = sizeof(igraph_uint_t) * 8;
-    igraph_uint_t result = 0;
-
-    if (num_bits >= bits_needed) {
-        /* this is easy and we want to avoid a shift with num_bits to the left
-         * if it is the same as sizeof(igraph_uint_t) */
-        return type->get(rng->state);
-    }
-
-    while (bits_needed > 0) {
-        result = (result << num_bits) + type->get(rng->state);
-        bits_needed -= num_bits;
-    }
-
-    return result;
+    return igraph_i_rng_get_random_bits(rng, sizeof(igraph_uint_t) * 8);
 }
+
+/**
+ * Generates a random integer in the full range of the \c uint32_t
+ * data type.
+ *
+ * \param rng The RNG.
+ * \param range The upper bound (inclusive).
+ * \return The random integer.
+ */
+static uint32_t igraph_i_rng_get_uint32(igraph_rng_t *rng) {
+    return igraph_i_rng_get_random_bits(rng, 32);
+}
+
+/**
+ * Generates a random integer in the range [0; range) (upper bound exclusive),
+ * restricted to at most 32 bits.
+ *
+ * \param rng The RNG.
+ * \param range The upper bound (exclusive).
+ * \return The random integer.
+ */
+static uint32_t igraph_i_rng_get_uint32_bounded(igraph_rng_t *rng, uint32_t range) {
+    /* Debiased integer multiplication -- Lemire's method
+     * from https://www.pcg-random.org/posts/bounded-rands.html */
+    uint32_t x, l, t = (-range) % range;
+    uint64_t m;
+    do {
+        x = igraph_i_rng_get_uint32(rng);
+        m = (uint64_t)(x) * (uint64_t)(range);
+        l = (uint32_t)m;
+    } while (l < t);
+    return m >> 32;
+}
+
+#if IGRAPH_INTEGER_SIZE == 64
+/**
+ * Generates a random integer in the full range of the \c uint64_t
+ * data type.
+ *
+ * \param rng The RNG.
+ * \param range The upper bound (inclusive).
+ * \return The random integer.
+ */
+static uint64_t igraph_i_rng_get_uint64(igraph_rng_t *rng) {
+    return igraph_i_rng_get_random_bits(rng, 64);
+}
+
+/**
+ * Generates a random integer in the range [0; range) (upper bound exclusive),
+ * restricted to at most 64 bits.
+ *
+ * \param rng The RNG.
+ * \param range The upper bound (exclusive).
+ * \return The random integer.
+ */
+static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t range) {
+    /* Debiased integer multiplication -- Lemire's method
+     * from https://www.pcg-random.org/posts/bounded-rands.html */
+    uint64_t x, l, t = (-range) % range;
+    __uint128_t m;
+    do {
+        x = igraph_i_rng_get_uint(rng);
+        m = (__uint128_t)(x) * (__uint128_t)(range);
+        l = (uint64_t)m;
+    } while (l < t);
+    return m >> 64;
+}
+#endif
 
 /**
  * Generates a random integer in the range [0; range) (upper bound exclusive).
@@ -332,25 +430,19 @@ static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng) {
  * \return The random integer.
  */
 static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uint_t range) {
-    /* Debiased integer multiplication -- Lemire's method
-     * from https://www.pcg-random.org/posts/bounded-rands.html */
-    igraph_uint_t x, l, t = (-range) % range;
+    /* We must make this function behave the same way for range < 2^32 so igraph
+     * behaves the same way on 32-bit and 64-bit platforms as long as we stick
+     * to integers less than 2^32. This is to ensure that the unit tests are
+     * consistent */
+
 #if IGRAPH_INTEGER_SIZE == 32
-    uint64_t m;
-    do {
-        x = igraph_i_rng_get_uint(rng);
-        m = (uint64_t)(x) * (uint64_t)(range);
-        l = (igraph_uint_t)m;
-    } while (l < t);
-    return m >> 32;
+    return igraph_i_rng_get_uint32_bounded(rng, range);
 #else
-    __uint128_t m;
-    do {
-        x = igraph_i_rng_get_uint(rng);
-        m = (__uint128_t)(x) * (__uint128_t)(range);
-        l = (igraph_integer_t)m;
-    } while (l < t);
-    return m >> 64;
+    if (range <= UINT32_MAX) {
+        return igraph_i_rng_get_uint32_bounded(rng, range);
+    } else {
+        return igraph_i_rng_get_uint64_bounded(rng, range);
+    }
 #endif
 }
 
