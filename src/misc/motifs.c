@@ -105,7 +105,9 @@ static igraph_error_t igraph_i_motifs_randesu_update_hist(
  * number of motifs of a given size in a graph;
  * \ref igraph_motifs_randesu_callback() for calling a callback function
  * for every motif found; \ref igraph_subisomorphic_lad() for finding
- * subgraphs on more than 4 (directed) or 6 (undirected) vertices.
+ * subgraphs on more than 4 (directed) or 6 (undirected) vertices;
+ * \ref igraph_graph_count() to find the number of graph on a given
+ * number of vertices, i.e. the length of the \p hist vector.
  *
  * Time complexity: TODO.
  *

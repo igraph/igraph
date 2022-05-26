@@ -297,6 +297,8 @@ IGRAPH_EXPORT igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, con
 IGRAPH_EXPORT igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                                          igraph_integer_t number, igraph_bool_t directed);
 
+IGRAPH_EXPORT igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count);
+
 
 
 

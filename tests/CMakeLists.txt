@@ -235,6 +235,7 @@ add_examples(
   bellman_ford
   dijkstra
   igraph_assortativity_degree
+  igraph_assortativity_nominal
   igraph_average_path_length
   igraph_cocitation
   igraph_diameter
@@ -478,6 +479,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  all_almost_e
   igraph_almost_equals
   igraph_power_law_fit
   overflow
