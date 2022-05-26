@@ -17,13 +17,13 @@ int main() {
         }
     }
     
-    igraph_t g;
     igraph_vector_int_t node_type_vec;
     igraph_vector_int_init(&node_type_vec, nodes);
 
     // igraph_matrix_print(&pref_matrix);
     for (int i = 0; i < 5; i++) {
         igraph_real_t assortativity;
+        igraph_t g;
 
         /* Generate undirected graph with 1000 nodes and 50 vertex types */
         igraph_preference_game(&g, nodes, types, /* type_dist= */ NULL, /* fixed_sizes= */ 1, &pref_matrix, &node_type_vec, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
