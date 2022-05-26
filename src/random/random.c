@@ -35,6 +35,10 @@
 
 #include "config.h" /* IGRAPH_THREAD_LOCAL, HAVE___UINT128_T, HAVE__UMUL128 */
 
+#ifdef HAVE__UMUL128
+#include <intrin.h> /* _umul128() is defined in intrin.h */
+#endif
+
 #include <assert.h>
 #include <math.h>
 #include <string.h>

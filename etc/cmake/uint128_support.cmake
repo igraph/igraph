@@ -5,6 +5,8 @@ cmake_push_check_state(RESET)
 
 # Check whether the compiler supports the _umul128() intrinsic
 check_cxx_source_runs("
+    #include <intrin.h>
+
     int main() {
         unsigned long long a = 0, b = 0;
         unsigned long long c;
