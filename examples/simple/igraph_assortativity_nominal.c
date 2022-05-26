@@ -8,7 +8,7 @@ int main() {
     igraph_matrix_init(&pref_matrix, types, types);
 
     igraph_rng_seed(igraph_rng_default(), 42);
-    printf("Randomly generated graph with %lld nodes and %lld vertex types\n\n", nodes, types);
+    printf("Randomly generated graph with %ld nodes and %ld vertex types\n\n", (int)nodes, (int)types);
 
     /* Generate preference matrix giving connection probabilities for different vertex types */
     for (igraph_integer_t i = 0; i < types; i++) {
@@ -19,11 +19,11 @@ int main() {
     
     igraph_t g;
     igraph_vector_int_t node_type_vec;
+    igraph_vector_int_init(&node_type_vec, nodes);
 
     // igraph_matrix_print(&pref_matrix);
     for (int i = 0; i < 5; i++) {
         igraph_real_t assortativity;
-        igraph_vector_int_init(&node_type_vec, nodes);
 
         /* Generate undirected graph with 1000 nodes and 50 vertex types */
         igraph_preference_game(&g, nodes, types, /* type_dist= */ NULL, /* fixed_sizes= */ 1, &pref_matrix, &node_type_vec, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
@@ -38,7 +38,7 @@ int main() {
         printf("Assortativity after rewiring = %g\n\n", assortativity);
 
         igraph_destroy(&g);    
-        igraph_vector_int_destroy(&node_type_vec);
     }
+    igraph_vector_int_destroy(&node_type_vec);
     igraph_matrix_destroy(&pref_matrix);
 }
