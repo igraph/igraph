@@ -21,6 +21,7 @@
 
 */
 
+
 #include "igraph_random.h"
 
 #include "igraph_nongraph.h"
@@ -32,7 +33,7 @@
 #include "core/math.h"
 #include "random/random_internal.h"
 
-#include "config.h" /* IGRAPH_THREAD_LOCAL */
+#include "config.h" /* IGRAPH_THREAD_LOCAL, HAVE___UINT128_T, HAVE__UMUL128 */
 
 #include <assert.h>
 #include <math.h>
@@ -412,6 +413,16 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
     /* Debiased integer multiplication -- Lemire's method
      * from https://www.pcg-random.org/posts/bounded-rands.html */
     uint64_t x, l, t = (-range) % range;
+#ifdef HAVE__UMUL128
+    /* MSVC has _umul128() so we use that */
+    uint64_t hi;
+    do {
+        x = igraph_i_rng_get_uint(rng);
+        l = _umul128(x, range, &hi);
+    } while (l < t);
+    return hi;
+#elif defined(HAVE___UINT128_T)
+    /* gcc and clang have __uint128_t */
     __uint128_t m;
     do {
         x = igraph_i_rng_get_uint(rng);
@@ -419,8 +430,12 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
         l = (uint64_t)m;
     } while (l < t);
     return m >> 64;
-}
+#else
+#  error "igraph requires __uint128_t or _umul128() in 64-bit mode"
 #endif
+}
+
+#endif /* IGRAPH_INTEGER_SIZE == 64 */
 
 /**
  * Generates a random integer in the range [0; range) (upper bound exclusive).

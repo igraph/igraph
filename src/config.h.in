@@ -14,6 +14,9 @@
 #cmakedefine HAVE_XLOCALE 1
 #cmakedefine HAVE__CONFIGTHREADLOCALE 1
 
+#cmakedefine HAVE__UMUL128 1
+#cmakedefine HAVE___UINT128_T 1
+
 #cmakedefine HAVE_GLPK 1
 #cmakedefine HAVE_LIBXML 1
 
