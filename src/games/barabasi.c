@@ -245,7 +245,13 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
             no_of_neighbors = (long int) VECTOR(*outseq)[k];
         }
         for (j = 0; j < no_of_neighbors; j++) {
-            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weights,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            }
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
@@ -363,7 +369,13 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
         } else {
             for (j = 0; j < no_of_neighbors; j++) {
                 sum = igraph_psumtree_sum(&sumtree);
-                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+                if (sum == 0) {
+                    /* If none of the so-far added nodes have positive weights,
+                     * we choose one uniformly to connect to. */
+                    to = RNG_INTEGER(0, i-1);
+                } else {
+                    igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+                }
                 VECTOR(degree)[to]++;
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
@@ -636,8 +648,8 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     }
     if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
         IGRAPH_ERRORF("The length of the out-degree sequence (%ld) does not agree with the number of nodes (%ld).",
-                       IGRAPH_EINVAL,
-                       igraph_vector_size(outseq), no_of_nodes);
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(outseq), no_of_nodes);
     }
     if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m < 0) {
         IGRAPH_ERRORF("The number of edges per time step must not be negative, got %" IGRAPH_PRId ".",
@@ -646,29 +658,29 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     }
     if (aging_bins <= 0) {
         IGRAPH_ERRORF("Number of aging bins must be positive, got %" IGRAPH_PRId ".",
-                     IGRAPH_EINVAL,
-                     aging_bins);
+                      IGRAPH_EINVAL,
+                      aging_bins);
     }
     if (deg_coef < 0) {
         IGRAPH_ERRORF("Degree coefficient must be non-negative, got %g.",
-                     IGRAPH_EINVAL,
-                     deg_coef);
+                      IGRAPH_EINVAL,
+                      deg_coef);
     }
     if (age_coef < 0) {
         IGRAPH_ERRORF("Age coefficient must be non-negative, got %g.",
-                     IGRAPH_EINVAL,
-                     deg_coef);
+                      IGRAPH_EINVAL,
+                      deg_coef);
     }
 
     if (zero_deg_appeal < 0) {
         IGRAPH_ERRORF("Zero degree appeal must be non-negative, got %g.",
-                     IGRAPH_EINVAL,
-                     zero_deg_appeal);
+                      IGRAPH_EINVAL,
+                      zero_deg_appeal);
     }
     if (zero_age_appeal < 0) {
         IGRAPH_ERRORF("Zero age appeal must be non-negative, got %g.",
-                     IGRAPH_EINVAL,
-                     zero_age_appeal);
+                      IGRAPH_EINVAL,
+                      zero_age_appeal);
     }
 
     if (no_of_nodes == 0) {
@@ -709,7 +721,13 @@ int igraph_barabasi_aging_game(igraph_t *graph,
         }
         sum = igraph_psumtree_sum(&sumtree);
         for (j = 0; j < no_of_neighbors; j++) {
-            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weights,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            }
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;

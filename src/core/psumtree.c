@@ -162,7 +162,9 @@ igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx) {
  *
  * \param t The tree to query.
  * \param idx The index of the item is returned here.
- * \param search The value to use for the search.
+ * \param search The value to use for the search. Must be in the interval
+ *        <code>[0, sum)</code>, where \c sum is the sum of all elements
+ *        (leaves) in the tree.
  * \return Error code; currently the search always succeeds.
  *
  * Time complexity: O(log n), where n is the number of items in the tree.
@@ -173,8 +175,11 @@ int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
     long int i = 1;
     long int size = igraph_vector_size(tree);
 
+    IGRAPH_ASSERT(search >= 0);
+    IGRAPH_ASSERT(search < igraph_psumtree_sum(t));
+
     while ( 2 * i + 1 <= size) {
-        if ( search <= VECTOR(*tree)[i * 2 - 1] ) {
+        if ( search < VECTOR(*tree)[i * 2 - 1] ) {
             i <<= 1;
         } else {
             search -= VECTOR(*tree)[i * 2 - 1];

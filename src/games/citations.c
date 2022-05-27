@@ -163,7 +163,13 @@ int igraph_lastcit_game(igraph_t *graph,
         for (j = 0; j < edges_per_node; j++) {
             long int to;
             igraph_real_t sum = igraph_psumtree_sum(&sumtree);
-            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weight,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            }
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, to);
             lastcit[to] = i + 1;
@@ -452,7 +458,13 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         igraph_real_t sum = VECTOR(sums)[type];
         for (j = 0; j < edges_per_step; j++) {
             long int to;
-            igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weight,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
+            }
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, to);
         }

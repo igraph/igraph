@@ -107,6 +107,25 @@ int main() {
     igraph_vector_destroy(&vec);
     igraph_psumtree_destroy(&tree);
 
+    /* Check that search considers intervals closed on the left,
+     * see https://github.com/igraph/igraph/issues/2080 */
+
+    igraph_psumtree_init(&tree, 6);
+    igraph_psumtree_update(&tree, 2, 1.0);
+    igraph_psumtree_update(&tree, 4, 1.0);
+    {
+        long int idx;
+        igraph_psumtree_search(&tree, &idx, 0.0);
+        IGRAPH_ASSERT(idx  == 2);
+        igraph_psumtree_search(&tree, &idx, 0.5);
+        IGRAPH_ASSERT(idx  == 2);
+        igraph_psumtree_search(&tree, &idx, 1.0);
+        IGRAPH_ASSERT(idx  == 4);
+        igraph_psumtree_search(&tree, &idx, 1.2);
+        IGRAPH_ASSERT(idx  == 4);
+    }
+    igraph_psumtree_destroy(&tree);
+
     /****************************************************/
     /* Non power-of-two vector size                     */
     /****************************************************/
