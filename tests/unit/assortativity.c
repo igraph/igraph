@@ -133,7 +133,7 @@ int main() {
 
     /* unnormalized assortativity based on categories is the same as modularity */
     igraph_modularity(&g, &types, NULL, 1, 0, &modularity);
-    IGRAPH_ASSERT(assort_unnorm == modularity);
+    IGRAPH_ASSERT(igraph_almost_equals(assort_unnorm, modularity, 1e-15));
 
     igraph_destroy(&g);
     igraph_vector_int_destroy(&types);
@@ -152,7 +152,7 @@ int main() {
      * a constant shift in the values. */
     igraph_vector_add_constant(&values, -5);
     igraph_assortativity(&g, &values, 0, &assort2, IGRAPH_UNDIRECTED, /*normalized=*/ 1);
-    IGRAPH_ASSERT(assort == assort2);
+    IGRAPH_ASSERT(igraph_almost_equals(assort, assort2, 1e-15));
 
     igraph_assortativity(&g, &values, 0, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ 0);
     printf("Assortativity based on values, unnormalized: %g\n", assort);
@@ -161,7 +161,7 @@ int main() {
      * a constant shift in the values. */
     igraph_vector_add_constant(&values, -5);
     igraph_assortativity(&g, &values, 0, &assort2, IGRAPH_UNDIRECTED, /*normalized=*/ 0);
-    IGRAPH_ASSERT(assort == assort2);
+    IGRAPH_ASSERT(igraph_almost_equals(assort, assort2, 1e-15));
 
     igraph_vector_destroy(&values);
     igraph_destroy(&g);
