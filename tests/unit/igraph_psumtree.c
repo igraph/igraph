@@ -111,7 +111,7 @@ int main() {
     igraph_psumtree_update(&tree, 2, 1.0);
     igraph_psumtree_update(&tree, 4, 1.0);
     {
-        long int idx;
+        igraph_integer_t idx;
         igraph_psumtree_search(&tree, &idx, 0.0);
         IGRAPH_ASSERT(idx  == 2);
         igraph_psumtree_search(&tree, &idx, 0.5);
