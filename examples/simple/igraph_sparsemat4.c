@@ -34,6 +34,7 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
     igraph_vector_t res;
     igraph_integer_t j, p;
     igraph_real_t min, max;
+    igraph_bool_t success;
 
     igraph_vector_init_copy(&res, b);
 
@@ -48,7 +49,18 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
     igraph_vector_minmax(&res, &min, &max);
     igraph_vector_destroy(&res);
 
-    return fabs(min) < 1e-12 && fabs(max) < 1e-12;
+    success = fabs(min) < 1e-12 && fabs(max) < 1e-12;
+
+    if (!success) {
+        printf("Incorrect solution.\n\n");
+        printf("A =\n"); igraph_sparsemat_print(A, stdout); printf("\n");
+        printf("x =\n"); igraph_vector_print(x); printf("\n");
+        printf("b =\n"); igraph_vector_print(b); printf("\n");
+		printf("difference between A*x and b =\n");
+        igraph_vector_print(&res); printf("\n\n");
+    }
+
+    return success;
 }
 
 int main() {
