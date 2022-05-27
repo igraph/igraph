@@ -80,6 +80,7 @@ add_library(
   random/random.c
   random/rng_glibc2.c
   random/rng_mt19937.c
+  random/rng_pcg32.c
 
   graph/adjlist.c
   graph/attributes.c

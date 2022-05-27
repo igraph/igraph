@@ -100,30 +100,14 @@ void sample() {
     IGRAPH_ASSERT(x == 0);
 }
 
-int main() {
+void test_and_destroy(igraph_rng_type_t *rng_type) {
     igraph_rng_t *def = igraph_rng_default();
-
     igraph_rng_t rng;
 
-    printf("Default\n\n");
-    igraph_rng_seed(igraph_rng_default(), 709);
+    igraph_rng_init(&rng, rng_type);
 
-    sample();
+    printf("\n%s\n\n", igraph_rng_name(&rng));
 
-    printf("\nMT19937\n\n");
-
-    igraph_rng_init(&rng, &igraph_rngtype_mt19937);
-    igraph_rng_set_default(&rng);
-    igraph_rng_seed(igraph_rng_default(), 42);
-
-    sample();
-
-    igraph_rng_set_default(def);
-    igraph_rng_destroy(&rng);
-
-    printf("\nGLIBC2\n\n");
-
-    igraph_rng_init(&rng, &igraph_rngtype_glibc2);
     igraph_rng_set_default(&rng);
     igraph_rng_seed(igraph_rng_default(), 137);
 
@@ -131,6 +115,20 @@ int main() {
 
     igraph_rng_set_default(def);
     igraph_rng_destroy(&rng);
+}
+
+int main() {
+    igraph_rng_type_t rng_types[] = {igraph_rngtype_glibc2, igraph_rngtype_mt19937, igraph_rngtype_pcg32};
+    igraph_integer_t i;
+
+    printf("Default\n\n");
+    igraph_rng_seed(igraph_rng_default(), 709);
+
+    sample();
+
+    for (i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
+        test_and_destroy(&rng_types[i]);
+    }
 
     return 0;
 }

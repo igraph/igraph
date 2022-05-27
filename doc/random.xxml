@@ -38,10 +38,11 @@ By default igraph uses the MT19937 generator. Prior to igraph version
 0.6, the generator supplied by the standard C library was used. This
 means the GLIBC2 generator on GNU libc 2 systems, and maybe the BSD RAND
 generator on others. The RAND generator was removed due to poor statistical
-properties in version 0.10.
+properties in version 0.10. The PCG generator was added in version 0.10.
 </para>
 <!-- doxrox-include igraph_rngtype_mt19937 -->
 <!-- doxrox-include igraph_rngtype_glibc2 -->
+<!-- doxrox-include igraph_rngtype_pcg32 -->
 </section>
 
 <!-- doxrox-include rng_use_cases -->

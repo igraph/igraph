@@ -48,7 +48,7 @@ void test_and_destroy(igraph_rng_type_t *rng_type, igraph_rng_t *rng_def) {
 
 int main() {
     int i;
-    igraph_rng_type_t rng_types[] = {igraph_rngtype_glibc2, igraph_rngtype_mt19937};
+    igraph_rng_type_t rng_types[] = {igraph_rngtype_glibc2, igraph_rngtype_mt19937, igraph_rngtype_pcg32};
     igraph_rng_t rng_def;
 
     IGRAPH_ASSERT(igraph_rng_init(&rng_def, &igraph_rngtype_glibc2) == IGRAPH_SUCCESS);
