@@ -55,16 +55,29 @@ __BEGIN_DECLS
  * - get_exp()
  * - get_gamma()
  *
- * The best is probably to define get() and get_real() and leave the others as
- * NULL; igraph will use default implementations for these.
+ * The best is probably to define get() and maybe get_real(), and leave the
+ * others as NULL; igraph will use default implementations for these. Note that
+ * if all that you would do in get_real() is to generate random bits with get()
+ * and divide by the maximum, don't do that; the default implementation takes
+ * care of this.
  */
 typedef struct igraph_rng_type_t {
     const char *name;
     uint8_t bits;
+
+    /* Initialization and destruction */
     igraph_error_t (*init)(void **state);
     void (*destroy)(void *state);
+
+    /* Seeding */
     igraph_error_t (*seed)(void *state, igraph_uint_t seed);
+
+    /* Fundamental generator: return as many random bits as the RNG supports in
+     * a single round */
     igraph_uint_t (*get)(void *state);
+
+    /* Optional generators; defaults are provided by igraph that rely solely
+     * on get() */
     igraph_real_t (*get_real)(void *state);
     igraph_real_t (*get_norm)(void *state);
     igraph_real_t (*get_geom)(void *state, igraph_real_t p);

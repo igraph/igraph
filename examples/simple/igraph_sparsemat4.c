@@ -56,7 +56,7 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
         printf("A =\n"); igraph_sparsemat_print(A, stdout); printf("\n");
         printf("x =\n"); igraph_vector_print(x); printf("\n");
         printf("b =\n"); igraph_vector_print(b); printf("\n");
-		printf("difference between A*x and b =\n");
+        printf("difference between A*x and b =\n");
         igraph_vector_print(&res); printf("\n\n");
     }
 
