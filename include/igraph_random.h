@@ -77,7 +77,7 @@ typedef struct igraph_rng_type_t {
 typedef struct igraph_rng_t {
     const igraph_rng_type_t *type;
     void *state;
-    int def;
+    igraph_bool_t is_seeded;
 } igraph_rng_t;
 
 /* --------------------------------- */
@@ -132,9 +132,9 @@ void PutRNGstate(void);
 #else
 
 #define RNG_BEGIN() \
-    if (igraph_rng_default()->def == 1) { \
+    if (!igraph_rng_default()->is_seeded) { \
         igraph_rng_seed(igraph_rng_default(), time(0)); \
-        igraph_rng_default()->def=2; \
+        igraph_rng_default()->is_seeded = 1; \
     }
 #define RNG_END()       /* do nothing */
 

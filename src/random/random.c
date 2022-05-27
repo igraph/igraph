@@ -150,6 +150,16 @@ extern IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default; /* defined in rng_
  * \function igraph_rng_set_default
  * \brief Set the default igraph random number generator.
  *
+ * This function \em copies the internal structure of the given \c igraph_rng_t
+ * object to igraph's internal default RNG structure. The structure itself
+ * contains two pointers only, one to the "methods" of the RNG and one to the
+ * memory buffer holding the internal state of the RNG. This means that if you
+ * keep on generating random numbers from the RNG after setting it as the
+ * default, it will affect the state of the default RNG as well because the two
+ * share the same state pointer. However, do \em not expect
+ * \ref igraph_rng_default() to return the same pointer as the one you passed
+ * in here - the state is shared, but the entire structure is not.
+ *
  * \param rng The random number generator to use as default from now
  *    on. Calling \ref igraph_rng_destroy() on it, while it is still
  *    being used as the default will result in crashes and/or
@@ -248,7 +258,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
  */
 igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
     const igraph_rng_type_t *type = rng->type;
-    rng->def = 0;
+    rng->is_seeded = 1;
     IGRAPH_CHECK(type->seed(rng->state, seed));
     return IGRAPH_SUCCESS;
 }
@@ -317,10 +327,10 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
  * RNG multiple times if needed.
  *
  * \param rng The RNG.
- * \param bits The number of random bits needed. Must be smaller than the size
- *        of the \c igraph_uint_t data type. Passing a value larger than the
- *        size of \c igraph_uint_t will throw away random bits except the last
- *        few that are needed to fill an \c igraph_uint_t .
+ * \param bits The number of random bits needed. Must be smaller than or equal
+ *        to the size of the \c igraph_uint_t data type. Passing a value larger
+ *        than the size of \c igraph_uint_t will throw away random bits except
+ *        the last few that are needed to fill an \c igraph_uint_t .
  * \return The random bits, packed into the low bits of an \c igraph_uint_t .
  *         The upper, unused bits of \c igraph_uint_t will be set to zero.
  */
@@ -352,7 +362,6 @@ static igraph_uint_t igraph_i_rng_get_random_bits(igraph_rng_t *rng, uint8_t bit
  * data type.
  *
  * \param rng The RNG.
- * \param range The upper bound (inclusive).
  * \return The random integer.
  */
 static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng) {
@@ -364,7 +373,6 @@ static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng) {
  * data type.
  *
  * \param rng The RNG.
- * \param range The upper bound (inclusive).
  * \return The random integer.
  */
 static uint32_t igraph_i_rng_get_uint32(igraph_rng_t *rng) {
