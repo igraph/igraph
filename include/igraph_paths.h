@@ -182,6 +182,9 @@ IGRAPH_EXPORT igraph_error_t igraph_eccentricity(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                                 igraph_neimode_t mode);
 
+IGRAPH_EXPORT igraph_error_t igraph_graph_center(const igraph_t *graph, igraph_vector_t *res,
+                                igraph_neimode_t mode);
+
 IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                                          igraph_real_t *diameter,
                                          igraph_integer_t vid_start,

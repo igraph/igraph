@@ -777,3 +777,50 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_graph_center
+ * \brief Centre vertices of a graph.
+ *
+ * The centre vertices of a graph is calculated by finding the vertices
+ * with the minimum eccentricity
+ *
+ * \param graph The input graph, it can be directed or undirected.
+ * \param res Pointer to an initialized vector, the result is stored
+ *    here.
+ * \param mode What kind of paths to consider for the calculation:
+ *    \c IGRAPH_OUT, paths that follow edge directions;
+ *    \c IGRAPH_IN, paths that follow the opposite directions; and
+ *    \c IGRAPH_ALL, paths that ignore edge directions. This argument
+ *    is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(v*(|V|+|E|)), where |V| is the number of
+ * vertices, |E| is the number of edges and v is the number of
+ * vertices for which eccentricity is calculated.
+ *
+ * \sa \ref igraph_eccentricity().
+ *
+ */
+igraph_error_t igraph_graph_center(const igraph_t *graph, igraph_vector_t *res,
+                  igraph_neimode_t mode) {
+
+    igraph_vector_t ecc;
+    igraph_vs_t vids = igraph_vss_all();
+
+    IGRAPH_CHECK(igraph_vector_init(&ecc, 0));
+    IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, vids, mode));
+    if (igraph_vcount(graph)) {
+        igraph_integer_t n = igraph_vector_size(&ecc);
+        igraph_integer_t min_eccentricity = (igraph_integer_t) igraph_vector_min(&ecc);
+
+        for (int i = 0; i < n; i++) {
+            if (VECTOR(ecc)[i] == min_eccentricity) {
+                igraph_vector_push_back(res, i);
+            }
+        }
+    }
+
+    igraph_vector_destroy(&ecc);
+    return 0;
+}
