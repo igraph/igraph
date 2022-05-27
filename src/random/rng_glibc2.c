@@ -100,9 +100,7 @@ static igraph_error_t igraph_rng_glibc2_init(void **state) {
     igraph_i_rng_glibc2_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_glibc2_state_t);
-    if (!st) {
-        IGRAPH_ERROR("Cannot initialize GNU libc 2 RNG", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(st, "Cannot initialize GNU libc 2 RNG");
     (*state) = st;
 
     igraph_rng_glibc2_seed(st, 0);
