@@ -780,11 +780,11 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
 /**
  * \function igraph_graph_center
- * \brief Centre vertices of a graph.
+ * \brief Central vertices of a graph.
  *
- * The centre vertices of a graph is calculated by finding the vertices
- * with the minimum eccentricity
- *
+ * The central vertices of a graph is calculated by finding the vertices
+ * with the minimum eccentricity. 
+ * 
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to an initialized vector, the result is stored
  *    here.
@@ -802,19 +802,22 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
  * \sa \ref igraph_eccentricity().
  *
  */
-igraph_error_t igraph_graph_center(const igraph_t *graph, igraph_vector_t *res,
-                  igraph_neimode_t mode) {
+igraph_error_t igraph_graph_center(const igraph_t *graph, 
+                    igraph_vector_t *res,
+                    igraph_vs_t vids,
+                    igraph_neimode_t mode) {
 
     igraph_vector_t ecc;
-    igraph_vs_t vids = igraph_vss_all();
-
-    IGRAPH_CHECK(igraph_vector_init(&ecc, 0));
+    igraph_vector_clear(res);
+    IGRAPH_ASSERT(igraph_vector_empty(res));
+    IGRAPH_VECTOR_INIT_FINALLY(&ecc, 0);
+    // Assume igraph_eccentricity() does not return infinity or NaN 
     IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, vids, mode));
-    if (igraph_vcount(graph)) {
-        igraph_integer_t n = igraph_vector_size(&ecc);
-        igraph_integer_t min_eccentricity = (igraph_integer_t) igraph_vector_min(&ecc);
+    if (igraph_vcount(graph) > 0) {
+        igraph_real_t n = igraph_vector_size(&ecc);
+        igraph_real_t min_eccentricity = igraph_vector_min(&ecc);
 
-        for (int i = 0; i < n; i++) {
+        for (igraph_integer_t i = 0; i < n; i++) {
             if (VECTOR(ecc)[i] == min_eccentricity) {
                 igraph_vector_push_back(res, i);
             }
@@ -822,5 +825,6 @@ igraph_error_t igraph_graph_center(const igraph_t *graph, igraph_vector_t *res,
     }
 
     igraph_vector_destroy(&ecc);
-    return 0;
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
 }
