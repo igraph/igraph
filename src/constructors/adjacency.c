@@ -919,7 +919,6 @@ static igraph_error_t igraph_i_sparse_adjacency_directed(
                 IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
             }
             for (igraph_integer_t count = 0; count < multi; count++) {
-                //TODO edge directions are reverse of igraph_sparsemat(), why?
                 VECTOR(*edges)[e++] = i[from];
                 VECTOR(*edges)[e++] = to;
             }
@@ -954,7 +953,6 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
                     IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
                 }
                 for (igraph_integer_t count = 0; count < multi; count++) {
-                    //edge directions are reverse of igraph_sparsemat()
                     VECTOR(*edges)[e++] = i[from];
                     VECTOR(*edges)[e++] = to;
                 }
@@ -990,7 +988,6 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
                     IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
                 }
                 for (igraph_integer_t count = 0; count < multi; count++) {
-                    //edge directions are reverse of igraph_sparsemat()
                     VECTOR(*edges)[e++] = i[from];
                     VECTOR(*edges)[e++] = to;
                 }
@@ -1026,7 +1023,6 @@ static igraph_error_t igraph_i_sparse_adjacency_plus(
                     IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
                 }
                 for (igraph_integer_t count = 0; count < multi; count++) {
-                    //edge directions are reverse of igraph_sparsemat()
                     VECTOR(*edges)[e++] = i[from];
                     VECTOR(*edges)[e++] = to;
                 }
@@ -1057,7 +1053,6 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
                     IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
                 }
                 for (igraph_integer_t count = 0; count < multi; count++) {
-                    //edge directions are reverse of igraph_sparsemat()
                     VECTOR(*edges)[e++] = i[from];
                     VECTOR(*edges)[e++] = to;
                 }
@@ -1089,7 +1084,6 @@ static igraph_error_t igraph_i_sparse_adjacency_lower(
                     IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
                 }
                 for (igraph_integer_t count = 0; count < multi; count++) {
-                    //edge directions are reverse of igraph_sparsemat()
                     VECTOR(*edges)[e++] = i[from];
                     VECTOR(*edges)[e++] = to;
                 }
@@ -1142,11 +1136,11 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
     CS_INT no_of_nodes = adjmatrix->cs->m;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
     if (no_of_edges) {
-        no_of_edges *= igraph_sparsemat_max(adjmatrix) * 2; //TODO maybe find a better maximum?
+        no_of_edges *= igraph_sparsemat_max(adjmatrix);
     }
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
-        IGRAPH_ERROR("Sparese adjacency matrix should be in column-compressed "
+        IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
                "form.", IGRAPH_EINVAL);
     }
     if (no_of_nodes != adjmatrix->cs->n) {
@@ -1421,7 +1415,7 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_vector_int_t edges;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
     if (no_of_edges) {
-        no_of_edges *= igraph_sparsemat_max(adjmatrix); //TODO maybe find a better maximum?
+        no_of_edges *= igraph_sparsemat_max(adjmatrix);
     }
     CS_INT no_of_nodes = adjmatrix->cs->m;
     /* Some checks */
