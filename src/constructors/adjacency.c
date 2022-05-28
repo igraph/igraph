@@ -908,12 +908,11 @@ static igraph_error_t igraph_i_sparse_adjacency_directed(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             igraph_integer_t multi = entry[to];
             if (from == i[to]) {
@@ -926,7 +925,6 @@ static igraph_error_t igraph_i_sparse_adjacency_directed(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
 
@@ -940,12 +938,11 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_real_t other;
@@ -965,7 +962,6 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
 
@@ -979,12 +975,11 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_real_t other;
@@ -1004,7 +999,6 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
 
@@ -1018,12 +1012,11 @@ static igraph_error_t igraph_i_sparse_adjacency_plus(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_real_t other;
@@ -1043,7 +1036,6 @@ static igraph_error_t igraph_i_sparse_adjacency_plus(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
 
@@ -1057,12 +1049,11 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_integer_t multi = entry[to];
@@ -1077,7 +1068,6 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
 
@@ -1092,12 +1082,11 @@ static igraph_error_t igraph_i_sparse_adjacency_lower(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from <= i[to]) {
                 igraph_integer_t multi = entry[to];
@@ -1112,7 +1101,6 @@ static igraph_error_t igraph_i_sparse_adjacency_lower(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
 
@@ -1126,7 +1114,6 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
@@ -1135,7 +1122,7 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
         IGRAPH_ERROR("Adjacency matrix should be symmetric for IGRAPH_ADJ_UNDIRECTED.",
                 IGRAPH_EINVAL);
     }
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_integer_t multi = entry[to];
@@ -1149,7 +1136,6 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
 
@@ -1222,12 +1208,11 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_real_t other;
@@ -1247,7 +1232,6 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
     igraph_vector_resize(weights, e/2);
@@ -1261,12 +1245,11 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_min (
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_real_t other;
@@ -1286,7 +1269,6 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_min (
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
     igraph_vector_resize(weights, e/2);
@@ -1301,12 +1283,11 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_plus (
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_real_t weight = entry[to];
@@ -1329,7 +1310,6 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_plus (
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
     igraph_vector_resize(weights, e/2);
@@ -1355,12 +1335,11 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from >= i[to]) {
                 igraph_real_t weight = entry[to];
@@ -1375,7 +1354,6 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
     igraph_vector_resize(weights, e/2);
@@ -1390,12 +1368,11 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             if (from <= i[to]) {
                 igraph_real_t weight = entry[to];
@@ -1411,7 +1388,6 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
     igraph_vector_resize(weights, e/2);
@@ -1426,12 +1402,11 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
     CS_INT *p = adjmatrix->cs->p;
     CS_INT *i = adjmatrix->cs->i;
     CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
     igraph_integer_t to = 0;
     igraph_integer_t e = 0;
     CS_ENTRY *entry = adjmatrix->cs->x;
 
-    while (p[from] < no_of_edges) {
+    for (igraph_integer_t from = 0; p[from] < no_of_edges; from++) {
         while (to < p[from + 1]) {
             igraph_real_t weight = entry[to];
             if (from == i[to]) {
@@ -1444,7 +1419,6 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
             }
             to++;
         }
-        from++;
     }
     igraph_vector_int_resize(edges, e);
     igraph_vector_resize(weights, e/2);
