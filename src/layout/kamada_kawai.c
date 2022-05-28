@@ -113,7 +113,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     igraph_integer_t i, j, m;
 
     if (maxiter < 0) {
-        IGRAPH_ERROR("Number of iterations must be non-negatice in "
+        IGRAPH_ERROR("Number of iterations must be non-negative in "
                      "Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
     if (kkconst <= 0) {
