@@ -74,7 +74,7 @@ int main() {
 
     printf("\nOut-star:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_ALL) == IGRAPH_SUCCESS);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
