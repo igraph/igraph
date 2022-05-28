@@ -1129,6 +1129,18 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup generators
+ * \function igraph_sparse_adjacency
+ * \brief Creates a graph from a sparse adjacency matrix.
+ *
+ * This has the same functionality as \ref igraph_adjacency(), but uses
+ * a column-compressed adjacency matrix.
+ *
+ * Time complexity: O(|E|),
+ * where |E| is the number of edges in the graph.
+ */
+
 igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjmatrix,
         igraph_adjacency_t mode, igraph_loops_t loops) {
 
@@ -1407,6 +1419,18 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup generators
+ * \function igraph_sparse_weighted_adjacency
+ * \brief Creates a graph from a weighted sparse adjacency matrix.
+ *
+ * This has the same functionality as \ref igraph_weighted_adjacency(), but uses
+ * a column-compressed adjacency matrix.
+ *
+ * Time complexity: O(|E|),
+ * where |E| is the number of edges in the graph.
+ */
+
 
 igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_t *graph, igraph_sparsemat_t *adjmatrix, igraph_adjacency_t mode,
@@ -1418,9 +1442,17 @@ igraph_error_t igraph_sparse_weighted_adjacency(
         no_of_edges *= igraph_sparsemat_max(adjmatrix);
     }
     CS_INT no_of_nodes = adjmatrix->cs->m;
-    /* Some checks */
-    if (igraph_sparsemat_nrow(adjmatrix) != igraph_sparsemat_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
+
+    if (!igraph_sparsemat_is_cc(adjmatrix)) {
+        IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
+               "form.", IGRAPH_EINVAL);
+    }
+    if (no_of_nodes != adjmatrix->cs->n) {
+        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+    }
+    if (no_of_nodes != 0 && igraph_sparsemat_min(adjmatrix) < 0) {
+        IGRAPH_ERRORF("Edge counts should be non-negative, found %g.", IGRAPH_EINVAL,
+                igraph_sparsemat_min(adjmatrix));
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
