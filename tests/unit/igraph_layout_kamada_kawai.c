@@ -74,6 +74,25 @@ int main() {
     igraph_destroy(&g);
     destroy_bounds(bounds);
 
+    printf("Two connected vertices.\n");
+    igraph_small(&g, 2, 0, 0,1, -1);
+    igraph_matrix_init(&result, 0, 0);
+    igraph_layout_kamada_kawai(&g, &result, /*use_seed*/ 0, /*maxiter*/ 1000,
+            /*epsilon*/ 0, /*kkconst */ 1000,
+            /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
+            /*maxy*/ NULL);
+    check_and_destroy(&result, 1.0);
+
+    printf("Two connected vertices in a box.\n");
+    igraph_matrix_init(&result, 0, 0);
+    make_box(2, 1.0, bounds);
+    igraph_layout_kamada_kawai(&g, &result, /*use_seed*/ 0, /*maxiter*/ 1000,
+            /*epsilon*/ 0, /*kkconst */ 1000,
+            /*weights*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3]);
+    check_and_destroy(&result, 1.0);
+    igraph_destroy(&g);
+    destroy_bounds(bounds);
+
     printf("A few tests with a disconnected graph of 10 vertices with loops in a box from -1 to 1.\n");
     igraph_small(&g, 10, 0, 0,1, 1,2, 2,0, 5,6, 6,7, 7,6, 7,7, 8,8, -1);
     igraph_vector_init(&weights, 8);
