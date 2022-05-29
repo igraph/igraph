@@ -931,9 +931,17 @@ igraph_bfs:
         NEIMODE mode=OUT, BOOLEAN unreachable,
         VERTEX_INDICES restricted,
         OUT VERTEX_INDICES order, OUT VECTOR_INT rank,
-        OUT VECTOR_INT father,
+        OUT VECTOR_INT parents,
         OUT VECTOR_INT pred, OUT VECTOR_INT succ,
         OUT VECTOR_INT dist, BFS_FUNC callback, EXTRA extra
+
+igraph_bfs_simple:
+    PARAMS: |-
+        GRAPH graph, VERTEX root,
+        NEIMODE mode=OUT,
+        OUT VERTEX_INDICES order,
+        OUT VECTOR_INT layers,
+        OUT VECTOR_INT parents
 
 igraph_dfs:
     PARAMS: |-
