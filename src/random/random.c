@@ -41,7 +41,6 @@
 
 #include <assert.h>
 #include <math.h>
-#include <string.h>
 
 /**
  * \section about_rngs
