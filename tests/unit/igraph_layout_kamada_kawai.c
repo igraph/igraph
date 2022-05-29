@@ -78,7 +78,7 @@ int main() {
     igraph_small(&g, 2, 0, 0,1, -1);
     igraph_matrix_init(&result, 0, 0);
     igraph_layout_kamada_kawai(&g, &result, /*use_seed*/ 0, /*maxiter*/ 1000,
-            /*epsilon*/ 0, /*kkconst */ 1000,
+            /*epsilon*/ 0, /*kkconst */ 2,
             /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
             /*maxy*/ NULL);
     check_and_destroy(&result, 1.0);
@@ -87,7 +87,7 @@ int main() {
     igraph_matrix_init(&result, 0, 0);
     make_box(2, 1.0, bounds);
     igraph_layout_kamada_kawai(&g, &result, /*use_seed*/ 0, /*maxiter*/ 1000,
-            /*epsilon*/ 0, /*kkconst */ 1000,
+            /*epsilon*/ 0, /*kkconst */ 2,
             /*weights*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3]);
     check_and_destroy(&result, 1.0);
     igraph_destroy(&g);
