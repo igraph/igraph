@@ -267,7 +267,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
  * \function igraph_rng_bits
  * \brief Query the number of random bits that a random number generator can generate in a single round.
  *
- * @param rng The RNG.
+ * \param rng The RNG.
  * \return The number of random bits that can be generated in a single round
  *         with the RNG.
  *
