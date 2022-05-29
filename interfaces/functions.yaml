@@ -19,12 +19,22 @@ igraph_add_edges:
 igraph_add_vertices:
     PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
 
+igraph_copy:
+    PARAMS: OUT GRAPH to, IN GRAPH from
+
 igraph_delete_edges:
     PARAMS: INOUT GRAPH graph, EDGESET edges
     DEPS: edges ON graph
 
 igraph_delete_vertices:
     PARAMS: INOUT GRAPH graph, VERTEXSET vertices
+    DEPS: vertices ON graph
+
+igraph_delete_vertices_idx:
+    PARAMS: |-
+        INOUT GRAPH graph, VERTEXSET vertices,
+        OPTIONAL OUT VECTOR_INT idx,
+        OPTIONAL OUT VECTOR_INT invidx
     DEPS: vertices ON graph
 
 igraph_vcount:
@@ -931,9 +941,17 @@ igraph_bfs:
         NEIMODE mode=OUT, BOOLEAN unreachable,
         VERTEX_INDICES restricted,
         OUT VERTEX_INDICES order, OUT VECTOR_INT rank,
-        OUT VECTOR_INT father,
+        OUT VECTOR_INT parents,
         OUT VECTOR_INT pred, OUT VECTOR_INT succ,
         OUT VECTOR_INT dist, BFS_FUNC callback, EXTRA extra
+
+igraph_bfs_simple:
+    PARAMS: |-
+        GRAPH graph, VERTEX root,
+        NEIMODE mode=OUT,
+        OUT VERTEX_INDICES order,
+        OUT VECTOR_INT layers,
+        OUT VECTOR_INT parents
 
 igraph_dfs:
     PARAMS: |-

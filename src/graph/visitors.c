@@ -338,7 +338,7 @@ cleanup:
  *
  * \example examples/simple/igraph_bfs_simple.c
  */
-igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
                       igraph_vector_int_t *order, igraph_vector_int_t *layers,
                       igraph_vector_int_t *parents) {
 
