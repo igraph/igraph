@@ -19,12 +19,22 @@ igraph_add_edges:
 igraph_add_vertices:
     PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
 
+igraph_copy:
+    PARAMS: OUT GRAPH to, IN GRAPH from
+
 igraph_delete_edges:
     PARAMS: INOUT GRAPH graph, EDGESET edges
     DEPS: edges ON graph
 
 igraph_delete_vertices:
     PARAMS: INOUT GRAPH graph, VERTEXSET vertices
+    DEPS: vertices ON graph
+
+igraph_delete_vertices_idx:
+    PARAMS: |-
+        INOUT GRAPH graph, VERTEXSET vertices,
+        OPTIONAL OUT VECTOR_INT idx,
+        OPTIONAL OUT VECTOR_INT invidx
     DEPS: vertices ON graph
 
 igraph_vcount:
