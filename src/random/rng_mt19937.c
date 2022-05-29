@@ -294,7 +294,8 @@ static igraph_i_rng_mt19937_state_t igraph_i_rng_default_state = {
 IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = {
     addr(igraph_rngtype_mt19937),
     addr(igraph_i_rng_default_state),
-    /* def= */ 1
+    /* is_seeded = */ 1,
+    /* bits_factor */ 0x1.0p-32
 };
 
 #undef addr

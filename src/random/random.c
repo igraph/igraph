@@ -227,6 +227,7 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double shape, double scale);
 igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
     rng->type = type;
     IGRAPH_CHECK(rng->type->init(&rng->state));
+    rng->bits_factor = ldexp(1.0, -type->bits);
     return IGRAPH_SUCCESS;
 }
 
@@ -257,8 +258,8 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
  */
 igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
     const igraph_rng_type_t *type = rng->type;
-    rng->is_seeded = 1;
     IGRAPH_CHECK(type->seed(rng->state, seed));
+    rng->is_seeded = 1;
     return IGRAPH_SUCCESS;
 }
 
@@ -591,7 +592,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
     if (type->get_real) {
         return type->get_real(rng->state);
     } else {
-        return ldexp(type->get(rng->state), -igraph_rng_bits(rng));
+        return type->get(rng->state) * rng->bits_factor;
     }
 }
 
