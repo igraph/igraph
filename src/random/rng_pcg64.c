@@ -31,7 +31,7 @@
  * pcg_variants.h header
  */
 
-#ifdef HAVE___UINT128_T
+#if IGRAPH_INTEGER_SIZE == 64 && defined(HAVE___UINT128_T)
 
 #include "random/pcg/pcg_variants.h"
 
@@ -85,11 +85,11 @@ static igraph_uint_t igraph_rng_pcg64_get(void *vstate) {
 }
 
 static igraph_error_t igraph_rng_pcg64_seed(void *vstate, igraph_uint_t seed) {
-    IGRAPH_ERROR("64-bit PCG generator needs __uint128_t", IGRAPH_UNIMPLEMENTED);
+    IGRAPH_ERROR("64-bit PCG generator needs __uint128_t.", IGRAPH_UNIMPLEMENTED);
 }
 
 static igraph_error_t igraph_rng_pcg64_init(void **state) {
-    IGRAPH_ERROR("64-bit PCG generator needs __uint128_t", IGRAPH_UNIMPLEMENTED);
+    IGRAPH_ERROR("64-bit PCG generator needs __uint128_t.", IGRAPH_UNIMPLEMENTED);
 }
 
 static void igraph_rng_pcg64_destroy(void *vstate) {
@@ -103,7 +103,8 @@ static void igraph_rng_pcg64_destroy(void *vstate) {
  *
  * This is an implementation of the PCG random number generator; see
  * https://www.pcg-random.org for more details. This implementation returns
- * 64 random bits in a single iteration.
+ * 64 random bits in a single iteration. It only available on 64-bit plaforms
+ * with compilers that provide the __uint128_t type.
  *
  * The generator was ported from the original source code published by the
  * authors at https://github.com/imneme/pcg-c .
