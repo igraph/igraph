@@ -118,7 +118,12 @@ void test_and_destroy(igraph_rng_type_t *rng_type) {
 }
 
 int main() {
-    igraph_rng_type_t rng_types[] = {igraph_rngtype_glibc2, igraph_rngtype_mt19937, igraph_rngtype_pcg32};
+    igraph_rng_type_t rng_types[] = {
+        igraph_rngtype_glibc2,
+        igraph_rngtype_mt19937,
+        igraph_rngtype_pcg32,
+        igraph_rngtype_pcg64
+    };
     igraph_integer_t i;
 
     printf("Default\n\n");

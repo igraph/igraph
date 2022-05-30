@@ -138,6 +138,7 @@ void stress_tests() {
         &igraph_rngtype_mt19937,
         &igraph_rngtype_glibc2,
         &igraph_rngtype_pcg32,
+        &igraph_rngtype_pcg64,
     };
     igraph_integer_t i;
     igraph_vector_int_t numbers;

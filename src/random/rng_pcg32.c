@@ -45,7 +45,7 @@ static igraph_error_t igraph_rng_pcg32_seed(void *vstate, igraph_uint_t seed) {
         seed = (pcg32_initializer.inc >> 1);
     }
 
-    /* PCG is seeded by a 64-bit state and a 64-bit sequence number (well, only
+    /* PCG32 is seeded by a 64-bit state and a 64-bit sequence number (well, only
      * 63 bits are used from the sequence number, though). Since the unified
      * igraph RNG seeding interface provides a single igraph_uint_t as the seed,
      * we use the seed to fill in the sequence number and use the state from
@@ -74,14 +74,14 @@ static void igraph_rng_pcg32_destroy(void *vstate) {
 
 /**
  * \var igraph_rngtype_pcg32
- * \brief The PCG random number generator.
+ * \brief The PCG random number generator (32-bit version).
  *
  * This is an implementation of the PCG random number generator; see
  * https://www.pcg-random.org for more details. This implementation returns
  * 32 random bits in a single iteration.
  *
  * The generator was ported from the original source code published by the
- * authors at https://www.pcg-random.org .
+ * authors at https://github.com/imneme/pcg-c .
  */
 
 const igraph_rng_type_t igraph_rngtype_pcg32 = {
