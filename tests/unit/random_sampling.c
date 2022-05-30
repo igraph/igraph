@@ -42,7 +42,7 @@ void sample() {
 
     x = RNG_UNIF(-100, 100);
     printf("unif: %g\n", x);
-    IGRAPH_ASSERT(-100 <= x && x <= 100);
+    IGRAPH_ASSERT(-100 <= x && x < 100);
 
     x = RNG_UNIF(3, 3);
     printf("unif: %g\n", x);
