@@ -147,6 +147,7 @@ void stress_tests() {
     igraph_vector_int_init(&numbers, N);
 
     for (i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
+        igraph_error_handler_t *oldhandler = igraph_set_error_handler(&igraph_error_handler_printignore);
         igraph_error_t err = igraph_rng_init(&rng, rng_types[i]);
         switch (err) {
         case IGRAPH_SUCCESS:
@@ -156,6 +157,7 @@ void stress_tests() {
         default:
             IGRAPH_FATAL("Error while initializing RNG.");
         }
+        igraph_set_error_handler(oldhandler);
 
         igraph_rng_seed(&rng, 42);
 

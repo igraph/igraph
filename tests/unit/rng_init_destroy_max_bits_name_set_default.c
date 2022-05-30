@@ -23,6 +23,7 @@ void test_and_destroy(igraph_rng_type_t *rng_type, igraph_rng_t *rng_def) {
     int i;
     igraph_rng_t rng;
 
+    igraph_error_handler_t *oldhandler = igraph_set_error_handler(&igraph_error_handler_printignore);
     igraph_error_t err = igraph_rng_init(&rng, rng_type);
     switch (err) {
     case IGRAPH_SUCCESS:
@@ -32,6 +33,7 @@ void test_and_destroy(igraph_rng_type_t *rng_type, igraph_rng_t *rng_def) {
     default:
         IGRAPH_FATAL("Error while initializing RNG.");
     }
+    igraph_set_error_handler(oldhandler);
 
     printf("rng name: %s\n", igraph_rng_name(&rng));
 
