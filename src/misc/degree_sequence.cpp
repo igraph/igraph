@@ -767,6 +767,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *      \ref igraph_k_regular_game() to generate random regular graphs;
  *      \ref igraph_rewire() to randomly rewire the edges of a graph while preserving its degree sequence.
  *
+ * \example examples/simple/igraph_realize_degree_sequence.c
  */
 
 igraph_error_t igraph_realize_degree_sequence(
