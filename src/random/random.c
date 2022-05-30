@@ -609,7 +609,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
          * See https://mumble.net/~campbell/tmp/random_real.c for details.
          * This way, we sample with a resolution of 2^-DBL_MANT_DIG. */
         igraph_real_t r = 0.0;
-        uint8_t b = 32 /* DBL_MANT_DIG */;
+        uint8_t b = type->bits; /* TODO: replace type->bits with DBL_MANT_DIG on this line to enable full precision sampling */
         while (b > type->bits) {
             r += type->get(rng->state);
             r *= neg_pow2[type->bits];
