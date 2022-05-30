@@ -706,7 +706,7 @@ Some of the highlights are:
  - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
  - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
  - `igraph_graph_count()` gives the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
- - `igraph_rngtype_pcg32` implements the PCG random number generator, which can be used as an alternative source of randomness instead of the default Mersenne Twister. Future versions of igraph might switch to PCG as the default PNG.
+ - `igraph_rngtype_pcg32` implements the PCG random number generator, which can be used as an alternative source of randomness instead of the default Mersenne Twister. Future versions of igraph might switch to PCG as the default RNG.
 
 ### Removed
 
