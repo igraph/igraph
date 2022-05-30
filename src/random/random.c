@@ -547,7 +547,7 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
  * be updated. The below #if guards against this.
  * Note: IEEE double has 53 binary digits.
  */
-#if DBL_MANT_BITS > 64
+#if DBL_MANT_DIG > 64
 #error "Unsupported 'double' type, too many representable digits."
 #endif
 static const igraph_real_t neg_pow2[] = {
@@ -607,13 +607,15 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
     if (type->get_real) {
         return type->get_real(rng->state);
     } else {
-        /* We will use precise the number of needed bits, and not more, to fill up the mantissa
-         * of a floating point number. Using more would introduce a small bias for low values,
+        /* We will use precisely the number of needed bits, and not more, to fill up the mantissa
+         * of a floating point number. This ensures that all arithmetic is exact and avoids rounding.
+         * Using more bits would trigger rounding, which introduces a small bias for low values
          * and would make it possible to produce an exact 1.0 value, which we do not allow.
          * See https://mumble.net/~campbell/tmp/random_real.c for details.
          * This way, we sample with a resolution of 2^-DBL_MANT_DIG. */
         igraph_real_t r = 0.0;
-        uint8_t b = type->bits; /* TODO: replace type->bits with DBL_MANT_DIG on this line to enable full precision sampling */
+        /* TODO: Set b = DBL_MANT_DIG below to enable full precision sampling */
+        uint8_t b = type->bits > DBL_MANT_DIG ? DBL_MANT_DIG : type->bits;
         while (b > type->bits) {
             r += type->get(rng->state);
             r *= neg_pow2[type->bits];
