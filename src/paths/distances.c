@@ -782,8 +782,9 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
  * \function igraph_graph_center
  * \brief Central vertices of a graph.
  *
- * The central vertices of a graph is calculated by finding the vertices
- * with the minimum eccentricity. 
+ * The central vertices of a graph are calculated by finding the vertices
+ * with the minimum eccentricity. The calculation is done per connected component:
+ * the central vertices of each component are returned.
  * 
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to an initialized vector, the result is stored
