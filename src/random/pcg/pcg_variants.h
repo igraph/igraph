@@ -45,7 +45,12 @@
     #define PCG_HAS_128BIT_OPS 1
 #endif
 
-#if __GNUC_GNU_INLINE__  &&  !defined(__cplusplus)
+/* Checking for !__GNUC_STDC_INLINE__ is a hack to work around a bug in the
+ * Intel compiler where it defined both __GNUC_GNU_INLINE__ and __GNUC_STDC_INLINE__
+ * to 1 when using -std=gnu99. igraph is always compiled with -std=gnu99.
+ *
+ * Tested with icc (ICC) 2021.3.0 20210609 on Linux */
+#if __GNUC_GNU_INLINE__  &&  !__GNUC_STDC_INLINE__ && !defined(__cplusplus)
     #error Nonstandard GNU inlining semantics. Compile with -std=c99 or better.
     /* We could instead use macros PCG_INLINE and PCG_EXTERN_INLINE
        but better to just reject ancient C code. */
