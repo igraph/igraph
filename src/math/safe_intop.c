@@ -95,6 +95,6 @@ igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
         IGRAPH_ERRORF("Overflow when raising 2 to power %" IGRAPH_PRId ".",
                       IGRAPH_EOVERFLOW, k);
     }
-    *res = 1 << k;
+    *res = (igraph_integer_t) 1 << k;
     return IGRAPH_SUCCESS;
 }
