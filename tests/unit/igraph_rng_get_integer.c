@@ -147,7 +147,16 @@ void stress_tests() {
     igraph_vector_int_init(&numbers, N);
 
     for (i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
-        igraph_rng_init(&rng, rng_types[i]);
+        igraph_error_t err = igraph_rng_init(&rng, rng_types[i]);
+        switch (err) {
+        case IGRAPH_SUCCESS:
+            break;
+        case IGRAPH_UNIMPLEMENTED:
+            continue;
+        default:
+            IGRAPH_FATAL("Error while initializing RNG.");
+        }
+
         igraph_rng_seed(&rng, 42);
 
         /* We are going to test multiple ranges. In each range, we generate

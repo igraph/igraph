@@ -104,7 +104,15 @@ void test_and_destroy(igraph_rng_type_t *rng_type) {
     igraph_rng_t *def = igraph_rng_default();
     igraph_rng_t rng;
 
-    igraph_rng_init(&rng, rng_type);
+    igraph_error_t err = igraph_rng_init(&rng, rng_type);
+    switch (err) {
+    case IGRAPH_SUCCESS:
+        break;
+    case IGRAPH_UNIMPLEMENTED:
+        return;
+    default:
+        IGRAPH_FATAL("Error while initializing RNG.");
+    }
 
     printf("\n%s\n\n", igraph_rng_name(&rng));
 
