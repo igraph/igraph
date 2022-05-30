@@ -103,7 +103,7 @@ static void igraph_rng_pcg64_destroy(void *vstate) {
  *
  * This is an implementation of the PCG random number generator; see
  * https://www.pcg-random.org for more details. This implementation returns
- * 64 random bits in a single iteration. It only available on 64-bit plaforms
+ * 64 random bits in a single iteration. It is only available on 64-bit plaforms
  * with compilers that provide the __uint128_t type.
  *
  * The generator was ported from the original source code published by the

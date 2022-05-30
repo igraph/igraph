@@ -45,6 +45,7 @@ properties in version 0.10. The PCG32 generator was added in version 0.10.
 <!-- doxrox-include igraph_rngtype_mt19937 -->
 <!-- doxrox-include igraph_rngtype_glibc2 -->
 <!-- doxrox-include igraph_rngtype_pcg32 -->
+<!-- doxrox-include igraph_rngtype_pcg64 -->
 </section>
 
 <!-- doxrox-include rng_use_cases -->
