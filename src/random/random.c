@@ -274,8 +274,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
  * Time complexity: O(1).
  */
 IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
-    const igraph_rng_type_t *type = rng->type;
-    return type->bits;
+    return rng->type->bits;
 }
 
 /**
@@ -429,7 +428,7 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
     /* MSVC has _umul128() so we use that */
     uint64_t hi;
     do {
-        x = igraph_i_rng_get_uint(rng);
+        x = igraph_i_rng_get_uint64(rng);
         l = _umul128(x, range, &hi);
     } while (l < t);
     return hi;
@@ -437,7 +436,7 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
     /* gcc and clang have __uint128_t */
     __uint128_t m;
     do {
-        x = igraph_i_rng_get_uint(rng);
+        x = igraph_i_rng_get_uint64(rng);
         m = (__uint128_t)(x) * (__uint128_t)(range);
         l = (uint64_t)m;
     } while (l < t);
@@ -493,23 +492,6 @@ igraph_integer_t igraph_rng_get_integer(
 ) {
     igraph_uint_t range;
 
-    /* We require the random integer to be in the range [l, h]. We do so by
-     * first casting (truncate toward zero) to the range [0, h - l] and then add
-     * l to arrive at the range [l, h]. That is, we calculate
-     *
-     * (igraph_integer_t)( r * (h - l + 1) ) + l
-     *
-     * instead of
-     *
-     * (igraph_integer_t)( r * (h - l + 1) + l),
-     *
-     * Please note the difference in the parentheses.
-     *
-     * In the latter formulation, if l is negative, this would incorrectly lead
-     * to the range [l + 1, h] instead of the desired [l, h] because negative
-     * numbers are truncated towards zero when cast. For example, if l = -5, any
-     * real in the range (-5, -4] would get cast to -4, not to -5.
-     */
     assert(h >= l);
 
     if (h == l) {
