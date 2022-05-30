@@ -33,4 +33,6 @@ int main(){
     printf("Assortativity after choosing vertices with the largest degrees first = %g\n", assortativity);
     igraph_destroy(&g3);
     igraph_vector_int_destroy(&degree);
+
+    return 0;
 }
