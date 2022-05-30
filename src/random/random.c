@@ -603,13 +603,22 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
     if (type->get_real) {
         return type->get_real(rng->state);
     } else {
-        igraph_real_t r = 0.0;
-        uint8_t b = 0;
-        while (b < 32 /* DBL_MANT_DIG-1 */) {
-            r += type->get(rng->state);
-            r *= neg_pow2[type->bits];
-            b += type->bits;
-        }
+        igraph_real_t r;
+        uint8_t b;
+        /* There is a tiny chance that the inner loop below produces an
+         * exact 1.0, which is not allowed. This would happen, for example,
+         * when type->get() returns all-1 bits on each call. We use simple
+         * rejection sampling to guard against producing an exact 1.0 and
+         * ensure that the result is always within [0, 1). */
+        do {
+            r = 0.0;
+            b = 0;
+            do {
+                r += type->get(rng->state);
+                r *= neg_pow2[type->bits];
+                b += type->bits;
+            } while (b < 32 /* DBL_MANT_DIG-1 */);
+        } while (r == 1.0);
         return r;
     }
 }
