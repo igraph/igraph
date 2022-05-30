@@ -670,6 +670,9 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` takes an additional bitfield parameter controlling some aspects of writing
    the GML file.
 
+ - The vector of parents in `igraph_get_shortest_paths()` and `igraph_get_shortest_paths_dijkstra()` now
+   use -1 to represent the starting vertex, and -2 for unreachable vertices.
+
 ### Added
 
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
