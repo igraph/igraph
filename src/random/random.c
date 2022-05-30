@@ -220,9 +220,6 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double shape, double scale);
  * \param type The type of the RNG, like \ref igraph_rngtype_mt19937 or
  * \ref igraph_rngtype_glibc2.
  * \return Error code.
- *
- * Time complexity: depends on the type of the generator, but usually
- * it should be O(1).
  */
 
 igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
@@ -281,7 +278,6 @@ IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
  * \function igraph_rng_max
  * \brief Query the maximum possible integer for a random number generator.
  *
- * </para><para>
  * Note that this number is only for informational purposes; it returns the
  * maximum possible integer that can be generated with the RNG with a single
  * call to its internals. It is derived directly from the number of random
@@ -311,7 +307,7 @@ igraph_uint_t igraph_rng_max(const igraph_rng_t *rng) {
  *
  * \param rng The RNG.
  * \return The name of the type of the generator. Do not deallocate or
- *         change the returned string pointer.
+ *         change the returned string.
  *
  * Time complexity: O(1).
  */
@@ -483,8 +479,8 @@ static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uin
  *        should be at least <code>l</code>.
  * \return The generated random integer.
  *
- * Time complexity: depends on the generator, but should be usually
- * O(1).
+ * Time complexity: O(log2(h-l) / bits) where bits is the value of
+ * \ref igraph_rng_bits(rng).
  */
 
 igraph_integer_t igraph_rng_get_integer(
@@ -517,12 +513,18 @@ igraph_integer_t igraph_rng_get_integer(
 
 /**
  * \function igraph_rng_get_normal
- * \brief Normally distributed random numbers.
+ * \brief Samples from a normal distribution.
+ *
+ * Generates random variates from a normal distribution with probability
+ * density
+ *
+ * </para><para>
+ * <code>exp( -(x - m)^2 / (2 s^2) )</code>.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \param m The mean.
- * \param s Standard deviation.
+ * \param s The standard deviation.
  * \return The generated normally distributed random number.
  *
  * Time complexity: depends on the type of the RNG.
@@ -573,7 +575,10 @@ static const igraph_real_t neg_pow2[] = {
 
 /**
  * \function igraph_rng_get_unif
- * \brief Generate real, uniform random numbers from an interval.
+ * \brief Samples real numbers from a given interval.
+ *
+ * Generates uniformly distributed real numbers from the <code>[l, h)</code>
+ * half-open interval.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -593,7 +598,10 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
 
 /**
  * \function igraph_rng_get_unif01
- * \brief Generate real, uniform random number from the unit interval.
+ * \brief Samples uniformly from the unit interval.
+ *
+ * Generates uniformly distributed real numbers from the <code>[0, 1)</code>
+ * half-open interval.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -629,7 +637,13 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_get_geom
- * \brief Generate geometrically distributed random numbers.
+ * \brief Samples from a geometric distribution.
+ *
+ * Generates random variates from a geometric distribution. The number \c k is generated
+ * with probability
+ *
+ * </para><para>
+ * <code>(1 - p)^k p</code>, <code>k = 0, 1, 2, ...</code>.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -637,7 +651,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
  *        than zero and smaller or equal to 1.
  * \return The generated geometrically distributed random number.
  *
- * Time complexity: depends on the type of the RNG.
+ * Time complexity: depends on the RNG.
  */
 
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
@@ -651,7 +665,13 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
 
 /**
  * \function igraph_rng_get_binom
- * \brief Generate binomially distributed random numbers.
+ * \brief Samples from a binomial distribution.
+ *
+ * Generates random variates from a binomial distribution. The number \c k is generated
+ * with probability
+ *
+ * </para><para>
+ * <code>(n \choose k) p^k (1-p)^(n-k)</code>, <code>k = 0, 1, ..., n</code>.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
@@ -659,7 +679,7 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
  * \param p Probability of an event.
  * \return The generated binomially distributed random number.
  *
- * Time complexity: depends on the type of the RNG.
+ * Time complexity: depends on the RNG.
  */
 
 igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, igraph_integer_t n, igraph_real_t p) {
@@ -673,15 +693,21 @@ igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, igraph_integer_t n, igraph
 
 /**
  * \function igraph_rng_get_gamma
- * \brief Generate sample from a Gamma distribution.
+ * \brief Samples from a gamma distribution.
+ *
+ * Generates random variates from a gamma distribution with probability
+ * density proportional to
+ *
+ * </para><para>
+ * <code>x^(shape-1) exp(-x / scale)</code>.
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
  * \param shape Shape parameter.
  * \param scale Scale parameter.
- * \return The generated sample
+ * \return The generated sample.
  *
- * Time complexity: depends on RNG.
+ * Time complexity: depends on the RNG.
  */
 
 igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
@@ -693,6 +719,25 @@ igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
         return igraph_i_rgamma(rng, shape, scale);
     }
 }
+
+/**
+ * \function igraph_rng_get_exp
+ * \brief Samples from an exponential distribution.
+ *
+ * Generates random variates from an exponential distribution with probability
+ * density proportional to
+ *
+ * </para><para>
+ * <code>exp(-rate x)</code>.
+ *
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
+ *        here to use the default igraph RNG.
+ * \param shape Shape parameter.
+ * \param scale Scale parameter.
+ * \return The generated sample.
+ *
+ * Time complexity: depends on the RNG.
+ */
 
 igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
     const igraph_rng_type_t *type = rng->type;
@@ -750,27 +795,27 @@ static igraph_error_t igraph_i_random_sample_alga(igraph_vector_int_t *res,
  * \function igraph_random_sample
  * \brief Generates an increasing random sequence of integers.
  *
- * </para><para>
  * This function generates an increasing sequence of random integer
  * numbers from a given interval. The algorithm is taken literally
  * from (Vitter 1987). This method can be used for generating numbers from a
  * \em very large interval. It is primarily created for randomly
  * selecting some edges from the sometimes huge set of possible edges
  * in a large graph.
+ *
  * </para><para>
- * Note that the type of the lower and the upper limit is \c igraph_real_t,
- * not \c igraph_integer_t. This does not mean that you can pass fractional
- * numbers there; these values must still be integral, but we need the
- * longer range of \c igraph_real_t in several places in the library
- * (for instance, when generating Erdos-Renyi graphs).
+ * Reference:
+ *
+ * </para><para>
+ * J. S. Vitter. An efficient algorithm for sequential random sampling.
+ * ACM Transactions on Mathematical Software, 13(1):58--67, 1987.
+ * https://doi.org/10.1145/23002.23003
+ *
  * \param res Pointer to an initialized vector. This will hold the
  *        result. It will be resized to the proper size.
  * \param l The lower limit of the generation interval (inclusive). This must
  *        be less than or equal to the upper limit, and it must be integral.
- *        Passing a fractional number here results in undefined behaviour.
  * \param h The upper limit of the generation interval (inclusive). This must
  *        be greater than or equal to the lower limit, and it must be integral.
- *        Passing a fractional number here results in undefined behaviour.
  * \param length The number of random integers to generate.
  * \return The error code \c IGRAPH_EINVAL is returned in each of the
  *         following cases: (1) The given lower limit is greater than the
@@ -781,14 +826,6 @@ static igraph_error_t igraph_i_random_sample_alga(igraph_vector_int_t *res,
  *
  * Time complexity: according to (Vitter 1987), the expected
  * running time is O(length).
- *
- * </para><para>
- * Reference:
- * \clist
- * \cli (Vitter 1987)
- *   J. S. Vitter. An efficient algorithm for sequential random sampling.
- *   \emb ACM Transactions on Mathematical Software, \eme 13(1):58--67, 1987.
- * \endclist
  *
  * \example examples/simple/igraph_random_sample.c
  */
@@ -946,6 +983,33 @@ static igraph_error_t igraph_i_random_sample_alga_real(igraph_vector_t *res,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup nongraph
+ * \function igraph_random_sample_real
+ * \brief Generates an increasing random sequence of integers (igraph_real_t version).
+ *
+ * This function is the 'real' version of \ref igraph_random_sample(), and was added
+ * so \ref igraph_erdos_renyi_game() and related function can use a random sample
+ * of doubles instead of integers to prevent overflows on systems with 32-bit
+ * \type igraph_integer_t.
+ *
+ * \param res Pointer to an initialized vector. This will hold the
+ *        result. It will be resized to the proper size.
+ * \param l The lower limit of the generation interval (inclusive). This must
+ *        be less than or equal to the upper limit, and it must be integral.
+ *        Passing a fractional number here results in undefined behaviour.
+ * \param h The upper limit of the generation interval (inclusive). This must
+ *        be greater than or equal to the lower limit, and it must be integral.
+ *        Passing a fractional number here results in undefined behaviour.
+ * \param length The number of random integers to generate.
+ * \return The error code \c IGRAPH_EINVAL is returned in each of the
+ *         following cases: (1) The given lower limit is greater than the
+ *         given upper limit, i.e. \c l &gt; \c h. (2) Assuming that
+ *         \c l &lt; \c h and N is the sample size, the above error code is
+ *         returned if N &gt; |\c h - \c l|, i.e. the sample size exceeds the
+ *         size of the candidate pool.
+ */
 
 igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
                     igraph_real_t h, igraph_integer_t length) {
