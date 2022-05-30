@@ -81,6 +81,10 @@ add_library(
   random/rng_glibc2.c
   random/rng_mt19937.c
   random/rng_pcg32.c
+  random/pcg/pcg-advance-64.c
+  random/pcg/pcg-output-64.c
+  random/pcg/pcg-output-32.c
+  random/pcg/pcg-rngs-64.c
 
   graph/adjlist.c
   graph/attributes.c
