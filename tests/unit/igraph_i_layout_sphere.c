@@ -34,8 +34,9 @@ int main () {
     igraph_matrix_t m;
     igraph_real_t x, y, z, r;
 
-    RNG_BEGIN();
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
+
+    RNG_BEGIN();
 
     /* 2D */
     igraph_matrix_init(&m, 1000, 2);

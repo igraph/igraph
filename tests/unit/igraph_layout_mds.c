@@ -34,8 +34,9 @@ int main() {
     igraph_matrix_t coords, dist_mat;
     int i, j;
 
-    RNG_BEGIN();
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
+
+    RNG_BEGIN();
 
     igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
