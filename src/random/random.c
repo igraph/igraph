@@ -41,6 +41,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <float.h> /* DBL_MANT_DIG */
 
 /**
  * \section about_rngs
@@ -227,7 +228,6 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double shape, double scale);
 igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
     rng->type = type;
     IGRAPH_CHECK(rng->type->init(&rng->state));
-    rng->bits_factor = ldexp(1.0, -type->bits);
     return IGRAPH_SUCCESS;
 }
 
@@ -556,6 +556,35 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
     }
 }
 
+/* Tabulated negative powers of 2 for random real generation:
+ *   neg_pow2[k] = 2^-k for k = 0 .. 64
+ *
+ * We cannot use the 0x0.p-32 style notation as MSVC does not support it.
+ * The decimal notation below uses enough digits to be accurate to 64 binary
+ * digits. If igraph_real_t has more than 64 binary digits, this table must
+ * be updated. Note: IEEE double has 53 binary digits.
+ */
+static const igraph_real_t neg_pow2[] = {
+    1., 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125,
+    0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625,
+    0.000030517578125, 0.0000152587890625, 7.62939453125e-6, 3.814697265625e-6, 1.9073486328125e-6,
+    9.5367431640625e-7, 4.76837158203125e-7, 2.384185791015625e-7, 1.1920928955078125e-7,
+    5.9604644775390625e-8, 2.98023223876953125e-8, 1.490116119384765625e-8, 7.450580596923828125e-9,
+    3.7252902984619140625e-9, 1.86264514923095703125e-9, 9.31322574615478515625e-10,
+    4.65661287307739257812e-10, 2.32830643653869628906e-10, 1.16415321826934814453e-10,
+    5.82076609134674072266e-11, 2.91038304567337036133e-11, 1.45519152283668518066e-11,
+    7.27595761418342590332e-12, 3.63797880709171295166e-12, 1.81898940354585647583e-12,
+    9.09494701772928237915e-13, 4.54747350886464118958e-13, 2.27373675443232059479e-13,
+    1.13686837721616029739e-13, 5.68434188608080148697e-14, 2.84217094304040074348e-14,
+    1.42108547152020037174e-14, 7.10542735760100185871e-15, 3.55271367880050092936e-15,
+    1.77635683940025046468e-15, 8.88178419700125232339e-16, 4.44089209850062616169e-16,
+    2.22044604925031308085e-16, 1.11022302462515654042e-16, 5.55111512312578270212e-17,
+    2.77555756156289135106e-17, 1.38777878078144567553e-17, 6.93889390390722837765e-18,
+    3.46944695195361418882e-18, 1.73472347597680709441e-18, 8.67361737988403547206e-19,
+    4.33680868994201773603e-19, 2.16840434497100886801e-19, 1.08420217248550443401e-19,
+    5.42101086242752217004e-20
+};
+
 /**
  * \function igraph_rng_get_unif
  * \brief Generate real, uniform random numbers from an interval.
@@ -592,7 +621,14 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
     if (type->get_real) {
         return type->get_real(rng->state);
     } else {
-        return type->get(rng->state) * rng->bits_factor;
+        igraph_real_t r = 0.0;
+        uint8_t b = 0;
+        while (b < 32 /* DBL_MANT_DIG-1 */) {
+            r += type->get(rng->state);
+            r *= neg_pow2[type->bits];
+            b += type->bits;
+        }
+        return r;
     }
 }
 

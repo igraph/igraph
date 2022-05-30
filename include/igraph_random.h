@@ -91,7 +91,6 @@ typedef struct igraph_rng_t {
     const igraph_rng_type_t *type;
     void *state;
     igraph_bool_t is_seeded;
-    igraph_real_t bits_factor; /* equal to 2^(-type->bits), used to speed up random real generation */
 } igraph_rng_t;
 
 /* --------------------------------- */
