@@ -24,45 +24,46 @@
 #include "config.h" /* IGRAPH_THREAD_LOCAL */
 
 #include <string.h> /* memset() */
+#include <ctype.h>
 
 
 #define N 624   /* Period parameters */
 #define M 397
 
 /* most significant w-r bits */
-static const unsigned long UPPER_MASK = 0x80000000UL;
+static const uint32_t UPPER_MASK = UINT32_C(0x80000000);
 
 /* least significant r bits */
-static const unsigned long LOWER_MASK = 0x7fffffffUL;
+static const uint32_t LOWER_MASK = UINT32_C(0x7fffffff);
 
 typedef struct {
-    unsigned long mt[N];
+    uint32_t mt[N];
     int mti;
 } igraph_i_rng_mt19937_state_t;
 
 static igraph_uint_t igraph_rng_mt19937_get(void *vstate) {
     igraph_i_rng_mt19937_state_t *state = vstate;
 
-    unsigned long k;
-    unsigned long int *const mt = state->mt;
+    uint32_t k;
+    uint32_t *const mt = state->mt;
 
-#define MAGIC(y) (((y)&0x1) ? 0x9908b0dfUL : 0)
+#define MAGIC(y) (((y) & 0x1) ? UINT32_C(0x9908b0df) : 0)
 
     if (state->mti >= N) {
         /* generate N words at one time */
         int kk;
 
         for (kk = 0; kk < N - M; kk++) {
-            unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+            uint32_t y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
             mt[kk] = mt[kk + M] ^ (y >> 1) ^ MAGIC(y);
         }
         for (; kk < N - 1; kk++) {
-            unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+            uint32_t y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
             mt[kk] = mt[kk + (M - N)] ^ (y >> 1) ^ MAGIC(y);
         }
 
         {
-            unsigned long y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
+            uint32_t y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
             mt[N - 1] = mt[M - 1] ^ (y >> 1) ^ MAGIC(y);
         }
 
@@ -75,8 +76,8 @@ static igraph_uint_t igraph_rng_mt19937_get(void *vstate) {
 
     k = mt[state->mti];
     k ^= (k >> 11);
-    k ^= (k << 7) & 0x9d2c5680UL;
-    k ^= (k << 15) & 0xefc60000UL;
+    k ^= (k << 7) & UINT32_C(0x9d2c5680);
+    k ^= (k << 15) & UINT32_C(0xefc60000);
     k ^= (k >> 18);
 
     state->mti++;
@@ -93,15 +94,15 @@ static igraph_error_t igraph_rng_mt19937_seed(void *vstate, igraph_uint_t seed) 
     if (seed == 0) {
         seed = 4357;   /* the default seed is 4357 */
     }
-    state->mt[0] = seed & 0xffffffffUL;
+    state->mt[0] = seed & UINT32_C(0xffffffff);
 
     for (i = 1; i < N; i++) {
         /* See Knuth's "Art of Computer Programming" Vol. 2, 3rd
            Ed. p.106 for multiplier. */
         state->mt[i] =
-            (1812433253UL * (state->mt[i - 1] ^ (state->mt[i - 1] >> 30)) +
-             (unsigned long) i);
-        state->mt[i] &= 0xffffffffUL;
+            (UINT32_C(1812433253) * (state->mt[i - 1] ^ (state->mt[i - 1] >> 30)) +
+             (uint32_t) i);
+        state->mt[i] &= UINT32_C(0xffffffff);
     }
 
     state->mti = i;
