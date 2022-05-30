@@ -809,6 +809,7 @@ igraph_error_t igraph_graph_center(const igraph_t *graph,
                     igraph_neimode_t mode) {
 
     igraph_vector_t ecc;
+
     igraph_vector_clear(res);
     IGRAPH_ASSERT(igraph_vector_empty(res));
     IGRAPH_VECTOR_INIT_FINALLY(&ecc, 0);
