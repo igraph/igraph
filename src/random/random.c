@@ -544,8 +544,12 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
  * We cannot use the 0x0.p-32 style notation as MSVC does not support it.
  * The decimal notation below uses enough digits to be accurate to 64 binary
  * digits. If igraph_real_t has more than 64 binary digits, this table must
- * be updated. Note: IEEE double has 53 binary digits.
+ * be updated. The below #if guards against this.
+ * Note: IEEE double has 53 binary digits.
  */
+#if DBL_MANT_BITS > 64
+#error "Unsupported 'double' type, too many representable digits."
+#endif
 static const igraph_real_t neg_pow2[] = {
     1., 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125, 0.00390625, 0.001953125,
     0.0009765625, 0.00048828125, 0.000244140625, 0.0001220703125, 0.00006103515625,
