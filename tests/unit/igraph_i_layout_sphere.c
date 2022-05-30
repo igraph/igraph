@@ -34,13 +34,14 @@ int main () {
     igraph_matrix_t m;
     igraph_real_t x, y, z, r;
 
-    srand(42); /* make tests deterministic */
+    RNG_BEGIN();
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
     /* 2D */
     igraph_matrix_init(&m, 1000, 2);
     for (i = 0; i < igraph_matrix_nrow(&m); i++) {
-        MATRIX(m, i, 0) = rand() / (double)RAND_MAX;
-        MATRIX(m, i, 1) = rand() / (double)RAND_MAX;
+        MATRIX(m, i, 0) = RNG_UNIF01();
+        MATRIX(m, i, 1) = RNG_UNIF01();
     }
     igraph_i_layout_sphere_2d(&m, &x, &y, &r);
 
@@ -58,9 +59,9 @@ int main () {
     /* 3D */
     igraph_matrix_init(&m, 1000, 3);
     for (i = 0; i < igraph_matrix_nrow(&m); i++) {
-        MATRIX(m, i, 0) = rand() / (double)RAND_MAX;
-        MATRIX(m, i, 1) = rand() / (double)RAND_MAX;
-        MATRIX(m, i, 2) = rand() / (double)RAND_MAX;
+        MATRIX(m, i, 0) = RNG_UNIF01();
+        MATRIX(m, i, 1) = RNG_UNIF01();
+        MATRIX(m, i, 2) = RNG_UNIF01();
     }
     igraph_i_layout_sphere_3d(&m, &x, &y, &z, &r);
 
@@ -76,6 +77,8 @@ int main () {
         }
     }
     igraph_matrix_destroy(&m);
+
+    RNG_END();
 
     VERIFY_FINALLY_STACK();
 
