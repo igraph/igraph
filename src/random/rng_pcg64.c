@@ -33,7 +33,7 @@
 
 #if IGRAPH_INTEGER_SIZE == 64 && defined(HAVE___UINT128_T)
 
-#include "random/pcg/pcg_variants.h"
+#include "pcg/pcg_variants.h"
 
 static const pcg64_random_t pcg64_initializer = PCG64_INITIALIZER;
 

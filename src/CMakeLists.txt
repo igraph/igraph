@@ -82,13 +82,6 @@ add_library(
   random/rng_mt19937.c
   random/rng_pcg32.c
   random/rng_pcg64.c
-  random/pcg/pcg-advance-128.c
-  random/pcg/pcg-advance-64.c
-  random/pcg/pcg-output-128.c
-  random/pcg/pcg-output-64.c
-  random/pcg/pcg-output-32.c
-  random/pcg/pcg-rngs-128.c
-  random/pcg/pcg-rngs-64.c
 
   graph/adjlist.c
   graph/attributes.c
@@ -397,7 +390,7 @@ endif()
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer cxsparse_vendored prpack
+  bliss cliquer cxsparse_vendored pcg prpack
 )
 
 if (NOT BUILD_SHARED_LIBS)
@@ -446,7 +439,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer cxsparse_vendored prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored pcg prpack
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -21,7 +21,7 @@
 #include "igraph_memory.h"
 #include "igraph_types.h"
 
-#include "random/pcg/pcg_variants.h"
+#include "pcg/pcg_variants.h"
 
 /* The original implementation of the 32-bit PCG random number generator in this
  * file was obtained from https://github.com/imneme/pcg-c
