@@ -114,14 +114,13 @@ void test_optional_rngtypes() {
     igraph_rng_type_t rng_types[] = {
         igraph_rngtype_pcg64
     };
-    const int NUM_RNG_TYPES = sizeof(rng_types) / sizeof(rng_types[0]);
     igraph_vector_int_t expected;
-    igraph_integer_t expected_values[NUM_RNG_TYPES][5] = {
+    igraph_integer_t expected_values[1][5] = {
         { 61, 38, 73, 84, 67 }
     };
     int i;
 
-    for (i = 0; i < NUM_RNG_TYPES; i++) {
+    for (i = 0; i < 1; i++) {
         igraph_vector_int_view(&expected, expected_values[i], 5);
         test_and_destroy_with_expected_values(&rng_types[i], &expected);
     }
