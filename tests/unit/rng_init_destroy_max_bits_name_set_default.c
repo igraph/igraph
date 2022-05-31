@@ -75,12 +75,12 @@ void test_and_destroy_with_expected_values(
 
     igraph_rng_seed(&rng, 42);
     for (i = 0; i < 5; i++) {
-        IGRAPH_ASSERT(VECTOR(*expected)[i] == igraph_rng_get_integer(igraph_rng_default(), 0, 100));
+        IGRAPH_ASSERT(VECTOR(*expected)[i] == igraph_rng_get_integer(&rng, 0, 100));
     }
 
     igraph_rng_seed(&rng, 42);
     for (i = 0; i < 5; i++) {
-        IGRAPH_ASSERT(VECTOR(*expected)[i] == igraph_rng_get_integer(igraph_rng_default(), 0, 100));
+        IGRAPH_ASSERT(VECTOR(*expected)[i] == igraph_rng_get_integer(&rng, 0, 100));
     }
 
     IGRAPH_ASSERT(igraph_rng_max(&rng) >= 0x7fffffff);
