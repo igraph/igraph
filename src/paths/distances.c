@@ -805,23 +805,21 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
  */
 igraph_error_t igraph_graph_center(const igraph_t *graph, 
                     igraph_vector_t *res,
-                    igraph_vs_t vids,
                     igraph_neimode_t mode) {
 
     igraph_vector_t ecc;
 
     igraph_vector_clear(res);
-    IGRAPH_ASSERT(igraph_vector_empty(res));
     IGRAPH_VECTOR_INIT_FINALLY(&ecc, 0);
     // Assume igraph_eccentricity() does not return infinity or NaN 
-    IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, vids, mode));
+    IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(), mode));
     if (igraph_vcount(graph) > 0) {
         igraph_real_t n = igraph_vector_size(&ecc);
         igraph_real_t min_eccentricity = igraph_vector_min(&ecc);
 
         for (igraph_integer_t i = 0; i < n; i++) {
             if (VECTOR(ecc)[i] == min_eccentricity) {
-                igraph_vector_push_back(res, i);
+                IGRAPH_CHECK(igraph_vector_push_back(res, i));
             }
         }
     }

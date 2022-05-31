@@ -7,8 +7,14 @@ Singleton graph:
 Path with isolated vertex:
 ( 1 )
 
+Disconnected graph:
+( 0 1 2 3 )
+
 Undirected path graph:
 ( 2 )
+
+Undirected Graph
+( 0 1 2 )
 
 Directed path graph:
 ( 4 )

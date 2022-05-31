@@ -30,14 +30,14 @@ int main() {
 
     printf("Null graph:\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
 
     printf("\nSingleton graph:\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
@@ -46,42 +46,56 @@ int main() {
     igraph_small(&g, 3, IGRAPH_UNDIRECTED,
                  0,2,
                  -1);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    print_vector(&center);
+    igraph_vector_clear(&center);
+    igraph_destroy(&g);
+
+    printf("\nDisconnected graph:\n");
+    igraph_small(&g, 4, IGRAPH_UNDIRECTED, -1);
+    igraph_graph_center(&g, &center, IGRAPH_OUT);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
 
     printf("\nUndirected path graph:\n");
     igraph_ring(&g, 5, IGRAPH_UNDIRECTED, /* mutual */ 0, /* circular */ 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
+    print_vector(&center);
+    igraph_vector_clear(&center);
+    igraph_destroy(&g);
+
+    printf("\nUndirected Graph\n");
+    igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 0, 2, 3, 0, 4, 1, 2, 5, -1);
+    igraph_graph_center(&g, &center, IGRAPH_OUT);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
 
     printf("\nDirected path graph:\n");
     igraph_ring(&g, 5, IGRAPH_DIRECTED, /* mutual */ 0, /* circular */ 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
 
     printf("\nUndirected star:\n");
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
 
     printf("\nOut-star:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_ALL) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_ALL) == IGRAPH_SUCCESS);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
 
     printf("\nIn-star:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
-    IGRAPH_ASSERT(igraph_graph_center(&g, &center, igraph_vss_all(), IGRAPH_OUT) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_vector(&center);
     igraph_vector_clear(&center);
     igraph_destroy(&g);
