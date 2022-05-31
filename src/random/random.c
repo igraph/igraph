@@ -204,10 +204,11 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
 #endif
 
 static double igraph_i_norm_rand(igraph_rng_t *rng);
-static double igraph_i_rgeom(igraph_rng_t *rng, double p);
+static double igraph_i_exp_rand(igraph_rng_t *rng);
 static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp);
 static double igraph_i_rexp(igraph_rng_t *rng, double rate);
 static double igraph_i_rgamma(igraph_rng_t *rng, double shape, double scale);
+static double igraph_i_rpois(igraph_rng_t *rng, double rate);
 
 /**
  * \function igraph_rng_init
@@ -486,12 +487,17 @@ static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uin
 igraph_integer_t igraph_rng_get_integer(
     igraph_rng_t *rng, igraph_integer_t l, igraph_integer_t h
 ) {
+    const igraph_rng_type_t *type = rng->type;
     igraph_uint_t range;
 
     assert(h >= l);
 
     if (h == l) {
         return l;
+    }
+
+    if (type->get_int) {
+        return type->get_int(rng->state, l, h);
     }
 
     if (IGRAPH_UNLIKELY(l == IGRAPH_INTEGER_MIN && h == IGRAPH_INTEGER_MAX)) {
@@ -639,8 +645,8 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
  * \function igraph_rng_get_geom
  * \brief Samples from a geometric distribution.
  *
- * Generates random variates from a geometric distribution. The number \c k is generated
- * with probability
+ * Generates random variates from a geometric distribution. The number \c k is
+ * generated with probability
  *
  * </para><para>
  * <code>(1 - p)^k p</code>, <code>k = 0, 1, 2, ...</code>.
@@ -656,10 +662,14 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
 
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
     const igraph_rng_type_t *type = rng->type;
+    if (igraph_is_nan(p) || p <= 0 || p > 1) {
+        return IGRAPH_NAN;
+    }
     if (type->get_geom) {
         return type->get_geom(rng->state, p);
     } else {
-        return igraph_i_rgeom(rng, p);
+        return igraph_i_rpois(rng, igraph_i_exp_rand(rng) * ((1 - p) / p));
+        // return igraph_rng_get_pois(rng, igraph_i_exp_rand(rng) * ((1 - p) / p));
     }
 }
 
@@ -732,8 +742,7 @@ igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
- * \param shape Shape parameter.
- * \param scale Scale parameter.
+ * \param rate Rate parameter.
  * \return The generated sample.
  *
  * Time complexity: depends on the RNG.
@@ -745,6 +754,38 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
         return type->get_exp(rng->state, rate);
     } else {
         return igraph_i_rexp(rng, rate);
+    }
+}
+
+/**
+ * \function igraph_rng_get_pois
+ * \brief Samples from a Poisson distribution.
+ *
+ * Generates random variates from a Poisson distribution. The number \c k is generated
+ * with probability
+ *
+ * </para><para>
+ * <code>rate^k * exp(-rate) / k!</code>, <code>k = 0, 1, 2, ...</code>.
+ *
+ * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
+ *        here to use the default igraph RNG.
+ * \param rate The rate parameter of the Poisson distribution. Must be larger
+ *        than zero.
+ * \return The generated geometrically distributed random number.
+ *
+ * Time complexity: depends on the RNG.
+ */
+
+igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate) {
+    const igraph_rng_type_t *type = rng->type;
+    if (igraph_is_nan(rate)) {
+        return IGRAPH_NAN;
+    } else if (rate <= 0) {
+        return 0;
+    } else if (type->get_pois) {
+        return type->get_pois(rng->state, rate);
+    } else {
+        return igraph_i_rpois(rng, rate);
     }
 }
 
@@ -1777,14 +1818,6 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 #undef a5
 #undef a6
 #undef a7
-
-static double igraph_i_rgeom(igraph_rng_t *rng, double p) {
-    if (igraph_is_nan(p) || p <= 0 || p > 1) {
-        ML_ERR_return_NAN;
-    }
-
-    return igraph_i_rpois(rng, igraph_i_exp_rand(rng) * ((1 - p) / p));
-}
 
 /* This is from nmath/rbinom.c */
 

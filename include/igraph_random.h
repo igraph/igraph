@@ -48,18 +48,28 @@ __BEGIN_DECLS
  * Optionally, you can provide specialized routines for several distributions
  * in the following functions:
  *
+ * - get_int()
  * - get_real()
  * - get_norm()
  * - get_geom()
  * - get_binom()
  * - get_exp()
  * - get_gamma()
+ * - get_pois()
  *
- * The best is probably to define get() and maybe get_real(), and leave the
- * others as NULL; igraph will use default implementations for these. Note that
- * if all that you would do in get_real() is to generate random bits with get()
- * and divide by the maximum, don't do that; the default implementation takes
- * care of this.
+ * The best is probably to define get() and maybe get_int() and get_real(),
+ * and leave the others as NULL; igraph will use default implementations for
+ * these. Note that if all that you would do in get_real() is to generate random
+ * bits with get() and divide by the maximum, don't do that; the default
+ * implementation takes care of this.
+ *
+ * When implementing get_int(), you do not need to check whether lo < hi;
+ * the caller is responsible for ensuring that this is the case. You can always
+ * assume that hi > lo. Note that both endpoints are _inclusive_, and you must
+ * make sure that your generation scheme works for both 32-bit and 64-bit
+ * versions of igraph_integer_t as igraph can be compiled for both cases. If
+ * you are unsure, leave get_int() unimplemented and igraph will provide its
+ * own implementation based on get().
  */
 typedef struct igraph_rng_type_t {
     const char *name;
@@ -78,6 +88,7 @@ typedef struct igraph_rng_type_t {
 
     /* Optional generators; defaults are provided by igraph that rely solely
      * on get() */
+    igraph_integer_t (*get_int)(void *state, igraph_integer_t l, igraph_integer_t h);
     igraph_real_t (*get_real)(void *state);
     igraph_real_t (*get_norm)(void *state);
     igraph_real_t (*get_geom)(void *state, igraph_real_t p);
@@ -85,6 +96,7 @@ typedef struct igraph_rng_type_t {
     igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
     igraph_real_t (*get_gamma)(void *state, igraph_real_t shape,
                                igraph_real_t scale);
+    igraph_real_t (*get_pois)(void *state, igraph_real_t mu);
 } igraph_rng_type_t;
 
 typedef struct igraph_rng_t {
@@ -121,6 +133,7 @@ IGRAPH_EXPORT igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t 
 IGRAPH_EXPORT igraph_real_t igraph_rng_get_gamma(
     igraph_rng_t *rng, igraph_real_t shape, igraph_real_t scale
 );
+IGRAPH_EXPORT igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate);
 IGRAPH_EXPORT igraph_error_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
                                            const igraph_vector_t *alpha,
                                            igraph_vector_t *result);
@@ -162,6 +175,7 @@ void PutRNGstate(void);
 #define RNG_GEOM(p)      (igraph_rng_get_geom(igraph_rng_default(),(p)))
 #define RNG_BINOM(n,p)   (igraph_rng_get_binom(igraph_rng_default(),(n),(p)))
 #define RNG_EXP(rate)    (igraph_rng_get_exp(igraph_rng_default(),(rate)))
+#define RNG_POIS(rate)   (igraph_rng_get_pois(igraph_rng_default(),(rate)))
 #define RNG_GAMMA(shape, scale) \
                          (igraph_rng_get_gamma(igraph_rng_default(), (shape), (scale)))
 
