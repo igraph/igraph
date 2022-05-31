@@ -43,7 +43,12 @@
 #endif
 
 #ifdef IGRAPH_SANITIZER_AVAILABLE
-#include <sanitizer/asan_interface.h>
+#  ifdef _MSC_VER
+/* MSVC does not put sanitizer/asan_interface.h in the include path when using /fsanitize=address */
+extern void __sanitizer_print_stack_trace(void);
+#  else
+#    include <sanitizer/asan_interface.h>
+#endif
 #endif
 
 #ifdef USING_R

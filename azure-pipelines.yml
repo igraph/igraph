@@ -94,15 +94,18 @@ jobs:
 
   - job: windows_static
     pool:
-       vmImage: windows-2019
+       vmImage: windows-latest
 
     steps:
       - template: .azure/build-win.yml
+        parameters:
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address'
+          vcvars_ver: '14.32'
 
   - job: windows_shared
     pool:
-       vmImage: windows-2019
-
+       vmImage: windows-latest
     steps:
       - template: .azure/build-win.yml
         parameters:

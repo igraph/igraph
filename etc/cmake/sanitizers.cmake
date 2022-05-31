@@ -74,7 +74,7 @@ if(USE_SANITIZER)
   elseif(MSVC)
     if(USE_SANITIZER MATCHES "([Aa]ddress)")
       message(STATUS "Building with Address sanitizer")
-      append("-fsanitize=address" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+      append("/fsanitize=address" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
     else()
       message(
         FATAL_ERROR
