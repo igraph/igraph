@@ -35,7 +35,7 @@ __BEGIN_DECLS
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-/* The new RNG interface is (somewhat) modelled based on the GSL */
+/* The new RNG interface is (somewhat) modelled on the GSL */
 
 /* When implementing your own RNG in igraph, the following methods must be
  * supplied in the corresponding igraph_rng_type_t structure:
@@ -70,6 +70,10 @@ __BEGIN_DECLS
  * versions of igraph_integer_t as igraph can be compiled for both cases. If
  * you are unsure, leave get_int() unimplemented and igraph will provide its
  * own implementation based on get().
+ *
+ * When implementing get_real(), the sampling range must be half-open,
+ * i.e. [0, 1). If unsure, leave get_real() unimplemented and igraph will
+ * provide an implementation in terms of get().
  */
 typedef struct igraph_rng_type_t {
     const char *name;
