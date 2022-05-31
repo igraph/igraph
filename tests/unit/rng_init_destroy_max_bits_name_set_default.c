@@ -57,24 +57,78 @@ void test_and_destroy(igraph_rng_type_t *rng_type, igraph_rng_t *rng_def) {
     igraph_rng_destroy(&rng);
 }
 
-int main() {
+void test_and_destroy_with_expected_values(
+    igraph_rng_type_t *rng_type, const igraph_vector_int_t *expected
+) {
+    int i;
+    igraph_error_t retval;
+    igraph_rng_t rng;
+
+    igraph_set_error_handler(igraph_error_handler_ignore);
+    retval = igraph_rng_init(&rng, rng_type);
+    igraph_set_error_handler(igraph_error_handler_abort);
+
+    if (retval == IGRAPH_UNIMPLEMENTED) {
+        /* not supported in the current setup, this is OK */
+        return;
+    }
+
+    igraph_rng_seed(&rng, 42);
+    for (i = 0; i < 5; i++) {
+        IGRAPH_ASSERT(VECTOR(*expected)[i] == igraph_rng_get_integer(igraph_rng_default(), 0, 100));
+    }
+
+    igraph_rng_seed(&rng, 42);
+    for (i = 0; i < 5; i++) {
+        IGRAPH_ASSERT(VECTOR(*expected)[i] == igraph_rng_get_integer(igraph_rng_default(), 0, 100));
+    }
+
+    IGRAPH_ASSERT(igraph_rng_max(&rng) >= 0x7fffffff);
+    IGRAPH_ASSERT(igraph_rng_bits(&rng) >= 31);
+
+    igraph_rng_destroy(&rng);
+}
+
+void test_mandatory_rngtypes() {
     int i;
     igraph_rng_type_t rng_types[] = {
         igraph_rngtype_glibc2,
         igraph_rngtype_mt19937,
         igraph_rngtype_pcg32,
-        igraph_rngtype_pcg64
     };
+    const int NUM_RNG_TYPES = sizeof(rng_types) / sizeof(rng_types[0]);
     igraph_rng_t rng_def;
 
     IGRAPH_ASSERT(igraph_rng_init(&rng_def, &igraph_rngtype_glibc2) == IGRAPH_SUCCESS);
 
-    for (i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
+    for (i = 0; i < NUM_RNG_TYPES; i++) {
         test_and_destroy(&rng_types[i], &rng_def);
     }
 
     igraph_rng_destroy(&rng_def);
 
     VERIFY_FINALLY_STACK();
+}
+
+void test_optional_rngtypes() {
+    igraph_rng_type_t rng_types[] = {
+        igraph_rngtype_pcg64
+    };
+    const int NUM_RNG_TYPES = sizeof(rng_types) / sizeof(rng_types[0]);
+    igraph_vector_int_t expected;
+    igraph_integer_t expected_values[NUM_RNG_TYPES][5] = {
+        { 61, 38, 73, 84, 67 }
+    };
+    int i;
+
+    for (i = 0; i < NUM_RNG_TYPES; i++) {
+        igraph_vector_int_view(&expected, expected_values[i], 5);
+        test_and_destroy_with_expected_values(&rng_types[i], &expected);
+    }
+}
+
+int main() {
+    test_mandatory_rngtypes();
+    test_optional_rngtypes();
     return 0;
 }
