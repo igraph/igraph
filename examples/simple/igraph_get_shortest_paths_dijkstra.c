@@ -80,8 +80,8 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
     }
 
     if (VECTOR(*pred)[start] != -1 || VECTOR(*inbound)[start] != -1) {
-        printf("%lld\n", VECTOR(*pred)[start]);
-        printf("%lld\n", VECTOR(*inbound)[start]);
+        printf("%" IGRAPH_PRId "\n", VECTOR(*pred)[start]);
+        printf("%" IGRAPH_PRId "\n", VECTOR(*inbound)[start]);
         exit(error_code + 1);
     }
 
