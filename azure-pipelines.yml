@@ -94,7 +94,7 @@ jobs:
 
   - job: windows_static
     pool:
-       vmImage: windows-latest
+       vmImage: windows-2022
 
     steps:
       - template: .azure/build-win.yml
@@ -105,7 +105,7 @@ jobs:
 
   - job: windows_shared
     pool:
-       vmImage: windows-latest
+       vmImage: windows-2022
     steps:
       - template: .azure/build-win.yml
         parameters:
