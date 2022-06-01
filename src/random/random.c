@@ -668,8 +668,7 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
     if (type->get_geom) {
         return type->get_geom(rng->state, p);
     } else {
-        return igraph_i_rpois(rng, igraph_i_exp_rand(rng) * ((1 - p) / p));
-        // return igraph_rng_get_pois(rng, igraph_i_exp_rand(rng) * ((1 - p) / p));
+        return igraph_rng_get_pois(rng, igraph_i_exp_rand(rng) * ((1 - p) / p));
     }
 }
 
@@ -778,9 +777,9 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
 
 igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate) {
     const igraph_rng_type_t *type = rng->type;
-    if (igraph_is_nan(rate)) {
+    if (igraph_is_nan(rate) || rate < 0) {
         return IGRAPH_NAN;
-    } else if (rate <= 0) {
+    } else if (rate == 0) {
         return 0;
     } else if (type->get_pois) {
         return type->get_pois(rng->state, rate);
