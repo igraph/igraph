@@ -98,6 +98,16 @@ void sample() {
 
     x = RNG_GAMMA(1, 0);
     IGRAPH_ASSERT(x == 0);
+
+    x = RNG_POIS(10);
+    printf("poisson: %g\n", x);
+    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+
+    x = RNG_POIS(0);
+    IGRAPH_ASSERT(x == 0);
+
+    x = RNG_POIS(-1);
+    IGRAPH_ASSERT(igraph_is_nan(x));
 }
 
 void test_and_destroy(igraph_rng_type_t *rng_type) {
