@@ -41,9 +41,9 @@ int main()
     VECTOR(weights_lm)[5] = 2;
     VECTOR(weights_lm)[6] = 7;
 
-    igraph_small(&g_empty, 0, 0, -1);
+    igraph_empty(&g_empty, 0, 0);
 
-    igraph_small(&g_lm, 5, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 3, 3, 4,1);
+    igraph_small(&g_lm, 5, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 1, 4, 2, 3, 3, 4,-1);
 
     printf("No vertices, not directed:\n");
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, steiner_terminals, IGRAPH_ALL, &weights_empty) == IGRAPH_SUCCESS);
