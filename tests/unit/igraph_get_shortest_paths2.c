@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     const igraph_integer_t edges[] = { 0, 1, 0, 2, 1, 6, 2, 6, 1, 3, 1, 4, 1, 5,
@@ -32,7 +32,7 @@ int main() {
     igraph_t g;
     igraph_vector_int_t edgev;
     igraph_vector_int_list_t resvertices, resedges;
-    igraph_vector_int_t predecessors, inbound_edges;
+    igraph_vector_int_t parents, inbound_edges;
     int vcount, i;
 
     igraph_vector_int_view(&edgev, edges, sizeof(edges) / sizeof(edges[0]));
@@ -41,12 +41,12 @@ int main() {
 
     igraph_vector_int_list_init(&resvertices, 0);
     igraph_vector_int_list_init(&resedges, 0);
-    igraph_vector_int_init(&predecessors, 0);
+    igraph_vector_int_init(&parents, 0);
     igraph_vector_int_init(&inbound_edges, 0);
 
     igraph_get_shortest_paths(&g, &resvertices, &resedges, /*from=*/ 0,
                               /*to=*/ igraph_vss_all(), /*mode=*/ IGRAPH_OUT,
-                              &predecessors, &inbound_edges);
+                              &parents, &inbound_edges);
 
     for (i = 0; i < vcount; i++) {
         igraph_vector_int_t *v1 = igraph_vector_int_list_get_ptr(&resvertices, i);
@@ -57,12 +57,12 @@ int main() {
         igraph_vector_int_print(v2);
     }
     printf("pred: ");
-    igraph_vector_int_print(&predecessors);
+    igraph_vector_int_print(&parents);
     printf("inbe: ");
     igraph_vector_int_print(&inbound_edges);
 
     igraph_vector_int_destroy(&inbound_edges);
-    igraph_vector_int_destroy(&predecessors);
+    igraph_vector_int_destroy(&parents);
     igraph_vector_int_list_destroy(&resedges);
     igraph_vector_int_list_destroy(&resvertices);
     igraph_destroy(&g);

@@ -144,6 +144,7 @@ igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t d
         }
         igraph_vector_int_push_back(&edges, num);
     }
+    va_end(ap);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
 

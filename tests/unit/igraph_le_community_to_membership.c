@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_and_destroy(igraph_vector_int_t *membership, igraph_vector_int_t *csize, igraph_matrix_int_t *mat) {
     printf("Membership: ");

@@ -120,6 +120,47 @@ static igraph_error_t igraph_i_arpack_err_dneupd(int error) {
     }
 }
 
+/* Pristine ARPACK options object that is not exposed to the user; this is used
+ * as a template for \c igraph_i_arpack_options_default when the user requests
+ * a pointer to the default object */
+const static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
+    /* .bmat = */ { 'I' },
+    /* .n = */ 0,
+    /* .which = */ { 'X', 'X' },
+    /* .nev = */ 1,
+    /* .tol = */ 0,
+    /* .ncv = */ 0, /* 0 means "automatic" */
+    /* .ldv = */ 0,
+    /* .ishift = */ 1,
+    /* .mxiter = */ 3000,
+    /* .nb = */ 1,
+    /* .mode = */ 1,
+    /* .start = */ 0,
+    /* .lworl = */ 0,
+    /* .sigma = */ 0,
+    /* .sigmai = */ 0,
+    /* .info = */ 0,
+    /* .ierr = */ 0,
+    /* .noiter = */ 0,
+    /* .nconv = */ 0,
+    /* .numop = */ 0,
+    /* .numopb = */ 0,
+    /* .numreo = */ 0,
+    /* .iparam = */ {
+        /* same as ishift: */ 1,
+        0,
+        /* same as mxiter: */ 3000,
+        /* same as nb: */ 1,
+        0,
+        0,
+        /* same as mode: */ 1
+        /* the rest are all zeros */
+    },
+    /* .ipntr = */ { 0 /* the rest are all zeros */ }
+};
+
+static IGRAPH_THREAD_LOCAL igraph_arpack_options_t igraph_i_arpack_options_default;
+
 /**
  * \function igraph_arpack_options_init
  * Initialize ARPACK options
@@ -141,6 +182,8 @@ static igraph_error_t igraph_i_arpack_err_dneupd(int error) {
  */
 
 void igraph_arpack_options_init(igraph_arpack_options_t *o) {
+    *o = igraph_i_arpack_options_pristine;
+
     o->bmat[0] = 'I';
     o->n = 0;         /* needs to be updated! */
     o->which[0] = 'X'; o->which[1] = 'X';
@@ -161,6 +204,26 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
     o->iparam[0] = o->ishift; o->iparam[1] = 0; o->iparam[2] = o->mxiter; o->iparam[3] = o->nb;
     o->iparam[4] = 0; o->iparam[5] = 0; o->iparam[6] = o->mode; o->iparam[7] = 0;
     o->iparam[8] = 0; o->iparam[9] = 0; o->iparam[10] = 0;
+}
+
+/**
+ * \function igraph_arpack_options_get_default
+ * \brief Return a pointer to a "default" ARPACK options object
+ *
+ * This function is used by other igraph functions taking an \ref igraph_arpack_options_t
+ * object as an argument to get a reference to a pre-initialized "default"
+ * ARPACK options object when the user passes \c NULL instead of a real ARPACK
+ * options object. The object returned from this function is reset to a pristine
+ * state with every call to \c igraph_arpack_options_get_default().
+ *
+ * </para><para>
+ * The object returned from this function must \em not be destroyed.
+ *
+ * Time complexity: O(1).
+ */
+igraph_arpack_options_t* igraph_arpack_options_get_default() {
+    igraph_i_arpack_options_default = igraph_i_arpack_options_pristine;
+    return &igraph_i_arpack_options_default;
 }
 
 /**
@@ -210,7 +273,7 @@ igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_int
 
 #define CHECKMEM(x) \
     if (!x) { \
-        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
+        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
@@ -612,6 +675,12 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
         sort[0] = 'L'; sort[1] = 'M';
     } else if (which('B', 'E')) {
         sort[0] = 'L'; sort[1] = 'A';
+    } else {
+        /* None of the above, no sorting. These 'X' values are
+         * ignored by ARPACK, but we set them anyway in order to
+         * avoid an uninitialized 'sort' which would trigger
+         * checkers such as MemorySanitizer. */
+        sort[0] = 'X'; sort[1] = 'X';
     }
 
     IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
@@ -669,7 +738,7 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
     return IGRAPH_SUCCESS;
 }
 
-int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
+igraph_error_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
                          const igraph_arpack_options_t *options,
                          igraph_real_t *dr, igraph_real_t *di,
                          igraph_real_t *v) {
@@ -697,6 +766,12 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
         sort[0] = 'S'; sort[1] = 'I';
     } else if (which('S', 'I')) {
         sort[0] = 'L'; sort[1] = 'I';
+    } else {
+        /* None of the above, no sorting. These 'X' values are
+         * ignored by ARPACK, but we set them anyway in order to
+         * avoid an uninitialized 'sort' which would trigger
+         * checkers such as MemorySanitizer. */
+        sort[0] = 'X'; sort[1] = 'X';
     }
 
 #undef which
@@ -783,7 +858,7 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -935,7 +1010,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
 #define CHECKMEM(x) \
     if (!x) { \
-        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
+        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
@@ -1196,7 +1271,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
 #define CHECKMEM(x) \
     if (!x) { \
-        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
+        IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
@@ -1440,7 +1515,7 @@ igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_mat
         }
     }
     igraph_matrix_destroy(vectors);
-    IGRAPH_CHECK(igraph_matrix_copy(vectors, &new_vectors));
+    IGRAPH_CHECK(igraph_matrix_init_copy(vectors, &new_vectors));
     igraph_matrix_destroy(&new_vectors);
     IGRAPH_FINALLY_CLEAN(1);
 

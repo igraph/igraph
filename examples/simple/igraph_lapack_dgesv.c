@@ -48,7 +48,7 @@ int main() {
         MATRIX(B, i, 0) = i + 1;
     }
 
-    igraph_matrix_copy(&RHS, &B);
+    igraph_matrix_init_copy(&RHS, &B);
     igraph_lapack_dgesv(&A, /*ipiv=*/ 0, &RHS, &info);
 
     if (info != 0) {

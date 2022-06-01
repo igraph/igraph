@@ -18,10 +18,10 @@
 </section>
 
 <section id="shortest-path-related-functions"><title>(Shortest)-path related functions</title>
-<!-- doxrox-include igraph_shortest_paths -->
-<!-- doxrox-include igraph_shortest_paths_dijkstra -->
-<!-- doxrox-include igraph_shortest_paths_bellman_ford -->
-<!-- doxrox-include igraph_shortest_paths_johnson -->
+<!-- doxrox-include igraph_distances -->
+<!-- doxrox-include igraph_distances_dijkstra -->
+<!-- doxrox-include igraph_distances_bellman_ford -->
+<!-- doxrox-include igraph_distances_johnson -->
 <!-- doxrox-include igraph_get_shortest_paths -->
 <!-- doxrox-include igraph_get_shortest_path -->
 <!-- doxrox-include igraph_get_shortest_paths_dijkstra -->
@@ -30,6 +30,7 @@
 <!-- doxrox-include igraph_get_shortest_path_bellman_ford -->
 <!-- doxrox-include igraph_get_all_shortest_paths -->
 <!-- doxrox-include igraph_get_all_shortest_paths_dijkstra -->
+<!-- doxrox-include igraph_get_k_shortest_paths -->
 <!-- doxrox-include igraph_get_all_simple_paths -->
 <!-- doxrox-include igraph_average_path_length -->
 <!-- doxrox-include igraph_average_path_length_dijkstra -->
@@ -40,6 +41,14 @@
 <!-- doxrox-include igraph_eccentricity -->
 <!-- doxrox-include igraph_radius -->
 <!-- doxrox-include igraph_pseudo_diameter -->
+<!-- doxrox-include igraph_vertex_path_from_edge_path -->
+</section>
+
+<section id="widest-path-related-functions"><title>Widest-path related functions</title>
+<!-- doxrox-include igraph_get_widest_path -->
+<!-- doxrox-include igraph_get_widest_paths -->
+<!-- doxrox-include igraph_widest_paths_dijkstra -->
+<!-- doxrox-include igraph_widest_paths_floyd_warshall -->
 </section>
 
 <section id="efficiency-measures"><title>Efficiency measures</title>
@@ -165,7 +174,9 @@
 </section>
 
 <section id="spectral-properties"><title>Spectral properties</title>
-<!-- doxrox-include igraph_laplacian -->
+<!-- doxrox-include igraph_get_laplacian -->
+<!-- doxrox-include igraph_get_laplacian_sparse -->
+<!-- doxrox-include igraph_laplacian_normalization_t -->
 </section>
 
 <section id="non-simple-graphs-multiple-and-loop-edges"><title>Non-simple graphs: Multiple and loop edges</title>
@@ -218,9 +229,18 @@
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->
 <!-- doxrox-include igraph_get_stochastic_sparse -->
-<!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_edgelist -->
 <!-- doxrox-include igraph_is_acyclic -->
+</section>
+
+<section id="structural-properties-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_shortest_paths -->
+<!-- doxrox-include igraph_shortest_paths_dijkstra -->
+<!-- doxrox-include igraph_shortest_paths_bellman_ford -->
+<!-- doxrox-include igraph_shortest_paths_johnson -->
+<!-- doxrox-include igraph_get_stochastic_sparsemat -->
+<!-- doxrox-include igraph_get_sparsemat -->
+<!-- doxrox-include igraph_laplacian -->
 </section>
 
 </chapter>

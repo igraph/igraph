@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2011-2021  The igraph development team
+   Copyright (C) 2011-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ __BEGIN_DECLS
  * 32-bit integers) or 64 (for 64-bit integers).
  */
 #define IGRAPH_INTEGER_SIZE @IGRAPH_INTEGER_SIZE@
+
+#define IGRAPH_DEPRECATED_ENUMVAL @IGRAPH_DEPRECATED_ENUMVAL@
 
 __END_DECLS
 

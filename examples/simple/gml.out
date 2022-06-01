@@ -1,4 +1,6 @@
-undirected
+The graph is undirected.
+
+-----------------
 0 1
 0 2
 0 3
@@ -77,8 +79,8 @@ undirected
 31 32
 31 33
 32 33
+
 -----------------
-Creator "igraph version @VERSION@ test suite"
 Version 1
 graph
 [

@@ -25,7 +25,6 @@
 
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
-#include "igraph_nongraph.h"
 #include "igraph_random.h"
 
 #include "random/random_internal.h"
@@ -66,7 +65,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     } else {
 
         igraph_integer_t i;
-        double maxedges = n, last;
+        igraph_real_t maxedges = n, last;
         if (directed && loops) {
             maxedges *= n;
         } else if (directed && !loops) {

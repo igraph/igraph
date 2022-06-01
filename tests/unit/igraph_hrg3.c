@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t karate;
@@ -69,7 +69,7 @@ int main() {
     igraph_hrg_predict(&karate, &edges, &prob, /* hrg= */ 0, /* start= */ 0,
                        /* num_samples= */ 100, /* num_bins= */ 25);
 
-    /* We do some simple validity tests on the resolts only; the exact results
+    /* We do some simple validity tests on the results only; the exact results
      * are different on i386 vs other platforms due to numerical inaccuracies */
     n = igraph_vector_int_size(&edges);
     for (i = 0; i < n; i++) {

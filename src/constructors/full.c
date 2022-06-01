@@ -57,7 +57,7 @@
  * O(|E|)=O(|V||V|)
  * here.
  *
- * \sa \ref igraph_lattice(), \ref igraph_star(), \ref igraph_kary_tree()
+ * \sa \ref igraph_square_lattice(), \ref igraph_star(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_full.c

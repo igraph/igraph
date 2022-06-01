@@ -30,18 +30,17 @@ int main() {
     igraph_integer_t no_of_nodes;
     igraph_integer_t i;
 
-    igraph_rng_seed(igraph_rng_default(), 42);
-
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
-                 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,
-                 5, 6, 5, 7, 5, 8, 5, 9, 6, 7, 6, 8, 6, 9, 7, 8, 7, 9, 8, 9, 0, 5, -1);
+                 0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,
+                 5, 6, 5, 7, 5, 8, 5, 9, 6, 7, 6, 8, 6, 9, 7, 8, 7, 9, 8, 9, 0, 5, 4, 9, -1);
     igraph_vector_init(&modularity, 0);
     igraph_matrix_int_init(&merges, 0, 0);
 
-    igraph_community_walktrap(&g, 0 /* no weights */,
+    igraph_community_walktrap(&g,
+                              NULL /* no weights */,
                               4 /* steps */,
                               &merges, &modularity,
-                              /* membership=*/ 0);
+                              /* membership=*/ NULL);
 
     no_of_nodes = igraph_vcount(&g);
     printf("Merges:\n");
@@ -53,18 +52,8 @@ int main() {
 
     igraph_destroy(&g);
 
-    /* isolated vertices */
-    igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
-    if (igraph_community_walktrap(&g, 0 /* no weights */, 4 /* steps */, &merges,
-                                  &modularity, /* membership = */ 0)) {
-        return 1;
-    }
-    if (igraph_vector_min(&modularity) != 0 || igraph_vector_max(&modularity) != 0) {
-        return 2;
-    }
-    igraph_destroy(&g);
-
     igraph_matrix_int_destroy(&merges);
     igraph_vector_destroy(&modularity);
+
     return 0;
 }

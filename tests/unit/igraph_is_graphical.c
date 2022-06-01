@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Undirected case */
 void graphical_print_destroy(igraph_vector_int_t *ds) {

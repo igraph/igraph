@@ -129,12 +129,18 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
 
     va_start(ap, n);
     while (1) {
+        igraph_error_t err;
         int num = va_arg(ap, int);
         if (num == 0) {
             break;
         }
-        IGRAPH_CHECK(igraph_vector_int_push_back(&shifts, num));
+        err = igraph_vector_int_push_back(&shifts, num);
+        if (err != IGRAPH_SUCCESS) {
+            va_end(ap);
+            IGRAPH_ERROR("", err);
+        }
     }
+    va_end(ap);
     if (igraph_vector_int_size(&shifts) == 0) {
         repeats = 0;
     } else {

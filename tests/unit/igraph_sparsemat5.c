@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define EPS 1e-13
 
@@ -45,7 +45,7 @@ void test_1x1(igraph_real_t value) {
     igraph_matrix_init(&values, 0, 0);
     igraph_matrix_init(&vectors, 0, 0);
     options.mode = 1;
-    igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rnsolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values, &vectors);
     printf("rnsolve:\n  - eigenvalues:\n");
     print_matrix(&values);
@@ -57,7 +57,7 @@ void test_1x1(igraph_real_t value) {
     igraph_vector_init(&values2, 0);
     igraph_matrix_init(&vectors, 0, 0);
     options.mode = 1;
-    igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rssolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values2, &vectors, IGRAPH_SPARSEMAT_SOLVE_LU);
     printf("rssolve:\n  - eigenvalues:\n");
     print_vector(&values2);
@@ -239,7 +239,7 @@ int main() {
     igraph_destroy(&g2);
 
     igraph_sparsemat_init(&A, 1, 1, 0);
-    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH);
+    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
     igraph_destroy(&g3);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
@@ -298,7 +298,7 @@ int main() {
 
     /***********************************************************************/
 
-    /* A directed tree and a directed, mutual ring */
+    /* A directed tree and a directed, mutual ring, no ARPACK options */
     printf("\n== A directed tree and a directed, mutual ring ==\n");
 #define DIM 10
     igraph_kary_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_OUT);
@@ -308,7 +308,7 @@ int main() {
     igraph_destroy(&g2);
 
     igraph_sparsemat_init(&A, 1, 1, 0);
-    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH);
+    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
     igraph_destroy(&g3);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
@@ -318,7 +318,7 @@ int main() {
 
     /* Regular mode */
     options.mode = 1;
-    igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rnsolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values2, &vectors);
 
     if (MATRIX(vectors, 0, 0) < 0.0) {
@@ -347,7 +347,7 @@ int main() {
                  -1);
 
     igraph_sparsemat_init(&A, 1, 1, 0);
-    igraph_get_adjacency_sparse(&g1, &A, IGRAPH_GET_ADJACENCY_BOTH);
+    igraph_get_adjacency_sparse(&g1, &A, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
     igraph_destroy(&g1);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);

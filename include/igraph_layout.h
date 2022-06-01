@@ -138,6 +138,22 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_bipartite(const igraph_t *graph,
                                           igraph_matrix_t *res, igraph_real_t hgap,
                                           igraph_real_t vgap, igraph_integer_t maxiter);
 
+IGRAPH_EXPORT igraph_error_t igraph_layout_umap(const igraph_t *graph,
+                                                igraph_matrix_t *res,
+                                                igraph_bool_t use_seed,
+                                                const igraph_vector_t *distances,
+                                                igraph_real_t min_dist,
+                                                igraph_integer_t epochs,
+                                                igraph_real_t sampling_prob);
+
+IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
+                                                igraph_matrix_t *res,
+                                                igraph_bool_t use_seed,
+                                                const igraph_vector_t *distances,
+                                                igraph_real_t min_dist,
+                                                igraph_integer_t epochs,
+                                                igraph_real_t sampling_prob);
+
 /**
  * \struct igraph_layout_drl_options_t
  * Parameters for the DrL layout generator
@@ -252,6 +268,25 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph,
                                                igraph_real_t weight_edge_lengths,
                                                igraph_real_t weight_edge_crossings,
                                                igraph_real_t weight_node_edge_dist);
+
+/**
+ * \typedef igraph_root_choice_t
+ * \brief Root choice heuristic for tree visualizations.
+ *
+ * Used with \ref igraph_roots_for_tree_layout().
+ */
+
+typedef enum {
+    IGRAPH_ROOT_CHOICE_DEGREE,
+    IGRAPH_ROOT_CHOICE_ECCENTRICITY
+} igraph_root_choice_t;
+
+IGRAPH_EXPORT igraph_error_t igraph_roots_for_tree_layout(
+        const igraph_t *graph,
+        igraph_neimode_t mode,
+        igraph_vector_int_t *roots,
+        igraph_root_choice_t use_eccentricity);
+
 
 __END_DECLS
 

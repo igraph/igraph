@@ -1,15 +1,28 @@
 #!/bin/bash -eu
 
+export DEPS_PATH=/src/deps
+mkdir $DEPS_PATH
+
+# Build libxml2 without ICU support, https://github.com/igraph/igraph/issues/1992 
+cd $SRC/libxml2-2.9.13 
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=$DEPS_PATH -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_LZMA=OFF
+make install -j$(nproc)
+
+# Build igraph
+cd $SRC/igraph
 mkdir build && cd build
 # CMAKE_BUILD_TYPE=None is an arbitrary value that prevents the automatic Release
 # build type setting, allowing OSS-Fuzz to pass on its own optimization flags.
-cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None
+cmake .. -DIGRAPH_WARNINGS_AS_ERRORS=OFF -DCMAKE_BUILD_TYPE=None -DCMAKE_PREFIX_PATH=$DEPS_PATH -DFLEX_KEEP_LINE_NUMBERS=ON
 make -j$(nproc)
+
 
 # Create seed corpus
 zip $OUT/read_gml_fuzzer_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.gml \
         $SRC/igraph/tests/regression/*.gml \
+        $SRC/igraph/tests/unit/*.gml \
         $SRC/igraph/fuzzing/test_inputs/*.gml
 
 zip $OUT/read_pajek_fuzzer_seed_corpus.zip \
@@ -42,9 +55,10 @@ zip $OUT/read_graphml_fuzzer_seed_corpus.zip \
 
 cd $SRC/igraph
 
-XML2_FLAGS = -Wl,-Bstatic -lxml2 -lz -llzma -licuuc -licudata -Wl,-Bdynamic -ldl
+XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 
-for TARGET in read_gml_fuzzer read_pajek_fuzzer read_dl_fuzzer read_lgl_fuzzer read_ncol_fuzzer read_graphml_fuzzer bliss_fuzzer vertex_connectivity_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer
+# disabled:  vertex_connectivity_fuzzer
+for TARGET in read_gml_fuzzer read_pajek_fuzzer read_dl_fuzzer read_lgl_fuzzer read_ncol_fuzzer read_graphml_fuzzer bliss_fuzzer edge_connectivity_fuzzer vertex_separators_fuzzer
 do
   $CXX $CXXFLAGS -I$SRC/igraph/build/include -I$SRC/igraph/include -o $TARGET.o -c ./fuzzing/$TARGET.cpp
   $CXX $CXXFLAGS $LIB_FUZZING_ENGINE $TARGET.o -o $OUT/$TARGET ./build/src/libigraph.a $XML2_FLAGS

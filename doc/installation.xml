@@ -15,7 +15,7 @@
   <itemizedlist>
     <listitem>
       <para>
-        <ulink url="https://cmake.org">CMake</ulink> 3.16 or later
+        <ulink url="https://cmake.org">CMake</ulink> 3.18 or later
       </para>
     </listitem>
     <listitem>
@@ -240,12 +240,6 @@ cmake --build . --target check --config Release
           with dynamic runtime linking using the
           <literal>x64-windows-static-md</literal> triplet.
         </para>
-        <para>
-          There are some known issues with igraph when using certain external packages
-          from vcpkg. When building against OpenBLAS, this results in a few differences
-          in some unit tests, see issue
-          <ulink url="https://github.com/igraph/igraph/issues/1491">#1491</ulink>.
-        </para>
       </section>
     </section>
       <section id="igraph-Installation-msys2">
@@ -306,9 +300,8 @@ cmake --build . --target check --config Release
 pacman -S \
   mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake \
   mingw-w64-x86_64-gmp mingw-w64-x86_64-libxml2 \
-  mingw-w64-x86_64-openblas mingw-w64-x86_64-suitesparse mingw-w64-x86_64-arpack mingw-w64-x86_64-glpk \
-  diffutils \
-  git bison flex
+  mingw-w64-x86_64-openblas mingw-w64-x86_64-suitesparse mingw-w64-x86_64-arpack \
+  mingw-w64-x86_64-glpk diffutils git bison flex
 </programlisting>
       <para>
         In order to build igraph, follow the <emphasis role="strong">General

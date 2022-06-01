@@ -28,8 +28,6 @@
 
 #include "centrality/centrality_internal.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
@@ -108,7 +106,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 1);
         }
         return IGRAPH_SUCCESS;
@@ -118,8 +116,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
@@ -129,7 +128,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
                 *value = 0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
                 igraph_vector_fill(vector, 1);
             }
             return IGRAPH_SUCCESS;
@@ -261,7 +260,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 1);
         }
         return IGRAPH_SUCCESS;
@@ -278,7 +277,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 0);
         }
         return IGRAPH_SUCCESS;
@@ -288,8 +287,9 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         if (igraph_is_directed(graph)) {
             IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
@@ -307,7 +307,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                 *value = 0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
                 igraph_vector_fill(vector, 1);
             }
             return IGRAPH_SUCCESS;
@@ -381,7 +381,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     if (vector) {
         igraph_real_t amax = 0;
         igraph_integer_t which = 0;
-        igraph_integer_t i;
+
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
 
         if (MATRIX(values, 0, 0) <= 0) {
@@ -493,8 +493,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *     complex numbers when some weights are negative. In this case only
  *     the real part is reported.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    for details. Supply \c NULL here to use the defaults. Note that the
+ *    function overwrites the <code>n</code> (number of vertices) parameter and
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
@@ -513,6 +513,10 @@ igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_bool_t directed, igraph_bool_t scale,
                                   const igraph_vector_t *weights,
                                   igraph_arpack_options_t *options) {
+
+    if (!options) {
+        options = igraph_arpack_options_get_default();
+    }
 
     if (directed && igraph_is_directed(graph)) {
         return igraph_i_eigenvector_centrality_directed(graph, vector, value,

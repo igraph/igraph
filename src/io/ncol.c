@@ -109,13 +109,11 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     igraph_integer_t no_of_nodes;
     igraph_integer_t no_predefined = 0;
     igraph_vector_ptr_t name, weight;
-    igraph_vector_ptr_t *pname = 0, *pweight = 0;
+    igraph_vector_ptr_t *pname = NULL, *pweight = NULL;
     igraph_attribute_record_t namerec, weightrec;
     const char *namestr = "name", *weightstr = "weight";
     igraph_i_ncol_parsedata_t context;
 
-    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&trie, names);
@@ -124,11 +122,11 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     /* Add the predefined names, if any */
     if (predefnames != 0) {
         igraph_integer_t i, id, n;
-        char *key;
+        const char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
-            igraph_strvector_get(predefnames, i, &key);
-            igraph_trie_get(&trie, key, &id);
+            key = igraph_strvector_get(predefnames, i);
+            IGRAPH_CHECK(igraph_trie_get(&trie, key, &id));
             if (id != i) {
                 IGRAPH_WARNING("Reading NCOL file, duplicate entry in predefined names.");
                 no_predefined--;
@@ -149,7 +147,10 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     igraph_ncol_yyset_in(instream, context.scanner);
 
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_ncol_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
@@ -163,7 +164,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read NCOL file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read NCOL file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
@@ -179,20 +180,23 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         IGRAPH_WARNING("Unknown vertex/vertices found in NCOL file, predefined names extended.");
     }
 
+    /* Prepare attributes, if needed */
+
     if (names) {
-        const igraph_strvector_t *namevec;
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
         pname = &name;
-        IGRAPH_CHECK(igraph_trie_getkeys(&trie, &namevec)); /* dirty */
         namerec.name = namestr;
         namerec.type = IGRAPH_ATTRIBUTE_STRING;
-        namerec.value = namevec;
+        namerec.value = igraph_i_trie_borrow_keys(&trie);
         VECTOR(name)[0] = &namerec;
     }
 
     if (weights == IGRAPH_ADD_WEIGHTS_YES ||
         (weights == IGRAPH_ADD_WEIGHTS_IF_PRESENT && context.has_weights)) {
+
         IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
+        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &weight);
         pweight = &weight;
         weightrec.name = weightstr;
         weightrec.type = IGRAPH_ATTRIBUTE_NUMERIC;
@@ -206,20 +210,25 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         no_of_nodes = igraph_vector_int_max(&edges) + 1;
     }
 
+    /* Create graph */
+    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
 
     if (pname) {
         igraph_vector_ptr_destroy(pname);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     if (pweight) {
         igraph_vector_ptr_destroy(pweight);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     igraph_vector_destroy(&ws);
     igraph_trie_destroy(&trie);
     igraph_vector_int_destroy(&edges);
     igraph_ncol_yylex_destroy(context.scanner);
-    IGRAPH_FINALLY_CLEAN(5);
+    IGRAPH_FINALLY_CLEAN(5); /* +1 for 'graph' */
 
     return IGRAPH_SUCCESS;
 }
@@ -324,10 +333,10 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
             int ret = 0;
-            char *str1, *str2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, from, &str1);
-            igraph_strvector_get(&nvec, to, &str2);
+            str1 = igraph_strvector_get(&nvec, from);
+            str2 = igraph_strvector_get(&nvec, to);
             ret = fprintf(outstream, "%s %s\n", str1, str2);
             if (ret < 0) {
                 IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);
@@ -375,10 +384,10 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             igraph_integer_t edge = IGRAPH_EIT_GET(it);
             igraph_integer_t from, to;
             int ret = 0, ret2 = 0;
-            char *str1, *str2;
+            const char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
-            igraph_strvector_get(&nvec, from, &str1);
-            igraph_strvector_get(&nvec, to, &str2);
+            str1 = igraph_strvector_get(&nvec, from);
+            str2 = igraph_strvector_get(&nvec, to);
             ret = fprintf(outstream, "%s %s ", str1, str2);
             if (ret < 0) {
                 IGRAPH_ERROR("Writing NCOL file failed.", IGRAPH_EFILE);

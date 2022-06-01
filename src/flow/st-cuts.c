@@ -33,7 +33,6 @@
 #include "igraph_stack.h"
 #include "igraph_visitor.h"
 
-#include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
 #include "flow/flow_internal.h"
@@ -849,7 +848,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 break;
             }
         }
-        igraph_vector_int_resize(&Nuv, nuvsize);
+        igraph_vector_int_resize(&Nuv, nuvsize); /* shrinks, error safe */
 
         /* -------------------------------------------------------------*/
         /* By a BFS search of <Nu(v)> determine I(S,v)-K.

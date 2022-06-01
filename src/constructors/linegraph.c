@@ -75,7 +75,8 @@ static igraph_error_t igraph_i_linegraph_undirected(const igraph_t *graph, igrap
     igraph_vector_int_destroy(&adjedges2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph));
+    IGRAPH_CHECK(igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph)));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -112,7 +113,9 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
 
     igraph_vector_int_destroy(&adjedges);
     IGRAPH_FINALLY_CLEAN(1);
-    igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph));
+
+    IGRAPH_CHECK(igraph_create(linegraph, &edges, no_of_edges, igraph_is_directed(graph)));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 

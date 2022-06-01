@@ -65,9 +65,8 @@ IGRAPH_EXPORT igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng
 IGRAPH_EXPORT void igraph_rng_destroy(igraph_rng_t *rng);
 
 IGRAPH_EXPORT igraph_error_t igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
-IGRAPH_EXPORT unsigned long int igraph_rng_max(igraph_rng_t *rng);
-IGRAPH_EXPORT IGRAPH_DEPRECATED unsigned long int igraph_rng_min(igraph_rng_t *rng);
-IGRAPH_EXPORT const char *igraph_rng_name(igraph_rng_t *rng);
+IGRAPH_EXPORT unsigned long int igraph_rng_max(const igraph_rng_t *rng);
+IGRAPH_EXPORT const char *igraph_rng_name(const igraph_rng_t *rng);
 
 IGRAPH_EXPORT long int igraph_rng_get_integer(igraph_rng_t *rng,
                                               long int l, long int h);
@@ -105,9 +104,6 @@ void PutRNGstate(void);
 #define RNG_BEGIN()    GetRNGstate()
 #define RNG_END()      PutRNGstate()
 
-double Rf_dnorm4(double x, double mu, double sigma, int give_log);
-#define igraph_dnorm Rf_dnorm4
-
 #else
 
 #define RNG_BEGIN() \
@@ -117,8 +113,6 @@ double Rf_dnorm4(double x, double mu, double sigma, int give_log);
     }
 #define RNG_END()       /* do nothing */
 
-IGRAPH_EXPORT double igraph_dnorm(double x, double mu, double sigma, int give_log);
-
 #endif
 
 #define RNG_INTEGER(l,h) (igraph_rng_get_integer(igraph_rng_default(),(l),(h)))
@@ -127,6 +121,9 @@ IGRAPH_EXPORT double igraph_dnorm(double x, double mu, double sigma, int give_lo
 #define RNG_UNIF01()     (igraph_rng_get_unif01(igraph_rng_default()))
 #define RNG_GEOM(p)      (igraph_rng_get_geom(igraph_rng_default(),(p)))
 #define RNG_BINOM(n,p)   (igraph_rng_get_binom(igraph_rng_default(),(n),(p)))
+#define RNG_EXP(rate)    (igraph_rng_get_exp(igraph_rng_default(),(rate)))
+#define RNG_GAMMA(shape, scale) \
+                         (igraph_rng_get_gamma(igraph_rng_default(), (shape), (scale)))
 #define RNG_INT31()      (igraph_rng_get_int31(igraph_rng_default()))
 
 __END_DECLS

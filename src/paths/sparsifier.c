@@ -22,13 +22,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
-#include "igraph_operators.h"
 #include "igraph_random.h"
-
-#include "core/math.h"
-
-#include "config.h"
 
 /*
  * This internal function gets the adjacency and incidence list representation

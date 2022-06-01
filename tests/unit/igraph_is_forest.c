@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check_output(const igraph_t *graph, igraph_bool_t *res, igraph_neimode_t mode){
     igraph_bool_t result;

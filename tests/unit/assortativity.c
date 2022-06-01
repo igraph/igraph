@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void assortativity_unnormalized(const igraph_t *graph, igraph_real_t *res, igraph_bool_t directed) {
     if (! igraph_is_directed(graph)) {
@@ -58,9 +58,71 @@ int main() {
 
     /* Assortativity based on vertex categories */
 
+    igraph_vector_int_init(&types, 0);
+
+    igraph_vector_init(&values, 0);
+
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
+    printf("Null graph nominal assortativity: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_assortativity(&g, &values, NULL, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
+    printf("Null graph value assortativity: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_destroy(&g);
+
+    igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
+
+    igraph_vector_int_resize(&types, 1);
+    VECTOR(types)[0] = 0;
+
+    igraph_vector_resize(&values, 1);
+    VECTOR(values)[0] = 0;
+
+    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
+    printf("Singleton graph nominal assortativity: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ 0);
+    printf("Singleton graph nominal assortativity, unnormalized: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_assortativity(&g, &values, NULL, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
+    printf("Singleton graph value assortativity: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_assortativity(&g, &values, NULL, &assort, IGRAPH_UNDIRECTED, /* normalized */ 0);
+    printf("Singleton graph value assortativity, unnormalized: ");
+    igraph_real_printf(assort);
+    printf("\n");
+
+    igraph_add_edge(&g, 0, 0);
+    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
+    printf("Singleton graph with loop, nominal assortativity: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ 0);
+    printf("Singleton graph with loop, nominal assortativity, unnormalized: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_assortativity(&g, &values, NULL, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
+    printf("Singleton graph with loop, value assortativity: ");
+    igraph_real_printf(assort);
+    printf("\n");
+    igraph_assortativity(&g, &values, NULL, &assort, IGRAPH_UNDIRECTED, /* normalized */ 0);
+    printf("Singleton graph with loop, value assortativity, unnormalized: ");
+    igraph_real_printf(assort);
+    printf("\n");
+
+    igraph_destroy(&g);
+    igraph_vector_destroy(&values);
+
+    printf("\n");
+
     igraph_famous(&g, "zachary");
 
-    igraph_vector_int_init(&types, 0);
     igraph_degree(&g, &types, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
 
     igraph_assortativity_nominal(&g, &types, &assort, IGRAPH_UNDIRECTED, /* normalized */ 1);
@@ -71,7 +133,7 @@ int main() {
 
     /* unnormalized assortativity based on categories is the same as modularity */
     igraph_modularity(&g, &types, NULL, 1, 0, &modularity);
-    IGRAPH_ASSERT(assort_unnorm == modularity);
+    IGRAPH_ASSERT(igraph_almost_equals(assort_unnorm, modularity, 1e-15));
 
     igraph_destroy(&g);
     igraph_vector_int_destroy(&types);
@@ -90,7 +152,7 @@ int main() {
      * a constant shift in the values. */
     igraph_vector_add_constant(&values, -5);
     igraph_assortativity(&g, &values, 0, &assort2, IGRAPH_UNDIRECTED, /*normalized=*/ 1);
-    IGRAPH_ASSERT(assort == assort2);
+    IGRAPH_ASSERT(igraph_almost_equals(assort, assort2, 1e-15));
 
     igraph_assortativity(&g, &values, 0, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ 0);
     printf("Assortativity based on values, unnormalized: %g\n", assort);
@@ -99,7 +161,7 @@ int main() {
      * a constant shift in the values. */
     igraph_vector_add_constant(&values, -5);
     igraph_assortativity(&g, &values, 0, &assort2, IGRAPH_UNDIRECTED, /*normalized=*/ 0);
-    IGRAPH_ASSERT(assort == assort2);
+    IGRAPH_ASSERT(igraph_almost_equals(assort, assort2, 1e-15));
 
     igraph_vector_destroy(&values);
     igraph_destroy(&g);

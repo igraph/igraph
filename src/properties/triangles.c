@@ -113,7 +113,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
+static igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -125,7 +125,7 @@ igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
+static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -162,6 +162,8 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         }
 
         neis2 = igraph_lazy_adjlist_get(&adjlist, v);
+        IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
+
         neilen = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen; j++) {
             igraph_integer_t nei = VECTOR(*neis2)[j];
@@ -181,6 +183,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_int_t *neis2;
         igraph_integer_t deg;
         neis2 = igraph_lazy_adjlist_get(&adjlist, v);
+        IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
         VECTOR(degree)[i] = deg = igraph_vector_int_size(neis2);
         if (deg > maxdegree) {
             maxdegree = deg;
@@ -196,7 +199,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (neis == 0) {
-        IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for local transitivity calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
@@ -211,6 +214,8 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         neis1 = igraph_lazy_adjlist_get(&adjlist, node);
+        IGRAPH_CHECK_OOM(neis1, "Failed to query neighbors.");
+
         neilen1 = igraph_vector_int_size(neis1);
         for (i = 0; i < neilen1; i++) {
             igraph_integer_t nei = VECTOR(*neis1)[i];
@@ -225,6 +230,7 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
             /*        neiindex, neirank); */
             if (neirank > noderank) {
                 neis2 = igraph_lazy_adjlist_get(&adjlist, nei);
+                IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
                 neilen2 = igraph_vector_int_size(neis2);
                 for (j = 0; j < neilen2; j++) {
                     igraph_integer_t nei2 = VECTOR(*neis2)[j];
@@ -252,9 +258,12 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
     for (i = 0; i < nodes_to_calc; i++, IGRAPH_VIT_NEXT(vit)) {
         igraph_integer_t node = IGRAPH_VIT_GET(vit);
         igraph_integer_t idx = VECTOR(indexv)[node] - 1;
-        igraph_vector_int_t *neis2 =
-            igraph_lazy_adjlist_get(&adjlist, node);
-        igraph_integer_t deg = igraph_vector_int_size(neis2);
+        igraph_vector_int_t *neis2 = igraph_lazy_adjlist_get(&adjlist, node);
+        igraph_integer_t deg;
+
+        IGRAPH_CHECK_OOM(neis2, "Failed to query neighbors.");
+
+        deg = igraph_vector_int_size(neis2);
         if (mode == IGRAPH_TRANSITIVITY_ZERO && deg < 2) {
             VECTOR(*res)[i] = 0.0;
         } else {
@@ -275,64 +284,6 @@ igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
-
-/* We don't use this, it is theoretically good, but practically not.
- */
-
-/* int igraph_transitivity_local_undirected3(const igraph_t *graph, */
-/*                    igraph_vector_t *res, */
-/*                    const igraph_vs_t vids) { */
-
-/*   igraph_vit_t vit; */
-/*   igraph_integer_t nodes_to_calc; */
-/*   igraph_lazy_adjlist_t adjlist; */
-/*   igraph_integer_t i, j; */
-
-/*   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit)); */
-/*   IGRAPH_FINALLY(igraph_vit_destroy, &vit); */
-/*   nodes_to_calc=IGRAPH_VIT_SIZE(vit); */
-
-/*   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, */
-/*                    IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE)); */
-/*   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist); */
-
-/*   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc)); */
-/*   for (i=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);  */
-/*        i++, IGRAPH_VIT_NEXT(vit)) { */
-/*     igraph_integer_t node=IGRAPH_VIT_GET(vit); */
-/*     igraph_vector_int_t *neis=igraph_lazy_adjlist_get(&adjlist, node); */
-/*     igraph_integer_t n1=igraph_vector_int_size(neis); */
-/*     igraph_real_t triangles=0; */
-/*     igraph_real_t triples=(double)n1*(n1-1); */
-/*     IGRAPH_ALLOW_INTERRUPTION(); */
-/*     for (j=0; j<n1; j++) { */
-/*       igraph_integer_t node2=VECTOR(*neis)[j]; */
-/*       igraph_vector_int_t *neis2=igraph_lazy_adjlist_get(&adjlist, node2); */
-/*       igraph_integer_t n2=igraph_vector_int_size(neis2); */
-/*       igraph_integer_t l1=0, l2=0; */
-/*       while (l1 < n1 && l2 < n2) { */
-/*  igraph_integer_t nei1=VECTOR(*neis)[l1]; */
-/*  igraph_integer_t nei2=VECTOR(*neis2)[l2]; */
-/*  if (nei1 < nei2) {  */
-/*    l1++; */
-/*  } else if (nei1 > nei2) { */
-/*    l2++; */
-/*  } else { */
-/*    triangles+=1; */
-/*    l1++; l2++; */
-/*  } */
-/*       } */
-/*     } */
-/*     /\* We're done with 'node' *\/ */
-/*     VECTOR(*res)[i] = triangles / triples;   */
-/*   } */
-
-/*   igraph_lazy_adjlist_destroy(&adjlist); */
-/*   igraph_vit_destroy(&vit); */
-/*   IGRAPH_FINALLY_CLEAN(2); */
-
-/*   return IGRAPH_SUCCESS; */
-/* } */
 
 /* This removes loop, multiple edges and edges that point
      "backwards" according to the rank vector. */
@@ -368,10 +319,9 @@ igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-
 }
 
-igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
+static igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -487,6 +437,12 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
  * \function igraph_list_triangles
  * \brief Find all triangles in a graph.
  *
+ * </para><para>
+ * The triangles are reported as a long list of vertex ID triplets. Use
+ * the \c int variant of \ref igraph_matrix_view_from_vector() to create a
+ * matrix view into the vector where each triangle is stored in a column of the
+ * matrix (see the example).
+ *
  * \param graph The input graph, edge directions are ignored.
  *        Multiple edges are ignored.
  * \param res Pointer to an initialized integer vector, the result
@@ -501,6 +457,8 @@ igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
  *
  * Time complexity: O(d^2 n), d is the average degree, n is the number
  * of vertices.
+ *
+ * \example examples/simple/igraph_list_triangles.c
  */
 
 igraph_error_t igraph_list_triangles(const igraph_t *graph,
@@ -599,7 +557,7 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (! neis) {
-        IGRAPH_ERROR("Insufficient memory for undirected global transitivity.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for undirected global transitivity.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
@@ -647,11 +605,12 @@ igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_transitivity_barrat1(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         const igraph_vs_t vids,
-                                         const igraph_vector_t *weights,
-                                         igraph_transitivity_mode_t mode) {
+static igraph_error_t igraph_i_transitivity_barrat1(
+        const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vs_t vids,
+        const igraph_vector_t *weights,
+        igraph_transitivity_mode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
@@ -694,6 +653,7 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         adj1 = igraph_lazy_inclist_get(&incident, node);
+        IGRAPH_CHECK_OOM(adj1, "Failed to query incident edges.");
         adjlen1 = igraph_vector_int_size(adj1);
         /* Mark the neighbors of the node */
         for (j = 0; j < adjlen1; j++) {
@@ -710,6 +670,7 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
             igraph_real_t weight1 = VECTOR(*weights)[edge1];
             igraph_integer_t v = IGRAPH_OTHER(graph, edge1, node);
             adj2 = igraph_lazy_inclist_get(&incident, v);
+            IGRAPH_CHECK_OOM(adj2, "Failed to query incident edges.");
             adjlen2 = igraph_vector_int_size(adj2);
             for (k = 0; k < adjlen2; k++) {
                 igraph_integer_t edge2 = VECTOR(*adj2)[k];
@@ -736,10 +697,11 @@ static int igraph_i_transitivity_barrat1(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_transitivity_barrat4(const igraph_t *graph,
-                                         igraph_vector_t *res,
-                                         const igraph_vector_t *weights,
-                                         igraph_transitivity_mode_t mode) {
+static igraph_error_t igraph_i_transitivity_barrat4(
+        const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vector_t *weights,
+        igraph_transitivity_mode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t order;

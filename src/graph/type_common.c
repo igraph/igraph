@@ -22,10 +22,6 @@
 
 #include "igraph_datatype.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
-
-#include "graph/attributes.h"
-#include "graph/neighbors.h"
 
 /* Internal functions */
 

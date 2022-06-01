@@ -26,14 +26,14 @@
 
 #include "core/trie.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
     igraph_trie_t trie;
     igraph_integer_t id;
     igraph_integer_t i;
-    char *str;
+    const char *str;
 
     /* init */
     igraph_trie_init(&trie, 0);
@@ -122,7 +122,7 @@ int main() {
     printf("alma:  %" IGRAPH_PRId "\n", id);
 
     for (i = 0; i < igraph_trie_size(&trie); i++) {
-        igraph_trie_idx(&trie, i, &str);
+        str = igraph_trie_idx(&trie, i);
         printf("%" IGRAPH_PRId ": %s\n", i, str);
     }
     igraph_trie_destroy(&trie);

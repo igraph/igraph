@@ -96,7 +96,7 @@ whitespace [ \t\v\f]
 <*>[\n\r]+        { BEGIN(INITIAL); yyextra->mode=0; return NEWLINE; } /* skip over multiple newlines */
 \"[^\"\0]*\"      { return QSTR; }
 \([^\)\0]*\)      { return PSTR; }
-\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
+(\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
                     return NUM; }
 
 x_fact/[ \t\n\r]  { if (yyextra->mode==1) { return VP_X_FACT; } else { return ALNUM; } }

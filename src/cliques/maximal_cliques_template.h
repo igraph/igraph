@@ -95,13 +95,8 @@
 #define RESNAME cliquehandler_fn, arg
 #define SUFFIX _callback
 #define RECORD do { \
-        igraph_vector_int_t *cl=IGRAPH_CALLOC(1, igraph_vector_int_t); \
         igraph_error_t cliquehandler_retval; \
-        if (!cl) { \
-            IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
-        } \
-        IGRAPH_CHECK(igraph_vector_int_copy(cl, R)); \
-        cliquehandler_retval = cliquehandler_fn(cl, arg); \
+        cliquehandler_retval = cliquehandler_fn(R, arg); \
         if (cliquehandler_retval == IGRAPH_STOP) { \
             return IGRAPH_STOP; \
         } else if (cliquehandler_retval) { \
@@ -128,7 +123,7 @@
                 err = igraph_vector_reserve(hist, 2*hcapacity); \
             err = igraph_vector_resize(hist, clsize); \
             if (err != IGRAPH_SUCCESS) \
-                IGRAPH_ERROR("Cannot count maximal cliques", IGRAPH_ENOMEM); \
+                IGRAPH_ERROR("Cannot count maximal cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
             for (j=hsize; j < clsize; j++) \
                 VECTOR(*hist)[j] = 0; \
         } \
@@ -153,7 +148,7 @@ static igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     igraph_vector_int_t *H,
     igraph_integer_t min_size, igraph_integer_t max_size) {
 
-    int err;
+    igraph_error_t err;
 
     IGRAPH_CHECK(igraph_vector_int_push_back(H, -1)); /* boundary */
 
@@ -238,10 +233,10 @@ igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     igraph_vector_int_destroy(&coreness);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-    igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &fulladjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &fulladjlist);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&PX, 20);

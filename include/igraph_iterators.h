@@ -283,9 +283,6 @@ IGRAPH_EXPORT igraph_error_t igraph_es_vector(igraph_es_t *es,
                                    const igraph_vector_int_t *v);
 IGRAPH_EXPORT igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_fromto(igraph_es_t *es,
-                                   igraph_vs_t from, igraph_vs_t to);
-
 IGRAPH_EXPORT igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
 IGRAPH_EXPORT igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 

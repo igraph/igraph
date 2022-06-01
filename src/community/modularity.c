@@ -23,7 +23,6 @@
 
 #include "igraph_community.h"
 
-#include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 
@@ -159,7 +158,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
 
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges)
-            IGRAPH_ERROR("Vector size differs from number of edges.",
+            IGRAPH_ERROR("Weight vector size differs from number of edges.",
                          IGRAPH_EINVAL);
         m = 0.0;
         for (i = 0; i < no_of_edges; i++) {
@@ -374,7 +373,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
         }
 
         /* Scaling one degree factor so every element gets scaled. */
-        igraph_vector_copy(&deg_unscaled, &deg);
+        igraph_vector_init_copy(&deg_unscaled, &deg);
         IGRAPH_FINALLY(igraph_vector_destroy, &deg_unscaled);
         scaling_factor = resolution / 2.0 / sw;
         igraph_vector_scale(&deg, scaling_factor);

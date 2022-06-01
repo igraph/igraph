@@ -82,25 +82,19 @@ static void igraph_i_subclique_next_free(void *ptr) {
     igraph_integer_t i;
     if (data->resultids) {
         for (i = 0; i < data->nc; i++) {
-            if (data->resultids + i) {
-                igraph_vector_int_destroy(data->resultids + i);
-            }
+            igraph_vector_int_destroy(&data->resultids[i]);
         }
         IGRAPH_FREE(data->resultids);
     }
     if (data->result) {
         for (i = 0; i < data->nc; i++) {
-            if (data->result + i) {
-                igraph_destroy(data->result + i);
-            }
+            igraph_destroy(&data->result[i]);
         }
         IGRAPH_FREE(data->result);
     }
     if (data->resultweights) {
         for (i = 0; i < data->nc; i++) {
-            if (data->resultweights + i) {
-                igraph_vector_destroy(data->resultweights + i);
-            }
+            igraph_vector_destroy(&data->resultweights[i]);
         }
         IGRAPH_FREE(data->resultweights);
     }
@@ -158,17 +152,17 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_subclique_next_free, &freedata);
     *resultids = IGRAPH_CALLOC(nc, igraph_vector_int_t);
     if (!*resultids) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     freedata.resultids = *resultids;
     *resultweights = IGRAPH_CALLOC(nc, igraph_vector_t);
     if (!*resultweights) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     freedata.resultweights = *resultweights;
     *result = IGRAPH_CALLOC(nc, igraph_t);
     if (!*result) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     freedata.result = *result;
 
@@ -245,8 +239,8 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
         /* Now we create the subgraph from the edges above the next
            threshold, and their incident vertices. */
 
-        igraph_vector_int_init(newids, 0);
-        igraph_vector_init(neww, 0);
+        IGRAPH_CHECK(igraph_vector_int_init(newids, 0));
+        IGRAPH_CHECK(igraph_vector_init(neww, 0));
 
         /* We use mark[] to denote the vertices already mapped to
            the new graph. If this is -(c+1), then the vertex was
@@ -366,11 +360,11 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     for (i = 0, j = igraph_vector_ptr_size(cliques) - 1; i < nocliques; i++, j--) {
         igraph_vector_int_t *cl = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (!cl) {
-            IGRAPH_ERROR("Cannot find graphlets", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot find graphlets", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, cl);
 
-        igraph_vector_int_list_pop_back(&mycliques, cl);
+        *cl = igraph_vector_int_list_pop_back(&mycliques);
 
         /* From this point onwards, _we_ own the clique and not `mycliques'.
          * We pass on the ownership to `cliques' */

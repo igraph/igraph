@@ -26,18 +26,54 @@
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 
-static igraph_error_t igraph_i_adjacency_directed(const igraph_matrix_t *adjmatrix,
-                                       igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_max(const igraph_matrix_t *adjmatrix,
-                                  igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_upper(const igraph_matrix_t *adjmatrix,
-                                    igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_lower(const igraph_matrix_t *adjmatrix,
-                                    igraph_vector_int_t *edges);
-static igraph_error_t igraph_i_adjacency_min(const igraph_matrix_t *adjmatrix,
-                                  igraph_vector_int_t *edges);
+static igraph_error_t igraph_i_adjacency_directed(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+);
+static igraph_error_t igraph_i_adjacency_max(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+);
+static igraph_error_t igraph_i_adjacency_upper(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+);
+static igraph_error_t igraph_i_adjacency_lower(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+);
+static igraph_error_t igraph_i_adjacency_min(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+);
 
-static igraph_error_t igraph_i_adjacency_directed(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjust_loop_edge_count(
+    igraph_integer_t* count, igraph_loops_t loops
+) {
+    /* The compiler should be smart enough to figure out that this can be
+     * inlined */
+    switch (loops) {
+        case IGRAPH_NO_LOOPS:
+            *count = 0;
+            break;
+        case IGRAPH_LOOPS_TWICE:
+            if (*count & 1) {
+                IGRAPH_ERROR("Odd number found in the diagonal of the adjacency matrix.", IGRAPH_EINVAL);
+            }
+            *count >>= 1;
+            break;
+        case IGRAPH_LOOPS_ONCE:
+        default:
+            break;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_adjacency_directed(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j, k;
@@ -45,6 +81,9 @@ static igraph_error_t igraph_i_adjacency_directed(const igraph_matrix_t *adjmatr
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_nodes; j++) {
             igraph_integer_t M = MATRIX(*adjmatrix, i, j);
+            if (i == j) {
+                IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            }
             for (k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
@@ -55,15 +94,29 @@ static igraph_error_t igraph_i_adjacency_directed(const igraph_matrix_t *adjmatr
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_max(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_max(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k;
+    igraph_integer_t i, j, k, M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = i; j < no_of_nodes; j++) {
-            igraph_integer_t M1 = MATRIX(*adjmatrix, i, j);
-            igraph_integer_t M2 = MATRIX(*adjmatrix, j, i);
+        /* do the loops first */
+        M1 = MATRIX(*adjmatrix, i, i);
+        if (M1) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M1, loops));
+            for (k = 0; k < M1; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+            }
+        }
+
+        /* then the rest */
+        for (j = i + 1; j < no_of_nodes; j++) {
+            M1 = MATRIX(*adjmatrix, i, j);
+            M2 = MATRIX(*adjmatrix, j, i);
             if (M1 < M2) {
                 M1 = M2;
             }
@@ -77,14 +130,28 @@ static igraph_error_t igraph_i_adjacency_max(const igraph_matrix_t *adjmatrix, i
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_upper(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_upper(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k;
+    igraph_integer_t i, j, k, M;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = i; j < no_of_nodes; j++) {
-            igraph_integer_t M = MATRIX(*adjmatrix, i, j);
+        /* do the loops first */
+        M = MATRIX(*adjmatrix, i, i);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+            }
+        }
+
+        /* then the rest */
+        for (j = i + 1; j < no_of_nodes; j++) {
+            M = MATRIX(*adjmatrix, i, j);
             for (k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
@@ -94,32 +161,59 @@ static igraph_error_t igraph_i_adjacency_upper(const igraph_matrix_t *adjmatrix,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_lower(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_lower(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k;
+    igraph_integer_t i, j, k, M;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j <= i; j++) {
-            igraph_integer_t M = MATRIX(*adjmatrix, i, j);
+        for (j = 0; j < i; j++) {
+            M = MATRIX(*adjmatrix, i, j);
             for (k = 0; k < M; k++) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+            }
+        }
+
+        /* do the loops as well */
+        M = MATRIX(*adjmatrix, i, i);
+        if (M) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M, loops));
+            for (k = 0; k < M; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
             }
         }
     }
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_adjacency_min(const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges) {
+static igraph_error_t igraph_i_adjacency_min(
+    const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
-    igraph_integer_t i, j, k;
+    igraph_integer_t i, j, k, M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = i; j < no_of_nodes; j++) {
-            igraph_integer_t M1 = MATRIX(*adjmatrix, i, j);
-            igraph_integer_t M2 = MATRIX(*adjmatrix, j, i);
+        /* do the loops first */
+        M1 = MATRIX(*adjmatrix, i, i);
+        if (M1) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&M1, loops));
+            for (k = 0; k < M1; k++) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+            }
+        }
+
+        /* then the rest */
+        for (j = i + 1; j < no_of_nodes; j++) {
+            M1 = MATRIX(*adjmatrix, i, j);
+            M2 = MATRIX(*adjmatrix, j, i);
             if (M1 > M2) {
                 M1 = M2;
             }
@@ -145,11 +239,8 @@ static igraph_error_t igraph_i_adjacency_min(const igraph_matrix_t *adjmatrix, i
  * \param adjmatrix The adjacency matrix. How it is interpreted
  *        depends on the \p mode argument.
  * \param mode Constant to specify how the given matrix is interpreted
- *        as an adjacency matrix. Possible values
- *        (A(i,j)
- *        is the element in row i and column
- *        j in the adjacency matrix
- *        \p adjmatrix):
+ *        as an adjacency matrix. Possible values (A(i,j) is the element in
+ *        row i and column j in the adjacency matrix \p adjmatrix):
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
  *          the graph will be directed and
@@ -184,23 +275,45 @@ static igraph_error_t igraph_i_adjacency_min(const igraph_matrix_t *adjmatrix, i
  *          only the lower left triangle (including the diagonal) is
  *          used for creating the edges.
  *       \endclist
+ * \param loops Constant to specify how the diagonal of the matrix should be
+ *        treated when creating loop edges.
+ *        \clist
+ *        \cli IGRAPH_NO_LOOPS
+ *          Ignore the diagonal of the input matrix and do not create loops.
+ *        \cli IGRAPH_LOOPS_ONCE
+ *          Treat the diagonal entries as the number of loop edges incident on
+ *          the corresponding vertex.
+ *        \cli IGRAPH_LOOPS_TWICE
+ *          Treat the diagonal entries as \em twice the number of loop edges
+ *          incident on the corresponding vertex. Odd numbers in the diagonal
+ *          will return an error code.
+ *        \endclist
  * \return Error code,
  *         \c IGRAPH_NONSQUARE: non-square matrix.
+ *         \c IGRAPH_EINVAL: Negative entry was found in adjacency matrix, or an
+ *         odd number was found in the diagonal with \c IGRAPH_LOOPS_TWICE
  *
  * Time complexity: O(|V||V|),
  * |V| is the number of vertices in the graph.
  *
  * \example examples/simple/igraph_adjacency.c
  */
-igraph_error_t igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
-                     igraph_adjacency_t mode) {
+igraph_error_t igraph_adjacency(
+    igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
+    igraph_loops_t loops
+) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes;
+    igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
 
     /* Some checks */
     if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
-        IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
+        IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
+    }
+
+    if (no_of_nodes != 0 && igraph_matrix_min(adjmatrix) < 0) {
+        IGRAPH_ERRORF("Edge counts should be non-negative, found %g.", IGRAPH_EINVAL,
+                igraph_matrix_min(adjmatrix));
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -209,23 +322,25 @@ igraph_error_t igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatri
     no_of_nodes = igraph_matrix_nrow(adjmatrix);
     switch (mode) {
     case IGRAPH_ADJ_DIRECTED:
-        IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges));
+        IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_MAX:
-        IGRAPH_CHECK(igraph_i_adjacency_max(adjmatrix, &edges));
+        IGRAPH_CHECK(igraph_i_adjacency_max(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_UPPER:
-        IGRAPH_CHECK(igraph_i_adjacency_upper(adjmatrix, &edges));
+        IGRAPH_CHECK(igraph_i_adjacency_upper(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_LOWER:
-        IGRAPH_CHECK(igraph_i_adjacency_lower(adjmatrix, &edges));
+        IGRAPH_CHECK(igraph_i_adjacency_lower(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_MIN:
-        IGRAPH_CHECK(igraph_i_adjacency_min(adjmatrix, &edges));
+        IGRAPH_CHECK(igraph_i_adjacency_min(adjmatrix, &edges, loops));
         break;
     case IGRAPH_ADJ_PLUS:
-        IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges));
+        IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges, loops));
         break;
+    default:
+        IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
@@ -239,38 +354,61 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
         const igraph_matrix_t *adjmatrix,
         igraph_vector_int_t *edges,
         igraph_vector_t *weights,
-        igraph_bool_t loops);
+        igraph_loops_t loops
+);
 static igraph_error_t igraph_i_weighted_adjacency_plus(
         const igraph_matrix_t *adjmatrix,
         igraph_vector_int_t *edges,
         igraph_vector_t *weights,
-        igraph_bool_t loops);
+        igraph_loops_t loops
+);
 static igraph_error_t igraph_i_weighted_adjacency_max(
         const igraph_matrix_t *adjmatrix,
         igraph_vector_int_t *edges,
         igraph_vector_t *weights,
-        igraph_bool_t loops);
+        igraph_loops_t loops
+);
 static igraph_error_t igraph_i_weighted_adjacency_upper(
         const igraph_matrix_t *adjmatrix,
         igraph_vector_int_t *edges,
         igraph_vector_t *weights,
-        igraph_bool_t loops);
+        igraph_loops_t loops
+);
 static igraph_error_t igraph_i_weighted_adjacency_lower(
         const igraph_matrix_t *adjmatrix,
         igraph_vector_int_t *edges,
         igraph_vector_t *weights,
-        igraph_bool_t loops);
+        igraph_loops_t loops
+);
 static igraph_error_t igraph_i_weighted_adjacency_min(
         const igraph_matrix_t *adjmatrix,
         igraph_vector_int_t *edges,
         igraph_vector_t *weights,
-        igraph_bool_t loops);
+        igraph_loops_t loops
+);
+
+static void igraph_i_adjust_loop_edge_weight(igraph_real_t* weight, igraph_loops_t loops) {
+    /* The compiler should be smart enough to figure out that this can be
+     * inlined */
+    switch (loops) {
+        case IGRAPH_NO_LOOPS:
+            *weight = 0.0;
+            break;
+        case IGRAPH_LOOPS_TWICE:
+            *weight /= 2;
+            break;
+        case IGRAPH_LOOPS_ONCE:
+        default:
+            break;
+    }
+}
 
 static igraph_error_t igraph_i_weighted_adjacency_directed(
-        const igraph_matrix_t *adjmatrix,
-        igraph_vector_int_t *edges,
-        igraph_vector_t *weights,
-        igraph_bool_t loops) {
+    const igraph_matrix_t *adjmatrix,
+    igraph_vector_int_t *edges,
+    igraph_vector_t *weights,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j;
@@ -278,15 +416,17 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_nodes; j++) {
             igraph_real_t M = MATRIX(*adjmatrix, i, j);
-            if (M == 0.0) {
-                continue;
+            if (M != 0.0) {
+                if (i == j) {
+                    igraph_i_adjust_loop_edge_weight(&M, loops);
+                    if (M == 0.0) {
+                        continue;
+                    }
+                }
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
-            if (i == j && !loops) {
-                continue;
-            }
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
-            IGRAPH_CHECK(igraph_vector_push_back(weights, M));
         }
     }
 
@@ -294,29 +434,34 @@ static igraph_error_t igraph_i_weighted_adjacency_directed(
 }
 
 static igraph_error_t igraph_i_weighted_adjacency_plus(
-        const igraph_matrix_t *adjmatrix,
-        igraph_vector_int_t *edges,
-        igraph_vector_t *weights,
-        igraph_bool_t loops) {
+    const igraph_matrix_t *adjmatrix,
+    igraph_vector_int_t *edges,
+    igraph_vector_t *weights,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j;
+    igraph_real_t M;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = i; j < no_of_nodes; j++) {
-            igraph_real_t M = MATRIX(*adjmatrix, i, j) + MATRIX(*adjmatrix, j, i);
-            if (M == 0.0) {
-                continue;
+        if (loops != IGRAPH_NO_LOOPS) {
+            M = MATRIX(*adjmatrix, i, i);
+            if (M != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
-            if (i == j && !loops) {
-                continue;
+        }
+
+        for (j = i + 1; j < no_of_nodes; j++) {
+            M = MATRIX(*adjmatrix, i, j) + MATRIX(*adjmatrix, j, i);
+            if (M != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
-            if (i == j) {
-                M /= 2;
-            }
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
-            IGRAPH_CHECK(igraph_vector_push_back(weights, M));
         }
     }
 
@@ -324,112 +469,151 @@ static igraph_error_t igraph_i_weighted_adjacency_plus(
 }
 
 static igraph_error_t igraph_i_weighted_adjacency_max(
-        const igraph_matrix_t *adjmatrix,
-        igraph_vector_int_t *edges,
-        igraph_vector_t *weights,
-        igraph_bool_t loops) {
+    const igraph_matrix_t *adjmatrix,
+    igraph_vector_int_t *edges,
+    igraph_vector_t *weights,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j;
+    igraph_real_t M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = i; j < no_of_nodes; j++) {
-            igraph_real_t M1 = MATRIX(*adjmatrix, i, j);
-            igraph_real_t M2 = MATRIX(*adjmatrix, j, i);
+        /* do the loops first */
+        if (loops) {
+            M1 = MATRIX(*adjmatrix, i, i);
+            if (M1 != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M1, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
+            }
+        }
+
+        /* then the rest */
+        for (j = i + 1; j < no_of_nodes; j++) {
+            M1 = MATRIX(*adjmatrix, i, j);
+            M2 = MATRIX(*adjmatrix, j, i);
             if (M1 < M2) {
                 M1 = M2;
             }
-            if (M1 == 0.0) {
-                continue;
+            if (M1 != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
             }
-            if (i == j && !loops) {
-                continue;
-            }
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
-            IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
         }
     }
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_weighted_adjacency_upper(
-        const igraph_matrix_t *adjmatrix,
-        igraph_vector_int_t *edges,
-        igraph_vector_t *weights,
-        igraph_bool_t loops) {
+    const igraph_matrix_t *adjmatrix,
+    igraph_vector_int_t *edges,
+    igraph_vector_t *weights,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j;
+    igraph_real_t M;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = i; j < no_of_nodes; j++) {
+        /* do the loops first */
+        if (loops) {
+            M = MATRIX(*adjmatrix, i, i);
+            if (M != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
+            }
+        }
+
+        /* then the rest */
+        for (j = i + 1; j < no_of_nodes; j++) {
             igraph_real_t M = MATRIX(*adjmatrix, i, j);
-            if (M == 0.0) {
-                continue;
+            if (M != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
-            if (i == j && !loops) {
-                continue;
-            }
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
-            IGRAPH_CHECK(igraph_vector_push_back(weights, M));
         }
     }
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_weighted_adjacency_lower(
-        const igraph_matrix_t *adjmatrix,
-        igraph_vector_int_t *edges,
-        igraph_vector_t *weights,
-        igraph_bool_t loops) {
+    const igraph_matrix_t *adjmatrix,
+    igraph_vector_int_t *edges,
+    igraph_vector_t *weights,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j;
+    igraph_real_t M;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j <= i; j++) {
-            igraph_real_t M = MATRIX(*adjmatrix, i, j);
-            if (M == 0.0) {
-                continue;
+        for (j = 0; j < i; j++) {
+            M = MATRIX(*adjmatrix, i, j);
+            if (M != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
-            if (i == j && !loops) {
-                continue;
+        }
+
+        /* do the loops as well */
+        if (loops) {
+            M = MATRIX(*adjmatrix, i, i);
+            if (M != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M));
             }
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
-            IGRAPH_CHECK(igraph_vector_push_back(weights, M));
         }
     }
     return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_weighted_adjacency_min(
-        const igraph_matrix_t *adjmatrix,
-        igraph_vector_int_t *edges,
-        igraph_vector_t *weights,
-        igraph_bool_t loops) {
+    const igraph_matrix_t *adjmatrix,
+    igraph_vector_int_t *edges,
+    igraph_vector_t *weights,
+    igraph_loops_t loops
+) {
 
     igraph_integer_t no_of_nodes = igraph_matrix_nrow(adjmatrix);
     igraph_integer_t i, j;
+    igraph_real_t M1, M2;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = i; j < no_of_nodes; j++) {
-            igraph_real_t M1 = MATRIX(*adjmatrix, i, j);
-            igraph_real_t M2 = MATRIX(*adjmatrix, j, i);
+        /* do the loops first */
+        if (loops) {
+            M1 = MATRIX(*adjmatrix, i, i);
+            if (M1 != 0.0) {
+                igraph_i_adjust_loop_edge_weight(&M1, loops);
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
+            }
+        }
+
+        /* then the rest */
+        for (j = i + 1; j < no_of_nodes; j++) {
+            M1 = MATRIX(*adjmatrix, i, j);
+            M2 = MATRIX(*adjmatrix, j, i);
             if (M1 > M2) {
                 M1 = M2;
             }
-            if (M1 == 0.0) {
-                continue;
+            if (M1 != 0.0) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
+                IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
             }
-            if (i == j && !loops) {
-                continue;
-            }
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, i));
-            IGRAPH_CHECK(igraph_vector_int_push_back(edges, j));
-            IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
         }
     }
 
@@ -489,10 +673,19 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *          only the lower left triangle (including the diagonal) is
  *          used for the edge weights.
  *       \endclist
- * \param attr the name of the attribute that will store the edge weights.
- *         If \c NULL , it will use \c weight as the attribute name.
- * \param loops Logical scalar, whether to ignore the diagonal elements
- *         in the adjacency matrix.
+ * \param weights Pointer to an initialized vector, the weights will be stored here.
+ * \param loops Constant to specify how the diagonal of the matrix should be
+ *        treated when creating loop edges.
+ *        \clist
+ *        \cli IGRAPH_NO_LOOPS
+ *          Ignore the diagonal of the input matrix and do not create loops.
+ *        \cli IGRAPH_LOOPS_ONCE
+ *          Treat the diagonal entries as the weight of the loop edge incident
+ *          on the corresponding vertex.
+ *        \cli IGRAPH_LOOPS_TWICE
+ *          Treat the diagonal entries as \em twice the weight of the loop edge
+ *          incident on the corresponding vertex.
+ *        \endclist
  * \return Error code,
  *         \c IGRAPH_NONSQUARE: non-square matrix.
  *
@@ -501,15 +694,12 @@ static igraph_error_t igraph_i_weighted_adjacency_min(
  *
  * \example examples/simple/igraph_weighted_adjacency.c
  */
-igraph_error_t igraph_weighted_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
-                              igraph_adjacency_t mode, const char* attr,
-                              igraph_bool_t loops) {
+igraph_error_t igraph_weighted_adjacency(
+    igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
+    igraph_vector_t *weights, igraph_loops_t loops
+) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_vector_t weights = IGRAPH_VECTOR_NULL;
-    const char* default_attr = "weight";
-    igraph_vector_ptr_t attr_vec;
-    igraph_attribute_record_t attr_rec;
     igraph_integer_t no_of_nodes;
 
     /* Some checks */
@@ -518,57 +708,50 @@ igraph_error_t igraph_weighted_adjacency(igraph_t *graph, const igraph_matrix_t 
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&weights, 0);
-    IGRAPH_VECTOR_PTR_INIT_FINALLY(&attr_vec, 1);
+    igraph_vector_clear(weights);
 
     /* Collect the edges */
     no_of_nodes = igraph_matrix_nrow(adjmatrix);
     switch (mode) {
     case IGRAPH_ADJ_DIRECTED:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_directed(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_MAX:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_max(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_UPPER:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_upper(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_LOWER:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_lower(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_MIN:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_min(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
     case IGRAPH_ADJ_PLUS:
         IGRAPH_CHECK(igraph_i_weighted_adjacency_plus(adjmatrix, &edges,
-                     &weights, loops));
+                     weights, loops));
         break;
+    default:
+        IGRAPH_ERROR("Invalid adjacency mode.", IGRAPH_EINVAL);
     }
-
-    /* Prepare attribute record */
-    attr_rec.name = attr ? attr : default_attr;
-    attr_rec.type = IGRAPH_ATTRIBUTE_NUMERIC;
-    attr_rec.value = &weights;
-    VECTOR(attr_vec)[0] = &attr_rec;
 
     /* Create graph */
     IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
     IGRAPH_FINALLY(igraph_destroy, graph);
     if (igraph_vector_int_size(&edges) > 0) {
-        IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
+        IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
     }
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Cleanup */
     igraph_vector_int_destroy(&edges);
-    igraph_vector_destroy(&weights);
-    igraph_vector_ptr_destroy(&attr_vec);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

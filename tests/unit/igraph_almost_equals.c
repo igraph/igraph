@@ -18,9 +18,7 @@
 
 #include <float.h>
 
-#include "core/math.h"
-
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* This file is ported from Java; the original source is here:
    https://floating-point-gui.de/errors/NearlyEqualsTest.java */

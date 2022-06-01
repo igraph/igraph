@@ -38,7 +38,8 @@ enum {
 	PLFIT_EINVAL   = 2,
 	PLFIT_UNDRFLOW = 3,
 	PLFIT_OVERFLOW = 4,
-	PLFIT_ENOMEM   = 5
+	PLFIT_ENOMEM   = 5,
+	PLFIT_EMAXITER = 6
 };
 
 #if (defined(__GNUC__) && GCC_VERSION_MAJOR >= 3)
@@ -55,7 +56,7 @@ enum {
 		if (PLFIT_UNLIKELY(plfit_i_ret != PLFIT_SUCCESS)) {\
 			return plfit_i_ret; \
 		} \
-	} while(0)
+	} while (0)
 
 #define PLFIT_ERROR(reason,plfit_errno) \
 	do {\

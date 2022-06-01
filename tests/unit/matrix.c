@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_matrix_t m, m1;
@@ -116,7 +116,7 @@ int main() {
             MATRIX(m, i, j) = (i + 1) * (j + 1);
         }
     }
-    igraph_matrix_copy(&m1, &m);
+    igraph_matrix_init_copy(&m1, &m);
     print_matrix(&m1);
     igraph_matrix_destroy(&m);
     igraph_matrix_destroy(&m1);

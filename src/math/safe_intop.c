@@ -48,3 +48,53 @@ igraph_error_t igraph_i_safe_vector_int_prod(const igraph_vector_int_t *vec, igr
     *res = prod;
     return IGRAPH_SUCCESS;
 }
+
+/**
+ *  Rounds up an integer to the next power of 2, with overflow check.
+ *  The result for 2, 3 and 4, respectively, would be 2, 4, and 4.
+ *  This function must not be called with negative input.
+ *  Based on https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+ */
+igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res) {
+    IGRAPH_ASSERT(k >= 0);
+    if (k == 0) {
+        *res = 0;
+        return IGRAPH_SUCCESS;
+    }
+    k--;
+    k |= k >> 1;
+    k |= k >> 2;
+    k |= k >> 4;
+    k |= k >> 8;
+    k |= k >> 16;
+#if IGRAPH_INTEGER_SIZE == 32
+    /* Nothing else to do. */
+#elif IGRAPH_INTEGER_SIZE == 64
+    k |= k >> 32;
+#else
+    /* If values other than 32 or 64 become allowed,
+     * this code will need to be updated. */
+#  error "Unexpected IGRAPH_INTEGER_SIZE value."
+#endif
+    if (k < IGRAPH_INTEGER_MAX) {
+        *res = k+1;
+        return IGRAPH_SUCCESS;
+    } else {
+        IGRAPH_ERRORF("Overflow when computing next power of 2 for %" IGRAPH_PRId ".",
+                      IGRAPH_EOVERFLOW, k);
+    }
+}
+
+/**
+ * Computes 2^k as an integer, with overflow check.
+ * This function must not be called with negative input.
+ */
+igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
+    IGRAPH_ASSERT(k >= 0);
+    if (k > IGRAPH_INTEGER_SIZE-2) {
+        IGRAPH_ERRORF("Overflow when raising 2 to power %" IGRAPH_PRId ".",
+                      IGRAPH_EOVERFLOW, k);
+    }
+    *res = (igraph_integer_t) 1 << k;
+    return IGRAPH_SUCCESS;
+}

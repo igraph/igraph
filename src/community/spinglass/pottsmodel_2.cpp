@@ -1129,7 +1129,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
     }
     if (result) {
         node = iter.First(community);
-        igraph_vector_int_resize(result, 0);
+        igraph_vector_int_clear(result);
         while (!iter.End()) {
             // printf("%s in community.\n",node->Get_Name());
             // fprintf(file,"%s\t%f\n",node->Get_Name(),node->Get_Affinity());
@@ -1214,7 +1214,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
         }
     }
     if (csize) {
-        igraph_vector_int_resize(csize, 0);
+        igraph_vector_int_clear(csize);
         for (unsigned long spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {
                 inner_links[spin] /= 2;

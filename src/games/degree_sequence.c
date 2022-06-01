@@ -65,7 +65,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
 
     bag1 = IGRAPH_CALLOC(outsum, igraph_integer_t);
     if (bag1 == 0) {
-        IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bag1);
 
@@ -77,7 +77,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     if (directed) {
         bag2 = IGRAPH_CALLOC(insum, igraph_integer_t);
         if (bag2 == 0) {
-            IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, bag2);
         for (i = 0; i < no_of_nodes; i++) {
@@ -466,7 +466,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
-            IGRAPH_ERROR("Cannot sample from configuration model (simple graphs).", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot sample from configuration model (simple graphs).", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
@@ -585,7 +585,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
-            IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;

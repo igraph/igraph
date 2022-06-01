@@ -1,6 +1,6 @@
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 #define PRINT_DESTROY(name) \

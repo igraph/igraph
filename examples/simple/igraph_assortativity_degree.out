@@ -1,17 +1,17 @@
-Barabasi-Albert network with 100000 nodes
+Forest fire model network with 1000 vertices and 0.2 forward burning probability.
 
-Assortativity before rewiring = -0.0204148
-Assortativity after rewiring = -0.00814841
+Assortativity before rewiring = 0.202122
+Assortativity after rewiring = -0.0411268
 
-Assortativity before rewiring = -0.0247227
-Assortativity after rewiring = -0.00750824
+Assortativity before rewiring = 0.217066
+Assortativity after rewiring = 0.00838012
 
-Assortativity before rewiring = -0.0308386
-Assortativity after rewiring = -0.00613711
+Assortativity before rewiring = 0.165968
+Assortativity after rewiring = -0.0193408
 
-Assortativity before rewiring = -0.0345163
-Assortativity after rewiring = -0.00693056
+Assortativity before rewiring = 0.199449
+Assortativity after rewiring = 0.0052581
 
-Assortativity before rewiring = -0.0231551
-Assortativity after rewiring = -0.00591497
+Assortativity before rewiring = 0.20196
+Assortativity after rewiring = -0.0257474
 

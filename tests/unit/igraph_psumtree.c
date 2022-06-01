@@ -23,15 +23,18 @@
 */
 
 #include <igraph.h>
-#include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_psumtree_t tree;
     igraph_vector_t vec;
     igraph_integer_t i, idx;
     igraph_real_t sum;
+
+    igraph_rng_seed(igraph_rng_default(), 42);
+
+    RNG_BEGIN();
 
     /* Uniform random numbers */
     igraph_vector_init(&vec, 16);
@@ -51,8 +54,7 @@ int main() {
     }
 
     for (i = 0; i < 16000; i++) {
-        igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_psumtree_search(&tree, &idx, r);
+        igraph_psumtree_search(&tree, &idx, RNG_UNIF(0, sum));
         VECTOR(vec)[idx] += 1;
     }
     for (i = 0; i < 16; i++) {
@@ -72,8 +74,7 @@ int main() {
 
     igraph_vector_null(&vec);
     for (i = 0; i < 24000; i++) {
-        igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_psumtree_search(&tree, &idx, r);
+        igraph_psumtree_search(&tree, &idx, RNG_UNIF(0, sum));
         VECTOR(vec)[idx] += 1;
     }
     for (i = 0; i < 16; i++) {
@@ -93,8 +94,7 @@ int main() {
 
     igraph_vector_null(&vec);
     for (i = 0; i < 20000; i++) {
-        igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_psumtree_search(&tree, &idx, r);
+        igraph_psumtree_search(&tree, &idx, RNG_UNIF(0, sum));
         VECTOR(vec)[idx] += 1;
     }
     if (VECTOR(vec)[0] != 0 || VECTOR(vec)[5] != 0 || VECTOR(vec)[15] != 0) {
@@ -102,6 +102,22 @@ int main() {
     }
 
     igraph_vector_destroy(&vec);
+    igraph_psumtree_destroy(&tree);
+
+    /* Check that search considers intervals closed on the left,
+     * see https://github.com/igraph/igraph/issues/2080 */
+
+    igraph_psumtree_init(&tree, 6);
+    igraph_psumtree_update(&tree, 2, 1.0);
+    igraph_psumtree_update(&tree, 4, 1.0);
+    igraph_psumtree_search(&tree, &idx, 0.0);
+    IGRAPH_ASSERT(idx  == 2);
+    igraph_psumtree_search(&tree, &idx, 0.5);
+    IGRAPH_ASSERT(idx  == 2);
+    igraph_psumtree_search(&tree, &idx, 1.0);
+    IGRAPH_ASSERT(idx  == 4);
+    igraph_psumtree_search(&tree, &idx, 1.2);
+    IGRAPH_ASSERT(idx  == 4);
     igraph_psumtree_destroy(&tree);
 
     /****************************************************/
@@ -117,8 +133,7 @@ int main() {
     sum = igraph_psumtree_sum(&tree);
 
     for (i = 0; i < 9000; i++) {
-        igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_psumtree_search(&tree, &idx, r);
+        igraph_psumtree_search(&tree, &idx, RNG_UNIF(0, sum));
         VECTOR(vec)[idx] += 1;
     }
     for (i = 0; i < 9; i++) {
@@ -135,8 +150,7 @@ int main() {
 
     igraph_vector_null(&vec);
     for (i = 0; i < 14000; i++) {
-        igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_psumtree_search(&tree, &idx, r);
+        igraph_psumtree_search(&tree, &idx, RNG_UNIF(0, sum));
         VECTOR(vec)[idx] += 1;
     }
     for (i = 0; i < 9; i++) {
@@ -165,9 +179,8 @@ int main() {
     sum = igraph_psumtree_sum(&tree);
 
     igraph_vector_null(&vec);
-    for (i = 0; i < 9000; i++) {
-        igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_psumtree_search(&tree, &idx, r);
+    for (i = 0; i < 9000; i++) {;
+        igraph_psumtree_search(&tree, &idx, RNG_UNIF(0, sum));
         VECTOR(vec)[idx] += 1;
     }
     if (VECTOR(vec)[0] != 0 || VECTOR(vec)[5] != 0 || VECTOR(vec)[8] != 0) {
@@ -181,6 +194,7 @@ int main() {
     /* Error handling                                   */
     /****************************************************/
 
+    igraph_error_handler_t *oldhandler = igraph_set_error_handler(&igraph_error_handler_ignore);
     igraph_psumtree_init(&tree, 9);
     if (igraph_psumtree_update(&tree, 2, -2) == IGRAPH_SUCCESS) {
         return 12;
@@ -191,7 +205,10 @@ int main() {
     if (igraph_psumtree_update(&tree, 2, IGRAPH_NAN) == IGRAPH_SUCCESS) {
         return 14;
     }
+    igraph_set_error_handler(oldhandler);
     igraph_psumtree_destroy(&tree);
+
+    RNG_END();
 
     VERIFY_FINALLY_STACK();
 

@@ -29,6 +29,9 @@
 #include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
+#include "igraph_matrix.h"
+#include "igraph_iterators.h"
 #include "igraph_vector_list.h"
 
 __BEGIN_DECLS
@@ -47,26 +50,43 @@ IGRAPH_EXPORT igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                                            igraph_bool_t directed,
                                            igraph_bool_t unconn);
 
-IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,
-                                                           igraph_vector_t steiner_terminals,
-                                                           igraph_neimode_t mode, const igraph_vector_t *weights);
-
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
                                         const igraph_vs_t from, const igraph_vs_t to,
                                         igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                                                      igraph_matrix_t *res,
                                                      const igraph_vs_t from,
                                                      const igraph_vs_t to,
                                                      const igraph_vector_t *weights,
                                                      igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
                                                  igraph_matrix_t *res,
                                                  const igraph_vs_t from,
                                                  const igraph_vs_t to,
                                                  const igraph_vector_t *weights,
                                                  igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_distances_johnson(const igraph_t *graph,
+                                                igraph_matrix_t *res,
+                                                const igraph_vs_t from,
+                                                const igraph_vs_t to,
+                                                const igraph_vector_t *weights);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
+                                        const igraph_vs_t from, const igraph_vs_t to,
+                                        igraph_neimode_t mode);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+                                                     igraph_matrix_t *res,
+                                                     const igraph_vs_t from,
+                                                     const igraph_vs_t to,
+                                                     const igraph_vector_t *weights,
+                                                     igraph_neimode_t mode);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
+                                                 igraph_matrix_t *res,
+                                                 const igraph_vs_t from,
+                                                 const igraph_vs_t to,
+                                                 const igraph_vector_t *weights,
+                                                 igraph_neimode_t mode);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
                                                 igraph_matrix_t *res,
                                                 const igraph_vs_t from,
                                                 const igraph_vs_t to,
@@ -77,7 +97,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                                             igraph_vector_int_list_t *edges,
                                             igraph_integer_t from, const igraph_vs_t to,
                                             igraph_neimode_t mode,
-                                            igraph_vector_int_t *predecessors,
+                                            igraph_vector_int_t *parents,
                                             igraph_vector_int_t *inbound_edges);
 IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                                       igraph_vector_int_list_t *vertices,
@@ -95,7 +115,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *
                                                      igraph_vs_t to,
                                                      const igraph_vector_t *weights,
                                                      igraph_neimode_t mode,
-                                                     igraph_vector_int_t *predecessors,
+                                                     igraph_vector_int_t *parents,
                                                      igraph_vector_int_t *inbound_edges);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
@@ -185,24 +205,79 @@ IGRAPH_EXPORT igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                               igraph_integer_t cutoff,
                                               igraph_neimode_t mode);
 
-IGRAPH_EXPORT igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_int_t *walk,
-                                     igraph_integer_t start, igraph_neimode_t mode,
+IGRAPH_EXPORT igraph_error_t igraph_random_walk(const igraph_t *graph,
+                                     const igraph_vector_t *weights,
+                                     igraph_vector_int_t *vertices,
+                                     igraph_vector_int_t *edges,
+                                     igraph_integer_t start,
+                                     igraph_neimode_t mode,
                                      igraph_integer_t steps,
                                      igraph_random_walk_stuck_t stuck);
 
-IGRAPH_EXPORT igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_get_k_shortest_paths(const igraph_t *graph,
                                           const igraph_vector_t *weights,
-                                          igraph_vector_int_t *edgewalk,
-                                          igraph_integer_t start, igraph_neimode_t mode,
-                                          igraph_integer_t steps,
-                                          igraph_random_walk_stuck_t stuck);
+                                          igraph_vector_int_list_t *vertex_paths,
+                                          igraph_vector_int_list_t *edge_paths,
+                                          igraph_integer_t k,
+                                          igraph_integer_t from,
+                                          igraph_integer_t to,
+                                          igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_spanner(const igraph_t *graph,
                                 igraph_vector_int_t *spanner,
                                 igraph_real_t stretch,
                                 const igraph_vector_t *weights);
 
+IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,
+                                                           igraph_vector_t steiner_terminals,
+                                                           igraph_neimode_t mode, const igraph_vector_t *weights);
+
+IGRAPH_EXPORT igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
+                                             igraph_vector_ptr_t *vertices,
+                                             igraph_vector_ptr_t *edges,
+                                             igraph_integer_t from,
+                                             igraph_vs_t to,
+                                             const igraph_vector_t *weights,
+                                             igraph_neimode_t mode,
+                                             igraph_vector_int_t *predecessors,
+                                             igraph_vector_int_t *inbound_edges);
+IGRAPH_EXPORT igraph_error_t igraph_get_widest_path(const igraph_t *graph,
+                                             igraph_vector_int_t *vertices,
+                                             igraph_vector_int_t *edges,
+                                             igraph_integer_t from,
+                                             igraph_integer_t to,
+                                             const igraph_vector_t *weights,
+                                             igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
+                                                   igraph_matrix_t *res,
+                                                   const igraph_vs_t from,
+                                                   const igraph_vs_t to,
+                                                   const igraph_vector_t *weights,
+                                                   igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
+                                             igraph_matrix_t *res,
+                                             const igraph_vs_t from,
+                                             const igraph_vs_t to,
+                                             const igraph_vector_t *weights,
+                                             igraph_neimode_t mode);
+
 IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
+
+IGRAPH_EXPORT igraph_error_t igraph_vertex_path_from_edge_path(
+   const igraph_t *graph, igraph_integer_t start,
+   const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
+   igraph_neimode_t mode
+);
+
+/* Deprecated functions: */
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
+                                                            const igraph_vector_t *weights,
+                                                            igraph_vector_int_t *edgewalk,
+                                                            igraph_integer_t start,
+                                                            igraph_neimode_t mode,
+                                                            igraph_integer_t steps,
+                                                            igraph_random_walk_stuck_t stuck);
 
 __END_DECLS
 

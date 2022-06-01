@@ -25,6 +25,7 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
+#include "internal/hacks.h" /* strdup */
 
 #include "config.h"
 
@@ -367,20 +368,26 @@ igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *
         /* This is a new attribute name */
         igraph_attribute_combination_record_t *rec =
             IGRAPH_CALLOC(1, igraph_attribute_combination_record_t);
-
-        if (!rec) {
-            IGRAPH_ERROR("Cannot create attribute combination data",
-                         IGRAPH_ENOMEM);
+        if (! rec) {
+            IGRAPH_ERROR("Cannot create attribute combination data.",
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        if (!name) {
+        IGRAPH_FINALLY(igraph_free, rec);
+        if (! name) {
             rec->name = NULL;
         } else {
             rec->name = strdup(name);
+            if (! rec->name) {
+                IGRAPH_ERROR("Cannot create attribute combination data.",
+                             IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            }
         }
+        IGRAPH_FINALLY(igraph_free, (char *) rec->name); /* free() is safe on NULL */
         rec->type = type;
         rec->func = func;
 
         IGRAPH_CHECK(igraph_vector_ptr_push_back(&comb->list, rec));
+        IGRAPH_FINALLY_CLEAN(2); /* ownership of 'rec' transferred to 'comb->list' */
 
     }
 

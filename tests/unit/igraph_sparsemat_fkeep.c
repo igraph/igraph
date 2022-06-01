@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 igraph_integer_t fkeep_none(igraph_integer_t row, igraph_integer_t col, igraph_real_t value, void *other) {
     IGRAPH_UNUSED(row);

@@ -3,7 +3,7 @@
 
 #include <time.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 static clock_t start;
 

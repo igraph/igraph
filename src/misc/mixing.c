@@ -94,6 +94,8 @@
  * \sa \ref igraph_assortativity() for computing the assortativity
  * based on continuous vertex values instead of discrete categories.
  * \ref igraph_modularity() to compute generalized modularity.
+ *
+ * \example examples/simple/igraph_assortativity_nominal.c
  */
 
 igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
@@ -114,6 +116,12 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
         IGRAPH_ERROR("Invalid types vector length.", IGRAPH_EINVAL);
     }
 
+    if (no_of_nodes == 0) {
+        *res = IGRAPH_NAN;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* 'types' length > 0 here, safe to call vector_min() */
     if (igraph_vector_int_min(types) < 0) {
         IGRAPH_ERROR("Vertex types must not be negative.", IGRAPH_EINVAL);
     }
@@ -250,8 +258,6 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * categories instead of numeric labels, and \ref
  * igraph_assortativity_degree() for the special case of assortativity
  * based on vertex degrees.
- * 
- * \example examples/simple/igraph_assortativity_degree.c
  */
 
 igraph_error_t igraph_assortativity(const igraph_t *graph,
@@ -297,9 +303,9 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
 
         num1 /= no_of_edges;
         if (normalized) {
-            den1 /= no_of_edges * 2;
+            den1 /= no_of_edges * 2.0;
         }
-        num2 /= no_of_edges * 2;
+        num2 /= no_of_edges * 2.0;
         num2 = num2 * num2;
 
         if (normalized) {
@@ -371,6 +377,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  *
  * \sa \ref igraph_assortativity() for the general function
  * calculating assortativity for any kind of numeric vertex values.
+ * 
+ * \example examples/simple/igraph_assortativity_degree.c
  */
 
 igraph_error_t igraph_assortativity_degree(const igraph_t *graph,

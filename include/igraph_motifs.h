@@ -43,14 +43,16 @@ __BEGIN_DECLS
  * function whenever a new motif is found during a motif search. This
  * callback function must be of type \c igraph_motifs_handler_t. It has
  * the following arguments:
+ *
  * \param graph The graph that that algorithm is working on. Of course
  *   this must not be modified.
  * \param vids The IDs of the vertices in the motif that has just been
  *   found. This vector is owned by the motif search algorithm, so do not
  *   modify or destroy it; make a copy of it if you need it later.
  * \param isoclass The isomorphism class of the motif that has just been
- *   found. Use \ref igraph_isoclass or \ref igraph_isoclass_subgraph to find
- *   out which isomorphism class belongs to a given motif.
+ *   found. Use \ref igraph_graph_count() to find the maximum possible
+ *   isoclass for graphs of a given size. See \ref igraph_isoclass and
+ *   \ref igraph_isoclass_subgraph for more information.
  * \param extra The extra argument that was passed to \ref
  *   igraph_motifs_randesu_callback().
  * \return \c IGRAPH_SUCCESS to continue the motif search,

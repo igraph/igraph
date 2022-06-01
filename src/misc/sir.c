@@ -159,7 +159,7 @@ igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
     for (i = 0; i < no_sim; i++) {
         igraph_sir_t *sir = IGRAPH_CALLOC(1, igraph_sir_t);
         if (!sir) {
-            IGRAPH_ERROR("Cannot run SIR model.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot run SIR model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_CHECK(igraph_sir_init(sir));
         VECTOR(*result)[i] = sir;

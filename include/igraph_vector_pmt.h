@@ -27,15 +27,17 @@
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init)(
         TYPE(igraph_vector)* v, igraph_integer_t size);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_copy)(
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_array)(
         TYPE(igraph_vector)* v, const BASE* data, igraph_integer_t length);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_copy)(
+        TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 
 #ifndef NOTORDERED
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
 #endif
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
-                                                const TYPE(igraph_vector) *from);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, copy)(
+        TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, destroy)(TYPE(igraph_vector)* v);
 
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
@@ -66,8 +68,10 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igra
 #define VECTOR(v) ((v).stor_begin)
 #endif
 
-IGRAPH_EXPORT BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
-IGRAPH_EXPORT BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
+IGRAPH_EXPORT BASE* FUNCTION(igraph_vector, get_ptr)(const TYPE(igraph_vector)* v, igraph_integer_t pos);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, BASE value);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
 
@@ -214,7 +218,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, binsearch2)(
 IGRAPH_EXPORT void FUNCTION(igraph_vector, clear)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize)(
         TYPE(igraph_vector)* v, igraph_integer_t new_size);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reserve)(
         TYPE(igraph_vector)* v, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back)(TYPE(igraph_vector)* v, BASE e);
@@ -253,18 +257,22 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_v
 #ifdef BASE_COMPLEX
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
-                                       igraph_vector_t *real);
+                                                        igraph_vector_t *real);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
-                                       igraph_vector_t *imag);
+                                                        igraph_vector_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
-        igraph_vector_t *real,
-        igraph_vector_t *imag);
+                                                            igraph_vector_t *real,
+                                                            igraph_vector_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
-        const igraph_vector_t *real,
-        const igraph_vector_t *imag);
+                                                          const igraph_vector_t *real,
+                                                          const igraph_vector_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
-        const igraph_vector_t *r,
-        const igraph_vector_t *theta);
+                                                                const igraph_vector_t *r,
+                                                                const igraph_vector_t *theta);
+
+IGRAPH_EXPORT igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *lhs,
+                                                               const igraph_vector_complex_t *rhs,
+                                                               igraph_real_t eps);
 
 #endif
 
@@ -276,11 +284,9 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_v
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, move_interval)(
         TYPE(igraph_vector) *v, igraph_integer_t begin, igraph_integer_t end,
         igraph_integer_t to);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, move_interval2)(
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, move_interval2)(
         TYPE(igraph_vector) *v, igraph_integer_t begin, igraph_integer_t end,
         igraph_integer_t to);
-IGRAPH_EXPORT void FUNCTION(igraph_vector, permdelete)
-        (TYPE(igraph_vector) *v, const igraph_vector_int_t *index, igraph_integer_t nremove);
 #ifndef NOTORDERED
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v, BASE elem);
 #endif

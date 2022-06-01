@@ -27,7 +27,7 @@
 
 #include "layout/layout_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int intersect() {
 
@@ -103,6 +103,65 @@ int distance() {
     return 0;
 }
 
+void check_layout_davidson_harel() {
+    igraph_t g;
+    igraph_matrix_t res;
+    igraph_bool_t use_seed;
+    igraph_integer_t maxiter, fineiter;
+    igraph_real_t  cool_fact, weight_node_dist, weight_border, weight_edge_lengths, weight_edge_crossings, weight_node_edge_dist;
+
+    igraph_rng_seed(igraph_rng_default(), 42);
+    igraph_matrix_init(&res, 0, 0);
+
+    use_seed = 0;
+    maxiter = 5;
+    fineiter = 5;
+    cool_fact = 0.75;
+    weight_node_dist = 1.0;
+    weight_border = 0.1;
+    weight_edge_lengths = 0.5;
+    weight_edge_crossings = 0.8;
+    weight_node_edge_dist = 0.2;
+
+    printf("Checking graph with no vertices\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
+    igraph_layout_davidson_harel(&g, &res, use_seed, maxiter, fineiter, cool_fact,
+            weight_node_dist, weight_border,
+            weight_edge_lengths,
+            weight_edge_crossings,
+            weight_node_edge_dist);
+
+    IGRAPH_ASSERT(igraph_matrix_nrow(&res) == 0);
+    igraph_destroy(&g);
+
+    printf("Checking graph with 10 vertices, no edges\n");
+    igraph_small(&g, 10, IGRAPH_DIRECTED, -1);
+    igraph_layout_davidson_harel(&g, &res, use_seed, maxiter, fineiter, cool_fact,
+            weight_node_dist, weight_border,
+            weight_edge_lengths,
+            weight_edge_crossings,
+            weight_node_edge_dist);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&res) == 10);
+    IGRAPH_ASSERT(igraph_matrix_ncol(&res) == 2);
+    IGRAPH_ASSERT(igraph_matrix_max(&res) < 20);
+    IGRAPH_ASSERT(igraph_matrix_min(&res) > -20);
+    igraph_destroy(&g);
+
+    printf("Checking full graph with 10 vertices\n");
+    igraph_full(&g, 10, IGRAPH_DIRECTED, 1);
+    igraph_layout_davidson_harel(&g, &res, use_seed, maxiter, fineiter, cool_fact,
+            weight_node_dist, weight_border,
+            weight_edge_lengths,
+            weight_edge_crossings,
+            weight_node_edge_dist);
+    IGRAPH_ASSERT(igraph_matrix_nrow(&res) == 10);
+    IGRAPH_ASSERT(igraph_matrix_ncol(&res) == 2);
+    IGRAPH_ASSERT(igraph_matrix_max(&res) < 20);
+    IGRAPH_ASSERT(igraph_matrix_min(&res) > -20);
+    igraph_destroy(&g);
+    igraph_matrix_destroy(&res);
+}
+
 int main() {
     int res1, res2;
 
@@ -116,6 +175,8 @@ int main() {
         printf("Unexpected result from distance(), config %d.\n", res2);
         return res2;
     }
+
+    check_layout_davidson_harel();
 
     VERIFY_FINALLY_STACK();
 

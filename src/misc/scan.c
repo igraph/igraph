@@ -282,7 +282,7 @@ static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
 
     neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (neis == 0) {
-        IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, neis);
 
@@ -392,7 +392,7 @@ static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igr
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&map2, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&weights, 0);
-    IGRAPH_CHECK(igraph_intersection(&is, us, them, /*map1=*/ 0, &map2));
+    IGRAPH_CHECK(igraph_intersection(&is, us, them, /* edge_map1= */ 0, &map2));
     IGRAPH_FINALLY(igraph_destroy, &is);
 
     /* Rewrite the map as edge weights */
@@ -449,7 +449,7 @@ igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them
         return igraph_i_local_scan_0_them_w(us, them, res, weights_them, mode);
     }
 
-    IGRAPH_CHECK(igraph_intersection(&is, us, them, /*edgemap1=*/ 0, /*edgemap2=*/ 0));
+    IGRAPH_CHECK(igraph_intersection(&is, us, them, /*edge_map1=*/ 0, /*edge_map2=*/ 0));
     IGRAPH_FINALLY(igraph_destroy, &is);
 
     IGRAPH_CHECK(igraph_strength(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS, /* weights = */ 0));
@@ -797,7 +797,7 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
  * \function igraph_local_scan_neighborhood_ecount
  * Local scan-statistics with pre-calculated neighborhoods
  *
- * Count the number of edges, or sum the edge weigths in
+ * Count the number of edges, or sum the edge weights in
  * neighborhoods given as a parameter.
  *
  * \param graph The graph to perform the counting/summing in.

@@ -66,7 +66,7 @@
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
+ * \sa \ref igraph_square_lattice(), \ref igraph_ring(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_star.c
@@ -186,7 +186,7 @@ igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
  *
- * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_star(), 
+ * \sa \ref igraph_square_lattice(), \ref igraph_ring(), \ref igraph_star(),
  * \ref igraph_kary_tree() for creating other regular structures.
  *
  */
@@ -227,11 +227,11 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
         return IGRAPH_SUCCESS;
     }
 
-    /* Register the star for deallocation in case of error flow before 
+    /* Register the star for deallocation in case of error flow before
      * the entire wheel is successfully created. */
     IGRAPH_FINALLY(igraph_destroy, graph);
 
-    /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices, 
+    /* Add edges to the rim. As the rim (or cycle) has n - 1 vertices,
      * it will have n - 1 edges. For MUTUAL mode, number of edges
      * will be double. */
     if (mode == IGRAPH_WHEEL_MUTUAL) {
@@ -281,13 +281,36 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
 
     /* 2 instead of 1 because the star graph is registered before. */
     IGRAPH_FINALLY_CLEAN(2);
-    
+
     return IGRAPH_SUCCESS;
 }
 
 /**
  * \ingroup generators
  * \function igraph_lattice
+ * \brief Arbitrary dimensional square lattices (deprecated).
+ *
+ * \deprecated-by igraph_square_lattice 0.10.0
+ */
+igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector,
+                   igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
+                   igraph_bool_t circular) {
+    igraph_vector_bool_t periodic;
+
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&periodic, igraph_vector_int_size(dimvector));
+    igraph_vector_bool_fill(&periodic, circular);
+
+    IGRAPH_CHECK(igraph_square_lattice(graph, dimvector, nei, directed, mutual, &periodic));
+
+    igraph_vector_bool_destroy(&periodic);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
+ * \function igraph_square_lattice
  * \brief Arbitrary dimensional square lattices.
  *
  * Creates d-dimensional square lattices of the given size. Optionally,
@@ -315,20 +338,23 @@ igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mo
  *        higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether
  *        to create all connections as mutual.
- * \param circular Boolean, defines whether the generated lattice is
- *        periodic.
+ * \param periodic Boolean vector, defines whether the generated lattice is
+ *        periodic along each dimension. The length of this vector must match
+ *        the length of \p dimvector. This parameter may also be \c NULL, which
+ *        implies that the lattice will not be periodic.
  * \return Error code:
- *         \c IGRAPH_EINVAL: invalid (negative)
- *         dimension vector.
+ *         \c IGRAPH_EINVAL: invalid (negative) dimension vector or mismatch
+ *         between the length of the dimension vector and the periodicity vector.
  *
  * Time complexity: If \p nei is less than two then it is O(|V|+|E|) (as
  * far as I remember), |V| and |E| are the number of vertices
  * and edges in the generated graph. Otherwise it is O(|V|*d^k+|E|), d
  * is the average degree of the graph, k is the \p nei argument.
  */
-igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector,
-                   igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
-                   igraph_bool_t circular) {
+igraph_error_t igraph_square_lattice(
+    igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
+    igraph_bool_t directed, igraph_bool_t mutual, const igraph_vector_bool_t *periodic
+) {
 
     igraph_integer_t dims = igraph_vector_int_size(dimvector);
     igraph_integer_t no_of_nodes;
@@ -341,6 +367,14 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
     }
 
+    if (periodic && igraph_vector_bool_size(periodic) != dims) {
+        IGRAPH_ERRORF(
+            "Length of periodicity vector must match the length of the "
+            "dimension vector (%" IGRAPH_PRId ").",
+            IGRAPH_EINVAL, dims
+        );
+    }
+
     /* compute no. of nodes in overflow-safe manner */
     IGRAPH_CHECK(igraph_i_safe_vector_int_prod(dimvector, &no_of_nodes));
 
@@ -348,12 +382,12 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
 
     coords = IGRAPH_CALLOC(dims, igraph_integer_t);
     if (coords == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, coords);
     weights = IGRAPH_CALLOC(dims, igraph_integer_t);
     if (weights == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, weights);
     if (dims > 0) {
@@ -375,10 +409,16 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
     }
 
+#define IS_PERIODIC(dim) ((periodic && VECTOR(*periodic)[dim]))
+
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
+
+        /* Connect the current node to the "next" node along each dimension */
         for (j = 0; j < dims; j++) {
-            if (circular || coords[j] != VECTOR(*dimvector)[j] - 1) {
+            igraph_bool_t is_periodic = IS_PERIODIC(j);
+
+            if (is_periodic|| coords[j] != VECTOR(*dimvector)[j] - 1) {
                 igraph_integer_t new_nei;
                 if (coords[j] != VECTOR(*dimvector)[j] - 1) {
                     new_nei = i + weights[j] + 1;
@@ -390,8 +430,8 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
                     igraph_vector_int_push_back(&edges, i); /* reserved */
                     igraph_vector_int_push_back(&edges, new_nei - 1); /* reserved */
                 }
-            } /* if circular || coords[j] */
-            if (mutual && directed && (circular || coords[j] != 0)) {
+            } /* if is_periodic || coords[j] */
+            if (mutual && directed && (is_periodic || coords[j] != 0)) {
                 igraph_integer_t new_nei;
                 if (coords[j] != 0) {
                     new_nei = i - weights[j] + 1;
@@ -399,11 +439,11 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
                     new_nei = i + (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
-                    (VECTOR(*dimvector)[j] != 2 || !circular)) {
+                    (VECTOR(*dimvector)[j] != 2 || !is_periodic)) {
                     igraph_vector_int_push_back(&edges, i); /* reserved */
                     igraph_vector_int_push_back(&edges, new_nei - 1); /* reserved */
                 }
-            } /* if circular || coords[0] */
+            } /* if is_periodic || coords[0] */
         } /* for j<dims */
 
         /* increase coords */
@@ -645,7 +685,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * root have \p branching_counts[d] children.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param branching_counts Vector detailing the number of branches at each level.
+ * \param branches Vector detailing the number of branches at each level.
  * \param type Constant, gives whether to create a directed tree, and
  *        if this is the case, also its orientation. Possible values:
  *        \clist
@@ -665,24 +705,25 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_kary_tree() and \ref igraph_star() for creating regular tree
- * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \sa \ref igraph_kary_tree(), \ref igraph_regular_tree() and \ref igraph_star()
+ * for creating other regular tree structures;
+ * \ref igraph_from_prufer() for creating arbitrary trees;
  * \ref igraph_tree_game() for uniform random sampling of trees.
  *
  * \example examples/simple/igraph_symmetric_tree.c
  */
 
-igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branching_counts,
+igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t *branches,
                 igraph_tree_mode_t type) {
 
     igraph_vector_int_t edges;
     igraph_integer_t j, k, temp, no_of_nodes, idx, parent, child, level_end;
-    igraph_integer_t branching_counts_size = igraph_vector_int_size(branching_counts);
+    igraph_integer_t branching_counts_size = igraph_vector_int_size(branches);
 
     if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN && type != IGRAPH_TREE_UNDIRECTED) {
         IGRAPH_ERROR("Invalid tree orientation type.", IGRAPH_EINVMODE);
     }
-    if (!igraph_vector_int_empty(branching_counts) && igraph_vector_int_min(branching_counts) <= 0) {
+    if (!igraph_vector_int_empty(branches) && igraph_vector_int_min(branches) <= 0) {
         IGRAPH_ERROR("The number of branches must be positive at each level.", IGRAPH_EINVAL);
     }
 
@@ -690,7 +731,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     no_of_nodes = 1;
     temp = 1;
     for (j = 0; j < branching_counts_size; ++j) {
-        IGRAPH_SAFE_MULT(temp, VECTOR(*branching_counts)[j], &temp);
+        IGRAPH_SAFE_MULT(temp, VECTOR(*branches)[j], &temp);
         IGRAPH_SAFE_ADD(no_of_nodes, temp, &no_of_nodes);
     }
 
@@ -710,7 +751,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     for (k = 0; k < branching_counts_size; ++k) {
         level_end = child; /* points to one past the last vertex of the current level of parents */
         while(parent < level_end) {
-            for (j = 0; j < VECTOR(*branching_counts)[k]; j++) {
+            for (j = 0; j < VECTOR(*branches)[k]; j++) {
                 if (type == IGRAPH_TREE_IN) {
                     VECTOR(edges)[idx++] = child++;
                     VECTOR(edges)[idx++] = parent;
@@ -726,6 +767,68 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branc
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, type != IGRAPH_TREE_UNDIRECTED));
 
     igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_regular_tree
+ * \brief Creates a regular tree.
+ *
+ * All vertices of a regular tree, except its leaves, have the same total degree \p k.
+ * This is different from a k-ary tree (\ref igraph_kary_tree()), where all
+ * vertices have the same number of children, thus the degre of the root is
+ * one less than the degree of the other internal vertices. Regular trees
+ * are also referred to as Bethe lattices.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param h The height of the tree, i.e. the distance between the root and the leaves.
+ * \param k The degree of the regular tree.
+ * \param type Constant, gives whether to create a directed tree, and
+ *        if this is the case, also its orientation. Possible values:
+ *        \clist
+ *        \cli IGRAPH_TREE_OUT
+ *          directed tree, the edges point
+ *          from the parents to their children,
+ *        \cli IGRAPH_TREE_IN
+ *          directed tree, the edges point from
+ *          the children to their parents.
+ *        \cli IGRAPH_TREE_UNDIRECTED
+ *          undirected tree.
+ *        \endclist
+ *
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_kary_tree() to create k-ary tree where each vertex has the same
+ * number of children, i.e. out-degree, instead of the same total degree.
+ * \ref igraph_symmetric_tree() to use a different number of children at each level.
+ *
+ * \example examples/simple/igraph_regular_tree.c
+ */
+
+igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_integer_t k, igraph_tree_mode_t type) {
+    igraph_vector_int_t branching_counts;
+
+    if (h < 1) {
+        IGRAPH_ERRORF("Height of regular tree must be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, h);
+    }
+    if (k < 2 ) {
+        IGRAPH_ERRORF("Degree of regular tree must be at least 2, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, k);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&branching_counts, h);
+    igraph_vector_int_fill(&branching_counts, k-1);
+    if (h > 0) {
+        VECTOR(branching_counts)[0] += 1;
+    }
+
+    IGRAPH_CHECK(igraph_symmetric_tree(graph, &branching_counts, type));
+
+    igraph_vector_int_destroy(&branching_counts);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

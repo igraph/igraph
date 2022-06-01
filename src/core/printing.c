@@ -35,8 +35,8 @@
     #define STRINGIFY(x) STRINGIFY_HELPER(x)
     #define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%." STRINGIFY(DBL_DIG) "g"
 #else
-    /* Assume a precision of 10 digits for %g */
-    #define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%.10g"
+    /* Assume a precision of 15 digits for %g */
+    #define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%.15g"
 #endif
 
 #ifndef USING_R

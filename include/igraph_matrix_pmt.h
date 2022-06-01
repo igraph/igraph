@@ -32,19 +32,26 @@ typedef struct TYPE(igraph_matrix) {
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init)(
     TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to,
-                                                const TYPE(igraph_matrix) *from);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init_copy)(
+    TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_matrix, copy)(
+    TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
 
 /*--------------------*/
 /* Accessing elements */
 /*--------------------*/
 
 /* MATRIX */
-IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, e)(
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE FUNCTION(igraph_matrix, e)(
     const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
-IGRAPH_EXPORT BASE* FUNCTION(igraph_matrix, e_ptr)(
+IGRAPH_EXPORT IGRAPH_DEPRECATED BASE* FUNCTION(igraph_matrix, e_ptr)(
+    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
+IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, get)(
+    const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
+IGRAPH_EXPORT BASE* FUNCTION(igraph_matrix, get_ptr)(
     const TYPE(igraph_matrix) *m, igraph_integer_t row, igraph_integer_t col);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, set)(
     TYPE(igraph_matrix)* m, igraph_integer_t row, igraph_integer_t col, BASE value);
@@ -63,6 +70,10 @@ IGRAPH_EXPORT void FUNCTION(igraph_matrix, fill)(TYPE(igraph_matrix) *m, BASE e)
 IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(
     const TYPE(igraph_matrix) *m, const BASE *data,
     igraph_integer_t nrow, igraph_integer_t ncol);
+IGRAPH_EXPORT const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view_from_vector)(
+    const TYPE(igraph_matrix) *m, const TYPE(igraph_vector) *v,
+    igraph_integer_t ncol
+);
 
 /*------------------*/
 /* Copying matrices */
@@ -198,7 +209,7 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, search)(
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, resize)(
     TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, resize_min)(
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, resize_min)(
     TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, add_cols)(
     TYPE(igraph_matrix) *m, igraph_integer_t n);
@@ -222,18 +233,22 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_m
 #ifdef BASE_COMPLEX
 
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
-                               igraph_matrix_t *real);
+                                                        igraph_matrix_t *real);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
-                               igraph_matrix_t *imag);
+                                                        igraph_matrix_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
-                                   igraph_matrix_t *real,
-                                   igraph_matrix_t *imag);
+                                                            igraph_matrix_t *real,
+                                                            igraph_matrix_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
-                                 const igraph_matrix_t *real,
-                                 const igraph_matrix_t *imag);
+                                                          const igraph_matrix_t *real,
+                                                          const igraph_matrix_t *imag);
 IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
-                                       const igraph_matrix_t *r,
-                                       const igraph_matrix_t *theta);
+                                                                const igraph_matrix_t *r,
+                                                                const igraph_matrix_t *theta);
+
+IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
+                                                                igraph_matrix_complex_t *rhs,
+                                                                igraph_real_t eps);
 
 #endif
 

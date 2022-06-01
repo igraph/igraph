@@ -22,8 +22,6 @@
 
 #include "centrality/centrality_internal.h"
 
-#include "config.h"
-
 igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
     /* Many of the centrality measures correspond to the eigenvector of some
      * matrix. When v is an eigenvector, c*v is also an eigenvector, therefore
