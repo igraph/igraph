@@ -10,6 +10,8 @@ Some of the highlights are:
 
  - A consistent use of `igraph_integer_t` for all indices and most integer quantities, both in the API and internally. This type is 64-bit by default on all 64-bit systems, bringing support for very large graphs with more than 2 billion vertices. Previously, vertex and edge indices were often represented as `igraph_real_t`. The move to an `igraph_integer_t` also implies a change from `igraph_vector_t` to `igraph_vector_int_t` in many functions.
 
+ - The random number generation framework has been overhauled. Sampling from the full range of `igraph_integer_t` is now possible. Similarly, the sampling of random reals has been improved to utilize almost the full range of the mantissa of an `igraph_real_t`. 
+
  - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most prevous uses of the non-managed `igraph_vector_ptr_t`.
 
  - File format readers are much more robust and more tolerant of invalid input.
@@ -25,6 +27,9 @@ Some of the highlights are:
    32 bits on 32-bit platforms and 64 bits on 64-bit platforms by default. You
    also have the option to compile a 32-bit igraph variant on a 64-bit platform
    by changing the `IGRAPH_INTEGER_SIZE` build variable in CMake to 32.
+
+ - The random number generator interface, `igraph_rng_type_t`, has been overhauled.
+   Check the declaration of the type for details.
 
  - Since `igraph_integer_t` aims to be the largest integer size that is feasible
    on a particular platform, there is no need for generic data types based on
@@ -671,7 +676,7 @@ Some of the highlights are:
    the GML file.
 
  - The vector of parents in `igraph_get_shortest_paths()` and `igraph_get_shortest_paths_dijkstra()` now
-     use -1 to represent the starting vertex, and -2 for unreachable vertices.
+   use -1 to represent the starting vertex, and -2 for unreachable vertices.
 
  - `igraph_rng_seed()` now requires an `igraph_uint_t` as its seed arguments. RNG implementations are free to use only the lower bits of the seed if they do not support 64-bit seeds.
 
@@ -710,6 +715,7 @@ Some of the highlights are:
  - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
  - `igraph_graph_count()` gives the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
  - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator, which can be used as an alternative source of randomness instead of the default Mersenne Twister. Future versions of igraph might switch to PCG as the default RNG.
+ - `igraph_rng_get_pois()` generates random variates from the Poisson distribution.
 
 ### Removed
 
@@ -734,6 +740,7 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
  - Foreign format readers now present more informative error messages.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
+ - It is not possible to overide the uniform integer and the Poisson samplers in the random number generator interface.
 
 ### Fixed
 
