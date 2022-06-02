@@ -20,6 +20,50 @@
 
 #include "test_utilities.h"
 
+/* Basic check: Are means within tol*sigma from the expected value? 
+ * This is meant to catch gross bugs while changing RNG/sampler code. */
+void stats() {
+    igraph_integer_t k;
+    const igraph_integer_t n = 100000;
+    igraph_real_t m, tm, tsd;
+    igraph_real_t tol = 3;
+
+    {
+        igraph_real_t p = 0.1;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            if (RNG_UNIF01() < p) {
+                m += 1;
+            }
+        }
+        tm  = n*p;
+        tsd = sqrt(n*p*(1-p));
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
+
+    {
+        tm = 2;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            m += RNG_POIS(tm);
+        }
+        m /= n;
+        tsd = sqrt(tm) / sqrt(n);
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
+
+    {
+        tm = 3;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            m += RNG_EXP(1 / tm);
+        }
+        m /= n;
+        tsd = tm / sqrt(n);
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
+}
+
 /* These is merely a smoke test for various random samplers.
  * It does not verify the correctness of the result, except
  * for some special edge cases. */
@@ -132,6 +176,7 @@ void test_and_destroy(igraph_rng_type_t *rng_type) {
     igraph_rng_seed(igraph_rng_default(), 137);
 
     sample();
+    stats();
 
     igraph_rng_set_default(def);
     igraph_rng_destroy(&rng);
@@ -150,6 +195,7 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 709);
 
     sample();
+    stats();
 
     for (i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
         test_and_destroy(&rng_types[i]);
