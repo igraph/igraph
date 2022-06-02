@@ -102,7 +102,9 @@ endif()
 check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
 
-# Check for 128-bit integer multiplication support
+# Check for 128-bit integer multiplication support and floating-point
+# endianness
+include(ieee754_endianness)
 include(uint128_support)
 
 if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)
