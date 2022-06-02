@@ -142,7 +142,7 @@ int main() {
   igraph_vector_init(&modularity, 0);
   igraph_vector_init(&membership, 0);
   igraph_vector_init_real(&weights, 6,
-                          1.0, 1.0, 0.1, 1.0, 1.0, 0.1);
+                          1.0, 0.5, 0.25, 0.75, 1.25, 1.5);
 
   igraph_community_walktrap(&graph, &weights, 4, &merges, &modularity, &membership);
   printf("Merges:\n");
