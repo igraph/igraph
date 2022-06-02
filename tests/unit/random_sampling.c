@@ -28,6 +28,9 @@ void stats() {
     igraph_real_t m, tm, tsd;
     igraph_real_t tol = 3;
 
+    printf("\n");
+
+    /* Binary trials with success of probability p. Counting successes. */
     {
         igraph_real_t p = 0.1;
         m = 0;
@@ -38,9 +41,11 @@ void stats() {
         }
         tm  = n*p;
         tsd = sqrt(n*p*(1-p));
+        printf("binary trials: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
         IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
     }
 
+    /* Mean of Poisson distributed values. */
     {
         tm = 2;
         m = 0;
@@ -49,9 +54,40 @@ void stats() {
         }
         m /= n;
         tsd = sqrt(tm) / sqrt(n);
+        printf("pois: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
         IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
     }
 
+    /* Mean of geometrically distributed values. */
+    {
+        igraph_real_t p = 0.25;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            m += RNG_GEOM(p);
+        }
+        m /= n;
+        tm  = (1-p) / p;
+        tsd = sqrt(1 - p) / p / sqrt(n);
+        printf("geom: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
+
+    /* Mean of binomially distributed values. */
+    {
+        igraph_real_t p = 0.33;
+        igraph_integer_t nn = 77;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            m += RNG_BINOM(nn, p);
+        }
+        m /= n;
+        tm  = nn * p;
+        tsd = sqrt(nn*p*(1-p)) / sqrt(n);
+        printf("binom: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
+
+    /* Mean of exponentially distributed values. */
     {
         tm = 3;
         m = 0;
@@ -60,6 +96,34 @@ void stats() {
         }
         m /= n;
         tsd = tm / sqrt(n);
+        printf("exp: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
+
+    /* Mean of gamma distributed values. */
+    {
+        igraph_real_t shape = 1.5, scale = 3.5;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            m += RNG_GAMMA(shape, scale);
+        }
+        m /= n;
+        tm  = shape*scale;
+        tsd = sqrt(shape) * scale / sqrt(n);
+        printf("gamma: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
+        IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
+    }
+
+    /* Mean of normally distributed values. */
+    {
+        tm = 3.0; tsd = 2.0;
+        m = 0;
+        for (k = 0; k < n; k++) {
+            m += RNG_NORMAL(tm, tsd);
+        }
+        m /= n;
+        tsd /= sqrt(n);
+        printf("norm: %g; expected: %g; std. dev.: %g\n", m, tm, tsd);
         IGRAPH_ASSERT(tm - tol*tsd < m && m < tm + tol*tsd);
     }
 }
@@ -189,7 +253,6 @@ int main() {
         igraph_rngtype_pcg32,
         igraph_rngtype_pcg64
     };
-    igraph_integer_t i;
 
     printf("Default\n\n");
     igraph_rng_seed(igraph_rng_default(), 709);
@@ -197,7 +260,7 @@ int main() {
     sample();
     stats();
 
-    for (i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
+    for (size_t i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
         test_and_destroy(&rng_types[i]);
     }
 
