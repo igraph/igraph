@@ -2102,11 +2102,11 @@ static double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
     static const double a6 = -0.1367177;
     static const double a7 = 0.1233795;
 
-    /* State variables [FIXME for threading!] :*/
-    static double aa = 0.;
-    static double aaa = 0.;
-    static double s, s2, d;    /* no. 1 (step 1) */
-    static double q0, b, si, c;/* no. 2 (step 4) */
+    /* State variables: */
+    static IGRAPH_THREAD_LOCAL double aa = 0.;
+    static IGRAPH_THREAD_LOCAL double aaa = 0.;
+    static IGRAPH_THREAD_LOCAL double s, s2, d;    /* no. 1 (step 1) */
+    static IGRAPH_THREAD_LOCAL double q0, b, si, c;/* no. 2 (step 4) */
 
     double e, p, q, r, t, u, v, w, x, ret_val;
 
