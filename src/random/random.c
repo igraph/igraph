@@ -606,7 +606,10 @@ igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
 igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
                                   igraph_real_t l, igraph_real_t h) {
     assert(h >= l);
-    /* Ensure that 'h' is never produced due to numerical roundoff errors. */
+
+    if (l == h) return h;
+
+    /* Ensure that 'h' is never produced due to numerical roundoff errors, except when l == h. */
     igraph_real_t r;
     do {
         r = igraph_rng_get_unif01(rng) * (h - l) + l;
