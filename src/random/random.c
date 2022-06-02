@@ -191,6 +191,7 @@ igraph_rng_t *igraph_rng_default() {
 /* ------------------------------------ */
 
 static igraph_uint_t igraph_i_rng_get_random_bits(igraph_rng_t *rng, uint8_t bits);
+static uint64_t igraph_i_rng_get_random_bits_uint64(igraph_rng_t *rng, uint8_t bits);
 
 static igraph_uint_t igraph_i_rng_get_uint(igraph_rng_t *rng);
 static igraph_uint_t igraph_i_rng_get_uint_bounded(igraph_rng_t *rng, igraph_uint_t range);
@@ -320,7 +321,7 @@ const char *igraph_rng_name(const igraph_rng_t *rng) {
 
 /**
  * Generates a given number of random bits, possibly invoking the underlying
- * RNG multiple times if needed.
+ * RNG multiple times if needed, and returns the result in an \c igraph_uint_t .
  *
  * \param rng The RNG.
  * \param bits The number of random bits needed. Must be smaller than or equal
@@ -334,6 +335,45 @@ static igraph_uint_t igraph_i_rng_get_random_bits(igraph_rng_t *rng, uint8_t bit
     const igraph_rng_type_t *type = rng->type;
     igraph_integer_t rng_bitwidth = igraph_rng_bits(rng);
     igraph_uint_t result;
+
+    if (rng_bitwidth >= bits) {
+        /* keep the high bits as RNGs sometimes tend to have lower entropy in
+         * low bits than in high bits */
+        result = type->get(rng->state) >> (rng_bitwidth - bits);
+    } else {
+        result = 0;
+        do {
+            result = (result << rng_bitwidth) + type->get(rng->state);
+            bits -= rng_bitwidth;
+        } while (bits > rng_bitwidth);
+
+        /* and now the last piece */
+        result = (result << bits) + (type->get(rng->state) >> (rng_bitwidth - bits));
+    }
+
+    return result;
+}
+
+/**
+ * Generates a given number of random bits, possibly invoking the underlying
+ * RNG multiple times if needed, and returns the result in an \c uint64_t .
+ *
+ * Prefer \c igraph_i_rng_get_random_bits() if you know that you need at most
+ * 32 bits due to the type of the return value. This function might perform
+ * worse on 32-bit platforms because the result is always 64 bits.
+ *
+ * \param rng The RNG.
+ * \param bits The number of random bits needed. Must be smaller than or equal
+ *        to the size of the \c uint64_t data type. Passing a value larger
+ *        than the size of \c uint64_t will throw away random bits except
+ *        the last few that are needed to fill an \c uint64_t .
+ * \return The random bits, packed into the low bits of an \c uint64_t .
+ *         The upper, unused bits of \c uint64_t will be set to zero.
+ */
+static uint64_t igraph_i_rng_get_random_bits_uint64(igraph_rng_t *rng, uint8_t bits) {
+    const igraph_rng_type_t *type = rng->type;
+    igraph_integer_t rng_bitwidth = igraph_rng_bits(rng);
+    uint64_t result;
 
     if (rng_bitwidth >= bits) {
         /* keep the high bits as RNGs sometimes tend to have lower entropy in
@@ -600,7 +640,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
          * Then we subtract 1 to arrive at the [0; 1) interval. This is fast
          * but we lose one bit of precision as there are 2^53 possible doubles
          * between 0 and 1. */
-        uint64_t r = (igraph_i_rng_get_uint64(rng) & 0xFFFFFFFFFFFFFull) | 0x3FF0000000000000ull;
+        uint64_t r = (igraph_i_rng_get_random_bits_uint64(rng, 52) & 0xFFFFFFFFFFFFFull) | 0x3FF0000000000000ull;
         return *(double *)(&r) - 1.0;
     }
 }
