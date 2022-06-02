@@ -80,6 +80,7 @@ static void igraph_rng_pcg32_destroy(void *vstate) {
  * https://www.pcg-random.org for more details. This implementation returns
  * 32 random bits in a single iteration.
  *
+ * </para><para>
  * The generator was ported from the original source code published by the
  * authors at https://github.com/imneme/pcg-c .
  */

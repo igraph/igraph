@@ -106,6 +106,12 @@ static void igraph_rng_pcg64_destroy(void *vstate) {
  * 64 random bits in a single iteration. It is only available on 64-bit plaforms
  * with compilers that provide the __uint128_t type.
  *
+ * </para><para>
+ * PCG64 typically provides better performance than PCG32 when sampling floating
+ * point numbers or very large integers, as it can provide twice as many random
+ * bits in a single generation round.
+ *
+ * </para><para>
  * The generator was ported from the original source code published by the
  * authors at https://github.com/imneme/pcg-c .
  */
