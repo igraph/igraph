@@ -179,9 +179,11 @@ void sample() {
     IGRAPH_ASSERT(!igraph_is_nan(x));
     IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
 
+#if IGRAPH_INTEGER_SIZE > 32
     x = RNG_BINOM((1LL << 31), 0.5);
     IGRAPH_ASSERT(!igraph_is_nan(x));
     IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
+#endif
 
     x = RNG_GEOM(0.2);
     printf("geom: %g\n", x);
