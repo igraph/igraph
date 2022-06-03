@@ -23,6 +23,8 @@
 
 #include "pcg/pcg_variants.h"
 
+#include "config.h" /* IGRAPH_THREAD_LOCAL */
+
 /* The original implementation of the 32-bit PCG random number generator in this
  * file was obtained from https://github.com/imneme/pcg-c
  *
@@ -101,3 +103,17 @@ const igraph_rng_type_t igraph_rngtype_pcg32 = {
     /* get_gamma= */ 0,
     /* get_pois= */  0
 };
+
+/***** Default RNG, used upon igraph startup *****/
+
+#define addr(a) (&a)
+
+static pcg32_random_t igraph_i_rng_default_state = PCG32_INITIALIZER;
+
+IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = {
+    addr(igraph_rngtype_pcg32),
+    addr(igraph_i_rng_default_state),
+    /* is_seeded = */ 1
+};
+
+#undef addr

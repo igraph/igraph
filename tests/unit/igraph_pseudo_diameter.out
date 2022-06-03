@@ -94,15 +94,15 @@ result: 4, from 0 to 4
 result: 4, from 4 to 0
 
 Petersen graph with random starts.
-result: 2, from 3 to 1
+result: 2, from 1 to 4
 
-result: 2, from 7 to 1
+result: 2, from 5 to 1
+
+result: 2, from 8 to 2
 
 result: 2, from 9 to 0
 
-result: 2, from 1 to 4
-
-result: 2, from 7 to 1
+result: 2, from 9 to 0
 
 result: 2, from 7 to 1
 
