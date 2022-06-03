@@ -742,7 +742,7 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
  - Foreign format readers now present more informative error messages.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
- - It is not possible to overide the uniform integer and the Poisson samplers in the random number generator interface.
+ - It is now possible to overide the uniform integer and the Poisson samplers in the random number generator interface.
 
 ### Fixed
 
