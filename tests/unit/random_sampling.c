@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-/* Basic check: Are means within tol*sigma from the expected value? 
+/* Basic check: Are means within tol*sigma from the expected value?
  * This is meant to catch gross bugs while changing RNG/sampler code. */
 void stats() {
     igraph_integer_t k;
@@ -174,6 +174,14 @@ void sample() {
 
     x = RNG_BINOM(5, 1);
     IGRAPH_ASSERT(x == 5);
+
+    x = RNG_BINOM((1LL << 31) - 1, 0.5);
+    IGRAPH_ASSERT(!igraph_is_nan(x));
+    IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
+
+    x = RNG_BINOM((1LL << 31), 0.5);
+    IGRAPH_ASSERT(!igraph_is_nan(x));
+    IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
 
     x = RNG_GEOM(0.2);
     printf("geom: %g\n", x);

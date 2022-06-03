@@ -1842,12 +1842,12 @@ static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp) {
     static IGRAPH_THREAD_LOCAL double xl, xll, xlr, xm, xr;
 
     static IGRAPH_THREAD_LOCAL double psave = -1.0;
-    static IGRAPH_THREAD_LOCAL int nsave = -1;
-    static IGRAPH_THREAD_LOCAL int m;
+    static IGRAPH_THREAD_LOCAL igraph_integer_t nsave = -1;
+    static IGRAPH_THREAD_LOCAL igraph_integer_t m;
 
     double f, f1, f2, u, v, w, w2, x, x1, x2, z, z2;
     double p, q, np, g, r, al, alv, amaxp, ffm, ynorm;
-    int i, ix, k, n;
+    igraph_integer_t i, ix, k, n;
 
     if (!igraph_finite(nin)) {
         ML_ERR_return_NAN;
@@ -1945,7 +1945,7 @@ static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp) {
             }
         }
         /* determine appropriate way to perform accept/reject test */
-        k = abs(ix - m);
+        k = imaxabs(ix - m);
         if (k <= 20 || k >= npq / 2 - 1) {
             /* explicit evaluation */
             f = 1.0;
