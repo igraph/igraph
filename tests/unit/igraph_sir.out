@@ -15,12 +15,12 @@ infected: ( 1 0 )
 recovered: ( 0 1 )
 
 Line:
+susceptibles: ( 4 3 3 3 )
+infected: ( 1 2 1 0 )
+recovered: ( 0 0 1 2 )
 susceptibles: ( 4 3 2 2 1 1 1 1 )
 infected: ( 1 2 3 2 3 2 1 0 )
 recovered: ( 0 0 0 1 1 2 3 4 )
-susceptibles: ( 4 3 3 2 2 2 )
-infected: ( 1 2 1 2 1 0 )
-recovered: ( 0 0 1 1 2 3 )
 
 Line, low infection rate, few infections expected:
 susceptibles: ( 4 4 )
@@ -31,9 +31,9 @@ infected: ( 1 0 )
 recovered: ( 0 1 )
 
 Full graph, more infections expected than line with same rates:
-susceptibles: ( 4 3 2 1 1 0 0 0 0 0 )
-infected: ( 1 2 3 4 3 4 3 2 1 0 )
-recovered: ( 0 0 0 0 1 1 2 3 4 5 )
+susceptibles: ( 4 4 )
+infected: ( 1 0 )
+recovered: ( 0 1 )
 susceptibles: ( 4 3 2 1 0 0 0 0 0 0 )
 infected: ( 1 2 3 4 5 4 3 2 1 0 )
 recovered: ( 0 0 0 0 0 1 2 3 4 5 )

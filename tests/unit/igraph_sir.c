@@ -54,7 +54,7 @@ void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_i
 int main() {
     igraph_t g_empty, g_lm, g_line, g_1, g_2, g_full;
 
-    igraph_rng_seed(igraph_rng_default(), 42);
+    igraph_rng_seed(igraph_rng_default(), 43);
 
     igraph_small(&g_empty, 0, 0, -1);
     igraph_small(&g_lm, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
