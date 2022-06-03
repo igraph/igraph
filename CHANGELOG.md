@@ -10,7 +10,7 @@ Some of the highlights are:
 
  - A consistent use of `igraph_integer_t` for all indices and most integer quantities, both in the API and internally. This type is 64-bit by default on all 64-bit systems, bringing support for very large graphs with more than 2 billion vertices. Previously, vertex and edge indices were often represented as `igraph_real_t`. The move to an `igraph_integer_t` also implies a change from `igraph_vector_t` to `igraph_vector_int_t` in many functions.
 
- - The random number generation framework has been overhauled. Sampling from the full range of `igraph_integer_t` is now possible. Similarly, the sampling of random reals has been improved to utilize almost the full range of the mantissa of an `igraph_real_t`. 
+ - The random number generation framework has been overhauled. Sampling from the full range of `igraph_integer_t` is now possible. Similarly, the sampling of random reals has been improved to utilize almost the full range of the mantissa of an `igraph_real_t`.
 
  - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most prevous uses of the non-managed `igraph_vector_ptr_t`.
 
@@ -682,6 +682,8 @@ Some of the highlights are:
 
  - `igraph_rngtype_rand` (i.e. the RNG that is based on BSD `rand()`) was removed due to poor statistical properties that sometimes resulted in weird artifacts like all-even "random" numbers when igraph's usage patterns happened to line up with the shortcomings of the `rand()` generator in a certain way.
 
+ - The default random number generator has been changed from Mersenne Twister to PCG32.
+
 ### Added
 
  - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.
@@ -714,7 +716,7 @@ Some of the highlights are:
  - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
  - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
  - `igraph_graph_count()` gives the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
- - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator, which can be used as an alternative source of randomness instead of the default Mersenne Twister. Future versions of igraph might switch to PCG as the default RNG.
+ - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator.
  - `igraph_rng_get_pois()` generates random variates from the Poisson distribution.
 
 ### Removed
