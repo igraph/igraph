@@ -1143,6 +1143,12 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
  *
  */
 
+/* The ISNAN macro is used in some of the code borrowed from R below. */
+#define ISNAN isnan
+
+/* Indicates that we use systems which support NaN values. */
+#define IEEE_754 1
+
 /* Private header file for use during compilation of Mathlib */
 #ifndef MATHLIB_PRIVATE_H
 #define MATHLIB_PRIVATE_H
