@@ -1344,7 +1344,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
         return R_D__0;                  \
     }
 
-static double igraph_i_qnorm5(double p, double mu, double sigma, int lower_tail, int log_p) {
+static double igraph_i_qnorm5(double p, double mu, double sigma, igraph_bool_t lower_tail, igraph_bool_t log_p) {
     double p_, q, r, val;
 
 #ifdef IEEE_754
@@ -1462,13 +1462,19 @@ static int imin2(int x, int y) {
 }
 
 static double igraph_i_norm_rand(igraph_rng_t *rng) {
+    double r;
 
-    double u1;
+    /* Use the inversion method based on uniform variates from (0, 1).
+     * We exclude 0.0 as it would lead to generating -infinity.
+     * It is assumed that unif01() provides sufficient accuracy.
+     * A resolution of 2^-32 may not be sufficient. igraph's default
+     * implementaton provides an accuracy of 2^-52.
+     */
+    do {
+        r = igraph_rng_get_unif01(rng);
+    } while (r == 0.0);
 
-#define BIG 134217728 /* 2^27 */
-    u1 = igraph_rng_get_unif01(rng);
-    u1 = (int)(BIG * u1) + igraph_rng_get_unif01(rng);
-    return igraph_i_qnorm5(u1 / BIG, 0.0, 1.0, 1, 0);
+    return igraph_i_qnorm5(r, 0.0, 1.0, 1, 0);
 }
 
 /*
