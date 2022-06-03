@@ -206,7 +206,7 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
 
 static double igraph_i_norm_rand(igraph_rng_t *rng);
 static double igraph_i_exp_rand(igraph_rng_t *rng);
-static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp);
+static double igraph_i_rbinom(igraph_rng_t *rng, igraph_integer_t n, double pp);
 static double igraph_i_rexp(igraph_rng_t *rng, double rate);
 static double igraph_i_rgamma(igraph_rng_t *rng, double shape, double scale);
 static double igraph_i_rpois(igraph_rng_t *rng, double rate);
@@ -1836,7 +1836,7 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 
 #define repeat for(;;)
 
-static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp) {
+static double igraph_i_rbinom(igraph_rng_t *rng, igraph_integer_t n, double pp) {
     /* FIXME: These should become THREAD_specific globals : */
 
     static IGRAPH_THREAD_LOCAL double c, fm, npq, p1, p2, p3, p4, qn;
@@ -1848,15 +1848,7 @@ static double igraph_i_rbinom(igraph_rng_t *rng, double nin, double pp) {
 
     double f, f1, f2, u, v, w, w2, x, x1, x2, z, z2;
     double p, q, np, g, r, al, alv, amaxp, ffm, ynorm;
-    igraph_integer_t i, ix, k, n;
-
-    if (!igraph_finite(nin)) {
-        ML_ERR_return_NAN;
-    }
-    n = floor(nin + 0.5);
-    if (n != nin) {
-        ML_ERR_return_NAN;
-    }
+    igraph_integer_t i, ix, k;
 
     if (!igraph_finite(pp) ||
         /* n=0, p=0, p=1 are not errors <TSL>*/
