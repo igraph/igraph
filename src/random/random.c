@@ -1453,11 +1453,11 @@ static double fsign(double x, double y) {
     return ((y >= 0) ? fabs(x) : -fabs(x));
 }
 
-static int imax2(int x, int y) {
+static igraph_integer_t imax2(igraph_integer_t x, igraph_integer_t y) {
     return (x < y) ? y : x;
 }
 
-static int imin2(int x, int y) {
+static igraph_integer_t imin2(igraph_integer_t x, igraph_integer_t y) {
     return (x < y) ? x : y;
 }
 
@@ -1632,7 +1632,8 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
     };
 
     /* These are static --- persistent between calls for same mu : */
-    static IGRAPH_THREAD_LOCAL int l, m;
+    static IGRAPH_THREAD_LOCAL int l;
+    static IGRAPH_THREAD_LOCAL igraph_integer_t m;
 
     static IGRAPH_THREAD_LOCAL double b1, b2, c, c0, c1, c2, c3;
     static IGRAPH_THREAD_LOCAL double pp[36], p0, p, q, s, d, omega;
@@ -1677,7 +1678,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
             /*muprev = 0.;-* such that next time, mu != muprev ..*/
             if (mu != muprev) {
                 muprev = mu;
-                m = imax2(1, (int) mu);
+                m = imax2(1, (igraph_integer_t) mu);
                 l = 0; /* pp[] is already ok up to pp[l] */
                 q = p0 = p = exp(-mu);
             }

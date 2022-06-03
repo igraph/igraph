@@ -226,6 +226,18 @@ void sample() {
 
     x = RNG_POIS(-1);
     IGRAPH_ASSERT(igraph_is_nan(x));
+
+    x = RNG_POIS((1LL << 31) - 1);
+    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+
+    x = RNG_POIS((1LL << 31));
+    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+
+#if IGRAPH_INTEGER_SIZE > 32
+    x = RNG_POIS((1LL << 32));
+    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+#endif
+
 }
 
 void test_and_destroy(igraph_rng_type_t *rng_type) {
