@@ -43,16 +43,21 @@ static igraph_uint_t igraph_rng_pcg32_get(void *vstate) {
 static igraph_error_t igraph_rng_pcg32_seed(void *vstate, igraph_uint_t seed) {
     pcg32_random_t *state = (pcg32_random_t*) vstate;
 
-    if (seed == 0) {
-        seed = (pcg32_initializer.inc >> 1);
-    }
-
     /* PCG32 is seeded by a 64-bit state and a 64-bit sequence number (well, only
      * 63 bits are used from the sequence number, though). Since the unified
      * igraph RNG seeding interface provides a single igraph_uint_t as the seed,
      * we use the seed to fill in the sequence number and use the state from
      * PCG32_INITIALIZER */
-    pcg32_srandom_r(state, pcg32_initializer.state, seed);
+    if (seed == 0) {
+        /* If you feel the temptation to unify the two branches by running
+         * seed = pcg32_initializer.inc >> 1, don't.
+         * seed is an igraph_uint_t, so it can be 32-bit or 64-bit.
+         * pcg32_initializer.inc is always 64-bit.
+         */
+        pcg32_srandom_r(state, pcg32_initializer.state, pcg32_initializer.inc >> 1);
+    } else {
+        pcg32_srandom_r(state, pcg32_initializer.state, seed);
+    }
 
     return IGRAPH_SUCCESS;
 }

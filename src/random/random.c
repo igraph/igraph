@@ -613,7 +613,7 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
     igraph_real_t r;
     do {
         r = igraph_rng_get_unif01(rng) * (h - l) + l;
-    } while (IGRAPH_UNLIKELY(r == l));
+    } while (IGRAPH_UNLIKELY(r == h));
     return r;
 }
 
