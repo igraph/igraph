@@ -57,11 +57,18 @@ __BEGIN_DECLS
  * - get_gamma()
  * - get_pois()
  *
- * The best is probably to define get() and maybe get_int() and get_real(),
- * and leave the others as NULL; igraph will use default implementations for
- * these. Note that if all that you would do in get_real() is to generate random
- * bits with get() and divide by the maximum, don't do that; the default
- * implementation takes care of this.
+ * The best is probably to define get() leave the others as NULL; igraph will use
+ * default implementations for these.
+ *
+ * Note that if all that you would do in a get_real() implementation is to
+ * generate random bits with get() and divide by the maximum, don't do that;
+ * The default implementation takes care of calling get() a sufficient number of
+ * times to utilize most of the precision of the igraph_real_t type, and generate
+ * accurate variates. Inaccuracies in the output of get_real() can get magnified
+ * when using the default generators for non-uniform distributions.
+ * When implementing get_real(), the sampling range must be half-open, i.e. [0, 1).
+ * If unsure, leave get_real() unimplemented and igraph will provide an implementation
+ * in terms of get().
  *
  * When implementing get_int(), you do not need to check whether lo < hi;
  * the caller is responsible for ensuring that this is the case. You can always
@@ -70,10 +77,6 @@ __BEGIN_DECLS
  * versions of igraph_integer_t as igraph can be compiled for both cases. If
  * you are unsure, leave get_int() unimplemented and igraph will provide its
  * own implementation based on get().
- *
- * When implementing get_real(), the sampling range must be half-open,
- * i.e. [0, 1). If unsure, leave get_real() unimplemented and igraph will
- * provide an implementation in terms of get().
  */
 typedef struct igraph_rng_type_t {
     const char *name;
