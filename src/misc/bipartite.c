@@ -499,7 +499,8 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
                           igraph_bool_t directed,
                           igraph_neimode_t mode) {
     
-    igraph_integer_t no_of_edges = 1;
+    igraph_integer_t no_of_edges;
+    igraph_integer_t no_of_edges_partial_sum = 0;
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t edges;
     igraph_vector_int_t vertex_acc;
@@ -513,12 +514,18 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     }
     no_of_nodes = VECTOR(vertex_acc)[n-1] + VECTOR(*vertex_set)[n-1];
 
+    for (igraph_integer_t i = 0; i < n; i++) {
+        igraph_integer_t v = VECTOR(*vertex_set)[i];
+        no_of_edges_partial_sum = no_of_edges_partial_sum + (v * (v-1))/2;
+    }
+
     if (!directed) {
-        no_of_edges = 30;
+        no_of_edges = (no_of_nodes * (no_of_nodes -1)) / 2 - no_of_edges_partial_sum;
     } else if (mode == IGRAPH_OUT || mode == IGRAPH_IN) {
-        no_of_edges = 30;
+        no_of_edges = (no_of_nodes * (no_of_nodes -1)) / 2 - no_of_edges_partial_sum;
     } else { /* mode==IGRAPH_ALL */
-        no_of_edges = 30 * 2;
+        no_of_edges = (no_of_nodes * (no_of_nodes -1)) / 2 - no_of_edges_partial_sum;
+        no_of_edges *= 2;
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
