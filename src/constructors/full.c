@@ -132,7 +132,7 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 }
 
 igraph_error_t igraph_full_multipartite(igraph_t *graph,
-                          igraph_vector_bool_t *types,
+                          igraph_vector_int_t *types,
                           igraph_vector_int_t *vertex_set,
                           igraph_bool_t directed,
                           igraph_neimode_t mode) {
@@ -141,16 +141,31 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     igraph_integer_t no_of_edges_partial_sum = 0;
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t edges;
-    igraph_vector_int_t vertex_acc;
+    igraph_vector_int_t vertex_set_acc;
     igraph_integer_t ptr = 0;
     igraph_integer_t n = igraph_vector_int_size(vertex_set);
-    
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_acc, n);
-    VECTOR(vertex_acc)[0] = 0;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_set_acc, n);
+    VECTOR(vertex_set_acc)[0] = 0;
     for (igraph_integer_t i = 1; i < n; i++) {
-        VECTOR(vertex_acc)[i] = VECTOR(vertex_acc)[i-1] + VECTOR(*vertex_set)[i-1];
+        VECTOR(vertex_set_acc)[i] = VECTOR(vertex_set_acc)[i-1] + VECTOR(*vertex_set)[i-1];
     }
-    no_of_nodes = VECTOR(vertex_acc)[n-1] + VECTOR(*vertex_set)[n-1];
+    no_of_nodes = VECTOR(vertex_set_acc)[n-1] + VECTOR(*vertex_set)[n-1];
+
+    if (types) {
+        IGRAPH_CHECK(igraph_vector_int_resize(types, no_of_nodes));
+        igraph_vector_int_null(types);
+        if (no_of_nodes > 0) {
+            igraph_integer_t v = 1;
+            VECTOR(*types)[0] = 0;
+            for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
+                if (i == VECTOR(vertex_set_acc)[v]) {
+                    v++;
+                }
+                VECTOR(*types)[i] = v-1;
+            }
+        }
+    }
 
     for (igraph_integer_t i = 0; i < n; i++) {
         igraph_integer_t v = VECTOR(*vertex_set)[i];
@@ -169,10 +184,10 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     for (igraph_integer_t from = 0; from < n-1; from++) {
-        igraph_integer_t edge_from = VECTOR(vertex_acc)[from];
+        igraph_integer_t edge_from = VECTOR(vertex_set_acc)[from];
         for (igraph_integer_t i = 0; i < VECTOR(*vertex_set)[from]; i++) {
             for (igraph_integer_t to = from+1; to < n; to++) {
-                igraph_integer_t edge_to = VECTOR(vertex_acc)[to];
+                igraph_integer_t edge_to = VECTOR(vertex_set_acc)[to];
                 for (igraph_integer_t j = 0; j < VECTOR(*vertex_set)[to]; j++) {
                     if (!directed || mode == IGRAPH_OUT) {
                         VECTOR(edges)[ptr++] = edge_from;
@@ -194,7 +209,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&edges);
-    igraph_vector_int_destroy(&vertex_acc);
+    igraph_vector_int_destroy(&vertex_set_acc);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
