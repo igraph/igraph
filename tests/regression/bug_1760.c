@@ -7,7 +7,7 @@
 int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t* to) {
     igraph_vector_int_list_t vpath, epath;
     igraph_integer_t num_paths;
-    igraph_vector_int_t predecessors;
+    igraph_vector_int_t parents;
     igraph_vector_int_t inbound_edges;
 
     printf("Unweighted case\n");
@@ -16,12 +16,12 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     IGRAPH_CHECK(igraph_vs_size(g, to, &num_paths));
     IGRAPH_CHECK(igraph_vector_int_list_init(&vpath, 0));
     IGRAPH_CHECK(igraph_vector_int_list_init(&epath, 0));
-    IGRAPH_CHECK(igraph_vector_int_init(&predecessors, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&parents, 0));
     IGRAPH_CHECK(igraph_vector_int_init(&inbound_edges, 0));
 
     IGRAPH_CHECK(igraph_get_shortest_paths(
         g, &vpath, &epath, from, *to, IGRAPH_IN,
-        &predecessors, &inbound_edges
+        &parents, &inbound_edges
     ));
 
     printf("Vertices:\n");
@@ -32,8 +32,8 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     print_vector_int_list(&epath);
     printf("\n");
 
-    printf("Predecessors:\n");
-    print_vector_int(&predecessors);
+    printf("Parents:\n");
+    print_vector_int(&parents);
     printf("\n");
 
     printf("Inbound edges:\n");
@@ -41,7 +41,7 @@ int test_unweighted(const igraph_t* g, igraph_integer_t from, const igraph_vs_t*
     printf("\n");
 
     igraph_vector_int_destroy(&inbound_edges);
-    igraph_vector_int_destroy(&predecessors);
+    igraph_vector_int_destroy(&parents);
     igraph_vector_int_list_destroy(&epath);
     igraph_vector_int_list_destroy(&vpath);
 
@@ -54,7 +54,7 @@ int test_weighted(
 ) {
     igraph_vector_int_list_t vpath, epath;
     igraph_integer_t num_paths;
-    igraph_vector_int_t predecessors;
+    igraph_vector_int_t parents;
     igraph_vector_int_t inbound_edges;
 
     printf("Weighted case\n");
@@ -65,18 +65,18 @@ int test_weighted(
     IGRAPH_CHECK(igraph_vs_size(g, to, &num_paths));
     IGRAPH_CHECK(igraph_vector_int_list_init(&vpath, 0));
     IGRAPH_CHECK(igraph_vector_int_list_init(&epath, 0));
-    IGRAPH_CHECK(igraph_vector_int_init(&predecessors, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&parents, 0));
     IGRAPH_CHECK(igraph_vector_int_init(&inbound_edges, 0));
 
     if (use_bellman_ford) {
         IGRAPH_CHECK(igraph_get_shortest_paths_bellman_ford(
             g, &vpath, &epath, from, *to, weights, IGRAPH_IN,
-            &predecessors, &inbound_edges
+            &parents, &inbound_edges
         ));
     } else {
         IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(
             g, &vpath, &epath, from, *to, weights, IGRAPH_IN,
-            &predecessors, &inbound_edges
+            &parents, &inbound_edges
         ));
     }
 
@@ -88,8 +88,8 @@ int test_weighted(
     print_vector_int_list(&epath);
     printf("\n");
 
-    printf("Predecessors:\n");
-    print_vector_int(&predecessors);
+    printf("Parents:\n");
+    print_vector_int(&parents);
     printf("\n");
 
     printf("Inbound edges:\n");
@@ -97,7 +97,7 @@ int test_weighted(
     printf("\n");
 
     igraph_vector_int_destroy(&inbound_edges);
-    igraph_vector_int_destroy(&predecessors);
+    igraph_vector_int_destroy(&parents);
     igraph_vector_int_list_destroy(&epath);
     igraph_vector_int_list_destroy(&vpath);
 
