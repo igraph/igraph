@@ -1251,6 +1251,12 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
  *
  */
 
+/* The ISNAN macro is used in some of the code borrowed from R below. */
+#define ISNAN isnan
+
+/* Indicates that we use systems which support NaN values. */
+#define IEEE_754 1
+
 /* Private header file for use during compilation of Mathlib */
 #ifndef MATHLIB_PRIVATE_H
 #define MATHLIB_PRIVATE_H
@@ -2084,11 +2090,11 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double a, double scale) {
     static const double a6 = -0.1367177;
     static const double a7 = 0.1233795;
 
-    /* State variables [FIXME for threading!] :*/
-    static double aa = 0.;
-    static double aaa = 0.;
-    static double s, s2, d;    /* no. 1 (step 1) */
-    static double q0, b, si, c;/* no. 2 (step 4) */
+    /* State variables: */
+    static IGRAPH_THREAD_LOCAL double aa = 0.;
+    static IGRAPH_THREAD_LOCAL double aaa = 0.;
+    static IGRAPH_THREAD_LOCAL double s, s2, d;    /* no. 1 (step 1) */
+    static IGRAPH_THREAD_LOCAL double q0, b, si, c;/* no. 2 (step 4) */
 
     double e, p, q, r, t, u, v, w, x, ret_val;
 
