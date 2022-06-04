@@ -126,11 +126,26 @@ void test_single_matrix(igraph_matrix_t* mat, igraph_adjacency_t mode) {
     VERIFY_FINALLY_STACK();
 }
 
+void check_error(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops, igraph_error_t error) {
+    igraph_t g;
+    igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
+    igraph_vector_t weights;
+    igraph_vector_init(&weights, 0);
+
+    igraph_matrix_as_sparsemat(&sparse_adjmatrix, adjmatrix, 0.0001);
+    igraph_sparsemat_compress(&sparse_adjmatrix, &sparse_adjmatrix_comp);
+
+    CHECK_ERROR(igraph_weighted_adjacency(&g, adjmatrix, mode, &weights, loops), error);
+    CHECK_ERROR(igraph_sparse_adjacency(&g, &sparse_adjmatrix_comp, mode, loops), error);
+
+    igraph_sparsemat_destroy(&sparse_adjmatrix);
+    igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
+    igraph_vector_destroy(&weights);
+}
+
 int main() {
     igraph_matrix_t mat;
     igraph_matrix_t mat_sym;
-    igraph_vector_t weights;
-    igraph_t g;
     int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 4, 0 }, { 0, 1, 0, 0 } };
     int m_sym[4][4] = { { 0, 2, 2, 0 }, { 2, 0, 0, 1 }, { 2, 0, 4, 0 }, { 0, 1, 0, 0 } };
     igraph_integer_t i, j;
@@ -211,30 +226,33 @@ int main() {
 
     VERIFY_FINALLY_STACK();
 
-    igraph_vector_init(&weights, 0);
-
     {
         printf("Check handling of non-square matrix error.\n");
         igraph_real_t e[] = {1, 2, 0};
         igraph_matrix_view(&mat, e, 1, 3);
-        CHECK_ERROR(igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, &weights, IGRAPH_NO_LOOPS), IGRAPH_NONSQUARE);
+        check_error(&mat, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NONSQUARE);
     }
 
     {
         printf("Check handling of invalid adjacency mode.\n");
         igraph_real_t e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
         igraph_matrix_view(&mat, e, 3, 3);
-        CHECK_ERROR(igraph_weighted_adjacency(&g, &mat, 42, &weights, IGRAPH_LOOPS_TWICE), IGRAPH_EINVAL);
+        check_error(&mat, 42, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
     }
 
     {
         printf("Check error for 0x1 matrix.\n");
         igraph_matrix_init(&mat, 0, 1);
-        CHECK_ERROR(igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_DIRECTED, &weights, 1), IGRAPH_NONSQUARE);
+        check_error(&mat, IGRAPH_ADJ_DIRECTED, 1, IGRAPH_NONSQUARE);
         igraph_matrix_destroy(&mat);
     }
 
-    igraph_vector_destroy(&weights);
+    {
+        printf("Check error for non-symmetric matrix and IGRAPH_ADJ_UNDIRECTED.\n");
+        igraph_real_t e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
+        igraph_matrix_view(&mat, e, 3, 3);
+        check_error(&mat, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
+    }
 
     VERIFY_FINALLY_STACK();
 

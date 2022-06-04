@@ -19,16 +19,13 @@
    02110-1301 USA
 
 */
-#include "igraph_sparsemat.h"
 
 #include "igraph_constructors.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
-
-#include <cs/cs.h> //TODO take a look at how this is done in /src/core/sparsemat.c. i didn't want to copy it all. Maybe we need a separate header?
-#undef cs  /* because otherwise it messes up the name of the 'cs' member in igraph_sparsemat_t */
+#include "igraph_sparsemat.h"
 
 static igraph_error_t igraph_i_adjacency_directed(
     const igraph_matrix_t *adjmatrix, igraph_vector_int_t *edges,
@@ -905,27 +902,23 @@ static igraph_error_t igraph_i_sparse_adjacency_directed(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            igraph_integer_t multi = entry[from];
-            if (to == i[from]) {
-                IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-            }
-            for (igraph_integer_t count = 0; count < multi; count++) {
-                VECTOR(*edges)[e++] = i[from];
-                VECTOR(*edges)[e++] = to;
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        if (to == from) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        }
+        for (igraph_integer_t count = 0; count < multi; count++) {
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
-
     return IGRAPH_SUCCESS;
 }
 
@@ -933,30 +926,29 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_real_t other;
-                igraph_vector_int_t x, y;
-                igraph_vector_int_view(&x, &to, 1);
-                igraph_vector_int_view(&y, &i[from], 1);
-                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-                igraph_integer_t multi = entry[from] > other ? entry[from] : other;
-                if (to == i[from]) {
-                    IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-                }
-                for (igraph_integer_t count = 0; count < multi; count++) {
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to < from) {
+            continue;
+        }
+        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        igraph_real_t other;
+        igraph_vector_int_t x, y;
+        igraph_vector_int_view(&x, &to, 1);
+        igraph_vector_int_view(&y, &from, 1);
+        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+        multi = multi > other ? multi : other;
+        if (to == from) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        }
+        for (igraph_integer_t count = 0; count < multi; count++) {
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -968,65 +960,29 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_real_t other;
-                igraph_vector_int_t x, y;
-                igraph_vector_int_view(&x, &to, 1);
-                igraph_vector_int_view(&y, &i[from], 1);
-                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-                igraph_integer_t multi = entry[from] < other ? entry[from] : other;
-                if (to == i[from]) {
-                    IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-                }
-                for (igraph_integer_t count = 0; count < multi; count++) {
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to < from) {
+            continue;
         }
-    }
-    igraph_vector_int_resize(edges, e);
-
-    return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_sparse_adjacency_plus(
-    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
-    igraph_loops_t loops
-) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
-    igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
-
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_real_t other;
-                igraph_vector_int_t x, y;
-                igraph_vector_int_view(&x, &to, 1);
-                igraph_vector_int_view(&y, i, 1);
-                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-                igraph_integer_t multi = entry[from] + other;
-                if (to == i[from]) {
-                    IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-                }
-                for (igraph_integer_t count = 0; count < multi; count++) {
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        igraph_real_t other;
+        igraph_vector_int_t x, y;
+        igraph_vector_int_view(&x, &to, 1);
+        igraph_vector_int_view(&y, &from, 1);
+        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+        multi = multi < other ? multi : other;
+        if (to == from) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        }
+        for (igraph_integer_t count = 0; count < multi; count++) {
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -1038,25 +994,23 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_integer_t multi = entry[from];
-                if (to == i[from]) {
-                    IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-                }
-                for (igraph_integer_t count = 0; count < multi; count++) {
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to < from) {
+            continue;
+        }
+        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        if (to == from) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        }
+        for (igraph_integer_t count = 0; count < multi; count++) {
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -1064,34 +1018,30 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
     return IGRAPH_SUCCESS;
 }
 
-
 static igraph_error_t igraph_i_sparse_adjacency_lower(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to <= i[from]) {
-                igraph_integer_t multi = entry[from];
-                if (to == i[from]) {
-                    IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-                }
-                for (igraph_integer_t count = 0; count < multi; count++) {
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to > from) {
+            continue;
+        }
+        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        if (to == from) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        }
+        for (igraph_integer_t count = 0; count < multi; count++) {
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
-
     return IGRAPH_SUCCESS;
 }
 
@@ -1099,29 +1049,27 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
     if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
         IGRAPH_ERROR("Adjacency matrix should be symmetric for IGRAPH_ADJ_UNDIRECTED.",
                 IGRAPH_EINVAL);
     }
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_integer_t multi = entry[from];
-                if (to == i[from]) {
-                    IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-                }
-                for (igraph_integer_t count = 0; count < multi; count++) {
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to < from) {
+            continue;
+        }
+        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
+        if (to == from) {
+            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        }
+        for (igraph_integer_t count = 0; count < multi; count++) {
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -1145,8 +1093,8 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
         igraph_adjacency_t mode, igraph_loops_t loops) {
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    CS_INT no_of_nodes = adjmatrix->cs->m;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
+    igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
     if (no_of_edges) {
         no_of_edges *= igraph_sparsemat_max(adjmatrix);
     }
@@ -1155,7 +1103,7 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
                "form.", IGRAPH_EINVAL);
     }
-    if (no_of_nodes != adjmatrix->cs->n) {
+    if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
         IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
     }
 
@@ -1204,31 +1152,30 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_real_t other;
-                igraph_vector_int_t x, y;
-                igraph_vector_int_view(&x, &to, 1);
-                igraph_vector_int_view(&y, &i[from], 1);
-                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-                igraph_real_t weight = entry[from] > other ? entry[from] : other;
-                if (to == i[from]) {
-                    igraph_i_adjust_loop_edge_weight(&weight, loops);
-                }
-                if (weight != 0) {
-                    VECTOR(*weights)[e/2] = weight;
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to < from) {
+            continue;
+        }
+        igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
+        igraph_real_t other;
+        igraph_vector_int_t x, y;
+        igraph_vector_int_view(&x, &to, 1);
+        igraph_vector_int_view(&y, &from, 1);
+        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+        weight = weight > other ? weight : other;
+        if (to == from) {
+            igraph_i_adjust_loop_edge_weight(&weight, loops);
+        }
+        if (weight != 0) {
+            VECTOR(*weights)[e/2] = weight;
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -1236,35 +1183,35 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
 
     return IGRAPH_SUCCESS;
 }
+
 static igraph_error_t igraph_i_sparse_weighted_adjacency_min (
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_real_t other;
-                igraph_vector_int_t x, y;
-                igraph_vector_int_view(&x, &to, 1);
-                igraph_vector_int_view(&y, &i[from], 1);
-                igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-                igraph_real_t weight = entry[from] < other ? entry[from] : other;
-                if (to == i[from]) {
-                    igraph_i_adjust_loop_edge_weight(&weight, loops);
-                }
-                if (weight != 0) {
-                    VECTOR(*weights)[e/2] = weight;
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to < from) {
+            continue;
+        }
+        igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
+        igraph_real_t other;
+        igraph_vector_int_t x, y;
+        igraph_vector_int_view(&x, &to, 1);
+        igraph_vector_int_view(&y, &from, 1);
+        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+        weight = weight < other ? weight : other;
+        if (to == from) {
+            igraph_i_adjust_loop_edge_weight(&weight, loops);
+        }
+        if (weight != 0) {
+            VECTOR(*weights)[e/2] = weight;
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -1277,34 +1224,91 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_plus (
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_real_t weight = entry[from];
-                if (to != i[from]) {
-                    igraph_real_t other;
-                    igraph_vector_int_t x, y;
-                    igraph_vector_int_view(&x, &to, 1);
-                    igraph_vector_int_view(&y, &i[from], 1);
-                    igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-                    weight += other;
-                }
-                if (to == i[from]) {
-                    igraph_i_adjust_loop_edge_weight(&weight, loops);
-                }
-                if (weight != 0) {
-                    VECTOR(*weights)[e/2] = weight;
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        if (to < from) {
+            continue;
+        }
+        igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
+        igraph_real_t other;
+        igraph_vector_int_t x, y;
+        igraph_vector_int_view(&x, &to, 1);
+        igraph_vector_int_view(&y, &from, 1);
+        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+        if (to == from) {
+            igraph_i_adjust_loop_edge_weight(&weight, loops);
+        } else {
+            weight += other;
+        }
+        if (weight != 0) {
+            VECTOR(*weights)[e/2] = weight;
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
+        }
+    }
+    igraph_vector_int_resize(edges, e);
+    igraph_vector_resize(weights, e/2);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_vector_t *weights, igraph_loops_t loops
+) {
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
+    igraph_integer_t e = 0;
+
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
+        if (to < from) {
+            continue;
+        }
+        if (to == from) {
+            igraph_i_adjust_loop_edge_weight(&weight, loops);
+        }
+        if (weight != 0) {
+            VECTOR(*weights)[e/2] = weight;
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
+        }
+    }
+    igraph_vector_int_resize(edges, e);
+    igraph_vector_resize(weights, e/2);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
+    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
+    igraph_vector_t *weights, igraph_loops_t loops
+) {
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
+    igraph_integer_t e = 0;
+
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
+        if (to > from) {
+            continue;
+        }
+        if (to == from) {
+            igraph_i_adjust_loop_edge_weight(&weight, loops);
+        }
+        if (weight != 0) {
+            VECTOR(*weights)[e/2] = weight;
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -1321,96 +1325,29 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_undirected (
         IGRAPH_ERROR("Adjacency matrix should be symmetric from produce an undirected graph.",
                 IGRAPH_EINVAL);
     }
-    return igraph_i_sparse_weighted_adjacency_max(adjmatrix, edges, weights, loops);
+    return igraph_i_sparse_weighted_adjacency_upper(adjmatrix, edges, weights, loops);
 }
 
-static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
-    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
-    igraph_vector_t *weights, igraph_loops_t loops
-) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
-    igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
-
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to >= i[from]) {
-                igraph_real_t weight = entry[from];
-                if (to == i[from]) {
-                    igraph_i_adjust_loop_edge_weight(&weight, loops);
-                }
-                if (weight != 0) {
-                    VECTOR(*weights)[e/2] = weight;
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
-        }
-    }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
-
-    return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
-    igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
-    igraph_vector_t *weights, igraph_loops_t loops
-) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
-    igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
-
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            if (to <= i[from]) {
-                igraph_real_t weight = entry[from];
-                if (to == i[from]) {
-                    igraph_i_adjust_loop_edge_weight(&weight, loops);
-                }
-
-                if (weight != 0) {
-                    VECTOR(*weights)[e/2] = weight;
-                    VECTOR(*edges)[e++] = i[from];
-                    VECTOR(*edges)[e++] = to;
-                }
-            }
-        }
-    }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
-
-    return IGRAPH_SUCCESS;
-}
 
 static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
-    CS_INT *p = adjmatrix->cs->p;
-    CS_INT *i = adjmatrix->cs->i;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
-    igraph_integer_t from = 0;
+    igraph_sparsemat_iterator_t it;
+    igraph_sparsemat_iterator_init(&it, adjmatrix);
     igraph_integer_t e = 0;
-    CS_ENTRY *entry = adjmatrix->cs->x;
 
-    for (igraph_integer_t to = 0; p[to] < no_of_edges; to++) {
-        for (; from < p[to + 1]; from++) {
-            igraph_real_t weight = entry[from];
-            if (to == i[from]) {
-                igraph_i_adjust_loop_edge_weight(&weight, loops);
-            }
-            if (weight != 0) {
-                VECTOR(*weights)[e/2] = weight;
-                VECTOR(*edges)[e++] = i[from];
-                VECTOR(*edges)[e++] = to;
-            }
+    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
+        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
+        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
+        igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
+        if (to == from) {
+            igraph_i_adjust_loop_edge_weight(&weight, loops);
+        }
+        if (weight != 0) {
+            VECTOR(*weights)[e/2] = weight;
+            VECTOR(*edges)[e++] = from;
+            VECTOR(*edges)[e++] = to;
         }
     }
     igraph_vector_int_resize(edges, e);
@@ -1437,17 +1374,17 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
     igraph_vector_int_t edges;
-    CS_INT no_of_edges = adjmatrix->cs->p[adjmatrix->cs->n];
+    igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
+    igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
     if (no_of_edges) {
         no_of_edges *= igraph_sparsemat_max(adjmatrix);
     }
-    CS_INT no_of_nodes = adjmatrix->cs->m;
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
                "form.", IGRAPH_EINVAL);
     }
-    if (no_of_nodes != adjmatrix->cs->n) {
+    if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
         IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
     }
     if (no_of_nodes != 0 && igraph_sparsemat_min(adjmatrix) < 0) {
