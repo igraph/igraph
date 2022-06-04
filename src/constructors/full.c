@@ -131,6 +131,74 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     return IGRAPH_SUCCESS;
 }
 
+igraph_error_t igraph_full_multipartite(igraph_t *graph,
+                          igraph_vector_bool_t *types,
+                          igraph_vector_int_t *vertex_set,
+                          igraph_bool_t directed,
+                          igraph_neimode_t mode) {
+    
+    igraph_integer_t no_of_edges;
+    igraph_integer_t no_of_edges_partial_sum = 0;
+    igraph_integer_t no_of_nodes;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t vertex_acc;
+    igraph_integer_t ptr = 0;
+    igraph_integer_t n = igraph_vector_int_size(vertex_set);
+    
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_acc, n);
+    VECTOR(vertex_acc)[0] = 0;
+    for (igraph_integer_t i = 1; i < n; i++) {
+        VECTOR(vertex_acc)[i] = VECTOR(vertex_acc)[i-1] + VECTOR(*vertex_set)[i-1];
+    }
+    no_of_nodes = VECTOR(vertex_acc)[n-1] + VECTOR(*vertex_set)[n-1];
+
+    for (igraph_integer_t i = 0; i < n; i++) {
+        igraph_integer_t v = VECTOR(*vertex_set)[i];
+        no_of_edges_partial_sum = no_of_edges_partial_sum + (v * (v-1))/2;
+    }
+
+    if (!directed) {
+        no_of_edges = (no_of_nodes * (no_of_nodes -1)) / 2 - no_of_edges_partial_sum;
+    } else if (mode == IGRAPH_OUT || mode == IGRAPH_IN) {
+        no_of_edges = (no_of_nodes * (no_of_nodes -1)) / 2 - no_of_edges_partial_sum;
+    } else { /* mode==IGRAPH_ALL */
+        no_of_edges = (no_of_nodes * (no_of_nodes -1)) / 2 - no_of_edges_partial_sum;
+        no_of_edges *= 2;
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
+
+    for (igraph_integer_t from = 0; from < n-1; from++) {
+        igraph_integer_t edge_from = VECTOR(vertex_acc)[from];
+        for (igraph_integer_t i = 0; i < VECTOR(*vertex_set)[from]; i++) {
+            for (igraph_integer_t to = from+1; to < n; to++) {
+                igraph_integer_t edge_to = VECTOR(vertex_acc)[to];
+                for (igraph_integer_t j = 0; j < VECTOR(*vertex_set)[to]; j++) {
+                    if (!directed || mode == IGRAPH_OUT) {
+                        VECTOR(edges)[ptr++] = edge_from;
+                        VECTOR(edges)[ptr++] = edge_to++;
+                    } else if (mode == IGRAPH_IN) {
+                        VECTOR(edges)[ptr++] = edge_to++;
+                        VECTOR(edges)[ptr++] = edge_from;
+                    } else {
+                        VECTOR(edges)[ptr++] = edge_from;
+                        VECTOR(edges)[ptr++] = edge_to;
+                        VECTOR(edges)[ptr++] = edge_to++;
+                        VECTOR(edges)[ptr++] = edge_from;
+                    }
+                }
+            }
+            edge_from++;
+        }
+    }
+    
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+    igraph_vector_int_destroy(&edges);
+    igraph_vector_int_destroy(&vertex_acc);
+    IGRAPH_FINALLY_CLEAN(2);
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_full_citation
  * \brief Creates a full citation graph.

@@ -43,12 +43,6 @@ IGRAPH_EXPORT igraph_error_t igraph_full_bipartite(igraph_t *graph,
                                         igraph_bool_t directed,
                                         igraph_neimode_t mode);
 
-IGRAPH_EXPORT igraph_error_t igraph_full_multipartite(igraph_t *graph,
-                                        igraph_vector_bool_t *types,
-                                        igraph_vector_int_t *vertex_set,
-                                        igraph_bool_t directed,
-                                        igraph_neimode_t mode);
-
 IGRAPH_EXPORT igraph_error_t igraph_create_bipartite(igraph_t *g, const igraph_vector_bool_t *types,
                                           const igraph_vector_int_t *edges,
                                           igraph_bool_t directed);
