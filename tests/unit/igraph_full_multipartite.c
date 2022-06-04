@@ -43,5 +43,5 @@ int main() {
     igraph_vector_int_destroy(&types);
     igraph_destroy(&g);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
