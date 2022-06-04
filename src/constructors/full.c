@@ -211,6 +211,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&vertex_set_acc);
     IGRAPH_FINALLY_CLEAN(2);
+
     return IGRAPH_SUCCESS;
 }
 
