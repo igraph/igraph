@@ -1444,15 +1444,6 @@ static double igraph_i_qnorm5(double p, double mu, double sigma, igraph_bool_t l
     return mu + sigma * val;
 }
 
-static double fsign(double x, double y) {
-#ifdef IEEE_754
-    if (ISNAN(x) || ISNAN(y)) {
-        return x + y;
-    }
-#endif
-    return ((y >= 0) ? fabs(x) : -fabs(x));
-}
-
 static igraph_integer_t imax2(igraph_integer_t x, igraph_integer_t y) {
     return (x < y) ? y : x;
 }
@@ -1776,7 +1767,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
         /*  sample t from the laplace 'hat'
             (if t <= -0.6744 then pk < fk for all mu >= 10.) */
         u = 2 * igraph_rng_get_unif01(rng) - 1.;
-        t = 1.8 + fsign(E, u);
+        t = 1.8 + copysign(E, u);
         if (t > -0.6744) {
             pois = floor(mu + s * t);
             fk = pois;
