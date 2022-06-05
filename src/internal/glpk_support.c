@@ -53,6 +53,8 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
         /* If an interruption has already occurred, do not set another error,
            to avoid an infinite loop between the term_hook (this function)
            and the error_hook. */
+        fprintf(stderr, "GLPK interruption type2.\n");
+        fflush(stderr);
         igraph_i_glpk_error_info.is_interrupted = 1;
         glp_error("GLPK was interrupted."); /* This dummy message is never printed */
 #if HAS_GLP_AT_ERROR
@@ -89,6 +91,8 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
        signals to GLPK that it should terminate the optimization and return
        with the code GLP_ESTOP.
     */
+    fprintf(stderr, "GLPK interruption type1.\n");
+    fflush(stderr);
     if (igraph_i_interruption_handler) {
         if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
             glp_ios_terminate(tree);

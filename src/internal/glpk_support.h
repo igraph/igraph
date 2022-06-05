@@ -122,6 +122,8 @@ void igraph_i_glp_delete_prob(glp_prob *p);
         igraph_i_glpk_error_info.msg_ptr = igraph_i_glpk_error_info.msg; \
         if (setjmp(igraph_i_glpk_error_info.jmp)) { \
             if (igraph_i_glpk_error_info.is_interrupted) { \
+                fprintf(stderr, "GLPK interruption received.\n"); \
+                fflush(stderr); \
                 return IGRAPH_INTERRUPTED; \
             } else { \
                 if (igraph_i_glpk_error_info.msg_ptr != igraph_i_glpk_error_info.msg) { \
