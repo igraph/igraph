@@ -669,7 +669,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
 
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
     const igraph_rng_type_t *type = rng->type;
-    if (igraph_is_nan(p) || p <= 0 || p > 1) {
+    if (!igraph_finite(p) || p <= 0 || p > 1) {
         return IGRAPH_NAN;
     }
     if (type->get_geom) {
@@ -775,8 +775,7 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
- * \param rate The rate parameter of the Poisson distribution. Must be larger
- *        than zero.
+ * \param rate The rate parameter of the Poisson distribution. Must not be negative.
  * \return The generated geometrically distributed random number.
  *
  * Time complexity: depends on the RNG.
@@ -1565,7 +1564,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
     double pois = -1.;
     int k, kflag, big_mu, new_big_mu = FALSE;
 
-    if (!igraph_finite(mu)) {
+    if (!igraph_finite(mu) || mu < 0) {
         ML_ERR_return_NAN;
     }
 
@@ -1757,7 +1756,6 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 #define repeat for(;;)
 
 static double igraph_i_rbinom(igraph_rng_t *rng, igraph_integer_t n, double pp) {
-    /* FIXME: These should become THREAD_specific globals : */
 
     static IGRAPH_THREAD_LOCAL double c, fm, npq, p1, p2, p3, p4, qn;
     static IGRAPH_THREAD_LOCAL double xl, xll, xlr, xm, xr;
@@ -1806,7 +1804,11 @@ static double igraph_i_rbinom(igraph_rng_t *rng, igraph_integer_t n, double pp) 
             m = ffm;
             fm = m;
             npq = np * q;
-            p1 = (int)(2.195 * sqrt(npq) - 4.6 * q) + 0.5;
+            /* Note (igraph): Original code used a cast to (int) for rounding. However,
+             * the max npq = n*p*(1-p) value is 0.25*n, thus 2.195 * sqrt(npq) may be
+             * as large as 1.0975 * sqrt(n). This is not representable on a 32-bit signed
+             * integer when n is a 64-bit signed integer. Thus we use trunc() instead. */
+            p1 = trunc(2.195 * sqrt(npq) - 4.6 * q) + 0.5;
             xm = fm + 0.5;
             xl = xm - p1;
             xr = xm + p1;
