@@ -296,6 +296,7 @@ add_legacy_tests(
   igraph_get_shortest_paths2
   igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
+  igraph_graph_center
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
