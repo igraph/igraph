@@ -777,3 +777,58 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_graph_center
+ * \brief Central vertices of a graph.
+ *
+ * The central vertices of a graph are calculated by finding the vertices
+ * with the minimum eccentricity. This concept is typically applied to
+ * connected graphs. In undirected disconnected graphs, the calculation
+ * is effectively done per connected component.
+ * 
+ * \param graph The input graph, it can be directed or undirected.
+ * \param res Pointer to an initialized vector, the result is stored
+ *    here.
+ * \param mode What kind of paths to consider for the calculation:
+ *    \c IGRAPH_OUT, paths that follow edge directions;
+ *    \c IGRAPH_IN, paths that follow the opposite directions; and
+ *    \c IGRAPH_ALL, paths that ignore edge directions. This argument
+ *    is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|V| (|V|+|E|)), where |V| is the number of
+ * vertices and |E| is the number of edges.
+ *
+ * \sa \ref igraph_eccentricity().
+ *
+ */
+igraph_error_t igraph_graph_center(const igraph_t *graph, 
+                    igraph_vector_t *res,
+                    igraph_neimode_t mode) {
+
+    igraph_vector_t ecc;
+
+    igraph_vector_clear(res);
+    if (igraph_vcount(graph) == 0) {
+        return IGRAPH_SUCCESS;
+    }
+    
+    IGRAPH_VECTOR_INIT_FINALLY(&ecc, 0);
+    IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(), mode));
+
+    /* igraph_eccentricity() does not return infinity or NaN, and the null graph
+     * case was handled above, therefore calling vector_min() is safe. */
+    igraph_real_t min_eccentricity = igraph_vector_min(&ecc);
+    igraph_real_t n = igraph_vector_size(&ecc);
+    for (igraph_integer_t i = 0; i < n; i++) {
+        if (VECTOR(ecc)[i] == min_eccentricity) {
+            IGRAPH_CHECK(igraph_vector_push_back(res, i));
+        }
+    }
+
+    igraph_vector_destroy(&ecc);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}

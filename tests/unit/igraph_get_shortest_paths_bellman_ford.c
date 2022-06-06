@@ -61,21 +61,21 @@ void check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
     }
 }
 
-void check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
+void check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* parents,
                         const igraph_vector_int_t* inbound, int start) {
 
     igraph_integer_t i, n = igraph_vcount(graph);
 
-    IGRAPH_ASSERT(igraph_vector_int_size(pred) == n);
+    IGRAPH_ASSERT(igraph_vector_int_size(parents) == n);
     IGRAPH_ASSERT(igraph_vector_int_size(inbound) == n);
 
-    IGRAPH_ASSERT(VECTOR(*pred)[start] == start && VECTOR(*inbound)[start] == -1);
+    IGRAPH_ASSERT(VECTOR(*parents)[start] == -1 && VECTOR(*inbound)[start] == -1);
 
     for (i = 0; i < n; i++) {
-        if (VECTOR(*pred)[i] == -1) {
+        if (VECTOR(*parents)[i] == -2) {
             IGRAPH_ASSERT(VECTOR(*inbound)[i] == -1);
 
-        } else if (VECTOR(*pred)[i] == i) {
+        } else if (VECTOR(*parents)[i] == -1) {
             IGRAPH_ASSERT(i == start);
 
             IGRAPH_ASSERT(VECTOR(*inbound)[i] == -1);
@@ -89,7 +89,7 @@ void check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
                 v = dummy;
             }
             IGRAPH_ASSERT(v == i);
-            IGRAPH_ASSERT(u == VECTOR(*pred)[i]);
+            IGRAPH_ASSERT(u == VECTOR(*parents)[i]);
         }
     }
 }
@@ -97,7 +97,7 @@ void check_pred_inbound(const igraph_t* graph, const igraph_vector_int_t* pred,
 int main() {
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;
-    igraph_vector_int_t pred, inbound;
+    igraph_vector_int_t parents, inbound;
     igraph_real_t weights_data_0[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_real_t weights_data_1[] = { 6, 7, 8, -4, -2, -3, 9, 2, 7 };
     igraph_real_t weights_data_2[] = { 6, 7, 2, -4, -2, -3, 9, 2, 7 };
@@ -114,7 +114,7 @@ int main() {
                 2, 1,
                 -1);
 
-    igraph_vector_int_init(&pred, 0);
+    igraph_vector_int_init(&parents, 0);
     igraph_vector_int_init(&inbound, 0);
 
     printf("Paths to only some vertices\n");
@@ -129,11 +129,11 @@ int main() {
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                            /*from=*/ 0, /*to=*/ vs,
                                            &weights_vec, IGRAPH_OUT,
-                                           /*predecessors=*/ &pred,
+                                           &parents,
                                            /*inbound_edges=*/ &inbound);
 
     check_evecs(&g, &vecs, &evecs);
-    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
+    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0);
 
     print_vector_int_list(&vecs);
 
@@ -144,18 +144,18 @@ int main() {
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                            /*from=*/ 0, /*to=*/ igraph_vss_all(),
                                            &weights_vec, IGRAPH_OUT,
-                                           /*predecessors=*/ &pred,
+                                           &parents,
                                            /*inbound_edges=*/ &inbound);
 
     check_evecs(&g, &vecs, &evecs);
-    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
+    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0);
 
     print_vector_int_list(&vecs);
 
     igraph_vector_int_list_destroy(&vecs);
     igraph_vector_int_list_destroy(&evecs);
 
-    igraph_vector_int_destroy(&pred);
+    igraph_vector_int_destroy(&parents);
     igraph_vector_int_destroy(&inbound);
 
     igraph_vs_destroy(&vs);
@@ -170,7 +170,7 @@ int main() {
 
     igraph_vector_int_list_init(&vecs, 0);
     igraph_vector_int_list_init(&evecs, 0);
-    igraph_vector_int_init(&pred, 0);
+    igraph_vector_int_init(&parents, 0);
     igraph_vector_int_init(&inbound, 0);
 
     igraph_vs_vector_small(&vs, 0, 1, 3, 2, 1,  -1);
@@ -182,11 +182,11 @@ int main() {
     igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                            /*from=*/ 0, /*to=*/ vs,
                                            &weights_vec, IGRAPH_OUT,
-                                           /*predecessors=*/ &pred,
+                                           &parents,
                                            /*inbound_edges=*/ &inbound);
 
     check_evecs(&g, &vecs, &evecs);
-    check_pred_inbound(&g, &pred, &inbound, /* from= */ 0);
+    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0);
 
     print_vector_int_list(&vecs);
 
@@ -199,12 +199,12 @@ int main() {
     IGRAPH_ASSERT(igraph_get_shortest_paths_bellman_ford(&g, /*vertices=*/ &vecs, /*edges=*/ &evecs,
                                                          /*from=*/ 0, /*to=*/ vs,
                                                          &weights_vec, IGRAPH_OUT,
-                                                         /*predecessors=*/ &pred,
+                                                         &parents,
                                                          /*inbound_edges=*/ &inbound) == IGRAPH_ENEGLOOP);
 
     igraph_vector_int_list_destroy(&vecs);
     igraph_vector_int_list_destroy(&evecs);
-    igraph_vector_int_destroy(&pred);
+    igraph_vector_int_destroy(&parents);
     igraph_vector_int_destroy(&inbound);
 
     igraph_vs_destroy(&vs);

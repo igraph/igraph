@@ -409,7 +409,7 @@ igraph_get_shortest_paths:
         GRAPH graph,
         OPTIONAL OUT VERTEXSET_LIST vertices, OPTIONAL OUT EDGESET_LIST edges,
         VERTEX from, VERTEXSET to=ALL, NEIMODE mode=OUT,
-        OPTIONAL OUT VECTOR_INT predecessors,
+        OPTIONAL OUT VECTOR_INT parents,
         OPTIONAL OUT VECTOR_INT inbound_edges
     DEPS: edges ON graph, from ON graph, to ON graph
 
@@ -431,7 +431,7 @@ igraph_get_shortest_paths_dijkstra:
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
-        OPTIONAL OUT VECTOR_INT predecessors=0,
+        OPTIONAL OUT VECTOR_INT parents=0,
         OPTIONAL OUT VECTOR_INT inbound_edges=0
     DEPS: |-
         vertices ON graph, edges ON graph, from ON graph, to ON graph,
@@ -442,7 +442,7 @@ igraph_get_shortest_paths_bellman_ford:
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEXSET to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
-        OPTIONAL OUT VECTOR_INT predecessors=0,
+        OPTIONAL OUT VECTOR_INT parents=0,
         OPTIONAL OUT VECTOR_INT inbound_edges=0
     DEPS: |-
         vertices ON graph, edges ON graph, from ON graph, to ON graph,

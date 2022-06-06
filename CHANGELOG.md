@@ -670,8 +670,9 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` takes an additional bitfield parameter controlling some aspects of writing
    the GML file.
 
- - The vector of parents in `igraph_get_shortest_paths()` and `igraph_get_shortest_paths_dijkstra()` now
-   use -1 to represent the starting vertex, and -2 for unreachable vertices.
+ - The vector of parents in `igraph_get_shortest_paths()`, `igraph_get_shortest_paths_bellman_ford()`
+   and `igraph_get_shortest_paths_dijkstra()` now use -1 to represent the starting vertex, and -2
+   for unreachable vertices.
 
 ### Added
 
@@ -841,6 +842,8 @@ Some of the highlights are:
  - Documentation improvements
 
 ## [Unreleased 0.9]
+
+## [0.9.9] - 2022-06-04
 
 ### Changed
 
@@ -1438,7 +1441,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.8..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.9..HEAD
+[0.9.9]: https://github.com/igraph/igraph/compare/0.9.8...0.9.9
 [0.9.8]: https://github.com/igraph/igraph/compare/0.9.7...0.9.8
 [0.9.7]: https://github.com/igraph/igraph/compare/0.9.6...0.9.7
 [0.9.6]: https://github.com/igraph/igraph/compare/0.9.5...0.9.6

@@ -106,7 +106,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph
                                                       igraph_vs_t to,
                                                       const igraph_vector_t *weights,
                                                       igraph_neimode_t mode,
-                                                      igraph_vector_int_t *predecessors,
+                                                      igraph_vector_int_t *parents,
                                                       igraph_vector_int_t *inbound_edges);
 IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                                      igraph_vector_int_list_t *vertices,
@@ -182,6 +182,10 @@ IGRAPH_EXPORT igraph_error_t igraph_eccentricity(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                                 igraph_neimode_t mode);
 
+IGRAPH_EXPORT igraph_error_t igraph_graph_center(const igraph_t *graph, 
+                                 igraph_vector_t *res,
+                                 igraph_neimode_t mode);
+
 IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                                          igraph_real_t *diameter,
                                          igraph_integer_t vid_start,
@@ -239,7 +243,7 @@ IGRAPH_EXPORT igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
                                              igraph_vs_t to,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode,
-                                             igraph_vector_int_t *predecessors,
+                                             igraph_vector_int_t *parents,
                                              igraph_vector_int_t *inbound_edges);
 IGRAPH_EXPORT igraph_error_t igraph_get_widest_path(const igraph_t *graph,
                                              igraph_vector_int_t *vertices,
