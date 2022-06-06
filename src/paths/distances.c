@@ -810,7 +810,7 @@ igraph_error_t igraph_graph_center(const igraph_t *graph,
     igraph_vector_t ecc;
 
     igraph_vector_clear(res);
-    if (igraph_vcount(igraph) == 0) {
+    if (igraph_vcount(graph) == 0) {
         return IGRAPH_SUCCESS;
     }
     
