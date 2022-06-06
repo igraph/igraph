@@ -77,7 +77,11 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
 void igraph_i_glpk_error_hook(void *info) {
     IGRAPH_UNUSED(info);
     igraph_i_glpk_error_info.is_error = 1;
+    fprintf(stderr, "GLPK error triggered. Freeing env.\n");
+    fflush(stderr);
     glp_free_env();
+    fprintf(stderr, "Performing longjmp.\n");
+    fflush(stderr);
     longjmp(igraph_i_glpk_error_info.jmp, 1);
 }
 
