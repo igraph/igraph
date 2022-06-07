@@ -66,7 +66,7 @@ static igraph_error_t igraph_rng_pcg32_init(void **state) {
     pcg32_random_t *st;
 
     st = IGRAPH_CALLOC(1, pcg32_random_t);
-    IGRAPH_CHECK_OOM(st, "Cannot initialize PCG32 RNG");
+    IGRAPH_CHECK_OOM(st, "Cannot initialize PCG32 RNG.");
     (*state) = st;
 
     igraph_rng_pcg32_seed(st, 0);

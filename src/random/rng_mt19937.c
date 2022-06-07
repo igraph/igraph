@@ -111,7 +111,7 @@ static igraph_error_t igraph_rng_mt19937_init(void **state) {
     igraph_i_rng_mt19937_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_mt19937_state_t);
-    IGRAPH_CHECK_OOM(st, "Cannot initialize MT19937 RNG");
+    IGRAPH_CHECK_OOM(st, "Cannot initialize MT19937 RNG.");
     (*state) = st;
 
     igraph_rng_mt19937_seed(st, 0);

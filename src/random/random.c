@@ -894,11 +894,11 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
 
     /* getting back some sense of sanity */
     if (l > h) {
-        IGRAPH_ERROR("Lower limit is greater than upper limit", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Lower limit is greater than upper limit.", IGRAPH_EINVAL);
     }
     /* now we know that l <= h */
     if (length > N) {
-        IGRAPH_ERROR("Sample size exceeds size of candidate pool", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Sample size exceeds size of candidate pool.", IGRAPH_EINVAL);
     }
 
     /* treat rare cases quickly */
@@ -1079,11 +1079,11 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 
     /* getting back some sense of sanity */
     if (l > h) {
-        IGRAPH_ERROR("Lower limit is greater than upper limit", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Lower limit is greater than upper limit.", IGRAPH_EINVAL);
     }
     /* now we know that l <= h */
     if (length > N) {
-        IGRAPH_ERROR("Sample size exceeds size of candidate pool", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Sample size exceeds size of candidate pool.", IGRAPH_EINVAL);
     }
 
     /* treat rare cases quickly */
