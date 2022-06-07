@@ -95,8 +95,8 @@
     #define BASE_VECTOR igraph_vector_complex_t
     #define BASE_MATRIX igraph_matrix_complex_t
     #define SHORT complex
-    #define ZERO igraph_complex(0,0)
-    #define ONE {{1.0,0.0}}
+    #define ZERO ((igraph_complex_t){{0.0, 0.0}})
+    #define ONE ((igraph_complex_t){{1.0, 0.0}})
     #define MULTIPLICITY 2
     #define NOTORDERED 1
     #define NOABS 1
