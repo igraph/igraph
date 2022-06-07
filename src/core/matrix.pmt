@@ -1526,10 +1526,9 @@ igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
     igraph_integer_t nrow = m->nrow, ncol = m->ncol;
     igraph_integer_t r, c;
-    BASE sum;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, nrow));
     for (r = 0; r < nrow; r++) {
-        sum = ZERO;
+        BASE sum = ZERO;
         for (c = 0; c < ncol; c++) {
 #ifdef SUM
             SUM(sum, sum, MATRIX(*m, r, c));
@@ -1559,10 +1558,9 @@ igraph_error_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
     igraph_integer_t nrow = m->nrow, ncol = m->ncol;
     igraph_integer_t r, c;
-    BASE sum;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, ncol));
     for (c = 0; c < ncol; c++) {
-        sum = ZERO;
+        BASE sum = ZERO;
         for (r = 0; r < nrow; r++) {
 #ifdef SUM
             SUM(sum, sum, MATRIX(*m, r, c));

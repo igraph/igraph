@@ -2884,9 +2884,9 @@ igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v) {
     igraph_integer_t i = 0;
 
 #ifdef EQ
-    while (i < n && EQ(VECTOR(*v)[i], ZERO)) {
+    while (i < n && EQ(VECTOR(*v)[i], (BASE) ZERO)) {
 #else
-    while (i < n && VECTOR(*v)[i] == ZERO) {
+    while (i < n && VECTOR(*v)[i] == (BASE) ZERO) {
 #endif
         i++;
     }
