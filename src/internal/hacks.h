@@ -32,19 +32,14 @@
 
 __BEGIN_DECLS
 
-#ifndef HAVE_STRNDUP
-    #define strndup igraph_i_strndup
-    char* igraph_i_strndup(const char *s, size_t n);
-#endif
-
 #ifndef HAVE_STRDUP
     #define strdup igraph_i_strdup
     char* igraph_i_strdup(const char *s);
 #endif
 
-#ifndef HAVE_STPCPY
-    #define stpcpy igraph_i_stpcpy
-    char* igraph_i_stpcpy(char* s1, const char* s2);
+#ifndef HAVE_STRNDUP
+    #define strndup igraph_i_strndup
+    char* igraph_i_strndup(const char *s, size_t n);
 #endif
 
 #ifndef HAVE_STRCASECMP

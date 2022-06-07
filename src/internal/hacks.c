@@ -26,9 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* These are implementations of common C functions that may be missing from some
- * compilers; for instance, icc does not provide stpcpy so we implement it
- * here. */
+/* These are implementations of common C functions that may be missing from some compilers. */
 
 /**
  * Drop-in replacement for strdup.
@@ -61,13 +59,4 @@ char *igraph_i_strndup(const char *s1, size_t n) {
         result[n] = '\0';
     }
     return result;
-}
-
-/**
- * Drop-in replacement for stpcpy.
- * Used only in compilers that do not have stpcpy
- */
-char* igraph_i_stpcpy(char* s1, const char* s2) {
-    char* result = strcpy(s1, s2);
-    return result + strlen(s1);
 }
