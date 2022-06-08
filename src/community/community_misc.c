@@ -464,7 +464,7 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
  *                     returned here.
  * \return  Error code.
  *
- * \see \ref igraph_compare_communities() with the \c IGRAPH_COMMCMP_SPLIT_JOIN
+ * \sa \ref igraph_compare_communities() with the \c IGRAPH_COMMCMP_SPLIT_JOIN
  * method if you are not interested in the individual distances but only the sum
  * of them.
  *
