@@ -363,6 +363,11 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  * In the directed case, it uses out-degrees as out-values and
  * in-degrees as in-values.
  *
+ * </para><para>
+ * For regular graphs, i.e. graphs in which all vertices have the
+ * same degree, computing degree correlations is not meaningful,
+ * and this function returns NaN.
+ *
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \param directed Boolean, whether to consider edge directions for
