@@ -94,6 +94,26 @@ int main() {
     igraph_vector_int_clear(&partitions);
     igraph_vector_int_clear(&types);
 
+    printf("\nUndirected graph, 4 partitions:");
+    igraph_vector_int_init(&partitions, 4);
+    igraph_vector_int_init(&types, 0);
+
+    VECTOR(partitions)[0] = 2;
+    VECTOR(partitions)[1] = 3;
+    VECTOR(partitions)[2] = 4;
+    VECTOR(partitions)[3] = 2;
+
+    igraph_full_multipartite(&g, &types, &partitions, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+
+    printf("\nEdge list:\n");
+    igraph_write_graph_edgelist(&g, stdout);
+
+    printf("\nPartition type:\n");
+    igraph_vector_int_print(&types);
+
+    igraph_vector_int_clear(&partitions);
+    igraph_vector_int_clear(&types);
+
     igraph_vector_int_destroy(&partitions);
     igraph_vector_int_destroy(&types);
     igraph_destroy(&g);
