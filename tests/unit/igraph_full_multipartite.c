@@ -21,25 +21,80 @@
 
 int main() {
     igraph_t g;
-    igraph_vector_int_t vertex_set;
+    igraph_vector_int_t partitions;
     igraph_vector_int_t types;
 
-    igraph_vector_int_init(&vertex_set, 3);
+    printf("empty directed graph, zero vertices:");
+    igraph_vector_int_init(&partitions, 0);
     igraph_vector_int_init(&types, 0);
+    igraph_full_multipartite(&g, &types, &partitions, IGRAPH_DIRECTED, IGRAPH_ALL);
 
-    VECTOR(vertex_set)[0] = 2;
-    VECTOR(vertex_set)[1] = 3;
-    VECTOR(vertex_set)[2] = 3;
-
-    igraph_full_multipartite(&g, &types, &vertex_set, IGRAPH_DIRECTED, IGRAPH_ALL);
-
-    printf("Edge list:\n");
+    printf("\nEdge list:\n");
     igraph_write_graph_edgelist(&g, stdout);
 
-    printf("\nVertex type:\n");
+    printf("\nPartition type:\n");
+    igraph_vector_int_print(&types);
+
+    igraph_vector_int_clear(&partitions);
+    igraph_vector_int_clear(&types);
+
+    printf("\ndirected graph with one partition, 4 vertices:");
+    igraph_vector_int_init(&partitions, 1);
+    igraph_vector_int_init(&types, 0);
+
+    VECTOR(partitions)[0] = 4;
+
+    igraph_full_multipartite(&g, &types, &partitions, IGRAPH_DIRECTED, IGRAPH_ALL);
+
+    printf("\nEdge list:\n");
+    igraph_write_graph_edgelist(&g, stdout);
+
+    printf("\nPartition type:\n");
     igraph_vector_int_print(&types);
     
-    igraph_vector_int_destroy(&vertex_set);
+    igraph_vector_int_clear(&partitions);
+    igraph_vector_int_clear(&types);
+
+    printf("\ndirected graph with 3 partitions:");
+    igraph_vector_int_init(&partitions, 3);
+    igraph_vector_int_init(&types, 0);
+
+    VECTOR(partitions)[0] = 2;
+    VECTOR(partitions)[1] = 3;
+    VECTOR(partitions)[2] = 3;
+
+    igraph_full_multipartite(&g, &types, &partitions, IGRAPH_DIRECTED, IGRAPH_ALL);
+
+    printf("\nEdge list:\n");
+    igraph_write_graph_edgelist(&g, stdout);
+
+    printf("\nPartition type:\n");
+    igraph_vector_int_print(&types);
+    
+    igraph_vector_int_clear(&partitions);
+    igraph_vector_int_clear(&types);
+
+    printf("\ndirected graph, 4 partitions, mode=IN:");
+    igraph_vector_int_init(&partitions, 4);
+    igraph_vector_int_init(&types, 0);
+
+    VECTOR(partitions)[0] = 2;
+    VECTOR(partitions)[1] = 3;
+    VECTOR(partitions)[2] = 4;
+    VECTOR(partitions)[3] = 2;
+
+    igraph_full_multipartite(&g, &types, &partitions, IGRAPH_DIRECTED, IGRAPH_IN);
+
+    printf("\nEdge list:\n");
+    igraph_write_graph_edgelist(&g, stdout);
+
+    printf("\nPartition type:\n");
+    igraph_vector_int_print(&types);
+    
+    igraph_vector_int_clear(&partitions);
+    igraph_vector_int_clear(&types);
+
+    igraph_vector_int_destroy(&partitions);
     igraph_vector_int_destroy(&types);
     igraph_destroy(&g);
 
