@@ -28,7 +28,8 @@
 
 
 void gsummary(const igraph_t * g) {
-    printf("|V|=%d |E|=%d directed=%d\n", (int)igraph_vcount(g), (int)igraph_ecount(g), (int)igraph_is_directed(g));
+    printf("|V|=%" IGRAPH_PRId " |E|=%" IGRAPH_PRId " directed=%d\n",
+           igraph_vcount(g), igraph_ecount(g), (int) igraph_is_directed(g));
 }
 
 void show_results(igraph_vector_int_t * membership, igraph_real_t codelength) {
