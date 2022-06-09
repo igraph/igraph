@@ -131,6 +131,44 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_full_multipartite
+ * \brief Create a full multipartite network.
+ *
+ * A multipartite network contains two or more partitions and connections
+ * are only possible between two vertices in different partitions.
+ *
+ * </para><para>
+ * igraph does not have direct support for bipartite networks, at
+ * least not at the C language level. In other words the igraph_t
+ * structure does not contain information about the vertex types.
+ * The C functions for bipartite networks usually have an additional
+ * input argument to graph, called \c types, a boolean vector giving
+ * the vertex types.
+ *
+ * </para><para>
+ * Most functions creating bipartite networks are able to create this
+ * extra vector, you just need to supply an initialized boolean vector
+ * to them.
+ *
+ * \param graph Pointer to an igraph_t object, the graph will be
+ *   created here.
+ * \param types Pointer to a boolean vector. If not a null pointer,
+ *   then the partition types will be stored here.
+ * \param partitions Pointer to an int vector, the number of partitions
+ * \param directed Boolean, whether to create a directed graph.
+ * \param mode A constant that gives the type of connections for
+ *   directed graphs. If \c IGRAPH_OUT, then edges point from vertices
+ *   of low-index vertices to high-index vertices; if \c
+ *   IGRAPH_IN, then the opposite direction is realized; if \c
+ *   IGRAPH_ALL, then mutual edges will be created.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ *
+ * \sa \ref igraph_full_bipartite() for bipartite full graphs.
+ */
 igraph_error_t igraph_full_multipartite(igraph_t *graph,
                           igraph_vector_int_t *types,
                           igraph_vector_int_t *partitions,
