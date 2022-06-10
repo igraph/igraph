@@ -96,18 +96,13 @@ int main() {
     infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
 
-    /* Two 4-cliques with one commun vertex (vertex 3) */
+    /* Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5) */
     printf("# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1,  0, 2,  0, 3,  1, 2,  1, 3,  2, 3, /* 4-clique 0,1,2,3 */
                  7, 4,  7, 5,  7, 6,  4, 5,  4, 6,  5, 6, /* 4-clique 4,5,6,7 */
                  0, 4,  1, 5, /* 8, 0, 8, 4, */
                  -1);
-    infomap_test(&g, /* smoke_test = */ 0);
-
-    printf("# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)\n");
-    igraph_add_edge(&g, 0, 4);
-    igraph_add_edge(&g, 1, 5);
     infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
 

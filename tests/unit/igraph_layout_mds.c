@@ -34,7 +34,9 @@ int main() {
     igraph_matrix_t coords, dist_mat;
     int i, j;
 
-    srand(42); /* make tests deterministic */
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
+
+    RNG_BEGIN();
 
     igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
@@ -58,7 +60,7 @@ int main() {
     igraph_matrix_init(&dist_mat, 8, 8);
     for (i = 0; i < 8; i++)
         for (j = 0; j < 2; j++) {
-            MATRIX(coords, i, j) = rand() % 1000;
+            MATRIX(coords, i, j) = RNG_INTEGER(0, 1000);
         }
     for (i = 0; i < 8; i++)
         for (j = i + 1; j < 8; j++) {
@@ -85,6 +87,8 @@ int main() {
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
+
+    RNG_END();
 
     return 0;
 }

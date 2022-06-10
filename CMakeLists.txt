@@ -101,6 +101,11 @@ endif()
 check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
 
+# Check for 128-bit integer multiplication support and floating-point
+# endianness
+include(ieee754_endianness)
+include(uint128_support)
+
 if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)
   message(WARNING "igraph cannot set per-thread locale on this platform. igraph_enter_safelocale() and igraph_exit_safelocale() will not be safe to use in multithreaded programs.")
 endif()
@@ -117,7 +122,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
     # directory that somehow gets into the coverage results. /Applications and
     # /Library/Developer are for macOS -- they exclude files from the macOS SDK.
-    EXCLUDE "io/*.l" "src/io/parsers/*" "io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*"
+    EXCLUDE "io/*.l" "src/io/parsers/*" "io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
   )
 endif()
 

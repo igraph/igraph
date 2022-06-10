@@ -49,8 +49,10 @@ __BEGIN_DECLS
 #  error "igraph integer size not defined; check the value of IGRAPH_INTEGER_SIZE when compiling"
 #elif IGRAPH_INTEGER_SIZE == 64
 typedef int64_t igraph_integer_t;
+typedef uint64_t igraph_uint_t;
 #elif IGRAPH_INTEGER_SIZE == 32
 typedef int32_t igraph_integer_t;
+typedef uint32_t igraph_uint_t;
 #else
 #  error "Invalid igraph integer size; check the value of IGRAPH_INTEGER_SIZE when compiling"
 #endif
@@ -61,8 +63,10 @@ typedef int    igraph_bool_t;
 /* printf format specifier for igraph_integer_t */
 #if IGRAPH_INTEGER_SIZE == 64
 #  define IGRAPH_PRId PRId64
+#  define IGRAPH_PRIu PRIu64
 #else
 #  define IGRAPH_PRId PRId32
+#  define IGRAPH_PRIu PRIu32
 #endif
 
 /* maximum and minimum allowed values for igraph_integer_t */
@@ -72,6 +76,15 @@ typedef int    igraph_bool_t;
 #else
 #  define IGRAPH_INTEGER_MAX INT32_MAX
 #  define IGRAPH_INTEGER_MIN INT32_MIN
+#endif
+
+/* maximum and minimum allowed values for igraph_uint_t */
+#if IGRAPH_INTEGER_SIZE == 64
+#  define IGRAPH_UINT_MAX UINT64_MAX
+#  define IGRAPH_UINT_MIN UINT64_MIN
+#else
+#  define IGRAPH_UINT_MAX UINT32_MAX
+#  define IGRAPH_UINT_MIN UINT32_MIN
 #endif
 
 /* Maximum vertex count for igraph_t
