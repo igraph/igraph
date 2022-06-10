@@ -196,6 +196,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
         igraph_empty(graph, num, directed);
         if (types) {
             IGRAPH_CHECK(igraph_vector_int_resize(types, num));
+            igraph_vector_int_null(types);
             for (igraph_integer_t i = 0; i < num; i++) {
                 VECTOR(*types)[0] = 0;
             }
