@@ -761,7 +761,7 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'A';
 
     if (weights == 0) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,
@@ -1370,7 +1370,7 @@ static int igraph_i_personalized_pagerank_arpack(const igraph_t *graph, igraph_v
     options->n = (int) no_of_nodes;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'R';
     options->start = 1;       /* no random start vector */
 
     directed = directed && igraph_is_directed(graph);
