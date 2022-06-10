@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+ - In some rare edge cases, `igraph_pagrank()` with the ARPACK method and `igraph_hub_score()` / `igraph_authority_score()` could return incorrect results. The problem could be detected by checking that the returned eigenvalue is not negative.
+
 ## [0.9.9] - 2022-06-04
 
 ### Changed
