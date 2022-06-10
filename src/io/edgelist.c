@@ -90,6 +90,14 @@ igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
         IGRAPH_CHECK(igraph_i_fget_integer(instream, &from));
         IGRAPH_CHECK(igraph_i_fget_integer(instream, &to));
 
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+        /* Protect from very large memory allocations when fuzzing. */
+#define IGRAPH_EDGELIST_MAX_VERTEX_COUNT (1L << 20)
+        if (from > IGRAPH_EDGELIST_MAX_VERTEX_COUNT || to > IGRAPH_EDGELIST_MAX_VERTEX_COUNT) {
+            IGRAPH_ERROR("Vertex count too large in edgelist file.", IGRAPH_EINVAL);
+        }
+#endif
+
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
     }
