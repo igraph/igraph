@@ -258,7 +258,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
             igraph_integer_t v = 1;
             VECTOR(*types)[0] = 0;
             for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
-                if (i == VECTOR(partitions_acc)[v]) {
+                if (v < n && i == VECTOR(partitions_acc)[v]) {
                     v++;
                 }
                 VECTOR(*types)[i] = v-1;
