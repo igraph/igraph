@@ -2234,3 +2234,6 @@ igraph_stochastic_imitation:
         GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VECTOR quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
+
+igraph_expand_path_to_pairs:
+    PARAMS: INOUT VERTEX_INDICES path
