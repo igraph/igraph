@@ -388,6 +388,11 @@ NEIMODE:
     CTYPE: igraph_neimode_t
     FLAGS: ENUM
 
+OPTIMALITY:
+    # This enum controls which algorithm to use in deterministic optimal imitation
+    CTYPE: igraph_optimal_t
+    FLAGS: ENUM
+
 PAGERANKALGO:
     # Enum that describes the various implementations of the PageRank algorithm
     CTYPE: igraph_pagerank_algo_t

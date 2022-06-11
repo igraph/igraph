@@ -2200,6 +2200,12 @@ igraph_convergence_degree:
 # Other functions, documented, graph related
 #######################################
 
+igraph_deterministic_optimal_imitation:
+    PARAMS: |-
+        GRAPH graph, VERTEX vid, OPTIMALITY optimality, VECTOR quantities,
+        INOUT VECTOR_INT strategies, NEIMODE mode
+    DEPS: vid ON graph, quantities ON graph, strategies ON graph
+
 igraph_stochastic_imitation:
     PARAMS: |-
         GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VECTOR quantities,
