@@ -135,27 +135,14 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * \function igraph_full_multipartite
  * \brief Create a full multipartite network.
  *
- * A multipartite network contains two or more partitions and connections
- * are only possible between two vertices in different partitions.
- *
- * </para><para>
- * igraph does not have direct support for bipartite networks, at
- * least not at the C language level. In other words the igraph_t
- * structure does not contain information about the vertex types.
- * The C functions for bipartite networks usually have an additional
- * input argument to graph, called \c types, a boolean vector giving
- * the vertex types.
- *
- * </para><para>
- * Most functions creating bipartite networks are able to create this
- * extra vector, you just need to supply an initialized boolean vector
- * to them.
+ * A multipartite network contains two or more types and connections
+ * are only possible between two vertices in different types.
  *
  * \param graph Pointer to an igraph_t object, the graph will be
  *   created here.
- * \param types Pointer to a boolean vector. If not a null pointer,
- *   then the partition types will be stored here.
- * \param partitions Pointer to an int vector, the number of partitions
+ * \param types Pointer to an int vector. If not a null pointer,
+ *   it contains information about the vertex types
+ * \param n Pointer to an int vector, the number of types
  * \param directed Boolean, whether to create a directed graph.
  * \param mode A constant that gives the type of connections for
  *   directed graphs. If \c IGRAPH_OUT, then edges point from vertices
@@ -171,19 +158,19 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  */
 igraph_error_t igraph_full_multipartite(igraph_t *graph,
                           igraph_vector_int_t *types,
-                          igraph_vector_int_t *partitions,
+                          const igraph_vector_int_t *n,
                           igraph_bool_t directed,
                           igraph_neimode_t mode) {
     
     igraph_integer_t no_of_edges = 0;
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t edges;
-    igraph_vector_int_t partitions_acc;
+    igraph_vector_int_t n_acc;
     igraph_integer_t ptr = 0;
 
-    igraph_integer_t n = igraph_vector_int_size(partitions);
+    igraph_integer_t nn = igraph_vector_int_size(n);
 
-    if (n == 0) {
+    if (nn == 0) {
         igraph_empty(graph, 0, directed);
         if (types) {
             igraph_vector_int_clear(types);
@@ -191,8 +178,8 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    if (n == 1) {
-        igraph_integer_t num = VECTOR(*partitions)[0];
+    if (nn == 1) {
+        igraph_integer_t num = VECTOR(*n)[0];
         igraph_empty(graph, num, directed);
         if (types) {
             IGRAPH_CHECK(igraph_vector_int_resize(types, num));
@@ -204,16 +191,16 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&partitions_acc, n);
-    VECTOR(partitions_acc)[0] = 0;
-    for (igraph_integer_t i = 1; i < n; i++) {
-        IGRAPH_SAFE_ADD(VECTOR(partitions_acc)[i-1], VECTOR(*partitions)[i-1], 
-                    &VECTOR(partitions_acc)[i]);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, nn);
+    VECTOR(n_acc)[0] = 0;
+    for (igraph_integer_t i = 1; i < nn; i++) {
+        IGRAPH_SAFE_ADD(VECTOR(n_acc)[i-1], VECTOR(*n)[i-1],
+                    &VECTOR(n_acc)[i]);
     }
-    IGRAPH_SAFE_ADD(VECTOR(partitions_acc)[n-1], VECTOR(*partitions)[n-1], &no_of_nodes);
+    IGRAPH_SAFE_ADD(VECTOR(n_acc)[nn-1], VECTOR(*n)[nn-1], &no_of_nodes);
 
-    for (igraph_integer_t i = 0; i < n; i++) {
-        igraph_integer_t v = VECTOR(*partitions)[i];
+    for (igraph_integer_t i = 0; i < nn; i++) {
+        igraph_integer_t v = VECTOR(*n)[i];
         igraph_integer_t partial_sum;
         IGRAPH_SAFE_ADD(no_of_nodes, -v, &partial_sum);
         IGRAPH_SAFE_MULT(partial_sum, v, &partial_sum);
@@ -226,12 +213,12 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges);
 
-    for (igraph_integer_t from = 0; from < n-1; from++) {
-        igraph_integer_t edge_from = VECTOR(partitions_acc)[from];
-        for (igraph_integer_t i = 0; i < VECTOR(*partitions)[from]; i++) {
-            for (igraph_integer_t to = from+1; to < n; to++) {
-                igraph_integer_t edge_to = VECTOR(partitions_acc)[to];
-                for (igraph_integer_t j = 0; j < VECTOR(*partitions)[to]; j++) {
+    for (igraph_integer_t from = 0; from < nn-1; from++) {
+        igraph_integer_t edge_from = VECTOR(n_acc)[from];
+        for (igraph_integer_t i = 0; i < VECTOR(*n)[from]; i++) {
+            for (igraph_integer_t to = from+1; to < nn; to++) {
+                igraph_integer_t edge_to = VECTOR(n_acc)[to];
+                for (igraph_integer_t j = 0; j < VECTOR(*n)[to]; j++) {
                     if (!directed || mode == IGRAPH_OUT) {
                         VECTOR(edges)[ptr++] = edge_from;
                         VECTOR(edges)[ptr++] = edge_to++;
@@ -259,7 +246,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
             igraph_integer_t v = 1;
             VECTOR(*types)[0] = 0;
             for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
-                if (v < n && i == VECTOR(partitions_acc)[v]) {
+                if (v < nn && i == VECTOR(n_acc)[v]) {
                     v++;
                 }
                 VECTOR(*types)[i] = v-1;
@@ -268,7 +255,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     }
 
     igraph_vector_int_destroy(&edges);
-    igraph_vector_int_destroy(&partitions_acc);
+    igraph_vector_int_destroy(&n_acc);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
