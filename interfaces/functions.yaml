@@ -1861,6 +1861,9 @@ igraph_all_st_mincuts:
         capacity ON graph, source ON graph, target ON graph,
         cuts ON graph, partition1s ON graph
 
+igraph_even_tarjan_reduction:
+    PARAMS: GRAPH graph, OUT GRAPH graphbar, OPTIONAL OUT VECTOR capacity
+
 igraph_is_separator:
     PARAMS: GRAPH graph, VERTEXSET candidate, OUT BOOLEAN res
     DEPS: candidate ON graph
