@@ -329,6 +329,13 @@ EIGENWHICHPOS:
     CTYPE: igraph_eigen_which_position_t
     FLAGS: ENUM
 
+ERDOS_RENYI_TYPE:
+    # Enum that says wheter a GNM (n vertices, m edges) or
+    # GNP (n vertices, every edge exists with probability p)
+    # graph is created
+    CTYPE: igraph_erdos_renyi_t
+    FLAGS: ENUM
+
 FAS_ALGORITHM:
     # Enum representing feedback arc set algorithms
     CTYPE: igraph_fas_algorithm_t

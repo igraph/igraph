@@ -1011,6 +1011,13 @@ igraph_bipartite_game_gnm:
         INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed,
         NEIMODE mode
 
+igraph_bipartite_game:
+    PARAMS: |-
+        OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types,
+        ERDOS_RENYI_TYPE type, INTEGER n1, INTEGER n2, REAL p,
+        INTEGER m, BOOLEAN directed, NEIMODE mode
+
+
 #######################################
 # Spectral properties
 #######################################
