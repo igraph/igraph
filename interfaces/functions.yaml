@@ -2195,3 +2195,13 @@ igraph_vertex_coloring_greedy:
 
 igraph_convergence_degree:
     PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR in, OUT VECTOR out
+
+#######################################
+# Other functions, documented, graph related
+#######################################
+
+igraph_stochastic_imitation:
+    PARAMS: |-
+        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VECTOR quantities,
+        INOUT VECTOR_INT strategies, NEIMODE mode
+    DEPS: vid ON graph, quantities ON graph, strategies ON graph
