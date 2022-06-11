@@ -1782,6 +1782,9 @@ igraph_compose:
 # Maximum flows, minimum cuts
 #######################################
 
+igraph_gomory_hu_tree:
+    PARAMS: GRAPH graph, OUT GRAPH tree, OPTIONAL OUT VECTOR flows, OPTIONAL EDGE_CAPACITY capactiy
+
 igraph_maxflow:
     PARAMS: |-
         GRAPH graph, OUT REAL value, OPTIONAL OUT VECTOR flow,
