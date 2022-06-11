@@ -65,6 +65,9 @@ igraph_edges:
     PARAMS: GRAPH graph, EDGESET eids, OUT VECTOR_INT edges
     DEPS: eids ON graph
 
+igraph_empty_attrs:
+    PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed, ATTRIBUTES attr
+
 igraph_get_eid:
     PARAMS: |-
         GRAPH graph, OUT EDGE eid, VERTEX from, VERTEX to,
