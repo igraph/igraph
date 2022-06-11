@@ -417,7 +417,7 @@ igraph_get_shortest_path:
         GRAPH graph,
         OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
         VERTEX from, VERTEX to, NEIMODE mode=OUT
-    DEPS: edges ON graph, from ON graph, to ON graph
+    DEPS: from ON graph, to ON graph
 
 igraph_get_shortest_path_bellman_ford:
     PARAMS: |-
