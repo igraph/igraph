@@ -2115,6 +2115,10 @@ igraph_almost_equals:
     PARAMS: DOUBLE a, DOUBLE b, DOUBLE eps
     RETURN: BOOLEAN
 
+igraph_cmp_epsilon:
+    PARAMS: DOUBLE a, DOUBLE b, DOUBLE eps
+    RETURN: INT
+
 #######################################
 # Eulerian functions
 #######################################
