@@ -35,8 +35,9 @@ int main() {
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types);
 
-    igraph_vector_int_clear(&partitions);
-    igraph_vector_int_clear(&types);
+    igraph_vector_int_destroy(&partitions);
+    igraph_vector_int_destroy(&types);
+    igraph_destroy(&g);
 
     printf("\ndirected graph with one partition, 4 vertices:");
     igraph_vector_int_init(&partitions, 1);
@@ -52,8 +53,9 @@ int main() {
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types);
     
-    igraph_vector_int_clear(&partitions);
-    igraph_vector_int_clear(&types);
+    igraph_vector_int_destroy(&partitions);
+    igraph_vector_int_destroy(&types);
+    igraph_destroy(&g);
 
     printf("\ndirected graph with 3 partitions:");
     igraph_vector_int_init(&partitions, 3);
@@ -71,8 +73,9 @@ int main() {
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types);
     
-    igraph_vector_int_clear(&partitions);
-    igraph_vector_int_clear(&types);
+    igraph_vector_int_destroy(&partitions);
+    igraph_vector_int_destroy(&types);
+    igraph_destroy(&g);
 
     printf("\ndirected graph, 4 partitions, mode=IN:");
     igraph_vector_int_init(&partitions, 4);
@@ -91,8 +94,9 @@ int main() {
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types);
     
-    igraph_vector_int_clear(&partitions);
-    igraph_vector_int_clear(&types);
+    igraph_vector_int_destroy(&partitions);
+    igraph_vector_int_destroy(&types);
+    igraph_destroy(&g);
 
     printf("\nUndirected graph, 4 partitions:");
     igraph_vector_int_init(&partitions, 4);
@@ -110,9 +114,6 @@ int main() {
 
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types);
-
-    igraph_vector_int_clear(&partitions);
-    igraph_vector_int_clear(&types);
 
     igraph_vector_int_destroy(&partitions);
     igraph_vector_int_destroy(&types);
