@@ -2104,6 +2104,10 @@ igraph_convex_hull:
 igraph_dim_select:
     PARAMS: VECTOR sv, OUT INTEGER dim
 
+igraph_almost_equals:
+    PARAMS: DOUBLE a, DOUBLE b, DOUBLE eps
+    RETURN: BOOLEAN
+
 #######################################
 # Eulerian functions
 #######################################

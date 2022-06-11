@@ -54,6 +54,10 @@ OUTFILE:
     # A file, already open for writing
     CTYPE: FILE*
 
+DOUBLE:
+    # A C double
+    CTYPE: double
+
 ###############################################################################
 # Vectors, matrices and other template types
 ###############################################################################
