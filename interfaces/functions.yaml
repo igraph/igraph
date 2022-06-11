@@ -412,6 +412,13 @@ igraph_distances:
         VERTEXSET to=ALL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph
 
+igraph_get_shortest_path:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
+        VERTEX from, VERTEX to, NEIMODE mode=OUT
+    DEPS: edges ON graph, from ON graph, to ON graph
+
 igraph_get_shortest_paths:
     PARAMS: |-
         GRAPH graph,
