@@ -2123,13 +2123,13 @@ igraph_eigen_matrix:
     PARAMS: |-
         MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
         EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=igraph.arpack.default,
-        INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT VECTOR vectors
+        INOUT ARPACKSTORAGE storage, OUT VECTOR_COMPLEX values, OUT MATRIX_COMPLEX vectors
 
 igraph_eigen_matrix_symmetric:
     PARAMS: |-
         MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
         EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=igraph.arpack.default,
-        INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT VECTOR vectors
+        INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT MATRIX vectors
 
 #######################################
 # Eulerian functions
