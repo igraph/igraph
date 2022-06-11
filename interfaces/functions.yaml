@@ -2119,6 +2119,18 @@ igraph_cmp_epsilon:
     PARAMS: DOUBLE a, DOUBLE b, DOUBLE eps
     RETURN: INT
 
+igraph_eigen_matrix:
+    PARAMS: |-
+        MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
+        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=igraph.arpack.default,
+        INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT VECTOR vectors
+
+igraph_eigen_matrix_symmetric:
+    PARAMS: |-
+        MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
+        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=igraph.arpack.default,
+        INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT VECTOR vectors
+
 #######################################
 # Eulerian functions
 #######################################
