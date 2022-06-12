@@ -962,6 +962,13 @@ igraph_average_local_efficiency:
         BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: weights ON graph
 
+igraph_sort_vertex_ids_by_degree:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_INDICES outvids, VERTEXSET vids,
+        NEIMODE mode=OUT, BOOLEAN loops=False, ORDER order, BOOLEAN only_indices=False
+    DEPS:
+        vids ON graph
+
 #######################################
 # Degree sequences
 #######################################

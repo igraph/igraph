@@ -393,6 +393,11 @@ OPTIMALITY:
     CTYPE: igraph_optimal_t
     FLAGS: ENUM
 
+ORDER:
+    # Whether ordering should be ascending or descending
+    CTYPE: igraph_order_t
+    FLAGS: ENUM
+
 PAGERANKALGO:
     # Enum that describes the various implementations of the PageRank algorithm
     CTYPE: igraph_pagerank_algo_t
