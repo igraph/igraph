@@ -2357,11 +2357,14 @@ igraph_has_attribute_table:
     RETURN: BOOLEAN
 
 #######################################
-# Progress handling
+# Progress, status handling
 #######################################
 
 igraph_progress:
     PARAMS: CSTRING message, REAL percent, EXTRA data
+
+igraph_status:
+    PARAMS: CSTRING message, EXTRA data
 
 #######################################
 # Other functions, documented, graph related
