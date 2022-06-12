@@ -1129,6 +1129,12 @@ igraph_maximal_cliques:
     PARAMS: GRAPH graph, OUT VERTEXSET_LIST res, INTEGER min_size=0, INTEGER max_size=0
     DEPS: res ON graph
 
+igraph_maximal_cliques_subset:
+    PARAMS: |-
+        GRAPH graph, VECTOR_INT subset, OUT VECTOR_INT_LIST res,
+        OUT INTEGER no, OUTFILE outfile, INTEGER min_size, INTEGER max_size
+    DEPS: res ON graph
+
 igraph_maximal_cliques_callback:
     PARAMS: |-
         GRAPH graph, CLIQUE_FUNC cliquehandler_fn, EXTRA arg,
