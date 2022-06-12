@@ -1555,6 +1555,9 @@ igraph_hrg_create:
     PARAMS: OUT HRG hrg, GRAPH graph, VECTOR prob
     DEPS: prob ON graph
 
+igraph_hrg_resize:
+    PARAMS: INOUT HRG hrg, INTEGER newsize
+
 #######################################
 # Conversion
 #######################################
