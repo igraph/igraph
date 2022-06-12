@@ -2246,6 +2246,9 @@ igraph_vertex_coloring_greedy:
 igraph_convergence_degree:
     PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR in, OUT VECTOR out
 
+igraph_has_attribute_table:
+    RETURN: BOOLEAN
+
 #######################################
 # Other functions, documented, graph related
 #######################################
