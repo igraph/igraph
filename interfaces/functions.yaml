@@ -972,6 +972,9 @@ igraph_sort_vertex_ids_by_degree:
 igraph_transitive_closure_dag:
     PARAMS: GRAPH graph, OUT GRAPH closure
 
+igraph_trussness:
+    PARAMS: GRAPH graph, OUT VECTOR_INT trussness
+
 #######################################
 # Degree sequences
 #######################################
