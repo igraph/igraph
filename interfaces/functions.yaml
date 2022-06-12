@@ -2373,6 +2373,10 @@ igraph_progress:
 igraph_status:
     PARAMS: CSTRING message, EXTRA data
 
+igraph_strerror:
+    PARAMS: ERROR igraph_errno
+    RETURN: CSTRING
+
 #######################################
 # Other functions, documented, graph related
 #######################################
