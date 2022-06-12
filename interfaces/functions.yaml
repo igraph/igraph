@@ -2052,6 +2052,9 @@ igraph_get_isomorphisms_vf2:
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
 
+igraph_subisomorphic:
+    PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso
+
 igraph_subisomorphic_vf2:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
