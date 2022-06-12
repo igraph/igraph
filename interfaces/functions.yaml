@@ -1391,6 +1391,12 @@ igraph_similarity_inverse_log_weighted:
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL
     DEPS: vids ON graph
 
+igraph_similarity_jaccard_pairs:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, VERTEX_INDICES pairs, NEIMODE mode=ALL,
+        BOOLEAN loops=False
+    DEPS: pairs ON graph
+
 #######################################
 # Community structure
 #######################################
