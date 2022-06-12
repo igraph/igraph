@@ -1864,6 +1864,14 @@ igraph_maxflow_value:
 igraph_mincut_value:
     PARAMS: GRAPH graph, OUT REAL res, EDGE_CAPACITY capacity
 
+igraph_st_mincut:
+    PARAMS: |-
+        GRAPH graph, OUT REAL value, OUT EDGESET cut, OUT VERTEXSET partition1, OUT VERTEXSET partion2,
+        VERTEX source, VERTEX target,
+        EDGE_CAPACITY capacity
+    DEPS:
+        source ON graph, target ON graph
+
 igraph_st_mincut_value:
     PARAMS: |-
         GRAPH graph, OUT REAL res, VERTEX source, VERTEX target,
