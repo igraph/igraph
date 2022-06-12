@@ -604,6 +604,19 @@ igraph_personalized_pagerank:
         vids ON graph, weights ON graph, vector ON graph vids,
         options ON algo
 
+igraph_personalized_pagerank_vs:
+    PARAMS: |-
+        GRAPH graph, PAGERANKALGO algo=PRPACK,
+        OUT VERTEX_QTY vector, OUT REAL value,
+        VERTEXSET vids=ALL, BOOLEAN directed=True,
+        REAL damping=0.85,
+        VERTEXSET reset_vids,
+        OPTIONAL EDGEWEIGHTS weights,
+        INOUT PAGERANKOPT options=NULL
+    DEPS: |-
+        vids ON graph, weights ON graph, vector ON graph vids,
+        options ON algo
+
 igraph_rewire:
     PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRING_MODE mode=SIMPLE
 
