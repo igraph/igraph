@@ -1856,6 +1856,12 @@ igraph_residual_graph:
         VECTOR flow
     DEPS: capacity ON graph, flow ON graph
 
+igraph_reverse_residual_graph:
+    PARAMS: |-
+        GRAPH graph, EDGE_CAPACITY capacity, OUT GRAPH residual,
+        VECTOR flow
+    DEPS: capacity ON graph, flow ON graph
+
 igraph_st_mincut:
     PARAMS: |-
         GRAPH graph, OUT REAL value, OUT EDGESET cut,
