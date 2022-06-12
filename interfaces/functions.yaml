@@ -1558,6 +1558,10 @@ igraph_hrg_create:
 igraph_hrg_resize:
     PARAMS: INOUT HRG hrg, INTEGER newsize
 
+igraph_hrg_size:
+    PARAMS: HRG hrg
+    RETURN: INTEGER
+
 #######################################
 # Conversion
 #######################################
