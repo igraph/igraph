@@ -2285,3 +2285,8 @@ igraph_stochastic_imitation:
 
 igraph_expand_path_to_pairs:
     PARAMS: INOUT VERTEX_INDICES path
+
+igraph_moran_process:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights, INOUT VECTOR quantities,
+        INOUT VECTOR_INT strategies, NEIMODE mode
