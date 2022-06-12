@@ -1788,6 +1788,11 @@ igraph_compose:
         OUT INDEX_VECTOR edge_map1, OUT INDEX_VECTOR edge_map2
     DEPS: edge_map1 ON g1, edge_map2 ON g2
 
+igraph_induced_subgraph_map:
+    PARAMS: |-
+        GRAPH graph, VERTEXSET vids, SUBGRAPH_IMPL impl, OPTIONAL OUT VECTOR_INT map,
+        OPTIONAL OUT VECTOR_INT invmap, BOOLEAN map_is_prepared
+
 #######################################
 # Maximum flows, minimum cuts
 #######################################
