@@ -1796,8 +1796,8 @@ igraph_compose:
 
 igraph_induced_subgraph_map:
     PARAMS: |-
-        GRAPH graph, VERTEXSET vids, SUBGRAPH_IMPL impl, OPTIONAL OUT VECTOR_INT map,
-        OPTIONAL OUT VECTOR_INT invmap, BOOLEAN map_is_prepared
+        GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl, OPTIONAL OUT VECTOR_INT map,
+        OPTIONAL OUT VECTOR_INT invmap
 
 #######################################
 # Maximum flows, minimum cuts
