@@ -969,6 +969,9 @@ igraph_sort_vertex_ids_by_degree:
     DEPS:
         vids ON graph
 
+igraph_transitive_closure_dag:
+    PARAMS: GRAPH graph, OUT GRAPH closure
+
 #######################################
 # Degree sequences
 #######################################
