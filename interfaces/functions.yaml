@@ -2404,3 +2404,11 @@ igraph_strerror:
 
 igraph_expand_path_to_pairs:
     PARAMS: INOUT VERTEX_INDICES path
+
+#######################################
+# Meta info
+#######################################
+
+igraph_version:
+    PARAMS: CSTRING_P version_string, OPTIONAL OUT INT major, OPTIONAL OUT INT minor, OPTIONAL OUT INT subminor
+    RETURN: VOID
