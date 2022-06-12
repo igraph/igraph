@@ -1850,6 +1850,12 @@ igraph_mincut:
         GRAPH graph, OUT REAL value, OUT VERTEXSET partition1,
         OUT VERTEXSET partition2, OUT EDGESET cut, OPTIONAL EDGE_CAPACITY capacity
 
+igraph_residual_graph:
+    PARAMS: |-
+        GRAPH graph, EDGE_CAPACITY capacity, OUT GRAPH residual, OUT EDGE_CAPACITY residual_capacity,
+        VECTOR flow
+    DEPS: capacity ON graph, flow ON graph
+
 igraph_st_mincut:
     PARAMS: |-
         GRAPH graph, OUT REAL value, OUT EDGESET cut,
