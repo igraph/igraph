@@ -2346,6 +2346,13 @@ igraph_roulette_wheel_imitation:
     DEPS:
         vid ON graph
 
+igraph_stochastic_imitation:
+    PARAMS: |-
+        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VECTOR quantities, INOUT VECTOR_INT strategies,
+        NEIMODE mode
+    DEPS:
+        vid ON graph
+
 #######################################
 # Other, (yet) undocumented functions
 #######################################
