@@ -2230,6 +2230,9 @@ igraph_eigen_matrix_symmetric:
         EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=igraph.arpack.default,
         INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT MATRIX vectors
 
+igraph_solve_lsap:
+    PARAMS: MATRIX c, INTEGER n, OUT VECTOR_INT p
+
 #######################################
 # Eulerian functions
 #######################################

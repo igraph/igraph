@@ -647,7 +647,7 @@ void preprocess(AP *p) {
  *
  * Time complexity: O(n^3), where n is the number of agents.
  */
-igraph_error_t igraph_solve_lsap(igraph_matrix_t *c, igraph_integer_t n,
+igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
                       igraph_vector_int_t *p) {
     AP *ap;
 
