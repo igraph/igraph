@@ -1381,6 +1381,12 @@ igraph_similarity_dice_es:
         BOOLEAN loops=False
     DEPS: es ON graph
 
+igraph_similarity_dice_pairs:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, VERTEX_INDICES pairs, NEIMODE mode=ALL,
+        BOOLEAN loops=False
+    DEPS: pairs ON graph
+
 igraph_similarity_inverse_log_weighted:
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL
     DEPS: vids ON graph
