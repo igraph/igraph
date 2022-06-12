@@ -2283,6 +2283,34 @@ igraph_vertex_coloring_greedy:
     DEPS: colors ON graph
 
 #######################################
+# Microscopic update
+#######################################
+
+igraph_deterministic_optimal_imitation:
+    PARAMS: |-
+        GRAPH graph, VERTEX vid, OPTIMALITY optimality, VECTOR quantities,
+        INOUT VECTOR_INT strategies, NEIMODE mode
+    DEPS: vid ON graph, quantities ON graph, strategies ON graph
+
+igraph_stochastic_imitation:
+    PARAMS: |-
+        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VECTOR quantities,
+        INOUT VECTOR_INT strategies, NEIMODE mode
+    DEPS: vid ON graph, quantities ON graph, strategies ON graph
+
+igraph_moran_process:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights, INOUT VECTOR quantities,
+        INOUT VECTOR_INT strategies, NEIMODE mode
+
+igraph_roulette_wheel_imitation:
+    PARAMS: |-
+        GRAPH graph, VERTEX vid, BOOLEAN islocal, VECTOR quantities, INOUT VECTOR_INT strategies,
+        NEIMODE mode
+    DEPS:
+        vid ON graph
+
+#######################################
 # Other, (yet) undocumented functions
 #######################################
 
@@ -2303,22 +2331,5 @@ igraph_progress:
 # Other functions, documented, graph related
 #######################################
 
-igraph_deterministic_optimal_imitation:
-    PARAMS: |-
-        GRAPH graph, VERTEX vid, OPTIMALITY optimality, VECTOR quantities,
-        INOUT VECTOR_INT strategies, NEIMODE mode
-    DEPS: vid ON graph, quantities ON graph, strategies ON graph
-
-igraph_stochastic_imitation:
-    PARAMS: |-
-        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VECTOR quantities,
-        INOUT VECTOR_INT strategies, NEIMODE mode
-    DEPS: vid ON graph, quantities ON graph, strategies ON graph
-
 igraph_expand_path_to_pairs:
     PARAMS: INOUT VERTEX_INDICES path
-
-igraph_moran_process:
-    PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights, INOUT VECTOR quantities,
-        INOUT VECTOR_INT strategies, NEIMODE mode
