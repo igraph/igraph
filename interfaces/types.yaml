@@ -46,10 +46,6 @@ CSTRING:
     # A null-terminated immutable C string
     CTYPE: const char*
 
-CSTRING_P:
-    # Pointer to null-terminated immutable C string
-    CTYPE: const char**
-
 INFILE:
     # A file, already open for reading
     CTYPE: FILE*

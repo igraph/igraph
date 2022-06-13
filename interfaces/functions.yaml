@@ -615,7 +615,7 @@ igraph_personalized_pagerank_vs:
         VERTEXSET vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85,
         VERTEXSET reset_vids,
-        OPTIONAL EDGEWEIGHTS weights,
+        OPTIONAL EDGEWEIGHTS weights=NULL,
         INOUT PAGERANKOPT options=NULL
     DEPS: |-
         vids ON graph, weights ON graph, vector ON graph vids,
@@ -969,7 +969,8 @@ igraph_average_local_efficiency:
 igraph_sort_vertex_ids_by_degree:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES outvids, VERTEXSET vids,
-        NEIMODE mode=OUT, BOOLEAN loops=False, ORDER order, BOOLEAN only_indices=False
+        NEIMODE mode=OUT, BOOLEAN loops=False, ORDER order=ASCENDING,
+        BOOLEAN only_indices=False
     DEPS:
         vids ON graph
 
@@ -1064,20 +1065,20 @@ igraph_is_bipartite:
 igraph_bipartite_game_gnp:
     PARAMS: |-
         OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types,
-        INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed,
-        NEIMODE mode
+        INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed=False,
+        NEIMODE mode=ALL
 
 igraph_bipartite_game_gnm:
     PARAMS: |-
         OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types,
-        INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed,
-        NEIMODE mode
+        INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed=False,
+        NEIMODE mode=ALL
 
 igraph_bipartite_game:
     PARAMS: |-
         OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types,
-        ERDOS_RENYI_TYPE type, INTEGER n1, INTEGER n2, REAL p,
-        INTEGER m, BOOLEAN directed, NEIMODE mode
+        ERDOS_RENYI_TYPE type, INTEGER n1, INTEGER n2, REAL p=0.0,
+        INTEGER m=0, BOOLEAN directed=False, NEIMODE mode=ALL
 
 
 #######################################
@@ -1161,8 +1162,8 @@ igraph_maximal_cliques:
 
 igraph_maximal_cliques_subset:
     PARAMS: |-
-        GRAPH graph, VECTOR_INT subset, OUT VECTOR_INT_LIST res,
-        OUT INTEGER no, OUTFILE outfile, INTEGER min_size, INTEGER max_size
+        GRAPH graph, VERTEX_INDICES subset, OUT VERTEXSET_LIST res,
+        OUT INTEGER no, OUTFILE outfile=NULL, INTEGER min_size=0, INTEGER max_size=0
     DEPS: res ON graph
 
 igraph_maximal_cliques_callback:
@@ -1844,15 +1845,17 @@ igraph_compose:
 
 igraph_induced_subgraph_map:
     PARAMS: |-
-        GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl, OPTIONAL OUT VECTOR_INT map,
-        OPTIONAL OUT VECTOR_INT invmap
+        GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl,
+        OPTIONAL OUT INDEX_VECTOR map, OPTIONAL OUT INDEX_VECTOR invmap
+    DEPS: vids ON graph
 
 #######################################
 # Maximum flows, minimum cuts
 #######################################
 
 igraph_gomory_hu_tree:
-    PARAMS: GRAPH graph, OUT GRAPH tree, OPTIONAL OUT VECTOR flows, OPTIONAL EDGE_CAPACITY capactiy
+    PARAMS: GRAPH graph, OUT GRAPH tree, OPTIONAL OUT VECTOR flows, OPTIONAL EDGE_CAPACITY capacity
+    DEPS: capacity ON graph
 
 igraph_maxflow:
     PARAMS: |-
@@ -1869,34 +1872,39 @@ igraph_maxflow_value:
     PARAMS: |-
         GRAPH graph, OUT REAL value, VERTEX source, VERTEX target,
         OPTIONAL EDGE_CAPACITY capacity, OPTIONAL OUT MAXFLOW_STATS stats
-    DEPS: source ON graph, target ON graph
+    DEPS: source ON graph, target ON graph, capacity ON graph
 
 igraph_mincut_value:
-    PARAMS: GRAPH graph, OUT REAL res, EDGE_CAPACITY capacity
+    PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_CAPACITY capacity
+    DEPS:
+        capacity ON graph
 
 igraph_st_mincut:
     PARAMS: |-
-        GRAPH graph, OUT REAL value, OUT EDGESET cut, OUT VERTEXSET partition1, OUT VERTEXSET partion2,
+        GRAPH graph, OUT REAL value, OUT EDGESET cut,
+        OUT VERTEXSET partition1, OUT VERTEXSET partition2,
         VERTEX source, VERTEX target,
-        EDGE_CAPACITY capacity
+        OPTIONAL EDGE_CAPACITY capacity
     DEPS:
-        source ON graph, target ON graph
+        source ON graph, target ON graph, capacity ON graph
 
 igraph_st_mincut_value:
     PARAMS: |-
         GRAPH graph, OUT REAL res, VERTEX source, VERTEX target,
-        EDGE_CAPACITY capacity
-    DEPS: source ON graph, target ON graph
+        OPTIONAL EDGE_CAPACITY capacity
+    DEPS: source ON graph, target ON graph, capacity ON graph
 
 igraph_mincut:
     PARAMS: |-
         GRAPH graph, OUT REAL value, OUT VERTEXSET partition1,
-        OUT VERTEXSET partition2, OUT EDGESET cut, OPTIONAL EDGE_CAPACITY capacity
+        OUT VERTEXSET partition2, OUT EDGESET cut,
+        OPTIONAL EDGE_CAPACITY capacity
+    DEPS: capacity ON graph
 
 igraph_residual_graph:
     PARAMS: |-
-        GRAPH graph, EDGE_CAPACITY capacity, OUT GRAPH residual, OUT EDGE_CAPACITY residual_capacity,
-        VECTOR flow
+        GRAPH graph, EDGE_CAPACITY capacity, OUT GRAPH residual,
+        OUT EDGE_CAPACITY residual_capacity, VECTOR flow
     DEPS: capacity ON graph, flow ON graph
 
 igraph_reverse_residual_graph:
@@ -2414,5 +2422,7 @@ igraph_expand_path_to_pairs:
 #######################################
 
 igraph_version:
-    PARAMS: CSTRING_P version_string, OPTIONAL OUT INT major, OPTIONAL OUT INT minor, OPTIONAL OUT INT subminor
+    PARAMS: |-
+        OPTIONAL OUT CSTRING version_string, OPTIONAL OUT INT major,
+        OPTIONAL OUT INT minor, OPTIONAL OUT INT subminor
     RETURN: VOID
