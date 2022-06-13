@@ -54,6 +54,14 @@ OUTFILE:
     # A file, already open for writing
     CTYPE: FILE*
 
+DOUBLE:
+    # A C double
+    CTYPE: double
+
+VOID:
+    # C void
+    CTYPE: void
+
 ###############################################################################
 # Vectors, matrices and other template types
 ###############################################################################
@@ -325,6 +333,13 @@ EIGENWHICHPOS:
     CTYPE: igraph_eigen_which_position_t
     FLAGS: ENUM
 
+ERDOS_RENYI_TYPE:
+    # Enum that says wheter a GNM (n vertices, m edges) or
+    # GNP (n vertices, every edge exists with probability p)
+    # graph is created
+    CTYPE: igraph_erdos_renyi_t
+    FLAGS: ENUM
+
 FAS_ALGORITHM:
     # Enum representing feedback arc set algorithms
     CTYPE: igraph_fas_algorithm_t
@@ -338,6 +353,11 @@ GETADJACENCY:
 GREEDY_COLORING_HEURISTIC:
     # Enum representing different heuristics for a greedy vertex coloring
     CTYPE: igraph_coloring_greedy_t
+    FLAGS: ENUM
+
+IMITATE_ALGORITHM:
+    # This enum controls which algorithm to use in stochastic imitation
+    CTYPE: igraph_imitate_algorithm_t
     FLAGS: ENUM
 
 LAPLACIAN_NORMALIZATION:
@@ -370,6 +390,16 @@ NEIMODE:
     # Enum that describes how a particular function should take into account
     # the neighbors of vertices
     CTYPE: igraph_neimode_t
+    FLAGS: ENUM
+
+OPTIMALITY:
+    # This enum controls which algorithm to use in deterministic optimal imitation
+    CTYPE: igraph_optimal_t
+    FLAGS: ENUM
+
+ORDER:
+    # Whether ordering should be ascending or descending
+    CTYPE: igraph_order_t
     FLAGS: ENUM
 
 PAGERANKALGO:
