@@ -40,20 +40,20 @@ __BEGIN_DECLS
  * Do not attempt to access them using a separate copy of the CXSparse library.
  * Use the public igraph_sparsemat_... types instead.
  */
-struct cs_dl_sparse;
-struct cs_dl_symbolic;
-struct cs_dl_numeric;
+struct cs_igraph_sparse;
+struct cs_igraph_symbolic;
+struct cs_igraph_numeric;
 
 typedef struct {
-    struct cs_dl_sparse *cs;
+    struct cs_igraph_sparse *cs;
 } igraph_sparsemat_t;
 
 typedef struct {
-    struct cs_dl_symbolic *symbolic;
+    struct cs_igraph_symbolic *symbolic;
 } igraph_sparsemat_symbolic_t;
 
 typedef struct {
-    struct cs_dl_numeric *numeric;
+    struct cs_igraph_numeric *numeric;
 } igraph_sparsemat_numeric_t;
 
 typedef enum { IGRAPH_SPARSEMAT_TRIPLET,

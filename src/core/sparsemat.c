@@ -34,19 +34,6 @@
 #include <limits.h>
 #include <string.h>
 
-/*
- * We have modified SuiteSparse_config.h (which CXSparse includes) to always
- * define cs_long_t to igraph_integer_t so we can safely use the cs_dl_*
- * variants in this file and be sure that it uses the correct integer size
- * for igraph (64-bit or 32-bit, depending on how the user configured it).
- * The downside is that we cannot use an external CXSparse because that may
- * use a different bit width for cs_long_t.
- */
-
-#ifndef CS_LONG
-#  define CS_LONG 1
-#endif
-
 #include <cs/cs.h>
 #undef cs  /* because otherwise it messes up the name of the 'cs' member in igraph_sparsemat_t */
 
@@ -3105,7 +3092,7 @@ igraph_error_t igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 igraph_error_t igraph_sparsemat_view(igraph_sparsemat_t *A, igraph_integer_t nzmax, igraph_integer_t m, igraph_integer_t n,
                           igraph_integer_t *p, igraph_integer_t *i, igraph_real_t *x, igraph_integer_t nz) {
 
-    A->cs = IGRAPH_CALLOC(1, cs_dl);
+    A->cs = IGRAPH_CALLOC(1, cs_igraph);
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;
