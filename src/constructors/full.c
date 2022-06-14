@@ -141,8 +141,8 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * \param graph Pointer to an igraph_t object, the graph will be
  *   created here.
  * \param types Pointer to an int vector. If not a null pointer,
- *   it contains information about the vertex types
- * \param n Pointer to an int vector, the number of types
+ *   it contains information about the vertex types.
+ * \param n Pointer to an int vector, the number of types.
  * \param directed Boolean, whether to create a directed graph.
  * \param mode A constant that gives the type of connections for
  *   directed graphs. If \c IGRAPH_OUT, then edges point from vertices
@@ -154,7 +154,7 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  *
- * \sa \ref igraph_full_bipartite() for bipartite full graphs.
+ * \sa \ref igraph_full_bipartite() for full bipartite graphs.
  */
 igraph_error_t igraph_full_multipartite(igraph_t *graph,
                           igraph_vector_int_t *types,
@@ -258,6 +258,72 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     igraph_vector_int_destroy(&n_acc);
     IGRAPH_FINALLY_CLEAN(2);
 
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_turan
+ * \brief Create a turan network.
+ *
+ * Turan networks are full multipartite networks with the property
+ * that the sizes of the subsets are as close to equal as possible.
+ *
+ * The function only returns an undirected graph. An empty graph is 
+ * returned when the number of vertices are zero or when the number
+ * of partitions are zero. A graph with one partition is returned if
+ * the number of partitions are greater than the number of vertices.
+ * 
+ * \param graph Pointer to an igraph_t object, the graph will be
+ *   created here.
+ * \param types Pointer to an int vector. If not a null pointer,
+ *   it contains information about the vertex types.
+ * \param n Integer, the number of vertices in the graph.
+ * \param r Integer, the number of parititons of the graph.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ *
+ * \sa \ref igraph_full_multipartite() for full multipartite graphs.
+ */
+igraph_error_t igraph_turan(igraph_t *graph,
+                          igraph_vector_int_t *types,
+                          igraph_integer_t n,
+                          igraph_integer_t r) {
+    igraph_integer_t quotient;
+    igraph_integer_t remainder;
+    igraph_vector_int_t subsets;
+
+    if (n == 0 || r == 0) {
+        igraph_empty(graph, 0, IGRAPH_UNDIRECTED);
+        if (types) {
+            igraph_vector_int_clear(types);
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    if (r > n) {
+        r = 1;
+    }
+
+    quotient = n / r;
+    remainder = n % r;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&subsets, r);
+    for (igraph_integer_t i = 0; i < r-1; i++) {
+        VECTOR(subsets)[i] = quotient;
+    }
+
+    if (remainder == 0) {
+        VECTOR(subsets)[r-1] = quotient;
+    } else {
+        IGRAPH_SAFE_ADD(quotient, remainder, &VECTOR(subsets)[r-1]);
+    }
+
+    IGRAPH_CHECK(igraph_full_multipartite(graph, types, &subsets,
+            IGRAPH_UNDIRECTED, IGRAPH_ALL));
+    igraph_vector_int_destroy(&subsets);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
 
