@@ -211,21 +211,22 @@ void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_t size) {
+igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_t capacity) {
     igraph_integer_t actual_size = igraph_vector_ptr_size(v);
     void **tmp;
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(capacity >= 0);
 
-    if (size <= igraph_vector_ptr_size(v)) {
+    if (capacity <= igraph_vector_ptr_size(v)) {
         return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) size, void*);
+    tmp = IGRAPH_REALLOC(v->stor_begin, (size_t) capacity, void*);
     IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for pointer vector.");
 
     v->stor_begin = tmp;
-    v->stor_end = v->stor_begin + size;
+    v->stor_end = v->stor_begin + capacity;
     v->end = v->stor_begin + actual_size;
 
     return IGRAPH_SUCCESS;
