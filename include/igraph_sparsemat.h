@@ -61,7 +61,7 @@ typedef enum { IGRAPH_SPARSEMAT_TRIPLET,
              } igraph_sparsemat_type_t;
 
 typedef struct {
-    igraph_sparsemat_t *mat;
+    const igraph_sparsemat_t *mat;
     igraph_integer_t pos;
     igraph_integer_t col;
 } igraph_sparsemat_iterator_t;
@@ -94,6 +94,9 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_permute(const igraph_sparsemat_t *
                                            const igraph_vector_int_t *q,
                                            igraph_sparsemat_t *res);
 
+IGRAPH_EXPORT igraph_real_t igraph_sparsemat_get(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_index(const igraph_sparsemat_t *A,
                                          const igraph_vector_int_t *p,
                                          const igraph_vector_int_t *q,
@@ -283,8 +286,9 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_normalize_cols(igraph_sparsemat_t 
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_normalize_rows(igraph_sparsemat_t *sparsemat,
                                                   igraph_bool_t allow_zeros);
 
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
-                                                 igraph_sparsemat_t *sparsemat);
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_init(
+    igraph_sparsemat_iterator_t *it, const igraph_sparsemat_t *sparsemat
+);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_bool_t igraph_sparsemat_iterator_end(const igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it);

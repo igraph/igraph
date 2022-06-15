@@ -42,6 +42,13 @@
  */
 #define STATIC_ASSERT(condition) ((void)sizeof(char[1 - 2*!(condition)]))
 
+/* Returns the number of potential nonzero elements in the given sparse matrix.
+ * The returned value can be used to iterate over A->cs->x no matter whether the
+ * matrix is in triplet or column-compressed form */
+static CS_INT igraph_i_sparsemat_count_elements(const igraph_sparsemat_t* A) {
+    return A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
+}
+
 /**
  * \section about_sparsemat About sparse matrices
  *
@@ -262,7 +269,7 @@ igraph_integer_t igraph_sparsemat_ncol(const igraph_sparsemat_t *A) {
  */
 
 igraph_sparsemat_type_t igraph_sparsemat_type(const igraph_sparsemat_t *A) {
-    return A->cs->nz < 0 ? IGRAPH_SPARSEMAT_CC : IGRAPH_SPARSEMAT_TRIPLET;
+    return igraph_sparsemat_is_cc(A) ? IGRAPH_SPARSEMAT_CC : IGRAPH_SPARSEMAT_TRIPLET;
 }
 
 /**
@@ -596,6 +603,75 @@ igraph_error_t igraph_sparsemat_compress(const igraph_sparsemat_t *A,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_real_t igraph_i_sparsemat_get_cc(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+) {
+    /* elements in column 'col' are at indices
+     * A->cs->p[col] .. A->cs->p[col+1] (open from right) in
+     * A->cs->x .
+     *
+     * Their corresponding row indices are in A->cs->i .
+     */
+
+    CS_INT lo = A->cs->p[col];
+    CS_INT hi = A->cs->p[col + 1];
+    igraph_real_t result = 0.0;
+
+    /* TODO: this could be faster with binary search if A->cs->i
+     * is sorted, which I think should be */
+    for (; lo < hi; lo++) {
+        if (A->cs->i[lo] == row) {
+            result += A->cs->x[lo];
+        }
+    }
+
+    return result;
+}
+
+static igraph_real_t igraph_i_sparsemat_get_triplet(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+) {
+    igraph_sparsemat_iterator_t it;
+    igraph_real_t result = 0.0;
+
+    igraph_sparsemat_iterator_init(&it, A);
+    while (!igraph_sparsemat_iterator_end(&it)) {
+        if (
+            igraph_sparsemat_iterator_row(&it) == row &&
+            igraph_sparsemat_iterator_col(&it) == col
+        ) {
+            result += igraph_sparsemat_iterator_get(&it);
+        }
+        igraph_sparsemat_iterator_next(&it);
+    }
+
+    return result;
+}
+
+/**
+ * \function igraph_sparsemat_get
+ * \brief Return the value of a single element from a sparse matrix.
+ *
+ * \param A The input matrix, in triplet or column-compressed format.
+ * \param row The row index
+ * \param col The column index
+ * \return The value of the cell with the given row and column indices in the
+ *         matrix; zero if the indices are out of bounds.
+ *
+ * Time complexity: TODO.
+ */
+igraph_real_t igraph_sparsemat_get(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+) {
+    if (row < 0 || col < 0 || row >= A->cs->m || col >= A->cs->n) {
+        return 0.0;
+    } else if (igraph_sparsemat_is_cc(A)) {
+        return igraph_i_sparsemat_get_cc(A, row, col);
+    } else {
+        return igraph_i_sparsemat_get_triplet(A, row, col);
+    }
+}
+
 /**
  * \function igraph_sparsemat_transpose
  * \brief Transposes a sparse matrix.
@@ -615,7 +691,7 @@ igraph_error_t igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
                                igraph_sparsemat_t *res,
                                igraph_bool_t store_values) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         /* column-compressed */
         res->cs = cs_transpose(A->cs, store_values);
         if (!res->cs) {
@@ -685,7 +761,7 @@ igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
      * ignored here; this should be fixed. Right now these functions don't
      * change 'res' if they fail so we will report matrices as not being
      * symmetric if an error happens */
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         igraph_i_sparsemat_is_symmetric_cc(A, &res);
     } else {
         igraph_i_sparsemat_is_symmetric_triplet(A, &res);
@@ -1217,7 +1293,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
 igraph_error_t igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
                      igraph_bool_t directed) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         return (igraph_i_sparsemat_cc(graph, A, directed));
     } else {
         return (igraph_i_sparsemat_triplet(graph, A, directed));
@@ -1285,7 +1361,7 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
 
     igraph_vector_int_t edges;
     igraph_vector_t weights;
-    CS_INT pot_edges = A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
+    CS_INT pot_edges = igraph_i_sparsemat_count_elements(A);
     const char* default_attr = "weight";
     igraph_vector_ptr_t attr_vec;
     igraph_attribute_record_t attr_rec;
@@ -1299,7 +1375,7 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
     IGRAPH_VECTOR_INIT_FINALLY(&weights, pot_edges);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&attr_vec, 1);
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         IGRAPH_CHECK(igraph_i_weighted_sparsemat_cc(A, directed, attr, loops,
                      &edges, &weights));
     } else {
@@ -1352,7 +1428,7 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
 igraph_error_t igraph_sparsemat_print(const igraph_sparsemat_t *A,
                            FILE *outstream) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         /* CC */
         CS_INT j, p;
         for (j = 0; j < A->cs->n; j++) {
@@ -2137,7 +2213,7 @@ igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A) {
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return IGRAPH_NEGINFINITY;
     }
@@ -2173,7 +2249,7 @@ igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A) {
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return IGRAPH_POSINFINITY;
     }
@@ -2209,7 +2285,7 @@ igraph_error_t igraph_sparsemat_minmax(igraph_sparsemat_t *A,
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         *min = IGRAPH_POSINFINITY;
         *max = IGRAPH_NEGINFINITY;
@@ -2244,7 +2320,7 @@ igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return 0;
     }
@@ -2278,7 +2354,7 @@ igraph_integer_t igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return 0;
     }
@@ -2775,8 +2851,7 @@ igraph_error_t igraph_sparsemat_colsums(const igraph_sparsemat_t *A,
 igraph_error_t igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by) {
 
     CS_ENTRY *px = A->cs->x;
-    CS_INT n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
-    CS_ENTRY *stop = px + n;
+    CS_ENTRY *stop = px + igraph_i_sparsemat_count_elements(A);
 
     for (; px < stop; px++) {
         *px *= by;
@@ -2855,7 +2930,7 @@ igraph_error_t igraph_sparsemat_add_cols(igraph_sparsemat_t *A, igraph_integer_t
 igraph_error_t igraph_sparsemat_resize(igraph_sparsemat_t *A, igraph_integer_t nrow,
                             igraph_integer_t ncol, igraph_integer_t nzmax) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         igraph_sparsemat_t tmp;
         IGRAPH_CHECK(igraph_sparsemat_init(&tmp, nrow, ncol, nzmax));
         igraph_sparsemat_destroy(A);
@@ -2886,11 +2961,7 @@ igraph_error_t igraph_sparsemat_resize(igraph_sparsemat_t *A, igraph_integer_t n
  */
 
 igraph_integer_t igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
-    if (A->cs->nz < 0) {
-        return A->cs->p[A->cs->n];
-    } else {
-        return A->cs->nz;
-    }
+    return igraph_i_sparsemat_count_elements(A);
 }
 
 igraph_error_t igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
@@ -2921,7 +2992,7 @@ igraph_error_t igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
                                 const igraph_vector_t *fact) {
     CS_INT *i = A->cs->i;
     CS_ENTRY *x = A->cs->x;
-    CS_INT no_of_edges = A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
+    CS_INT no_of_edges = igraph_i_sparsemat_count_elements(A);
     CS_INT e;
 
     for (e = 0; e < no_of_edges; e++, x++, i++) {
@@ -2969,7 +3040,7 @@ static igraph_error_t igraph_i_sparsemat_scale_cols_triplet(igraph_sparsemat_t *
 
 igraph_error_t igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
                                 const igraph_vector_t *fact) {
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         return igraph_i_sparsemat_scale_cols_cc(A, fact);
     } else {
         return igraph_i_sparsemat_scale_cols_triplet(A, fact);
@@ -3148,7 +3219,7 @@ igraph_error_t igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
                                         igraph_vector_int_t *i,
                                         igraph_vector_int_t *j,
                                         igraph_vector_t *x) {
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         igraph_sparsemat_t tmp;
         IGRAPH_CHECK(igraph_sparsemat_sort(A, &tmp));
         IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
@@ -3167,7 +3238,8 @@ igraph_integer_t igraph_sparsemat_nzmax(const igraph_sparsemat_t *A) {
 }
 
 igraph_error_t igraph_sparsemat_neg(igraph_sparsemat_t *A) {
-    CS_INT i, nz = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    CS_INT i;
+    CS_INT nz = igraph_i_sparsemat_count_elements(A);
     CS_ENTRY *px = A->cs->x;
 
     for (i = 0; i < nz; i++, px++) {
@@ -3263,7 +3335,8 @@ igraph_error_t igraph_sparsemat_normalize_rows(
  */
 
 igraph_error_t igraph_sparsemat_iterator_init(
-    igraph_sparsemat_iterator_t *it, igraph_sparsemat_t *sparsemat) {
+    igraph_sparsemat_iterator_t *it, const igraph_sparsemat_t *sparsemat
+) {
 
     it->mat = sparsemat;
     igraph_sparsemat_iterator_reset(it);

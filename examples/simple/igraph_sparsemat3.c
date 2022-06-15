@@ -216,7 +216,9 @@ int main() {
         return 3;
     }
 
-    /* A single element */
+    igraph_sparsemat_destroy(&A);
+
+    /* Getting single elements with index() */
 
     igraph_vector_int_resize(&p, 1);
     igraph_vector_int_resize(&q, 1);
@@ -231,7 +233,20 @@ int main() {
         }
     }
 
-    igraph_sparsemat_destroy(&A);
+    /* Getting single elements with get() */
+
+    igraph_vector_int_resize(&p, 1);
+    igraph_vector_int_resize(&q, 1);
+
+    for (i = 0; i < 100; i++) {
+        igraph_integer_t row = RNG_INTEGER(0, NROW - 1);
+        igraph_integer_t col = RNG_INTEGER(0, NCOL - 1);
+        if (igraph_sparsemat_get(&B, row, col) != MATRIX(M, row, col)) {
+            return 4;
+        }
+    }
+
+    /* Getting submatrices with index() */
 
     for (i = 0; i < 100; i++) {
         igraph_real_t value;
