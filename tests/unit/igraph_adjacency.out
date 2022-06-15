@@ -106,8 +106,6 @@ vcount: 3
 edges: {
 0 1
 0 1
-0 1
-1 2
 1 2
 1 2
 1 2
@@ -124,8 +122,6 @@ edges: {
 0 0
 0 1
 0 1
-0 1
-1 2
 1 2
 1 2
 1 2
@@ -146,8 +142,6 @@ edges: {
 0 0
 0 1
 0 1
-0 1
-1 2
 1 2
 1 2
 1 2
@@ -455,3 +449,5 @@ Check handling of negative number of edges error.
 Check handling of odd number in diagonal.
 
 Check handling of invalid adjacency mode.
+
+Check handling of non-symmetric matrix for IGRAPH_ADJ_UNDIRECTED.
