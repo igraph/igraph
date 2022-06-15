@@ -594,9 +594,8 @@ Some of the highlights are:
    `igraph_blas_dgemv_array()` thus now return an `igraph_error_t`, which may be
    set to `IGRAPH_EOVERFLOW` if the input vectors or matrices are too large.
 
- - `igraph_sparsemat_transpose()` now takes an `igraph_bool_t` as its `values`
-   argument instead of an `int`. In practice, it has always been treated as a
-   boolean.
+ - The `values` argument of `igraph_sparsemat_transpose()` was removed; now the
+   function always copies the values over to the transposed matrix.
 
  - `igraph_sparsemat_cholsol()`, `igraph_sparsemat_lusol()`, `igraph_sparsemat_symbqr`
    and `igraph_sparsemat_symblu` now take an `igraph_integer_t` as their `order` parameter.

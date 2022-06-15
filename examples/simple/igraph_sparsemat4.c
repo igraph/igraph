@@ -131,7 +131,7 @@ int main() {
     igraph_vector_init(&x, DIM);
     igraph_sparsemat_ltsolve(&B, &b, &x);
 
-    igraph_sparsemat_transpose(&B, &A, /*values=*/ 1);
+    igraph_sparsemat_transpose(&B, &A);
     if (! check_solution(&A, &x, &b)) {
         return 2;
     }
@@ -161,7 +161,7 @@ int main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
     igraph_sparsemat_dupl(&B);
-    igraph_sparsemat_transpose(&B, &A, /*values=*/ 1);
+    igraph_sparsemat_transpose(&B, &A);
 
     igraph_vector_init(&b, DIM);
     for (i = 0; i < DIM; i++) {
@@ -200,7 +200,7 @@ int main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
     igraph_sparsemat_dupl(&B);
-    igraph_sparsemat_transpose(&B, &A, /*values=*/ 1);
+    igraph_sparsemat_transpose(&B, &A);
     igraph_sparsemat_destroy(&B);
 
     igraph_vector_init(&b, DIM);
@@ -211,7 +211,7 @@ int main() {
     igraph_vector_init(&x, DIM);
     igraph_sparsemat_utsolve(&A, &b, &x);
 
-    igraph_sparsemat_transpose(&A, &B, /*values=*/ 1);
+    igraph_sparsemat_transpose(&A, &B);
     if (! check_solution(&B, &x, &b)) {
         return 4;
     }
@@ -244,7 +244,7 @@ int main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
     igraph_sparsemat_dupl(&B);
-    igraph_sparsemat_transpose(&B, &A, /*values=*/ 1);
+    igraph_sparsemat_transpose(&B, &A);
     igraph_sparsemat_multiply(&A, &B, &C);
     igraph_sparsemat_destroy(&A);
     igraph_sparsemat_destroy(&B);

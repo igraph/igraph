@@ -679,21 +679,18 @@ igraph_real_t igraph_sparsemat_get(
  * \param A The input matrix, column-compressed or triple format.
  * \param res Pointer to an uninitialized sparse matrix, the result is
  *    stored here.
- * \param values If this is non-zero, the matrix transpose is
- *    calculated the normal way. If it is zero, then only the pattern
- *    of the input matrix is stored in the result, the values are not.
  * \return Error code.
  *
  * Time complexity: TODO.
  */
 
-igraph_error_t igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
-                               igraph_sparsemat_t *res,
-                               igraph_bool_t store_values) {
+igraph_error_t igraph_sparsemat_transpose(
+    const igraph_sparsemat_t *A, igraph_sparsemat_t *res
+) {
 
     if (igraph_sparsemat_is_cc(A)) {
         /* column-compressed */
-        res->cs = cs_transpose(A->cs, store_values);
+        res->cs = cs_transpose(A->cs, /* values = */ 1);
         if (!res->cs) {
             IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
         }
@@ -713,14 +710,14 @@ static igraph_error_t igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_
     igraph_bool_t res;
     igraph_integer_t nz;
 
-    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &t, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &t));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &t);
     IGRAPH_CHECK(igraph_sparsemat_dupl(&t));
-    IGRAPH_CHECK(igraph_sparsemat_transpose(&t, &tt, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(&t, &tt));
     igraph_sparsemat_destroy(&t);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &tt);
-    IGRAPH_CHECK(igraph_sparsemat_transpose(&tt, &t, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(&tt, &t));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &t);
 
     nz = t.cs->p[t.cs->n];
@@ -3180,9 +3177,9 @@ igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
 
     igraph_sparsemat_t tmp;
 
-    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &tmp, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &tmp));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
-    IGRAPH_CHECK(igraph_sparsemat_transpose(&tmp, sorted, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(&tmp, sorted));
     igraph_sparsemat_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
 
