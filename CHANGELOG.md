@@ -759,6 +759,7 @@ Some of the highlights are:
  - `igraph_matrix_complex_create()` and `igraph_matrix_complex_create_polar()` now set their sizes correctly.
  - The core data structures (vector, etc.) have overflow checks now.
  - Deterministic graph generators have overflow checks now.
+ - `igraph_sparsemat_getelements_sorted()` did not sort the elements for triplet matrices correctly; this is fixed now.
 
 ### Deprecated
 

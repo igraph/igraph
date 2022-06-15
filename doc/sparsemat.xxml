@@ -29,6 +29,7 @@
 <!-- doxrox-include igraph_sparsemat_is_triplet -->
 <!-- doxrox-include igraph_sparsemat_is_cc -->
 <!-- doxrox-include igraph_sparsemat_get -->
+<!-- doxrox-include igraph_sparsemat_getelements -->
 <!-- doxrox-include igraph_sparsemat_getelements_sorted -->
 <!-- doxrox-include igraph_sparsemat_min -->
 <!-- doxrox-include igraph_sparsemat_max -->
@@ -54,6 +55,7 @@
 <!-- doxrox-include igraph_sparsemat_add_rows -->
 <!-- doxrox-include igraph_sparsemat_add_cols -->
 <!-- doxrox-include igraph_sparsemat_resize -->
+<!-- doxrox-include igraph_sparsemat_sort -->
 </section>
 
 <section id="operations-on_sparse_matrix_iterators"><title>Operations on sparse matrix iterators</title>

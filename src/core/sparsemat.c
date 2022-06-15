@@ -2961,6 +2961,33 @@ igraph_integer_t igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
     return igraph_i_sparsemat_count_elements(A);
 }
 
+
+/**
+ * \function igraph_sparsemat_getelements
+ * \brief Returns all elements of a sparse matrix
+ *
+ * This function will return the elements of a sparse matrix in three vectors.
+ * Two vectors will indicate where the elements are located, and one will
+ * specify the elements themselves.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \param i An initialized integer vector. This will store the rows of the
+ *          returned elements.
+ * \param j An initialized integer vector. For a triplet matrix this will
+ *          store the columns of the returned elements. For a compressed
+ *          matrix, if the column index is \c k, then <code>j[k]</code>
+ *          is the index in \p x of the start of the \c k-th column, and
+ *          the last element of \c j is the total number of elements.
+ *          The total number of elements in the \c k-th column is
+ *          therefore <code>j[k+1] - j[k]</code>. For example, if there
+ *          is one element in the first column, and five in the second,
+ *          \c j will be set to <code>{0, 1, 6}</code>.
+ * \param x An initialized vector. The elements will be placed here.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of stored elements in the sparse matrix.
+ */
+
 igraph_error_t igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
                                  igraph_vector_int_t *i,
                                  igraph_vector_int_t *j,
@@ -3172,27 +3199,88 @@ igraph_error_t igraph_sparsemat_view(igraph_sparsemat_t *A, igraph_integer_t nzm
     return IGRAPH_SUCCESS;
 }
 
+
+/**
+ * \function igraph_sparsemat_sort
+ * \brief Sorts all elements of a sparse matrix by row and column indices.
+ *
+ * This function will sort the elements of a sparse matrix such that iterating
+ * over the entries will return them sorted by column indices; elements in the
+ * same column are then sorted by row indices.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \param sorted An uninitialized sparse matrix; the result will be returned
+ *        here. The result will be in triplet form if the input was in triplet
+ *        form, otherwise it will be in compressed form. Note that sorting is
+ *        more efficient when the matrix is already in compressed form.
+ * \return Error code.
+ *
+ * Time complexity: TODO
+ */
+
 igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
                           igraph_sparsemat_t *sorted) {
-
     igraph_sparsemat_t tmp;
+    igraph_sparsemat_t tmp2;
 
-    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &tmp));
-    IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
-    IGRAPH_CHECK(igraph_sparsemat_transpose(&tmp, sorted));
-    igraph_sparsemat_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(1);
+    if (igraph_sparsemat_is_cc(A)) {
+        /* for column-compressed matrices, we will transpose the matrix twice,
+         * which will sort the indices as a side effect */
+        IGRAPH_CHECK(igraph_sparsemat_transpose(A, &tmp));
+        IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+        IGRAPH_CHECK(igraph_sparsemat_transpose(&tmp, sorted));
+        igraph_sparsemat_destroy(&tmp);
+        IGRAPH_FINALLY_CLEAN(1);
+    } else {
+        igraph_sparsemat_iterator_t it;
+
+        /* for triplet matrices, we convert it to compressed column representation,
+         * sort it, then we convert back */
+        IGRAPH_CHECK(igraph_sparsemat_compress(A, &tmp));
+        IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+        IGRAPH_CHECK(igraph_sparsemat_sort(&tmp, &tmp2));
+
+        igraph_sparsemat_destroy(&tmp);
+        tmp = tmp2;   /* tmp is still protected in the FINALLY stack */
+
+        IGRAPH_CHECK(igraph_sparsemat_init(
+            sorted,
+            igraph_sparsemat_nrow(&tmp),
+            igraph_sparsemat_ncol(&tmp),
+            igraph_i_sparsemat_count_elements(&tmp)
+        ));
+        IGRAPH_FINALLY(igraph_sparsemat_destroy, sorted);
+
+        IGRAPH_CHECK(igraph_sparsemat_iterator_init(&it, &tmp));
+        while (!igraph_sparsemat_iterator_end(&it)) {
+            IGRAPH_CHECK(igraph_sparsemat_entry(
+                sorted,
+                igraph_sparsemat_iterator_row(&it),
+                igraph_sparsemat_iterator_col(&it),
+                igraph_sparsemat_iterator_get(&it)
+            ));
+            igraph_sparsemat_iterator_next(&it);
+        }
+
+        igraph_sparsemat_destroy(&tmp);
+        IGRAPH_FINALLY_CLEAN(2);  /* tmp + sorted */
+    }
 
     return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_sparsemat_getelements_sorted
- * \brief Returns the sorted elements of a sparse matrix.
+ * \brief Returns all elements of a sparse matrix, sorted by row and column indices.
  *
- * This function will sort a sparse matrix and return the elements in
- * 3 vectors. Two vectors will indicate where the elements are located,
- * and one will give the elements.
+ * This function will sort a sparse matrix and return the elements in three
+ * vectors. Two vectors will indicate where the elements are located,
+ * and one will specify the elements themselves.
+ *
+ * </para><para>
+ * Sorting is done based on the <em>indices</em> of the elements, not their
+ * numeric values. The returned entries will be sorted by column indices;
+ * entries in the same column are then sorted by row indices.
  *
  * \param A A sparse matrix in either triplet or compressed form.
  * \param i An initialized integer vector. This will store the rows of the
@@ -3209,23 +3297,23 @@ igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
  * \param x An initialized vector. The elements will be placed here.
  * \return Error code.
  *
- * Time complexity: O(n), the number of stored elements in the sparse matrix.
+ * Time complexity: TODO.
  */
 
 igraph_error_t igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
                                         igraph_vector_int_t *i,
                                         igraph_vector_int_t *j,
                                         igraph_vector_t *x) {
-    if (igraph_sparsemat_is_cc(A)) {
-        igraph_sparsemat_t tmp;
-        IGRAPH_CHECK(igraph_sparsemat_sort(A, &tmp));
-        IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
-        IGRAPH_CHECK(igraph_sparsemat_getelements(&tmp, i, j, x));
-        igraph_sparsemat_destroy(&tmp);
-        IGRAPH_FINALLY_CLEAN(1);
-    } else {
-        IGRAPH_CHECK(igraph_sparsemat_getelements(A, i, j, x));
-    }
+    igraph_sparsemat_t tmp;
+    IGRAPH_CHECK(igraph_sparsemat_sort(A, &tmp));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+    IGRAPH_CHECK(igraph_sparsemat_getelements(&tmp, i, j, x));
+    igraph_sparsemat_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* TODO: in triplets format, we could in theory sort the entries without
+     * going through an extra sorting step (which temporarily converts the
+     * matrix into compressed format). This is not implemented yet. */
 
     return IGRAPH_SUCCESS;
 }
