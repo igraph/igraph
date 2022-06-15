@@ -3278,7 +3278,7 @@ igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
  * and one will specify the elements themselves.
  *
  * </para><para>
- * Sorting is done based on the <em>indices</em> of the elements, not their
+ * Sorting is done based on the \em indices of the elements, not their
  * numeric values. The returned entries will be sorted by column indices;
  * entries in the same column are then sorted by row indices.
  *

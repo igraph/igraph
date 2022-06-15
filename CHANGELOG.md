@@ -718,6 +718,7 @@ Some of the highlights are:
  - `igraph_graph_count()` gives the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
  - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator.
  - `igraph_rng_get_pois()` generates random variates from the Poisson distribution.
+ - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
 
 ### Removed
 
