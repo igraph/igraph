@@ -794,20 +794,23 @@ igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate) {
     }
 }
 
-/*
+
+/**
  * \ingroup internal
  *
- * This function appends the rest of the needed random number to the
- * result vector.
+ * This function appends the rest of the needed random numbers to the
+ * result vector. It is Algoirthm A in Vitter's paper.
  */
 
-static igraph_error_t igraph_i_random_sample_alga(igraph_vector_int_t *res,
-                                       igraph_integer_t l, igraph_integer_t h,
-                                       igraph_integer_t length) {
+static void igraph_i_random_sample_alga(igraph_vector_int_t *res,
+                                        igraph_integer_t l, igraph_integer_t h,
+                                        igraph_integer_t length) {
+    /* Vitter: Variables V, quot, Nreal, and top are of type real */
+
     igraph_integer_t N = h - l + 1;
     igraph_integer_t n = length;
 
-    igraph_integer_t top = N - n;
+    igraph_real_t top = N - n;
     igraph_real_t Nreal = N;
     igraph_integer_t S = 0;
     igraph_real_t V, quot;
@@ -825,15 +828,13 @@ static igraph_error_t igraph_i_random_sample_alga(igraph_vector_int_t *res,
             quot = (quot * top) / Nreal;
         }
         l += S;
-        igraph_vector_int_push_back(res, l);    /* allocated */
+        igraph_vector_int_push_back(res, l); /* allocated */
         Nreal = -1.0 + Nreal; n = -1 + n;
     }
 
-    S = floor(round(Nreal) * RNG_UNIF01());
+    S = trunc(round(Nreal) * RNG_UNIF01());
     l += S + 1;
-    igraph_vector_int_push_back(res, l);  /* allocated */
-
-    return IGRAPH_SUCCESS;
+    igraph_vector_int_push_back(res, l); /* allocated */
 }
 
 /**
@@ -880,7 +881,6 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
                          igraph_integer_t length) {
     igraph_integer_t N = h - l + 1;
     igraph_integer_t n = length;
-    igraph_error_t retval;
 
     igraph_real_t nreal = length;
     igraph_real_t ninv = (nreal != 0) ? 1.0 / nreal : 0.0;
@@ -912,9 +912,8 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
         return IGRAPH_SUCCESS;
     }
     if (length == N) {
-        igraph_integer_t i = 0;
         IGRAPH_CHECK(igraph_vector_int_resize(res, length));
-        for (i = 0; i < length; i++) {
+        for (igraph_integer_t i = 0; i < length; i++) {
             VECTOR(*res)[i] = l++;
         }
         return IGRAPH_SUCCESS;
@@ -982,9 +981,8 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
     }
 
     if (n > 1) {
-        retval = igraph_i_random_sample_alga(res, l + 1, h, n);
+        igraph_i_random_sample_alga(res, l + 1, h, n);
     } else {
-        retval = 0;
         S = floor(N * Vprime);
         l += S + 1;
         igraph_vector_int_push_back(res, l);    /* allocated */
@@ -992,12 +990,12 @@ igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l
 
     RNG_END();
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_random_sample_alga_real(igraph_vector_t *res,
-                                       igraph_integer_t l, igraph_integer_t h,
-                                       igraph_integer_t length) {
+static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
+                                       igraph_real_t l, igraph_real_t h,
+                                       igraph_real_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
 
@@ -1019,15 +1017,13 @@ static igraph_error_t igraph_i_random_sample_alga_real(igraph_vector_t *res,
             quot = (quot * top) / Nreal;
         }
         l += S;
-        igraph_vector_push_back(res, l);    /* allocated */
+        igraph_vector_push_back(res, l); /* allocated */
         Nreal = -1.0 + Nreal; n = -1 + n;
     }
 
-    S = floor(round(Nreal) * RNG_UNIF01());
+    S = trunc(round(Nreal) * RNG_UNIF01());
     l += S + 1;
-    igraph_vector_push_back(res, l);  /* allocated */
-
-    return IGRAPH_SUCCESS;
+    igraph_vector_push_back(res, l); /* allocated */
 }
 
 /**
@@ -1065,7 +1061,6 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
  */
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
-    igraph_error_t retval;
 
     igraph_real_t nreal = length;
     igraph_real_t ninv = (nreal != 0) ? 1.0 / nreal : 0.0;
@@ -1097,9 +1092,8 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
         return IGRAPH_SUCCESS;
     }
     if (length == N) {
-        igraph_integer_t i = 0;
         IGRAPH_CHECK(igraph_vector_resize(res, length));
-        for (i = 0; i < length; i++) {
+        for (igraph_integer_t i = 0; i < length; i++) {
             VECTOR(*res)[i] = l++;
         }
         return IGRAPH_SUCCESS;
@@ -1167,11 +1161,8 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
     }
 
     if (n > 1) {
-        retval = igraph_i_random_sample_alga_real(res, (igraph_integer_t) l + 1,
-                                             (igraph_integer_t) h,
-                                             (igraph_integer_t) n);
+        igraph_i_random_sample_alga_real(res, l + 1, h, n);
     } else {
-        retval = IGRAPH_SUCCESS;
         S = floor(N * Vprime);
         l += S + 1;
         igraph_vector_push_back(res, l);    /* allocated */
@@ -1179,7 +1170,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 
     RNG_END();
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 /*
