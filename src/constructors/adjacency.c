@@ -140,8 +140,10 @@ static igraph_error_t igraph_i_adjacency_undirected(
     igraph_loops_t loops
 ) {
     if (!igraph_matrix_is_symmetric(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix should be symmetric for IGRAPH_ADJ_UNDIRECTED.",
-                IGRAPH_EINVAL);
+        IGRAPH_ERROR(
+            "Adjacency matrix should be symmetric to produce an undirected graph.",
+            IGRAPH_EINVAL
+        );
     }
     return igraph_i_adjacency_max(adjmatrix, edges, loops);
 }
@@ -536,8 +538,10 @@ static igraph_error_t igraph_i_weighted_adjacency_undirected(
     igraph_loops_t loops
 ) {
     if (!igraph_matrix_is_symmetric(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix should be symmetric for IGRAPH_ADJ_UNDIRECTED.",
-                IGRAPH_EINVAL);
+        IGRAPH_ERROR(
+            "Adjacency matrix should be symmetric to produce an undirected graph.",
+            IGRAPH_EINVAL
+        );
     }
     return igraph_i_weighted_adjacency_max(adjmatrix, edges, weights, loops);
 }
@@ -1049,32 +1053,13 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    igraph_sparsemat_iterator_t it;
-    igraph_sparsemat_iterator_init(&it, adjmatrix);
-    igraph_integer_t e = 0;
-
     if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix should be symmetric for IGRAPH_ADJ_UNDIRECTED.",
-                IGRAPH_EINVAL);
+        IGRAPH_ERROR(
+            "Adjacency matrix should be symmetric to produce an undirected graph.",
+            IGRAPH_EINVAL
+        );
     }
-    for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
-        igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
-        igraph_integer_t to = igraph_sparsemat_iterator_col(&it);
-        if (to < from) {
-            continue;
-        }
-        igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
-        if (to == from) {
-            IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
-        }
-        for (igraph_integer_t count = 0; count < multi; count++) {
-            VECTOR(*edges)[e++] = from;
-            VECTOR(*edges)[e++] = to;
-        }
-    }
-    igraph_vector_int_resize(edges, e);
-
-    return IGRAPH_SUCCESS;
+    return igraph_i_sparse_adjacency_upper(adjmatrix, edges, loops);
 }
 
 /**
@@ -1322,8 +1307,10 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_undirected (
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
     if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
-        IGRAPH_ERROR("Adjacency matrix should be symmetric from produce an undirected graph.",
-                IGRAPH_EINVAL);
+        IGRAPH_ERROR(
+            "Adjacency matrix should be symmetric to produce an undirected graph.",
+            IGRAPH_EINVAL
+        );
     }
     return igraph_i_sparse_weighted_adjacency_upper(adjmatrix, edges, weights, loops);
 }
