@@ -941,14 +941,15 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
             continue;
         }
         igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
-        igraph_real_t other;
-        igraph_vector_int_t x, y;
-        igraph_vector_int_view(&x, &to, 1);
-        igraph_vector_int_view(&y, &from, 1);
-        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-        multi = multi > other ? multi : other;
         if (to == from) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        } else {
+            igraph_real_t other;
+            igraph_vector_int_t x, y;
+            igraph_vector_int_view(&x, &to, 1);
+            igraph_vector_int_view(&y, &from, 1);
+            igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+            multi = multi > other ? multi : other;
         }
         for (igraph_integer_t count = 0; count < multi; count++) {
             VECTOR(*edges)[e++] = from;
@@ -975,14 +976,15 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
             continue;
         }
         igraph_integer_t multi = igraph_sparsemat_iterator_get(&it);
-        igraph_real_t other;
-        igraph_vector_int_t x, y;
-        igraph_vector_int_view(&x, &to, 1);
-        igraph_vector_int_view(&y, &from, 1);
-        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-        multi = multi < other ? multi : other;
         if (to == from) {
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
+        } else {
+            igraph_real_t other;
+            igraph_vector_int_t x, y;
+            igraph_vector_int_view(&x, &to, 1);
+            igraph_vector_int_view(&y, &from, 1);
+            igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+            multi = multi < other ? multi : other;
         }
         for (igraph_integer_t count = 0; count < multi; count++) {
             VECTOR(*edges)[e++] = from;
@@ -1148,14 +1150,15 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
             continue;
         }
         igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
-        igraph_real_t other;
-        igraph_vector_int_t x, y;
-        igraph_vector_int_view(&x, &to, 1);
-        igraph_vector_int_view(&y, &from, 1);
-        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-        weight = weight > other ? weight : other;
         if (to == from) {
             igraph_i_adjust_loop_edge_weight(&weight, loops);
+        } else {
+            igraph_real_t other;
+            igraph_vector_int_t x, y;
+            igraph_vector_int_view(&x, &to, 1);
+            igraph_vector_int_view(&y, &from, 1);
+            igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+            weight = weight > other ? weight : other;
         }
         if (weight != 0) {
             VECTOR(*weights)[e/2] = weight;
@@ -1184,14 +1187,15 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_min (
             continue;
         }
         igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
-        igraph_real_t other;
-        igraph_vector_int_t x, y;
-        igraph_vector_int_view(&x, &to, 1);
-        igraph_vector_int_view(&y, &from, 1);
-        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
-        weight = weight < other ? weight : other;
         if (to == from) {
             igraph_i_adjust_loop_edge_weight(&weight, loops);
+        } else {
+            igraph_real_t other;
+            igraph_vector_int_t x, y;
+            igraph_vector_int_view(&x, &to, 1);
+            igraph_vector_int_view(&y, &from, 1);
+            igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
+            weight = weight < other ? weight : other;
         }
         if (weight != 0) {
             VECTOR(*weights)[e/2] = weight;
@@ -1220,14 +1224,14 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_plus (
             continue;
         }
         igraph_real_t weight = igraph_sparsemat_iterator_get(&it);
-        igraph_real_t other;
-        igraph_vector_int_t x, y;
-        igraph_vector_int_view(&x, &to, 1);
-        igraph_vector_int_view(&y, &from, 1);
-        igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
         if (to == from) {
             igraph_i_adjust_loop_edge_weight(&weight, loops);
         } else {
+            igraph_real_t other;
+            igraph_vector_int_t x, y;
+            igraph_vector_int_view(&x, &to, 1);
+            igraph_vector_int_view(&y, &from, 1);
+            igraph_sparsemat_index(adjmatrix, &x, &y, NULL, &other);
             weight += other;
         }
         if (weight != 0) {
