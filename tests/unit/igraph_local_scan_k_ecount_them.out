@@ -8,6 +8,9 @@ One vertex:
 Directed disconnected graph with loops and multiple edges, no weights, k = 0, IGRAPH_IN:
 ( 1 2 1 2 2 0 )
 
+Same graph, with weights:
+( 0.3 0 0 0.6 1.1 0 )
+
 Same graph, k=1:
 ( 2 2 2 3 2 0 )
 

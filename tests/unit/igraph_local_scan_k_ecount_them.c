@@ -53,6 +53,9 @@ int main() {
     printf("Directed disconnected graph with loops and multiple edges, no weights, k = 0, IGRAPH_IN:\n");
     call_and_print(&g_lm, &g_lm, 0, NULL, IGRAPH_IN);
 
+    printf("Same graph, with weights:\n");
+    call_and_print(&g_lm, &g_lm, 0, &weights, IGRAPH_IN);
+
     printf("Same graph, k=1:\n");
     call_and_print(&g_lm, &g_lm, 1, NULL, IGRAPH_IN);
 
