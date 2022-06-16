@@ -313,6 +313,7 @@ add_legacy_tests(
   igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_path_length_hist
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
