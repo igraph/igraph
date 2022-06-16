@@ -391,12 +391,12 @@ static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igr
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&map2, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&weights, 0);
     IGRAPH_CHECK(igraph_intersection(&is, us, them, /* edge_map1= */ 0, &map2));
     IGRAPH_FINALLY(igraph_destroy, &is);
 
     /* Rewrite the map as edge weights */
     m = igraph_vector_int_size(&map2);
+    IGRAPH_VECTOR_INIT_FINALLY(&weights, m);
     for (i = 0; i < m; i++) {
         VECTOR(weights)[i] = VECTOR(*weights_them)[ VECTOR(map2)[i] ];
     }
