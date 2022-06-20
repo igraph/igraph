@@ -137,7 +137,7 @@ static igraph_error_t igraph_i_local_scan_1_directed(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        /* Mark neighbors and self*/
+        /* Mark neighbors and self */
         VECTOR(neis)[node] = node + 1;
         for (i = 0; i < edgeslen1; i++) {
             igraph_integer_t e = VECTOR(*edges1)[i];
@@ -185,7 +185,7 @@ static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
 
     igraph_vector_int_t neis;
 
-    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, no_of_nodes);
@@ -199,7 +199,7 @@ static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        /* Mark neighbors. We also count the edges that are incident to ego.
+        /* Mark neighbors. We also count the edges that are incident on ego.
            Note that this time we do not mark ego, because we don't want to
            double count its incident edges later, when we are going over the
            incident edges of ego's neighbors. */
@@ -211,8 +211,11 @@ static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
             VECTOR(*res)[node] += w;
         }
 
+        /* Explicitly unmark ego in case it had a loop edge */
+        VECTOR(neis)[node] = 0;
+
         /* Crawl neighbors. We make sure that each neighbor of 'node' is
-           only crawed once. We count all qualifying edges of ego, and
+           only crawled once. We count all qualifying edges of ego, and
            then unmark ego to avoid double counting. */
         for (i = 0; i < edgeslen1; i++) {
             igraph_integer_t e2 = VECTOR(*edges1)[i];
