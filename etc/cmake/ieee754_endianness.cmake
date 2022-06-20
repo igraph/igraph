@@ -19,13 +19,18 @@ if(NOT CMAKE_CROSSCOMPILING)
         else()
             set(TEST_RESULT NO)
         endif()
-        set(
-            IEEE754_DOUBLE_ENDIANNESS_MATCHES ${TEST_RESULT} CACHE BOOL
-            "Specifies whether the endianness of IEEE754 doubles is the same as the endianness of uint64_t."
-            FORCE
-        )
-        mark_as_advanced(IEEE754_DOUBLE_ENDIANNESS_MATCHES)
-    endif()
+
+		set(
+			IEEE754_DOUBLE_ENDIANNESS_MATCHES ${TEST_RESULT} CACHE BOOL
+			"Specifies whether the endianness of IEEE754 doubles is the same as the endianness of uint64_t."
+			FORCE
+		)
+		mark_as_advanced(IEEE754_DOUBLE_ENDIANNESS_MATCHES)
+	endif()
+else()
+    # If we are cross-compiling, let's just assume that IEEE754 doubles use the
+    # same endianness as uint64_t
+    set(IEEE754_DOUBLE_ENDIANNESS_MATCHES YES)
 endif()
 
 cmake_pop_check_state()
