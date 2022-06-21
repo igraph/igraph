@@ -90,17 +90,17 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
             new_edges = 0;
         }
     } else {
-        IGRAPH_CHECK(igraph_i_safe_mult((no_of_nodes - start_nodes), no_of_neighbors, &new_edges));
+        IGRAPH_SAFE_MULT(no_of_nodes - start_nodes, no_of_neighbors, &new_edges);
     }
-    IGRAPH_CHECK(igraph_i_safe_add(start_edges, new_edges, &no_of_edges));
+    IGRAPH_SAFE_ADD(start_edges, new_edges, &no_of_edges);
     if (no_of_edges > IGRAPH_ECOUNT_MAX) {
         IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
     resp = start_edges * 2;
     bagsize = no_of_nodes;
-    IGRAPH_CHECK(igraph_i_safe_add(bagsize, no_of_edges, &bagsize));
+    IGRAPH_SAFE_ADD(bagsize, no_of_edges, &bagsize);
     if (outpref) {
-        IGRAPH_CHECK(igraph_i_safe_add(bagsize, no_of_edges, &bagsize));
+        IGRAPH_SAFE_ADD(bagsize, no_of_edges, &bagsize);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
@@ -210,9 +210,9 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
             new_edges = 0;
         }
     } else {
-        IGRAPH_CHECK(igraph_i_safe_mult((no_of_nodes - start_nodes), no_of_neighbors, &new_edges));
+        IGRAPH_SAFE_MULT(no_of_nodes - start_nodes, no_of_neighbors, &new_edges);
     }
-    IGRAPH_CHECK(igraph_i_safe_add(start_edges, new_edges, &no_of_edges));
+    IGRAPH_SAFE_ADD(start_edges, new_edges, &no_of_edges);
     if (no_of_edges > IGRAPH_ECOUNT_MAX) {
         IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
@@ -327,9 +327,9 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
             new_edges = 0;
         }
     } else {
-        IGRAPH_CHECK(igraph_i_safe_mult((no_of_nodes - start_nodes), no_of_neighbors, &new_edges));
+        IGRAPH_SAFE_MULT(no_of_nodes - start_nodes, no_of_neighbors, &new_edges);
     }
-    IGRAPH_CHECK(igraph_i_safe_add(start_edges, new_edges, &no_of_edges));
+    IGRAPH_SAFE_ADD(start_edges, new_edges, &no_of_edges);
     if (no_of_edges > IGRAPH_ECOUNT_MAX) {
         IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
@@ -707,7 +707,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
 
     if (outseq == 0 || igraph_vector_int_size(outseq) == 0) {
         no_of_neighbors = m;
-        IGRAPH_CHECK(igraph_i_safe_mult((no_of_nodes - 1), no_of_neighbors, &no_of_edges));
+        IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
         IGRAPH_CHECK(igraph_i_safe_vector_int_sum(outseq, &no_of_edges));
         no_of_edges -= VECTOR(*outseq)[0];
