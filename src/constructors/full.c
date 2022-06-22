@@ -173,7 +173,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     igraph_integer_t nn = igraph_vector_int_size(n);
 
     if (nn == 0) {
-        igraph_empty(graph, 0, directed);
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
         if (types) {
             igraph_vector_int_clear(types);
         }
