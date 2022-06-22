@@ -289,9 +289,9 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
  * \sa \ref igraph_full_multipartite() for full multipartite graphs.
  */
 igraph_error_t igraph_turan(igraph_t *graph,
-                          igraph_vector_int_t *types,
-                          igraph_integer_t n,
-                          igraph_integer_t r) {
+                            igraph_vector_int_t *types,
+                            igraph_integer_t n,
+                            igraph_integer_t r) {
     igraph_integer_t quotient;
     igraph_integer_t remainder;
     igraph_vector_int_t subsets;
