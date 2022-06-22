@@ -133,16 +133,18 @@ igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
 
 /**
  * \function igraph_full_multipartite
- * \brief Create a full multipartite network.
+ * \brief Create a full multipartite graph.
  *
- * A multipartite network contains two or more types and connections
- * are only possible between two vertices in different types.
+ * A multipartite graph contains two or more types of vertices and connections
+ * are only possible between two vertices of different types. This function
+ * creates a complete multipartite graph.
  *
  * \param graph Pointer to an igraph_t object, the graph will be
  *   created here.
- * \param types Pointer to an int vector. If not a null pointer,
- *   it contains information about the vertex types.
- * \param n Pointer to an int vector, the number of types.
+ * \param types Pointer to an integer vector. If not a null pointer,
+ *   the type of each vertex will be stored here.
+ * \param n Pointer to an integer vector, the number of vertices
+ *   of each type.
  * \param directed Boolean, whether to create a directed graph.
  * \param mode A constant that gives the type of connections for
  *   directed graphs. If \c IGRAPH_OUT, then edges point from vertices
