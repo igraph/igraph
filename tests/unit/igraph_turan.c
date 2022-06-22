@@ -45,21 +45,6 @@ int main() {
     igraph_destroy(&g_turan);
 
 
-    printf("\nEmpty graph with zero partitions:");
-    igraph_vector_int_init(&types_turan, 0);
-    igraph_turan(&g_turan, &types_turan, 0, 10);
-
-    printf("\nEdge list:\n");
-    igraph_write_graph_edgelist(&g_turan, stdout);
-
-    printf("\nPartition type:\n");
-    igraph_vector_int_print(&types_turan);
-
-    igraph_vector_int_destroy(&types_turan);
-    igraph_destroy(&g_turan);
-
-
-
     printf("\nTuran graph with 10 vertices and 1 partition:");
     igraph_vector_int_init(&types_turan, 0);
     igraph_turan(&g_turan, &types_turan, 10, 1);
@@ -97,7 +82,7 @@ int main() {
     VECTOR(partitions)[2] = 3;
     VECTOR(partitions)[3] = 4;
 
-    igraph_full_multipartite(&g_multipartite, &types_multipartite, &partitions, 
+    igraph_full_multipartite(&g_multipartite, &types_multipartite, &partitions,
                         IGRAPH_UNDIRECTED, IGRAPH_ALL);
     igraph_turan(&g_turan, &types_turan, 13, 4);
 
@@ -110,9 +95,9 @@ int main() {
 
     igraph_isomorphic(&g_multipartite, &g_turan, &res);
     if (res) {
-        printf("\nTuran(13,4) is isomorphic to full multipartite(3,3,3,4)\n");
+        printf("\nTuran(13,4) is isomorphic to full multipartite(4,3,3,3)\n");
     }
-    
+
     igraph_vector_int_destroy(&partitions);
     igraph_vector_int_destroy(&types_multipartite);
     igraph_vector_int_destroy(&types_turan);
@@ -120,5 +105,66 @@ int main() {
     igraph_destroy(&g_multipartite);
 
 
-    return 0;
+    igraph_vector_int_init(&partitions, 3);
+    igraph_vector_int_init(&types_multipartite, 0);
+    igraph_vector_int_init(&types_turan, 0);
+
+    VECTOR(partitions)[0] = 3;
+    VECTOR(partitions)[1] = 3;
+    VECTOR(partitions)[2] = 2;
+
+    igraph_full_multipartite(&g_multipartite, &types_multipartite, &partitions,
+                        IGRAPH_UNDIRECTED, IGRAPH_ALL);
+    igraph_turan(&g_turan, &types_turan, 8, 3);
+
+    printf("\nTuran graph with 8 vertices and 3 partitions:");
+    printf("\nEdge list:\n");
+    igraph_write_graph_edgelist(&g_turan, stdout);
+
+    printf("\nPartition type:\n");
+    igraph_vector_int_print(&types_turan);
+
+    igraph_isomorphic(&g_multipartite, &g_turan, &res);
+    if (res) {
+        printf("\nTuran(8,3) is isomorphic to full multipartite(3,3,2)\n");
+    }
+
+    igraph_vector_int_destroy(&partitions);
+    igraph_vector_int_destroy(&types_multipartite);
+    igraph_vector_int_destroy(&types_turan);
+    igraph_destroy(&g_turan);
+    igraph_destroy(&g_multipartite);
+
+
+    igraph_vector_int_init(&partitions, 3);
+    igraph_vector_int_init(&types_multipartite, 0);
+    igraph_vector_int_init(&types_turan, 0);
+
+    VECTOR(partitions)[0] = 2;
+    VECTOR(partitions)[1] = 2;
+    VECTOR(partitions)[2] = 2;
+
+    igraph_full_multipartite(&g_multipartite, &types_multipartite, &partitions,
+                        IGRAPH_UNDIRECTED, IGRAPH_ALL);
+    igraph_turan(&g_turan, &types_turan, 6, 3);
+
+    printf("\nTuran graph with 6 vertices and 3 partitions:");
+    printf("\nEdge list:\n");
+    igraph_write_graph_edgelist(&g_turan, stdout);
+
+    printf("\nPartition type:\n");
+    igraph_vector_int_print(&types_turan);
+
+    igraph_isomorphic(&g_multipartite, &g_turan, &res);
+    if (res) {
+        printf("\nTuran(6,3) is isomorphic to full multipartite(2,2,2)\n");
+    }
+
+    igraph_vector_int_destroy(&partitions);
+    igraph_vector_int_destroy(&types_multipartite);
+    igraph_vector_int_destroy(&types_turan);
+    igraph_destroy(&g_turan);
+    igraph_destroy(&g_multipartite);
+
+    return IGRAPH_SUCCESS;
 }

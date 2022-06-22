@@ -157,3 +157,27 @@ Edge list:
 
 Partition type:
 0 0 1 1 1 2 2 2 2 3 3
+
+directed graph with 3 partitions, all partitions with size zero:
+Edge list:
+
+Partition type:
+
+
+directed graph with 3 partitions, one parition with size zero:
+Edge list:
+0 2
+0 3
+0 4
+1 2
+1 3
+1 4
+2 0
+2 1
+3 0
+3 1
+4 0
+4 1
+
+Partition type:
+0 0 1 1 1

@@ -164,15 +164,13 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
                           igraph_bool_t directed,
                           igraph_neimode_t mode) {
     
-    igraph_integer_t no_of_edges = 0;
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t edges;
     igraph_vector_int_t n_acc;
-    igraph_integer_t ptr = 0;
 
-    igraph_integer_t nn = igraph_vector_int_size(n);
+    igraph_integer_t no_of_types = igraph_vector_int_size(n);
 
-    if (nn == 0) {
+    if (no_of_types == 0) {
         IGRAPH_CHECK(igraph_empty(graph, 0, directed));
         if (types) {
             igraph_vector_int_clear(types);
@@ -180,7 +178,11 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    if (nn == 1) {
+    if (igraph_vector_int_min(n) < 0) {
+        IGRAPH_ERROR("Invalid number of vertices in type vector.", IGRAPH_EINVAL);
+    }
+
+    if (no_of_types == 1) {
         igraph_integer_t num = VECTOR(*n)[0];
         IGRAPH_CHECK(igraph_empty(graph, num, directed));
         if (types) {
@@ -190,34 +192,37 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, nn);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, no_of_types);
     VECTOR(n_acc)[0] = 0;
-    for (igraph_integer_t i = 1; i < nn; i++) {
+    for (igraph_integer_t i = 1; i < no_of_types; i++) {
         IGRAPH_SAFE_ADD(VECTOR(n_acc)[i-1], VECTOR(*n)[i-1],
                     &VECTOR(n_acc)[i]);
     }
-    IGRAPH_SAFE_ADD(VECTOR(n_acc)[nn-1], VECTOR(*n)[nn-1], &no_of_nodes);
+    IGRAPH_SAFE_ADD(VECTOR(n_acc)[no_of_types-1], VECTOR(*n)[no_of_types-1], &no_of_nodes);
 
-    for (igraph_integer_t i = 0; i < nn; i++) {
+    igraph_integer_t no_of_edges2 = 0;
+
+    for (igraph_integer_t i = 0; i < no_of_types; i++) {
         igraph_integer_t v = VECTOR(*n)[i];
-        igraph_integer_t partial_sum;
-        IGRAPH_SAFE_ADD(no_of_nodes, -v, &partial_sum);
+        igraph_integer_t partial_sum = no_of_nodes - v;
         IGRAPH_SAFE_MULT(partial_sum, v, &partial_sum);
-        IGRAPH_SAFE_ADD(no_of_edges, partial_sum, &no_of_edges);
+        IGRAPH_SAFE_ADD(no_of_edges2, partial_sum, &no_of_edges2);
     }
 
     if (directed && mode == IGRAPH_ALL) {
-        IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
 
-    for (igraph_integer_t from = 0; from < nn-1; from++) {
-        igraph_integer_t edge_from = VECTOR(n_acc)[from];
-        for (igraph_integer_t i = 0; i < VECTOR(*n)[from]; i++) {
-            for (igraph_integer_t to = from+1; to < nn; to++) {
-                igraph_integer_t edge_to = VECTOR(n_acc)[to];
-                for (igraph_integer_t j = 0; j < VECTOR(*n)[to]; j++) {
+    igraph_integer_t ptr = 0;
+
+    for (igraph_integer_t from_type = 0; from_type < no_of_types-1; from_type++) {
+        igraph_integer_t edge_from = VECTOR(n_acc)[from_type];
+        for (igraph_integer_t i = 0; i < VECTOR(*n)[from_type]; i++) {
+            for (igraph_integer_t to_type = from_type+1; to_type < no_of_types; to_type++) {
+                igraph_integer_t edge_to = VECTOR(n_acc)[to_type];
+                for (igraph_integer_t j = 0; j < VECTOR(*n)[to_type]; j++) {
                     if (!directed || mode == IGRAPH_OUT) {
                         VECTOR(edges)[ptr++] = edge_from;
                         VECTOR(edges)[ptr++] = edge_to++;
@@ -240,12 +245,11 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
 
     if (types) {
         IGRAPH_CHECK(igraph_vector_int_resize(types, no_of_nodes));
-        igraph_vector_int_null(types);
         if (no_of_nodes > 0) {
             igraph_integer_t v = 1;
             VECTOR(*types)[0] = 0;
             for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
-                if (v < nn && i == VECTOR(n_acc)[v]) {
+                if (v < no_of_types && i == VECTOR(n_acc)[v]) {
                     v++;
                 }
                 VECTOR(*types)[i] = v-1;
@@ -268,9 +272,9 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
  * that the sizes of the partitions are as close to equal as possible.
  *
  * This function only generates undirected graphs. The null graph is 
- * returned when the number of vertices is zero or when the number
- * of partitions is zero. A complete graph is returned if
- * the number of partitions is greater than the number of vertices.
+ * returned when the number of vertices is zero. A complete graph is
+ * returned if the number of partitions is greater than the number of 
+ * vertices.
  * 
  * \param graph Pointer to an igraph_t object, the graph will be
  *   created here.
@@ -293,7 +297,15 @@ igraph_error_t igraph_turan(igraph_t *graph,
     igraph_integer_t remainder;
     igraph_vector_int_t subsets;
 
-    if (n == 0 || r == 0) {
+    if (n < 0) {
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+    }
+
+    if (r <= 0) {
+        IGRAPH_ERROR("Invalid number of partitions.", IGRAPH_EINVAL);
+    }
+
+    if (n == 0) {
         IGRAPH_CHECK(igraph_empty(graph, 0, IGRAPH_UNDIRECTED));
         if (types) {
             igraph_vector_int_clear(types);
@@ -302,21 +314,17 @@ igraph_error_t igraph_turan(igraph_t *graph,
     }
 
     if (r > n) {
-        r = 1;
+        r = n;
     }
 
     quotient = n / r;
     remainder = n % r;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&subsets, r);
-    for (igraph_integer_t i = 0; i < r-1; i++) {
-        VECTOR(subsets)[i] = quotient;
-    }
 
-    if (remainder == 0) {
-        VECTOR(subsets)[r-1] = quotient;
-    } else {
-        IGRAPH_SAFE_ADD(quotient, remainder, &VECTOR(subsets)[r-1]);
+    igraph_vector_int_fill(&subsets, quotient);
+    for (igraph_integer_t i = 0; i < remainder; i++) {
+        VECTOR(subsets)[i]++;
     }
 
     IGRAPH_CHECK(igraph_full_multipartite(graph, types, &subsets,
