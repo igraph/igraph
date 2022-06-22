@@ -297,7 +297,7 @@ igraph_error_t igraph_turan(igraph_t *graph,
     igraph_vector_int_t subsets;
 
     if (n == 0 || r == 0) {
-        igraph_empty(graph, 0, IGRAPH_UNDIRECTED);
+        IGRAPH_CHECK(igraph_empty(graph, 0, IGRAPH_UNDIRECTED));
         if (types) {
             igraph_vector_int_clear(types);
         }
