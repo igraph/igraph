@@ -265,22 +265,22 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
 
 /**
  * \function igraph_turan
- * \brief Create a turan network.
+ * \brief Create a Turán graph.
  *
- * Turan networks are full multipartite networks with the property
- * that the sizes of the subsets are as close to equal as possible.
+ * Turán graphs are complete multipartite graphs with the property
+ * that the sizes of the partitions are as close to equal as possible.
  *
- * The function only returns an undirected graph. An empty graph is 
- * returned when the number of vertices are zero or when the number
- * of partitions are zero. A graph with one partition is returned if
- * the number of partitions are greater than the number of vertices.
+ * This function only generates undirected graphs. The null graph is 
+ * returned when the number of vertices is zero or when the number
+ * of partitions is zero. A complete graph is returned if
+ * the number of partitions is greater than the number of vertices.
  * 
  * \param graph Pointer to an igraph_t object, the graph will be
  *   created here.
- * \param types Pointer to an int vector. If not a null pointer,
- *   it contains information about the vertex types.
+ * \param types Pointer to an integer vector. If not a null pointer,
+ *   the type (partition index) of each vertex will be stored here.
  * \param n Integer, the number of vertices in the graph.
- * \param r Integer, the number of parititons of the graph.
+ * \param r Integer, the number of partitions of the graph.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
