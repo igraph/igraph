@@ -204,6 +204,7 @@ add_legacy_tests(
   igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
+  igraph_full_multipartite
   igraph_generalized_petersen
   igraph_grg_game
   igraph_growing_random_game
@@ -220,6 +221,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_square_lattice
   igraph_static_power_law_game
+  igraph_turan
   igraph_wheel
   igraph_weighted_adjacency
   kary_tree
