@@ -164,7 +164,6 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
                           igraph_bool_t directed,
                           igraph_neimode_t mode) {
     
-    igraph_integer_t no_of_nodes;
     igraph_vector_int_t edges;
     igraph_vector_int_t n_acc;
 
@@ -182,29 +181,18 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
         IGRAPH_ERROR("Invalid number of vertices in type vector.", IGRAPH_EINVAL);
     }
 
-    if (no_of_types == 1) {
-        igraph_integer_t num = VECTOR(*n)[0];
-        IGRAPH_CHECK(igraph_empty(graph, num, directed));
-        if (types) {
-            IGRAPH_CHECK(igraph_vector_int_resize(types, num));
-            igraph_vector_int_null(types);
-        }
-        return IGRAPH_SUCCESS;
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, no_of_types);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, no_of_types+1);
     VECTOR(n_acc)[0] = 0;
-    for (igraph_integer_t i = 1; i < no_of_types; i++) {
+    for (igraph_integer_t i = 1; i < no_of_types+1; i++) {
         IGRAPH_SAFE_ADD(VECTOR(n_acc)[i-1], VECTOR(*n)[i-1],
                     &VECTOR(n_acc)[i]);
     }
-    IGRAPH_SAFE_ADD(VECTOR(n_acc)[no_of_types-1], VECTOR(*n)[no_of_types-1], &no_of_nodes);
 
     igraph_integer_t no_of_edges2 = 0;
 
     for (igraph_integer_t i = 0; i < no_of_types; i++) {
         igraph_integer_t v = VECTOR(*n)[i];
-        igraph_integer_t partial_sum = no_of_nodes - v;
+        igraph_integer_t partial_sum = VECTOR(n_acc)[no_of_types] - v;
         IGRAPH_SAFE_MULT(partial_sum, v, &partial_sum);
         IGRAPH_SAFE_ADD(no_of_edges2, partial_sum, &no_of_edges2);
     }
@@ -241,15 +229,14 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
         }
     }
     
-    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+    IGRAPH_CHECK(igraph_create(graph, &edges, VECTOR(n_acc)[no_of_types], directed));
 
     if (types) {
-        IGRAPH_CHECK(igraph_vector_int_resize(types, no_of_nodes));
-        if (no_of_nodes > 0) {
+        IGRAPH_CHECK(igraph_vector_int_resize(types, VECTOR(n_acc)[no_of_types]));
+        if (VECTOR(n_acc)[no_of_types] > 0) {
             igraph_integer_t v = 1;
-            VECTOR(*types)[0] = 0;
-            for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
-                if (v < no_of_types && i == VECTOR(n_acc)[v]) {
+            for (igraph_integer_t i = 0; i < VECTOR(n_acc)[no_of_types]; i++) {
+                if (i == VECTOR(n_acc)[v]) {
                     v++;
                 }
                 VECTOR(*types)[i] = v-1;
