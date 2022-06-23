@@ -290,7 +290,7 @@ igraph_error_t igraph_turan(igraph_t *graph,
     }
 
     if (r <= 0) {
-        IGRAPH_ERROR("Invalid number of partitions.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of partitions must be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, r);
     }
 
     if (n == 0) {
