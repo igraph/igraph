@@ -286,7 +286,7 @@ igraph_error_t igraph_turan(igraph_t *graph,
     igraph_vector_int_t subsets;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of vertices must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
     }
 
     if (r <= 0) {
