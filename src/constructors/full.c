@@ -163,7 +163,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
                           const igraph_vector_int_t *n,
                           igraph_bool_t directed,
                           igraph_neimode_t mode) {
-    
+
     igraph_vector_int_t edges;
     igraph_vector_int_t n_acc;
 
@@ -213,22 +213,23 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
                 for (igraph_integer_t j = 0; j < VECTOR(*n)[to_type]; j++) {
                     if (!directed || mode == IGRAPH_OUT) {
                         VECTOR(edges)[ptr++] = edge_from;
-                        VECTOR(edges)[ptr++] = edge_to++;
+                        VECTOR(edges)[ptr++] = edge_to;
                     } else if (mode == IGRAPH_IN) {
-                        VECTOR(edges)[ptr++] = edge_to++;
+                        VECTOR(edges)[ptr++] = edge_to;
                         VECTOR(edges)[ptr++] = edge_from;
                     } else {
                         VECTOR(edges)[ptr++] = edge_from;
                         VECTOR(edges)[ptr++] = edge_to;
-                        VECTOR(edges)[ptr++] = edge_to++;
+                        VECTOR(edges)[ptr++] = edge_to;
                         VECTOR(edges)[ptr++] = edge_from;
                     }
+                    edge_to++;
                 }
             }
             edge_from++;
         }
     }
-    
+
     IGRAPH_CHECK(igraph_create(graph, &edges, VECTOR(n_acc)[no_of_types], directed));
 
     if (types) {
@@ -258,11 +259,11 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
  * Turán graphs are complete multipartite graphs with the property
  * that the sizes of the partitions are as close to equal as possible.
  *
- * This function only generates undirected graphs. The null graph is 
+ * This function only generates undirected graphs. The null graph is
  * returned when the number of vertices is zero. A complete graph is
- * returned if the number of partitions is greater than the number of 
+ * returned if the number of partitions is greater than the number of
  * vertices.
- * 
+ *
  * \param graph Pointer to an igraph_t object, the graph will be
  *   created here.
  * \param types Pointer to an integer vector. If not a null pointer,
