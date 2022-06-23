@@ -178,7 +178,7 @@ igraph_error_t igraph_full_multipartite(igraph_t *graph,
     }
 
     if (igraph_vector_int_min(n) < 0) {
-        IGRAPH_ERROR("Invalid number of vertices in type vector.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of vertices must not be negative in any partition.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, no_of_types+1);
