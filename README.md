@@ -18,3 +18,8 @@ igraph can also be used from:
  - R — https://github.com/igraph/rigraph
  - Python — https://github.com/igraph/python-igraph
  - Mathematica — https://github.com/szhorvat/IGraphM
+
+igraph is a collaborative work of many people from all around the world --
+see the [list of contributors here](./CONTRIBUTORS.md). If you would like
+to contribute yourself, [click here to see how you can
+help](./CONTRIBUTING.md).
