@@ -58,6 +58,21 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/nograpes"><img src="https://avatars.githubusercontent.com/u/2967973?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Aman Verma</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=nograpes" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/guyroznb"><img src="https://avatars.githubusercontent.com/u/55619320?v=4?s=100" width="100px;" alt=""/><br /><sub><b>guy rozenberg</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=guyroznb" title="Code">💻</a></td>
     <td align="center"><a href="http://linkedin.com/in/artemvl"><img src="https://avatars.githubusercontent.com/u/6162969?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Artem V L</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=luav" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Katterrina"><img src="https://avatars.githubusercontent.com/u/31630249?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kateřina Č.</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Katterrina" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/valdaarhun"><img src="https://avatars.githubusercontent.com/u/39989901?v=4?s=100" width="100px;" alt=""/><br /><sub><b>valdaarhun</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=valdaarhun" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/YuliYudith"><img src="https://avatars.githubusercontent.com/u/54366258?v=4?s=100" width="100px;" alt=""/><br /><sub><b>YuliYudith</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=YuliYudith" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/alexsyou"><img src="https://avatars.githubusercontent.com/u/54590871?v=4?s=100" width="100px;" alt=""/><br /><sub><b>alexsyou</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=alexsyou" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/rohitt28"><img src="https://avatars.githubusercontent.com/u/67415747?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rohit Tawde</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=rohitt28" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/alexperrone"><img src="https://avatars.githubusercontent.com/u/4990236?v=4?s=100" width="100px;" alt=""/><br /><sub><b>alexperrone</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=alexperrone" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/borsgeorgica"><img src="https://avatars.githubusercontent.com/u/15649138?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Georgica Bors</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=borsgeorgica" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.linkedin.com/in/meet-patel-b1329a16b/"><img src="https://avatars.githubusercontent.com/u/63169740?v=4?s=100" width="100px;" alt=""/><br /><sub><b>MEET PATEL</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=meetpatel0963" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/kwofach"><img src="https://avatars.githubusercontent.com/u/97578264?v=4?s=100" width="100px;" alt=""/><br /><sub><b>kwofach</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=kwofach" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Gomango999"><img src="https://avatars.githubusercontent.com/u/37771462?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kevin Zhu</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Gomango999" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/pradkrish"><img src="https://avatars.githubusercontent.com/u/47261443?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pradeep Krishnamurthy</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=pradkrish" title="Code">💻</a></td>
   </tr>
 </table>
 
