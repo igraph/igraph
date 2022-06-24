@@ -475,7 +475,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_i
     return err;
 }
 
-static void igraph_i_cattribute_permute_free(igraph_vector_ptr_t *v) {
+static void igraph_i_cattribute_clear_attribute_container(igraph_vector_ptr_t *v) {
     igraph_integer_t i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         igraph_attribute_record_t *rec = VECTOR(*v)[i];
@@ -563,32 +563,24 @@ static igraph_error_t igraph_i_cattribute_permute_vertices_in_place(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph,
-        igraph_t *newgraph,
-        const igraph_vector_int_t *idx) {
-
-    igraph_i_cattributes_t *attr, *new_attr;
-    igraph_vector_ptr_t *val, *new_val;
+static igraph_error_t igraph_i_cattribute_permute_vertices(
+    const igraph_t *graph, igraph_t *newgraph, const igraph_vector_int_t *idx
+) {
+    igraph_i_cattributes_t *attr = graph->attr, *new_attr = newgraph->attr;
+    igraph_vector_ptr_t *val = &attr->val, *new_val = &new_attr->val;
     igraph_integer_t i, valno;
+
+    IGRAPH_ASSERT(graph == newgraph || igraph_vector_ptr_empty(new_val));
 
     /* Handle in-place permutation separately */
     if (graph == newgraph) {
         return igraph_i_cattribute_permute_vertices_in_place(newgraph, idx);
     }
 
-    attr = graph->attr;
-    val = &attr->val;
-    new_attr = newgraph->attr;
-    new_val = &new_attr->val;
-
     /* New vertex attributes */
     valno = igraph_vector_ptr_size(val);
-    if (igraph_vector_ptr_size(new_val) != 0) {
-        IGRAPH_ERROR("Vertex attributes were already copied", IGRAPH_EATTRIBUTES);
-    }
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_val, valno));
-
-    IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_val);
+    IGRAPH_FINALLY(igraph_i_cattribute_clear_attribute_container, new_val);
 
     for (i = 0; i < valno; i++) {
         igraph_attribute_record_t *oldrec = VECTOR(*val)[i];
@@ -1451,6 +1443,9 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     igraph_integer_t i, j, keepno = 0;
     igraph_attribute_combination_todo_item_t *todo_items;
 
+    IGRAPH_ASSERT(graph != newgraph);
+    IGRAPH_ASSERT(igraph_vector_ptr_empty(new_val));
+
     todo_items = IGRAPH_CALLOC(valno, igraph_attribute_combination_todo_item_t);
     if (!todo_items) {
         IGRAPH_ERROR("Cannot combine vertex attributes",
@@ -1472,7 +1467,7 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_val, keepno));
-    IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_val);
+    IGRAPH_FINALLY(igraph_i_cattribute_clear_attribute_container, new_val);
 
     for (i = 0, j = 0; i < valno; i++) {
         igraph_attribute_record_t *newrec, *oldrec = VECTOR(*val)[i];
@@ -1633,7 +1628,7 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     }
 
     IGRAPH_FREE(todo_items);
-    igraph_i_cattribute_permute_free(val);
+    igraph_i_cattribute_clear_attribute_container(val);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
@@ -1900,27 +1895,21 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
                                              igraph_t *newgraph,
                                              const igraph_vector_int_t *idx) {
 
-    igraph_i_cattributes_t *attr, *new_attr;
-    igraph_vector_ptr_t *eal, *new_eal;
+    igraph_i_cattributes_t *attr = graph->attr, *new_attr = newgraph->attr;
+    igraph_vector_ptr_t *eal = &attr->eal, *new_eal = &new_attr->eal;
     igraph_integer_t i, ealno;
+
+    IGRAPH_ASSERT(graph == newgraph || igraph_vector_ptr_empty(new_eal));
 
     if (graph == newgraph) {
         return igraph_i_cattribute_permute_edges_in_place(newgraph, idx);
     }
 
-    attr = graph->attr;
-    eal = &attr->eal;
-    new_attr = newgraph->attr;
-    new_eal = &new_attr->eal;
-
     /* New edge attributes */
     ealno = igraph_vector_ptr_size(eal);
-    if (igraph_vector_ptr_size(new_eal) != 0) {
-        IGRAPH_ERROR("Edge attributes were already copied", IGRAPH_EATTRIBUTES);
-    }
+    IGRAPH_ASSERT(igraph_vector_ptr_empty(new_eal));
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_eal, ealno));
-
-    IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_eal);
+    IGRAPH_FINALLY(igraph_i_cattribute_clear_attribute_container, new_eal);
 
     for (i = 0; i < ealno; i++) {
         igraph_attribute_record_t *oldrec = VECTOR(*eal)[i];
@@ -2001,10 +1990,12 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
     igraph_integer_t i, j, keepno = 0;
     igraph_attribute_combination_todo_item_t *todo_items;
 
+    IGRAPH_ASSERT(graph != newgraph);
+    IGRAPH_ASSERT(igraph_vector_ptr_empty(new_eal));
+
     todo_items = IGRAPH_CALLOC(ealno, igraph_attribute_combination_todo_item_t);
     if (!todo_items) {
-        IGRAPH_ERROR("Cannot combine edge attributes",
-                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot combine edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, todo_items);
 
@@ -2022,7 +2013,7 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_eal, keepno));
-    IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_eal);
+    IGRAPH_FINALLY(igraph_i_cattribute_clear_attribute_container, new_eal);
 
     for (i = 0, j = 0; i < ealno; i++) {
         igraph_attribute_record_t *newrec, *oldrec = VECTOR(*eal)[i];
