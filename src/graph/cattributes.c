@@ -1628,7 +1628,6 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     }
 
     IGRAPH_FREE(todo_items);
-    igraph_i_cattribute_clear_attribute_container(val);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
