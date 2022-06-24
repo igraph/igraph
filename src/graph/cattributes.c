@@ -556,7 +556,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices_in_place(
             IGRAPH_FINALLY_CLEAN(2);
             break;
         default:
-            IGRAPH_WARNING("Unknown edge attribute ignored");
+            IGRAPH_WARNING("Unknown vertex attribute ignored");
         }
     }
 
@@ -584,8 +584,7 @@ static igraph_error_t igraph_i_cattribute_permute_vertices(const igraph_t *graph
     /* New vertex attributes */
     valno = igraph_vector_ptr_size(val);
     if (igraph_vector_ptr_size(new_val) != 0) {
-        IGRAPH_ERROR("Vertex attributes were already copied",
-                        IGRAPH_EATTRIBUTES);
+        IGRAPH_ERROR("Vertex attributes were already copied", IGRAPH_EATTRIBUTES);
     }
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_val, valno));
 
@@ -1429,6 +1428,15 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
     return IGRAPH_SUCCESS;
 }
 
+typedef struct {
+    igraph_attribute_combination_type_t type;
+    union {
+        igraph_function_pointer_t as_void;
+        igraph_cattributes_combine_num_t *as_num;
+        igraph_cattributes_combine_str_t *as_str;
+        igraph_cattributes_combine_bool_t *as_bool;
+    } func;
+} igraph_attribute_combination_todo_item_t;
 
 static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph,
                                                 igraph_t *newgraph,
@@ -1441,31 +1449,24 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     igraph_vector_ptr_t *new_val = &toattr->val;
     igraph_integer_t valno = igraph_vector_ptr_size(val);
     igraph_integer_t i, j, keepno = 0;
-    int *TODO;
-    igraph_function_pointer_t *funcs;
+    igraph_attribute_combination_todo_item_t *todo_items;
 
-    TODO = IGRAPH_CALLOC(valno, int);
-    if (!TODO) {
+    todo_items = IGRAPH_CALLOC(valno, igraph_attribute_combination_todo_item_t);
+    if (!todo_items) {
         IGRAPH_ERROR("Cannot combine vertex attributes",
                      IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    IGRAPH_FINALLY(igraph_free, TODO);
-    funcs = IGRAPH_CALLOC(valno, igraph_function_pointer_t);
-    if (!funcs) {
-        IGRAPH_ERROR("Cannot combine vertex attributes",
-                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_free, funcs);
+    IGRAPH_FINALLY(igraph_free, todo_items);
 
     for (i = 0; i < valno; i++) {
         igraph_attribute_record_t *oldrec = VECTOR(*val)[i];
         const char *name = oldrec->name;
-        igraph_attribute_combination_type_t todo;
+        igraph_attribute_combination_type_t type;
         igraph_function_pointer_t voidfunc;
-        igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
-        TODO[i] = todo;
-        funcs[i] = voidfunc;
-        if (todo != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+        IGRAPH_CHECK(igraph_attribute_combination_query(comb, name, &type, &voidfunc));
+        todo_items[i].type = type;
+        todo_items[i].func.as_void = voidfunc;
+        if (type != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
             keepno++;
         }
     }
@@ -1476,18 +1477,11 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     for (i = 0, j = 0; i < valno; i++) {
         igraph_attribute_record_t *newrec, *oldrec = VECTOR(*val)[i];
         const char *name = oldrec->name;
-        igraph_attribute_combination_type_t todo =
-            (igraph_attribute_combination_type_t) (TODO[i]);
-        igraph_attribute_type_t type = oldrec->type;
-        igraph_cattributes_combine_num_t *numfunc =
-            (igraph_cattributes_combine_num_t*) funcs[i];
-        igraph_cattributes_combine_str_t *strfunc =
-            (igraph_cattributes_combine_str_t*) funcs[i];
-        igraph_cattributes_combine_bool_t *boolfunc =
-            (igraph_cattributes_combine_bool_t*) funcs[i];
+        igraph_attribute_combination_todo_item_t todo_item = todo_items[i];
+        igraph_attribute_type_t attr_type = oldrec->type;
 
-        if (todo == IGRAPH_ATTRIBUTE_COMBINE_DEFAULT ||
-            todo == IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+        if (todo_item.type == IGRAPH_ATTRIBUTE_COMBINE_DEFAULT ||
+            todo_item.type == IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
             continue;
         }
 
@@ -1501,13 +1495,13 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
             IGRAPH_ERROR("Cannot combine vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char *) newrec->name);
-        newrec->type = type;
+        newrec->type = attr_type;
 
-        if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            switch (todo) {
+        if (attr_type == IGRAPH_ATTRIBUTE_NUMERIC) {
+            switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
                 IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-                             numfunc));
+                             todo_item.func.as_num));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
                 IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -1546,11 +1540,11 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
-        } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            switch (todo) {
+        } else if (attr_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
                 IGRAPH_CHECK(igraph_i_cattributes_cb_func(oldrec, newrec, merges,
-                             boolfunc));
+                             todo_item.func.as_bool));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
             case IGRAPH_ATTRIBUTE_COMBINE_MAX:
@@ -1582,11 +1576,11 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
-        } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-            switch (todo) {
+        } else if (attr_type == IGRAPH_ATTRIBUTE_STRING) {
+            switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
                 IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges,
-                             strfunc));
+                             todo_item.func.as_str));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
                 IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
@@ -1638,10 +1632,9 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
         j++;
     }
 
-    IGRAPH_FREE(funcs);
-    IGRAPH_FREE(TODO);
+    IGRAPH_FREE(todo_items);
     igraph_i_cattribute_permute_free(val);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -1922,6 +1915,9 @@ static igraph_error_t igraph_i_cattribute_permute_edges(const igraph_t *graph,
 
     /* New edge attributes */
     ealno = igraph_vector_ptr_size(eal);
+    if (igraph_vector_ptr_size(new_eal) != 0) {
+        IGRAPH_ERROR("Edge attributes were already copied", IGRAPH_EATTRIBUTES);
+    }
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_eal, ealno));
 
     IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_eal);
@@ -2003,30 +1999,23 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
     igraph_vector_ptr_t *new_eal = &toattr->eal;
     igraph_integer_t ealno = igraph_vector_ptr_size(eal);
     igraph_integer_t i, j, keepno = 0;
-    igraph_attribute_combination_type_t *TODO;
-    igraph_function_pointer_t *funcs;
+    igraph_attribute_combination_todo_item_t *todo_items;
 
-    TODO = IGRAPH_CALLOC(ealno, igraph_attribute_combination_type_t);
-    if (!TODO) {
+    todo_items = IGRAPH_CALLOC(ealno, igraph_attribute_combination_todo_item_t);
+    if (!todo_items) {
         IGRAPH_ERROR("Cannot combine edge attributes",
                      IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    IGRAPH_FINALLY(igraph_free, TODO);
-    funcs = IGRAPH_CALLOC(ealno, igraph_function_pointer_t);
-    if (!funcs) {
-        IGRAPH_ERROR("Cannot combine edge attributes",
-                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_free, funcs);
+    IGRAPH_FINALLY(igraph_free, todo_items);
 
     for (i = 0; i < ealno; i++) {
         igraph_attribute_record_t *oldrec = VECTOR(*eal)[i];
         const char *name = oldrec->name;
         igraph_attribute_combination_type_t todo;
         igraph_function_pointer_t voidfunc;
-        igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
-        TODO[i] = todo;
-        funcs[i] = voidfunc;
+        IGRAPH_CHECK(igraph_attribute_combination_query(comb, name, &todo, &voidfunc));
+        todo_items[i].type = todo;
+        todo_items[i].func.as_void = voidfunc;
         if (todo != IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
             keepno++;
         }
@@ -2038,17 +2027,11 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
     for (i = 0, j = 0; i < ealno; i++) {
         igraph_attribute_record_t *newrec, *oldrec = VECTOR(*eal)[i];
         const char *name = oldrec->name;
-        igraph_attribute_combination_type_t todo = TODO[i];
-        igraph_attribute_type_t type = oldrec->type;
-        igraph_cattributes_combine_num_t *numfunc =
-            (igraph_cattributes_combine_num_t*) funcs[i];
-        igraph_cattributes_combine_str_t *strfunc =
-            (igraph_cattributes_combine_str_t*) funcs[i];
-        igraph_cattributes_combine_bool_t *boolfunc =
-            (igraph_cattributes_combine_bool_t*) funcs[i];
+        igraph_attribute_combination_todo_item_t todo_item = todo_items[i];
+        igraph_attribute_type_t attr_type = oldrec->type;
 
-        if (todo == IGRAPH_ATTRIBUTE_COMBINE_DEFAULT ||
-            todo == IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
+        if (todo_item.type == IGRAPH_ATTRIBUTE_COMBINE_DEFAULT ||
+            todo_item.type == IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
             continue;
         }
 
@@ -2062,13 +2045,13 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
             IGRAPH_ERROR("Cannot combine edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, (char *) newrec->name);
-        newrec->type = type;
+        newrec->type = attr_type;
 
-        if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            switch (todo) {
+        if (attr_type == IGRAPH_ATTRIBUTE_NUMERIC) {
+            switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
                 IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-                             numfunc));
+                             todo_item.func.as_num));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
                 IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -2107,11 +2090,11 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
-        } else if (type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            switch (todo) {
+        } else if (attr_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
                 IGRAPH_CHECK(igraph_i_cattributes_cb_func(oldrec, newrec, merges,
-                             boolfunc));
+                             todo_item.func.as_bool));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
             case IGRAPH_ATTRIBUTE_COMBINE_MAX:
@@ -2143,11 +2126,11 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
                              IGRAPH_UNIMPLEMENTED);
                 break;
             }
-        } else if (type == IGRAPH_ATTRIBUTE_STRING) {
-            switch (todo) {
+        } else if (attr_type == IGRAPH_ATTRIBUTE_STRING) {
+            switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
                 IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges,
-                             strfunc));
+                             todo_item.func.as_str));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
                 IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
@@ -2199,9 +2182,8 @@ static igraph_error_t igraph_i_cattribute_combine_edges(const igraph_t *graph,
         j++;
     }
 
-    IGRAPH_FREE(funcs);
-    IGRAPH_FREE(TODO);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FREE(todo_items);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
