@@ -719,6 +719,8 @@ Some of the highlights are:
  - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator.
  - `igraph_rng_get_pois()` generates random variates from the Poisson distribution.
  - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
+ - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
+ - `igraph_turan()` generates Turán graphs.
 
 ### Removed
 
