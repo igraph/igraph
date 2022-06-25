@@ -64,6 +64,7 @@ igraph_error_t igraph_simple_interconnected_islands_game(
     igraph_integer_t i, j, is;
     igraph_real_t last;
     igraph_integer_t island_ecount;
+    igraph_real_t nr_edges_reserved;
 
     if (islands_n < 0) {
         IGRAPH_ERRORF("Number of islands cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, islands_n);
@@ -84,9 +85,13 @@ igraph_error_t igraph_simple_interconnected_islands_game(
     avg_edges_per_island = islands_pin * max_possible_edges_per_island;
     number_of_inter_island_edges = n_inter * (islands_n * (islands_n - 1)) / 2;
 
-    /* reserve enough space for all the edges */
+    nr_edges_reserved = 1.1 * avg_edges_per_island * islands_n + number_of_inter_island_edges;
+    /* The cast of ECOUNT_MAX to double could change its value, which means in theory this could still overflow, but only for very rare cases. */
+    if (nr_edges_reserved > (double) (IGRAPH_ECOUNT_MAX )) {
+        IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
+    }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 1.1 * avg_edges_per_island * islands_n + number_of_inter_island_edges));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, nr_edges_reserved * 2));
 
     IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&s, 1.1 * avg_edges_per_island));
