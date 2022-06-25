@@ -29,6 +29,8 @@
 #include "igraph_random.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 typedef struct {
     igraph_integer_t no;
     igraph_psumtree_t *sumtrees;
@@ -98,6 +100,7 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
     igraph_integer_t *lastcit;
     igraph_integer_t *index;
     igraph_integer_t binwidth;
+    igraph_integer_t no_of_edges;
 
     if (agebins != igraph_vector_size(preference) - 1) {
         IGRAPH_ERRORF("The `preference' vector should be of length `agebins' plus one."
@@ -109,6 +112,15 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
         IGRAPH_ERRORF("Number of nodes should be non-negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      nodes);
+    }
+    if (edges_per_node < 0 ) {
+        IGRAPH_ERRORF("Number of edges per node should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_node);
+    }
+    IGRAPH_SAFE_MULT(nodes, edges_per_node, &no_of_edges);
+    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
     }
     if (agebins < 1 ) {
         IGRAPH_ERRORF("Number of age bins should be at least 1, received %" IGRAPH_PRId ".",
@@ -253,12 +265,21 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_int_t edges;
     igraph_vector_t cumsum;
     igraph_real_t sum, nnval;
-    igraph_integer_t i, j, type;
+    igraph_integer_t i, j, type, no_of_edges;
     igraph_integer_t pref_len = igraph_vector_size(pref);
 
     if (igraph_vector_int_size(types) != nodes) {
         IGRAPH_ERRORF("Length of types vector (%" IGRAPH_PRId ") must match number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(types), nodes);
+    }
+    if (edges_per_step < 0 ) {
+        IGRAPH_ERRORF("Number of edges per step should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_step);
+    }
+    IGRAPH_SAFE_MULT(nodes, edges_per_step, &no_of_edges);
+    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
     }
 
     if (nodes == 0) {
@@ -375,6 +396,8 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  * \param pref The preference matrix, a square matrix is required,
  *     both the number of rows and columns should be the maximum
  *     element in \p types plus one (types are numbered from zero).
+ * \param edges_per_step Integer constant, the number of edges to add
+ *     in each time step.
  * \param directed Logical constant, whether to create a directed
  *     network.
  * \return Error code.
@@ -394,12 +417,21 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     igraph_psumtree_t *sumtrees;
     igraph_vector_t sums;
     igraph_integer_t no_of_types;
-    igraph_integer_t i, j;
+    igraph_integer_t i, j, no_of_edges;
 
     if (igraph_vector_int_size(types) != nodes) {
         IGRAPH_ERRORF("Length of types vector (%" IGRAPH_PRId ") not equal to number"
                       " of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(types), nodes);
+    }
+    if (edges_per_step < 0 ) {
+        IGRAPH_ERRORF("Number of edges per step should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_step);
+    }
+    IGRAPH_SAFE_MULT(nodes, edges_per_step, &no_of_edges);
+    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
     }
 
     /* avoid calling vector_max on empty vector */
@@ -439,7 +471,7 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     }
     IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_types);
 
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, nodes * edges_per_step));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
 
     /* First node */
     for (i = 0; i < no_of_types; i++) {
