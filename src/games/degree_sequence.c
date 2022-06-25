@@ -35,6 +35,7 @@
 
 #include "core/interruption.h"
 #include "core/set.h"
+#include "math/safe_intop.h"
 
 static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *graph,
                                        const igraph_vector_int_t *out_seq,
@@ -55,13 +56,17 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
                      "No undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
 
-    outsum = igraph_vector_int_sum(out_seq);
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(out_seq, &outsum));
     if (directed) {
-        insum = igraph_vector_int_sum(in_seq);
+        IGRAPH_CHECK(igraph_i_safe_vector_int_sum(in_seq, &insum));
     }
 
     no_of_nodes = igraph_vector_int_size(out_seq);
     no_of_edges = directed ? outsum : outsum / 2;
+
+    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+    }
 
     bag1 = IGRAPH_CALLOC(outsum, igraph_integer_t);
     if (bag1 == 0) {
@@ -152,7 +157,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
                      IGRAPH_EINVAL);
     }
 
-    outsum = igraph_vector_int_sum(seq);
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(seq, &outsum));
     no_of_nodes = igraph_vector_int_size(seq);
 
     /* Allocate required data structures */
@@ -274,7 +279,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_degree_sequence_game_fas_heur_directed(igraph_t *graph,
+static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t *graph,
         const igraph_vector_int_t *out_seq, const igraph_vector_int_t *in_seq) {
     igraph_adjlist_t al;
     igraph_bool_t deg_seq_ok, failed, finished;
@@ -295,7 +300,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fas_heur_directed(igraph_t *
                      IGRAPH_EINVAL);
     }
 
-    outsum = igraph_vector_int_sum(out_seq);
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(out_seq, &outsum));
     no_of_nodes = igraph_vector_int_size(out_seq);
 
     /* Allocate required data structures */
@@ -776,7 +781,7 @@ igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_
         if (in_deg == 0) {
             return igraph_i_degree_sequence_game_fast_heur_undirected(graph, out_deg);
         } else {
-            return igraph_i_degree_sequence_game_fas_heur_directed(graph, out_deg, in_deg);
+            return igraph_i_degree_sequence_game_fast_heur_directed(graph, out_deg, in_deg);
         }
 
     case IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE:
