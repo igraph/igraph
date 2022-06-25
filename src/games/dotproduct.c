@@ -86,12 +86,18 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
                 IGRAPH_WARNING("Negative connection probability in "
                                "dot-product graph");
             } else if (prob > 1 && ! warned_big) {
+                if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
+                    IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
+                }
                 warned_big = 1;
                 IGRAPH_WARNING("Greater than 1 connection probability in "
                                "dot-product graph");
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             } else if (RNG_UNIF01() < prob) {
+                if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
+                    IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
+                }
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             }
