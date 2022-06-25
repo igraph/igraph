@@ -26,6 +26,8 @@
 #include "igraph_constructors.h"
 #include "igraph_random.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \ingroup generators
  * \function igraph_growing_random_game
@@ -72,7 +74,14 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
         IGRAPH_ERROR("Invalid number of edges per step (m)", IGRAPH_EINVAL);
     }
 
-    no_of_edges = no_of_nodes > 0 ? (no_of_nodes - 1) * no_of_neighbors : 0;
+    if (no_of_nodes == 0) {
+        no_of_edges = 0;
+    } else {
+        IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
+        if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+            IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
+        }
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
