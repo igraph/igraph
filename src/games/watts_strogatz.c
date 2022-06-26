@@ -26,6 +26,8 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_watts_strogatz_game
  * \brief The Watts-Strogatz small-world model.
@@ -65,6 +67,8 @@ igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                                igraph_real_t p, igraph_bool_t loops,
                                igraph_bool_t multiple) {
 
+    igraph_integer_t no_edges;
+    igraph_integer_t no_nodes;
     igraph_vector_int_t dimvector;
     igraph_vector_bool_t periodic;
 
@@ -78,6 +82,14 @@ igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
     if (p < 0 || p > 1) {
         IGRAPH_ERROR("WS game: rewiring probability should be between 0 and 1",
                      IGRAPH_EINVAL);
+    }
+    no_nodes = size;
+    for (igraph_integer_t i = 1; i < dim; i++) {
+        IGRAPH_SAFE_MULT(no_nodes, size, &no_nodes);
+    }
+    IGRAPH_SAFE_MULT(no_nodes, nei, &no_edges);
+    if (no_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
 
     /* Create the lattice first */
