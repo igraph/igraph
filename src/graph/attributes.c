@@ -86,7 +86,9 @@ igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         const igraph_vector_int_list_t *merges,
                                         const igraph_attribute_combination_t *comb) {
     /* It is assumed that the two graphs are not the same and that the new
-     * graph has no vertex attributes yet */
+     * graph has no vertex attributes yet. We cannot assert the latter but we
+     * can assert the former */
+    IGRAPH_ASSERT(graph != newgraph);
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_vertices(graph, newgraph,
                 merges,
@@ -123,7 +125,9 @@ igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      const igraph_vector_int_list_t *merges,
                                      const igraph_attribute_combination_t *comb) {
     /* It is assumed that the two graphs are not the same and that the new
-     * graph has no edge attributes yet */
+     * graph has no eedge attributes yet. We cannot assert the latter but we
+     * can assert the former */
+    IGRAPH_ASSERT(graph != newgraph);
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_edges(graph, newgraph,
                 merges,

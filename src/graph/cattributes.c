@@ -498,6 +498,94 @@ static void igraph_i_cattribute_clear_attribute_container(igraph_vector_ptr_t *v
     igraph_vector_ptr_clear(v);
 }
 
+typedef struct {
+    igraph_vector_t *numeric;
+    igraph_strvector_t *string;
+    igraph_vector_bool_t *boolean;
+    igraph_integer_t length;
+} igraph_i_attribute_permutation_work_area_t;
+
+static igraph_error_t igraph_i_attribute_permutation_work_area_init(
+  igraph_i_attribute_permutation_work_area_t *work_area, igraph_integer_t length
+) {
+    work_area->length = length;
+    work_area->numeric = NULL;
+    work_area->string = NULL;
+    work_area->boolean = NULL;
+    return IGRAPH_SUCCESS;
+}
+
+static void igraph_i_attribute_permutation_work_area_destroy(
+  igraph_i_attribute_permutation_work_area_t *work_area
+) {
+    if (work_area->numeric != NULL) {
+        igraph_vector_destroy(work_area->numeric);
+        igraph_Free(work_area->numeric);
+        work_area->numeric = NULL;
+    }
+    if (work_area->string != NULL) {
+        igraph_strvector_destroy(work_area->string);
+        igraph_Free(work_area->string);
+        work_area->string = NULL;
+    }
+    if (work_area->boolean != NULL) {
+        igraph_vector_bool_destroy(work_area->boolean);
+        igraph_Free(work_area->boolean);
+        work_area->boolean = NULL;
+    }
+}
+
+static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_numeric(
+  igraph_i_attribute_permutation_work_area_t *work_area
+) {
+    igraph_vector_t* vec = work_area->numeric;
+
+    if (vec == NULL) {
+        vec = IGRAPH_CALLOC(1, igraph_vector_t);
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_FINALLY(igraph_free, vec);
+        IGRAPH_CHECK(igraph_vector_init(vec, work_area->length));
+        work_area->numeric = vec;
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_boolean(
+  igraph_i_attribute_permutation_work_area_t *work_area
+) {
+    igraph_vector_bool_t* vec = work_area->boolean;
+
+    if (vec == NULL) {
+        vec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_FINALLY(igraph_free, vec);
+        IGRAPH_CHECK(igraph_vector_bool_init(vec, work_area->length));
+        work_area->boolean = vec;
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_attribute_permutation_work_area_alloc_string(
+  igraph_i_attribute_permutation_work_area_t *work_area
+) {
+    igraph_strvector_t* vec = work_area->string;
+
+    if (vec == NULL) {
+        vec = IGRAPH_CALLOC(1, igraph_strvector_t);
+        IGRAPH_CHECK_OOM(vec, "Cannot permute attributes");
+        IGRAPH_FINALLY(igraph_free, vec);
+        IGRAPH_CHECK(igraph_strvector_init(vec, work_area->length));
+        work_area->string = vec;
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
 static igraph_error_t igraph_i_cattribute_permute_vertices_in_place(
     igraph_t *graph, const igraph_vector_int_t *idx
 ) {
@@ -505,60 +593,88 @@ static igraph_error_t igraph_i_cattribute_permute_vertices_in_place(
     igraph_vector_ptr_t *val = &attr->val;
     igraph_integer_t valno = igraph_vector_ptr_size(val);
     igraph_integer_t i;
+    igraph_attribute_record_t *oldrec;
+    igraph_vector_t *num, *num_work;
+    igraph_strvector_t *str, *str_work;
+    igraph_vector_bool_t *oldbool, *bool_work;
+    igraph_i_attribute_permutation_work_area_t work_area;
+    igraph_integer_t idx_size = igraph_vector_int_size(idx);
 
+    /* shortcut: don't allocate anything if there are no attributes */
+    if (valno == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    /* do all the allocations that can potentially fail before we actually
+     * start to permute the vertices to ensure that we will not ever need to
+     * back out from a permutation once we've started it */
+    IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_init(&work_area, idx_size));
+    IGRAPH_FINALLY(igraph_i_attribute_permutation_work_area_destroy, &work_area);
     for (i = 0; i < valno; i++) {
-        igraph_attribute_record_t *oldrec = VECTOR(*val)[i];
-        igraph_attribute_type_t type = oldrec->type;
-        igraph_vector_t *num, *newnum;
-        igraph_strvector_t *str, *newstr;
-        igraph_vector_bool_t *oldbool, *newbool;
-        switch (type) {
+        oldrec = VECTOR(*val)[i];
+        switch (oldrec->type) {
         case IGRAPH_ATTRIBUTE_NUMERIC:
             num = (igraph_vector_t*) oldrec->value;
-            newnum = IGRAPH_CALLOC(1, igraph_vector_t);
-            if (!newnum) {
-                IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
-            IGRAPH_FINALLY(igraph_free, newnum);
-            IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
-            IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
-            oldrec->value = newnum;
-            igraph_vector_destroy(num);
-            IGRAPH_FREE(num);
-            IGRAPH_FINALLY_CLEAN(2);
+            IGRAPH_CHECK(igraph_vector_reserve(num, idx_size));
+            IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_alloc_numeric(&work_area));
             break;
+
         case IGRAPH_ATTRIBUTE_BOOLEAN:
             oldbool = (igraph_vector_bool_t*) oldrec->value;
-            newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-            if (!newbool) {
-                IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
-            IGRAPH_FINALLY(igraph_free, newbool);
-            IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
-            IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
-            oldrec->value = newbool;
-            igraph_vector_bool_destroy(oldbool);
-            IGRAPH_FREE(oldbool);
-            IGRAPH_FINALLY_CLEAN(2);
+            IGRAPH_CHECK(igraph_vector_bool_reserve(oldbool, idx_size));
+            IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_alloc_boolean(&work_area));
             break;
+
         case IGRAPH_ATTRIBUTE_STRING:
-            str = (igraph_strvector_t*)oldrec->value;
-            newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
-            if (!newstr) {
-                IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
-            IGRAPH_FINALLY(igraph_free, newstr);
-            IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
-            IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
-            oldrec->value = newstr;
-            igraph_strvector_destroy(str);
-            IGRAPH_FREE(str);
-            IGRAPH_FINALLY_CLEAN(2);
+            str = (igraph_strvector_t*) oldrec->value;
+            IGRAPH_CHECK(igraph_strvector_reserve(str, idx_size));
+            IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_alloc_string(&work_area));
             break;
+
         default:
             IGRAPH_WARNING("Unknown vertex attribute ignored");
         }
     }
+
+    /* now all vectors involved in the process are as large as they should be
+     * (or larger) so the operations below are not supposed to fail -- except
+     * for string operations that still do some extra allocations and we are
+     * not prepared for the failures of those. This must still be fixed. */
+    for (i = 0; i < valno; i++) {
+        oldrec = VECTOR(*val)[i];
+        switch (oldrec->type) {
+        case IGRAPH_ATTRIBUTE_NUMERIC:
+            num = (igraph_vector_t*) oldrec->value;
+            num_work = work_area.numeric;
+            IGRAPH_ASSERT(num_work != NULL);
+            IGRAPH_CHECK(igraph_vector_index(num, num_work, idx));
+            work_area.numeric = num;
+            oldrec->value = num_work;
+            break;
+        case IGRAPH_ATTRIBUTE_BOOLEAN:
+            oldbool = (igraph_vector_bool_t*) oldrec->value;
+            bool_work = work_area.boolean;
+            IGRAPH_ASSERT(bool_work != NULL);
+            IGRAPH_CHECK(igraph_vector_bool_index(oldbool, bool_work, idx));
+            work_area.boolean = oldbool;
+            oldrec->value = bool_work;
+            break;
+        case IGRAPH_ATTRIBUTE_STRING:
+            str = (igraph_strvector_t*) oldrec->value;
+            str_work = work_area.string;
+            IGRAPH_ASSERT(str_work != NULL);
+            IGRAPH_CHECK(igraph_strvector_index(str, str_work, idx));
+            work_area.string = str;
+            oldrec->value = str_work;
+            break;
+        default:
+            /* already warned */
+            break;
+        }
+    }
+
+    igraph_i_attribute_permutation_work_area_destroy(&work_area);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -1832,60 +1948,88 @@ static igraph_error_t igraph_i_cattribute_permute_edges_in_place(
     igraph_vector_ptr_t *eal = &attr->eal;
     igraph_integer_t ealno = igraph_vector_ptr_size(eal);
     igraph_integer_t i;
+    igraph_attribute_record_t *oldrec;
+    igraph_vector_t *num, *num_work;
+    igraph_strvector_t *str, *str_work;
+    igraph_vector_bool_t *oldbool, *bool_work;
+    igraph_i_attribute_permutation_work_area_t work_area;
+    igraph_integer_t idx_size = igraph_vector_int_size(idx);
 
+    /* shortcut: don't allocate anything if there are no attributes */
+    if (ealno == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    /* do all the allocations that can potentially fail before we actually
+     * start to permute the vertices to ensure that we will not ever need to
+     * back out from a permutation once we've started it */
+    IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_init(&work_area, idx_size));
+    IGRAPH_FINALLY(igraph_i_attribute_permutation_work_area_destroy, &work_area);
     for (i = 0; i < ealno; i++) {
-        igraph_attribute_record_t *oldrec = VECTOR(*eal)[i];
-        igraph_attribute_type_t type = oldrec->type;
-        igraph_vector_t *num, *newnum;
-        igraph_strvector_t *str, *newstr;
-        igraph_vector_bool_t *oldbool, *newbool;
-        switch (type) {
+        oldrec = VECTOR(*eal)[i];
+        switch (oldrec->type) {
         case IGRAPH_ATTRIBUTE_NUMERIC:
             num = (igraph_vector_t*) oldrec->value;
-            newnum = IGRAPH_CALLOC(1, igraph_vector_t);
-            if (!newnum) {
-                IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
-            IGRAPH_FINALLY(igraph_free, newnum);
-            IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
-            IGRAPH_CHECK(igraph_vector_index(num, newnum, idx));
-            oldrec->value = newnum;
-            igraph_vector_destroy(num);
-            IGRAPH_FREE(num);
-            IGRAPH_FINALLY_CLEAN(2);
+            IGRAPH_CHECK(igraph_vector_reserve(num, idx_size));
+            IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_alloc_numeric(&work_area));
             break;
+
         case IGRAPH_ATTRIBUTE_BOOLEAN:
             oldbool = (igraph_vector_bool_t*) oldrec->value;
-            newbool = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-            if (!newbool) {
-                IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
-            IGRAPH_FINALLY(igraph_free, newbool);
-            IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, 0);
-            IGRAPH_CHECK(igraph_vector_bool_index(oldbool, newbool, idx));
-            oldrec->value = newbool;
-            igraph_vector_bool_destroy(oldbool);
-            IGRAPH_FREE(oldbool);
-            IGRAPH_FINALLY_CLEAN(2);
+            IGRAPH_CHECK(igraph_vector_bool_reserve(oldbool, idx_size));
+            IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_alloc_boolean(&work_area));
             break;
+
         case IGRAPH_ATTRIBUTE_STRING:
-            str = (igraph_strvector_t*)oldrec->value;
-            newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
-            if (!newstr) {
-                IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
-            IGRAPH_FINALLY(igraph_free, newstr);
-            IGRAPH_STRVECTOR_INIT_FINALLY(newstr, 0);
-            IGRAPH_CHECK(igraph_strvector_index(str, newstr, idx));
-            oldrec->value = newstr;
-            igraph_strvector_destroy(str);
-            IGRAPH_FREE(str);
-            IGRAPH_FINALLY_CLEAN(2);
+            str = (igraph_strvector_t*) oldrec->value;
+            IGRAPH_CHECK(igraph_strvector_reserve(str, idx_size));
+            IGRAPH_CHECK(igraph_i_attribute_permutation_work_area_alloc_string(&work_area));
             break;
+
         default:
             IGRAPH_WARNING("Unknown edge attribute ignored");
         }
     }
+
+    /* now all vectors involved in the process are as large as they should be
+     * (or larger) so the operations below are not supposed to fail -- except
+     * for string operations that still do some extra allocations and we are
+     * not prepared for the failures of those. This must still be fixed. */
+    for (i = 0; i < ealno; i++) {
+        oldrec = VECTOR(*eal)[i];
+        switch (oldrec->type) {
+        case IGRAPH_ATTRIBUTE_NUMERIC:
+            num = (igraph_vector_t*) oldrec->value;
+            num_work = work_area.numeric;
+            IGRAPH_ASSERT(num_work != NULL);
+            IGRAPH_CHECK(igraph_vector_index(num, num_work, idx));
+            work_area.numeric = num;
+            oldrec->value = num_work;
+            break;
+        case IGRAPH_ATTRIBUTE_BOOLEAN:
+            oldbool = (igraph_vector_bool_t*) oldrec->value;
+            bool_work = work_area.boolean;
+            IGRAPH_ASSERT(bool_work != NULL);
+            IGRAPH_CHECK(igraph_vector_bool_index(oldbool, bool_work, idx));
+            work_area.boolean = oldbool;
+            oldrec->value = bool_work;
+            break;
+        case IGRAPH_ATTRIBUTE_STRING:
+            str = (igraph_strvector_t*) oldrec->value;
+            str_work = work_area.string;
+            IGRAPH_ASSERT(str_work != NULL);
+            IGRAPH_CHECK(igraph_strvector_index(str, str_work, idx));
+            work_area.string = str;
+            oldrec->value = str_work;
+            break;
+        default:
+            /* already warned */
+            break;
+        }
+    }
+
+    igraph_i_attribute_permutation_work_area_destroy(&work_area);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
