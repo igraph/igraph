@@ -29,6 +29,7 @@
 #include "igraph_vector_list.h"
 
 #include "core/interruption.h"
+#include "math/safe_intop.h"
 
 #include <math.h> /* for sqrt and floor */
 
@@ -90,7 +91,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                            igraph_bool_t directed,
                            igraph_bool_t loops) {
 
-    igraph_integer_t i, j;
+    igraph_integer_t i, j, no_reserved_edges;
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_vector_int_t* nodetypes;
@@ -273,7 +274,11 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_int_size(&edges) + l * 2));
+            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l * 2, &no_reserved_edges);
+            if (no_reserved_edges > IGRAPH_ECOUNT_MAX) {
+                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+            }
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
 
             if (i != j) {
                 /* Generating the subgraph between vertices of type i and j */
@@ -387,7 +392,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
                                       igraph_vector_int_t *node_type_in_vec,
                                       igraph_bool_t loops) {
 
-    igraph_integer_t i, j, k;
+    igraph_integer_t i, j, k, no_reserved_edges;
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_vector_t cumdist;
@@ -542,7 +547,12 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_int_size(&edges) + l * 2));
+            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l * 2, &no_reserved_edges);
+            if (no_reserved_edges > IGRAPH_ECOUNT_MAX) {
+                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+            }
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
+
 
             if (!loops && c > 0) {
                 for (kk = 0; kk < l; kk++) {
