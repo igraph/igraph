@@ -152,7 +152,6 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
         IGRAPH_ERROR("The vertex type distribution vector must contain at least one positive value.", IGRAPH_EINVAL);
     }
 
-
     if (node_type_vec) {
         nodetypes = node_type_vec;
         IGRAPH_CHECK(igraph_vector_int_resize(nodetypes, nodes));
@@ -182,9 +181,6 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
             igraph_integer_t type2 = VECTOR(*nodetypes)[node2];
             /*    printf("unif: %f, %f, types: %li, %li\n", uni1, uni2, type1, type2); */
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
-                if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                    IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                }
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, node1));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, node2));
             }

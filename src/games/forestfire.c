@@ -164,9 +164,6 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
 #define ADD_EDGE_TO(nei) \
     if (VECTOR(visited)[(nei)] != actnode+1) {                           \
-        if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {   \
-            IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW); \
-        }                                                                \
         VECTOR(visited)[(nei)] = actnode+1;                              \
         IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, nei));                \
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, actnode));      \

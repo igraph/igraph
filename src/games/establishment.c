@@ -162,9 +162,6 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes
         for (j = 0; j < k; j++) {
             igraph_integer_t type2 = VECTOR(*nodetypes)[VECTOR(potneis)[j]];
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
-                if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                    IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                }
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, VECTOR(potneis)[j]));
             }

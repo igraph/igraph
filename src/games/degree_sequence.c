@@ -64,10 +64,6 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     no_of_nodes = igraph_vector_int_size(out_seq);
     no_of_edges = directed ? outsum : outsum / 2;
 
-    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
-        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
-    }
-
     bag1 = IGRAPH_CALLOC(outsum, igraph_integer_t);
     if (bag1 == 0) {
         IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */

@@ -232,7 +232,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     for (i = 0; i < types; i++) {
         for (j = 0; j < types; j++) {
             /* Generating the random subgraph between vertices of type i and j */
-            igraph_integer_t k, l;
+            igraph_integer_t k, l, l_x2;
             igraph_real_t p, last;
             igraph_vector_int_t *v1, *v2;
             igraph_integer_t v1_size, v2_size;
@@ -274,10 +274,8 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l * 2, &no_reserved_edges);
-            if (no_reserved_edges > IGRAPH_ECOUNT_MAX) {
-                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
-            }
+            IGRAPH_SAFE_MULT(l, 2, &l_x2)
+            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
             IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
 
             if (i != j) {
@@ -515,7 +513,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     IGRAPH_VECTOR_INT_INIT_FINALLY(&intersect, 0);
     for (i = 0; i < out_types; i++) {
         for (j = 0; j < in_types; j++) {
-            igraph_integer_t kk, l;
+            igraph_integer_t kk, l, l_x2;
             igraph_integer_t c = 0;
             igraph_real_t p, last;
             igraph_vector_int_t *v1, *v2;
@@ -547,10 +545,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l * 2, &no_reserved_edges);
-            if (no_reserved_edges > IGRAPH_ECOUNT_MAX) {
-                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
-            }
+            IGRAPH_SAFE_MULT(l, 2, &l_x2)
+            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
             IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
 
 

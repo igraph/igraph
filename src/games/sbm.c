@@ -30,7 +30,6 @@
 #include "igraph_games.h"
 
 #include "core/interruption.h"
-#include "math/safe_intop.h"
 
 #include <float.h>      /* for DBL_EPSILON */
 #include <math.h>       /* for sqrt and floor */
@@ -76,15 +75,6 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
                     const igraph_matrix_t *pref_matrix,
                     const igraph_vector_int_t *block_sizes,
                     igraph_bool_t directed, igraph_bool_t loops) {
-
-#define IGRAPH_ADD_EDGE \
-    do {if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {   \
-            IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW); \
-        }                                                                \
-        igraph_vector_int_push_back(&edges, fromoff + vfrom); \
-        igraph_vector_int_push_back(&edges, tooff + vto);     \
-        last += RNG_GEOM(prob);               \
-        last += 1; } while (0)
 
     igraph_integer_t no_blocks = igraph_matrix_nrow(pref_matrix);
     igraph_integer_t from, to, fromoff = 0;
@@ -161,14 +151,20 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    IGRAPH_ADD_EDGE;
+                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
+                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    last += RNG_GEOM(prob);
+                    last += 1;
                 }
             } else if (directed && !loops && from != to) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    IGRAPH_ADD_EDGE;
+                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
+                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    last += RNG_GEOM(prob);
+                    last += 1;
                 }
             } else if (directed && !loops && from == to) {
                 maxedges = ((igraph_real_t) fromsize) * (fromsize - 1.0);
@@ -178,35 +174,50 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
                     if (vfrom == vto) {
                         vto = fromsize - 1;
                     }
-                    IGRAPH_ADD_EDGE;
+                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
+                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    last += RNG_GEOM(prob);
+                    last += 1;
                 }
             } else if (!directed && loops && from != to) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    IGRAPH_ADD_EDGE;
+                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
+                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    last += RNG_GEOM(prob);
+                    last += 1;
                 }
             } else if (!directed && loops && from == to) {
                 maxedges = ((igraph_real_t) fromsize) * (fromsize + 1.0) / 2.0;
                 while (last < maxedges) {
                     vto = floor((sqrt(8 * last + 1) - 1) / 2);
                     vfrom = last - (((igraph_real_t) vto) * (vto + 1.0)) / 2.0;
-                    IGRAPH_ADD_EDGE;
+                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
+                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    last += RNG_GEOM(prob);
+                    last += 1;
                 }
             } else if (!directed && !loops && from != to) {
                 maxedges = ((igraph_real_t) fromsize) * tosize;
                 while (last < maxedges) {
                     vto = floor(last / fromsize);
                     vfrom = last - ((igraph_real_t) vto) * fromsize;
-                    IGRAPH_ADD_EDGE;
+                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
+                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    last += RNG_GEOM(prob);
+                    last += 1;
                 }
             } else { /*!directed && !loops && from==to */
                 maxedges = ((igraph_real_t) fromsize) * (fromsize - 1.0) / 2.0;
                 while (last < maxedges) {
                     vto = floor((sqrt(8 * last + 1) + 1) / 2);
                     vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
-                    IGRAPH_ADD_EDGE;
+                    igraph_vector_int_push_back(&edges, fromoff + vfrom);
+                    igraph_vector_int_push_back(&edges, tooff + vto);
+                    last += RNG_GEOM(prob);
+                    last += 1;
                 }
             }
 
@@ -223,7 +234,6 @@ igraph_error_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-#undef IGRAPH_ADD_EDGE
 }
 
 /**
@@ -327,9 +337,6 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = floor(last / fromsize);
                         igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
-                        if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                            IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                        }
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -340,9 +347,6 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
                         igraph_integer_t vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
-                        if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                            IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                        }
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -365,12 +369,7 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
         for (b = 0; b < no_blocks; b++) {
             igraph_integer_t fromsize = m;
             igraph_integer_t tosize = n - tooff;
-            igraph_integer_t from, to, new_edges, total_edges;
-            IGRAPH_SAFE_MULT(fromsize, tosize, &new_edges);
-            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), new_edges, &total_edges);
-            if (total_edges >= IGRAPH_ECOUNT_MAX) {
-                IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-            }
+            igraph_integer_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + from));
@@ -390,9 +389,6 @@ igraph_error_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
             while (last < maxedges) {
                 igraph_integer_t vto = floor(last / fromsize);
                 igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
-                if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                    IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                }
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                 last += RNG_GEOM(p);
@@ -551,9 +547,6 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = floor(last / fromsize);
                         igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
-                        if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                            IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                        }
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -564,9 +557,6 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                     while (last < maxedges) {
                         igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
                         igraph_integer_t vfrom = last - (((igraph_real_t) vto) * (vto - 1.0)) / 2.0;
-                        if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                            IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                        }
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + fromoff + vfrom));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, offset + tooff + vto));
                         last += RNG_GEOM(prob);
@@ -589,12 +579,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
         for (b = 0; b < no_blocks; b++) {
             igraph_integer_t fromsize = VECTOR(*mlist)[b];
             igraph_integer_t tosize = n - tooff;
-            igraph_integer_t from, to, new_edges, total_edges;
-            IGRAPH_SAFE_MULT(fromsize, tosize, &new_edges);
-            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), new_edges, &total_edges);
-            if (total_edges >= IGRAPH_ECOUNT_MAX) {
-                IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-            }
+            igraph_integer_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + from));
@@ -616,9 +601,6 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
             while (last < maxedges) {
                 igraph_integer_t vto = floor(last / fromsize);
                 igraph_integer_t vfrom = last - ((igraph_real_t) vto) * fromsize;
-                if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                    IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                }
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, fromoff + vfrom));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, tooff + vto));
                 last += RNG_GEOM(p);

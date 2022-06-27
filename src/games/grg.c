@@ -103,9 +103,6 @@ igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
             while ( j < nodes && (dx = VECTOR(*xx)[j] - xx1) < radius) {
                 dy = VECTOR(*yy)[j] - yy1;
                 if (dx * dx + dy * dy < r2) {
-                    if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                        IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                    }
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
                 }
@@ -130,9 +127,6 @@ igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
                     dy = 1 - dy;
                 }
                 if (dx * dx + dy * dy < r2) {
-                    if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                        IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                    }
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
                 }
@@ -147,9 +141,6 @@ igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
                         dy = 1 - dy;
                     }
                     if (dx * dx + dy * dy < r2) {
-                        if (igraph_vector_int_size(&edges) / 2 >= IGRAPH_ECOUNT_MAX) {
-                            IGRAPH_ERROR("Overflow in number of generated edges.", IGRAPH_EOVERFLOW);
-                        }
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
                     }
