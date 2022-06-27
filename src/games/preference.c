@@ -274,7 +274,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_SAFE_MULT(l, 2, &l_x2)
+            IGRAPH_SAFE_MULT(l, 2, &l_x2);
             IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
             IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
 
@@ -545,7 +545,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_SAFE_MULT(l, 2, &l_x2)
+            IGRAPH_SAFE_MULT(l, 2, &l_x2);
             IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
             IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
 
