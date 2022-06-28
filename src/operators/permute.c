@@ -29,12 +29,13 @@
 
 /**
  * \function igraph_permute_vertices
- * Permute the vertices
+ * \brief Permute the vertices.
  *
  * This function creates a new graph from the input graph by permuting
  * its vertices according to the specified mapping. Call this function
  * with the output of \ref igraph_canonical_permutation() to create
  * the canonical form of a graph.
+ *
  * \param graph The input graph.
  * \param res Pointer to an uninitialized graph object. The new graph
  *    is created here.
@@ -56,7 +57,15 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     long int i, p = 0;
 
     if (igraph_vector_size(permutation) != no_of_nodes) {
-        IGRAPH_ERROR("Permute vertices: invalid permutation vector size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Permute vertices: invalid permutation vector size.", IGRAPH_EINVAL);
+    }
+
+    if (no_of_nodes > 0) {
+        igraph_real_t min, max;
+        IGRAPH_CHECK(igraph_vector_minmax(permutation, &min, &max));
+        if (! igraph_finite(min) || min < 0 || max >= no_of_nodes) {
+            IGRAPH_ERROR("Invalid index in permutation vector when permuting vertices.", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
@@ -92,5 +101,6 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
