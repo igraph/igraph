@@ -74,6 +74,7 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
 
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
                                igraph_is_directed(graph)));
+    IGRAPH_FINALLY(igraph_destroy, res);
 
     /* Attributes */
     if (graph->attr) {
@@ -97,7 +98,7 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     }
 
     igraph_vector_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2); /* +1 for res */
 
     return IGRAPH_SUCCESS;
 }
