@@ -60,12 +60,9 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
         IGRAPH_ERROR("Permute vertices: invalid permutation vector size.", IGRAPH_EINVAL);
     }
 
-    if (no_of_nodes > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(permutation, &min, &max);
-        if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid index in permutation vector when permuting vertices.", IGRAPH_EINVAL);
-        }
+    /* TODO: do the check in the below for loop instead to avoid interating through the vector twice? */
+    if (! igraph_vector_int_isininterval(permutation, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("Invalid index in permutation vector when permuting vertices.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
@@ -76,6 +73,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, igraph_is_directed(graph)));
+    IGRAPH_FINALLY(igraph_destroy, res);
 
     /* Attributes */
     if (graph->attr) {
@@ -99,6 +97,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     }
 
     igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2); /* +1 for res */
+
     return IGRAPH_SUCCESS;
 }
