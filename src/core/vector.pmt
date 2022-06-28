@@ -1614,6 +1614,8 @@ igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
+        /* Note that the following is not equivalent to *ptr < low || *ptr > high
+         * when *ptr is NaN! */
         if (!(*ptr >= low && *ptr <= high)) {
             return 0;
         }
