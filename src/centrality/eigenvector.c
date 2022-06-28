@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
                     igraph_vector_size(weights), igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -296,7 +296,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
 
         if (min < 0.0) {
             IGRAPH_WARNING("Negative weights, eigenpair might be complex");
