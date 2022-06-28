@@ -42,7 +42,7 @@
  * \param permutation The permutation to apply. Vertex 0 is mapped to
  *    the first element of the vector, vertex 1 to the second,
  * etc. Note that it is not checked that the vector contains every
- *    element only once, and no range checking is performed either.
+ *    element only once.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in terms of the number of
