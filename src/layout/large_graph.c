@@ -55,7 +55,8 @@ static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  * placing the vertices on a grid and calculating the repulsion only
  * for vertices which are closer to each other than a limit.
  *
- * \param graph The (initialized) graph object to place.
+ * \param graph The (initialized) graph object to place. It must be connnected;
+ *   disconnected graphs are not handled by the algorithm.
  * \param res Pointer to an initialized matrix object to hold the
  *   result. It will be resized if needed.
  * \param maxit The maximum number of cooling iterations to perform
@@ -188,6 +189,12 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             igraph_integer_t vid = VECTOR(vids)[i];
             igraph_integer_t par = VECTOR(parents)[vid];
+
+            if (par < 0) {
+                /* this is either the root vertex or an unreachable node */
+                continue;
+            }
+
             IGRAPH_ALLOW_INTERRUPTION();
             igraph_2dgrid_getcenter(&grid, &massx, &massy);
             igraph_i_norm2d(&massx, &massy);

@@ -90,6 +90,10 @@ Some of the highlights are:
  - `igraph_bfs_simple()` now takes `igraph_vector_int_t` for its `vids`,
    `layers` and `parents` arguments instead of an `igraph_vector_t`.
 
+ - `igraph_bfs_simple()` now returns -1 in `parents` for the root node of the
+   traversal, and -2 for unreachable vertices. This is now consistent with other
+   functions that return a parent vector.
+
  - `igraph_biconnected_components()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`. Also, the container
    used for the edges and vertices of the components is now an `igraph_vector_int_list_t`
