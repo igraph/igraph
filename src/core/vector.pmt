@@ -2774,12 +2774,10 @@ igraph_error_t FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
  * Handy if you want to have both the smallest and largest element of
  * a vector. The vector is only traversed once. The vector must be non-empty.
  * If a vector contains at least one NaN, both \c min and \c max will be NaN.
- * \param v The input vector. It must contain at least one element.
  *
- * \param min Pointer to a base type variable, the minimum is stored
- *     here.
- * \param max Pointer to a base type variable, the maximum is stored
- *     here.
+ * \param v The input vector. It must contain at least one element.
+ * \param min Pointer to a base type variable, the minimum is stored here.
+ * \param max Pointer to a base type variable, the maximum is stored here.
  *
  * Time complexity: O(n), the number of elements.
  */
