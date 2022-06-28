@@ -684,6 +684,10 @@ Some of the highlights are:
 
  - The default random number generator has been changed from Mersenne Twister to PCG32.
 
+ - `igraph_vector_minmax()` and `igraph_vector_which_minmax()` no longer return an error code. The return type is now `void`. These functions never fail.
+
+ - `igraph_matrix_minmax()`, `igraph_matrix_which_minmax()`, `igraph_matrix_which_min()` and `igraph_matrix_which_max()` no longer return an error code. The return type is now `void`. These functions never fail.
+
 ### Added
 
  - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.
