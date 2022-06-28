@@ -1360,10 +1360,6 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
         IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
     }
-    if (no_of_nodes != 0 && igraph_sparsemat_min(adjmatrix) < 0) {
-        IGRAPH_ERRORF("Edge counts should be non-negative, found %g.", IGRAPH_EINVAL,
-                igraph_sparsemat_min(adjmatrix));
-    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
     igraph_vector_resize(weights, no_of_edges);
