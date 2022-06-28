@@ -1352,9 +1352,6 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
     igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
-    if (no_of_edges) {
-        no_of_edges *= igraph_sparsemat_max(adjmatrix);
-    }
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
