@@ -68,6 +68,9 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
     igraph_bool_t has_edges = igraph_vector_size(edges) > 0;
     igraph_real_t max = has_edges ? igraph_vector_max(edges) + 1 : 0;
 
+    if (! igraph_finite(max)) {
+        IGRAPH_ERROR("Invalid (non-finite or NaN) vertex index when creating graph.", IGRAPH_EINVAL);
+    }
     if (igraph_vector_size(edges) % 2 != 0) {
         IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
     }
