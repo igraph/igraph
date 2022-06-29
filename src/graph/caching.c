@@ -121,6 +121,6 @@ void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_pro
  */
 void igraph_i_property_cache_invalidate_all(const igraph_t *graph) {
     for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_LAST; ++prop) {
-        igraph_i_property_cache_clear(graph, prop);
+        igraph_i_property_cache_invalidate(graph, prop);
     }
 }
