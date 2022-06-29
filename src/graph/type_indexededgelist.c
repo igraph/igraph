@@ -324,6 +324,9 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
 
 #undef CHECK_ERR
 
+    /* modification successful, clear the cached properties of the graph */
+    igraph_i_property_cache_invalidate_all(graph);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -393,6 +396,9 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
             IGRAPH_ERROR("Cannot add vertices.", err);
         }
     }
+
+    /* modification successful, clear the cached properties of the graph */
+    igraph_i_property_cache_invalidate_all(graph);
 
     return IGRAPH_SUCCESS;
 }
@@ -506,6 +512,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     /* Create start vectors, no memory is needed for this */
     igraph_i_create_start(&graph->os, &graph->from, &graph->oi, no_of_nodes);
     igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
+
+    /* modification successful, clear the cached properties of the graph */
+    igraph_i_property_cache_invalidate_all(graph);
 
     /* Nothing to deallocate... */
     return IGRAPH_SUCCESS;
@@ -689,6 +698,9 @@ igraph_error_t igraph_delete_vertices_idx(
         igraph_vector_int_destroy(my_vertex_recoding);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
+    /* modification successful, clear the cached properties of the graph */
+    igraph_i_property_cache_invalidate_all(graph);
 
     return IGRAPH_SUCCESS;
 }
