@@ -48,8 +48,7 @@ static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  *
  * </para><para>
  * This is a layout generator similar to the Large Graph Layout
- * algorithm and program
- * (http://lgl.sourceforge.net/). But unlike LGL, this
+ * algorithm and program (http://lgl.sourceforge.net/). But unlike LGL, this
  * version uses a Fruchterman-Reingold style simulated annealing
  * algorithm for placing the vertices. The speedup is achieved by
  * placing the vertices on a grid and calculating the repulsion only
@@ -132,6 +131,12 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, 0);
     IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
     no_of_layers = igraph_vector_int_size(&layers) - 1;
+
+    /* Check whether we have reached all the nodes -- if not, the graph is
+     * disconnected */
+    if (no_of_nodes > 0 && igraph_vector_int_min(&parents) <= -2) {
+        IGRAPH_WARNING("LGL layout does not support disconnected graphs yet");
+    }
 
     /* We don't need the mst any more */
     igraph_destroy(&mst);
