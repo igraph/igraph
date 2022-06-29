@@ -109,7 +109,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 
 	igraph_shortest_paths_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights);
 	
-	printf("Johnson Works\n");
+	//printf("Johnson Works\n");
 	
 	IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy,steiner_terminals));
 	IGRAPH_FINALLY(igraph_vector_int_destroy,&steiner_terminals_copy);
@@ -129,14 +129,14 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 
 	igraph_matrix_fill(&dp_cache, INT_MAX);
 	
-	printf("Matrix Filled\n");
+//	printf("Matrix Filled\n");
 	
 	q = VECTOR(steiner_terminals_copy)[0];
 
 	igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
 	allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(steiner_terminals), no_of_vertices);
-	printSubsets(allSubsets);
+//	printSubsets(allSubsets);
 	// Singleton subset rows may be filled in trivially
 	// printf("subsets Filled\n");
 	// printf("Size:%ld\n",igraph_vector_int_size(&steiner_terminals_copy));
