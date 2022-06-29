@@ -19,7 +19,7 @@
 
 int main()
 {
-    printf("Starting Tests\n");
+   // printf("Starting Tests\n");
     igraph_t g_empty, g_lm;
 
     igraph_vector_int_t steiner_terminals,steiner_terminals_null;
@@ -95,10 +95,10 @@ int main()
                                                 5, 6, 
                                                 -1);
     
-    printf("No vertices, not directed:\n");
+    //printf("No vertices, not directed:\n");
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_UNDIRECTED, &weights_empty) == IGRAPH_SUCCESS);
 
-    printf("Un-Directed graph with loops and multi-edges, select none:\n");
+    //printf("Un-Directed graph with loops and multi-edges, select none:\n");
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm,&steiner_terminals, IGRAPH_UNDIRECTED, &weights_lm) == IGRAPH_SUCCESS);
 
 
