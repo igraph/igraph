@@ -127,8 +127,8 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices)));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
-	igraph_matrix_fill(&dp_cache, INT_MAX);
-	
+  igraph_matrix_fill(&dp_cache, INT_MAX);
+
 //	printf("Matrix Filled\n");
 	
 	q = VECTOR(steiner_terminals_copy)[0];
