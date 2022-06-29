@@ -104,7 +104,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t ec = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
-    IGRAPH_TRY_CACHE(graph, IGRAPH_PROP_HAS_MULTI, res);
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_HAS_MULTI, res);
 
     if (vc == 0 || ec == 0) {
         *res = 0;

@@ -43,7 +43,7 @@
 igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t i, m = igraph_ecount(graph);
 
-    IGRAPH_TRY_CACHE(graph, IGRAPH_PROP_HAS_LOOP, res);
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_HAS_LOOP, res);
 
     *res = 0;
 

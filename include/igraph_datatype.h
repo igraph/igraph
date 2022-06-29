@@ -40,7 +40,7 @@ typedef enum {
     IGRAPH_PROP_WEAKLY_CONNECTED,    /* weakly connected */
     IGRAPH_PROP_STRONGLY_CONNECTED,  /* strongly connected */
     IGRAPH_PROP_I_LAST               /* dummy value used to count enum values */
-} igraph_property_t;
+} igraph_cached_property_t;
 
 /**
  * \ingroup internal
