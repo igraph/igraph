@@ -365,6 +365,12 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
  * argument that led us to change the definition:
  * https://github.com/igraph/igraph/issues/1539
  *
+ * </para><para>
+ * The return value of this function is cached in the graph itself, separately
+ * for weak and strong connectivity. Calling the function multiple times with
+ * no modifications to the graph in between will return a cached value in O(1)
+ * time.
+ *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
  *        here.
@@ -384,39 +390,48 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
 igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                         igraph_connectedness_t mode) {
 
+    igraph_cached_property_t prop;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_error_t retval = IGRAPH_SUCCESS;
+    igraph_integer_t no;
+
+    switch (mode) {
+        case IGRAPH_WEAK:
+            prop = IGRAPH_PROP_WEAKLY_CONNECTED;
+            break;
+
+        case IGRAPH_STRONG:
+            prop = IGRAPH_PROP_STRONGLY_CONNECTED;
+            break;
+
+        default:
+            IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, prop, res);
 
     if (no_of_nodes == 0) {
         /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1539
          * for the reasoning behind the change */
         *res = 0;
-        return IGRAPH_SUCCESS;
-    }
-
-    if (no_of_nodes == 1) {
+    } else if (no_of_nodes == 1) {
         *res = 1;
-        return IGRAPH_SUCCESS;
-    }
-
-    if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
-        return igraph_is_connected_weak(graph, res);
-    } else if (mode == IGRAPH_STRONG) {
-        igraph_error_t retval;
-        igraph_integer_t no;
-
+    } else if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
+        retval = igraph_is_connected_weak(graph, res);
+    } else {   /* mode == IGRAPH_STRONG */
         /* A strongly connected graph has at least as many edges as vertices,
          * except for the singleton graph, which is handled above. */
         if (igraph_ecount(graph) < no_of_nodes) {
             *res = 0;
-            return IGRAPH_SUCCESS;
+        } else {
+            retval = igraph_i_connected_components_strong(graph, NULL, NULL, &no);
+            *res = (no == 1);
         }
-
-        retval = igraph_i_connected_components_strong(graph, NULL, NULL, &no);
-        *res = (no == 1);
-        return retval;
     }
 
-    IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    igraph_i_property_cache_set(graph, prop, *res);
+
+    return retval;
 }
 
 static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
