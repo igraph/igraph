@@ -14,6 +14,22 @@
 
 std::map<std::set<igraph_integer_t>, igraph_integer_t> subsetMap;
 
+void printSubsets(std::set<std::set<igraph_integer_t>> allSubsets)
+{
+	printf("Subsets :\n{\n");
+	for (auto i = allSubsets.begin() ; i != allSubsets.end() ; ++i )
+	{
+		printf("\t{ ");
+		for (auto j = (*i).begin() ; j != (*i).end() ; j++)
+		{
+			if (j != (*i).begin()) { printf(", ");}
+			printf("%ld",*j);
+		}
+		printf("}");
+		if (i != (--allSubsets.end())) { printf(",\n");}
+	}
+	printf("\n}\n");
+}
 std::set<std::set<igraph_integer_t>> generateSubsets(igraph_vector_int_t steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize)
 {
 	igraph_integer_t count = (1 << n);
@@ -108,7 +124,9 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 		igraph_vector_remove(&steiner_vertices, i - j);
 	}
 
-	igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices));
+	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices)));
+	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
+
 	igraph_matrix_fill(&dp_cache, INT_MAX);
 	
 	printf("Matrix Filled\n");
@@ -118,7 +136,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 	igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
 	allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(steiner_terminals), no_of_vertices);
-
+	printSubsets(allSubsets);
 	// Singleton subset rows may be filled in trivially
 	// printf("subsets Filled\n");
 	// printf("Size:%ld\n",igraph_vector_int_size(&steiner_terminals_copy));
@@ -223,7 +241,9 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 	
 	igraph_vector_int_destroy(&steiner_terminals_copy);
 	
-	IGRAPH_FINALLY_CLEAN(3);
+	igraph_matrix_destroy(&dp_cache);
+
+	IGRAPH_FINALLY_CLEAN(4);
 
 	return IGRAPH_SUCCESS;
 	
