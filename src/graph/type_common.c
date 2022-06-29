@@ -25,10 +25,6 @@
 
 /* Internal functions */
 
-static int igraph_i_create_start(
-        igraph_vector_t *res, igraph_vector_t *el,
-        igraph_vector_t *index, igraph_integer_t nodes);
-
 /* The functions in this file are sensible "default" implementations for some
  * of the core API functions that simply call other core API functions. If
  * you are implementing your own data type, chances are that you can use these

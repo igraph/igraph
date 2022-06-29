@@ -32,7 +32,7 @@
 
 /* Internal functions */
 
-static igraph_error_t igraph_i_create_start(
+static igraph_error_t igraph_i_create_start_vectors(
         igraph_vector_int_t *res, igraph_vector_int_t *el,
         igraph_vector_int_t *index, igraph_integer_t nodes);
 
@@ -309,10 +309,10 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         }
 
         /* os & is, its length does not change, error safe */
-        igraph_i_create_start(&graph->os, &graph->from, &newoi, graph->n);
-        igraph_i_create_start(&graph->is, &graph->to, &newii, graph->n);
+        igraph_i_create_start_vectors(&graph->os, &graph->from, &newoi, graph->n);
+        igraph_i_create_start_vectors(&graph->is, &graph->to, &newii, graph->n);
 
-        /* everything went fine  */
+        /* everything went fine */
         igraph_vector_int_destroy(&graph->oi);
         igraph_vector_int_destroy(&graph->ii);
         IGRAPH_FINALLY_CLEAN(2);
@@ -510,8 +510,8 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Create start vectors, no memory is needed for this */
-    igraph_i_create_start(&graph->os, &graph->from, &graph->oi, no_of_nodes);
-    igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
+    igraph_i_create_start_vectors(&graph->os, &graph->from, &graph->oi, no_of_nodes);
+    igraph_i_create_start_vectors(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
 
     /* modification successful, clear the cached properties of the graph */
     igraph_i_property_cache_invalidate_all(graph);
@@ -627,15 +627,16 @@ igraph_error_t igraph_delete_vertices_idx(
             j++;
         }
     }
+
     /* update oi & ii */
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.from, &newgraph.to, &newgraph.oi,
                                          remaining_vertices));
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.to, &newgraph.from, &newgraph.ii,
                                          remaining_vertices));
 
-    IGRAPH_CHECK(igraph_i_create_start(&newgraph.os, &newgraph.from,
+    IGRAPH_CHECK(igraph_i_create_start_vectors(&newgraph.os, &newgraph.from,
                                        &newgraph.oi, remaining_vertices));
-    IGRAPH_CHECK(igraph_i_create_start(&newgraph.is, &newgraph.to,
+    IGRAPH_CHECK(igraph_i_create_start_vectors(&newgraph.is, &newgraph.to,
                                        &newgraph.ii, remaining_vertices));
 
     newgraph.cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
@@ -649,7 +650,10 @@ igraph_error_t igraph_delete_vertices_idx(
     /* attributes */
     IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph,
                             /*graph=*/ 1, /*vertex=*/0, /*edge=*/0);
-    IGRAPH_FINALLY_CLEAN(8);
+
+    /* at this point igraph_destroy can take over the responsibility of
+     * deallocating the graph */
+    IGRAPH_FINALLY_CLEAN(8);    /* 2 for the property cache, 6 for the vectors */
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
     if (newgraph.attr) {
@@ -925,7 +929,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
  * \ingroup internal
  */
 
-static igraph_error_t igraph_i_create_start(
+static igraph_error_t igraph_i_create_start_vectors(
         igraph_vector_int_t *res, igraph_vector_int_t *el,
         igraph_vector_int_t *iindex, igraph_integer_t nodes) {
 
