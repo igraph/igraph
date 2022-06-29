@@ -67,6 +67,7 @@ int main() {
                         /* root */       0),
         "LGL layout does not support disconnected graphs yet"
     );
+    igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
