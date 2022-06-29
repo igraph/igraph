@@ -87,6 +87,11 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
  *
+ * </para><para>
+ * The return value of this function is cached in the graph itself; calling
+ * the function multiple times with no modifications to the graph in between
+ * will return a cached value in O(1) time.
+ *
  * \param graph The input graph.
  * \param res Pointer to a boolean variable, the result will be stored here.
  * \return Error code.

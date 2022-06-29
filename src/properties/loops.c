@@ -31,6 +31,12 @@
  *
  * </para><para>
  * A loop edge is an edge from a vertex to itself.
+ *
+ * </para><para>
+ * The return value of this function is cached in the graph itself; calling
+ * the function multiple times with no modifications to the graph in between
+ * will return a cached value in O(1) time.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result.
  *
