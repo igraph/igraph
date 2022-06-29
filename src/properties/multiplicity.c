@@ -188,13 +188,9 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
         igraph_integer_t e = IGRAPH_EIT_GET(eit);
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
-        igraph_vector_int_t *neis =
-            igraph_lazy_inclist_get(&inclist, from);
+        igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, from);
 
-        if (neis == 0) {
-            /* Most likely out of memory */
-            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
 
         VECTOR(*res)[i] = 0;
 
@@ -255,13 +251,9 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
         igraph_integer_t e = IGRAPH_EIT_GET(eit);
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
-        igraph_vector_int_t *neis =
-            igraph_lazy_inclist_get(&inclist, from);
+        igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, from);
 
-        if (neis == 0) {
-            /* Most likely out of memory */
-            IGRAPH_ERROR("Out of memory while building lazy incidence list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
 
         VECTOR(*res)[i] = 0;
 
@@ -343,8 +335,8 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
         /* Check whether there is a to->from edge, search for from in the
            out-list of to. We don't search an empty vector, because
            vector_binsearch seems to have a bug with this. */
-        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                to);
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
+        IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
         if (igraph_vector_int_empty(neis)) {
             VECTOR(*res)[i] = 0;
         } else {

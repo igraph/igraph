@@ -94,6 +94,8 @@
  * \sa \ref igraph_assortativity() for computing the assortativity
  * based on continuous vertex values instead of discrete categories.
  * \ref igraph_modularity() to compute generalized modularity.
+ *
+ * \example examples/simple/igraph_assortativity_nominal.c
  */
 
 igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
@@ -230,7 +232,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * For an educational overview of the concept of assortativity, see
  * M. E. J. Newman,
  * Networks: An Introduction, Oxford University Press (2010).
- * https://doi.org/10.1093/acprof:oso/9780199206650.001.0001.
+ * https://doi.org/10.1093/acprof%3Aoso/9780199206650.001.0001.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param values The vertex values, these can be arbitrary numeric
@@ -256,8 +258,6 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * categories instead of numeric labels, and \ref
  * igraph_assortativity_degree() for the special case of assortativity
  * based on vertex degrees.
- * 
- * \example examples/simple/igraph_assortativity_degree.c
  */
 
 igraph_error_t igraph_assortativity(const igraph_t *graph,
@@ -303,9 +303,9 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
 
         num1 /= no_of_edges;
         if (normalized) {
-            den1 /= no_of_edges * 2;
+            den1 /= no_of_edges * 2.0;
         }
-        num2 /= no_of_edges * 2;
+        num2 /= no_of_edges * 2.0;
         num2 = num2 * num2;
 
         if (normalized) {
@@ -363,6 +363,11 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  * In the directed case, it uses out-degrees as out-values and
  * in-degrees as in-values.
  *
+ * </para><para>
+ * For regular graphs, i.e. graphs in which all vertices have the
+ * same degree, computing degree correlations is not meaningful,
+ * and this function returns NaN.
+ *
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \param directed Boolean, whether to consider edge directions for
@@ -377,6 +382,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  *
  * \sa \ref igraph_assortativity() for the general function
  * calculating assortativity for any kind of numeric vertex values.
+ * 
+ * \example examples/simple/igraph_assortativity_degree.c
  */
 
 igraph_error_t igraph_assortativity_degree(const igraph_t *graph,

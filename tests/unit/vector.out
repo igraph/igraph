@@ -18,7 +18,7 @@ Test igraph_vector_resize, igraph_vector_sort
 Test igraph_vector_{which}_{min, max}
  100 99 98 97 96 95 94 93 92 91
 Test NaN values
-Test igraph_vector_init_copy
+Test igraph_vector_init_array
 ( 100 99 98 97 96 95 94 93 92 91 )
 Test igraph_vector_copy_to
  11 12 13 14 15 16 17 18 19 20
@@ -26,6 +26,9 @@ Test igraph_vector_init_seq, igraph_vector_sum, igraph_vector_prod
  15 120
 Test igraph_vector_remove_section
 ( 1 2 5 )
+Test igraph_vector_remove_section with invalid limits
+( 1 2 5 )
+( 1 )
 Test igraph_vector_remove
 ( 2 3 4 5 7 8 9 )
 Test igraph_vector_remove_fast
@@ -45,9 +48,10 @@ Test igraph_vector_init_real
 ( 1 2 3 4 5 6 7 8 9 10 )
 Test igraph_vector_init_int
 ( 1 2 3 4 5 6 7 8 9 10 )
-Test igraph_vector_permdelete
 Test order2
 ( 0 8 1 7 6 2 3 5 4 )
+Test order2 on empty vector
+( )
 Test filter_smaller, quite special....
 ( 4 4 5 6 7 8 )
 ( 1 2 3 4 4 4 4 5 6 7 8 )

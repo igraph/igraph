@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Release notes
+
+This release focuses on infrastructural improvements, stability, and making the igraph interface more consistent, more predictable and easier to use. It contains many API-breaking changes and function renamings, in preparation for a future 1.0 release, at which point the API will become stable. Changes in this direction are likely to continue through a 0.11 release. It is recommended that you migrate your code from 0.9 to 0.10 soon, to make the eventual transition to 1.0 easier.
+
+Some of the highlights are:
+
+ - A consistent use of `igraph_integer_t` for all indices and most integer quantities, both in the API and internally. This type is 64-bit by default on all 64-bit systems, bringing support for very large graphs with more than 2 billion vertices. Previously, vertex and edge indices were often represented as `igraph_real_t`. The move to an `igraph_integer_t` also implies a change from `igraph_vector_t` to `igraph_vector_int_t` in many functions.
+
+ - The random number generation framework has been overhauled. Sampling from the full range of `igraph_integer_t` is now possible. Similarly, the sampling of random reals has been improved to utilize almost the full range of the mantissa of an `igraph_real_t`.
+
+ - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most prevous uses of the non-managed `igraph_vector_ptr_t`.
+
+ - File format readers are much more robust and more tolerant of invalid input.
+
+ - Many improvements to robustness and reliability, made possible by internal refactorings.
+
 ### Breaking changes
 
  - igraph now requires CMake 3.18 or later.
@@ -11,6 +27,9 @@
    32 bits on 32-bit platforms and 64 bits on 64-bit platforms by default. You
    also have the option to compile a 32-bit igraph variant on a 64-bit platform
    by changing the `IGRAPH_INTEGER_SIZE` build variable in CMake to 32.
+
+ - The random number generator interface, `igraph_rng_type_t`, has been overhauled.
+   Check the declaration of the type for details.
 
  - Since `igraph_integer_t` aims to be the largest integer size that is feasible
    on a particular platform, there is no need for generic data types based on
@@ -28,6 +47,12 @@
  - Similarly, igraph functions that used to accept the `long` variant of a
    generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int`
    variant of the same data type.
+
+ - Error handlers should no longer perform a `longjmp()`. Doing so will introduce
+   memory leaks, as resource cleanup is now done in multiple stages, through
+   multiple calls to the error handler. Thus, the error handler should either
+   abort execution immediately (as the default handler does), or report the error,
+   call `IGRAPH_FINALLY_FREE()`, and return normally.
 
  - `igraph_add_edges()` now uses an `igraph_vector_int_t` for its `edges`
    parameter.
@@ -50,8 +75,8 @@
  - `igraph_asymmetric_preferennce_game()` now uses an `igraph_vector_int_t` to
    return the types of the nodes in the generated graph.
 
- - `igraph_automorphism_group()` now returns the generators in a pointer vector
-   containing `igraph_vector_int_t` structs, not `igraph_vector_t`.
+ - `igraph_automorphism_group()` now returns the generators in an `igraph_vector_int_list_t`
+   instead of a pointer vector containing `igraph_vector_t` objects.
 
  - `igraph_barabasi_game()`, `igraph_barabasi_aging_game()`,
    `igraph_recent_degree_game()` and `igraph_recent_degree_aging_game()` now use
@@ -65,10 +90,14 @@
  - `igraph_bfs_simple()` now takes `igraph_vector_int_t` for its `vids`,
    `layers` and `parents` arguments instead of an `igraph_vector_t`.
 
+ - `igraph_bfs_simple()` now returns -1 in `parents` for the root node of the
+   traversal, and -2 for unreachable vertices. This is now consistent with other
+   functions that return a parent vector.
+
  - `igraph_biconnected_components()` now uses an `igraph_vector_int_t` to return
-   the list of articulation points, not an `igraph_vector_t`. Also, the members
-   of the pointer vectors containing the edges and vertices of the components
-   are now of type `igraph_vector_int_t`, not `igraph_vector_t`.
+   the list of articulation points, not an `igraph_vector_t`. Also, the container
+   used for the edges and vertices of the components is now an `igraph_vector_int_list_t`
+   instead of a pointer vector containing `igraph_vector_t` objects.
 
  - `igraph_bipartite_projection()` now uses `igraph_vector_int_t` to return
    `multiplicity1` and `multiplicity2`, not `igraph_vector_t`.
@@ -112,8 +141,8 @@
    `igraph_vector_int_t` to return `reachable_count`, not an `igraph_vector_t`.
 
  - `igraph_cohesive_blocks()` now uses an `igraph_vector_int_t` to return the
-   mapping from block indices to parent block indices, and the `cohesion`; also, it uses a pointer
-   vector of `igraph_vector_int_t`s to return the blocks themselves instead of
+   mapping from block indices to parent block indices, and the `cohesion`; also,
+   it uses an `igraph_vector_int_list_t` to return the blocks themselves instead of
    a pointer vector of `igraph_vector_t`.
 
  - `igraph_community_walktrap()`, `igraph_community_edge_betweenness()`,
@@ -217,9 +246,16 @@
  - `igraph_feedback_arc_set()` now uses an `igraph_vector_int_t` to return the
    IDs of the edges in the feedback arc set instead of an `igraph_vector_t`.
 
+ - `igraph_get_adjacency()` no longer has the `eids` argument, which would produce
+   an adjacency matrix where non-zero values were 1-based (not 0-based) edge IDs.
+   If you need a matrix with edge IDs, create it manually.
+
  - `igraph_get_adjacency_sparse()` now returns the sparse adjacency matrix in
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
    _initialized_ for sake of consistency with other igraph functions.
+
+ - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now has a
+   `loops` argument that lets the user specify how loop edges should be handled.
 
  - `igraph_get_edgelist()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
@@ -249,18 +285,23 @@
    to return the predecessors and inbound edges instead of an
    `igraph_vector_long_t`.
 
- - The pointer vectors in the argument lists of `igraph_get_all_shortest_paths()`,
+ - The functions `igraph_get_all_shortest_paths()`,
    `igraph_get_all_shortest_paths_dijkstra()`, `igraph_get_shortest_paths()`,
-   `igraph_get_shortesT_paths_bellman_ford()` and
-   `igraph_get_shortest_paths_dijkstra()` now contain `igraph_vector_int_t` vectors
-   instead of `igraph_vector_t`.
+   `igraph_get_shortest_paths_bellman_ford()` and
+   `igraph_get_shortest_paths_dijkstra()` now return paths in an
+   `igraph_vector_int_list_t` instead of a pointer vector containing
+   `igraph_vector_t` objects.
 
  - The `maps` parameters in `igraph_get_isomorphisms_vf2()` and
    `igraph_get_subisomorphisms_vf2()` are now of type `igraph_vector_int_list_t`.
 
+ - `igraph_get_stochastic()` now has an additional `weights` argument for edge
+   weights.
+
  - `igraph_get_stochastic_sparse()` now returns the sparse adjacency matrix in
    an `igraph_sparsemat_t` structure, and it assumes that the input matrix is
-   _initialized_ for sake of consistency with other igraph functions.
+   _initialized_ for sake of consistency with other igraph functions. It also
+   received an additional `weights` argument for edge weights.
 
  - `igraph_girth()` now uses an `igraph_vector_int_t` for its
    `circle` parameter.
@@ -302,8 +343,8 @@
  - `igraph_intersection()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
 
- - The `edgemaps` parameter of `igraph_intersection_many()` is now a vector of
-   `igraph_vector_int_t` pointers.
+ - The `edgemaps` parameter of `igraph_intersection_many()` is now an
+   `igraph_vector_int_list_t` instead of a pointer vector.
 
  - `igraph_is_chordal()` now uses an `igraph_vector_int_t` for its
    `alpha`, `alpham1` and `fill_in` parameters.
@@ -370,6 +411,8 @@
  - `igraph_maxflow()` now uses an `igraph_vector_int_t` for its
    `cut`, `partition` and `partition2` parameters.
 
+ - The `igraph_maxflow_stats_t` struct now contains `igraph_integer_t` values instead of `int` ones.
+
  - The `res` parameters in `igraph_maximal_cliques()` and `igraph_maximal_cliques_subset()`
    are now of type `igraph_vector_int_list_t`.
 
@@ -402,8 +445,7 @@
  - `igraph_neighborhood_size()` now uses an `igraph_vector_int_t` for its
    `res` parameter.
 
- - The `res` parameter of `igraph_neighborhood()` is now a vector of pointers
-   to `igraph_vector_int_t`.
+ - The `res` parameter of `igraph_neighborhood()` is now an `igraph_vector_int_list_t`.
 
  - `igraph_neighbors()` now uses an `igraph_vector_int_t` for its
    `neis` parameter.
@@ -411,11 +453,25 @@
  - `igraph_permute_vertices()` now takes an `igraph_vector_int_t` as the
    permutation vector.
 
+ - `igraph_power_law_fit()` does not calculate the p-value automatically any
+   more because the previous estimation method did not match the results from
+   the original paper of Clauset, Shalizi and Newman (2009) and the
+   implementation of the method outlined in the paper runs slower than the
+   previous naive estimate. A separate function named
+   `igraph_plfit_result_calculate_p_value()` is now provided for calculating
+   the p-value. The automatic selection of the `x_min` cutoff also uses a
+   different method than earlier versions. As a consequence, results might be
+   slightly different if you used tests where the `x_min` cutoff was selected
+   automatically. The new behaviour is now consistent with the defaults of the
+   underlying `plfit` library.
+
  - `igraph_preference_game()` now uses an `igraph_vector_int_t` to return the
    types of the nodes in the generated graph.
 
  - `igraph_random_walk()` now uses an `igraph_vector_int_t` for its
-   `walk` parameter.
+   results. Also, the function now takes both vertices and edges as
+   parameters. It can return IDs of vertices and/or edges on the walk.
+   The function now takes weights as a parameter to support weighted graphs.
 
  - `igraph_random_edge_walk()` now uses an `igraph_vector_int_t` for its
    `edgewalk` parameter.
@@ -479,8 +535,8 @@
    now of type `igraph_vector_int_list_t`.
 
  - `igraph_subisomorphic_lad()` now uses an `igraph_vector_int_t` for its `map`
-   parameter. Also, its `domains` parameter is now a pointer vector containing
-   `igraph_vector_int_t` objects instead of `igraph_vector_t`.
+   parameter. Also, its `domains` parameter is now an `igraph_vector_int_list_t`
+   instead of a pointer vector containing `igraph_vector_t` objects.
 
  - `igraph_unfold_tree()` now uses an `igraph_vector_int_t` for its `vertex_index`
    and `roots` parameters.
@@ -488,8 +544,15 @@
  - `igraph_union()` now uses an `igraph_vector_int_t` for its
    `edge_map1` and `edge_map2` parameters.
 
- - The `edgemaps` parameter of `igraph_union_many()` is now a vector of
-   `igraph_vector_int_t` pointers.
+ - The `edgemaps` parameter of `igraph_union_many()` is now an
+   `igraph_vector_int_list_t` instead of a pointer vector.
+
+ - `igraph_vector_init_copy()` was refactored to take _another_ vector that the
+   newly initialized vector should copy. The old array-based initialization
+   function is now called `igraph_vector_init_array()`.
+
+ - `igraph_vector_ptr_init_copy()` was renamed to `igraph_vector_ptr_init_array()`
+   for sake of consistency.
 
  - `igraph_vs_vector()`, `igraph_vss_vector()` and `igraph_vs_vector_copy()` now
    all take an `igraph_vector_int_t` as the vector of vertex IDs, not an
@@ -535,9 +598,8 @@
    `igraph_blas_dgemv_array()` thus now return an `igraph_error_t`, which may be
    set to `IGRAPH_EOVERFLOW` if the input vectors or matrices are too large.
 
- - `igraph_sparsemat_transpose()` now takes an `igraph_bool_t` as its `values`
-   argument instead of an `int`. In practice, it has always been treated as a
-   boolean.
+ - The `values` argument of `igraph_sparsemat_transpose()` was removed; now the
+   function always copies the values over to the transposed matrix.
 
  - `igraph_sparsemat_cholsol()`, `igraph_sparsemat_lusol()`, `igraph_sparsemat_symbqr`
    and `igraph_sparsemat_symblu` now take an `igraph_integer_t` as their `order` parameter.
@@ -570,8 +632,8 @@
    `igraph_community_multilevel()` additionaly uses a `igraph_matrix_int_t`
    instead of `igraph_matrix_t()` for its memberships parameter.
 
- - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use `IGRAPH_ALL`
-   instead.
+ - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use the equivalent
+   `IGRAPH_ALL` instead.
 
  - `igraph_vector_resize_min()` and `igraph_matrix_resize_min()` no longer return an
    error code (return type is now `void`). The vector or matrix is always left in
@@ -582,9 +644,58 @@
 
  - `igraph_read_graph_graphml()` now uses `igraph_integer_t` for its `index` argument.
 
+ - `igraph_read_graph_pajek()` now creates a Boolean `type` attribute for bipartite graphs.
+   Previously it created a numeric attribute.
+
+ - `igraph_adjacency()` no longer accepts a negative number of edges in its
+   adjacency matrix. When negative entries are found, an error is generated.
+
+ - `igraph_adjacency()` gained an additional `loops` argument that lets you
+   specify whether the diagonal entries should be ignored or should be interpreted
+   as raw edge counts or _twice_ the number of edges (which is common in linear
+   algebra contexts).
+
+ - `igraph_weighted_adjacency()` now returns the weights in a separate vector
+   instead of storing it in a vertex attribute. The reason is twofold: first,
+   the previous solution worked only with the C attribute handler (not the ones
+   from the higher-level interfaces), and second, it wasn't consistent with
+   other igraph functions that use weights provided as separate arguments.
+
+ - The `loops` argument of `igraph_weighted_adjacency()` was converted to an
+   `igraph_loops_t` for sake of consistency with `igraph_adjacency()` and
+   `igraph_get_adjacency()`.
+
+ - `igraph_st_vertex_connectivity()` now ignores edges between source and target for `IGRAPH_VCONN_NEI_IGNORE`
+
+ - The `igraph_community_eb_get_merges()` bridges parameter now starts the indices into the
+   edge removal vector at 0, not 1.
+
+ - The `igraph_community_eb_get_merges()` now reports an error when not all edges in the graph are
+   removed, instead of a nonsensical result.
+
+ - `igraph_incidence()` does not accept negative incidences anymore.
+
+ - `igraph_write_graph_gml()` takes an additional bitfield parameter controlling some aspects of writing
+   the GML file.
+
+ - The vector of parents in `igraph_get_shortest_paths()`, `igraph_get_shortest_paths_bellman_ford()`
+   and `igraph_get_shortest_paths_dijkstra()` now use -1 to represent the starting vertex, and -2
+   for unreachable vertices.
+
+ - `igraph_rng_seed()` now requires an `igraph_uint_t` as its seed arguments. RNG implementations are free to use only the lower bits of the seed if they do not support 64-bit seeds.
+
+ - `igraph_rngtype_rand` (i.e. the RNG that is based on BSD `rand()`) was removed due to poor statistical properties that sometimes resulted in weird artifacts like all-even "random" numbers when igraph's usage patterns happened to line up with the shortcomings of the `rand()` generator in a certain way.
+
+ - The default random number generator has been changed from Mersenne Twister to PCG32.
+
+ - `igraph_vector_minmax()` and `igraph_vector_which_minmax()` no longer return an error code. The return type is now `void`. These functions never fail.
+
+ - `igraph_matrix_minmax()`, `igraph_matrix_which_minmax()`, `igraph_matrix_which_min()` and `igraph_matrix_which_max()` no longer return an error code. The return type is now `void`. These functions never fail.
 
 ### Added
 
+ - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.
+ - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
  - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
@@ -593,13 +704,31 @@
  - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou).
  - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999).
  - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM).
+ - `igraph_regular_tree()` creates a regular tree where all internal vertices have the same total degree.
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28).
  - `igraph_is_acyclic()` to check whether a graph is acyclic (#1945, thanks to @borsgeorgica).
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
  - `igraph_blas_dgemm()` to multiply two matrices.
  - `igraph_wheel()` to create a wheel graph (#1938, thanks to @kwofach).
  - `igraph_stack_capacity()` to query the capacity of a stack.
- - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floats with an epsilon margin.
+ - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floating point numbers with a relative tolerance.
+ - `igraph_complex_almost_equals()` to compare complex numbers with a relative tolerance.
+ - `igraph_vector_all_almost_e()`, `igraph_vector_complex_all_almost_e()`, `igraph_matrix_all_almost_e()`, `igraph_matrix_complex_all_almost_e()` for elementwise comparisons of floating point vector and matrices with a relative tolerance.
+ - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
+ - `igraph_fundamental_cycles()` computes a fundamental cycle basis (experimental).
+ - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
+ - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without re-allocating them.
+ - `igraph_get_k_shortest_paths()` finds the k shortest paths between a source and a target vertex (#1763, thanks to @GroteGnoom)
+ - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
+ - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix, with various kinds of normalizations. They replace the now-deprecated `igraph_laplacian()`. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
+ - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
+ - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
+ - `igraph_graph_count()` gives the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
+ - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator.
+ - `igraph_rng_get_pois()` generates random variates from the Poisson distribution.
+ - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
+ - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
+ - `igraph_turan()` generates Turán graphs.
 
 ### Removed
 
@@ -615,6 +744,16 @@
  - `igraph_ring()` no longer simplifies its result when generating a one- or two-vertex graph. The one-cycle has a self-loop and the undirected two-cycle has parallel edges.
  - igraph functions that take an ARPACK options object now also accept `NULL` in place of an options object, and they will fall back to using a default object provided by `igraph_arpack_options_get_default()`.
  - `igraph_vector_view()` now allows `data` to be `NULL` in the special case when `length == 0`.
+ - `igraph_write_graph_gml()` uses the `creator` parameter in a different way: the supplied
+   string is now written into the Creator line as-is instead of being appended to a default
+   value.
+ - `igraph_read_graph_gml()` now supports graph attributes (in addition to vertex and edge attributes).
+ - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
+   `igraph_write_graph_gml()` skips writing NaN values. These two changes ensure consistent round-tripping.
+ - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
+ - Foreign format readers now present more informative error messages.
+ - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
+ - It is now possible to overide the uniform integer and the Poisson samplers in the random number generator interface.
 
 ### Fixed
 
@@ -622,24 +761,57 @@
  - The GraphML parser does not print to stderr any more in case of encoding
    errors and other error conditions originating from the underlying `libxml2`
    library.
+ - The GraphML parser would omit some edges and vertices when reading files with custom attribute types, such as those produced by yEd. This is now corrected.
  - The GML parser no longer mixes up Inf and NaN and -Inf now works.
+ - The GML parser now supports nodes with no id field.
+ - The GML parser now performs more stringent checks on the input file, such as verifying that `id`, `source`, `target` and `directed` fields are not duplicated.
+ - `igraph_write_graph_gml()` no longer produces corrupt output when some string attribute values contain `"` characters.
+ - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
+ - `igraph_matrix_complex_create()` and `igraph_matrix_complex_create_polar()` now set their sizes correctly.
+ - The core data structures (vector, etc.) have overflow checks now.
+ - Deterministic graph generators have overflow checks now.
+ - `igraph_sparsemat_getelements_sorted()` did not sort the elements for triplet matrices correctly; this is fixed now.
 
 ### Deprecated
+
+ - `igraph_complex_eq_tol()` is now deprecated in favour of `igraph_complex_almost_equals()`.
 
  - `igraph_clusters()` has been renamed to `igraph_connected_components()`; the
    old name is deprecated and will be removed in 0.11.
 
- - `igraph_get_stochastic_sparsemat()` has been renamed to `igraph_get_stochastic_sparse()`;
-   the old name is deprecated and will be removed in 0.11.
+ - `igraph_get_sparsemat()` is deprecated in favour of `igraph_get_adjacency_sparse()`,
+   and will be removed in 0.11. Note that `igraph_get_adjacency_sparse()` takes an
+   _initialized_ sparse matrix as input, unlike `igraph_get_sparsemat()` which takes
+   an uninitialized one.
+
+ - `igraph_get_stochastic_sparsemat()` is deprecated in favour of `igraph_get_stochastic_sparse()`,
+   and will be removed in 0.11. Note that `igraph_get_stochastic_sparse()` takes an
+   _initialized_ sparse matrix as input, unlike `igraph_get_stochastic_sparsemat()` which
+   takes an uninitialized one.
 
  - `igraph_lattice()` has been renamed to `igraph_square_lattice()` to indicate
    that this function generates square lattices only. The old name is deprecated
    and will either be removed in 0.11 or will be changed to become a generic
    lattice generator that also supports other types of lattices.
 
+ - `igraph_laplacian()` is now deprecated; use `igraph_get_laplacian()` or
+   `igraph_get_laplacian_sparse()` depending on whether you need a dense or a
+   sparse matrix.
+
+ - `igraph_matrix_all_e_tol()` is now deprecated in favour of `igraph_matrix_all_almost_e()`.
+
+ - `igraph_matrix_copy()` is now deprecated; use `igraph_matrix_init_copy()`
+   instead. The new name emphasizes that the function _initializes_ the first
+   argument instead of expecting an already-initialized target matrix. The old
+   name will be removed in 0.11.
+
  - `igraph_matrix_e()` and `igraph_matrix_e_ptr()` have been renamed to
    `igraph_matrix_get()` and `igraph_matrix_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
+
+- `igraph_random_edge_walk()` has been deprecated by `igraph_random_walk()`
+   to support edges and/or vertices for the random walk in a single function.
+   It will be removed in 0.11.
 
  - `igraph_read_graph_dimacs()` has been renamed to `igraph_read_graph_dimacs_flow()`;
    the old name is deprecated and might be re-used as a generic DIMACS reader
@@ -655,12 +827,32 @@
    for sake of consistency with other vector-like data structures; the old name
    is deprecated and will be removed in 0.11.
 
+ - `igraph_strvector_copy()` has been renamed to `igraph_strvector_init_copy()`
+   for sake of consistency with other vector-like data structures; the old name
+   is deprecated and will be removed in 0.11.
+
+ - `igraph_strvector_get()` now returns a `const char*` and not a `char*` to
+   indicate that you are not supposed to modify the string in the vector
+   directly. If you do want to modify it and you are aware of the implications
+   (i.e. the new string must not be longer than the original one), you can
+   cast away the constness of the return value before modifying it.
+
+ - `igraph_strvector_set2()` has been renamed to `igraph_strvector_set_len()`;
+   the old name is deprecated and will be removed in 0.11.
+
  - `igraph_tree()` has been renamed to `igraph_kary_tree()`; the old name is
    deprecated and will be removed in 0.11.
 
  - `igraph_vector_e()` and `igraph_vector_e_ptr()` have been renamed to
    `igraph_vector_get()` and `igraph_vector_get_ptr()`. The old names are
    deprecated and will be removed in 0.11.
+
+ - `igraph_vector_e_tol()` is now deprecated in favour of `igraph_vector_all_almost_e()`.
+
+ - `igraph_vector_copy()` is now deprecated; use `igraph_vector_init_copy()`
+   instead. The new name emphasizes that the function _initializes_ the first
+   argument instead of expecting an already-initialized target vector. The old
+   name will be removed in 0.11.
 
  - `igraph_write_graph_dimacs()` has been renamed to `igraph_write_graph_dimacs_flow()`;
    the old name is deprecated and might be re-used as a generic DIMACS writer
@@ -671,7 +863,65 @@
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
    to simplify the API. The deprecated variants will be removed in 0.11.
 
-## [Unreleased 0.9.8]
+### Other
+
+ - Documentation improvements
+
+## [Unreleased 0.9]
+
+### Fixed
+
+ - Fixed incorrect results from `igraph_local_scan_1_ecount()` when the graph was directed but the mode was `IGRAPH_ALL` and some nodes had loop edges. See issue #2092.
+ - In some rare edge cases, `igraph_pagerank()` with the ARPACK method and `igraph_hub_score()` / `igraph_authority_score()` could return incorrect results. The problem could be detected by checking that the returned eigenvalue is not negative. See issue #2090.
+ - `igraph_permute_vertices()` now checks for out-of-range indices in the permutation vector.
+ - `igraph_create()` now checks for non-finite vertex indices in the edges vector.
+
+## [0.9.9] - 2022-06-04
+
+### Changed
+
+ - `igraph_community_walktrap()` now uses double precision floating point operations internally instead of single precision.
+ - In `igraph_community_leiden()`, the `nb_clusters` output parameter is now optional (i.e. it can be `NULL`).
+ - `igraph_read_graph_graphml()` no longer attempts to temporarily set the C locale, and will therefore not work correctly if the current locale uses a decimal comma.
+
+### Fixed
+
+ - `igraph_community_walktrap()` would return an invalid `modularity` vector when the `merges` matrix was not requested.
+ - `igraph_community_walktrap()` would return a `modularity` vector that was too long for disconnected graphs. This would cause a failure in some weighted graphs when the `membership` vector was requested.
+ - `igraph_community_walktrap()` now checks the weight vector: only non-negative weights are accepted, and all vertices must have non-zero strength.
+ - `igraph_community_walktrap()` now returns a modularity score of NaN for graphs with no edges.
+ - `igraph_community_fast_greedy()` now returns a modularity score of NaN for graphs with no edges.
+ - `igraph_community_edge_betweenness()` now returns a modularity vector with a single NaN entry for graph with no edges. Previously it returned a zero-length vector.
+ - `igraph_community_leading_eigenvector()` does not ignore non-ARPACK-related errors from `igraph_arpack_rssolve()` any more.
+ - `igraph_preference_game()` now works correctly when `fixed_size` is true and
+   `type_dist` is not given; earlier versions had a bug where more than half of
+   the vertices mistakenly ended up in group 0.
+ - Fixed a memory leak in `igraph_hrg_fit()` when using `start=1`.
+ - `igraph_write_graph_dot()` now outputs NaN values unchanged.
+ - `igraph_write_graph_dot()` no longer produces invalid DOT files when empty string attributes are present.
+ - `igraph_layout_fruchterman_reingold()` and `igraph_layout_kamada_kawai()`, as well as their 3D versions, did not respect vertex coordinate bounds (`xmin`, `xmax`, etc.) when minimum values were large or maximum values were small. This is now fixed.
+ - The initial coordinates of the Kamada-Kawai layout (`igraph_layout_kamada_kawai()` and `igraph_layout_kamada_kawai_3d()`) are chosen to be more in line with the original publication, improving the stability of the result. See isse #963. This changes the output of the function for the same graph, compared with previous versions. To obtain the same layout, initialize coordinates with `igraph_layout_circle()` (in 2D) or `igraph_layout_sphere()` (in 3D).
+ - Improved numerical stability in Kamada-Kawai layout.
+ - Corrected a problem in the calculation of displacements in `igraph_layout_fruchterman_reingold()` and its 3D version. This fixes using the "grid" variant of the algorithm on disconnected graphs.
+ - `igraph_sumtree_search()` would consider search intervals open on the left and closed on the right, contrary to the documentation. This is now corrected to closed on the left and open on the right. In some cases this lead to a zero-weight element being returned for a zero search value. See issue #2080.
+
+### Other
+
+ - Greatly improved error reporting from foregin format parsers.
+ - Documentation improvements.
+
+## [0.9.8] - 2022-04-08
+
+### Fixed
+
+ - Assertion failure in `igraph_bfs()` when an empty `roots` or `restricted` vector was provided.
+ - `igraph_diversity()` now returns 0 for degree-1 vertices. Previously it incorrectly returned NaN or +-Inf depending on roundoff errors.
+ - `igraph_community_walktrap()` does not crash any more when provided with
+   `modularity=NULL` and `membership=NULL`.
+
+### Other
+
+ - Documentation improvements.
 
 ## [0.9.7] - 2022-03-16
 
@@ -704,7 +954,7 @@
 ### Other
 
  - The C attribute handler now verifies attribute types when retrieving attributes.
- - Documentation improvements
+ - Documentation improvements.
 
 ## [0.9.6] - 2022-01-05
 
@@ -1224,7 +1474,9 @@
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.7..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.9..HEAD
+[0.9.9]: https://github.com/igraph/igraph/compare/0.9.8...0.9.9
+[0.9.8]: https://github.com/igraph/igraph/compare/0.9.7...0.9.8
 [0.9.7]: https://github.com/igraph/igraph/compare/0.9.6...0.9.7
 [0.9.6]: https://github.com/igraph/igraph/compare/0.9.5...0.9.6
 [0.9.5]: https://github.com/igraph/igraph/compare/0.9.4...0.9.5

@@ -21,16 +21,11 @@
 
 */
 
+#include "igraph_interface.h"
 #include "igraph_nongraph.h"
 #include "igraph_paths.h"
-#include "igraph_random.h"
-#include "igraph_types.h"
 
 #include "core/interruption.h"
-#include "plfit/plfit_error.h"
-#include "plfit/plfit.h"
-
-#include <math.h>
 
 /**
  * \ingroup nongraph
@@ -271,7 +266,7 @@ igraph_error_t igraph_convex_hull(
  * converting the path into a vector of vertex IDs that can be passed to
  * \ref igraph_get_eids().
  *
- * \param  vector  the input vector. It will be modified in-place and it will be
+ * \param  path  the input vector. It will be modified in-place and it will be
  *         resized as needed. When the vector contains less than two vertex IDs,
  *         it will be cleared.
  * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory to expand
@@ -300,174 +295,85 @@ igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t* path) {
     return IGRAPH_SUCCESS;
 }
 
-static const char* igraph_i_plfit_error_message = 0;
-
-static void igraph_i_plfit_error_handler_store(const char *reason, const char *file,
-        int line, int plfit_errno) {
-
-    IGRAPH_UNUSED(file);
-    IGRAPH_UNUSED(line);
-    IGRAPH_UNUSED(plfit_errno);
-
-    igraph_i_plfit_error_message = reason;
-}
-
 /**
- * \ingroup nongraph
- * \function igraph_power_law_fit
- * \brief Fits a power-law distribution to a vector of numbers
- *
- * This function fits a power-law distribution to a vector containing samples
- * from a distribution (that is assumed to follow a power-law of course). In
- * a power-law distribution, it is generally assumed that P(X=x) is
- * proportional to x<superscript>-alpha</superscript>, where x is a positive number and alpha
- * is greater than 1. In many real-world cases, the power-law behaviour kicks
- * in only above a threshold value \em xmin. The goal of this functions is to
- * determine \em alpha if \em xmin is given, or to determine \em xmin and the
- * corresponding value of \em alpha.
+ * \function igraph_vertex_path_from_edge_path
+ * \brief Converts a path of edge IDs to the traversed vertex IDs.
  *
  * </para><para>
- * The function uses the maximum likelihood principle to determine \em alpha
- * for a given \em xmin; in other words, the function will return the \em alpha
- * value for which the probability of drawing the given sample is the highest.
- * When \em xmin is not given in advance, the algorithm will attempt to find
- * the optimal \em xmin value for which the p-value of a Kolmogorov-Smirnov
- * test between the fitted distribution and the original sample is the largest.
- * The function uses the method of Clauset, Shalizi and Newman to calculate the
- * parameters of the fitted distribution. See the following reference for
- * details:
+ * This function is useful when you have a sequence of edge IDs representing a
+ * continuous path in a graph and you would like to obtain the vertex IDs that
+ * the path traverses. The function is used implicitly by several shortest path
+ * related functions to convert a path of edge IDs to the corresponding
+ * representation that describes the path in terms of vertex IDs instead.
  *
- * </para><para>
- * Aaron Clauset, Cosma R .Shalizi and Mark E.J. Newman: Power-law
- * distributions in empirical data. SIAM Review 51(4):661-703, 2009.
- *
- * \param data vector containing the samples for which a power-law distribution
- *             is to be fitted. Note that you have to provide the \em samples,
- *             not the probability density function or the cumulative
- *             distribution function. For example, if you wish to fit
- *             a power-law to the degrees of a graph, you can use the output of
- *             \ref igraph_degree directly as an input argument to
- *             \ref igraph_power_law_fit
- * \param result the result of the fitting algorithm. See \ref igraph_plfit_result_t
- *             for more details.
- * \param xmin the minimum value in the sample vector where the power-law
- *             behaviour is expected to kick in. Samples smaller than \c xmin
- *             will be ignored by the algorithm. Pass zero here if you want to
- *             include all the samples. If \c xmin is negative, the algorithm
- *             will attempt to determine its best value automatically.
- * \param force_continuous assume that the samples in the \c data argument come
- *             from a continuous distribution even if the sample vector
- *             contains integer values only (by chance). If this argument is
- *             false, igraph will assume a continuous distribution if at least
- *             one sample is non-integer and assume a discrete distribution
- *             otherwise.
- * \return Error code:
- *         \c IGRAPH_ENOMEM: not enough memory
- *         \c IGRAPH_EINVAL: one of the arguments is invalid
- *         \c IGRAPH_EOVERFLOW: overflow during the fitting process
- *         \c IGRAPH_EUNDERFLOW: underflow during the fitting process
- *         \c IGRAPH_FAILURE: the underlying algorithm signaled a failure
- *         without returning a more specific error code
- *
- * Time complexity: in the continuous case, O(n log(n)) if \c xmin is given.
- * In the discrete case, the time complexity is dominated by the complexity of
- * the underlying L-BFGS algorithm that is used to optimize alpha. If \c xmin
- * is not given, the time complexity is multiplied by the number of unique
- * samples in the input vector (although it should be faster in practice).
- *
- * \example examples/simple/igraph_power_law_fit.c
+ * \param  graph  the graph that the edge IDs refer to
+ * \param  start  the start vertex of the path
+ * \param  edge_path  the sequence of edge IDs that describe the path
+ * \param  vertex_path  the sequence of vertex IDs traversed will be returned here
+ * \return Error code: \c IGRAPH_ENOMEM if there is not enough memory,
+ *         \c IGRAPH_EINVAL if the edge path does not start at the given vertex
+ *         or if there is at least one edge whose start vertex does not match
+ *         the end vertex of the previous edge
  */
-igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* result,
-                         igraph_real_t xmin, igraph_bool_t force_continuous) {
-    plfit_error_handler_t* plfit_stored_error_handler;
-    plfit_result_t plfit_result;
-    plfit_continuous_options_t cont_options;
-    plfit_discrete_options_t disc_options;
-    igraph_bool_t discrete = force_continuous ? 0 : 1;
-    igraph_bool_t finite_size_correction;
-    int retval;
-    size_t i, n;
+igraph_error_t igraph_vertex_path_from_edge_path(
+   const igraph_t *graph, igraph_integer_t start,
+   const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
+   igraph_neimode_t mode
+) {
+    igraph_integer_t i, no_of_edges;
+    igraph_integer_t from, to;
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_bool_t next_edge_ok;
+    igraph_integer_t next_start;
 
-    n = (size_t) igraph_vector_size(data);
-    finite_size_correction = (n < 50);
+    igraph_vector_int_clear(vertex_path);
 
-    if (discrete) {
-        /* Does the vector contain discrete values only? */
-        for (i = 0; i < n; i++) {
-            if ((igraph_integer_t)(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
-                discrete = 0;
+    no_of_edges = igraph_vector_int_size(edge_path);
+    IGRAPH_CHECK(igraph_vector_int_reserve(vertex_path, no_of_edges + 1));
+
+    if (!directed) {
+        mode = IGRAPH_ALL;
+    }
+
+    for (i = 0; i < no_of_edges; i++) {
+        igraph_vector_int_push_back(vertex_path, start);  /* reserved */
+        IGRAPH_CHECK(igraph_edge(graph, VECTOR(*edge_path)[i], &from, &to));
+
+        switch (mode) {
+            case IGRAPH_OUT:
+                next_edge_ok = from == start;
+                next_start = to;
                 break;
-            }
+
+            case IGRAPH_IN:
+                next_edge_ok = to == start;
+                next_start = from;
+                break;
+
+            case IGRAPH_ALL:
+                if (from == start) {
+                    next_edge_ok = 1;
+                    next_start = to;
+                } else if (to == start) {
+                    next_edge_ok = 1;
+                    next_start = from;
+                } else {
+                    next_edge_ok = 0;
+                }
+                break;
+
+            default:
+                IGRAPH_ERROR("Invalid neighborhood mode.", IGRAPH_EINVAL);
         }
-    }
 
-    RNG_BEGIN();
-
-    plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
-    if (discrete) {
-        plfit_discrete_options_init(&disc_options);
-        /* TODO: approximation method should be switched to PLFIT_P_VALUE_EXACT in igraph 0.9 */
-        disc_options.p_value_method = PLFIT_P_VALUE_APPROXIMATE;
-        disc_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
-
-        if (xmin >= 0) {
-            retval = plfit_estimate_alpha_discrete(VECTOR(*data), n, xmin,
-                                                   &disc_options, &plfit_result);
-        } else {
-            retval = plfit_discrete(VECTOR(*data), n, &disc_options, &plfit_result);
+        if (!next_edge_ok) {
+            IGRAPH_ERROR("Edge IDs do not form a continuous path.", IGRAPH_EINVAL);
         }
-    } else {
-        plfit_continuous_options_init(&cont_options);
-        /* TODO: approximation method should be switched to PLFIT_P_VALUE_EXACT in igraph 0.9 */
-        cont_options.p_value_method = PLFIT_P_VALUE_APPROXIMATE;
-        /* TODO: xmin method should be switched to PLFIT_STRATIFIED_SAMPLING in igraph 0.9 */
-        cont_options.xmin_method = PLFIT_GSS_OR_LINEAR;
-        cont_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
-        if (xmin >= 0) {
-            retval = plfit_estimate_alpha_continuous(VECTOR(*data), n, xmin,
-                     &cont_options, &plfit_result);
-        } else {
-            retval = plfit_continuous(VECTOR(*data), n, &cont_options, &plfit_result);
-        }
-    }
-    plfit_set_error_handler(plfit_stored_error_handler);
-
-    RNG_END();
-
-    switch (retval) {
-    case PLFIT_FAILURE:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_FAILURE);
-        break;
-
-    case PLFIT_EINVAL:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EINVAL);
-        break;
-
-    case PLFIT_UNDRFLOW:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EUNDERFLOW);
-        break;
-
-    case PLFIT_OVERFLOW:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_EOVERFLOW);
-        break;
-
-    case PLFIT_ENOMEM:
-        IGRAPH_ERROR(igraph_i_plfit_error_message, IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        break;
-
-    default:
-        break;
+        start = next_start;
     }
 
-    if (result) {
-        result->continuous = !discrete;
-        result->alpha = plfit_result.alpha;
-        result->xmin = plfit_result.xmin;
-        result->L = plfit_result.L;
-        result->D = plfit_result.D;
-        result->p = plfit_result.p;
-    }
+    igraph_vector_int_push_back(vertex_path, start);  /* reserved */
 
     return IGRAPH_SUCCESS;
 }

@@ -27,7 +27,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_operators.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
@@ -35,8 +34,6 @@
 
 #include "core/interruption.h"
 #include "operators/subgraph.h"
-
-#include <limits.h>
 
 static igraph_error_t igraph_i_connected_components_weak(
     const igraph_t *graph, igraph_vector_int_t *membership,
@@ -366,7 +363,7 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
  * definition. This behaviour changed in igraph 0.9; earlier versions assumed
  * that the null graph is connected. See the following issue on Github for the
  * argument that led us to change the definition:
- * https://github.com/igraph/igraph/issues/1538
+ * https://github.com/igraph/igraph/issues/1539
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
@@ -390,7 +387,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes == 0) {
-        /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1538
+        /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1539
          * for the reasoning behind the change */
         *res = 0;
         return IGRAPH_SUCCESS;
@@ -532,11 +529,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 /**
  * \function igraph_decompose
- * \brief Decompose a graph into connected components.
+ * \brief Decomposes a graph into connected components.
  *
- * Create separate graph for each component of a graph. Note that the
+ * Creates a separate graph for each component of a graph. Note that the
  * vertex IDs in the new graphs will be different than in the original
- * graph. (Except if there is only one component in the original graph.)
+ * graph, except when there is only a single component in the original graph.
  *
  * \param graph The original graph.
  * \param components This list of graphs will contain the individual components.
@@ -905,10 +902,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 /**
  * \function igraph_articulation_points
- * Find the articulation points in a graph.
+ * \brief Finds the articulation points in a graph.
  *
  * A vertex is an articulation point if its removal increases
  * the number of connected components in the graph.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the
  *    articulation points will be stored here.
@@ -926,7 +924,7 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
 
 /**
  * \function igraph_biconnected_components
- * Calculate biconnected components
+ * \brief Calculates biconnected components.
  *
  * A graph is biconnected if the removal of any single vertex (and
  * its incident edges) does not disconnect it.
@@ -1205,7 +1203,7 @@ static igraph_error_t igraph_i_bridges_rec(
     nc = igraph_vector_int_size(incedges);
     for (i = 0; i < nc; ++i) {
         igraph_integer_t edge = VECTOR(*incedges)[i];
-        igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
+        igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
 
         if (! VECTOR(*visited)[v]) {
             VECTOR(*incoming_edge)[v] = edge;
@@ -1226,7 +1224,7 @@ static igraph_error_t igraph_i_bridges_rec(
 
 /**
  * \function igraph_bridges
- * Find all bridges in a graph.
+ * \brief Finds all bridges in a graph.
  *
  * An edge is a bridge if its removal increases the number of (weakly)
  * connected components in the graph.
@@ -1254,28 +1252,20 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
-    IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&disc, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &disc);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&low, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&incoming_edge, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &incoming_edge);
-    for (i = 0; i < n; ++i) {
-        VECTOR(incoming_edge)[i] = -1;
-    }
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&disc, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incoming_edge, n);
+    igraph_vector_int_fill(&incoming_edge, -1);
 
     igraph_vector_int_clear(bridges);
 
     time = 0;
-    for (i = 0; i < n; ++i)
+    for (i = 0; i < n; ++i) {
         if (! VECTOR(visited)[i]) {
             IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &incoming_edge));
         }
+    }
 
     igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);

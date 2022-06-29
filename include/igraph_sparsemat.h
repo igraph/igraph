@@ -35,20 +35,25 @@
 
 __BEGIN_DECLS
 
-struct cs_dl_sparse;
-struct cs_dl_symbolic;
-struct cs_dl_numeric;
+/*
+ * These types are private to igraph, and customized to use igraph_integer_t.
+ * Do not attempt to access them using a separate copy of the CXSparse library.
+ * Use the public igraph_sparsemat_... types instead.
+ */
+struct cs_igraph_sparse;
+struct cs_igraph_symbolic;
+struct cs_igraph_numeric;
 
 typedef struct {
-    struct cs_dl_sparse *cs;
+    struct cs_igraph_sparse *cs;
 } igraph_sparsemat_t;
 
 typedef struct {
-    struct cs_dl_symbolic *symbolic;
+    struct cs_igraph_symbolic *symbolic;
 } igraph_sparsemat_symbolic_t;
 
 typedef struct {
-    struct cs_dl_numeric *numeric;
+    struct cs_igraph_numeric *numeric;
 } igraph_sparsemat_numeric_t;
 
 typedef enum { IGRAPH_SPARSEMAT_TRIPLET,
@@ -56,7 +61,7 @@ typedef enum { IGRAPH_SPARSEMAT_TRIPLET,
              } igraph_sparsemat_type_t;
 
 typedef struct {
-    igraph_sparsemat_t *mat;
+    const igraph_sparsemat_t *mat;
     igraph_integer_t pos;
     igraph_integer_t col;
 } igraph_sparsemat_iterator_t;
@@ -65,10 +70,18 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_init(
     igraph_sparsemat_t *A, igraph_integer_t rows, igraph_integer_t cols,
     igraph_integer_t nzmax
 );
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_copy(igraph_sparsemat_t *to,
-                                        const igraph_sparsemat_t *from);
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_init_copy(
+    igraph_sparsemat_t *to, const igraph_sparsemat_t *from);
 IGRAPH_EXPORT void igraph_sparsemat_destroy(igraph_sparsemat_t *A);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_realloc(igraph_sparsemat_t *A, igraph_integer_t nzmax);
+
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_init_eye(igraph_sparsemat_t *A,
+    igraph_integer_t n, igraph_integer_t nzmax,
+    igraph_real_t value, igraph_bool_t compress);
+
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_init_diag(igraph_sparsemat_t *A,
+    igraph_integer_t nzmax, const igraph_vector_t *values,
+    igraph_bool_t compress);
 
 IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_nrow(const igraph_sparsemat_t *A);
 IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_ncol(const igraph_sparsemat_t *B);
@@ -81,6 +94,9 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_permute(const igraph_sparsemat_t *
                                            const igraph_vector_int_t *q,
                                            igraph_sparsemat_t *res);
 
+IGRAPH_EXPORT igraph_real_t igraph_sparsemat_get(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_index(const igraph_sparsemat_t *A,
                                          const igraph_vector_int_t *p,
                                          const igraph_vector_int_t *q,
@@ -91,8 +107,9 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_entry(igraph_sparsemat_t *A,
     igraph_integer_t row, igraph_integer_t col, igraph_real_t elem);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_compress(const igraph_sparsemat_t *A,
                                             igraph_sparsemat_t *res);
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
-                                             igraph_sparsemat_t *res, igraph_bool_t store_values);
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_transpose(
+    const igraph_sparsemat_t *A, igraph_sparsemat_t *res
+);
 IGRAPH_EXPORT igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_dupl(igraph_sparsemat_t *A);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_fkeep(igraph_sparsemat_t *A,
@@ -138,14 +155,6 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
 
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_print(const igraph_sparsemat_t *A,
                                          FILE *outstream);
-
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_eye(igraph_sparsemat_t *A,
-    igraph_integer_t n, igraph_integer_t nzmax,
-    igraph_real_t value, igraph_bool_t compress);
-
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_diag(igraph_sparsemat_t *A,
-    igraph_integer_t nzmax, const igraph_vector_t *values,
-    igraph_bool_t compress);
 
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
                                    igraph_bool_t directed);
@@ -278,8 +287,9 @@ IGRAPH_EXPORT igraph_error_t igraph_sparsemat_normalize_cols(igraph_sparsemat_t 
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_normalize_rows(igraph_sparsemat_t *sparsemat,
                                                   igraph_bool_t allow_zeros);
 
-IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
-                                                 igraph_sparsemat_t *sparsemat);
+IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_init(
+    igraph_sparsemat_iterator_t *it, const igraph_sparsemat_t *sparsemat
+);
 IGRAPH_EXPORT igraph_error_t igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_bool_t igraph_sparsemat_iterator_end(const igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it);
@@ -287,6 +297,15 @@ IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_iterator_col(const igraph_sparse
 IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_real_t igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it);
 IGRAPH_EXPORT igraph_integer_t igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_sparsemat_copy(
+    igraph_sparsemat_t *to, const igraph_sparsemat_t *from);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_sparsemat_diag(
+    igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values,
+    igraph_bool_t compress);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_sparsemat_eye(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
+    igraph_real_t value, igraph_bool_t compress);
 
 __END_DECLS
 

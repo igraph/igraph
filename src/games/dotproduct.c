@@ -110,7 +110,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
 
 /**
  * \function igraph_sample_sphere_surface
- * Sample points uniformly from the surface of a sphere
+ * \brief Sample points uniformly from the surface of a sphere.
  *
  * The center of the sphere is at the origin.
  *
@@ -139,13 +139,13 @@ igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer
 
     if (dim < 2) {
         IGRAPH_ERROR("Sphere must be at least two dimensional to sample from "
-                     "surface", IGRAPH_EINVAL);
+                     "surface.", IGRAPH_EINVAL);
     }
     if (n < 0) {
-        IGRAPH_ERROR("Number of samples must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of samples must be non-negative.", IGRAPH_EINVAL);
     }
     if (radius <= 0) {
-        IGRAPH_ERROR("Sphere radius must be positive", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Sphere radius must be positive.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, dim, n));
@@ -177,7 +177,7 @@ igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer
 
 /**
  * \function igraph_sample_sphere_volume
- * Sample points uniformly from the volume of a sphere
+ * \brief Sample points uniformly from the volume of a sphere.
  *
  * The center of the sphere is at the origin.
  *

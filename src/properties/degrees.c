@@ -125,8 +125,8 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
                                   mode, IGRAPH_LOOPS));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, maxdeg);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_neis, maxdeg);
-    igraph_vector_int_resize(&neis, 0);
-    igraph_vector_int_resize(&edge_neis, 0);
+    igraph_vector_int_clear(&neis);
+    igraph_vector_int_clear(&edge_neis);
 
     if (knnk) {
         IGRAPH_CHECK(igraph_vector_resize(knnk, maxdeg));
@@ -296,7 +296,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
                                neighbor_degree_mode, IGRAPH_LOOPS));
     IGRAPH_CHECK(igraph_maxdegree(graph, &maxdeg, igraph_vss_all(), mode, IGRAPH_LOOPS));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, maxdeg);
-    igraph_vector_int_resize(&neis, 0);
+    igraph_vector_int_clear(&neis);
 
     if (knnk) {
         IGRAPH_CHECK(igraph_vector_resize(knnk, maxdeg));

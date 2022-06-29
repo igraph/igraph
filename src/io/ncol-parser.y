@@ -83,8 +83,9 @@ int igraph_ncol_yyerror(YYLTYPE* locp,
 %type <edgenum>   edgeid
 %type <weightnum> weight
 
-%token ALNUM
-%token NEWLINE
+%token ALNUM    "alphanumeric"
+%token NEWLINE  "end of line"
+%token END 0    "end of file" /* friendly name for $end */
 %token ERROR
 
 %%
@@ -109,7 +110,7 @@ edge :   edgeid edgeid NEWLINE        {
 
 edgeid : ALNUM  {
   igraph_integer_t trie_id;
-  IGRAPH_YY_CHECK(igraph_trie_get2(context->trie,
+  IGRAPH_YY_CHECK(igraph_trie_get_len(context->trie,
     igraph_ncol_yyget_text(scanner),
     igraph_ncol_yyget_leng(scanner),
     &trie_id

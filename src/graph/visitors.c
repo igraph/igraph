@@ -134,7 +134,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
     }
 
-    if (roots) {
+    if (roots && noroots > 0) {
         igraph_integer_t min, max;
         igraph_vector_int_minmax(roots, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
@@ -142,7 +142,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         }
     }
 
-    if (restricted) {
+    if (restricted && igraph_vector_int_size(restricted) > 0) {
         igraph_integer_t min, max;
         igraph_vector_int_minmax(restricted, &min, &max);
         if (min < 0 || max >= no_of_nodes) {
@@ -236,9 +236,11 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
             igraph_integer_t actvect = igraph_dqueue_int_pop(&Q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&Q);
             igraph_integer_t succ_vec;
-            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                                                actvect);
-            igraph_integer_t i, n = igraph_vector_int_size(neis);
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
+            igraph_integer_t i, n;
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+            n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
@@ -327,8 +329,8 @@ cleanup:
  * \param parents If not a null pointer, then an initialized vector must be
  *        passed here. The vector will be resized so its length is equal to the
  *        number of nodes, and it will contain the index of the parent node for
- *        each \em visited node. The values in the vector are undefined for
- *        vertices that were \em not visited.
+ *        each \em visited node. The values in the vector are set to -2 for
+ *        vertices that were \em not visited, and -1 for the root vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -336,9 +338,11 @@ cleanup:
  *
  * \example examples/simple/igraph_bfs_simple.c
  */
-igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
-                      igraph_vector_int_t *order, igraph_vector_int_t *layers,
-                      igraph_vector_int_t *parents) {
+igraph_error_t igraph_bfs_simple(
+    const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+    igraph_vector_int_t *order, igraph_vector_int_t *layers,
+    igraph_vector_int_t *parents
+) {
 
     igraph_dqueue_int_t q;
     igraph_integer_t num_visited = 0;
@@ -376,6 +380,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_
     }
     if (parents) {
         IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
+        igraph_vector_int_fill(parents, -2);
     }
 
     /* ok start with root */
@@ -388,7 +393,7 @@ igraph_error_t igraph_bfs_simple(igraph_t *graph, igraph_integer_t root, igraph_
         IGRAPH_CHECK(igraph_vector_int_push_back(order, root));
     }
     if (parents) {
-        VECTOR(*parents)[root] = root;
+        VECTOR(*parents)[root] = -1;
     }
     num_visited++;
     added[root] = 1;
@@ -606,6 +611,8 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
             igraph_integer_t n = igraph_vector_int_size(neis);
             igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, actvect);
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
             /* Search for a neighbor that was not yet visited */
             igraph_bool_t any = 0;

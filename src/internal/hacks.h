@@ -28,6 +28,8 @@
 
 #include "config.h"
 
+#include <stdlib.h>
+
 __BEGIN_DECLS
 
 #ifndef HAVE_STRDUP
@@ -35,9 +37,9 @@ __BEGIN_DECLS
     char* igraph_i_strdup(const char *s);
 #endif
 
-#ifndef HAVE_STPCPY
-    #define stpcpy igraph_i_stpcpy
-    char* igraph_i_stpcpy(char* s1, const char* s2);
+#ifndef HAVE_STRNDUP
+    #define strndup igraph_i_strndup
+    char* igraph_i_strndup(const char *s, size_t n);
 #endif
 
 #ifndef HAVE_STRCASECMP
@@ -45,6 +47,14 @@ __BEGIN_DECLS
         #define strcasecmp _stricmp
     #else
         #error "igraph needs strcasecmp() or _stricmp()"
+    #endif
+#endif
+
+#ifndef HAVE_STRNCASECMP
+    #ifdef HAVE__STRNICMP
+        #define strncasecmp _strnicmp
+    #else
+        #error "igraph needs strncasecmp() or _strnicmp()"
     #endif
 #endif
 

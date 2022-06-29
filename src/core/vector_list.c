@@ -132,7 +132,7 @@
  * \type igraph_vector_list_t destructor, \ref igraph_vector_list_destroy().
  * Calling the destructor also destroys all the vectors inside the vector
  * list due to the ownership rules. If you want to keep a few of the vectors
- * in the vector list, you need to copy them with \ref igraph_vector_copy() or
+ * in the vector list, you need to copy them with \ref igraph_vector_init_copy() or
  * \ref igraph_vector_update(), or you need to remove them from the list and
  * take ownership by calling \ref igraph_vector_list_pop_back(),
  * \ref igraph_vector_list_remove() or \ref igraph_vector_list_remove_fast() .</para>

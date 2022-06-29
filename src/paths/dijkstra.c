@@ -191,6 +191,7 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_lazy_inclist_get(&inclist, minnei);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_integer_t edge = VECTOR(*neis)[j];
@@ -280,12 +281,12 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param predecessors A pointer to an initialized igraph vector or null.
- *        If not null, a vector containing the predecessor of each vertex in
+ * \param parents A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the parent of each vertex in
  *        the single source shortest path tree is returned here. The
- *        predecessor of vertex i in the tree is the vertex from which vertex i
- *        was reached. The predecessor of the start vertex (in the \c from
- *        argument) is itself by definition. If the predecessor is -1, it means
+ *        parent of vertex i in the tree is the vertex from which vertex i
+ *        was reached. The parent of the start vertex (in the \c from
+ *        argument) is -1. If the parent is -2, it means
  *        that the given vertex was not reached from the source during the
  *        search. Note that the search terminates if all the vertices in
  *        \c to are reached.
@@ -325,7 +326,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        igraph_vs_t to,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode,
-                                       igraph_vector_int_t *predecessors,
+                                       igraph_vector_int_t *parents,
                                        igraph_vector_int_t *inbound_edges) {
     /* Implementation details. This is the basic Dijkstra algorithm,
        with a binary heap. The heap is indexed, i.e. it stores not only
@@ -341,7 +342,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
          computation, as IGRAPH_FINITE() might involve a function call
          and we want to spare that. So we store distance+1.0 instead of
          distance, and zero denotes infinity.
-       - `parents' assigns the inbound edge IDs of all vertices in the
+       - `parent_eids' assigns the inbound edge IDs of all vertices in the
          shortest path tree to the vertices. In this implementation, the
          edge ID + 1 is stored, zero means unreachable vertices.
     */
@@ -352,13 +353,13 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists;
-    igraph_integer_t *parents;
+    igraph_integer_t *parent_eids;
     igraph_bool_t *is_target;
     igraph_integer_t i, to_reach;
 
     if (!weights) {
         return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
-                                         predecessors, inbound_edges);
+                                         parents, inbound_edges);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -392,11 +393,11 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
     igraph_vector_fill(&dists, -1.0);
 
-    parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parents == 0) {
+    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    if (parent_eids == 0) {
         IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    IGRAPH_FINALLY(igraph_free, parents);
+    IGRAPH_FINALLY(igraph_free, parent_eids);
     is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
     if (is_target == 0) {
         IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -414,7 +415,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     }
 
     VECTOR(dists)[from] = 0.0;  /* zero distance */
-    parents[from] = 0;
+    parent_eids[from] = 0;
     igraph_2wheap_push_with_index(&Q, from, 0);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
@@ -431,6 +432,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_lazy_inclist_get(&inclist, minnei);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             igraph_integer_t edge = VECTOR(*neis)[i];
@@ -440,12 +442,12 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
             if (curdist < 0) {
                 /* This is the first finite distance */
                 VECTOR(dists)[tto] = altdist;
-                parents[tto] = edge + 1;
+                parent_eids[tto] = edge + 1;
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
             } else if (altdist < curdist) {
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
-                parents[tto] = edge + 1;
+                parent_eids[tto] = edge + 1;
                 IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
             }
         }
@@ -455,20 +457,20 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         IGRAPH_WARNING("Couldn't reach some vertices");
     }
 
-    /* Create `predecessors' if needed */
-    if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_int_resize(predecessors, no_of_nodes));
+    /* Create `parents' if needed */
+    if (parents) {
+        IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (i == from) {
                 /* i is the start vertex */
-                VECTOR(*predecessors)[i] = i;
-            } else if (parents[i] <= 0) {
+                VECTOR(*parents)[i] = -1;
+            } else if (parent_eids[i] <= 0) {
                 /* i was not reached */
-                VECTOR(*predecessors)[i] = -1;
+                VECTOR(*parents)[i] = -2;
             } else {
-                /* i was reached via the edge with ID = parents[i] - 1 */
-                VECTOR(*predecessors)[i] = IGRAPH_OTHER(graph, parents[i] - 1, i);
+                /* i was reached via the edge with ID = parent_eids[i] - 1 */
+                VECTOR(*parents)[i] = IGRAPH_OTHER(graph, parent_eids[i] - 1, i);
             }
         }
     }
@@ -478,12 +480,12 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
-            if (parents[i] <= 0) {
+            if (parent_eids[i] <= 0) {
                 /* i was not reached */
                 VECTOR(*inbound_edges)[i] = -1;
             } else {
-                /* i was reached via the edge with ID = parents[i] - 1 */
-                VECTOR(*inbound_edges)[i] = parents[i] - 1;
+                /* i was reached via the edge with ID = parent_eids[i] - 1 */
+                VECTOR(*inbound_edges)[i] = parent_eids[i] - 1;
             }
         }
     }
@@ -507,9 +509,9 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
             size = 0;
             act = node;
-            while (parents[act]) {
+            while (parent_eids[act]) {
                 size++;
-                edge = parents[act] - 1;
+                edge = parent_eids[act] - 1;
                 act = IGRAPH_OTHER(graph, edge, act);
             }
             if (vvec && (size > 0 || node == from)) {
@@ -520,8 +522,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
             }
             act = node;
-            while (parents[act]) {
-                edge = parents[act] - 1;
+            while (parent_eids[act]) {
+                edge = parent_eids[act] - 1;
                 act = IGRAPH_OTHER(graph, edge, act);
                 size--;
                 if (vvec) {
@@ -538,7 +540,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_2wheap_destroy(&Q);
     igraph_vector_destroy(&dists);
     IGRAPH_FREE(is_target);
-    IGRAPH_FREE(parents);
+    IGRAPH_FREE(parent_eids);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(6);
 
@@ -831,6 +833,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
         /* Now check all neighbors of 'minnei' for a shorter path */
         neis = igraph_lazy_inclist_get(&inclist, minnei);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
         for (i = 0; i < nlen; i++) {
             igraph_integer_t edge = VECTOR(*neis)[i];

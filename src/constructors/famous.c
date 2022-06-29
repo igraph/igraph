@@ -24,7 +24,7 @@
 
 #include "igraph_constructors.h"
 
-#include "internal/hacks.h"
+#include "internal/hacks.h" /* strcasecmp */
 
 const igraph_integer_t igraph_i_famous_bull[] = {
     5, 5, 0,

@@ -33,13 +33,15 @@
 
 #include <string.h>
 
-/**
- * \ingroup igraphtrie
- * \brief Creates a trie node (not to be called directly)
- * \return Error code: errors by igraph_strvector_init(),
- *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
+
+/*
+ * igraph_trie_t is a data structures that stores an ordered list of strings.
+ * It allows an efficient lookup of the index of a string. It has the capability
+ * to also store the list of strings directly for reverse lookup of strings
+ * by index.
  */
 
+/* Allocates memory for a trie node. */
 static igraph_error_t igraph_i_trie_init_node(igraph_trie_node_t *t) {
     IGRAPH_STRVECTOR_INIT_FINALLY(&t->strs, 0);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 0);
@@ -53,6 +55,9 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
 /**
  * \ingroup igraphtrie
  * \brief Creates a trie.
+ *
+ * \param t An uninitialized trie.
+ * \param storekeys Specifies whether keys are stored for reverse lookup.
  * \return Error code: errors by igraph_strvector_init(),
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
@@ -60,8 +65,8 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
 igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     t->maxvalue = -1;
     t->storekeys = storekeys;
-    IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *) t ));
-    IGRAPH_FINALLY(igraph_i_trie_destroy_node, (igraph_trie_node_t *) t );
+    IGRAPH_CHECK(igraph_i_trie_init_node(&t->node));
+    IGRAPH_FINALLY(igraph_i_trie_destroy_node, &t->node);
     if (storekeys) {
         IGRAPH_CHECK(igraph_strvector_init(&t->keys, 0));
     }
@@ -69,11 +74,6 @@ igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
-
-/**
- * \ingroup igraphtrie
- * \brief Destroys a node of a trie (not to be called directly).
- */
 
 static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
     igraph_integer_t i;
@@ -92,6 +92,7 @@ static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool
     }
 }
 
+/* Deallocates a trie node. */
 static void igraph_i_trie_destroy_node(igraph_trie_node_t *t) {
     igraph_i_trie_destroy_node_helper(t, 0);
 }
@@ -99,21 +100,19 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t) {
 /**
  * \ingroup igraphtrie
  * \brief Destroys a trie (frees allocated memory).
+ *
+ * \param t The trie.
  */
 
 void igraph_trie_destroy(igraph_trie_t *t) {
     if (t->storekeys) {
         igraph_strvector_destroy(&t->keys);
     }
-    igraph_i_trie_destroy_node( (igraph_trie_node_t*) t);
+    igraph_i_trie_destroy_node(&t->node);
 }
 
 
-/**
- * \ingroup igraphtrie
- * \brief Internal helping function for igraph_trie_t
- */
-
+/* Computes the location (index) of the first difference between 'str' and 'key' */
 static size_t igraph_i_strdiff(const char *str, const char *key) {
     size_t diff = 0;
     while (key[diff] != '\0' && str[diff] != '\0' && str[diff] == key[diff]) {
@@ -126,15 +125,14 @@ static size_t igraph_i_strdiff(const char *str, const char *key) {
  * \ingroup igraphtrie
  * \brief Search/insert in a trie (not to be called directly).
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
 static igraph_error_t igraph_i_trie_get_node(
     igraph_trie_node_t *t, const char *key, igraph_integer_t newvalue,
     igraph_integer_t *id
 ) {
-    char *str;
+    const char *str;
     igraph_integer_t i;
     igraph_bool_t add;
 
@@ -175,20 +173,22 @@ static igraph_error_t igraph_i_trie_get_node(
                 return igraph_i_trie_get_node(node, key + diff, newvalue, id);
             } else if (add) {
                 igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
-                if (node == 0) {
-                    IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+                if (! node) {
+                    IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                 }
+                IGRAPH_FINALLY(igraph_free, node);
                 IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
                 IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
                 IGRAPH_VECTOR_INT_INIT_FINALLY(&node->values, 1);
                 IGRAPH_CHECK(igraph_strvector_set(&node->strs, 0, key + diff));
+                IGRAPH_FINALLY_CLEAN(4);
+
                 VECTOR(node->children)[0] = 0;
                 VECTOR(node->values)[0] = newvalue;
 
                 VECTOR(t->children)[i] = node;
 
                 *id = newvalue;
-                IGRAPH_FINALLY_CLEAN(3);
                 return IGRAPH_SUCCESS;
             } else {
                 *id = -1;
@@ -202,9 +202,10 @@ static igraph_error_t igraph_i_trie_get_node(
             char *str2;
 
             igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
-            if (node == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            if (! node) {
+                IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
+            IGRAPH_FINALLY(igraph_free, node);
             IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
             IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
             IGRAPH_VECTOR_INT_INIT_FINALLY(&node->values, 1);
@@ -214,14 +215,15 @@ static igraph_error_t igraph_i_trie_get_node(
             VECTOR(node->values)[0] = VECTOR(t->values)[i];
 
             str2 = strdup(str);
-            if (str2 == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(str2, "Cannot add to trie.");
+
             str2[diff] = '\0';
             IGRAPH_FINALLY(igraph_free, str2);
+
             IGRAPH_CHECK(igraph_strvector_set(&t->strs, i, str2));
+
             IGRAPH_FREE(str2);
-            IGRAPH_FINALLY_CLEAN(4);
+            IGRAPH_FINALLY_CLEAN(5);
 
             VECTOR(t->values)[i] = newvalue;
             VECTOR(t->children)[i] = node;
@@ -236,9 +238,10 @@ static igraph_error_t igraph_i_trie_get_node(
             char *str2;
 
             igraph_trie_node_t *node = IGRAPH_CALLOC(1, igraph_trie_node_t);
-            if (node == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            if (! node) {
+                IGRAPH_ERROR("Cannot add to trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
             }
+            IGRAPH_FINALLY(igraph_free, node);
             IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 2);
             IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 2);
             IGRAPH_VECTOR_INT_INIT_FINALLY(&node->values, 2);
@@ -250,14 +253,15 @@ static igraph_error_t igraph_i_trie_get_node(
             VECTOR(node->values)[1] = newvalue;
 
             str2 = strdup(str);
-            if (str2 == 0) {
-                IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(str2, "Cannot add to trie.");
+
             str2[diff] = '\0';
             IGRAPH_FINALLY(igraph_free, str2);
+
             IGRAPH_CHECK(igraph_strvector_set(&t->strs, i, str2));
+
             IGRAPH_FREE(str2);
-            IGRAPH_FINALLY_CLEAN(4);
+            IGRAPH_FINALLY_CLEAN(5);
 
             VECTOR(t->values)[i] = -1;
             VECTOR(t->children)[i] = node;
@@ -277,13 +281,13 @@ static igraph_error_t igraph_i_trie_get_node(
     /* Nothing matches */
 
     if (add) {
-        IGRAPH_CHECK(igraph_vector_ptr_reserve(&t->children,
-                                               igraph_vector_ptr_size(&t->children) + 1));
-        IGRAPH_CHECK(igraph_vector_int_reserve(&t->values, igraph_vector_int_size(&t->values) + 1));
+        /* Memory saving at the cost of performance may be possible by using the pattern
+         *     CHECK(reserve(vec, size(vec) + 1));
+         *     push_back(vec, value);
+         * This was the original pattern used before igraph 0.10. */
         IGRAPH_CHECK(igraph_strvector_push_back(&t->strs, key));
-
-        igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
-        igraph_vector_int_push_back(&t->values, newvalue); /* allocated */
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(&t->children, NULL));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&t->values, newvalue));
         *id = newvalue;
     } else {
         *id = -1;
@@ -294,12 +298,17 @@ static igraph_error_t igraph_i_trie_get_node(
 
 /**
  * \ingroup igraphtrie
- * \brief Search/insert in a trie.
+ * \brief Search/insert a null-terminated string in a trie.
+ *
+ * \param t The trie.
+ * \param key The string to search for. If not found, it will be inserted.
+ * \param id The index of the string is stored here.
+ * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
 igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
     if (!t->storekeys) {
-        IGRAPH_CHECK(igraph_i_trie_get_node((igraph_trie_node_t*) t, key, t->maxvalue + 1, id));
+        IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id));
         if (*id > t->maxvalue) {
             t->maxvalue = *id;
         }
@@ -313,7 +322,7 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
             IGRAPH_FINALLY_EXIT();
             IGRAPH_ERROR("cannot get element from trie", ret);
         }
-        ret = igraph_i_trie_get_node((igraph_trie_node_t*) t, key, t->maxvalue + 1, id);
+        ret = igraph_i_trie_get_node(&t->node, key, t->maxvalue + 1, id);
         if (ret != IGRAPH_SUCCESS) {
             igraph_strvector_resize(&t->keys, igraph_strvector_size(&t->keys) - 1); /* shrinks, error safe */
             IGRAPH_FINALLY_EXIT();
@@ -334,22 +343,28 @@ igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer
 
 /**
  * \ingroup igraphtrie
- * \brief Search/insert in a trie (for internal use).
+ * \brief Search/insert a string of given length in a trie.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * This function is identical to \ref igraph_trie_get(), except that
+ * it takes a string of a given length as input instead of a null-terminated
+ * string.
+ *
+ * \param t The trie.
+ * \param key The string to search for. If not found, it will be inserted.
+ * \param length The length of \p key.
+ * \param id The index of the string is stored here.
+ * \return Error code, usually \c IGRAPH_ENOMEM.
  */
 
-igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_integer_t length,
-                     igraph_integer_t *id) {
-    char *tmp = IGRAPH_CALLOC(length + 1, char);
+igraph_error_t igraph_trie_get_len(
+        igraph_trie_t *t, const char *key,
+        igraph_integer_t length,
+        igraph_integer_t *id) {
 
-    if (tmp == 0) {
-        IGRAPH_ERROR("Cannot get from trie", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    char *tmp = strndup(key, length);
+    if (! tmp) {
+        IGRAPH_ERROR("Cannot get from trie.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-
-    strncpy(tmp, key, length);
-    tmp[length] = '\0';
     IGRAPH_FINALLY(igraph_free, tmp);
     IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
     IGRAPH_FREE(tmp);
@@ -361,27 +376,45 @@ igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_intege
 /**
  * \ingroup igraphtrie
  * \brief Search in a trie.
- * This variant does not add \c key to the trie if it does not exist.
- * In this case, a negative id is returned.
+ *
+ * This variant does not add \p key to the trie if it does not exist.
+ * In this case, a negative \p id is returned.
+ *
+ * \param t The trie.
+ * \param key The string to search for.
+ * \param id If \p key is found, its index is stored here. Otherwise,
+ *    a negative value is returned.
+ * \param Error code.
  */
 
 igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
-    IGRAPH_CHECK(igraph_i_trie_get_node((igraph_trie_node_t*) t, key, -1, id));
+    IGRAPH_CHECK(igraph_i_trie_get_node(&t->node, key, -1, id));
     return IGRAPH_SUCCESS;
 }
 
 /**
  * \ingroup igraphtrie
  * \brief Get an element of a trie based on its index.
+ *
+ * \param t The trie.
+ * \param idx The index of the string. It is not checked that it is within range.
+ * \return The string with the given index. If the trie does not store the keys for
+ *   reverse lookup, \c NULL is returned.
  */
 
-char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
+const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx) {
+    if (! t->storekeys) {
+        return NULL;
+    }
     return igraph_strvector_get(&t->keys, idx);
 }
 
 /**
  * \ingroup igraphtrie
  * \brief Returns the size of a trie.
+ *
+ * \param t The trie.
+ * \return The size of the trie, i.e. one larger than the maximum index.
  */
 
 igraph_integer_t igraph_trie_size(igraph_trie_t *t) {
@@ -390,7 +423,19 @@ igraph_integer_t igraph_trie_size(igraph_trie_t *t) {
 
 /* Hmmm, very dirty.... */
 
-igraph_error_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
-    *strv = &t->keys;
-    return IGRAPH_SUCCESS;
+/**
+ * \ingroup igraphtrie
+ * \brief Retrieves all the keys from the trie.
+ *
+ * </para><para>
+ * Note that the returned pointer is a \em borrowed reference into the internal
+ * string vector of the trie. Do \em not modify it and do \em not use it after
+ * the trie was destroyed.
+ *
+ * \param t The trie.
+ * \return The borrowed reference.
+ */
+
+const igraph_strvector_t* igraph_i_trie_borrow_keys(igraph_trie_t *t) {
+    return &t->keys;
 }

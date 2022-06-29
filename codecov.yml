@@ -28,3 +28,4 @@ comment:
 ignore:
   - "tests"
   - "examples"
+  - "vendor/pcg"

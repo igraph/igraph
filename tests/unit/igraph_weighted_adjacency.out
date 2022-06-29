@@ -1,0 +1,297 @@
+0x0 matrix
+==========
+
+No loops
+--------
+
+directed: true
+vcount: 0
+edges: {
+}
+
+Loops once
+----------
+
+directed: true
+vcount: 0
+edges: {
+}
+
+Loops twice
+-----------
+
+directed: true
+vcount: 0
+edges: {
+}
+
+IGRAPH_ADJ_DIRECTED
+===================
+
+No loops
+--------
+
+directed: true
+vcount: 4
+edges: {
+0 1: 1
+0 2: 2
+1 0: 2
+1 3: 1
+3 1: 1
+}
+
+Loops once
+----------
+
+directed: true
+vcount: 4
+edges: {
+0 1: 1
+0 2: 2
+1 0: 2
+1 3: 1
+2 2: 4
+3 1: 1
+}
+
+Loops twice
+-----------
+
+directed: true
+vcount: 4
+edges: {
+0 1: 1
+0 2: 2
+1 0: 2
+1 3: 1
+2 2: 2
+3 1: 1
+}
+
+IGRAPH_ADJ_UPPER
+================
+
+No loops
+--------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 1
+2 0: 2
+3 1: 1
+}
+
+Loops once
+----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 1
+2 0: 2
+3 1: 1
+2 2: 4
+}
+
+Loops twice
+-----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 1
+2 0: 2
+3 1: 1
+2 2: 2
+}
+
+IGRAPH_ADJ_LOWER
+================
+
+No loops
+--------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+3 1: 1
+}
+
+Loops once
+----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 2: 4
+3 1: 1
+}
+
+Loops twice
+-----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 2: 2
+3 1: 1
+}
+
+IGRAPH_ADJ_MIN
+==============
+
+No loops
+--------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 1
+3 1: 1
+}
+
+Loops once
+----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 1
+3 1: 1
+2 2: 4
+}
+
+Loops twice
+-----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 1
+3 1: 1
+2 2: 2
+}
+
+IGRAPH_ADJ_MAX
+==============
+
+No loops
+--------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 0: 2
+3 1: 1
+}
+
+Loops once
+----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 0: 2
+3 1: 1
+2 2: 4
+}
+
+Loops twice
+-----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 0: 2
+3 1: 1
+2 2: 2
+}
+
+IGRAPH_ADJ_UNDIRECTED
+==============
+
+No loops
+--------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 0: 2
+3 1: 1
+}
+
+Loops once
+----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 0: 2
+3 1: 1
+2 2: 4
+}
+
+Loops twice
+-----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 2
+2 0: 2
+3 1: 1
+2 2: 2
+}
+
+IGRAPH_ADJ_PLUS
+===============
+
+No loops
+--------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 3
+2 0: 2
+3 1: 2
+}
+
+Loops once
+----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 3
+2 0: 2
+3 1: 2
+2 2: 4
+}
+
+Loops twice
+-----------
+
+directed: false
+vcount: 4
+edges: {
+1 0: 3
+2 0: 2
+3 1: 2
+2 2: 2
+}
+
+Check handling of non-square matrix error.
+Check handling of invalid adjacency mode.
+Check error for 0x1 matrix.
+Check error for non-symmetric matrix and IGRAPH_ADJ_UNDIRECTED.

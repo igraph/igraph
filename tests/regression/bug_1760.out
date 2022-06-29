@@ -13,8 +13,8 @@ Edges:
   1: ( )
 }
 
-Predecessors:
-( 1 2 2 -1 )
+Parents:
+( 1 2 -1 -2 )
 
 Inbound edges:
 ( 0 1 -1 -1 )
@@ -36,8 +36,8 @@ Edges:
   1: ( )
 }
 
-Predecessors:
-( 1 2 2 -1 )
+Parents:
+( 1 2 -1 -2 )
 
 Inbound edges:
 ( 0 1 -1 -1 )
@@ -59,8 +59,8 @@ Edges:
   1: ( )
 }
 
-Predecessors:
-( 1 2 2 -1 )
+Parents:
+( 1 2 -1 -2 )
 
 Inbound edges:
 ( 0 1 -1 -1 )

@@ -27,6 +27,8 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
+#include "math/safe_intop.h"
+
 /* Uniform sampling of labelled trees (igraph_tree_game) */
 
 /* The following implementation uniformly samples Prufer trees and converts
@@ -79,8 +81,11 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
     igraph_vector_int_t vertices;
     igraph_vector_bool_t visited;
     igraph_integer_t i, j, k;
+    igraph_integer_t no_edges;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2 * (n - 1));
+    IGRAPH_SAFE_MULT(n - 1, 2, &no_edges);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_edges);
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);

@@ -27,12 +27,6 @@
 #include "centrality/centrality_internal.h"
 #include "centrality/prpack_internal.h"
 
-#include "config.h"
-
-#include <limits.h>
-#include <math.h>
-#include <string.h>    /* memset */
-
 static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
                                                  igraph_vector_t *vector,
                                                  igraph_real_t *value, const igraph_vs_t vids,
@@ -501,7 +495,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     options->n = (int) no_of_nodes;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'R';
     options->start = 1;       /* no random start vector */
 
     directed = directed && igraph_is_directed(graph);
@@ -514,7 +508,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (igraph_is_nan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
@@ -568,7 +562,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
             IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
         }
 
-        IGRAPH_CHECK(igraph_vector_copy(&normalized_reset, reset));
+        IGRAPH_CHECK(igraph_vector_init_copy(&normalized_reset, reset));
         IGRAPH_FINALLY(igraph_vector_destroy, &normalized_reset);
 
         igraph_vector_scale(&normalized_reset, 1.0 / reset_sum);
@@ -693,7 +687,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     }
 
     if (vector) {
-        igraph_integer_t i;
         igraph_vit_t vit;
         igraph_integer_t nodes_to_calc;
         igraph_real_t sum = 0;

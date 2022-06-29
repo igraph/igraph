@@ -110,9 +110,13 @@ int check_simple() {
 int main() {
     int ret;
 
+    RNG_BEGIN();
+
     if ( (ret = check_simple()) != 0) {
         return ret;
     }
+
+    RNG_END();
 
     return 0;
 }

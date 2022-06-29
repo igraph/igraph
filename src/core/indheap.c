@@ -46,23 +46,24 @@ static void igraph_indheap_i_switch(igraph_indheap_t* h, igraph_integer_t e1, ig
  * \ingroup indheap
  * \brief Initializes an indexed heap (constructor).
  *
- * @return Error code:
+ * \return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
 igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_integer_t alloc_size) {
-    if (alloc_size <= 0 ) {
+    IGRAPH_ASSERT(alloc_size >= 0);
+    if (alloc_size == 0 ) {
         alloc_size = 1;
     }
     h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
-    if (h->stor_begin == 0) {
-        h->index_begin = 0;
+    if (! h->stor_begin) {
+        h->index_begin = NULL;
         IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
-    if (h->index_begin == 0) {
+    if (! h->index_begin) {
         IGRAPH_FREE(h->stor_begin);
-        h->stor_begin = 0;
+        h->stor_begin = NULL;
         IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
@@ -81,26 +82,30 @@ void igraph_indheap_clear(igraph_indheap_t *h) {
  * \ingroup indheap
  * \brief Initializes and build an indexed heap from a C array (constructor).
  *
- * @return Error code:
+ * \return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
 igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, igraph_real_t* data, igraph_integer_t len) {
     igraph_integer_t i;
+    igraph_integer_t alloc_size;
 
-    h->stor_begin = IGRAPH_CALLOC(len, igraph_real_t);
-    if (h->stor_begin == 0) {
+    IGRAPH_ASSERT(len >= 0);
+    alloc_size = (len <= 0) ? 1 : len;
+
+    h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
+    if (! h->stor_begin) {
         h->index_begin = 0;
         IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    h->index_begin = IGRAPH_CALLOC(len, igraph_integer_t);
-    if (h->index_begin == 0) {
+    h->index_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
+    if (! h->index_begin) {
         IGRAPH_FREE(h->stor_begin);
         h->stor_begin = 0;
         IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    h->stor_end = h->stor_begin + len;
-    h->end = h->stor_end;
+    h->stor_end = h->stor_begin + alloc_size;
+    h->end = h->stor_begin + len;
     h->destroy = 1;
 
     memcpy(h->stor_begin, data, (size_t) len * sizeof(igraph_real_t));
@@ -108,7 +113,7 @@ igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, igraph_real_t* dat
         h->index_begin[i] = i + 1;
     }
 
-    igraph_indheap_i_build (h, 0);
+    igraph_indheap_i_build(h, 0);
 
     return IGRAPH_SUCCESS;
 }
@@ -137,7 +142,7 @@ void igraph_indheap_destroy(igraph_indheap_t* h) {
  * \brief Checks whether a heap is empty.
  */
 
-igraph_bool_t igraph_indheap_empty(igraph_indheap_t* h) {
+igraph_bool_t igraph_indheap_empty(const igraph_indheap_t *h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->stor_begin == h->end;
@@ -154,7 +159,11 @@ igraph_error_t igraph_indheap_push(igraph_indheap_t* h, igraph_real_t elem) {
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        igraph_integer_t new_size = igraph_indheap_size(h) * 2;
+        igraph_integer_t old_size = igraph_indheap_size(h);
+        igraph_integer_t new_size =  old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to indheap, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
         if (new_size == 0) {
             new_size = 1;
         }
@@ -182,7 +191,11 @@ igraph_error_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_intege
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        igraph_integer_t new_size = igraph_indheap_size(h) * 2;
+        igraph_integer_t old_size = igraph_indheap_size(h);
+        igraph_integer_t new_size =  old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to indheap, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
         if (new_size == 0) {
             new_size = 1;
         }
@@ -232,7 +245,7 @@ igraph_error_t igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, 
  * \brief Returns the largest element in an indexed heap.
  */
 
-igraph_real_t igraph_indheap_max(igraph_indheap_t* h) {
+igraph_real_t igraph_indheap_max(const igraph_indheap_t *h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     IGRAPH_ASSERT(h->stor_begin != h->end);
@@ -264,7 +277,7 @@ igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
  * \brief Gives the number of elements in an indexed heap.
  */
 
-igraph_integer_t igraph_indheap_size(igraph_indheap_t* h) {
+igraph_integer_t igraph_indheap_size(const igraph_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
@@ -274,7 +287,7 @@ igraph_integer_t igraph_indheap_size(igraph_indheap_t* h) {
  * \ingroup indheap
  * \brief Reserves more memory for an indexed heap.
  *
- * @return Error code:
+ * \return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
@@ -318,7 +331,7 @@ igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, igraph_integer_t size
  * \brief Returns the index of the largest element in an indexed heap.
  */
 
-igraph_integer_t igraph_indheap_max_index(igraph_indheap_t *h) {
+igraph_integer_t igraph_indheap_max_index(const igraph_indheap_t *h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->index_begin[0];
@@ -423,12 +436,13 @@ static void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, igraph_integer_t e1
  * \ingroup doubleindheap
  * \brief Initializes an empty doubly indexed heap object (constructor).
  *
- * @return Error code:
+ * \return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
 igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_integer_t alloc_size) {
-    if (alloc_size <= 0 ) {
+    IGRAPH_ASSERT(alloc_size >= 0);
+    if (alloc_size == 0 ) {
         alloc_size = 1;
     }
     h->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_real_t);
@@ -487,7 +501,7 @@ void igraph_d_indheap_destroy(igraph_d_indheap_t* h) {
  * \brief Decides whether a heap is empty.
  */
 
-igraph_bool_t igraph_d_indheap_empty(igraph_d_indheap_t* h) {
+igraph_bool_t igraph_d_indheap_empty(const igraph_d_indheap_t *h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->stor_begin == h->end;
@@ -505,7 +519,11 @@ igraph_error_t igraph_d_indheap_push(igraph_d_indheap_t* h, igraph_real_t elem,
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        igraph_integer_t new_size = igraph_d_indheap_size(h) * 2;
+        igraph_integer_t old_size = igraph_d_indheap_size(h);
+        igraph_integer_t new_size =  old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to indheap, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
         if (new_size == 0) {
             new_size = 1;
         }
@@ -528,7 +546,7 @@ igraph_error_t igraph_d_indheap_push(igraph_d_indheap_t* h, igraph_real_t elem,
  * \brief Returns the largest element in the heap.
  */
 
-igraph_real_t igraph_d_indheap_max(igraph_d_indheap_t* h) {
+igraph_real_t igraph_d_indheap_max(const igraph_d_indheap_t *h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     IGRAPH_ASSERT(h->stor_begin != h->end);
@@ -560,7 +578,7 @@ igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
  * \brief Gives the number of elements in the heap.
  */
 
-igraph_integer_t igraph_d_indheap_size(igraph_d_indheap_t* h) {
+igraph_integer_t igraph_d_indheap_size(const igraph_d_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
@@ -570,7 +588,7 @@ igraph_integer_t igraph_d_indheap_size(igraph_d_indheap_t* h) {
  * \ingroup doubleindheap
  * \brief Allocates memory for a heap.
  *
- * @return Error code:
+ * \return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
@@ -824,6 +842,12 @@ igraph_error_t igraph_2wheap_push_with_index(igraph_2wheap_t *h,
     /*   printf("-> %.2g [%li]\n", elem, idx); */
 
     igraph_integer_t size = igraph_vector_size(&h->data);
+
+    if (size > IGRAPH_INTEGER_MAX - 2) {
+        /* to allow size+2 below */
+        IGRAPH_ERROR("Cannot push to 2wheap, already at maximum size.", IGRAPH_EOVERFLOW);
+    }
+
     IGRAPH_CHECK(igraph_vector_push_back(&h->data, elem));
     IGRAPH_CHECK(igraph_vector_int_push_back(&h->index, idx));
     VECTOR(h->index2)[idx] = size + 2;
@@ -921,7 +945,7 @@ igraph_error_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, ig
 
 /* Check that the heap is in a consistent state */
 
-igraph_error_t igraph_2wheap_check(igraph_2wheap_t *h) {
+igraph_error_t igraph_2wheap_check(const igraph_2wheap_t *h) {
     igraph_integer_t size = igraph_2wheap_size(h);
     igraph_integer_t i;
     igraph_bool_t error = 0;

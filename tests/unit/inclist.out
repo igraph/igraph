@@ -256,15 +256,14 @@ In- and out-edges, loops listed twice: {
 
 Testing incidence to adjacency list conversion
 
-Incidence list: {
-  0: ( 0 1 5 7 )
-  1: ( 0 2 )
-  2: ( 2 3 3 4 )
-  3: ( 5 1 4 6 )
-  4: ( 7 6 11 11 8 8 9 10 )
-  5: ( 9 12 )
-  6: ( 10 12 )
-}
+Incidence list (printed with igraph_inclist_fprint):
+0 1 5 7
+0 2
+2 3 3 4
+5 1 4 6
+7 6 11 11 8 8 9 10
+9 12
+10 12
 
 Corresponding adjacency list: {
   0: ( 1 3 3 4 )
@@ -275,6 +274,14 @@ Corresponding adjacency list: {
   5: ( 4 6 )
   6: ( 4 5 )
 }
+
+Cleared incidence list (printed with igraph_inclist_print):
+
+
+
+
+
+
 
 ============================================================
 

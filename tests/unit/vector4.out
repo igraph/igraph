@@ -1,0 +1,28 @@
+Taking sum of squares of empty vector:
+0
+Taking sum of squares of vector with NaN:
+NaN
+Taking sum of squares of vector:
+30
+Checking if vector is equal to itself:
+1
+Checking if vector is equal to other vector:
+0
+Checking if all elements of vector are less than its own elements:
+0
+Checking if all elements of vector are less than vector with nan:
+0
+Checking if all elements of vector are less than vector with smaller elements:
+0
+Checking if all elements of vector are less than vector with larger elements:
+1
+Checking if all elements of vector are greater than its own elements:
+0
+Checking if all elements of vector are greater than vector with nan:
+0
+Checking if all elements of vector are greater than vector with smaller elements:
+1
+Checking if all elements of vector are greater than vector with larger elements:
+0
+Checking vector_printf without nans:
+--   1-- --   5-- --   2--

@@ -47,7 +47,6 @@ add_library(
   core/estack.c
   core/fixed_vectorlist.c
   core/grid.c
-  core/hashtable.c
   core/heap.c
   core/indheap.c
   core/interruption.c
@@ -80,8 +79,9 @@ add_library(
 
   random/random.c
   random/rng_glibc2.c
-  random/rng_rand.c
   random/rng_mt19937.c
+  random/rng_pcg32.c
+  random/rng_pcg64.c
 
   graph/adjlist.c
   graph/attributes.c
@@ -216,6 +216,7 @@ add_library(
   layout/merge_grid.c
   layout/reingold_tilford.c
   layout/sugiyama.c
+  layout/umap.c
 
   operators/add_edge.c
   operators/complementer.c
@@ -243,8 +244,9 @@ add_library(
   paths/random_walk.c
   paths/shortest_paths.c
   paths/simple_paths.c
-  paths/unweighted.c
   paths/sparsifier.c
+  paths/unweighted.c
+  paths/widest_paths.c
 
   properties/basic_properties.c
   properties/constraint.c
@@ -272,6 +274,7 @@ add_library(
   misc/cocitation.c
   misc/coloring.c
   misc/conversion.c
+  misc/cycle_bases.c
   misc/degree_sequence.cpp
   misc/embedding.c
   misc/feedback_arc_set.c
@@ -280,7 +283,9 @@ add_library(
   misc/microscopic_update.c
   misc/mixing.c
   misc/motifs.c
+  misc/order_cycle.cpp
   misc/other.c
+  misc/power_law_fit.c
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c
@@ -386,7 +391,7 @@ endif()
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer cxsparse_vendored prpack
+  bliss cliquer cxsparse_vendored pcg prpack
 )
 
 if (NOT BUILD_SHARED_LIBS)
@@ -435,7 +440,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer cxsparse_vendored prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored pcg prpack
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

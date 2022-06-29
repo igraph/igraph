@@ -71,7 +71,9 @@ igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t
 igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_int_t *idx) {
-
+    /* graph and newgraph may be the same, in which case we need to support
+     * in-place operations. If they are _not_ the same, it is assumed that the
+     * new graph has no vertex attributes yet */
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_vertices(graph, newgraph, idx);
     } else {
@@ -83,6 +85,10 @@ igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_int_list_t *merges,
                                         const igraph_attribute_combination_t *comb) {
+    /* It is assumed that the two graphs are not the same and that the new
+     * graph has no vertex attributes yet. We cannot assert the latter but we
+     * can assert the former */
+    IGRAPH_ASSERT(graph != newgraph);
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_vertices(graph, newgraph,
                 merges,
@@ -104,6 +110,9 @@ igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
 igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_int_t *idx) {
+    /* graph and newgraph may be the same, in which case we need to support
+     * in-place operations. If they are _not_ the same, it is assumed that the
+     * new graph has no edge attributes yet */
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_edges(graph, newgraph, idx);
     } else {
@@ -115,6 +124,10 @@ igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_int_list_t *merges,
                                      const igraph_attribute_combination_t *comb) {
+    /* It is assumed that the two graphs are not the same and that the new
+     * graph has no eedge attributes yet. We cannot assert the latter but we
+     * can assert the former */
+    IGRAPH_ASSERT(graph != newgraph);
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_edges(graph, newgraph,
                 merges,

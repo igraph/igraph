@@ -30,6 +30,7 @@
 
 #include "core/interruption.h"
 #include "internal/glpk_support.h"
+#include "math/safe_intop.h"
 
 #include "config.h"
 
@@ -85,14 +86,13 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
                                         const igraph_vector_t *weights) {
 
 #ifndef HAVE_GLPK
-    IGRAPH_ERROR("GLPK is not available",
-                 IGRAPH_UNIMPLEMENTED);
+    IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t no_of_variables = no_of_nodes * (no_of_nodes + 1) / 2;
+    igraph_integer_t no_of_variables;
     igraph_integer_t i, j, k, l;
     int st;
     int idx[] = { 0, 0, 0, 0 };
@@ -132,6 +132,14 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
+    /* no_of_variables = no_of_nodes * (no_of_nodes + 1) / 2;
+     *
+     * Here we do not use IGRAPH_SAFE_N_CHOOSE_2 because later we rely on
+     * (no_of_nodes + 1) * no_of_nodes not overflowing even before the
+     * division by 2. See IDX() macro.
+     */
+    IGRAPH_SAFE_MULT(no_of_nodes + 1, no_of_nodes, &no_of_variables);
+    no_of_variables /= 2;
     if (no_of_variables > INT_MAX) {
         IGRAPH_ERROR("Problem too large for GLPK.", IGRAPH_EOVERFLOW);
     }

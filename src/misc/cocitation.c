@@ -200,7 +200,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
     igraph_integer_t no_of_vids;
     igraph_integer_t from, i, j, k, l, u, v;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
-    igraph_vector_t vid_reverse_index;
+    igraph_vector_int_t vid_reverse_index;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -210,8 +210,8 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
     /* Create a mapping from vertex IDs to the row of the matrix where
      * the result for this vertex will appear */
-    IGRAPH_VECTOR_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
-    igraph_vector_fill(&vid_reverse_index, -1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
+    igraph_vector_int_fill(&vid_reverse_index, -1);
     for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         v = IGRAPH_VIT_GET(vit);
         if (v < 0 || v >= no_of_nodes) {
@@ -254,7 +254,7 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
     /* Clean up */
     igraph_vector_int_destroy(&neis);
-    igraph_vector_destroy(&vid_reverse_index);
+    igraph_vector_int_destroy(&vid_reverse_index);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -356,6 +356,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
         for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
             i = IGRAPH_VIT_GET(vit);
             v1 = igraph_lazy_adjlist_get(&al, i);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, i, &k)) {
                 igraph_vector_int_insert(v1, k, i);
             }
@@ -372,7 +373,9 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
             }
             v1 = igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
             v2 = igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
-            igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
+            IGRAPH_CHECK_OOM(v2, "Failed to query neighbors.");
+            IGRAPH_CHECK(igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection));
             if (len_union > 0) {
                 MATRIX(*res, i, j) = ((igraph_real_t)len_intersection) / len_union;
             } else {
@@ -475,8 +478,9 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
             }
             seen[j] = 1;
             v1 = igraph_lazy_adjlist_get(&al, j);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, j, &u)) {
-                igraph_vector_int_insert(v1, u, j);
+                IGRAPH_CHECK(igraph_vector_int_insert(v1, u, j));
             }
         }
 
@@ -495,6 +499,8 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
 
         v1 = igraph_lazy_adjlist_get(&al, u);
         v2 = igraph_lazy_adjlist_get(&al, v);
+        IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
+        IGRAPH_CHECK_OOM(v2, "Failed to query neighbors.");
         IGRAPH_CHECK(igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection));
         if (len_union > 0) {
             VECTOR(*res)[j] = ((igraph_real_t)len_intersection) / len_union;

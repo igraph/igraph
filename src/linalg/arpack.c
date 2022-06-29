@@ -123,7 +123,7 @@ static igraph_error_t igraph_i_arpack_err_dneupd(int error) {
 /* Pristine ARPACK options object that is not exposed to the user; this is used
  * as a template for \c igraph_i_arpack_options_default when the user requests
  * a pointer to the default object */
-static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
+const static igraph_arpack_options_t igraph_i_arpack_options_pristine = {
     /* .bmat = */ { 'I' },
     /* .n = */ 0,
     /* .which = */ { 'X', 'X' },
@@ -675,6 +675,12 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
         sort[0] = 'L'; sort[1] = 'M';
     } else if (which('B', 'E')) {
         sort[0] = 'L'; sort[1] = 'A';
+    } else {
+        /* None of the above, no sorting. These 'X' values are
+         * ignored by ARPACK, but we set them anyway in order to
+         * avoid an uninitialized 'sort' which would trigger
+         * checkers such as MemorySanitizer. */
+        sort[0] = 'X'; sort[1] = 'X';
     }
 
     IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
@@ -732,7 +738,7 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
     return IGRAPH_SUCCESS;
 }
 
-int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
+igraph_error_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
                          const igraph_arpack_options_t *options,
                          igraph_real_t *dr, igraph_real_t *di,
                          igraph_real_t *v) {
@@ -760,6 +766,12 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
         sort[0] = 'S'; sort[1] = 'I';
     } else if (which('S', 'I')) {
         sort[0] = 'L'; sort[1] = 'I';
+    } else {
+        /* None of the above, no sorting. These 'X' values are
+         * ignored by ARPACK, but we set them anyway in order to
+         * avoid an uninitialized 'sort' which would trigger
+         * checkers such as MemorySanitizer. */
+        sort[0] = 'X'; sort[1] = 'X';
     }
 
 #undef which
@@ -846,7 +858,7 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1503,7 +1515,7 @@ igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_mat
         }
     }
     igraph_matrix_destroy(vectors);
-    IGRAPH_CHECK(igraph_matrix_copy(vectors, &new_vectors));
+    IGRAPH_CHECK(igraph_matrix_init_copy(vectors, &new_vectors));
     igraph_matrix_destroy(&new_vectors);
     IGRAPH_FINALLY_CLEAN(1);
 

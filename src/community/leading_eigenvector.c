@@ -393,7 +393,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    community <quote>p</quote>, the merge in the second line forms
  *    community <quote>p+1</quote>, etc. The matrix should be
  *    initialized before calling and will be resized as needed.
- *    This argument is ignored of it is \c NULL.
+ *    This argument is ignored if it is \c NULL.
  * \param membership The membership of the vertices after all the
  *    splits were performed will be stored here. The vector must be
  *    initialized  before calling and will be resized as needed.
@@ -531,7 +531,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     }
 
     if (steps < 0 || steps > no_of_nodes - 1) {
-        steps = no_of_nodes - 1;
+        steps = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     }
 
     if (!membership) {
@@ -691,15 +691,17 @@ igraph_error_t igraph_community_leading_eigenvector(
            cases it tends to fail. We need to suppress error handling for
            the first call. */
         {
-            int i;
+            igraph_error_t retval;
             igraph_error_handler_t *errh =
                     igraph_set_error_handler(igraph_i_error_handler_none);
             igraph_warning_handler_t *warnh =
                     igraph_set_warning_handler(igraph_warning_handler_ignore);
-            igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
-                                  /*values=*/ 0, /*vectors=*/ 0);
+            retval = igraph_arpack_rssolve(arpcb2, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
             igraph_set_warning_handler(warnh);
+            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
+                IGRAPH_ERROR("ARPACK call failed", retval);
+            }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. Note that we cannot use a
                  * fixed all-1 starting vector as sometimes ARPACK would return a
@@ -738,11 +740,14 @@ igraph_error_t igraph_community_leading_eigenvector(
         options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
 
         {
+            igraph_error_t retval;
             igraph_error_handler_t *errh =
                     igraph_set_error_handler(igraph_i_error_handler_none);
-            igraph_arpack_rssolve(arpcb1, &extra, options, &storage,
-                                  /*values=*/ 0, /*vectors=*/ 0);
+            retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
+            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
+                IGRAPH_ERROR("ARPACK call failed", retval);
+            }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. See the comment a few lines
                  * above about the exact choice of this starting vector */
@@ -802,7 +807,7 @@ igraph_error_t igraph_community_leading_eigenvector(
             IGRAPH_CHECK_CALLBACK(
                         callback(
                             mymembership, comm, storage.d[0], &vv, arpcb1,
-                        &extra, callback_extra
+                            &extra, callback_extra
                         ), &ret
                     );
 

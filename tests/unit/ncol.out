@@ -1,0 +1,11 @@
+Vertex 0: name="vertex_name0"
+Vertex 1: name="vertex_name1"
+Vertex 2: name="vertex_name2"
+Vertex 3: name="vertex_name3"
+Edge 0 (0-1): weight=12.3
+Edge 1 (0-1): weight=NaN
+Edge 2 (0-1): weight=NaN
+Edge 3 (1-2): weight=NaN
+Edge 4 (2-3): weight=-Inf
+Edge 5 (3-0): weight=NaN
+

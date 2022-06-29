@@ -85,19 +85,20 @@ static igraph_error_t igraph_i_dl_check_vid(igraph_integer_t dl_vid);
 %type <integer> integer elabel;
 %type <real> weight;
 
-%token NUM
-%token NEWLINE
-%token DL
-%token NEQ
-%token DATA
-%token LABELS
-%token LABELSEMBEDDED
+%token NUM              "number"
+%token NEWLINE          "end of line"
+%token DL               "DL"
+%token NEQ              "n=vertexcount"
+%token DATA             "data:"
+%token LABELS           "labels:"
+%token LABELSEMBEDDED   "labels embedded:"
 %token FORMATFULLMATRIX
 %token FORMATEDGELIST1
 %token FORMATNODELIST1
-%token DIGIT
-%token LABEL
+%token DIGIT            "binary digit"
+%token LABEL            "label"
 %token EOFF
+%token END 0            "end of file" /* friendly name for $end */
 %token ERROR
 
 %%
@@ -244,7 +245,7 @@ elabel: LABEL {
     }
     igraph_strvector_clear(&context->labels);
   }
-  IGRAPH_YY_CHECK(igraph_trie_get2(&context->trie, igraph_dl_yyget_text(scanner),
+  IGRAPH_YY_CHECK(igraph_trie_get_len(&context->trie, igraph_dl_yyget_text(scanner),
                                    igraph_dl_yyget_leng(scanner), &trie_id));
   IGRAPH_ASSERT(0 <= trie_id && trie_id < IGRAPH_DL_MAX_VERTEX_COUNT);
   $$ = trie_id;
@@ -311,10 +312,7 @@ int igraph_dl_yyerror(YYLTYPE* locp,
 
 static igraph_error_t igraph_i_dl_add_str(char *newstr, yy_size_t length,
                         igraph_i_dl_parsedata_t *context) {
-  char tmp=newstr[length];
-  newstr[length]='\0';
-  IGRAPH_CHECK(igraph_strvector_push_back(&context->labels, newstr));
-  newstr[length]=tmp;
+  IGRAPH_CHECK(igraph_strvector_push_back_len(&context->labels, newstr, length));
   return IGRAPH_SUCCESS;
 }
 

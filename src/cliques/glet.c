@@ -82,25 +82,19 @@ static void igraph_i_subclique_next_free(void *ptr) {
     igraph_integer_t i;
     if (data->resultids) {
         for (i = 0; i < data->nc; i++) {
-            if (data->resultids + i) {
-                igraph_vector_int_destroy(data->resultids + i);
-            }
+            igraph_vector_int_destroy(&data->resultids[i]);
         }
         IGRAPH_FREE(data->resultids);
     }
     if (data->result) {
         for (i = 0; i < data->nc; i++) {
-            if (data->result + i) {
-                igraph_destroy(data->result + i);
-            }
+            igraph_destroy(&data->result[i]);
         }
         IGRAPH_FREE(data->result);
     }
     if (data->resultweights) {
         for (i = 0; i < data->nc; i++) {
-            if (data->resultweights + i) {
-                igraph_vector_destroy(data->resultweights + i);
-            }
+            igraph_vector_destroy(&data->resultweights[i]);
         }
         IGRAPH_FREE(data->resultweights);
     }
@@ -488,8 +482,8 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 
             /* Check if hay is a superset */
             while (pi < n_i && pj < n_j && n_i - pi <= n_j - pj) {
-                int ei = VECTOR(*needle)[pi];
-                int ej = VECTOR(*hay)[pj];
+                igraph_integer_t ei = VECTOR(*needle)[pi];
+                igraph_integer_t ej = VECTOR(*hay)[pj];
                 if (ei < ej) {
                     break;
                 } else if (ei > ej) {
@@ -661,7 +655,7 @@ igraph_error_t igraph_i_graphlets_project(
         total_edges += n * (n - 1) / 2;
         VECTOR(celidx)[i + 2] = total_edges;
         for (j = 0; j < n; j++) {
-            int vv = VECTOR(*v)[j] - vid1;
+            igraph_integer_t vv = VECTOR(*v)[j] - vid1;
             VECTOR(vclidx)[vv + 2] += 1;
         }
     }

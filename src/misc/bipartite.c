@@ -538,7 +538,7 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
         igraph_vector_int_minmax(edges, &min_edge, &max_edge);
     }
     if (min_edge < 0 || max_edge >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid (negative) vertex ID", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid (negative or too large) vertex ID", IGRAPH_EINVVID);
     }
 
     /* Check bipartiteness */
@@ -614,6 +614,11 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
     igraph_integer_t i, j, k;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
+    if (n1 > 0 && n2 > 0 && igraph_matrix_min(incidence) < 0) {
+        IGRAPH_ERRORF("Incidence matrix elements should be non-negative, found %g.",
+                IGRAPH_EINVAL, igraph_matrix_min(incidence));
+    }
 
     if (multiple) {
 

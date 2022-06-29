@@ -154,10 +154,10 @@ static const char *igraph_i_error_strings[] = {
     /* 61 */ "Result too large"
 };
 
-const char* igraph_strerror(const igraph_error_t igraph_errno) {
+const char *igraph_strerror(const igraph_error_t igraph_errno) {
     if (igraph_errno < 0 ||
-        ((unsigned long)igraph_errno) >= sizeof(igraph_i_error_strings) / sizeof(char *)) {
-        return "Invalid error code; no error string available.";
+        ((size_t) igraph_errno) >= sizeof(igraph_i_error_strings) / sizeof(char *)) {
+        IGRAPH_FATALF("Invalid error code %d; no error string available.", (int) igraph_errno);
     }
     return igraph_i_error_strings[igraph_errno];
 }
@@ -181,6 +181,7 @@ igraph_error_t igraph_errorf(const char *reason, const char *file, int line,
     va_start(ap, igraph_errno);
     vsnprintf(igraph_i_errormsg_buffer,
               sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
+    va_end(ap);
     return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
 }
 
@@ -284,6 +285,20 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
     return igraph_i_finally_stack_size;
 }
 
+/**
+ * \function IGRAPH_FINALLY_ENTER
+ *
+ * For internal use only.
+ *
+ * Opens a new level in the finally stack. Must have a matching
+ * IGRAPH_FINALLY_EXIT() call that closes the level and exits it.
+ *
+ * The finally stack is divided into "levels". A call to IGRAPH_FINALLY_FREE()
+ * will only unwind the current level of the finally stack, not any of the lower
+ * levels. This mechanism is used to allow some functions to pause stack unwinding
+ * until they can restore their data structures into a consistent state.
+ * See igraph_add_edges() for an example usage.
+ */
 void IGRAPH_FINALLY_ENTER(void) {
     int no = igraph_i_finally_stack_size;
     /* Level indices must always be in increasing order in the finally stack */
@@ -295,6 +310,17 @@ void IGRAPH_FINALLY_ENTER(void) {
     igraph_i_finally_stack_level++;
 }
 
+/**
+ * \function IGRAPH_FINALLY_EXIT
+ *
+ * For internal use only.
+ *
+ * Exists the current level of the finally stack, see IGRAPH_FINALLY_ENTER()
+ * for details. If an error occured inbetween the last pair of
+ * IGRAPH_FINALLY_ENTER()/EXIT() calls, a call to igraph_error(), typically
+ * through IGRAPH_ERROR(), is mandatory directly after IGRAPH_FINALLY_EXIT().
+ * This ensures that resource cleanup will properly resume.
+ */
 void IGRAPH_FINALLY_EXIT(void) {
     igraph_i_finally_stack_level--;
     if (igraph_i_finally_stack_level < 0) {
@@ -366,6 +392,7 @@ void igraph_warningf(const char *reason, const char *file, int line,
     va_start(ap, line);
     vsnprintf(igraph_i_warningmsg_buffer,
               sizeof(igraph_i_warningmsg_buffer) / sizeof(char), reason, ap);
+    va_end(ap);
     igraph_warning(igraph_i_warningmsg_buffer, file, line);
 }
 

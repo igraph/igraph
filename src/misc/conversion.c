@@ -41,7 +41,10 @@
  *
  * </para><para>
  * The result is an adjacency matrix. Entry i, j of the matrix
- * contains the number of edges connecting vertex i to vertex j.
+ * contains the number of edges connecting vertex i to vertex j in the unweighted
+ * case, or the total weight of edges connecting vertex i to vertex j in the
+ * weighted case.
+ *
  * \param graph Pointer to the graph to convert
  * \param res Pointer to an initialized matrix object, it will be
  *        resized if needed.
@@ -57,20 +60,40 @@
  *          the whole matrix is used, a symmetric matrix is returned
  *          if the graph is undirected.
  *        \endclist
+ * \param weights An optional vector containing the weight of each edge
+ *        in the graph. Supply a null pointer here to make all edges have
+ *        the same weight of 1.
+ * \param loops Constant specifying how loop edges should be handled.
+ *        Possible values:
+ *        \clist
+ *        \cli IGRAPH_NO_LOOPS
+ *          loop edges are ignored and the diagonal of the matrix will contain
+ *          zeros only
+ *        \cli IGRAPH_LOOPS_ONCE
+ *          loop edges are counted once, i.e. a vertex with a single unweighted
+ *          loop edge will have 1 in the corresponding diagonal entry
+ *        \cli IGRAPH_LOOPS_TWICE
+ *          loop edges are counted twice in \em undirected graphs, i.e. a vertex
+ *          with a single unweighted loop edge in an undirected graph will have
+ *          2 in the corresponding diagonal entry. Loop edges in directed graphs
+ *          are still counted as 1. Essentially, this means that the function is
+ *          counting the incident edge \em stems , which makes more sense when
+ *          using the adjacency matrix in linear algebra.
+ *        \endclist
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
  * \sa igraph_get_adjacency_sparse() if you want a sparse matrix representation
  *
- * Time complexity: O(|V||V|),
- * |V| is the
- * number of vertices in the graph.
+ * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  */
 
-igraph_error_t igraph_get_adjacency(
-    const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type
-) {
+#define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
 
+igraph_error_t igraph_get_adjacency(
+    const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,
+    const igraph_vector_t *weights, igraph_loops_t loops
+) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -83,16 +106,21 @@ igraph_error_t igraph_get_adjacency(
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            MATRIX(*res, from, to) += 1;
+            if (from != to || loops != IGRAPH_NO_LOOPS) {
+                MATRIX(*res, from, to) += WEIGHT_OF(i);
+            }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                MATRIX(*res, to, from) += 1;
+                MATRIX(*res, to, from) += WEIGHT_OF(i);
             } else {
-                MATRIX(*res, from, to) += 1;
+                MATRIX(*res, from, to) += WEIGHT_OF(i);
+            }
+            if (to == from && loops == IGRAPH_LOOPS_TWICE) {
+                MATRIX(*res, to, to) += WEIGHT_OF(i);
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
@@ -100,22 +128,32 @@ igraph_error_t igraph_get_adjacency(
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                MATRIX(*res, from, to) += 1;
+                MATRIX(*res, from, to) += WEIGHT_OF(i);
             } else {
-                MATRIX(*res, to, from) += 1;
+                MATRIX(*res, to, from) += WEIGHT_OF(i);
+            }
+            if (to == from && loops == IGRAPH_LOOPS_TWICE) {
+                MATRIX(*res, to, to) += WEIGHT_OF(i);
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            MATRIX(*res, from, to) += 1;
-            if (from != to) {
-                MATRIX(*res, to, from) += 1;
+            MATRIX(*res, from, to) += WEIGHT_OF(i);
+            if (from != to || loops == IGRAPH_LOOPS_TWICE) {
+                MATRIX(*res, to, from) += WEIGHT_OF(i);
             }
         }
     } else {
         IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
+    }
+
+    /* Erase the diagonal if we don't need loop edges */
+    if (loops == IGRAPH_NO_LOOPS) {
+        for (i = 0; i < no_of_nodes; i++) {
+            MATRIX(*res, i, i) = 0;
+        }
     }
 
     return IGRAPH_SUCCESS;
@@ -126,7 +164,7 @@ igraph_error_t igraph_get_adjacency(
  * \brief Returns the adjacency matrix of a graph in a sparse matrix format.
  *
  * \param graph The input graph.
- * \param res Pointer to an initialized sparse matrix. The result
+ * \param res Pointer to an \em initialized sparse matrix. The result
  *    will be stored here. The matrix will be resized as needed.
  * \param type Constant specifying the type of the adjacency matrix to
  *        create for undirected graphs. It is ignored for directed
@@ -149,7 +187,8 @@ igraph_error_t igraph_get_adjacency(
  */
 
 igraph_error_t igraph_get_adjacency_sparse(
-    const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type
+    const igraph_t *graph, igraph_sparsemat_t *res, igraph_get_adjacency_t type,
+    const igraph_vector_t *weights, igraph_loops_t loops
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -164,16 +203,30 @@ igraph_error_t igraph_get_adjacency_sparse(
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
+            if (from != to || loops != IGRAPH_NO_LOOPS) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
+            }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, WEIGHT_OF(i)));
+            } else if (to == from) {
+                switch (loops) {
+                    case IGRAPH_LOOPS_ONCE:
+                        IGRAPH_CHECK(igraph_sparsemat_entry(res, to, to, WEIGHT_OF(i)));
+                        break;
+                    case IGRAPH_LOOPS_TWICE:
+                        IGRAPH_CHECK(igraph_sparsemat_entry(res, to, to, 2 * WEIGHT_OF(i)));
+                        break;
+                    case IGRAPH_NO_LOOPS:
+                    default:
+                        break;
+                }
             } else {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
@@ -181,18 +234,42 @@ igraph_error_t igraph_get_adjacency_sparse(
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
             if (to < from) {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
+            } else if (to == from) {
+                switch (loops) {
+                    case IGRAPH_LOOPS_ONCE:
+                        IGRAPH_CHECK(igraph_sparsemat_entry(res, to, to, WEIGHT_OF(i)));
+                        break;
+                    case IGRAPH_LOOPS_TWICE:
+                        IGRAPH_CHECK(igraph_sparsemat_entry(res, to, to, 2 * WEIGHT_OF(i)));
+                        break;
+                    case IGRAPH_NO_LOOPS:
+                    default:
+                        break;
+                }
             } else {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, WEIGHT_OF(i)));
             }
         }
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         for (i = 0; i < no_of_edges; i++) {
             from = IGRAPH_FROM(graph, i);
             to = IGRAPH_TO(graph, i);
-            IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, 1.0));
-            if (from != to) {
-                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, 1.0));
+            if (to == from) {
+                switch (loops) {
+                    case IGRAPH_LOOPS_ONCE:
+                        IGRAPH_CHECK(igraph_sparsemat_entry(res, to, to, WEIGHT_OF(i)));
+                        break;
+                    case IGRAPH_LOOPS_TWICE:
+                        IGRAPH_CHECK(igraph_sparsemat_entry(res, to, to, 2 * WEIGHT_OF(i)));
+                        break;
+                    case IGRAPH_NO_LOOPS:
+                    default:
+                        break;
+                }
+            } else {
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, from, to, WEIGHT_OF(i)));
+                IGRAPH_CHECK(igraph_sparsemat_entry(res, to, from, WEIGHT_OF(i)));
             }
         }
     } else {
@@ -200,6 +277,36 @@ igraph_error_t igraph_get_adjacency_sparse(
     }
 
     return IGRAPH_SUCCESS;
+}
+
+#undef WEIGHT_OF
+
+/**
+ * \function igraph_get_sparsemat
+ * \brief Converts an igraph graph to a sparse matrix (deprecated).
+ *
+ * If the graph is undirected, then a symmetric matrix is created.
+ *
+ * </para><para>
+ * This function is deprecated in favour of \ref igraph_get_adjacency_sparse(),
+ * but does not work in an identical way. This function takes an \em uninitialized
+ * \c igraph_sparsemat_t while \ref igraph_get_adjacency_sparse() takes
+ * an already initialized one.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an \em uninitialized sparse matrix. The result
+ *    will be stored here.
+ * \return Error code.
+ *
+ * \deprecated-by igraph_get_adjacency_sparse 0.10.0
+ */
+
+igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
+    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
+    return igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
 }
 
 /**
@@ -695,6 +802,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+#define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
+
 /**
  * \function igraph_get_stochastic
  * Stochastic adjacency matrix of a graph
@@ -702,53 +811,69 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise or column-wise, such that
  * the sum of each row (or column) is one.
+ *
  * \param graph The input graph.
- * \param matrix Pointer to an initialized matrix, the result is stored here.
+ * \param res Pointer to an initialized matrix, the result is stored here.
  *   It will be resized as needed.
- * \param column_wise Whether to normalize column-wise. For undirected
- *    graphs this argument does not have any effect.
+ * \param column_wise Whether to normalize column-wise.
  * \return Error code.
  *
- * Time complexity: O(|V||V|), quadratic in the number of vertices.
+ * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  *
- * \sa igraph_get_stochastic_sparsemat(), the sparse version of this
+ * \sa igraph_get_stochastic_sparse(), the sparse version of this
  * function.
  */
 
-igraph_error_t igraph_get_stochastic(const igraph_t *graph,
-                          igraph_matrix_t *matrix,
-                          igraph_bool_t column_wise) {
-
+igraph_error_t igraph_get_stochastic(
+    const igraph_t *graph, igraph_matrix_t *res, igraph_bool_t column_wise,
+    const igraph_vector_t *weights
+) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_integer_t i, from, to;
+    igraph_vector_t sums;
     igraph_real_t sum;
-    igraph_integer_t i, j;
 
-    IGRAPH_CHECK(igraph_get_adjacency(graph, matrix, IGRAPH_GET_ADJACENCY_BOTH));
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
+    igraph_matrix_null(res);
 
-    if (!column_wise) {
-        for (i = 0; i < no_of_nodes; i++) {
-            sum = 0.0;
-            for (j = 0; j < no_of_nodes; j++) {
-                sum += MATRIX(*matrix, i, j);
-            }
-            for (j = 0; j < no_of_nodes; j++) {
-                MATRIX(*matrix, i, j) /= sum;
-            }
+    IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_nodes);
+
+    if (directed) {
+        IGRAPH_CHECK(igraph_strength(
+            graph, &sums, igraph_vss_all(),
+            column_wise ? IGRAPH_IN : IGRAPH_OUT,
+            /* loops = */ 1, weights
+        ));
+
+        for (i = 0; i < no_of_edges; i++) {
+            from = IGRAPH_FROM(graph, i);
+            to = IGRAPH_TO(graph, i);
+            sum = VECTOR(sums)[column_wise ? to : from];
+            MATRIX(*res, from, to) += WEIGHT_OF(i) / sum;
         }
     } else {
-        for (i = 0; i < no_of_nodes; i++) {
-            sum = 0.0;
-            for (j = 0; j < no_of_nodes; j++) {
-                sum += MATRIX(*matrix, j, i);
-            }
-            for (j = 0; j < no_of_nodes; j++) {
-                MATRIX(*matrix, j, i) /= sum;
-            }
+        IGRAPH_CHECK(igraph_strength(
+            graph, &sums, igraph_vss_all(), IGRAPH_ALL,
+            /* loops = */ IGRAPH_LOOPS_TWICE, weights
+        ));
+
+        for (i = 0; i < no_of_edges; i++) {
+            from = IGRAPH_FROM(graph, i);
+            to = IGRAPH_TO(graph, i);
+            MATRIX(*res, from, to) += WEIGHT_OF(i) / VECTOR(sums)[column_wise ? to : from];
+            MATRIX(*res, to, from) += WEIGHT_OF(i) / VECTOR(sums)[column_wise ? from: to];
         }
     }
 
+    igraph_vector_destroy(&sums);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
+
+#undef WEIGHT_OF
 
 /**
  * \function igraph_get_stochastic_sparse
@@ -757,11 +882,11 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise or column-wise, such that
  * the sum of each row (or column) is one.
+ *
  * \param graph The input graph.
- * \param sparsemat Pointer to an initialized sparse matrix, the
+ * \param res Pointer to an \em initialized sparse matrix, the
  *    result is stored here. The matrix will be resized as needed.
- * \param column_wise Whether to normalize column-wise. For undirected
- *    graphs this argument does not have any effect.
+ * \param column_wise Whether to normalize column-wise.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -770,16 +895,16 @@ igraph_error_t igraph_get_stochastic(const igraph_t *graph,
  * \sa igraph_get_stochastic(), the dense version of this function.
  */
 
-igraph_error_t igraph_get_stochastic_sparse(const igraph_t *graph,
-                                    igraph_sparsemat_t *sparsemat,
-                                    igraph_bool_t column_wise) {
-
-    IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, sparsemat, IGRAPH_GET_ADJACENCY_BOTH));
+igraph_error_t igraph_get_stochastic_sparse(
+    const igraph_t *graph, igraph_sparsemat_t *res, igraph_bool_t column_wise,
+    const igraph_vector_t *weights
+) {
+    IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, res, IGRAPH_GET_ADJACENCY_BOTH, weights, IGRAPH_LOOPS_TWICE));
 
     if (column_wise) {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(sparsemat, /* allow_zeros = */ 0));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_cols(res, /* allow_zeros = */ 0));
     } else {
-        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(sparsemat, /* allow_zeros = */ 0));
+        IGRAPH_CHECK(igraph_sparsemat_normalize_rows(res, /* allow_zeros = */ 0));
     }
 
     return IGRAPH_SUCCESS;
@@ -788,15 +913,32 @@ igraph_error_t igraph_get_stochastic_sparse(const igraph_t *graph,
 
 /**
  * \function igraph_get_stochastic_sparsemat
- * \brief Stochastic adjacency matrix of a graph (deprecated alias)
+ * \brief Stochastic adjacency matrix of a graph (deprecated).
+ *
+ * This function is deprecated in favour of \ref igraph_get_stochastic_sparse(),
+ * but does not work in an identical way. This function takes an \em uninitialized
+ * \c igraph_sparsemat_t while \ref igraph_get_stochastic_sparse() takes
+ * an already initialized one.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an \em uninitialized sparse matrix, the
+ *    result is stored here. The matrix will be resized as needed.
+ * \param column_wise Whether to normalize column-wise. For undirected
+ *    graphs this argument does not have any effect.
+ * \return Error code.
  *
  * \deprecated-by igraph_get_stochastic_sparse 0.10.0
  */
 
 igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
-                                    igraph_sparsemat_t *sparsemat,
-                                    igraph_bool_t column_wise) {
-    return igraph_get_stochastic_sparse(graph, sparsemat, column_wise);
+                                               igraph_sparsemat_t *res,
+                                               igraph_bool_t column_wise) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t nzmax = igraph_is_directed(graph) ? no_of_edges : 2*no_of_edges;
+    IGRAPH_CHECK(igraph_sparsemat_init(res, no_of_nodes, no_of_nodes, nzmax));
+    return igraph_get_stochastic_sparse(graph, res, column_wise, NULL);
 }
 
 

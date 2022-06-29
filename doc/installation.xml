@@ -15,7 +15,7 @@
   <itemizedlist>
     <listitem>
       <para>
-        <ulink url="https://cmake.org">CMake</ulink> 3.16 or later
+        <ulink url="https://cmake.org">CMake</ulink> 3.18 or later
       </para>
     </listitem>
     <listitem>
@@ -240,12 +240,6 @@ cmake --build . --target check --config Release
           with dynamic runtime linking using the
           <literal>x64-windows-static-md</literal> triplet.
         </para>
-        <para>
-          There are some known issues with igraph when using certain external packages
-          from vcpkg. When building against OpenBLAS, this results in a few differences
-          in some unit tests, see issue
-          <ulink url="https://github.com/igraph/igraph/issues/1491">#1491</ulink>.
-        </para>
       </section>
     </section>
       <section id="igraph-Installation-msys2">
@@ -306,9 +300,8 @@ cmake --build . --target check --config Release
 pacman -S \
   mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake \
   mingw-w64-x86_64-gmp mingw-w64-x86_64-libxml2 \
-  mingw-w64-x86_64-openblas mingw-w64-x86_64-suitesparse mingw-w64-x86_64-arpack mingw-w64-x86_64-glpk \
-  diffutils \
-  git bison flex
+  mingw-w64-x86_64-openblas mingw-w64-x86_64-suitesparse mingw-w64-x86_64-arpack \
+  mingw-w64-x86_64-glpk diffutils git bison flex
 </programlisting>
       <para>
         In order to build igraph, follow the <emphasis role="strong">General
@@ -545,6 +538,20 @@ $ cmake .. \
 #define QNaN0 0x0
 #define QNaN1 0x7ff80000
 </programlisting>
+    </para>
+    <para>
+      igraph also checks whether the endianness of <literal>uint64_t</literal>
+      matches the endianness of <literal>double</literal> on the platform
+      being compiled. This is needed to ensure that certain functions in igraph's
+      random number generator work properly. However, it is not possible to
+      execute this check when cross-compiling, so in this case igraph simply
+      assumes that the endianness matches (which is the case for the vast
+      majority of platforms anyway). The only case where you might run into
+      problems is when you cross-compile for Apple Silicon (<literal>arm64</literal>)
+      from an Intel-based Mac, in which case CMake might not realize that you
+      are cross-compiling and will try to execute the check anyway. You can
+      work around this by setting <literal>IEEE754_DOUBLE_ENDIANNESS_MATCHES</literal>
+      to <literal>ON</literal> explicitly before invoking CMake.
     </para>
   </section>
   <section id="igraph-Installation-additional-notes">

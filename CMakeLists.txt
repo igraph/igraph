@@ -75,6 +75,7 @@ find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
+include(CheckIncludeFiles)
 include(CMakePushCheckState)
 
 # First we check for some functions and symbols
@@ -82,11 +83,32 @@ cmake_push_check_state()
 if(NEED_LINKING_AGAINST_LIBM)
   list(APPEND CMAKE_REQUIRED_LIBRARIES m)
 endif()
-check_symbol_exists(stpcpy string.h HAVE_STPCPY)
 check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
-check_symbol_exists(strdup string.h HAVE_STRDUP)
+check_symbol_exists(strncasecmp strings.h HAVE_STRNCASECMP)
 check_symbol_exists(_stricmp string.h HAVE__STRICMP)
+check_symbol_exists(_strnicmp string.h HAVE__STRNICMP)
+check_symbol_exists(strdup string.h HAVE_STRDUP)
+check_symbol_exists(strndup string.h HAVE_STRNDUP)
+check_include_files(xlocale.h HAVE_XLOCALE)
+if(HAVE_XLOCALE)
+  # On BSD, uselocale() is in xlocale.h instead of locale.h.
+  # Some systems provide xlocale.h, but uselocale() is still in locale.h,
+  # thus we try both.
+  check_symbol_exists(uselocale "xlocale.h;locale.h" HAVE_USELOCALE)
+else()
+  check_symbol_exists(uselocale locale.h HAVE_USELOCALE)
+endif()
+check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
+
+# Check for 128-bit integer multiplication support and floating-point
+# endianness
+include(ieee754_endianness)
+include(uint128_support)
+
+if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)
+  message(WARNING "igraph cannot set per-thread locale on this platform. igraph_enter_safelocale() and igraph_exit_safelocale() will not be safe to use in multithreaded programs.")
+endif()
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
@@ -98,9 +120,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
     # Generated files are excluded; apparently the CodeCoverage script has some
     # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
-    # directory that somehow gets into the coverage resolts. /Applications and
+    # directory that somehow gets into the coverage results. /Applications and
     # /Library/Developer are for macOS -- they exclude files from the macOS SDK.
-    EXCLUDE "io/*.l" "src/io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*"
+    EXCLUDE "io/*.l" "src/io/parsers/*" "io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
   )
 endif()
 

@@ -105,6 +105,16 @@ __BEGIN_DECLS
 
 #endif
 
+/* Overflow-safe calculation of "n choose 2" = n*(n-1) / 2, assuming that n >= 0. */
+#define IGRAPH_SAFE_N_CHOOSE_2(n, res) \
+    do { \
+        igraph_integer_t _safe_n = (n); \
+        if (_safe_n % 2 == 0) IGRAPH_SAFE_MULT(_safe_n / 2, _safe_n - 1, res); \
+        else IGRAPH_SAFE_MULT(_safe_n, (_safe_n - 1) / 2, res); \
+    } while (0)
+
+igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res);
+igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_mult(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_vector_int_sum(const igraph_vector_int_t *vec, igraph_integer_t *res);

@@ -95,7 +95,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * \param nodes The number of vertices in the graph.
  * \param fw_prob The forward burning probability.
  * \param bw_factor The backward burning ratio. The backward burning
-      probability is calculated as <code>bw.factor*fw.prob</code>.
+      probability is calculated as <code>bw_factor * fw_prob</code>.
  * \param pambs The number of ambassador vertices.
  * \param directed Whether to create a directed graph.
  * \return Error code.

@@ -29,7 +29,11 @@ typedef struct {
 static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int *x) {
     unsigned long int k;
 
-    x[*i] += x[*j];
+    /* The original implementation used x[*i] += x[*j] here. Considering that
+     * x is signed, this is undefined behaviour according to the C standard.
+     * Therefore, we temporarily cast to unsigned long int to achieve what the
+     * original intention was */
+    x[*i] = ((unsigned long int)x[*i]) + ((unsigned long int)x[*j]);
     k = (x[*i] >> 1) & 0x7FFFFFFF;
 
     (*i)++;
@@ -45,14 +49,10 @@ static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int
     return k;
 }
 
-static unsigned long int igraph_rng_glibc2_get(void *vstate) {
+static igraph_uint_t igraph_rng_glibc2_get(void *vstate) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     return igraph_i_rng_glibc2_get(&state->i, &state->j, 31, state->x);
-}
-
-static igraph_real_t igraph_rng_glibc2_get_real(void *state) {
-    return igraph_rng_glibc2_get(state) / 2147483648.0;
 }
 
 /* this function is independent of the bit size */
@@ -79,12 +79,12 @@ static void igraph_i_rng_glibc2_init(long int *x, int n,
     }
 }
 
-static igraph_error_t igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
+static igraph_error_t igraph_rng_glibc2_seed(void *vstate, igraph_uint_t seed) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     int i;
 
-    igraph_i_rng_glibc2_init(state->x, 31, seed);
+    igraph_i_rng_glibc2_init(state->x, 31, (unsigned long) seed);
 
     state->i = 3;
     state->j = 0;
@@ -100,9 +100,7 @@ static igraph_error_t igraph_rng_glibc2_init(void **state) {
     igraph_i_rng_glibc2_state_t *st;
 
     st = IGRAPH_CALLOC(1, igraph_i_rng_glibc2_state_t);
-    if (!st) {
-        IGRAPH_ERROR("Cannot initialize GNU libc 2 RNG", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(st, "Cannot initialize GNU libc 2 RNG.");
     (*state) = st;
 
     igraph_rng_glibc2_seed(st, 0);
@@ -130,16 +128,17 @@ static void igraph_rng_glibc2_destroy(void *vstate) {
 
 const igraph_rng_type_t igraph_rngtype_glibc2 = {
     /* name= */      "LIBC",
-    /* min=  */      0,
-    /* max=  */      0x7fffffffUL,
+    /* bits=  */     31,
     /* init= */      igraph_rng_glibc2_init,
     /* destroy= */   igraph_rng_glibc2_destroy,
     /* seed= */      igraph_rng_glibc2_seed,
     /* get= */       igraph_rng_glibc2_get,
-    /* get_real= */  igraph_rng_glibc2_get_real,
+    /* get_int= */   0,
+    /* get_real= */  0,
     /* get_norm= */  0,
     /* get_geom= */  0,
     /* get_binom= */ 0,
     /* get_exp= */   0,
-    /* get_gamma= */ 0
+    /* get_gamma= */ 0,
+    /* get_pois= */  0
 };

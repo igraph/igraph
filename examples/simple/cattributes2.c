@@ -61,7 +61,7 @@ int main() {
      * print warnings about boolean attributes being converted to numbers, and
      * we don't care about these */
     oldwarnhandler = igraph_set_warning_handler(igraph_warning_handler_ignore);
-    igraph_write_graph_gml(&g, stdout, 0, "");
+    igraph_write_graph_gml(&g, stdout, IGRAPH_WRITE_GML_DEFAULT_SW, 0, "");
     igraph_set_warning_handler(oldwarnhandler);
 
     /* Back to business */

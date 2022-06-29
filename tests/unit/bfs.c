@@ -131,6 +131,15 @@ int main() {
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
 
+    /* Empty root vertex vector */
+
+    igraph_vector_int_clear(&roots);
+    printf("(");
+    igraph_bfs(&graph, /*root=*/ -1, &roots, /*neimode=*/ IGRAPH_OUT,
+               /*unreachable=*/ 0, &restricted,
+               0, 0, 0, 0, 0, 0, &bfs_callback, 0);
+    printf(" )\n");
+
     igraph_vector_int_destroy(&roots);
     igraph_vector_int_destroy(&restricted);
     igraph_destroy(&graph);

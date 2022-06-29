@@ -382,10 +382,10 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c1, comm1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
@@ -469,7 +469,7 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
  *                     returned here.
  * \return  Error code.
  *
- * \see \ref igraph_compare_communities() with the \c IGRAPH_COMMCMP_SPLIT_JOIN
+ * \sa \ref igraph_compare_communities() with the \c IGRAPH_COMMCMP_SPLIT_JOIN
  * method if you are not interested in the individual distances but only the sum
  * of them.
  *
@@ -486,10 +486,10 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c1, comm1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));

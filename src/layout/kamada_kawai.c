@@ -25,9 +25,12 @@
 
 #include "igraph_interface.h"
 #include "igraph_paths.h"
-#include "igraph_random.h"
 
 #include "core/interruption.h"
+#include "layout/layout_internal.h"
+
+/* Energy gradient values below this threshold are considered to be zero. */
+#define KK_EPS 1e-13
 
 /**
  * \ingroup layout
@@ -41,6 +44,10 @@
  * the weight between two vertices pushes them apart. The Young modulus of springs
  * is inversely proportional to the graph distance, ensuring that springs between
  * far-apart veritces will have a smaller effect on the layout.
+ *
+ * </para><para>
+ * This layout works particularly well for locally connected spatial networks
+ * such as lattices.
  *
  * </para><para>
  * This layout algorithm is not suitable for large graphs. The memory
@@ -106,70 +113,52 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     igraph_integer_t i, j, m;
 
     if (maxiter < 0) {
-        IGRAPH_ERROR("Number of iterations must be non-negatice in "
-                     "Kamada-Kawai layout", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of iterations must be non-negative in "
+                     "Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
     if (kkconst <= 0) {
-        IGRAPH_ERROR("`K' constant must be positive in Kamada-Kawai layout",
+        IGRAPH_ERROR("`K' constant must be positive in Kamada-Kawai layout.",
                      IGRAPH_EINVAL);
     }
 
     if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
                      igraph_matrix_ncol(res) != 2)) {
         IGRAPH_ERROR("Invalid start position matrix size in "
-                     "Kamada-Kawai layout", IGRAPH_EINVAL);
+                     "Kamada-Kawai layout.", IGRAPH_EINVAL);
     }
     if (weights && igraph_vector_size(weights) != no_edges) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
-        IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
     }
     if (maxx && igraph_vector_size(maxx) != no_nodes) {
-        IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxx vector length.", IGRAPH_EINVAL);
     }
     if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
-        IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+        IGRAPH_ERROR("minx must not be greater than maxx.", IGRAPH_EINVAL);
     }
     if (miny && igraph_vector_size(miny) != no_nodes) {
-        IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid miny vector length.", IGRAPH_EINVAL);
     }
     if (maxy && igraph_vector_size(maxy) != no_nodes) {
-        IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid maxy vector length.", IGRAPH_EINVAL);
     }
     if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
-        IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+        IGRAPH_ERROR("miny must not be greater than maxy.", IGRAPH_EINVAL);
     }
 
     if (!use_seed) {
         if (minx || maxx || miny || maxy) {
-            const igraph_real_t width = sqrt(no_nodes), height = width;
-            IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
-            RNG_BEGIN();
-            for (i = 0; i < no_nodes; i++) {
-                igraph_real_t x1 = minx ? VECTOR(*minx)[i] : -width / 2;
-                igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] :  width / 2;
-                igraph_real_t y1 = miny ? VECTOR(*miny)[i] : -height / 2;
-                igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] :  height / 2;
-                if (!igraph_finite(x1)) {
-                    x1 = -width / 2;
-                }
-                if (!igraph_finite(x2)) {
-                    x2 =  width / 2;
-                }
-                if (!igraph_finite(y1)) {
-                    y1 = -height / 2;
-                }
-                if (!igraph_finite(y2)) {
-                    y2 =  height / 2;
-                }
-                MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
-                MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
-            }
-            RNG_END();
+            igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
         } else {
             igraph_layout_circle(graph, res, /* order= */ igraph_vss_all());
+            /* The original paper recommends using a radius of 0.5*L0 here.
+             * The coefficient of 0.36 was chosen empirically so that this initial
+             * layout would be as close as possible to the equilibrium layout
+             * when the graph is a cycle graph. */
+            igraph_matrix_scale(res, 0.36 * L0);
         }
     }
 
@@ -235,7 +224,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
             }
             dx = MATRIX(*res, m, 0) - MATRIX(*res, i, 0);
             dy = MATRIX(*res, m, 1) - MATRIX(*res, i, 1);
-            mi_dist = hypot(dx, dy);
+            mi_dist = sqrt(dx*dx + dy*dy);
             myD1 += MATRIX(kij, m, i) * (dx - MATRIX(lij, m, i) * dx / mi_dist);
             myD2 += MATRIX(kij, m, i) * (dy - MATRIX(lij, m, i) * dy / mi_dist);
         }
@@ -275,7 +264,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
             }
             dx = old_x - MATRIX(*res, i, 0);
             dy = old_y - MATRIX(*res, i, 1);
-            dist = hypot(dx, dy);
+            dist = sqrt(dx*dx + dy*dy);
             den = dist * (dx * dx + dy * dy);
             A += MATRIX(kij, m, i) * (1 - MATRIX(lij, m, i) * dy * dy / den);
             B += MATRIX(kij, m, i) * MATRIX(lij, m, i) * dx * dy / den;
@@ -284,9 +273,25 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
         myD1 = VECTOR(D1)[m];
         myD2 = VECTOR(D2)[m];
 
-        /* Need to solve some linear equations */
-        delta_y = (B * myD1 - myD2 * A) / (C * A - B * B);
-        delta_x = - (myD1 + B * delta_y) / A;
+        /* We need to solve the following linear equations, corresponding to
+         * eqs. (11) and (12) in the paper.
+         *
+         * A * delta_x + B * delta_y == myD1
+         * B * delta_x + C * delta_y == myD2
+         *
+         * We special-case the equilibrium case, i.e. when the energy gradient
+         * is zero and no displacement is necessary. This is important for the
+         * case of path graphs, where the determinant of the LHS will be
+         * zero in equilibrium, causing numerical problems.
+         */
+        if (myD1*myD1 + myD2*myD2 < KK_EPS*KK_EPS) {
+            delta_x = 0;
+            delta_y = 0;
+        } else {
+            igraph_real_t det = C * A - B * B;
+            delta_y = (B * myD1 - A * myD2) / det;
+            delta_x = (B * myD2 - C * myD1) / det;
+        }
 
         new_x = old_x + delta_x;
         new_y = old_y + delta_y;
@@ -314,10 +319,10 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
             }
             old_dx = old_x - MATRIX(*res, i, 0);
             old_dy = old_y - MATRIX(*res, i, 1);
-            old_mi_dist = hypot(old_dx, old_dy);
+            old_mi_dist = sqrt(old_dx*old_dx + old_dy*old_dy);
             new_dx = new_x - MATRIX(*res, i, 0);
             new_dy = new_y - MATRIX(*res, i, 1);
-            new_mi_dist = hypot(new_dx, new_dy);
+            new_mi_dist = sqrt(new_dx*new_dx + new_dy*new_dy);
 
             VECTOR(D1)[i] -= MATRIX(kij, m, i) *
                              (-old_dx + MATRIX(lij, m, i) * old_dx / old_mi_dist);
@@ -354,7 +359,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  * \function igraph_layout_kamada_kawai_3d
  * \brief 3D version of the Kamada-Kawai layout generator.
  *
- * This is the 3D version of igraph_layout_kamada_kawai().
+ * This is the 3D version of \ref igraph_layout_kamada_kawai().
  * See the documentation of that function for more information.
  *
  * </para><para>
@@ -409,8 +414,8 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
                                   const igraph_vector_t *miny, const igraph_vector_t *maxy,
                                   const igraph_vector_t *minz, const igraph_vector_t *maxz) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_integer_t no_edges = igraph_ecount(graph);
+    const igraph_integer_t no_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_edges = igraph_ecount(graph);
     igraph_real_t L, L0 = sqrt(no_nodes);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
@@ -465,41 +470,13 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
 
     if (!use_seed) {
         if (minx || maxx || miny || maxy || minz || maxz) {
-            const igraph_real_t width = sqrt(no_nodes), height = width, depth = width;
-            IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 3));
-            RNG_BEGIN();
-            for (i = 0; i < no_nodes; i++) {
-                igraph_real_t x1 = minx ? VECTOR(*minx)[i] : -width / 2;
-                igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] :  width / 2;
-                igraph_real_t y1 = miny ? VECTOR(*miny)[i] : -height / 2;
-                igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] :  height / 2;
-                igraph_real_t z1 = minz ? VECTOR(*minz)[i] : -depth / 2;
-                igraph_real_t z2 = maxz ? VECTOR(*maxz)[i] :  depth / 2;
-                if (!igraph_finite(x1)) {
-                    x1 = -width / 2;
-                }
-                if (!igraph_finite(x2)) {
-                    x2 =  width / 2;
-                }
-                if (!igraph_finite(y1)) {
-                    y1 = -height / 2;
-                }
-                if (!igraph_finite(y2)) {
-                    y2 =  height / 2;
-                }
-                if (!igraph_finite(z1)) {
-                    z1 = -depth / 2;
-                }
-                if (!igraph_finite(z2)) {
-                    z2 =  depth / 2;
-                }
-                MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
-                MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
-                MATRIX(*res, i, 2) = RNG_UNIF(z1, z2);
-            }
-            RNG_END();
+            igraph_i_layout_random_bounded_3d(graph, res, minx, maxx, miny, maxy, minz, maxz);
         } else {
             igraph_layout_sphere(graph, res);
+            /* The coefficient of 0.36 was chosen empirically so that this initial layout
+             * would be as close as possible to the equilibrium layout when the graph is
+             * a Goldberg polyhedron, i.e. having a naturally spherical layout. */
+            igraph_matrix_scale(res, 0.36*L0);
         }
     }
 
@@ -575,7 +552,6 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         igraph_real_t Axx = 0.0, Axy = 0.0, Axz = 0.0, Ayy = 0.0, Ayz = 0.0, Azz = 0.0;
         igraph_real_t max_delta, delta_x, delta_y, delta_z;
         igraph_real_t old_x, old_y, old_z, new_x, new_y, new_z;
-        igraph_real_t detnum;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -624,16 +600,15 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
         /* Need to solve some linear equations, we just use Cramer's rule */
 #define DET(a,b,c,d,e,f,g,h,i) ((a*e*i+b*f*g+c*d*h)-(c*e*g+b*d*i+a*f*h))
 
-        detnum  = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Axz, Ayz, Azz);
-        if (detnum != 0) {
+        /* See comments in 2D version for the reason for this check */
+        if (Ax*Ax + Ay*Ay + Az*Az < KK_EPS*KK_EPS) {
+            delta_x = delta_y = delta_z = 0;
+        } else {
+            igraph_real_t detnum;
+            detnum  = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Axz, Ayz, Azz);
             delta_x = DET(Ax, Ay, Az, Axy, Ayy, Ayz, Axz, Ayz, Azz) / detnum;
             delta_y = DET(Axx, Axy, Axz, Ax, Ay, Az, Axz, Ayz, Azz) / detnum;
             delta_z = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Ax, Ay, Az ) / detnum;
-        } else {
-            /* No new stable position for node m; this can happen in rare
-             * cases, e.g., if the graph has two nodes only. It's best to leave
-             * the node where it is. */
-            delta_x = delta_y = delta_z = 0;
         }
 
         new_x = old_x + delta_x;

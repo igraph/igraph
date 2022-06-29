@@ -85,7 +85,7 @@ static igraph_error_t igraph_i_create_start(
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
  */
-igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void* attr) {
+igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr) {
 
     if (n < 0) {
         IGRAPH_ERROR("Cannot create empty graph with negative number of vertices.", IGRAPH_EINVAL);
@@ -183,17 +183,17 @@ void igraph_destroy(igraph_t *graph) {
 igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     to->n = from->n;
     to->directed = from->directed;
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->from, &from->from));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->from, &from->from));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->from);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->to, &from->to));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->to, &from->to));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->to);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->oi, &from->oi));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->oi, &from->oi));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->oi);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->ii, &from->ii));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->ii, &from->ii));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->ii);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->os, &from->os));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->os, &from->os));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->os);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->is, &from->is));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->is, &from->is));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->is);
 
     to->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
@@ -252,7 +252,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         IGRAPH_ERROR("Invalid (odd) length of edges vector.", IGRAPH_EINVEVECTOR);
     }
     if (!igraph_vector_int_isininterval(edges, 0, igraph_vcount(graph) - 1)) {
-        IGRAPH_ERROR("Out-of-range edge IDs when adding edges.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Out-of-range vertex IDs when adding edges.", IGRAPH_EINVVID);
     }
 
     /* from & to */
@@ -428,7 +428,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_eit_t eit;
 
     igraph_vector_int_t newfrom, newto;
-    igraph_vector_int_t newoi;
+    igraph_vector_int_t newoi, newii;
 
     igraph_bool_t *mark;
     igraph_integer_t i, j;
@@ -469,8 +469,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     /* Create index, this might require additional memory */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&newoi, remaining_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&newii, remaining_edges);
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newfrom, &newto, &newoi, no_of_nodes));
-    IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &graph->ii, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &newii, no_of_nodes));
 
     /* Edge attributes, we need an index that gives the IDs of the
        original edges for every new edge.
@@ -492,10 +493,12 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_vector_int_destroy(&graph->from);
     igraph_vector_int_destroy(&graph->to);
     igraph_vector_int_destroy(&graph->oi);
+    igraph_vector_int_destroy(&graph->ii);
     graph->from = newfrom;
     graph->to = newto;
     graph->oi = newoi;
-    IGRAPH_FINALLY_CLEAN(3);
+    graph->ii = newii;
+    IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_FREE(mark);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1115,46 +1118,46 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
    in 'eid' if it is found; otherwise 'eid' is left intact.
    */
 
-#define BINSEARCH(start,end,value,iindex,edgelist,N,result,result_pos)     \
-    do {                                                      \
-        while ((start) < (end)) {                                 \
-            igraph_integer_t mid=(start)+((end)-(start))/2;                 \
-            igraph_integer_t e= VECTOR((iindex))[mid];            \
-            if (VECTOR((edgelist))[e] < (value)) {                  \
-                (start)=mid+1;                                        \
-            } else {                                                \
-                (end)=mid;                                            \
-            }                                                       \
-        }                                                         \
-        if ((start)<(N)) {                                        \
-            igraph_integer_t e= VECTOR((iindex))[(start)];        \
-            if (VECTOR((edgelist))[e] == (value)) {                 \
-                *(result)= e;                                         \
-                if (result_pos != 0) { *(result_pos) = start; }     \
-            }                                                       \
+#define BINSEARCH(start,end,value,iindex,edgelist,N,result,result_pos) \
+    do { \
+        while ((start) < (end)) { \
+            igraph_integer_t mid =(start)+((end)-(start))/2; \
+            igraph_integer_t e = VECTOR((iindex))[mid]; \
+            if (VECTOR((edgelist))[e] < (value)) { \
+                (start) = mid+1; \
+            } else { \
+                (end) = mid; \
+            } \
+        } \
+        if ((start) < (N)) { \
+            igraph_integer_t e = VECTOR((iindex))[(start)]; \
+            if (VECTOR((edgelist))[e] == (value)) { \
+                *(result) = e; \
+                if (result_pos != 0) { *(result_pos) = start; } \
+            } \
         } } while(0)
 
-#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid)                     \
-    do {                                                              \
-        igraph_integer_t start= VECTOR(graph->os)[xfrom];         \
-        igraph_integer_t end= VECTOR(graph->os)[xfrom+1];         \
-        igraph_integer_t N=end;                                                 \
-        igraph_integer_t start2= VECTOR(graph->is)[xto];          \
-        igraph_integer_t end2= VECTOR(graph->is)[xto+1];          \
-        igraph_integer_t N2=end2;                                               \
-        igraph_integer_t* nullptr=0; \
-        if (end-start<end2-start2) {                                    \
-            BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid,nullptr);           \
-        } else {                                                        \
-            BINSEARCH(start2,end2,xfrom,graph->ii,graph->from,N2,eid,nullptr);    \
-        }                                                               \
+#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid) \
+    do { \
+        igraph_integer_t start = VECTOR(graph->os)[xfrom]; \
+        igraph_integer_t end = VECTOR(graph->os)[xfrom+1]; \
+        igraph_integer_t N = end; \
+        igraph_integer_t start2 = VECTOR(graph->is)[xto]; \
+        igraph_integer_t end2 = VECTOR(graph->is)[xto+1]; \
+        igraph_integer_t N2 = end2; \
+        igraph_integer_t *nullptr = 0; \
+        if (end-start < end2-start2) { \
+            BINSEARCH(start, end, xto, graph->oi, graph->to, N, eid, nullptr); \
+        } else { \
+            BINSEARCH(start2, end2, xfrom, graph->ii, graph->from, N2, eid, nullptr); \
+        } \
     } while (0)
 
-#define FIND_UNDIRECTED_EDGE(graph,from,to,eid)                     \
-    do {                                                              \
-        igraph_integer_t xfrom1= from > to ? from : to;                         \
-        igraph_integer_t xto1= from > to ? to : from;                           \
-        FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid);                      \
+#define FIND_UNDIRECTED_EDGE(graph, from, to, eid) \
+    do { \
+        igraph_integer_t xfrom1 = from > to ? from : to; \
+        igraph_integer_t xto1 = from > to ? to : from; \
+        FIND_DIRECTED_EDGE(graph, xfrom1, xto1, eid); \
     } while (0)
 
 /**
@@ -1327,38 +1330,38 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
 
-#define FIND_ALL_DIRECTED_EDGES(graph,xfrom,xto,eidvec)                     \
-    do {                                                              \
-        igraph_integer_t start= VECTOR(graph->os)[xfrom];         \
-        igraph_integer_t end= VECTOR(graph->os)[xfrom+1];         \
-        igraph_integer_t N=end;                                                 \
-        igraph_integer_t start2= VECTOR(graph->is)[xto];          \
-        igraph_integer_t end2= VECTOR(graph->is)[xto+1];          \
-        igraph_integer_t N2=end2;                                               \
-        igraph_integer_t eid = -1;                                               \
-        igraph_integer_t pos = -1;                                               \
-        if (end-start<end2-start2) {                                    \
-            BINSEARCH(start,end,xto,graph->oi,graph->to,N,&eid,&pos);           \
-            while (pos >= 0 && pos < N) {                                              \
-                eid = VECTOR(graph->oi)[pos++];     \
+#define FIND_ALL_DIRECTED_EDGES(graph,xfrom,xto,eidvec) \
+    do { \
+        igraph_integer_t start = VECTOR(graph->os)[xfrom]; \
+        igraph_integer_t end = VECTOR(graph->os)[xfrom+1]; \
+        igraph_integer_t N = end; \
+        igraph_integer_t start2 = VECTOR(graph->is)[xto]; \
+        igraph_integer_t end2 = VECTOR(graph->is)[xto+1]; \
+        igraph_integer_t N2 = end2; \
+        igraph_integer_t eid = -1; \
+        igraph_integer_t pos = -1; \
+        if (end-start < end2-start2) { \
+            BINSEARCH(start, end, xto, graph->oi, graph->to, N, &eid,&pos); \
+            while (pos >= 0 && pos < N) { \
+                eid = VECTOR(graph->oi)[pos++]; \
                 if (VECTOR(graph->to)[eid] != xto) { break; } \
-                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid));     \
-            }                                                           \
-        } else {                                                        \
-            BINSEARCH(start2,end2,xfrom,graph->ii,graph->from,N2,&eid,&pos);    \
-            while (pos >= 0 && pos < N2) {                                              \
-                eid = VECTOR(graph->ii)[pos++];     \
+                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid)); \
+            } \
+        } else { \
+            BINSEARCH(start2, end2, xfrom, graph->ii, graph->from, N2, &eid, &pos); \
+            while (pos >= 0 && pos < N2) { \
+                eid = VECTOR(graph->ii)[pos++]; \
                 if (VECTOR(graph->from)[eid] != xfrom) { break; } \
-                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid));     \
-            }                                                           \
-        }                                                               \
+                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid)); \
+            } \
+        } \
     } while (0)
 
-#define FIND_ALL_UNDIRECTED_EDGES(graph,from,to,eidvec)                     \
-    do {                                                              \
-        igraph_integer_t xfrom1= from > to ? from : to;                         \
-        igraph_integer_t xto1= from > to ? to : from;                           \
-        FIND_ALL_DIRECTED_EDGES(graph,xfrom1,xto1,eidvec);                      \
+#define FIND_ALL_UNDIRECTED_EDGES(graph,from,to,eidvec) \
+    do { \
+        igraph_integer_t xfrom1 = from > to ? from : to; \
+        igraph_integer_t xto1 = from > to ? to : from; \
+        FIND_ALL_DIRECTED_EDGES(graph, xfrom1, xto1, eidvec); \
     } while (0)
 
 /**

@@ -137,15 +137,13 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         context.n = n;
     }
 
-    /* OK, everything is ready, create the graph */
-    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
+    /* Prepare attributes */
 
     /* Labels */
     if (igraph_strvector_size(&context.labels) != 0) {
         namevec = (const igraph_strvector_t*) &context.labels;
     } else if (igraph_trie_size(&context.trie) != 0) {
-        igraph_trie_getkeys(&context.trie, &namevec);
+        namevec = igraph_i_trie_borrow_keys(&context.trie);
     }
     if (namevec) {
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
@@ -168,6 +166,9 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
+    /* Create graph */
+    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, context.n, pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &context.edges, pweight));
 

@@ -276,7 +276,7 @@ static void igraph_i_mf_relabel(igraph_integer_t v, igraph_integer_t no_of_nodes
                                 igraph_vector_int_t *first,
                                 igraph_vector_t *rescap, igraph_vector_int_t *to,
                                 igraph_vector_int_t *current,
-                                igraph_maxflow_stats_t *stats, int *nrelabelsince) {
+                                igraph_maxflow_stats_t *stats, igraph_integer_t *nrelabelsince) {
 
     igraph_integer_t min = no_of_nodes;
     igraph_integer_t k, l, min_edge = 0;
@@ -302,7 +302,7 @@ static void igraph_i_mf_push(igraph_integer_t v, igraph_integer_t e, igraph_inte
                              igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
                              igraph_vector_int_t *distance,
                              igraph_vector_int_t *rev, igraph_maxflow_stats_t *stats,
-                             int *npushsince) {
+                             igraph_integer_t *npushsince) {
 
 
     IGRAPH_UNUSED(current);
@@ -333,7 +333,7 @@ static void igraph_i_mf_discharge(igraph_integer_t v,
                                   igraph_dbuckets_t *ibuckets,
                                   igraph_vector_int_t *rev,
                                   igraph_maxflow_stats_t *stats,
-                                  int *npushsince, int *nrelabelsince) {
+                                  igraph_integer_t *npushsince, igraph_integer_t *nrelabelsince) {
     do {
         igraph_integer_t i;
         igraph_integer_t start = CURRENT(v);
@@ -503,7 +503,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     igraph_dqueue_int_t bfsq;
 
     igraph_integer_t i, j, idx;
-    int npushsince = 0, nrelabelsince = 0;
+    igraph_integer_t npushsince = 0, nrelabelsince = 0;
 
     igraph_maxflow_stats_t local_stats;   /* used if the user passed a null pointer for stats */
 
@@ -1176,7 +1176,7 @@ igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 /* This is a flow-based version, but there is a better one
    for undirected graphs */
 
-/* int igraph_i_mincut_value_undirected(const igraph_t *graph, */
+/* igraph_error_t igraph_i_mincut_value_undirected(const igraph_t *graph, */
 /*                   igraph_real_t *res, */
 /*                   const igraph_vector_t *capacity) { */
 
@@ -1264,7 +1264,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                 igraph_vector_int_clear(cut);
             }
             if (partition) {
-                int j = 0;
+                igraph_integer_t j = 0;
                 IGRAPH_CHECK(igraph_vector_int_resize(partition,
                                                   VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {
@@ -1274,7 +1274,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
                 }
             }
             if (partition2) {
-                int j = 0;
+                igraph_integer_t j = 0;
                 IGRAPH_CHECK(igraph_vector_int_resize(partition2, no_of_nodes -
                                                   VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {
@@ -1758,6 +1758,66 @@ igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_t *graph,
+                                                    igraph_integer_t *res,
+                                                    igraph_integer_t source,
+                                                    igraph_integer_t target,
+                                                    igraph_vconn_nei_t neighbors,
+                                                    igraph_bool_t *done,
+                                                    igraph_integer_t *no_conn) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_bool_t conn;
+    *done = 1;
+    *no_conn = 0;
+
+    if (source == target) {
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
+    }
+
+    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
+        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVAL);
+    }
+
+    switch (neighbors) {
+    case IGRAPH_VCONN_NEI_ERROR:
+        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        if (conn) {
+            IGRAPH_ERROR("Source and target vertices connected.", IGRAPH_EINVAL);
+        }
+        break;
+    case IGRAPH_VCONN_NEI_NEGATIVE:
+        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        if (conn) {
+            *res = -1;
+            return IGRAPH_SUCCESS;
+        }
+        break;
+    case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
+        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
+        if (conn) {
+            *res = no_of_nodes;
+            return IGRAPH_SUCCESS;
+        }
+        break;
+    case IGRAPH_VCONN_NEI_IGNORE:
+        {
+            igraph_integer_t eid;
+            igraph_vector_int_t multi;
+            igraph_get_eid(graph, &eid, source, target, /*directed=*/1, /*error=*/ 0);
+            if (eid >= 0) {
+                igraph_vector_int_view(&multi, no_conn, 1);
+                igraph_count_multiple(graph, &multi, igraph_ess_1(eid));
+            }
+            break;
+        }
+    default:
+        IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'.", IGRAPH_EINVAL);
+        break;
+    }
+    *done = 0;
+    return IGRAPH_SUCCESS;
+}
+
 static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
                                                     igraph_integer_t *res,
                                                     igraph_integer_t source,
@@ -1770,38 +1830,12 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
     igraph_real_t real_res;
     igraph_t newgraph;
     igraph_integer_t i;
-    igraph_bool_t conn1;
+    igraph_bool_t done;
+    igraph_integer_t no_conn;
 
-    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
-    }
-
-    switch (neighbors) {
-    case IGRAPH_VCONN_NEI_ERROR:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-        if (conn1) {
-            IGRAPH_ERROR("vertices connected", IGRAPH_EINVAL);
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NEGATIVE:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-        if (conn1) {
-            *res = -1;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-        if (conn1) {
-            *res = no_of_nodes;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_IGNORE:
-        break;
-    default:
-        IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'", IGRAPH_EINVAL);
-        break;
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
+    if (done) {
+        return (IGRAPH_SUCCESS);
     }
 
     /* Create the new graph */
@@ -1836,6 +1870,8 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
                                       source, target, 0, 0));
     *res = (igraph_integer_t)real_res;
 
+    *res -= no_conn;
+
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -1847,41 +1883,13 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
                                                       igraph_integer_t source,
                                                       igraph_integer_t target,
                                                       igraph_vconn_nei_t neighbors) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_t newgraph;
-    igraph_bool_t conn;
+    igraph_bool_t done;
+    igraph_integer_t no_conn;
 
-    if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
-    }
-
-    switch (neighbors) {
-    case IGRAPH_VCONN_NEI_ERROR:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-        if (conn) {
-            IGRAPH_ERROR("vertices connected", IGRAPH_EINVAL);
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NEGATIVE:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-        if (conn) {
-            *res = -1;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_NUMBER_OF_NODES:
-        IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-        if (conn) {
-            *res = no_of_nodes;
-            return IGRAPH_SUCCESS;
-        }
-        break;
-    case IGRAPH_VCONN_NEI_IGNORE:
-        break;
-    default:
-        IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'", IGRAPH_EINVAL);
-        break;
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
+    if (done) {
+        return (IGRAPH_SUCCESS);
     }
 
     IGRAPH_CHECK(igraph_copy(&newgraph, graph));
@@ -1941,11 +1949,6 @@ igraph_error_t igraph_st_vertex_connectivity(const igraph_t *graph,
                                   igraph_integer_t source,
                                   igraph_integer_t target,
                                   igraph_vconn_nei_t neighbors) {
-
-    if (source == target) {
-        IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
-    }
-
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
                      source, target,
@@ -2455,7 +2458,7 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     igraph_real_t flow_value;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Gomory-Hu tree can only be calculated for undirected graphs",
+        IGRAPH_ERROR("Gomory-Hu tree can only be calculated for undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
@@ -2507,7 +2510,7 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     IGRAPH_PROGRESS("Gomory-Hu tree", 100.0, 0);
 
     /* Re-use the 'partition' vector as an edge list now */
-    IGRAPH_CHECK(igraph_vector_int_resize(&partition, 2 * (no_of_nodes - 1)));
+    IGRAPH_CHECK(igraph_vector_int_resize(&partition, no_of_nodes > 0 ? 2 * (no_of_nodes - 1) : 0));
     for (i = 1, mid = 0; i < no_of_nodes; i++, mid += 2) {
         VECTOR(partition)[mid]   = i;
         VECTOR(partition)[mid + 1] = VECTOR(neighbors)[i];

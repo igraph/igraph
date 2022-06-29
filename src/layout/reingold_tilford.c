@@ -48,7 +48,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     igraph_adjlist_t allneis;
     igraph_vector_int_t *neis;
 
-    igraph_vector_int_resize(pnewedges, 0);
+    igraph_vector_int_clear(pnewedges);
 
     /* traverse from real_root and see what nodes you cannot reach */
     no_of_newedges = 0;
@@ -502,19 +502,69 @@ igraph_error_t igraph_i_layout_reingold_tilford_cluster_degrees_directed(
  * either lowest ecccentricity (if 'use_ecccentricity' is true) or based on
  * highest degree (out- or in-degree in directed mode).
  */
-igraph_error_t igraph_i_layout_reingold_tilford_select_roots(
+
+/**
+ * \function igraph_roots_for_tree_layout
+ * \brief Roots suitable for a nice tree layout.
+ *
+ * This function chooses a root, or a set of roots suitable for visualizing a tree,
+ * or a tree-like graph. It is typically used with \ref igraph_layout_reingold_tilford().
+ * The principle is to select a minimal set of roots so that all other vertices
+ * will be reachable from them.
+ *
+ * </para><para>
+ * In the undirected case, one root is chosen from each connected component.
+ * In the directed case, one root is chosen from each strongly connected component
+ * that has no incoming (or outgoing) edges (depending on 'mode'). When more than
+ * one root choice is possible, vertices are prioritized based on the given \p heuristic.
+ *
+ * \param graph The graph, typically a tree, but any graph is accepted.
+ * \param mode Whether to interpret the input as undirected, a directed out-tree or in-tree.
+ * \param roots An initialized integer vector, the roots will be returned here.
+ * \param heuristic The heuristic to use for breaking ties when multiple root
+ *   choices are possible.
+ *          \clist
+ *          \cli IGRAPH_ROOT_CHOICE_DEGREE
+ *           Choose the vertices with the highest degree (out- or in-degree
+ *           in directed mode). This simple heuristic is fast even in large graphs.
+ *          \cli IGRAPH_ROOT_CHOICE_ECCENTRICITY
+ *           Choose the vertices with the lowest eccentricity. This usually results
+ *           in a "wide and shallow" tree layout. While this heuristic produces
+ *           high-quality results, it is slow for large graphs: computing the
+ *           eccentricities has quadractic complexity in the number of vertices.
+ *          \endclist
+ * \return Error code.
+ *
+ * Time complexity: depends on the heuristic.
+ */
+igraph_error_t igraph_roots_for_tree_layout(
         const igraph_t *graph,
         igraph_neimode_t mode,
         igraph_vector_int_t *roots,
-        igraph_bool_t use_eccentricity) {
+        igraph_root_choice_t heuristic) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t order, membership;
     igraph_integer_t no_comps;
     igraph_integer_t i, j;
+    igraph_bool_t use_eccentricity;
+
+    switch (heuristic) {
+    case IGRAPH_ROOT_CHOICE_DEGREE:
+        use_eccentricity = 0; break;
+    case IGRAPH_ROOT_CHOICE_ECCENTRICITY:
+        use_eccentricity = 1; break;
+    default:
+        IGRAPH_ERROR("Invalid root choice heuristic given.", IGRAPH_EINVAL);
+    }
 
     if (! igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
+    }
+
+    if (no_of_nodes == 0) {
+        igraph_vector_int_clear(roots);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
@@ -646,10 +696,11 @@ igraph_error_t igraph_i_layout_reingold_tilford_select_roots(
  *   Simply put, in the udirected case, one root should be given from each
  *   connected component. If \p roots is \c NULL or a pointer to an empty vector,
  *   then the roots will be selected automatically. Currently, automatic root
- *   selection prefers low ecccentricity vertices in graphs with fewer than
+ *   selection prefers low eccentricity vertices in graphs with fewer than
  *   500 vertices, and high degree vertices (acording to \p mode) in larger graphs.
  *   The root selecton heuristic may change without notice. To ensure a consistent
- *   output, please specify the roots manually.
+ *   output, please specify the roots manually. The \ref igraph_roots_for_tree_layout()
+ *   function gives more control over automatic root selection.
  * \param rootlevel This argument can be useful when drawing forests which are
  *   not trees (i.e. they are unconnected and have tree components). It specifies
  *   the level of the root vertices for every tree in the forest. It is only
@@ -659,7 +710,7 @@ igraph_error_t igraph_i_layout_reingold_tilford_select_roots(
  *
  * Added in version 0.2.
  *
- * \sa \ref igraph_layout_reingold_tilford_circular().
+ * \sa \ref igraph_layout_reingold_tilford_circular(), \sa igraph_roots_for_tree_layout()
  *
  * \example examples/simple/igraph_layout_reingold_tilford.c
  */
@@ -704,7 +755,8 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
     if (!roots || igraph_vector_int_size(roots) == 0) {
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&myroots, 0);
-        igraph_i_layout_reingold_tilford_select_roots(graph, mode, &myroots, no_of_nodes < 500);
+        igraph_roots_for_tree_layout(graph, mode, &myroots,
+                                     no_of_nodes < 500 ? IGRAPH_ROOT_CHOICE_DEGREE : IGRAPH_ROOT_CHOICE_ECCENTRICITY);
         proots = &myroots;
 
     } else if (rootlevel && igraph_vector_int_size(rootlevel) > 0 &&

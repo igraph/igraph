@@ -78,7 +78,7 @@ int check_eigenvector(
                    );
         }
         prod = igraph_complex_div(prod, eval);
-        if (!igraph_complex_eq_tol(prod, evec[i], 1e-6)) {
+        if (!igraph_complex_almost_equals(prod, evec[i], 1e-12)) {
             prod = igraph_complex_sub(prod, evec[i]);
             printf("%s: vector corresponding to eigenvalue (%.4f + %.4f*i) is not an "
                    "eigenvector, coordinate %d differs by %.4f + %.4f*i\n",

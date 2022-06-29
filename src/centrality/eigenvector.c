@@ -28,8 +28,6 @@
 
 #include "centrality/centrality_internal.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
@@ -118,11 +116,12 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -288,15 +287,16 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         if (igraph_is_directed(graph)) {
             IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
 
         if (min < 0.0) {
             IGRAPH_WARNING("Negative weights, eigenpair might be complex");
@@ -381,7 +381,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     if (vector) {
         igraph_real_t amax = 0;
         igraph_integer_t which = 0;
-        igraph_integer_t i;
+
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
 
         if (MATRIX(values, 0, 0) <= 0) {

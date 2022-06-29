@@ -26,7 +26,6 @@
 #include "igraph_iterators.h"
 #include "igraph_memory.h"
 #include "igraph_interface.h"
-#include "igraph_structural.h"
 #include "igraph_types.h"
 
 #include <string.h>
@@ -419,7 +418,7 @@ igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs, const igraph_vector_int_t 
         IGRAPH_ERROR("Cannot create vertex selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
-    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
 
     vs->type = IGRAPH_VS_VECTOR;
@@ -566,7 +565,7 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
         if (!vec) {
             IGRAPH_ERROR("Cannot copy vertex selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.vecptr));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
         break;
     default:
@@ -1076,7 +1075,7 @@ igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t 
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
-    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
 
     es->type = IGRAPH_ES_VECTOR;
@@ -1206,7 +1205,7 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
-    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
 
     es->type = IGRAPH_ES_PAIRS;
@@ -1305,7 +1304,7 @@ igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
         IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
-    IGRAPH_CHECK(igraph_vector_int_copy(vec, v));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
 
     es->type = IGRAPH_ES_PATH;
@@ -1453,7 +1452,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
         if (!vec) {
             IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.vecptr));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
         break;
     case IGRAPH_ES_PATH:
@@ -1462,7 +1461,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
         if (!vec) {
             IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        IGRAPH_CHECK(igraph_vector_int_copy(vec, src->data.path.ptr));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.path.ptr));
         dest->data.path.ptr = vec;
         break;
     default:

@@ -24,6 +24,7 @@
 #ifndef IGRAPH_ATTRIBUTES_H
 #define IGRAPH_ATTRIBUTES_H
 
+#include "igraph_config.h"
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
@@ -102,27 +103,29 @@ __BEGIN_DECLS
  *
  * Note that this is only the
  * type communicated by the attribute interface towards igraph
- * functions. E.g. in the GNU R attribute handler, it is safe to say
+ * functions. E.g. in the R attribute handler, it is safe to say
  * that all complex R object attributes are strings, as long as this
  * interface is able to serialize them into strings. See also \ref
  * igraph_attribute_table_t.
- * \enumval IGRAPH_ATTRIBUTE_DEFAULT Currently not used for anything.
+ * \enumval IGRAPH_ATTRIBUTE_UNSPECIFIED Currently used internally
+ *   as a "null value" or "placeholder value" in some algorithms.
+ *   Attribute records with this type must not be passed to igraph
+ *   functions.
  * \enumval IGRAPH_ATTRIBUTE_NUMERIC Numeric attribute.
  * \enumval IGRAPH_ATTRIBUTE_BOOLEAN Logical values, true or false.
  * \enumval IGRAPH_ATTRIBUTE_STRING Attribute that can be converted to
  *   a string.
- * \enumval IGRAPH_ATTRIBUTE_R_OBJECT An R object. This is usually
- *   ignored by the igraph functions.
- * \enumval IGRAPH_ATTRIBUTE_PY_OBJECT A Python object. Usually
- *   ignored by the igraph functions.
- *
+ * \enumval IGRAPH_ATTRIBUTE_OBJECT Custom attribute type, to be
+ *   used for special data types by client applications. The R and
+ *   Python interfaces use this for attributes that hold R or Python
+ *   objects. Usually ignored by igraph functions.
  */
-typedef enum { IGRAPH_ATTRIBUTE_DEFAULT = 0,
+typedef enum { IGRAPH_ATTRIBUTE_UNSPECIFIED = 0,
+               IGRAPH_ATTRIBUTE_DEFAULT IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_ATTRIBUTE_UNSPECIFIED,
                IGRAPH_ATTRIBUTE_NUMERIC = 1,
-               IGRAPH_ATTRIBUTE_BOOLEAN = 5,
-               IGRAPH_ATTRIBUTE_STRING = 2,
-               IGRAPH_ATTRIBUTE_R_OBJECT = 3,
-               IGRAPH_ATTRIBUTE_PY_OBJECT = 4
+               IGRAPH_ATTRIBUTE_BOOLEAN = 2,
+               IGRAPH_ATTRIBUTE_STRING = 3,
+               IGRAPH_ATTRIBUTE_OBJECT = 127
              } igraph_attribute_type_t;
 
 typedef struct igraph_attribute_record_t {

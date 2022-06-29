@@ -1,59 +1,45 @@
-------
-------
-------
-------
-------
+Initializing and setting elements:
 ---zero---
 ---one---
 ---two---
 ---three---
 ---four---
+
+strvector size after first removing one element, and then the rest:
+0
+
+Resize to three elements, and set them:
 ---zero---
 ---one---
 ---two---
----three---
----four---
+
+Then copy the first element over the third element:
 ---zero---
 ---one---
----two---
----three---
----four---
+---zero---
+
+Make a copy of the strvector and set the last element of the copy:
 ---zero---
 ---one---
----two---
----three---
----four---
+---copy two---
+
+Append the copy to the strvector:
+---zero---
+---one---
+---zero---
+---zero---
+---one---
+---copy two---
+
+Add two strings at the end:
+---zero---
+---one---
+---zero---
+---zero---
+---one---
+---copy two---
 ---zeroth---
 ---first---
----second---
----third---
----fourth---
----
----
-------
-------
-------
----
-------
-------
-------
----
----0---
----1---
----2---
----3---
----4---
----5---
-------
-------
-------
-------
----one---
-------
----two---
-------
----one---
----two---
----three---
----four---
----five---
+
+strvector size after clearing it:
+0

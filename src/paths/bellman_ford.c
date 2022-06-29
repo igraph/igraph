@@ -24,12 +24,9 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_stack.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-
-#include <string.h>
 
 /**
  * \function igraph_distances_bellman_ford
@@ -164,6 +161,8 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
             }
 
             neis = igraph_lazy_inclist_get(&inclist, j);
+            IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
             nlen = igraph_vector_int_size(neis);
 
             for (k = 0; k < nlen; k++) {
@@ -260,12 +259,12 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
  *    for undirected graphs.
- * \param predecessors A pointer to an initialized igraph vector or null.
- *        If not null, a vector containing the predecessor of each vertex in
+ * \param parents A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the parent of each vertex in
  *        the single source shortest path tree is returned here. The
- *        predecessor of vertex i in the tree is the vertex from which vertex i
- *        was reached. The predecessor of the start vertex (in the \c from
- *        argument) is itself by definition. If the predecessor is -1, it means
+ *        parent of vertex i in the tree is the vertex from which vertex i
+ *        was reached. The parent of the start vertex (in the \c from
+ *        argument) is -1. If the parent is -2, it means
  *        that the given vertex was not reached from the source during the
  *        search. Note that the search terminates if all the vertices in
  *        \c to are reached.
@@ -305,11 +304,11 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                         igraph_vs_t to,
                                         const igraph_vector_t *weights,
                                         igraph_neimode_t mode,
-                                        igraph_vector_int_t *predecessors,
+                                        igraph_vector_int_t *parents,
                                         igraph_vector_int_t *inbound_edges) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t *parents;
+    igraph_integer_t *parent_eids;
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j, k;
     igraph_dqueue_int_t Q;
@@ -321,7 +320,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     if (!weights) {
         return  igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
-                                         predecessors, inbound_edges);
+                                         parents, inbound_edges);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -344,11 +343,11 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_list_resize(edges, IGRAPH_VIT_SIZE(tovit)));
     }
 
-    parents = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parents == 0) {
+    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    if (parent_eids == 0) {
         IGRAPH_ERROR("Insufficient memory for shortest paths with Bellman-Ford.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    IGRAPH_FINALLY(igraph_free, parents);
+    IGRAPH_FINALLY(igraph_free, parent_eids);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     igraph_vector_fill(&dist, my_infinity);
@@ -379,6 +378,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         }
 
         neis = igraph_lazy_inclist_get(&inclist, j);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
         nlen = igraph_vector_int_size(neis);
 
         for (k = 0; k < nlen; k++) {
@@ -387,7 +388,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
             if (VECTOR(dist)[target] > VECTOR(dist)[j] + VECTOR(*weights)[nei]) {
                 /* relax the edge */
                 VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
-                parents[target] = nei + 1;
+                parent_eids[target] = nei + 1;
                 if (VECTOR(clean_vertices)[target]) {
                     VECTOR(clean_vertices)[target] = 0;
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
@@ -396,20 +397,20 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         }
     }
 
-    /* Create `predecessors' if needed */
-    if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_int_resize(predecessors, no_of_nodes));
+    /* Create `parents' if needed */
+    if (parents) {
+        IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
             if (i == from) {
                 /* i is the start vertex */
-                VECTOR(*predecessors)[i] = i;
-            } else if (parents[i] <= 0) {
+                VECTOR(*parents)[i] = -1;
+            } else if (parent_eids[i] <= 0) {
                 /* i was not reached */
-                VECTOR(*predecessors)[i] = -1;
+                VECTOR(*parents)[i] = -2;
             } else {
-                /* i was reached via the edge with ID = parents[i] - 1 */
-                VECTOR(*predecessors)[i] = IGRAPH_OTHER(graph, parents[i] - 1, i);
+                /* i was reached via the edge with ID = parent_eids[i] - 1 */
+                VECTOR(*parents)[i] = IGRAPH_OTHER(graph, parent_eids[i] - 1, i);
             }
         }
     }
@@ -419,12 +420,12 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
-            if (parents[i] <= 0) {
+            if (parent_eids[i] <= 0) {
                 /* i was not reached */
                 VECTOR(*inbound_edges)[i] = -1;
             } else {
-                /* i was reached via the edge with ID = parents[i] - 1 */
-                VECTOR(*inbound_edges)[i] = parents[i] - 1;
+                /* i was reached via the edge with ID = parent_eids[i] - 1 */
+                VECTOR(*inbound_edges)[i] = parent_eids[i] - 1;
             }
         }
     }
@@ -448,9 +449,9 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
             size = 0;
             act = node;
-            while (parents[act]) {
+            while (parent_eids[act]) {
                 size++;
-                edge = parents[act] - 1;
+                edge = parent_eids[act] - 1;
                 act = IGRAPH_OTHER(graph, edge, act);
             }
             if (vvec && (size > 0 || node == from)) {
@@ -461,8 +462,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
             }
             act = node;
-            while (parents[act]) {
-                edge = parents[act] - 1;
+            while (parent_eids[act]) {
+                edge = parent_eids[act] - 1;
                 act = IGRAPH_OTHER(graph, edge, act);
                 size--;
                 if (vvec) {
@@ -481,7 +482,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_vit_destroy(&tovit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_FREE(parents);
+    IGRAPH_FREE(parent_eids);
     igraph_dqueue_int_destroy(&Q);
     igraph_vector_int_destroy(&clean_vertices);
     igraph_vector_int_destroy(&num_queued);

@@ -60,7 +60,7 @@
 
 #ifdef IGRAPH_MC_FULL
 #define RESTYPE                 \
-    igraph_vector_int_t *subset,            \
+    const igraph_vector_int_t *subset,            \
     igraph_vector_int_list_t *res,           \
     igraph_integer_t *no,           \
     FILE *outfile

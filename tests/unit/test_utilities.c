@@ -88,12 +88,40 @@ void print_matrix(const igraph_matrix_t *m) {
     print_matrix_format(m, stdout, "%8g");
 }
 
+void print_matrix_int(const igraph_matrix_int_t *m) {
+    igraph_integer_t i, j, nrow = igraph_matrix_int_nrow(m), ncol = igraph_matrix_int_ncol(m);
+    for (i = 0; i < nrow; i++) {
+        printf(i == 0 ? "[" : " ");
+        for (j = 0; j < ncol; j++) {
+            printf(" ");
+            printf("%8" IGRAPH_PRId, MATRIX(*m, i, j));
+        }
+        printf(i == nrow-1 ? " ]\n" : "\n");
+    }
+}
+
 /* Round elements of a matrix to integers and print them. */
 /* This is meant to be used when the elements of a matrix are integer values. */
 void print_matrix_round(const igraph_matrix_t *m) {
     print_matrix_format(m, stdout, "%4.f");
 }
 
+void print_matrix_complex_round(const igraph_matrix_complex_t *m) {
+
+    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
+    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
+    igraph_integer_t i, j;
+    for (i = 0; i < nr; i++) {
+        for (j = 0; j < nc; j++) {
+            igraph_complex_t z = MATRIX(*m, i, j);
+            if (j != 0) {
+                putchar(' ');
+            }
+            printf("%.f%+.fi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+        }
+        printf("\n");
+    }
+}
 
 /* Print an adjacency list. Use brackets around each vector and also use
  * brackets around the entire adjacency list to make it clear when the list
@@ -113,6 +141,39 @@ void print_adjlist(const igraph_adjlist_t *adjlist) {
 
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph) {
+    print_weighted_graph(graph, NULL);
+}
+
+/* Print a graph with edge weights from a vector. Use brackets to make it
+ * obvious when the edge list is empty. */
+void print_weighted_graph(const igraph_t *graph, const igraph_vector_t* weights) {
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t i;
+
+    printf("directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
+    printf("vcount: %" IGRAPH_PRId "\n", vcount);
+    printf("edges: {\n");
+    for (i=0; i < ecount; ++i) {
+        if (weights) {
+            printf(
+                "%" IGRAPH_PRId " %" IGRAPH_PRId ": %g\n",
+                IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i),
+                VECTOR(*weights)[i]
+            );
+        } else {
+            printf(
+                "%" IGRAPH_PRId " %" IGRAPH_PRId "\n",
+                IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i)
+            );
+        }
+    }
+    printf("}\n");
+}
+
+/* Print a graph with edge weights from an edge attribute. Use brackets to make
+ * it obvious when the edge list is empty. */
+void print_weighted_graph_attr(const igraph_t *graph, const char* attr) {
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t i;
@@ -121,7 +182,11 @@ void print_graph(const igraph_t *graph) {
     printf("vcount: %" IGRAPH_PRId "\n", vcount);
     printf("edges: {\n");
     for (i=0; i < ecount; ++i)
-        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
+        printf
+            ("%" IGRAPH_PRId " %" IGRAPH_PRId ": %g\n",
+            IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i),
+            EAN(graph, attr, i)
+        );
     printf("}\n");
 }
 
@@ -234,7 +299,7 @@ void print_vector_first_nonzero_element_positive(const igraph_vector_t *vector, 
     igraph_vector_t copy;
     igraph_integer_t i, n;
 
-    igraph_vector_copy(&copy, vector);
+    igraph_vector_init_copy(&copy, vector);
 
     n = igraph_vector_size(&copy);
 
@@ -261,7 +326,7 @@ void print_vector_complex_first_nonzero_real_part_positive(const igraph_vector_c
     igraph_vector_complex_t copy;
     igraph_integer_t i, n;
 
-    igraph_vector_complex_copy(&copy, vector);
+    igraph_vector_complex_init_copy(&copy, vector);
 
     n = igraph_vector_complex_size(&copy);
 
@@ -291,7 +356,7 @@ void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* 
     igraph_matrix_t copy;
     igraph_integer_t i, j, nrow, ncol;
 
-    igraph_matrix_copy(&copy, matrix);
+    igraph_matrix_init_copy(&copy, matrix);
 
     nrow = igraph_matrix_nrow(&copy);
     ncol = igraph_matrix_ncol(&copy);
@@ -324,7 +389,7 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     char buf[256];
     size_t len;
 
-    igraph_matrix_complex_copy(&copy, matrix);
+    igraph_matrix_complex_init_copy(&copy, matrix);
 
     nrow = igraph_matrix_complex_nrow(&copy);
     ncol = igraph_matrix_complex_ncol(&copy);
@@ -427,4 +492,89 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff) {
             VECTOR(*vec)[i] = 0;
         }
     }
+}
+
+/* print all graph, edge and vertex attributes of a graph */
+void print_attributes(const igraph_t *g) {
+    igraph_vector_int_t gtypes, vtypes, etypes;
+    igraph_strvector_t gnames, vnames, enames;
+    igraph_integer_t i;
+
+    igraph_integer_t j;
+
+    igraph_vector_int_init(&gtypes, 0);
+    igraph_vector_int_init(&vtypes, 0);
+    igraph_vector_int_init(&etypes, 0);
+    igraph_strvector_init(&gnames, 0);
+    igraph_strvector_init(&vnames, 0);
+    igraph_strvector_init(&enames, 0);
+
+    igraph_cattribute_list(g, &gnames, &gtypes, &vnames, &vtypes,
+                           &enames, &etypes);
+
+    /* Graph attributes */
+    for (i = 0; i < igraph_strvector_size(&gnames); i++) {
+        if (i != 0)
+            putchar(' ');
+        printf("%s=", STR(gnames, i));
+        if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
+            igraph_real_printf(GAN(g, STR(gnames, i)));
+        } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            printf("%d", GAB(g, STR(gnames, i)));
+        } else {
+            printf("\"%s\"", GAS(g, STR(gnames, i)));
+        }
+    }
+    if (igraph_strvector_size(&gnames))
+        printf("\n");
+
+    for (i = 0; i < igraph_vcount(g); i++) {
+        printf("Vertex %" IGRAPH_PRId ":", i);
+        for (j = 0; j < igraph_strvector_size(&vnames); j++) {
+            putchar(' ');
+            printf("%s=", STR(vnames, j));
+            if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
+                igraph_real_printf(VAN(g, STR(vnames, j), i));
+            } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+                printf("%d", VAB(g, STR(vnames, j), i));
+            } else {
+                printf("\"%s\"", VAS(g, STR(vnames, j), i));
+            }
+        }
+        printf("\n");
+    }
+
+    for (i = 0; i < igraph_ecount(g); i++) {
+        printf("Edge %" IGRAPH_PRId " (%" IGRAPH_PRId "-%" IGRAPH_PRId "):", i, IGRAPH_FROM(g, i), IGRAPH_TO(g, i));
+        for (j = 0; j < igraph_strvector_size(&enames); j++) {
+            putchar(' ');
+            printf("%s=", STR(enames, j));
+            if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
+                igraph_real_printf(EAN(g, STR(enames, j), i));
+            } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
+                printf("%d", EAB(g, STR(enames, j), i));
+            } else {
+                printf("\"%s\"", EAS(g, STR(enames, j), i));
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+
+    igraph_strvector_destroy(&enames);
+    igraph_strvector_destroy(&vnames);
+    igraph_strvector_destroy(&gnames);
+    igraph_vector_int_destroy(&etypes);
+    igraph_vector_int_destroy(&vtypes);
+    igraph_vector_int_destroy(&gtypes);
+}
+
+expect_warning_context_t expect_warning_ctx;
+
+void record_last_warning(const char *reason, const char *file, int line) {
+    if (expect_warning_ctx.observed) {
+        igraph_free(expect_warning_ctx.observed);
+    }
+
+    expect_warning_ctx.observed = strdup(reason);
 }

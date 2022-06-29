@@ -107,7 +107,7 @@ igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
     IGRAPH_ASSERT(size >= 0);
     v->stor_begin = IGRAPH_CALLOC(alloc_size, ITEM_TYPE);
     if (v->stor_begin == 0) {
-        IGRAPH_ERROR("cannot initialize list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot initialize list.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     v->stor_end = v->stor_begin + alloc_size;
     v->end = v->stor_begin + size;
@@ -200,6 +200,7 @@ igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(capacity >= 0);
 
     current_capacity = FUNCTION(capacity)(v);
 
@@ -208,9 +209,7 @@ igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
     }
 
     tmp = IGRAPH_REALLOC(v->stor_begin, capacity, ITEM_TYPE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("cannot reserve space for list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for list.");
 
     v->end = tmp + (v->end - v->stor_begin);
     v->stor_begin = tmp;
@@ -861,7 +860,7 @@ igraph_error_t FUNCTION(permute)(TYPE* v, const igraph_vector_int_t* index) {
 
     work = IGRAPH_CALLOC(size, ITEM_TYPE);
     if (work == 0) {
-        IGRAPH_ERROR("cannot permute list", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot permute list.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     for (i = 0; i < size; i++) {
@@ -951,6 +950,53 @@ igraph_error_t FUNCTION(sort_ind)(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_remove_consecutive_duplicates
+ * \brief Removes consecutive duplicates from a vector list.
+ *
+ * Removes consecutive duplicate vectors from the list. Optionally, a custom
+ * equivalence relation may be used to determine when two vectors are
+ * considered to be the same.
+ *
+ * </para><para>
+ * An efficient way to remove all duplicates, not just consecutive ones,
+ * is to first sort the vector list using \ref igraph_vector_list_sort(),
+ * then use this function. This will of course re-order the list.
+ *
+ * \param v The list to remove consecutive duplicates from.
+ * \param eq A comparison function that takes pointers to two vectors and
+ *    returns true if they are equivalent. It is assumed that it implements
+ *    a transitive, but not necessarily symmetric relation.
+ *    Use \ref igraph_vector_all_e() to consider vector equivalent only
+ *    when their contents are identical.
+ *
+ * \sa igraph_vector_list_sort()
+ *
+ * Time complexity: O(n), the number of items in the list.
+ */
+void FUNCTION(remove_consecutive_duplicates)(
+        TYPE *v, igraph_bool_t (*eq)(const ITEM_TYPE*, const ITEM_TYPE*)
+) {
+    igraph_integer_t i, j, n = FUNCTION(size)(v);
+    ITEM_TYPE *p = v->stor_begin;
+
+    if (n < 2) {
+        return;
+    }
+
+    for (i=0, j=0; i < n-1; ++i) {
+        if (eq(&p[i], &p[i+1])) {
+            INTERNAL_FUNCTION(destroy_item)(&p[i]);
+        } else {
+            p[j++] = p[i];
+        }
+    }
+    p[j++] = p[n-1];
+
+    v->end = p + j;
+}
+
 /* ************************************************************************ */
 
 #ifndef CUSTOM_INIT_DESTROY
@@ -961,7 +1007,7 @@ static igraph_error_t INTERNAL_FUNCTION(init_item)(const TYPE* list, ITEM_TYPE* 
 }
 
 static igraph_error_t INTERNAL_FUNCTION(copy_item)(ITEM_TYPE* dest, const ITEM_TYPE* source) {
-    return ITEM_FUNCTION(copy)(dest, source);
+    return ITEM_FUNCTION(init_copy)(dest, source);
 }
 
 static void INTERNAL_FUNCTION(destroy_item)(ITEM_TYPE* item) {
@@ -1005,7 +1051,7 @@ static igraph_error_t INTERNAL_FUNCTION(expand_if_full)(TYPE* v) {
         igraph_integer_t old_size = FUNCTION(size)(v);
         igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
         if (old_size == IGRAPH_INTEGER_MAX) {
-            IGRAPH_ERROR("Cannot add new item to vector, already at maximum size.", IGRAPH_EOVERFLOW);
+            IGRAPH_ERROR("Cannot add new item to list, already at maximum size.", IGRAPH_EOVERFLOW);
         }
         if (new_size == 0) {
             new_size = 1;

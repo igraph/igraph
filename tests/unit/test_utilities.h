@@ -9,6 +9,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Structure used by the EXPECT_WARNING macro to test whether a warning was
+ * triggered in a section of the code in unit tests */
+typedef struct {
+    const char* expected;
+    char* observed;
+} expect_warning_context_t;
+
+extern expect_warning_context_t expect_warning_ctx;
+
 /* Print an igraph_real_t value. Be consistent in printing NaN/Inf across platforms. */
 void print_real(FILE *f, igraph_real_t x, const char *format);
 
@@ -34,9 +43,15 @@ void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format);
 
 void print_matrix(const igraph_matrix_t *m);
 
+void print_matrix_int(const igraph_matrix_int_t *m);
+
 /* Round elements of a matrix to integers and print them. */
 /* This is meant to be used when the elements of a matrix are integer values. */
 void print_matrix_round(const igraph_matrix_t *m);
+
+/* Round elements of a complex matrix to integers and print them. */
+/* This is meant to be used when the elements of a matrix are integer values. */
+void print_matrix_complex_round(const igraph_matrix_complex_t *m);
 
 /* Print an adjacency list. Use brackets around each vector and also use
  * brackets around the entire adjacency list to make it clear when the list
@@ -46,6 +61,14 @@ void print_adjlist(const igraph_adjlist_t *adjlist);
 
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
 void print_graph(const igraph_t *graph);
+
+/* Print a graph with edge weights from a vector. Use brackets to make it
+ * obvious when the edge list is empty. */
+void print_weighted_graph(const igraph_t *graph, const igraph_vector_t* weights);
+
+/* Print a graph with edge weights from an edge attribute. Use brackets to make
+ * it obvious when the edge list is empty. */
+void print_weighted_graph_attr(const igraph_t *graph, const char* attr);
 
 /* Print an incidence list. Use brackets around each vector and also use
  * brackets around the entire incidence list to make it clear when the list
@@ -87,6 +110,9 @@ void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* 
  * part in each column has a positive real part. */
 void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matrix);
 
+/* print all graph, edge and vertex attributes of a graph */
+void print_attributes(const igraph_t *g);
+
 void matrix_init_int_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem);
 void matrix_int_init_int_row_major(igraph_matrix_int_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const int *elem);
 void matrix_init_real_row_major(igraph_matrix_t *mat, igraph_integer_t nrow, igraph_integer_t ncol, const igraph_real_t *elem);
@@ -124,4 +150,25 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);
         igraph_set_error_handler(handler); \
     } while (0)
 
+void record_last_warning(const char *reason, const char *file, int line);
+
+#define EXPECT_WARNING(funcall, expected_warning) \
+    do { \
+        igraph_warning_handler_t *handler; \
+        expect_warning_ctx.expected = expected_warning; \
+        expect_warning_ctx.observed = NULL; \
+        handler = igraph_set_warning_handler(record_last_warning); \
+        IGRAPH_ASSERT(IGRAPH_SUCCESS == funcall); \
+        igraph_set_warning_handler(handler); \
+        if (expect_warning_ctx.observed == NULL) { \
+            printf("Expected this warning but none was raised:\n  %s\n", expected_warning); \
+            abort(); \
+        } else if (strcmp(expect_warning_ctx.observed, expect_warning_ctx.expected)) { \
+            printf("Expected warning:\n  %s\ngot:\n  %s\n", expected_warning, expect_warning_ctx.observed); \
+            free(expect_warning_ctx.observed); \
+            abort(); \
+        } else { \
+            free(expect_warning_ctx.observed); \
+        } \
+    } while (0)
 #endif /* TEST_UTILITIES_H */

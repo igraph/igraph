@@ -35,13 +35,14 @@ __BEGIN_DECLS
  */
 
 typedef struct s_igraph_strvector {
-    char **data;
-    igraph_integer_t len;
+    char **stor_begin;
+    char **stor_end;
+    char **end;
 } igraph_strvector_t;
 
 /**
  * \define STR
- * Indexing string vectors
+ * \brief Indexing string vectors.
  *
  * This is a macro that allows to query the elements of a string vector, just
  * like \ref igraph_strvector_get(), but without the overhead of a function
@@ -54,9 +55,9 @@ typedef struct s_igraph_strvector {
  *
  * Time complexity: O(1).
  */
-#define STR(sv,i) ((const char *)((sv).data[(i)]))
+#define STR(sv,i) ((const char *)((sv).stor_begin[(i)]))
 
-#define IGRAPH_STRVECTOR_NULL { 0,0 }
+#define IGRAPH_STRVECTOR_NULL { 0,0,0 }
 #define IGRAPH_STRVECTOR_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_strvector_init(v, size)); \
         IGRAPH_FINALLY( igraph_strvector_destroy, v); } while (0)
@@ -64,26 +65,29 @@ typedef struct s_igraph_strvector {
 IGRAPH_EXPORT igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t len);
 IGRAPH_EXPORT void igraph_strvector_destroy(igraph_strvector_t *sv);
 IGRAPH_EXPORT igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv);
-IGRAPH_EXPORT char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx);
+IGRAPH_EXPORT igraph_integer_t igraph_strvector_capacity(const igraph_strvector_t *sv);
+IGRAPH_EXPORT const char* igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_set(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value);
-IGRAPH_EXPORT igraph_error_t igraph_strvector_set2(
+IGRAPH_EXPORT igraph_error_t igraph_strvector_set_len(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len);
 IGRAPH_EXPORT void igraph_strvector_clear(igraph_strvector_t *sv);
 IGRAPH_EXPORT void igraph_strvector_remove_section(
     igraph_strvector_t *v, igraph_integer_t from, igraph_integer_t to);
 IGRAPH_EXPORT void igraph_strvector_remove(
     igraph_strvector_t *v, igraph_integer_t elem);
-IGRAPH_EXPORT igraph_error_t igraph_strvector_copy(
+IGRAPH_EXPORT igraph_error_t igraph_strvector_init_copy(
     igraph_strvector_t *to, const igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_append(
     igraph_strvector_t *to, const igraph_strvector_t *from);
+IGRAPH_EXPORT igraph_error_t igraph_strvector_merge(
+    igraph_strvector_t *to, igraph_strvector_t *from);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_resize(
     igraph_strvector_t* v, igraph_integer_t newsize);
-IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
-IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v, const char *value);
-IGRAPH_EXPORT void igraph_strvector_permdelete(
-    igraph_strvector_t *v, const igraph_vector_int_t *index, igraph_integer_t nremove);
+IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back(igraph_strvector_t *v,
+        const char *value);
+IGRAPH_EXPORT igraph_error_t igraph_strvector_push_back_len(igraph_strvector_t *v,
+        const char *value, igraph_integer_t len);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                                          const char *sep);
 
@@ -91,6 +95,15 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
                                          igraph_strvector_t *newv,
                                          const igraph_vector_int_t *idx);
 
+IGRAPH_EXPORT igraph_error_t igraph_strvector_reserve(igraph_strvector_t *sv,
+                                                      igraph_integer_t capacity);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_copy(
+    igraph_strvector_t *to, const igraph_strvector_t *from);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_strvector_set2(
+    igraph_strvector_t *sv, igraph_integer_t idx, const char *value, size_t len
+);
 
 __END_DECLS
 

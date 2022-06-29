@@ -431,7 +431,7 @@ igraph_error_t igraph_centralization_closeness(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_closeness(graph, scores, NULL, NULL, igraph_vss_all(), mode,
-                                  /*weights=*/ 0, /*normalize=*/ 1));
+                                  /*weights=*/ 0, /*normalized=*/ 1));
 
     IGRAPH_CHECK(igraph_centralization_closeness_tmax(graph, 0, mode,
                  tmax));

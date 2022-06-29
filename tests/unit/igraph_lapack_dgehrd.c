@@ -39,7 +39,7 @@ int main() {
     igraph_kary_tree(&tree, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
 
     igraph_matrix_init(&sto, nodes, nodes);
-    igraph_get_stochastic(&tree, &sto, /*column_wise=*/ 0);
+    igraph_get_stochastic(&tree, &sto, /*column_wise=*/ 0, /* weights = */ NULL);
     igraph_matrix_transpose(&sto);
 
     igraph_matrix_init(&hess, nodes, nodes);

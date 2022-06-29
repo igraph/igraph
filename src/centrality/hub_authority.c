@@ -48,7 +48,7 @@ typedef struct igraph_i_kleinberg_data2_t {
 } igraph_i_kleinberg_data2_t;
 
 static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(
-        int n, igraph_vector_t *to, const igraph_real_t *from,
+        igraph_integer_t n, igraph_vector_t *to, const igraph_real_t *from,
         igraph_adjlist_t *in) {
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
@@ -90,7 +90,7 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_kleinberg_weighted_hub_to_auth(int n,
+static igraph_error_t igraph_i_kleinberg_weighted_hub_to_auth(igraph_integer_t n,
         igraph_vector_t *to, const igraph_real_t *from, igraph_inclist_t *in,
         const igraph_t *g, const igraph_vector_t *weights) {
     igraph_vector_int_t *neis;
@@ -225,7 +225,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                     igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -285,7 +285,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'A';
 
     if (weights == 0) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,
@@ -309,7 +309,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         }
         igraph_real_t amax = 0;
         igraph_integer_t which = 0;
-        igraph_integer_t i;
+
         IGRAPH_CHECK(igraph_vector_resize(my_hub_vector_p, options->n));
         for (i = 0; i < options->n; i++) {
             igraph_real_t tmp;

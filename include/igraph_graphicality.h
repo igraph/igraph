@@ -26,7 +26,7 @@
 
 __BEGIN_DECLS
 
-typedef unsigned char igraph_edge_type_sw_t;
+typedef unsigned int igraph_edge_type_sw_t;
 
 /*
  * bit 0: self-loops alowed?
