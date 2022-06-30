@@ -163,7 +163,7 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 			indexOfSubsetD = fetchIndexofMapofSets(D);
 			for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
 			{
-				igraph_integer_t u = IGRAPH_INTEGER_MAX;
+				igraph_real_t distance1 = IGRAPH_INFINITY;
 				std::set<igraph_integer_t>::iterator subset_D_iterator;
 
 				for (subset_D_iterator = D.begin(); subset_D_iterator != D.end(); subset_D_iterator++)
@@ -189,20 +189,20 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 
 					igraph_integer_t indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE);
 
-					if (distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j)) < u)
+					if (distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j)) < distance1)
 					{
-						u = distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j));
+						distance1 = distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j));
 					}
 				}
 				for (igraph_integer_t k = 0; k < igraph_vector_size(&steiner_vertices); k++)
 				{
-					MATRIX(dp_cache, indexOfSubsetD, k) = std::min(MATRIX(dp_cache, indexOfSubsetD, k), MATRIX(distance, k, j) + u);
+					MATRIX(dp_cache, indexOfSubsetD, k) = std::min(MATRIX(dp_cache, indexOfSubsetD, k), MATRIX(distance, k, j) + distance1);
 				}
 			}
 		}
 	}
-	igraph_integer_t u = IGRAPH_INTEGER_MAX;
-	igraph_integer_t v = IGRAPH_INTEGER_MAX;
+	igraph_real_t distance1 = IGRAPH_INFINITY;
+	igraph_real_t distance2 = IGRAPH_INFINITY;
 
 	for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
 	{
@@ -225,17 +225,17 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 
 			igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(CMinusF);
 
-			if (distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j)) < u)
+			if (distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j)) < distance1)
 			{
-				u = distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j));
+				distance1 = distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j));
 			}
 		}
-		if (MATRIX(distance, q, j) + u < v)
+		if (MATRIX(distance, q, j) + distance1 < distance2)
 		{
-			v = MATRIX(distance, q, j) + u;
+			distance2 = MATRIX(distance, q, j) + distance1;
 		}
 	}
-	*res = v;
+	*res = distance2;
 	//std::cout << u << " " << v << std::endl;
 	igraph_vector_destroy(&steiner_vertices);
 	
