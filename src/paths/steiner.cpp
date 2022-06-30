@@ -86,7 +86,7 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 }
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
-igraph_neimode_t mode, const igraph_vector_t *weights)
+igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 {
 
 	igraph_integer_t no_of_vertices = (igraph_integer_t)igraph_vcount(graph);
@@ -102,7 +102,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 
 	if (igraph_vector_size(weights) != no_of_edges)
 	{	
-		IGRAPH_ERRORF("Weight vector length does not match %lld vec size and %lld edges \n",IGRAPH_EINVAL,igraph_vector_size(weights), no_of_edges);
+		IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges \n",IGRAPH_EINVAL,igraph_vector_size(weights), no_of_edges);
 	}
 	IGRAPH_CHECK(igraph_matrix_init(&distance,no_of_vertices,no_of_vertices));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&distance);
@@ -127,7 +127,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices)));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
-  igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
+    igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
 
 //	printf("Matrix Filled\n");
 	
