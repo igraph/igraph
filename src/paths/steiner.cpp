@@ -5,12 +5,13 @@
 #include "igraph_error.h"
 #include "igraph.h"
 
-#include <string.h>
-#include <math.h>
+#include <cstring>
+#include <cmath>
 #include <map>
-#include <limits.h>
+#include <climits>
 #include <vector>
 #include <set>
+#include <iostream>
 
 std::map<std::set<igraph_integer_t>, igraph_integer_t> subsetMap;
 
@@ -23,7 +24,8 @@ void printSubsets(std::set<std::set<igraph_integer_t>> allSubsets)
 		for (auto j = (*i).begin() ; j != (*i).end() ; j++)
 		{
 			if (j != (*i).begin()) { printf(", ");}
-			printf("%ld",*j);
+			//printf("%lld",(long long)*j);
+			std::cout << *j;
 		}
 		printf("}");
 		if (i != (--allSubsets.end())) { printf(",\n");}
@@ -84,7 +86,7 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 }
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
-igraph_neimode_t mode, const igraph_vector_t *weights)
+igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 {
 
 	igraph_integer_t no_of_vertices = (igraph_integer_t)igraph_vcount(graph);
@@ -99,10 +101,8 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 	IGRAPH_VECTOR_INIT_FINALLY(&steiner_vertices, 0);
 
 	if (igraph_vector_size(weights) != no_of_edges)
-	{
-		char error[1024] = {0};
-		sprintf(error,"Weight vector length does not match %ld vec size and %ld edges \n",igraph_vector_size(weights),no_of_edges);
-		IGRAPH_ERROR(error, IGRAPH_EINVAL);
+	{	
+		IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges \n",IGRAPH_EINVAL,igraph_vector_size(weights), no_of_edges);
 	}
 	IGRAPH_CHECK(igraph_matrix_init(&distance,no_of_vertices,no_of_vertices));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&distance);
@@ -127,7 +127,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices)));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
-  igraph_matrix_fill(&dp_cache, INT_MAX);
+    igraph_matrix_fill(&dp_cache, IGRAPH_INTEGER_MAX);
 
 //	printf("Matrix Filled\n");
 	
@@ -162,7 +162,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 			indexOfSubsetD = fetchIndexofMapofSets(D);
 			for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
 			{
-				igraph_integer_t u = INT_MAX;
+				igraph_integer_t u = IGRAPH_INTEGER_MAX;
 				std::set<igraph_integer_t>::iterator subset_D_iterator;
 
 				for (subset_D_iterator = D.begin(); subset_D_iterator != D.end(); subset_D_iterator++)
@@ -200,8 +200,8 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 			}
 		}
 	}
-	igraph_integer_t u = INT_MAX;
-	igraph_integer_t v = INT_MAX;
+	igraph_integer_t u = IGRAPH_INTEGER_MAX;
+	igraph_integer_t v = IGRAPH_INTEGER_MAX;
 
 	for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
 	{
@@ -234,7 +234,8 @@ igraph_neimode_t mode, const igraph_vector_t *weights)
 			v = MATRIX(distance, q, j) + u;
 		}
 	}
-	
+	*res = v;
+	//std::cout << u << " " << v << std::endl;
 	igraph_vector_destroy(&steiner_vertices);
 	
 	igraph_matrix_destroy(&distance);
