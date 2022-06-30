@@ -34,7 +34,7 @@ void printSubsets(std::set<std::set<igraph_integer_t>> allSubsets)
 }
 std::set<std::set<igraph_integer_t>> generateSubsets(igraph_vector_int_t steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize)
 {
-	igraph_integer_t count = (1 << n);
+	igraph_integer_t count = ((igraph_integer_t) 1 << n);
 	std::set<std::set<igraph_integer_t>> allSubsets;
 	igraph_integer_t subsetIndex = graphsize;
 
@@ -51,7 +51,7 @@ std::set<std::set<igraph_integer_t>> generateSubsets(igraph_vector_int_t steiner
 			// This if condition will check if jth bit in binary representation of  i  is set or not
 			// if the value of (i & (1 << j)) is greater than 0 , include arr[j] in the current subset
 			// otherwise exclude arr[j]
-			if ((i & (1 << j)) > 0)
+			if ((i & ((igraph_integer_t)1 << j)) > 0)
 			{
 				newSubset.insert(VECTOR(steinerTerminals)[j]);
 			}
@@ -127,7 +127,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices)));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
-    igraph_matrix_fill(&dp_cache, IGRAPH_INTEGER_MAX);
+    igraph_matrix_fill(&dp_cache, (igraph_real_t) IGRAPH_INTEGER_MAX);
 
 //	printf("Matrix Filled\n");
 	
@@ -153,7 +153,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	// }
 	for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++)
 	{
-		for (igraph_integer_t i = 0; i < allSubsets.size(); i++)
+		for (igraph_integer_t i = 0; i < (igraph_integer_t)allSubsets.size(); i++)
 		{
 			auto it = allSubsets.begin();
 			std::advance(it,i);
@@ -193,9 +193,9 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 						u = distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j));
 					}
 				}
-				for (igraph_integer_t i = 0; j < igraph_vector_size(&steiner_vertices); j++)
+				for (igraph_integer_t k = 0; k < igraph_vector_size(&steiner_vertices); k++)
 				{
-					MATRIX(dp_cache, indexOfSubsetD, i) = std::min(MATRIX(dp_cache, indexOfSubsetD, i), MATRIX(distance, i, j) + u);
+					MATRIX(dp_cache, indexOfSubsetD, k) = std::min(MATRIX(dp_cache, indexOfSubsetD, k), MATRIX(distance, k, j) + u);
 				}
 			}
 		}
