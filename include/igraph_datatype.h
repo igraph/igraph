@@ -117,6 +117,8 @@ typedef struct igraph_s {
     igraph_i_property_cache_t *cache;
 } igraph_t;
 
+IGRAPH_EXPORT void igraph_invalidate_cache(const igraph_t* graph);
+
 __END_DECLS
 
 #endif
