@@ -127,7 +127,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices)));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
-    igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
+    igraph_matrix_fill(&dp_cache, IGRAPH_INTEGER_MAX);
 
 //	printf("Matrix Filled\n");
 	
@@ -162,7 +162,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 			indexOfSubsetD = fetchIndexofMapofSets(D);
 			for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
 			{
-				igraph_integer_t u = IGRAPH_INFINITY;
+				igraph_integer_t u = IGRAPH_INTEGER_MAX;
 				std::set<igraph_integer_t>::iterator subset_D_iterator;
 
 				for (subset_D_iterator = D.begin(); subset_D_iterator != D.end(); subset_D_iterator++)
@@ -200,8 +200,8 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 			}
 		}
 	}
-	igraph_integer_t u = IGRAPH_INFINITY;
-	igraph_integer_t v = IGRAPH_INFINITY;
+	igraph_integer_t u = IGRAPH_INTEGER_MAX;
+	igraph_integer_t v = IGRAPH_INTEGER_MAX;
 
 	for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
 	{
@@ -234,7 +234,8 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 			v = MATRIX(distance, q, j) + u;
 		}
 	}
-	
+	*res = v;
+	//std::cout << u << " " << v << std::endl;
 	igraph_vector_destroy(&steiner_vertices);
 	
 	igraph_matrix_destroy(&distance);
