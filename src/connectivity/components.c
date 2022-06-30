@@ -397,11 +397,11 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
 
     switch (mode) {
         case IGRAPH_WEAK:
-            prop = IGRAPH_PROP_WEAKLY_CONNECTED;
+            prop = IGRAPH_PROP_IS_WEAKLY_CONNECTED;
             break;
 
         case IGRAPH_STRONG:
-            prop = IGRAPH_PROP_STRONGLY_CONNECTED;
+            prop = IGRAPH_PROP_IS_STRONGLY_CONNECTED;
             break;
 
         default:

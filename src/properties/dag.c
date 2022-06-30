@@ -153,6 +153,8 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
         return IGRAPH_SUCCESS;
     }
 
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_IS_DAG, res);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_dqueue_int_init(&sources, 0));
@@ -198,6 +200,8 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
+
+    igraph_i_property_cache_set(graph, IGRAPH_PROP_IS_DAG, *res);
 
     return IGRAPH_SUCCESS;
 }
