@@ -12,6 +12,7 @@
 #include <vector>
 #include <set>
 #include <iostream>
+#include <algorithm>
 
 std::map<std::set<igraph_integer_t>, igraph_integer_t> subsetMap;
 
@@ -107,7 +108,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	IGRAPH_CHECK(igraph_matrix_init(&distance,no_of_vertices,no_of_vertices));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&distance);
 
-	igraph_shortest_paths_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights);
+	igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights);
 	
 	//printf("Johnson Works\n");
 	
