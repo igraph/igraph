@@ -201,7 +201,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
 
-    igraph_i_property_cache_set(graph, IGRAPH_PROP_IS_DAG, *res);
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_DAG, *res);
 
     return IGRAPH_SUCCESS;
 }

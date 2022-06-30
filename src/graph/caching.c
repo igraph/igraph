@@ -90,7 +90,7 @@ igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_p
  * \param prop   the property to update in the cache
  * \param value  the value of the property to add to the cache
  */
-void igraph_i_property_cache_set(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value) {
+void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value) {
     IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_LAST);
     assert(graph->cache != NULL);
     /* Even though graph is const, updating the cache is not considered modification.

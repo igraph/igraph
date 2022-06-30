@@ -429,7 +429,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
         }
     }
 
-    igraph_i_property_cache_set(graph, prop, *res);
+    igraph_i_property_cache_set_bool(graph, prop, *res);
 
     return retval;
 }
