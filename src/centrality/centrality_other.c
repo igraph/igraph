@@ -1084,7 +1084,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \c IGRAPH_PAGERANK_ALGO_ARPACK, based on the ARPACK library. This
  * was the default before igraph version 0.7. The second and recommended
  * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This is using the
- * PRPACK package, see https://github.com/dgleich/prpack .
+ * PRPACK package, see https://github.com/dgleich/prpack.
  *
  * </para><para>
  * Note that the PageRank of a given vertex depends on the PageRank

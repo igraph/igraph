@@ -17,7 +17,7 @@ Copyright (C) 2002 Sampo Niskanen, Patric Östergård.
 License: [GNU GPLv2][gpl2] or later
 
 
-#### [PRPACK](https://github.com/DavidKurokawa/prpack)
+#### [PRPACK](https://github.com/dgleich/prpack)
 
 Copyright (C) David Kurokawa, David Gleich, Chen Greif.
 
