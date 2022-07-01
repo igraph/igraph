@@ -39,12 +39,14 @@ typedef enum {
 
     /* Stores whether the graph has at least one multi-edge, taking into account
      * edge directions in directed graphs. In other words, this property should
-     * be false for a directed graph with edges (a, b) and (b, a). */
+     * be false for a directed graph with edges (a, b) and (b, a), and true
+     * for a directed graph with edges (a, b) and (a, b) again. */
     IGRAPH_PROP_HAS_MULTI,
 
-    /* Stores whether the graph has at least one multi-edge, ignoring edge
-     * directions in directed graphs. In other words, this property should
-     * be true for a directed graph with edges (a, b) and (b, a). */
+    /* Stores whether the graph has at least one reciprocal edge pair. Ignored
+     * in undirected graphs. This property should be true for a directed graph
+     * with edges (a, b) and (b, a), and false for a directed graph with
+     * edges (a, b) and (a, b) again. */
     IGRAPH_PROP_HAS_RECIPROCAL,
 
     /* Stores whether the graph is weakly connected */
