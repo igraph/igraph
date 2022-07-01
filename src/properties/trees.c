@@ -669,8 +669,11 @@ static igraph_error_t igraph_i_is_forest(
  */
 igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res) {
     if (igraph_is_directed(graph)) {
+        /* igraph_is_dag is cached */
         return igraph_is_dag(graph, res);
     } else {
+        /* igraph_is_forest is cached if mode == IGRAPH_ALL and we don't need
+         * the roots */
         return igraph_is_forest(graph, res, NULL, IGRAPH_ALL);
     }
 }
