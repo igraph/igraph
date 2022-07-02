@@ -86,7 +86,8 @@ igraph_error_t igraph_simple_interconnected_islands_game(
     number_of_inter_island_edges = n_inter * (islands_n * (islands_n - 1)) / 2;
 
     nr_edges_reserved = 1.1 * avg_edges_per_island * islands_n + number_of_inter_island_edges;
-    /* The cast of ECOUNT_MAX to double could change its value, which means in theory this could still overflow, but only for very rare cases. */
+    /* The cast of ECOUNT_MAX to double could change its value, which means in theory the size of
+       the edges vector could still overflow, but only for very rare cases. */
     if (nr_edges_reserved > (double) (IGRAPH_ECOUNT_MAX )) {
         IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
     }

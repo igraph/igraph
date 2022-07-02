@@ -113,6 +113,7 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
         IGRAPH_CHECK(igraph_i_safe_vector_int_sum(outseq, &no_of_edges));
         no_of_edges -= VECTOR(*outseq)[0];
     }
+    /* To ensure the size of the edges vector will not overflow. */
     if (no_of_edges > IGRAPH_ECOUNT_MAX) {
         IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
@@ -284,6 +285,7 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
         IGRAPH_CHECK(igraph_i_safe_vector_int_sum(outseq, &no_of_edges));
         no_of_edges -= VECTOR(*outseq)[0];
     }
+    /* To ensure the size of the edges vector will not overflow. */
     if (no_of_edges > IGRAPH_ECOUNT_MAX) {
         IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }

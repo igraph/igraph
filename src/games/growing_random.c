@@ -78,6 +78,7 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
         no_of_edges = 0;
     } else {
         IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
+        /* To ensure the size of the edges vector will not overflow. */
         if (no_of_edges > IGRAPH_ECOUNT_MAX) {
             IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
         }
