@@ -66,7 +66,7 @@ void igraph_i_property_cache_destroy(igraph_i_property_cache_t *cache) {
  *         an undefined value otherwise
  */
 igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop) {
-    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_LAST);
+    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
     assert(graph->cache != NULL);
     return graph->cache->value[prop];
 }
@@ -78,7 +78,7 @@ igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cac
  * \param prop   the property to check in the cache
  */
 igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop) {
-    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_LAST);
+    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
     assert(graph->cache != NULL);
     return graph->cache->known[prop];
 }
@@ -91,7 +91,7 @@ igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_p
  * \param value  the value of the property to add to the cache
  */
 void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_property_t prop, igraph_bool_t value) {
-    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_LAST);
+    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
     assert(graph->cache != NULL);
     /* Even though graph is const, updating the cache is not considered modification.
      * Functions that merely compute graph properties, and thus leave the graph structure
@@ -107,7 +107,7 @@ void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_prope
  * \param prop   the property to clear from the cache
  */
 void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop) {
-    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_LAST);
+    IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
     assert(graph->cache != NULL);
     graph->cache->known[prop] = 0;
 }
@@ -120,7 +120,7 @@ void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_pro
  * \param graph  the graph whose cache is to be invalidated
  */
 void igraph_i_property_cache_invalidate_all(const igraph_t *graph) {
-    for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_LAST; ++prop) {
+    for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
         igraph_i_property_cache_invalidate(graph, prop);
     }
 }

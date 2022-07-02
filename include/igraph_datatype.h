@@ -64,7 +64,7 @@ typedef enum {
     IGRAPH_PROP_IS_FOREST,
 
     /* Dummy value used to count enum values */
-    IGRAPH_PROP_I_LAST
+    IGRAPH_PROP_I_SIZE
 } igraph_cached_property_t;
 
 /**
