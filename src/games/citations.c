@@ -107,17 +107,17 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
                      IGRAPH_EINVAL,
                      agebins, igraph_vector_size(preference));
     }
-    if (nodes < 0 ) {
+    if (nodes < 0) {
         IGRAPH_ERRORF("Number of nodes should be non-negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      nodes);
     }
-    if (edges_per_node < 0 ) {
+    if (edges_per_node < 0) {
         IGRAPH_ERRORF("Number of edges per node should be non-negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      edges_per_node);
     }
-    if (agebins < 1 ) {
+    if (agebins < 1) {
         IGRAPH_ERRORF("Number of age bins should be at least 1, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      agebins);
@@ -267,7 +267,7 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         IGRAPH_ERRORF("Length of types vector (%" IGRAPH_PRId ") must match number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(types), nodes);
     }
-    if (edges_per_step < 0 ) {
+    if (edges_per_step < 0) {
         IGRAPH_ERRORF("Number of edges per step should be non-negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      edges_per_step);
