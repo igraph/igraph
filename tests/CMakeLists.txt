@@ -285,6 +285,7 @@ add_legacy_tests(
   igraph_betweenness
   igraph_betweenness_subset
   igraph_closeness
+  igraph_constraint
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
