@@ -37,13 +37,14 @@
  * other compared to a random null model. It is defined as
  *
  * </para><para>
- * <code>Q = 1/(2m) sum_ij (A_ij - gamma * k_i * k_j / (2m)) * d(c_i,c_j)</code>,
+ * <code>Q = 1/(2m) sum_ij (A_ij - gamma k_i k_j / (2m)) δ(c_i,c_j)</code>,
  *
  * </para><para>
  * where \c m is the number of edges, <code>A_ij</code> is the adjacency matrix,
  * \c k_i is the degree of vertex \c i, \c c_i is the cluster that vertex \c i belongs to
- * (or its vertex type), <code>d(i,j)=1</code> if <code>i=j</code> and 0 otherwise,
- * and the sum goes over all <code>i, j</code> pairs of vertices.
+ * (or its vertex type), <code>δ(i,j)=1</code> if <code>i=j</code> and 0 otherwise,
+ * and the sum goes over all \c i, \c j pairs of vertices. Note that in this formula,
+ * the diagonal of the adjacency matrix contains twice the number of self-loops.
  *
  * </para><para>
  * The resolution parameter \c gamma allows weighting the random null model, which
@@ -55,10 +56,10 @@
  *
  * </para><para>
  * Modularity can also be calculated on directed graphs. This only requires a relatively
- * modest change
+ * modest change,
  *
  * </para><para>
- * <code>Q = 1/(m) sum_ij (A_ij - gamma * k^out_i * k^in_j / m) * d(c_i,c_j)</code>,
+ * <code>Q = 1/m sum_ij (A_ij - gamma k^out_i k^in_j / m) δ(c_i,c_j)</code>,
  *
  * </para><para>
  * where \c k^out_i is the out-degree of node \c i and \c k^in_j is the in-degree of node \c j.
