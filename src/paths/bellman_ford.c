@@ -43,8 +43,7 @@
  *    vertices in the graph, in the order of vertex IDs. For unreachable
  *    vertices the matrix contains \c IGRAPH_INFINITY.
  * \param from The source vertices.
- * \param to The target vertices. It is not allowed to include a
- *    vertex twice or more.
+ * \param to The target vertices.
  * \param weights The edge weights. There must not be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
@@ -123,6 +122,11 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
         IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
         no_of_to = IGRAPH_VIT_SIZE(tovit);
+
+        /* No need to check here whether the vertices in 'to' are unique because
+         * the loop below uses a temporary distance vector that is then copied
+         * into the result matrix at the end of the outer loop iteration, and
+         * this is safe even if 'to' contains the same vertex multiple times */
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);

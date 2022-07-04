@@ -145,6 +145,13 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
         IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
         no_of_to = IGRAPH_VIT_SIZE(tovit);
+
+        /* We need to check whether the vertices in 'tovit' are unique; this is
+         * because the inner while loop of the main algorithm updates the
+         * distance matrix whenever a shorter path is encountered from the
+         * source vertex 'i' to a target vertex, and we need to be able to
+         * map a target vertex to its column in the distance matrix. The mapping
+         * is constructed by the loop below */
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
             igraph_integer_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
