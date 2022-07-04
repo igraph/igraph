@@ -87,7 +87,9 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
     }
 
     /* If no edges, then we can just run the unweighted version */
@@ -99,7 +101,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     {
         igraph_real_t min_weight = igraph_vector_min(weights);
         if (igraph_is_nan(min_weight)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         if (min_weight >= 0) {
             return igraph_distances_dijkstra(graph, res, from, to, weights, IGRAPH_OUT);
@@ -107,7 +109,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     }
 
     if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Johnson's shortest path: undirected graph and negative weight",
+        IGRAPH_ERROR("Johnson's shortest path: undirected graph and negative weight.",
                      IGRAPH_EINVAL);
     }
 

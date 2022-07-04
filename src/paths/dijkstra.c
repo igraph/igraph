@@ -151,7 +151,7 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
             igraph_integer_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
-                IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
+                IGRAPH_ERROR("Target vertex list must not have any duplicates.",
                              IGRAPH_EINVAL);
             }
             VECTOR(indexv)[v] = ++i;

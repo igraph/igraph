@@ -100,10 +100,12 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0 && igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
@@ -151,7 +153,8 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
             VECTOR(clean_vertices)[j] = 1;
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
-                IGRAPH_ERROR("cannot run Bellman-Ford algorithm", IGRAPH_ENEGLOOP);
+                IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
+                             IGRAPH_ENEGLOOP);
             }
 
             /* If we cannot get to j in finite time yet, there is no need to relax
@@ -368,7 +371,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         VECTOR(clean_vertices)[j] = 1;
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
-            IGRAPH_ERROR("cannot run Bellman-Ford algorithm", IGRAPH_ENEGLOOP);
+            IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
+                         IGRAPH_ENEGLOOP);
         }
 
         /* If we cannot get to j in finite time yet, there is no need to relax

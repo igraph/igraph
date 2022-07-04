@@ -96,7 +96,7 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
@@ -108,7 +108,7 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
 
     already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (already_counted == 0) {
-        IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for graph distance calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_counted);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -124,7 +124,7 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
             igraph_integer_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
-                IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
+                IGRAPH_ERROR("Target vertex list must not have any duplicates.",
                              IGRAPH_EINVAL);
             }
             VECTOR(indexv)[v] = ++i;
@@ -301,11 +301,11 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     igraph_integer_t reached = 0;
 
     if (from < 0 || from >= no_of_nodes) {
-        IGRAPH_ERROR("cannot get shortest paths", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Vertex index out of range.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
@@ -320,7 +320,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parent_eids == 0) {
-        IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Insufficient memory for shortest path calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, parent_eids);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
