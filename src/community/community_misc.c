@@ -324,10 +324,48 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1,
  * or the adjusted Rand index of Hubert and Arabie (1985).
  *
  * </para><para>
+ * Some of these measures are defined based on the entropy of a discrete
+ * random variable associated with a given clustering \c C of vertices.
+ * Let \c p_i be the probability that a randomly picked vertex would be part
+ * of cluster \c i. Then the entropy of the clustering is
+ *
+ * </para><para>
+ * <code>H(C) = -\sum_i p_i ln p_i</code>
+ *
+ * </para><para>
+ * Similarly, we can define the joint entropy of two clusterings \c C_1 and \c C_2
+ * based on the probability \c p_ij that a random vertex is part of cluster \c i
+ * in the first clustering and cluster \c j in the second one:
+ *
+ * </para><para>
+ * <code>H(C_1, C_2) = -\sum_ii p_ij ln p_ij</code>
+ *
+ * </para><para>
+ * The mutual information of \c C_1 and \c C_2 is then
+ * <code>MI(C_1, C_2)=H(C_1) + H(C_2) - H(C_1, C_2) >=0 </code>.
+ * A large mutual information indicates a high overlap between the two clusterings.
+ * The normalized mutual information, as computed by igraph, is
+ *
+ * </para><para>
+ * <code>NMI(C_1, C_2)=2 MI(C_1, C_2) / (H(C_1) + H(C_2))</code>
+ *
+ * It takes its value from the interval (0, 1], with 1 achieved when the two clusterings
+ * coincide.
+ *
+ * </para><para>
+ * The variation of information is defined as
+ * <code>VI(C_1, C_2) = [H(C_1) - MI(C_1, C_2)] + [H(C_2) - MI(C_1, C_2)]</code>.
+ * Lower values of the variation of information indicate a smaller difference between
+ * the two clusterings, with <code>VI = 0</code> achieved precisely when they coincide.
+ *
+ * </para><para>
+ * For an explanation of the split-join distance, see \ref igraph_split_join_distance().
+ *
+ * </para><para>
  * References:
  *
  * </para><para>
- * Meila M: Comparing clusterings by the variation of information.
+ * Meilă M: Comparing clusterings by the variation of information.
  * In: Schölkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
  * 16th Annual Conference on Computational Learning Theory and 7th Kernel
  * Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
@@ -369,6 +407,8 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1,
  *                 selects the adjusted Rand index.
  *
  * \return  Error code.
+ *
+ * \sa \ref igraph_split_join_distance().
  *
  * Time complexity: O(n log(n)).
  */
@@ -530,12 +570,12 @@ static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
     k2 = (long int)igraph_vector_max(v2) + 1;
     p1 = IGRAPH_CALLOC(k1, double);
     if (p1 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for computing community entropy.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, p1);
     p2 = IGRAPH_CALLOC(k2, double);
     if (p2 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for computing community entropy.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, p2);
 
