@@ -315,7 +315,7 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1,
 /**
  * \ingroup communities
  * \function igraph_compare_communities
- * \brief Compares community structures using various metrics
+ * \brief Compares community structures using various metrics.
  *
  * This function assesses the distance between two community structures
  * using the variation of information (VI) metric of Meila (2003), the
@@ -332,23 +332,28 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1,
  * 16th Annual Conference on Computational Learning Theory and 7th Kernel
  * Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
  * Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
+ * https://doi.org/10.1007/978-3-540-45167-9_14
  *
  * </para><para>
  * Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community structure
  * identification. J Stat Mech P09008, 2005.
+ * https://doi.org/10.1088/1742-5468/2005/09/P09008
  *
  * </para><para>
  * van Dongen S: Performance criteria for graph clustering and Markov cluster
  * experiments. Technical Report INS-R0012, National Research Institute for
  * Mathematics and Computer Science in the Netherlands, Amsterdam, May 2000.
+ * https://ir.cwi.nl/pub/4461
  *
  * </para><para>
  * Rand WM: Objective criteria for the evaluation of clustering methods.
  * J Am Stat Assoc 66(336):846-850, 1971.
+ * https://doi.org/10.2307/2284239
  *
  * </para><para>
  * Hubert L and Arabie P: Comparing partitions. Journal of Classification
  * 2:193-218, 1985.
+ * https://doi.org/10.1007/BF01908075
  *
  * \param  comm1   the membership vector of the first community structure
  * \param  comm2   the membership vector of the second community structure
