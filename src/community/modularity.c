@@ -37,7 +37,7 @@
  * other compared to a random null model. It is defined as
  *
  * </para><para>
- * <code>Q = 1/(2m) sum_ij (A_ij - gamma k_i k_j / (2m)) δ(c_i,c_j)</code>,
+ * <code>Q = 1/(2m) sum_ij (A_ij - γ k_i k_j / (2m)) δ(c_i,c_j)</code>,
  *
  * </para><para>
  * where \c m is the number of edges, <code>A_ij</code> is the adjacency matrix,
@@ -47,19 +47,19 @@
  * the diagonal of the adjacency matrix contains twice the number of self-loops.
  *
  * </para><para>
- * The resolution parameter \c gamma allows weighting the random null model, which
+ * The resolution parameter \c γ allows weighting the random null model, which
  * might be useful when finding partitions with a high modularity. Maximizing modularity
  * with higher values of the resolution parameter typically results in more, smaller clusters
  * when finding partitions with a high modularity. Lower values typically results in
  * fewer, larger clusters. The original definition of modularity is retrieved
- * when setting <code>gamma=1</code>.
+ * when setting <code>γ = 1</code>.
  *
  * </para><para>
  * Modularity can also be calculated on directed graphs. This only requires a relatively
  * modest change,
  *
  * </para><para>
- * <code>Q = 1/m sum_ij (A_ij - gamma k^out_i k^in_j / m) δ(c_i,c_j)</code>,
+ * <code>Q = 1/m sum_ij (A_ij - γ k^out_i k^in_j / m) δ(c_i,c_j)</code>,
  *
  * </para><para>
  * where \c k^out_i is the out-degree of node \c i and \c k^in_j is the in-degree of node \c j.
@@ -88,7 +88,7 @@
  * 118703. https://doi.org/10.1103/PhysRevLett.100.118703
  *
  * </para><para>
- * For the introduction of the resolution parameter, see Reichardt, J., and
+ * For the introduction of the resolution parameter \c γ, see Reichardt, J., and
  * Bornholdt, S. (2006). Statistical mechanics of community detection. Physical
  * Review E 74, 016110. https://doi.org/10.1103/PhysRevE.74.016110
  *
@@ -98,7 +98,7 @@
  *                   It does not have to be consecutive, i.e. empty communities
  *                   are allowed.
  * \param weights    Weight vector or \c NULL if no weights are specified.
- * \param resolution Resolution parameter. Must be greater than or equal to 0.
+ * \param resolution The resolutin parameter \c γ. Must not be negative.
  *                   Set it to 1 to use the classical definition of modularity.
  * \param directed   Whether to use the directed or undirected version of modularity.
  *                   Ignored for undirected graphs.
@@ -133,7 +133,7 @@ int igraph_modularity(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
     if (resolution < 0.0) {
-      IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
+      IGRAPH_ERROR("The resolution parameter must not be negative.", IGRAPH_EINVAL);
     }
 
     if (no_of_edges == 0) {
