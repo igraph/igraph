@@ -31,16 +31,21 @@
  * \function igraph_simple_interconnected_islands_game
  * \brief Generates a random graph made of several interconnected islands, each island being a random graph.
  *
+ * All islands are of the same size. Within an island, each edge is generated
+ * with the same probability. A fixed number of additional edges are then
+ * generated for each unordered pair of islands to connect them. Note that
+ * the islands themselves will \em not contain multiple edges, but there might
+ * be multiple edges between the same pair of vertices between islands.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param islands_n The number of islands in the graph.
  * \param islands_size The size of islands in the graph.
- * \param islands_pin The probability to create each possible edge into each island.
+ * \param islands_pin The probability to create each possible edge within islands.
  * \param n_inter The number of edges to create between two islands.
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid parameter
- *         \c IGRAPH_ENOMEM: there is not enough
- *         memory for the operation.
+ *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
