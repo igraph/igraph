@@ -330,7 +330,7 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1,
  * of cluster \c i. Then the entropy of the clustering is
  *
  * </para><para>
- * <code>H(C) = -\sum_i p_i ln p_i</code>
+ * <code>H(C) = - \sum_i p_i log p_i</code>
  *
  * </para><para>
  * Similarly, we can define the joint entropy of two clusterings \c C_1 and \c C_2
@@ -338,17 +338,18 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1,
  * in the first clustering and cluster \c j in the second one:
  *
  * </para><para>
- * <code>H(C_1, C_2) = -\sum_ii p_ij ln p_ij</code>
+ * <code>H(C_1, C_2) = - \sum_ii p_ij log p_ij</code>
  *
  * </para><para>
  * The mutual information of \c C_1 and \c C_2 is then
- * <code>MI(C_1, C_2)=H(C_1) + H(C_2) - H(C_1, C_2) >=0 </code>.
+ * <code>MI(C_1, C_2) = H(C_1) + H(C_2) - H(C_1, C_2) >= 0 </code>.
  * A large mutual information indicates a high overlap between the two clusterings.
  * The normalized mutual information, as computed by igraph, is
  *
  * </para><para>
- * <code>NMI(C_1, C_2)=2 MI(C_1, C_2) / (H(C_1) + H(C_2))</code>
+ * <code>NMI(C_1, C_2) = 2 MI(C_1, C_2) / (H(C_1) + H(C_2))</code>.
  *
+ * </para><para>
  * It takes its value from the interval (0, 1], with 1 achieved when the two clusterings
  * coincide.
  *
