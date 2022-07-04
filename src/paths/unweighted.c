@@ -91,7 +91,6 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
 
     igraph_integer_t i, j;
     igraph_vit_t fromvit, tovit;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_vector_int_t indexv;
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
@@ -132,7 +131,7 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-    igraph_matrix_fill(res, my_infinity);
+    igraph_matrix_fill(res, IGRAPH_INFINITY);
 
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);

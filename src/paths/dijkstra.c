@@ -24,12 +24,10 @@
 #include "igraph_paths.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_nongraph.h"
 #include "igraph_stack.h"
-#include "igraph_qsort.h"
 #include "igraph_vector_ptr.h"
 
 #include "core/indheap.h"
@@ -108,7 +106,6 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     igraph_integer_t no_of_from, no_of_to;
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_bool_t all_to;
     igraph_vector_int_t indexv;
 
@@ -159,7 +156,7 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-    igraph_matrix_fill(res, my_infinity);
+    igraph_matrix_fill(res, IGRAPH_INFINITY);
 
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);

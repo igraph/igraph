@@ -82,7 +82,6 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     igraph_vector_int_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t fromvit, tovit;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_bool_t all_to;
     igraph_vector_t dist;
 
@@ -134,7 +133,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
          IGRAPH_VIT_NEXT(fromvit), i++) {
         igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
 
-        igraph_vector_fill(&dist, my_infinity);
+        igraph_vector_fill(&dist, IGRAPH_INFINITY);
         VECTOR(dist)[source] = 0;
         igraph_vector_int_null(&clean_vertices);
         igraph_vector_int_null(&num_queued);
@@ -317,7 +316,6 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_vector_int_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t tovit;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_vector_t dist;
 
     if (!weights) {
@@ -352,7 +350,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, parent_eids);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
-    igraph_vector_fill(&dist, my_infinity);
+    igraph_vector_fill(&dist, IGRAPH_INFINITY);
     VECTOR(dist)[from] = 0;
     igraph_vector_int_null(&clean_vertices);
     igraph_vector_int_null(&num_queued);
