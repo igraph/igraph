@@ -29,7 +29,7 @@
 
 /**
  * \function igraph_modularity
- * \brief Calculate the modularity of a graph with respect to some clusters or vertex types.
+ * \brief Calculates the modularity of a graph with respect to some clusters or vertex types.
  *
  * The modularity of a graph with respect to some clustering of the vertices
  * (or assignment of vertex types)
@@ -258,15 +258,15 @@ static int igraph_i_modularity_matrix_get_adjacency(
 
 /**
  * \function igraph_modularity_matrix
- * \brief Calculate the modularity matrix
+ * \brief Calculates the modularity matrix.
  *
- * This function returns the modularity matrix defined as
- *
- * </para><para>
- * <code>B_ij = A_ij - gamma * k_i * k_j / (2m)</code>
+ * This function returns the modularity matrix, which is defined as
  *
  * </para><para>
- * for undirected graphs, where \c A_ij is the adjacency matrix, \c gamma is the
+ * <code>B_ij = A_ij - γ k_i k_j / (2m)</code>
+ *
+ * </para><para>
+ * for undirected graphs, where \c A_ij is the adjacency matrix, \c γ is the
  * resolution parameter, \c k_i is the degree of vertex \c i, and \c m is the
  * number of edges in the graph. When there are no edges, or the weights add up
  * to zero, the result is undefined.
@@ -275,25 +275,27 @@ static int igraph_i_modularity_matrix_get_adjacency(
  * For directed graphs the modularity matrix is changed to
  *
  * </para><para>
- * <code>B_ij = A_ij - gamma * k^out_i * k^in_j / m</code>
+ * <code>B_ij = A_ij - γ k^out_i k^in_j / m</code>
+ *
+ * </para><para>
  * where <code>k^out_i</code> is the out-degree of node \c i and <code>k^in_j</code> is the
  * in-degree of node \c j.
  *
  * </para><para>
  * Note that self-loops in undirected graphs are multiplied by 2 in this
- * implementation. If weights are specified, the weighted counterparts are used.
+ * implementation. If weights are specified, the weighted counterparts of the adjacency
+ * matrix and degrees are used.
  *
  * \param graph      The input graph.
  * \param weights    Edge weights, pointer to a vector. If this is a null pointer
  *                   then every edge is assumed to have a weight of 1.
- * \param resolution Resolution parameter. Must be greater than or equal to 0.
+ * \param resolution The esolution parameter \c γ. Must not be negative.
  *                   Default is 1. Lower values favor fewer, larger communities;
  *                   higher values favor more, smaller communities.
  * \param modmat     Pointer to an initialized matrix in which the modularity
  *                   matrix is stored.
  * \param directed   For directed graphs: if the edges should be treated as
- *                   undirected.
- *                   For undirected graphs this is ignored.
+ *                   undirected. For undirected graphs this is ignored.
  *
  * \sa \ref igraph_modularity()
  */
@@ -314,7 +316,7 @@ int igraph_modularity_matrix(const igraph_t *graph,
     }
 
     if (resolution < 0.0) {
-        IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The resolution parameter must not be negative.", IGRAPH_EINVAL);
     }
 
     if (!igraph_is_directed(graph)) {
