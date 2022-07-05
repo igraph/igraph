@@ -494,6 +494,9 @@ Some of the highlights are:
  - `igraph_similarity_jaccard_pairs()` now uses an `igraph_vector_int_t` for its
    `pairs` parameter.
 
+ - `igraph_simple_interconnected_islands_game()` does not generate multi-edges
+   between islands any more.
+
  - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
    use an `igraph_vector_int_t` to return the vertex IDs instead of an
    `igraph_vector_t`.
