@@ -177,6 +177,9 @@ igraph_realize_degree_sequence:
 igraph_circulant:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, BOOLEAN directed=False
 
+igraph_generalized_petersen:
+    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER k
+
 igraph_weighted_sparsemat:
     PARAMS:
         OUT GRAPH graph, SPARSEMAT A, BOOLEAN directed, CSTRING attr, BOOLEAN loops=False
