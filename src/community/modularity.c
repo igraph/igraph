@@ -288,7 +288,7 @@ static int igraph_i_modularity_matrix_get_adjacency(
  * \param graph      The input graph.
  * \param weights    Edge weights, pointer to a vector. If this is a null pointer
  *                   then every edge is assumed to have a weight of 1.
- * \param resolution The esolution parameter \c γ. Must not be negative.
+ * \param resolution The resolution parameter \c γ. Must not be negative.
  *                   Default is 1. Lower values favor fewer, larger communities;
  *                   higher values favor more, smaller communities.
  * \param modmat     Pointer to an initialized matrix in which the modularity
