@@ -320,8 +320,30 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
 
 #undef CHECK_ERR
 
-    /* modification successful, clear the cached properties of the graph */
-    igraph_i_property_cache_invalidate_all(graph);
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Adding one or more edges cannot make a strongly or weakly connected
+     * graph disconnected, so we keep those flags if they are cached as true.
+     *
+     * Adding one or more edges may turn a DAG into a non-DAG or a forest into
+     * a non-forest, so we can keep those flags only if they are cached as
+     * false.
+     *
+     * Also, adding one or more edges does not change HAS_LOOP, HAS_MULTI and
+     * HAS_RECIPROCAL if they were already true.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_IS_DAG) | (1 << IGRAPH_PROP_IS_FOREST),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED) |
+        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL)
+    );
 
     return IGRAPH_SUCCESS;
 }
@@ -393,8 +415,36 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
         }
     }
 
-    /* modification successful, clear the cached properties of the graph */
-    igraph_i_property_cache_invalidate_all(graph);
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Adding one or more nodes does not change the following cached properties:
+     *
+     * - IGRAPH_PROP_HAS_LOOP
+     * - IGRAPH_PROP_HAS_MULTI
+     * - IGRAPH_PROP_HAS_RECIPROCAL
+     * - IGRAPH_PROP_IS_DAG (adding a node does not create/destroy cycles)
+     * - IGRAPH_PROP_IS_FOREST (same)
+     *
+     * Adding one or more nodes without any edges incident on them is sure to
+     * make the graph disconnected (weakly or strongly), so we can keep the
+     * connectivity-related properties if they are currently cached as false.
+     * (Actually, even if they weren't cached as false, we could still set them
+     * to false, but we don't have that functionality yet).
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL) |
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST),
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED),
+        /* keep_when_true = */
+        0
+    );
 
     return IGRAPH_SUCCESS;
 }
@@ -507,8 +557,27 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_i_create_start_vectors(&graph->os, &graph->from, &graph->oi, no_of_nodes);
     igraph_i_create_start_vectors(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
 
-    /* modification successful, clear the cached properties of the graph */
-    igraph_i_property_cache_invalidate_all(graph);
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Deleting one or more edges cannot make a directed acyclic graph cyclic,
+     * or an undirected forest into a cyclic graph, so we keep those flags if
+     * they are cached as true
+     *
+     * Also, if the graph had no loop edges before the deletion, it will have
+     * no loop edges after the deletion either. The same applies to reciprocal
+     * edges or multiple edges as well.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST)
+    );
 
     /* Nothing to deallocate... */
     return IGRAPH_SUCCESS;
@@ -695,8 +764,27 @@ igraph_error_t igraph_delete_vertices_idx(
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    /* modification successful, clear the cached properties of the graph */
-    igraph_i_property_cache_invalidate_all(graph);
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Deleting one or more vertices cannot make a directed acyclic graph cyclic,
+     * or an undirected forest into a cyclic graph, so we keep those flags if
+     * they are cached as true.
+     *
+     * Also, if the graph had no loop edges before the deletion, it will have
+     * no loop edges after the deletion either. The same applies to reciprocal
+     * edges or multiple edges as well.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST)
+    );
 
     return IGRAPH_SUCCESS;
 }

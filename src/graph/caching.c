@@ -124,3 +124,77 @@ void igraph_i_property_cache_invalidate_all(const igraph_t *graph) {
         igraph_i_property_cache_invalidate(graph, prop);
     }
 }
+
+/**
+ * \brief Invalidates all but a few cached properties of the graph, subject to
+ *        specific conditions.
+ *
+ * This function is typically called after the graph is modified if we know that
+ * the modification does not affect certain cached properties in certain cases.
+ * For instance, adding more vertices does not make a connected graph disconnected,
+ * so we can keep the cached properties related to graph connectivity if they
+ * were already cached as true, but we need to invalidate them if they were
+ * cached as false.
+ *
+ * </para><para>
+ * Use <code>1 << IGRAPH_PROP_SOMETHING</code> to encode an individual property
+ * in the bits of the bitmask used in the arguments of this function.
+ *
+ * \param graph       the graph whose cache is to be invalidated
+ * \param keep_always bitmask where the i-th bit corresponds to cached property \em i
+ *        and it should be set to 1 if the property should be \em kept ,
+ *        irrespectively of its current cached value.
+ */
+void igraph_i_property_cache_invalidate_conditionally(
+    const igraph_t *graph, uint64_t keep_always, uint64_t keep_when_false,
+    uint64_t keep_when_true
+) {
+    uint64_t invalidate = ~keep_always;
+    uint64_t mask;
+    uint64_t maybe_keep = invalidate & (keep_when_false | keep_when_true);
+
+    /* The bits of maybe_keep are set to 1 for those properties that we would
+     * invalidate by default, _but_ where the current cached value of the
+     * property may change the decision */
+
+    if (maybe_keep) {
+        for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
+            mask = 1 << prop;
+            if ((maybe_keep & mask) && igraph_i_property_cache_has(graph, prop)) {
+                igraph_bool_t cached_value = igraph_i_property_cache_get_bool(graph, prop);
+                if (
+                    ((keep_when_false & mask) && !cached_value) ||
+                    ((keep_when_true & mask) && cached_value)
+                ) {
+                    invalidate &= ~mask;
+                }
+            }
+        }
+    }
+
+    for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
+        mask = 1 << prop;
+        if (invalidate & mask) {
+            igraph_i_property_cache_invalidate(graph, prop);
+        }
+    }
+}
+
+/**
+ * \brief Invalidates all but a few cached properties of the graph.
+ *
+ * This function is typically called after the graph is modified if we know that
+ * the modification does not affect certain cached properties.
+ *
+ * </para><para>
+ * Use <code>1 << IGRAPH_PROP_SOMETHING</code> to encode an individual property
+ * in the bits of the bitmask used in the argument of this function.
+ *
+ * \param graph  the graph whose cache is to be invalidated
+ * \param keep   bitmask where the i-th bit corresponds to cached property \em i
+ *        and it should be set to 1 if the property should be \em kept ,
+ *        irrespectively of its current cached value.
+ */
+void igraph_i_property_cache_invalidate_except(const igraph_t *graph, uint64_t keep) {
+    igraph_i_property_cache_invalidate_conditionally(graph, keep, 0, 0);
+}

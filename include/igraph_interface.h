@@ -76,6 +76,10 @@ IGRAPH_EXPORT igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *gra
 IGRAPH_EXPORT igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop);
 IGRAPH_EXPORT void igraph_i_property_cache_set_bool(const igraph_t *cache, igraph_cached_property_t prop, igraph_bool_t value);
 IGRAPH_EXPORT void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT void igraph_i_property_cache_invalidate_conditionally(
+    const igraph_t *graph, uint64_t keep_always, uint64_t keep_when_false, uint64_t keep_when_true
+);
+IGRAPH_EXPORT void igraph_i_property_cache_invalidate_except(const igraph_t *graph, uint64_t keep);
 IGRAPH_EXPORT void igraph_i_property_cache_invalidate_all(const igraph_t *graph);
 
 #define IGRAPH_RETURN_IF_CACHED_BOOL(graphptr, prop, resptr) \
