@@ -34,7 +34,7 @@ struct igraph_i_property_cache_t;
 typedef struct igraph_i_property_cache_t igraph_i_property_cache_t;
 
 typedef enum {
-    /* Stores whether the graph has at least one self-loop */
+    /* Stores whether the graph has at least one self-loop. */
     IGRAPH_PROP_HAS_LOOP = 0,
 
     /* Stores whether the graph has at least one multi-edge, taking into account
