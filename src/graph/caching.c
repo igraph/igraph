@@ -101,10 +101,10 @@ void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_prope
 }
 
 /**
- * \brief Clears the cached value of a property in a graph.
+ * \brief Invalidates the cached value of a property in a graph.
  *
  * \param graph  the graph whose cache is to be modified
- * \param prop   the property to clear from the cache
+ * \param prop   the property to invalidate in the cache
  */
 void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop) {
     IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
@@ -113,7 +113,7 @@ void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_pro
 }
 
 /**
- * \brief Clears all cached properties of the graph.
+ * \brief Invalidates all cached properties of the graph.
  *
  * This function is typically called after the graph is modified.
  *

@@ -52,7 +52,7 @@ typedef enum {
     /* Stores whether the graph is weakly connected. */
     IGRAPH_PROP_IS_WEAKLY_CONNECTED,
 
-    /* Stores whether the graph is strongly connected */
+    /* Stores whether the graph is strongly connected. Ignored in undirected graphs. */
     IGRAPH_PROP_IS_STRONGLY_CONNECTED,
 
     /* Stores whether the graph is a directed acyclic graph. Not used for
