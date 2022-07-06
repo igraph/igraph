@@ -96,13 +96,13 @@ int main()
                                                 -1);
     
     //printf("No vertices, not directed:\n");
-    igraph_integer_t val1,val2;
+    igraph_real_t val1,val2;
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_UNDIRECTED, &weights_empty,&val1) == IGRAPH_SUCCESS);
 
     //printf("Un-Directed graph with loops and multi-edges, select none:\n");
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm,&steiner_terminals, IGRAPH_UNDIRECTED, &weights_lm,&val2) == IGRAPH_SUCCESS);
 
-   //printf("val1 %" IGRAPH_PRId " val2 %"IGRAPH_PRId "\n" IGRAPH_PRId, val1,val2);
+   //printf("val1 %f val2 %f\n", val1,val2);
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
     igraph_vector_destroy(&weights_empty);

@@ -87,7 +87,7 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 }
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
-igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
+igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 {
 
 	igraph_integer_t no_of_vertices = (igraph_integer_t)igraph_vcount(graph);
@@ -98,7 +98,11 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	igraph_integer_t q;
 	std::set<std::set<igraph_integer_t>> allSubsets;
 	igraph_matrix_t distance;
-
+	if (no_of_edges == 0 && no_of_vertices == 0) //graph is empty
+	{
+		*res = 0;
+		return IGRAPH_SUCCESS;
+	}
 	if (igraph_vector_size(weights) != no_of_edges)
 	{	
 		IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges \n",IGRAPH_EINVAL,igraph_vector_size(weights), no_of_edges);
