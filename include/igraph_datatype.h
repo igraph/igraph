@@ -60,7 +60,7 @@ typedef enum {
     IGRAPH_PROP_IS_DAG,
 
     /* Stores whether the graph is a forest, i.e. an undirected or directed
-     * graph that is cycle-free even if we ignore edge directions */
+     * graph that is cycle-free even if we ignore edge directions. */
     IGRAPH_PROP_IS_FOREST,
 
     /* Dummy value used to count enum values */
