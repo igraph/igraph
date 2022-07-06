@@ -56,7 +56,7 @@ typedef enum {
     IGRAPH_PROP_IS_STRONGLY_CONNECTED,
 
     /* Stores whether the graph is a directed acyclic graph. Not used for
-     * undirected graphs */
+     * undirected graphs. */
     IGRAPH_PROP_IS_DAG,
 
     /* Stores whether the graph is a forest, i.e. an undirected or directed
