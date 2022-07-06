@@ -93,13 +93,11 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	igraph_integer_t no_of_vertices = (igraph_integer_t)igraph_vcount(graph);
 	igraph_integer_t no_of_edges = igraph_ecount(graph);
 
-	igraph_vector_t steiner_vertices;
 	igraph_vector_int_t steiner_terminals_copy; 
 	igraph_matrix_t dp_cache; // dynamic programming table
 	igraph_integer_t q;
 	std::set<std::set<igraph_integer_t>> allSubsets;
 	igraph_matrix_t distance;
-	IGRAPH_VECTOR_INIT_FINALLY(&steiner_vertices, 0);
 
 	if (igraph_vector_size(weights) != no_of_edges)
 	{	
@@ -109,7 +107,14 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	IGRAPH_FINALLY(igraph_matrix_destroy,&distance);
 
 	igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights);
-	
+	// for (long int i = 0 ; i  <  no_of_vertices; i++)
+	// {
+	// 	for (long int j = 0 ; j  <  no_of_vertices; j++)
+	// 	{
+	// 		std::cout << igraph_matrix_get(&distance, i,j) << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
 	//printf("Johnson Works\n");
 	
 	IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy,steiner_terminals));
@@ -118,17 +123,20 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	
 	// Creating a vector of steiner vertices. steiner vertices = vertices in graph - steiner terminals
 
-	IGRAPH_CHECK(igraph_vector_push_back(&steiner_vertices, no_of_vertices));
-
-	for (igraph_integer_t i = 0, j = 0; i < igraph_vector_int_size(&steiner_terminals_copy); i++, j++)
-	{
-		igraph_vector_remove(&steiner_vertices, i - j);
-	}
-
-	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), igraph_vector_size(&steiner_vertices)));
+	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), no_of_vertices));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
-    igraph_matrix_fill(&dp_cache, (igraph_real_t) IGRAPH_INTEGER_MAX);
+    igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
+	for (long int i = 0 ; i  <  no_of_vertices; i++)
+	{
+		for (long int j = 0 ; j  <  no_of_vertices; j++)
+		{
+			//std::cout << igraph_matrix_get(&distance, i,j) << " ";
+			igraph_matrix_set(&dp_cache,i,j,igraph_matrix_get(&distance,i,j));
+			std::cout << igraph_matrix_get(&dp_cache, i,j) << " ";
+		}
+		std::cout << std::endl;
+	}
 
 //	printf("Matrix Filled\n");
 	
@@ -137,21 +145,7 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
 	allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(steiner_terminals), no_of_vertices);
-//	printSubsets(allSubsets);
-	// Singleton subset rows may be filled in trivially
-	// printf("subsets Filled\n");
-	// printf("Size:%ld\n",igraph_vector_int_size(&steiner_terminals_copy));
-	// for (igraph_integer_t i = 0; i < igraph_vector_int_size(&steiner_terminals_copy); i++)
-	// {
-	// 	printf("I am Looping n\n");
-	// 	printf("%ld",igraph_vector_size(&steiner_vertices));
-	// 	for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
-	// 	{
-	// 		printf("I am Looping mx n\n");
-	// 		printf("%f",MATRIX(distance, (igraph_integer_t)VECTOR(steiner_terminals_copy)[i], (igraph_integer_t)VECTOR(steiner_vertices)[j]));
-	// 		igraph_matrix_set(&dp_cache, (igraph_integer_t)VECTOR(steiner_terminals_copy)[i], (igraph_integer_t)VECTOR(steiner_vertices)[j], MATRIX(distance, (igraph_integer_t)VECTOR(steiner_terminals_copy)[i], (igraph_integer_t)VECTOR(steiner_vertices)[j]));
-	// 	}
-	// }
+
 	for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++)
 	{
 		for (igraph_integer_t i = 0; i < (igraph_integer_t)allSubsets.size(); i++)
@@ -161,7 +155,12 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 			std::set<igraph_integer_t> D = *it;
 			igraph_integer_t indexOfSubsetD;
 			indexOfSubsetD = fetchIndexofMapofSets(D);
-			for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
+
+			for (igraph_integer_t j = 0; j < no_of_vertices; j++){
+				MATRIX(dp_cache,indexOfSubsetD,j) = IGRAPH_INFINITY;
+			}
+
+			for (igraph_integer_t j = 0; j < no_of_vertices; j++)
 			{
 				igraph_real_t distance1 = IGRAPH_INFINITY;
 				std::set<igraph_integer_t>::iterator subset_D_iterator;
@@ -180,11 +179,9 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 						if (*iter == E)
 						{
 							iter = DMinusE.erase(iter);
+							break;
 						}
-						else
-						{
-							++iter;
-						}
+						++iter;
 					}
 
 					igraph_integer_t indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE);
@@ -192,21 +189,22 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 					if (distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j)) < distance1)
 					{
 						distance1 = distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j));
+						//std::cout << distance1 << std::endl;
 					}
 				}
-				for (igraph_integer_t k = 0; k < igraph_vector_size(&steiner_vertices); k++)
+				for (igraph_integer_t k = 0; k < no_of_vertices; k++)
 				{
 					MATRIX(dp_cache, indexOfSubsetD, k) = std::min(MATRIX(dp_cache, indexOfSubsetD, k), MATRIX(distance, k, j) + distance1);
 				}
 			}
 		}
 	}
-	igraph_real_t distance1 = IGRAPH_INFINITY;
+	
 	igraph_real_t distance2 = IGRAPH_INFINITY;
 
-	for (igraph_integer_t j = 0; j < igraph_vector_size(&steiner_vertices); j++)
+	for (igraph_integer_t j = 0; j < no_of_vertices; j++)
 	{
-
+		igraph_real_t distance1 = IGRAPH_INFINITY;
 		for (igraph_integer_t subset_C_iterator = 0; subset_C_iterator < igraph_vector_int_size(steiner_terminals); subset_C_iterator++)
 		{
 			igraph_integer_t F = VECTOR(steiner_terminals_copy)[subset_C_iterator];
@@ -229,15 +227,17 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 			{
 				distance1 = distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j));
 			}
+
 		}
+		std::cout << "u:"<<distance1 << std::endl;
 		if (MATRIX(distance, q, j) + distance1 < distance2)
 		{
 			distance2 = MATRIX(distance, q, j) + distance1;
+			std::cout << distance2 <<std::endl;
 		}
 	}
 	*res = distance2;
 	//std::cout << u << " " << v << std::endl;
-	igraph_vector_destroy(&steiner_vertices);
 	
 	igraph_matrix_destroy(&distance);
 	
@@ -245,7 +245,7 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 	
 	igraph_matrix_destroy(&dp_cache);
 
-	IGRAPH_FINALLY_CLEAN(4);
+	IGRAPH_FINALLY_CLEAN(3);
 
 	return IGRAPH_SUCCESS;
 	
