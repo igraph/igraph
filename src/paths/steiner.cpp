@@ -133,9 +133,9 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 		{
 			//std::cout << igraph_matrix_get(&distance, i,j) << " ";
 			igraph_matrix_set(&dp_cache,i,j,igraph_matrix_get(&distance,i,j));
-			std::cout << igraph_matrix_get(&dp_cache, i,j) << " ";
+			//std::cout << igraph_matrix_get(&dp_cache, i,j) << " ";
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
 	}
 
 //	printf("Matrix Filled\n");
@@ -229,11 +229,11 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_integer_t *res)
 			}
 
 		}
-		std::cout << "u:"<<distance1 << std::endl;
-		if (MATRIX(distance, q, j) + distance1 < distance2)
+		//std::cout << "u:" << distance1 << std::endl;
+		if ( q != j && MATRIX(distance, q, j) + distance1 < distance2)
 		{
 			distance2 = MATRIX(distance, q, j) + distance1;
-			std::cout << distance2 <<std::endl;
+			//std::cout << distance2 <<std::endl;
 		}
 	}
 	*res = distance2;
