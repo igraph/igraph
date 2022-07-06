@@ -49,7 +49,7 @@ typedef enum {
      * edges (a, b) and (a, b) again. */
     IGRAPH_PROP_HAS_RECIPROCAL,
 
-    /* Stores whether the graph is weakly connected */
+    /* Stores whether the graph is weakly connected. */
     IGRAPH_PROP_IS_WEAKLY_CONNECTED,
 
     /* Stores whether the graph is strongly connected */
