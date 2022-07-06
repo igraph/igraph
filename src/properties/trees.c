@@ -254,6 +254,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * \example examples/simple/igraph_kary_tree.c
  */
 igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
+    igraph_bool_t is_tree = 0;
     igraph_integer_t iroot = 0;
     igraph_integer_t visited_count;
     igraph_integer_t vcount, ecount;
@@ -261,20 +262,31 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
 
+    /* For undirected graphs, we can return early if we know from the cache
+     * that the graph is weakly connected and is a forest */
+    if (!igraph_is_directed(graph) &&
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)
+    ) {
+        is_tree = 1;
+        iroot = 0;
+        goto success;
+    }
+
     /* A tree must have precisely vcount-1 edges. */
     /* By convention, the zero-vertex graph will not be considered a tree. */
     if (ecount != vcount - 1) {
-        *res = 0;
-        return IGRAPH_SUCCESS;
+        is_tree = 0;
+        goto success;
     }
 
     /* The single-vertex graph is a tree, provided it has no edges (checked in the previous if (..)) */
     if (vcount == 1) {
-        *res = 1;
-        if (root) {
-            *root = 0;
-        }
-        return IGRAPH_SUCCESS;
+        is_tree = 1;
+        iroot = 0;
+        goto success;
     }
 
     /* For higher vertex counts we cannot short-circuit due to the possibility
@@ -295,7 +307,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
      * we choose 0.
      */
 
-    *res = 1; /* assume success */
+    is_tree = 1; /* assume success */
 
     switch (mode) {
     case IGRAPH_ALL:
@@ -324,14 +336,14 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
                  * improve performance when the graph is indeed a tree, persumably
                  * the most common case. Thus we only check until finding the root.
                  */
-                *res = 0;
+                is_tree = 0;
                 break;
             }
         }
 
         /* If no suitable root is found, the graph is not a tree. */
-        if (*res && i == vcount) {
-            *res = 0;
+        if (is_tree && i == vcount) {
+            is_tree = 0;
         } else {
             iroot = i;
         }
@@ -346,13 +358,25 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
     }
 
     /* if no suitable root was found, skip visiting vertices */
-    if (*res) {
+    if (is_tree) {
         IGRAPH_CHECK(igraph_i_is_tree_visitor(graph, iroot, mode, &visited_count));
-        *res = visited_count == vcount;
+        is_tree = visited_count == vcount;
+    }
+
+success:
+    if (res) {
+        *res = is_tree;
     }
 
     if (root) {
         *root = iroot;
+    }
+
+    if (is_tree && !igraph_is_directed(graph)) {
+        /* For undirected graphs, a tree is weakly connected and is a forest, so
+         * we can cache this */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, 1);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, 1);
     }
 
     return IGRAPH_SUCCESS;
