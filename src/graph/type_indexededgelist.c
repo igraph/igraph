@@ -102,9 +102,7 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
 
     /* init cache */
     graph->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
-    if (! graph->cache) {
-        IGRAPH_ERROR("Cannot create graph.", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(graph->cache, "Cannot create graph.");
     IGRAPH_FINALLY(igraph_free, graph->cache);
     IGRAPH_CHECK(igraph_i_property_cache_init(graph->cache));
     IGRAPH_FINALLY(igraph_i_property_cache_destroy, graph->cache);
@@ -197,9 +195,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->is);
 
     to->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
-    if (! to->cache) {
-        IGRAPH_ERROR("Cannot copy graph.", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(to->cache, "Cannot copy graph.");
     IGRAPH_FINALLY(igraph_free, to->cache);
     IGRAPH_CHECK(igraph_i_property_cache_copy(to->cache, from->cache));
     IGRAPH_FINALLY(igraph_i_property_cache_destroy, to->cache);
@@ -440,9 +436,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_integer_t i, j;
 
     mark = IGRAPH_CALLOC(no_of_edges, int);
-    if (mark == 0) {
-        IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(mark, "Cannot delete edges.");
     IGRAPH_FINALLY(igraph_free, mark);
 
     IGRAPH_CHECK(igraph_eit_create(graph, edges, &eit));
@@ -640,9 +634,7 @@ igraph_error_t igraph_delete_vertices_idx(
                                        &newgraph.ii, remaining_vertices));
 
     newgraph.cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
-    if (! newgraph.cache) {
-        IGRAPH_ERROR("Cannot delete vertices.", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(newgraph.cache, "Cannot delete vertices.");
     IGRAPH_FINALLY(igraph_free, newgraph.cache);
     IGRAPH_CHECK(igraph_i_property_cache_init(newgraph.cache));
     IGRAPH_FINALLY(igraph_i_property_cache_destroy, newgraph.cache);
