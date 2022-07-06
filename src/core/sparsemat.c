@@ -31,16 +31,13 @@
 #include "igraph_types.h"
 #include "igraph_vector_ptr.h"
 
+#include "internal/hacks.h"    /* STATIC_ASSERT */
+
 #include <limits.h>
 #include <string.h>
 
 #include <cs/cs.h>
 #undef cs  /* because otherwise it messes up the name of the 'cs' member in igraph_sparsemat_t */
-
-/* Magic macro to fail the build if certain condition does not hold. See:
- * https://stackoverflow.com/questions/4079243/how-can-i-use-sizeof-in-a-preprocessor-macro
- */
-#define STATIC_ASSERT(condition) ((void)sizeof(char[1 - 2*!(condition)]))
 
 /* Returns the number of potential nonzero elements in the given sparse matrix.
  * The returned value can be used to iterate over A->cs->x no matter whether the

@@ -24,13 +24,17 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 
+#include "internal/hacks.h"
+
 #include <string.h> /* memset */
 
 __BEGIN_DECLS
 
 struct igraph_i_property_cache_t {
     igraph_bool_t value[IGRAPH_PROP_I_SIZE];
-    igraph_bool_t known[IGRAPH_PROP_I_SIZE];
+
+    /** Bit field that stores which of the properties are cached at the moment */
+    uint32_t known;
 };
 
 igraph_error_t igraph_i_property_cache_init(igraph_i_property_cache_t *cache);

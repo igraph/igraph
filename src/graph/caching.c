@@ -28,8 +28,10 @@
  * \brief Initializes a property cache, ensuring that all values are unknown.
  */
 igraph_error_t igraph_i_property_cache_init(igraph_i_property_cache_t *cache) {
+    STATIC_ASSERT(IGRAPH_PROP_I_SIZE <= 32);
+
     memset(cache->value, 0, sizeof(cache->value) / sizeof(cache->value[0]));
-    memset(cache->known, 0, sizeof(cache->known) / sizeof(cache->known[0]));
+    cache->known = 0;
     return IGRAPH_SUCCESS;
 }
 
@@ -80,7 +82,7 @@ igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cac
 igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop) {
     IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
     assert(graph->cache != NULL);
-    return graph->cache->known[prop];
+    return graph->cache->known & (1 << prop);
 }
 
 /**
@@ -97,7 +99,7 @@ void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_prope
      * Functions that merely compute graph properties, and thus leave the graph structure
      * intact, will often update the cache. */
     graph->cache->value[prop] = value;
-    graph->cache->known[prop] = 1;
+    graph->cache->known |= (1 << prop);
 }
 
 /**
@@ -109,7 +111,7 @@ void igraph_i_property_cache_set_bool(const igraph_t *graph, igraph_cached_prope
 void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop) {
     IGRAPH_ASSERT(prop >= 0 && prop < IGRAPH_PROP_I_SIZE);
     assert(graph->cache != NULL);
-    graph->cache->known[prop] = 0;
+    graph->cache->known &= ~(1 << prop);
 }
 
 /**
@@ -120,9 +122,8 @@ void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_pro
  * \param graph  the graph whose cache is to be invalidated
  */
 void igraph_i_property_cache_invalidate_all(const igraph_t *graph) {
-    for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
-        igraph_i_property_cache_invalidate(graph, prop);
-    }
+    assert(graph->cache != NULL);
+    graph->cache->known = 0;
 }
 
 /**
@@ -146,22 +147,31 @@ void igraph_i_property_cache_invalidate_all(const igraph_t *graph) {
  *        irrespectively of its current cached value.
  */
 void igraph_i_property_cache_invalidate_conditionally(
-    const igraph_t *graph, uint64_t keep_always, uint64_t keep_when_false,
-    uint64_t keep_when_true
+    const igraph_t *graph, uint32_t keep_always, uint32_t keep_when_false,
+    uint32_t keep_when_true
 ) {
-    uint64_t invalidate = ~keep_always;
-    uint64_t mask;
-    uint64_t maybe_keep = invalidate & (keep_when_false | keep_when_true);
+    uint32_t invalidate = ~keep_always;
+    uint32_t mask;
+    uint32_t maybe_keep;
+    igraph_bool_t cached_value;
 
-    /* The bits of maybe_keep are set to 1 for those properties that we would
-     * invalidate by default, _but_ where the current cached value of the
-     * property may change the decision */
+    assert(graph->cache != NULL);
+
+    /* The bits of maybe_keep are set to 1 for those properties that are:
+     *
+     * - currently cached
+     * - should _probably_ be invalidated
+     * - _but_ the current cached value of the property may change the decision
+     */
+    maybe_keep = graph->cache->known & invalidate & (keep_when_false | keep_when_true);
 
     if (maybe_keep) {
         for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
             mask = 1 << prop;
-            if ((maybe_keep & mask) && igraph_i_property_cache_has(graph, prop)) {
-                igraph_bool_t cached_value = igraph_i_property_cache_get_bool(graph, prop);
+            if (maybe_keep & mask) {
+                /* if we get here, we know that the property is cached; we have
+                 * masked maybe_keep with graph->cache->known */
+                cached_value = igraph_i_property_cache_get_bool(graph, prop);
                 if (
                     ((keep_when_false & mask) && !cached_value) ||
                     ((keep_when_true & mask) && cached_value)
@@ -172,29 +182,5 @@ void igraph_i_property_cache_invalidate_conditionally(
         }
     }
 
-    for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
-        mask = 1 << prop;
-        if (invalidate & mask) {
-            igraph_i_property_cache_invalidate(graph, prop);
-        }
-    }
-}
-
-/**
- * \brief Invalidates all but a few cached properties of the graph.
- *
- * This function is typically called after the graph is modified if we know that
- * the modification does not affect certain cached properties.
- *
- * </para><para>
- * Use <code>1 << IGRAPH_PROP_SOMETHING</code> to encode an individual property
- * in the bits of the bitmask used in the argument of this function.
- *
- * \param graph  the graph whose cache is to be invalidated
- * \param keep   bitmask where the i-th bit corresponds to cached property \em i
- *        and it should be set to 1 if the property should be \em kept ,
- *        irrespectively of its current cached value.
- */
-void igraph_i_property_cache_invalidate_except(const igraph_t *graph, uint64_t keep) {
-    igraph_i_property_cache_invalidate_conditionally(graph, keep, 0, 0);
+    graph->cache->known &= ~invalidate;
 }
