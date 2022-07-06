@@ -43,6 +43,10 @@ igraph_error_t igraph_i_property_cache_copy(
         const igraph_i_property_cache_t *other_cache);
 void igraph_i_property_cache_destroy(igraph_i_property_cache_t *cache);
 
+void igraph_i_property_cache_invalidate_conditionally(
+    const igraph_t *graph, uint32_t keep_always, uint32_t keep_when_false, uint32_t keep_when_true
+);
+
 __END_DECLS
 
 #endif /* IGRAPH_CACHING_H */
