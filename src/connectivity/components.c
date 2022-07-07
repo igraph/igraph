@@ -392,7 +392,6 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
 
     igraph_cached_property_t prop;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_error_t retval = IGRAPH_SUCCESS;
     igraph_integer_t no;
 
     if (!igraph_is_directed(graph)) {
@@ -421,21 +420,21 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     } else if (no_of_nodes == 1) {
         *res = 1;
     } else if (mode == IGRAPH_WEAK) {
-        retval = igraph_is_connected_weak(graph, res);
+        IGRAPH_CHECK(igraph_is_connected_weak(graph, res));
     } else {   /* mode == IGRAPH_STRONG */
         /* A strongly connected graph has at least as many edges as vertices,
          * except for the singleton graph, which is handled above. */
         if (igraph_ecount(graph) < no_of_nodes) {
             *res = 0;
         } else {
-            retval = igraph_i_connected_components_strong(graph, NULL, NULL, &no);
+            IGRAPH_CHECK(igraph_i_connected_components_strong(graph, NULL, NULL, &no));
             *res = (no == 1);
         }
     }
 
     igraph_i_property_cache_set_bool(graph, prop, *res);
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
