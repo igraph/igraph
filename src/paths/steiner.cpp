@@ -87,7 +87,7 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 }
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
-igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_real_t *res)
+igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 {
 
 	igraph_integer_t no_of_vertices = (igraph_integer_t)igraph_vcount(graph);
