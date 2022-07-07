@@ -166,12 +166,12 @@ igraph_adjlist:
 
 igraph_full_bipartite:
     PARAMS: |-
-        OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types, INTEGER n1,
+        OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types, INTEGER n1,
         INTEGER n2, BOOLEAN directed=False, NEIMODE mode=ALL
 
 igraph_full_multipartite:
     PARAMS: |-
-        OUT GRAPH graph, OPTIONAL OUT VECTOR_INT types, VECTOR_INT n,
+        OUT GRAPH graph, OPTIONAL OUT INDEX_VECTOR types, VECTOR_INT n,
         BOOLEAN directed=False, NEIMODE mode=ALL
 
 igraph_realize_degree_sequence:
@@ -184,6 +184,10 @@ igraph_circulant:
 
 igraph_generalized_petersen:
     PARAMS: OUT GRAPH graph, INTEGER n, INTEGER k
+
+igraph_turan:
+    PARAMS: |-
+        OUT GRAPH graph, OPTIONAL OUT INDEX_VECTOR types, INTEGER n, INTEGER r
 
 igraph_weighted_sparsemat:
     PARAMS:
@@ -293,12 +297,12 @@ igraph_lastcit_game:
 
 igraph_cited_type_game:
     PARAMS: |-
-        OUT GRAPH graph, INTEGER nodes, VECTOR_INT types, VECTOR pref,
+        OUT GRAPH graph, INTEGER nodes, INDEX_VECTOR types, VECTOR pref,
         INTEGER edges_per_step=1, BOOLEAN directed=True
 
 igraph_citing_cited_type_game:
     PARAMS: |-
-        OUT GRAPH graph, INTEGER nodes, VECTOR_INT types, MATRIX pref,
+        OUT GRAPH graph, INTEGER nodes, INDEX_VECTOR types, MATRIX pref,
         INTEGER edges_per_step=1, BOOLEAN directed=True
 
 igraph_forest_fire_game:
@@ -1068,12 +1072,12 @@ igraph_bipartite_projection:
 
 igraph_create_bipartite:
     PARAMS: |-
-        OUT GRAPH graph, IN VECTOR_BOOL types,
+        OUT GRAPH graph, IN BIPARTITE_TYPES types,
         VECTOR_INT edges, BOOLEAN directed=False
 
 igraph_incidence:
     PARAMS: |-
-        OUT GRAPH graph, OUT VECTOR_BOOL types, MATRIX incidence,
+        OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
@@ -1084,23 +1088,23 @@ igraph_get_incidence:
     DEPS: types ON graph
 
 igraph_is_bipartite:
-    PARAMS: GRAPH graph, OUT BOOLEAN res, OPTIONAL OUT VECTOR_BOOL type
+    PARAMS: GRAPH graph, OUT BOOLEAN res, OPTIONAL OUT BIPARTITE_TYPES type
 
 igraph_bipartite_game_gnp:
     PARAMS: |-
-        OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types,
+        OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
         INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed=False,
         NEIMODE mode=ALL
 
 igraph_bipartite_game_gnm:
     PARAMS: |-
-        OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types,
+        OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
         INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed=False,
         NEIMODE mode=ALL
 
 igraph_bipartite_game:
     PARAMS: |-
-        OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types,
+        OUT GRAPH graph, OPTIONAL OUT BIPARTITE_TYPES types,
         ERDOS_RENYI_TYPE type, INTEGER n1, INTEGER n2, REAL p=0.0,
         INTEGER m=0, BOOLEAN directed=False, NEIMODE mode=ALL
 
@@ -1393,6 +1397,18 @@ igraph_layout_davidson_harel:
         REAL weight_edge_crossings=ECROSSW,
         REAL weight_node_edge_dist=NEDISTW
 
+igraph_layout_umap:
+    PARAMS: |-
+        GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
+        VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
+        REAL sampling_prob
+
+igraph_layout_umap_3d:
+    PARAMS: |-
+        GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
+        VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
+        REAL sampling_prob
+
 #######################################
 # Cocitation and other similarity measures
 #######################################
@@ -1404,12 +1420,6 @@ igraph_cocitation:
 igraph_bibcoupling:
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
     DEPS: vids ON graph
-
-igraph_similarity_jaccard:
-    PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
-        BOOLEAN loops=False
-    DEPS: vids ON graph res, mode ON vids
 
 igraph_similarity_dice:
     PARAMS: |-
@@ -1432,6 +1442,18 @@ igraph_similarity_dice_pairs:
 igraph_similarity_inverse_log_weighted:
     PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL
     DEPS: vids ON graph
+
+igraph_similarity_jaccard:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
+        BOOLEAN loops=False
+    DEPS: vids ON graph res, mode ON vids
+
+igraph_similarity_jaccard_es:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, EDGESET es=ALL, NEIMODE mode=ALL,
+        BOOLEAN loops=False
+    DEPS: es ON graph
 
 igraph_similarity_jaccard_pairs:
     PARAMS: |-
@@ -2192,6 +2214,9 @@ igraph_simplify_and_colorize:
     PARAMS: |-
         GRAPH graph, OUT GRAPH res, OUT VECTOR_INT vertex_color, OUT VECTOR_INT edge_color
     DEPS: vertex_color ON graph, edge_color ON graph
+
+igraph_graph_count:
+    PARAMS: INTEGER n, BOOLEAN directed=False, OUT INTEGER count
 
 #######################################
 # Matching
