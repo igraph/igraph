@@ -97,8 +97,8 @@
  * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
  * vertices in the graph and |E| is the number of edges
  *
- * \sa \ref igraph_igraph_widest_path_widths_dijkstra() or
- * \ref igraph_igraph_widest_path_widths_floyd_warshall() if you only need the
+ * \sa \ref igraph_widest_path_widths_dijkstra() or
+ * \ref igraph_widest_path_widths_floyd_warshall() if you only need the
  * widths of the paths but not the paths themselves.
  */
 igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
@@ -405,7 +405,7 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
 }
 
 /**
- * \function igraph_igraph_widest_path_widths_floyd_warshall
+ * \function igraph_widest_path_widths_floyd_warshall
  * \brief Widths of widest paths between vertices.
  *
  * This function implements a modified Floyd Warshalls algorithm,
@@ -433,10 +433,10 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  *
  * Time complexity: O(|V|^3), where |V| is the number of vertices in the graph.
  *
- * \sa \ref igraph_igraph_widest_path_widths_dijkstra() for a variant that runs faster
+ * \sa \ref igraph_widest_path_widths_dijkstra() for a variant that runs faster
  * on sparse graphs.
  */
-igraph_error_t igraph_igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
+igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
@@ -561,7 +561,7 @@ igraph_error_t igraph_igraph_widest_path_widths_floyd_warshall(const igraph_t *g
 }
 
 /**
- * \function igraph_igraph_widest_path_widths_dijkstra
+ * \function igraph_widest_path_widths_dijkstra
  * \brief Widths of widest paths between vertices.
  *
  * This function implements a modified Dijkstra's algorithm, which
@@ -593,10 +593,10 @@ igraph_error_t igraph_igraph_widest_path_widths_floyd_warshall(const igraph_t *g
  * Time complexity: O(s*(|E|log|E|+|V|)), where |V| is the number of
  * vertices in the graph, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_igraph_widest_path_widths_floyd_warshall() for a variant that runs faster
+ * \sa \ref igraph_widest_path_widths_floyd_warshall() for a variant that runs faster
  * on dense graphs.
  */
-igraph_error_t igraph_igraph_widest_path_widths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
