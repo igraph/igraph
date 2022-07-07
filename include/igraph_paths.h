@@ -29,9 +29,6 @@
 #include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
-#include "igraph_matrix.h"
-#include "igraph_iterators.h"
 #include "igraph_vector_list.h"
 
 __BEGIN_DECLS
@@ -233,8 +230,8 @@ IGRAPH_EXPORT igraph_error_t igraph_spanner(const igraph_t *graph,
                                 const igraph_vector_t *weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
-                                             igraph_vector_ptr_t *vertices,
-                                             igraph_vector_ptr_t *edges,
+                                             igraph_vector_int_list_t *vertices,
+                                             igraph_vector_int_list_t *edges,
                                              igraph_integer_t from,
                                              igraph_vs_t to,
                                              const igraph_vector_t *weights,

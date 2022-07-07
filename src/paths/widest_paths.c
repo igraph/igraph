@@ -41,19 +41,13 @@
  * the largest width between two vertices, this function gives only one of them.
  * \param graph The graph object.
  * \param vertices The result, the IDs of the vertices along the paths.
- *        This is a pointer vector, each element points to a vector
- *        object. These should be initialized before passing them to
- *        the function, which will properly clear and/or resize them
- *        and fill the IDs of the vertices along the paths from/to
- *        the vertices. Supply a null pointer here if you don't need
- *        these vectors.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
  * \param edges The result, the IDs of the edges along the paths.
- *        This is a pointer vector, each element points to a vector
- *        object. These should be initialized before passing them to
- *        the function, which will properly clear and/or resize them
- *        and fill the IDs of the vertices along the paths from/to
- *        the vertices. Supply a null pointer here if you don't need
- *        these vectors.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
  * \param from The id of the vertex from/to which the widest paths are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
@@ -109,8 +103,8 @@
  * if you only need the path length but not the paths themselves.
  */
 igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
-                                       igraph_vector_ptr_t *vertices,
-                                       igraph_vector_ptr_t *edges,
+                                       igraph_vector_int_list_t *vertices,
+                                       igraph_vector_int_list_t *edges,
                                        igraph_integer_t from,
                                        igraph_vs_t to,
                                        const igraph_vector_t *weights,
@@ -163,10 +157,10 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_ptr_resize(vertices, IGRAPH_VIT_SIZE(vit)));
+        IGRAPH_CHECK(igraph_vector_int_list_resize(vertices, IGRAPH_VIT_SIZE(vit)));
     }
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_ptr_resize(edges, IGRAPH_VIT_SIZE(vit)));
+        IGRAPH_CHECK(igraph_vector_int_list_resize(edges, IGRAPH_VIT_SIZE(vit)));
     }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
@@ -281,14 +275,16 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
             igraph_integer_t node = IGRAPH_VIT_GET(vit);
             igraph_integer_t size, act, edge;
             igraph_vector_int_t *vvec = 0, *evec = 0;
+
             if (vertices) {
-                vvec = VECTOR(*vertices)[i];
+                vvec = igraph_vector_int_list_get_ptr(vertices, i);
                 igraph_vector_int_clear(vvec);
             }
             if (edges) {
-                evec = VECTOR(*edges)[i];
+                evec = igraph_vector_int_list_get_ptr(edges, i);
                 igraph_vector_int_clear(evec);
             }
+
             IGRAPH_ALLOW_INTERRUPTION();
 
             size = 0;
@@ -375,22 +371,20 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
                                       const igraph_vector_t *weights,
                                       igraph_neimode_t mode) {
 
-    igraph_vector_ptr_t vertices2, *vp = &vertices2;
-    igraph_vector_ptr_t edges2, *ep = &edges2;
+    igraph_vector_int_list_t vertices2, *vp = &vertices2;
+    igraph_vector_int_list_t edges2, *ep = &edges2;
 
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&vertices2, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vertices2);
-        VECTOR(vertices2)[0] = vertices;
+        IGRAPH_CHECK(igraph_vector_int_list_init(&vertices2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &vertices2);
     } else {
-        vp = 0;
+        vp = NULL;
     }
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&edges2, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &edges2);
-        VECTOR(edges2)[0] = edges;
+        IGRAPH_CHECK(igraph_vector_int_list_init(&edges2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &edges2);
     } else {
-        ep = 0;
+        ep = NULL;
     }
 
     IGRAPH_CHECK(igraph_get_widest_paths(graph, vp, ep,
@@ -398,11 +392,13 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
                  weights, mode, 0, 0));
 
     if (edges) {
-        igraph_vector_ptr_destroy(&edges2);
+        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        igraph_vector_ptr_destroy(&vertices2);
+        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
