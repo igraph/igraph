@@ -31,7 +31,7 @@
 #include "igraph_types.h"
 #include "igraph_vector_ptr.h"
 
-#include "internal/hacks.h"    /* STATIC_ASSERT */
+#include "internal/hacks.h"    /* IGRAPH_STATIC_ASSERT */
 
 #include <limits.h>
 #include <string.h>
@@ -113,8 +113,8 @@ static CS_INT igraph_i_sparsemat_count_elements(const igraph_sparsemat_t* A) {
 
 igraph_error_t igraph_sparsemat_init(igraph_sparsemat_t *A, igraph_integer_t rows,
         igraph_integer_t cols, igraph_integer_t nzmax) {
-    STATIC_ASSERT(sizeof(igraph_integer_t) == sizeof(CS_INT));
-    STATIC_ASSERT(sizeof(igraph_real_t) == sizeof(CS_ENTRY));
+    IGRAPH_STATIC_ASSERT(sizeof(igraph_integer_t) == sizeof(CS_INT));
+    IGRAPH_STATIC_ASSERT(sizeof(igraph_real_t) == sizeof(CS_ENTRY));
 
     if (rows < 0) {
         IGRAPH_ERROR("Negative number of rows", IGRAPH_EINVAL);

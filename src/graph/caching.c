@@ -28,7 +28,7 @@
  * \brief Initializes a property cache, ensuring that all values are unknown.
  */
 igraph_error_t igraph_i_property_cache_init(igraph_i_property_cache_t *cache) {
-    STATIC_ASSERT(IGRAPH_PROP_I_SIZE <= 32);
+    IGRAPH_STATIC_ASSERT(IGRAPH_PROP_I_SIZE <= 32);
 
     memset(cache->value, 0, sizeof(cache->value) / sizeof(cache->value[0]));
     cache->known = 0;
