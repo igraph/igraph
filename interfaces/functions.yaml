@@ -941,6 +941,11 @@ igraph_eccentricity:
         NEIMODE mode=ALL
     DEPS: vids ON graph, res ON graph vids
 
+igraph_graph_center:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
+    DEPS: res ON graph
+
 igraph_radius:
     PARAMS: GRAPH graph, OUT REAL radius, NEIMODE mode=ALL
 
