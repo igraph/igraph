@@ -135,7 +135,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     /* Check whether we have reached all the nodes -- if not, the graph is
      * disconnected */
     if (no_of_nodes > 0 && igraph_vector_int_min(&parents) <= -2) {
-        IGRAPH_WARNING("LGL layout does not support disconnected graphs yet");
+        IGRAPH_WARNING("LGL layout does not support disconnected graphs yet.");
     }
 
     /* We don't need the mst any more */

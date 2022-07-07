@@ -65,7 +65,7 @@ int main() {
                         /* repulserad */ vc * vc * vc,
                         /* cellsize */   sqrt(sqrt(vc)),
                         /* root */       0),
-        "LGL layout does not support disconnected graphs yet"
+        "LGL layout does not support disconnected graphs yet."
     );
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);

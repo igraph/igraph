@@ -494,6 +494,9 @@ Some of the highlights are:
  - `igraph_similarity_jaccard_pairs()` now uses an `igraph_vector_int_t` for its
    `pairs` parameter.
 
+ - `igraph_simple_interconnected_islands_game()` does not generate multi-edges
+   between islands any more.
+
  - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
    use an `igraph_vector_int_t` to return the vertex IDs instead of an
    `igraph_vector_t`.
@@ -719,7 +722,7 @@ Some of the highlights are:
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
  - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without re-allocating them.
  - `igraph_get_k_shortest_paths()` finds the k shortest paths between a source and a target vertex (#1763, thanks to @GroteGnoom)
- - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
+ - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_path_widths_dijkstra()` and `igraph_widest_path_widths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
  - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix, with various kinds of normalizations. They replace the now-deprecated `igraph_laplacian()`. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
  - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
  - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
@@ -875,6 +878,11 @@ Some of the highlights are:
  - In some rare edge cases, `igraph_pagerank()` with the ARPACK method and `igraph_hub_score()` / `igraph_authority_score()` could return incorrect results. The problem could be detected by checking that the returned eigenvalue is not negative. See issue #2090.
  - `igraph_permute_vertices()` now checks for out-of-range indices in the permutation vector.
  - `igraph_create()` now checks for non-finite vertex indices in the edges vector.
+ - `igraph_eigenvector_centrality()` would return incorrect scores when some weights were negative.
+
+### Other
+
+ - Documentation improvement.
 
 ## [0.9.9] - 2022-06-04
 
