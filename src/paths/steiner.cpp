@@ -148,7 +148,7 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 
 	igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
-	allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(steiner_terminals), no_of_vertices);
+	allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_vertices);
 
 	for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++)
 	{
@@ -163,7 +163,7 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 			for (igraph_integer_t j = 0; j < no_of_vertices; j++){
 				MATRIX(dp_cache,indexOfSubsetD,j) = IGRAPH_INFINITY;
 			}
-
+			
 			for (igraph_integer_t j = 0; j < no_of_vertices; j++)
 			{
 				igraph_real_t distance1 = IGRAPH_INFINITY;
@@ -172,33 +172,49 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 				for (subset_D_iterator = D.begin(); subset_D_iterator != D.end(); subset_D_iterator++)
 				{
 					igraph_integer_t E = *subset_D_iterator;
-
-					igraph_integer_t distanceEJ = MATRIX(distance, E, j);
-					std::set<igraph_integer_t> DMinusE = D;
+					if (E != j) {
+						igraph_integer_t distanceEJ = MATRIX(distance, E, j);
+						//std::cout << "Distance EJ" << distanceEJ << std::endl;
+					
+						std::set<igraph_integer_t> DMinusE = D;
 
 					//igraph_vector_remove(&DMinusE,E);
 
-					for (std::set<igraph_integer_t>::iterator iter = DMinusE.begin(); iter != DMinusE.end();)
-					{
-						if (*iter == E)
+						for (std::set<igraph_integer_t>::iterator iter = DMinusE.begin(); iter != DMinusE.end();)
 						{
-							iter = DMinusE.erase(iter);
-							break;
+							if (*iter == E)
+							{
+								iter = DMinusE.erase(iter);
+								break;
+							}
+							++iter;
 						}
-						++iter;
+						
+						igraph_integer_t indexOfSubsetDMinusE;
+						if (DMinusE.size() == 1){
+							std::set<igraph_integer_t>::iterator node = DMinusE.begin();
+							indexOfSubsetDMinusE = *node;
+						}
+						else {
+							indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE);
+						}
+						
+						//std::cout << "Index:" << indexOfSubsetDMinusE << std::endl;
+					//std::cout << "Matrix Data Addition" << MATRIX(dp_cache, indexOfSubsetDMinusE, j) + distanceEJ;
+					
+						if ((distanceEJ + MATRIX(dp_cache, indexOfSubsetDMinusE, j)) < distance1)
+						{
+							distance1 = distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j));
+								
+						}
 					}
-
-					igraph_integer_t indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE);
-
-					if (distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j)) < distance1)
-					{
-						distance1 = distanceEJ + (MATRIX(dp_cache, indexOfSubsetDMinusE, j));
-						//std::cout << distance1 << std::endl;
-					}
+					
 				}
+				//std::cout <<"Distance - 1"<< distance1 << std::endl;
+				
 				for (igraph_integer_t k = 0; k < no_of_vertices; k++)
 				{
-					MATRIX(dp_cache, indexOfSubsetD, k) = std::min(MATRIX(dp_cache, indexOfSubsetD, k), MATRIX(distance, k, j) + distance1);
+					igraph_matrix_set(&dp_cache,indexOfSubsetD,k,std::min(MATRIX(dp_cache, indexOfSubsetD, k), MATRIX(distance, k, j) + distance1));
 				}
 			}
 		}
@@ -227,17 +243,19 @@ igraph_i_directed_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 
 			igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(CMinusF);
 
-			if (distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j)) < distance1)
+			if (distanceFJ != 0 && (distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j)) < distance1))
 			{
 				distance1 = distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j));
+				//std::cout << "u:" << distance1 << std::endl;	
 			}
 
 		}
-		//std::cout << "u:" << distance1 << std::endl;
+		
+		
 		if ( q != j && MATRIX(distance, q, j) + distance1 < distance2)
 		{
 			distance2 = MATRIX(distance, q, j) + distance1;
-			//std::cout << distance2 <<std::endl;
+			//std::cout << "Distance-2" << distance2 <<std::endl;
 		}
 	}
 	*res = distance2;
