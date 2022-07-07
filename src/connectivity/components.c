@@ -99,7 +99,7 @@ igraph_error_t igraph_connected_components(
         return igraph_i_connected_components_strong(graph, membership, csize, no);
     }
 
-    IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Cannot calculate connected components.", IGRAPH_EINVAL);
 }
 
 static igraph_error_t igraph_i_connected_components_weak(
@@ -118,7 +118,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot calculate weakly connected components.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
