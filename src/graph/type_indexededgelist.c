@@ -566,7 +566,10 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
      *
      * Deleting one or more edges cannot make a directed acyclic graph cyclic,
      * or an undirected forest into a cyclic graph, so we keep those flags if
-     * they are cached as true
+     * they are cached as true.
+     *
+     * Similarly, deleting one or more edges cannot make a disconnected graph
+     * connected, so we keep the connectivity flags if they are cached as false.
      *
      * Also, if the graph had no loop edges before the deletion, it will have
      * no loop edges after the deletion either. The same applies to reciprocal
@@ -578,7 +581,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
         /* keep_when_false = */
         (1 << IGRAPH_PROP_HAS_LOOP) |
         (1 << IGRAPH_PROP_HAS_MULTI) |
-        (1 << IGRAPH_PROP_HAS_RECIPROCAL),
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL) |
+        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED),
         /* keep_when_true = */
         (1 << IGRAPH_PROP_IS_DAG) |
         (1 << IGRAPH_PROP_IS_FOREST)
