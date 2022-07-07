@@ -191,7 +191,7 @@ igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids, igraph_vect
  * might ask you to call this function explicitly if we suspect that you are
  * running into a bug in igraph's cache handling. A tell-tale sign of an invalid
  * cache entry is that the result of a cached igraph function (such as
- * \ref igraph_is_dag() or \ref igraph_is_simple() ) is different before and
+ * \ref igraph_is_dag() or \ref igraph_is_simple()) is different before and
  * after a cache invalidation.
  *
  * \param graph The graph whose cache is to be invalidated.

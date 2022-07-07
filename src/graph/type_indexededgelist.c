@@ -429,7 +429,10 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
      * make the graph disconnected (weakly or strongly), so we can keep the
      * connectivity-related properties if they are currently cached as false.
      * (Actually, even if they weren't cached as false, we could still set them
-     * to false, but we don't have that functionality yet).
+     * to false, but we don't have that functionality yet). The only exception
+     * is when the graph had zero vertices and gained only one vertex, because
+     * it then becomes connected. That's why we have the condition below in the
+     * keep_when_false section.
      */
     igraph_i_property_cache_invalidate_conditionally(
         graph,
@@ -440,8 +443,10 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
         (1 << IGRAPH_PROP_IS_DAG) |
         (1 << IGRAPH_PROP_IS_FOREST),
         /* keep_when_false = */
-        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
-        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED),
+        igraph_vcount(graph) >= 2 ? (
+            (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+            (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED)
+        ) : 0,
         /* keep_when_true = */
         0
     );
