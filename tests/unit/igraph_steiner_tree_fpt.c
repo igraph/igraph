@@ -99,10 +99,11 @@ int main()
     igraph_real_t val1,val2;
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_ALL, &weights_empty,&val1) == IGRAPH_SUCCESS);
     printf("%.2f\n",val1);
-    
+    IGRAPH_ASSERT(val1 == 0);
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm,&steiner_terminals, IGRAPH_ALL, &weights_lm,&val2) == IGRAPH_SUCCESS);
     printf("%.2f\n",val2);
+    IGRAPH_ASSERT(val2 == 5);
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
     igraph_vector_destroy(&weights_empty);
