@@ -260,8 +260,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID, or the length of \p to is
- *           not the same as the length of \p res.
+ *           \p from is invalid vertex ID
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist

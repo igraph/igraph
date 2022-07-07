@@ -169,6 +169,11 @@ igraph_full_bipartite:
         OUT GRAPH graph, OPTIONAL OUT VECTOR_BOOL types, INTEGER n1,
         INTEGER n2, BOOLEAN directed=False, NEIMODE mode=ALL
 
+igraph_full_multipartite:
+    PARAMS: |-
+        OUT GRAPH graph, OPTIONAL OUT VECTOR_INT types, VECTOR_INT n,
+        BOOLEAN directed=False, NEIMODE mode=ALL
+
 igraph_realize_degree_sequence:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg=NULL,
@@ -522,6 +527,25 @@ igraph_get_k_shortest_paths:
         INTEGER k, VERTEX from, VERTEX to, NEIMODE mode=OUT
     DEPS: |-
         from ON graph, to ON graph, weights ON graph, vertex_paths ON graph, edge_paths ON graph
+
+igraph_get_widest_path:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
+        VERTEX from, VERTEX to, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
+    DEPS: |-
+        from ON graph, to ON graph, weights ON graph, vertices ON graph, edges ON graph
+
+igraph_get_widest_paths:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VERTEXSET_LIST vertices, OPTIONAL OUT EDGESET_LIST edges,
+        VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights=NULL,
+        NEIMODE mode=OUT, OPTIONAL OUT VECTOR_INT parents,
+        OPTIONAL OUT VECTOR_INT inbound_edges
+    DEPS: |-
+        from ON graph, to ON graph, weights ON graph, vertices ON graph,
+        edges ON graph
 
 igraph_spanner:
     PARAMS: |-
@@ -916,6 +940,11 @@ igraph_eccentricity:
         GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         NEIMODE mode=ALL
     DEPS: vids ON graph, res ON graph vids
+
+igraph_graph_center:
+    PARAMS: |-
+        GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
+    DEPS: res ON graph
 
 igraph_radius:
     PARAMS: GRAPH graph, OUT REAL radius, NEIMODE mode=ALL

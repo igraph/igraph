@@ -288,8 +288,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *         \cli IGRAPH_EINVAL
  *           The weight vector doesn't math the number of edges.
  *         \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID, or the length of \p to is
- *           not the same as the length of \p vertices or \p edges.
+ *           \p from is invalid vertex ID
  *         \cli IGRAPH_ENEGLOOP
  *           Bellman-ford algorithm encounted a negative loop.
  *         \endclist
