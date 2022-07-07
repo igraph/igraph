@@ -433,6 +433,11 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     }
 
     igraph_i_property_cache_set_bool(graph, prop, *res);
+    if (igraph_is_directed(graph) && prop == IGRAPH_PROP_IS_WEAKLY_CONNECTED && *res == 0) {
+        /* If the graph is not weakly connected, it is not strongly connected
+         * either so we can also cache that */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
+    }
 
     return IGRAPH_SUCCESS;
 }
