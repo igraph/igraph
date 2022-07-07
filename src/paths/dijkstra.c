@@ -307,9 +307,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID, or the length of \p to is
- *           not the same as the length of \p vertices (if not NULL) or
- *           the length of \p edges (if not NULL)
+ *           \p from is invalid vertex ID
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
