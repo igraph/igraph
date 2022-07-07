@@ -89,9 +89,7 @@
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID, or the length of \p to is
- *           not the same as the length of \p vertices (if not NULL) or
- *           the length of \p edges (if not NULL)
+ *           \p from is invalid vertex ID
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -99,8 +97,9 @@
  * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
  * vertices in the graph and |E| is the number of edges
  *
- * \sa \ref igraph_widest_path_lengths_dijkstra() or \ref igraph_widest_path_lengths_floyd_warshall()
- * if you only need the path length but not the paths themselves.
+ * \sa \ref igraph_igraph_widest_path_widths_dijkstra() or
+ * \ref igraph_igraph_widest_path_widths_floyd_warshall() if you only need the
+ * widths of the paths but not the paths themselves.
  */
 igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
                                        igraph_vector_int_list_t *vertices,
@@ -406,8 +405,8 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
 }
 
 /**
- * \function igraph_widest_path_lengths_floyd_warshall
- * \brief Widest path lengths between vertices.
+ * \function igraph_igraph_widest_path_widths_floyd_warshall
+ * \brief Widths of widest paths between vertices.
  *
  * This function implements a modified Floyd Warshalls algorithm,
  * to find the widest path widths from a set of source vertices to
@@ -434,10 +433,10 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  *
  * Time complexity: O(|V|^3), where |V| is the number of vertices in the graph.
  *
- * \sa \ref igraph_widest_path_lengths_dijkstra() for a variant that runs faster
+ * \sa \ref igraph_igraph_widest_path_widths_dijkstra() for a variant that runs faster
  * on sparse graphs.
  */
-igraph_error_t igraph_widest_path_lengths_floyd_warshall(const igraph_t *graph,
+igraph_error_t igraph_igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
@@ -562,8 +561,8 @@ igraph_error_t igraph_widest_path_lengths_floyd_warshall(const igraph_t *graph,
 }
 
 /**
- * \function igraph_widest_path_lengths_dijkstra
- * \brief Widest path lengths between vertices.
+ * \function igraph_igraph_widest_path_widths_dijkstra
+ * \brief Widths of widest paths between vertices.
  *
  * This function implements a modified Dijkstra's algorithm, which
  * can find the widest path widths from a source vertex to all
@@ -594,10 +593,10 @@ igraph_error_t igraph_widest_path_lengths_floyd_warshall(const igraph_t *graph,
  * Time complexity: O(s*(|E|log|E|+|V|)), where |V| is the number of
  * vertices in the graph, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_widest_path_lengths_floyd_warshall() for a variant that runs faster
+ * \sa \ref igraph_igraph_widest_path_widths_floyd_warshall() for a variant that runs faster
  * on dense graphs.
  */
-igraph_error_t igraph_widest_path_lengths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,

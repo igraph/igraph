@@ -75,8 +75,8 @@ void check_invalid_input(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res,
                         igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                         igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                         igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
-    CHECK_ERROR(igraph_widest_path_lengths_dijkstra(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_widest_path_lengths_floyd_warshall(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_igraph_widest_path_widths_dijkstra(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_igraph_widest_path_widths_floyd_warshall(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_get_widest_paths(g, vertices, edges, source, *to, w, IGRAPH_OUT,
                 parents, inbound_edges), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_get_widest_path(g, vertices2, edges2, source, destination, w, IGRAPH_OUT), IGRAPH_EINVAL);
@@ -85,8 +85,8 @@ void check_invalid_input(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res,
 /* runs the width finding algorithms and assert they succeed */
 void run_widest_paths(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res1, igraph_matrix_t *res2,
                     igraph_vs_t *from, igraph_vs_t *to, igraph_neimode_t mode) {
-    IGRAPH_ASSERT(igraph_widest_path_lengths_dijkstra(g, res1, *from, *to, w, mode) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(igraph_widest_path_lengths_floyd_warshall(g, res2, *from, *to, w, mode) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_igraph_widest_path_widths_dijkstra(g, res1, *from, *to, w, mode) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_igraph_widest_path_widths_floyd_warshall(g, res2, *from, *to, w, mode) == IGRAPH_SUCCESS);
 }
 
 /* runs the path finding algorithms and asserts they succeed */
