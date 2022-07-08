@@ -29,7 +29,7 @@
 
 /**
  * \function igraph_compose
- * \brief Calculates the composition of two graphs
+ * \brief Calculates the composition of two graphs.
  *
  * The composition of graphs contains the same number of vertices as
  * the bigger graph of the two operands. It contains an (i,j) edge if
@@ -39,8 +39,8 @@
  * </para><para>This is of course exactly the composition of two
  * binary relations.
  *
- * </para><para>Two two graphs must have the same directedness,
- * otherwise the function returns with an error message.
+ * </para><para>The two graphs must have the same directedness,
+ * otherwise the function returns with an error.
  * Note that for undirected graphs the two relations are by definition
  * symmetric.
  *
