@@ -281,13 +281,14 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * \function igraph_vs_vector
  * \brief Vertex set based on a vector.
  *
- * This function makes it possible to handle a \type vector_t
+ * This function makes it possible to handle an \type igraph_vector_t
  * temporarily as a vertex selector. The vertex selector should be
- * thought of like a \em view to the vector. If you make changes to
+ * thought of as a \em view into the vector. If you make changes to
  * the vector that also affects the vertex selector. Destroying the
- * vertex selector does not destroy the vector. (Of course.) Do not
- * destroy the vector before destroying the vertex selector, or you
- * might get strange behavior.
+ * vertex selector does not destroy the vector. Do not destroy the
+ * vector before destroying the vertex selector, or you might get
+ * strange behavior. This function that does check that the vertex IDs
+ * within the vector are valid.
  *
  * \param vs Pointer to an uninitialized vertex selector.
  * \param v Pointer to a \type igraph_vector_t object.
@@ -387,12 +388,13 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
  * \function igraph_vs_vector_copy
  * \brief Vertex set based on a vector, with copying.
  *
- * This function makes it possible to handle a \type vector_t
+ * This function makes it possible to handle an \type igraph_vector_t
  * permanently as a vertex selector. The vertex selector creates a
  * copy of the original vector, so the vector can safely be destroyed
  * after creating the vertex selector. Changing the original vector
  * will not affect the vertex selector. The vertex selector is
- * responsible for deleting the copy made by itself.
+ * responsible for deleting the copy made by itself. This function does
+ * not check that the vertex IDs in the vector are valid.
  *
  * \param vs Pointer to an uninitialized vertex selector.
  * \param v Pointer to a \type igraph_vector_t object.
@@ -994,15 +996,13 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
  * \function igraph_es_vector
  * \brief Handle a vector as an edge selector.
  *
- * </para><para>
- * Creates an edge selector which serves as a view to a vector
- * containing edge ids. Do not destroy the vector before destroying
- * the view.
- *
- * Many views can be created to the same vector.
+ * Creates an edge selector which serves as a view into a vector
+ * containing edge IDs. Do not destroy the vector before destroying
+ * the edge selector. This function does not check that the edge
+ * IDs are valid.
  *
  * \param es Pointer to an uninitialized edge selector.
- * \param v Vector containing edge ids.
+ * \param v Vector containing edge IDs.
  * \return Error code.
  * \sa \ref igraph_ess_vector(), \ref igraph_es_destroy()
  *
@@ -1020,13 +1020,13 @@ int igraph_es_vector(igraph_es_t *es,
  * \function igraph_es_vector_copy
  * \brief Edge set, based on a vector, with copying.
  *
- *
- * This function makes it possible to handle a \type vector_t
+ * This function makes it possible to handle an \type igraph_vector_t
  * permanently as an edge selector. The edge selector creates a
  * copy of the original vector, so the vector can safely be destroyed
  * after creating the edge selector. Changing the original vector
  * will not affect the edge selector. The edge selector is
- * responsible for deleting the copy made by itself.
+ * responsible for deleting the copy made by itself. This function
+ * does not check that the edge IDs are valid.
  *
  * \param es Pointer to an uninitialized edge selector.
  * \param v Pointer to a \type igraph_vector_t object.
