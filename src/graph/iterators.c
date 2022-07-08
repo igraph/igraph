@@ -362,9 +362,7 @@ igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
     igraph_vector_int_t* vec;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create vertex selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create vertex selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
     va_start(ap, vs);
@@ -418,9 +416,7 @@ igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs, const igraph_vector_int_t 
     igraph_vector_int_t* vec;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create vertex selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create vertex selector.");
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
@@ -567,9 +563,7 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
     switch (dest->type) {
     case IGRAPH_VS_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (!vec) {
-            IGRAPH_ERROR("Cannot copy vertex selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(vec, "Cannot copy vertex selector.");
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
         break;
@@ -637,9 +631,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         vec_len = igraph_vector_int_size(&vec);
         *result = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(*result, igraph_bool_t);
-        if (seen == 0) {
-            IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(seen, "Cannot calculate vertex selector length.");
         IGRAPH_FINALLY(igraph_free, seen);
         for (i = 0; i < vec_len; i++) {
             if (!seen[ VECTOR(vec)[i] ]) {
@@ -713,9 +705,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         break;
     case IGRAPH_VS_ADJ:
         vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (vec_int == 0) {
-            IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(vec_int, "Cannot create vertex iterator.");
         IGRAPH_FINALLY(igraph_free, vec_int);
         IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
@@ -738,9 +728,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         break;
     case IGRAPH_VS_NONADJ:
         vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (vec_int == 0) {
-            IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(vec_int, "Cannot create vertex iterator.");
         IGRAPH_FINALLY(igraph_free, vec_int);
         IGRAPH_VECTOR_INT_INIT_FINALLY(vec_int, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
@@ -748,9 +736,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         vec_len = igraph_vector_int_size(&vec);
         n = igraph_vcount(graph);
         seen = IGRAPH_CALLOC(n, igraph_bool_t);
-        if (seen == 0) {
-            IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(seen, "Cannot create vertex iterator.");
         IGRAPH_FINALLY(igraph_free, seen);
         for (i = 0; i < vec_len; i++) {
             if (! seen [ VECTOR(vec)[i] ] ) {
@@ -1077,9 +1063,7 @@ igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t 
     igraph_vector_int_t* vec;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
@@ -1205,9 +1189,7 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
     igraph_vector_int_t* vec;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
@@ -1249,9 +1231,7 @@ igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ..
     igraph_vector_int_t *vec;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
     va_start(ap, directed);
@@ -1304,9 +1284,7 @@ igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
     igraph_vector_int_t *vec;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
     IGRAPH_FINALLY_CLEAN(1);
@@ -1324,9 +1302,7 @@ igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...
     igraph_vector_int_t *vec;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
     va_start(ap, directed);
@@ -1452,18 +1428,14 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     switch (dest->type) {
     case IGRAPH_ES_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (!vec) {
-            IGRAPH_ERROR("Cannot copy edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
         break;
     case IGRAPH_ES_PATH:
     case IGRAPH_ES_PAIRS:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (!vec) {
-            IGRAPH_ERROR("Cannot copy edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.path.ptr));
         dest->data.path.ptr = vec;
         break;
@@ -1684,9 +1656,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
     igraph_integer_t i, j, length;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge iterator.");
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(vec, no_of_edges));
@@ -1695,8 +1665,8 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         igraph_vector_int_t adj;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_incident(graph, &adj, i, mode);
-            igraph_vector_int_append(vec, &adj);
+            IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
+            igraph_vector_int_append(vec, &adj);  /* reserved */
         }
         igraph_vector_int_destroy(&adj);
         IGRAPH_FINALLY_CLEAN(1);
@@ -1707,16 +1677,14 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         igraph_bool_t *added;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         added = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
-        if (added == 0) {
-            IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(added, "Cannot create edge iterator.");
         IGRAPH_FINALLY(igraph_free, added);
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_incident(graph, &adj, i, IGRAPH_ALL);
+            IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL));
             length = igraph_vector_int_size(&adj);
             for (j = 0; j < length; j++) {
                 if (!added[ VECTOR(adj)[j] ]) {
-                    igraph_vector_int_push_back(vec, VECTOR(adj)[j]);
+                    igraph_vector_int_push_back(vec, VECTOR(adj)[j]);  /* reserved */
                     added[ VECTOR(adj)[j] ] += 1;
                 }
             }
@@ -1746,9 +1714,7 @@ static igraph_error_t igraph_i_eit_create_incident(const igraph_t* graph,
     IGRAPH_CHECK(igraph_incident(graph, &vec, es.data.incident.vid, es.data.incident.mode));
 
     vec_int = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec_int == 0) {
-        IGRAPH_ERROR("Cannot create iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec_int, "Cannot create edge iterator.");
     IGRAPH_FINALLY(igraph_free, vec_int);
 
     n = igraph_vector_int_size(&vec);
@@ -1786,9 +1752,7 @@ static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
     }
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge iterator.");
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n / 2);
 
@@ -1830,9 +1794,7 @@ static igraph_error_t igraph_i_eit_path(const igraph_t *graph,
     }
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge iterator.");
     IGRAPH_FINALLY(igraph_free, vec);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, len);
@@ -1871,9 +1833,7 @@ static igraph_error_t igraph_i_eit_all_between(
     }
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
-    if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(vec, "Cannot create edge iterator.");
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
     IGRAPH_CHECK(igraph_get_all_eids_between(graph, vec, from, to, directed));
