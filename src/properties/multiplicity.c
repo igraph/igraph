@@ -272,27 +272,26 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
 
 /**
  * \function igraph_is_mutual
- * Check whether the edges of a directed graph are mutual.
+ * \brief Check whether some edges of a directed graph are mutual.
  *
- * An (A,B) edge is mutual if the graph contains the (B,A) edge, too.
- * </para>
+ * An (A,B) edge is mutual if the graph contains the (B,A) edge too.
  *
- * <para>An undirected graph only has mutual edges, by definition.
- * </para>
+ * </para><para>
+ * An undirected graph only has mutual edges, by definition.
  *
- * <para>Edge multiplicity is not considered here, e.g. if there are two
+ * </para><para>
+ * Edge multiplicity is not considered here, e.g. if there are two
  * (A,B) edges and one (B,A) edge, then all three are considered to be
  * mutual.
- * </para>
  *
- * <para>Loops are always mutual.
+ * </para><para>
+ * Self-loops are always mutual.
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
  *        here.
  * \param es The sequence of edges to check. Supply
- *        <code>igraph_ess_all()</code> for all edges, see \ref
- *        igraph_ess_all().
+ *        \ref igraph_ess_all() to check all edges.
  * \return Error code.
  *
  * Time complexity: O(n log(d)), n is the number of edges supplied, d
@@ -329,15 +328,10 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
         igraph_integer_t to = IGRAPH_TO(graph, edge);
 
         /* Check whether there is a to->from edge, search for from in the
-           out-list of to. We don't search an empty vector, because
-           vector_binsearch seems to have a bug with this. */
+           out-list of to */
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
         IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
-        if (igraph_vector_int_empty(neis)) {
-            VECTOR(*res)[i] = 0;
-        } else {
-            VECTOR(*res)[i] = igraph_vector_int_binsearch2(neis, from);
-        }
+        VECTOR(*res)[i] = igraph_vector_int_binsearch2(neis, from);
     }
 
     igraph_lazy_adjlist_destroy(&adjlist);
