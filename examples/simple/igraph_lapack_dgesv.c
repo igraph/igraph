@@ -108,7 +108,7 @@ int main() {
         return 5;
     }
     for (i = 0; i < DIM; i++) {
-        if (fabs(MATRIX(B, i, 0) - MATRIX(RHS, i, 0)) > 1e-13) {
+        if (fabs(MATRIX(B, i, 0) - MATRIX(RHS, i, 0)) > 1e-11) {
             return 6;
         }
     }

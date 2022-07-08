@@ -10,6 +10,8 @@ Some of the highlights are:
 
  - A consistent use of `igraph_integer_t` for all indices and most integer quantities, both in the API and internally. This type is 64-bit by default on all 64-bit systems, bringing support for very large graphs with more than 2 billion vertices. Previously, vertex and edge indices were often represented as `igraph_real_t`. The move to an `igraph_integer_t` also implies a change from `igraph_vector_t` to `igraph_vector_int_t` in many functions.
 
+ - The random number generation framework has been overhauled. Sampling from the full range of `igraph_integer_t` is now possible. Similarly, the sampling of random reals has been improved to utilize almost the full range of the mantissa of an `igraph_real_t`.
+
  - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most prevous uses of the non-managed `igraph_vector_ptr_t`.
 
  - File format readers are much more robust and more tolerant of invalid input.
@@ -25,6 +27,9 @@ Some of the highlights are:
    32 bits on 32-bit platforms and 64 bits on 64-bit platforms by default. You
    also have the option to compile a 32-bit igraph variant on a 64-bit platform
    by changing the `IGRAPH_INTEGER_SIZE` build variable in CMake to 32.
+
+ - The random number generator interface, `igraph_rng_type_t`, has been overhauled.
+   Check the declaration of the type for details.
 
  - Since `igraph_integer_t` aims to be the largest integer size that is feasible
    on a particular platform, there is no need for generic data types based on
@@ -84,6 +89,10 @@ Some of the highlights are:
 
  - `igraph_bfs_simple()` now takes `igraph_vector_int_t` for its `vids`,
    `layers` and `parents` arguments instead of an `igraph_vector_t`.
+
+ - `igraph_bfs_simple()` now returns -1 in `parents` for the root node of the
+   traversal, and -2 for unreachable vertices. This is now consistent with other
+   functions that return a parent vector.
 
  - `igraph_biconnected_components()` now uses an `igraph_vector_int_t` to return
    the list of articulation points, not an `igraph_vector_t`. Also, the container
@@ -485,6 +494,9 @@ Some of the highlights are:
  - `igraph_similarity_jaccard_pairs()` now uses an `igraph_vector_int_t` for its
    `pairs` parameter.
 
+ - `igraph_simple_interconnected_islands_game()` does not generate multi-edges
+   between islands any more.
+
  - `igraph_sort_vertex_ids_by_degree()` and `igraph_topological_sorting()` now
    use an `igraph_vector_int_t` to return the vertex IDs instead of an
    `igraph_vector_t`.
@@ -589,9 +601,8 @@ Some of the highlights are:
    `igraph_blas_dgemv_array()` thus now return an `igraph_error_t`, which may be
    set to `IGRAPH_EOVERFLOW` if the input vectors or matrices are too large.
 
- - `igraph_sparsemat_transpose()` now takes an `igraph_bool_t` as its `values`
-   argument instead of an `int`. In practice, it has always been treated as a
-   boolean.
+ - The `values` argument of `igraph_sparsemat_transpose()` was removed; now the
+   function always copies the values over to the transposed matrix.
 
  - `igraph_sparsemat_cholsol()`, `igraph_sparsemat_lusol()`, `igraph_sparsemat_symbqr`
    and `igraph_sparsemat_symblu` now take an `igraph_integer_t` as their `order` parameter.
@@ -674,8 +685,19 @@ Some of the highlights are:
    and `igraph_get_shortest_paths_dijkstra()` now use -1 to represent the starting vertex, and -2
    for unreachable vertices.
 
+ - `igraph_rng_seed()` now requires an `igraph_uint_t` as its seed arguments. RNG implementations are free to use only the lower bits of the seed if they do not support 64-bit seeds.
+
+ - `igraph_rngtype_rand` (i.e. the RNG that is based on BSD `rand()`) was removed due to poor statistical properties that sometimes resulted in weird artifacts like all-even "random" numbers when igraph's usage patterns happened to line up with the shortcomings of the `rand()` generator in a certain way.
+
+ - The default random number generator has been changed from Mersenne Twister to PCG32.
+
+ - `igraph_vector_minmax()` and `igraph_vector_which_minmax()` no longer return an error code. The return type is now `void`. These functions never fail.
+
+ - `igraph_matrix_minmax()`, `igraph_matrix_which_minmax()`, `igraph_matrix_which_min()` and `igraph_matrix_which_max()` no longer return an error code. The return type is now `void`. These functions never fail.
+
 ### Added
 
+ - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
  - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
@@ -700,11 +722,16 @@ Some of the highlights are:
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
  - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without re-allocating them.
  - `igraph_get_k_shortest_paths()` finds the k shortest paths between a source and a target vertex (#1763, thanks to @GroteGnoom)
- - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_paths_dijkstra()` and `igraph_widest_paths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
+ - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_path_widths_dijkstra()` and `igraph_widest_path_widths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
  - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix, with various kinds of normalizations. They replace the now-deprecated `igraph_laplacian()`. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
  - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
  - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
  - `igraph_graph_count()` gives the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
+ - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator.
+ - `igraph_rng_get_pois()` generates random variates from the Poisson distribution.
+ - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
+ - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
+ - `igraph_turan()` generates Turán graphs.
 
 ### Removed
 
@@ -729,6 +756,7 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
  - Foreign format readers now present more informative error messages.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
+ - It is now possible to overide the uniform integer and the Poisson samplers in the random number generator interface.
 
 ### Fixed
 
@@ -745,6 +773,7 @@ Some of the highlights are:
  - `igraph_matrix_complex_create()` and `igraph_matrix_complex_create_polar()` now set their sizes correctly.
  - The core data structures (vector, etc.) have overflow checks now.
  - Deterministic graph generators have overflow checks now.
+ - `igraph_sparsemat_getelements_sorted()` did not sort the elements for triplet matrices correctly; this is fixed now.
 
 ### Deprecated
 
@@ -843,6 +872,22 @@ Some of the highlights are:
 
 ## [Unreleased 0.9]
 
+### Added
+
+ - `igraph_reverse_edges()` reverses the specified edges in the graph while preserving all attributes.
+
+### Fixed
+
+ - Fixed incorrect results from `igraph_local_scan_1_ecount()` when the graph was directed but the mode was `IGRAPH_ALL` and some nodes had loop edges. See issue #2092.
+ - In some rare edge cases, `igraph_pagerank()` with the ARPACK method and `igraph_hub_score()` / `igraph_authority_score()` could return incorrect results. The problem could be detected by checking that the returned eigenvalue is not negative. See issue #2090.
+ - `igraph_permute_vertices()` now checks for out-of-range indices in the permutation vector.
+ - `igraph_create()` now checks for non-finite vertex indices in the edges vector.
+ - `igraph_eigenvector_centrality()` would return incorrect scores when some weights were negative.
+
+### Other
+
+ - Documentation improvement.
+
 ## [0.9.9] - 2022-06-04
 
 ### Changed
@@ -870,7 +915,7 @@ Some of the highlights are:
  - The initial coordinates of the Kamada-Kawai layout (`igraph_layout_kamada_kawai()` and `igraph_layout_kamada_kawai_3d()`) are chosen to be more in line with the original publication, improving the stability of the result. See isse #963. This changes the output of the function for the same graph, compared with previous versions. To obtain the same layout, initialize coordinates with `igraph_layout_circle()` (in 2D) or `igraph_layout_sphere()` (in 3D).
  - Improved numerical stability in Kamada-Kawai layout.
  - Corrected a problem in the calculation of displacements in `igraph_layout_fruchterman_reingold()` and its 3D version. This fixes using the "grid" variant of the algorithm on disconnected graphs.
- - `igraph_sumtree_search()` would consider search interval opens on the left and closed on the right, contrary to the documentation. This is now corrected to closed on the left and open on the right. In some cases this lead to a zero-weight element being returned for a zero search value. See issue #2080.
+ - `igraph_sumtree_search()` would consider search intervals open on the left and closed on the right, contrary to the documentation. This is now corrected to closed on the left and open on the right. In some cases this lead to a zero-weight element being returned for a zero search value. See issue #2080.
 
 ### Other
 

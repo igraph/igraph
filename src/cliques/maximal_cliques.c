@@ -477,7 +477,7 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
  */
 
 igraph_error_t igraph_maximal_cliques_subset(
-    const igraph_t *graph, igraph_vector_int_t *subset,
+    const igraph_t *graph, const igraph_vector_int_t *subset,
     igraph_vector_int_list_t *res, igraph_integer_t *no,
     FILE *outfile, igraph_integer_t min_size, igraph_integer_t max_size
 );
@@ -495,8 +495,8 @@ igraph_error_t igraph_maximal_cliques_subset(
  * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
  * callback function as a pointer to an \ref igraph_vector_int_t. The vector is
  * owned by the maximal clique search routine so users are expected to make a
- * copy of the vector usign \ref igraph_vector_int_copy() if they want to hold
- * on to it.
+ * copy of the vector usign \ref igraph_vector_int_init_copy() if they want to
+ * hold on to it.
  *
  * </para><para>
  * Edge directions are ignored.

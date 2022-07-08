@@ -225,7 +225,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                     igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -285,7 +285,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'A';
 
     if (weights == 0) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,

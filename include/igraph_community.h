@@ -69,12 +69,8 @@ IGRAPH_EXPORT igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                              igraph_real_t coolfact,
                                              igraph_spincomm_update_t update_rule,
                                              igraph_real_t gamma,
-                                       /* the rest is for the NegSpin implementation */
-                                       igraph_spinglass_implementation_t implementation,
-                                       /*                    igraph_matrix_t *adhesion, */
-                                       /*                    igraph_matrix_t *normalised_adhesion, */
-                                       /*                    igraph_real_t *polarization, */
-                                       igraph_real_t lambda);
+                                             igraph_spinglass_implementation_t implementation,
+                                             igraph_real_t gamma_minus);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                                     const igraph_vector_t *weights,

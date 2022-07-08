@@ -56,6 +56,7 @@ int doit(int which) {
 
     /* Triplet diagonal matrix */
 
+    printf("Triplet diagonal matrix\n");
     igraph_vector_init(&vec, N);
     igraph_vector_int_init(&pos, N);
     for (i = 0; i < N; i++) {
@@ -136,12 +137,14 @@ int doit(int which) {
 
     /* Random triplet matrix */
 
+    printf("Random triplet matrix\n");
     igraph_sparsemat_init(&A, /*rows=*/ N, /*cols=*/ M, /*nzmax=*/ NZ + 5);
     for (i = 0; i < NZ; i++) {
         int r = igraph_rng_get_integer(igraph_rng_default(), 0, N - 1);
         int c = igraph_rng_get_integer(igraph_rng_default(), 0, M - 1);
         igraph_real_t x = igraph_rng_get_integer(igraph_rng_default(),
                           -10, 10);
+        IGRAPH_ASSERT(x >= -10 && x <= 10);
         igraph_sparsemat_entry(&A, r, c, x);
     }
     if (which == MAX) {
@@ -161,6 +164,7 @@ int doit(int which) {
 
     /* Random compresssed matrix */
 
+    printf("Random compressed matrix\n");
     igraph_sparsemat_compress(&A, &A2);
 
     igraph_vector_null(&vec);
@@ -180,6 +184,7 @@ int doit(int which) {
 
     /* Matrix with zero rows, triplet */
 
+    printf("Matrix with zero rows, triplet\n");
     igraph_sparsemat_init(&A, /*rows=*/ 0, /*cols=*/ M, /*nzmax=*/ NZ);
     if (which == MAX) {
         igraph_sparsemat_scale(&A, -1.0);
@@ -199,6 +204,7 @@ int doit(int which) {
 
     /* Matrix with zero rows, compressed */
 
+    printf("Matrix with zero rows, compressed\n");
     igraph_sparsemat_compress(&A, &A2);
 
     igraph_vector_null(&vec);
@@ -219,6 +225,7 @@ int doit(int which) {
 
     /* Matrix with zero columns, triplet */
 
+    printf("Matrix with zero columns, triplet\n");
     igraph_sparsemat_init(&A, /*rows=*/ N, /*cols=*/ 0, /*nzmax=*/ NZ);
     if (which == MAX) {
         igraph_sparsemat_scale(&A, -1.0);
@@ -238,6 +245,7 @@ int doit(int which) {
 
     /* Matrix with zero columns, compressed */
 
+    printf("Matrix with zero columns, compressed\n");
     igraph_sparsemat_compress(&A, &A2);
 
     igraph_vector_null(&vec);

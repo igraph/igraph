@@ -122,6 +122,7 @@ igraph_error_t FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, igraph_int
 
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(capacity >= 0);
 
     current_capacity = FUNCTION(igraph_stack, capacity)(s);
 

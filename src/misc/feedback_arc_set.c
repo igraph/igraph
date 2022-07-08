@@ -31,6 +31,7 @@
 #include "igraph_visitor.h"
 
 #include "internal/glpk_support.h"
+#include "math/safe_intop.h"
 #include "misc/feedback_arc_set.h"
 
 #include <limits.h>
@@ -439,7 +440,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
 igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_int_t *result,
                                  const igraph_vector_t *weights) {
 #ifndef HAVE_GLPK
-    IGRAPH_ERROR("GLPK is not available", IGRAPH_UNIMPLEMENTED);
+    IGRAPH_ERROR("GLPK is not available.", IGRAPH_UNIMPLEMENTED);
 #else
 
     igraph_integer_t no_of_components;
@@ -448,7 +449,7 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
     igraph_vector_int_t membership, *vec;
     igraph_vector_int_t ordering, vertex_remapping;
     igraph_vector_int_list_t vertices_by_components, edges_by_components;
-    igraph_integer_t i, j, k, l, m, n, from, to, no_of_rows;
+    igraph_integer_t i, j, k, l, m, n, from, to, no_of_rows, n_choose_2;
     igraph_real_t weight;
     glp_prob *ip;
     glp_iocp parm;
@@ -490,8 +491,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
 
     /* Solve an IP for feedback arc sets in each of the components */
     for (i = 0; i < no_of_components; i++) {
-        igraph_vector_int_t* vertices_in_comp = igraph_vector_int_list_get_ptr(&vertices_by_components, i);
-        igraph_vector_int_t* edges_in_comp = igraph_vector_int_list_get_ptr(&edges_by_components, i);
+        igraph_vector_int_t *vertices_in_comp = igraph_vector_int_list_get_ptr(&vertices_by_components, i);
+        igraph_vector_int_t *edges_in_comp = igraph_vector_int_list_get_ptr(&edges_by_components, i);
 
         /*
          * Let x_ij denote whether layer(i) < layer(j).
@@ -528,14 +529,14 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         }
 
         /* Set up variables */
-        k = n * (n - 1) / 2;
-        if (k > INT_MAX) {
-            IGRAPH_ERROR("Feedback arc set problem too large for GLPK", IGRAPH_EOVERFLOW);
+        IGRAPH_SAFE_N_CHOOSE_2(n, &n_choose_2);
+        if (n_choose_2 > INT_MAX) {
+            IGRAPH_ERROR("Feedback arc set problem too large for GLPK.", IGRAPH_EOVERFLOW);
         }
 
-        if (k > 0) {
-            glp_add_cols(ip, (int) k);
-            for (j = 1; j <= k; j++) {
+        if (n_choose_2 > 0) {
+            glp_add_cols(ip, (int) n_choose_2);
+            for (j = 1; j <= n_choose_2; j++) {
                 glp_set_col_kind(ip, (int) j, GLP_BV);
             }
         }
@@ -563,9 +564,25 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
 
         /* Add constraints */
         if (n > 1) {
-            no_of_rows = n * (n - 1) / 2 + n * (n - 1) * (n - 2) / 3;
+            {
+                /* Overflow-safe block for:
+                 *   no_of_rows = n * (n - 1) / 2 + n * (n - 1) * (n - 2) / 3
+                 */
+
+                /* res = n * (n - 1) * (n - 2) / 3 */
+                igraph_integer_t mod = n % 3;
+                igraph_integer_t res = n / 3; /* same as (n - mod) / 3 */
+
+                mod = (mod + 1) % 3;
+                IGRAPH_SAFE_MULT(res, n - mod, &res);
+                mod = (mod + 1) % 3;
+                IGRAPH_SAFE_MULT(res, n - mod, &res);
+
+                /* no_of_rows = n * (n - 1) / 2 + res */
+                IGRAPH_SAFE_ADD(n_choose_2, res, &no_of_rows);
+            }
             if (no_of_rows > INT_MAX) {
-                IGRAPH_ERROR("Feedback arc set problem too large for GLPK", IGRAPH_EOVERFLOW);
+                IGRAPH_ERROR("Feedback arc set problem too large for GLPK.", IGRAPH_EOVERFLOW);
             }
             glp_add_rows(ip, (int) no_of_rows);
             m = 1;
@@ -600,9 +617,8 @@ igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector
         /* Find the ordering of the vertices */
         IGRAPH_CHECK(igraph_vector_int_resize(&ordering, n));
         igraph_vector_int_null(&ordering);
-        m = n * (n - 1) / 2;
         j = 0; k = 1;
-        for (l = 1; l <= m; l++) {
+        for (l = 1; l <= n_choose_2; l++) {
             /* variable l always corresponds to the (j, k) vertex pair */
             /* printf("(%ld, %ld) = %g\n", i, j, glp_mip_col_val(ip, l)); */
             if (glp_mip_col_val(ip, (int) l) > 0) {

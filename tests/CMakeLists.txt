@@ -204,6 +204,7 @@ add_legacy_tests(
   igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
+  igraph_full_multipartite
   igraph_generalized_petersen
   igraph_grg_game
   igraph_growing_random_game
@@ -220,6 +221,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_square_lattice
   igraph_static_power_law_game
+  igraph_turan
   igraph_wheel
   igraph_weighted_adjacency
   kary_tree
@@ -314,6 +316,7 @@ add_legacy_tests(
   igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_path_length_hist
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
@@ -508,6 +511,7 @@ add_legacy_tests(
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
+  igraph_reverse_edges
   igraph_rewire_directed_edges
 )
 
@@ -777,12 +781,11 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_rng_get_exp
   igraph_rng_get_integer
   mt
   random_sampling
   rng_reproducibility
-  rng_init_destroy_max_min_name_set_default
+  rng_init_destroy_max_bits_name_set_default
 )
 
 # qsort.at

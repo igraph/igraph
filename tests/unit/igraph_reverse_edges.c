@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge, MA, 02138 USA
+   Copyright (C) 2022 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,19 +16,31 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
-#include <igraph.h>
+#include "test_utilities.h"
 
 int main() {
+    igraph_t graph;
 
-    int i;
+    igraph_small(&graph, 0, IGRAPH_DIRECTED,
+                 0,1, 1,2, 2,3, 3,1, 1,4,
+                 -1);
 
-    igraph_rng_seed(igraph_rng_default(), 42);
-    for (i = 0; i < 1000; i++) {
-        printf("%g\n", igraph_rng_get_exp(igraph_rng_default(), 2.5));
-    }
+    printf("Original graph:\n");
+    print_graph(&graph);
+
+    printf("Reverse one edge:\n");
+    igraph_reverse_edges(&graph, igraph_ess_1(2));
+    print_graph(&graph);
+
+    printf("Reverse all edges:\n");
+    igraph_reverse_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID));
+    print_graph(&graph);
+
+    igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

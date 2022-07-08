@@ -105,7 +105,7 @@ int main() {
     igraph_destroy(&G);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_print(&B, stdout);
-    igraph_sparsemat_transpose(&B, &C, /*values=*/ 1);
+    igraph_sparsemat_transpose(&B, &C);
     igraph_sparsemat_print(&C, stdout);
     igraph_sparsemat_destroy(&A);
     igraph_sparsemat_destroy(&B);

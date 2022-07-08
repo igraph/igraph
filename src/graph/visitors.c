@@ -329,8 +329,8 @@ cleanup:
  * \param parents If not a null pointer, then an initialized vector must be
  *        passed here. The vector will be resized so its length is equal to the
  *        number of nodes, and it will contain the index of the parent node for
- *        each \em visited node. The values in the vector are undefined for
- *        vertices that were \em not visited.
+ *        each \em visited node. The values in the vector are set to -2 for
+ *        vertices that were \em not visited, and -1 for the root vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -338,9 +338,11 @@ cleanup:
  *
  * \example examples/simple/igraph_bfs_simple.c
  */
-igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
-                      igraph_vector_int_t *order, igraph_vector_int_t *layers,
-                      igraph_vector_int_t *parents) {
+igraph_error_t igraph_bfs_simple(
+    const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+    igraph_vector_int_t *order, igraph_vector_int_t *layers,
+    igraph_vector_int_t *parents
+) {
 
     igraph_dqueue_int_t q;
     igraph_integer_t num_visited = 0;
@@ -378,6 +380,7 @@ igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_integer_t root, i
     }
     if (parents) {
         IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
+        igraph_vector_int_fill(parents, -2);
     }
 
     /* ok start with root */
@@ -390,7 +393,7 @@ igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_integer_t root, i
         IGRAPH_CHECK(igraph_vector_int_push_back(order, root));
     }
     if (parents) {
-        VECTOR(*parents)[root] = root;
+        VECTOR(*parents)[root] = -1;
     }
     num_visited++;
     added[root] = 1;

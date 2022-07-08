@@ -6,15 +6,18 @@
 The igraph library
 ------------------
 
-igraph is a C library for creating, manipulating and analysing graphs.
-It is intended to be as powerful (i.e. fast) as possible to enable
-working with large graphs.
+igraph is a C library for complex network analysis and graph theory, with
+emphasis on efficiency, portability and ease of use.
 
-See https://igraph.org for installation instructions
-and documentation.
+See https://igraph.org for installation instructions and documentation.
 
 igraph can also be used from:
 
  - R — https://github.com/igraph/rigraph
  - Python — https://github.com/igraph/python-igraph
  - Mathematica — https://github.com/szhorvat/IGraphM
+
+igraph is a collaborative work of many people from all around the world —
+see the [list of contributors here](./CONTRIBUTORS.md). If you would like
+to contribute yourself, [click here to see how you can
+help](./CONTRIBUTING.md).

@@ -531,7 +531,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     }
 
     if (steps < 0 || steps > no_of_nodes - 1) {
-        steps = no_of_nodes - 1;
+        steps = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     }
 
     if (!membership) {

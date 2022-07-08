@@ -2458,7 +2458,7 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     igraph_real_t flow_value;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Gomory-Hu tree can only be calculated for undirected graphs",
+        IGRAPH_ERROR("Gomory-Hu tree can only be calculated for undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
@@ -2510,7 +2510,7 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     IGRAPH_PROGRESS("Gomory-Hu tree", 100.0, 0);
 
     /* Re-use the 'partition' vector as an edge list now */
-    IGRAPH_CHECK(igraph_vector_int_resize(&partition, 2 * (no_of_nodes - 1)));
+    IGRAPH_CHECK(igraph_vector_int_resize(&partition, no_of_nodes > 0 ? 2 * (no_of_nodes - 1) : 0));
     for (i = 1, mid = 0; i < no_of_nodes; i++, mid += 2) {
         VECTOR(partition)[mid]   = i;
         VECTOR(partition)[mid + 1] = VECTOR(neighbors)[i];

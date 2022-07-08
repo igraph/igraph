@@ -29,9 +29,6 @@
 #include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
-#include "igraph_matrix.h"
-#include "igraph_iterators.h"
 #include "igraph_vector_list.h"
 
 __BEGIN_DECLS
@@ -182,8 +179,8 @@ IGRAPH_EXPORT igraph_error_t igraph_eccentricity(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                                 igraph_neimode_t mode);
 
-IGRAPH_EXPORT igraph_error_t igraph_graph_center(const igraph_t *graph, 
-                                 igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_graph_center(const igraph_t *graph,
+                                 igraph_vector_int_t *res,
                                  igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
@@ -238,8 +235,8 @@ IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph
                                                            igraph_real_t *result);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
-                                             igraph_vector_ptr_t *vertices,
-                                             igraph_vector_ptr_t *edges,
+                                             igraph_vector_int_list_t *vertices,
+                                             igraph_vector_int_list_t *edges,
                                              igraph_integer_t from,
                                              igraph_vs_t to,
                                              const igraph_vector_t *weights,
@@ -253,13 +250,13 @@ IGRAPH_EXPORT igraph_error_t igraph_get_widest_path(const igraph_t *graph,
                                              igraph_integer_t to,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_widest_paths_floyd_warshall(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
                                                    igraph_matrix_t *res,
                                                    const igraph_vs_t from,
                                                    const igraph_vs_t to,
                                                    const igraph_vector_t *weights,
                                                    igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_widest_paths_dijkstra(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                                              igraph_matrix_t *res,
                                              const igraph_vs_t from,
                                              const igraph_vs_t to,

@@ -495,7 +495,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     options->n = (int) no_of_nodes;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'R';
     options->start = 1;       /* no random start vector */
 
     directed = directed && igraph_is_directed(graph);
@@ -508,7 +508,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (igraph_is_nan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }

@@ -167,6 +167,10 @@ void *thread_function(void *arg) {
         VECTOR(*result)[i] = v[i];
     }
 
+    if (VECTOR(*result)[0] < 0) {
+        igraph_vector_scale(result, -1.0);
+    }
+
     free(v);
     free(workl);
     free(workd);

@@ -30,6 +30,7 @@
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"
 #include "igraph_graphicality.h"
+#include "igraph_sparsemat.h"
 
 __BEGIN_DECLS
 
@@ -47,6 +48,8 @@ IGRAPH_EXPORT igraph_error_t igraph_adjacency(
 IGRAPH_EXPORT igraph_error_t igraph_weighted_adjacency(
         igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
         igraph_vector_t *weights, igraph_loops_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_sparse_weighted_adjacency(igraph_t *graph, igraph_sparsemat_t *adjmatrix, igraph_adjacency_t mode, igraph_vector_t *weights, igraph_loops_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
                               igraph_integer_t center);
 IGRAPH_EXPORT igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
@@ -67,6 +70,9 @@ IGRAPH_EXPORT igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer
                                                  igraph_tree_mode_t type);
 IGRAPH_EXPORT igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer);
 IGRAPH_EXPORT igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_full_multipartite(igraph_t *graph, igraph_vector_int_t *types, const igraph_vector_int_t *n,
+                                        igraph_bool_t directed, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_turan(igraph_t *graph, igraph_vector_int_t *types, igraph_integer_t n, igraph_integer_t r);
 IGRAPH_EXPORT igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
                                        igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number);

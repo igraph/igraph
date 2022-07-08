@@ -65,7 +65,7 @@ int main() {
     printf("Full graph of 50 vertices, motif size 3, sample first 40:\n");
     call_and_print(&g_50_full, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 0, &parsample);
 
-    printf("Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300:\n");
+    printf("Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300):\n");
     call_and_print(&g_50_full, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 20, /*parsample*/ NULL);
 
     printf("Triangle and a vertex, motif size 4, sample all:\n");

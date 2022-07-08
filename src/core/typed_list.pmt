@@ -200,6 +200,7 @@ igraph_error_t FUNCTION(reserve)(TYPE* v, igraph_integer_t capacity) {
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(capacity >= 0);
 
     current_capacity = FUNCTION(capacity)(v);
 

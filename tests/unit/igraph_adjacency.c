@@ -20,16 +20,47 @@
 
 void print_destroy(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops) {
     igraph_t g;
+    igraph_t g_sparse;
+    igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
+    igraph_bool_t same;
 
     igraph_adjacency(&g, adjmatrix, mode, loops);
+
+    igraph_matrix_as_sparsemat(&sparse_adjmatrix, adjmatrix, 0.0001);
+    igraph_sparsemat_compress(&sparse_adjmatrix, &sparse_adjmatrix_comp);
+    igraph_sparse_adjacency(&g_sparse, &sparse_adjmatrix_comp, mode, loops);
     print_graph_canon(&g);
+
+    igraph_is_same_graph(&g, &g_sparse, &same);
+    if (!same) {
+        printf("Sparse graph differs from non-sparse:\n");
+        print_graph_canon(&g_sparse);
+        exit(1);
+    }
+
     igraph_matrix_destroy(adjmatrix);
+    igraph_sparsemat_destroy(&sparse_adjmatrix);
+    igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
     igraph_destroy(&g);
+    igraph_destroy(&g_sparse);
+}
+
+void check_error(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops, igraph_error_t error) {
+    igraph_t g;
+    igraph_sparsemat_t sparse_adjmatrix, sparse_adjmatrix_comp;
+
+    igraph_matrix_as_sparsemat(&sparse_adjmatrix, adjmatrix, 0.0001);
+    igraph_sparsemat_compress(&sparse_adjmatrix, &sparse_adjmatrix_comp);
+
+    CHECK_ERROR(igraph_adjacency(&g, adjmatrix, mode, loops), error);
+    CHECK_ERROR(igraph_sparse_adjacency(&g, &sparse_adjmatrix_comp, mode, loops), error);
+
+    igraph_sparsemat_destroy(&sparse_adjmatrix);
+    igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
 }
 
 int main() {
     igraph_matrix_t adjmatrix;
-    igraph_t g;
 
     printf("\n0x0 matrix:\n");
     matrix_init_int_row_major(&adjmatrix, 0, 0, NULL);
@@ -74,19 +105,19 @@ int main() {
     }
     printf("\n3x3 matrix, IGRAPH_ADJ_UNDIRECTED, no loops:\n");
     {
-        int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
+        int e[] = {4, 2, 0, 2, 0, 4, 0, 4, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_NO_LOOPS);
     }
     printf("\n3x3 matrix, IGRAPH_ADJ_UNDIRECTED, loops once:\n");
     {
-        int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
+        int e[] = {4, 2, 0, 2, 0, 4, 0, 4, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_ONCE);
     }
     printf("\n3x3 matrix, IGRAPH_ADJ_UNDIRECTED, loops twice:\n");
     {
-        int e[] = {4, 2, 0, 3, 0, 4, 0, 5, 6};
+        int e[] = {4, 2, 0, 2, 0, 4, 0, 4, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
         print_destroy(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_TWICE);
     }
@@ -187,28 +218,35 @@ int main() {
     {
         int e[] = {1, 2, 0};
         matrix_init_int_row_major(&adjmatrix, 3, 1, e);
-        CHECK_ERROR(igraph_adjacency(&g, &adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS), IGRAPH_NONSQUARE);
+        check_error(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NONSQUARE);
         igraph_matrix_destroy(&adjmatrix);
     }
     printf("\nCheck handling of negative number of edges error.\n");
     {
         int e[] = {1, 2, 0, -3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
-        CHECK_ERROR(igraph_adjacency(&g, &adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS), IGRAPH_EINVAL);
+        check_error(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_EINVAL);
         igraph_matrix_destroy(&adjmatrix);
     }
     printf("\nCheck handling of odd number in diagonal.\n");
     {
         int e[] = {1, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
-        CHECK_ERROR(igraph_adjacency(&g, &adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_TWICE), IGRAPH_EINVAL);
+        check_error(&adjmatrix, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
         igraph_matrix_destroy(&adjmatrix);
     }
     printf("\nCheck handling of invalid adjacency mode.\n");
     {
         int e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
-        CHECK_ERROR(igraph_adjacency(&g, &adjmatrix, 42, IGRAPH_LOOPS_TWICE), IGRAPH_EINVAL);
+        check_error(&adjmatrix, 42, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
+        igraph_matrix_destroy(&adjmatrix);
+    }
+    printf("\nCheck handling of non-symmetric matrix for IGRAPH_ADJ_UNDIRECTED.\n");
+    {
+        int e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
+        matrix_init_int_row_major(&adjmatrix, 3, 3, e);
+        check_error(&adjmatrix, IGRAPH_ADJ_UNDIRECTED, IGRAPH_LOOPS_ONCE, IGRAPH_EINVAL);
         igraph_matrix_destroy(&adjmatrix);
     }
 
