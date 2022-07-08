@@ -48,9 +48,9 @@ int main() {
     print_graph_canon(&g);
     igraph_destroy(&g);
 
-    printf("Three islands, full graphs, max 20 connections between islands.\n");
+    printf("Three islands, full graphs, 16 connections between islands.\n");
     IGRAPH_ASSERT(igraph_simple_interconnected_islands_game(&g, /*number of islands*/3, /*size of islands*/ 4,
-                  /*islands_pin*/ 1, /*number of edges between two islands*/ 20) == IGRAPH_SUCCESS);
+                  /*islands_pin*/ 1, /*number of edges between two islands*/ 16) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_ecount(&g) == 18 + 48);
     igraph_destroy(&g);
 
@@ -81,6 +81,11 @@ int main() {
     printf("Negative number of edges between islands.\n");
     IGRAPH_ASSERT(igraph_simple_interconnected_islands_game(&g, /*number of islands*/2, /*size of islands*/ 4,
                   /*islands_pin*/ 1, /*number of edges between two islands*/ -3) == IGRAPH_EINVAL);
+    igraph_destroy(&g);
+
+    printf("Too many edges between islands.\n");
+    IGRAPH_ASSERT(igraph_simple_interconnected_islands_game(&g, /*number of islands*/3, /*size of islands*/ 4,
+                  /*islands_pin*/ 1, /*number of edges between two islands*/ 20) == IGRAPH_EINVAL);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
