@@ -336,15 +336,12 @@ int igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es
         long int to = IGRAPH_TO(graph, edge);
 
         /* Check whether there is a to->from edge, search for from in the
-           out-list of to. We don't search an empty vector, because
-           vector_binsearch seems to have a bug with this. */
-        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                (igraph_integer_t) to);
-        if (igraph_vector_int_empty(neis)) {
-            VECTOR(*res)[i] = 0;
-        } else {
-            VECTOR(*res)[i] = igraph_vector_int_binsearch2(neis, from);
+           out-list of to */
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) to);
+        if (neis == NULL) {
+            IGRAPH_ERROR("Failed to query neighbors.", IGRAPH_ENOMEM);
         }
+        VECTOR(*res)[i] = igraph_vector_int_binsearch2(neis, from);
     }
 
     igraph_lazy_adjlist_destroy(&adjlist);

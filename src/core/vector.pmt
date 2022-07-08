@@ -1877,6 +1877,7 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  * position of where it should be inserted (to keep the vector sorted)
  * is returned. If the vector contains any NaN values, the returned
  * value is undefined and \p pos may point to any position.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to a \type long int. This is set to the
@@ -1905,13 +1906,15 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  * \brief Finds an element by binary searching a sorted slice of a vector.
  *
  * </para><para>
-
  * It is assumed that the indicated slice of the vector, from \p start to \p end,
  * is sorted. If the specified element (\p what) is not in the slice of the
- * vector, then the position of where it should be inserted (to keep the vector
- * sorted) is returned. If the indicated slice contains any NaN values, the
+ * vector, then the position of where it should be inserted (to keep the \em slice
+ * sorted) is returned. Note that this means that the returned index will point
+ * \em inside the slice (including its endpoints), but will not evaluate values
+ * \em outside the slice. If the indicated slice contains any NaN values, the
  * returned value is undefined and \c pos may point to any position within
  * the slice.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to a \type long int. This is set to the position of an
