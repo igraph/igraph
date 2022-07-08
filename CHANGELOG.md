@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_reverse_edges()` reverses the specified edges in the graph while preserving all attributes.
+
 ### Fixed
 
  - Fixed incorrect results from `igraph_local_scan_1_ecount()` when the graph was directed but the mode was `IGRAPH_ALL` and some nodes had loop edges. See issue #2092.
