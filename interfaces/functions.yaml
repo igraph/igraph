@@ -526,7 +526,7 @@ igraph_subgraph_edges:
     DEPS: eids ON graph
 
 igraph_reverse_edges:
-    PARAMS: INOUT GRAPH graph, EDGESET eids
+    PARAMS: INOUT GRAPH graph, EDGESET eids=ALL
     DEPS: eids ON graph
 
 igraph_average_path_length:
