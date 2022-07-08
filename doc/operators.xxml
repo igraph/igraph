@@ -29,6 +29,7 @@
 <!-- doxrox-include igraph_linegraph -->
 <!-- doxrox-include igraph_simplify -->
 <!-- doxrox-include igraph_subgraph_edges -->
+<!-- doxrox-include igraph_reverse_edges -->
 </section>
 
 </chapter>

@@ -525,6 +525,10 @@ igraph_subgraph_edges:
     PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
     DEPS: eids ON graph
 
+igraph_reverse_edges:
+    PARAMS: INOUT GRAPH graph, EDGESET eids
+    DEPS: eids ON graph
+
 igraph_average_path_length:
     PARAMS: GRAPH graph, PRIMARY OUT REAL res, OUT REAL unconn_pairs=NULL,
         BOOLEAN directed=True, BOOLEAN unconn=True
