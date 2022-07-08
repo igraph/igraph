@@ -227,6 +227,7 @@ add_library(
   operators/intersection.c
   operators/misc_internal.c
   operators/permute.c
+  operators/reverse.c
   operators/rewire.c
   operators/rewire_edges.c
   operators/simplify.c
