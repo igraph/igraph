@@ -290,8 +290,9 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
  * the vector that also affects the vertex selector. Destroying the
  * vertex selector does not destroy the vector. Do not destroy the
  * vector before destroying the vertex selector, or you might get
- * strange behavior. This function that does check that the vertex IDs
- * within the vector are valid.
+ * strange behavior. Since selectors are not tied to any specific
+ * graph, this function does not check whether the vertex IDs in
+ * the vector are valid.
  *
  * \param vs Pointer to an uninitialized vertex selector.
  * \param v Pointer to a \type igraph_vector_int_t object.
@@ -335,15 +336,15 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_int_t *v) {
  * \function igraph_vs_vector_small
  * \brief Create a vertex set by giving its elements.
  *
- * This function can be used to create a vertex selector with a couple
+ * This function can be used to create a vertex selector with a few
  * of vertices. Do not forget to include a <code>-1</code> after the
  * last vertex ID. The behavior of the function is undefined if you
  * don't use a <code>-1</code> properly.
  *
  * </para><para>
- * Note that the vertex IDs supplied will be parsed as
- * <code>int</code>'s so you cannot supply arbitrarily large (too
- * large for int) vertex IDs here.
+ * Note that the vertex IDs supplied will be parsed as value of type
+ * \type int so you cannot supply arbitrarily large (too
+ * large for \type int) vertex IDs here.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
  * \param ... Additional parameters, these will be the vertex IDs to
@@ -401,8 +402,9 @@ igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
  * copy of the original vector, so the vector can safely be destroyed
  * after creating the vertex selector. Changing the original vector
  * will not affect the vertex selector. The vertex selector is
- * responsible for deleting the copy made by itself. This function does
- * not check that the vertex IDs in the vector are valid.
+ * responsible for deleting the copy made by itself. Since selectors
+ * are not tied to any specific graph, this function does not check whether
+ * the vertex IDs in the vector are valid.
  *
  * \param vs Pointer to an uninitialized vertex selector.
  * \param v Pointer to a \type igraph_vector_int_t object.
@@ -524,11 +526,11 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
  * by \ref igraph_vs_all() or \ref igraph_vss_all(). Note that the
  * vertex selector might contain all vertices in a given graph but if
  * it wasn't created by the two constructors mentioned here the return
- * value will be FALSE.
+ * value will be \c FALSE.
  *
  * \param vs Pointer to a vertex selector object.
- * \return TRUE (1) if the vertex selector contains all vertices and
- *         FALSE (0) otherwise.
+ * \return \c TRUE (1) if the vertex selector contains all vertices and
+ *         \c FALSE (0) otherwise.
  *
  * Time complexity: O(1).
  */
@@ -553,6 +555,7 @@ igraph_error_t igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
 /**
  * \function igraph_vs_copy
  * \brief Creates a copy of a vertex selector.
+ *
  * \param src The selector being copied.
  * \param dest An uninitialized selector that will contain the copy.
  */
@@ -784,7 +787,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         vit->start = vs.data.vid;
         vit->end = vs.data.vid + 1;
         if (vit->pos >= igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID.", IGRAPH_EINVVID);
         }
         break;
     case IGRAPH_VS_VECTORPTR:
@@ -795,7 +798,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         vit->vec = vs.data.vecptr;
         vit->end = igraph_vector_int_size(vit->vec);
         if (!igraph_vector_int_isininterval(vit->vec, 0, igraph_vcount(graph) - 1)) {
-            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID", IGRAPH_EINVVID);
+            IGRAPH_ERROR("Cannot create iterator, invalid vertex ID.", IGRAPH_EINVVID);
         }
         break;
     case IGRAPH_VS_SEQ:
@@ -805,7 +808,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         vit->end = vs.data.seq.to;
         break;
     default:
-        IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot create iterator, invalid selector.", IGRAPH_EINVAL);
         break;
     }
     return IGRAPH_SUCCESS;
@@ -878,7 +881,7 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t
  *        \c IGRAPH_EDGEORDER_FROM, vertex ID order, the id of the
  *           \em source vertex counts for directed graphs. The order
  *           of the incident edges of a given vertex is arbitrary.
- *        \c IGRAPH_EDGEORDER_TO, vertex ID order, the id of the \em
+ *        \c IGRAPH_EDGEORDER_TO, vertex ID order, the ID of the \em
  *           target vertex counts for directed graphs. The order
  *           of the incident edges of a given vertex is arbitrary.
  *        For undirected graph the latter two is the same.
@@ -901,7 +904,7 @@ igraph_error_t igraph_es_all(igraph_es_t *es,
         es->type = IGRAPH_ES_ALLTO;
         break;
     default:
-        IGRAPH_ERROR("Invalid edge order, cannot create selector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid edge order, cannot create selector.", IGRAPH_EINVAL);
         break;
     }
     return IGRAPH_SUCCESS;
@@ -932,7 +935,7 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
  * \brief Edges incident on a given vertex.
  *
  * \param es Pointer to an uninitialized edge selector object.
- * \param vid Vertex id, of which the incident edges will be
+ * \param vid Vertex ID, of which the incident edges will be
  *        selected.
  * \param mode Constant giving the type of the incident edges to
  *        select. This is ignored for undirected graphs. Possible values:
@@ -994,7 +997,7 @@ igraph_es_t igraph_ess_none(void) {
  * \brief Edge selector containing a single edge.
  *
  * \param es Pointer to an uninitialized edge selector object.
- * \param eid Edge id of the edge to select.
+ * \param eid Edge ID of the edge to select.
  * \return Error code.
  * \sa \ref igraph_ess_1(), \ref igraph_es_destroy()
  *
@@ -1011,7 +1014,7 @@ igraph_error_t igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
  * \function igraph_ess_1
  * \brief Immediate version of the single edge edge selector.
  *
- * \param eid The id of the edge.
+ * \param eid The ID of the edge.
  * \return The edge selector.
  * \sa \ref igraph_es_1()
  *
@@ -1031,8 +1034,9 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
  *
  * Creates an edge selector which serves as a view into a vector
  * containing edge IDs. Do not destroy the vector before destroying
- * the edge selector. This function does not check that the edge
- * IDs are valid.
+ * the edge selector. Since selectors are not tied to any specific
+ * graph, this function does not check whether the edge IDs in
+ * the vector are valid.
  *
  * \param es Pointer to an uninitialized edge selector.
  * \param v Vector containing edge IDs.
@@ -1057,8 +1061,9 @@ igraph_error_t igraph_es_vector(igraph_es_t *es, const igraph_vector_int_t *v) {
  * copy of the original vector, so the vector can safely be destroyed
  * after creating the edge selector. Changing the original vector
  * will not affect the edge selector. The edge selector is
- * responsible for deleting the copy made by itself. This function
- * does not check that the edge IDs are valid.
+ * responsible for deleting the copy made by itself. Since selectors
+ * are not tied to any specific graph, this function does not check
+ * whether the edge IDs in the vector are valid.
  *
  * \param es Pointer to an uninitialized edge selector.
  * \param v Pointer to a \type igraph_vector_int_t object.
@@ -1073,7 +1078,7 @@ igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t 
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
@@ -1089,7 +1094,6 @@ igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t 
  * \function igraph_ess_vector
  * \brief Immediate vector view edge selector.
  *
- * </para><para>
  * This is the immediate version of the vector of edge IDs edge
  * selector.
  *
@@ -1111,7 +1115,6 @@ igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v) {
  * \function igraph_es_fromto
  * \brief Edge selector, all edges between two vertex sets.
  *
- * </para><para>
  * This function is not implemented yet.
  *
  * \param es Pointer to an uninitialized edge selector.
@@ -1127,7 +1130,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v) {
 
 igraph_error_t igraph_es_fromto(igraph_es_t *es, igraph_vs_t from, igraph_vs_t to) {
     IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
-    IGRAPH_ERROR("igraph_es_fromto not implemented yet", IGRAPH_UNIMPLEMENTED);
+    IGRAPH_ERROR("igraph_es_fromto not implemented yet.", IGRAPH_UNIMPLEMENTED);
     /* TODO */
 }
 
@@ -1203,7 +1206,7 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
@@ -1247,7 +1250,7 @@ igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ..
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
 
@@ -1288,7 +1291,7 @@ igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ..
  * to create an iterator using this selector will fail.
  *
  * \param es Pointer to an uninitialized edge selector object.
- * \param v Pointer to a vector of vertex ID's along the path.
+ * \param v Pointer to a vector of vertex IDs along the path.
  * \param directed If edge directions should be taken into account. This
  *                 will be ignored if the graph to select from is undirected.
  * \return Error code.
@@ -1302,7 +1305,7 @@ igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_CHECK(igraph_vector_int_init_copy(vec, v));
@@ -1322,7 +1325,7 @@ igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
 
@@ -1385,7 +1388,6 @@ IGRAPH_EXPORT igraph_error_t igraph_es_all_between(
  * \function igraph_es_destroy
  * \brief Destroys an edge selector object.
  *
- * </para><para>
  * Call this function on an edge selector when it is not needed any
  * more. Do \em not call this function on edge selectors created by
  * immediate constructors, those don't need to be destroyed.
@@ -1451,7 +1453,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     case IGRAPH_ES_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (!vec) {
-            IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Cannot copy edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
@@ -1460,7 +1462,7 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     case IGRAPH_ES_PAIRS:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (!vec) {
-            IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Cannot copy edge selector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.path.ptr));
         dest->data.path.ptr = vec;
@@ -1584,7 +1586,7 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
         return IGRAPH_SUCCESS;
 
     default:
-        IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
+        IGRAPH_ERROR("Cannot calculate selector length, invalid selector type.",
                      IGRAPH_EINVAL);
     }
 }
@@ -1595,11 +1597,11 @@ static igraph_error_t igraph_i_es_pairs_size(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (n % 2 != 0) {
-        IGRAPH_ERROR("Cannot calculate edge selector length from odd number of vertices",
+        IGRAPH_ERROR("Cannot calculate edge selector length from odd number of vertices.",
                      IGRAPH_EINVAL);
     }
     if (!igraph_vector_int_isininterval(es->data.path.ptr, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot calculate edge selector length.", IGRAPH_EINVVID);
     }
 
     *result = n / 2;
@@ -1621,7 +1623,7 @@ static igraph_error_t igraph_i_es_path_size(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (!igraph_vector_int_isininterval(es->data.path.ptr, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot calculate selector length.", IGRAPH_EINVVID);
     }
 
     if (n <= 1) {
@@ -1649,7 +1651,7 @@ static igraph_error_t igraph_i_es_all_between_size(const igraph_t *graph,
     igraph_vector_int_t vec;
 
     if (from < 0 || from >= no_of_nodes || to < 0 || to >= no_of_nodes) {
-        IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot calculate selector length.", IGRAPH_EINVVID);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
@@ -1683,7 +1685,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
@@ -1706,7 +1708,7 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         added = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
         if (added == 0) {
-            IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, added);
         for (i = 0; i < no_of_nodes; i++) {
@@ -1776,16 +1778,16 @@ static igraph_error_t igraph_i_eit_pairs(const igraph_t *graph,
     igraph_vector_int_t* vec;
 
     if (n % 2 != 0) {
-        IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
+        IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices.",
                      IGRAPH_EINVAL);
     }
     if (!igraph_vector_int_isininterval(es.data.path.ptr, 0, no_of_nodes - 1)) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_EINVVID);
     }
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     if (vec == 0) {
-        IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot create edge iterator.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vec);
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n / 2);
