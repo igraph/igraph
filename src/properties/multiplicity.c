@@ -282,23 +282,18 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  * \function igraph_is_mutual
  * \brief Check whether some edges of a directed graph are mutual.
  *
- * <para>
  * An (A,B) edge is mutual if the graph contains the (B,A) edge too.
- * </para>
  *
- * <para>
+ * </para><para>
  * An undirected graph only has mutual edges, by definition.
- * </para>
  *
- * <para>
+ * </para><para>
  * Edge multiplicity is not considered here, e.g. if there are two
  * (A,B) edges and one (B,A) edge, then all three are considered to be
  * mutual.
- * </para>
  *
- * <para>
+ * </para><para>
  * Self-loops are always mutual.
- * </para>
  *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
