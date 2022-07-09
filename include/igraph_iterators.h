@@ -52,9 +52,9 @@ typedef struct igraph_vs_t {
             igraph_neimode_t mode;
         } adj;                  /* adjacent vertices  */
         struct {
-            igraph_integer_t from;
-            igraph_integer_t to;
-        } seq;                              /* sequence of vertices from:to */
+            igraph_integer_t from;          /* first index */
+            igraph_integer_t to;            /* last index */
+        } seq;                  /* sequence of vertices from:to */
     } data;
 } igraph_vs_t;
 
@@ -108,8 +108,8 @@ IGRAPH_EXPORT int igraph_vs_type(const igraph_vs_t *vs);
 typedef struct igraph_vit_t {
     int type;
     long int pos;
-    long int start;
-    long int end;
+    long int start; /* first index */
+    long int end;   /* one past last index */
     const igraph_vector_t *vec;
 } igraph_vit_t;
 
@@ -241,8 +241,8 @@ typedef struct igraph_es_t {
             igraph_neimode_t mode;
         } incident;
         struct {
-            igraph_integer_t from;
-            igraph_integer_t to;
+            igraph_integer_t from; /* first index */
+            igraph_integer_t to;   /* last index */
         } seq;
         struct {
             const igraph_vector_t *ptr;
@@ -311,8 +311,8 @@ IGRAPH_EXPORT int igraph_es_type(const igraph_es_t *es);
 typedef struct igraph_eit_t {
     int type;
     long int pos;
-    long int start;
-    long int end;
+    long int start; /* first index */
+    long int end;   /* one past last index */
     const igraph_vector_t *vec;
 } igraph_eit_t;
 
