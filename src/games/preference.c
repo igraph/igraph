@@ -264,6 +264,10 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 }
             }
 
+            if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+            }
+
             IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
 
             last = RNG_GEOM(p);
@@ -527,6 +531,11 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             v2_size = igraph_vector_int_size(v2);
 
             maxedges = ((igraph_real_t) v1_size) * v2_size;
+
+            if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+            }
+
             if (!loops) {
                 IGRAPH_CHECK(igraph_vector_int_intersect_sorted(v1, v2, &intersect));
                 c = igraph_vector_int_size(&intersect);

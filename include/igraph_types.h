@@ -43,6 +43,7 @@ __BEGIN_DECLS
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <float.h>
 
 
 #if !defined(IGRAPH_INTEGER_SIZE)
@@ -86,6 +87,9 @@ typedef int    igraph_bool_t;
 #  define IGRAPH_UINT_MAX UINT32_MAX
 #  define IGRAPH_UINT_MIN UINT32_MIN
 #endif
+
+/* Largest positive value for igraph_real_t that can safely represent integers. */
+#define IGRAPH_MAX_EXACT_REAL ((double)(1LL << DBL_MANT_DIG))
 
 /* Maximum vertex count for igraph_t
  * The 'os' and 'is' vectors in igraph_t have vcount+1 elements,
