@@ -26,7 +26,7 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
-#include "graph/neighbors.h"
+#include "graph/internal.h"
 #include "math/safe_intop.h"
 
 /* Internal functions */
@@ -1648,5 +1648,24 @@ igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *grap
     }
 
     *res = 1; /* No difference was found, graphs are the same */
+    return IGRAPH_SUCCESS;
+}
+
+
+/* Reverses the direction of all edges in a directed graph.
+ * The graph is modified in-place.
+ * Attributes are preserved.
+ */
+igraph_error_t igraph_i_reverse(igraph_t *graph) {
+
+    /* Nothing to do for undirected graphs. */
+    if (! igraph_is_directed(graph)) {
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_swap(&graph->to, &graph->from);
+    igraph_vector_int_swap(&graph->oi, &graph->ii);
+    igraph_vector_int_swap(&graph->os, &graph->is);
+
     return IGRAPH_SUCCESS;
 }

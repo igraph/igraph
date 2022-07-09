@@ -29,6 +29,7 @@
 #include "igraph_vector.h"
 
 #include "graph/attributes.h"
+#include "graph/internal.h"
 
 /**
  * \function igraph_reverse_edges
@@ -52,6 +53,11 @@ igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
     /* Nothing to do on undirected graph. */
     if (! igraph_is_directed(graph)) {
         return IGRAPH_SUCCESS;
+    }
+
+    /* Use fast method when all edges are to be reversed. */
+    if (igraph_es_is_all(&eids)) {
+        return igraph_i_reverse(graph);
     }
 
     /* Convert graph to edge list. */
