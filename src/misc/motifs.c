@@ -32,7 +32,7 @@
 
 #include "core/interruption.h"
 #include "isomorphism/isoclasses.h"
-#include "graph/neighbors.h"
+#include "graph/internal.h"
 
 /**
  * Callback function for igraph_motifs_randesu that counts the motifs by
