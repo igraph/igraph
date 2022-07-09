@@ -866,7 +866,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
     int ido = 0;
     int rvec = vectors || storage ? 1 : 0; /* calculate eigenvectors? */
-    char *all = "All";
+    char *all = "A";
 
     int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
@@ -1124,7 +1124,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
     int ido = 0;
     int rvec = vectors || storage ? 1 : 0;
-    char *all = "All";
+    char *all = "A";
 
     int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
