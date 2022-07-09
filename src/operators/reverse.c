@@ -74,6 +74,7 @@ int igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
     IGRAPH_CHECK(igraph_create(&new_graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &new_graph);
 
+    IGRAPH_I_ATTRIBUTE_DESTROY(&new_graph);
     IGRAPH_I_ATTRIBUTE_COPY(&new_graph, graph, 1, 1, 1); /* does IGRAPH_CHECK */
 
     igraph_eit_destroy(&eit);
