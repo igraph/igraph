@@ -89,20 +89,35 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
 igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 {
-
+	if (mode != IGRAPH_ALL)
+	{
+		std::cout << "Currently this function only supports undirected graphs while the graph's mode is not undirected." <<std::endl;
+		return IGRAPH_FAILURE;
+	}
+	
+	
 	igraph_integer_t no_of_vertices = (igraph_integer_t)igraph_vcount(graph);
 	igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+	// if (igraph_vector_int_size(steiner_terminals) == no_of_vertices)
+	// {
+	// 	std::cout << "Getting Minimum Spanning Tree" << std::endl;
+	// 	igraph_error_t ans = igraph_minimum_spanning_tree(graph,res,weights);
+	// 	return ans;
+		
+	// } Needs to be moved to Phase 2 when we implement backtracking to get the edges out
+	if (no_of_vertices == 0 || (no_of_vertices == 1)) //graph is empty
+	{
+		*res = 0;
+		return IGRAPH_FAILURE;
+	}
 
 	igraph_vector_int_t steiner_terminals_copy; 
 	igraph_matrix_t dp_cache; // dynamic programming table
 	igraph_integer_t q;
 	std::set<std::set<igraph_integer_t>> allSubsets;
 	igraph_matrix_t distance;
-	if (no_of_edges == 0 && no_of_vertices == 0) //graph is empty
-	{
-		*res = 0;
-		return IGRAPH_SUCCESS;
-	}
+	
 	if (igraph_vector_size(weights) != no_of_edges)
 	{	
 		IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges \n",IGRAPH_EINVAL,igraph_vector_size(weights), no_of_edges);
@@ -120,7 +135,15 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 	// 	std::cout << std::endl;
 	// }
 	//printf("Johnson Works\n");
-	
+	for (igraph_integer_t i = 0; i < no_of_vertices; i++)
+	{
+		if (igraph_matrix_get(&distance,i,i) != 0)
+		{
+			igraph_matrix_set(&distance,i,i,0);
+			std::cout <<"Found Self-loop at node number " << i 
+					<< ". Ignoring the self-loop in this function."<< std::endl;
+		}
+	}
 	IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy,steiner_terminals));
 	IGRAPH_FINALLY(igraph_vector_int_destroy,&steiner_terminals_copy);
 	igraph_vector_int_sort(&steiner_terminals_copy);

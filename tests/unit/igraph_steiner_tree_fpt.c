@@ -97,7 +97,7 @@ int main()
     
     printf("No vertices, not directed:\n");
     igraph_real_t val1,val2;
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_ALL, &weights_empty,&val1) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_ALL, &weights_empty,&val1) == IGRAPH_FAILURE);
     printf("%.2f\n",val1);
     IGRAPH_ASSERT(val1 == 0);
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
