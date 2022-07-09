@@ -37,6 +37,7 @@
 #include "core/marked_queue.h"
 #include "flow/flow_internal.h"
 #include "graph/attributes.h"
+#include "math/safe_intop.h"
 
 typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
                                                    const igraph_marked_queue_int_t *S,
@@ -86,12 +87,21 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
-    igraph_integer_t new_no_of_nodes = no_of_nodes * 2;
-    igraph_integer_t new_no_of_edges = no_of_nodes + no_of_edges * 2;
+    igraph_integer_t new_no_of_nodes;
+    igraph_integer_t new_no_of_edges;
 
     igraph_vector_int_t edges;
     igraph_integer_t edgeptr = 0, capptr = 0;
     igraph_integer_t i;
+
+    IGRAPH_SAFE_MULT(no_of_nodes, 2, &new_no_of_nodes);
+    IGRAPH_SAFE_MULT(no_of_edges, 2, &new_no_of_edges);
+    IGRAPH_SAFE_ADD(new_no_of_edges, no_of_nodes, &new_no_of_edges);
+
+    /* To ensure the size of the edges vector will not overflow. */
+    if (new_no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, new_no_of_edges * 2);
 
