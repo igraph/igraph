@@ -25,7 +25,12 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include <float.h>
+
 __BEGIN_DECLS
+
+/* Largest positive value for igraph_real_t that can safely represent integers. */
+#define IGRAPH_MAX_EXACT_REAL ((double)(1LL << DBL_MANT_DIG))
 
 /* These macros raise an error if the operation would result in an overflow.
  * They must only be used in functions that return an igraph_error_t.
