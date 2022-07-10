@@ -346,3 +346,71 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
 
     return IGRAPH_SUCCESS;
 }
+
+
+/**
+ * \function igraph_has_mutual
+ * \brief Check whether a directed graph has any mutual edges.
+ *
+ * An (A,B) non-loop directed edge is mutual if the graph contains
+ * the (B,A) edge too. Whether directed self-loops are considered mutual
+ * is controlled by the \p loops parameter.
+ *
+ * </para><para>
+ * An undirected graph only has mutual edges, by definition.
+ *
+ * </para><para>
+ * Edge multiplicity is not considered here, e.g. if there are two
+ * (A,B) edges and one (B,A) edge, then all three are considered to be
+ * mutual.
+ *
+ * \param graph The input graph.
+ * \param loops Boolean, whether to consider directed self-loops
+ *        to be mutual.
+ * \param res Pointer to a boolean, the result will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(|E| log(d)) where d is the maximum in-degree.
+ */
+igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t loops, igraph_bool_t *res) {
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_lazy_adjlist_t adjlist;
+
+    if (! igraph_is_directed(graph)) {
+        /* In undirected graphs, all edges are considered mutual, so we just check
+         * if there are any edges. */
+        *res = no_of_edges > 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+    *res = 0; /* assume no mutual edges */
+    for (igraph_integer_t edge=0; edge < no_of_edges; edge++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_integer_t to = IGRAPH_TO(graph, edge);
+
+        if (from == to) {
+            if (loops) {
+                *res = 1;
+                break;
+            }
+            continue; /* no need to do binsearch for self-loops */
+        }
+
+        /* Check whether there is a to->from edge, search for from in the
+           out-list of to */
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
+        IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+        if (igraph_vector_int_binsearch2(neis, from)) {
+            *res = 1;
+            break;
+        }
+    }
+
+    igraph_lazy_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}

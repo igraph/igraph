@@ -734,6 +734,7 @@ Some of the highlights are:
  - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
  - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
  - `igraph_turan()` generates Turán graphs.
+ - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
 
 ### Removed
 
