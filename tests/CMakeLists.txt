@@ -208,6 +208,7 @@ add_legacy_tests(
   igraph_generalized_petersen
   igraph_grg_game
   igraph_growing_random_game
+  igraph_hsbm_game
   igraph_k_regular_game
   igraph_lastcit_game
   igraph_linegraph
