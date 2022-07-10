@@ -57,9 +57,9 @@ typedef struct igraph_vs_t {
             igraph_neimode_t mode;
         } adj;                              /* adjacent vertices  */
         struct {
-            igraph_integer_t from;
-            igraph_integer_t to;
-        } seq;                              /* sequence of vertices from:to */
+            igraph_integer_t from;          /* first index */
+            igraph_integer_t to;            /* last index */
+        } seq;                  /* sequence of vertices from:to */
     } data;
 } igraph_vs_t;
 
@@ -115,8 +115,8 @@ typedef enum {
 typedef struct igraph_vit_t {
     igraph_vit_type_t type;
     igraph_integer_t pos;
-    igraph_integer_t start;
-    igraph_integer_t end;
+    igraph_integer_t start; /* first index */
+    igraph_integer_t end;   /* one past last index */
     const igraph_vector_int_t *vec;
 } igraph_vit_t;
 
@@ -251,8 +251,8 @@ typedef struct igraph_es_t {
             igraph_neimode_t mode;
         } incident;
         struct {
-            igraph_integer_t from;
-            igraph_integer_t to;
+            igraph_integer_t from; /* first index */
+            igraph_integer_t to;   /* last index */
         } seq;
         struct {
             const igraph_vector_int_t *ptr;
@@ -327,8 +327,8 @@ typedef enum {
 typedef struct igraph_eit_t {
     igraph_eit_type_t type;
     igraph_integer_t pos;
-    igraph_integer_t start;
-    igraph_integer_t end;
+    igraph_integer_t start; /* first index */
+    igraph_integer_t end;   /* one past last index */
     const igraph_vector_int_t *vec;
 } igraph_eit_t;
 

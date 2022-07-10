@@ -883,6 +883,8 @@ Some of the highlights are:
  - `igraph_permute_vertices()` now checks for out-of-range indices in the permutation vector.
  - `igraph_create()` now checks for non-finite vertex indices in the edges vector.
  - `igraph_eigenvector_centrality()` would return incorrect scores when some weights were negative.
+ - `igraph_es_seq()` and `igraph_ess_seq()` did not include the `to` vertex in the sequence.
+ - `igraph_eit_create()` and `igraph_vit_create()` now checks that all edge/vertex indices are in range when creating iterators from sequence-type selectors.
 
 ### Other
 
