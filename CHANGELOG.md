@@ -695,6 +695,8 @@ Some of the highlights are:
 
  - `igraph_matrix_minmax()`, `igraph_matrix_which_minmax()`, `igraph_matrix_which_min()` and `igraph_matrix_which_max()` no longer return an error code. The return type is now `void`. These functions never fail.
 
+ - `igraph_is_mutual()` has an additional parameter which controls whether directed self-loops are considered mutual.
+
 ### Added
 
  - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.

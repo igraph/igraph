@@ -274,7 +274,9 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * \function igraph_is_mutual
  * \brief Check whether some edges of a directed graph are mutual.
  *
- * An (A,B) edge is mutual if the graph contains the (B,A) edge too.
+ * An (A,B) non-loop directed edge is mutual if the graph contains
+ * the (B,A) edge too. Whether directed self-loops are considered mutual
+ * is controlled by the \p loops parameter.
  *
  * </para><para>
  * An undirected graph only has mutual edges, by definition.
@@ -284,14 +286,13 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * (A,B) edges and one (B,A) edge, then all three are considered to be
  * mutual.
  *
- * </para><para>
- * Self-loops are always mutual.
- *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
  *        here.
  * \param es The sequence of edges to check. Supply
  *        \ref igraph_ess_all() to check all edges.
+ * \param loops Boolean, whether to consider directed self-loops
+ *        to be mutual.
  * \return Error code.
  *
  * Time complexity: O(n log(d)), n is the number of edges supplied, d
@@ -299,7 +300,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * supplied edges. An upper limit of the time complexity is O(n log(|E|)),
  * |E| is the number of edges in the graph.
  */
-igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
+igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es, igraph_bool_t loops) {
 
     igraph_eit_t eit;
     igraph_lazy_adjlist_t adjlist;
@@ -326,6 +327,11 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
         igraph_integer_t edge = IGRAPH_EIT_GET(eit);
         igraph_integer_t from = IGRAPH_FROM(graph, edge);
         igraph_integer_t to = IGRAPH_TO(graph, edge);
+
+        if (from == to) {
+            VECTOR(*res)[i] = loops;
+            continue; /* no need to do binsearch for self-loops */
+        }
 
         /* Check whether there is a to->from edge, search for from in the
            out-list of to */

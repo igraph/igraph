@@ -22,7 +22,7 @@
 void call_and_print(igraph_t *graph, igraph_es_t es) {
     igraph_vector_bool_t result;
     igraph_vector_bool_init(&result, 0);
-    IGRAPH_ASSERT(igraph_is_mutual(graph, &result, es) == IGRAPH_SUCCESS);
+    igraph_is_mutual(graph, &result, es, 1);
     igraph_vector_bool_print(&result);
     printf("\n");
     igraph_vector_bool_destroy(&result);
@@ -52,10 +52,9 @@ int main() {
     call_and_print(&g_lmu, igraph_ess_all(IGRAPH_EDGEORDER_ID));
 
     VERIFY_FINALLY_STACK();
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Edge out of range.\n");
-    IGRAPH_ASSERT(igraph_is_mutual(&g_lm, &result, igraph_ess_1(100)) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_is_mutual(&g_lm, &result, igraph_ess_1(100), 1), IGRAPH_EINVAL);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_lm);
