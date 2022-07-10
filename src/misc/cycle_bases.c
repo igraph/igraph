@@ -215,6 +215,8 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
     igraph_inclist_t inclist;
     igraph_vector_int_t visited; /* see comments before igraph_i_fundamental_cycles_bfs() */
 
+    IGRAPH_UNUSED(weights);
+
     if (start_vid >= no_of_nodes) {
         IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVAL);
     }
@@ -406,6 +408,8 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     igraph_integer_t i;
     igraph_integer_t rank;
     igraph_vector_int_list_t candidates;
+
+    IGRAPH_UNUSED(weights);
 
     /* Compute candidate elements for the minimum weight basis. */
     {
