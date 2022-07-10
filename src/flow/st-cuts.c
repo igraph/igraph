@@ -88,14 +88,13 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     igraph_integer_t new_no_of_nodes;
-    igraph_integer_t new_no_of_edges;
+    igraph_integer_t new_no_of_edges = no_of_edges * 2;
 
     igraph_vector_int_t edges;
     igraph_integer_t edgeptr = 0, capptr = 0;
     igraph_integer_t i;
 
     IGRAPH_SAFE_MULT(no_of_nodes, 2, &new_no_of_nodes);
-    IGRAPH_SAFE_MULT(no_of_edges, 2, &new_no_of_edges);
     IGRAPH_SAFE_ADD(new_no_of_edges, no_of_nodes, &new_no_of_edges);
 
     /* To ensure the size of the edges vector will not overflow. */
