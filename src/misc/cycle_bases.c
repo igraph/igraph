@@ -186,7 +186,6 @@ igraph_i_fundamental_cycles_bfs(
  * Edge directions are ignored. Multi-edges and self-loops are supported.
  *
  * \param graph The graph object.
- * \param weights Currently unused.
  * \param result An initialized integer vector list. The result will be stored here,
  *   each vector containing the edge IDs of a basis element.
  * \param start_vid If negative, a complete fundamental cycle basis is returned.
@@ -196,6 +195,7 @@ igraph_i_fundamental_cycles_bfs(
  * \param bfs_cutoff If negative, a complete cycle basis is returned. Otherwise, only
  *   cycles of length <code>2*bfs_cutoff + 1</code> or shorter are included. \p bfs_cutoff
  *   is used to limit the depth of the BFS tree when searching for cycle edges.
+ * \param weights Currently unused.
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
@@ -203,10 +203,10 @@ igraph_i_fundamental_cycles_bfs(
  * \experimental
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
-                                         const igraph_vector_t *weights,
                                          igraph_vector_int_list_t *result,
                                          igraph_integer_t start_vid,
-                                         igraph_integer_t bfs_cutoff) {
+                                         igraph_integer_t bfs_cutoff,
+                                         const igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -370,7 +370,6 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \brief Computes a minimum weight cycle basis.
  *
  * \param graph The graph object.
- * \param weights Currently unused.
  * \param result An initialized integer vector list, the elements of the cycle
  *   basis will be stored here as vectors of edge IDs.
  * \param bfs_cutoff If negative, an exact minimum cycle basis is returned. Otherwise
@@ -387,7 +386,8 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  *   the edge IDs will appear ordered along the cycle. This comes at a small
  *   performance cost. If false, no guarantees are given about the ordering
  *   of edge IDs within cycles. This parameter exists solely to control
- *   performance tradeoffs
+ *   performance tradeoffs.
+ * \param weights Currently unused.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -395,11 +395,11 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \experimental
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
-                                          const igraph_vector_t *weights,
                                           igraph_vector_int_list_t *result,
                                           igraph_integer_t bfs_cutoff,
                                           igraph_bool_t complete,
-                                          igraph_bool_t use_cycle_order) {
+                                          igraph_bool_t use_cycle_order,
+                                          const igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);

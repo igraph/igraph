@@ -2384,11 +2384,11 @@ igraph_eulerian_cycle:
 #######################################
 
 igraph_fundamental_cycles:
-    PARAMS: GRAPH graph, weights=NULL, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff, EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph, basis ON graph, start ON graph
 
 igraph_minimum_cycle_basis:
-    PARAMS: GRAPH graph, weights=NULL, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order, EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph, basis ON graph
 
 #######################################
