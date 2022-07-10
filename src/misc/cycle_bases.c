@@ -186,6 +186,7 @@ igraph_i_fundamental_cycles_bfs(
  * Edge directions are ignored. Multi-edges and self-loops are supported.
  *
  * \param graph The graph object.
+ * \param weights Currently unused.
  * \param result An initialized integer vector list. The result will be stored here,
  *   each vector containing the edge IDs of a basis element.
  * \param start_vid If negative, a complete fundamental cycle basis is returned.
@@ -202,6 +203,7 @@ igraph_i_fundamental_cycles_bfs(
  * \experimental
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
+                                         const igraph_vector_t *weights,
                                          igraph_vector_int_list_t *result,
                                          igraph_integer_t start_vid,
                                          igraph_integer_t bfs_cutoff) {
@@ -368,6 +370,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \brief Computes a minimum weight cycle basis.
  *
  * \param graph The graph object.
+ * \param weights Currently unused.
  * \param result An initialized integer vector list, the elements of the cycle
  *   basis will be stored here as vectors of edge IDs.
  * \param bfs_cutoff If negative, an exact minimum cycle basis is returned. Otherwise
@@ -392,6 +395,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \experimental
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
+                                          const igraph_vector_t *weights,
                                           igraph_vector_int_list_t *result,
                                           igraph_integer_t bfs_cutoff,
                                           igraph_bool_t complete,
