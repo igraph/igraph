@@ -424,7 +424,7 @@ int igraph_vs_vector_copy(igraph_vs_t *vs,
  * \brief Vertex set, an interval of vertices.
  *
  * Creates a vertex selector containing all vertices with vertex ID
- * equal to or bigger than \c from and equal to or smaller than \c
+ * equal to or bigger than \p from and equal to or smaller than \p
  * to.
  *
  * \param vs Pointer to an uninitialized vertex selector object.
@@ -444,7 +444,7 @@ int igraph_vs_seq(igraph_vs_t *vs,
                   igraph_integer_t from, igraph_integer_t to) {
     vs->type = IGRAPH_VS_SEQ;
     vs->data.seq.from = from;
-    vs->data.seq.to = to + 1;
+    vs->data.seq.to = to;
     return 0;
 }
 
@@ -468,7 +468,7 @@ igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
     igraph_vs_t vs;
     vs.type = IGRAPH_VS_SEQ;
     vs.data.seq.from = from;
-    vs.data.seq.to = to + 1;
+    vs.data.seq.to = to;
     return vs;
 }
 
@@ -598,7 +598,7 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         return 0;
 
     case IGRAPH_VS_SEQ:
-        *result = vs->data.seq.to - vs->data.seq.from;
+        *result = vs->data.seq.to - vs->data.seq.from + 1;
         return 0;
 
     case IGRAPH_VS_ALL:
@@ -768,10 +768,16 @@ int igraph_vit_create(const igraph_t *graph,
         }
         break;
     case IGRAPH_VS_SEQ:
+        if (vs.data.seq.from < 0 || vs.data.seq.from >= igraph_vcount(graph)) {
+            IGRAPH_ERROR("Cannot create sequence iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
+        }
+        if (vs.data.seq.to < 0 || vs.data.seq.to >= igraph_vcount(graph)) {
+            IGRAPH_ERROR("Cannot create sequece iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
+        }
         vit->type = IGRAPH_VIT_SEQ;
         vit->pos = vs.data.seq.from;
         vit->start = vs.data.seq.from;
-        vit->end = vs.data.seq.to;
+        vit->end = vs.data.seq.to + 1;
         break;
     default:
         IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);
@@ -1103,9 +1109,8 @@ int igraph_es_fromto(igraph_es_t *es,
  * \function igraph_es_seq
  * \brief Edge selector, a sequence of edge ids.
  *
- * All edge ids between <code>from</code> and <code>to</code> will be
- * included in the edge selection. This includes <code>from</code> and
- * excludes <code>to</code>.
+ * All edge ids between \p from and \p to (inclusive) will be
+ * included in the edge selection.
  *
  * \param es Pointer to an uninitialized edge selector object.
  * \param from The first edge ID to be included.
@@ -1500,7 +1505,7 @@ int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
         return 0;
 
     case IGRAPH_ES_SEQ:
-        *result = es->data.seq.to - es->data.seq.from;
+        *result = es->data.seq.to - es->data.seq.from + 1;
         return 0;
 
     case IGRAPH_ES_PAIRS:
@@ -1851,19 +1856,16 @@ int igraph_eit_create(const igraph_t *graph,
         }
         break;
     case IGRAPH_ES_SEQ:
+        if (es.data.seq.from < 0 || es.data.seq.from >= igraph_ecount(graph)) {
+            IGRAPH_ERROR("Cannot create sequence iterator, starting edge ID out of range.", IGRAPH_EINVAL);
+        }
+        if (es.data.seq.to < 0 || es.data.seq.to >= igraph_ecount(graph)) {
+            IGRAPH_ERROR("Cannot create sequece iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+        }
         eit->type = IGRAPH_EIT_SEQ;
         eit->pos = es.data.seq.from;
         eit->start = es.data.seq.from;
-        eit->end = es.data.seq.to;
-        if (eit->start < 0) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
-        }
-        if (eit->end < 0) {
-            IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
-        }
-        if (eit->start >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create iterator, starting edge greater than number of edges.", IGRAPH_EINVAL);
-        }
+        eit->end = es.data.seq.to + 1;
         break;
     case IGRAPH_ES_PAIRS:
         IGRAPH_CHECK(igraph_i_eit_pairs(graph, es, eit));
