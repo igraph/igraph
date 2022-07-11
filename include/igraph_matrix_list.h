@@ -23,8 +23,8 @@
 #ifndef IGRAPH_MATRIX_LIST_H
 #define IGRAPH_MATRIX_LIST_H
 
-#include "igraph_constants.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_matrix.h"
 #include "igraph_types.h"
 

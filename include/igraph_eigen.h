@@ -26,6 +26,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_arpack.h"
+#include "igraph_error.h"
 #include "igraph_lapack.h"
 #include "igraph_sparsemat.h"
 

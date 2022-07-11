@@ -2,6 +2,7 @@
 #ifndef IGRAPH_PARSE_UTILS_H
 #define IGRAPH_PARSE_UTILS_H
 
+#include "igraph_error.h"
 #include "igraph_types.h"
 
 /* This macro must be used only in Bison actions, in place of IGRAPH_CHECK(). */
