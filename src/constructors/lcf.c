@@ -54,7 +54,7 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     long int no_of_edges = n + no_of_shifts * repeats;
 
     if (repeats < 0) {
-        IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of repeats must not be negative.", IGRAPH_EINVAL);
     }
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * no_of_edges);
 
