@@ -97,7 +97,7 @@ static igraph_error_t igraph_i_create_start(
 igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr) {
 
     if (n < 0) {
-        IGRAPH_ERROR("Cannot create empty graph with negative number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
     graph->n = 0;
