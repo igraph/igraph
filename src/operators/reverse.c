@@ -48,7 +48,8 @@
  *              Pass <code>igraph_ess_all(IGRAPH_EDGEORDER_ID)</code> to reverse all edges.
  * \return Error code.
  *
- * Time complexity: O(|E|) where |E| is the number of edges in the graph.
+ * Time complexity: O(1) if all edges are reversed, otherwise
+ * O(|E|) where |E| is the number of edges in the graph.
  */
 igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
