@@ -38,9 +38,9 @@
  * All attributes, as well as the ordering of edges and vertices are preserved.
  *
  * </para><para>
- * This operation is rarely needed in igraph, as almost all functions that handle directed
- * graphs take a \c mode argument that can be set to \c IGRAPH_IN to effectively treat
- * edges as reversed.
+ * Note that is rarely necessary to reverse \em all edges, as almost all functions that
+ * handle directed graphs take a \c mode argument that can be set to \c IGRAPH_IN to
+ * effectively treat edges as reversed.
  *
  * \param graph The graph whose edges will be reversed.
  * \param es    The edges to be reversed.
