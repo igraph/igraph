@@ -24,10 +24,11 @@
 #ifndef IGRAPH_VECTOR_H
 #define IGRAPH_VECTOR_H
 
+#include "igraph_complex.h"
 #include "igraph_constants.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
-#include "igraph_complex.h"
 
 __BEGIN_DECLS
 

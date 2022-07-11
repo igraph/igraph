@@ -36,7 +36,7 @@ edges: {
 5 7
 6 7
 }
-Three islands, full graphs, max 20 connections between islands.
+Three islands, full graphs, 16 connections between islands.
 Three islands, random graphs, 3 connections between islands.
 directed: false
 vcount: 12
@@ -60,3 +60,4 @@ Negative number of islands.
 Negative island size.
 Probability out of range.
 Negative number of edges between islands.
+Too many edges between islands.

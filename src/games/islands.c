@@ -85,6 +85,15 @@ igraph_error_t igraph_simple_interconnected_islands_game(
         IGRAPH_ERRORF("Number of inter-island links cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n_inter);
     }
 
+    number_of_inter_island_edges = islands_size * islands_size;
+    if (n_inter > number_of_inter_island_edges) {
+        IGRAPH_ERRORF(
+            "Too many edges requested between islands, maximum possible "
+            "is %" IGRAPH_PRId ", got %" IGRAPH_PRId ".",
+            IGRAPH_EINVAL, number_of_inter_island_edges, n_inter
+        );
+    }
+
     /* how much memory ? */
     number_of_nodes = islands_n * islands_size;
     max_possible_edges_per_island = ((igraph_real_t)islands_size * ((igraph_real_t)islands_size - 1.0)) / 2.0;
@@ -127,14 +136,12 @@ igraph_error_t igraph_simple_interconnected_islands_game(
 
         /* create the links with other islands */
         island_ecount = islands_size * islands_size;
-        number_of_inter_island_edges = n_inter < island_ecount ? n_inter : island_ecount;
+        number_of_inter_island_edges = n_inter;
         for (i = is + 1; i < islands_n; i++) { /* for each other island (not the previous ones) */
-            IGRAPH_CHECK(igraph_random_sample_real(
-                &s, 0, island_ecount - 1, number_of_inter_island_edges
-            ));
+            IGRAPH_CHECK(igraph_random_sample_real(&s, 0, island_ecount - 1, n_inter));
 
             start_index_of_other_island = i * islands_size;
-            for (j = 0; j < number_of_inter_island_edges; j++) { /* for each link between islands */
+            for (j = 0; j < n_inter; j++) { /* for each link between islands */
                 from = VECTOR(s)[j] / islands_size;
                 to = VECTOR(s)[j] - from * islands_size;
                 from += start_index_of_island;

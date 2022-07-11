@@ -25,6 +25,7 @@
 #define IGRAPH_MATRIX_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_vector.h"
 
 __BEGIN_DECLS

@@ -37,7 +37,6 @@ __BEGIN_DECLS
 #endif
 
 #include "igraph_config.h"
-#include "igraph_error.h"
 
 #include <inttypes.h>
 #include <math.h>

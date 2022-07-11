@@ -27,7 +27,7 @@
 
 #include "graph/attributes.h"
 #include "graph/caching.h"
-#include "graph/neighbors.h"
+#include "graph/internal.h"
 #include "math/safe_intop.h"
 
 /* Internal functions */
@@ -62,11 +62,16 @@ static igraph_error_t igraph_i_create_start_vectors(
  * \function igraph_empty_attrs
  * \brief Creates an empty graph with some vertices, no edges and some graph attributes.
  *
- * </para><para>
  * Use this instead of \ref igraph_empty() if you wish to add some graph
  * attributes right after initialization. This function is currently
  * not very interesting for the ordinary user. Just supply 0 here or
  * use \ref igraph_empty().
+ *
+ * </para><para>
+ * This function does not set any vertex attributes. To create a graph which has
+ * vertex attributes, call this function specifying 0 vertices, then use
+ * \ref igraph_add_vertices() to add vertices and their attributes.
+ *
  * \param graph Pointer to a not-yet initialized graph object.
  * \param n The number of vertices in the graph; a non-negative
  *          integer number is expected.
@@ -78,9 +83,14 @@ static igraph_error_t igraph_i_create_start_vectors(
  *        \cli IGRAPH_UNDIRECTED
  *          Create an \em undirected graph.
  *        \endclist
- * \param attr The attributes.
+ * \param attr The graph attributes. Supply \c NULL if not graph attributes
+ *        are to be set.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
+ *
+ * \sa \ref igraph_empty() to create an empty graph without attributes;
+ * \ref igraph_add_vertices() and \ref igraph_add_edges() to add vertices
+ * and edges, possibly with associated attributes.
  *
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
@@ -88,7 +98,7 @@ static igraph_error_t igraph_i_create_start_vectors(
 igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr) {
 
     if (n < 0) {
-        IGRAPH_ERROR("Cannot create empty graph with negative number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
     graph->n = 0;
@@ -1773,5 +1783,24 @@ igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *grap
     }
 
     *res = 1; /* No difference was found, graphs are the same */
+    return IGRAPH_SUCCESS;
+}
+
+
+/* Reverses the direction of all edges in a directed graph.
+ * The graph is modified in-place.
+ * Attributes are preserved.
+ */
+igraph_error_t igraph_i_reverse(igraph_t *graph) {
+
+    /* Nothing to do for undirected graphs. */
+    if (! igraph_is_directed(graph)) {
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_swap(&graph->to, &graph->from);
+    igraph_vector_int_swap(&graph->oi, &graph->ii);
+    igraph_vector_int_swap(&graph->os, &graph->is);
+
     return IGRAPH_SUCCESS;
 }

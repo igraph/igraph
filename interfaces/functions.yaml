@@ -689,6 +689,10 @@ igraph_subgraph_edges:
     PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
     DEPS: eids ON graph
 
+igraph_reverse_edges:
+    PARAMS: INOUT GRAPH graph, EDGESET eids=ALL
+    DEPS: eids ON graph
+
 igraph_average_path_length:
     PARAMS: GRAPH graph, PRIMARY OUT REAL res, OUT REAL unconn_pairs=NULL,
         BOOLEAN directed=True, BOOLEAN unconn=True
@@ -2380,12 +2384,12 @@ igraph_eulerian_cycle:
 #######################################
 
 igraph_fundamental_cycles:
-    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff
-    DEPS: basis ON graph, start ON graph
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph, basis ON graph, start ON graph
 
 igraph_minimum_cycle_basis:
-    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order
-    DEPS: basis ON graph
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph, basis ON graph
 
 #######################################
 # Trees

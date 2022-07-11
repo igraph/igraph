@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2022 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,20 +16,31 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
-
 */
 
-#ifndef IGRAPH_CENTRALITY_INTERNAL_H
-#define IGRAPH_CENTRALITY_INTERNAL_H
+#include "test_utilities.h"
 
-#include "igraph_decls.h"
-#include "igraph_types.h"
-#include "igraph_vector.h"
+int main() {
+    igraph_t graph;
 
-__BEGIN_DECLS
+    igraph_small(&graph, 0, IGRAPH_DIRECTED,
+                 0,1, 1,2, 2,3, 3,1, 1,4,
+                 -1);
 
-igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector);
+    printf("Original graph:\n");
+    print_graph(&graph);
 
-__END_DECLS
+    printf("Reverse one edge:\n");
+    igraph_reverse_edges(&graph, igraph_ess_1(2));
+    print_graph(&graph);
 
-#endif
+    printf("Reverse all edges:\n");
+    igraph_reverse_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID));
+    print_graph(&graph);
+
+    igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
+
+    return 0;
+}
