@@ -46,7 +46,8 @@ typedef enum {
     /* Stores whether the graph has at least one reciprocal edge pair. Ignored
      * in undirected graphs. This property should be true for a directed graph
      * with edges (a, b) and (b, a), and false for a directed graph with
-     * edges (a, b) and (a, b) again. */
+     * edges (a, b) and (a, b) again. Self-loops (a, a) are not considered
+     * reciprocal. */
     IGRAPH_PROP_HAS_RECIPROCAL,
 
     /* Stores whether the graph is weakly connected. */
