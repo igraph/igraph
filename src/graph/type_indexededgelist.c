@@ -114,12 +114,7 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
 int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void* attr) {
 
     if (n < 0) {
-        IGRAPH_ERROR("cannot create empty graph with negative number of vertices",
-                     IGRAPH_EINVAL);
-    }
-
-    if (!IGRAPH_FINITE(n)) {
-        IGRAPH_ERROR("number of vertices is not finite (NA, NaN or Inf)", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
     graph->n = 0;
