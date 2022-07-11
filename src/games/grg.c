@@ -34,7 +34,7 @@
  *
  * A geometric random graph is created by dropping points (i.e. vertices)
  * randomly on the unit square and then connecting all those pairs
- * which are less than \c radius apart in Euclidean distance.
+ * which are strictly less than \c radius apart in Euclidean distance.
  *
  * </para><para>
  * Original code contributed by Keith Briggs, thanks Keith.
@@ -61,11 +61,18 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 
     long int i;
     igraph_vector_t myx, myy, *xx = &myx, *yy = &myy, edges;
-    igraph_real_t r2 = radius >= 0 ? radius * radius : 0.0;
+    igraph_real_t r2;
 
     if (nodes < 0) {
         IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
     }
+
+    /* since we only connect nodes strictly closer than radius,
+     * radius < 0 is equivalent to radius == 0 */
+    if (radius < 0) {
+        radius = 0;
+    }
+    r2 = radius*radius;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes));
@@ -103,6 +110,7 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 
             IGRAPH_ALLOW_INTERRUPTION();
 
+            /* dx is always positive due to xx being sorted */
             while ( j < nodes && (dx = VECTOR(*xx)[j] - xx1) < radius) {
                 dy = VECTOR(*yy)[j] - yy1;
                 if (dx * dx + dy * dy < r2) {
@@ -121,6 +129,7 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 
             IGRAPH_ALLOW_INTERRUPTION();
 
+            /* dx is always positive due to xx being sorted */
             while ( j < nodes && (dx = VECTOR(*xx)[j] - xx1) < radius) {
                 dy = fabs(VECTOR(*yy)[j] - yy1);
                 if (dx > 0.5) {
