@@ -62,7 +62,7 @@ igraph_error_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_integer_t i;
     igraph_vector_t myx, myy, *xx = &myx, *yy = &myy;
     igraph_vector_int_t edges;
-    igraph_real_t r2 = radius * radius;
+    igraph_real_t r2 = 0 ? radius * radius : 0.0;
 
     if (nodes < 0) {
         IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
