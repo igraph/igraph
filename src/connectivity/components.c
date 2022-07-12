@@ -109,7 +109,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     char *already_added;
-    igraph_integer_t first_node, act_cluster_size = 0, no_of_clusters = 1;
+    igraph_integer_t first_node, act_cluster_size = 0, no_of_clusters = 0;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
@@ -144,7 +144,7 @@ static igraph_error_t igraph_i_connected_components_weak(
         already_added[first_node] = 1;
         act_cluster_size = 1;
         if (membership) {
-            VECTOR(*membership)[first_node] = no_of_clusters - 1;
+            VECTOR(*membership)[first_node] = no_of_clusters;
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, first_node));
 
@@ -161,10 +161,11 @@ static igraph_error_t igraph_i_connected_components_weak(
                 already_added[neighbor] = 1;
                 act_cluster_size++;
                 if (membership) {
-                    VECTOR(*membership)[neighbor] = no_of_clusters - 1;
+                    VECTOR(*membership)[neighbor] = no_of_clusters;
                 }
             }
         }
+
         no_of_clusters++;
         if (csize) {
             IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_cluster_size));
@@ -174,13 +175,17 @@ static igraph_error_t igraph_i_connected_components_weak(
     /* Cleaning up */
 
     if (no) {
-        *no = no_of_clusters - 1;
+        *no = no_of_clusters;
     }
 
+    /* Clean up */
     IGRAPH_FREE(already_added);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
+
+    /* Update cache */
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, no_of_clusters == 1);
 
     return IGRAPH_SUCCESS;
 }
@@ -189,14 +194,13 @@ static igraph_error_t igraph_i_connected_components_strong(
     const igraph_t *graph, igraph_vector_int_t *membership,
     igraph_vector_int_t *csize, igraph_integer_t *no
 ) {
-
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t next_nei = IGRAPH_VECTOR_NULL;
 
     igraph_integer_t i, n, num_seen;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
-    igraph_integer_t no_of_clusters = 1;
+    igraph_integer_t no_of_clusters = 0;
     igraph_integer_t act_cluster_size;
 
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
@@ -285,7 +289,7 @@ static igraph_error_t igraph_i_connected_components_strong(
         VECTOR(next_nei)[grandfather] = 1;
         act_cluster_size = 1;
         if (membership) {
-            VECTOR(*membership)[grandfather] = no_of_clusters - 1;
+            VECTOR(*membership)[grandfather] = no_of_clusters;
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, grandfather));
 
@@ -310,7 +314,7 @@ static igraph_error_t igraph_i_connected_components_strong(
                 VECTOR(next_nei)[neighbor] = 1;
                 act_cluster_size++;
                 if (membership) {
-                    VECTOR(*membership)[neighbor] = no_of_clusters - 1;
+                    VECTOR(*membership)[neighbor] = no_of_clusters;
                 }
 
                 num_seen++;
@@ -332,16 +336,21 @@ static igraph_error_t igraph_i_connected_components_strong(
     IGRAPH_PROGRESS("Strongly connected components: ", 100.0, NULL);
 
     if (no) {
-        *no = no_of_clusters - 1;
+        *no = no_of_clusters;
     }
 
-    /* Clean up, return */
-
+    /* Clean up */
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&out);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&next_nei);
     IGRAPH_FINALLY_CLEAN(4);
+
+    /* Update cache */
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_clusters == 1);
+    if (no_of_clusters == 1) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, 1);
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -432,12 +441,9 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
         }
     }
 
-    igraph_i_property_cache_set_bool(graph, prop, *res);
-    if (igraph_is_directed(graph) && prop == IGRAPH_PROP_IS_WEAKLY_CONNECTED && *res == 0) {
-        /* If the graph is not weakly connected, it is not strongly connected
-         * either so we can also cache that */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
-    }
+    /* Cache updates are done in igraph_i_connected_components_strong() and
+     * igraph_is_connected_weak() because those might be called from other
+     * places and we want to make use of the caching if so */
 
     return IGRAPH_SUCCESS;
 }
@@ -453,13 +459,13 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
      * See https://github.com/igraph/igraph/issues/1538 */
     if (no_of_nodes == 0) {
         *res = 0;
-        return IGRAPH_SUCCESS;
+        goto exit;
     }
 
     /* A connected graph has at least |V| - 1 edges. */
     if (no_of_edges < no_of_nodes - 1) {
         *res = 0;
-        return IGRAPH_SUCCESS;
+        goto exit;
     }
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
@@ -510,6 +516,14 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
+
+exit:
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, *res);
+    if (igraph_is_directed(graph) && *res == 0) {
+        /* If the graph is not weakly connected, it is not strongly connected
+         * either so we can also cache that */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
+    }
 
     return IGRAPH_SUCCESS;
 }
