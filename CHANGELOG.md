@@ -732,6 +732,7 @@ Some of the highlights are:
  - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
  - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
  - `igraph_turan()` generates Turán graphs.
+ - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
 
 ### Removed
 
@@ -857,6 +858,10 @@ Some of the highlights are:
    argument instead of expecting an already-initialized target vector. The old
    name will be removed in 0.11.
 
+ - `igraph_vector_init_seq()` is now deprecated in favour of
+   `igraph_vector_init_range()`, which uses C-style intervals (closed from the
+   left and open from the right).
+
  - `igraph_write_graph_dimacs()` has been renamed to `igraph_write_graph_dimacs_flow()`;
    the old name is deprecated and might be re-used as a generic DIMACS writer
    in the future. Also, the function now uses `igraph_integer_t` as the source
@@ -865,6 +870,10 @@ Some of the highlights are:
  - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
    to simplify the API. The deprecated variants will be removed in 0.11.
+ - `igraph_vs_seq()`, `igraph_vss_seq()`, `igraph_es_seq()` and `igraph_ess_seq()`
+   are now deprecated in favour of `igraph_vs_range()`, `igraph_vss_range()`,
+   `igraph_es_range()` and `igraph_ess_range()` because these use C-style
+   intervals (closed from the left, open from the right).
 
 ### Other
 
