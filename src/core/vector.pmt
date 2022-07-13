@@ -86,7 +86,7 @@
  * \ref igraph_vector_init_copy() creates a new identical copy
  * of an already existing and initialized vector. \ref
  * igraph_vector_init_array() creates a vector by copying a regular C array.
- * \ref igraph_vector_init_seq() creates a vector containing a regular
+ * \ref igraph_vector_init_range() creates a vector containing a regular
  * sequence with increment one.</para>
  *
  * <para>\ref igraph_vector_view() is a special constructor, it allows you to
@@ -1653,11 +1653,12 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 /**
  * \ingroup vector
  * \function igraph_vector_init_seq
- * \brief Initializes a vector with a sequence.
+ * \brief Initializes a vector with a sequence, inclusive endpoints (deprecated).
  *
  * </para><para>
- * The vector will contain the numbers \p from,
- * \p from+1, ..., \p to.
+ * The vector will contain the numbers \p from, \p from+1, ..., \p to. Note that
+ * both endpoints are \em inclusive, contrary to typical usage of ranges in C.
+ *
  * \param v Pointer to an uninitialized vector object.
  * \param from The lower limit in the sequence (inclusive).
  * \param to The upper limit in the sequence (inclusive).
@@ -1668,10 +1669,39 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
  * of elements in the vector.
  */
 
-igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
-                                      BASE from, BASE to) {
+igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v, BASE from, BASE to) {
     BASE *p;
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from + 1)));
+
+    for (p = v->stor_begin; p < v->end; p++) {
+        *p = from++;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_init_range
+ * \brief Initializes a vector with a range.
+ *
+ * </para><para>
+ * The vector will contain the numbers \p start, \p start+1, ..., \p end-1. Note
+ * that the range is closed from the left and open from the right, according to
+ * C conventions.
+ *
+ * \param v Pointer to an uninitialized vector object.
+ * \param start The lower limit in the range (inclusive).
+ * \param end The upper limit in the range (exclusive).
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory.
+ *
+ * Time complexity: O(n), the number of elements in the vector.
+ */
+
+igraph_error_t FUNCTION(igraph_vector, init_range)(TYPE(igraph_vector) *v, BASE from, BASE to) {
+    BASE *p;
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from)));
 
     for (p = v->stor_begin; p < v->end; p++) {
         *p = from++;

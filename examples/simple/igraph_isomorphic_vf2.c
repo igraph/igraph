@@ -37,7 +37,7 @@ int main() {
     igraph_rng_seed(igraph_rng_default(), 12345);
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-    igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_int_init_range(&perm, 0, igraph_vcount(&ring1));
     igraph_vector_int_shuffle(&perm);
     igraph_permute_vertices(&ring1, &ring2, &perm);
 
@@ -158,7 +158,7 @@ int main() {
     /* ---------------------------------------------------------------- */
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_vector_int_init_seq(&perm, 0, igraph_ecount(&ring1) - 1);
+    igraph_vector_int_init_range(&perm, 0, igraph_ecount(&ring1));
     igraph_vector_int_shuffle(&perm);
     igraph_permute_vertices(&ring1, &ring2, &perm);
     igraph_vector_int_destroy(&perm);

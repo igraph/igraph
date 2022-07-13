@@ -198,7 +198,7 @@ int main() {
     printf("\nEdgeless graph, personalized PageRank\n");
 
     igraph_empty(&g, 4, IGRAPH_UNDIRECTED);
-    igraph_vector_init_seq(&reset, 1, 4);
+    igraph_vector_init_range(&reset, 1, 5);
 
     igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
                     igraph_vss_all(), 1, 0.85, &reset, 0, &arpack_options);
@@ -332,7 +332,7 @@ int main() {
 
         /* We delete some edges to break the symmetry of the graph.
          * Otherwise all vertices would have the same PageRank. */
-        igraph_vector_int_init_seq(&edges_to_delete, 0, 37);
+        igraph_vector_int_init_range(&edges_to_delete, 0, 38);
         igraph_delete_edges(&g, igraph_ess_vector(&edges_to_delete));
         igraph_vector_int_destroy(&edges_to_delete);
 
@@ -364,7 +364,7 @@ int main() {
 
         printf("\nLarge test graph, weighted\n");
 
-        igraph_vector_init_seq(&weights, igraph_ecount(&g) + 1, 2*igraph_ecount(&g));
+        igraph_vector_init_range(&weights, igraph_ecount(&g) + 1, 2*igraph_ecount(&g) + 1);
 
         igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res_arpack, &value,
                         igraph_vss_all(), 1, 0.85, &weights, &arpack_options);

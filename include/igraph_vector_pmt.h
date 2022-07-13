@@ -33,7 +33,8 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_copy)(
         TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 
 #ifndef NOTORDERED
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_range)(TYPE(igraph_vector)*v, BASE start, BASE end);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
 #endif
 
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, copy)(

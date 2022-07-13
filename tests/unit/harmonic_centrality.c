@@ -46,7 +46,7 @@ int main() {
 
     igraph_vector_destroy(&weights);
 
-    igraph_vector_init_seq(&weights, 1, igraph_ecount(&graph));
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&graph) + 1);
     printf("Weighted undirected:\n");
     igraph_harmonic_centrality(&graph, &res, igraph_vss_all(), IGRAPH_ALL, /* weights= */ &weights, /* normalized= */ 1);
     print_vector(&res);

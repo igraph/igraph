@@ -115,7 +115,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &com_to_numvertices);
 
     /* Initialize node ordering vector */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&node_order, 0, no_of_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
 
     /* Initialize the membership vector with 0 values */

@@ -683,7 +683,7 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
         sort[0] = 'X'; sort[1] = 'X';
     }
 
-    IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
+    IGRAPH_CHECK(igraph_vector_init_range(&order, 0, nconv));
     IGRAPH_FINALLY(igraph_vector_destroy, &order);
 #ifdef HAVE_GFORTRAN
     igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order), /*which_len=*/ 2);
@@ -776,7 +776,7 @@ igraph_error_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *ve
 
 #undef which
 
-    IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
+    IGRAPH_CHECK(igraph_vector_init_range(&order, 0, nconv));
     IGRAPH_FINALLY(igraph_vector_destroy, &order);
 #ifdef HAVE_GFORTRAN
     igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order), /*which_len=*/ 2);

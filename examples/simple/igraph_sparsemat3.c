@@ -138,8 +138,8 @@ int main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
 
-    igraph_vector_int_init_seq(&p, 0, NROW - 1);
-    igraph_vector_int_init_seq(&q, 0, NCOL - 1);
+    igraph_vector_int_init_range(&p, 0, NROW);
+    igraph_vector_int_init_range(&q, 0, NCOL);
 
     /* Identity */
 

@@ -143,7 +143,7 @@ int main() {
 
     igraph_famous(&g, "zachary");
 
-    igraph_vector_init_seq(&values, 0, igraph_vcount(&g) - 1);
+    igraph_vector_init_range(&values, 0, igraph_vcount(&g));
 
     igraph_assortativity(&g, &values, 0, &assort, IGRAPH_UNDIRECTED, /*normalized=*/ 1);
     printf("Assortativity based on values: %g\n", assort);
