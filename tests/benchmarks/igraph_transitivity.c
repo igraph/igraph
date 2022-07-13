@@ -41,7 +41,7 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, N, M,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_init(&trans, igraph_vcount(&g));
-    igraph_vs_seq(&all_vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
     BENCH(" 1 Local transitivity, all vertices method, GNM",
           igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
@@ -68,7 +68,7 @@ int main() {
                          /*outpref=*/ 0, /*A=*/ 1, IGRAPH_UNDIRECTED,
                          IGRAPH_BARABASI_PSUMTREE, /*start_from=*/ 0);
     igraph_vector_resize(&trans, igraph_vcount(&g));
-    igraph_vs_seq(&all_vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
     BENCH(" 5 Local transitivity, all vertices method, Barabasi",
           igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
@@ -94,7 +94,7 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 500, 2000,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_resize(&trans, igraph_vcount(&g));
-    igraph_vs_seq(&all_vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
 #define REPS 1000
 
@@ -124,7 +124,7 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 50, 300,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_resize(&trans, igraph_vcount(&g));
-    igraph_vs_seq(&all_vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
 #undef REPS
 

@@ -59,8 +59,8 @@ int main() {
     igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
 
     igraph_vector_init(&bet, 0);
-    igraph_vs_seq(&vs_source, 0, 500);
-    igraph_vs_seq(&vs_target, 500, 999);
+    igraph_vs_range(&vs_source, 0, 501);
+    igraph_vs_range(&vs_target, 500, 1000);
 
     igraph_betweenness_subset(/* graph=     */ &g,
         /* res=       */ &bet,
@@ -98,8 +98,8 @@ int main() {
      * are 1945 and 199 if the vertex being considered is a descendant of the
      * common grand-grandparent in layer 2, and zero otherwise. */
 
-    igraph_vs_seq(&vs_source, 10911, 11110);
-    igraph_vs_seq(&vs_target, 10911, 11110);
+    igraph_vs_range(&vs_source, 10911, 11111);
+    igraph_vs_range(&vs_target, 10911, 11111);
     igraph_vector_init(&bet, 0);
 
     igraph_betweenness_subset(

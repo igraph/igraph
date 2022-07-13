@@ -98,8 +98,8 @@ int main() {
      * leads to a descendant of the common grand-grandparent in layer 2, and
      * zero otherwise. */
 
-    igraph_vs_seq(&vs_source, 10911, 11110);
-    igraph_vs_seq(&vs_target, 10911, 11110);
+    igraph_vs_range(&vs_source, 10911, 11111);
+    igraph_vs_range(&vs_target, 10911, 11111);
     igraph_vector_init(&bet, 0);
 
     igraph_edge_betweenness_subset(

@@ -69,8 +69,8 @@ int main() {
     CHECK_ERROR(igraph_eit_create(&g, es, &eit), IGRAPH_EINVAL);
     igraph_vector_int_destroy(&v);
 
-    printf("Checking es_seq:\n");
-    igraph_es_seq(&es, 2, 4);
+    printf("Checking es_range:\n");
+    igraph_es_range(&es, 2, 5);
     check(&g, &es);
     CHECK_ERROR(igraph_eit_create(&g_no_edges, es, &eit), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_eit_create(&g_no_vertices, es, &eit), IGRAPH_EINVAL);
@@ -82,8 +82,8 @@ int main() {
     igraph_vector_int_print(&check_as_vector);
     igraph_vector_int_destroy(&check_as_vector);
 
-    printf("Checking ess_seq using es_seq parameters:\n");
-    es = igraph_ess_seq(2, 4);
+    printf("Checking ess_range using es_range parameters:\n");
+    es = igraph_ess_range(2, 5);
     check(&g, &es);
     CHECK_ERROR(igraph_eit_create(&g_no_edges, es, &eit), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_eit_create(&g_no_vertices, es, &eit), IGRAPH_EINVAL);

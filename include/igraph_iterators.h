@@ -88,8 +88,11 @@ IGRAPH_EXPORT igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...);
 IGRAPH_EXPORT igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs,
                                         const igraph_vector_int_t *v);
 
-IGRAPH_EXPORT igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to);
-IGRAPH_EXPORT igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
+
+IGRAPH_EXPORT igraph_error_t igraph_vs_range(igraph_vs_t *vs, igraph_integer_t start, igraph_integer_t end);
+IGRAPH_EXPORT igraph_vs_t igraph_vss_range(igraph_integer_t start, igraph_integer_t end);
 
 IGRAPH_EXPORT void igraph_vs_destroy(igraph_vs_t *vs);
 
@@ -284,8 +287,11 @@ IGRAPH_EXPORT igraph_error_t igraph_es_vector(igraph_es_t *es,
                                    const igraph_vector_int_t *v);
 IGRAPH_EXPORT igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
-IGRAPH_EXPORT igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT igraph_error_t igraph_es_range(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT igraph_es_t igraph_ess_range(igraph_integer_t from, igraph_integer_t to);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
 IGRAPH_EXPORT igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t *v);
 
