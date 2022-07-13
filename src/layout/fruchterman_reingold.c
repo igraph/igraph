@@ -349,6 +349,7 @@ static int igraph_layout_i_grid_fr(
  *        more than 1000 vertices.
  * \param weight Pointer to a vector containing edge weights,
  *        the attraction along the edges will be multiplied by these.
+ *        Weights must be positive.
  *        It will be ignored if it is a null-pointer.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
@@ -380,6 +381,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                        const igraph_vector_t *maxy) {
 
     igraph_integer_t no_nodes = igraph_vcount(graph);
+    igraph_integer_t no_edges = igraph_ecount(graph);
 
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
@@ -392,8 +394,11 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
                      "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
-    if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    if (weight && igraph_vector_size(weight) != no_edges) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
+    }
+    if (weight && no_edges > 0 && igraph_vector_min(weight) <= 0) {
+        IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
@@ -453,6 +458,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
  *        the iteration.
  * \param weight Pointer to a vector containing edge weights,
  *        the attraction along the edges will be multiplied by these.
+ *        Weights must be positive.
  *        It will be ignored if it is a null-pointer.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
@@ -514,6 +520,9 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
     if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+    }
+    if (weight && no_edges > 0 && igraph_vector_min(weight) <= 0) {
+        IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
