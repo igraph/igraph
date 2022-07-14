@@ -301,7 +301,7 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
- * \enumval IGRAPH_ARPACK_PROD Matrix-vector product failed.
+ * \enumval IGRAPH_ARPACK_PROD Matrix-vector product failed (not used any more).
  * \enumval IGRAPH_ARPACK_NPOS N must be positive.
  * \enumval IGRAPH_ARPACK_NEVNPOS NEV must be positive.
  * \enumval IGRAPH_ARPACK_NCVSMALL NCV must be bigger.
@@ -363,7 +363,7 @@ typedef enum {
     IGRAPH_UNIMPLEMENTED     = 12,
     IGRAPH_INTERRUPTED       = 13,
     IGRAPH_DIVERGED          = 14,
-    IGRAPH_ARPACK_PROD       = 15,
+    IGRAPH_ARPACK_PROD       = 15,   /* unused, reserved */
     IGRAPH_ARPACK_NPOS       = 16,
     IGRAPH_ARPACK_NEVNPOS    = 17,
     IGRAPH_ARPACK_NCVSMALL   = 18,
