@@ -23,6 +23,7 @@ Checking ess_range using es_range parameters:
 1 1
 1 3
 2 0
+Checking whether ess_range accepts an empty range.
 Checking es_path:
 3 4
 2 3

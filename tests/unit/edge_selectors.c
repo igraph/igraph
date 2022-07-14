@@ -88,6 +88,12 @@ int main() {
     CHECK_ERROR(igraph_eit_create(&g_no_edges, es, &eit), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_eit_create(&g_no_vertices, es, &eit), IGRAPH_EINVAL);
 
+    printf("Checking whether ess_range accepts an empty range.\n");
+    es = igraph_ess_range(2, 2);
+    check(&g, &es);
+    CHECK_ERROR(igraph_eit_create(&g_no_edges, es, &eit), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_eit_create(&g_no_vertices, es, &eit), IGRAPH_EINVAL);
+
     printf("Checking es_path:\n");
     igraph_vector_int_init_int(&v, 3, 4, 3, 2);
     igraph_es_path(&es, &v, /*directed*/0);
