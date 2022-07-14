@@ -993,12 +993,10 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                 IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
                              IGRAPH_ARPACK_PROD);
             }
-
-        } else {
-            if (ido != 99) {
-                IGRAPH_WARNINGF("Unexpected IDO value %d when running ARPACK.", ido);
-            }
+        } else if (ido == 99) {
             break;
+        } else {
+            IGRAPH_ERRORF("Unexpected IDO value %d when running ARPACK.", IGRAPH_FAILURE, ido);
         }
     }
 
@@ -1259,11 +1257,10 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                 IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
                              IGRAPH_ARPACK_PROD);
             }
-        } else {
-            if (ido != 99) {
-                IGRAPH_WARNINGF("Unexpected IDO value %d when running ARPACK.", ido);
-            }
+        } else if (ido == 99) {
             break;
+        } else {
+            IGRAPH_ERRORF("Unexpected IDO value %d when running ARPACK.", IGRAPH_FAILURE, ido);
         }
     }
 
