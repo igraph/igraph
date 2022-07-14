@@ -468,9 +468,9 @@ igraph_error_t igraph_vs_range(igraph_vs_t *vs, igraph_integer_t start, igraph_i
 
 igraph_vs_t igraph_vss_range(igraph_integer_t start, igraph_integer_t end) {
     igraph_vs_t vs;
-    vs.type = IGRAPH_VS_SEQ;
-    vs.data.seq.from = start;
-    vs.data.seq.to = end - 1;
+    vs.type = IGRAPH_VS_RANGE;
+    vs.data.range.start = start;
+    vs.data.range.end = end;
     return vs;
 }
 
@@ -496,9 +496,7 @@ igraph_vs_t igraph_vss_range(igraph_integer_t start, igraph_integer_t end) {
  */
 
 igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to) {
-    vs->type = IGRAPH_VS_SEQ;
-    vs->data.seq.from = from;
-    vs->data.seq.to = to;
+    *vs = igraph_vss_seq(from, to);
     return IGRAPH_SUCCESS;
 }
 
@@ -519,11 +517,7 @@ igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_inte
  */
 
 igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
-    igraph_vs_t vs;
-    vs.type = IGRAPH_VS_SEQ;
-    vs.data.seq.from = from;
-    vs.data.seq.to = to;
-    return vs;
+    return igraph_vss_range(from, to + 1);
 }
 
 /**
@@ -548,7 +542,7 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
     case IGRAPH_VS_NONE:
     case IGRAPH_VS_1:
     case IGRAPH_VS_VECTORPTR:
-    case IGRAPH_VS_SEQ:
+    case IGRAPH_VS_RANGE:
     case IGRAPH_VS_NONADJ:
         break;
     case IGRAPH_VS_VECTOR:
@@ -656,8 +650,8 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         }
         return IGRAPH_SUCCESS;
 
-    case IGRAPH_VS_SEQ:
-        *result = vs->data.seq.to - vs->data.seq.from + 1;
+    case IGRAPH_VS_RANGE:
+        *result = vs->data.range.end - vs->data.range.start;
         return IGRAPH_SUCCESS;
 
     case IGRAPH_VS_ALL:
@@ -744,7 +738,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
 
     switch (vs.type) {
     case IGRAPH_VS_ALL:
-        vit->type = IGRAPH_VIT_SEQ;
+        vit->type = IGRAPH_VIT_RANGE;
         vit->pos = 0;
         vit->start = 0;
         vit->end = igraph_vcount(graph);
@@ -808,13 +802,13 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         vit->end = n;
         break;
     case IGRAPH_VS_NONE:
-        vit->type = IGRAPH_VIT_SEQ;
+        vit->type = IGRAPH_VIT_RANGE;
         vit->pos = 0;
         vit->start = 0;
         vit->end = 0;
         break;
     case IGRAPH_VS_1:
-        vit->type = IGRAPH_VIT_SEQ;
+        vit->type = IGRAPH_VIT_RANGE;
         vit->pos = vs.data.vid;
         vit->start = vs.data.vid;
         vit->end = vs.data.vid + 1;
@@ -833,17 +827,17 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
             IGRAPH_ERROR("Cannot create iterator, invalid vertex ID.", IGRAPH_EINVVID);
         }
         break;
-    case IGRAPH_VS_SEQ:
-        if (vs.data.seq.from < 0 || vs.data.seq.from >= igraph_vcount(graph)) {
+    case IGRAPH_VS_RANGE:
+        if (vs.data.range.start < 0 || vs.data.range.start >= igraph_vcount(graph)) {
             IGRAPH_ERROR("Cannot create sequence iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
         }
-        if (vs.data.seq.to < 0 || vs.data.seq.to >= igraph_vcount(graph)) {
+        if (vs.data.range.end < 0 || vs.data.range.end > igraph_vcount(graph)) {
             IGRAPH_ERROR("Cannot create sequece iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
         }
-        vit->type = IGRAPH_VIT_SEQ;
-        vit->pos = vs.data.seq.from;
-        vit->start = vs.data.seq.from;
-        vit->end = vs.data.seq.to + 1;
+        vit->type = IGRAPH_VIT_RANGE;
+        vit->pos = vs.data.range.start;
+        vit->start = vs.data.range.start;
+        vit->end = vs.data.range.end;
         break;
     default:
         IGRAPH_ERROR("Cannot create iterator, invalid selector.", IGRAPH_EINVAL);
@@ -867,7 +861,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
 
 void igraph_vit_destroy(const igraph_vit_t *vit) {
     switch (vit->type) {
-    case IGRAPH_VIT_SEQ:
+    case IGRAPH_VIT_RANGE:
     case IGRAPH_VIT_VECTORPTR:
         break;
     case IGRAPH_VIT_VECTOR:
@@ -886,7 +880,7 @@ igraph_error_t igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_int_t
     IGRAPH_CHECK(igraph_vector_int_resize(v, IGRAPH_VIT_SIZE(*vit)));
 
     switch (vit->type) {
-    case IGRAPH_VIT_SEQ:
+    case IGRAPH_VIT_RANGE:
         for (i = 0; i < IGRAPH_VIT_SIZE(*vit); i++) {
             VECTOR(*v)[i] = vit->start + i;
         }
@@ -1207,9 +1201,9 @@ igraph_error_t igraph_es_range(igraph_es_t *es, igraph_integer_t start, igraph_i
 
 igraph_es_t igraph_ess_range(igraph_integer_t start, igraph_integer_t end) {
     igraph_es_t es;
-    es.type = IGRAPH_ES_SEQ;
-    es.data.seq.from = start;
-    es.data.seq.to = end - 1;
+    es.type = IGRAPH_ES_RANGE;
+    es.data.range.start = start;
+    es.data.range.end = end;
     return es;
 }
 
@@ -1232,9 +1226,7 @@ igraph_es_t igraph_ess_range(igraph_integer_t start, igraph_integer_t end) {
  */
 
 igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to) {
-    es->type = IGRAPH_ES_SEQ;
-    es->data.seq.from = from;
-    es->data.seq.to = to;
+    *es = igraph_ess_seq(from, to);
     return IGRAPH_SUCCESS;
 }
 
@@ -1253,11 +1245,7 @@ igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_inte
  */
 
 igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
-    igraph_es_t es;
-    es.type = IGRAPH_ES_SEQ;
-    es.data.seq.from = from;
-    es.data.seq.to = to;
-    return es;
+    return igraph_ess_range(from, to + 1);
 }
 
 /**
@@ -1480,7 +1468,7 @@ void igraph_es_destroy(igraph_es_t *es) {
     case IGRAPH_ES_NONE:
     case IGRAPH_ES_1:
     case IGRAPH_ES_VECTORPTR:
-    case IGRAPH_ES_SEQ:
+    case IGRAPH_ES_RANGE:
     case IGRAPH_ES_ALL_BETWEEN:
         break;
     case IGRAPH_ES_VECTOR:
@@ -1639,8 +1627,8 @@ igraph_error_t igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
         *result = igraph_vector_int_size(es->data.vecptr);
         return IGRAPH_SUCCESS;
 
-    case IGRAPH_ES_SEQ:
-        *result = es->data.seq.to - es->data.seq.from + 1;
+    case IGRAPH_ES_RANGE:
+        *result = es->data.range.end - es->data.range.start;
         return IGRAPH_SUCCESS;
 
     case IGRAPH_ES_PAIRS:
@@ -1976,7 +1964,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
                       igraph_es_t es, igraph_eit_t *eit) {
     switch (es.type) {
     case IGRAPH_ES_ALL:
-        eit->type = IGRAPH_EIT_SEQ;
+        eit->type = IGRAPH_EIT_RANGE;
         eit->pos = 0;
         eit->start = 0;
         eit->end = igraph_ecount(graph);
@@ -1991,13 +1979,13 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
         IGRAPH_CHECK(igraph_i_eit_create_incident(graph, es, eit));
         break;
     case IGRAPH_ES_NONE:
-        eit->type = IGRAPH_EIT_SEQ;
+        eit->type = IGRAPH_EIT_RANGE;
         eit->pos = 0;
         eit->start = 0;
         eit->end = 0;
         break;
     case IGRAPH_ES_1:
-        eit->type = IGRAPH_EIT_SEQ;
+        eit->type = IGRAPH_EIT_RANGE;
         eit->pos = es.data.eid;
         eit->start = es.data.eid;
         eit->end = es.data.eid + 1;
@@ -2016,17 +2004,17 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
             IGRAPH_ERROR("Cannot create iterator, invalid edge ID.", IGRAPH_EINVAL);
         }
         break;
-    case IGRAPH_ES_SEQ:
-        if (es.data.seq.from < 0 || es.data.seq.from >= igraph_ecount(graph)) {
+    case IGRAPH_ES_RANGE:
+        if (es.data.range.start < 0 || es.data.range.start >= igraph_ecount(graph)) {
             IGRAPH_ERROR("Cannot create sequence iterator, starting edge ID out of range.", IGRAPH_EINVAL);
         }
-        if (es.data.seq.to < 0 || es.data.seq.to >= igraph_ecount(graph)) {
+        if (es.data.range.end < 0 || es.data.range.end > igraph_ecount(graph)) {
             IGRAPH_ERROR("Cannot create sequece iterator, ending edge ID out of range.", IGRAPH_EINVAL);
         }
-        eit->type = IGRAPH_EIT_SEQ;
-        eit->pos = es.data.seq.from;
-        eit->start = es.data.seq.from;
-        eit->end = es.data.seq.to + 1;
+        eit->type = IGRAPH_EIT_RANGE;
+        eit->pos = es.data.range.start;
+        eit->start = es.data.range.start;
+        eit->end = es.data.range.end;
         break;
     case IGRAPH_ES_PAIRS:
         IGRAPH_CHECK(igraph_i_eit_pairs(graph, es, eit));
@@ -2056,7 +2044,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
 
 void igraph_eit_destroy(const igraph_eit_t *eit) {
     switch (eit->type) {
-    case IGRAPH_EIT_SEQ:
+    case IGRAPH_EIT_RANGE:
     case IGRAPH_EIT_VECTORPTR:
         break;
     case IGRAPH_EIT_VECTOR:
@@ -2076,7 +2064,7 @@ igraph_error_t igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_int_t
     IGRAPH_CHECK(igraph_vector_int_resize(v, IGRAPH_EIT_SIZE(*eit)));
 
     switch (eit->type) {
-    case IGRAPH_EIT_SEQ:
+    case IGRAPH_EIT_RANGE:
         for (i = 0; i < IGRAPH_EIT_SIZE(*eit); i++) {
             VECTOR(*v)[i] = eit->start + i;
         }
