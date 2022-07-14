@@ -6,6 +6,10 @@
 
  - `igraph_reverse_edges()` reverses the specified edges in the graph while preserving all attributes.
 
+### Changes
+
+ - The `IGRAPH_ARPACK_PROD` error code is no longer used. Instead, the specific error encountered while doing matrix multiplication is reported.
+
 ### Fixed
 
  - Fixed incorrect results from `igraph_local_scan_1_ecount()` when the graph was directed but the mode was `IGRAPH_ALL` and some nodes had loop edges. See issue #2092.
