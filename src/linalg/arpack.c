@@ -953,6 +953,8 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
     /* Ok, we have everything */
     while (1) {
+        igraph_real_t *from, *to;
+
 #ifdef HAVE_GFORTRAN
         igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -969,9 +971,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
         if (ido == -1 || ido == 1) {
-            igraph_real_t *from = workd + options->ipntr[0] - 1;
-            igraph_real_t *to = workd + options->ipntr[1] - 1;
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
             IGRAPH_CHECK(fun(to, from, options->n, extra));
+        } else if (ido == 2) {
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
+            memcpy(to, from, sizeof(igraph_real_t) * options->n);
         } else if (ido == 99) {
             break;
         } else {
@@ -1214,6 +1220,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
     /* Ok, we have everything */
     while (1) {
+        igraph_real_t *from, *to;
+
 #ifdef HAVE_GFORTRAN
         igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1230,8 +1238,17 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
         if (ido == -1 || ido == 1) {
-            igraph_real_t *from = workd + options->ipntr[0] - 1;
-            igraph_real_t *to = workd + options->ipntr[1] - 1;
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
+            IGRAPH_CHECK(fun(to, from, options->n, extra));
+        } else if (ido == 2) {
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
+            memcpy(to, from, sizeof(igraph_real_t) * options->n);
+        } else if (ido == 4) {
+            /* same as ido == 1 but the arguments are at different places */
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[2] - 1;
             IGRAPH_CHECK(fun(to, from, options->n, extra));
         } else if (ido == 99) {
             break;
