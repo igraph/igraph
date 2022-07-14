@@ -175,7 +175,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
     IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
 
-    IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, &dij, igraph_vss_all(),
+    IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
                  igraph_vss_all(), weights, IGRAPH_ALL));
 
     max_dij = 0.0;
