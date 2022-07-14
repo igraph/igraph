@@ -1064,11 +1064,10 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
             from = workd + options->ipntr[0] - 1;
             to = workd + options->ipntr[1] - 1;
             memcpy(to, from, sizeof(igraph_real_t) * options->n);
-        } else {
-            /* ido = 99 */
-            /* ido = 3 should not happen because options->iparam[0] != 0 */
-            IGRAPH_ASSERT(ido == 99);
+        } else if (ido == 99) {
             break;
+        } else {
+            IGRAPH_ERRORF("Unexpected IDO value %d when running ARPACK.", IGRAPH_FAILURE, ido);
         }
     }
 
@@ -1337,11 +1336,10 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
             from = workd + options->ipntr[0] - 1;
             to = workd + options->ipntr[2] - 1;
             IGRAPH_CHECK(fun(to, from, options->n, extra));
-        } else {
-            /* ido = 99 */
-            /* ido = 3 should not happen because options->iparam[0] != 0 */
-            IGRAPH_ASSERT(ido == 99);
+        } else if (ido == 99) {
             break;
+        } else {
+            IGRAPH_ERRORF("Unexpected IDO value %d when running ARPACK.", IGRAPH_FAILURE, ido);
         }
     }
 
