@@ -995,6 +995,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
             }
 
         } else {
+            if (ido != 99) {
+                IGRAPH_WARNINGF("Unexpected IDO value %d when running ARPACK.", ido);
+            }
             break;
         }
     }
@@ -1257,6 +1260,9 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                              IGRAPH_ARPACK_PROD);
             }
         } else {
+            if (ido != 99) {
+                IGRAPH_WARNINGF("Unexpected IDO value %d when running ARPACK.", ido);
+            }
             break;
         }
     }
