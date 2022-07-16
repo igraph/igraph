@@ -930,7 +930,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
 
 /**
  * \function igraph_biconnected_components
- * Calculate biconnected components
+ * \brief Calculate biconnected components.
  *
  * A graph is biconnected if the removal of any single vertex (and
  * its incident edges) does not disconnect it.
@@ -942,6 +942,10 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * one biconnected component. Note that this is not true for
  * vertices: the same vertex can be part of many biconnected
  * components.
+ *
+ * </para><para>
+ * Note that some authors do not consider the graph consisting of
+ * two connected vertices as biconnected, however, igraph does.
  *
  * </para><para>
  * Somewhat arbitrarily, igraph does not consider components containing
