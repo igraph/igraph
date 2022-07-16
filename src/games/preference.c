@@ -533,7 +533,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             maxedges = ((igraph_real_t) v1_size) * v2_size;
 
             if (maxedges > IGRAPH_MAX_EXACT_REAL) {
-                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+                IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
             }
 
             if (!loops) {
