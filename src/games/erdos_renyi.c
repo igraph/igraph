@@ -28,6 +28,7 @@
 #include "igraph_random.h"
 
 #include "random/random_internal.h"
+#include "math/safe_intop.h"
 
 /**
  * \section about_games
@@ -76,6 +77,9 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             maxedges *= (n - 1) / 2.0;
         }
 
+        if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+            IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+        }
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
 

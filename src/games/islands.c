@@ -26,6 +26,7 @@
 #include "igraph_constructors.h"
 #include "igraph_random.h"
 
+#include "math/safe_intop.h"
 /**
  * \ingroup generators
  * \function igraph_simple_interconnected_islands_game
@@ -88,8 +89,8 @@ igraph_error_t igraph_simple_interconnected_islands_game(
     nr_edges_reserved = 1.1 * avg_edges_per_island * islands_n + number_of_inter_island_edges;
     /* The cast of ECOUNT_MAX to double could change its value, which means in theory the size of
        the edges vector could still overflow, but only for very rare cases. */
-    if (nr_edges_reserved > (double) (IGRAPH_ECOUNT_MAX )) {
-        IGRAPH_ERROR("Number of edges overflows.", IGRAPH_EOVERFLOW);
+    if (nr_edges_reserved > (double) (IGRAPH_ECOUNT_MAX ) || nr_edges_reserved > IGRAPH_MAX_EXACT_REAL) {
+        IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
     }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, nr_edges_reserved * 2));

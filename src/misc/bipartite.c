@@ -31,6 +31,7 @@
 #include "igraph_nongraph.h"
 
 #include "graph/attributes.h"
+#include "math/safe_intop.h"
 
 /**
  * \section about_bipartite Bipartite networks in igraph
@@ -949,6 +950,9 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
             maxedges = 2.0 * n1_real * n2_real;
         }
 
+        if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+            IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+        }
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&s, 0);
         IGRAPH_CHECK(igraph_vector_int_reserve(&s, (igraph_integer_t) (maxedges * p * 1.1)));
