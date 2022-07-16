@@ -265,7 +265,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             }
 
             if (maxedges > IGRAPH_MAX_EXACT_REAL) {
-                IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+                IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
             }
 
             IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
