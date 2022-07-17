@@ -291,6 +291,7 @@ add_legacy_tests(
   igraph_diversity
   igraph_distances_johnson
   igraph_eccentricity
+  igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
@@ -322,7 +323,6 @@ add_legacy_tests(
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
-  igraph_weighted_eccentricity
   igraph_widest_paths
   harmonic_centrality
   random_spanning_tree

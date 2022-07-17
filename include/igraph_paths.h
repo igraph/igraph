@@ -177,7 +177,7 @@ IGRAPH_EXPORT igraph_error_t igraph_eccentricity(const igraph_t *graph,
                                       igraph_vs_t vids,
                                       igraph_neimode_t mode);
 
-IGRAPH_EXPORT igraph_error_t igraph_weighted_eccentricity(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
                         const igraph_vector_t *weights,
                         igraph_vector_t *res,
                         igraph_vs_t vids,

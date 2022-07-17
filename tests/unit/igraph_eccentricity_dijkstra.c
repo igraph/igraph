@@ -29,7 +29,7 @@ void print_and_destroy(igraph_t *graph, igraph_neimode_t mode) {
     for (int i = 0; i < igraph_ecount(graph); i++) {
         VECTOR(weights)[i] = 1;
     }
-    igraph_weighted_eccentricity(graph, &weights, &ecc, igraph_vss_all(), mode);
+    igraph_eccentricity_dijkstra(graph, &weights, &ecc, igraph_vss_all(), mode);
     print_vector(&ecc);
     igraph_destroy(graph);
     igraph_vector_destroy(&ecc);

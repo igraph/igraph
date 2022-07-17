@@ -121,115 +121,109 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_weighted_eccentricity(const igraph_t *graph,
-                                 const igraph_vector_t *weights,
-                                 igraph_vector_t *res,
-                                 igraph_vs_t vids,
-                                 igraph_lazy_adjlist_t *adjlist,
-                                 igraph_integer_t *vid_ecc,
-                                 igraph_bool_t unconn, igraph_neimode_t mode) {
+/**
+ * This function finds the weighted eccentricity and returns it via \p ecc.
+ * It's used for igraph_pseudo_diameter_dijkstra. \p vid_ecc returns the vertex
+ * id of the ecc with the greatest
+ * distance from \p vid_start. If two vertices have the same greatest distance,
+ * the one with the lowest degree is chosen.
+ * When the graph is not (strongly) connected and \p unconn is false, then \p ecc
+ * wil be set to infinity, and \p vid_ecc to -1;
+ */
+static igraph_error_t igraph_i_eccentricity_dijkstra(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_real_t *ecc,
+        igraph_integer_t vid_start,
+        igraph_integer_t *vid_ecc,
+        igraph_bool_t unconn,
+        igraph_lazy_inclist_t *inclist) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_dqueue_int_t q;
-    igraph_dqueue_t dist_q;
-    igraph_vit_t vit;
-    igraph_vector_int_t counted;
-    igraph_integer_t i, mark = 1;
-    igraph_integer_t min_degree = 0;
+    igraph_2wheap_t Q;
+    igraph_vector_t vec_dist;
+    igraph_integer_t i;
+    igraph_real_t degree_ecc, dist;
+    igraph_integer_t degree_i;
+    igraph_vector_int_t *neis;
 
-    IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
+    IGRAPH_VECTOR_INIT_FINALLY(&vec_dist, no_of_nodes);
+    igraph_vector_fill(&vec_dist, IGRAPH_INFINITY);
+    IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+    IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
-    IGRAPH_CHECK(igraph_dqueue_init(&dist_q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &dist_q);
+    igraph_2wheap_clear(&Q);
+    igraph_2wheap_push_with_index(&Q, vid_start, -1.0);
 
-    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+    while (!igraph_2wheap_empty(&Q)) {
+        igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
+        igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
+        igraph_integer_t nlen;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&counted, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &counted);
+        VECTOR(vec_dist)[minnei] = mindist - 1.0;
 
-    IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
-    igraph_vector_fill(res, -1);
-
-    for (i = 0, IGRAPH_VIT_RESET(vit);
-         !IGRAPH_VIT_END(vit);
-         IGRAPH_VIT_NEXT(vit), mark++, i++) {
-
-        igraph_integer_t source;
-        igraph_integer_t nodes_reached = 1;
-        source = IGRAPH_VIT_GET(vit);
-        IGRAPH_CHECK(igraph_dqueue_int_push(&q, source));
-        IGRAPH_CHECK(igraph_dqueue_push(&dist_q, 0));
-        VECTOR(counted)[source] = mark;
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t act = igraph_dqueue_int_pop(&q);
-            igraph_real_t dist = igraph_dqueue_pop(&dist_q);
-            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(adjlist, act);
-            igraph_integer_t j, n;
-
-            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
-
-            n = igraph_vector_int_size(neis);
-            for (j = 0; j < n; j++) {
-                igraph_vector_int_t eids;
-                igraph_real_t weight;
-                IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
-                igraph_integer_t nei = VECTOR(*neis)[j];
-                if (mode == IGRAPH_OUT) {
-                    igraph_get_all_eids_between(graph, &eids, act, nei, IGRAPH_DIRECTED);
-                } else if (mode == IGRAPH_IN) {
-                    igraph_get_all_eids_between(graph, &eids, nei, act, IGRAPH_DIRECTED);
-                } else {
-                    igraph_get_all_eids_between(graph, &eids, act, nei, IGRAPH_UNDIRECTED);
-                }
-                weight = VECTOR(*weights)[VECTOR(eids)[0]];
-                for (igraph_integer_t k = 1; k < igraph_vector_int_size(&eids); k++) {
-                    if (VECTOR(*weights)[VECTOR(eids)[k]] < weight) {
-                        weight = VECTOR(*weights)[VECTOR(eids)[k]];
-                    }
-                }
-                if (VECTOR(counted)[nei] != mark) {
-                    VECTOR(counted)[nei] = mark;
-                    nodes_reached++;
-                    IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
-                    IGRAPH_CHECK(igraph_dqueue_push(&dist_q, dist + weight));
-                }
-                igraph_vector_int_destroy(&eids);
-                IGRAPH_FINALLY_CLEAN(1);
+        /* Now check all neighbors of 'minnei' for a shorter path */
+        neis = igraph_lazy_inclist_get(inclist, minnei);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+        nlen = igraph_vector_int_size(neis);
+        for (i = 0; i < nlen; i++) {
+            igraph_integer_t edge = VECTOR(*neis)[i];
+            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
+            igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
+            igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
+            igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
+            if (!has) {
+                /* This is the first non-infinite distance */
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+            } else if (altdist < curdist) {
+                /* This is a shorter path */
+                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
             }
-            if (vid_ecc) {
-                /* Return the vertex ID of the vertex which has the lowest
-                 * degree of the vertices most distant from the starting
-                 * vertex. Assumes there is only 1 vid in vids. Used for
-                 * pseudo_diameter calculations. */
-                if (dist > VECTOR(*res)[i] || (dist == VECTOR(*res)[i] && n < min_degree)) {
-                    VECTOR(*res)[i] = dist;
-                    *vid_ecc = act;
-                    min_degree = n;
-                }
-            } else if (dist > VECTOR(*res)[i]) {
-                VECTOR(*res)[i] = dist;
-            }
-        } /* while !igraph_dqueue_int_empty(dqueue) */
-
-        if (nodes_reached != no_of_nodes && !unconn && vid_ecc) {
-            *vid_ecc = -1;
-            break;
         }
-    } /* for IGRAPH_VIT_NEXT(vit) */
+    }
 
-    igraph_vector_int_destroy(&counted);
-    igraph_vit_destroy(&vit);
-    igraph_dqueue_int_destroy(&q);
-    igraph_dqueue_destroy(&dist_q);
-    IGRAPH_FINALLY_CLEAN(4);
+    *ecc = 0;
+    *vid_ecc = vid_start;
+    degree_ecc = 0;
 
+    for (i = 0; i < no_of_nodes; i++) {
+        if (i == vid_start) {
+            continue;
+        }
+        dist = VECTOR(vec_dist)[i];
+
+        /* inclist is used to ignore multiple edges when finding the degree */
+        neis = igraph_lazy_inclist_get(inclist, i);
+        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+
+        degree_i  = igraph_vector_int_size(neis);
+
+        if (dist > *ecc) {
+            if (!IGRAPH_FINITE(dist)) {
+                if (!unconn) {
+                    *ecc = IGRAPH_INFINITY;
+                    *vid_ecc = -1;
+                    break;
+                }
+            } else {
+                *ecc = dist;
+                *vid_ecc = i;
+                degree_ecc = degree_i;
+            }
+        } else if (dist == *ecc) {
+            if (degree_i < degree_ecc) {
+                degree_ecc = degree_i;
+                *vid_ecc = i;
+            }
+        }
+    }
+    igraph_2wheap_destroy(&Q);
+    igraph_vector_destroy(&vec_dist);
+    IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
+
 /**
  * \function igraph_eccentricity
  * \brief Eccentricity of some vertices.
@@ -279,20 +273,64 @@ igraph_error_t igraph_eccentricity(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_weighted_eccentricity(const igraph_t *graph,
+/**
+ * \function igraph_eccentricity_dijkstra
+ * \brief Eccentricity of some vertices, using weighted edges.
+ *
+ * The eccentricity of a vertex is calculated by measuring the shortest
+ * distance from (or to) the vertex, to (or from) all vertices in the
+ * graph, and taking the maximum.
+ *
+ * </para><para>
+ * This implementation ignores vertex pairs that are in different
+ * components. Isolated vertices have eccentricity zero.
+ *
+ * \param graph The input graph, it can be directed or undirected.
+ * \param weights The edge weights. All edge weights must be
+ *    non-negative for Dijkstra's algorithm to work. Additionally, no
+ *    edge weight may be NaN. If either case does not hold, an error
+ *    is returned. If this is a null pointer, then the unweighted
+ *    version, \ref igraph_eccentricity() is called.
+ * \param res Pointer to an initialized vector, the result is stored
+ *    here.
+ * \param vids The vertices for which the eccentricity is calculated.
+ * \param mode What kind of paths to consider for the calculation:
+ *    \c IGRAPH_OUT, paths that follow edge directions;
+ *    \c IGRAPH_IN, paths that follow the opposite directions; and
+ *    \c IGRAPH_ALL, paths that ignore edge directions. This argument
+ *    is ignored for undirected graphs.
+ * \return Error code.
+ *
+ */
+
+igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
                         const igraph_vector_t *weights,
                         igraph_vector_t *res,
                         igraph_vs_t vids,
                         igraph_neimode_t mode) {
-    igraph_lazy_adjlist_t adjlist;
+    igraph_lazy_inclist_t inclist;
+    igraph_vit_t vit;
+    igraph_integer_t dump;
+    igraph_real_t ecc;
 
-    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
-                                          IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+    if (weights == NULL) {
+        return(igraph_eccentricity(graph, res, vids, mode));
+    }
 
-    IGRAPH_CHECK(igraph_i_weighted_eccentricity(graph, weights, res, vids, &adjlist,
-                                       /*vid_ecc*/ NULL, /*unconn*/ 1, mode));
-    igraph_lazy_adjlist_destroy(&adjlist);
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode,
+                                          IGRAPH_NO_LOOPS));
+    IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, 0));
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+
+    for (IGRAPH_VIT_RESET(vit);
+            !IGRAPH_VIT_END(vit);
+            IGRAPH_VIT_NEXT(vit)) {
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc, IGRAPH_VIT_GET(vit), /*vid_ecc*/&dump, /*unconn*/ 1, &inclist));
+        IGRAPH_CHECK(igraph_vector_push_back(res, ecc));
+    }
+    igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }
@@ -570,108 +608,6 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-/**
- * This function finds the weighted eccentricity and returns it via \p ecc.
- * It's used for igraph_pseudo_diameter_dijkstra. \p vid_ecc returns the vertex
- * id of the ecc with the greatest
- * distance from \p vid_start. If two vertices have the same greatest distance,
- * the one with the lowest degree is chosen.
- * When the graph is not (strongly) connected and \p unconn is false, then \p ecc
- * wil be set to infinity, and \p vid_ecc to -1;
- */
-static igraph_error_t igraph_i_eccentricity_dijkstra(
-        const igraph_t *graph,
-        const igraph_vector_t *weights,
-        igraph_real_t *ecc,
-        igraph_integer_t vid_start,
-        igraph_integer_t *vid_ecc,
-        igraph_bool_t unconn,
-        igraph_lazy_inclist_t *inclist) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_2wheap_t Q;
-    igraph_vector_t vec_dist;
-    igraph_integer_t i;
-    igraph_real_t degree_ecc, dist;
-    igraph_integer_t degree_i;
-    igraph_vector_int_t *neis;
-
-    IGRAPH_VECTOR_INIT_FINALLY(&vec_dist, no_of_nodes);
-    igraph_vector_fill(&vec_dist, IGRAPH_INFINITY);
-    IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
-    IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-
-    igraph_2wheap_clear(&Q);
-    igraph_2wheap_push_with_index(&Q, vid_start, -1.0);
-
-    while (!igraph_2wheap_empty(&Q)) {
-        igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
-        igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
-        igraph_integer_t nlen;
-
-        VECTOR(vec_dist)[minnei] = mindist - 1.0;
-
-        /* Now check all neighbors of 'minnei' for a shorter path */
-        neis = igraph_lazy_inclist_get(inclist, minnei);
-        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
-        nlen = igraph_vector_int_size(neis);
-        for (i = 0; i < nlen; i++) {
-            igraph_integer_t edge = VECTOR(*neis)[i];
-            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
-            igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
-            igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
-            igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
-            igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
-            if (!has) {
-                /* This is the first non-infinite distance */
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
-            } else if (altdist < curdist) {
-                /* This is a shorter path */
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
-            }
-        }
-    }
-
-    *ecc = 0;
-    *vid_ecc = vid_start;
-    degree_ecc = 0;
-
-    for (i = 0; i < no_of_nodes; i++) {
-        if (i == vid_start) {
-            continue;
-        }
-        dist = VECTOR(vec_dist)[i];
-
-        /* inclist is used to ignore multiple edges when finding the degree */
-        neis = igraph_lazy_inclist_get(inclist, i);
-        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
-
-        degree_i  = igraph_vector_int_size(neis);
-
-        if (dist > *ecc) {
-            if (!IGRAPH_FINITE(dist)) {
-                if (!unconn) {
-                    *ecc = IGRAPH_INFINITY;
-                    *vid_ecc = -1;
-                    break;
-                }
-            } else {
-                *ecc = dist;
-                *vid_ecc = i;
-                degree_ecc = degree_i;
-            }
-        } else if (dist == *ecc) {
-            if (degree_i < degree_ecc) {
-                degree_ecc = degree_i;
-                *vid_ecc = i;
-            }
-        }
-    }
-    igraph_2wheap_destroy(&Q);
-    igraph_vector_destroy(&vec_dist);
-    IGRAPH_FINALLY_CLEAN(2);
-    return IGRAPH_SUCCESS;
-}
 
 /**
  * \function igraph_pseudo_diameter_dijkstra
