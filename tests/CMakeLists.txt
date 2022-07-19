@@ -490,6 +490,7 @@ add_legacy_tests(
   igraph_almost_equals
   igraph_power_law_fit
   overflow
+  prop_caching
 )
 
 # operators.at
