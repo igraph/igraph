@@ -757,6 +757,41 @@ void FUNCTION(igraph_vector, fill)      (TYPE(igraph_vector)* v, BASE e) {
     }
 }
 
+#ifndef NOTORDERED
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_range
+ * \brief Updates a vector to store a range.
+ *
+ * </para><para>
+ * Sets the elements of the vector to contain the numbers \p start, \p start+1,
+ * ..., \p end-1. Note that the range is closed from the left and open from the
+ * right, according to C conventions.
+ *
+ * \param v The vector to update.
+ * \param start The lower limit in the range (inclusive).
+ * \param end The upper limit in the range (exclusive).
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory.
+ *
+ * Time complexity: O(n), the number of elements in the vector.
+ */
+
+igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector) *v, BASE from, BASE to) {
+    BASE *p;
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, (to - from)));
+
+    for (p = v->stor_begin; p < v->end; p++) {
+        *p = from;
+        from = from + ONE;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+#endif
+
 /**
  * \ingroup vector
  * \function igraph_vector_tail
@@ -1706,7 +1741,8 @@ igraph_error_t FUNCTION(igraph_vector, init_range)(TYPE(igraph_vector) *v, BASE 
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from)));
 
     for (p = v->stor_begin; p < v->end; p++) {
-        *p = from++;
+        *p = from;
+        from = from + ONE;
     }
 
     return IGRAPH_SUCCESS;

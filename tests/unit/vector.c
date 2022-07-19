@@ -364,6 +364,16 @@ int main() {
     }
     igraph_vector_destroy(&v);
 
+    printf("Test range\n");
+
+    igraph_vector_init(&v, 100);
+    igraph_vector_range(&v, 20, 50);
+    IGRAPH_ASSERT(igraph_vector_size(&v) == 30);
+    for (i = 0; i < igraph_vector_size(&v); i++) {
+        IGRAPH_ASSERT(VECTOR(v)[i] == 20 + i);
+    }
+    igraph_vector_destroy(&v);
+
     printf("Test igraph_vector_int_init_range, igraph_vector_int_order1\n");
     igraph_vector_int_init_range(&v4, 1, 11);
     igraph_vector_int_init(&v5, 0);

@@ -23,6 +23,7 @@
 <section id="initializing-elements"><title>Initializing elements</title>
 <!-- doxrox-include igraph_vector_null -->
 <!-- doxrox-include igraph_vector_fill -->
+<!-- doxrox-include igraph_vector_range -->
 </section>
 
 <section id="vector-accessing-elements">

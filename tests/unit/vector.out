@@ -62,5 +62,6 @@ Test rank
 Test pair order
 ( 0 1 2 3 )
 Test fill
+Test range
 Test igraph_vector_int_init_range, igraph_vector_int_order1
 ( 0 1 2 3 4 5 6 7 8 9 )
