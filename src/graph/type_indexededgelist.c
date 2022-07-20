@@ -26,12 +26,13 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
+#include "graph/caching.h"
 #include "graph/internal.h"
 #include "math/safe_intop.h"
 
 /* Internal functions */
 
-static igraph_error_t igraph_i_create_start(
+static igraph_error_t igraph_i_create_start_vectors(
         igraph_vector_int_t *res, igraph_vector_int_t *el,
         igraph_vector_int_t *index, igraph_integer_t nodes);
 
@@ -109,6 +110,13 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->os, 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->is, 1);
 
+    /* init cache */
+    graph->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    IGRAPH_CHECK_OOM(graph->cache, "Cannot create graph.");
+    IGRAPH_FINALLY(igraph_free, graph->cache);
+    IGRAPH_CHECK(igraph_i_property_cache_init(graph->cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, graph->cache);
+
     VECTOR(graph->os)[0] = 0;
     VECTOR(graph->is)[0] = 0;
 
@@ -119,7 +127,7 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     /* add the vertices */
     IGRAPH_CHECK(igraph_add_vertices(graph, n, 0));
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
 }
 
@@ -142,6 +150,9 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
 void igraph_destroy(igraph_t *graph) {
 
     IGRAPH_I_ATTRIBUTE_DESTROY(graph);
+
+    igraph_i_property_cache_destroy(graph->cache);
+    IGRAPH_FREE(graph->cache);
 
     igraph_vector_int_destroy(&graph->from);
     igraph_vector_int_destroy(&graph->to);
@@ -193,9 +204,15 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     IGRAPH_CHECK(igraph_vector_int_init_copy(&to->is, &from->is));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->is);
 
+    to->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    IGRAPH_CHECK_OOM(to->cache, "Cannot copy graph.");
+    IGRAPH_FINALLY(igraph_free, to->cache);
+    IGRAPH_CHECK(igraph_i_property_cache_copy(to->cache, from->cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, to->cache);
+
     IGRAPH_I_ATTRIBUTE_COPY(to, from, 1, 1, 1); /* does IGRAPH_CHECK */
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
 }
 
@@ -298,10 +315,10 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         }
 
         /* os & is, its length does not change, error safe */
-        igraph_i_create_start(&graph->os, &graph->from, &newoi, graph->n);
-        igraph_i_create_start(&graph->is, &graph->to, &newii, graph->n);
+        igraph_i_create_start_vectors(&graph->os, &graph->from, &newoi, graph->n);
+        igraph_i_create_start_vectors(&graph->is, &graph->to, &newii, graph->n);
 
-        /* everything went fine  */
+        /* everything went fine */
         igraph_vector_int_destroy(&graph->oi);
         igraph_vector_int_destroy(&graph->ii);
         IGRAPH_FINALLY_CLEAN(2);
@@ -312,6 +329,31 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
     IGRAPH_FINALLY_EXIT();
 
 #undef CHECK_ERR
+
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Adding one or more edges cannot make a strongly or weakly connected
+     * graph disconnected, so we keep those flags if they are cached as true.
+     *
+     * Adding one or more edges may turn a DAG into a non-DAG or a forest into
+     * a non-forest, so we can keep those flags only if they are cached as
+     * false.
+     *
+     * Also, adding one or more edges does not change HAS_LOOP, HAS_MULTI and
+     * HAS_RECIPROCAL if they were already true.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_IS_DAG) | (1 << IGRAPH_PROP_IS_FOREST),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED) |
+        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL)
+    );
 
     return IGRAPH_SUCCESS;
 }
@@ -383,6 +425,42 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
         }
     }
 
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Adding one or more nodes does not change the following cached properties:
+     *
+     * - IGRAPH_PROP_HAS_LOOP
+     * - IGRAPH_PROP_HAS_MULTI
+     * - IGRAPH_PROP_HAS_RECIPROCAL
+     * - IGRAPH_PROP_IS_DAG (adding a node does not create/destroy cycles)
+     * - IGRAPH_PROP_IS_FOREST (same)
+     *
+     * Adding one or more nodes without any edges incident on them is sure to
+     * make the graph disconnected (weakly or strongly), so we can keep the
+     * connectivity-related properties if they are currently cached as false.
+     * (Actually, even if they weren't cached as false, we could still set them
+     * to false, but we don't have that functionality yet). The only exception
+     * is when the graph had zero vertices and gained only one vertex, because
+     * it then becomes connected. That's why we have the condition below in the
+     * keep_when_false section.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL) |
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST),
+        /* keep_when_false = */
+        igraph_vcount(graph) >= 2 ? (
+            (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+            (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED)
+        ) : 0,
+        /* keep_when_true = */
+        0
+    );
+
     return IGRAPH_SUCCESS;
 }
 
@@ -423,9 +501,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_integer_t i, j;
 
     mark = IGRAPH_CALLOC(no_of_edges, int);
-    if (mark == 0) {
-        IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(mark, "Cannot delete edges.");
     IGRAPH_FINALLY(igraph_free, mark);
 
     IGRAPH_CHECK(igraph_eit_create(graph, edges, &eit));
@@ -493,8 +569,35 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Create start vectors, no memory is needed for this */
-    igraph_i_create_start(&graph->os, &graph->from, &graph->oi, no_of_nodes);
-    igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
+    igraph_i_create_start_vectors(&graph->os, &graph->from, &graph->oi, no_of_nodes);
+    igraph_i_create_start_vectors(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
+
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Deleting one or more edges cannot make a directed acyclic graph cyclic,
+     * or an undirected forest into a cyclic graph, so we keep those flags if
+     * they are cached as true.
+     *
+     * Similarly, deleting one or more edges cannot make a disconnected graph
+     * connected, so we keep the connectivity flags if they are cached as false.
+     *
+     * Also, if the graph had no loop edges before the deletion, it will have
+     * no loop edges after the deletion either. The same applies to reciprocal
+     * edges or multiple edges as well.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL) |
+        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST)
+    );
 
     /* Nothing to deallocate... */
     return IGRAPH_SUCCESS;
@@ -607,21 +710,31 @@ igraph_error_t igraph_delete_vertices_idx(
             j++;
         }
     }
+
     /* update oi & ii */
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.from, &newgraph.to, &newgraph.oi,
                                          remaining_vertices));
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.to, &newgraph.from, &newgraph.ii,
                                          remaining_vertices));
 
-    IGRAPH_CHECK(igraph_i_create_start(&newgraph.os, &newgraph.from,
+    IGRAPH_CHECK(igraph_i_create_start_vectors(&newgraph.os, &newgraph.from,
                                        &newgraph.oi, remaining_vertices));
-    IGRAPH_CHECK(igraph_i_create_start(&newgraph.is, &newgraph.to,
+    IGRAPH_CHECK(igraph_i_create_start_vectors(&newgraph.is, &newgraph.to,
                                        &newgraph.ii, remaining_vertices));
+
+    newgraph.cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    IGRAPH_CHECK_OOM(newgraph.cache, "Cannot delete vertices.");
+    IGRAPH_FINALLY(igraph_free, newgraph.cache);
+    IGRAPH_CHECK(igraph_i_property_cache_init(newgraph.cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, newgraph.cache);
 
     /* attributes */
     IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph,
                             /*graph=*/ 1, /*vertex=*/0, /*edge=*/0);
-    IGRAPH_FINALLY_CLEAN(6);
+
+    /* at this point igraph_destroy can take over the responsibility of
+     * deallocating the graph */
+    IGRAPH_FINALLY_CLEAN(8);    /* 2 for the property cache, 6 for the vectors */
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
     if (newgraph.attr) {
@@ -670,6 +783,28 @@ igraph_error_t igraph_delete_vertices_idx(
         igraph_vector_int_destroy(my_vertex_recoding);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Deleting one or more vertices cannot make a directed acyclic graph cyclic,
+     * or an undirected forest into a cyclic graph, so we keep those flags if
+     * they are cached as true.
+     *
+     * Also, if the graph had no loop edges before the deletion, it will have
+     * no loop edges after the deletion either. The same applies to reciprocal
+     * edges or multiple edges as well.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_RECIPROCAL),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST)
+    );
 
     return IGRAPH_SUCCESS;
 }
@@ -894,7 +1029,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
  * \ingroup internal
  */
 
-static igraph_error_t igraph_i_create_start(
+static igraph_error_t igraph_i_create_start_vectors(
         igraph_vector_int_t *res, igraph_vector_int_t *el,
         igraph_vector_int_t *iindex, igraph_integer_t nodes) {
 

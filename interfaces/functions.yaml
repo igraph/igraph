@@ -2499,6 +2499,10 @@ igraph_strerror:
 igraph_expand_path_to_pairs:
     PARAMS: INOUT VERTEX_INDICES path
 
+igraph_invalidate_cache:
+    PARAMS: GRAPH graph
+    RETURN: VOID
+
 igraph_vertex_path_from_edge_path:
     PARAMS: |-
         GRAPH graph, VERTEX start, EDGE_INDICES edge_path,

@@ -31,6 +31,12 @@
  *
  * </para><para>
  * A loop edge is an edge from a vertex to itself.
+ *
+ * </para><para>
+ * The return value of this function is cached in the graph itself; calling
+ * the function multiple times with no modifications to the graph in between
+ * will return a cached value in O(1) time.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized boolean vector for storing the result.
  *
@@ -43,6 +49,8 @@
 igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t i, m = igraph_ecount(graph);
 
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_HAS_LOOP, res);
+
     *res = 0;
 
     for (i = 0; i < m; i++) {
@@ -51,6 +59,8 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
             break;
         }
     }
+
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, *res);
 
     return IGRAPH_SUCCESS;
 }

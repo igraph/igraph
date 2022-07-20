@@ -86,6 +86,7 @@ add_library(
   graph/adjlist.c
   graph/attributes.c
   graph/basic_query.c
+  graph/caching.c
   graph/cattributes.c
   graph/graph_list.c
   graph/iterators.c
