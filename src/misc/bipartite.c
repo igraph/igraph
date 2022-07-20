@@ -940,10 +940,11 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
     } else {
 
         igraph_integer_t to, from, slen;
-        igraph_real_t n1_real = (igraph_real_t) n1;  /* for divisions below */
-        igraph_real_t n2_real = (igraph_real_t) n2;  /* for divisions below */
+        igraph_real_t n1_real = n1;  /* for divisions below */
+        igraph_real_t n2_real = n2;  /* for divisions below */
+        igraph_real_t maxedges, last;
+        igraph_integer_t maxedges_int;
 
-        double maxedges, last;
         if (!directed || mode != IGRAPH_ALL) {
             maxedges = n1_real * n2_real;
         } else {
@@ -955,7 +956,8 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
         }
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_int_reserve(&s, (igraph_integer_t) (maxedges * p * 1.1)));
+        IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &maxedges_int));
+        IGRAPH_CHECK(igraph_vector_int_reserve(&s, maxedges_int));
 
         RNG_BEGIN();
 
@@ -1016,10 +1018,10 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
     igraph_vector_int_t s;
 
     if (n1 < 0 || n2 < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
     if (m < 0) {
-        IGRAPH_ERROR("Invalid number of edges", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
     }
 
     if (types) {
@@ -1033,22 +1035,21 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
 
     if (m == 0 || n1 * n2 == 0) {
         if (m > 0) {
-            IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
         }
         IGRAPH_CHECK(igraph_empty(graph, n1 + n2, directed));
     } else {
-
-
         igraph_integer_t i;
-        double maxedges;
+        igraph_real_t maxedges;
+
         if (!directed || mode != IGRAPH_ALL) {
-            maxedges = (double) n1 * (double) n2;
+            maxedges = (igraph_real_t) n1 * (igraph_real_t) n2;
         } else {
-            maxedges = 2.0 * (double) n1 * (double) n2;
+            maxedges = 2.0 * (igraph_real_t) n1 * (igraph_real_t) n2;
         }
 
         if (m > maxedges) {
-            IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
         }
 
         if (maxedges == m) {

@@ -268,7 +268,8 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
             }
 
-            IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
+            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &no_reserved_edges));
+            IGRAPH_CHECK(igraph_vector_reserve(&s, no_reserved_edges));
 
             last = RNG_GEOM(p);
             while (last < maxedges) {
@@ -544,7 +545,9 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
 
             p = MATRIX(*pref_matrix, i, j);
             igraph_vector_clear(&s);
-            IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
+
+            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &no_reserved_edges));
+            IGRAPH_CHECK(igraph_vector_reserve(&s, no_reserved_edges));
 
             last = RNG_GEOM(p);
             while (last < maxedges) {

@@ -68,10 +68,10 @@ igraph_error_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t i, j;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
     if (m < 0) {
-        IGRAPH_ERROR("Invalid number of edges per step (m)", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of edges per step (m).", IGRAPH_EINVAL);
     }
 
     if (no_of_nodes == 0) {

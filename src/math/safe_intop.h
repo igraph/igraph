@@ -118,6 +118,10 @@ __BEGIN_DECLS
         else IGRAPH_SAFE_MULT(_safe_n, (_safe_n - 1) / 2, res); \
     } while (0)
 
+igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t* result);
+igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t* result);
+igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result);
+
 igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_safe_add(igraph_integer_t a, igraph_integer_t b, igraph_integer_t *res);
