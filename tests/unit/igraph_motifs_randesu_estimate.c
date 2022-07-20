@@ -38,7 +38,7 @@ int main() {
     igraph_vector_init_real(&cut_prob_0_3, 3, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_0_4, 4, 0.0, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_01, 3, 0.1, 0.1, 0.1);
-    igraph_vector_int_init_seq(&parsample, 0, 40);
+    igraph_vector_int_init_range(&parsample, 0, 41);
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

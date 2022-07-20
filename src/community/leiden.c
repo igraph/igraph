@@ -78,7 +78,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     IGRAPH_FINALLY(igraph_dqueue_int_destroy, &unstable_nodes);
 
     /* Shuffle nodes */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&node_order, 0, n - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
     IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
 
@@ -964,7 +964,7 @@ static igraph_error_t igraph_i_community_leiden(
  *    membership from which optimisation starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
  *    is typically started using a singleton clustering. This can be achieved
- *    using \c igraph_vector_init_seq.
+ *    using \c igraph_vector_int_init_range.
  * \param nb_clusters The number of clusters contained in \c membership.
  *    If \c NULL, the number of clusters will not be returned.
  * \param quality The quality of the partition, in terms of the objective

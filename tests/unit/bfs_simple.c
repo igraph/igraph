@@ -61,6 +61,13 @@ int main() {
     print_vector_int(&layers);
     igraph_destroy(&g);
 
+    /* Test directed graph where not all nodes are reachable */
+    igraph_kary_tree(&g, 20, 2, IGRAPH_TREE_OUT);
+    igraph_bfs_simple(&g, 7, IGRAPH_OUT, 0, &layers, &parents);
+    print_vector_int(&layers);
+    print_vector_int(&parents);
+    igraph_destroy(&g);
+
     igraph_vector_int_destroy(&vids);
     igraph_vector_int_destroy(&layers);
     igraph_vector_int_destroy(&parents);

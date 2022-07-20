@@ -26,6 +26,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_vector.h"
 #include "igraph_vector_list.h"
 

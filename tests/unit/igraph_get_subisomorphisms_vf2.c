@@ -71,6 +71,7 @@ void check_print_destroy_simple(igraph_t *g1, igraph_t *g2) {
 int main() {
     igraph_t ring, ring_dir;
     igraph_t ring_plus, ring_plus_dir;
+    igraph_t ring_loop;
     igraph_t g_0, g_1;
     igraph_vector_int_t coloring;
     igraph_vector_int_t plus_edge_coloring;
@@ -86,6 +87,8 @@ int main() {
     igraph_small(&g_1, 1, 0, -1);
     igraph_ring(&ring, 5, /*directed*/ 0, /*mutual*/ 0, /*circular*/ 1);
     igraph_ring(&ring_dir, 5, /*directed*/ 1, /*mutual*/ 0, /*circular*/ 1);
+    igraph_ring(&ring_loop, 5, /*directed*/ 0, /*mutual*/ 0, /*circular*/ 1);
+    igraph_add_edge(&ring_loop, 2, 2);
 
     printf("Two empty graphs:\n");
     check_print_destroy_simple(&g_0, &g_0);
@@ -129,12 +132,16 @@ int main() {
     printf("Ring+ and ring with different directedness.\n");
     check_print_destroy(&ring_plus_dir, &ring, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
 
+    printf("Graph with loop edges.\n");
+    check_print_destroy(&ring, &ring_loop, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_EINVAL);
+
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
     igraph_destroy(&ring);
     igraph_destroy(&ring_dir);
     igraph_destroy(&ring_plus);
     igraph_destroy(&ring_plus_dir);
+    igraph_destroy(&ring_loop);
     igraph_vector_int_destroy(&coloring);
     igraph_vector_int_destroy(&plus_edge_coloring);
     igraph_vector_int_destroy(&plus_vertex_coloring);

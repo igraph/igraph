@@ -26,9 +26,9 @@
 
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
-#include "igraph_constants.h"
 
 __BEGIN_DECLS
 

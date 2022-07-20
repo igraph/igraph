@@ -25,15 +25,14 @@
 #define IGRAPH_RANDOM_H
 
 #include "igraph_decls.h"
-
-__BEGIN_DECLS
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
 
-#include "igraph_types.h"
-#include "igraph_vector.h"
+__BEGIN_DECLS
 
 /* The new RNG interface is (somewhat) modelled on the GSL */
 

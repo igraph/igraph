@@ -22,7 +22,6 @@
 
 */
 
-#include "igraph_interface.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 #include "igraph_random.h"

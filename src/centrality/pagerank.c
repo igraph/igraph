@@ -24,7 +24,6 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
-#include "centrality/centrality_internal.h"
 #include "centrality/prpack_internal.h"
 
 static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
@@ -508,7 +507,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (igraph_is_nan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }

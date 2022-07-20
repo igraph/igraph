@@ -18,8 +18,6 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_centrality.h"
-
 #include "centrality/centrality_internal.h"
 
 igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {

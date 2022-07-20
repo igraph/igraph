@@ -225,7 +225,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                     igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {

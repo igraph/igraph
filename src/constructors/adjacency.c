@@ -1352,9 +1352,6 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
     igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
-    if (no_of_edges) {
-        no_of_edges *= igraph_sparsemat_max(adjmatrix);
-    }
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
@@ -1362,10 +1359,6 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     }
     if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
         IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
-    }
-    if (no_of_nodes != 0 && igraph_sparsemat_min(adjmatrix) < 0) {
-        IGRAPH_ERRORF("Edge counts should be non-negative, found %g.", IGRAPH_EINVAL,
-                igraph_sparsemat_min(adjmatrix));
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);

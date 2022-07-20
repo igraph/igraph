@@ -86,7 +86,7 @@
  * \ref igraph_vector_init_copy() creates a new identical copy
  * of an already existing and initialized vector. \ref
  * igraph_vector_init_array() creates a vector by copying a regular C array.
- * \ref igraph_vector_init_seq() creates a vector containing a regular
+ * \ref igraph_vector_init_range() creates a vector containing a regular
  * sequence with increment one.</para>
  *
  * <para>\ref igraph_vector_view() is a special constructor, it allows you to
@@ -756,6 +756,41 @@ void FUNCTION(igraph_vector, fill)      (TYPE(igraph_vector)* v, BASE e) {
         *ptr = e;
     }
 }
+
+#ifndef NOTORDERED
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_range
+ * \brief Updates a vector to store a range.
+ *
+ * </para><para>
+ * Sets the elements of the vector to contain the numbers \p start, \p start+1,
+ * ..., \p end-1. Note that the range is closed from the left and open from the
+ * right, according to C conventions.
+ *
+ * \param v The vector to update.
+ * \param start The lower limit in the range (inclusive).
+ * \param end The upper limit in the range (exclusive).
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory.
+ *
+ * Time complexity: O(n), the number of elements in the vector.
+ */
+
+igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector) *v, BASE from, BASE to) {
+    BASE *p;
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, (to - from)));
+
+    for (p = v->stor_begin; p < v->end; p++) {
+        *p = from;
+        from = from + ONE;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+#endif
 
 /**
  * \ingroup vector
@@ -1653,11 +1688,14 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 /**
  * \ingroup vector
  * \function igraph_vector_init_seq
- * \brief Initializes a vector with a sequence.
+ * \brief Initializes a vector with a sequence, inclusive endpoints (deprecated).
  *
  * </para><para>
- * The vector will contain the numbers \p from,
- * \p from+1, ..., \p to.
+ * The vector will contain the numbers \p from, \p from+1, ..., \p to. Note that
+ * both endpoints are \em inclusive, contrary to typical usage of ranges in C.
+ *
+ * \deprecated-by igraph_vector_init_range 0.10.0
+ *
  * \param v Pointer to an uninitialized vector object.
  * \param from The lower limit in the sequence (inclusive).
  * \param to The upper limit in the sequence (inclusive).
@@ -1668,13 +1706,43 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
  * of elements in the vector.
  */
 
-igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
-                                      BASE from, BASE to) {
+igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v, BASE from, BASE to) {
     BASE *p;
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from + 1)));
 
     for (p = v->stor_begin; p < v->end; p++) {
         *p = from++;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_init_range
+ * \brief Initializes a vector with a range.
+ *
+ * </para><para>
+ * The vector will contain the numbers \p start, \p start+1, ..., \p end-1. Note
+ * that the range is closed from the left and open from the right, according to
+ * C conventions.
+ *
+ * \param v Pointer to an uninitialized vector object.
+ * \param start The lower limit in the range (inclusive).
+ * \param end The upper limit in the range (exclusive).
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory.
+ *
+ * Time complexity: O(n), the number of elements in the vector.
+ */
+
+igraph_error_t FUNCTION(igraph_vector, init_range)(TYPE(igraph_vector) *v, BASE from, BASE to) {
+    BASE *p;
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from)));
+
+    for (p = v->stor_begin; p < v->end; p++) {
+        *p = from;
+        from = from + ONE;
     }
 
     return IGRAPH_SUCCESS;
@@ -1830,6 +1898,8 @@ igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
+        /* Note that the following is not equivalent to *ptr < low || *ptr > high
+         * when *ptr is NaN! */
         if (!(*ptr >= low && *ptr <= high)) {
             return 0;
         }
@@ -2093,6 +2163,7 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  * position of where it should be inserted (to keep the vector sorted)
  * is returned. If the vector contains any NaN values, the returned
  * value is undefined and \p pos may point to any position.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to an \type igraph_integer_t. This is set to the
@@ -2121,13 +2192,15 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  * \brief Finds an element by binary searching a sorted slice of a vector.
  *
  * </para><para>
-
  * It is assumed that the indicated slice of the vector, from \p start to \p end,
  * is sorted. If the specified element (\p what) is not in the slice of the
- * vector, then the position of where it should be inserted (to keep the vector
- * sorted) is returned. If the indicated slice contains any NaN values, the
+ * vector, then the position of where it should be inserted (to keep the \em slice
+ * sorted) is returned. Note that this means that the returned index will point
+ * \em inside the slice (including its endpoints), but will not evaluate values
+ * \em outside the slice. If the indicated slice contains any NaN values, the
  * returned value is undefined and \c pos may point to any position within
  * the slice.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to an \type igraph_integer_t. This is set to the position of an
@@ -2772,17 +2845,15 @@ igraph_error_t FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
  * Handy if you want to have both the smallest and largest element of
  * a vector. The vector is only traversed once. The vector must be non-empty.
  * If a vector contains at least one NaN, both \c min and \c max will be NaN.
+ *
  * \param v The input vector. It must contain at least one element.
- * \param min Pointer to a base type variable, the minimum is stored
- *     here.
- * \param max Pointer to a base type variable, the maximum is stored
- *     here.
- * \return Error code.
+ * \param min Pointer to a base type variable, the minimum is stored here.
+ * \param max Pointer to a base type variable, the maximum is stored here.
  *
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
+void FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
                                     BASE *min, BASE *max) {
     BASE* ptr;
     IGRAPH_ASSERT(v != NULL);
@@ -2790,7 +2861,7 @@ igraph_error_t FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
     IGRAPH_ASSERT(v->stor_begin != v->end);
     *min = *max = *(v->stor_begin);
     #if defined(BASE_IGRAPH_REAL)
-        if (igraph_is_nan(*min)) { return IGRAPH_SUCCESS; }; /* Result is NaN */
+        if (igraph_is_nan(*min)) { return; }; /* Result is NaN */
     #endif
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
@@ -2802,36 +2873,34 @@ igraph_error_t FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
         #if defined(BASE_IGRAPH_REAL)
         else if (igraph_is_nan(*ptr)) { /* Result is NaN */
             *min = *max = *ptr;
-            return IGRAPH_SUCCESS;
+            return;
         };
         #endif
         ptr++;
     }
-    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_vector_which_minmax
- * \brief Index of the minimum and maximum elements
+ * \brief Index of the minimum and maximum elements.
  *
- * </para><para>
  * Handy if you need the indices of the smallest and largest
  * elements. The vector is traversed only once. The vector must be
  * non-empty. If the minimum or maximum is not unique, the index
  * of the first minimum or the first maximum is returned, respectively.
  * If a vector contains at least one NaN, both \c which_min and \c which_max
  * will point to the first NaN value.
+ *
  * \param v The input vector. It must contain at least one element.
  * \param which_min The index of the minimum element will be stored
  *   here.
  * \param which_max The index of the maximum element will be stored
  *   here.
- * \return Error code.
  *
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
+void FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
         igraph_integer_t *which_min, igraph_integer_t *which_max) {
     BASE *min, *max;
     BASE *ptr;
@@ -2843,7 +2912,7 @@ igraph_error_t FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *
     #if defined(BASE_IGRAPH_REAL)
         if (igraph_is_nan(*ptr)) {  /* Result is NaN */
             *which_min = *which_max = 0;
-            return IGRAPH_SUCCESS;
+            return;
         }
     #endif
     while (ptr < v->end) {
@@ -2855,14 +2924,13 @@ igraph_error_t FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *
 #if defined(BASE_IGRAPH_REAL)
         else if (igraph_is_nan(*ptr)) {  /* Result is NaN */
             *which_min = *which_max  = ptr - v->stor_begin;
-            return IGRAPH_SUCCESS;
+            return;
         }
 #endif
         ptr++;
     }
     *which_min = min - v->stor_begin;
     *which_max = max - v->stor_begin;
-    return IGRAPH_SUCCESS;
 }
 
 #endif

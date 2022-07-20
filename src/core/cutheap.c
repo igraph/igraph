@@ -82,9 +82,9 @@ static void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, igraph_integer_t h
 igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes) {
     ch->dnodes = nodes;
     IGRAPH_VECTOR_INIT_FINALLY(&ch->heap, nodes); /* all zero */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&ch->index, 0, nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&ch->index, 0, nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &ch->index);
-    IGRAPH_CHECK(igraph_vector_init_seq(&ch->hptr, INDEXINC, nodes + INDEXINC - 1));
+    IGRAPH_CHECK(igraph_vector_init_range(&ch->hptr, INDEXINC, nodes + INDEXINC));
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }

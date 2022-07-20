@@ -33,7 +33,8 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_copy)(
         TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 
 #ifndef NOTORDERED
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_range)(TYPE(igraph_vector)*v, BASE start, BASE end);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
 #endif
 
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, copy)(
@@ -81,6 +82,10 @@ IGRAPH_EXPORT BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
 
 IGRAPH_EXPORT void FUNCTION(igraph_vector, null)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, fill)(TYPE(igraph_vector)* v, BASE e);
+
+#ifndef NOTORDERED
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector)*v, BASE start, BASE end);
+#endif
 
 /*-----------------------*/
 /* Vector views          */
@@ -165,9 +170,9 @@ IGRAPH_EXPORT BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, minmax)(
+IGRAPH_EXPORT void FUNCTION(igraph_vector, minmax)(
         const TYPE(igraph_vector) *v, BASE *min, BASE *max);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, which_minmax)(
+IGRAPH_EXPORT void FUNCTION(igraph_vector, which_minmax)(
         const TYPE(igraph_vector) *v, igraph_integer_t *which_min, igraph_integer_t *which_max);
 #endif
 

@@ -17,7 +17,7 @@ Copyright (C) 2002 Sampo Niskanen, Patric Östergård.
 License: [GNU GPLv2][gpl2] or later
 
 
-#### [PRPACK](https://github.com/DavidKurokawa/prpack)
+#### [PRPACK](https://github.com/dgleich/prpack)
 
 Copyright (C) David Kurokawa, David Gleich, Chen Greif.
 
@@ -180,7 +180,7 @@ use or performance of this software.
 
 #### [GLPK (GNU Linear Programming Kit) Version 5.0](https://www.gnu.org/software/glpk/)
 
-Copyright (C) 2000-2020 Free Software Foundation, Inc. 
+Copyright (C) 2000-2020 Free Software Foundation, Inc.
 
 Written by Andrew Makhorin, Department for Applied Informatics,
 Moscow Aviation Institute, Moscow, Russia. E-mail: <mao@gnu.org>.

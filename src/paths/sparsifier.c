@@ -211,7 +211,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     // Phase 1: forming the clusters
     // Create a vector which maps the nodes to the centers of the corresponding
     // clusters. At the beginning each node is its own cluster center.
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&clustering, 0, no_of_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&clustering, 0, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &clustering);
 
     // A mapping vector which indicates the neighboring edge with the smallest
