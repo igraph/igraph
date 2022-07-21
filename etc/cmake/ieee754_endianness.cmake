@@ -36,6 +36,12 @@ else()
     # If we are cross-compiling, let's just assume that IEEE754 doubles use the
     # same endianness as uint64_t
     set(IEEE754_DOUBLE_ENDIANNESS_MATCHES YES)
+    message(WARNING "\
+igraph is being cross-compiled, therefore we cannot validate whether the \
+endianness of IEEE754 doubles is the same as the endianness of uint64_t. \
+Most likely it is, unless you are compiling for some esoteric platform, \
+in which case you need make sure that this is the case on your own.\
+")
 endif()
 
 cmake_pop_check_state()
