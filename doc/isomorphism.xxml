@@ -49,7 +49,6 @@
 </section>
 
 <section id="functions-for-graphs-with-3-or-4-vertices"><title>Functions for small graphs</title>
-<!-- doxrox-include igraph_isomorphic_small -->
 <!-- doxrox-include igraph_isoclass -->
 <!-- doxrox-include igraph_isoclass_subgraph -->
 <!-- doxrox-include igraph_isoclass_create -->

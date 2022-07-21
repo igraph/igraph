@@ -2200,9 +2200,6 @@ igraph_get_subisomorphisms_vf2:
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
 
-igraph_isomorphic_small:
-    PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso
-
 igraph_canonical_permutation:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors,

@@ -794,8 +794,10 @@ Some of the highlights are:
    _initialized_ sparse matrix as input, unlike `igraph_get_stochastic_sparsemat()` which
    takes an uninitialized one.
 
- - `igraph_isomorphic_34()` has been remaed to `igraph_isomorphic_small()` as
-   it can now handle _undirected_ graphs with 5 or 6 vertices as well.
+ - `igraph_isomorphic_34()` has been deprecated in favour of `igraph_isomorphic()`.
+   Note that `igraph_isomorphic()` calls an optimized version for directed graphs
+   of size 3 and 4, and undirected graphs with 3-6 vertices, so there is no need
+   for a separate function.
 
  - `igraph_lattice()` has been renamed to `igraph_square_lattice()` to indicate
    that this function generates square lattices only. The old name is deprecated

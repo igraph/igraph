@@ -48,10 +48,14 @@
  *
  * <para>Finally, the isomorphism classes of all directed graphs with three and
  * four vertices and all undirected graphs with 3-6 vertices are precomputed
- * and stored in igraph, so for these small graphs there is a very simple fast
- * way to decide isomorphism. See \ref igraph_isomorphic_small().
- * </para>
+ * and stored in igraph, so for these small graphs there is a separate fast
+ * path in the code that does not use more complex, generic isomorphism
+ * algorithms.</para>
  */
+
+static igraph_error_t igraph_i_isomorphic_small(
+    const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
+);
 
 /**
  * \function igraph_isomorphic
@@ -77,8 +81,10 @@
  * \oli If one of the graphs has multi-edges then an error is triggered.
  * \oli If the two graphs does not have the same number of vertices
  *    and edges it returns with \c FALSE.
- * \oli Otherwise, if the graphs have three or four vertices then an O(1)
- *    algorithm is used with precomputed data.
+ * \oli Otherwise, if the \ref igraph_isoclass() function supports both
+ *    graphs (which is true for directed graphs with 3 and 4 vertices, and
+ *    undirected graphs with 3-6 vertices), an O(1) algorithm is used with
+ *    precomputed data.
  * \oli Otherwise Bliss is used, see \ref igraph_isomorphic_bliss().
  * \endolist
  *
@@ -118,7 +124,7 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
         IGRAPH_CHECK(igraph_has_loop(graph1, &loop1));
         IGRAPH_CHECK(igraph_has_loop(graph2, &loop2));
         if (!loop1 && !loop2) {
-            IGRAPH_CHECK(igraph_isomorphic_small(graph1, graph2, iso));
+            IGRAPH_CHECK(igraph_i_isomorphic_small(graph1, graph2, iso));
         } else {
             IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
                                                  0, 0, /*sh=*/ IGRAPH_BLISS_FL, 0, 0));
@@ -135,7 +141,14 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
  * \function igraph_isomorphic_34
  * Graph isomorphism for 3-4 vertices (deprecated alias).
  *
- * \deprecated-by igraph_isomorphic_small 0.10.0
+ * \deprecated-by igraph_isomorphic 0.10.0
+ *
+ * If you really care about performance and you \em know for sure that your
+ * input graphs are simple and have either 3 or 4 vertices for directed graphs,
+ * or 3-6 vertices for undirected graphs, you can compare their isomorphism
+ * classes obtained from \ref igraph_isoclass() directly instead of calling
+ * \ref igraph_isomorphic(); this saves the cost of checking whether the graphs
+ * do not contain multiple edges or self-loops.
  *
  * \param graph1 The first input graph.
  * \param graph2 The second input graph. Must have the same
@@ -148,11 +161,11 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 igraph_error_t igraph_isomorphic_34(
     const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
 ) {
-    return igraph_isomorphic_small(graph1, graph2, iso);
+    return igraph_i_isomorphic_small(graph1, graph2, iso);
 }
 
 /**
- * \function igraph_isomorphic_small
+ * \function igraph_i_isomorphic_small
  * \brief Graph isomorphism for small graphs.
  *
  * This function uses precomputed indices to decide isomorphism
@@ -168,7 +181,7 @@ igraph_error_t igraph_isomorphic_34(
  *
  * Time complexity: O(1).
  */
-igraph_error_t igraph_isomorphic_small(
+igraph_error_t igraph_i_isomorphic_small(
     const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *iso
 ) {
     igraph_integer_t class1, class2;
