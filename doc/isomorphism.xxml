@@ -49,7 +49,7 @@
 </section>
 
 <section id="functions-for-graphs-with-3-or-4-vertices"><title>Functions for small graphs</title>
-<!-- doxrox-include igraph_isomorphic_34 -->
+<!-- doxrox-include igraph_isomorphic_small -->
 <!-- doxrox-include igraph_isoclass -->
 <!-- doxrox-include igraph_isoclass_subgraph -->
 <!-- doxrox-include igraph_isoclass_create -->
@@ -59,6 +59,10 @@
 <section id="isomorphism-utility-functions"><title>Utility functions</title>
 <!-- doxrox-include igraph_permute_vertices -->
 <!-- doxrox-include igraph_simplify_and_colorize -->
+</section>
+
+<section id="isomorphism-deprecated-functions"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_isomorphic_34 -->
 </section>
 
 </chapter>
