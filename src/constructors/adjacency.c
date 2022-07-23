@@ -1005,6 +1005,7 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
+    }
 
     return IGRAPH_SUCCESS;
 }
