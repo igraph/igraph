@@ -26,6 +26,7 @@
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
 #include "igraph_cliques.h"
+#include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_qsort.h"
@@ -577,7 +578,7 @@ igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
 
     minthr = igraph_vector_min(weights);
 
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&ids, 0, no_of_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&ids, 0, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &ids);
 
     IGRAPH_CHECK(igraph_i_graphlets(graph, weights, &mycliques, thresholds, &ids, minthr));

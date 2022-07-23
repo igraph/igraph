@@ -46,7 +46,7 @@ int main() {
 
     /* degree-one vertices */
     igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
-    igraph_vector_init_seq(&weights, 1, igraph_ecount(&g));
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&g) + 1);
 
     printf("Tree (having degree-one vertices):\n");
     igraph_diversity(&g, &weights, &result, igraph_vss_all());

@@ -30,6 +30,44 @@
 
 __BEGIN_DECLS
 
+struct igraph_i_property_cache_t;
+typedef struct igraph_i_property_cache_t igraph_i_property_cache_t;
+
+typedef enum {
+    /* Stores whether the graph has at least one self-loop. */
+    IGRAPH_PROP_HAS_LOOP = 0,
+
+    /* Stores whether the graph has at least one multi-edge, taking into account
+     * edge directions in directed graphs. In other words, this property should
+     * be false for a directed graph with edges (a, b) and (b, a), and true
+     * for a directed graph with edges (a, b) and (a, b) again. */
+    IGRAPH_PROP_HAS_MULTI,
+
+    /* Stores whether the graph has at least one reciprocal edge pair. Ignored
+     * in undirected graphs. This property should be true for a directed graph
+     * with edges (a, b) and (b, a), and false for a directed graph with
+     * edges (a, b) and (a, b) again. Self-loops (a, a) are not considered
+     * reciprocal. */
+    IGRAPH_PROP_HAS_RECIPROCAL,
+
+    /* Stores whether the graph is weakly connected. */
+    IGRAPH_PROP_IS_WEAKLY_CONNECTED,
+
+    /* Stores whether the graph is strongly connected. Ignored in undirected graphs. */
+    IGRAPH_PROP_IS_STRONGLY_CONNECTED,
+
+    /* Stores whether the graph is a directed acyclic graph. Not used for
+     * undirected graphs. */
+    IGRAPH_PROP_IS_DAG,
+
+    /* Stores whether the graph is a forest, i.e. an undirected or directed
+     * graph that is cycle-free even if we ignore edge directions. */
+    IGRAPH_PROP_IS_FOREST,
+
+    /* Dummy value used to count enum values */
+    IGRAPH_PROP_I_SIZE
+} igraph_cached_property_t;
+
 /**
  * \ingroup internal
  * \struct igraph_t
@@ -79,7 +117,10 @@ typedef struct igraph_s {
     igraph_vector_int_t os;
     igraph_vector_int_t is;
     void *attr;
+    igraph_i_property_cache_t *cache;
 } igraph_t;
+
+IGRAPH_EXPORT void igraph_invalidate_cache(const igraph_t* graph);
 
 __END_DECLS
 

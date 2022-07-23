@@ -25,10 +25,9 @@
 #define IGRAPH_STRUCTURAL_H
 
 #include "igraph_decls.h"
-
-#include "igraph_attributes.h"
-#include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
+#include "igraph_constants.h"
 #include "igraph_iterators.h"
 #include "igraph_matrix.h"
 #include "igraph_sparsemat.h"

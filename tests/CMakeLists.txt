@@ -208,6 +208,7 @@ add_legacy_tests(
   igraph_generalized_petersen
   igraph_grg_game
   igraph_growing_random_game
+  igraph_hsbm_game
   igraph_k_regular_game
   igraph_lastcit_game
   igraph_linegraph
@@ -490,6 +491,7 @@ add_legacy_tests(
   igraph_almost_equals
   igraph_power_law_fit
   overflow
+  prop_caching
 )
 
 # operators.at
@@ -510,6 +512,7 @@ add_legacy_tests(
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
+  igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
 )

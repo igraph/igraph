@@ -25,10 +25,6 @@
 
 /* Internal functions */
 
-static int igraph_i_create_start(
-        igraph_vector_t *res, igraph_vector_t *el,
-        igraph_vector_t *index, igraph_integer_t nodes);
-
 /* The functions in this file are sensible "default" implementations for some
  * of the core API functions that simply call other core API functions. If
  * you are implementing your own data type, chances are that you can use these
@@ -178,4 +174,30 @@ igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids, igraph_vect
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_invalidate_cache
+ * \brief Invalidates the internal cache of an igraph graph
+ *
+ * </para><para>
+ * igraph graphs cache some basic properties about themselves in an internal
+ * data structure. This function invalidates the contents of the cache and
+ * forces a recalculation of the cached properties the next time they are
+ * needed.
+ *
+ * </para><para>
+ * You should not need to call this function during normal usage; however, we
+ * might ask you to call this function explicitly if we suspect that you are
+ * running into a bug in igraph's cache handling. A tell-tale sign of an invalid
+ * cache entry is that the result of a cached igraph function (such as
+ * \ref igraph_is_dag() or \ref igraph_is_simple()) is different before and
+ * after a cache invalidation.
+ *
+ * \param graph The graph whose cache is to be invalidated.
+ *
+ * Time complexity: O(1).
+ */
+void igraph_invalidate_cache(const igraph_t* graph) {
+    igraph_i_property_cache_invalidate_all(graph);
 }

@@ -477,7 +477,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&semi, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ancestor, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&label, 0, no_of_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&label, 0, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &label);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &succ);

@@ -130,6 +130,11 @@ igraph_error_t igraph_topological_sorting(
  * </para><para>
  * A directed acyclic graph (DAG) is a directed graph with no cycles.
  *
+ * </para><para>
+ * The return value of this function is cached in the graph itself; calling
+ * the function multiple times with no modifications to the graph in between
+ * will return a cached value in O(1) time.
+ *
  * \param graph The input graph.
  * \param res Pointer to a boolean constant, the result
  *     is stored here.
@@ -152,6 +157,8 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
         *res = 0;
         return IGRAPH_SUCCESS;
     }
+
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_IS_DAG, res);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
@@ -198,6 +205,8 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     igraph_vector_int_destroy(&neis);
     igraph_dqueue_int_destroy(&sources);
     IGRAPH_FINALLY_CLEAN(3);
+
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_DAG, *res);
 
     return IGRAPH_SUCCESS;
 }

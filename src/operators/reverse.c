@@ -29,6 +29,7 @@
 #include "igraph_vector.h"
 
 #include "graph/attributes.h"
+#include "graph/internal.h"
 
 /**
  * \function igraph_reverse_edges
@@ -37,10 +38,18 @@
  * This functon reverses some edges of a directed graph. The modification is done in place.
  * All attributes, as well as the ordering of edges and vertices are preserved.
  *
+ * </para><para>
+ * Note that is rarely necessary to reverse \em all edges, as almost all functions that
+ * handle directed graphs take a \c mode argument that can be set to \c IGRAPH_IN to
+ * effectively treat edges as reversed.
+ *
  * \param graph The graph whose edges will be reversed.
  * \param es    The edges to be reversed.
  *              Pass <code>igraph_ess_all(IGRAPH_EDGEORDER_ID)</code> to reverse all edges.
  * \return Error code.
+ *
+ * Time complexity: O(1) if all edges are reversed, otherwise
+ * O(|E|) where |E| is the number of edges in the graph.
  */
 igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -52,6 +61,11 @@ igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
     /* Nothing to do on undirected graph. */
     if (! igraph_is_directed(graph)) {
         return IGRAPH_SUCCESS;
+    }
+
+    /* Use fast method when all edges are to be reversed. */
+    if (igraph_es_is_all(&eids)) {
+        return igraph_i_reverse(graph);
     }
 
     /* Convert graph to edge list. */
@@ -74,6 +88,7 @@ igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids) {
     IGRAPH_CHECK(igraph_create(&new_graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &new_graph);
 
+    IGRAPH_I_ATTRIBUTE_DESTROY(&new_graph);
     IGRAPH_I_ATTRIBUTE_COPY(&new_graph, graph, 1, 1, 1); /* does IGRAPH_CHECK */
 
     igraph_eit_destroy(&eit);

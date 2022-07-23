@@ -29,6 +29,7 @@
 #include "igraph_arpack.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 

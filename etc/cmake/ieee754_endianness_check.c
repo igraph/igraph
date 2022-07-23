@@ -13,8 +13,12 @@ union {
 int main() {
     value.as_uint64_t = 4841376218035192321ULL;
     if (value.as_double == 4510218239279617.0) {
-        return 0; /* endianness of uint64_t and double match */
-    } else {
-        return 1; /* endianness of uint64_t and double do not match */
+		/* endianness of uint64_t and double match */
+		printf("OK");
     }
+    /* we always return 0, even for a negative result, this is because we
+	 * need to tell on the CMake side whether a compiler misconfiguration
+	 * aborted our program, which can then be detected from a nonzero exit
+	 * code */
+    return 0;
 }

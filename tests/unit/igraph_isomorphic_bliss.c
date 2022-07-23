@@ -56,7 +56,7 @@ int main() {
         printf("Splitting heuristic: %s\n", sh_names[i]);
 
         igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-        igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+        igraph_vector_int_init_range(&perm, 0, igraph_vcount(&ring1));
         igraph_vector_int_shuffle(&perm);
         igraph_permute_vertices(&ring1, &ring2, &perm);
 

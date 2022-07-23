@@ -31,7 +31,7 @@ int main() {
     igraph_integer_t size;
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
-    igraph_vs_seq(&vs, 0, 9);
+    igraph_vs_range(&vs, 0, 10);
     igraph_vit_create(&g, vs, &vit);
     igraph_vs_size(&g, &vs, &size);
     printf("%" IGRAPH_PRId "", size);

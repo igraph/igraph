@@ -23,7 +23,6 @@
 
 #include "igraph_layout.h"
 
-#include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_random.h"

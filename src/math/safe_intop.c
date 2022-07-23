@@ -102,3 +102,46 @@ igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
     *res = (igraph_integer_t) 1 << k;
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is assumed to have no
+ * fractional part.
+ */
+static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_integer_t* result) {
+    if (value < IGRAPH_INTEGER_MIN) {
+        IGRAPH_ERROR("Underflow when converting a real number to an integer.", IGRAPH_EUNDERFLOW);
+    }
+    if (value > IGRAPH_INTEGER_MAX) {
+        IGRAPH_ERROR("Overflow when converting a real number to an integer.", IGRAPH_EOVERFLOW);
+    }
+    *result = value;
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with ceil().
+ */
+igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t* result) {
+    return igraph_i_safe_real_to_int(ceil(value), result);
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with floor().
+ */
+igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t* result) {
+    return igraph_i_safe_real_to_int(floor(value), result);
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with round().
+ */
+igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result) {
+    return igraph_i_safe_real_to_int(round(value), result);
+}

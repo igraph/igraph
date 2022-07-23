@@ -717,6 +717,7 @@ Some of the highlights are:
  - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floating point numbers with a relative tolerance.
  - `igraph_complex_almost_equals()` to compare complex numbers with a relative tolerance.
  - `igraph_vector_all_almost_e()`, `igraph_vector_complex_all_almost_e()`, `igraph_matrix_all_almost_e()`, `igraph_matrix_complex_all_almost_e()` for elementwise comparisons of floating point vector and matrices with a relative tolerance.
+ - `igraph_vector_range()` to fill an existing vector with a range of increasing numbers.
  - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
  - `igraph_fundamental_cycles()` computes a fundamental cycle basis (experimental).
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
@@ -732,6 +733,7 @@ Some of the highlights are:
  - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
  - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
  - `igraph_turan()` generates Turán graphs.
+ - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
 
 ### Removed
 
@@ -791,6 +793,11 @@ Some of the highlights are:
    and will be removed in 0.11. Note that `igraph_get_stochastic_sparse()` takes an
    _initialized_ sparse matrix as input, unlike `igraph_get_stochastic_sparsemat()` which
    takes an uninitialized one.
+
+ - `igraph_isomorphic_34()` has been deprecated in favour of `igraph_isomorphic()`.
+   Note that `igraph_isomorphic()` calls an optimized version for directed graphs
+   of size 3 and 4, and undirected graphs with 3-6 vertices, so there is no need
+   for a separate function.
 
  - `igraph_lattice()` has been renamed to `igraph_square_lattice()` to indicate
    that this function generates square lattices only. The old name is deprecated
@@ -857,6 +864,10 @@ Some of the highlights are:
    argument instead of expecting an already-initialized target vector. The old
    name will be removed in 0.11.
 
+ - `igraph_vector_init_seq()` is now deprecated in favour of
+   `igraph_vector_init_range()`, which uses C-style intervals (closed from the
+   left and open from the right).
+
  - `igraph_write_graph_dimacs()` has been renamed to `igraph_write_graph_dimacs_flow()`;
    the old name is deprecated and might be re-used as a generic DIMACS writer
    in the future. Also, the function now uses `igraph_integer_t` as the source
@@ -865,6 +876,10 @@ Some of the highlights are:
  - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
    to simplify the API. The deprecated variants will be removed in 0.11.
+ - `igraph_vs_seq()`, `igraph_vss_seq()`, `igraph_es_seq()` and `igraph_ess_seq()`
+   are now deprecated in favour of `igraph_vs_range()`, `igraph_vss_range()`,
+   `igraph_es_range()` and `igraph_ess_range()` because these use C-style
+   intervals (closed from the left, open from the right).
 
 ### Other
 
@@ -880,13 +895,17 @@ Some of the highlights are:
 
  - Fixed incorrect results from `igraph_local_scan_1_ecount()` when the graph was directed but the mode was `IGRAPH_ALL` and some nodes had loop edges. See issue #2092.
  - In some rare edge cases, `igraph_pagerank()` with the ARPACK method and `igraph_hub_score()` / `igraph_authority_score()` could return incorrect results. The problem could be detected by checking that the returned eigenvalue is not negative. See issue #2090.
- - `igraph_permute_vertices()` now checks for out-of-range indices in the permutation vector.
+ - `igraph_permute_vertices()` now checks for out-of-range indices and duplicates in the permutation vector.
  - `igraph_create()` now checks for non-finite vertex indices in the edges vector.
  - `igraph_eigenvector_centrality()` would return incorrect scores when some weights were negative.
+ - `igraph_es_seq()` and `igraph_ess_seq()` did not include the `to` vertex in the sequence.
+ - `igraph_eit_create()` and `igraph_vit_create()` now check that all edge/vertex indices are in range when creating iterators from sequence-type selectors.
+ - `igraph_grg_game()` now validates its arguments.
+ - `igraph_layout_kamada_kawai()`, `igraph_layout_fruchterman_reingold()`, as well as their 3D versions now check for non-positive weights.
 
 ### Other
 
- - Documentation improvement.
+ - Documentation improvements.
 
 ## [0.9.9] - 2022-06-04
 
