@@ -891,6 +891,10 @@ Some of the highlights are:
 
  - `igraph_reverse_edges()` reverses the specified edges in the graph while preserving all attributes.
 
+### Changes
+
+ - The `IGRAPH_ARPACK_PROD` error code is no longer used. Instead, the specific error encountered while doing matrix multiplication is reported.
+
 ### Fixed
 
  - Fixed incorrect results from `igraph_local_scan_1_ecount()` when the graph was directed but the mode was `IGRAPH_ALL` and some nodes had loop edges. See issue #2092.
@@ -901,7 +905,9 @@ Some of the highlights are:
  - `igraph_es_seq()` and `igraph_ess_seq()` did not include the `to` vertex in the sequence.
  - `igraph_eit_create()` and `igraph_vit_create()` now check that all edge/vertex indices are in range when creating iterators from sequence-type selectors.
  - `igraph_grg_game()` now validates its arguments.
- - `igraph_layout_kamada_kawai()`, `igraph_layout_fruchterman_reingold()`, as well as their 3D versions now check for non-positive weights.
+ - `igraph_layout_drl()` and its 3D version now validate their inputs.
+ - `igraph_layout_kamada_kawai()`, `igraph_layout_fruchterman_reingold()`, `igraph_layout_drl()`, as well as their 3D versions now check for non-positive weights.
+ - `igraph_asymmetric_preference_game()` interpreted its `type_dist_matrix` argument incorrectly.
 
 ### Other
 

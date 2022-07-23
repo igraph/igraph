@@ -975,6 +975,10 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * components.
  *
  * </para><para>
+ * Note that some authors do not consider the graph consisting of
+ * two connected vertices as biconnected, however, igraph does.
+ *
+ * </para><para>
  * Somewhat arbitrarily, igraph does not consider components containing
  * a single vertex only as being biconnected. Isolated vertices will
  * not be part of any of the biconnected components.
