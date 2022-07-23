@@ -908,7 +908,6 @@ static igraph_error_t igraph_i_sparse_adjacency_directed(
 ) {
     igraph_sparsemat_iterator_t it;
     igraph_sparsemat_iterator_init(&it, adjmatrix);
-    igraph_integer_t e = 0;
 
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
         igraph_integer_t from = igraph_sparsemat_iterator_row(&it);
@@ -918,11 +917,10 @@ static igraph_error_t igraph_i_sparse_adjacency_directed(
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         }
         for (igraph_integer_t count = 0; count < multi; count++) {
-            VECTOR(*edges)[e++] = from;
-            VECTOR(*edges)[e++] = to;
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
     }
-    igraph_vector_int_resize(edges, e);
     return IGRAPH_SUCCESS;
 }
 
@@ -931,7 +929,6 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
     igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
-    igraph_integer_t e = 0;
     igraph_real_t other;
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
@@ -949,11 +946,10 @@ static igraph_error_t igraph_i_sparse_adjacency_max(
             multi = multi > other ? multi : other;
         }
         for (igraph_integer_t count = 0; count < multi; count++) {
-            VECTOR(*edges)[e++] = from;
-            VECTOR(*edges)[e++] = to;
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
     }
-    igraph_vector_int_resize(edges, e);
 
     return IGRAPH_SUCCESS;
 }
@@ -963,7 +959,6 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
     igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
-    igraph_integer_t e = 0;
     igraph_real_t other;
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
@@ -981,11 +976,10 @@ static igraph_error_t igraph_i_sparse_adjacency_min(
             multi = multi < other ? multi : other;
         }
         for (igraph_integer_t count = 0; count < multi; count++) {
-            VECTOR(*edges)[e++] = from;
-            VECTOR(*edges)[e++] = to;
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
     }
-    igraph_vector_int_resize(edges, e);
 
     return IGRAPH_SUCCESS;
 }
@@ -995,7 +989,6 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
     igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
-    igraph_integer_t e = 0;
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
@@ -1009,11 +1002,9 @@ static igraph_error_t igraph_i_sparse_adjacency_upper(
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         }
         for (igraph_integer_t count = 0; count < multi; count++) {
-            VECTOR(*edges)[e++] = from;
-            VECTOR(*edges)[e++] = to;
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
-    }
-    igraph_vector_int_resize(edges, e);
 
     return IGRAPH_SUCCESS;
 }
@@ -1023,7 +1014,6 @@ static igraph_error_t igraph_i_sparse_adjacency_lower(
     igraph_loops_t loops
 ) {
     igraph_sparsemat_iterator_t it;
-    igraph_integer_t e = 0;
 
     igraph_sparsemat_iterator_init(&it, adjmatrix);
     for (; !igraph_sparsemat_iterator_end(&it); igraph_sparsemat_iterator_next(&it)) {
@@ -1037,11 +1027,10 @@ static igraph_error_t igraph_i_sparse_adjacency_lower(
             IGRAPH_CHECK(igraph_i_adjust_loop_edge_count(&multi, loops));
         }
         for (igraph_integer_t count = 0; count < multi; count++) {
-            VECTOR(*edges)[e++] = from;
-            VECTOR(*edges)[e++] = to;
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, from));
+            IGRAPH_CHECK(igraph_vector_int_push_back(edges, to));
         }
     }
-    igraph_vector_int_resize(edges, e);
     return IGRAPH_SUCCESS;
 }
 
@@ -1075,10 +1064,6 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
-    igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
-    if (no_of_edges) {
-        no_of_edges *= igraph_sparsemat_max(adjmatrix);
-    }
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
@@ -1093,7 +1078,7 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
                 igraph_sparsemat_min(adjmatrix));
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     /* Collect the edges */
     switch (mode) {
