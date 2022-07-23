@@ -49,13 +49,15 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
 
 /**
  * \function igraph_even_tarjan_reduction
- * Even-Tarjan reduction of a graph
+ * \brief Even-Tarjan reduction of a graph.
  *
  * A digraph is created with twice as many vertices and edges. For each
- * original vertex i, two vertices i'= i and i'' = i' + n are created,
- * with a directed edge from i' to i''. For each original directed edge
- * from i to j, two new edges are created, from i' to j'' and from i''
- * to j'.
+ * original vertex \c i, two vertices <code>i' = i</code> and
+ * <code>i'' = i' + n</code> are created,
+ * with a directed edge from <code>i'</code> to <code>i''</code>.
+ * For each original directed edge from \c i to \c j, two new edges are created,
+ * from <code>i'</code> to <code>j''</code> and from <code>i''</code>
+ * to <code>j'</code>.
  *
  * </para><para>This reduction is used in the paper (observation 2):
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
@@ -72,7 +74,7 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
  * \param capacity Pointer to an initialized vector or a null pointer. If
  *        not a null pointer, then it will be filled the capacity from
  *        the reduction: the first |E| elements are 1, the remaining |E|
- *        are equal to |V| (which is used to mean infinity).
+ *        are equal to |V| (which is used to indicate infinity).
  * \return Error code.
  *
  * Time complexity: O(|E|+|V|).
