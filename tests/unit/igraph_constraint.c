@@ -56,6 +56,10 @@ int main() {
     printf("Full graph, 4 vertices, weights make it a line:\n");
     call_and_print(&g_4_full, igraph_vss_all(), &weights_line);
 
+    /*
+       each p_ij and p_ji is equal to 1/3, because each node has 3 connections with equal weight and p_ij is z_ij/sum_j(z_ij) where z are the edge weights.
+       so C_ij = (1/3 + (1/3)^2) for each j, which means C_i = (1/3 + 2/9)^2 *3 = 0.925925925925926
+       */
     printf("Full graph, 4 vertices, all same weights:\n");
     call_and_print(&g_4_full, igraph_vss_all(), &weights_full);
 
@@ -68,6 +72,12 @@ int main() {
     printf("Full graph, 4 vertices, no weights, with loop:\n");
     call_and_print(&g_4_full_loop, igraph_vss_all(), NULL); 
 
+    /*
+       for node 0, each p_ij is again equal to 1/3, but p_ji equals 1/4 for j = 3, because that's connected to 4 other nodes, so for example for C_01 the contribution is
+       C_01 = (p_01 + p_02p_21 + p_03p_31)^2 = (1/3 + 1/9 + 1/12)^2
+       and you end up with:
+       ((1/3 + 2/9)^2 ) + ((1/3 + 1/9 + 1/12)^2 * 2) = 0.8657407407407408
+       */
     printf("Hole in middle of two clusters:\n");
     call_and_print(&g_hole, igraph_vss_all(), NULL);
 
