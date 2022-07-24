@@ -312,9 +312,25 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     igraph_vit_t vit;
     igraph_integer_t dump;
     igraph_real_t ecc;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (weights == NULL) {
         return(igraph_eccentricity(graph, res, vids, mode));
+    }
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
+        } else if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode,

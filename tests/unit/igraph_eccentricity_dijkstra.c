@@ -21,23 +21,32 @@
 
 #include "test_utilities.h"
 
-void print_and_destroy(igraph_t *graph, igraph_neimode_t mode) {
+void print_and_destroy_weighted(igraph_t *graph, igraph_neimode_t mode, igraph_vector_t *weights) {
     igraph_vector_t ecc;
-    igraph_vector_t weights;
     igraph_vector_init(&ecc, 0);
+    igraph_eccentricity_dijkstra(graph, weights, &ecc, igraph_vss_all(), mode);
+    print_vector(&ecc);
+    igraph_destroy(graph);
+    igraph_vector_destroy(&ecc);
+    if (weights) {
+        igraph_vector_destroy(weights);
+    }
+}
+
+void print_and_destroy(igraph_t *graph, igraph_neimode_t mode) {
+    igraph_vector_t weights;
     igraph_vector_init(&weights, igraph_ecount(graph));
     for (int i = 0; i < igraph_ecount(graph); i++) {
         VECTOR(weights)[i] = 1;
     }
-    igraph_eccentricity_dijkstra(graph, &weights, &ecc, igraph_vss_all(), mode);
-    print_vector(&ecc);
-    igraph_destroy(graph);
-    igraph_vector_destroy(&ecc);
-    igraph_vector_destroy(&weights);
+    print_and_destroy_weighted(graph, mode, &weights);
 }
 
 int main() {
     igraph_t g;
+    igraph_vector_t weights;
+    igraph_vector_t ecc;
+    igraph_vector_init(&ecc, 0);
 
     printf("Null graph:\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
@@ -73,6 +82,30 @@ int main() {
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     print_and_destroy(&g, IGRAPH_OUT);
 
+    printf("\nOut-star with NULL weights:\n");
+    igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
+    print_and_destroy_weighted(&g, IGRAPH_ALL, NULL);
+
+    VERIFY_FINALLY_STACK();
+
+    printf("\nCheck wrong number of weights error.\n");
+    igraph_vector_init(&weights, 1);
+    igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
+    CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
+    
+    printf("Check NaN weight error.\n");
+    igraph_destroy(&g);
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, -1);
+    VECTOR(weights)[0] = IGRAPH_NAN;
+    CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
+    
+    printf("Check negative weight error.\n");
+    VECTOR(weights)[0] = -1;
+    CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
+
+    igraph_vector_destroy(&ecc);
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
     VERIFY_FINALLY_STACK();
 
     return 0;

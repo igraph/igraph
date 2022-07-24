@@ -21,3 +21,10 @@ Out-star:
 
 In-star:
 ( 1 0 0 0 0 0 0 0 0 0 )
+
+Out-star with NULL weights:
+( 1 2 2 2 2 2 2 2 2 2 )
+
+Check wrong number of weights error.
+Check NaN weight error.
+Check negative weight error.
