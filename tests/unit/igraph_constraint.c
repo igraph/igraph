@@ -29,7 +29,7 @@ void call_and_print(igraph_t *graph, igraph_vs_t vids, igraph_vector_t *weights)
 
 
 int main() {
-    igraph_t g_0, g_1, g_lmu, g_lm, g_4_full, g_4_full_split, g_4_full_loop, g_4_line, g_hole;
+    igraph_t g_0, g_1, g_4_full, g_4_full_split, g_4_full_loop, g_4_line, g_hole;
     igraph_vector_t weights_full, weights_full_split, weights_line, result;
 
     igraph_vector_init_real(&weights_line, 6, 1., 0., 0., 1., 0., 1.);
@@ -43,8 +43,6 @@ int main() {
     igraph_small(&g_4_full_split, 4, IGRAPH_UNDIRECTED, 0,1, 0,1, 0,2, 0,3, 1,2, 1,3, 1,3, 1,3, 2,3, -1);
     igraph_small(&g_4_line, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, -1);
     igraph_small(&g_hole, 9, IGRAPH_UNDIRECTED, 0,1, 0,2, 0,3, 1,2, 1,3, 2,3, 3,4, 4,5, 5,6, 5,7, 5,8, 6,7, 6,8, 7,8, -1);
-    igraph_small(&g_lm, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
-    igraph_small(&g_lmu, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1); //undirected
 
     printf("No vertices:\n");
     call_and_print(&g_0, igraph_vss_none(), NULL);
@@ -75,8 +73,6 @@ int main() {
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
-    igraph_destroy(&g_lmu);
-    igraph_destroy(&g_lm);
     igraph_destroy(&g_4_full);
     igraph_destroy(&g_4_full_loop);
     igraph_destroy(&g_4_full_split);
