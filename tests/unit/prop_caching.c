@@ -23,6 +23,14 @@
  * without a cache should be tested in other unit tests, not here.
  */
 
+igraph_error_t has_mutual_nonloop_edge(const igraph_t* graph, igraph_bool_t* result) {
+    return igraph_has_mutual(graph, result, /* loops = */ 0);
+}
+
+igraph_error_t has_mutual_edge(const igraph_t* graph, igraph_bool_t* result) {
+    return igraph_has_mutual(graph, result, /* loops = */ 1);
+}
+
 igraph_error_t is_weakly_connected(const igraph_t* graph, igraph_bool_t* result) {
     return igraph_is_connected(graph, result, IGRAPH_WEAK);
 }
@@ -55,6 +63,8 @@ void validate_properties(const igraph_t* graph) {
     CHECK(is_forest);
     CHECK(is_weakly_connected);
     CHECK(is_strongly_connected);
+    CHECK(has_mutual_edge);
+    CHECK(has_mutual_nonloop_edge);
 }
 
 void test_basic_operations(igraph_t* graph) {

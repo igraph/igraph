@@ -411,6 +411,22 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igra
         return IGRAPH_SUCCESS;
     }
 
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_RECIPROCAL)) {
+        if (igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_RECIPROCAL)) {
+            /* we know that the graph has at least one mutual non-loop edge
+             * (because the cache only stores non-loop edges) */
+            *res = 1;
+            return IGRAPH_SUCCESS;
+        } else if (loops) {
+            /* no non-loop mutual edges, but maybe we have loops? */
+            return igraph_has_loop(graph, res);
+        } else {
+            /* no non-loop mutual edges, and loops are not to be treated as mutual */
+            *res = 0;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
@@ -439,6 +455,11 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igra
 
     igraph_lazy_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
+
+    /* cache the result if loops are not treated as mutual */
+    if (!loops) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_RECIPROCAL, *res);
+    }
 
     return IGRAPH_SUCCESS;
 }
