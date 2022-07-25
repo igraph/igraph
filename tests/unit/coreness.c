@@ -113,6 +113,8 @@ void add_loop_and_multiple_edges(igraph_t* graph, igraph_real_t loop_prob, igrap
 
     igraph_add_edges(graph, &extra_edges, 0);
 
+    igraph_vector_int_destroy(&extra_edges);
+
     RNG_END();
 }
 
