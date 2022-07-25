@@ -24,7 +24,6 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
-#include "centrality/centrality_internal.h"
 #include "centrality/prpack_internal.h"
 
 static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph,

@@ -2203,9 +2203,6 @@ igraph_get_subisomorphisms_vf2:
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
 
-igraph_isomorphic_34:
-    PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso
-
 igraph_canonical_permutation:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors,
@@ -2387,12 +2384,12 @@ igraph_eulerian_cycle:
 #######################################
 
 igraph_fundamental_cycles:
-    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff
-    DEPS: basis ON graph, start ON graph
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph, basis ON graph, start ON graph
 
 igraph_minimum_cycle_basis:
-    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order
-    DEPS: basis ON graph
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph, basis ON graph
 
 #######################################
 # Trees
@@ -2501,6 +2498,10 @@ igraph_strerror:
 
 igraph_expand_path_to_pairs:
     PARAMS: INOUT VERTEX_INDICES path
+
+igraph_invalidate_cache:
+    PARAMS: GRAPH graph
+    RETURN: VOID
 
 igraph_vertex_path_from_edge_path:
     PARAMS: |-

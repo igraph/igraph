@@ -27,6 +27,7 @@
 #include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_iterators.h"
 
 __BEGIN_DECLS
@@ -71,6 +72,20 @@ IGRAPH_EXPORT igraph_error_t igraph_get_all_eids_between(const igraph_t *graph, 
 IGRAPH_EXPORT igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t vid,
                                   igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *igraph2, igraph_bool_t *res);
+
+IGRAPH_EXPORT igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT void igraph_i_property_cache_set_bool(const igraph_t *cache, igraph_cached_property_t prop, igraph_bool_t value);
+IGRAPH_EXPORT void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT void igraph_i_property_cache_invalidate_all(const igraph_t *graph);
+
+#define IGRAPH_RETURN_IF_CACHED_BOOL(graphptr, prop, resptr) \
+    do { \
+        if (igraph_i_property_cache_has((graphptr), (prop))) { \
+            *(resptr) = igraph_i_property_cache_get_bool((graphptr), (prop)); \
+            return IGRAPH_SUCCESS; \
+        } \
+    } while (0)
 
 /**
  * \define IGRAPH_FROM

@@ -102,3 +102,55 @@ igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
     *res = (igraph_integer_t) 1 << k;
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is assumed to have no
+ * fractional part.
+ */
+static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_integer_t *result) {
+    /* IGRAPH_INTEGER_MAX is one less than a power of 2, and may not be representable as
+     * a floating point number. Thus we cannot safely check that value <= IGRAPH_INTEGER_MAX,
+     * as this would convert IGRAPH_INTEGER_MAX to floating point, potentially chaning its value.
+     * Instead, we compute int_max_plus_1 = IGRAPH_INTEGER_MAX + 1, which is exactly representable
+     * since it is a power of 2, and check that value < int_max_plus_1.
+     *
+     * IGRAPH_INTEGER_MIN is a negative power of 2, so there is no such issue.
+     */
+    const igraph_real_t int_max_plus_1 = 2.0 * (IGRAPH_INTEGER_MAX / 2 + 1);
+    const igraph_real_t int_min = (igraph_real_t) IGRAPH_INTEGER_MIN;
+    if (int_min <= value && value < int_max_plus_1) {
+        *result = (igraph_integer_t) value;
+        return IGRAPH_SUCCESS;
+    } else {
+        /* %.f ensures exact printing, %g would not */
+        IGRAPH_ERRORF("Cannot convert %.f to integer, outside of representable range.", IGRAPH_EOVERFLOW, value);
+    }
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with ceil().
+ */
+igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t *result) {
+    return igraph_i_safe_real_to_int(ceil(value), result);
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with floor().
+ */
+igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t *result) {
+    return igraph_i_safe_real_to_int(floor(value), result);
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with round().
+ */
+igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result) {
+    return igraph_i_safe_real_to_int(round(value), result);
+}

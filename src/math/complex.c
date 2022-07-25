@@ -22,7 +22,6 @@
 */
 
 #include "igraph_complex.h"
-#include "igraph_nongraph.h"
 
 #include <math.h>
 

@@ -59,8 +59,8 @@ int main() {
     igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
 
     igraph_vector_init(&bet, 0);
-    igraph_vs_seq(&vs_source, 0, 500);
-    igraph_vs_seq(&vs_target, 500, 999);
+    igraph_vs_range(&vs_source, 0, 501);
+    igraph_vs_range(&vs_target, 500, 1000);
 
     igraph_betweenness_subset(/* graph=     */ &g,
         /* res=       */ &bet,
@@ -98,8 +98,8 @@ int main() {
      * are 1945 and 199 if the vertex being considered is a descendant of the
      * common grand-grandparent in layer 2, and zero otherwise. */
 
-    igraph_vs_seq(&vs_source, 10911, 11110);
-    igraph_vs_seq(&vs_target, 10911, 11110);
+    igraph_vs_range(&vs_source, 10911, 11111);
+    igraph_vs_range(&vs_target, 10911, 11111);
     igraph_vector_init(&bet, 0);
 
     igraph_betweenness_subset(
@@ -210,10 +210,10 @@ int main() {
 
     for (i = 0; i < 5; i++)
     {
-        igraph_vector_int_init_seq(&node_vec, 0, 4);
+        igraph_vector_int_init_range(&node_vec, 0, 5);
         igraph_vector_int_remove(&node_vec, i);
         igraph_vs_vector(&vs, &node_vec);
-        igraph_vector_int_init_seq(&source_vec, 0, 4);
+        igraph_vector_int_init_range(&source_vec, 0, 5);
         igraph_vector_int_remove(&source_vec, i);
         igraph_vs_vector(&vs_source, &source_vec);
         printf("subset without %" IGRAPH_PRId "\n", i);
@@ -267,7 +267,7 @@ int main() {
 
     for (i = 0; i < 3; i++)
     {
-        igraph_vector_int_init_seq(&target_vec, 0, 3);
+        igraph_vector_int_init_range(&target_vec, 0, 4);
         igraph_vector_int_remove(&target_vec, i);
         igraph_vs_vector(&vs_target, &target_vec);
         printf("subset without %" IGRAPH_PRId "\n", i);
@@ -331,10 +331,10 @@ int main() {
         igraph_square_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* periodic */ 0);
 
         igraph_vector_init(&bet, 0);
-        igraph_vector_int_init_seq(&target_vec, 0, igraph_vcount(&g) - 1);
+        igraph_vector_int_init_range(&target_vec, 0, igraph_vcount(&g));
         igraph_vector_int_remove(&target_vec, 0);
         igraph_vs_vector(&vs_target, &target_vec);
-        igraph_vector_int_init_seq(&source_vec, 0, igraph_vcount(&g) - 1);
+        igraph_vector_int_init_range(&source_vec, 0, igraph_vcount(&g));
         igraph_vector_int_remove(&source_vec, 0);
         igraph_vs_vector(&vs_source, &source_vec);
 

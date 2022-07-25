@@ -88,6 +88,12 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
         IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
 
+    if (edges_per_step < 0) {
+        IGRAPH_ERRORF("Number of edges per step should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_step);
+    }
+
     if (types < 1) {
         IGRAPH_ERROR("The number of vertex types must be at least 1.", IGRAPH_EINVAL);
     }

@@ -1,7 +1,6 @@
 
 #include "igraph_error.h"
 #include "igraph_memory.h"
-#include "igraph_constants.h"
 
 #include "core/interruption.h"
 #include "cliques/cliquer_internal.h"

@@ -89,6 +89,21 @@ int main() {
     igraph_vs_as_vector(&g_no_vertices, vs, &v);
     igraph_vector_int_print(&v);
 
+    printf("Checking vs_range:\n");
+    igraph_vs_range(&vs, 2, 5);
+    check(&g, &vs);
+    CHECK_ERROR(igraph_vit_create(&g_no_vertices, vs, &vit), IGRAPH_EINVAL);
+
+    printf("Checking vss_range using vs_range parameters:\n");
+    vs = igraph_vss_range(2, 5);
+    check(&g, &vs);
+    CHECK_ERROR(igraph_vit_create(&g_no_vertices, vs, &vit), IGRAPH_EINVAL);
+
+    printf("Checking whether vss_range accepts an empty range.\n");
+    vs = igraph_vss_range(2, 2);
+    check(&g, &vs);
+    CHECK_ERROR(igraph_vit_create(&g_no_vertices, vs, &vit), IGRAPH_EINVAL);
+
     igraph_destroy(&g);
     igraph_destroy(&g_no_vertices);
     igraph_destroy(&g_no_edges);

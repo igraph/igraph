@@ -25,11 +25,11 @@
 #define IGRAPH_SPARSEMAT_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
 #include "igraph_arpack.h"
-#include "igraph_config.h"
 
 #include <stdio.h>
 

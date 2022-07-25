@@ -16,13 +16,14 @@
 <!-- doxrox-include igraph_vector_init -->
 <!-- doxrox-include igraph_vector_init_array -->
 <!-- doxrox-include igraph_vector_init_copy -->
-<!-- doxrox-include igraph_vector_init_seq -->
+<!-- doxrox-include igraph_vector_init_range -->
 <!-- doxrox-include igraph_vector_destroy -->
 </section>
 
 <section id="initializing-elements"><title>Initializing elements</title>
 <!-- doxrox-include igraph_vector_null -->
 <!-- doxrox-include igraph_vector_fill -->
+<!-- doxrox-include igraph_vector_range -->
 </section>
 
 <section id="vector-accessing-elements">
@@ -163,6 +164,7 @@
 <!-- doxrox-include igraph_vector_copy -->
 <!-- doxrox-include igraph_vector_e -->
 <!-- doxrox-include igraph_vector_e_ptr -->
+<!-- doxrox-include igraph_vector_init_seq -->
 <!-- doxrox-include igraph_vector_ptr_copy -->
 <!-- doxrox-include igraph_vector_ptr_e -->
 </section>

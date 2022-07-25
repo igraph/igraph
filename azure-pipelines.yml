@@ -72,6 +72,18 @@ jobs:
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
 
+  - job: linux_clang
+    pool:
+      vmImage: 'ubuntu-22.04'
+    steps:
+      - script: sudo apt-get install ninja-build ccache clang -y
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+
   - job: linux_x87
     steps:
       - script: sudo apt-get install ninja-build ccache -y

@@ -51,6 +51,18 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
 
+    if (
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI)
+    ) {
+        /* use the cached result */
+        *res = (
+            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP) &&
+            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)
+        );
+        return IGRAPH_SUCCESS;
+    }
+
     if (vc == 0 || ec == 0) {
         *res = 1;
     } else {
@@ -75,6 +87,13 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
         IGRAPH_FINALLY_CLEAN(1);
     }
 
+    /* If the graph turned out to be simple, we can cache that it has no loop
+     * and no multiple edges */
+    if (*res) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, 0);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, 0);
+    }
+
     return IGRAPH_SUCCESS;
 }
 
@@ -86,6 +105,11 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  * </para><para>
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
+ *
+ * </para><para>
+ * The return value of this function is cached in the graph itself; calling
+ * the function multiple times with no modifications to the graph in between
+ * will return a cached value in O(1) time.
  *
  * \param graph The input graph.
  * \param res Pointer to a boolean variable, the result will be stored here.
@@ -103,6 +127,8 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
+
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_HAS_MULTI, res);
 
     if (vc == 0 || ec == 0) {
         *res = 0;
@@ -136,6 +162,8 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, *res);
 
     return IGRAPH_SUCCESS;
 }

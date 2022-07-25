@@ -25,8 +25,8 @@ int main() {
     VECTOR(edges)[i] = RNG_INTEGER(0, igraph_vcount(&graph) - 1);
   }
 
-  igraph_add_edges(&graph, &edges, 0);
-  igraph_average_path_length(&graph, &avg_path_len, NULL, IGRAPH_UNDIRECTED, 1);
+  igraph_add_edges(&graph, &edges, NULL);
+  igraph_average_path_length(&graph, &avg_path_len, NULL, IGRAPH_UNDIRECTED, /* unconn= */ 1);
   printf("Average path length (randomized lattice): %g\n", (double) avg_path_len);
 
   igraph_vector_bool_destroy(&periodic);

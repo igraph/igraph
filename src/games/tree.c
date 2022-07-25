@@ -91,7 +91,7 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
 
     /* The vertices vector contains visited vertices between 0..k-1, unvisited ones between k..n-1. */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&vertices, 0, n - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&vertices, 0, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &vertices);
 
     RNG_BEGIN();

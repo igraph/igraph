@@ -7,6 +7,7 @@
 #ifndef F2C_INCLUDE
 #define F2C_INCLUDE
 
+#include "igraph_error.h"
 #include "linalg/blas_internal.h"
 #include "linalg/lapack_internal.h"
 #include "linalg/arpack_internal.h"

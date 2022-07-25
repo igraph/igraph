@@ -1,0 +1,23 @@
+Graph before permuting vertices:
+directed: true
+vcount: 6
+edges: {
+0 1
+1 0
+2 1
+2 2
+5 4
+5 4
+}
+
+Graph after permuting vertices:
+directed: true
+vcount: 6
+edges: {
+0 1
+1 0
+5 1
+5 5
+2 4
+2 4
+}

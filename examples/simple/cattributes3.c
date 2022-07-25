@@ -60,7 +60,7 @@ int main() {
                  1, 2, 2, 3,
                  -1);
 
-    igraph_vector_init_seq(&weight, 1, igraph_ecount(&g));
+    igraph_vector_init_range(&weight, 1, igraph_ecount(&g) + 1);
     SETEANV(&g, "weight", &weight);
     igraph_vector_destroy(&weight);
 

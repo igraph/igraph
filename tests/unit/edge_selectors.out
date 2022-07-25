@@ -13,14 +13,17 @@ es_copy
 es_as_vector
 2 3 4
 es_vector with negative entry should fail.
-Checking es_seq:
+Checking es_range:
 1 1
 1 3
+2 0
 Checking eit_as_vector using seq:
-2 3
-Checking ess_seq using es_seq parameters:
+2 3 4
+Checking ess_range using es_range parameters:
 1 1
 1 3
+2 0
+Checking whether ess_range accepts an empty range.
 Checking es_path:
 3 4
 2 3
