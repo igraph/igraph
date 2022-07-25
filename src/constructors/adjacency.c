@@ -1065,6 +1065,8 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
 
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(adjmatrix);
+    igraph_integer_t no_of_nonzeros = igraph_sparsemat_count_nonzero(adjmatrix);
+    igraph_integer_t approx_no_of_edges;
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
         IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
@@ -1080,6 +1082,27 @@ igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjm
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
+    /* Approximate the number of edges in the graph based on the number of
+     * nonzero elements in the matrix */
+    switch (mode) {
+        case IGRAPH_ADJ_DIRECTED:
+        case IGRAPH_ADJ_PLUS:
+        case IGRAPH_ADJ_UPPER:
+        case IGRAPH_ADJ_LOWER:
+            approx_no_of_edges = no_of_nonzeros;
+            break;
+        case IGRAPH_ADJ_UNDIRECTED:
+        case IGRAPH_ADJ_MAX:
+        case IGRAPH_ADJ_MIN:
+            approx_no_of_edges = no_of_nonzeros / 2;
+            break;
+        default:
+            approx_no_of_edges = no_of_nonzeros;
+            break;
+    }
+
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, approx_no_of_edges * 2));
 
     /* Collect the edges */
     switch (mode) {
