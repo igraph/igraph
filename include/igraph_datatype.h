@@ -48,7 +48,7 @@ typedef enum {
      * with edges (a, b) and (b, a), and false for a directed graph with
      * edges (a, b) and (a, b) again. Self-loops (a, a) are not considered
      * reciprocal. */
-    IGRAPH_PROP_HAS_RECIPROCAL,
+    IGRAPH_PROP_HAS_MUTUAL,
 
     /* Stores whether the graph is weakly connected. */
     IGRAPH_PROP_IS_WEAKLY_CONNECTED,

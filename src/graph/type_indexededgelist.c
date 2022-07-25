@@ -340,7 +340,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
      * false.
      *
      * Also, adding one or more edges does not change HAS_LOOP, HAS_MULTI and
-     * HAS_RECIPROCAL if they were already true.
+     * HAS_MUTUAL if they were already true.
      */
     igraph_i_property_cache_invalidate_conditionally(
         graph,
@@ -352,7 +352,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
         (1 << IGRAPH_PROP_HAS_LOOP) |
         (1 << IGRAPH_PROP_HAS_MULTI) |
-        (1 << IGRAPH_PROP_HAS_RECIPROCAL)
+        (1 << IGRAPH_PROP_HAS_MUTUAL)
     );
 
     return IGRAPH_SUCCESS;
@@ -431,7 +431,7 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
      *
      * - IGRAPH_PROP_HAS_LOOP
      * - IGRAPH_PROP_HAS_MULTI
-     * - IGRAPH_PROP_HAS_RECIPROCAL
+     * - IGRAPH_PROP_HAS_MUTUAL
      * - IGRAPH_PROP_IS_DAG (adding a node does not create/destroy cycles)
      * - IGRAPH_PROP_IS_FOREST (same)
      *
@@ -449,7 +449,7 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
         /* keep_always = */
         (1 << IGRAPH_PROP_HAS_LOOP) |
         (1 << IGRAPH_PROP_HAS_MULTI) |
-        (1 << IGRAPH_PROP_HAS_RECIPROCAL) |
+        (1 << IGRAPH_PROP_HAS_MUTUAL) |
         (1 << IGRAPH_PROP_IS_DAG) |
         (1 << IGRAPH_PROP_IS_FOREST),
         /* keep_when_false = */
@@ -591,7 +591,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
         /* keep_when_false = */
         (1 << IGRAPH_PROP_HAS_LOOP) |
         (1 << IGRAPH_PROP_HAS_MULTI) |
-        (1 << IGRAPH_PROP_HAS_RECIPROCAL) |
+        (1 << IGRAPH_PROP_HAS_MUTUAL) |
         (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
         (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED),
         /* keep_when_true = */
@@ -800,7 +800,7 @@ igraph_error_t igraph_delete_vertices_idx(
         /* keep_when_false = */
         (1 << IGRAPH_PROP_HAS_LOOP) |
         (1 << IGRAPH_PROP_HAS_MULTI) |
-        (1 << IGRAPH_PROP_HAS_RECIPROCAL),
+        (1 << IGRAPH_PROP_HAS_MUTUAL),
         /* keep_when_true = */
         (1 << IGRAPH_PROP_IS_DAG) |
         (1 << IGRAPH_PROP_IS_FOREST)
