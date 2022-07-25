@@ -10,3 +10,7 @@ Modularity: 0.452381
 Negative implementation.
 Modularity: 0.452381
 ( 0 0 0 0 0 1 1 1 1 1 )
+
+Trivial case: null graph.
+
+Trivial case: singleton graph.

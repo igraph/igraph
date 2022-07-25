@@ -129,6 +129,53 @@ int main() {
                                       /*gamma=       */ 1.0);
 
     igraph_destroy(&g);
+
+    printf("\nTrivial case: null graph.\n");
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    igraph_community_spinglass(&g,
+                               NULL, /* no weights */
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,   /* no of spins */
+                               0,    /* parallel update */
+                               1.0,  /* start temperature */
+                               0.01, /* stop temperature */
+                               0.99, /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    IGRAPH_ASSERT(igraph_vector_int_empty(&membership));
+    IGRAPH_ASSERT(igraph_vector_int_empty(&csize));
+    IGRAPH_ASSERT(temperature == 0.01);
+    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    igraph_destroy(&g);
+
+    printf("\nTrivial case: singleton graph.\n");
+    igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
+    igraph_community_spinglass(&g,
+                               NULL, /* no weights */
+                               &modularity,
+                               &temperature,
+                               &membership,
+                               &csize,
+                               10,   /* no of spins */
+                               0,    /* parallel update */
+                               1.0,  /* start temperature */
+                               0.01, /* stop temperature */
+                               0.99, /* cooling factor */
+                               IGRAPH_SPINCOMM_UPDATE_CONFIG,
+                               1.0, /* gamma */
+                               IGRAPH_SPINCOMM_IMP_ORIG,
+                               /*gamma_minus =*/ 0);
+    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 1 && VECTOR(membership)[0] == 0);
+    IGRAPH_ASSERT(igraph_vector_int_size(&csize) == 1 && VECTOR(csize)[0] == 1);
+    IGRAPH_ASSERT(temperature == 0.01);
+    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    igraph_destroy(&g);
+
     igraph_vector_int_destroy(&membership);
     igraph_vector_int_destroy(&csize);
 
