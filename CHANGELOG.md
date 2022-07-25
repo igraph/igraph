@@ -23,6 +23,7 @@
  - `igraph_layout_drl()` and its 3D version now validate their inputs.
  - `igraph_layout_kamada_kawai()`, `igraph_layout_fruchterman_reingold()`, `igraph_layout_drl()`, as well as their 3D versions now check for non-positive weights.
  - `igraph_asymmetric_preference_game()` interpreted its `type_dist_matrix` argument incorrectly.
+ - Fixed incorrect result of `igraph_community_spinglass()` for null and singleton graphs.
 
 ### Other
 
