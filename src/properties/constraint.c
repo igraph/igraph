@@ -104,7 +104,7 @@ igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
-    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS, 0));
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS, weights));
 
     IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
     igraph_vector_null(res);
