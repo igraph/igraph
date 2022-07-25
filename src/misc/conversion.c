@@ -33,6 +33,7 @@
 
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
+#include "math/safe_intop.h"
 
 /**
  * \ingroup conversion
@@ -465,12 +466,13 @@ igraph_error_t igraph_to_directed(igraph_t *graph,
         igraph_t newgraph;
         igraph_vector_int_t edges;
         igraph_vector_int_t index;
-        igraph_integer_t size = no_of_edges * 4;
+        igraph_integer_t size;
         igraph_integer_t i;
+        IGRAPH_SAFE_MULT(no_of_edges, 4, &size);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, size));
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
-        IGRAPH_CHECK(igraph_vector_int_resize(&edges, no_of_edges * 4));
+        IGRAPH_CHECK(igraph_vector_int_resize(&edges, size));
         IGRAPH_VECTOR_INT_INIT_FINALLY(&index, no_of_edges * 2);
         for (i = 0; i < no_of_edges; i++) {
             VECTOR(edges)[no_of_edges * 2 + i * 2]  = VECTOR(edges)[i * 2 + 1];
