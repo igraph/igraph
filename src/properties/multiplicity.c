@@ -393,14 +393,14 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
  * mutual.
  *
  * \param graph The input graph.
+ * \param res Pointer to a boolean, the result will be stored here.
  * \param loops Boolean, whether to consider directed self-loops
  *        to be mutual.
- * \param res Pointer to a boolean, the result will be stored here.
  * \return Error code.
  *
  * Time complexity: O(|E| log(d)) where d is the maximum in-degree.
  */
-igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t loops, igraph_bool_t *res) {
+igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igraph_bool_t loops) {
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_lazy_adjlist_t adjlist;
 

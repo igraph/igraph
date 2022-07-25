@@ -869,7 +869,7 @@ igraph_is_mutual:
     DEPS: es ON graph
 
 igraph_has_mutual:
-    PARAMS: GRAPH graph, BOOLEAN loops=True, OUT BOOLEAN res
+    PARAMS: GRAPH graph, OUT BOOLEAN res, BOOLEAN loops=True
 
 igraph_maximum_cardinality_search:
     PARAMS: GRAPH graph, OPTIONAL OUT INDEX_VECTOR alpha, OPTIONAL OUT VERTEX_INDICES alpham1
