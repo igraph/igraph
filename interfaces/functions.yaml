@@ -865,8 +865,11 @@ igraph_unfold_tree:
         OPTIONAL OUT INDEX_VECTOR vertex_index
 
 igraph_is_mutual:
-    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL, BOOLEAN loops=True
     DEPS: es ON graph
+
+igraph_has_mutual:
+    PARAMS: GRAPH graph, OUT BOOLEAN res, BOOLEAN loops=True
 
 igraph_maximum_cardinality_search:
     PARAMS: GRAPH graph, OPTIONAL OUT INDEX_VECTOR alpha, OPTIONAL OUT VERTEX_INDICES alpham1
