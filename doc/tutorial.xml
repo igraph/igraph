@@ -16,19 +16,37 @@ the <command>igraph</command> library.
 </para>
 
 <para>
-This example illustrates a couple of points. First, programs
+This example illustrates a couple of points:
+</para>
+
+<itemizedlist>
+<listitem><para>
+First, programs
 using the <command>igraph</command> library should include the
 <filename>igraph.h</filename> header
-file. Second, <command>igraph</command> uses the
+file.
+</para></listitem>
+<listitem><para>
+Second, <command>igraph</command> uses the
+<type>igraph_integer_t</type> type for integers instead of
+<type>int</type> or <type>long int</type>, and it also uses the
 <type>igraph_real_t</type> type for real numbers instead of
-<type>double</type>. Third, <command>igraph</command> graph objects
-are represented by the <type>igraph_t</type> data
-type. Fourth, the <link
+<type>double</type>. Depending on how igraph was compiled, and whether you are
+using a 32-bit or 64-bit system, <type>igraph_integer_t</type> may be a 32-bit
+or 64-bit integer.
+</para></listitem>
+<listitem><para>
+Third, <command>igraph</command> graph objects are represented by the <type>igraph_t</type> data
+type.
+</para></listitem>
+<listitem><para>
+Fourth, the <link
 linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
 destroys it, i.e. deallocates the memory associated to it.
-</para>
+</para></listitem>
+</itemizedlist>
 
 <para>
 For compiling this program you need a C compiler. Optionally,
@@ -208,9 +226,8 @@ on them. A vector can be indexed by the
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). The elements of a vector are of type <type>igraph_real_t</type>
 for <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>,
-and of type <type>igraph_integer_t</type> for <type>igraph_vector_int_t</type>. Depending on
-how igraph was compiled, and whether you are using a 32-bit or 64-bit system, <type>igraph_integer_t</type>
-may be a 32- or 64-bit integer. As you might expect, <type>igraph_vector_bool_t</type> holds
+and of type <type>igraph_integer_t</type> for <type>igraph_vector_int_t</type>.
+As you might expect, <type>igraph_vector_bool_t</type> holds
 <type>igraph_bool_t</type> values. Vectors can be resized and most <command>igraph</command>
 functions returning the result in a vector automatically resize it to the size they need.
 </para>
@@ -243,7 +260,7 @@ two, etc. This way we add ten random edges to the lattice.
 Note that this example program may add <emphasis>loop edges</emphasis>, edges
 pointing a vertex to itself, or <emphasis>multiple edges</emphasis>, more than one edge
 between the same pair of vertices.
-<type>igraph_t</type> can of course represent loops and multiple edges, although some 
+<type>igraph_t</type> can of course represent loops and multiple edges, although some
 routines expect simple graphs, i.e. graphs which contain neither of these. This is because some
 structural properties are ill-defined for non-simple graphs. Loop and multi-edges can be removed by calling
 <link linkend="igraph_simplify"><function>igraph_simplify()</function></link>.
