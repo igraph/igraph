@@ -115,7 +115,7 @@ format{whitespace}*[=]{whitespace}*nodelist1{whitespace}* {
 <FULLMATRIX>[^ \t\n\r\v\f\0,]+            { return LABEL; }
 <FULLMATRIX>{whitespace}                  { }
 
-<EDGELIST>\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)?  { return NUM; }
+<EDGELIST>(\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)?  { return NUM; }
 <EDGELIST>[^ \t\n\r\v\f\0,]+                                 { return LABEL; }
 <EDGELIST>{whitespace}*                                    { }
 

@@ -24,14 +24,7 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
-#include "centrality/centrality_internal.h"
 #include "centrality/prpack_internal.h"
-
-#include "config.h"
-
-#include <limits.h>
-#include <math.h>
-#include <string.h>    /* memset */
 
 static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
                                                  igraph_vector_t *vector,
@@ -241,10 +234,11 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  *    meaning unweighted edges, or a vector of non-negative values
  *    of the same length as the number of edges.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the <code>n</code> (number
- *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
- *    (LM) parameters and it always starts the calculation from a non-random vector
- *    calculated based on the degree of the vertices.
+ *    for details. Supply \c NULL here to use the defaults. Note that the function
+ *    overwrites the <code>n</code> (number of vertices), <code>nev</code> (1),
+ *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and it always
+ *    starts the calculation from a non-random vector calculated based on the
+ *    degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *         \c IGRAPH_EINVVID, invalid vertex ID in \p vids.
@@ -315,10 +309,11 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the <code>n</code> (number
- *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
- *    (LM) parameters and it always starts the calculation from a non-random vector
- *    calculated based on the degree of the vertices.
+ *    for details. Supply \c NULL here to use the defaults. Note that the function
+ *    overwrites the <code>n</code> (number of vertices), <code>nev</code> (1),
+ *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and it always
+ *    starts the calculation from a non-random vector calculated based on the
+ *    degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
@@ -406,10 +401,11 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  *    meaning unweighted edges, or a vector of non-negative values
  *    of the same length as the number of edges.
  * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the <code>n</code> (number
- *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
- *    (LM) parameters and it always starts the calculation from a non-random vector
- *    calculated based on the degree of the vertices.
+ *    for details. Supply \c NULL here to use the defaults. Note that the function
+ *    overwrites the <code>n</code> (number of vertices), <code>nev</code> (1),
+ *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and it always
+ *    starts the calculation from a non-random vector calculated based on the
+ *    degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
@@ -438,7 +434,8 @@ igraph_error_t igraph_personalized_pagerank(const igraph_t *graph,
     if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
         return igraph_i_personalized_pagerank_arpack(graph, vector, value, vids,
                 directed, damping, reset,
-                weights, options);
+                weights, options ? options : igraph_arpack_options_get_default()
+        );
     } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
         return igraph_i_personalized_pagerank_prpack(graph, vector, value, vids,
                 directed, damping, reset,
@@ -497,7 +494,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     options->n = (int) no_of_nodes;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'R';
     options->start = 1;       /* no random start vector */
 
     directed = directed && igraph_is_directed(graph);
@@ -510,7 +507,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (igraph_is_nan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
@@ -564,7 +561,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
             IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
         }
 
-        IGRAPH_CHECK(igraph_vector_copy(&normalized_reset, reset));
+        IGRAPH_CHECK(igraph_vector_init_copy(&normalized_reset, reset));
         IGRAPH_FINALLY(igraph_vector_destroy, &normalized_reset);
 
         igraph_vector_scale(&normalized_reset, 1.0 / reset_sum);
@@ -689,7 +686,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     }
 
     if (vector) {
-        igraph_integer_t i;
         igraph_vit_t vit;
         igraph_integer_t nodes_to_calc;
         igraph_real_t sum = 0;

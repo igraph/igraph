@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
@@ -56,7 +56,7 @@ int main() {
         printf("Splitting heuristic: %s\n", sh_names[i]);
 
         igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-        igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+        igraph_vector_int_init_range(&perm, 0, igraph_vcount(&ring1));
         igraph_vector_int_shuffle(&perm);
         igraph_permute_vertices(&ring1, &ring2, &perm);
 
@@ -94,7 +94,7 @@ int main() {
         VECTOR(color1)[0] = 1;
         VECTOR(color1)[1] = 1;
         VECTOR(color2)[0] = 1;
-        VECTOR(color2)[2] = 1;
+        VECTOR(color2)[3] = 1;
 
         iso = 1;
         igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, sh, 0, 0);

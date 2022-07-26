@@ -28,8 +28,6 @@
 
 #include "centrality/centrality_internal.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
@@ -90,17 +88,14 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
 
     igraph_vector_t values;
     igraph_matrix_t vectors;
-    igraph_vector_int_t degree;
+    igraph_vector_t degree;
     igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    int no_of_nodes_int;
+    igraph_bool_t negative_weights = 0;
 
     if (no_of_nodes > INT_MAX) {
         IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
     }
-
-    options->n = no_of_nodes_int = (int) no_of_nodes;
-    options->start = 1;   /* no random start vector */
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -108,7 +103,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 1);
         }
         return IGRAPH_SUCCESS;
@@ -118,32 +113,41 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
                 *value = 0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
                 igraph_vector_fill(vector, 1);
             }
             return IGRAPH_SUCCESS;
         }
+
+        if (min < 0) {
+            /* When there are negative weights, the eigenvalue and the eigenvector are no
+             * longer guaranteed to be non-negative. */
+            negative_weights = 1;
+            IGRAPH_WARNING("Negative weight in graph. The largest eigenvalue "
+                           "will be selected, but it may not be the largest in magnitude.");
+        }
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
-    IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
+    IGRAPH_MATRIX_INIT_FINALLY(&vectors, no_of_nodes, 1);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, options->n);
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                               IGRAPH_ALL, /*loops=*/ 0));
+    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(),
+                                 IGRAPH_ALL, IGRAPH_LOOPS, weights));
     RNG_BEGIN();
-    for (i = 0; i < options->n; i++) {
+    for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(degree)[i]) {
             MATRIX(vectors, i, 0) = VECTOR(degree)[i] + RNG_UNIF(-1e-4, 1e-4);
         } else {
@@ -151,10 +155,10 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         }
     }
     RNG_END();
-    igraph_vector_int_destroy(&degree);
+    igraph_vector_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
 
-    options->n = no_of_nodes_int;
+    options->n = (int) no_of_nodes;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     options->which[0] = 'L'; options->which[1] = 'A';
@@ -192,23 +196,20 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    if (value) {
-        *value = VECTOR(values)[0];
-    }
-
     if (vector) {
         igraph_real_t amax = 0;
         igraph_integer_t which = 0;
-        IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
+        IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
 
-        if (VECTOR(values)[0] <= 0) {
+        if (!negative_weights && VECTOR(values)[0] <= 0) {
             /* Pathological case: largest eigenvalue is zero, therefore all the
              * scores can also be zeros, this will be a valid eigenvector.
              * This usually happens with graphs that have lots of sinks and
              * sources only. */
             igraph_vector_fill(vector, 0);
+            VECTOR(values)[0] = 0;
         } else {
-            for (i = 0; i < options->n; i++) {
+            for (i = 0; i < no_of_nodes; i++) {
                 igraph_real_t tmp;
                 VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
                 tmp = fabs(VECTOR(*vector)[i]);
@@ -224,16 +225,22 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
             }
 
             /* Correction for numeric inaccuracies (eliminating -0.0) */
-            for (i = 0; i < options->n; i++) {
-                if (VECTOR(*vector)[i] < 0) {
-                    VECTOR(*vector)[i] = 0;
+            if (! negative_weights) {
+                for (i = 0; i < no_of_nodes; i++) {
+                    if (VECTOR(*vector)[i] < 0) {
+                        VECTOR(*vector)[i] = 0;
+                    }
                 }
             }
         }
     }
 
+    if (value) {
+        *value = VECTOR(values)[0];
+    }
+
     if (options->info) {
-        IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
+        IGRAPH_WARNING("Non-zero return code from ARPACK routine.");
     }
 
     igraph_matrix_destroy(&vectors);
@@ -254,6 +261,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     igraph_bool_t dag;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
+    igraph_bool_t negative_weights = 0;
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -261,7 +269,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 1);
         }
         return IGRAPH_SUCCESS;
@@ -278,7 +286,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             *value = 0;
         }
         if (vector) {
-            igraph_vector_resize(vector, igraph_vcount(graph));
+            IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
             igraph_vector_fill(vector, 0);
         }
         return IGRAPH_SUCCESS;
@@ -288,18 +296,22 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         igraph_real_t min, max;
 
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating "
-                         "eigenvector centrality", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights vector length (%" IGRAPH_PRId ") not equal to "
+                    "number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                    igraph_vector_size(weights), igraph_ecount(graph));
         }
         if (igraph_is_directed(graph)) {
             IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
         }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
 
         if (min < 0.0) {
-            IGRAPH_WARNING("Negative weights, eigenpair might be complex");
+            /* When there are negative weights, the eigenvalue and the eigenvector are no
+             * longer guaranteed to be non-negative, or even real-valued. */
+            negative_weights = 1;
+            IGRAPH_WARNING("Negative weights in directed graph, eigenpair may be complex.");
         }
         if (min == 0.0 && max == 0.0) {
             /* special case: all weights are zeros */
@@ -307,7 +319,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
                 *value = 0;
             }
             if (vector) {
-                igraph_vector_resize(vector, igraph_vcount(graph));
+                IGRAPH_CHECK(igraph_vector_resize(vector, igraph_vcount(graph)));
                 igraph_vector_fill(vector, 1);
             }
             return IGRAPH_SUCCESS;
@@ -327,13 +339,13 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     options->which[0] = 'L' ; options->which[1] = 'R';
 
     IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
-    IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
+    IGRAPH_MATRIX_INIT_FINALLY(&vectors, no_of_nodes, 1);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
+    IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
-                                 IGRAPH_IN, /*loops=*/ 1, weights));
+                                 IGRAPH_IN, IGRAPH_LOOPS, weights));
     RNG_BEGIN();
-    for (i = 0; i < options->n; i++) {
+    for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(indegree)[i]) {
             MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
         } else {
@@ -374,17 +386,13 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    if (value) {
-        *value = MATRIX(values, 0, 0);
-    }
-
     if (vector) {
         igraph_real_t amax = 0;
         igraph_integer_t which = 0;
-        igraph_integer_t i;
+
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
 
-        if (MATRIX(values, 0, 0) <= 0) {
+        if (!negative_weights && MATRIX(values, 0, 0) <= 0) {
             /* Pathological case: largest eigenvalue is zero, therefore all the
              * scores can also be zeros, this will be a valid eigenvector.
              * This usually happens with graphs that have lots of sinks and
@@ -392,7 +400,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
             igraph_vector_fill(vector, 0);
             MATRIX(values, 0, 0) = 0;
         } else {
-            for (i = 0; i < options->n; i++) {
+            for (i = 0; i < no_of_nodes; i++) {
                 igraph_real_t tmp;
                 VECTOR(*vector)[i] = MATRIX(vectors, i, 0);
                 tmp = fabs(VECTOR(*vector)[i]);
@@ -409,15 +417,21 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         }
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
-        for (i = 0; i < options->n; i++) {
-            if (VECTOR(*vector)[i] < 0) {
-                VECTOR(*vector)[i] = 0;
+        if (! negative_weights) {
+            for (i = 0; i < no_of_nodes; i++) {
+                if (VECTOR(*vector)[i] < 0) {
+                    VECTOR(*vector)[i] = 0;
+                }
             }
         }
     }
 
+    if (value) {
+        *value = MATRIX(values, 0, 0);
+    }
+
     if (options->info) {
-        IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
+        IGRAPH_WARNING("Non-zero return code from ARPACK routine.");
     }
 
     igraph_matrix_destroy(&vectors);
@@ -429,7 +443,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
 
 /**
  * \function igraph_eigenvector_centrality
- * Eigenvector centrality of the vertices
+ * \brief Eigenvector centrality of the vertices.
  *
  * Eigenvector centrality is a measure of the importance of a node in a
  * network. It assigns relative scores to all nodes in the network based
@@ -461,8 +475,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * to the sum of centralities of vertices pointing to it.
  *
  * </para><para>
- * Eigenvector centrality is meaningful only for connected graphs.
- * Graphs that are not connected should be decomposed into connected
+ * Eigenvector centrality is meaningful only for (strongly) connected graphs.
+ * Undirected graphs that are not connected should be decomposed into connected
  * components, and the eigenvector centrality calculated for each separately.
  * This function does not verify that the graph is connected. If it is not,
  * in the undirected case the scores of all but one component will be zeros.
@@ -488,13 +502,14 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *     in a directed graph. It is ignored for undirected graphs.
  * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
- * \param weights A null pointer (= no edge weights), or a vector
- *     giving the weights of the edges. The algorithm might produce
- *     complex numbers when some weights are negative. In this case only
+ * \param weights A null pointer (indicating no edge weights), or a vector
+ *     giving the weights of the edges. Weights should be positive to guarantee
+ *     a meaningful result. The algorithm might produce complex numbers when some
+ *     weights are negative and the graph is directed. In this case only
  *     the real part is reported.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    for details. Supply \c NULL here to use the defaults. Note that the
+ *    function overwrites the <code>n</code> (number of vertices) parameter and
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
@@ -513,6 +528,10 @@ igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_bool_t directed, igraph_bool_t scale,
                                   const igraph_vector_t *weights,
                                   igraph_arpack_options_t *options) {
+
+    if (!options) {
+        options = igraph_arpack_options_get_default();
+    }
 
     if (directed && igraph_is_directed(graph)) {
         return igraph_i_eigenvector_centrality_directed(graph, vector, value,

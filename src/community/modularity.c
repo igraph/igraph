@@ -23,13 +23,12 @@
 
 #include "igraph_community.h"
 
-#include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 
 /**
  * \function igraph_modularity
- * \brief Calculate the modularity of a graph with respect to some clusters or vertex types.
+ * \brief Calculates the modularity of a graph with respect to some clusters or vertex types.
  *
  * The modularity of a graph with respect to some clustering of the vertices
  * (or assignment of vertex types)
@@ -37,28 +36,29 @@
  * other compared to a random null model. It is defined as
  *
  * </para><para>
- * <code>Q = 1/(2m) sum_ij (A_ij - gamma * k_i * k_j / (2m)) * d(c_i,c_j)</code>,
+ * <code>Q = 1/(2m) sum_ij (A_ij - γ k_i k_j / (2m)) δ(c_i,c_j)</code>,
  *
  * </para><para>
  * where \c m is the number of edges, <code>A_ij</code> is the adjacency matrix,
  * \c k_i is the degree of vertex \c i, \c c_i is the cluster that vertex \c i belongs to
- * (or its vertex type), <code>d(i,j)=1</code> if <code>i=j</code> and 0 otherwise,
- * and the sum goes over all <code>i, j</code> pairs of vertices.
+ * (or its vertex type), <code>δ(i,j)=1</code> if <code>i=j</code> and 0 otherwise,
+ * and the sum goes over all \c i, \c j pairs of vertices. Note that in this formula,
+ * the diagonal of the adjacency matrix contains twice the number of self-loops.
  *
  * </para><para>
- * The resolution parameter \c gamma allows weighting the random null model, which
+ * The resolution parameter \c γ allows weighting the random null model, which
  * might be useful when finding partitions with a high modularity. Maximizing modularity
  * with higher values of the resolution parameter typically results in more, smaller clusters
  * when finding partitions with a high modularity. Lower values typically results in
  * fewer, larger clusters. The original definition of modularity is retrieved
- * when setting <code>gamma=1</code>.
+ * when setting <code>γ = 1</code>.
  *
  * </para><para>
  * Modularity can also be calculated on directed graphs. This only requires a relatively
- * modest change
+ * modest change,
  *
  * </para><para>
- * <code>Q = 1/(m) sum_ij (A_ij - gamma * k^out_i * k^in_j / m) * d(c_i,c_j)</code>,
+ * <code>Q = 1/m sum_ij (A_ij - γ k^out_i k^in_j / m) δ(c_i,c_j)</code>,
  *
  * </para><para>
  * where \c k^out_i is the out-degree of node \c i and \c k^in_j is the in-degree of node \c j.
@@ -87,7 +87,7 @@
  * 118703. https://doi.org/10.1103/PhysRevLett.100.118703
  *
  * </para><para>
- * For the introduction of the resolution parameter, see Reichardt, J., and
+ * For the introduction of the resolution parameter \c γ, see Reichardt, J., and
  * Bornholdt, S. (2006). Statistical mechanics of community detection. Physical
  * Review E 74, 016110. https://doi.org/10.1103/PhysRevE.74.016110
  *
@@ -97,7 +97,7 @@
  *                   It does not have to be consecutive, i.e. empty communities
  *                   are allowed.
  * \param weights    Weight vector or \c NULL if no weights are specified.
- * \param resolution Resolution parameter. Must be greater than or equal to 0.
+ * \param resolution The resolutin parameter \c γ. Must not be negative.
  *                   Set it to 1 to use the classical definition of modularity.
  * \param directed   Whether to use the directed or undirected version of modularity.
  *                   Ignored for undirected graphs.
@@ -132,7 +132,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
     if (resolution < 0.0) {
-      IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
+      IGRAPH_ERROR("The resolution parameter must not be negative.", IGRAPH_EINVAL);
     }
 
     if (no_of_edges == 0) {
@@ -159,7 +159,7 @@ igraph_error_t igraph_modularity(const igraph_t *graph,
 
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges)
-            IGRAPH_ERROR("Vector size differs from number of edges.",
+            IGRAPH_ERROR("Weight vector size differs from number of edges.",
                          IGRAPH_EINVAL);
         m = 0.0;
         for (i = 0; i < no_of_edges; i++) {
@@ -257,15 +257,15 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
 
 /**
  * \function igraph_modularity_matrix
- * \brief Calculate the modularity matrix
+ * \brief Calculates the modularity matrix.
  *
- * This function returns the modularity matrix defined as
- *
- * </para><para>
- * <code>B_ij = A_ij - gamma * k_i * k_j / (2m)</code>
+ * This function returns the modularity matrix, which is defined as
  *
  * </para><para>
- * for undirected graphs, where \c A_ij is the adjacency matrix, \c gamma is the
+ * <code>B_ij = A_ij - γ k_i k_j / (2m)</code>
+ *
+ * </para><para>
+ * for undirected graphs, where \c A_ij is the adjacency matrix, \c γ is the
  * resolution parameter, \c k_i is the degree of vertex \c i, and \c m is the
  * number of edges in the graph. When there are no edges, or the weights add up
  * to zero, the result is undefined.
@@ -274,25 +274,27 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
  * For directed graphs the modularity matrix is changed to
  *
  * </para><para>
- * <code>B_ij = A_ij - gamma * k^out_i * k^in_j / m</code>
+ * <code>B_ij = A_ij - γ k^out_i k^in_j / m</code>
+ *
+ * </para><para>
  * where <code>k^out_i</code> is the out-degree of node \c i and <code>k^in_j</code> is the
  * in-degree of node \c j.
  *
  * </para><para>
  * Note that self-loops in undirected graphs are multiplied by 2 in this
- * implementation. If weights are specified, the weighted counterparts are used.
+ * implementation. If weights are specified, the weighted counterparts of the adjacency
+ * matrix and degrees are used.
  *
  * \param graph      The input graph.
  * \param weights    Edge weights, pointer to a vector. If this is a null pointer
  *                   then every edge is assumed to have a weight of 1.
- * \param resolution Resolution parameter. Must be greater than or equal to 0.
+ * \param resolution The resolution parameter \c γ. Must not be negative.
  *                   Default is 1. Lower values favor fewer, larger communities;
  *                   higher values favor more, smaller communities.
  * \param modmat     Pointer to an initialized matrix in which the modularity
  *                   matrix is stored.
  * \param directed   For directed graphs: if the edges should be treated as
- *                   undirected.
- *                   For undirected graphs this is ignored.
+ *                   undirected. For undirected graphs this is ignored.
  *
  * \sa \ref igraph_modularity()
  */
@@ -314,7 +316,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     }
 
     if (resolution < 0.0) {
-        IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The resolution parameter must not be negative.", IGRAPH_EINVAL);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -374,7 +376,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
         }
 
         /* Scaling one degree factor so every element gets scaled. */
-        igraph_vector_copy(&deg_unscaled, &deg);
+        igraph_vector_init_copy(&deg_unscaled, &deg);
         IGRAPH_FINALLY(igraph_vector_destroy, &deg_unscaled);
         scaling_factor = resolution / 2.0 / sw;
         igraph_vector_scale(&deg, scaling_factor);

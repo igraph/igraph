@@ -29,6 +29,7 @@
 
 #include "core/grid.h"
 #include "core/interruption.h"
+#include "layout/layout_internal.h"
 
 static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                               igraph_matrix_t *res,
@@ -47,7 +48,6 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
     igraph_vector_t dispx, dispy;
     igraph_real_t temp = start_temp;
     igraph_real_t difftemp = start_temp / niter;
-    igraph_real_t width = sqrt(no_nodes), height = width;
     igraph_bool_t conn = 1;
     igraph_real_t C = 0;
 
@@ -59,27 +59,7 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
     RNG_BEGIN();
 
     if (!use_seed) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
-        for (i = 0; i < no_nodes; i++) {
-            igraph_real_t x1 = minx ? VECTOR(*minx)[i] : -width / 2;
-            igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] :  width / 2;
-            igraph_real_t y1 = miny ? VECTOR(*miny)[i] : -height / 2;
-            igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] :  height / 2;
-            if (!igraph_finite(x1)) {
-                x1 = -sqrt(no_nodes) / 2;
-            }
-            if (!igraph_finite(x2)) {
-                x2 =  sqrt(no_nodes) / 2;
-            }
-            if (!igraph_finite(y1)) {
-                y1 = -sqrt(no_nodes) / 2;
-            }
-            if (!igraph_finite(y2)) {
-                y2 =  sqrt(no_nodes) / 2;
-            }
-            MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
-            MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
-        }
+        igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, no_nodes);
@@ -101,9 +81,9 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                     igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
                     igraph_real_t dlen = dx * dx + dy * dy;
 
-                    if (dlen == 0) {
-                        dx = RNG_UNIF01() * 1e-9;
-                        dy = RNG_UNIF01() * 1e-9;
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy;
                     }
 
@@ -121,9 +101,9 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
                     igraph_real_t dlen, rdlen;
 
                     dlen = dx * dx + dy * dy;
-                    if (dlen == 0) {
-                        dx = RNG_UNIF(0, 1e-6);
-                        dy = RNG_UNIF(0, 1e-6);
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy;
                     }
 
@@ -139,13 +119,13 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
 
         /* calculate attractive forces */
         for (e = 0; e < no_edges; e++) {
-            /* each edges is an ordered pair of vertices v and u */
+            /* each edge is an ordered pair of vertices v and u */
             igraph_integer_t v = IGRAPH_FROM(graph, e);
             igraph_integer_t u = IGRAPH_TO(graph, e);
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t w = weight ? VECTOR(*weight)[e] : 1.0;
-            igraph_real_t dlen = hypot(dx, dy) * w;
+            igraph_real_t dlen = sqrt(dx*dx + dy*dy) * w;
             VECTOR(dispx)[v] -= (dx * dlen);
             VECTOR(dispy)[v] -= (dy * dlen);
             VECTOR(dispx)[u] += (dx * dlen);
@@ -155,14 +135,18 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
         /* limit max displacement to temperature t and prevent from
            displacement outside frame */
         for (v = 0; v < no_nodes; v++) {
-            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = hypot(dx, dy);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
+            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+
+            if (displen > temp) {
+                dx *= temp/displen;
+                dy *= temp/displen;
+            }
+
             if (displen > 0) {
-                MATRIX(*res, v, 0) += (dx / displen) * mx;
-                MATRIX(*res, v, 1) += (dy / displen) * my;
+                MATRIX(*res, v, 0) += dx;
+                MATRIX(*res, v, 1) += dy;
             }
             if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
                 MATRIX(*res, v, 0) = VECTOR(*minx)[v];
@@ -212,27 +196,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
     RNG_BEGIN();
 
     if (!use_seed) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
-        for (i = 0; i < no_nodes; i++) {
-            igraph_real_t x1 = minx ? VECTOR(*minx)[i] : -width / 2;
-            igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] :  width / 2;
-            igraph_real_t y1 = miny ? VECTOR(*miny)[i] : -height / 2;
-            igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] :  height / 2;
-            if (!igraph_finite(x1)) {
-                x1 = -sqrt(no_nodes) / 2;
-            }
-            if (!igraph_finite(x2)) {
-                x2 =  sqrt(no_nodes) / 2;
-            }
-            if (!igraph_finite(y1)) {
-                y1 = -sqrt(no_nodes) / 2;
-            }
-            if (!igraph_finite(y2)) {
-                y2 =  sqrt(no_nodes) / 2;
-            }
-            MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
-            MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
-        }
+        igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
     }
 
     /* make grid */
@@ -263,6 +227,11 @@ static igraph_error_t igraph_layout_i_grid_fr(
                 igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
                 igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
                 igraph_real_t dlen = dx * dx + dy * dy;
+                while (dlen == 0) {
+                    dx = RNG_UNIF(-1e-9, 1e-9);
+                    dy = RNG_UNIF(-1e-9, 1e-9);
+                    dlen = dx * dx + dy * dy;
+                }
                 if (dlen < cellsize * cellsize) {
                     VECTOR(dispx)[v] += dx / dlen;
                     VECTOR(dispy)[v] += dy / dlen;
@@ -279,7 +248,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t w = weight ? VECTOR(*weight)[e] : 1.0;
-            igraph_real_t dlen = hypot(dx, dy) * w;
+            igraph_real_t dlen = sqrt(dx*dx + dy*dy) * w;
             VECTOR(dispx)[v] -= (dx * dlen);
             VECTOR(dispy)[v] -= (dy * dlen);
             VECTOR(dispx)[u] += (dx * dlen);
@@ -288,14 +257,18 @@ static igraph_error_t igraph_layout_i_grid_fr(
 
         /* update */
         for (v = 0; v < no_nodes; v++) {
-            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t displen = hypot(dx, dy);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
+            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t displen = sqrt(dx * dx + dy * dy);
+
+            if (displen > temp) {
+                dx *= temp/displen;
+                dy *= temp/displen;
+            }
+
             if (displen > 0) {
-                MATRIX(*res, v, 0) += (dx / displen) * mx;
-                MATRIX(*res, v, 1) += (dy / displen) * my;
+                MATRIX(*res, v, 0) += dx;
+                MATRIX(*res, v, 1) += dy;
             }
             if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
                 MATRIX(*res, v, 0) = VECTOR(*minx)[v];
@@ -327,10 +300,31 @@ static igraph_error_t igraph_layout_i_grid_fr(
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  *
  * </para><para>
- * This is a force-directed layout, see Fruchterman, T.M.J. and
- * Reingold, E.M.: Graph Drawing by Force-directed Placement.
+ * This is a force-directed layout that simulates an attractive force \c f_a between
+ * connected vertex pairs and a repulsive force \c f_r between all vertex pairs.
+ * The forces are computed as a function of the distance \c d between the two vertices as
+ *
+ * </para><para>
+ * <code>f_a(d) = -w * d^2</code> and <code>f_r(d) = 1/d</code>,
+ *
+ * </para><para>
+ * where \c w represents the edge weight. The equilibrium distance of two connected
+ * vertices is thus <code>1/w^3</code>, assuming no other forces acting on them.
+ *
+ * </para><para>
+ * In disconnected graphs, igraph effectively inserts a weak connection of weight
+ * <code>n^(-3/2)</code> between all pairs of vertices, where \c n is the vertex count.
+ * This ensures that components are kept near each other.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Fruchterman, T.M.J. and Reingold, E.M.:
+ * Graph Drawing by Force-directed Placement.
  * Software -- Practice and Experience, 21/11, 1129--1164,
- * 1991.
+ * 1991. https://doi.org/10.1002/spe.4380211102
+ *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
@@ -351,6 +345,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
  *        more than 1000 vertices.
  * \param weight Pointer to a vector containing edge weights,
  *        the attraction along the edges will be multiplied by these.
+ *        Weights must be positive.
  *        It will be ignored if it is a null-pointer.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
@@ -382,6 +377,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                        const igraph_vector_t *maxy) {
 
     igraph_integer_t no_nodes = igraph_vcount(graph);
+    igraph_integer_t no_edges = igraph_ecount(graph);
 
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "
@@ -394,8 +390,11 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                      "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
-    if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    if (weight && igraph_vector_size(weight) != no_edges) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
+    }
+    if (weight && no_edges > 0 && igraph_vector_min(weight) <= 0) {
+        IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
@@ -438,9 +437,8 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * \function igraph_layout_fruchterman_reingold_3d
  * \brief 3D Fruchterman-Reingold algorithm.
  *
- * This is the 3D version of the force based
- * Fruchterman-Reingold layout (see \ref
- * igraph_layout_fruchterman_reingold for the 2D version
+ * This is the 3D version of the force based Fruchterman-Reingold layout.
+ * See \ref igraph_layout_fruchterman_reingold() for the 2D version.
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
@@ -456,6 +454,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  *        the iteration.
  * \param weight Pointer to a vector containing edge weights,
  *        the attraction along the edges will be multiplied by these.
+ *        Weights must be positive.
  *        It will be ignored if it is a null-pointer.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
@@ -495,13 +494,12 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         const igraph_vector_t *minz,
         const igraph_vector_t *maxz) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_integer_t no_edges = igraph_ecount(graph);
+    const igraph_integer_t no_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_edges = igraph_ecount(graph);
     igraph_integer_t i;
     igraph_vector_t dispx, dispy, dispz;
     igraph_real_t temp = start_temp;
     igraph_real_t difftemp = start_temp / niter;
-    igraph_real_t width = sqrt(no_nodes), height = width, depth = width;
     igraph_bool_t conn = 1;
     igraph_real_t C = 0;
 
@@ -518,6 +516,9 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
     if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+    }
+    if (weight && no_edges > 0 && igraph_vector_min(weight) <= 0) {
+        IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
@@ -556,18 +557,7 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     RNG_BEGIN();
 
     if (!use_seed) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 3));
-        for (i = 0; i < no_nodes; i++) {
-            igraph_real_t x1 = minx ? VECTOR(*minx)[i] : -width / 2;
-            igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] :  width / 2;
-            igraph_real_t y1 = miny ? VECTOR(*miny)[i] : -height / 2;
-            igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] :  height / 2;
-            igraph_real_t z1 = minz ? VECTOR(*minz)[i] : -depth / 2;
-            igraph_real_t z2 = maxz ? VECTOR(*maxz)[i] :  depth / 2;
-            MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
-            MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
-            MATRIX(*res, i, 2) = RNG_UNIF(z1, z2);
-        }
+        igraph_i_layout_random_bounded_3d(graph, res, minx, maxx, miny, maxy, minz, maxz);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, no_nodes);
@@ -592,10 +582,10 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
                     igraph_real_t dz = MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
                     igraph_real_t dlen = dx * dx + dy * dy + dz * dz;
 
-                    if (dlen == 0) {
-                        dx = RNG_UNIF01() * 1e-9;
-                        dy = RNG_UNIF01() * 1e-9;
-                        dz = RNG_UNIF01() * 1e-9;
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
+                        dz = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy + dz * dz;
                     }
 
@@ -616,10 +606,10 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
                     igraph_real_t dlen, rdlen;
 
                     dlen = dx * dx + dy * dy + dz * dz;
-                    if (dlen == 0) {
-                        dx = RNG_UNIF01() * 1e-9;
-                        dy = RNG_UNIF01() * 1e-9;
-                        dz = RNG_UNIF01() * 1e-9;
+                    while (dlen == 0) {
+                        dx = RNG_UNIF(-1e-9, 1e-9);
+                        dy = RNG_UNIF(-1e-9, 1e-9);
+                        dz = RNG_UNIF(-1e-9, 1e-9);
                         dlen = dx * dx + dy * dy + dz * dz;
                     }
 
@@ -656,17 +646,21 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         /* limit max displacement to temperature t and prevent from
            displacement outside frame */
         for (v = 0; v < no_nodes; v++) {
-            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
-            igraph_real_t dz = VECTOR(dispz)[v] + RNG_UNIF01() * 1e-9;
+            igraph_real_t dx = VECTOR(dispx)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dy = VECTOR(dispy)[v] + RNG_UNIF(-1e-9, 1e-9);
+            igraph_real_t dz = VECTOR(dispz)[v] + RNG_UNIF(-1e-9, 1e-9);
             igraph_real_t displen = sqrt(dx * dx + dy * dy + dz * dz);
-            igraph_real_t mx = fabs(dx) < temp ? dx : temp;
-            igraph_real_t my = fabs(dy) < temp ? dy : temp;
-            igraph_real_t mz = fabs(dz) < temp ? dz : temp;
+
+            if (displen > temp) {
+                dx *= temp/displen;
+                dy *= temp/displen;
+                dz *= temp/displen;
+            }
+
             if (displen > 0) {
-                MATRIX(*res, v, 0) += (dx / displen) * mx;
-                MATRIX(*res, v, 1) += (dy / displen) * my;
-                MATRIX(*res, v, 2) += (dz / displen) * mz;
+                MATRIX(*res, v, 0) += dx;
+                MATRIX(*res, v, 1) += dy;
+                MATRIX(*res, v, 2) += dz;
             }
             if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
                 MATRIX(*res, v, 0) = VECTOR(*minx)[v];

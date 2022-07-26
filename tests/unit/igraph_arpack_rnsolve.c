@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 typedef struct cb2_data_t {
     igraph_matrix_t *A;
@@ -78,7 +78,7 @@ int check_eigenvector(
                    );
         }
         prod = igraph_complex_div(prod, eval);
-        if (!igraph_complex_eq_tol(prod, evec[i], 1e-6)) {
+        if (!igraph_complex_almost_equals(prod, evec[i], 1e-12)) {
             prod = igraph_complex_sub(prod, evec[i]);
             printf("%s: vector corresponding to eigenvalue (%.4f + %.4f*i) is not an "
                    "eigenvector, coordinate %d differs by %.4f + %.4f*i\n",
@@ -138,7 +138,7 @@ int main() {
 
     for (i = 0; i < DIM; i++) {
         for (j = 0; j < DIM; j++) {
-            MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), -10, 10);
+            MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), -12, 12);
         }
     }
 

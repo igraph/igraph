@@ -93,9 +93,10 @@ typedef struct igraph_i_community_leading_eigenvector_data_t {
     igraph_real_t sumweights;
 } igraph_i_community_leading_eigenvector_data_t;
 
-static igraph_error_t igraph_i_community_leading_eigenvector(igraph_real_t *to,
-                                                  const igraph_real_t *from,
-                                                  int n, void *extra) {
+static igraph_error_t igraph_i_community_leading_eigenvector(
+        igraph_real_t *to,
+        const igraph_real_t *from,
+        int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     igraph_integer_t j, k, nlen, size = n;
@@ -154,9 +155,10 @@ static igraph_error_t igraph_i_community_leading_eigenvector(igraph_real_t *to,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_community_leading_eigenvector2(igraph_real_t *to,
-                                                   const igraph_real_t *from,
-                                                   int n, void *extra) {
+static igraph_error_t igraph_i_community_leading_eigenvector2(
+        igraph_real_t *to,
+        const igraph_real_t *from,
+        int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     igraph_integer_t j, k, nlen, size = n;
@@ -220,9 +222,10 @@ static igraph_error_t igraph_i_community_leading_eigenvector2(igraph_real_t *to,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
-                                                           const igraph_real_t *from,
-                                                           int n, void *extra) {
+static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
+        igraph_real_t *to,
+        const igraph_real_t *from,
+        int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     igraph_integer_t j, k, nlen, size = n;
@@ -284,9 +287,10 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(igraph_rea
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
-                                                            const igraph_real_t *from,
-                                                            int n, void *extra) {
+static igraph_error_t igraph_i_community_leading_eigenvector2_weighted(
+        igraph_real_t *to,
+        const igraph_real_t *from,
+        int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     igraph_integer_t j, k, nlen, size = n;
@@ -389,7 +393,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    community <quote>p</quote>, the merge in the second line forms
  *    community <quote>p+1</quote>, etc. The matrix should be
  *    initialized before calling and will be resized as needed.
- *    This argument is ignored of it is \c NULL.
+ *    This argument is ignored if it is \c NULL.
  * \param membership The membership of the vertices after all the
  *    splits were performed will be stored here. The vector must be
  *    initialized  before calling and will be resized as needed.
@@ -402,8 +406,8 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  *    underlying community structure and no further steps can be
  *    done. If you want as many steps as possible then supply the
  *    number of vertices in the network here.
- * \param options The options for ARPACK. \c n is always
- *    overwritten. \c ncv is set to at least 4.
+ * \param options The options for ARPACK. Supply \c NULL here to use the
+ *    defaults. \c n is always overwritten. \c ncv is set to at least 4.
  * \param modularity If not a null pointer, then it must be a pointer
  *    to a real number and the modularity score of the final division
  *    is stored here.
@@ -461,7 +465,8 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * |E| the number of edges, <quote>steps</quote> the number of splits
  * performed.
  */
-igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
+igraph_error_t igraph_community_leading_eigenvector(
+        const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_matrix_int_t *merges,
         igraph_vector_int_t *membership,
@@ -491,11 +496,11 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     igraph_arpack_storage_t storage;
     igraph_real_t mod = 0;
     igraph_arpack_function_t *arpcb1 =
-        weights ? igraph_i_community_leading_eigenvector_weighted :
-        igraph_i_community_leading_eigenvector;
+            weights ? igraph_i_community_leading_eigenvector_weighted :
+                      igraph_i_community_leading_eigenvector;
     igraph_arpack_function_t *arpcb2 =
-        weights ? igraph_i_community_leading_eigenvector2_weighted :
-        igraph_i_community_leading_eigenvector2;
+            weights ? igraph_i_community_leading_eigenvector2_weighted :
+                      igraph_i_community_leading_eigenvector2;
     igraph_real_t sumweights = 0.0;
 
     if (no_of_nodes > INT_MAX) {
@@ -526,7 +531,7 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     if (steps < 0 || steps > no_of_nodes - 1) {
-        steps = no_of_nodes - 1;
+        steps = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     }
 
     if (!membership) {
@@ -616,6 +621,10 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         sumweights = igraph_vector_sum(weights);
     }
 
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
+    }
+
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     options->start = 0;
     options->which[0] = 'L'; options->which[1] = 'A';
@@ -682,15 +691,17 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
            cases it tends to fail. We need to suppress error handling for
            the first call. */
         {
-            int i;
+            igraph_error_t retval;
             igraph_error_handler_t *errh =
-                igraph_set_error_handler(igraph_i_error_handler_none);
+                    igraph_set_error_handler(igraph_i_error_handler_none);
             igraph_warning_handler_t *warnh =
-                igraph_set_warning_handler(igraph_warning_handler_ignore);
-            igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
-                                  /*values=*/ 0, /*vectors=*/ 0);
+                    igraph_set_warning_handler(igraph_warning_handler_ignore);
+            retval = igraph_arpack_rssolve(arpcb2, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
             igraph_set_warning_handler(warnh);
+            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
+                IGRAPH_ERROR("ARPACK call failed", retval);
+            }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. Note that we cannot use a
                  * fixed all-1 starting vector as sometimes ARPACK would return a
@@ -729,11 +740,14 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
 
         {
+            igraph_error_t retval;
             igraph_error_handler_t *errh =
-                igraph_set_error_handler(igraph_i_error_handler_none);
-            igraph_arpack_rssolve(arpcb1, &extra, options, &storage,
-                                  /*values=*/ 0, /*vectors=*/ 0);
+                    igraph_set_error_handler(igraph_i_error_handler_none);
+            retval = igraph_arpack_rssolve(arpcb1, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
             igraph_set_error_handler(errh);
+            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
+                IGRAPH_ERROR("ARPACK call failed", retval);
+            }
             if (options->nconv < 1) {
                 /* Call again from a fixed starting point. See the comment a few lines
                  * above about the exact choice of this starting vector */
@@ -791,11 +805,11 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
 
             igraph_vector_view(&vv, storage.v, size);
             IGRAPH_CHECK_CALLBACK(
-                callback(
-                    mymembership, comm, storage.d[0], &vv, arpcb1,
-                    &extra, callback_extra
-                ), &ret
-            );
+                        callback(
+                            mymembership, comm, storage.d[0], &vv, arpcb1,
+                            &extra, callback_extra
+                        ), &ret
+                    );
 
             if (ret == IGRAPH_STOP) {
                 break;
@@ -948,9 +962,9 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(2);
 
     if (modularity) {
-      IGRAPH_CHECK(igraph_modularity(graph, mymembership, weights,
-                                    /* resolution */ 1,
-                                    /* only undirected */ 0, modularity));
+        IGRAPH_CHECK(igraph_modularity(graph, mymembership, weights,
+                                       /* resolution */ 1,
+                                       /* only undirected */ 0, modularity));
     }
 
     if (!membership) {
@@ -984,9 +998,9 @@ igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
  * Time complexity: O(|V|), the number of vertices.
  */
 igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merges,
-                                      igraph_integer_t steps,
-                                      igraph_vector_int_t *membership,
-                                      igraph_vector_int_t *csize) {
+                                                 igraph_integer_t steps,
+                                                 igraph_vector_int_t *membership,
+                                                 igraph_vector_int_t *csize) {
 
     igraph_integer_t no_of_nodes = igraph_vector_int_size(membership);
     igraph_vector_int_t fake_memb;
@@ -999,7 +1013,8 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merg
     }
     if (components > no_of_nodes) {
         IGRAPH_ERRORF("Invalid membership vector: number of components (%" IGRAPH_PRId ") must "
-         "not be greater than the number of nodes (%" IGRAPH_PRId ").", IGRAPH_EINVAL, components, no_of_nodes);
+                      "not be greater than the number of nodes (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL, components, no_of_nodes);
     }
     if (steps >= components) {
         IGRAPH_ERRORF("Number of steps (%" IGRAPH_PRId ") must be smaller than number of components (%" IGRAPH_PRId ").",

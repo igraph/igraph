@@ -29,6 +29,7 @@
 #include "igraph_arpack.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
 
@@ -69,12 +70,8 @@ IGRAPH_EXPORT igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                              igraph_real_t coolfact,
                                              igraph_spincomm_update_t update_rule,
                                              igraph_real_t gamma,
-                                       /* the rest is for the NegSpin implementation */
-                                       igraph_spinglass_implementation_t implementation,
-                                       /*                    igraph_matrix_t *adhesion, */
-                                       /*                    igraph_matrix_t *normalised_adhesion, */
-                                       /*                    igraph_real_t *polarization, */
-                                       igraph_real_t lambda);
+                                             igraph_spinglass_implementation_t implementation,
+                                             igraph_real_t gamma_minus);
 
 IGRAPH_EXPORT igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                                     const igraph_vector_t *weights,
@@ -90,7 +87,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_spinglass_single(const igraph_t *g
 
 IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                                             const igraph_vector_t *weights,
-                                            int steps,
+                                            igraph_integer_t steps,
                                             igraph_matrix_int_t *merges,
                                             igraph_vector_t *modularity,
                                             igraph_vector_int_t *membership);
@@ -98,7 +95,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_walktrap(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_community_infomap(const igraph_t * graph,
                                            const igraph_vector_t *e_weights,
                                            const igraph_vector_t *v_weights,
-                                           int nb_trials,
+                                           igraph_integer_t nb_trials,
                                            igraph_vector_int_t *membership,
                                            igraph_real_t *codelength);
 

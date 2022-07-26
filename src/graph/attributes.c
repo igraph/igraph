@@ -25,6 +25,7 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
+#include "internal/hacks.h" /* strdup */
 
 #include "config.h"
 
@@ -70,7 +71,9 @@ igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t
 igraph_error_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_int_t *idx) {
-
+    /* graph and newgraph may be the same, in which case we need to support
+     * in-place operations. If they are _not_ the same, it is assumed that the
+     * new graph has no vertex attributes yet */
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_vertices(graph, newgraph, idx);
     } else {
@@ -82,6 +85,10 @@ igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_int_list_t *merges,
                                         const igraph_attribute_combination_t *comb) {
+    /* It is assumed that the two graphs are not the same and that the new
+     * graph has no vertex attributes yet. We cannot assert the latter but we
+     * can assert the former */
+    IGRAPH_ASSERT(graph != newgraph);
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_vertices(graph, newgraph,
                 merges,
@@ -103,6 +110,9 @@ igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
 igraph_error_t igraph_i_attribute_permute_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_int_t *idx) {
+    /* graph and newgraph may be the same, in which case we need to support
+     * in-place operations. If they are _not_ the same, it is assumed that the
+     * new graph has no edge attributes yet */
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->permute_edges(graph, newgraph, idx);
     } else {
@@ -114,6 +124,10 @@ igraph_error_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_int_list_t *merges,
                                      const igraph_attribute_combination_t *comb) {
+    /* It is assumed that the two graphs are not the same and that the new
+     * graph has no eedge attributes yet. We cannot assert the latter but we
+     * can assert the former */
+    IGRAPH_ASSERT(graph != newgraph);
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->combine_edges(graph, newgraph,
                 merges,
@@ -367,20 +381,26 @@ igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *
         /* This is a new attribute name */
         igraph_attribute_combination_record_t *rec =
             IGRAPH_CALLOC(1, igraph_attribute_combination_record_t);
-
-        if (!rec) {
-            IGRAPH_ERROR("Cannot create attribute combination data",
-                         IGRAPH_ENOMEM);
+        if (! rec) {
+            IGRAPH_ERROR("Cannot create attribute combination data.",
+                         IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        if (!name) {
+        IGRAPH_FINALLY(igraph_free, rec);
+        if (! name) {
             rec->name = NULL;
         } else {
             rec->name = strdup(name);
+            if (! rec->name) {
+                IGRAPH_ERROR("Cannot create attribute combination data.",
+                             IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+            }
         }
+        IGRAPH_FINALLY(igraph_free, (char *) rec->name); /* free() is safe on NULL */
         rec->type = type;
         rec->func = func;
 
         IGRAPH_CHECK(igraph_vector_ptr_push_back(&comb->list, rec));
+        IGRAPH_FINALLY_CLEAN(2); /* ownership of 'rec' transferred to 'comb->list' */
 
     }
 

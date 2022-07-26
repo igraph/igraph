@@ -27,7 +27,7 @@
 
 #include "linalg/arpack_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Test whether ARPACK is thread-safe. We will create two threads,
    each calling a different ARPACK eigensolver. We will make sure that
@@ -165,6 +165,10 @@ void *thread_function(void *arg) {
     igraph_vector_resize(result, options.n);
     for (i = 0; i < options.n; i++) {
         VECTOR(*result)[i] = v[i];
+    }
+
+    if (VECTOR(*result)[0] < 0) {
+        igraph_vector_scale(result, -1.0);
     }
 
     free(v);

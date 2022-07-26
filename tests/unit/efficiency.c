@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int test_graph(const char* name, const igraph_t* graph, const igraph_real_t* weights_array) {
     igraph_real_t eff;

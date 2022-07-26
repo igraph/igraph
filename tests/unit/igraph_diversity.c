@@ -2,7 +2,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t g;
@@ -44,21 +44,38 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
+    /* degree-one vertices */
+    igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&g) + 1);
+
+    printf("Tree (having degree-one vertices):\n");
+    igraph_diversity(&g, &weights, &result, igraph_vss_all());
+    print_vector(&result);
+
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
     /* error conditions are tested from now on */
     VERIFY_FINALLY_STACK();
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     /* graph with multiple edges */
     igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 2,0, -1);
     igraph_vector_init_int_end(&weights, -1, 3, 2, 8, -1);
-    IGRAPH_ASSERT(igraph_diversity(&g, &weights, &result, igraph_vss_all()) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_diversity(&g, &weights, &result, igraph_vss_all()), IGRAPH_EINVAL);
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
+    /* negative weights */
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 2,1, -1);
+    igraph_vector_init_int_end(&weights, -1, 3, -2, 8, -1);
+    CHECK_ERROR(igraph_diversity(&g, &weights, &result, igraph_vss_all()), IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
     /* directed graph */
     igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 0,2, -1);
     igraph_vector_init_int_end(&weights, -1, 3, 2, -1);
-    IGRAPH_ASSERT(igraph_diversity(&g, &weights, &result, igraph_vss_all()) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_diversity(&g, &weights, &result, igraph_vss_all()), IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 

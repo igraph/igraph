@@ -29,16 +29,21 @@
 
 __BEGIN_DECLS
 
-#define IGRAPH_CALLOC(n,t)    (t*) calloc( (n) > 0 ? (size_t)(n) : (size_t)1, sizeof(t) )
+#define IGRAPH_CALLOC(n,t)    (t*) calloc( (n) > 0 ? (size_t)((n)*sizeof(t)) : (size_t)1, 1 )
+#define IGRAPH_MALLOC(n)      malloc( (n) > 0 ? (size_t)((n)) : (size_t)1 )
 #define IGRAPH_REALLOC(p,n,t) (t*) realloc((void*)(p), (n) > 0 ? (size_t)((n)*sizeof(t)) : (size_t)1)
 #define IGRAPH_FREE(p)        (free( (void *)(p) ), (p) = NULL)
 
+/* These are deprecated and scheduled for removal in 0.11 */
 #define igraph_Calloc IGRAPH_CALLOC
 #define igraph_Realloc IGRAPH_REALLOC
 #define igraph_Free IGRAPH_FREE
+/* Deprecated section ends here */
 
-IGRAPH_EXPORT void igraph_free(void *p);
-IGRAPH_EXPORT void *igraph_malloc(size_t n);
+IGRAPH_EXPORT void *igraph_calloc(size_t count, size_t size);
+IGRAPH_EXPORT void *igraph_malloc(size_t size);
+IGRAPH_EXPORT void *igraph_realloc(void* ptr, size_t size);
+IGRAPH_EXPORT void igraph_free(void *ptr);
 
 __END_DECLS
 

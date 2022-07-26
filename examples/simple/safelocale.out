@@ -1,0 +1,21 @@
+Version 1
+graph
+[
+  directed 0
+  node
+  [
+    id 1
+    value 1.23
+  ]
+  node
+  [
+    id 2
+    value 4.87e-05
+  ]
+  edge
+  [
+    source 2
+    target 1
+    weight -377.9
+  ]
+]

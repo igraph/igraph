@@ -22,15 +22,20 @@
 
 */
 
-#ifndef FLOWGRAPH_H
-#define FLOWGRAPH_H
+#ifndef INFOMAP_FLOWGRAPH_H
+#define INFOMAP_FLOWGRAPH_H
 
-#include <vector>
-#include <set>
+#include "infomap_Node.h"
 
 #include "igraph_interface.h"
 
-#include "infomap_Node.h"
+#include <vector>
+#include <set>
+#include <cmath>
+
+inline double plogp(double x) {
+    return x > 0.0 ? x*log(x) : 0.0;
+}
 
 class FlowGraph {
 private:
@@ -39,24 +44,22 @@ private:
 public:
     FlowGraph(igraph_integer_t n);
     FlowGraph(igraph_integer_t n, const igraph_vector_t *nodeWeights);
-    FlowGraph(FlowGraph * fgraph);
-    FlowGraph(FlowGraph * fgraph, igraph_integer_t sub_Nnode, igraph_integer_t * sub_members);
+    FlowGraph(const FlowGraph &fgraph);
+    FlowGraph(const FlowGraph &fgraph, const std::vector<igraph_integer_t> &sub_members);
 
-    FlowGraph(const igraph_t * graph, const igraph_vector_t *e_weights,
+    FlowGraph(const igraph_t *graph, const igraph_vector_t *e_weights,
               const igraph_vector_t *v_weights);
 
-    ~FlowGraph();
-
-    void swap(FlowGraph * fgraph);
+    void swap(FlowGraph &fgraph);
 
     void initiate();
     void eigenvector();
     void calibrate();
 
-    void back_to(FlowGraph * fgraph);
+    void back_to(const FlowGraph &fgraph);
 
     /*************************************************************************/
-    Node **node;
+    std::vector<Node> node;
     igraph_integer_t Nnode;
 
     double alpha, beta;
@@ -73,6 +76,4 @@ public:
     double codeLength;
 };
 
-void delete_FlowGraph(FlowGraph *fgraph);
-
-#endif
+#endif // INFOMAP_FLOWGRAPH_H

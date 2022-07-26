@@ -346,7 +346,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
      * w and k are zero-based here, unlike in the statement of the theorem above.
      */
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&work, degrees));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&work, degrees));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &work);
 
     igraph_vector_int_reverse_sort(&work);
@@ -628,7 +628,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     }
 
     /* Create an index vector that sorts the vertices by decreasing in-degree */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&index_array, 0, vcount - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&index_array, 0, vcount));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &index_array);
 
     /* Set up the auxiliary struct for sorting */
@@ -767,11 +767,11 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
 
     /* Copy and sort both vectors: */
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&sorted_deg1, degrees1));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&sorted_deg1, degrees1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sorted_deg1);
     igraph_vector_int_reverse_sort(&sorted_deg1); /* decreasing sort */
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&sorted_deg2, degrees2));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&sorted_deg2, degrees2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sorted_deg2);
     igraph_vector_int_sort(&sorted_deg2); /* increasing sort */
 

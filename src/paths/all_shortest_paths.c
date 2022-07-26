@@ -111,7 +111,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     igraph_vector_int_t neis;
     igraph_vector_int_t ptrlist;
     igraph_vector_int_t ptrhead;
-    igraph_integer_t n, j, i, t;
+    igraph_integer_t n, j, i;
     igraph_integer_t to_reach, reached = 0, maxdist = 0;
 
     igraph_vit_t vit;
@@ -150,7 +150,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
      * source */
     geodist = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (geodist == 0) {
-        IGRAPH_ERROR("Cannot calculate shortest paths", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, geodist);
     /* dequeue to store the BFS queue -- odd elements are the vertex indices,
@@ -302,7 +302,6 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
         igraph_vector_int_list_clear(edges);
     }
     j = 0;
-    t = 0;
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t fatherptr = VECTOR(ptrhead)[i];
 

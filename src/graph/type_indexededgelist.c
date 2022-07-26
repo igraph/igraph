@@ -26,12 +26,13 @@
 #include "igraph_memory.h"
 
 #include "graph/attributes.h"
-#include "graph/neighbors.h"
+#include "graph/caching.h"
+#include "graph/internal.h"
 #include "math/safe_intop.h"
 
 /* Internal functions */
 
-static igraph_error_t igraph_i_create_start(
+static igraph_error_t igraph_i_create_start_vectors(
         igraph_vector_int_t *res, igraph_vector_int_t *el,
         igraph_vector_int_t *index, igraph_integer_t nodes);
 
@@ -61,11 +62,16 @@ static igraph_error_t igraph_i_create_start(
  * \function igraph_empty_attrs
  * \brief Creates an empty graph with some vertices, no edges and some graph attributes.
  *
- * </para><para>
  * Use this instead of \ref igraph_empty() if you wish to add some graph
  * attributes right after initialization. This function is currently
  * not very interesting for the ordinary user. Just supply 0 here or
  * use \ref igraph_empty().
+ *
+ * </para><para>
+ * This function does not set any vertex attributes. To create a graph which has
+ * vertex attributes, call this function specifying 0 vertices, then use
+ * \ref igraph_add_vertices() to add vertices and their attributes.
+ *
  * \param graph Pointer to a not-yet initialized graph object.
  * \param n The number of vertices in the graph; a non-negative
  *          integer number is expected.
@@ -77,17 +83,22 @@ static igraph_error_t igraph_i_create_start(
  *        \cli IGRAPH_UNDIRECTED
  *          Create an \em undirected graph.
  *        \endclist
- * \param attr The attributes.
+ * \param attr The graph attributes. Supply \c NULL if not graph attributes
+ *        are to be set.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
+ *
+ * \sa \ref igraph_empty() to create an empty graph without attributes;
+ * \ref igraph_add_vertices() and \ref igraph_add_edges() to add vertices
+ * and edges, possibly with associated attributes.
  *
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
  */
-igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void* attr) {
+igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr) {
 
     if (n < 0) {
-        IGRAPH_ERROR("Cannot create empty graph with negative number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
     graph->n = 0;
@@ -99,6 +110,13 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->os, 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->is, 1);
 
+    /* init cache */
+    graph->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    IGRAPH_CHECK_OOM(graph->cache, "Cannot create graph.");
+    IGRAPH_FINALLY(igraph_free, graph->cache);
+    IGRAPH_CHECK(igraph_i_property_cache_init(graph->cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, graph->cache);
+
     VECTOR(graph->os)[0] = 0;
     VECTOR(graph->is)[0] = 0;
 
@@ -109,7 +127,7 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     /* add the vertices */
     IGRAPH_CHECK(igraph_add_vertices(graph, n, 0));
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
 }
 
@@ -132,6 +150,9 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
 void igraph_destroy(igraph_t *graph) {
 
     IGRAPH_I_ATTRIBUTE_DESTROY(graph);
+
+    igraph_i_property_cache_destroy(graph->cache);
+    IGRAPH_FREE(graph->cache);
 
     igraph_vector_int_destroy(&graph->from);
     igraph_vector_int_destroy(&graph->to);
@@ -170,22 +191,28 @@ void igraph_destroy(igraph_t *graph) {
 igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     to->n = from->n;
     to->directed = from->directed;
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->from, &from->from));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->from, &from->from));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->from);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->to, &from->to));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->to, &from->to));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->to);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->oi, &from->oi));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->oi, &from->oi));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->oi);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->ii, &from->ii));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->ii, &from->ii));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->ii);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->os, &from->os));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->os, &from->os));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->os);
-    IGRAPH_CHECK(igraph_vector_int_copy(&to->is, &from->is));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&to->is, &from->is));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &to->is);
+
+    to->cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    IGRAPH_CHECK_OOM(to->cache, "Cannot copy graph.");
+    IGRAPH_FINALLY(igraph_free, to->cache);
+    IGRAPH_CHECK(igraph_i_property_cache_copy(to->cache, from->cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, to->cache);
 
     IGRAPH_I_ATTRIBUTE_COPY(to, from, 1, 1, 1); /* does IGRAPH_CHECK */
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
 }
 
@@ -224,8 +251,6 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
     igraph_integer_t edges_to_add = igraph_vector_int_size(edges) / 2;
     igraph_integer_t new_no_of_edges;
     igraph_integer_t i = 0;
-    igraph_error_handler_t *oldhandler;
-    igraph_error_t ret1, ret2;
     igraph_vector_int_t newoi, newii;
     igraph_bool_t directed = igraph_is_directed(graph);
 
@@ -233,7 +258,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         IGRAPH_ERROR("Invalid (odd) length of edges vector.", IGRAPH_EINVEVECTOR);
     }
     if (!igraph_vector_int_isininterval(edges, 0, igraph_vcount(graph) - 1)) {
-        IGRAPH_ERROR("Out-of-range edge IDs when adding edges.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Out-of-range vertex IDs when adding edges.", IGRAPH_EINVVID);
     }
 
     /* from & to */
@@ -255,54 +280,80 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
         }
     }
 
-    /* disable the error handler temporarily */
-    oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
+    /* If an error occurs while the edges are being added, we make the necessary fixup
+     * to ensure that the graph is still in a consistent state when this function returns.
+     * The graph may already be on the finally stack when calling this function. We use
+     * a separate finally stack level to avoid its destructor from being called on error,
+     * so that the fixup can succeed.
+     */
+
+#define CHECK_ERR(expr) \
+    do { \
+        igraph_error_t err = (expr); \
+        if (err != IGRAPH_SUCCESS) { \
+            igraph_vector_int_resize(&graph->from, no_of_edges); /* gets smaller, error safe */ \
+            igraph_vector_int_resize(&graph->to, no_of_edges);   /* gets smaller, error safe */ \
+            IGRAPH_FINALLY_EXIT(); \
+            IGRAPH_ERROR("Cannot add edges.", err); \
+        } \
+    } while (0)
 
     /* oi & ii */
-    ret1 = igraph_vector_int_init(&newoi, no_of_edges);
-    ret2 = igraph_vector_int_init(&newii, no_of_edges);
-    if (ret1 != 0 || ret2 != 0) {
-        igraph_vector_int_resize(&graph->from, no_of_edges); /* gets smaller */
-        igraph_vector_int_resize(&graph->to, no_of_edges);   /* gets smaller */
-        igraph_set_error_handler(oldhandler);
-        IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
-    }
-    ret1 = igraph_vector_int_pair_order(&graph->from, &graph->to, &newoi, graph->n);
-    ret2 = igraph_vector_int_pair_order(&graph->to, &graph->from, &newii, graph->n);
-    if (ret1 != 0 || ret2 != 0) {
-        igraph_vector_int_resize(&graph->from, no_of_edges);
-        igraph_vector_int_resize(&graph->to, no_of_edges);
-        igraph_vector_int_destroy(&newoi);
-        igraph_vector_int_destroy(&newii);
-        igraph_set_error_handler(oldhandler);
-        IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
-    }
+    IGRAPH_FINALLY_ENTER();
+    {
+        CHECK_ERR(igraph_vector_int_init(&newoi, no_of_edges));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &newoi);
+        CHECK_ERR(igraph_vector_int_init(&newii, no_of_edges));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &newii);
+        CHECK_ERR(igraph_vector_int_pair_order(&graph->from, &graph->to, &newoi, graph->n));
+        CHECK_ERR(igraph_vector_int_pair_order(&graph->to, &graph->from, &newii, graph->n));
 
-    /* Attributes */
-    if (graph->attr) {
-        igraph_set_error_handler(oldhandler);
-        ret1 = igraph_i_attribute_add_edges(graph, edges, attr);
-        igraph_set_error_handler(igraph_error_handler_ignore);
-        if (ret1 != 0) {
-            igraph_vector_int_resize(&graph->from, no_of_edges);
-            igraph_vector_int_resize(&graph->to, no_of_edges);
-            igraph_vector_int_destroy(&newoi);
-            igraph_vector_int_destroy(&newii);
-            igraph_set_error_handler(oldhandler);
-            IGRAPH_ERROR("cannot add edges", ret1);
+        /* Attributes */
+        if (graph->attr) {
+            /* TODO: Does this keep the attribute table in a consistent state upon failure? */
+            CHECK_ERR(igraph_i_attribute_add_edges(graph, edges, attr));
         }
+
+        /* os & is, its length does not change, error safe */
+        igraph_i_create_start_vectors(&graph->os, &graph->from, &newoi, graph->n);
+        igraph_i_create_start_vectors(&graph->is, &graph->to, &newii, graph->n);
+
+        /* everything went fine */
+        igraph_vector_int_destroy(&graph->oi);
+        igraph_vector_int_destroy(&graph->ii);
+        IGRAPH_FINALLY_CLEAN(2);
+
+        graph->oi = newoi;
+        graph->ii = newii;
     }
+    IGRAPH_FINALLY_EXIT();
 
-    /* os & is, its length does not change, error safe */
-    igraph_i_create_start(&graph->os, &graph->from, &newoi, graph->n);
-    igraph_i_create_start(&graph->is, &graph->to, &newii, graph->n);
+#undef CHECK_ERR
 
-    /* everything went fine  */
-    igraph_vector_int_destroy(&graph->oi);
-    igraph_vector_int_destroy(&graph->ii);
-    graph->oi = newoi;
-    graph->ii = newii;
-    igraph_set_error_handler(oldhandler);
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Adding one or more edges cannot make a strongly or weakly connected
+     * graph disconnected, so we keep those flags if they are cached as true.
+     *
+     * Adding one or more edges may turn a DAG into a non-DAG or a forest into
+     * a non-forest, so we can keep those flags only if they are cached as
+     * false.
+     *
+     * Also, adding one or more edges does not change HAS_LOOP, HAS_MULTI and
+     * HAS_MUTUAL if they were already true.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_IS_DAG) | (1 << IGRAPH_PROP_IS_FOREST),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED) |
+        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_MUTUAL)
+    );
 
     return IGRAPH_SUCCESS;
 }
@@ -329,6 +380,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
  */
 igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     igraph_integer_t ec = igraph_ecount(graph);
+    igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t new_vc;
     igraph_integer_t i;
 
@@ -353,9 +405,61 @@ igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *a
 
     graph->n += nv;
 
+    /* Add attributes if necessary. This section is protected with
+     * FINALLY_ENTER/EXIT so that the graph would not be accidentally
+     * free upon error until it could be restored to a consistant state. */
+
     if (graph->attr) {
-        IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
+        igraph_error_t err;
+        IGRAPH_FINALLY_ENTER();
+        err = igraph_i_attribute_add_vertices(graph, nv, attr);
+        if (err != IGRAPH_SUCCESS) {
+            /* Restore original vertex count on failure */
+            graph->n = vc;
+            igraph_vector_int_resize(&graph->os, vc + 1); /* shrinks */
+            igraph_vector_int_resize(&graph->is, vc + 1); /* shrinks */
+        }
+        IGRAPH_FINALLY_EXIT();
+        if (err != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("Cannot add vertices.", err);
+        }
     }
+
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Adding one or more nodes does not change the following cached properties:
+     *
+     * - IGRAPH_PROP_HAS_LOOP
+     * - IGRAPH_PROP_HAS_MULTI
+     * - IGRAPH_PROP_HAS_MUTUAL
+     * - IGRAPH_PROP_IS_DAG (adding a node does not create/destroy cycles)
+     * - IGRAPH_PROP_IS_FOREST (same)
+     *
+     * Adding one or more nodes without any edges incident on them is sure to
+     * make the graph disconnected (weakly or strongly), so we can keep the
+     * connectivity-related properties if they are currently cached as false.
+     * (Actually, even if they weren't cached as false, we could still set them
+     * to false, but we don't have that functionality yet). The only exception
+     * is when the graph had zero vertices and gained only one vertex, because
+     * it then becomes connected. That's why we have the condition below in the
+     * keep_when_false section.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_MUTUAL) |
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST),
+        /* keep_when_false = */
+        igraph_vcount(graph) >= 2 ? (
+            (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+            (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED)
+        ) : 0,
+        /* keep_when_true = */
+        0
+    );
 
     return IGRAPH_SUCCESS;
 }
@@ -391,15 +495,13 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_eit_t eit;
 
     igraph_vector_int_t newfrom, newto;
-    igraph_vector_int_t newoi;
+    igraph_vector_int_t newoi, newii;
 
     igraph_bool_t *mark;
     igraph_integer_t i, j;
 
     mark = IGRAPH_CALLOC(no_of_edges, int);
-    if (mark == 0) {
-        IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(mark, "Cannot delete edges.");
     IGRAPH_FINALLY(igraph_free, mark);
 
     IGRAPH_CHECK(igraph_eit_create(graph, edges, &eit));
@@ -432,8 +534,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     /* Create index, this might require additional memory */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&newoi, remaining_edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&newii, remaining_edges);
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newfrom, &newto, &newoi, no_of_nodes));
-    IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &graph->ii, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_pair_order(&newto, &newfrom, &newii, no_of_nodes));
 
     /* Edge attributes, we need an index that gives the IDs of the
        original edges for every new edge.
@@ -455,17 +558,46 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_vector_int_destroy(&graph->from);
     igraph_vector_int_destroy(&graph->to);
     igraph_vector_int_destroy(&graph->oi);
+    igraph_vector_int_destroy(&graph->ii);
     graph->from = newfrom;
     graph->to = newto;
     graph->oi = newoi;
-    IGRAPH_FINALLY_CLEAN(3);
+    graph->ii = newii;
+    IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_FREE(mark);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Create start vectors, no memory is needed for this */
-    igraph_i_create_start(&graph->os, &graph->from, &graph->oi, no_of_nodes);
-    igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
+    igraph_i_create_start_vectors(&graph->os, &graph->from, &graph->oi, no_of_nodes);
+    igraph_i_create_start_vectors(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
+
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Deleting one or more edges cannot make a directed acyclic graph cyclic,
+     * or an undirected forest into a cyclic graph, so we keep those flags if
+     * they are cached as true.
+     *
+     * Similarly, deleting one or more edges cannot make a disconnected graph
+     * connected, so we keep the connectivity flags if they are cached as false.
+     *
+     * Also, if the graph had no loop edges before the deletion, it will have
+     * no loop edges after the deletion either. The same applies to reciprocal
+     * edges or multiple edges as well.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_MUTUAL) |
+        (1 << IGRAPH_PROP_IS_STRONGLY_CONNECTED) |
+        (1 << IGRAPH_PROP_IS_WEAKLY_CONNECTED),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST)
+    );
 
     /* Nothing to deallocate... */
     return IGRAPH_SUCCESS;
@@ -578,21 +710,31 @@ igraph_error_t igraph_delete_vertices_idx(
             j++;
         }
     }
+
     /* update oi & ii */
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.from, &newgraph.to, &newgraph.oi,
                                          remaining_vertices));
     IGRAPH_CHECK(igraph_vector_int_pair_order(&newgraph.to, &newgraph.from, &newgraph.ii,
                                          remaining_vertices));
 
-    IGRAPH_CHECK(igraph_i_create_start(&newgraph.os, &newgraph.from,
+    IGRAPH_CHECK(igraph_i_create_start_vectors(&newgraph.os, &newgraph.from,
                                        &newgraph.oi, remaining_vertices));
-    IGRAPH_CHECK(igraph_i_create_start(&newgraph.is, &newgraph.to,
+    IGRAPH_CHECK(igraph_i_create_start_vectors(&newgraph.is, &newgraph.to,
                                        &newgraph.ii, remaining_vertices));
+
+    newgraph.cache = IGRAPH_CALLOC(1, igraph_i_property_cache_t);
+    IGRAPH_CHECK_OOM(newgraph.cache, "Cannot delete vertices.");
+    IGRAPH_FINALLY(igraph_free, newgraph.cache);
+    IGRAPH_CHECK(igraph_i_property_cache_init(newgraph.cache));
+    IGRAPH_FINALLY(igraph_i_property_cache_destroy, newgraph.cache);
 
     /* attributes */
     IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph,
                             /*graph=*/ 1, /*vertex=*/0, /*edge=*/0);
-    IGRAPH_FINALLY_CLEAN(6);
+
+    /* at this point igraph_destroy can take over the responsibility of
+     * deallocating the graph */
+    IGRAPH_FINALLY_CLEAN(8);    /* 2 for the property cache, 6 for the vectors */
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
     if (newgraph.attr) {
@@ -641,6 +783,28 @@ igraph_error_t igraph_delete_vertices_idx(
         igraph_vector_int_destroy(my_vertex_recoding);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
+    /* modification successful, clear the cached properties of the graph.
+     *
+     * Deleting one or more vertices cannot make a directed acyclic graph cyclic,
+     * or an undirected forest into a cyclic graph, so we keep those flags if
+     * they are cached as true.
+     *
+     * Also, if the graph had no loop edges before the deletion, it will have
+     * no loop edges after the deletion either. The same applies to reciprocal
+     * edges or multiple edges as well.
+     */
+    igraph_i_property_cache_invalidate_conditionally(
+        graph,
+        /* keep_always = */ 0,
+        /* keep_when_false = */
+        (1 << IGRAPH_PROP_HAS_LOOP) |
+        (1 << IGRAPH_PROP_HAS_MULTI) |
+        (1 << IGRAPH_PROP_HAS_MUTUAL),
+        /* keep_when_true = */
+        (1 << IGRAPH_PROP_IS_DAG) |
+        (1 << IGRAPH_PROP_IS_FOREST)
+    );
 
     return IGRAPH_SUCCESS;
 }
@@ -865,7 +1029,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
  * \ingroup internal
  */
 
-static igraph_error_t igraph_i_create_start(
+static igraph_error_t igraph_i_create_start_vectors(
         igraph_vector_int_t *res, igraph_vector_int_t *el,
         igraph_vector_int_t *iindex, igraph_integer_t nodes) {
 
@@ -1070,46 +1234,46 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
    in 'eid' if it is found; otherwise 'eid' is left intact.
    */
 
-#define BINSEARCH(start,end,value,iindex,edgelist,N,result,result_pos)     \
-    do {                                                      \
-        while ((start) < (end)) {                                 \
-            igraph_integer_t mid=(start)+((end)-(start))/2;                 \
-            igraph_integer_t e= VECTOR((iindex))[mid];            \
-            if (VECTOR((edgelist))[e] < (value)) {                  \
-                (start)=mid+1;                                        \
-            } else {                                                \
-                (end)=mid;                                            \
-            }                                                       \
-        }                                                         \
-        if ((start)<(N)) {                                        \
-            igraph_integer_t e= VECTOR((iindex))[(start)];        \
-            if (VECTOR((edgelist))[e] == (value)) {                 \
-                *(result)= e;                                         \
-                if (result_pos != 0) { *(result_pos) = start; }     \
-            }                                                       \
+#define BINSEARCH(start,end,value,iindex,edgelist,N,result,result_pos) \
+    do { \
+        while ((start) < (end)) { \
+            igraph_integer_t mid =(start)+((end)-(start))/2; \
+            igraph_integer_t e = VECTOR((iindex))[mid]; \
+            if (VECTOR((edgelist))[e] < (value)) { \
+                (start) = mid+1; \
+            } else { \
+                (end) = mid; \
+            } \
+        } \
+        if ((start) < (N)) { \
+            igraph_integer_t e = VECTOR((iindex))[(start)]; \
+            if (VECTOR((edgelist))[e] == (value)) { \
+                *(result) = e; \
+                if (result_pos != 0) { *(result_pos) = start; } \
+            } \
         } } while(0)
 
-#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid)                     \
-    do {                                                              \
-        igraph_integer_t start= VECTOR(graph->os)[xfrom];         \
-        igraph_integer_t end= VECTOR(graph->os)[xfrom+1];         \
-        igraph_integer_t N=end;                                                 \
-        igraph_integer_t start2= VECTOR(graph->is)[xto];          \
-        igraph_integer_t end2= VECTOR(graph->is)[xto+1];          \
-        igraph_integer_t N2=end2;                                               \
-        igraph_integer_t* nullptr=0; \
-        if (end-start<end2-start2) {                                    \
-            BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid,nullptr);           \
-        } else {                                                        \
-            BINSEARCH(start2,end2,xfrom,graph->ii,graph->from,N2,eid,nullptr);    \
-        }                                                               \
+#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid) \
+    do { \
+        igraph_integer_t start = VECTOR(graph->os)[xfrom]; \
+        igraph_integer_t end = VECTOR(graph->os)[xfrom+1]; \
+        igraph_integer_t N = end; \
+        igraph_integer_t start2 = VECTOR(graph->is)[xto]; \
+        igraph_integer_t end2 = VECTOR(graph->is)[xto+1]; \
+        igraph_integer_t N2 = end2; \
+        igraph_integer_t *nullptr = 0; \
+        if (end-start < end2-start2) { \
+            BINSEARCH(start, end, xto, graph->oi, graph->to, N, eid, nullptr); \
+        } else { \
+            BINSEARCH(start2, end2, xfrom, graph->ii, graph->from, N2, eid, nullptr); \
+        } \
     } while (0)
 
-#define FIND_UNDIRECTED_EDGE(graph,from,to,eid)                     \
-    do {                                                              \
-        igraph_integer_t xfrom1= from > to ? from : to;                         \
-        igraph_integer_t xto1= from > to ? to : from;                           \
-        FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid);                      \
+#define FIND_UNDIRECTED_EDGE(graph, from, to, eid) \
+    do { \
+        igraph_integer_t xfrom1 = from > to ? from : to; \
+        igraph_integer_t xto1 = from > to ? to : from; \
+        FIND_DIRECTED_EDGE(graph, xfrom1, xto1, eid); \
     } while (0)
 
 /**
@@ -1282,38 +1446,38 @@ igraph_error_t igraph_get_eids(const igraph_t *graph, igraph_vector_int_t *eids,
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
 
-#define FIND_ALL_DIRECTED_EDGES(graph,xfrom,xto,eidvec)                     \
-    do {                                                              \
-        igraph_integer_t start= VECTOR(graph->os)[xfrom];         \
-        igraph_integer_t end= VECTOR(graph->os)[xfrom+1];         \
-        igraph_integer_t N=end;                                                 \
-        igraph_integer_t start2= VECTOR(graph->is)[xto];          \
-        igraph_integer_t end2= VECTOR(graph->is)[xto+1];          \
-        igraph_integer_t N2=end2;                                               \
-        igraph_integer_t eid = -1;                                               \
-        igraph_integer_t pos = -1;                                               \
-        if (end-start<end2-start2) {                                    \
-            BINSEARCH(start,end,xto,graph->oi,graph->to,N,&eid,&pos);           \
-            while (pos >= 0 && pos < N) {                                              \
-                eid = VECTOR(graph->oi)[pos++];     \
+#define FIND_ALL_DIRECTED_EDGES(graph,xfrom,xto,eidvec) \
+    do { \
+        igraph_integer_t start = VECTOR(graph->os)[xfrom]; \
+        igraph_integer_t end = VECTOR(graph->os)[xfrom+1]; \
+        igraph_integer_t N = end; \
+        igraph_integer_t start2 = VECTOR(graph->is)[xto]; \
+        igraph_integer_t end2 = VECTOR(graph->is)[xto+1]; \
+        igraph_integer_t N2 = end2; \
+        igraph_integer_t eid = -1; \
+        igraph_integer_t pos = -1; \
+        if (end-start < end2-start2) { \
+            BINSEARCH(start, end, xto, graph->oi, graph->to, N, &eid,&pos); \
+            while (pos >= 0 && pos < N) { \
+                eid = VECTOR(graph->oi)[pos++]; \
                 if (VECTOR(graph->to)[eid] != xto) { break; } \
-                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid));     \
-            }                                                           \
-        } else {                                                        \
-            BINSEARCH(start2,end2,xfrom,graph->ii,graph->from,N2,&eid,&pos);    \
-            while (pos >= 0 && pos < N2) {                                              \
-                eid = VECTOR(graph->ii)[pos++];     \
+                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid)); \
+            } \
+        } else { \
+            BINSEARCH(start2, end2, xfrom, graph->ii, graph->from, N2, &eid, &pos); \
+            while (pos >= 0 && pos < N2) { \
+                eid = VECTOR(graph->ii)[pos++]; \
                 if (VECTOR(graph->from)[eid] != xfrom) { break; } \
-                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid));     \
-            }                                                           \
-        }                                                               \
+                IGRAPH_CHECK(igraph_vector_int_push_back(eidvec, eid)); \
+            } \
+        } \
     } while (0)
 
-#define FIND_ALL_UNDIRECTED_EDGES(graph,from,to,eidvec)                     \
-    do {                                                              \
-        igraph_integer_t xfrom1= from > to ? from : to;                         \
-        igraph_integer_t xto1= from > to ? to : from;                           \
-        FIND_ALL_DIRECTED_EDGES(graph,xfrom1,xto1,eidvec);                      \
+#define FIND_ALL_UNDIRECTED_EDGES(graph,from,to,eidvec) \
+    do { \
+        igraph_integer_t xfrom1 = from > to ? from : to; \
+        igraph_integer_t xto1 = from > to ? to : from; \
+        FIND_ALL_DIRECTED_EDGES(graph, xfrom1, xto1, eidvec); \
     } while (0)
 
 /**
@@ -1619,5 +1783,24 @@ igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *grap
     }
 
     *res = 1; /* No difference was found, graphs are the same */
+    return IGRAPH_SUCCESS;
+}
+
+
+/* Reverses the direction of all edges in a directed graph.
+ * The graph is modified in-place.
+ * Attributes are preserved.
+ */
+igraph_error_t igraph_i_reverse(igraph_t *graph) {
+
+    /* Nothing to do for undirected graphs. */
+    if (! igraph_is_directed(graph)) {
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_swap(&graph->to, &graph->from);
+    igraph_vector_int_swap(&graph->oi, &graph->ii);
+    igraph_vector_int_swap(&graph->os, &graph->is);
+
     return IGRAPH_SUCCESS;
 }

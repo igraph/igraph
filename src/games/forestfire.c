@@ -95,7 +95,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * \param nodes The number of vertices in the graph.
  * \param fw_prob The forward burning probability.
  * \param bw_factor The backward burning ratio. The backward burning
-      probability is calculated as <code>bw.factor*fw.prob</code>.
+      probability is calculated as <code>bw_factor * fw_prob</code>.
  * \param pambs The number of ambassador vertices.
  * \param directed Whether to create a directed graph.
  * \return Error code.
@@ -139,12 +139,12 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
     inneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
     if (!inneis) {
-        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, inneis);
     outneis = IGRAPH_CALLOC(no_of_nodes, igraph_vector_int_t);
     if (!outneis) {
-        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot run forest fire model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, outneis);
     data.inneis = inneis;
@@ -163,8 +163,8 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     RNG_BEGIN();
 
 #define ADD_EDGE_TO(nei) \
-    if (VECTOR(visited)[(nei)] != actnode+1) {                     \
-        VECTOR(visited)[(nei)] = actnode+1;                          \
+    if (VECTOR(visited)[(nei)] != actnode+1) {                           \
+        VECTOR(visited)[(nei)] = actnode+1;                              \
         IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, nei));                \
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, actnode));      \
         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));          \

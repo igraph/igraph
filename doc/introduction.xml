@@ -70,8 +70,11 @@ implementation allowing use and modification for anyone.
 <para>
     igraph library
 </para><para>
-    Copyright (C) 2003-2012  Gábor Csardi &lt;csardi.gabor@gmail.com>
-    334 Harvard st, Cambridge MA, 02139, USA
+    Copyright (C) 2003-2004  Gábor Csárdi &lt;csardi.gabor@gmail.com>
+</para><para>
+    Copyright (C) 2005-2019  Gábor Csárdi &lt;csardi.gabor@gmail.com> and Tamás Nepusz &lt;ntamas@gmail.com>
+</para><para>
+    Copyright (C) 2020-2022  The igraph development team
 </para><para>
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -85,7 +88,7 @@ implementation allowing use and modification for anyone.
 </para><para>
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc.
 </para>
 </section>
 

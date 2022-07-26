@@ -21,7 +21,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int is_almost_one(igraph_real_t x) {
     /* 2^5 = 32 is 5 binary digits  of tolerance */
@@ -105,9 +105,10 @@ int main() {
     printf("PRPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
-    /* Check twice more for consistency */
+    /* Check twice more for consistency, this time without explicitly
+     * supplied ARPACK options */
     igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
@@ -117,7 +118,7 @@ int main() {
     IGRAPH_ASSERT(is_almost_one(value));
 
     igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
@@ -197,7 +198,7 @@ int main() {
     printf("\nEdgeless graph, personalized PageRank\n");
 
     igraph_empty(&g, 4, IGRAPH_UNDIRECTED);
-    igraph_vector_init_seq(&reset, 1, 4);
+    igraph_vector_init_range(&reset, 1, 5);
 
     igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
                     igraph_vss_all(), 1, 0.85, &reset, 0, &arpack_options);
@@ -331,7 +332,7 @@ int main() {
 
         /* We delete some edges to break the symmetry of the graph.
          * Otherwise all vertices would have the same PageRank. */
-        igraph_vector_int_init_seq(&edges_to_delete, 0, 37);
+        igraph_vector_int_init_range(&edges_to_delete, 0, 38);
         igraph_delete_edges(&g, igraph_ess_vector(&edges_to_delete));
         igraph_vector_int_destroy(&edges_to_delete);
 
@@ -363,7 +364,7 @@ int main() {
 
         printf("\nLarge test graph, weighted\n");
 
-        igraph_vector_init_seq(&weights, igraph_ecount(&g) + 1, 2*igraph_ecount(&g));
+        igraph_vector_init_range(&weights, igraph_ecount(&g) + 1, 2*igraph_ecount(&g) + 1);
 
         igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res_arpack, &value,
                         igraph_vss_all(), 1, 0.85, &weights, &arpack_options);

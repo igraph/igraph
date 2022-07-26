@@ -99,7 +99,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     igraph_real_t x, max_in, max_out;
     igraph_real_t max_no_of_edges;
     igraph_bool_t is_directed = (fitness_in != 0);
-    float num_steps;
+    igraph_real_t num_steps;
     igraph_integer_t step_counter = 0;
     igraph_integer_t i, from, to, pos;
 

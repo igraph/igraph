@@ -29,6 +29,8 @@
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 
+#include "core/math.h"
+
 #include <limits.h>
 
 typedef struct {
@@ -681,8 +683,7 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
         return IGRAPH_SUCCESS;
     }
 
-    igraph_vector_init(&tmp, vc);
-    IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, vc);
     if (!weights) {
         IGRAPH_CHECK(igraph_adjlist_init(graph, &outlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &outlist);
@@ -861,10 +862,10 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
  *        graph. This vector is added to the diagonal of the adjacency
  *        matrix, before performing the SVD.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *        for details. Note that the function overwrites the
- *        <code>n</code> (number of vertices), <code>nev</code> and
- *        <code>which</code> parameters and it always starts the
- *        calculation from a random start vector.
+ *        for details. Supply \c NULL to use the defaults. Note that the
+ *        function overwrites the <code>n</code> (number of vertices),
+ *        <code>nev</code> and <code>which</code> parameters and it always
+ *        starts the calculation from a random start vector.
  * \return Error code.
  *
  */
@@ -890,6 +891,10 @@ igraph_error_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
     } else {
         callback = weights ? igraph_i_asembeddinguw : igraph_i_asembeddingu;
         callback_right = 0;
+    }
+
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
     }
 
     return igraph_i_spectral_embedding(graph, n, weights, which, scaled,
@@ -930,10 +935,7 @@ static igraph_error_t igraph_i_lse_und(const igraph_t *graph,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
-    IGRAPH_CHECK(
-        igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1,
-                    weights)
-    );
+    IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1, weights));
 
     switch (type) {
     case IGRAPH_EMBEDDING_D_A:
@@ -986,14 +988,8 @@ static igraph_error_t igraph_i_lse_dir(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&deg_in, n);
     IGRAPH_VECTOR_INIT_FINALLY(&deg_out, n);
-    IGRAPH_CHECK(
-        igraph_strength(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /*loops=*/ 1,
-                    weights)
-    );
-    IGRAPH_CHECK(
-        igraph_strength(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /*loops=*/ 1,
-                    weights)
-    );
+    IGRAPH_CHECK(igraph_strength(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /*loops=*/ 1, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /*loops=*/ 1, weights));
 
     for (i = 0; i < n; i++) {
         VECTOR(deg_in)[i] = 1.0 / sqrt(VECTOR(deg_in)[i]);
@@ -1063,10 +1059,10 @@ static igraph_error_t igraph_i_lse_dir(const igraph_t *graph,
  *        pointer, then the eigenvalues (for undirected graphs) or the
  *        singular values (for directed graphs) are stored here.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *        for details. Note that the function overwrites the
- *        <code>n</code> (number of vertices), <code>nev</code> and
- *        <code>which</code> parameters and it always starts the
- *        calculation from a random start vector.
+ *        for details. Supply \c NULL to use the defaults. Note that the
+ *        function overwrites the <code>n</code> (number of vertices),
+ *        <code>nev</code> and <code>which</code> parameters and it always
+ *        starts the calculation from a random start vector.
  * \return Error code.
  *
  * \sa \ref igraph_adjacency_spectral_embedding to embed the adjacency
@@ -1083,6 +1079,10 @@ igraph_error_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
                                         igraph_matrix_t *Y,
                                         igraph_vector_t *D,
                                         igraph_arpack_options_t *options) {
+
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
+    }
 
     if (igraph_is_directed(graph)) {
         return igraph_i_lse_dir(graph, n, weights, which, type, scaled,

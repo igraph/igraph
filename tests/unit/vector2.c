@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
@@ -33,8 +33,8 @@ int main() {
     igraph_integer_t imin, imax;
     int i;
 
-    igraph_vector_init_seq(&v1, 1, 10);
-    igraph_vector_init_seq(&v2, 0, 9);
+    igraph_vector_init_range(&v1, 1, 11);
+    igraph_vector_init_range(&v2, 0, 10);
 
     igraph_vector_swap(&v1, &v2);
     print_vector_format(&v1, stdout, "%g");
@@ -73,7 +73,7 @@ int main() {
     igraph_vector_destroy(&v1);
     igraph_vector_destroy(&v2);
 
-    igraph_vector_init_seq(&v1, 1, 10);
+    igraph_vector_init_range(&v1, 1, 11);
     igraph_vector_init(&v2, 10);
     for (i = 0; i < 10; i++) {
         VECTOR(v2)[i] = 10 - i;

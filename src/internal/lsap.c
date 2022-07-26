@@ -84,7 +84,7 @@ igraph_error_t ap_hungarian(AP *p) {
     ci = calloc(1 + n, sizeof(igraph_integer_t));
 
     if (ri == NULL || ci == NULL || p->s == NULL || p->f == NULL) {
-        IGRAPH_ERROR("ap_hungarian: could not allocate memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("ap_hungarian: could not allocate memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     preprocess(p);
@@ -620,7 +620,7 @@ void preprocess(AP *p) {
  * \function igraph_solve_lsap
  * \brief Solve a balanced linear assignment problem.
  *
- * This functions solves a linear assinment problem using the Hungarian
+ * This functions solves a linear assignment problem using the Hungarian
  * method. A number of tasks, an equal number of agents, and the cost
  * of each agent to perform the tasks is given. This function then
  * assigns one task to each agent in such a way that the total cost is
@@ -632,7 +632,7 @@ void preprocess(AP *p) {
  *
  * </param><param>
  * To solve an unbalanced assignment problem, where the number of agents
- * is greater than the number of tasks, an extra task with zero cost
+ * is greater than the number of tasks, extra tasks with zero costs
  * should be added.
  *
  * \param c The assignment problem, where the number of rows is the
@@ -647,7 +647,7 @@ void preprocess(AP *p) {
  *
  * Time complexity: O(n^3), where n is the number of agents.
  */
-igraph_error_t igraph_solve_lsap(igraph_matrix_t *c, igraph_integer_t n,
+igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
                       igraph_vector_int_t *p) {
     AP *ap;
 

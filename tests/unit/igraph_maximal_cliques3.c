@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void sort_cliques(igraph_vector_int_list_t *cliques) {
     igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
@@ -43,7 +43,7 @@ int main() {
     igraph_t graph;
     igraph_vector_int_list_t cliques;
 
-    igraph_rng_seed(igraph_rng_default(), 42);
+    igraph_rng_seed(igraph_rng_default(), 41);
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP,
                             /*n=*/ 100, /*p=*/ 0.7, /*directed=*/ 0,
                             /*loops=*/ 0);

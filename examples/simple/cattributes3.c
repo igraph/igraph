@@ -28,6 +28,25 @@ int mf(const igraph_vector_t *input, igraph_real_t *output) {
     return 0;
 }
 
+static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
+    igraph_simplify(g, /*multiple=*/ 1, /*loops=*/ 1, comb);
+    igraph_write_graph_graphml(g, stdout, /*prefixattr=*/ 1);
+    igraph_attribute_combination_destroy(comb);
+    igraph_destroy(g);
+}
+
+static void weight_test(igraph_t *g, igraph_attribute_combination_type_t weight_attr) {
+    igraph_t g2;
+    igraph_attribute_combination_t comb;
+
+    igraph_copy(&g2, g);
+    igraph_attribute_combination(&comb,
+                                 "weight", weight_attr,
+                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
+                                 IGRAPH_NO_MORE_ATTRIBUTES);
+    simplify_write_destroy(&g2, &comb);
+}
+
 int main() {
 
     igraph_t g, g2;
@@ -41,115 +60,35 @@ int main() {
                  1, 2, 2, 3,
                  -1);
 
-    igraph_vector_init_seq(&weight, 1, igraph_ecount(&g));
+    igraph_vector_init_range(&weight, 1, igraph_ecount(&g) + 1);
     SETEANV(&g, "weight", &weight);
     igraph_vector_destroy(&weight);
 
-    /* ****************************************************** */
-    igraph_copy(&g2, &g);
-    igraph_attribute_combination(&comb,
-                                 "weight", IGRAPH_ATTRIBUTE_COMBINE_SUM,
-                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
-                                 IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
+    weight_test(&g, IGRAPH_ATTRIBUTE_COMBINE_SUM);
+    weight_test(&g, IGRAPH_ATTRIBUTE_COMBINE_PROD);
+    weight_test(&g, IGRAPH_ATTRIBUTE_COMBINE_MIN);
+    weight_test(&g, IGRAPH_ATTRIBUTE_COMBINE_MAX);
+    weight_test(&g, IGRAPH_ATTRIBUTE_COMBINE_FIRST);
+    weight_test(&g, IGRAPH_ATTRIBUTE_COMBINE_LAST);
+    weight_test(&g, IGRAPH_ATTRIBUTE_COMBINE_MEAN);
 
     /* ****************************************************** */
-    igraph_copy(&g2, &g);
-    igraph_attribute_combination(&comb,
-                                 "weight", IGRAPH_ATTRIBUTE_COMBINE_PROD,
-                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
-                                 IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
 
-    /* ****************************************************** */
-    igraph_copy(&g2, &g);
-    igraph_attribute_combination(&comb,
-                                 "weight", IGRAPH_ATTRIBUTE_COMBINE_MIN,
-                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
-                                 IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
-
-    /* ****************************************************** */
-    igraph_copy(&g2, &g);
-    igraph_attribute_combination(&comb,
-                                 "weight", IGRAPH_ATTRIBUTE_COMBINE_MAX,
-                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
-                                 IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
-
-    /* ****************************************************** */
-    igraph_copy(&g2, &g);
-    igraph_attribute_combination(&comb,
-                                 "weight", IGRAPH_ATTRIBUTE_COMBINE_FIRST,
-                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
-                                 IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
-
-    /* ****************************************************** */
-    igraph_copy(&g2, &g);
-    igraph_attribute_combination(&comb,
-                                 "weight", IGRAPH_ATTRIBUTE_COMBINE_LAST,
-                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
-                                 IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
-
-    /* ****************************************************** */
-    igraph_copy(&g2, &g);
-    igraph_attribute_combination(&comb,
-                                 "weight", IGRAPH_ATTRIBUTE_COMBINE_MEAN,
-                                 "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
-                                 IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
-
-    /* ****************************************************** */
     igraph_copy(&g2, &g);
     igraph_attribute_combination(&comb,
                                  "weight", IGRAPH_ATTRIBUTE_COMBINE_FUNCTION, mf,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_IGNORE,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
-    /* ****************************************************** */
+    simplify_write_destroy(&g2, &comb);
 
     /* ****************************************************** */
+
     igraph_copy(&g2, &g);
     igraph_attribute_combination(&comb,
                                  "",       IGRAPH_ATTRIBUTE_COMBINE_MEAN,
                                  IGRAPH_NO_MORE_ATTRIBUTES);
-    igraph_simplify(&g2, /*multiple=*/ 1, /*loops=*/ 1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    igraph_write_graph_graphml(&g2, stdout, /*prefixattr=*/ 1);
-    igraph_destroy(&g2);
+    simplify_write_destroy(&g2, &comb);
+
     /* ****************************************************** */
 
     igraph_destroy(&g);

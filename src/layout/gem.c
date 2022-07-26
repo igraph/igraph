@@ -27,12 +27,13 @@
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
-#include "core/math.h"
 #include "core/interruption.h"
+#include "core/math.h"
 
 /**
  * \ingroup layout
  * \function igraph_layout_gem
+ * \brief Layout graph according to GEM algorithm.
  *
  * The GEM layout algorithm, as described in Arne Frick, Andreas Ludwig,
  * Heiko Mehldau: A Fast Adaptive Layout Algorithm for Undirected Graphs,
@@ -87,29 +88,34 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     const igraph_real_t sigma_r = 1.0 / 2.0 / no_nodes;
 
     if (maxiter < 0) {
-        IGRAPH_ERROR("Number of iterations must be non-negative in GEM layout",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of iterations must be non-negative in GEM layout, "
+                "got %" IGRAPH_PRId ".",
+                IGRAPH_EINVAL, maxiter);
     }
-    if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
-                     igraph_matrix_ncol(res) != 2)) {
-        IGRAPH_ERROR("Invalid start position matrix size in GEM layout",
-                     IGRAPH_EINVAL);
+    if (use_seed && igraph_matrix_nrow(res) != no_nodes) {
+        IGRAPH_ERRORF("In GEM layout, seed matrix number of rows should equal number of nodes (%" IGRAPH_PRId "), got %" IGRAPH_PRId ".",
+                IGRAPH_EINVAL, no_nodes, igraph_matrix_nrow(res));
+    }
+    if (use_seed && igraph_matrix_ncol(res) != 2) {
+        IGRAPH_ERRORF("In GEM layout, seed matrix number of columns should be 2, got %" IGRAPH_PRId ".",
+                IGRAPH_EINVAL, igraph_matrix_ncol(res));
     }
     if (temp_max <= 0) {
-        IGRAPH_ERROR("Maximum temperature should be positive in GEM layout",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Maximum temperature should be positive in GEM layout, got %g.",
+                IGRAPH_EINVAL, temp_max);
     }
     if (temp_min <= 0) {
-        IGRAPH_ERROR("Minimum temperature should be positive in GEM layout",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Minimum temperature should be positive in GEM layout, got %g.",
+                IGRAPH_EINVAL, temp_min);
     }
     if (temp_init <= 0) {
-        IGRAPH_ERROR("Initial temperature should be positive in GEM layout",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Initial temperature should be positive in GEM layout, got %g.",
+                IGRAPH_EINVAL, temp_init);
     }
     if (temp_max < temp_init || temp_init < temp_min) {
-        IGRAPH_ERROR("Minimum <= Initial <= Maximum temperature is required "
-                     "in GEM layout", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Minimum <= Initial <= Maximum temperature is required "
+                "in GEM layout, but %g is not larger than %g and smaller than %g.", IGRAPH_EINVAL,
+                temp_init, temp_min, temp_max);
     }
 
     if (no_nodes == 0) {
@@ -120,7 +126,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&impulse_y, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&temp, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&skew_gauge, no_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&perm, 0, no_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
     IGRAPH_VECTOR_INIT_FINALLY(&phi, no_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 10);

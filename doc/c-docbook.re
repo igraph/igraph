@@ -5,7 +5,33 @@ REPLACE ----- remove the " *" lines -------------------------------------------
 ^[ ]\*\s*\n
 WITH --------------------------------------------------------------------------
 \n
-REPLACE ----- for the template functions --------------------------------------
+REPLACE IN typed_list.pmt ----- for the typed list template functions ---------
+
+FUNCTION\(
+(?P<suffix>[^\)]*)
+\)\s*
+
+WITH
+
+igraph_vector_list_\g<suffix>
+
+REPLACE IN typed_list.pmt ----- typed list template item type -----------------
+
+ITEM_TYPE
+
+WITH
+
+igraph_vector_t
+
+REPLACE IN typed_list.pmt ----- typed list template type ----------------------
+
+TYPE
+
+WITH
+
+igraph_vector_list_t
+
+REPLACE IN *.pmt ----- for the template functions -----------------------------
 
 FUNCTION\(
 (?P<base>[^, \)]*)\s*,\s*
@@ -16,7 +42,7 @@ WITH
 
 \g<base>_\g<suffix>
 
-REPLACE ----- template type ---------------------------------------------------
+REPLACE IN *.pmt ----- template type ------------------------------------------
 
 TYPE\(
 (?P<type>[^\)]*)
@@ -26,7 +52,7 @@ WITH
 
 \g<type>_t
 
-REPLACE ----- template base type, we cowardly assume real number --------------
+REPLACE IN *.pmt ----- template base type, we cowardly assume real number -----
 
 BASE
 
@@ -325,7 +351,7 @@ WITH --------------------------------------------------------------------------
 </para>
 </section>
 
-REPLACE ----- structure member descriptions, one block ------------------------
+REPLACE IN *.h ----- structure member descriptions, one block -----------------
 
 ^[\s]*\n
 (?P<before2>.*?)                # empty line+text
@@ -344,7 +370,7 @@ WITH --------------------------------------------------------------------------
 \g<members>
 </variablelist></para></formalpara><para>
 
-REPLACE ----- structure member descriptions -----------------------------------
+REPLACE IN *.h ----- structure member descriptions ----------------------------
 
 \\member\b\s*                    # \enumval command
 (?P<paramname>(\w+)|(...))\s+     # name of the parameter
@@ -626,7 +652,7 @@ WITH --------------------------------------------------------------------------
 
 REPLACE ----- add http:// and https:// links ----------------------------------
 
-(?P<link>https?:\/\/[-\+=&;%@./~()'\w_]*[-\+=&;%@/~'\w_])
+(?P<link>https?:\/\/[-\+=&;%@.:/~()'\w_]*[-\+=&;%@/~'\w_])
 
 WITH --------------------------------------------------------------------------
 

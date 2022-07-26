@@ -29,7 +29,7 @@ int main() {
     igraph_t g;
 
     igraph_vector_int_init_int(&v, 2, 5, 5);
-    igraph_lattice(&g, &v, 1, IGRAPH_DIRECTED, 1 /*mutual*/, 0 /*circular*/);
+    igraph_square_lattice(&g, &v, 1, IGRAPH_DIRECTED, 1 /*mutual*/, 0 /*periodic*/);
     igraph_to_undirected(&g, IGRAPH_TO_UNDIRECTED_COLLAPSE,
                          /*edge_comb=*/ 0);
     igraph_write_graph_edgelist(&g, stdout);

@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t graph;
@@ -97,7 +97,7 @@ int main() {
 
     igraph_simplify(&graph, /* multiple */ 1, /* loops */ 0, &comb);
 
-    igraph_vector_int_init_seq(&membership, 0, igraph_vcount(&graph) - 1);
+    igraph_vector_int_init_range(&membership, 0, igraph_vcount(&graph));
     EANV(&graph, "weight", &weights);
     for (resolution = 0.5; resolution <= 1.5; resolution += 0.5) {
         igraph_modularity(&graph, &membership, &weights,

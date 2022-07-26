@@ -1,0 +1,16 @@
+No vertices:
+directed: true
+vcount: 0
+edges: {
+}
+5 vertices, 0-1, 0-4, 1-4 are connected:
+directed: true
+vcount: 5
+edges: {
+0 1
+0 4
+1 0
+1 4
+4 0
+4 1
+}

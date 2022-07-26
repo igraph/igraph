@@ -28,7 +28,7 @@
 
 #include "flow/flow_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int test_all_st_cuts(const igraph_t *graph,
                      igraph_integer_t source,

@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
     igraph_t g;
@@ -45,7 +45,7 @@ int main() {
     }
 
     for (i = 0, n = igraph_vcount(&g); i < n; i++) {
-        printf("%i ", (int) VAN(&g, "type", i));
+        printf("%d ", (int) VAB(&g, "type", i));
     }
     printf("\n");
 

@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
@@ -34,6 +34,7 @@ int main() {
 
     igraph_rng_seed(igraph_rng_default(), 33);
 
+    printf("Testing k-ary tree\n");
     igraph_kary_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
     /*   igraph_barabasi_game(&g, 1000, 1, 0, 0, IGRAPH_UNDIRECTED); */
     igraph_matrix_init(&coords, 0, 0);
@@ -47,6 +48,25 @@ int main() {
                       /* cellsize */   sqrt(sqrt(vc)),
                       /* root */       0);
 
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
+
+    /* Test that a warning is printed for disconnected graphs */
+    printf("Testing disconnected graph\n");
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, 3, 4, -1);
+    igraph_matrix_init(&coords, 0, 0);
+    vc = igraph_vcount(&g);
+    EXPECT_WARNING(
+        igraph_layout_lgl(&g, &coords,
+                        /* maxiter */    150,
+                        /* maxdelta */   vc,
+                        /* area */       vc * vc,
+                        /* coolexp */    1.5,
+                        /* repulserad */ vc * vc * vc,
+                        /* cellsize */   sqrt(sqrt(vc)),
+                        /* root */       0),
+        "LGL layout does not support disconnected graphs yet."
+    );
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
 

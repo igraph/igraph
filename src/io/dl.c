@@ -88,7 +88,10 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     igraph_dl_yyset_in(instream, context.scanner);
 
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_dl_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
@@ -102,7 +105,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
@@ -117,7 +120,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     n = igraph_vector_size(&context.weights);
     n2 = igraph_vector_int_size(&context.edges) / 2;
     if (n != 0) {
-        igraph_vector_resize(&context.weights, n2);
+        IGRAPH_CHECK(igraph_vector_resize(&context.weights, n2));
         for (; n < n2; n++) {
             VECTOR(context.weights)[n] = IGRAPH_NAN;
         }
@@ -134,15 +137,13 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         context.n = n;
     }
 
-    /* OK, everything is ready, create the graph */
-    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
+    /* Prepare attributes */
 
     /* Labels */
     if (igraph_strvector_size(&context.labels) != 0) {
         namevec = (const igraph_strvector_t*) &context.labels;
     } else if (igraph_trie_size(&context.trie) != 0) {
-        igraph_trie_getkeys(&context.trie, &namevec);
+        namevec = igraph_i_trie_borrow_keys(&context.trie);
     }
     if (namevec) {
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
@@ -165,6 +166,9 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
+    /* Create graph */
+    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+    IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, context.n, pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &context.edges, pweight));
 

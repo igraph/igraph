@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_and_destroy(igraph_matrix_t *vectors, igraph_matrix_t *values, igraph_integer_t nev, igraph_error_t error) {
     printf("vectors in:\n");

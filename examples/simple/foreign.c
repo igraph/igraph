@@ -28,13 +28,18 @@ int main() {
     igraph_t g;
     FILE *ifile;
 
-    /* PAJEK */
+    /* Turn on attribute handling. */
+    igraph_set_attribute_table(&igraph_cattribute_table);
+
+    /* Read a Pajek file. */
     ifile = fopen("links.net", "r");
     if (ifile == 0) {
         return 10;
     }
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
+
+    /* Write it in edgelist format. */
     printf("The graph:\n");
     printf("Vertices: %" IGRAPH_PRId "\n", igraph_vcount(&g));
     printf("Edges: %" IGRAPH_PRId "\n", igraph_ecount(&g));

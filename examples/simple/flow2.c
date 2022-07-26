@@ -141,8 +141,8 @@ int check_flow(int errorinc,
     }
     igraph_delete_edges(&graph_copy, igraph_ess_vector(&cut_int));
     igraph_matrix_init(&sp, 1, 1);
-    igraph_shortest_paths(&graph_copy, &sp, /*from=*/ igraph_vss_1(source),
-                          /*to=*/ igraph_vss_1(target), IGRAPH_OUT);
+    igraph_distances(&graph_copy, &sp, /*from=*/ igraph_vss_1(source),
+                     /*to=*/ igraph_vss_1(target), IGRAPH_OUT);
     if (MATRIX(sp, 0, 0) != IGRAPH_INFINITY) {
         return errorinc + 10;
     }
@@ -173,8 +173,9 @@ int main() {
 
     /***************/
     infile = fopen("ak-4102.max", "r");
-    igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity,
-                             IGRAPH_DIRECTED);
+    igraph_read_graph_dimacs_flow(
+        &g, infile, 0, 0, &source, &target, &capacity, IGRAPH_DIRECTED
+    );
     fclose(infile);
 
     igraph_vector_int_init(&cut, 0);

@@ -474,7 +474,7 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
         IGRAPH_ERROR("Invalid 'il' and/or 'iu' values.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
@@ -646,7 +646,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
         IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
@@ -889,7 +889,7 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
         sense = 'B';
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
@@ -1005,7 +1005,7 @@ igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
     IGRAPH_VECTOR_INIT_FINALLY(&tau, n - 1);
 

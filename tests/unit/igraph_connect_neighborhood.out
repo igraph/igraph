@@ -1,0 +1,124 @@
+Graph with no vertices:
+directed: false
+vcount: 0
+edges: {
+}
+Directed graph with loops and multiple edges, order 0, IGRAPH_OUT:
+directed: true
+vcount: 6
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 3
+3 4
+3 4
+}
+Same graph, order 1:
+directed: true
+vcount: 6
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 3
+3 4
+3 4
+}
+Same graph, order 2:
+directed: true
+vcount: 6
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 3
+3 4
+3 4
+0 3
+1 4
+2 4
+}
+Same starting graph, order 2, IGRAPH_IN:
+directed: true
+vcount: 6
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 3
+3 4
+3 4
+0 3
+1 4
+2 4
+}
+Same starting graph, order 2, IGRAPH_ALL:
+directed: true
+vcount: 6
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 3
+3 4
+3 4
+0 3
+1 2
+1 4
+2 4
+}
+Same starting graph, order 3, IGRAPH_OUT:
+directed: true
+vcount: 6
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 3
+3 4
+3 4
+0 3
+0 4
+1 4
+2 4
+}
+Same starting graph, order 12, IGRAPH_IN:
+directed: true
+vcount: 6
+edges: {
+0 1
+0 2
+1 1
+1 3
+2 3
+3 4
+3 4
+0 3
+1 4
+2 4
+0 4
+}
+Same starting graph, but undirected, order 3, IGRAPH_OUT:
+directed: false
+vcount: 6
+edges: {
+1 0
+2 0
+1 1
+3 1
+3 2
+4 3
+4 3
+3 0
+2 1
+4 1
+4 2
+}
+Check negative order error.

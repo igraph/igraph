@@ -26,6 +26,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
@@ -66,7 +67,7 @@ IGRAPH_EXPORT igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, ig
                                             const igraph_vector_t *weights, igraph_real_t cutoff);
 IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                                           igraph_bool_t directed,
-                                          const igraph_vector_t *weigths);
+                                          const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
                                                  igraph_bool_t directed,
                                                  const igraph_vector_t *weights, igraph_real_t cutoff);

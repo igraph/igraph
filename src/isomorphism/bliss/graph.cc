@@ -604,7 +604,7 @@ public:
   unsigned int cr_cep_index;
   unsigned int cr_level;
 
-  bool needs_long_prune;
+  bool needs_long_prune = false; /* igraph-specific patch: initialize to false to silence UBSan */
   unsigned int long_prune_begin;
   std::set<unsigned int, std::less<unsigned int> > long_prune_redundant;
 
@@ -1498,9 +1498,6 @@ AbstractGraph::search(const bool canonical,
           child_node.cr_level = cr_level;
           child_node.cr_cep_stack_size = cr_cep_stack.size();
           child_node.cr_cep_index = cr_cep_index;
-
-          /* Initialize needs_long_prune to prevent a gcc-ubsan warning */
-          child_node.needs_long_prune = true;
 
           search_stack.push_back(child_node);
           continue;

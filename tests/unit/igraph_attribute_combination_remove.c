@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_comb(igraph_attribute_combination_t *comb) {
     int i;

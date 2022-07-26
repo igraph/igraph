@@ -27,6 +27,7 @@
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_iterators.h"
 
 __BEGIN_DECLS
@@ -38,17 +39,6 @@ IGRAPH_EXPORT igraph_error_t igraph_transitivity_local_undirected(const igraph_t
                                                        igraph_vector_t *res,
                                                        const igraph_vs_t vids,
                                                        igraph_transitivity_mode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
-                                                        igraph_vector_t *res,
-                                                        const igraph_vs_t vids,
-                                                        igraph_transitivity_mode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
-                                                        igraph_vector_t *res,
-                                                        const igraph_vs_t vids,
-                                                        igraph_transitivity_mode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
-                                                        igraph_vector_t *res,
-                                                        igraph_transitivity_mode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
                                                           igraph_real_t *res,
                                                           igraph_transitivity_mode_t mode);

@@ -10,7 +10,7 @@
 
 /* `hsl/specfunc/hzeta.c' C source file
 // HSL - Home Scientific Library
-// Copyright (C) 2017-2018  Jerome Benoit
+// Copyright (C) 2017-2022  Jerome Benoit
 //
 // HSL is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -97,7 +97,7 @@ typedef struct gsl_sf_result_struct gsl_sf_result;
 
 // B_{2j}/(2j)
 static
-double hsl_sf_hzeta_eulermaclaurin_series_coeffs[HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER+1]={
+double hsl_sf_hzeta_eulermaclaurin_series_coeffs[HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER+2]={
 	+1.0,
 	+1.0/12.0,
 	-1.0/720.0,
@@ -130,12 +130,12 @@ double hsl_sf_hzeta_eulermaclaurin_series_coeffs[HSL_SF_HZETA_EULERMACLAURIN_SER
 	+1.01530758555695563116307139454e-46,
 	-2.57180415824187174992481940976e-48,
 	+6.51445603523381493155843485864e-50,
-	-1.65013099068965245550609878048e-51
-	}; // hsl_sf_hzeta_eulermaclaurin_series_coeffs
+	-1.65013099068965245550609878048e-51,
+	NAN}; // hsl_sf_hzeta_eulermaclaurin_series_coeffs
 
 // 4\zeta(2j)/(2\pi)^(2j)
 static
-double hsl_sf_hzeta_eulermaclaurin_series_majorantratios[HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER+1]={
+double hsl_sf_hzeta_eulermaclaurin_series_majorantratios[HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER+2]={
 	-2.0,
 	+1.0/6.0,
 	+1.0/360.0,
@@ -168,8 +168,8 @@ double hsl_sf_hzeta_eulermaclaurin_series_majorantratios[HSL_SF_HZETA_EULERMACLA
 	+2.03061517111391126232614278906e-46,
 	+5.14360831648374349984963881946e-48,
 	+1.30289120704676298631168697172e-49,
-	+3.30026198137930491101219756091e-51
-	}; // hsl_sf_hzeta_eulermaclaurin_series_majorantratios
+	+3.30026198137930491101219756091e-51,
+	NAN}; // hsl_sf_hzeta_eulermaclaurin_series_majorantratios
 
 
 extern
@@ -234,6 +234,7 @@ int hsl_sf_hzeta_e(const double s, const double q, gsl_sf_result * result) {
 				ratio=scp*pcp;
 				if ((fabs(delta/ans)) < (0.5*GSL_DBL_EPSILON)) break;
 				}
+			if (HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER<j) PLFIT_ERROR("maximum iterations exceeded",PLFIT_EMAXITER);
 
 			ans=0.0; while (n) ans+=terms[--n];
 			mjr=hsl_sf_hzeta_eulermaclaurin_series_majorantratios[j]*ratio;
@@ -298,6 +299,7 @@ int hsl_sf_hzeta_deriv_e(const double s, const double q, gsl_sf_result * result)
 				ratio=scp*pcp*lcp;
 				if ((fabs(delta/ans)) < (0.5*GSL_DBL_EPSILON)) break;
 				}
+			if (HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER<j) PLFIT_ERROR("maximum iterations exceeded",PLFIT_EMAXITER);
 
 			ans=0.0; while (n) ans+=terms[--n];
 			mjr=hsl_sf_hzeta_eulermaclaurin_series_majorantratios[j]*ratio;
@@ -375,6 +377,7 @@ int hsl_sf_hzeta_deriv2_e(const double s, const double q, gsl_sf_result * result
 				if ((fabs(delta/ans)) < (0.5*GSL_DBL_EPSILON)) break;
 				lcp+=slcp;
 				}
+			if (HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER<j) PLFIT_ERROR("maximum iterations exceeded",PLFIT_EMAXITER);
 
 			ans=0.0; while (n) ans+=terms[--n];
 			mjr=hsl_sf_hzeta_eulermaclaurin_series_majorantratios[j]*ratio;
@@ -457,6 +460,7 @@ int hsl_sf_hZeta0(const double s, const double q, double * value, double * abser
 		ratio=scp*pcp;
 		if ((fabs(delta/ans)) < (0.5*GSL_DBL_EPSILON)) break;
 		}
+	if (HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER<j) PLFIT_ERROR("maximum iterations exceeded",PLFIT_EMAXITER);
 
 	ans=0.0; while (n) ans+=terms[--n];
 	mjr=hsl_sf_hzeta_eulermaclaurin_series_majorantratios[j]*ratio;
@@ -555,6 +559,7 @@ int hsl_sf_hZeta1(const double s, const double q, const double ln_q, double * va
 		ratio=scp*pcp*lcp;
 		if ((fabs(delta/ans)) < (0.5*GSL_DBL_EPSILON)) break;
 		}
+	if (HSL_SF_HZETA_EULERMACLAURIN_SERIES_ORDER<j) PLFIT_ERROR("maximum iterations exceeded",PLFIT_EMAXITER);
 
 	ans=0.0; while (n) ans+=terms[--n];
 	mjr=hsl_sf_hzeta_eulermaclaurin_series_majorantratios[j]*ratio;

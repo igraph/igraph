@@ -24,8 +24,8 @@
 #define IGRAPH_MATCHING_H
 
 #include "igraph_decls.h"
-#include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
@@ -46,10 +46,6 @@ IGRAPH_EXPORT igraph_error_t igraph_maximum_bipartite_matching(const igraph_t* g
                                                     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
                                                     igraph_real_t* matching_weight, igraph_vector_int_t* matching,
                                                     const igraph_vector_t* weights, igraph_real_t eps);
-
-IGRAPH_EXPORT igraph_error_t igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
-                                          igraph_real_t* matching_weight, igraph_vector_int_t* matching,
-                                          const igraph_vector_t* weights);
 
 __END_DECLS
 

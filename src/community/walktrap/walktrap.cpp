@@ -59,7 +59,11 @@
 #include "igraph_community.h"
 #include "igraph_components.h"
 #include "igraph_interface.h"
+
+#include "core/exceptions.h"
 #include "core/interruption.h"
+
+#include <climits>
 
 using namespace igraph::walktrap;
 
@@ -87,6 +91,8 @@ using namespace igraph::walktrap;
  *     If it is a NULL pointer then all edges will have equal
  *     weights. The weights are expected to be positive.
  * \param steps Integer constant, the length of the random walks.
+ *     Typically, good results are obtained with values between
+ *     3-8 with 4-5 being a reasonable default.
  * \param merges Pointer to a matrix, the merges performed by the
  *     algorithm will be stored here (if not NULL). Each merge is a
  *     row in a two-column matrix and contains the IDs of the merged
@@ -118,49 +124,84 @@ using namespace igraph::walktrap;
 
 igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                               const igraph_vector_t *weights,
-                              int steps,
+                              igraph_integer_t steps,
                               igraph_matrix_int_t *merges,
                               igraph_vector_t *modularity,
                               igraph_vector_int_t *membership) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    int length = steps;
-    long max_memory = -1;
+    IGRAPH_HANDLE_EXCEPTIONS(
+        igraph_integer_t no_of_nodes = igraph_vcount(graph);
+        igraph_integer_t no_of_edges = igraph_ecount(graph);
+        igraph_integer_t comp_count;
 
-    if (membership && !(modularity && merges)) {
-        IGRAPH_ERROR("Cannot calculate membership without modularity or merges",
-                     IGRAPH_EINVAL);
-    }
+        if (steps <= 0) {
+            IGRAPH_ERROR("Length of random walks must be positive for walktrap community detection.", IGRAPH_EINVAL);
+        }
 
-    Graph G;
-    if (G.convert_from_igraph(graph, weights)) {
-        IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
-    }
+        if (steps > INT_MAX) {
+            IGRAPH_ERROR("Length of random walks too large for walktrap community detection.", IGRAPH_EINVAL);
+        }
 
-    if (merges) {
-        igraph_integer_t no;
-        IGRAPH_CHECK(igraph_connected_components(graph, /*membership=*/ 0, /*csize=*/ 0, &no, IGRAPH_WEAK));
-        IGRAPH_CHECK(igraph_matrix_int_resize(merges, no_of_nodes - no, 2));
-    }
-    if (modularity) {
-        IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
-        igraph_vector_null(modularity);
-    }
-    Communities C(&G, length, max_memory, merges, modularity);
+        int length = steps;
+        long max_memory = -1;
 
-    while (!C.H->is_empty()) {
-        IGRAPH_ALLOW_INTERRUPTION();
-        C.merge_nearest_communities();
-    }
+        if (weights) {
+            if (igraph_vector_size(weights) != no_of_edges) {
+                IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
+            }
 
-    if (membership) {
-        igraph_integer_t m;
-        m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
-        IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
-                     /*steps=*/ m,
-                     membership,
-                     /*csize=*/ NULL));
-    }
+            if (no_of_edges > 0) {
+                igraph_real_t minweight = igraph_vector_min(weights);
+                if (minweight < 0) {
+                    IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
+                } else if (igraph_is_nan(minweight)) {
+                    IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+                }
+            }
+        }
 
-    return IGRAPH_SUCCESS;
+        if (membership && !(modularity && merges)) {
+            IGRAPH_ERROR("Cannot calculate membership without modularity or merges",
+                        IGRAPH_EINVAL);
+        }
+
+        Graph G;
+        IGRAPH_CHECK(G.convert_from_igraph(graph, weights));
+
+        if (merges || modularity) {
+            IGRAPH_CHECK(igraph_connected_components(graph, /*membership=*/ 0, /*csize=*/ 0,
+                                                     &comp_count, IGRAPH_WEAK));
+        }
+        if (merges) {
+            IGRAPH_CHECK(igraph_matrix_int_resize(merges, no_of_nodes - comp_count, 2));
+        }
+        if (modularity) {
+            IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes - comp_count + 1));
+            igraph_vector_null(modularity);
+        }
+        Communities C(&G, length, max_memory, merges, modularity);
+
+        while (!C.H->is_empty()) {
+            IGRAPH_ALLOW_INTERRUPTION();
+            C.merge_nearest_communities();
+        }
+
+        if (membership) {
+            igraph_integer_t m;
+            m = no_of_nodes > 0 ? igraph_vector_which_max(modularity) : 0;
+            IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
+                        /*steps=*/ m,
+                        membership,
+                        /*csize=*/ NULL));
+        }
+
+        /* The walktrap implementation cannot work with NaN values internally,
+         * and produces 0 for the modularity of edgeless graphs. We correct
+         * this to NaN in the last step for consistency. */
+        if (modularity && no_of_edges == 0) {
+            VECTOR(*modularity)[0] = IGRAPH_NAN;
+        }
+
+        return IGRAPH_SUCCESS;
+    )
 }

@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void sort_and_print(igraph_vector_int_t *vec) {
     igraph_vector_int_sort(vec);

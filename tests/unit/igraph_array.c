@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_array(const igraph_array3_t *a) {
     igraph_integer_t i, j, k;

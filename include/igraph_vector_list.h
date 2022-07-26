@@ -44,18 +44,6 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "igraph_typed_list_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
-
-#define BASE_BOOL
-#include "igraph_pmt.h"
-#include "igraph_typed_list_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_BOOL
-
 #define BASE_INT
 #include "igraph_pmt.h"
 #include "igraph_typed_list_pmt.h"

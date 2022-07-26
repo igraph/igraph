@@ -26,6 +26,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_arpack.h"
+#include "igraph_error.h"
 #include "igraph_lapack.h"
 #include "igraph_sparsemat.h"
 
@@ -94,17 +95,6 @@ IGRAPH_EXPORT igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
                                          igraph_matrix_t *vectors,
                                          igraph_vector_complex_t *cmplxvalues,
                                          igraph_matrix_complex_t *cmplxvectors);
-
-IGRAPH_EXPORT igraph_error_t igraph_eigen_laplacian(const igraph_t *graph,
-                                         igraph_eigen_algorithm_t algorithm,
-                                         const igraph_eigen_which_t *which,
-                                         igraph_arpack_options_t *options,
-                                         igraph_arpack_storage_t *storage,
-                                         igraph_vector_t *values,
-                                         igraph_matrix_t *vectors,
-                                         igraph_vector_complex_t *cmplxvalues,
-                                         igraph_matrix_complex_t *cmplxvectors);
-
 
 __END_DECLS
 

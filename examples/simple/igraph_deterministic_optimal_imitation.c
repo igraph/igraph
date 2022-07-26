@@ -129,7 +129,7 @@ igraph_error_t isolated_vertex_test() {
     /* strategies vector: 0 means aggressive strategy; 1 means passive */
     igraph_vector_int_init_int(&strat, 4, 1, 0, 1, 0);
     /* make a copy of the original strategies vector for comparison later on */
-    igraph_vector_int_copy(&v, &strat);
+    igraph_vector_int_init_copy(&v, &strat);
     /* Now update strategy of vertex 3. Since this vertex is isolated, no */
     /* strategy update would take place. The resulting strategies vector */
     /* would be the same as it was originally. */
@@ -196,7 +196,7 @@ igraph_error_t petersen_game_test() {
     /* play game and compare resulting updated strategies */
     for (i = 0; i < nvert; i++) {
         /* maximum deterministic imitation */
-        igraph_vector_int_copy(&stratcopy, &strat);
+        igraph_vector_int_init_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
                 /*vertex*/ i,
                 /*optimality*/ IGRAPH_MAXIMUM,
@@ -209,7 +209,7 @@ igraph_error_t petersen_game_test() {
         }
         igraph_vector_int_destroy(&stratcopy);
         /* minimum deterministic imitation */
-        igraph_vector_int_copy(&stratcopy, &strat);
+        igraph_vector_int_init_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
                 /*vertex*/ i,
                 /*optimality*/ IGRAPH_MINIMUM,

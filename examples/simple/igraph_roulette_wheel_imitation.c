@@ -162,7 +162,7 @@ igraph_error_t roulette_test() {
     i = 0;
     while (i < n) {
         test = all_checks[i];
-        igraph_vector_int_copy(&stratcopy, &strat);
+        igraph_vector_int_init_copy(&stratcopy, &strat);
         ret = igraph_roulette_wheel_imitation(test->graph, test->vertex,
                                               test->islocal, test->quantities,
                                               &stratcopy, test->mode);
@@ -241,7 +241,7 @@ igraph_error_t retain_strategy_test() {
             return IGRAPH_FAILURE;    /* ideally this should never happen */
         }
         igraph_vector_int_destroy(&stratcp);
-        igraph_vector_int_copy(&stratcp, &strat);
+        igraph_vector_int_init_copy(&stratcp, &strat);
         igraph_roulette_wheel_imitation(&g, v, /*is local?*/ 1, &quant, &stratcp,
                                         IGRAPH_ALL);
     } while (VECTOR(stratcp)[v] != VECTOR(strat)[v]);
@@ -255,7 +255,7 @@ igraph_error_t retain_strategy_test() {
             return IGRAPH_FAILURE;    /* ideally this should never happen */
         }
         igraph_vector_int_destroy(&stratcp);
-        igraph_vector_int_copy(&stratcp, &strat);
+        igraph_vector_int_init_copy(&stratcp, &strat);
         igraph_roulette_wheel_imitation(&g, v, /*is local?*/ 0, &quant, &stratcp,
                                         IGRAPH_ALL);
     } while (VECTOR(stratcp)[v] != VECTOR(strat)[v]);

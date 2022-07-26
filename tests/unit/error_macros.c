@@ -17,7 +17,7 @@
 */
 
 #include <igraph_error.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int cause_error() {
     IGRAPH_ERRORF("%d %f %ld %c", IGRAPH_EINVAL, 1, 1.0, 1L, 'a');

@@ -44,7 +44,7 @@ public:
         IGRAPH_UNUSED(jcong_);
     }
     long rand_int31() {
-        return RNG_INT31();
+        return RNG_INTEGER(0, 0x7fffffff);
     }
     double rand_halfopen01() { // (0,1]
         return RNG_UNIF01();

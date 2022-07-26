@@ -1,7 +1,9 @@
-# Minimum CMake that we require is 3.16 because we use --ignore-eol when
-# comparing unit test results with expected outcomes (added in 3.14) and we
-# also use SKIP_REGULAR_EXPRESSION to handle skipped tests properly
-cmake_minimum_required(VERSION 3.16)
+# Minimum CMake that we require is 3.18.
+# Some of the recent features we use:
+#  * --ignore-eol when comparing unit test results with expected outcomes (3.14)
+#  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
+#  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
+cmake_minimum_required(VERSION 3.18...3.22)
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
@@ -38,6 +40,9 @@ project(
 # Include some compiler-related helpers and set global compiler options
 include(compilers)
 
+# Detect is certain attributes are supported by the compiler
+include(attribute_support)
+
 # Set default symbol visibility to hidden
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -70,26 +75,40 @@ find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
+include(CheckIncludeFiles)
+include(CMakePushCheckState)
 
 # First we check for some functions and symbols
-set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+cmake_push_check_state()
 if(NEED_LINKING_AGAINST_LIBM)
   list(APPEND CMAKE_REQUIRED_LIBRARIES m)
 endif()
-check_symbol_exists(expm1 math.h HAVE_EXPM1)
-check_symbol_exists(fmin math.h HAVE_FMIN)
-check_symbol_exists(finite math.h HAVE_FINITE)
-check_symbol_exists(isfinite math.h HAVE_ISFINITE)
-check_symbol_exists(log2 math.h HAVE_LOG2)
-check_symbol_exists(log1p math.h HAVE_LOG1P)
-check_symbol_exists(rint math.h HAVE_RINT)
-check_symbol_exists(rintf math.h HAVE_RINTF)
-check_symbol_exists(round math.h HAVE_ROUND)
-check_symbol_exists(stpcpy string.h HAVE_STPCPY)
 check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
-check_symbol_exists(strdup string.h HAVE_STRDUP)
+check_symbol_exists(strncasecmp strings.h HAVE_STRNCASECMP)
 check_symbol_exists(_stricmp string.h HAVE__STRICMP)
-set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+check_symbol_exists(_strnicmp string.h HAVE__STRNICMP)
+check_symbol_exists(strdup string.h HAVE_STRDUP)
+check_symbol_exists(strndup string.h HAVE_STRNDUP)
+check_include_files(xlocale.h HAVE_XLOCALE)
+if(HAVE_XLOCALE)
+  # On BSD, uselocale() is in xlocale.h instead of locale.h.
+  # Some systems provide xlocale.h, but uselocale() is still in locale.h,
+  # thus we try both.
+  check_symbol_exists(uselocale "xlocale.h;locale.h" HAVE_USELOCALE)
+else()
+  check_symbol_exists(uselocale locale.h HAVE_USELOCALE)
+endif()
+check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
+cmake_pop_check_state()
+
+# Check for 128-bit integer multiplication support and floating-point
+# endianness
+include(ieee754_endianness)
+include(uint128_support)
+
+if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)
+  message(WARNING "igraph cannot set per-thread locale on this platform. igraph_enter_safelocale() and igraph_exit_safelocale() will not be safe to use in multithreaded programs.")
+endif()
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
@@ -101,9 +120,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND IGRAPH_ENABLE_CODE_COVERAGE)
     EXECUTABLE "${CMAKE_COMMAND}" "--build" "${PROJECT_BINARY_DIR}" "--target" "check"
     # Generated files are excluded; apparently the CodeCoverage script has some
     # problems with them. Yes, the exclusion is correct, it refers to a nonexistent
-    # directory that somehow gets into the coverage resolts. /Applications is for
-    # macOS -- it excludes files from the macOS SDK.
-    EXCLUDE "io/*.l" "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
+    # directory that somehow gets into the coverage results. /Applications and
+    # /Library/Developer are for macOS -- they exclude files from the macOS SDK.
+    EXCLUDE "io/*.l" "src/io/parsers/*" "io/parsers/*" "/Applications/Xcode*" "/Library/Developer/*" "examples/*" "interfaces/*" "tests/*" "vendor/pcg/*"
   )
 endif()
 

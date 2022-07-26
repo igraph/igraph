@@ -27,7 +27,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_operators.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
@@ -35,8 +34,6 @@
 
 #include "core/interruption.h"
 #include "operators/subgraph.h"
-
-#include <limits.h>
 
 static igraph_error_t igraph_i_connected_components_weak(
     const igraph_t *graph, igraph_vector_int_t *membership,
@@ -102,7 +99,7 @@ igraph_error_t igraph_connected_components(
         return igraph_i_connected_components_strong(graph, membership, csize, no);
     }
 
-    IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Cannot calculate connected components.", IGRAPH_EINVAL);
 }
 
 static igraph_error_t igraph_i_connected_components_weak(
@@ -112,7 +109,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     char *already_added;
-    igraph_integer_t first_node, act_cluster_size = 0, no_of_clusters = 1;
+    igraph_integer_t first_node, act_cluster_size = 0, no_of_clusters = 0;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
@@ -121,7 +118,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate weakly connected components.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
@@ -147,7 +144,7 @@ static igraph_error_t igraph_i_connected_components_weak(
         already_added[first_node] = 1;
         act_cluster_size = 1;
         if (membership) {
-            VECTOR(*membership)[first_node] = no_of_clusters - 1;
+            VECTOR(*membership)[first_node] = no_of_clusters;
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, first_node));
 
@@ -164,10 +161,11 @@ static igraph_error_t igraph_i_connected_components_weak(
                 already_added[neighbor] = 1;
                 act_cluster_size++;
                 if (membership) {
-                    VECTOR(*membership)[neighbor] = no_of_clusters - 1;
+                    VECTOR(*membership)[neighbor] = no_of_clusters;
                 }
             }
         }
+
         no_of_clusters++;
         if (csize) {
             IGRAPH_CHECK(igraph_vector_int_push_back(csize, act_cluster_size));
@@ -177,13 +175,17 @@ static igraph_error_t igraph_i_connected_components_weak(
     /* Cleaning up */
 
     if (no) {
-        *no = no_of_clusters - 1;
+        *no = no_of_clusters;
     }
 
+    /* Clean up */
     IGRAPH_FREE(already_added);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
+
+    /* Update cache */
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, no_of_clusters == 1);
 
     return IGRAPH_SUCCESS;
 }
@@ -192,14 +194,13 @@ static igraph_error_t igraph_i_connected_components_strong(
     const igraph_t *graph, igraph_vector_int_t *membership,
     igraph_vector_int_t *csize, igraph_integer_t *no
 ) {
-
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t next_nei = IGRAPH_VECTOR_NULL;
 
     igraph_integer_t i, n, num_seen;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
-    igraph_integer_t no_of_clusters = 1;
+    igraph_integer_t no_of_clusters = 0;
     igraph_integer_t act_cluster_size;
 
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
@@ -288,7 +289,7 @@ static igraph_error_t igraph_i_connected_components_strong(
         VECTOR(next_nei)[grandfather] = 1;
         act_cluster_size = 1;
         if (membership) {
-            VECTOR(*membership)[grandfather] = no_of_clusters - 1;
+            VECTOR(*membership)[grandfather] = no_of_clusters;
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, grandfather));
 
@@ -313,7 +314,7 @@ static igraph_error_t igraph_i_connected_components_strong(
                 VECTOR(next_nei)[neighbor] = 1;
                 act_cluster_size++;
                 if (membership) {
-                    VECTOR(*membership)[neighbor] = no_of_clusters - 1;
+                    VECTOR(*membership)[neighbor] = no_of_clusters;
                 }
 
                 num_seen++;
@@ -335,16 +336,21 @@ static igraph_error_t igraph_i_connected_components_strong(
     IGRAPH_PROGRESS("Strongly connected components: ", 100.0, NULL);
 
     if (no) {
-        *no = no_of_clusters - 1;
+        *no = no_of_clusters;
     }
 
-    /* Clean up, return */
-
+    /* Clean up */
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&out);
     igraph_dqueue_int_destroy(&q);
     igraph_vector_int_destroy(&next_nei);
     IGRAPH_FINALLY_CLEAN(4);
+
+    /* Update cache */
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_clusters == 1);
+    if (no_of_clusters == 1) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, 1);
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -366,7 +372,13 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
  * definition. This behaviour changed in igraph 0.9; earlier versions assumed
  * that the null graph is connected. See the following issue on Github for the
  * argument that led us to change the definition:
- * https://github.com/igraph/igraph/issues/1538
+ * https://github.com/igraph/igraph/issues/1539
+ *
+ * </para><para>
+ * The return value of this function is cached in the graph itself, separately
+ * for weak and strong connectivity. Calling the function multiple times with
+ * no modifications to the graph in between will return a cached value in O(1)
+ * time.
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
@@ -387,39 +399,53 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
 igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                         igraph_connectedness_t mode) {
 
+    igraph_cached_property_t prop;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no;
+
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_WEAK;
+    }
+
+    switch (mode) {
+        case IGRAPH_WEAK:
+            prop = IGRAPH_PROP_IS_WEAKLY_CONNECTED;
+            break;
+
+        case IGRAPH_STRONG:
+            prop = IGRAPH_PROP_IS_STRONGLY_CONNECTED;
+            break;
+
+        default:
+            IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, prop, res);
 
     if (no_of_nodes == 0) {
-        /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1538
+        /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1539
          * for the reasoning behind the change */
         *res = 0;
-        return IGRAPH_SUCCESS;
-    }
-
-    if (no_of_nodes == 1) {
+    } else if (no_of_nodes == 1) {
         *res = 1;
-        return IGRAPH_SUCCESS;
-    }
-
-    if (mode == IGRAPH_WEAK || !igraph_is_directed(graph)) {
-        return igraph_is_connected_weak(graph, res);
-    } else if (mode == IGRAPH_STRONG) {
-        igraph_error_t retval;
-        igraph_integer_t no;
-
+    } else if (mode == IGRAPH_WEAK) {
+        IGRAPH_CHECK(igraph_is_connected_weak(graph, res));
+    } else {   /* mode == IGRAPH_STRONG */
         /* A strongly connected graph has at least as many edges as vertices,
          * except for the singleton graph, which is handled above. */
         if (igraph_ecount(graph) < no_of_nodes) {
             *res = 0;
-            return IGRAPH_SUCCESS;
+        } else {
+            IGRAPH_CHECK(igraph_i_connected_components_strong(graph, NULL, NULL, &no));
+            *res = (no == 1);
         }
-
-        retval = igraph_i_connected_components_strong(graph, NULL, NULL, &no);
-        *res = (no == 1);
-        return retval;
     }
 
-    IGRAPH_ERROR("Invalid connectedness mode.", IGRAPH_EINVAL);
+    /* Cache updates are done in igraph_i_connected_components_strong() and
+     * igraph_is_connected_weak() because those might be called from other
+     * places and we want to make use of the caching if so */
+
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
@@ -433,18 +459,18 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
      * See https://github.com/igraph/igraph/issues/1538 */
     if (no_of_nodes == 0) {
         *res = 0;
-        return IGRAPH_SUCCESS;
+        goto exit;
     }
 
     /* A connected graph has at least |V| - 1 edges. */
     if (no_of_edges < no_of_nodes - 1) {
         *res = 0;
-        return IGRAPH_SUCCESS;
+        goto exit;
     }
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Weak connectedness check failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Weak connectedness check failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
@@ -491,6 +517,14 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
 
+exit:
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, *res);
+    if (igraph_is_directed(graph) && *res == 0) {
+        /* If the graph is not weakly connected, it is not strongly connected
+         * either so we can also cache that */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, *res);
+    }
+
     return IGRAPH_SUCCESS;
 }
 
@@ -532,11 +566,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 /**
  * \function igraph_decompose
- * \brief Decompose a graph into connected components.
+ * \brief Decomposes a graph into connected components.
  *
- * Create separate graph for each component of a graph. Note that the
+ * Creates a separate graph for each component of a graph. Note that the
  * vertex IDs in the new graphs will be different than in the original
- * graph. (Except if there is only one component in the original graph.)
+ * graph, except when there is only a single component in the original graph.
  *
  * \param graph The original graph.
  * \param components This list of graphs will contain the individual components.
@@ -600,7 +634,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     /* already_added keeps track of what nodes made it into a graph already */
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 
@@ -905,10 +939,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 /**
  * \function igraph_articulation_points
- * Find the articulation points in a graph.
+ * \brief Finds the articulation points in a graph.
  *
  * A vertex is an articulation point if its removal increases
  * the number of connected components in the graph.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the
  *    articulation points will be stored here.
@@ -926,7 +961,7 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
 
 /**
  * \function igraph_biconnected_components
- * Calculate biconnected components
+ * \brief Calculates biconnected components.
  *
  * A graph is biconnected if the removal of any single vertex (and
  * its incident edges) does not disconnect it.
@@ -938,6 +973,10 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * one biconnected component. Note that this is not true for
  * vertices: the same vertex can be part of many biconnected
  * components.
+ *
+ * </para><para>
+ * Note that some authors do not consider the graph consisting of
+ * two connected vertices as biconnected, however, igraph does.
  *
  * </para><para>
  * Somewhat arbitrarily, igraph does not consider components containing
@@ -1205,7 +1244,7 @@ static igraph_error_t igraph_i_bridges_rec(
     nc = igraph_vector_int_size(incedges);
     for (i = 0; i < nc; ++i) {
         igraph_integer_t edge = VECTOR(*incedges)[i];
-        igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
+        igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
 
         if (! VECTOR(*visited)[v]) {
             VECTOR(*incoming_edge)[v] = edge;
@@ -1226,7 +1265,7 @@ static igraph_error_t igraph_i_bridges_rec(
 
 /**
  * \function igraph_bridges
- * Find all bridges in a graph.
+ * \brief Finds all bridges in a graph.
  *
  * An edge is a bridge if its removal increases the number of (weakly)
  * connected components in the graph.
@@ -1254,28 +1293,20 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
-    IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&disc, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &disc);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&low, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&incoming_edge, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &incoming_edge);
-    for (i = 0; i < n; ++i) {
-        VECTOR(incoming_edge)[i] = -1;
-    }
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&disc, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, n);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incoming_edge, n);
+    igraph_vector_int_fill(&incoming_edge, -1);
 
     igraph_vector_int_clear(bridges);
 
     time = 0;
-    for (i = 0; i < n; ++i)
+    for (i = 0; i < n; ++i) {
         if (! VECTOR(visited)[i]) {
             IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &incoming_edge));
         }
+    }
 
     igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);
@@ -1350,7 +1381,7 @@ igraph_error_t igraph_subcomponent(
 
     already_added = IGRAPH_CALLOC(no_of_nodes, char);
     if (already_added == 0) {
-        IGRAPH_ERROR("Subcomponent failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Subcomponent failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, already_added);
 

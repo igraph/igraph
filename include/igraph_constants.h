@@ -24,17 +24,10 @@
 #ifndef IGRAPH_CONSTANTS_H
 #define IGRAPH_CONSTANTS_H
 
+#include "igraph_config.h"
 #include "igraph_decls.h"
 
 __BEGIN_DECLS
-
-/* GCC added support for enumerator attributes in version 6.
- * Verified that clang 3.0 also supports them. */
-#if __GNUC__ >= 6 || defined(__clang__)
-#define IGRAPH_DEPRECATED_ENUMVAL __attribute__ ((deprecated))
-#else
-#define IGRAPH_DEPRECATED_ENUMVAL
-#endif
 
 /* -------------------------------------------------- */
 /* Constants                                          */
@@ -67,9 +60,10 @@ typedef enum { IGRAPH_RECIPROCITY_DEFAULT = 0,
              } igraph_reciprocity_t;
 
 typedef enum { IGRAPH_ADJ_DIRECTED = 0,
-               IGRAPH_ADJ_UNDIRECTED = 1, IGRAPH_ADJ_MAX = 1,
+               IGRAPH_ADJ_UNDIRECTED,
                IGRAPH_ADJ_UPPER, IGRAPH_ADJ_LOWER, IGRAPH_ADJ_MIN,
-               IGRAPH_ADJ_PLUS
+               IGRAPH_ADJ_PLUS,
+               IGRAPH_ADJ_MAX,
              } igraph_adjacency_t;
 
 typedef enum { IGRAPH_STAR_OUT = 0, IGRAPH_STAR_IN,

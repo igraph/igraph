@@ -110,8 +110,7 @@ typedef struct {
 /* Scans the community neighborhood list for the new maximal dq value.
  * Returns 1 if the maximum is different from the previous one,
  * 0 otherwise. */
-static int igraph_i_fastgreedy_community_rescan_max(
-        igraph_i_fastgreedy_community* comm) {
+static igraph_bool_t igraph_i_fastgreedy_community_rescan_max(igraph_i_fastgreedy_community* comm) {
     igraph_integer_t i, n;
     igraph_i_fastgreedy_commpair *p, *best;
     igraph_real_t bestdq, currdq;
@@ -460,9 +459,10 @@ static void igraph_i_fastgreedy_community_sort_neighbors_of(
  * of the community list clist to newdq and restores the heap property
  * in community c if necessary. Returns 1 if the maximum in the row had
  * to be updated, zero otherwise */
-static int igraph_i_fastgreedy_community_update_dq(
+static igraph_bool_t igraph_i_fastgreedy_community_update_dq(
         igraph_i_fastgreedy_community_list* list,
         igraph_i_fastgreedy_commpair* p, igraph_real_t newdq) {
+
     igraph_integer_t i, j, to, from;
     igraph_real_t olddq;
     igraph_i_fastgreedy_community *comm_to, *comm_from;
@@ -716,17 +716,17 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     communities.no_of_communities = no_of_nodes;
     communities.e = IGRAPH_CALLOC(no_of_nodes, igraph_i_fastgreedy_community);
     if (communities.e == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, communities.e);
     communities.heap = IGRAPH_CALLOC(no_of_nodes, igraph_i_fastgreedy_community*);
     if (communities.heap == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, communities.heap);
     communities.heapindex = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (communities.heapindex == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY_CLEAN(2);
     IGRAPH_FINALLY(igraph_i_fastgreedy_community_list_destroy, &communities);
@@ -740,7 +740,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     debug("Allocating dq vector\n");
     dq = IGRAPH_CALLOC(no_of_edges, igraph_real_t);
     if (dq == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, dq);
     debug("Creating community pair list\n");
@@ -748,7 +748,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
     pairs = IGRAPH_CALLOC(2 * no_of_edges, igraph_i_fastgreedy_commpair);
     if (pairs == 0) {
-        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, pairs);
     loop_weight_sum = 0;
@@ -1042,7 +1042,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         igraph_integer_t merges_nrow = igraph_matrix_int_nrow(merges);
         ivec = IGRAPH_CALLOC(merges_nrow, igraph_integer_t);
         if (ivec == 0) {
-            IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for fast greedy community detection.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, ivec);
         for (i = 0; i < no_of_joins; i++) {
@@ -1056,7 +1056,15 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
 
     if (modularity) {
         VECTOR(*modularity)[no_of_joins] = q;
-        igraph_vector_resize(modularity, no_of_joins + 1);
+        IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_joins + 1));
+    }
+
+    /* Internally, the algorithm does not create NaN values.
+     * If the graph has no edges, the final modularity will be zero.
+     * We change this to NaN for consistency. */
+    if (modularity && no_of_edges == 0) {
+        IGRAPH_ASSERT(no_of_joins == 0);
+        VECTOR(*modularity)[0] = IGRAPH_NAN;
     }
 
     debug("Freeing memory\n");

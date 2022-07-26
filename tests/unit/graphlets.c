@@ -22,7 +22,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_cliques_and_thresholds(igraph_vector_int_list_t* cliques, igraph_vector_t* thresholds) {
     printf("Cliques:\n");

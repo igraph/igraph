@@ -21,7 +21,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
@@ -301,7 +301,7 @@ int main() {
         VECTOR(dims)[0] = 37;
         VECTOR(dims)[1] = 37;
 
-        igraph_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+        igraph_square_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* periodic */ 0);
 
         igraph_vector_init(&bet, 0);
         igraph_betweenness(&g, &bet, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL);

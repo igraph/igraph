@@ -1,0 +1,24 @@
+Graph with no vertices:
+result: 
+unconnected: 0
+
+Graph with one vertex:
+result: 
+unconnected: 0
+
+Graph with two vertices:
+result: 
+unconnected: 1
+
+Graph with two connected vertices:
+result: 1
+unconnected: 0
+
+Graph with loops and multiple edges, undirected:
+result: 6 3 1
+unconnected: 5
+
+Graph with loops and multiple edges, directed:
+result: 7 5 1
+unconnected: 17
+

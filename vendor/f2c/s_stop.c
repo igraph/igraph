@@ -20,6 +20,8 @@ void f_exit(void);
 int s_stop(char *s, ftnlen n)
 #endif
 {
+	IGRAPH_FATAL("STOP statement executed from f2c code");
+	/*
 int i;
 
 if(n > 0)
@@ -33,6 +35,7 @@ if(n > 0)
 f_exit();
 #endif
 exit(0);
+*/
 
 /* We cannot avoid (useless) compiler diagnostics here:		*/
 /* some compilers complain if there is no return statement,	*/

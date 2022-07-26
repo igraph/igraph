@@ -14,7 +14,7 @@
 <section id="matrix-constructor-and-destructor">
 <!-- doxrox-include igraph_matrix_constructor_and_destructor -->
 <!-- doxrox-include igraph_matrix_init -->
-<!-- doxrox-include igraph_matrix_copy -->
+<!-- doxrox-include igraph_matrix_init_copy -->
 <!-- doxrox-include igraph_matrix_destroy -->
 </section>
 
@@ -23,18 +23,23 @@
 <!-- doxrox-include igraph_matrix_fill -->
 </section>
 
+<section id="matrix-accessing-elements">
+<!-- doxrox-include igraph_matrix_accessing_elements -->
+<!-- doxrox-include MATRIX -->
+<!-- doxrox-include igraph_matrix_get -->
+<!-- doxrox-include igraph_matrix_get_ptr -->
+<!-- doxrox-include igraph_matrix_set -->
+</section>
+
+<section id="matrix-views"><title>Matrix views</title>
+<!-- doxrox-include igraph_matrix_view -->
+<!-- doxrox-include igraph_matrix_view_from_vector -->
+</section>
+
 <section id="copying-matrices"><title>Copying matrices</title>
 <!-- doxrox-include igraph_matrix_copy_to -->
 <!-- doxrox-include igraph_matrix_update -->
 <!-- doxrox-include igraph_matrix_swap -->
-</section>
-
-<section id="matrix-accessing-elements">
-<!-- doxrox-include igraph_matrix_accessing_elements -->
-<!-- doxrox-include MATRIX -->
-<!-- doxrox-include igraph_matrix_e -->
-<!-- doxrox-include igraph_matrix_e_ptr -->
-<!-- doxrox-include igraph_matrix_set -->
 </section>
 
 <section id="operations-on-rows-and-columns"><title>Operations on rows and columns</title>
@@ -65,6 +70,7 @@
 
 <section id="matrix-comparisons"><title>Matrix comparisons</title>
 <!-- doxrox-include igraph_matrix_all_e -->
+<!-- doxrox-include igraph_matrix_all_almost_e -->
 <!-- doxrox-include igraph_matrix_all_l -->
 <!-- doxrox-include igraph_matrix_all_g -->
 <!-- doxrox-include igraph_matrix_all_le -->
@@ -108,6 +114,21 @@
 <!-- doxrox-include igraph_matrix_add_cols -->
 <!-- doxrox-include igraph_matrix_remove_row -->
 <!-- doxrox-include igraph_matrix_remove_col -->
+</section>
+
+<section id="complex-matrices"><title>Complex matrix operations</title>
+<!-- doxrox-include igraph_matrix_complex_real -->
+<!-- doxrox-include igraph_matrix_complex_imag -->
+<!-- doxrox-include igraph_matrix_complex_realimag -->
+<!-- doxrox-include igraph_matrix_complex_create -->
+<!-- doxrox-include igraph_matrix_complex_create_polar -->
+<!-- doxrox-include igraph_matrix_complex_all_almost_e -->
+</section>
+
+<section id="matrix-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_matrix_copy -->
+<!-- doxrox-include igraph_matrix_e -->
+<!-- doxrox-include igraph_matrix_e_ptr -->
 </section>
 
 </section>

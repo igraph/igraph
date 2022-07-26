@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_and_destroy(igraph_t *g, igraph_integer_t center, igraph_vector_int_t *order, igraph_error_t error) {
     igraph_matrix_t result;

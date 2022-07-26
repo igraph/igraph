@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
@@ -36,7 +36,7 @@ int main() {
     igraph_small(&g, 7, 0, 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3, 3, 4, 4, 5, 4, 6, 5, 6, -1);
     igraph_convergence_degree(&g, &result, 0, 0);
     for (i = 0; i < igraph_ecount(&g); i++) {
-        printf("%.4f ", (float)igraph_vector_e(&result, i));
+        printf("%.4f ", igraph_vector_get(&result, i));
     }
     printf("\n");
     igraph_destroy(&g);
@@ -44,7 +44,7 @@ int main() {
     igraph_small(&g, 6, 1, 1, 0, 2, 0, 3, 0, 4, 0, 0, 5, -1);
     igraph_convergence_degree(&g, &result, 0, 0);
     for (i = 0; i < igraph_ecount(&g); i++) {
-        printf("%.4f ", (float)igraph_vector_e(&result, i));
+        printf("%.4f ", igraph_vector_get(&result, i));
     }
     printf("\n");
     igraph_destroy(&g);

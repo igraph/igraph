@@ -23,7 +23,6 @@
 
 #include "igraph_layout.h"
 
-#include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_random.h"
@@ -35,7 +34,7 @@
 #include "core/math.h"
 
 static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
-    igraph_real_t len = hypot(*x, *y);
+    igraph_real_t len = sqrt(*x * *x + *y * *y);
     if (len != 0) {
         *x /= len;
         *y /= len;
@@ -48,14 +47,14 @@ static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  *
  * </para><para>
  * This is a layout generator similar to the Large Graph Layout
- * algorithm and program
- * (http://lgl.sourceforge.net/). But unlike LGL, this
+ * algorithm and program (http://lgl.sourceforge.net/). But unlike LGL, this
  * version uses a Fruchterman-Reingold style simulated annealing
  * algorithm for placing the vertices. The speedup is achieved by
  * placing the vertices on a grid and calculating the repulsion only
  * for vertices which are closer to each other than a limit.
  *
- * \param graph The (initialized) graph object to place.
+ * \param graph The (initialized) graph object to place. It must be connnected;
+ *   disconnected graphs are not handled by the algorithm.
  * \param res Pointer to an initialized matrix object to hold the
  *   result. It will be resized if needed.
  * \param maxit The maximum number of cooling iterations to perform
@@ -132,6 +131,12 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
     no_of_layers = igraph_vector_int_size(&layers) - 1;
 
+    /* Check whether we have reached all the nodes -- if not, the graph is
+     * disconnected */
+    if (no_of_nodes > 0 && igraph_vector_int_min(&parents) <= -2) {
+        IGRAPH_WARNING("LGL layout does not support disconnected graphs yet.");
+    }
+
     /* We don't need the mst any more */
     igraph_destroy(&mst);
     igraph_empty(&mst, 0, IGRAPH_UNDIRECTED); /* to make finalization work */
@@ -188,6 +193,12 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             igraph_integer_t vid = VECTOR(vids)[i];
             igraph_integer_t par = VECTOR(parents)[vid];
+
+            if (par < 0) {
+                /* this is either the root vertex or an unreachable node */
+                continue;
+            }
+
             IGRAPH_ALLOW_INTERRUPTION();
             igraph_2dgrid_getcenter(&grid, &massx, &massy);
             igraph_i_norm2d(&massx, &massy);
@@ -266,7 +277,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_edge(graph, VECTOR(edges)[jj], &from, &to);
                 xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
                 yd = MATRIX(*res, from, 1) - MATRIX(*res, to, 1);
-                dist = hypot(xd, yd);
+                dist = sqrt(xd*xd + yd*yd);
                 if (dist != 0) {
                     xd /= dist;
                     yd /= dist;
@@ -285,7 +296,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 while ( (nei = igraph_2dgrid_next_nei(&grid, &vidit) - 1) != -1) {
                     igraph_real_t xd = MATRIX(*res, vid, 0) - MATRIX(*res, nei, 0);
                     igraph_real_t yd = MATRIX(*res, vid, 1) - MATRIX(*res, nei, 1);
-                    igraph_real_t dist = hypot(xd, yd);
+                    igraph_real_t dist = sqrt(xd*xd + yd*yd);
                     igraph_real_t force;
                     if (dist < cellsize) {
                         pairs++;
@@ -310,7 +321,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_integer_t vvid = VECTOR(vids)[jj];
                 igraph_real_t fx = VECTOR(forcex)[vvid];
                 igraph_real_t fy = VECTOR(forcey)[vvid];
-                igraph_real_t ded = hypot(fx, fy);
+                igraph_real_t ded = sqrt(fx*fx + fy*fy);
                 if (ded > t) {
                     ded = t / ded;
                     fx *= ded; fy *= ded;
