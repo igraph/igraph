@@ -1003,7 +1003,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     for (i = 0; i < 4; i++) {
         IGRAPH_CHECK(igraph_i_layout_sugiyama_vertical_alignment(graph,
                      layering, layout, &ignored_edges,
-                     /* reverse = */ (igraph_bool_t) i / 2, /* align_right = */ i % 2,
+                     /* reverse = */ i / 2, /* align_right = */ i % 2,
                      &roots, &align));
         IGRAPH_CHECK(igraph_i_layout_sugiyama_horizontal_compaction(graph,
                      &vertex_to_the_left, &roots, &align, hgap, &xs[i]));
