@@ -500,7 +500,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_bool_t *mark;
     igraph_integer_t i, j;
 
-    mark = IGRAPH_CALLOC(no_of_edges, int);
+    mark = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
     IGRAPH_CHECK_OOM(mark, "Cannot delete edges.");
     IGRAPH_FINALLY(igraph_free, mark);
 
