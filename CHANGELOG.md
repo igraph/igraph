@@ -28,6 +28,10 @@ Some of the highlights are:
    also have the option to compile a 32-bit igraph variant on a 64-bit platform
    by changing the `IGRAPH_INTEGER_SIZE` build variable in CMake to 32.
 
+ - `igraph_bool_t` is now a C99 bool and not an `int`. Similarly,
+   `igraph_vector_bool_t` now consumes `sizeof(bool)` bytes per entry only, not
+   `sizeof(int)`.
+
  - The random number generator interface, `igraph_rng_type_t`, has been overhauled.
    Check the declaration of the type for details.
 

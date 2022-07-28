@@ -40,6 +40,7 @@ __BEGIN_DECLS
 
 #include <inttypes.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -57,7 +58,11 @@ typedef uint32_t igraph_uint_t;
 #endif
 
 typedef double igraph_real_t;
-typedef int    igraph_bool_t;
+
+/* IGRAPH_BOOL_TYPE is set to 'bool' by default, and it is not meant to be
+ * overridden, except for the R interface where we know what we are doing.
+ * See igraph_config.h for more info */
+typedef IGRAPH_BOOL_TYPE igraph_bool_t;
 
 /* printf format specifier for igraph_integer_t */
 #if IGRAPH_INTEGER_SIZE == 64
