@@ -30,6 +30,7 @@ void check(const igraph_vector_int_t *m) {
     igraph_reindex_membership(&m2, NULL, NULL);
     IGRAPH_ASSERT(igraph_vector_int_min(m) == 0);
     IGRAPH_ASSERT(igraph_vector_int_max(m) == igraph_vector_int_max(&m2));
+    igraph_vector_int_destroy(&m2);
 }
 
 int main() {
