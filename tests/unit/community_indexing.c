@@ -35,8 +35,8 @@ void check(const igraph_vector_int_t *m) {
 int main() {
     igraph_t graph;
     igraph_vector_int_t membership;
-    igraph_vector_t modularity;
-    igraph_matrix_int_t merges;
+    igraph_vector_t modularity; /* non-optional for walktrap */
+    igraph_matrix_int_t merges; /* non-optional for walktrap */
     igraph_error_handler_t *handler;
     igraph_error_t ret;
 
@@ -80,6 +80,8 @@ int main() {
         IGRAPH_ASSERT(ret == IGRAPH_SUCCESS);
         check(&membership);
     }
+
+    igraph_destroy(&graph);
 
     igraph_matrix_int_destroy(&merges);
     igraph_vector_destroy(&modularity);
