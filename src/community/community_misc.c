@@ -234,11 +234,11 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
  *                     vertex, i.e. the component to which it belongs.
  *                     The vector will be altered in-place.
  * \param  new_to_old  Pointer to a vector which will contain the
- *                     old component ID for each new one, or NULL,
+ *                     old component ID for each new one, or \c NULL,
  *                     in which case it is not returned. The vector
  *                     will be resized as needed.
  * \param  nb_clusters Pointer to an integer for the number of
- *                     distinct clusters. If not NULL, this will be
+ *                     distinct clusters. If not \c NULL, this will be
  *                     updated to reflect the number of distinct
  *                     clusters found in membership.
  *
