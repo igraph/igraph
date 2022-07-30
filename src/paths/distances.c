@@ -315,7 +315,7 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     if (weights == NULL) {
-        return(igraph_eccentricity(graph, res, vids, mode));
+        return igraph_eccentricity(graph, res, vids, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
