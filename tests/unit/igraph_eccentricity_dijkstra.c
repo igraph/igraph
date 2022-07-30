@@ -78,13 +78,18 @@ int main() {
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     print_and_destroy(&g, IGRAPH_ALL);
 
-    printf("\nIn-star:\n");
+    printf("\nOut-star, IGRAPH_OUT:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     print_and_destroy(&g, IGRAPH_OUT);
 
     printf("\nOut-star with NULL weights:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     print_and_destroy_weighted(&g, IGRAPH_ALL, NULL);
+
+    printf("\nOut-star with weights:\n");
+    igraph_vector_init_real(&weights, 9, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9);
+    igraph_small(&g, 10, IGRAPH_DIRECTED, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7, 0,8, 0,9, -1);
+    print_and_destroy_weighted(&g, IGRAPH_ALL, &weights);
 
     VERIFY_FINALLY_STACK();
 
