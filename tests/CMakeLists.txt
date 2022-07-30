@@ -310,7 +310,7 @@ add_legacy_tests(
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
-  igraph_local_scan_neighborhood_ecount
+  igraph_local_scan_subset_ecount
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs

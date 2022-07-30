@@ -18,10 +18,10 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_vector_int_list_t *neighborhoods) {
+void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_vector_int_list_t *subsets) {
     igraph_vector_t result;
     igraph_vector_init(&result, 0);
-    IGRAPH_ASSERT(igraph_local_scan_neighborhood_ecount(graph, &result, weights, neighborhoods) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_local_scan_subset_ecount(graph, &result, weights, subsets) == IGRAPH_SUCCESS);
     print_vector(&result);
     igraph_vector_destroy(&result);
     printf("\n");
@@ -31,7 +31,7 @@ void call_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_vector_int
 int main() {
     igraph_t g_0, g_1, g_lmu, g_lm;
     igraph_vector_t weights, result;
-    igraph_vector_int_list_t neighborhoods;
+    igraph_vector_int_list_t subsets;
     igraph_vector_int_t n1;
 
     igraph_vector_init_real(&weights, 8, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6);
@@ -41,32 +41,53 @@ int main() {
     igraph_small(&g_lm, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
     igraph_small(&g_lmu, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1); //undirected
 
-    igraph_vector_int_list_init(&neighborhoods, 0);
+    igraph_vector_int_list_init(&subsets, 0);
 
 
     printf("No vertices:\n");
-    call_and_print(&g_0, NULL, &neighborhoods);
+    call_and_print(&g_0, NULL, &subsets);
 
-    printf("one vertex, empty neighborhood:\n");
+    printf("one vertex, empty subset:\n");
     igraph_vector_int_init(&n1, 0);
-    igraph_vector_int_list_push_back(&neighborhoods, &n1);
-    call_and_print(&g_1, NULL, &neighborhoods);
+    igraph_vector_int_list_push_back(&subsets, &n1);
+    call_and_print(&g_1, NULL, &subsets);
 
-    printf("Graph with unconnected vertices, loops and multiple edges, empty neighborhoods:\n");
+    printf("Graph with unconnected vertices, loops and multiple edges, empty subsets:\n");
     for (int i = 0; i < 5; i ++) {
         igraph_vector_int_init_int(&n1, 0);
-        igraph_vector_int_list_push_back(&neighborhoods, &n1);
+        igraph_vector_int_list_push_back(&subsets, &n1);
     }
-    call_and_print(&g_lm, NULL, &neighborhoods);
-    igraph_vector_int_list_clear(&neighborhoods);
+    call_and_print(&g_lm, NULL, &subsets);
+    igraph_vector_int_list_clear(&subsets);
 
-    printf("Graph with unconnected vertices, loops and multiple edges, all the same neighborhood:\n");
+    printf("Same graph, every vertex as a subset:\n");
     for (int i = 0; i < 6; i ++) {
-        igraph_vector_int_init_int(&n1, 3, 0, 1, 2);
-        igraph_vector_int_list_push_back(&neighborhoods, &n1);
+        igraph_vector_int_init_int(&n1, 1, i);
+        igraph_vector_int_list_push_back(&subsets, &n1);
     }
-    call_and_print(&g_lm, NULL, &neighborhoods);
-    igraph_vector_int_list_destroy(&neighborhoods);
+    call_and_print(&g_lm, NULL, &subsets);
+    igraph_vector_int_list_clear(&subsets);
+
+    printf("Same graph, every vertex and next one as a subset:\n");
+    for (int i = 0; i < 6; i ++) {
+        igraph_vector_int_init_int(&n1, 2, i, (i + 1) % 6);
+        igraph_vector_int_list_push_back(&subsets, &n1);
+    }
+    call_and_print(&g_lm, NULL, &subsets);
+
+    printf("Same situation, but with weights:\n");
+    call_and_print(&g_lm, &weights, &subsets);
+
+    printf("Same situation, no weights, but undirected graph:\n");
+    call_and_print(&g_lmu, NULL, &subsets);
+    igraph_vector_int_list_clear(&subsets);
+
+    printf("Same graph, whole graph as subset:\n");
+    igraph_vector_int_list_resize(&subsets, 0);
+    igraph_vector_int_init_int(&n1, 6, 0, 1, 2, 3, 4, 5);
+    igraph_vector_int_list_push_back(&subsets, &n1);
+    call_and_print(&g_lmu, NULL, &subsets);
+    igraph_vector_int_list_destroy(&subsets);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
@@ -74,7 +95,7 @@ int main() {
     igraph_destroy(&g_lmu);
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&result);
-    igraph_vector_int_list_destroy(&neighborhoods);
+    igraph_vector_int_list_destroy(&subsets);
 
     VERIFY_FINALLY_STACK();
     return 0;
