@@ -142,13 +142,13 @@ IGRAPH_EXPORT void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m,
 #ifndef NOTORDERED
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_matrix, min)(const TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_matrix, max)(const TYPE(igraph_matrix) *m);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, which_min)(
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, which_min)(
     const TYPE(igraph_matrix) *m, igraph_integer_t *i, igraph_integer_t *j);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, which_max)(
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, which_max)(
     const TYPE(igraph_matrix) *m, igraph_integer_t *i, igraph_integer_t *j);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, minmax)(
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, minmax)(
     const TYPE(igraph_matrix) *m, BASE *min, BASE *max);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, which_minmax)(
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, which_minmax)(
     const TYPE(igraph_matrix) *m, igraph_integer_t *imin, igraph_integer_t *jmin,
     igraph_integer_t *imax, igraph_integer_t *jmax);
 #endif

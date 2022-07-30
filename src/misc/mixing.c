@@ -232,7 +232,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
  * For an educational overview of the concept of assortativity, see
  * M. E. J. Newman,
  * Networks: An Introduction, Oxford University Press (2010).
- * https://doi.org/10.1093/acprof:oso/9780199206650.001.0001.
+ * https://doi.org/10.1093/acprof%3Aoso/9780199206650.001.0001.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param values The vertex values, these can be arbitrary numeric
@@ -362,6 +362,11 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  * the degrees as the vertex values and normalization enabled.
  * In the directed case, it uses out-degrees as out-values and
  * in-degrees as in-values.
+ *
+ * </para><para>
+ * For regular graphs, i.e. graphs in which all vertices have the
+ * same degree, computing degree correlations is not meaningful,
+ * and this function returns NaN.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to a real variable, the result is stored here.

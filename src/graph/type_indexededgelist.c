@@ -61,11 +61,16 @@ static igraph_error_t igraph_i_create_start(
  * \function igraph_empty_attrs
  * \brief Creates an empty graph with some vertices, no edges and some graph attributes.
  *
- * </para><para>
  * Use this instead of \ref igraph_empty() if you wish to add some graph
  * attributes right after initialization. This function is currently
  * not very interesting for the ordinary user. Just supply 0 here or
  * use \ref igraph_empty().
+ *
+ * </para><para>
+ * This function does not set any vertex attributes. To create a graph which has
+ * vertex attributes, call this function specifying 0 vertices, then use
+ * \ref igraph_add_vertices() to add vertices and their attributes.
+ *
  * \param graph Pointer to a not-yet initialized graph object.
  * \param n The number of vertices in the graph; a non-negative
  *          integer number is expected.
@@ -77,9 +82,14 @@ static igraph_error_t igraph_i_create_start(
  *        \cli IGRAPH_UNDIRECTED
  *          Create an \em undirected graph.
  *        \endclist
- * \param attr The attributes.
+ * \param attr The graph attributes. Supply \c NULL if not graph attributes
+ *        are to be set.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
+ *
+ * \sa \ref igraph_empty() to create an empty graph without attributes;
+ * \ref igraph_add_vertices() and \ref igraph_add_edges() to add vertices
+ * and edges, possibly with associated attributes.
  *
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).

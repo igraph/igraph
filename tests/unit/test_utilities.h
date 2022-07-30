@@ -9,6 +9,15 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Structure used by the EXPECT_WARNING macro to test whether a warning was
+ * triggered in a section of the code in unit tests */
+typedef struct {
+    const char* expected;
+    char* observed;
+} expect_warning_context_t;
+
+extern expect_warning_context_t expect_warning_ctx;
+
 /* Print an igraph_real_t value. Be consistent in printing NaN/Inf across platforms. */
 void print_real(FILE *f, igraph_real_t x, const char *format);
 
@@ -141,4 +150,25 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);
         igraph_set_error_handler(handler); \
     } while (0)
 
+void record_last_warning(const char *reason, const char *file, int line);
+
+#define EXPECT_WARNING(funcall, expected_warning) \
+    do { \
+        igraph_warning_handler_t *handler; \
+        expect_warning_ctx.expected = expected_warning; \
+        expect_warning_ctx.observed = NULL; \
+        handler = igraph_set_warning_handler(record_last_warning); \
+        IGRAPH_ASSERT(IGRAPH_SUCCESS == funcall); \
+        igraph_set_warning_handler(handler); \
+        if (expect_warning_ctx.observed == NULL) { \
+            printf("Expected this warning but none was raised:\n  %s\n", expected_warning); \
+            abort(); \
+        } else if (strcmp(expect_warning_ctx.observed, expect_warning_ctx.expected)) { \
+            printf("Expected warning:\n  %s\ngot:\n  %s\n", expected_warning, expect_warning_ctx.observed); \
+            free(expect_warning_ctx.observed); \
+            abort(); \
+        } else { \
+            free(expect_warning_ctx.observed); \
+        } \
+    } while (0)
 #endif /* TEST_UTILITIES_H */

@@ -568,3 +568,13 @@ void print_attributes(const igraph_t *g) {
     igraph_vector_int_destroy(&vtypes);
     igraph_vector_int_destroy(&gtypes);
 }
+
+expect_warning_context_t expect_warning_ctx;
+
+void record_last_warning(const char *reason, const char *file, int line) {
+    if (expect_warning_ctx.observed) {
+        igraph_free(expect_warning_ctx.observed);
+    }
+
+    expect_warning_ctx.observed = strdup(reason);
+}

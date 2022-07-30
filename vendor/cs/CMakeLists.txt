@@ -71,7 +71,7 @@ endif()
 # Disable complex number support for CXSparse because:
 #   - It is necessary to compile with MSVC
 #   - igraph does not need complex number support from CXSparse on any platform
-target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX CS_LONG)
+target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
 
 # Since these are included as object files, they should call the
 # function as is (without a visibility specification)

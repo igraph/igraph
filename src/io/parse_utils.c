@@ -158,6 +158,122 @@ igraph_error_t igraph_i_parse_real(const char *str, size_t length, igraph_real_t
     return IGRAPH_SUCCESS;
 }
 
+
+/* Skips all whitespace in a file. */
+igraph_error_t igraph_i_fskip_whitespace(FILE *file) {
+    int ch;
+
+    do {
+        ch = fgetc(file);
+    } while (isspace(ch));
+    if (ferror(file)) {
+        IGRAPH_ERROR("Error reading file.", IGRAPH_EFILE);
+    }
+    ungetc(ch, file);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/* Reads an integer from a file. Throws an error if the result is not representable.
+ *
+ * Any initial whitespace is skipped. If no number is found, an error is raised.
+ *
+ * This function assumes that the number is followed by whitespace or the end of the file.
+ * If this is not the case, an error will be raised.
+ */
+igraph_error_t igraph_i_fget_integer(FILE *file, igraph_integer_t *value) {
+    /* The value requiring the most characters on 64-bit is -2^63, i.e. "-9223372036854775808".
+     * This is 20 characters long, plus one for the null terminator, requiring a buffer of
+     * at least 21 characters. We use a slightly larger buffer to allow for leading zeros and
+     * clearer error messages.
+     *
+     * Note: The string held in this buffer is not null-terminated.
+     */
+    char buf[32];
+    int ch;
+
+    IGRAPH_CHECK(igraph_i_fskip_whitespace(file));
+
+    int i = 0; /* must be 'int' due to use in printf format specifier */
+    while (1) {
+        ch = fgetc(file);
+        if (ch == EOF) break;
+        if (isspace(ch)) {
+            ungetc(ch, file);
+            break;
+        }
+        if (i == sizeof(buf)) {
+            /* Reached the end of the buffer. */
+            IGRAPH_ERRORF("'%.*s' is not a valid integer value.", IGRAPH_PARSEERROR, i, buf);
+        }
+        buf[i++] = ch;
+    }
+    if (ferror(file)) {
+        IGRAPH_ERROR("Error while reading integer.", IGRAPH_EFILE);
+    }
+
+    if (i == 0) {
+        IGRAPH_ERROR("Integer expected, reached end of file instead.", IGRAPH_PARSEERROR);
+    }
+
+    IGRAPH_CHECK(igraph_i_parse_integer(buf, i, value));
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/* Reads a real number from a file. Throws an error if the result is not representable.
+ *
+ * Any initial whitespace is skipped. If no number is found, an error is raised.
+ *
+ * This function assumes that the number is followed by whitespace or the end of the file.
+ * If this is not the case, an error will be raised.
+ */
+igraph_error_t igraph_i_fget_real(FILE *file, igraph_real_t *value) {
+    /* The value requiring the most characters with an IEEE-754 double is the smallest
+     * representable number, with signs added, "-2.2250738585072014e-308"
+     *
+     * This is 24 characters long, plus one for the null terminator, requiring a buffer of
+     * at least 25 characters. This is 17 mantissa digits for lossless representation,
+     * 3 exponent digits, "e", and up to two minus signs. We use a larger buffer as some
+     * files may have more digits specified than necessary for exact representation.
+     *
+     * Note: The string held in this buffer is not null-terminated.
+     */
+    char buf[64];
+    int ch;
+
+    IGRAPH_CHECK(igraph_i_fskip_whitespace(file));
+
+    int i = 0; /* must be 'int' due to use in printf format specifier */
+    while (1) {
+        ch = fgetc(file);
+        if (ch == EOF) break;
+        if (isspace(ch)) {
+            ungetc(ch, file);
+            break;
+        }
+        if (i == sizeof(buf)) {
+            /* Reached the end of the buffer. */
+            IGRAPH_ERRORF("'%.*s' is not a valid real value.", IGRAPH_PARSEERROR, i, buf);
+        }
+        buf[i++] = ch;
+    }
+    if (ferror(file)) {
+        IGRAPH_ERROR("Error while reading real number.", IGRAPH_EFILE);
+    }
+
+    if (i == 0) {
+        IGRAPH_ERROR("Real number expected, reached end of file instead.", IGRAPH_PARSEERROR);
+    }
+
+    IGRAPH_CHECK(igraph_i_parse_real(buf, i, value));
+
+    return IGRAPH_SUCCESS;
+}
+
+
 /* igraph_i_safelocale() and igraph_i_unsafelocale() will set the numeric locale to "C"
  * and re-set it to its original value. This is to ensure that parsing and writing
  * numbers uses a decimal point instead of a comma.

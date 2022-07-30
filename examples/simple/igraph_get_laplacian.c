@@ -28,7 +28,7 @@ int main() {
     igraph_vector_init_int(&weights, 5, 1, 2, 3, 4, 5);
 
     igraph_ring(&g, 5, IGRAPH_DIRECTED, 0, 1);
-    igraph_get_laplacian(&g, &m, IGRAPH_OUT, /*normalization*/ 1, &weights);
+    igraph_get_laplacian(&g, &m, IGRAPH_OUT, IGRAPH_LAPLACIAN_SYMMETRIC, &weights);
     igraph_matrix_print(&m);
 
     igraph_vector_destroy(&weights);

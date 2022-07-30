@@ -1315,52 +1315,48 @@ igraph_real_t FUNCTION(igraph_matrix, min)(const TYPE(igraph_matrix) *m) {
  * \function igraph_matrix_which_min
  * \brief Indices of the smallest element.
  *
- * </para><para>
  * The matrix must be non-empty. If the smallest element is not unique,
  * then the indices of the first such element are returned. If the matrix contains
  * NaN values, the indices of the first NaN value are returned.
+ *
  * \param m The matrix.
  * \param i Pointer to an <type>igraph_integer_t</type>. The row index of the
  *   minimum is stored here.
  * \param j Pointer to an <type>igraph_integer_t</type>. The column index of
  *   the minimum is stored here.
- * \return Error code.
  *
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, which_min)(
+void FUNCTION(igraph_matrix, which_min)(
         const TYPE(igraph_matrix) *m, igraph_integer_t *i, igraph_integer_t *j) {
     igraph_integer_t vmin = FUNCTION(igraph_vector, which_min)(&m->data);
     *i = vmin % m->nrow;
     *j = vmin / m->nrow;
-    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_matrix_which_max
  * \brief Indices of the largest element.
  *
- * </para><para>
  * The matrix must be non-empty. If the largest element is not unique,
  * then the indices of the first such element are returned. If the matrix contains
  * NaN values, the indices of the first NaN value are returned.
+ *
  * \param m The matrix.
  * \param i Pointer to an <type>igraph_integer_t</type>. The row index of the
  *   maximum is stored here.
  * \param j Pointer to an <type>igraph_integer_t</type>. The column index of
  *   the maximum is stored here.
- * \return Error code.
  *
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, which_max)(
+void FUNCTION(igraph_matrix, which_max)(
         const TYPE(igraph_matrix) *m, igraph_integer_t *i, igraph_integer_t *j) {
     igraph_integer_t vmax = FUNCTION(igraph_vector, which_max)(&m->data);
     *i = vmax % m->nrow;
     *j = vmax / m->nrow;
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1370,30 +1366,30 @@ igraph_error_t FUNCTION(igraph_matrix, which_max)(
  * Handy if you want to have both the smallest and largest element of
  * a matrix. The matrix is only traversed once. The matrix must be non-empty.
  * If a matrix contains at least one NaN, both \c min and \c max will be NaN.
+ *
  * \param m The input matrix. It must contain at least one element.
  * \param min Pointer to a base type variable. The minimum is stored here.
  * \param max Pointer to a base type variable. The maximum is stored here.
- * \return Error code.
  *
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
+void FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
                                     BASE *min, BASE *max) {
-    return FUNCTION(igraph_vector, minmax)(&m->data, min, max);
+    FUNCTION(igraph_vector, minmax)(&m->data, min, max);
 }
 
 /**
  * \function igraph_matrix_which_minmax
  * \brief Indices of the minimum and maximum elements
  *
- * </para><para>
  * Handy if you need the indices of the smallest and largest
  * elements. The matrix is traversed only once. The matrix must be
  * non-empty. If the minimum or maximum is not unique, the index
  * of the first minimum or the first maximum is returned, respectively.
  * If a matrix contains at least one NaN, both \c which_min and \c which_max
  * will point to the first NaN value.
+ *
  * \param m The input matrix.
  * \param imin Pointer to an <type>igraph_integer_t</type>, the row index of
  *   the minimum is stored here.
@@ -1403,12 +1399,11 @@ igraph_error_t FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
  *   the maximum is stored here.
  * \param jmax Pointer to an <type>igraph_integer_t</type>, the column index of
  *   the maximum is stored here.
- * \return Error code.
  *
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_error_t FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
+void FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
         igraph_integer_t *imin, igraph_integer_t *jmin,
         igraph_integer_t *imax, igraph_integer_t *jmax) {
     igraph_integer_t vmin, vmax;
@@ -1417,7 +1412,6 @@ igraph_error_t FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *
     *jmin = vmin / m->nrow;
     *imax = vmax % m->nrow;
     *jmax = vmax / m->nrow;
-    return IGRAPH_SUCCESS;
 }
 
 #endif
@@ -1526,10 +1520,9 @@ igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
     igraph_integer_t nrow = m->nrow, ncol = m->ncol;
     igraph_integer_t r, c;
-    BASE sum;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, nrow));
     for (r = 0; r < nrow; r++) {
-        sum = ZERO;
+        BASE sum = ZERO;
         for (c = 0; c < ncol; c++) {
 #ifdef SUM
             SUM(sum, sum, MATRIX(*m, r, c));
@@ -1559,10 +1552,9 @@ igraph_error_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
     igraph_integer_t nrow = m->nrow, ncol = m->ncol;
     igraph_integer_t r, c;
-    BASE sum;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, ncol));
     for (c = 0; c < ncol; c++) {
-        sum = ZERO;
+        BASE sum = ZERO;
         for (r = 0; r < nrow; r++) {
 #ifdef SUM
             SUM(sum, sum, MATRIX(*m, r, c));

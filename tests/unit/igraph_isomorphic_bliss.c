@@ -94,7 +94,7 @@ int main() {
         VECTOR(color1)[0] = 1;
         VECTOR(color1)[1] = 1;
         VECTOR(color2)[0] = 1;
-        VECTOR(color2)[2] = 1;
+        VECTOR(color2)[3] = 1;
 
         iso = 1;
         igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, sh, 0, 0);
