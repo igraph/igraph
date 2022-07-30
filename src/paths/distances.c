@@ -343,7 +343,7 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     for (IGRAPH_VIT_RESET(vit);
             !IGRAPH_VIT_END(vit);
             IGRAPH_VIT_NEXT(vit)) {
-        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc, IGRAPH_VIT_GET(vit), /*vid_ecc*/&dump, /*unconn*/ 1, &inclist));
+        IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc, IGRAPH_VIT_GET(vit), /*vid_ecc*/ &dump, /*unconn*/ 1, &inclist));
         IGRAPH_CHECK(igraph_vector_push_back(res, ecc));
     }
     igraph_lazy_inclist_destroy(&inclist);
