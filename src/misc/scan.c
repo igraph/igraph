@@ -834,7 +834,7 @@ igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
-    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_subsets));
     igraph_vector_null(res);
 
     for (subset = 0; subset < no_of_subsets; subset++) {

@@ -83,7 +83,6 @@ int main() {
     igraph_vector_int_list_clear(&subsets);
 
     printf("Same graph, whole graph as subset:\n");
-    igraph_vector_int_list_resize(&subsets, 0);
     igraph_vector_int_init_int(&n1, 6, 0, 1, 2, 3, 4, 5);
     igraph_vector_int_list_push_back(&subsets, &n1);
     call_and_print(&g_lmu, NULL, &subsets);
