@@ -176,6 +176,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_vector_ptr_init(&eattrs, 0);
     IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &eattrs);
 
+    context.directed = false; /* assume undirected until an element implying directedness is encountered */
     context.vector = &edges;
     context.mode = 0;
     context.vcount = -1;
