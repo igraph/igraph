@@ -63,7 +63,10 @@ IGRAPH_EXPORT igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_
                                                         igraph_vector_t *res,
                                                         const igraph_vector_t *weights,
                                                         const igraph_vector_int_list_t *neighborhoods);
-
+IGRAPH_EXPORT igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
+                                                        igraph_vector_t *res,
+                                                        const igraph_vector_t *weights,
+                                                        const igraph_vector_int_list_t *neighborhoods);
 __END_DECLS
 
 #endif
