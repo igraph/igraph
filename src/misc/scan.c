@@ -795,28 +795,26 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
 
     return IGRAPH_SUCCESS;
 }
-
 /**
- * \function igraph_local_scan_neighborhood_ecount
- * Local scan-statistics with pre-calculated neighborhoods
+ * \function igraph_local_scan_subset_ecount
+ * Local scan-statistics of subgraphs induced by subsets of vertices 
  *
  * Count the number of edges, or sum the edge weights in
- * neighborhoods given as a parameter.
+ * induced subgraphs given as a parameter.
  *
  * \param graph The graph to perform the counting/summing in.
  * \param res Initialized vector, the result is stored here.
  * \param weights Weight vector for weighted graphs, null pointer for
  *        unweighted graphs.
- * \param neighborhoods List of <code>igraph_vector_int_t</code>
- *        objects, the neighborhoods, one for each vertex in the
- *        graph.
+ * \param subsets List of <code>igraph_vector_int_t</code>
+ *        objects, the vertex subsets.
  * \return Error code.
  */
 
-igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
-        const igraph_vector_int_list_t *neighborhoods) {
+        const igraph_vector_int_list_t *subsets) {
 
     igraph_integer_t node, no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
@@ -825,10 +823,6 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
 
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length in local scan", IGRAPH_EINVAL);
-    }
-    if (igraph_vector_int_list_size(neighborhoods) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid neighborhood list length in local scan",
-                     IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
@@ -874,4 +868,41 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_local_scan_neighborhood_ecount
+ * Local scan-statistics with pre-calculated neighborhoods
+ *
+ * Count the number of edges, or sum the edge weights in
+ * neighborhoods given as a parameter.
+ *
+ * \deprecated-by igraph_local_scan_subset_ecount 0.10.0
+ *
+ * \param graph The graph to perform the counting/summing in.
+ * \param res Initialized vector, the result is stored here.
+ * \param weights Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param neighborhoods List of <code>igraph_vector_int_t</code>
+ *        objects, the neighborhoods, one for each vertex in the
+ *        graph.
+ * \return Error code.
+ */
+
+igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vector_t *weights,
+        const igraph_vector_int_list_t *neighborhoods) {
+
+    igraph_integer_t node, no_of_nodes = igraph_vcount(graph);
+    igraph_inclist_t incs;
+    igraph_vector_int_t marked;
+    igraph_bool_t directed = igraph_is_directed(graph);
+
+    if (igraph_vector_int_list_size(neighborhoods) != no_of_nodes) {
+        IGRAPH_ERROR("Invalid neighborhood list length in local scan",
+                     IGRAPH_EINVAL);
+    }
+
+    return igraph_local_scan_subset_ecount(graph, res, weights, neighborhood);
 }
