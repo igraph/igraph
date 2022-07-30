@@ -733,6 +733,7 @@ Some of the highlights are:
  - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
  - `igraph_turan()` generates Turán graphs.
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
+ - `igraph_eccentricity()` and `igraph_eccentricity_dijkstra()` find the longest among all shortest paths from vertices.
 
 ### Removed
 
