@@ -977,8 +977,8 @@ igraph_eccentricity:
 
 igraph_eccentricity_dijkstra:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NUL, 
-        LOUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, EDGEWEIGHTS weights=NULL, 
+        OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         NEIMODE mode=ALL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
