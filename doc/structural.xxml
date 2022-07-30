@@ -76,8 +76,9 @@
 <!-- doxrox-include igraph_local_scan_1_ecount_them -->
 <!-- doxrox-include igraph_local_scan_k_ecount_them -->
 </section>
-<section id="pre-calculated-neighborhoods"><title>Pre-calculated neighborhoods</title>
+<section id="pre-calculated-subsets"><title>Pre-calculated subsets</title>
 <!-- doxrox-include igraph_local_scan_neighborhood_ecount -->
+<!-- doxrox-include igraph_local_scan_subset_ecount -->
 </section>
 </section>
 

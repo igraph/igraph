@@ -823,7 +823,7 @@ igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector length in local scan", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length in local scan.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
@@ -843,7 +843,7 @@ igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
         for (i = 0; i < neilen; i++) {
             igraph_integer_t vertex = VECTOR(*nei)[i];
             if (vertex < 0 || vertex >= no_of_nodes) {
-                IGRAPH_ERROR("Invalid vertex ID in neighborhood list in local scan",
+                IGRAPH_ERROR("Invalid vertex ID in neighborhood list in local scan.",
                              IGRAPH_EINVAL);
             }
             VECTOR(marked)[vertex] = subset + 1;
@@ -901,7 +901,7 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_vector_int_list_size(neighborhoods) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid neighborhood list length in local scan",
+        IGRAPH_ERROR("Invalid neighborhood list length in local scan.",
                      IGRAPH_EINVAL);
     }
 
