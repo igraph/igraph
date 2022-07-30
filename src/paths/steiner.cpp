@@ -86,6 +86,21 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset)
 	return key;
 }
 
+std::set<igraph_integer_t> fetchSetsBasedonIndex(igraph_integer_t index)
+{
+	std::set<igraph_integer_t>  key;
+	std::map<std::set<igraph_integer_t>, igraph_integer_t>::iterator it;
+	for (it = subsetMap.begin(); it != subsetMap.end(); ++it)
+	{
+		if (it->second == index)
+		{
+			key = it->first;
+		}
+	}
+
+	return key;
+}
+
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
 igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 {
@@ -127,7 +142,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 	
 	// Creating a vector of steiner vertices. steiner vertices = vertices in graph - steiner terminals
 
-	IGRAPH_CHECK(igraph_matrix_init(&dp_cache, pow(2, igraph_vector_int_size(&steiner_terminals_copy)), no_of_vertices));
+	IGRAPH_CHECK(igraph_matrix_init(&dp_cache,no_of_vertices + pow(2, igraph_vector_int_size(&steiner_terminals_copy)), no_of_vertices));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
     igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
@@ -247,6 +262,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 			{
 				distance1 = distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j));
 				//std::cout << "u:" << distance1 << std::endl;	
+
 			}
 
 		}
@@ -255,7 +271,6 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 		if ( q != j && MATRIX(distance, q, j) + distance1 < distance2)
 		{
 			distance2 = MATRIX(distance, q, j) + distance1;
-			//std::cout << "Distance-2" << distance2 <<std::endl;
 		}
 	}
 	*res = distance2;
