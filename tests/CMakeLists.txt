@@ -208,6 +208,7 @@ add_legacy_tests(
   igraph_generalized_petersen
   igraph_grg_game
   igraph_growing_random_game
+  igraph_hsbm_game
   igraph_k_regular_game
   igraph_lastcit_game
   igraph_linegraph
@@ -275,6 +276,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  coreness
   efficiency
   global_transitivity
   hub_and_authority
@@ -285,6 +287,7 @@ add_legacy_tests(
   igraph_betweenness
   igraph_betweenness_subset
   igraph_closeness
+  igraph_constraint
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
@@ -299,6 +302,7 @@ add_legacy_tests(
   igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
   igraph_graph_center
+  igraph_has_mutual
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
@@ -491,6 +495,7 @@ add_legacy_tests(
   igraph_almost_equals
   igraph_power_law_fit
   overflow
+  prop_caching
 )
 
 # operators.at
@@ -511,6 +516,8 @@ add_legacy_tests(
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
+  igraph_permute_vertices
+  igraph_reverse_edges
   igraph_rewire_directed_edges
 )
 
@@ -587,6 +594,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  community_indexing
   community_leiden
   community_label_propagation
   community_label_propagation2

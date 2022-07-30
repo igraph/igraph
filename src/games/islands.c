@@ -26,21 +26,30 @@
 #include "igraph_constructors.h"
 #include "igraph_random.h"
 
+#include "math/safe_intop.h"
+#include "random/random_internal.h"
+
 /**
  * \ingroup generators
  * \function igraph_simple_interconnected_islands_game
  * \brief Generates a random graph made of several interconnected islands, each island being a random graph.
  *
+ * All islands are of the same size. Within an island, each edge is generated
+ * with the same probability. A fixed number of additional edges are then
+ * generated for each unordered pair of islands to connect them. The generated
+ * graph is guaranteed to be simple.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param islands_n The number of islands in the graph.
  * \param islands_size The size of islands in the graph.
- * \param islands_pin The probability to create each possible edge into each island.
- * \param n_inter The number of edges to create between two islands.
+ * \param islands_pin The probability to create each possible edge within islands.
+ * \param n_inter The number of edges to create between two islands. It may be
+ *        larger than \p islands_size squared, but in this case it is assumed
+ *        to be \p islands_size squared.
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid parameter
- *         \c IGRAPH_ENOMEM: there is not enough
- *         memory for the operation.
+ *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
@@ -59,11 +68,11 @@ igraph_error_t igraph_simple_interconnected_islands_game(
     igraph_real_t max_possible_edges_per_island;
     igraph_real_t avg_edges_per_island;
     igraph_integer_t number_of_inter_island_edges;
-    igraph_integer_t start_island = 0;
-    igraph_integer_t end_island = 0;
-    igraph_integer_t i, j, is;
+    igraph_integer_t start_index_of_island, start_index_of_other_island;
+    igraph_integer_t i, j, is, from, to;
     igraph_real_t last;
     igraph_integer_t island_ecount;
+    igraph_real_t nr_edges_reserved;
 
     if (islands_n < 0) {
         IGRAPH_ERRORF("Number of islands cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, islands_n);
@@ -78,15 +87,29 @@ igraph_error_t igraph_simple_interconnected_islands_game(
         IGRAPH_ERRORF("Number of inter-island links cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n_inter);
     }
 
+    number_of_inter_island_edges = islands_size * islands_size;
+    if (n_inter > number_of_inter_island_edges) {
+        IGRAPH_ERRORF(
+            "Too many edges requested between islands, maximum possible "
+            "is %" IGRAPH_PRId ", got %" IGRAPH_PRId ".",
+            IGRAPH_EINVAL, number_of_inter_island_edges, n_inter
+        );
+    }
+
     /* how much memory ? */
     number_of_nodes = islands_n * islands_size;
     max_possible_edges_per_island = ((igraph_real_t)islands_size * ((igraph_real_t)islands_size - 1.0)) / 2.0;
     avg_edges_per_island = islands_pin * max_possible_edges_per_island;
     number_of_inter_island_edges = n_inter * (islands_n * (islands_n - 1)) / 2;
 
-    /* reserve enough space for all the edges */
+    nr_edges_reserved = 1.1 * avg_edges_per_island * islands_n + number_of_inter_island_edges;
+    /* The cast of ECOUNT_MAX to double could change its value, which means in theory the size of
+       the edges vector could still overflow, but only for very rare cases. */
+    if (nr_edges_reserved > (double) (IGRAPH_ECOUNT_MAX ) || nr_edges_reserved > IGRAPH_MAX_EXACT_REAL) {
+        IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+    }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 1.1 * avg_edges_per_island * islands_n + number_of_inter_island_edges));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, nr_edges_reserved * 2));
 
     IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&s, 1.1 * avg_edges_per_island));
@@ -95,10 +118,8 @@ igraph_error_t igraph_simple_interconnected_islands_game(
 
     /* first create all the islands */
     for (is = 0; is < islands_n; is++) { /* for each island */
-
-        /* index for start and end of nodes in this island */
-        start_island = islands_size * is;
-        end_island = start_island + islands_size - 1;
+        /* index for start and end of nodes in this island, both inclusive */
+        start_index_of_island = islands_size * is;
 
         igraph_vector_clear(&s);
 
@@ -111,26 +132,31 @@ igraph_error_t igraph_simple_interconnected_islands_game(
 
         island_ecount = igraph_vector_size(&s);
         for (i = 0; i < island_ecount; i++) {
-            igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2.0);
-            igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2.0;
-            to += start_island;
-            from += start_island;
+            to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2.0);
+            from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2.0;
+            to += start_index_of_island;
+            from += start_index_of_island;
 
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
         }
 
         /* create the links with other islands */
+        island_ecount = islands_size * islands_size;
+        number_of_inter_island_edges = n_inter;
         for (i = is + 1; i < islands_n; i++) { /* for each other island (not the previous ones) */
+            IGRAPH_CHECK(igraph_random_sample_real(&s, 0, island_ecount - 1, n_inter));
 
+            start_index_of_other_island = i * islands_size;
             for (j = 0; j < n_inter; j++) { /* for each link between islands */
-                igraph_integer_t from = RNG_INTEGER(start_island, end_island);
-                igraph_integer_t to = RNG_INTEGER(i * islands_size, (i + 1) * islands_size - 1);
+                from = VECTOR(s)[j] / islands_size;
+                to = VECTOR(s)[j] - from * islands_size;
+                from += start_index_of_island;
+                to += start_index_of_other_island;
 
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
             }
-
         }
     }
 

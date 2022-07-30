@@ -25,7 +25,6 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
-#include "core/indheap.h"
 #include "core/interruption.h"
 
 /**
@@ -44,8 +43,7 @@
  *    vertices in the graph, in the order of vertex IDs. For unreachable
  *    vertices the matrix contains \c IGRAPH_INFINITY.
  * \param from The source vertices.
- * \param to The target vertices. It is not allowed to include a
- *    vertex twice or more.
+ * \param to The target vertices.
  * \param weights The edge weights. There must not be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
@@ -83,7 +81,6 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     igraph_vector_int_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t fromvit, tovit;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_bool_t all_to;
     igraph_vector_t dist;
 
@@ -100,10 +97,12 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
+                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0 && igraph_vector_is_any_nan(weights)) {
-        IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
@@ -123,6 +122,11 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
         IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
         no_of_to = IGRAPH_VIT_SIZE(tovit);
+
+        /* No need to check here whether the vertices in 'to' are unique because
+         * the loop below uses a temporary distance vector that is then copied
+         * into the result matrix at the end of the outer loop iteration, and
+         * this is safe even if 'to' contains the same vertex multiple times */
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
@@ -133,7 +137,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
          IGRAPH_VIT_NEXT(fromvit), i++) {
         igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
 
-        igraph_vector_fill(&dist, my_infinity);
+        igraph_vector_fill(&dist, IGRAPH_INFINITY);
         VECTOR(dist)[source] = 0;
         igraph_vector_int_null(&clean_vertices);
         igraph_vector_int_null(&num_queued);
@@ -151,7 +155,8 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
             VECTOR(clean_vertices)[j] = 1;
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
-                IGRAPH_ERROR("cannot run Bellman-Ford algorithm", IGRAPH_ENEGLOOP);
+                IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
+                             IGRAPH_ENEGLOOP);
             }
 
             /* If we cannot get to j in finite time yet, there is no need to relax
@@ -283,8 +288,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *         \cli IGRAPH_EINVAL
  *           The weight vector doesn't math the number of edges.
  *         \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID, or the length of \p to is
- *           not the same as the length of \p vertices or \p edges.
+ *           \p from is invalid vertex ID
  *         \cli IGRAPH_ENEGLOOP
  *           Bellman-ford algorithm encounted a negative loop.
  *         \endclist
@@ -315,7 +319,6 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_vector_int_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t tovit;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_vector_t dist;
 
     if (!weights) {
@@ -350,7 +353,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, parent_eids);
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
-    igraph_vector_fill(&dist, my_infinity);
+    igraph_vector_fill(&dist, IGRAPH_INFINITY);
     VECTOR(dist)[from] = 0;
     igraph_vector_int_null(&clean_vertices);
     igraph_vector_int_null(&num_queued);
@@ -368,7 +371,8 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         VECTOR(clean_vertices)[j] = 1;
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
-            IGRAPH_ERROR("cannot run Bellman-Ford algorithm", IGRAPH_ENEGLOOP);
+            IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
+                         IGRAPH_ENEGLOOP);
         }
 
         /* If we cannot get to j in finite time yet, there is no need to relax

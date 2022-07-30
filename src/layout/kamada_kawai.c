@@ -39,7 +39,7 @@
  *
  * This is a force-directed layout. A spring is inserted between all pairs
  * of vertices, both those which are directly connected and those that are not.
- * The unstretched length of springs is chosen based on the graph distance
+ * The unstretched length of springs is chosen based on the undirected graph distance
  * between the corresponding pair of vertices. Thus, in a weighted graph, increasing
  * the weight between two vertices pushes them apart. The Young modulus of springs
  * is inversely proportional to the graph distance, ensuring that springs between
@@ -80,6 +80,8 @@
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
  * \param weights Edge weights, larger values will result longer edges.
+ *        Weights must be positive. Pass \c NULL to assume unit weights
+ *        for all edges.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
  *        \quote x \endquote coordinate for every vertex.
@@ -129,6 +131,9 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     if (weights && igraph_vector_size(weights) != no_edges) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
+    if (weights && no_edges > 0 && igraph_vector_min(weights) <= 0) {
+        IGRAPH_ERROR("Weights must be positive for Kamada-Kawai layout.", IGRAPH_EINVAL);
+    }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
         IGRAPH_ERROR("Invalid minx vector length.", IGRAPH_EINVAL);
@@ -170,16 +175,8 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
     IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
 
-    if (weights && no_edges > 0 && igraph_vector_min(weights) < 0) {
-        IGRAPH_CHECK(igraph_distances_bellman_ford(graph, &dij, igraph_vss_all(),
-                     igraph_vss_all(), weights,
-                     IGRAPH_ALL));
-    } else {
-
-        IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
-                     igraph_vss_all(), weights,
-                     IGRAPH_ALL));
-    }
+    IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
+                 igraph_vss_all(), weights, IGRAPH_ALL));
 
     max_dij = 0.0;
     for (i = 0; i < no_nodes; i++) {
@@ -384,6 +381,8 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
  * \param kkconst The Kamada-Kawai vertex attraction constant.
  *        Typical value: number of vertices.
  * \param weights Edge weights, larger values will result longer edges.
+ *        Weights must be positive. Pass \c NULL to assume unit weights
+ *        for all edges.
  * \param minx Pointer to a vector, or a \c NULL pointer. If not a
  *        \c NULL pointer then the vector gives the minimum
  *        \quote x \endquote coordinate for every vertex.
@@ -439,6 +438,9 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     if (weights && igraph_vector_size(weights) != no_edges) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
+    if (weights && no_edges > 0 && igraph_vector_min(weights) <= 0) {
+        IGRAPH_ERROR("Weights must be positive for Kamada-Kawai layout.", IGRAPH_EINVAL);
+    }
 
     if (minx && igraph_vector_size(minx) != no_nodes) {
         IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
@@ -488,8 +490,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
     IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
     IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
-                 igraph_vss_all(), weights,
-                 IGRAPH_ALL));
+                 igraph_vss_all(), weights, IGRAPH_ALL));
 
     max_dij = 0.0;
     for (i = 0; i < no_nodes; i++) {

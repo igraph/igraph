@@ -23,8 +23,6 @@
 
 #include "igraph_games.h"
 
-#include "igraph_interface.h"
-
 /**
  * \ingroup generators
  * \function igraph_k_regular_game

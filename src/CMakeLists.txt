@@ -86,6 +86,7 @@ add_library(
   graph/adjlist.c
   graph/attributes.c
   graph/basic_query.c
+  graph/caching.c
   graph/cattributes.c
   graph/graph_list.c
   graph/iterators.c
@@ -227,6 +228,7 @@ add_library(
   operators/intersection.c
   operators/misc_internal.c
   operators/permute.c
+  operators/reverse.c
   operators/rewire.c
   operators/rewire_edges.c
   operators/simplify.c
@@ -309,8 +311,8 @@ add_library(
 )
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "0.0.0")
-set_target_properties(igraph PROPERTIES SOVERSION 0)
+set_target_properties(igraph PROPERTIES VERSION "3.0.0")
+set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
 target_compile_definitions(

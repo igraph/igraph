@@ -273,7 +273,7 @@ void test_cutoff_weighted() {
 
     igraph_vector_init(&closeness, 0);
     igraph_vector_int_init(&reachable, 0);
-    igraph_vector_init_seq(&weights, 1, 3);
+    igraph_vector_init_range(&weights, 1, 4);
 
     for (i=0; i < sizeof(cutoff_vec) / sizeof(cutoff_vec[0]); ++i) {
         printf("\nRange-limited weighted closeness with cutoff %g\n", cutoff_vec[i]);

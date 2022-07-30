@@ -28,8 +28,6 @@
 #include "igraph_constants.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
-#include "igraph_progress.h"
-#include "igraph_stack.h"
 
 #include "cliques/cliquer_internal.h"
 #include "core/interruption.h"

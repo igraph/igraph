@@ -24,12 +24,10 @@
 #include "igraph_paths.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_nongraph.h"
 #include "igraph_stack.h"
-#include "igraph_qsort.h"
 #include "igraph_vector_ptr.h"
 
 #include "core/indheap.h"
@@ -108,7 +106,6 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     igraph_integer_t no_of_from, no_of_to;
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
     igraph_bool_t all_to;
     igraph_vector_int_t indexv;
 
@@ -148,10 +145,17 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
         IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
         no_of_to = IGRAPH_VIT_SIZE(tovit);
+
+        /* We need to check whether the vertices in 'tovit' are unique; this is
+         * because the inner while loop of the main algorithm updates the
+         * distance matrix whenever a shorter path is encountered from the
+         * source vertex 'i' to a target vertex, and we need to be able to
+         * map a target vertex to its column in the distance matrix. The mapping
+         * is constructed by the loop below */
         for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
             igraph_integer_t v = IGRAPH_VIT_GET(tovit);
             if (VECTOR(indexv)[v]) {
-                IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
+                IGRAPH_ERROR("Target vertex list must not have any duplicates.",
                              IGRAPH_EINVAL);
             }
             VECTOR(indexv)[v] = ++i;
@@ -159,7 +163,7 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-    igraph_matrix_fill(res, my_infinity);
+    igraph_matrix_fill(res, IGRAPH_INFINITY);
 
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);
@@ -303,9 +307,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID, or the length of \p to is
- *           not the same as the length of \p vertices (if not NULL) or
- *           the length of \p edges (if not NULL)
+ *           \p from is invalid vertex ID
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist

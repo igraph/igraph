@@ -195,6 +195,7 @@ igraph_i_fundamental_cycles_bfs(
  * \param bfs_cutoff If negative, a complete cycle basis is returned. Otherwise, only
  *   cycles of length <code>2*bfs_cutoff + 1</code> or shorter are included. \p bfs_cutoff
  *   is used to limit the depth of the BFS tree when searching for cycle edges.
+ * \param weights Currently unused.
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
@@ -204,7 +205,8 @@ igraph_i_fundamental_cycles_bfs(
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                          igraph_vector_int_list_t *result,
                                          igraph_integer_t start_vid,
-                                         igraph_integer_t bfs_cutoff) {
+                                         igraph_integer_t bfs_cutoff,
+                                         const igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -212,6 +214,8 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
     igraph_integer_t i;
     igraph_inclist_t inclist;
     igraph_vector_int_t visited; /* see comments before igraph_i_fundamental_cycles_bfs() */
+
+    IGRAPH_UNUSED(weights);
 
     if (start_vid >= no_of_nodes) {
         IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVAL);
@@ -384,7 +388,8 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  *   the edge IDs will appear ordered along the cycle. This comes at a small
  *   performance cost. If false, no guarantees are given about the ordering
  *   of edge IDs within cycles. This parameter exists solely to control
- *   performance tradeoffs
+ *   performance tradeoffs.
+ * \param weights Currently unused.
  * \return Error code.
  *
  * Time complexity: TODO.
@@ -395,13 +400,16 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                           igraph_vector_int_list_t *result,
                                           igraph_integer_t bfs_cutoff,
                                           igraph_bool_t complete,
-                                          igraph_bool_t use_cycle_order) {
+                                          igraph_bool_t use_cycle_order,
+                                          const igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t i;
     igraph_integer_t rank;
     igraph_vector_int_list_t candidates;
+
+    IGRAPH_UNUSED(weights);
 
     /* Compute candidate elements for the minimum weight basis. */
     {

@@ -126,7 +126,7 @@ igraph_error_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&impulse_y, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&temp, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&skew_gauge, no_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&perm, 0, no_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
     IGRAPH_VECTOR_INIT_FINALLY(&phi, no_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 10);

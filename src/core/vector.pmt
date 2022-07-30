@@ -86,7 +86,7 @@
  * \ref igraph_vector_init_copy() creates a new identical copy
  * of an already existing and initialized vector. \ref
  * igraph_vector_init_array() creates a vector by copying a regular C array.
- * \ref igraph_vector_init_seq() creates a vector containing a regular
+ * \ref igraph_vector_init_range() creates a vector containing a regular
  * sequence with increment one.</para>
  *
  * <para>\ref igraph_vector_view() is a special constructor, it allows you to
@@ -756,6 +756,41 @@ void FUNCTION(igraph_vector, fill)      (TYPE(igraph_vector)* v, BASE e) {
         *ptr = e;
     }
 }
+
+#ifndef NOTORDERED
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_range
+ * \brief Updates a vector to store a range.
+ *
+ * </para><para>
+ * Sets the elements of the vector to contain the numbers \p start, \p start+1,
+ * ..., \p end-1. Note that the range is closed from the left and open from the
+ * right, according to C conventions.
+ *
+ * \param v The vector to update.
+ * \param start The lower limit in the range (inclusive).
+ * \param end The upper limit in the range (exclusive).
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory.
+ *
+ * Time complexity: O(n), the number of elements in the vector.
+ */
+
+igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector) *v, BASE from, BASE to) {
+    BASE *p;
+    IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, (to - from)));
+
+    for (p = v->stor_begin; p < v->end; p++) {
+        *p = from;
+        from = from + ONE;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+#endif
 
 /**
  * \ingroup vector
@@ -1653,11 +1688,14 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
 /**
  * \ingroup vector
  * \function igraph_vector_init_seq
- * \brief Initializes a vector with a sequence.
+ * \brief Initializes a vector with a sequence, inclusive endpoints (deprecated).
  *
  * </para><para>
- * The vector will contain the numbers \p from,
- * \p from+1, ..., \p to.
+ * The vector will contain the numbers \p from, \p from+1, ..., \p to. Note that
+ * both endpoints are \em inclusive, contrary to typical usage of ranges in C.
+ *
+ * \deprecated-by igraph_vector_init_range 0.10.0
+ *
  * \param v Pointer to an uninitialized vector object.
  * \param from The lower limit in the sequence (inclusive).
  * \param to The upper limit in the sequence (inclusive).
@@ -1668,13 +1706,43 @@ igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
  * of elements in the vector.
  */
 
-igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
-                                      BASE from, BASE to) {
+igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v, BASE from, BASE to) {
     BASE *p;
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from + 1)));
 
     for (p = v->stor_begin; p < v->end; p++) {
         *p = from++;
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_init_range
+ * \brief Initializes a vector with a range.
+ *
+ * </para><para>
+ * The vector will contain the numbers \p start, \p start+1, ..., \p end-1. Note
+ * that the range is closed from the left and open from the right, according to
+ * C conventions.
+ *
+ * \param v Pointer to an uninitialized vector object.
+ * \param start The lower limit in the range (inclusive).
+ * \param end The upper limit in the range (exclusive).
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: out of memory.
+ *
+ * Time complexity: O(n), the number of elements in the vector.
+ */
+
+igraph_error_t FUNCTION(igraph_vector, init_range)(TYPE(igraph_vector) *v, BASE from, BASE to) {
+    BASE *p;
+    IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (to - from)));
+
+    for (p = v->stor_begin; p < v->end; p++) {
+        *p = from;
+        from = from + ONE;
     }
 
     return IGRAPH_SUCCESS;
@@ -2095,6 +2163,7 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
  * position of where it should be inserted (to keep the vector sorted)
  * is returned. If the vector contains any NaN values, the returned
  * value is undefined and \p pos may point to any position.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to an \type igraph_integer_t. This is set to the
@@ -2123,13 +2192,15 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
  * \brief Finds an element by binary searching a sorted slice of a vector.
  *
  * </para><para>
-
  * It is assumed that the indicated slice of the vector, from \p start to \p end,
  * is sorted. If the specified element (\p what) is not in the slice of the
- * vector, then the position of where it should be inserted (to keep the vector
- * sorted) is returned. If the indicated slice contains any NaN values, the
+ * vector, then the position of where it should be inserted (to keep the \em slice
+ * sorted) is returned. Note that this means that the returned index will point
+ * \em inside the slice (including its endpoints), but will not evaluate values
+ * \em outside the slice. If the indicated slice contains any NaN values, the
  * returned value is undefined and \c pos may point to any position within
  * the slice.
+ *
  * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
  * \param pos Pointer to an \type igraph_integer_t. This is set to the position of an

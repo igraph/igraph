@@ -22,19 +22,13 @@
 #include "test_utilities.h"
 
 /* initialise structures used in "get_widest_path(s)" algorithms */
-void init_vertices_and_edges(igraph_integer_t n, igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
+void init_vertices_and_edges(igraph_integer_t n,
+                            igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                             igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                             igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
-    igraph_integer_t i;
+    igraph_vector_int_list_init(vertices, n);
+    igraph_vector_int_list_init(edges, n);
 
-    igraph_vector_ptr_init(vertices, n);
-    igraph_vector_ptr_init(edges, n);
-    for (i = 0; i < igraph_vector_ptr_size(vertices); i++) {
-        VECTOR(*vertices)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_init(VECTOR(*vertices)[i], 0);
-        VECTOR(*edges)[i] = calloc(1, sizeof(igraph_vector_int_t));
-        igraph_vector_init(VECTOR(*edges)[i], 0);
-    }
     igraph_vector_int_init(parents, 0);
     igraph_vector_int_init(inbound_edges, 0);
 
@@ -43,38 +37,23 @@ void init_vertices_and_edges(igraph_integer_t n, igraph_vector_ptr_t *vertices, 
 }
 
 /* destroy structures used in "get_widest_path(s)" algorithms, ignores if NULL*/
-void destroy_vertices_and_edges(igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
+void destroy_vertices_and_edges(igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                             igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                             igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
-    igraph_integer_t i;
-
     if (edges2)         igraph_vector_int_destroy(edges2);
     if (vertices2)      igraph_vector_int_destroy(vertices2);
 
     if (inbound_edges)  igraph_vector_int_destroy(inbound_edges);
     if (parents)   igraph_vector_int_destroy(parents);
 
-    if (edges) {
-        for (i = 0; i < igraph_vector_ptr_size(edges); i++) {
-            igraph_vector_int_destroy(VECTOR(*edges)[i]);
-            free(VECTOR(*edges)[i]);
-        }
-        igraph_vector_ptr_destroy(edges);
-    }
-
-    if (vertices) {
-        for (i = 0; i < igraph_vector_ptr_size(vertices); i++) {
-            igraph_vector_int_destroy(VECTOR(*vertices)[i]);
-            free(VECTOR(*vertices)[i]);
-        }
-        igraph_vector_ptr_destroy(vertices);
-    }
+    if (edges) igraph_vector_int_list_destroy(edges);
+    if (vertices) igraph_vector_int_list_destroy(vertices);
 }
 
 /* destroy all structures, ignores if NULL */
 void destroy_all(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res1, igraph_matrix_t *res2,
                     igraph_vs_t *from, igraph_vs_t *to,
-                    igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
+                    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                     igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                     igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
 
@@ -93,11 +72,11 @@ void destroy_all(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res1, igraph_
 void check_invalid_input(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res,
                         igraph_integer_t source, igraph_integer_t destination,
                         igraph_vs_t *from, igraph_vs_t *to,
-                        igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
+                        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                         igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                         igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
-    CHECK_ERROR(igraph_widest_paths_dijkstra(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_widest_paths_floyd_warshall(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_widest_path_widths_dijkstra(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_widest_path_widths_floyd_warshall(g, res, *from, *to, w, IGRAPH_OUT), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_get_widest_paths(g, vertices, edges, source, *to, w, IGRAPH_OUT,
                 parents, inbound_edges), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_get_widest_path(g, vertices2, edges2, source, destination, w, IGRAPH_OUT), IGRAPH_EINVAL);
@@ -106,15 +85,15 @@ void check_invalid_input(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res,
 /* runs the width finding algorithms and assert they succeed */
 void run_widest_paths(igraph_t *g, igraph_vector_t *w, igraph_matrix_t *res1, igraph_matrix_t *res2,
                     igraph_vs_t *from, igraph_vs_t *to, igraph_neimode_t mode) {
-    IGRAPH_ASSERT(igraph_widest_paths_dijkstra(g, res1, *from, *to, w, mode) == IGRAPH_SUCCESS);
-    IGRAPH_ASSERT(igraph_widest_paths_floyd_warshall(g, res2, *from, *to, w, mode) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_widest_path_widths_dijkstra(g, res1, *from, *to, w, mode) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_widest_path_widths_floyd_warshall(g, res2, *from, *to, w, mode) == IGRAPH_SUCCESS);
 }
 
 /* runs the path finding algorithms and asserts they succeed */
 void run_get_widest_paths(igraph_t *g, igraph_vector_t *w,
                         igraph_integer_t source, igraph_integer_t destination,
                         igraph_vs_t *to, igraph_neimode_t mode,
-                        igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
+                        igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                         igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                         igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
     IGRAPH_ASSERT(igraph_get_widest_paths(g, vertices, edges, source, *to, w, mode,
@@ -131,7 +110,7 @@ void check_and_print_matrices(igraph_matrix_t *res1, igraph_matrix_t *res2) {
 
 /* prints results of all widest path algorithms */
 void print_results(igraph_integer_t n, igraph_matrix_t *res1, igraph_matrix_t *res2,
-                    igraph_vector_ptr_t *vertices, igraph_vector_ptr_t *edges,
+                    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
                     igraph_vector_int_t *parents, igraph_vector_int_t *inbound_edges,
                     igraph_vector_int_t *vertices2, igraph_vector_int_t *edges2) {
     igraph_integer_t i;
@@ -141,8 +120,8 @@ void print_results(igraph_integer_t n, igraph_matrix_t *res1, igraph_matrix_t *r
 
     for (i = 0; i < n; i++) {
         printf("path to node %" IGRAPH_PRId ":\n", i);
-        igraph_vector_int_t *vertex_path = VECTOR(*vertices)[i];
-        igraph_vector_int_t *edge_path = VECTOR(*edges)[i];
+        igraph_vector_int_t *vertex_path = igraph_vector_int_list_get_ptr(vertices, i);
+        igraph_vector_int_t *edge_path = igraph_vector_int_list_get_ptr(edges, i);
         printf("  vertices: ");
         print_vector_int(vertex_path);
         printf("  edges:    ");
@@ -172,8 +151,8 @@ int main() {
     igraph_vs_t from, to;
     igraph_vector_t w;
 
-    igraph_vector_ptr_t vertices;
-    igraph_vector_ptr_t edges;
+    igraph_vector_int_list_t vertices;
+    igraph_vector_int_list_t edges;
     igraph_vector_int_t parents;
     igraph_vector_int_t inbound_edges;
 
@@ -189,8 +168,8 @@ int main() {
     igraph_small(&g, n, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
 
     igraph_matrix_init(&res1, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -210,8 +189,8 @@ int main() {
     igraph_vector_init_real(&w, m+3, -1.0, 2.0, 3.0, 2.0, 5.0, 1.0);
 
     igraph_matrix_init(&res1, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -231,8 +210,8 @@ int main() {
     igraph_vector_init_real(&w, m, -1.0, IGRAPH_NAN, 3.0);
 
     igraph_matrix_init(&res1, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -272,8 +251,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -298,7 +277,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -323,8 +302,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -352,7 +331,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -377,7 +356,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -403,7 +382,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -430,7 +409,7 @@ int main() {
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -440,8 +419,8 @@ int main() {
     check_and_print_matrices(&res1, &res2);
 
     printf("\npath to node 7:\n");
-    igraph_vector_int_t *vertex_path = VECTOR(vertices)[7];
-    igraph_vector_int_t *edge_path = VECTOR(edges)[7];
+    igraph_vector_int_t *vertex_path = igraph_vector_int_list_get_ptr(&vertices, 7);
+    igraph_vector_int_t *edge_path = igraph_vector_int_list_get_ptr(&edges, 7);
 
     printf("  vertices: ");
     print_vector_int(vertex_path);
@@ -468,8 +447,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -497,7 +476,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 3);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -523,7 +502,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -548,8 +527,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 

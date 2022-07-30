@@ -37,10 +37,10 @@ __BEGIN_DECLS
 #endif
 
 #include "igraph_config.h"
-#include "igraph_error.h"
 
 #include <inttypes.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -58,7 +58,11 @@ typedef uint32_t igraph_uint_t;
 #endif
 
 typedef double igraph_real_t;
-typedef int    igraph_bool_t;
+
+/* IGRAPH_BOOL_TYPE is set to 'bool' by default, and it is not meant to be
+ * overridden, except for the R interface where we know what we are doing.
+ * See igraph_config.h for more info */
+typedef IGRAPH_BOOL_TYPE igraph_bool_t;
 
 /* printf format specifier for igraph_integer_t */
 #if IGRAPH_INTEGER_SIZE == 64
@@ -87,15 +91,38 @@ typedef int    igraph_bool_t;
 #  define IGRAPH_UINT_MIN UINT32_MIN
 #endif
 
-/* Maximum vertex count for igraph_t
- * The 'os' and 'is' vectors in igraph_t have vcount+1 elements,
- * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1 */
-#define IGRAPH_VCOUNT_MAX (IGRAPH_INTEGER_MAX-1)
 
-/* Maximum edge count for igraph_t
- * The endpoints of edges are often stored in a vector twice the length
- * of the edge count, thus this cannot be larger than IGRAPH_INTEGER_MAX/2 */
+/**
+ * \define IGRAPH_VCOUNT_MAX
+ * \brief The maximum number of vertices supported in igraph graphs.
+ *
+ * The value of this constant is one less than \c IGRAPH_INTEGER_MAX .
+ * When igraph is compiled in 32-bit mode, this means that you are limited
+ * to 2<superscript>31</superscript> – 2 (about 2.1 billion) vertices. In
+ * 64-bit mode, the limit is 2<superscript>63</superscript> – 2 so you are much
+ * more likely to hit out-of-memory issues due to other reasons before reaching
+ * this limit.
+ */
+#define IGRAPH_VCOUNT_MAX (IGRAPH_INTEGER_MAX-1)
+/* The 'os' and 'is' vectors in igraph_t have vcount+1 elements,
+ * thus this cannot currently be larger than IGRAPH_INTEGER_MAX-1
+ */
+
+/**
+ * \define IGRAPH_ECOUNT_MAX
+ * \brief The maximum number of edges supported in igraph graphs.
+ *
+ * The value of this constant is half of \c IGRAPH_INTEGER_MAX .
+ * When igraph is compiled in 32-bit mode, this means that you are limited
+ * to approximately 2<superscript>30</superscript> (about 1.07 billion)
+ * vertices. In 64-bit mode, the limit is approximately
+ * 2<superscript>62</superscript> so you are much more likely to hit
+ * out-of-memory issues due to other reasons before reaching this limit.
+ */
 #define IGRAPH_ECOUNT_MAX (IGRAPH_INTEGER_MAX/2)
+/* The endpoints of edges are often stored in a vector twice the length
+ * of the edge count, thus this cannot be larger than IGRAPH_INTEGER_MAX/2.
+ * Some of the overflow checking code relies on this. */
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */
