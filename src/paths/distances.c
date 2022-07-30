@@ -123,8 +123,8 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
 
 /**
  * This function finds the weighted eccentricity and returns it via \p ecc.
- * It's used for igraph_pseudo_diameter_dijkstra. \p vid_ecc returns the vertex
- * id of the ecc with the greatest
+ * It's used for igraph_pseudo_diameter_dijkstra() and igraph_eccentricity_dijkstra().
+ * \p vid_ecc returns the vertex id of the ecc with the greatest
  * distance from \p vid_start. If two vertices have the same greatest distance,
  * the one with the lowest degree is chosen.
  * When the graph is not (strongly) connected and \p unconn is false, then \p ecc
