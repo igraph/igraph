@@ -29,7 +29,7 @@ int main() {
          igraph_vector_int_which_max(&result));
 
   igraph_closeness(&graph, &result_real, NULL, NULL, igraph_vss_all(), IGRAPH_ALL,
-                   /* weights= */ NULL, /* normalized= */ 0);
+                   /* weights= */ NULL, /* normalized= */ false);
   printf("Maximum closeness is   %10g, vertex %2" IGRAPH_PRId ".\n",
          (double) igraph_vector_max(&result_real),
          igraph_vector_which_max(&result_real));
