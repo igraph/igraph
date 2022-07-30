@@ -975,6 +975,13 @@ igraph_eccentricity:
         NEIMODE mode=ALL
     DEPS: vids ON graph, res ON graph vids
 
+igraph_eccentricity_dijkstra:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NUL, 
+        LOUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        NEIMODE mode=ALL
+    DEPS: weights ON graph, vids ON graph, res ON graph vids
+
 igraph_graph_center:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
@@ -997,6 +1004,7 @@ igraph_pseudo_diameter_dijkstra:
         OUT REAL diameter, VERTEX start_vid,
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
+    DEPS: weights ON graph
 
 igraph_diversity:
     PARAMS: |-
