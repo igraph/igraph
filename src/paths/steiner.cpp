@@ -101,6 +101,65 @@ std::set<igraph_integer_t> fetchSetsBasedonIndex(igraph_integer_t index)
 	return key;
 }
 
+igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vector_t *weights,
+                                       igraph_matrix_t dp_cache, std::set<igraph_integer_t> SetD , igraph_integer_t q, igraph_neimode_t mode)
+{
+	
+	igraph_integer_t indexD  = fetchIndexofMapofSets(SetD);
+	//igraph_integer_t min_col_num = 0;
+	igraph_integer_t min_sum_for_col = igraph_matrix_get(&dp_cache,q,0) + igraph_matrix_get(&dp_cache,indexD,0);
+	for (igraph_integer_t i = 1; i < dp_cache.ncol ; i++)
+	{
+		if ((igraph_matrix_get(&dp_cache,q,i) + igraph_matrix_get(&dp_cache,indexD,i)) < min_sum_for_col )
+		{
+			//min_col_num = i;
+			min_sum_for_col = (igraph_matrix_get(&dp_cache,q,i) + igraph_matrix_get(&dp_cache,indexD,i));
+		}
+	}
+
+	igraph_vs_t vs;
+	igraph_vit_t vit;
+	igraph_vs_all(&vs);
+	igraph_vit_create(graph, vs, &vit);
+	igraph_vector_int_t vectoridlist;
+	igraph_vector_int_init(&vectoridlist,IGRAPH_VIT_SIZE(vit));
+	int i = 0;
+	while (!IGRAPH_VIT_END(vit)) {
+		VECTOR(vectoridlist)[i] = IGRAPH_VIT_GET(vit);
+		i += 1;
+		IGRAPH_VIT_NEXT(vit);
+	}
+
+
+	igraph_es_t es;
+	igraph_eit_t eit;
+	igraph_es_all(&es,IGRAPH_EDGEORDER_ID);
+	igraph_eit_create(graph,es,&eit);
+	igraph_vector_int_t edgeidlist;
+	igraph_vector_int_init(&edgeidlist,IGRAPH_VIT_SIZE(eit));
+	i = 0;
+	while (!IGRAPH_EIT_END(eit)) {
+		VECTOR(edgeidlist)[i] = IGRAPH_EIT_GET(eit);
+		i += 1;
+		IGRAPH_EIT_NEXT(eit);
+	}
+
+	// for (long int i = 0 ; i  < igraph_vector_int_size(&edgeidlist); i++)
+	// {
+	// 	std::cout << VECTOR(edgeidlist)[i] << " ";
+	// }	
+	// std::cout << std::endl;
+	igraph_vit_destroy(&vit);
+	igraph_vs_destroy(&vs);
+	igraph_eit_destroy(&eit);
+	igraph_es_destroy(&es);
+	// igraph_integer_t shortestpath = igraph_get_shortest_path_dijkstra(graph,)
+	// igraph_integer_t combination_value  = Combination(SetD.size(), SetD.size() -1);
+	return IGRAPH_SUCCESS;
+
+}
+
+
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
 igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 {
@@ -165,7 +224,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 	
 	// Creating a vector of steiner vertices. steiner vertices = vertices in graph - steiner terminals
 
-	IGRAPH_CHECK(igraph_matrix_init(&dp_cache,no_of_vertices + pow(2, igraph_vector_int_size(&steiner_terminals_copy)), no_of_vertices));
+	IGRAPH_CHECK(igraph_matrix_init(&dp_cache,no_of_vertices + pow(2, igraph_vector_int_size(&steiner_terminals_copy) - 1), no_of_vertices));
 	IGRAPH_FINALLY(igraph_matrix_destroy,&dp_cache);
 
     igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
@@ -298,7 +357,15 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 	}
 	*res = distance2;
 	//std::cout << u << " " << v << std::endl;
-	
+	// for (igraph_integer_t i = 0 ; i < no_of_vertices +  pow(2, igraph_vector_int_size(&steiner_terminals_copy) - 1) ; i ++)
+	// {
+	// 	for (igraph_integer_t j = 0 ; j < no_of_vertices ; j ++)
+	// 	{
+	// 		std::cout << igraph_matrix_get(&dp_cache,i,j) << " ";
+	// 	}
+	// std::cout << std::endl;
+	// }
+	generate_steiner_tree_appx(graph,weights,dp_cache,*allSubsets.begin(),q,IGRAPH_ALL);
 	igraph_matrix_destroy(&distance);
 	
 	igraph_vector_int_destroy(&steiner_terminals_copy);
@@ -311,3 +378,19 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 	
 
 }
+
+igraph_integer_t factorial ( igraph_integer_t n)
+{
+	igraph_integer_t answer = 1;
+	for (igraph_integer_t i = 1 ; i <= n; i ++)
+	{
+		answer *= i;
+	}
+	return answer;
+}
+
+igraph_integer_t Combination (igraph_integer_t n, igraph_integer_t r)
+{
+	return factorial(n)/ (factorial(n-r) * factorial(r));
+}
+
