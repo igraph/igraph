@@ -39,7 +39,11 @@ int main() {
 
     CHECK_ERROR(igraph_matrix_zapsmall(&mat, -1), IGRAPH_EINVAL);
 
+    igraph_matrix_destroy(&mat);
+
     /* TODO complex case */
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
