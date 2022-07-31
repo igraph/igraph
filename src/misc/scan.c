@@ -806,7 +806,7 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
  * \param res Initialized vector, the result is stored here.
  * \param weights Weight vector for weighted graphs, null pointer for
  *        unweighted graphs.
- * \param subsets List of <code>igraph_vector_int_t</code>
+ * \param subsets List of \type igraph_vector_int_t
  *        objects, the vertex subsets.
  * \return Error code.
  */
