@@ -12,9 +12,11 @@ Some of the highlights are:
 
  - The random number generation framework has been overhauled. Sampling from the full range of `igraph_integer_t` is now possible. Similarly, the sampling of random reals has been improved to utilize almost the full range of the mantissa of an `igraph_real_t`.
 
- - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most prevous uses of the non-managed `igraph_vector_ptr_t`.
+ - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most previous uses of the non-managed `igraph_vector_ptr_t`.
 
  - File format readers are much more robust and more tolerant of invalid input.
+
+ - igraph is much more resilient to overflow errors.
 
  - Many improvements to robustness and reliability, made possible by internal refactorings.
 
@@ -28,7 +30,7 @@ Some of the highlights are:
    also have the option to compile a 32-bit igraph variant on a 64-bit platform
    by changing the `IGRAPH_INTEGER_SIZE` build variable in CMake to 32.
 
- - `igraph_bool_t` is now a C99 bool and not an `int`. Similarly,
+ - `igraph_bool_t` is now a C99 `bool` and not an `int`. Similarly,
    `igraph_vector_bool_t` now consumes `sizeof(bool)` bytes per entry only, not
    `sizeof(int)`.
 
@@ -57,6 +59,10 @@ Some of the highlights are:
    multiple calls to the error handler. Thus, the error handler should either
    abort execution immediately (as the default handler does), or report the error,
    call `IGRAPH_FINALLY_FREE()`, and return normally.
+
+ - Most callback functions now return an error code. In previous versions they
+   returned a boolean value indicating whether to terminate the search. A request
+   to stop the search is now indicated with the special return code `IGRAPH_STOP`.
 
  - `igraph_add_edges()` now uses an `igraph_vector_int_t` for its `edges`
    parameter.
@@ -767,7 +773,7 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
  - Foreign format readers now present more informative error messages.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
- - It is now possible to overide the uniform integer and the Poisson samplers in the random number generator interface.
+ - It is now possible to override the uniform integer and the Poisson samplers in the random number generator interface.
 
 ### Fixed
 
