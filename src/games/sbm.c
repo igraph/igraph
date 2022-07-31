@@ -468,46 +468,46 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t b, offset = 0;
 
     if (n < 1) {
-        IGRAPH_ERROR("`n' must be positive for HSBM", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`n' must be positive for HSBM.", IGRAPH_EINVAL);
     }
     if (no_blocks == 0) {
-        IGRAPH_ERROR("`rholist' empty for HSBM", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`rholist' empty for HSBM.", IGRAPH_EINVAL);
     }
     if (igraph_matrix_list_size(Clist) != no_blocks &&
         igraph_vector_int_size(mlist) != no_blocks) {
         IGRAPH_ERROR("`rholist' must have same length as `Clist' and `m' "
-                     "for HSBM", IGRAPH_EINVAL);
+                     "for HSBM.", IGRAPH_EINVAL);
     }
     if (p < 0 || p > 1) {
-        IGRAPH_ERROR("`p' must be a probability for HSBM", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`p' must be a probability for HSBM.", IGRAPH_EINVAL);
     }
     /* Checks for m's */
     if (igraph_vector_int_sum(mlist) != n) {
-        IGRAPH_ERROR("`m' must sum up to `n' for HSBM", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`m' must sum up to `n' for HSBM.", IGRAPH_EINVAL);
     }
     if (igraph_vector_int_min(mlist) < 1) {
-        IGRAPH_ERROR("`m' must be positive for HSBM", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`m' must be positive for HSBM.", IGRAPH_EINVAL);
     }
     /* Checks for the rhos */
     for (i = 0; i < no_blocks; i++) {
         const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, i);
         if (!igraph_vector_isininterval(rho, 0, 1)) {
-            IGRAPH_ERROR("`rho' must be between zero and one for HSBM",
+            IGRAPH_ERROR("`rho' must be between zero and one for HSBM.",
                          IGRAPH_EINVAL);
         }
         if (fabs(igraph_vector_sum(rho) - 1.0) > sq_dbl_epsilon) {
-            IGRAPH_ERROR("`rho' must sum up to 1 for HSBM", IGRAPH_EINVAL);
+            IGRAPH_ERROR("`rho' must sum up to 1 for HSBM.", IGRAPH_EINVAL);
         }
     }
     /* Checks for the Cs */
     for (i = 0; i < no_blocks; i++) {
         const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
         if (igraph_matrix_min(C) < 0 || igraph_matrix_max(C) > 1) {
-            IGRAPH_ERROR("`C' must be between zero and one for HSBM",
+            IGRAPH_ERROR("Bernoulli rates must be between zero and one for HSBM.",
                          IGRAPH_EINVAL);
         }
         if (!igraph_matrix_is_symmetric(C)) {
-            IGRAPH_ERROR("`C' must be a symmetric matrix", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Bernoulli rate matrices must be symmetric.", IGRAPH_EINVAL);
         }
     }
     /* Check that C and rho sizes match */
@@ -516,7 +516,8 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
         const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
         igraph_integer_t k = igraph_vector_size(rho);
         if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
-            IGRAPH_ERROR("`C' dimensions must match `rho' dimensions in HSBM",
+            IGRAPH_ERROR("All Bernoulli rate matrix dimensions must match `rho' "
+                    "dimensions in HSBM.",
                          IGRAPH_EINVAL);
         }
     }
@@ -528,7 +529,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
         for (j = 0; j < k; j++) {
             igraph_real_t s = VECTOR(*rho)[j] * m;
             if (fabs(round(s) - s) > sq_dbl_epsilon) {
-                IGRAPH_ERROR("`rho' * `m' is not integer in HSBM", IGRAPH_EINVAL);
+                IGRAPH_ERROR("`rho' * `m' is not integer in HSBM.", IGRAPH_EINVAL);
             }
         }
     }
