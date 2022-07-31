@@ -742,6 +742,7 @@ Some of the highlights are:
  - `igraph_local_scan_subset_ecount()` counts the number of edges in induced sugraphs from a subset of vertices.
  - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
+ - `igraph_eccentricity()` and `igraph_eccentricity_dijkstra()` find the longest among all shortest paths from vertices.
 
 ### Removed
 
