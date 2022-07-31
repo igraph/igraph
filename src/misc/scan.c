@@ -797,7 +797,7 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
 }
 /**
  * \function igraph_local_scan_subset_ecount
- * Local scan-statistics of subgraphs induced by subsets of vertices 
+ * \brief Local scan-statistics of subgraphs induced by subsets of vertices.
  *
  * Count the number of edges, or sum the edge weights in
  * induced subgraphs from vertices given as a parameter.
