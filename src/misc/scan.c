@@ -795,6 +795,80 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
 
     return IGRAPH_SUCCESS;
 }
+/**
+ * \function igraph_local_scan_subset_ecount
+ * \brief Local scan-statistics of subgraphs induced by subsets of vertices.
+ *
+ * Count the number of edges, or sum the edge weights in
+ * induced subgraphs from vertices given as a parameter.
+ *
+ * \param graph The graph to perform the counting/summing in.
+ * \param res Initialized vector, the result is stored here.
+ * \param weights Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param subsets List of \type igraph_vector_int_t
+ *        objects, the vertex subsets.
+ * \return Error code.
+ */
+
+igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
+        igraph_vector_t *res,
+        const igraph_vector_t *weights,
+        const igraph_vector_int_list_t *subsets) {
+
+    igraph_integer_t subset, no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_subsets = igraph_vector_int_list_size(subsets);
+    igraph_inclist_t incs;
+    igraph_vector_int_t marked;
+    igraph_bool_t directed = igraph_is_directed(graph);
+
+    if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
+        IGRAPH_ERROR("Invalid weight vector length in local scan.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_TWICE));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_subsets));
+    igraph_vector_null(res);
+
+    for (subset = 0; subset < no_of_subsets; subset++) {
+        igraph_vector_int_t *nei = igraph_vector_int_list_get_ptr(subsets, subset);
+        igraph_integer_t i, neilen = igraph_vector_int_size(nei);
+        for (i = 0; i < neilen; i++) {
+            igraph_integer_t vertex = VECTOR(*nei)[i];
+            if (vertex < 0 || vertex >= no_of_nodes) {
+                IGRAPH_ERROR("Invalid vertex ID in neighborhood list in local scan.",
+                             IGRAPH_EINVAL);
+            }
+            VECTOR(marked)[vertex] = subset + 1;
+        }
+
+        for (i = 0; i < neilen; i++) {
+            igraph_integer_t vertex = VECTOR(*nei)[i];
+            igraph_vector_int_t *edges = igraph_inclist_get(&incs, vertex);
+            igraph_integer_t j, edgeslen = igraph_vector_int_size(edges);
+            for (j = 0; j < edgeslen; j++) {
+                igraph_integer_t edge = VECTOR(*edges)[j];
+                igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge, vertex);
+                if (VECTOR(marked)[nei2] == subset + 1) {
+                    igraph_real_t w = weights ? VECTOR(*weights)[edge] : 1;
+                    VECTOR(*res)[subset] += w;
+                }
+            }
+        }
+        if (!directed) {
+            VECTOR(*res)[subset] /= 2.0;
+        }
+    }
+
+    igraph_inclist_destroy(&incs);
+    igraph_vector_int_destroy(&marked);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
 
 /**
  * \function igraph_local_scan_neighborhood_ecount
@@ -803,11 +877,13 @@ igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_
  * Count the number of edges, or sum the edge weights in
  * neighborhoods given as a parameter.
  *
+ * \deprecated-by igraph_local_scan_subset_ecount 0.10.0
+ *
  * \param graph The graph to perform the counting/summing in.
  * \param res Initialized vector, the result is stored here.
  * \param weights Weight vector for weighted graphs, null pointer for
  *        unweighted graphs.
- * \param neighborhoods List of <code>igraph_vector_int_t</code>
+ * \param neighborhoods List of \type igraph_vector_int_t
  *        objects, the neighborhoods, one for each vertex in the
  *        graph.
  * \return Error code.
@@ -818,60 +894,12 @@ igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
         const igraph_vector_t *weights,
         const igraph_vector_int_list_t *neighborhoods) {
 
-    igraph_integer_t node, no_of_nodes = igraph_vcount(graph);
-    igraph_inclist_t incs;
-    igraph_vector_int_t marked;
-    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector length in local scan", IGRAPH_EINVAL);
-    }
     if (igraph_vector_int_list_size(neighborhoods) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid neighborhood list length in local scan",
+        IGRAPH_ERROR("Invalid neighborhood list length in local scan.",
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
-    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
-    IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
-
-    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
-    igraph_vector_null(res);
-
-    for (node = 0; node < no_of_nodes; node++) {
-        igraph_vector_int_t *nei = igraph_vector_int_list_get_ptr(neighborhoods, node);
-        igraph_integer_t i, neilen = igraph_vector_int_size(nei);
-        VECTOR(marked)[node] = node + 1;
-        for (i = 0; i < neilen; i++) {
-            igraph_integer_t vertex = VECTOR(*nei)[i];
-            if (vertex < 0 || vertex >= no_of_nodes) {
-                IGRAPH_ERROR("Invalid vertex ID in neighborhood list in local scan",
-                             IGRAPH_EINVAL);
-            }
-            VECTOR(marked)[vertex] = node + 1;
-        }
-
-        for (i = 0; i < neilen; i++) {
-            igraph_integer_t vertex = VECTOR(*nei)[i];
-            igraph_vector_int_t *edges = igraph_inclist_get(&incs, vertex);
-            igraph_integer_t j, edgeslen = igraph_vector_int_size(edges);
-            for (j = 0; j < edgeslen; j++) {
-                igraph_integer_t edge = VECTOR(*edges)[j];
-                igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge, vertex);
-                if (VECTOR(marked)[nei2] == node + 1) {
-                    igraph_real_t w = weights ? VECTOR(*weights)[edge] : 1;
-                    VECTOR(*res)[node] += w;
-                }
-            }
-        }
-        if (!directed) {
-            VECTOR(*res)[node] /= 2.0;
-        }
-    }
-
-    igraph_inclist_destroy(&incs);
-    igraph_vector_int_destroy(&marked);
-    IGRAPH_FINALLY_CLEAN(2);
-
-    return IGRAPH_SUCCESS;
+    return igraph_local_scan_subset_ecount(graph, res, weights, neighborhoods);
 }

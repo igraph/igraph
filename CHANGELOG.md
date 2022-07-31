@@ -739,6 +739,7 @@ Some of the highlights are:
  - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
  - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
  - `igraph_turan()` generates Turán graphs.
+ - `igraph_local_scan_subset_ecount()` counts the number of edges in induced sugraphs from a subset of vertices.
  - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
 
@@ -883,6 +884,9 @@ Some of the highlights are:
  - The macros `igraph_Calloc`, `igraph_Realloc` and `igraph_Free` have been
    deprecated in favour of `IGRAPH_CALLOC`, `IGRAPH_REALLOC` and `IGRAPH_FREE`
    to simplify the API. The deprecated variants will be removed in 0.11.
+
+ - `igraph_local_scan_neighborhood_ecount()` is now deprecated in favour of `igraph_local_scan_subset_ecount()`.
+
  - `igraph_vs_seq()`, `igraph_vss_seq()`, `igraph_es_seq()` and `igraph_ess_seq()`
    are now deprecated in favour of `igraph_vs_range()`, `igraph_vss_range()`,
    `igraph_es_range()` and `igraph_ess_range()` because these use C-style

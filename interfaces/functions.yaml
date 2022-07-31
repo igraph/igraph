@@ -1878,6 +1878,12 @@ igraph_local_scan_neighborhood_ecount:
         VERTEXSET_LIST neighborhoods
     DEPS: weights ON graph
 
+igraph_local_scan_subset_ecount:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL,
+        VERTEXSET_LIST subsets
+    DEPS: weights ON graph
+
 igraph_list_triangles:
     PARAMS: GRAPH graph, OUT VERTEXSET res
     DEPS: res ON graph
