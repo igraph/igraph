@@ -13,6 +13,7 @@
 ### Fixed
 
  - Fixed incorrect results from `igraph_local_scan_1_ecount()` when the graph was directed but the mode was `IGRAPH_ALL` and some nodes had loop edges. See issue #2092.
+ - Fixed incorrect counting of self-loops in `igraph_local_scan_neighborhood_ecount()` when the graph was undirected.
  - In some rare edge cases, `igraph_pagerank()` with the ARPACK method and `igraph_hub_score()` / `igraph_authority_score()` could return incorrect results. The problem could be detected by checking that the returned eigenvalue is not negative. See issue #2090.
  - `igraph_permute_vertices()` now checks for out-of-range indices and duplicates in the permutation vector.
  - `igraph_create()` now checks for non-finite vertex indices in the edges vector.

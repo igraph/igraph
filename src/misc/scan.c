@@ -837,7 +837,7 @@ int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
-    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
