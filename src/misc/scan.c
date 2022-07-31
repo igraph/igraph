@@ -827,11 +827,7 @@ igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&marked, no_of_nodes);
-    if (directed) {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
-    } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_TWICE));
-    }
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_subsets));
