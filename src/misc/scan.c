@@ -883,7 +883,7 @@ igraph_error_t igraph_local_scan_subset_ecount(const igraph_t *graph,
  * \param res Initialized vector, the result is stored here.
  * \param weights Weight vector for weighted graphs, null pointer for
  *        unweighted graphs.
- * \param neighborhoods List of <code>igraph_vector_int_t</code>
+ * \param neighborhoods List of \type igraph_vector_int_t
  *        objects, the neighborhoods, one for each vertex in the
  *        graph.
  * \return Error code.
