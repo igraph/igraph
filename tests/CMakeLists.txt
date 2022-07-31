@@ -366,6 +366,7 @@ add_legacy_tests(
   igraph_layout_drl
   igraph_layout_bipartite
   igraph_layout_fruchterman_reingold
+  igraph_layout_fruchterman_reingold_3d
   igraph_layout_gem
   igraph_layout_graphopt
   igraph_layout_grid
