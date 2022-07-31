@@ -543,7 +543,7 @@ igraph_error_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     for (b = 0; b < no_blocks; b++) {
         igraph_integer_t from, to, fromoff = 0;
         const igraph_vector_t *rho = igraph_vector_list_get_ptr(rholist, b);
-        const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, i);
+        const igraph_matrix_t *C = igraph_matrix_list_get_ptr(Clist, b);
         igraph_integer_t m = VECTOR(*mlist)[b];
         igraph_integer_t k = igraph_vector_size(rho);
 
