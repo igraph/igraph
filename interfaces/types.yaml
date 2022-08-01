@@ -511,6 +511,10 @@ TREEMODE:
     CTYPE: igraph_tree_mode_t
     FLAGS: ENUM
 
+VCONNNEI:
+    CTYPE: igraph_vconn_nei_t
+    FLAGS: ENUM
+
 ###############################################################################
 # Switches / flags / bits
 ###############################################################################
@@ -633,9 +637,6 @@ PLFIT:
     # Structure representing the result of a power-law fitting algorithms
     CTYPE: igraph_plfit_result_t
     FLAGS: BY_REF
-
-VCONNNEI:
-    CTYPE: igraph_vconn_nei_t
 
 VERTEX_ATTRIBUTE_COMBINATION:
     # Structure specifying how the attributes of vertices should be combined
