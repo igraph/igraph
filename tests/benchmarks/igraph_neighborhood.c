@@ -440,9 +440,9 @@ int main() {
     igraph_vs_t vids_all, vids_50, vids_5000, vids_200;
 
     igraph_vs_all(&vids_all);
-    igraph_vs_seq(&vids_50, 0, 50);
-    igraph_vs_seq(&vids_5000, 0, 5000);
-    igraph_vs_seq(&vids_200, 0, 200);
+    igraph_vs_range(&vids_50, 0, 50);
+    igraph_vs_range(&vids_5000, 0, 5000);
+    igraph_vs_range(&vids_200, 0, 200);
 
     igraph_full(&g_full, 500, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_ring(&g_ring, 50000, IGRAPH_UNDIRECTED, /* mutual */ 0, /*circular*/ 0);
