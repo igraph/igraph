@@ -150,7 +150,7 @@ public:
         return n;
     };
     // print graph in SUCC_LIST mode, in stdout
-    void print(FILE *f = stdout);
+    /* void print(FILE *f = stdout); */
     igraph_error_t print(igraph_t *graph);
     // Test if graph is connected
     bool is_connected();

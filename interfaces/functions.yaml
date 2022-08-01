@@ -865,8 +865,11 @@ igraph_unfold_tree:
         OPTIONAL OUT INDEX_VECTOR vertex_index
 
 igraph_is_mutual:
-    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL, BOOLEAN loops=True
     DEPS: es ON graph
+
+igraph_has_mutual:
+    PARAMS: GRAPH graph, OUT BOOLEAN res, BOOLEAN loops=True
 
 igraph_maximum_cardinality_search:
     PARAMS: GRAPH graph, OPTIONAL OUT INDEX_VECTOR alpha, OPTIONAL OUT VERTEX_INDICES alpham1
@@ -975,6 +978,13 @@ igraph_eccentricity:
         NEIMODE mode=ALL
     DEPS: vids ON graph, res ON graph vids
 
+igraph_eccentricity_dijkstra:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL, 
+        OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        NEIMODE mode=ALL
+    DEPS: weights ON graph, vids ON graph, res ON graph vids
+
 igraph_graph_center:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
@@ -997,6 +1007,7 @@ igraph_pseudo_diameter_dijkstra:
         OUT REAL diameter, VERTEX start_vid,
         OUT INTEGER from=NULL, OUT INTEGER to=NULL,
         BOOLEAN directed=True, BOOLEAN unconnected=True
+    DEPS: weights ON graph
 
 igraph_diversity:
     PARAMS: |-
@@ -1875,6 +1886,12 @@ igraph_local_scan_neighborhood_ecount:
         VERTEXSET_LIST neighborhoods
     DEPS: weights ON graph
 
+igraph_local_scan_subset_ecount:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL,
+        VERTEXSET_LIST subsets
+    DEPS: weights ON graph
+
 igraph_list_triangles:
     PARAMS: GRAPH graph, OUT VERTEXSET res
     DEPS: res ON graph
@@ -2200,9 +2217,6 @@ igraph_get_subisomorphisms_vf2:
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
 
-igraph_isomorphic_34:
-    PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso
-
 igraph_canonical_permutation:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors,
@@ -2384,12 +2398,12 @@ igraph_eulerian_cycle:
 #######################################
 
 igraph_fundamental_cycles:
-    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff
-    DEPS: basis ON graph, start ON graph
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, OPTIONAL VERTEX start, INTEGER bfs_cutoff, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph, basis ON graph, start ON graph
 
 igraph_minimum_cycle_basis:
-    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order
-    DEPS: basis ON graph
+    PARAMS: GRAPH graph, OUT EDGESET_LIST basis, INTEGER bfs_cutoff, BOOLEAN complete, BOOLEAN use_cycle_order, EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph, basis ON graph
 
 #######################################
 # Trees
@@ -2498,6 +2512,10 @@ igraph_strerror:
 
 igraph_expand_path_to_pairs:
     PARAMS: INOUT VERTEX_INDICES path
+
+igraph_invalidate_cache:
+    PARAMS: GRAPH graph
+    RETURN: VOID
 
 igraph_vertex_path_from_edge_path:
     PARAMS: |-

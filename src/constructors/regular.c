@@ -751,6 +751,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t 
     for (k = 0; k < branching_counts_size; ++k) {
         level_end = child; /* points to one past the last vertex of the current level of parents */
         while(parent < level_end) {
+            IGRAPH_ALLOW_INTERRUPTION();
             for (j = 0; j < VECTOR(*branches)[k]; j++) {
                 if (type == IGRAPH_TREE_IN) {
                     VECTOR(edges)[idx++] = child++;

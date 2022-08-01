@@ -345,10 +345,7 @@ static igraph_error_t igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun,
 
     /* Probe the value in the matrix */
     a = 1;
-    if (fun(&b, &a, 1, extra)) {
-        IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                     IGRAPH_ARPACK_PROD);
-    }
+    IGRAPH_CHECK(fun(&b, &a, 1, extra));
 
     options->nconv = nev;
 
@@ -381,10 +378,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun,
 
     /* Probe the value in the matrix */
     a = 1;
-    if (fun(&b, &a, 1, extra)) {
-        IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                     IGRAPH_ARPACK_PROD);
-    }
+    IGRAPH_CHECK(fun(&b, &a, 1, extra));
 
     options->nconv = nev;
 
@@ -426,15 +420,9 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
 
     /* Probe the values in the matrix */
     vec[0] = 1; vec[1] = 0;
-    if (fun(mat, vec, 2, extra)) {
-        IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                     IGRAPH_ARPACK_PROD);
-    }
+    IGRAPH_CHECK(fun(mat, vec, 2, extra));
     vec[0] = 0; vec[1] = 1;
-    if (fun(mat + 2, vec, 2, extra)) {
-        IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                     IGRAPH_ARPACK_PROD);
-    }
+    IGRAPH_CHECK(fun(mat + 2, vec, 2, extra));
     a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
 
     /* Get the trace and the determinant */
@@ -577,15 +565,9 @@ static igraph_error_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun,
 
     /* Probe the values in the matrix */
     vec[0] = 1; vec[1] = 0;
-    if (fun(mat, vec, 2, extra)) {
-        IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                     IGRAPH_ARPACK_PROD);
-    }
+    IGRAPH_CHECK(fun(mat, vec, 2, extra));
     vec[0] = 0; vec[1] = 1;
-    if (fun(mat + 2, vec, 2, extra)) {
-        IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                     IGRAPH_ARPACK_PROD);
-    }
+    IGRAPH_CHECK(fun(mat + 2, vec, 2, extra));
     a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
 
     /* Get the trace and the determinant */
@@ -683,7 +665,7 @@ igraph_error_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *ve
         sort[0] = 'X'; sort[1] = 'X';
     }
 
-    IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
+    IGRAPH_CHECK(igraph_vector_init_range(&order, 0, nconv));
     IGRAPH_FINALLY(igraph_vector_destroy, &order);
 #ifdef HAVE_GFORTRAN
     igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order), /*which_len=*/ 2);
@@ -776,7 +758,7 @@ igraph_error_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *ve
 
 #undef which
 
-    IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
+    IGRAPH_CHECK(igraph_vector_init_range(&order, 0, nconv));
     IGRAPH_FINALLY(igraph_vector_destroy, &order);
 #ifdef HAVE_GFORTRAN
     igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order), /*which_len=*/ 2);
@@ -952,7 +934,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
     int ido = 0;
     int rvec = vectors || storage ? 1 : 0; /* calculate eigenvectors? */
-    char *all = "All";
+    char *all = "A";
 
     int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
@@ -1057,6 +1039,8 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
     /* Ok, we have everything */
     while (1) {
+        igraph_real_t *from, *to;
+
 #ifdef HAVE_GFORTRAN
         igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1073,15 +1057,17 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
         if (ido == -1 || ido == 1) {
-            igraph_real_t *from = workd + options->ipntr[0] - 1;
-            igraph_real_t *to = workd + options->ipntr[1] - 1;
-            if (fun(to, from, options->n, extra) != 0) {
-                IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                             IGRAPH_ARPACK_PROD);
-            }
-
-        } else {
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
+            IGRAPH_CHECK(fun(to, from, options->n, extra));
+        } else if (ido == 2) {
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
+            memcpy(to, from, sizeof(igraph_real_t) * options->n);
+        } else if (ido == 99) {
             break;
+        } else {
+            IGRAPH_ERRORF("Unexpected IDO value %d when running ARPACK.", IGRAPH_FAILURE, ido);
         }
     }
 
@@ -1210,7 +1196,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
     int ido = 0;
     int rvec = vectors || storage ? 1 : 0;
-    char *all = "All";
+    char *all = "A";
 
     int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
@@ -1320,6 +1306,8 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
     /* Ok, we have everything */
     while (1) {
+        igraph_real_t *from, *to;
+
 #ifdef HAVE_GFORTRAN
         igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1336,14 +1324,22 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 #endif
 
         if (ido == -1 || ido == 1) {
-            igraph_real_t *from = workd + options->ipntr[0] - 1;
-            igraph_real_t *to = workd + options->ipntr[1] - 1;
-            if (fun(to, from, options->n, extra) != 0) {
-                IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
-                             IGRAPH_ARPACK_PROD);
-            }
-        } else {
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
+            IGRAPH_CHECK(fun(to, from, options->n, extra));
+        } else if (ido == 2) {
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[1] - 1;
+            memcpy(to, from, sizeof(igraph_real_t) * options->n);
+        } else if (ido == 4) {
+            /* same as ido == 1 but the arguments are at different places */
+            from = workd + options->ipntr[0] - 1;
+            to = workd + options->ipntr[2] - 1;
+            IGRAPH_CHECK(fun(to, from, options->n, extra));
+        } else if (ido == 99) {
             break;
+        } else {
+            IGRAPH_ERRORF("Unexpected IDO value %d when running ARPACK.", IGRAPH_FAILURE, ido);
         }
     }
 

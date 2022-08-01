@@ -87,6 +87,7 @@ add_library(
   graph/adjlist.c
   graph/attributes.c
   graph/basic_query.c
+  graph/caching.c
   graph/cattributes.c
   graph/graph_list.c
   graph/iterators.c
@@ -311,9 +312,12 @@ add_library(
   $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
 )
 
+# Required by Xcode new build system
+add_dependencies(igraph parsersources)
+
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "0.0.0")
-set_target_properties(igraph PROPERTIES SOVERSION 0)
+set_target_properties(igraph PROPERTIES VERSION "3.0.0")
+set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
 target_compile_definitions(

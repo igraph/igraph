@@ -23,6 +23,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 
 __BEGIN_DECLS
 

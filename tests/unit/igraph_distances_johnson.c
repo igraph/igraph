@@ -52,7 +52,7 @@ int main() {
     print_matrix(&result);
 
     printf("Directed graph with loops and multi-edges, select vertices 1 and 2:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_seq(1, 2), igraph_vss_seq(1, 2), &weights_lm) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_range(1, 3), igraph_vss_range(1, 3), &weights_lm) == IGRAPH_SUCCESS);
     print_matrix(&result);
 
     printf("Directed graph with loops and multi-edges, select 0 -> 2:\n");

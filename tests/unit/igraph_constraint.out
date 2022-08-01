@@ -1,0 +1,27 @@
+No vertices:
+( )
+
+One vertex:
+( NaN )
+
+Line graph, 4 vertices:
+( 1 0.5 0.5 1 )
+
+Full graph, 4 vertices, weights make it a line:
+( 1.25 0.5625 0.5625 1.25 )
+
+Full graph, 4 vertices, all same weights:
+( 0.925926 0.925926 0.925926 0.925926 )
+
+Full graph, 4 vertices, all same weights, but split over multiple edges:
+( 0.925926 0.925926 0.925926 0.925926 )
+
+Full graph, 4 vertices, no weights:
+( 0.925926 0.925926 0.925926 0.925926 )
+
+Full graph, 4 vertices, no weights, with loop:
+( 0.925926 0.925926 0.925926 0.925926 )
+
+Hole in middle of two clusters:
+( 0.865741 0.865741 0.865741 0.583333 0.5 0.583333 0.865741 0.865741 0.865741 )
+

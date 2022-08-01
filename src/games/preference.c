@@ -29,6 +29,7 @@
 #include "igraph_vector_list.h"
 
 #include "core/interruption.h"
+#include "math/safe_intop.h"
 
 #include <math.h> /* for sqrt and floor */
 
@@ -90,7 +91,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                            igraph_bool_t directed,
                            igraph_bool_t loops) {
 
-    igraph_integer_t i, j;
+    igraph_integer_t i, j, no_reserved_edges;
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_vector_int_t* nodetypes;
@@ -231,7 +232,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     for (i = 0; i < types; i++) {
         for (j = 0; j < types; j++) {
             /* Generating the random subgraph between vertices of type i and j */
-            igraph_integer_t k, l;
+            igraph_integer_t k, l, l_x2;
             igraph_real_t p, last;
             igraph_vector_int_t *v1, *v2;
             igraph_integer_t v1_size, v2_size;
@@ -263,7 +264,12 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
                 }
             }
 
-            IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
+            if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+                IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+            }
+
+            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &no_reserved_edges));
+            IGRAPH_CHECK(igraph_vector_reserve(&s, no_reserved_edges));
 
             last = RNG_GEOM(p);
             while (last < maxedges) {
@@ -273,7 +279,9 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_int_size(&edges) + l * 2));
+            IGRAPH_SAFE_MULT(l, 2, &l_x2);
+            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
 
             if (i != j) {
                 /* Generating the subgraph between vertices of type i and j */
@@ -355,8 +363,8 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  *
  * \param graph Pointer to an uninitialized graph.
  * \param nodes The number of vertices in the graph.
- * \param out_types The number of vertex out-types.
- * \param in_types The number of vertex in-types.
+ * \param no_out_types The number of vertex out-types.
+ * \param no_in_types The number of vertex in-types.
  * \param type_dist_matrix Matrix of size <code>out_types * in_types</code>,
  *   giving the joint distribution of vertex types.
  *   If \c NULL, incoming and outgoing vertex types are independent and uniformly
@@ -379,15 +387,15 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  */
 
 igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
-                                      igraph_integer_t out_types,
-                                      igraph_integer_t in_types,
+                                      igraph_integer_t no_out_types,
+                                      igraph_integer_t no_in_types,
                                       const igraph_matrix_t *type_dist_matrix,
                                       const igraph_matrix_t *pref_matrix,
                                       igraph_vector_int_t *node_type_out_vec,
                                       igraph_vector_int_t *node_type_in_vec,
                                       igraph_bool_t loops) {
 
-    igraph_integer_t i, j, k;
+    igraph_integer_t i, j, k, no_reserved_edges;
     igraph_vector_int_t edges;
     igraph_vector_t s;
     igraph_vector_t cumdist;
@@ -401,19 +409,19 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         IGRAPH_ERROR("The number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
-    if (in_types < 1) {
+    if (no_in_types < 1) {
         IGRAPH_ERROR("The number of vertex in-types must be at least 1.", IGRAPH_EINVAL);
     }
 
-    if (out_types < 1) {
+    if (no_out_types < 1) {
         IGRAPH_ERROR("The number of vertex out-types must be at least 1.", IGRAPH_EINVAL);
     }
 
     if (type_dist_matrix) {
         igraph_real_t lo;
 
-        if (igraph_matrix_nrow(type_dist_matrix) != out_types ||
-            igraph_matrix_ncol(type_dist_matrix) != in_types) {
+        if (igraph_matrix_nrow(type_dist_matrix) != no_out_types ||
+            igraph_matrix_ncol(type_dist_matrix) != no_in_types) {
             IGRAPH_ERROR("The type distribution matrix must have dimensions out_types * in_types.", IGRAPH_EINVAL);
         }
 
@@ -426,8 +434,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         }
     }
 
-    if (igraph_matrix_nrow(pref_matrix) != out_types ||
-        igraph_matrix_ncol(pref_matrix) != in_types) {
+    if (igraph_matrix_nrow(pref_matrix) != no_out_types ||
+        igraph_matrix_ncol(pref_matrix) != no_in_types) {
         IGRAPH_ERROR("The preference matrix must have dimensions out_types * in_types.", IGRAPH_EINVAL);
     }
 
@@ -443,7 +451,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&cumdist, in_types * out_types + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&cumdist, no_in_types * no_out_types + 1);
 
     if (node_type_in_vec) {
         nodetypes_in = node_type_in_vec;
@@ -467,18 +475,20 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes_out, nodes);
     }
 
-    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vids_by_intype, in_types);
-    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vids_by_outtype, out_types);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vids_by_intype, no_in_types);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vids_by_outtype, no_out_types);
 
     VECTOR(cumdist)[0] = 0;
+    k = 0;
     if (type_dist_matrix) {
-        for (i = 0, k = 0; i < out_types; i++) {
-            for (j = 0; j < in_types; j++, k++) {
+        for (j = 0; j < no_in_types; j++) {
+            for (i = 0; i < no_out_types; i++) {
                 VECTOR(cumdist)[k + 1] = VECTOR(cumdist)[k] + MATRIX(*type_dist_matrix, i, j);
+                k++;
             }
         }
     } else {
-        for (i = 0; i < out_types * in_types; i++) {
+        for (i = 0; i < no_out_types * no_in_types; i++) {
             VECTOR(cumdist)[i + 1] = i + 1;
         }
     }
@@ -487,18 +497,18 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     RNG_BEGIN();
 
     for (i = 0; i < nodes; i++) {
-        igraph_integer_t type1, type2;
+        igraph_integer_t in_type, out_type;
         igraph_real_t uni1 = RNG_UNIF(0, maxcum);
-        igraph_vector_binsearch(&cumdist, uni1, &type1);
-        type2 = (type1 - 1) % out_types;
-        type1 = (type1 - 1) / out_types;
-        VECTOR(*nodetypes_in)[i] = type1;
-        VECTOR(*nodetypes_out)[i] = type2;
+        igraph_vector_binsearch(&cumdist, uni1, &in_type);
+        out_type = (in_type - 1) % no_out_types;
+        in_type = (in_type - 1) / no_out_types;
+        VECTOR(*nodetypes_in)[i] = in_type;
+        VECTOR(*nodetypes_out)[i] = out_type;
         IGRAPH_CHECK(igraph_vector_int_push_back(
-            igraph_vector_int_list_get_ptr(&vids_by_intype, type1), i
+            igraph_vector_int_list_get_ptr(&vids_by_intype, in_type), i
         ));
         IGRAPH_CHECK(igraph_vector_int_push_back(
-            igraph_vector_int_list_get_ptr(&vids_by_outtype, type2), i
+            igraph_vector_int_list_get_ptr(&vids_by_outtype, out_type), i
         ));
     }
 
@@ -508,9 +518,9 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&intersect, 0);
-    for (i = 0; i < out_types; i++) {
-        for (j = 0; j < in_types; j++) {
-            igraph_integer_t kk, l;
+    for (i = 0; i < no_out_types; i++) {
+        for (j = 0; j < no_in_types; j++) {
+            igraph_integer_t kk, l, l_x2;
             igraph_integer_t c = 0;
             igraph_real_t p, last;
             igraph_vector_int_t *v1, *v2;
@@ -524,6 +534,11 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             v2_size = igraph_vector_int_size(v2);
 
             maxedges = ((igraph_real_t) v1_size) * v2_size;
+
+            if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+                IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+            }
+
             if (!loops) {
                 IGRAPH_CHECK(igraph_vector_int_intersect_sorted(v1, v2, &intersect));
                 c = igraph_vector_int_size(&intersect);
@@ -532,7 +547,9 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
 
             p = MATRIX(*pref_matrix, i, j);
             igraph_vector_clear(&s);
-            IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
+
+            IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &no_reserved_edges));
+            IGRAPH_CHECK(igraph_vector_reserve(&s, no_reserved_edges));
 
             last = RNG_GEOM(p);
             while (last < maxedges) {
@@ -542,7 +559,10 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
             }
             l = igraph_vector_size(&s);
 
-            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_int_size(&edges) + l * 2));
+            IGRAPH_SAFE_MULT(l, 2, &l_x2);
+            IGRAPH_SAFE_ADD(igraph_vector_int_size(&edges), l_x2, &no_reserved_edges);
+            IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_reserved_edges));
+
 
             if (!loops && c > 0) {
                 for (kk = 0; kk < l; kk++) {

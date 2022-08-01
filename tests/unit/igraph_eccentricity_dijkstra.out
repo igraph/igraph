@@ -1,0 +1,33 @@
+Null graph:
+( )
+
+Singleton graph:
+( 0 )
+
+Path with isolated vertex:
+( 1 0 1 )
+
+Undirected path graph:
+( 4 3 2 3 4 )
+
+Directed path graph:
+( 4 3 2 1 0 )
+
+Undirected star:
+( 1 2 2 2 2 2 2 2 2 2 )
+
+Out-star:
+( 1 2 2 2 2 2 2 2 2 2 )
+
+Out-star, IGRAPH_OUT:
+( 1 0 0 0 0 0 0 0 0 0 )
+
+Out-star with NULL weights:
+( 1 2 2 2 2 2 2 2 2 2 )
+
+Out-star with weights:
+( 0.9 1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.7 )
+
+Check wrong number of weights error.
+Check NaN weight error.
+Check negative weight error.

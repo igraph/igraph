@@ -283,8 +283,8 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         }
         if (csize) {
             /* 0 clusters for 0 nodes, 1 cluster for 1 node */
-            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_fill(membership, 1);
+            IGRAPH_CHECK(igraph_vector_int_resize(csize, no_of_nodes));
+            igraph_vector_int_fill(csize, 1);
         }
         return IGRAPH_SUCCESS;
     }
@@ -570,8 +570,8 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         }
         if (csize) {
             /* 0 clusters for 0 nodes, 1 cluster for 1 node */
-            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_fill(membership, 1);
+            IGRAPH_CHECK(igraph_vector_int_resize(csize, no_of_nodes));
+            igraph_vector_int_fill(csize, 1);
         }
         return IGRAPH_SUCCESS;
     }

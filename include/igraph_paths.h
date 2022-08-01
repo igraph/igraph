@@ -25,6 +25,7 @@
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_iterators.h"
 #include "igraph_matrix.h"
 #include "igraph_types.h"
@@ -175,6 +176,12 @@ IGRAPH_EXPORT igraph_error_t igraph_eccentricity(const igraph_t *graph,
                                       igraph_vector_t *res,
                                       igraph_vs_t vids,
                                       igraph_neimode_t mode);
+
+IGRAPH_EXPORT igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
+                        const igraph_vector_t *weights,
+                        igraph_vector_t *res,
+                        igraph_vs_t vids,
+                        igraph_neimode_t mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                                 igraph_neimode_t mode);

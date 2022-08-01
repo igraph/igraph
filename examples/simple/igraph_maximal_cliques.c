@@ -83,7 +83,7 @@ int main() {
     /* Create a graph that has a random component, plus a number of
        relatively small cliques */
 
-    igraph_vector_int_init_seq(&perm, 0, NODES - 1);
+    igraph_vector_int_init_range(&perm, 0, NODES);
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, NODES, NODES,
                             /*directed=*/ 0, /*loops=*/ 0);
     igraph_full(&cli, CLIQUE_SIZE, /*directed=*/ 0, /*loops=*/ 0);

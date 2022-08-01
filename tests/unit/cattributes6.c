@@ -225,7 +225,7 @@ int main() {
     SETVANV(&g, "y", &y);
     igraph_vector_destroy(&y);
 
-    igraph_vector_init_seq(&y, 0, igraph_vcount(&g) - 1);
+    igraph_vector_init_range(&y, 0, igraph_vcount(&g));
     SETVANV(&g, "foobar", &y);
     igraph_vector_destroy(&y);
 
@@ -258,7 +258,7 @@ int main() {
     SETEANV(&g, "weight", &y);
     igraph_vector_destroy(&y);
 
-    igraph_vector_init_seq(&y, 0, igraph_ecount(&g) - 1);
+    igraph_vector_init_range(&y, 0, igraph_ecount(&g));
     SETEANV(&g, "foobar", &y);
     igraph_vector_destroy(&y);
 

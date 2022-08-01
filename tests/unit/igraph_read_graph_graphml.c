@@ -109,6 +109,8 @@ int main() {
         unlink("test2.graphml");
     }
     dump_graph("Directed graph:\n", &g);
+    dump_vertex_attribute_bool("gender", &g);
+    dump_vertex_attribute_string("color", &g);
     igraph_destroy(&g);
 
     /* The same with undirected graph */
@@ -119,6 +121,8 @@ int main() {
     }
     fclose(ifile);
     dump_graph("Undirected graph:\n", &g);
+    dump_vertex_attribute_bool("gender", &g);
+    dump_vertex_attribute_string("color", &g);
     igraph_destroy(&g);
 
     /* Test a GraphML file with default attributes */

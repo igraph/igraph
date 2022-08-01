@@ -310,6 +310,10 @@ static igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t
         VECTOR(x)[i] = (end_point / nr_points) * i + 0.001; /* added a 0.001 to prevent NaNs */
     }
 
+    /* Initialize squared_sum_res_old to a dummy value to prevent some compilers
+     * from complaining about uninitialized values */
+    squared_sum_res_old = IGRAPH_INFINITY;
+
 #ifdef UMAP_DEBUG
     printf("start fit_ab\n");
 #endif
@@ -876,7 +880,7 @@ static igraph_error_t igraph_i_layout_umap(
         /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
         if (no_of_nodes <= 1)
             return IGRAPH_SUCCESS;
-        
+
     } else {
          /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
          if (no_of_nodes <= 1) {

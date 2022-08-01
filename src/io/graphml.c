@@ -1631,7 +1631,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
                                        NULL);
         if (ctxt) {
             if (xmlCtxtUseOptions(ctxt,
-                                  XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
+                                  XML_PARSE_NOBLANKS |
                                   XML_PARSE_NONET | XML_PARSE_NSCLEAN |
                                   XML_PARSE_NOCDATA | XML_PARSE_HUGE
                                   )) {

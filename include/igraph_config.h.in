@@ -37,6 +37,19 @@ __BEGIN_DECLS
 
 #define IGRAPH_DEPRECATED_ENUMVAL @IGRAPH_DEPRECATED_ENUMVAL@
 
+/**
+ * \define IGRAPH_BOOL_TYPE
+ *
+ * Specifies the C type to be used for igraph_bool_t. This is added here _only_
+ * to support the R interface, where we want to be able to create views into
+ * R boolean vectors and treat them as an igraph_vector_bool_t, which requires
+ * us to align igraph_bool_t with R's boolean type.
+ *
+ * Any other use-case of overriding igraph's bool type is completely
+ * unsupported.
+ */
+#define IGRAPH_BOOL_TYPE bool
+
 __END_DECLS
 
 #endif

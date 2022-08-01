@@ -108,14 +108,25 @@ int main() {
     IGRAPH_ASSERT(igraph_is_nan(VECTOR(modularity)[0]));
 
     /* Optimal modularity */
+    /* Test only when GLPK is available */
 
-    m = 2;
-    igraph_vector_int_resize(&membership, 1);
+    {
+        igraph_error_t ret;
+        igraph_error_handler_t *handler;
 
-    igraph_community_optimal_modularity(&g, &m, &membership, NULL);
+        m = 2;
+        igraph_vector_int_resize(&membership, 1);
 
-    IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
-    IGRAPH_ASSERT(igraph_is_nan(m));
+        handler = igraph_set_error_handler(igraph_error_handler_ignore);
+        ret = igraph_community_optimal_modularity(&g, &m, &membership, NULL);
+        igraph_set_error_handler(handler);
+
+        if (ret != IGRAPH_UNIMPLEMENTED) {
+            IGRAPH_ASSERT(ret == IGRAPH_SUCCESS);
+            IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
+            IGRAPH_ASSERT(igraph_is_nan(m));
+        }
+    }
 
     /* Spinglass */
 

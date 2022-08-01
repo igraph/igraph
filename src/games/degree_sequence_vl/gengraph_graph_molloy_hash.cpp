@@ -65,9 +65,7 @@ void graph_molloy_hash::init() {
 
 //_________________________________________________________________________
 graph_molloy_hash::graph_molloy_hash(degree_sequence &degs) {
-    igraph_status("Allocating memory for graph...", 0);
-    igraph_integer_t s = alloc(degs);
-    igraph_statusf("%" IGRAPH_PRId " bytes allocated successfully\n", 0, s);
+    alloc(degs);
 }
 
 //_________________________________________________________________________
@@ -408,21 +406,24 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
 
     // Status report
     {
-        igraph_status("*** Shuffle Monitor ***\n", 0);
-        igraph_statusf(" - Average cost : %f / validated edge swap\n", 0,
+        igraph_status("*** Shuffle Monitor ***\n", NULL);
+        igraph_statusf(" - Average cost : %f / validated edge swap\n", NULL,
                        double(cost) / double(nb_swaps));
         igraph_statusf(" - Connectivity tests : %" IGRAPH_PRId " (%" IGRAPH_PRId " successes, %" IGRAPH_PRId " failures)\n",
-                       0, successes + failures, successes, failures);
-        igraph_statusf(" - Average window : %" IGRAPH_PRId "\n", 0,
-                       igraph_integer_t(avg_T / double(successes + failures)));
+                       NULL, successes + failures, successes, failures);
+        // %.f rounds to integer
+        igraph_statusf(" - Average window : %.f\n", NULL,
+                       avg_T / double(successes + failures));
         if (type == FINAL_HEURISTICS || type == BRUTE_FORCE_HEURISTICS)
-            igraph_statusf(" - Average isolation test width : %f\n", 0,
+            igraph_statusf(" - Average isolation test width : %f\n", NULL,
                            avg_K / double(successes + failures));
     }
     return nb_swaps;
 }
 
 //_________________________________________________________________________
+
+/*
 void graph_molloy_hash::print(FILE *f) {
     igraph_integer_t i, j;
     for (i = 0; i < n; i++) {
@@ -433,6 +434,7 @@ void graph_molloy_hash::print(FILE *f) {
         fprintf(f, "\n");
     }
 }
+*/
 
 igraph_error_t graph_molloy_hash::print(igraph_t *graph) {
     igraph_integer_t i, j;

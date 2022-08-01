@@ -115,7 +115,7 @@ void test_bliss() {
     igraph_vector_int_list_t generators;
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-    igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_int_init_range(&perm, 0, igraph_vcount(&ring1));
     random_permutation(&perm);
     igraph_permute_vertices(&ring1, &ring2, &perm);
 
@@ -166,7 +166,7 @@ void test_bliss() {
                "Note that the generator set is not guaranteed to be minimal.\n");
     igraph_vector_int_list_clear(&generators);
 
-    igraph_vector_int_init_seq(&color, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_int_init_range(&color, 0, igraph_vcount(&ring1));
 
     igraph_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "1") != 0) {

@@ -39,7 +39,7 @@ int main() {
     SETGAN(&g, "edges", igraph_ecount(&g));
     SETGAB(&g, "famous", 1);
 
-    igraph_vector_init_seq(&y, 1, igraph_vcount(&g));
+    igraph_vector_init_range(&y, 1, igraph_vcount(&g) + 1);
     SETVANV(&g, "id", &y);
     igraph_vector_destroy(&y);
 
@@ -48,7 +48,7 @@ int main() {
 
     SETVAB(&g, "is_first", 0, 1);
 
-    igraph_vector_init_seq(&y, 1, igraph_ecount(&g));
+    igraph_vector_init_range(&y, 1, igraph_ecount(&g) + 1);
     SETEANV(&g, "id", &y);
     igraph_vector_destroy(&y);
 

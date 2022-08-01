@@ -171,7 +171,7 @@ int main() {
         return 1;
     }
 
-    igraph_similarity_jaccard(&g, &m, igraph_vss_seq(1, 2), IGRAPH_ALL, 0);
+    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
     print_matrix(&m, stdout);
 
     ret = check_jaccard_all(&g, &m, IGRAPH_OUT, 1);

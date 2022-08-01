@@ -10,6 +10,8 @@ Directed: 0
 2 4
 3 5
 4 5
+Vertex attribute 'gender': true true false true false false
+Vertex attribute 'color': 'green' 'yellow' 'blue' 'red "with entities"' 'yellow' 'turquoise'
 Warning: Unknown attribute key 'd3' in a <data> tag, ignoring attribute.
 Undirected graph:
 Vertices: 6
@@ -22,6 +24,8 @@ Directed: 0
 2 4
 3 5
 4 5
+Vertex attribute 'gender': true true false true false false
+Vertex attribute 'color': 'green' 'yellow' 'blue' 'red "with entities"' 'yellow' 'turquoise'
 Graph with default attributes:
 Vertices: 3
 Edges: 2
