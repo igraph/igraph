@@ -493,6 +493,8 @@ TREE_MODE:
     FLAGS: ENUM
 
 VCONNNEI:
+    # Enum specifying what to do in vertex connectivity tests when the two
+    # vertices being tested are already connected
     CTYPE: igraph_vconn_nei_t
     FLAGS: ENUM
 
