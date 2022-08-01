@@ -632,6 +632,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
+    igraph_real_t dummy;   /* to prevent some Clang sanitizer warnings */
+
     if (igraph_matrix_nrow(A) > INT_MAX) {
         IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
     }
@@ -672,8 +674,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy, 0, 0), &lda,
                  VECTOR(*myreal), VECTOR(*myimag),
-                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                  VECTOR(work), &lwork, info);
 
     lwork = (int) VECTOR(work)[0];
@@ -681,8 +683,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy, 0, 0), &lda,
                  VECTOR(*myreal), VECTOR(*myimag),
-                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                  VECTOR(work), &lwork, info);
 
     if (*info < 0) {
