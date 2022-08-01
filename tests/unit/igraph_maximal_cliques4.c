@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void sort_cliques(igraph_vector_int_list_t *cliques) {
     igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
@@ -58,8 +58,8 @@ int main() {
                                   &cliques, &n, /*outfile=*/ 0,
                                   /*min_size=*/ 9, /*max_size=*/ 0);
 
-    igraph_vector_int_init_seq(&v1,  0, 12);
-    igraph_vector_int_init_seq(&v2, 13, 99);
+    igraph_vector_int_init_range(&v1,  0, 13);
+    igraph_vector_int_init_range(&v2, 13, 100);
     igraph_maximal_cliques_subset(&graph, &v1, &cl1, &n1, /*outfile=*/ 0,
                                   /*min_size=*/ 9, /*max_size=*/ 0);
     igraph_maximal_cliques_subset(&graph, &v2, &cl2, &n2, /*outfile=*/ 0,

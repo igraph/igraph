@@ -43,24 +43,27 @@ static void FUNCTION(igraph_heap, i_switch)(BASE* arr, igraph_integer_t e1, igra
  * \function igraph_heap_init
  * \brief Initializes an empty heap object.
  *
- * Creates an empty heap, but allocates size for some elements.
+ * Creates an \em empty heap, and also allocates memory
+ * for some elements.
+ *
  * \param h Pointer to an uninitialized heap object.
- * \param alloc_size Number of elements to allocate memory for.
+ * \param capacity Number of elements to allocate memory for.
  * \return Error code.
  *
  * Time complexity: O(\p alloc_size), assuming memory allocation is a
  * linear operation.
  */
 
-igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t alloc_size) {
-    if (alloc_size <= 0 ) {
-        alloc_size = 1;
+igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t capacity) {
+    IGRAPH_ASSERT(capacity >= 0);
+    if (capacity == 0 ) {
+        capacity = 1;
     }
-    h->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
-    if (h->stor_begin == 0) {
-        IGRAPH_ERROR("heap init failed", IGRAPH_ENOMEM);
+    h->stor_begin = IGRAPH_CALLOC(capacity, BASE);
+    if (! h->stor_begin) {
+        IGRAPH_ERROR("Cannot initialize heap.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    h->stor_end = h->stor_begin + alloc_size;
+    h->stor_end = h->stor_begin + capacity;
     h->end = h->stor_begin;
     h->destroy = 1;
 
@@ -72,8 +75,9 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_
  * \function igraph_heap_init_array
  * \brief Build a heap from an array.
  *
- * Initializes a heap object from an array, the heap is also
+ * Initializes a heap object from an array. The heap is also
  * built of course (constructor).
+ *
  * \param h Pointer to an uninitialized heap object.
  * \param data Pointer to an array of base data type.
  * \param len The length of the array at \p data.
@@ -84,8 +88,8 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_
 
 igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, igraph_integer_t len) {
     h->stor_begin = IGRAPH_CALLOC(len, BASE);
-    if (h->stor_begin == 0) {
-        IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
+    if (! h->stor_begin) {
+        IGRAPH_ERROR("Cannot initialize heap from array.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     h->stor_end = h->stor_begin + len;
     h->end = h->stor_end;
@@ -110,9 +114,8 @@ igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* dat
 
 void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h) {
     if (h->destroy) {
-        if (h->stor_begin != 0) {
-            IGRAPH_FREE(h->stor_begin);
-            h->stor_begin = 0;
+        if (h->stor_begin != NULL) {
+            IGRAPH_FREE(h->stor_begin); /* sets to NULL */
         }
     }
 }
@@ -128,7 +131,7 @@ void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h) {
  * TIme complexity: O(1).
  */
 
-igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
+igraph_bool_t FUNCTION(igraph_heap, empty)(const TYPE(igraph_heap)* h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->stor_begin == h->end;
@@ -139,10 +142,10 @@ igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
  * \function igraph_heap_clear
  * \brief Removes all elements from a heap.
  *
- * </para><para>
  * This function simply sets the size of the heap to zero, it does
  * not free any allocated memory. For that you have to call
  * \ref igraph_heap_destroy().
+ *
  * \param h The heap object.
  *
  * Time complexity: O(1).
@@ -160,6 +163,7 @@ void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h) {
  * \brief Add an element.
  *
  * Adds an element to the heap.
+ *
  * \param h The heap object.
  * \param elem The element to add.
  * \return Error code.
@@ -175,7 +179,11 @@ igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
-        igraph_integer_t new_size = FUNCTION(igraph_heap, size)(h) * 2;
+        igraph_integer_t old_size = FUNCTION(igraph_heap, size)(h);
+        igraph_integer_t new_size =  old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to heap, already at maximum size.", IGRAPH_EOVERFLOW);
+        }
         if (new_size == 0) {
             new_size = 1;
         }
@@ -199,13 +207,14 @@ igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
  *
  * For maximum heaps this is the largest, for minimum heaps the
  * smallest element of the heap.
+ *
  * \param h The heap object.
  * \return The top element.
  *
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_heap, top)(TYPE(igraph_heap)* h) {
+BASE FUNCTION(igraph_heap, top)(const TYPE(igraph_heap)* h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     IGRAPH_ASSERT(h->stor_begin != h->end);
@@ -216,10 +225,11 @@ BASE FUNCTION(igraph_heap, top)(TYPE(igraph_heap)* h) {
 /**
  * \ingroup heap
  * \function igraph_heap_delete_top
- * \brief Return and removes the top element
+ * \brief Removes and returns the top element.
  *
  * Removes and returns the top element of the heap. For maximum heaps
  * this is the largest, for minimum heaps the smallest element.
+ *
  * \param h The heap object.
  * \return The top element.
  *
@@ -244,16 +254,17 @@ BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h) {
 /**
  * \ingroup heap
  * \function igraph_heap_size
- * \brief Number of elements
+ * \brief Number of elements in the heap.
  *
  * Gives the number of elements in a heap.
+ *
  * \param h The heap object.
  * \return The number of elements in the heap.
  *
  * Time complexity: O(1).
  */
 
-igraph_integer_t FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
+igraph_integer_t FUNCTION(igraph_heap, size)(const TYPE(igraph_heap)* h) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->end - h->stor_begin;
@@ -262,35 +273,36 @@ igraph_integer_t FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
 /**
  * \ingroup heap
  * \function igraph_heap_reserve
- * \brief Allocate more memory
+ * \brief Reserves memory for a heap.
  *
  * Allocates memory for future use. The size of the heap is
- * unchanged. If the heap is larger than the \p size parameter then
+ * unchanged. If the heap is larger than the \p capacity parameter then
  * nothing happens.
+ *
  * \param h The heap object.
- * \param size The number of elements to allocate memory for.
+ * \param capacity The number of elements to allocate memory for.
  * \return Error code.
  *
- * Time complexity: O(\p size) if \p size is larger than the current
+ * Time complexity: O(\p capacity) if \p capacity is larger than the current
  * number of elements. O(1) otherwise.
  */
 
-igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integer_t size) {
+igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integer_t capacity) {
     igraph_integer_t actual_size = FUNCTION(igraph_heap, size)(h);
     BASE *tmp;
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
+    IGRAPH_ASSERT(capacity >= 0);
 
-    if (size <= actual_size) {
+    if (capacity <= actual_size) {
         return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(h->stor_begin, (size_t) size, BASE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("heap reserve failed", IGRAPH_ENOMEM);
-    }
+    tmp = IGRAPH_REALLOC(h->stor_begin, (size_t) capacity, BASE);
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for heap.");
+
     h->stor_begin = tmp;
-    h->stor_end = h->stor_begin + size;
+    h->stor_end = h->stor_begin + capacity;
     h->end = h->stor_begin + actual_size;
 
     return IGRAPH_SUCCESS;

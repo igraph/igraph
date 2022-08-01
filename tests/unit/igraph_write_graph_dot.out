@@ -1,0 +1,74 @@
+/* Created by igraph @VERSION@ */
+graph {
+  0 [
+    VAN=-1
+    VAS=foo
+    VAB=1
+  ];
+  1 [
+    VAN=2.1
+    VAS=bar
+    VAB=0
+  ];
+  2 [
+    VAN=NaN
+    VAS=""
+    VAB=0
+  ];
+  3 [
+    VAN=NaN
+    VAS=""
+    VAB=0
+  ];
+  4 [
+    VAN=NaN
+    VAS=""
+    VAB=0
+  ];
+  5 [
+    VAN=NaN
+    VAS=""
+    VAB=0
+  ];
+
+  1 -- 0 [
+    EAN=-100.1
+    EAS=Blue
+    EAB=1
+  ];
+  2 -- 0 [
+    EAN=NaN
+    EAS=""
+    EAB=0
+  ];
+  1 -- 1 [
+    EAN=100
+    EAS=RED
+    EAB=0
+  ];
+  3 -- 1 [
+    EAN=NaN
+    EAS=""
+    EAB=0
+  ];
+  2 -- 0 [
+    EAN=NaN
+    EAS=""
+    EAB=0
+  ];
+  3 -- 2 [
+    EAN=NaN
+    EAS=""
+    EAB=0
+  ];
+  4 -- 3 [
+    EAN=NaN
+    EAS=""
+    EAB=0
+  ];
+  4 -- 3 [
+    EAN=NaN
+    EAS=""
+    EAB=0
+  ];
+}

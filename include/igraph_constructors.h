@@ -26,10 +26,12 @@
 
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"
 #include "igraph_graphicality.h"
+#include "igraph_sparsemat.h"
 
 __BEGIN_DECLS
 
@@ -41,30 +43,40 @@ IGRAPH_EXPORT igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_
                                 igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                                ...);
-IGRAPH_EXPORT igraph_error_t igraph_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
-                                   igraph_adjacency_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_weighted_adjacency(igraph_t *graph, const igraph_matrix_t *adjmatrix,
-                                            igraph_adjacency_t mode, const char* attr,
-                                            igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_adjacency(
+        igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
+        igraph_loops_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_weighted_adjacency(
+        igraph_t *graph, const igraph_matrix_t *adjmatrix, igraph_adjacency_t mode,
+        igraph_vector_t *weights, igraph_loops_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_sparse_adjacency(igraph_t *graph, igraph_sparsemat_t *adjmatrix, igraph_adjacency_t mode, igraph_loops_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_sparse_weighted_adjacency(igraph_t *graph, igraph_sparsemat_t *adjmatrix, igraph_adjacency_t mode, igraph_vector_t *weights, igraph_loops_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
                               igraph_integer_t center);
 IGRAPH_EXPORT igraph_error_t igraph_wheel(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mode,
                               igraph_integer_t center);
-IGRAPH_EXPORT igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
                                  igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t circular);
+IGRAPH_EXPORT igraph_error_t igraph_square_lattice(igraph_t *graph, const igraph_vector_int_t *dimvector, igraph_integer_t nei,
+                                 igraph_bool_t directed, igraph_bool_t mutual, const igraph_vector_bool_t *circular);
 IGRAPH_EXPORT igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                               igraph_bool_t mutual, igraph_bool_t circular);
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
                               igraph_tree_mode_t type);
 IGRAPH_EXPORT igraph_error_t igraph_kary_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
-                              igraph_tree_mode_t type);
-IGRAPH_EXPORT igraph_error_t igraph_symmetric_tree(igraph_t *graph, igraph_vector_int_t *branch_level,
-                              igraph_tree_mode_t type);
+                                              igraph_tree_mode_t type);
+IGRAPH_EXPORT igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t *branches,
+                                                   igraph_tree_mode_t type);
+IGRAPH_EXPORT igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_integer_t k,
+                                                 igraph_tree_mode_t type);
 IGRAPH_EXPORT igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer);
 IGRAPH_EXPORT igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_full_multipartite(igraph_t *graph, igraph_vector_int_t *types, const igraph_vector_int_t *n,
+                                        igraph_bool_t directed, igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_turan(igraph_t *graph, igraph_vector_int_t *types, igraph_integer_t n, igraph_integer_t r);
 IGRAPH_EXPORT igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
                                        igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, int number);
+IGRAPH_EXPORT igraph_error_t igraph_atlas(igraph_t *graph, igraph_integer_t number);
 IGRAPH_EXPORT igraph_error_t igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
                                                const igraph_matrix_int_t *W, igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);

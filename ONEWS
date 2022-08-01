@@ -796,7 +796,7 @@ New in the C layer
 - Some stochastic test results are ignored (for spinglass community
   detection, some Erdos-Renyi generator tests)
 - Weighted shortest paths, Dijkstra's algorithm.
-- The unweigthed shortest path routine returns 'Inf' for unreachable
+- The unweighted shortest path routine returns 'Inf' for unreachable
   vertices.
 - New function, igraph_adjlist can create igraph graphs from
   adjacency lists.

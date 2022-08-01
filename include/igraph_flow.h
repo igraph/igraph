@@ -26,6 +26,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_list.h"
@@ -54,7 +55,7 @@ __BEGIN_DECLS
  */
 
 typedef struct {
-    int nopush, norelabel, nogap, nogapnodes, nobfs;
+    igraph_integer_t nopush, norelabel, nogap, nogapnodes, nobfs;
 } igraph_maxflow_stats_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,

@@ -75,7 +75,7 @@ void DensityGrid::Init() {
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
         igraph_error("DrL is out of memory", IGRAPH_FILE_BASENAME, __LINE__,
-                     IGRAPH_ENOMEM);
+                     IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         return;
 #endif
     }

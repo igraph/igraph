@@ -23,12 +23,11 @@
 
 #define NCOMPLEX  /* to make it compile with MSVC on Windows */
 
-#include <cs.h>
 #include <igraph.h>
 #include "linalg/blas_internal.h"
 #include "linalg/arpack_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         const igraph_vector_t *v,
@@ -136,36 +135,15 @@ int my_dgemm(const igraph_matrix_t *m1,
 
 igraph_bool_t check_same(const igraph_sparsemat_t *A,
                          const igraph_matrix_t *M) {
+    igraph_matrix_t A_dense;
+    igraph_bool_t result;
 
-    igraph_integer_t nrow = igraph_sparsemat_nrow(A);
-    igraph_integer_t ncol = igraph_sparsemat_ncol(A);
-    igraph_integer_t j, p, nzero = 0;
+    igraph_matrix_init(&A_dense, 1, 1);
+    igraph_sparsemat_as_matrix(&A_dense, A);
+    result = igraph_matrix_all_e(&A_dense, M);
+    igraph_matrix_destroy(&A_dense);
 
-    if (nrow != igraph_matrix_nrow(M) ||
-        ncol != igraph_matrix_ncol(M)) {
-        return 0;
-    }
-
-    for (j = 0; j < A->cs->n; j++) {
-        for (p = A->cs->p[j]; p < A->cs->p[j + 1]; p++) {
-            igraph_integer_t to = A->cs->i[p];
-            igraph_real_t value = A->cs->x[p];
-            if (value != MATRIX(*M, to, j)) {
-                return 0;
-            }
-            nzero += 1;
-        }
-    }
-
-    for (j = 0; j < nrow; j++) {
-        for (p = 0; p < ncol; p++) {
-            if (MATRIX(*M, j, p) != 0) {
-                nzero -= 1;
-            }
-        }
-    }
-
-    return nzero == 0;
+    return result;
 }
 
 int main() {
@@ -175,7 +153,7 @@ int main() {
     igraph_matrix_t M, N, O;
     igraph_integer_t i;
 
-    srand(1);
+    RNG_BEGIN();
 
     /* Matrix-vector product */
 #define NROW 10
@@ -267,6 +245,8 @@ int main() {
     igraph_matrix_destroy(&O);
 
     VERIFY_FINALLY_STACK();
+
+    RNG_END();
 
     return 0;
 }

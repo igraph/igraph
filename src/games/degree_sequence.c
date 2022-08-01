@@ -35,6 +35,7 @@
 
 #include "core/interruption.h"
 #include "core/set.h"
+#include "math/safe_intop.h"
 
 static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *graph,
                                        const igraph_vector_int_t *out_seq,
@@ -55,9 +56,9 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
                      "No undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
 
-    outsum = igraph_vector_int_sum(out_seq);
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(out_seq, &outsum));
     if (directed) {
-        insum = igraph_vector_int_sum(in_seq);
+        IGRAPH_CHECK(igraph_i_safe_vector_int_sum(in_seq, &insum));
     }
 
     no_of_nodes = igraph_vector_int_size(out_seq);
@@ -65,7 +66,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
 
     bag1 = IGRAPH_CALLOC(outsum, igraph_integer_t);
     if (bag1 == 0) {
-        IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bag1);
 
@@ -77,7 +78,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *grap
     if (directed) {
         bag2 = IGRAPH_CALLOC(insum, igraph_integer_t);
         if (bag2 == 0) {
-            IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot sample with configuration model.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, bag2);
         for (i = 0; i < no_of_nodes; i++) {
@@ -152,7 +153,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
                      IGRAPH_EINVAL);
     }
 
-    outsum = igraph_vector_int_sum(seq);
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(seq, &outsum));
     no_of_nodes = igraph_vector_int_size(seq);
 
     /* Allocate required data structures */
@@ -274,7 +275,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_degree_sequence_game_fas_heur_directed(igraph_t *graph,
+static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t *graph,
         const igraph_vector_int_t *out_seq, const igraph_vector_int_t *in_seq) {
     igraph_adjlist_t al;
     igraph_bool_t deg_seq_ok, failed, finished;
@@ -295,7 +296,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fas_heur_directed(igraph_t *
                      IGRAPH_EINVAL);
     }
 
-    outsum = igraph_vector_int_sum(out_seq);
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(out_seq, &outsum));
     no_of_nodes = igraph_vector_int_size(out_seq);
 
     /* Allocate required data structures */
@@ -466,7 +467,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
-            IGRAPH_ERROR("Cannot sample from configuration model (simple graphs).", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot sample from configuration model (simple graphs).", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
@@ -585,7 +586,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = IGRAPH_CALLOC(1, igraph_set_t);
         if (! set) {
-            IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
@@ -776,7 +777,7 @@ igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_
         if (in_deg == 0) {
             return igraph_i_degree_sequence_game_fast_heur_undirected(graph, out_deg);
         } else {
-            return igraph_i_degree_sequence_game_fas_heur_directed(graph, out_deg, in_deg);
+            return igraph_i_degree_sequence_game_fast_heur_directed(graph, out_deg, in_deg);
         }
 
     case IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE:

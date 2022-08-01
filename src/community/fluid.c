@@ -59,8 +59,6 @@
  * \return Error code.
  *
  * Time complexity: O(|E|)
- *
- * \example examples/simple/igraph_community_fluid_communities.c
  */
 igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                                        igraph_integer_t no_of_communities,
@@ -117,7 +115,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &com_to_numvertices);
 
     /* Initialize node ordering vector */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&node_order, 0, no_of_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
 
     /* Initialize the membership vector with 0 values */
@@ -130,7 +128,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     for (i = 0; i < no_of_communities; i++) {
         /* Initialize membership at initial nodes for each community
          * where 0 refers to have no label*/
-        VECTOR(*membership)[VECTOR(node_order)[i]] = i + 1.0;
+        VECTOR(*membership)[VECTOR(node_order)[i]] = i + 1;
         /* Initialize com_to_numvertices list: Number of vertices for each community */
         VECTOR(com_to_numvertices)[i] = 1;
     }
@@ -240,11 +238,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     /* There must be no 0 labels in membership vector at this point */
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(*membership)[i] -= 1;
-        /* Something went wrong: At least one vertex has no community assigned */
-        if (VECTOR(*membership)[i] < 0) {
-            IGRAPH_ERROR("Something went wrong during execution. One or more vertices got "
-                         "no community assigned at algorithm convergence.", IGRAPH_EINTERNAL);
-        }
+        IGRAPH_ASSERT(VECTOR(*membership)[i] >= 0); /* all vertices must have a community assinged */
     }
 
     igraph_adjlist_destroy(&al);

@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 /* https://github.com/igraph/igraph/issues/950 */
@@ -98,8 +98,8 @@ int main() {
      * leads to a descendant of the common grand-grandparent in layer 2, and
      * zero otherwise. */
 
-    igraph_vs_seq(&vs_source, 10911, 11110);
-    igraph_vs_seq(&vs_target, 10911, 11110);
+    igraph_vs_range(&vs_source, 10911, 11111);
+    igraph_vs_range(&vs_target, 10911, 11111);
     igraph_vector_init(&bet, 0);
 
     igraph_edge_betweenness_subset(
@@ -182,9 +182,9 @@ int main() {
     printf("\nZachary karate club, unweighted graph, edge betweenness\n");
     printf("==========================================================\n");
     igraph_famous(&g, "zachary");
-    igraph_vector_int_init_seq(&source_vec, 0, 32);
+    igraph_vector_int_init_range(&source_vec, 0, 33);
     igraph_vs_vector(&vs_source, &source_vec);
-    igraph_vector_int_init_seq(&target_vec, 1, 33);
+    igraph_vector_int_init_range(&target_vec, 1, 34);
     igraph_vs_vector(&vs_target, &target_vec);
     igraph_vector_init(&eb, 0);
 
@@ -210,9 +210,9 @@ int main() {
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
 
     igraph_vector_init(&eb, 0);
-    igraph_vector_int_init_seq(&node_vec, 0, 3);
+    igraph_vector_int_init_range(&node_vec, 0, 4);
     igraph_es_vector(&es, &node_vec);
-    igraph_vector_int_init_seq(&target_vec, 1, 4);
+    igraph_vector_int_init_range(&target_vec, 1, 5);
     igraph_vs_vector(&vs_target, &target_vec);
     igraph_edge_betweenness_subset (/* graph=     */ &g,
         /* res=       */ &eb,
@@ -236,7 +236,7 @@ int main() {
                  0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
                  6, 7, 7, 8, -1);
     igraph_vector_init(&eb, 0);
-    igraph_vector_int_init_seq(&source_vec, 1, 8);
+    igraph_vector_int_init_range(&source_vec, 1, 9);
     igraph_vs_vector(&vs_source, &source_vec);
 
     igraph_edge_betweenness_subset (/* graph=     */ &g,
@@ -281,13 +281,13 @@ int main() {
         VECTOR(dims)[0] = 37;
         VECTOR(dims)[1] = 37;
 
-        igraph_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+        igraph_square_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, /* mutual */ 0, /* periodic */ 0);
 
         igraph_vector_init(&bet, 0);
-        igraph_vector_int_init_seq(&target_vec, 0, igraph_vcount(&g) - 1);
+        igraph_vector_int_init_range(&target_vec, 0, igraph_vcount(&g));
         igraph_vector_int_remove(&target_vec, 0);
         igraph_vs_vector(&vs_target, &target_vec);
-        igraph_vector_int_init_seq(&source_vec, 0, igraph_vcount(&g) - 1);
+        igraph_vector_int_init_range(&source_vec, 0, igraph_vcount(&g));
         igraph_vector_int_remove(&source_vec, 0);
         igraph_vs_vector(&vs_source, &source_vec);
 

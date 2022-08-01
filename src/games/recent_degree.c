@@ -29,6 +29,8 @@
 #include "igraph_random.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_recent_degree_game
  * \brief Stochastic graph generator based on the number of incident edges a node has gained recently.
@@ -106,13 +108,14 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
 
     if (!have_outseq) {
         no_of_neighbors = m;
-        no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
+        IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
-        igraph_integer_t outseq_len = igraph_vector_int_size(outseq);
-        no_of_edges = 0;
-        for (i = 1; i < outseq_len; i++) {
-            no_of_edges += VECTOR(*outseq)[i];
-        }
+        IGRAPH_CHECK(igraph_i_safe_vector_int_sum(outseq, &no_of_edges));
+        no_of_edges -= VECTOR(*outseq)[0];
+    }
+    /* To ensure the size of the edges vector will not overflow. */
+    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
@@ -146,7 +149,13 @@ igraph_error_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t nodes
 
         sum = igraph_psumtree_sum(&sumtree);
         for (j = 0; j < no_of_neighbors; j++) {
-            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weight,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            }
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
@@ -271,13 +280,14 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
 
     if (!have_outseq) {
         no_of_neighbors = m;
-        no_of_edges = (no_of_nodes - 1) * no_of_neighbors;
+        IGRAPH_SAFE_MULT(no_of_nodes - 1, no_of_neighbors, &no_of_edges);
     } else {
-        igraph_integer_t outseq_len = igraph_vector_int_size(outseq);
-        no_of_edges = 0;
-        for (i = 1; i < outseq_len; i++) {
-            no_of_edges += VECTOR(*outseq)[i];
-        }
+        IGRAPH_CHECK(igraph_i_safe_vector_int_sum(outseq, &no_of_edges));
+        no_of_edges -= VECTOR(*outseq)[0];
+    }
+    /* To ensure the size of the edges vector will not overflow. */
+    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
 
     binwidth = nodes / aging_bins + 1;
@@ -318,7 +328,13 @@ igraph_error_t igraph_recent_degree_aging_game(igraph_t *graph,
 
         sum = igraph_psumtree_sum(&sumtree);
         for (j = 0; j < no_of_neighbors; j++) {
-            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weight,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            }
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;

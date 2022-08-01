@@ -33,11 +33,11 @@
 #include "igraph_stack.h"
 #include "igraph_visitor.h"
 
-#include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
 #include "flow/flow_internal.h"
 #include "graph/attributes.h"
+#include "math/safe_intop.h"
 
 typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
                                                    const igraph_marked_queue_int_t *S,
@@ -50,13 +50,15 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
 
 /**
  * \function igraph_even_tarjan_reduction
- * Even-Tarjan reduction of a graph
+ * \brief Even-Tarjan reduction of a graph.
  *
  * A digraph is created with twice as many vertices and edges. For each
- * original vertex i, two vertices i'= i and i'' = i' + n are created,
- * with a directed edge from i' to i''. For each original directed edge
- * from i to j, two new edges are created, from i' to j'' and from i''
- * to j'.
+ * original vertex \c i, two vertices <code>i' = i</code> and
+ * <code>i'' = i' + n</code> are created,
+ * with a directed edge from <code>i'</code> to <code>i''</code>.
+ * For each original directed edge from \c i to \c j, two new edges are created,
+ * from <code>i'</code> to <code>j''</code> and from <code>i''</code>
+ * to <code>j'</code>.
  *
  * </para><para>This reduction is used in the paper (observation 2):
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
@@ -73,7 +75,7 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
  * \param capacity Pointer to an initialized vector or a null pointer. If
  *        not a null pointer, then it will be filled the capacity from
  *        the reduction: the first |E| elements are 1, the remaining |E|
- *        are equal to |V| (which is used to mean infinity).
+ *        are equal to |V| (which is used to indicate infinity).
  * \return Error code.
  *
  * Time complexity: O(|E|+|V|).
@@ -87,12 +89,20 @@ igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *gra
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
-    igraph_integer_t new_no_of_nodes = no_of_nodes * 2;
-    igraph_integer_t new_no_of_edges = no_of_nodes + no_of_edges * 2;
+    igraph_integer_t new_no_of_nodes;
+    igraph_integer_t new_no_of_edges = no_of_edges * 2;
 
     igraph_vector_int_t edges;
     igraph_integer_t edgeptr = 0, capptr = 0;
     igraph_integer_t i;
+
+    IGRAPH_SAFE_MULT(no_of_nodes, 2, &new_no_of_nodes);
+    IGRAPH_SAFE_ADD(new_no_of_edges, no_of_nodes, &new_no_of_edges);
+
+    /* To ensure the size of the edges vector will not overflow. */
+    if (new_no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
+    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, new_no_of_edges * 2);
 
@@ -469,7 +479,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&semi, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ancestor, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&label, 0, no_of_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&label, 0, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &label);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &succ, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &succ);
@@ -849,7 +859,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 break;
             }
         }
-        igraph_vector_int_resize(&Nuv, nuvsize);
+        igraph_vector_int_resize(&Nuv, nuvsize); /* shrinks, error safe */
 
         /* -------------------------------------------------------------*/
         /* By a BFS search of <Nu(v)> determine I(S,v)-K.

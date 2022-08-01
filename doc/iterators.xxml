@@ -21,7 +21,7 @@
 <!-- doxrox-include igraph_vs_vector -->
 <!-- doxrox-include igraph_vs_vector_small -->
 <!-- doxrox-include igraph_vs_vector_copy -->
-<!-- doxrox-include igraph_vs_seq -->
+<!-- doxrox-include igraph_vs_range -->
 </section>
 
 <section id="generic-vertex-selector-operations"><title>Generic vertex selector operations</title>
@@ -37,7 +37,7 @@
 <!-- doxrox-include igraph_vss_none -->
 <!-- doxrox-include igraph_vss_1 -->
 <!-- doxrox-include igraph_vss_vector -->
-<!-- doxrox-include igraph_vss_seq -->
+<!-- doxrox-include igraph_vss_range -->
 </section>
 
 <section id="vertex-iterators"><title>Vertex iterators</title>
@@ -57,8 +57,7 @@
 <!-- doxrox-include igraph_es_none -->
 <!-- doxrox-include igraph_es_1 -->
 <!-- doxrox-include igraph_es_vector -->
-<!-- doxrox-include igraph_es_fromto -->
-<!-- doxrox-include igraph_es_seq -->
+<!-- doxrox-include igraph_es_range -->
 <!-- doxrox-include igraph_es_pairs -->
 <!-- doxrox-include igraph_es_pairs_small -->
 <!-- doxrox-include igraph_es_path -->
@@ -70,7 +69,7 @@
 <!-- doxrox-include igraph_ess_none -->
 <!-- doxrox-include igraph_ess_1 -->
 <!-- doxrox-include igraph_ess_vector -->
-<!-- doxrox-include igraph_ess_seq -->
+<!-- doxrox-include igraph_ess_range -->
 </section>
 
 <section id="generic-edge-selector-operations"><title>Generic edge selector operations</title>
@@ -93,9 +92,16 @@
 <!-- doxrox-include IGRAPH_EIT_GET -->
 </section>
 
+<section id="deprecated-vertex-edge-selectors"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_es_seq -->
+<!-- doxrox-include igraph_ess_seq -->
+<!-- doxrox-include igraph_vs_seq -->
+<!-- doxrox-include igraph_vss_seq -->
+</section>
 
-<!-- <section id="examples"><title>Examples</title>
-	</section>
+<!--
+    <section id="examples"><title>Examples</title>
+    </section>
 -->
 
 </chapter>

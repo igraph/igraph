@@ -1,6 +1,10 @@
 include(test_helpers)
 include(benchmark_helpers)
 
+add_library(test_utilities OBJECT unit/test_utilities.c)
+target_link_libraries(test_utilities PRIVATE igraph)
+use_all_warnings(test_utilities)
+
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
 add_custom_target(build_tests)
@@ -25,11 +29,8 @@ add_dependencies(benchmark build_benchmarks)
 # to using RUNPATH instead of RPATH. Since RUNPATH is only considered after
 # LD_LIBRARY_PATH, if another version of igraph is installed somewhere it will
 # be linked to that library.
-include(CheckCCompilerFlag)
-set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
-set(CMAKE_REQUIRED_FLAGS "-Wl,--enable-new-dtags")
-check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
-set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+include(CheckLinkerFlag)
+check_linker_flag(C "-Wl,--enable-new-dtags" HAVE_ENABLE_NEW_DTAGS)
 if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
   message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
@@ -81,16 +82,20 @@ add_legacy_tests(
   igraph_sparsemat_normalize
   igraph_sparsemat_view
   igraph_sparsemat_which_minmax
+  igraph_strvector
   igraph_vector_floor
   igraph_vector_lex_cmp
   matrix
   matrix2
   matrix3
+  matrix_complex
   stack
-  strvector_set2_remove_print
+  strvector_set_len_remove_print
   vector
   vector2
   vector3
+  vector4
+  vector_list
   vector_ptr
   vector_ptr_sort_ind
   vector_qsort_ind
@@ -108,7 +113,6 @@ add_legacy_tests(
   2wheap
   cutheap
   d_indheap
-  hashtable
   marked_queue
   set
   trie
@@ -132,6 +136,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_edges
   igraph_is_same_graph
   igraph_i_incident
   igraph_i_neighbors
@@ -141,7 +146,6 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   igraph_es_pairs
-#  igraph_es_fromto
   igraph_vs_nonadj
   igraph_vs_seq
   igraph_vs_vector
@@ -169,6 +173,8 @@ add_examples(
   igraph_grg_game
   igraph_kary_tree
   igraph_lcf
+  igraph_realize_degree_sequence
+  igraph_regular_tree
   igraph_ring
   igraph_small
   igraph_star
@@ -178,9 +184,11 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  constructor-failure
   erdos_renyi_game
   erdos_renyi_game_gnp
   full
+  igraph_adjacency
   igraph_barabasi_aging_game
   igraph_bipartite_game
   igraph_callaway_traits_game
@@ -188,18 +196,22 @@ add_legacy_tests(
   igraph_cited_type_game
   igraph_citing_cited_type_game
   igraph_correlated_game
+  igraph_correlated_pair_game
   igraph_degree_sequence_game
+  igraph_dot_product_game
   igraph_establishment_game
   igraph_extended_chordal_ring
   igraph_forest_fire_game
   igraph_from_prufer
   igraph_full_citation
+  igraph_full_multipartite
   igraph_generalized_petersen
   igraph_grg_game
   igraph_growing_random_game
+  igraph_hsbm_game
+  igraph_hsbm_list_game
   igraph_k_regular_game
   igraph_lastcit_game
-  igraph_lattice
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
@@ -209,8 +221,11 @@ add_legacy_tests(
   igraph_recent_degree_game
   igraph_sbm_game
   igraph_simple_interconnected_islands_game
+  igraph_square_lattice
   igraph_static_power_law_game
+  igraph_turan
   igraph_wheel
+  igraph_weighted_adjacency
   kary_tree
   symmetric_tree
   tree_game
@@ -225,6 +240,7 @@ add_examples(
   bellman_ford
   dijkstra
   igraph_assortativity_degree
+  igraph_assortativity_nominal
   igraph_average_path_length
   igraph_cocitation
   igraph_diameter
@@ -238,6 +254,7 @@ add_examples(
   igraph_has_multiple
   igraph_is_loop
   igraph_is_multiple
+  igraph_list_triangles
   igraph_knn
   igraph_minimum_spanning_tree
   igraph_pagerank
@@ -253,12 +270,14 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_feedback_arc_set_undirected
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_unfold_tree
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  coreness
   efficiency
   global_transitivity
   hub_and_authority
@@ -269,16 +288,23 @@ add_legacy_tests(
   igraph_betweenness
   igraph_betweenness_subset
   igraph_closeness
+  igraph_constraint
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
   igraph_diversity
+  igraph_distances_johnson
   igraph_eccentricity
+  igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
   igraph_get_all_simple_paths
+  igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
+  igraph_graph_center
+  igraph_has_mutual
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
@@ -290,18 +316,20 @@ add_legacy_tests(
   igraph_list_triangles
   igraph_local_scan_k_ecount
   igraph_local_scan_k_ecount_them
+  igraph_local_scan_subset_ecount
   igraph_local_transitivity
   igraph_neighborhood
   igraph_neighborhood_graphs
   igraph_neighborhood_size
   igraph_pagerank
+  igraph_path_length_hist
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
-  igraph_shortest_paths_johnson
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
+  igraph_widest_paths
   harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
@@ -313,6 +341,7 @@ add_legacy_tests(
   FOLDER tests/regression NAMES
   bug_1760
   bug_1814
+  bug_1970
 )
 
 # components.at
@@ -340,8 +369,11 @@ add_legacy_tests(
   igraph_layout_drl
   igraph_layout_bipartite
   igraph_layout_fruchterman_reingold
+  igraph_layout_fruchterman_reingold_3d
+  igraph_layout_gem
   igraph_layout_graphopt
   igraph_layout_grid
+  igraph_layout_kamada_kawai
   igraph_layout_lgl
   igraph_layout_mds
   igraph_layout_merge2
@@ -351,6 +383,7 @@ add_legacy_tests(
   igraph_layout_reingold_tilford_extended
   igraph_layout_star
   igraph_layout_sugiyama
+  igraph_layout_umap
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES
@@ -376,7 +409,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bfs
   bfs_simple
-  igraph_random_edge_walk
 )
 
 # topology.at
@@ -433,13 +465,19 @@ add_examples(
   igraph_read_graph_lgl
   igraph_write_graph_lgl
   igraph_write_graph_pajek
+  safelocale
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  foreign_empty
+  igraph_read_graph_graphml
+  gml
   igraph_write_graph_leda
-  igraph_write_graph_dimacs
+  igraph_write_graph_dimacs_flow
+  igraph_write_graph_dot
   lineendings
+  ncol
   pajek
   pajek2
   pajek_bipartite
@@ -456,8 +494,12 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  all_almost_e
   igraph_almost_equals
+  igraph_power_law_fit
   overflow
+  prop_caching
+  zapsmall
 )
 
 # operators.at
@@ -473,9 +515,13 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_contract_vertices
+  igraph_connect_neighborhood
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_intersection2
+  igraph_permute_vertices
+  igraph_reverse_edges
   igraph_rewire_directed_edges
 )
 
@@ -483,13 +529,21 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   adjlist
-  igraph_laplacian
+  igraph_get_laplacian
+  igraph_get_laplacian_sparse
   igraph_to_undirected
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   adjlist
+  igraph_adjlist_init_complementer
+  igraph_adjlist_simplify
+  igraph_get_adjacency
+  igraph_get_adjacency_sparse
+  igraph_get_laplacian
+  igraph_get_stochastic
+  igraph_get_stochastic_sparse
   igraph_to_directed
   igraph_to_prufer
   inclist
@@ -516,6 +570,7 @@ add_legacy_tests(
   igraph_edge_disjoint_paths
   igraph_st_edge_connectivity
   igraph_st_mincut
+  igraph_st_vertex_connectivity
 )
 
 add_legacy_tests(
@@ -533,7 +588,6 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
-  igraph_community_fluid_communities
   igraph_community_label_propagation
   igraph_community_leading_eigenvector
   igraph_community_leiden
@@ -544,11 +598,15 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  community_indexing
   community_leiden
   community_label_propagation
   community_label_propagation2
   community_label_propagation3
+  community_walktrap
   graphlets
+  igraph_community_eb_get_merges
+  igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
   igraph_compare_communities
@@ -557,6 +615,7 @@ add_legacy_tests(
   igraph_modularity_matrix
   igraph_split_join_distance
   levc-stress
+  null_communities
   spinglass
 )
 add_legacy_tests(
@@ -612,6 +671,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_attribute_combination_remove
   cattributes5
+  cattributes6
 )
 add_legacy_tests(
   FOLDER tests/regression NAMES
@@ -637,6 +697,7 @@ add_legacy_tests(
   igraph_arpack_rnsolve
   igraph_arpack_unpack_complex
   igraph_blas_dgemm
+  igraph_eigenvector_centrality
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs
@@ -652,6 +713,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_get_incidence
+  igraph_incidence
 )
 
 # centralization.at
@@ -730,11 +792,11 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_rng_get_exp
   igraph_rng_get_integer
   mt
+  random_sampling
   rng_reproducibility
-  rng_init_destroy_max_min_name_set_default
+  rng_init_destroy_max_bits_name_set_default
 )
 
 # qsort.at
@@ -762,6 +824,12 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_is_graphical
   igraph_is_bigraphical
+)
+
+# cycle bases
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  cycle_bases
 )
 
 # handlers
@@ -838,4 +906,11 @@ add_benchmarks(
   igraph_random_walk
   igraph_transitivity
   inc_vs_adj
+)
+
+# dot product
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_sample_dirichlet
+  igraph_sample_sphere
 )

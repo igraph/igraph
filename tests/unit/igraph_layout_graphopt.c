@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
     igraph_real_t min, max;

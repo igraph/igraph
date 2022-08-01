@@ -25,10 +25,9 @@
 #define IGRAPH_STRUCTURAL_H
 
 #include "igraph_decls.h"
-
-#include "igraph_attributes.h"
-#include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
+#include "igraph_constants.h"
 #include "igraph_iterators.h"
 #include "igraph_matrix.h"
 #include "igraph_sparsemat.h"
@@ -55,7 +54,8 @@ IGRAPH_EXPORT igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector
                                  igraph_es_t es);
 IGRAPH_EXPORT igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
                                      igraph_es_t es);
-IGRAPH_EXPORT igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
+IGRAPH_EXPORT igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es, igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
 IGRAPH_EXPORT igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_acyclic(const igraph_t *graph, igraph_bool_t *res);
@@ -123,10 +123,42 @@ IGRAPH_EXPORT igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igra
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
 
-IGRAPH_EXPORT igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-                                   igraph_sparsemat_t *sparseres,
-                                   igraph_bool_t normalized,
-                                   const igraph_vector_t *weights);
+/**
+ * \typedef igraph_laplacian_normalization_t
+ * \brief Normalization methods for a Laplacian matrix.
+ *
+ * Normalization methods for \ref igraph_get_laplacian() and
+ * \ref igraph_get_laplacian_sparse(). In the following, \c A refers to the
+ * (possibly weighted) adjacency matrix and \c D is a diagonal matrix containing
+ * degrees (unweighted case) or strengths (weighted case). Out-, in- or total degrees
+ * are used according to the \p mode parameter.
+ *
+ * \enumval IGRAPH_LAPLACIAN_UNNORMALIZED Unnormalized Laplacian, <code>L = D - A</code>.
+ * \enumval IGRAPH_LAPLACIAN_SYMMETRIC Symmetric normalized Laplacian, <code>L = I - D^(-1/2) A D^(-1/2)</code>.
+ * \enumval IGRAPH_LAPLACIAN_LEFT Left-stochastic normalized Laplacian, <code>L = I - D^-1 A</code>.
+ * \enumval IGRAPH_LAPLACIAN_RIGHT Right-stochastic normalized Laplacian, <code>L = I - A D^-1</code>.
+ */
+typedef enum {
+    IGRAPH_LAPLACIAN_UNNORMALIZED = 0,
+    IGRAPH_LAPLACIAN_SYMMETRIC = 1,
+    IGRAPH_LAPLACIAN_LEFT = 2,
+    IGRAPH_LAPLACIAN_RIGHT = 3
+} igraph_laplacian_normalization_t;
+
+IGRAPH_EXPORT igraph_error_t igraph_get_laplacian(
+   const igraph_t *graph, igraph_matrix_t *res, igraph_neimode_t mode,
+   igraph_laplacian_normalization_t normalization,
+   const igraph_vector_t *weights
+);
+IGRAPH_EXPORT igraph_error_t igraph_get_laplacian_sparse(
+   const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
+   igraph_laplacian_normalization_t normalization,
+   const igraph_vector_t *weights
+);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_laplacian(
+   const igraph_t *graph, igraph_matrix_t *res, igraph_sparsemat_t *sparseres,
+   igraph_bool_t normalized, const igraph_vector_t *weights
+);
 
 __END_DECLS
 

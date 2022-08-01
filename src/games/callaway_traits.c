@@ -88,6 +88,12 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
         IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
 
+    if (edges_per_step < 0) {
+        IGRAPH_ERRORF("Number of edges per step should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_step);
+    }
+
     if (types < 1) {
         IGRAPH_ERROR("The number of vertex types must be at least 1.", IGRAPH_EINVAL);
     }
@@ -115,7 +121,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
 
     {
         igraph_real_t lo, hi;
-        igraph_matrix_minmax(pref_matrix, &lo, &hi);
+        igraph_matrix_minmax(pref_matrix, &lo, &hi); /* matrix size is at least 1x1, safe to call minmax */
 
         if (lo < 0 || hi > 1) {
             IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
@@ -154,7 +160,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
     } else {
         nodetypes = IGRAPH_CALLOC(1, igraph_vector_int_t);
         if (! nodetypes) {
-            IGRAPH_ERROR("Insufficient memory for callaway_traits_game.", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for callaway_traits_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         IGRAPH_FINALLY(igraph_free, nodetypes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes, nodes);

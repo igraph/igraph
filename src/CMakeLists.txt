@@ -17,13 +17,17 @@ foreach(FORMAT dl gml lgl ncol pajek)
     if (BISON_VERSION VERSION_GREATER_EQUAL 3)
       set(bison_no_deprecated -Wno-deprecated)
     endif()
+	if (NOT FLEX_KEEP_LINE_NUMBERS)
+      set(bison_hide_line_numbers --no-lines)
+      set(flex_hide_line_numbers --noline)
+    endif()
     bison_target(
       ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
-      COMPILE_FLAGS "--no-lines ${bison_no_deprecated}"
+      COMPILE_FLAGS "${bison_hide_line_numbers} ${bison_no_deprecated}"
     )
     flex_target(
       ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
-      COMPILE_FLAGS "--noline"
+      COMPILE_FLAGS "${flex_hide_line_numbers}"
       DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.h
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
@@ -43,7 +47,6 @@ add_library(
   core/estack.c
   core/fixed_vectorlist.c
   core/grid.c
-  core/hashtable.c
   core/heap.c
   core/indheap.c
   core/interruption.c
@@ -56,7 +59,6 @@ add_library(
   core/psumtree.c
   core/set.c
   core/sparsemat.c
-  core/spmatrix.c
   core/stack.c
   core/statusbar.c
   core/strvector.c
@@ -76,10 +78,15 @@ add_library(
   linalg/lapack.c
 
   random/random.c
+  random/rng_glibc2.c
+  random/rng_mt19937.c
+  random/rng_pcg32.c
+  random/rng_pcg64.c
 
   graph/adjlist.c
   graph/attributes.c
   graph/basic_query.c
+  graph/caching.c
   graph/cattributes.c
   graph/graph_list.c
   graph/iterators.c
@@ -147,7 +154,6 @@ add_library(
   community/fluid.c
   community/infomap/infomap_FlowGraph.cc
   community/infomap/infomap_Greedy.cc
-  community/infomap/infomap_Node.cc
   community/infomap/infomap.cc
   community/label_propagation.c
   community/leading_eigenvector.c
@@ -210,6 +216,7 @@ add_library(
   layout/merge_grid.c
   layout/reingold_tilford.c
   layout/sugiyama.c
+  layout/umap.c
 
   operators/add_edge.c
   operators/complementer.c
@@ -221,6 +228,7 @@ add_library(
   operators/intersection.c
   operators/misc_internal.c
   operators/permute.c
+  operators/reverse.c
   operators/rewire.c
   operators/rewire_edges.c
   operators/simplify.c
@@ -237,8 +245,9 @@ add_library(
   paths/random_walk.c
   paths/shortest_paths.c
   paths/simple_paths.c
-  paths/unweighted.c
   paths/sparsifier.c
+  paths/unweighted.c
+  paths/widest_paths.c
 
   properties/basic_properties.c
   properties/constraint.c
@@ -266,6 +275,7 @@ add_library(
   misc/cocitation.c
   misc/coloring.c
   misc/conversion.c
+  misc/cycle_bases.c
   misc/degree_sequence.cpp
   misc/embedding.c
   misc/feedback_arc_set.c
@@ -274,7 +284,9 @@ add_library(
   misc/microscopic_update.c
   misc/mixing.c
   misc/motifs.c
+  misc/order_cycle.cpp
   misc/other.c
+  misc/power_law_fit.c
   misc/scan.c
   misc/sir.c
   misc/spanning_trees.c
@@ -298,9 +310,12 @@ add_library(
   $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
 )
 
+# Required by Xcode new build system
+add_dependencies(igraph parsersources)
+
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "0.0.0")
-set_target_properties(igraph PROPERTIES SOVERSION 0)
+set_target_properties(igraph PROPERTIES VERSION "3.0.0")
+set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
 target_compile_definitions(
@@ -380,7 +395,7 @@ endif()
 target_link_libraries(
   igraph
   PRIVATE
-  bliss cliquer cxsparse_vendored prpack
+  bliss cliquer cxsparse_vendored pcg prpack
 )
 
 if (NOT BUILD_SHARED_LIBS)
@@ -429,7 +444,7 @@ write_basic_package_version_file(
 
 # Define how to install the library
 install(
-  TARGETS igraph bliss cliquer cxsparse_vendored prpack
+  TARGETS igraph bliss cliquer cxsparse_vendored pcg prpack
   EXPORT igraph_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 igraph_error_t test_directed() {
     igraph_t g;

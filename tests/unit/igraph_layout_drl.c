@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void set_options_fast(igraph_layout_drl_options_t *options) {
     options->edge_cut = 4.0/5.0;

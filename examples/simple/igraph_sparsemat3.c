@@ -21,9 +21,6 @@
 
 */
 
-#define NCOMPLEX  /* to make it compile with MSVC on Windows */
-
-#include <cs.h>
 #include <igraph.h>
 
 int permute(const igraph_matrix_t *M,
@@ -104,36 +101,15 @@ igraph_error_t random_permutation(igraph_vector_int_t *vec) {
 
 igraph_bool_t check_same(const igraph_sparsemat_t *A,
                          const igraph_matrix_t *M) {
+    igraph_matrix_t A_dense;
+    igraph_bool_t result;
 
-    igraph_integer_t nrow = igraph_sparsemat_nrow(A);
-    igraph_integer_t ncol = igraph_sparsemat_ncol(A);
-    igraph_integer_t j, p, nzero = 0;
+    igraph_matrix_init(&A_dense, 1, 1);
+    igraph_sparsemat_as_matrix(&A_dense, A);
+    result = igraph_matrix_all_e(&A_dense, M);
+    igraph_matrix_destroy(&A_dense);
 
-    if (nrow != igraph_matrix_nrow(M) ||
-        ncol != igraph_matrix_ncol(M)) {
-        return 0;
-    }
-
-    for (j = 0; j < A->cs->n; j++) {
-        for (p = A->cs->p[j]; p < A->cs->p[j + 1]; p++) {
-            igraph_integer_t to = A->cs->i[p];
-            igraph_real_t value = A->cs->x[p];
-            if (value != MATRIX(*M, to, j)) {
-                return 0;
-            }
-            nzero += 1;
-        }
-    }
-
-    for (j = 0; j < nrow; j++) {
-        for (p = 0; p < ncol; p++) {
-            if (MATRIX(*M, j, p) != 0) {
-                nzero -= 1;
-            }
-        }
-    }
-
-    return nzero == 0;
+    return result;
 }
 
 int main() {
@@ -142,6 +118,8 @@ int main() {
     igraph_matrix_t M, N;
     igraph_vector_int_t p, q;
     igraph_integer_t i;
+
+    RNG_BEGIN();
 
     /* Permutation of a matrix */
 
@@ -160,8 +138,8 @@ int main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
 
-    igraph_vector_int_init_seq(&p, 0, NROW - 1);
-    igraph_vector_int_init_seq(&q, 0, NCOL - 1);
+    igraph_vector_int_init_range(&p, 0, NROW);
+    igraph_vector_int_init_range(&q, 0, NCOL);
 
     /* Identity */
 
@@ -238,7 +216,9 @@ int main() {
         return 3;
     }
 
-    /* A single element */
+    igraph_sparsemat_destroy(&A);
+
+    /* Getting single elements with index() */
 
     igraph_vector_int_resize(&p, 1);
     igraph_vector_int_resize(&q, 1);
@@ -253,7 +233,20 @@ int main() {
         }
     }
 
-    igraph_sparsemat_destroy(&A);
+    /* Getting single elements with get() */
+
+    igraph_vector_int_resize(&p, 1);
+    igraph_vector_int_resize(&q, 1);
+
+    for (i = 0; i < 100; i++) {
+        igraph_integer_t row = RNG_INTEGER(0, NROW - 1);
+        igraph_integer_t col = RNG_INTEGER(0, NCOL - 1);
+        if (igraph_sparsemat_get(&B, row, col) != MATRIX(M, row, col)) {
+            return 4;
+        }
+    }
+
+    /* Getting submatrices with index() */
 
     for (i = 0; i < 100; i++) {
         igraph_real_t value;
@@ -319,6 +312,8 @@ int main() {
     igraph_vector_int_destroy(&q);
     igraph_matrix_destroy(&M);
     igraph_matrix_destroy(&N);
+
+    RNG_END();
 
     return 0;
 }

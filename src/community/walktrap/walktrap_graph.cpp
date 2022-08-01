@@ -54,8 +54,12 @@
 // see readme.txt for more details
 
 #include "walktrap_graph.h"
+
 #include "igraph_interface.h"
+
 #include <algorithm>
+#include <stdexcept>
+#include <climits>
 #include <cstring>      // strlen
 
 using namespace std;
@@ -149,25 +153,24 @@ void Edge_list::add(int v1, int v2, double w) {
     size++;
 }
 
-int Graph::convert_from_igraph(const igraph_t *graph,
+igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
                                const igraph_vector_t *weights) {
     Graph &G = *this;
 
-    int max_vertex = (int)igraph_vcount(graph) - 1;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i;
-    igraph_integer_t deg;
-    igraph_real_t w;
+
+    if (no_of_nodes > INT_MAX || no_of_edges > INT_MAX) {
+        throw std::domain_error("Graph too large for walktrap community detection.");
+    }
+
+    int max_vertex = no_of_nodes - 1;
 
     Edge_list EL;
 
-    for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from, to;
-        int v1, v2;
-        w = weights ? VECTOR(*weights)[i] : 1.0;
-        igraph_edge(graph, i, &from, &to);
-        v1 = (int)from; v2 = (int)to;
-        EL.add(v1, v2, w);
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+        igraph_real_t w = weights ? VECTOR(*weights)[i] : 1.0;
+        EL.add(IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i), w);
     }
 
     G.nb_vertices = max_vertex + 1;
@@ -185,8 +188,8 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     for (int i = 0; i < G.nb_vertices; i++) {
-        deg = G.vertices[i].degree;
-        w = (deg == 0) ? 1.0 : (G.vertices[i].total_weight / double(deg));
+        int deg = G.vertices[i].degree;
+        double w = (deg == 0) ? 1.0 : (G.vertices[i].total_weight / double(deg));
         G.vertices[i].edges = new Edge[deg + 1];
         G.vertices[i].edges[0].neighbor = i;
         G.vertices[i].edges[0].weight = w;
@@ -204,6 +207,13 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     for (int i = 0; i < G.nb_vertices; i++) {
+        /* Check for zero strength, as it may lead to crashed in walktrap algorithm.
+         * See https://github.com/igraph/igraph/pull/2043 */
+        if (G.vertices[i].total_weight == 0) {
+            /* G.vertices will be destroyed by Graph::~Graph() */
+            IGRAPH_ERROR("Vertex with zero strength found: all vertices must have positive strength for walktrap",
+                         IGRAPH_EINVAL);
+        }
         sort(G.vertices[i].edges, G.vertices[i].edges + G.vertices[i].degree);
     }
 
@@ -219,7 +229,7 @@ int Graph::convert_from_igraph(const igraph_t *graph,
         G.vertices[i].degree = a + 1;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 long Graph::memory() {

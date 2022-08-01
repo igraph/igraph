@@ -1,3 +1,14 @@
+Null graph nominal assortativity: NaN
+Null graph value assortativity: NaN
+Singleton graph nominal assortativity: NaN
+Singleton graph nominal assortativity, unnormalized: NaN
+Singleton graph value assortativity: NaN
+Singleton graph value assortativity, unnormalized: NaN
+Singleton graph with loop, nominal assortativity: NaN
+Singleton graph with loop, nominal assortativity, unnormalized: 0
+Singleton graph with loop, value assortativity: NaN
+Singleton graph with loop, value assortativity, unnormalized: 0
+
 Karate club, normalized assortativity based on degree categories: -0.077745
 Karate club, non-normalized assortativity based on degree categories: -0.0693623
 Assortativity based on values: 0.448049

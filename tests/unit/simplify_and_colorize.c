@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define SIMPLIFY_PRINT_DESTROY(name) \
     printf(name "\n"); \

@@ -1,7 +1,6 @@
 
 #include "igraph_error.h"
 #include "igraph_memory.h"
-#include "igraph_constants.h"
 
 #include "core/interruption.h"
 #include "cliques/cliquer_internal.h"
@@ -207,18 +206,19 @@ igraph_error_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
 
-    igraph_vector_resize(hist, max_size);
+    IGRAPH_CHECK(igraph_vector_resize(hist, max_size));
     igraph_vector_null(hist);
     igraph_cliquer_opt.user_data = hist;
     igraph_cliquer_opt.user_function = &count_cliques_callback;
 
     IGRAPH_CHECK(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt, NULL));
 
-    for (i = max_size; i > 0; --i)
+    for (i = max_size; i > 0; --i) {
         if (VECTOR(*hist)[i - 1] > 0) {
             break;
         }
-    igraph_vector_resize(hist, i);
+    }
+    IGRAPH_CHECK(igraph_vector_resize(hist, i));
     igraph_vector_resize_min(hist);
 
     graph_free(g);
@@ -231,15 +231,16 @@ igraph_error_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t
 /* Call function for each clique. */
 
 struct callback_data {
+    igraph_vector_int_t *clique;
     igraph_clique_handler_t *handler;
     void *arg;
 };
 
 static igraph_error_t callback_callback(set_t s, graph_t *g, clique_options *opt) {
-    igraph_vector_int_t *clique;
     struct callback_data *cd;
     int i;
     igraph_integer_t j;
+    igraph_error_t retval;
 
     IGRAPH_UNUSED(g);
 
@@ -247,24 +248,23 @@ static igraph_error_t callback_callback(set_t s, graph_t *g, clique_options *opt
 
     cd = (struct callback_data *) opt->user_data;
 
-    clique = (igraph_vector_int_t *) malloc(sizeof(igraph_vector_int_t));
-    if (clique == 0) {
-        IGRAPH_ERROR("storing cliques failed", IGRAPH_ENOMEM);
-    }
-    IGRAPH_CHECK(igraph_vector_int_init(clique, set_size(s)));
+    IGRAPH_CHECK(igraph_vector_int_resize(cd->clique, set_size(s)));
 
     i = -1; j = 0;
     while ((i = set_return_next(s, i)) >= 0) {
-        VECTOR(*clique)[j++] = i;
+        VECTOR(*cd->clique)[j++] = i;
     }
 
-    return (*(cd->handler))(clique, cd->arg);
+    retval = (*(cd->handler))(cd->clique, cd->arg);
+
+    return retval;
 }
 
 igraph_error_t igraph_i_cliquer_callback(const igraph_t *graph,
                               igraph_integer_t min_size, igraph_integer_t max_size,
                               igraph_clique_handler_t *cliquehandler_fn, void *arg) {
     graph_t *g;
+    igraph_vector_int_t current_clique;
     struct callback_data cd;
     igraph_integer_t vcount = igraph_vcount(graph);
 
@@ -290,6 +290,9 @@ igraph_error_t igraph_i_cliquer_callback(const igraph_t *graph,
     IGRAPH_CHECK(igraph_to_cliquer(graph, &g));
     IGRAPH_FINALLY(graph_free, g);
 
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&current_clique, min_size);
+
+    cd.clique = &current_clique;
     cd.handler = cliquehandler_fn;
     cd.arg = arg;
     igraph_cliquer_opt.user_data = &cd;
@@ -297,8 +300,9 @@ igraph_error_t igraph_i_cliquer_callback(const igraph_t *graph,
 
     IGRAPH_CHECK(clique_unweighted_find_all(g, (int) min_size, (int) max_size, /* maximal= */ FALSE, &igraph_cliquer_opt, NULL));
 
+    igraph_vector_int_destroy(&current_clique);
     graph_free(g);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }

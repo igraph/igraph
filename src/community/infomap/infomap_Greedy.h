@@ -22,27 +22,22 @@
 
 */
 
-#ifndef GREEDY_H
-#define GREEDY_H
-
-#include <vector>
-#include <map>
-#include <utility>
-#include <climits>
-
-#include "igraph_random.h"
+#ifndef INFOMAP_GREEDY_H
+#define INFOMAP_GREEDY_H
 
 #include "infomap_Node.h"
 #include "infomap_FlowGraph.h"
+
+#include "igraph_random.h"
+
+#include <vector>
 
 class Greedy {
 public:
     Greedy(FlowGraph * fgraph);
     // initialise les attributs par rapport au graph
 
-    ~Greedy();
-
-    void setMove(igraph_integer_t *moveTo);
+    void setMove(const std::vector<igraph_integer_t> &moveTo);
     //virtual void determMove(int *moveTo);
 
     bool optimize();
@@ -51,10 +46,14 @@ public:
     void apply(bool sort);
     //virtual void level(Node ***, bool sort);
 
-    void tune(void);
+    /* void tune(void); */ /* unused */
 
     /**************************************************************************/
 
+public:
+    double codeLength;
+
+private:
     FlowGraph * graph;
     igraph_integer_t Nnode;
 
@@ -63,8 +62,6 @@ public:
     double exit_log_exit;
     double size_log_size;
     double nodeSize_log_nodeSize;
-
-    double codeLength;
 
     double alpha, beta;
     // local copy of fgraph alpha, beta (=alpha -  Nnode = graph->Nnode;1)
@@ -81,5 +78,4 @@ public:
     std::vector<size_t> mod_members;
 };
 
-void delete_Greedy(Greedy *greedy);
-#endif
+#endif // INFOMAP_GREEDY_H

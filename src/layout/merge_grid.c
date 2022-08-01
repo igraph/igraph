@@ -60,7 +60,7 @@ igraph_error_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
 
     grid->data = IGRAPH_CALLOC(stepsx * stepsy, igraph_integer_t);
     if (grid->data == 0) {
-        IGRAPH_ERROR("Cannot create grid", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create grid", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     return IGRAPH_SUCCESS;
 }

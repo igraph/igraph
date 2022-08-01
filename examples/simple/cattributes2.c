@@ -39,7 +39,7 @@ int main() {
     SETGAN(&g, "edges", igraph_ecount(&g));
     SETGAB(&g, "famous", 1);
 
-    igraph_vector_init_seq(&y, 1, igraph_vcount(&g));
+    igraph_vector_init_range(&y, 1, igraph_vcount(&g) + 1);
     SETVANV(&g, "id", &y);
     igraph_vector_destroy(&y);
 
@@ -48,7 +48,7 @@ int main() {
 
     SETVAB(&g, "is_first", 0, 1);
 
-    igraph_vector_init_seq(&y, 1, igraph_ecount(&g));
+    igraph_vector_init_range(&y, 1, igraph_ecount(&g) + 1);
     SETEANV(&g, "id", &y);
     igraph_vector_destroy(&y);
 
@@ -61,7 +61,7 @@ int main() {
      * print warnings about boolean attributes being converted to numbers, and
      * we don't care about these */
     oldwarnhandler = igraph_set_warning_handler(igraph_warning_handler_ignore);
-    igraph_write_graph_gml(&g, stdout, 0, "");
+    igraph_write_graph_gml(&g, stdout, IGRAPH_WRITE_GML_DEFAULT_SW, 0, "");
     igraph_set_warning_handler(oldwarnhandler);
 
     /* Back to business */

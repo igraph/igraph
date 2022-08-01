@@ -48,7 +48,7 @@ typedef struct igraph_i_kleinberg_data2_t {
 } igraph_i_kleinberg_data2_t;
 
 static igraph_error_t igraph_i_kleinberg_unweighted_hub_to_auth(
-        int n, igraph_vector_t *to, const igraph_real_t *from,
+        igraph_integer_t n, igraph_vector_t *to, const igraph_real_t *from,
         igraph_adjlist_t *in) {
     igraph_vector_int_t *neis;
     igraph_integer_t i, j, nlen;
@@ -90,7 +90,7 @@ static igraph_error_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_kleinberg_weighted_hub_to_auth(int n,
+static igraph_error_t igraph_i_kleinberg_weighted_hub_to_auth(igraph_integer_t n,
         igraph_vector_t *to, const igraph_real_t *from, igraph_inclist_t *in,
         const igraph_t *g, const igraph_vector_t *weights) {
     igraph_vector_int_t *neis;
@@ -164,8 +164,8 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \param weights A null pointer (=no edge weights), or a vector
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    for details. Supply \c NULL here to use the defaults. Note that the function
+ *    overwrites the <code>n</code> (number of vertices) parameter and
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
@@ -225,7 +225,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
                     igraph_ecount(graph));
         }
         /* Safe to call minmax, ecount == 0 case was caught earlier */
-        IGRAPH_CHECK(igraph_vector_minmax(weights, &min, &max));
+        igraph_vector_minmax(weights, &min, &max);
         if (min == 0 && max == 0) {
             /* special case: all weights are zeros */
             if (value) {
@@ -247,7 +247,11 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
     }
 
-    options->n = (int) no_of_nodes;
+    if (!options) {
+        options = igraph_arpack_options_get_default();
+    }
+
+    options->n = no_of_nodes;
     options->start = 1;   /* no random start vector */
 
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
@@ -281,7 +285,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    options->which[0] = 'L'; options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'A';
 
     if (weights == 0) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,
@@ -305,7 +309,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         }
         igraph_real_t amax = 0;
         igraph_integer_t which = 0;
-        igraph_integer_t i;
+
         IGRAPH_CHECK(igraph_vector_resize(my_hub_vector_p, options->n));
         for (i = 0; i < options->n; i++) {
             igraph_real_t tmp;
@@ -339,7 +343,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
 
     if (authority_vector) {
         igraph_real_t norm;
-        igraph_vector_resize(authority_vector, no_of_nodes);
+        IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
         igraph_vector_null(authority_vector);
         if (weights == 0) {
             igraph_i_kleinberg_unweighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &inadjlist);

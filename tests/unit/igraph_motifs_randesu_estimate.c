@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob,
                     igraph_integer_t sample_size, igraph_vector_int_t *parsample) {
@@ -38,7 +38,7 @@ int main() {
     igraph_vector_init_real(&cut_prob_0_3, 3, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_0_4, 4, 0.0, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_01, 3, 0.1, 0.1, 0.1);
-    igraph_vector_int_init_seq(&parsample, 0, 40);
+    igraph_vector_int_init_range(&parsample, 0, 41);
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -65,7 +65,7 @@ int main() {
     printf("Full graph of 50 vertices, motif size 3, sample first 40:\n");
     call_and_print(&g_50_full, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 0, &parsample);
 
-    printf("Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300:\n");
+    printf("Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300):\n");
     call_and_print(&g_50_full, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 20, /*parsample*/ NULL);
 
     printf("Triangle and a vertex, motif size 4, sample all:\n");

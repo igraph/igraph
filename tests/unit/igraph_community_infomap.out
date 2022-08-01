@@ -4,9 +4,6 @@ Membership: 0 0 0 1 1 1
 # Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)
 Codelength: 2.94884 (in 2 modules)
 Membership: 0 0 0 0 1 1 1 1 
-# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)
-Codelength: 2.96655 (in 2 modules)
-Membership: 0 1 0 0 0 1 1 1 
 # Zachary Karate club
 Codelength: 4.60606 (in 3 modules)
 Membership: 0 0 0 0 1 1 1 0 2 0 1 0 0 0 2 2 1 0 2 0 2 0 2 2 2 2 2 2 2 2 2 2 2 2 

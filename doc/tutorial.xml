@@ -16,19 +16,37 @@ the <command>igraph</command> library.
 </para>
 
 <para>
-This example illustrates a couple of points. First, programs
+This example illustrates a couple of points:
+</para>
+
+<itemizedlist>
+<listitem><para>
+First, programs
 using the <command>igraph</command> library should include the
 <filename>igraph.h</filename> header
-file. Second, <command>igraph</command> uses the
+file.
+</para></listitem>
+<listitem><para>
+Second, <command>igraph</command> uses the
+<type>igraph_integer_t</type> type for integers instead of
+<type>int</type> or <type>long int</type>, and it also uses the
 <type>igraph_real_t</type> type for real numbers instead of
-<type>double</type>. Third, <command>igraph</command> graph objects
-are represented by the <type>igraph_t</type> data
-type. Fourth, the <link
+<type>double</type>. Depending on how igraph was compiled, and whether you are
+using a 32-bit or 64-bit system, <type>igraph_integer_t</type> may be a 32-bit
+or 64-bit integer.
+</para></listitem>
+<listitem><para>
+Third, <command>igraph</command> graph objects are represented by the <type>igraph_t</type> data
+type.
+</para></listitem>
+<listitem><para>
+Fourth, the <link
 linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
 destroys it, i.e. deallocates the memory associated to it.
-</para>
+</para></listitem>
+</itemizedlist>
 
 <para>
 For compiling this program you need a C compiler. Optionally,
@@ -46,7 +64,7 @@ for this example program, create a file name <filename>CMakeLists.txt</filename>
 following contents:
 
 <programlisting>
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 project(igraph_test)
 
 find_package(igraph REQUIRED)
@@ -86,12 +104,17 @@ cmake --build .
 </programlisting>
 </para>
 
-<note><title>C++ has to be enabled in igraph projects</title>
+<note><title>C++ must be enabled in igraph projects</title>
 <para>Parts of igraph are implemented in C++; therefore, any CMake target that
 depends on igraph should use the C++ linker. Furthermore, OpenMP support in
 igraph works correctly only if C++ is enabled in the CMake project. The script
 that finds igraph on the host machine will throw an error if C++ support is
 not enabled in the CMake project.</para>
+
+<para>C++ support is enabled by default when no languages are explicitly
+specified in CMake's <code>project</code> command. If you do specify some
+languages explicitly, make sure to also include <code>CXX</code>.
+</para>
 </note>
 
 </section>
@@ -166,9 +189,8 @@ generators. Stochastic (i.e. randomized) graph generators are called
 <command>igraph</command> can handle directed and undirected graphs. Most graph
 generators are able to create both types of graphs and most other
 functions are usually also capable of handling
-both. E.g. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
-which (surprisingly) calculates
-shortest paths from a vertex to other vertices can calculate
+both. E.g., <link linkend="igraph_get_shortest_paths"><function>igraph_get_shortest_paths()</function></link>,
+which calculates shortest paths from a vertex to other vertices, can calculate
 directed or undirected paths.
 </para>
 
@@ -177,7 +199,7 @@ directed or undirected paths.
 graphs are deterministic regular structures like star graphs
 (<link linkend="igraph_star"><function>igraph_star()</function></link>),
 ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices
-(<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>) or trees
+(<link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link>) or trees
 (<link linkend="igraph_kary_tree"><function>igraph_kary_tree()</function></link>).
 </para>
 
@@ -193,7 +215,8 @@ can reduce path lengths a lot.)
 <para>
 This example illustrates some new points. <command>igraph</command> uses
 <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>
-instead of plain C arrays. <type>igraph_vector_t</type> is superior to
+and its related types (<type>igraph_vector_int_t</type>, <type>igraph_vector_bool_t</type>
+and so on) instead of plain C arrays. <type>igraph_vector_t</type> is superior to
 regular arrays in almost every sense. Vectors are created by the
 <link linkend="igraph_vector_init"><function>igraph_vector_init()</function></link>
 function and, like graphs, they should be destroyed if not
@@ -201,31 +224,32 @@ needed any more by calling
 <link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
 on them. A vector can be indexed by the
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
-(right now it is a macro). Vectors
-can be resized, e.g. most <command>igraph</command> functions returning the result in a
-vector resize it to the size of the result.
+(right now it is a macro). The elements of a vector are of type <type>igraph_real_t</type>
+for <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>,
+and of type <type>igraph_integer_t</type> for <type>igraph_vector_int_t</type>.
+As you might expect, <type>igraph_vector_bool_t</type> holds
+<type>igraph_bool_t</type> values. Vectors can be resized and most <command>igraph</command>
+functions returning the result in a vector automatically resize it to the size they need.
 </para>
 
 <para>
-<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>
-takes a vector argument specifying the dimensions of
+<link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link>
+takes an integer vector argument specifying the dimensions of
 the lattice. In this example we generate a 30x30 two dimensional
-lattice. See the documentation of
-<link linkend="igraph_lattice"><function>igraph_lattice()</function></link> in
+periodic lattice. See the documentation of
+<link linkend="igraph_square_lattice"><function>igraph_square_lattice()</function></link> in
 the reference manual for the other arguments.
 </para>
 
 <para>
-The vertices in a graph are identified by an integer number between
-0 and N-1, N is the number of vertices in the graph (this can be
-obtained by
-<link linkend="igraph_vcount"><function>igraph_vcount()</function></link>,
-as in the example).
+The vertices in a graph are identified by a <emphasis>vertex ID</emphasis>, an integer between
+<code>0</code> and <code>N-1</code>, where <code>N</code> is the number of vertices in the graph. The vertex count can be
+retrieved using <link linkend="igraph_vcount"><function>igraph_vcount()</function></link>,
+as in the example.
 </para>
 
 <para>
-The <link
-linkend="igraph_add_edges"><function>igraph_add_edges()</function></link>
+The <link linkend="igraph_add_edges"><function>igraph_add_edges()</function></link>
 function simply takes a graph and a vector of
 vertex IDs defining the new edges. The first edge is between the first
 two vertex IDs in the vector, the second edge is between the second
@@ -233,15 +257,12 @@ two, etc. This way we add ten random edges to the lattice.
 </para>
 
 <para>
-Note that in the example it is possible to add loop edges, edges
-pointing to the same vertex and multiple edges, more than one edge
+Note that this example program may add <emphasis>loop edges</emphasis>, edges
+pointing a vertex to itself, or <emphasis>multiple edges</emphasis>, more than one edge
 between the same pair of vertices.
-<type>igraph_t</type> can of course
-represent loops and
-multiple edges, although some routines expect simple graphs,
-i.e. graphs without loop and multiple edges, because for example some
-structural properties are ill-defined for non-simple graphs. Loop
-edges can be removed by calling
+<type>igraph_t</type> can of course represent loops and multiple edges, although some
+routines expect simple graphs, i.e. graphs which contain neither of these. This is because some
+structural properties are ill-defined for non-simple graphs. Loop and multi-edges can be removed by calling
 <link linkend="igraph_simplify"><function>igraph_simplify()</function></link>.
 </para>
 
@@ -250,20 +271,19 @@ edges can be removed by calling
 <para>
 In our next example we will calculate various centrality measures in a
 friendship graph. The friendship graph is from the famous Zachary karate
-club study. (Web search on 'Zachary karate' if you want to know more about
+club study. (Do a web search on "Zachary karate" if you want to know more about
 this.) Centrality measures quantify how central is the position of
 individual vertices in the graph.
 <xi:include href="../examples/tutorial/tutorial3.c.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </para>
 
 <para>
-This example reflects some new features. First of all, it shows a
-way to define a graph simply as defining a C array with its edges.
-Function <link
-linkend="igraph_vector_view"><function>igraph_vector_view()</function></link>
-creates a <emphasis>view</emphasis> of a C
-array. It does not copy any data, this also means that you should not
-call <link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
+This example demonstrates some new operations. First of all, it shows a
+way to create a graph a list of edges stored in a plain C array.
+Function <link linkend="igraph_vector_view"><function>igraph_vector_view()</function></link>
+creates a <emphasis>view</emphasis> of a C array. It does not copy any data,
+which means that you must not call
+<link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
 on a vector created this way. This vector is then used to create the
 undirected graph.
 </para>
@@ -271,18 +291,27 @@ undirected graph.
 <para>
 Then the degree, closeness and betweenness centrality of the vertices
 is calculated and the highest values are printed. Note that the vector
-(<varname>result</varname>) which returns the result from these
-functions has to be initialized first, and also that the functions resize
+<varname>result</varname>, into which these functions will write their
+result, must be initialized first, and also that the functions resize
 it to be able to hold the result.
 </para>
 
 <para>
-The <constant>igraph_vss_all()</constant> argument tells the functions to
-calculate the property for every vertex in the graph, it is shorthand
-for a <emphasis>vertex selector</emphasis> (<type>igraph_vs_t</type>).
-Vertex selectors help to perform operations on a subset of vertices,
-you can read more about them in <link linkend="igraph-Iterators">one
-of the following chapters.</link>
+Notice that in order to print values of type <type>igraph_integer_t</type>,
+we used the <constant>IGRAPH_PRId</constant> format macro constant. This
+macro is similar to the standard <constant>PRI</constant> constants defined
+in <code>stdint.h</code>, and expands to the correct <code>printf</code>
+format specifier on each platform that <command>igraph</command> supports.
+</para>
+
+<para>
+The <link linkend="igraph_vss_all"><function>igraph_vss_all()</function></link> argument
+tells the functions to calculate the property for every vertex in the graph.
+It is shorthand for a <emphasis>vertex selector</emphasis>, represented by type
+<type>igraph_vs_t</type>.
+Vertex selectors help perform operations on a subset of vertices.
+You can read more about them in <link linkend="igraph-Iterators">one
+of the following chapters</link>.
 </para>
 </section>
 

@@ -41,18 +41,26 @@ int igraph_pajek_yyparse (igraph_i_pajek_parsedata_t* context);
 void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
 
 void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
-    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(attrs); i++) {
+    const igraph_integer_t attr_count = igraph_vector_ptr_size(attrs);
+    for (igraph_integer_t i = 0; i < attr_count; i++) {
         igraph_attribute_record_t *rec = VECTOR(*attrs)[i];
         if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *vec = (igraph_vector_t*) rec->value;
             igraph_vector_destroy(vec);
             IGRAPH_FREE(vec);
+        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            igraph_vector_bool_t *vec = (igraph_vector_bool_t*) rec->value;
+            igraph_vector_bool_destroy(vec);
+            IGRAPH_FREE(vec);
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
             igraph_strvector_destroy(strvec);
             IGRAPH_FREE(strvec);
+        } else {
+            /* Must never reach here */
+            IGRAPH_FATAL("Unknown attribute type encountered.");
         }
-        igraph_free( (char*)(rec->name));
+        IGRAPH_FREE(rec->name);
         IGRAPH_FREE(rec);
     }
     igraph_vector_ptr_destroy(attrs);
@@ -168,6 +176,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     igraph_vector_ptr_init(&eattrs, 0);
     IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &eattrs);
 
+    context.directed = false; /* assume undirected until an element implying directedness is encountered */
     context.vector = &edges;
     context.mode = 0;
     context.vcount = -1;
@@ -186,7 +195,10 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     igraph_pajek_yyset_in(instream, context.scanner);
 
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
     int err = igraph_pajek_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
     switch (err) {
     case 0: /* success */
         break;
@@ -200,7 +212,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         }
         break;
     case 2: /* out of memory */
-        IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot read Pajek file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         break;
     default: /* must never reach here */
         /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
@@ -211,25 +223,37 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
         IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading Pajek file.", err);
     }
 
-    for (i = 0; i < igraph_vector_ptr_size(&eattrs); i++) {
+    /* Prepare attributes */
+    const igraph_integer_t eattr_count = igraph_vector_ptr_size(&eattrs);
+    for (i = 0; i < eattr_count; i++) {
         igraph_attribute_record_t *rec = VECTOR(eattrs)[i];
         if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *vec = (igraph_vector_t*)rec->value;
             igraph_integer_t origsize = igraph_vector_size(vec);
-            igraph_vector_resize(vec, context.actedge);
+            IGRAPH_CHECK(igraph_vector_resize(vec, context.actedge));
             for (j = origsize; j < context.actedge; j++) {
                 VECTOR(*vec)[j] = IGRAPH_NAN;
             }
+        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+            /* Boolean attributes are not currently added by the parser.
+             * This section is here for future-proofing. */
+            igraph_vector_bool_t *vec = (igraph_vector_bool_t*)rec->value;
+            igraph_integer_t origsize = igraph_vector_bool_size(vec);
+            IGRAPH_CHECK(igraph_vector_bool_resize(vec, context.actedge));
+            for (j = origsize; j < context.actedge; j++) {
+                VECTOR(*vec)[j] = 0;
+            }
         } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-            igraph_integer_t origsize = igraph_strvector_size(strvec);
-            igraph_strvector_resize(strvec, context.actedge);
-            for (j = origsize; j < context.actedge; j++) {
-                igraph_strvector_set(strvec, j, "");
-            }
+            /* strvector_resize() adds empty strings */
+            IGRAPH_CHECK(igraph_strvector_resize(strvec, context.actedge));
+        } else {
+            /* Must never reach here */
+            IGRAPH_FATAL("Unknown attribute type encountered.");
         }
     }
 
+    /* Create graph */
     IGRAPH_CHECK(igraph_empty(graph, 0, context.directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
     IGRAPH_CHECK(igraph_add_vertices(graph, context.vcount, &vattrs));
@@ -304,12 +328,13 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 #define E_COLOR            22
 #define E_LAST             23
 
-static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
+static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     igraph_integer_t destlen = 0;
     igraph_bool_t need_escape = 0;
 
     /* Determine whether the string contains characters to be escaped */
-    char *s, *d;
+    const char *s;
+    char *d;
     for (s = src; *s; s++, destlen++) {
         if (*s == '\\') {
             need_escape = 1;
@@ -331,7 +356,7 @@ static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
          */
         *dest = IGRAPH_CALLOC(destlen + 3, char);
         if (!*dest) {
-            IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
 
         d = *dest;
@@ -343,7 +368,7 @@ static igraph_error_t igraph_i_pajek_escape(char* src, char** dest) {
 
     *dest = IGRAPH_CALLOC(destlen + 3, char);
     if (!*dest) {
-        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     d = *dest;
@@ -483,7 +508,8 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     igraph_vector_int_t vx_numa;
     igraph_vector_int_t vx_stra;
 
-    char *s, *escaped;
+    const char *s;
+    char *escaped;
 
     igraph_bool_t bipartite = 0;
     igraph_vector_int_t bip_index, bip_index2;
@@ -501,8 +527,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     /* Check if graph is bipartite */
     if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, "type")) {
         igraph_attribute_type_t type_type;
-        igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX,
-                                   "type");
+        igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX, "type");
         if (type_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
             igraph_integer_t bptr = 0, tptr = 0;
             bipartite = 1; write_vertex_attrs = 1;
@@ -556,32 +581,29 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     /* Check the vertex attributes */
     memset(vtypes, 0, sizeof(vtypes[0])*V_LAST);
     for (i = 0; i < V_LAST; i++) {
-        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
-                                        vnames[i])) {
-            igraph_i_attribute_gettype(graph, &vtypes[i], IGRAPH_ATTRIBUTE_VERTEX,
-                                       vnames[i]);
+        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vnames[i])) {
+            IGRAPH_CHECK(igraph_i_attribute_gettype(
+                             graph, &vtypes[i], IGRAPH_ATTRIBUTE_VERTEX, vnames[i]));
             write_vertex_attrs = 1;
         } else {
             vtypes[i] = (igraph_attribute_type_t) -1;
         }
     }
-    for (i = 0; i < (sizeof(vnumnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (igraph_integer_t) (sizeof(vnumnames) / sizeof(vnumnames[0])); i++) {
         igraph_attribute_type_t type;
-        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
-                                        vnumnames[i])) {
-            igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_VERTEX,
-                                       vnumnames[i]);
+        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vnumnames[i])) {
+            IGRAPH_CHECK(igraph_i_attribute_gettype(
+                             graph, &type, IGRAPH_ATTRIBUTE_VERTEX, vnumnames[i]));
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&vx_numa, i));
             }
         }
     }
-    for (i = 0; i < (sizeof(vstrnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (igraph_integer_t) (sizeof(vstrnames) / sizeof(vstrnames[0])); i++) {
         igraph_attribute_type_t type;
-        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
-                                        vstrnames[i])) {
-            igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_VERTEX,
-                                       vstrnames[i]);
+        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vstrnames[i])) {
+            IGRAPH_CHECK(igraph_i_attribute_gettype(
+                             graph, &type, IGRAPH_ATTRIBUTE_VERTEX, vstrnames[i]));
             if (type == IGRAPH_ATTRIBUTE_STRING) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&vx_stra, i));
             }
@@ -596,15 +618,15 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             /* vertex ID */
             fprintf(outstream, "%" IGRAPH_PRId, i + 1);
             if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_ID],
-                        igraph_vss_1(id), &numv);
+                IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(
+                                 graph, vnames[V_ID], igraph_vss_1(id), &numv));
                 fputs(" \"", outstream);
                 igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
                 fputc('"', outstream);
             } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {
-                igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_ID],
-                        igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
+                                 graph, vnames[V_ID], igraph_vss_1(id), &strv));
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
@@ -615,12 +637,12 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             /* coordinates */
             if (vtypes[V_X] == IGRAPH_ATTRIBUTE_NUMERIC &&
                 vtypes[V_Y] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_X],
-                        igraph_vss_1(id), &numv);
+                IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(
+                                 graph, vnames[V_X], igraph_vss_1(id), &numv));
                 fputc(' ', outstream);
                 igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
-                igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_Y],
-                        igraph_vss_1(id), &numv);
+                IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(
+                                 graph, vnames[V_Y], igraph_vss_1(id), &numv));
                 fputc(' ', outstream);
                 igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
                 if (vtypes[V_Z] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -633,9 +655,9 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
 
             /* shape */
             if (vtypes[V_SHAPE] == IGRAPH_ATTRIBUTE_STRING) {
-                igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_SHAPE],
-                        igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
+                                 graph, vnames[V_SHAPE], igraph_vss_1(id), &strv));
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s", escaped);
                 IGRAPH_FREE(escaped);
@@ -644,8 +666,8 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             /* numeric parameters */
             for (j = 0; j < igraph_vector_int_size(&vx_numa); j++) {
                 igraph_integer_t idx = VECTOR(vx_numa)[j];
-                igraph_i_attribute_get_numeric_vertex_attr(graph, vnumnames[idx],
-                        igraph_vss_1(id), &numv);
+                IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(
+                                 graph, vnumnames[idx], igraph_vss_1(id), &numv));
                 fprintf(outstream, " %s ", vnumnames2[idx]);
                 igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
             }
@@ -653,9 +675,9 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
             /* string parameters */
             for (j = 0; j < igraph_vector_int_size(&vx_stra); j++) {
                 igraph_integer_t idx = VECTOR(vx_stra)[j];
-                igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
-                        igraph_vss_1(id), &strv);
-                igraph_strvector_get(&strv, 0, &s);
+                IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(
+                                 graph, vstrnames[idx], igraph_vss_1(id), &strv));
+                s = igraph_strvector_get(&strv, 0);
                 IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
                 fprintf(outstream, " %s %s", vstrnames2[idx], escaped);
                 IGRAPH_FREE(escaped);
@@ -680,31 +702,28 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
 
     /* Check edge attributes */
     for (i = 0; i < E_LAST; i++) {
-        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
-                                        enames[i])) {
-            igraph_i_attribute_gettype(graph, &etypes[i], IGRAPH_ATTRIBUTE_EDGE,
-                                       enames[i]);
+        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, enames[i])) {
+            IGRAPH_CHECK(igraph_i_attribute_gettype(
+                             graph, &etypes[i], IGRAPH_ATTRIBUTE_EDGE, enames[i]));
         } else {
             etypes[i] = (igraph_attribute_type_t) -1;
         }
     }
-    for (i = 0; i < (sizeof(enumnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (igraph_integer_t) (sizeof(enumnames) / sizeof(enumnames[0])); i++) {
         igraph_attribute_type_t type;
-        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
-                                        enumnames[i])) {
-            igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_EDGE,
-                                       enumnames[i]);
+        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, enumnames[i])) {
+            IGRAPH_CHECK(igraph_i_attribute_gettype(
+                             graph, &type, IGRAPH_ATTRIBUTE_EDGE, enumnames[i]));
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&ex_numa, i));
             }
         }
     }
-    for (i = 0; i < (sizeof(estrnames) / sizeof(const char*)); i++) {
+    for (i = 0; i < (igraph_integer_t) (sizeof(estrnames) / sizeof(estrnames[0])); i++) {
         igraph_attribute_type_t type;
-        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
-                                        estrnames[i])) {
-            igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_EDGE,
-                                       estrnames[i]);
+        if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, estrnames[i])) {
+            IGRAPH_CHECK(igraph_i_attribute_gettype(
+                             graph, &type, IGRAPH_ATTRIBUTE_EDGE, estrnames[i]));
             if (type == IGRAPH_ATTRIBUTE_STRING) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&ex_stra, i));
             }
@@ -723,8 +742,8 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
 
         /* Weights */
         if (etypes[E_WEIGHT] == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_i_attribute_get_numeric_edge_attr(graph, enames[E_WEIGHT],
-                    igraph_ess_1(edge), &numv);
+            IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(
+                             graph, enames[E_WEIGHT], igraph_ess_1(edge), &numv));
             fputc(' ', outstream);
             igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
         }
@@ -732,8 +751,8 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
         /* numeric parameters */
         for (j = 0; j < igraph_vector_int_size(&ex_numa); j++) {
             igraph_integer_t idx = VECTOR(ex_numa)[j];
-            igraph_i_attribute_get_numeric_edge_attr(graph, enumnames[idx],
-                    igraph_ess_1(edge), &numv);
+            IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(
+                             graph, enumnames[idx], igraph_ess_1(edge), &numv));
             fprintf(outstream, " %s ", enumnames2[idx]);
             igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
         }
@@ -741,9 +760,9 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
         /* string parameters */
         for (j = 0; j < igraph_vector_int_size(&ex_stra); j++) {
             igraph_integer_t idx = VECTOR(ex_stra)[j];
-            igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
-                                                    igraph_ess_1(edge), &strv);
-            igraph_strvector_get(&strv, 0, &s);
+            IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(
+                             graph, estrnames[idx], igraph_ess_1(edge), &strv));
+            s = igraph_strvector_get(&strv, 0);
             IGRAPH_CHECK(igraph_i_pajek_escape(s, &escaped));
             fprintf(outstream, " %s %s", estrnames2[idx], escaped);
             IGRAPH_FREE(escaped);

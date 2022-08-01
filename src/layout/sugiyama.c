@@ -23,7 +23,6 @@
 */
 
 #include "igraph_layout.h"
-#include "igraph_centrality.h"
 #include "igraph_components.h"
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
@@ -336,7 +335,7 @@ igraph_error_t igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *re
         IGRAPH_VECTOR_INT_INIT_FINALLY(&layers_own, no_of_nodes);
         IGRAPH_CHECK(igraph_i_layout_sugiyama_place_nodes_vertically(graph, weights, &layers_own));
     } else {
-        IGRAPH_CHECK(igraph_vector_int_copy(&layers_own, layers));
+        IGRAPH_CHECK(igraph_vector_int_init_copy(&layers_own, layers));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &layers_own);
     }
 
@@ -757,7 +756,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
     {
         igraph_integer_t *xs = IGRAPH_CALLOC(no_of_layers, igraph_integer_t);
         if (xs == 0) {
-            IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("cannot order nodes horizontally", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         for (i = 0; i < no_of_vertices; i++) {
             MATRIX(*layout, i, 0) = xs[(igraph_integer_t)MATRIX(*layout, i, 1)]++;
@@ -1004,7 +1003,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     for (i = 0; i < 4; i++) {
         IGRAPH_CHECK(igraph_i_layout_sugiyama_vertical_alignment(graph,
                      layering, layout, &ignored_edges,
-                     /* reverse = */ (igraph_bool_t) i / 2, /* align_right = */ i % 2,
+                     /* reverse = */ i / 2, /* align_right = */ i % 2,
                      &roots, &align));
         IGRAPH_CHECK(igraph_i_layout_sugiyama_horizontal_compaction(graph,
                      &vertex_to_the_left, &roots, &align, hgap, &xs[i]));

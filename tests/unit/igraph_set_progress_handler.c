@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 igraph_error_t handler(const char* message, igraph_real_t percent, void*data) {
     printf("handler, %s, %f, %d\n", message, percent, *(int*)data);

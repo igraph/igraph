@@ -1,0 +1,453 @@
+
+0x0 matrix:
+directed: true
+vcount: 0
+edges: {
+}
+
+1x1 matrix, no loops:
+directed: true
+vcount: 1
+edges: {
+}
+
+1x1 matrix, loops once:
+directed: true
+vcount: 1
+edges: {
+0 0
+}
+
+1x1 matrix, loops twice:
+directed: true
+vcount: 1
+edges: {
+0 0
+}
+
+3x3 matrix, IGRAPH_ADJ_DIRECTED, no loops:
+directed: true
+vcount: 3
+edges: {
+0 1
+0 1
+1 0
+1 0
+1 0
+1 2
+1 2
+1 2
+1 2
+2 1
+2 1
+2 1
+2 1
+2 1
+}
+
+3x3 matrix, IGRAPH_ADJ_DIRECTED, loops once:
+directed: true
+vcount: 3
+edges: {
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+1 0
+1 0
+1 0
+1 2
+1 2
+1 2
+1 2
+2 1
+2 1
+2 1
+2 1
+2 1
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_DIRECTED, loops twice:
+directed: true
+vcount: 3
+edges: {
+0 0
+0 0
+0 1
+0 1
+1 0
+1 0
+1 0
+1 2
+1 2
+1 2
+1 2
+2 1
+2 1
+2 1
+2 1
+2 1
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_UNDIRECTED, no loops:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+}
+
+3x3 matrix, IGRAPH_ADJ_UNDIRECTED, loops once:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_UNDIRECTED, loops twice:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_MAX, no loops:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+}
+
+3x3 matrix, IGRAPH_ADJ_MAX, loops once:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_MAX, loops twice:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_MIN, no loops:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+}
+
+3x3 matrix, IGRAPH_ADJ_MIN, loops once:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_MIN, loops twice:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_PLUS, no loops:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 1
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+}
+
+3x3 matrix, IGRAPH_ADJ_PLUS, loops once:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_PLUS, loops twice:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 1
+0 1
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_UPPER, no loops:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+}
+
+3x3 matrix, IGRAPH_ADJ_UPPER, loops once:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_UPPER, loops twice:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_LOWER, no loops:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+}
+
+3x3 matrix, IGRAPH_ADJ_LOWER, loops once:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+2 2
+2 2
+2 2
+}
+
+3x3 matrix, IGRAPH_ADJ_LOWER, loops twice:
+directed: false
+vcount: 3
+edges: {
+0 0
+0 0
+0 1
+0 1
+0 1
+1 2
+1 2
+1 2
+1 2
+1 2
+2 2
+2 2
+2 2
+}
+
+Check handling of non-square matrix error.
+
+Check handling of negative number of edges error.
+
+Check handling of odd number in diagonal.
+
+Check handling of invalid adjacency mode.
+
+Check handling of non-symmetric matrix for IGRAPH_ADJ_UNDIRECTED.

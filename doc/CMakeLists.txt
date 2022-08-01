@@ -46,7 +46,6 @@ set(
   random.xxml
   separators.xxml
   sparsemat.xxml
-  spmatrix.xxml
   spatialgames.xxml
   stack.xxml
   status.xxml
@@ -221,6 +220,15 @@ if(DOC_BUILD_SUPPORTED)
     COMMENT "Parsing documentation chunks from source code"
   )
 
+  set(DOCXML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/doc/xmlstamp)
+  add_custom_command(
+    OUTPUT ${DOCXML_STAMP}
+    COMMAND ${CMAKE_COMMAND} -E touch ${DOCXML_STAMP}
+    MAIN_DEPENDENCY igraph-docs.xml
+    DEPENDS ${DOCBOOK_INPUTS}
+  )
+  add_custom_target(docxml DEPENDS ${DOCXML_STAMP})
+
   if(HTML_DOC_BUILD_SUPPORTED)
     set(HTML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/html/stamp)
 
@@ -232,7 +240,7 @@ if(DOC_BUILD_SUPPORTED)
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/html/*.png ${CMAKE_CURRENT_BINARY_DIR}/html
       COMMAND ${CMAKE_COMMAND} -E touch ${HTML_STAMP}
       MAIN_DEPENDENCY igraph-docs.xml
-      DEPENDS ${DOCBOOK_INPUTS}
+      DEPENDS docxml
       COMMENT "Generating HTML documentation with xmlto"
     )
 
@@ -257,7 +265,7 @@ if(DOC_BUILD_SUPPORTED)
       ARGS
       -E remove igraph-docs-with-resolved-includes-tmp.xml
       MAIN_DEPENDENCY igraph-docs.xml
-      DEPENDS ${DOCBOOK_INPUTS}
+      DEPENDS docxml
       COMMENT "Resolving includes in DocBook XML source"
     )
 

@@ -4,6 +4,8 @@
 #include "graph.hh"
 #include "partition.hh"
 
+#include "igraph_decls.h"
+
 /* Allow using 'and' instead of '&&' with MSVC */
 #if _MSC_VER
 #include <ciso646>
@@ -966,6 +968,7 @@ Partition::zplit_cell(Partition::Cell* const cell,
           /* Generic sorting and splitting */
           const bool sorted = shellsort_cell(cell);
           assert(sorted);
+          IGRAPH_UNUSED(sorted);
           last_new_cell = split_cell(cell);
         }
     }

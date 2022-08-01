@@ -23,7 +23,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 static int compare_first_items(const void* a, const void* b) {
     igraph_vector_t *vec1 = (igraph_vector_t*) a;

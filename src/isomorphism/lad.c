@@ -57,23 +57,17 @@
 
 #include "core/interruption.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <limits.h>
-
-
-/* define boolean type as char */
-#define true 1
-#define false 0
-#define bool char
 
 /* helper to allocate an array of given size and free it using IGRAPH_FINALLY
  * when needed */
 #define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
         VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
-            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
+            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
         }  \
         IGRAPH_FINALLY(igraph_free, VAR);  \
     }
@@ -83,7 +77,7 @@
 #define ALLOC_ARRAY_IN_HISTORY(VAR, SIZE, TYPE, HISTORY) { \
         VAR = IGRAPH_CALLOC(SIZE, TYPE);   \
         if (VAR == 0) {                    \
-            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
+            IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ \
         }  \
         IGRAPH_FINALLY(igraph_free, VAR);  \
         IGRAPH_CHECK(igraph_vector_ptr_push_back(HISTORY, VAR));  \
@@ -464,8 +458,7 @@ static bool igraph_i_lad_matchVertex(igraph_integer_t u, bool induced, Tdomain* 
        return false if an inconsistency is detected by FC(Edges) or
        FC(diff); true otherwise; */
     igraph_vector_int_t toBeMatched;
-    igraph_vector_int_init(&toBeMatched, Gp->nbVertices);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &toBeMatched);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&toBeMatched, Gp->nbVertices);
     VECTOR(toBeMatched)[0] = u;
     IGRAPH_CHECK(igraph_i_lad_matchVertices(1, &toBeMatched, induced, D, Gp, Gt,
                                &invalid));
@@ -577,12 +570,12 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                     mu = IGRAPH_CALLOC(VECTOR(Gp->nbSucc)[u], igraph_integer_t);
                     if (mu == 0) {
                         igraph_free(val); igraph_free(dom);
-                        IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     mv = IGRAPH_CALLOC(VECTOR(Gt->nbSucc)[v], igraph_integer_t);
                     if (mv == 0) {
                         igraph_free(mu); igraph_free(val); igraph_free(dom);
-                        IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+                        IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                     }
                     for (i = 0; i < VECTOR(Gp->nbSucc)[u]; i++) {
                         mu[i] = VECTOR(Gp->nbSucc)[VECTOR(*Gp_uneis)[i]];

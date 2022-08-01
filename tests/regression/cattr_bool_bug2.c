@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 #define FILENAME "mybool.graphml.xml"
 

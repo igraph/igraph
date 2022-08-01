@@ -26,22 +26,59 @@
 #include "igraph_conversion.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
+#include "igraph_qsort.h"
 #include "igraph_random.h"
+#include "igraph_structural.h"
+
+#include "core/interruption.h"
+
+/* The "code" of an edge is a single index representing its location in the adjacency matrix,
+ * More specifically, the relevant parts of the adjacency matrix (i.e. non-diagonal in directed,
+ * upper triangular in undirecred) are column-wise concatenated into an array. The "code" is
+ * the index in this array. We use floating point numbers for the code, as it can easily
+ * exceed integers representable on 32 bits.
+ */
+#define D_CODE(f,t) (((t)==no_of_nodes-1 ? (f) : (t)) * no_of_nodes + (f))
+#define U_CODE(f,t) ((t) * ((t)-1) / 2 + (f))
+#define CODE(f,t) (directed ? D_CODE((double)(f),(double)(t)) : U_CODE((double)(f),(double)(t)))
+
+/* TODO: Slight speedup may be possible if repeated vertex count queries are avoided. */
+static int code_cmp(void *graph, const void *va, const void *vb) {
+    const igraph_integer_t *a = (const igraph_integer_t *) va;
+    const igraph_integer_t *b = (const igraph_integer_t *) vb;
+    const igraph_integer_t no_of_nodes = igraph_vcount((igraph_t *) graph);
+    const igraph_bool_t directed = igraph_is_directed((igraph_t *) graph);
+    const igraph_real_t codea = CODE(a[0], a[1]);
+    const igraph_real_t codeb = CODE(b[0], b[1]);
+    if (codea < codeb) {
+        return -1;
+    } else if (codea > codeb) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+/* Sort an edge vector by edge codes. */
+static void sort_edges(igraph_vector_int_t *edges, const igraph_t *graph) {
+    igraph_qsort_r(VECTOR(*edges), igraph_vector_int_size(edges) / 2, 2*sizeof(igraph_integer_t), (void *) graph, code_cmp);
+}
 
 /**
  * \function igraph_correlated_game
  * \brief Generates a random graph correlated to an existing graph.
  *
  * Sample a new graph by perturbing the adjacency matrix of a
- * given graph and shuffling its vertices.
+ * given simple graph and shuffling its vertices.
  *
- * \param old_graph The original graph.
+ * \param old_graph The original graph, it must be simple.
  * \param new_graph The new graph will be stored here.
- * \param corr A scalar in the unit interval, the target Pearson
- *        correlation between the adjacency matrices of the original the
+ * \param corr A scalar in the unit interval [0,1], the target Pearson
+ *        correlation between the adjacency matrices of the original and the
  *        generated graph (the adjacency matrix being used as a vector).
  * \param p A numeric scalar, the probability of an edge between two
- *        vertices, it must in the open (0,1) interval.
+ *        vertices, it must in the open (0,1) interval. Typically,
+ *        the density of \p old_graph.
  * \param permutation A permutation to apply to the vertices of the
  *        generated graph. It can also be a null pointer, in which case
  *        the vertices will not be permuted.
@@ -57,8 +94,8 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     igraph_integer_t no_of_nodes = igraph_vcount(old_graph);
     igraph_integer_t no_of_edges = igraph_ecount(old_graph);
     igraph_bool_t directed = igraph_is_directed(old_graph);
-    igraph_real_t no_of_all = directed ? no_of_nodes * (no_of_nodes - 1) :
-                              no_of_nodes * (no_of_nodes - 1) / 2;
+    igraph_real_t no_of_all = directed ? ((igraph_real_t) no_of_nodes) * (no_of_nodes - 1) :
+                              ((igraph_real_t) no_of_nodes) * (no_of_nodes - 1) / 2;
     igraph_real_t no_of_missing = no_of_all - no_of_edges;
     igraph_real_t q = p + corr * (1 - p);
     igraph_real_t p_del = 1 - q;
@@ -71,20 +108,26 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     igraph_real_t inf = IGRAPH_INFINITY;
     igraph_real_t next_e, next_a, next_d;
     igraph_integer_t i, newec;
+    igraph_bool_t simple;
 
-    if (corr < -1 || corr > 1) {
-        IGRAPH_ERROR("Correlation must be in [-1,1] in correlated "
-                     "Erdos-Renyi game", IGRAPH_EINVAL);
+    if (corr < 0 || corr > 1) {
+        IGRAPH_ERRORF("Correlation must be in [0,1] in correlated Erdos-Renyi game, got %g.",
+                      IGRAPH_EINVAL, corr);
     }
     if (p <= 0 || p >= 1) {
-        IGRAPH_ERROR("Edge probability must be in (0,1) in correlated "
-                     "Erdos-Renyi game", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Edge probability must be in (0,1) in correlated Erdos-Renyi game, got %g.",
+                      IGRAPH_EINVAL, p);
     }
     if (permutation) {
         if (igraph_vector_int_size(permutation) != no_of_nodes) {
-            IGRAPH_ERROR("Invalid permutation length in correlated Erdos-Renyi game",
+            IGRAPH_ERROR("Invalid permutation length in correlated Erdos-Renyi game.",
                          IGRAPH_EINVAL);
         }
+    }
+    IGRAPH_CHECK(igraph_is_simple(old_graph, &simple));
+    if (! simple) {
+        IGRAPH_ERROR("The original graph must be simple for correlated Erdos-Renyi game.",
+                     IGRAPH_EINVAL);
     }
 
     /* Special cases */
@@ -101,7 +144,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
         if (permutation) {
             newec = igraph_vector_int_size(&edges);
             for (i = 0; i < newec; i++) {
-                int tmp = VECTOR(edges)[i];
+                igraph_integer_t tmp = VECTOR(edges)[i];
                 VECTOR(edges)[i] = VECTOR(*permutation)[tmp];
             }
         }
@@ -117,6 +160,11 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
+    /* The samping method used is analogous to the one in igraph_erdos_renyi_game_gnp(),
+     * and assumes that the edge list of the old graph is in order of increasing "codes".
+     * Even IGRAPH_EDGEORDER_TO does not guarantee this, therefore we sort explicitly.
+     */
+    sort_edges(&edges, old_graph);
 
     RNG_BEGIN();
 
@@ -142,8 +190,6 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
 
     RNG_END();
 
-    IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
-
     /* Now we are merging the original edges, the edges that are removed,
        and the new edges. We have the following pointers:
        - p_a: the next edge to add
@@ -153,9 +199,6 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
        - next_a: the code of the next edge to add
        - next_d: the code of the next edge to delete */
 
-#define D_CODE(f,t) (((t)==no_of_nodes-1 ? f : t) * no_of_nodes + (f))
-#define U_CODE(f,t) ((t) * ((t)-1) / 2 + (f))
-#define CODE(f,t) (directed ? D_CODE(f,t) : U_CODE(f,t))
 #define CODEE() (CODE(VECTOR(edges)[2*p_e], VECTOR(edges)[2*p_e+1]))
 
     /* First we (re)code the edges to delete */
@@ -173,18 +216,19 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     /* Now we can do the merge. Additional edges are tricky, because
        the code must be shifted by the edges in the original graph. */
 
-#define UPD_E()                             \
+#define UPD_E() \
     { if (p_e < no_of_edges) { next_e=CODEE(); } else { next_e = inf; } }
-#define UPD_A()                             \
-{ if (p_a < no_add) { \
+#define UPD_A() \
+    { if (p_a < no_add) { \
             next_a = VECTOR(add)[p_a] + p_e; } else { next_a = inf; } }
-#define UPD_D()                             \
-{ if (p_d < no_del) { \
+#define UPD_D() \
+    { if (p_d < no_del) { \
             next_d = VECTOR(delete)[p_d]; } else { next_d = inf; } }
 
     UPD_E(); UPD_A(); UPD_D();
 
     while (next_e != inf || next_a != inf || next_d != inf) {
+        IGRAPH_ALLOW_INTERRUPTION();
         if (next_e <= next_a && next_e < next_d) {
 
             /* keep an edge */
@@ -202,6 +246,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
 
             /* add an edge */
             igraph_integer_t to, from;
+            IGRAPH_ASSERT(igraph_finite(next_a));
             if (directed) {
                 to = floor(next_a / no_of_nodes);
                 from = next_a - ((igraph_real_t)to) * no_of_nodes;

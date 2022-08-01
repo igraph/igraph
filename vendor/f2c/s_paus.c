@@ -39,6 +39,8 @@ s_1paus(fin) FILE *fin;
 s_1paus(FILE *fin)
 #endif
 {
+	IGRAPH_FATAL("s_1paus() called from f2c code");
+	/*
 	fprintf(stderr,
 	"To resume execution, type go.  Other input will terminate the job.\n");
 	fflush(stderr);
@@ -49,6 +51,7 @@ s_1paus(FILE *fin)
 #endif
 		exit(0);
 		}
+		*/
 	}
 
  int
@@ -58,6 +61,8 @@ s_paus(s, n) char *s; ftnlen n;
 s_paus(char *s, ftnlen n)
 #endif
 {
+	IGRAPH_FATAL("s_paus() called from f2c code");
+	/*
 	fprintf(stderr, "PAUSE ");
 	if(n > 0)
 		fprintf(stderr, " %.*s", (int)n, s);
@@ -86,6 +91,7 @@ s_paus(char *s, ftnlen n)
 		}
 	fprintf(stderr, "Execution resumes after PAUSE.\n");
 	fflush(stderr);
+	*/
 	return 0; /* NOT REACHED */
 #ifdef __cplusplus
 	}

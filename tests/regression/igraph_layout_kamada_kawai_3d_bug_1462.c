@@ -1,7 +1,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 void snap_to_zero(igraph_real_t* value) {
     if (fabs(*value) < 1e-5) {

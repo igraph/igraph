@@ -32,11 +32,13 @@
 <section id="fitting-powerlaw-distributions-to-empirical-data"><title>Fitting power-law distributions to empirical data</title>
 <!-- doxrox-include igraph_plfit_result_t -->
 <!-- doxrox-include igraph_power_law_fit -->
+<!-- doxrox-include igraph_plfit_result_calculate_p_value -->
 </section>
 
 <section id="compare-floats-with-tolerance"><title>Comparing floats with a tolerance</title>
-<!-- doxrox-include igraph_almost_equals -->
 <!-- doxrox-include igraph_cmp_epsilon -->
+<!-- doxrox-include igraph_almost_equals -->
+<!-- doxrox-include igraph_complex_almost_equals -->
 </section>
 
 </chapter>

@@ -18,7 +18,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 /* https://github.com/igraph/igraph/issues/950 */

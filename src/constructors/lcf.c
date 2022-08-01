@@ -57,7 +57,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t no_of_edges2;
 
     if (repeats < 0) {
-        IGRAPH_ERROR("Number of repeats must be positive.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of repeats must not be negative.", IGRAPH_EINVAL);
     }
 
     /* no_of_edges = n + no_of_shifts * repeats */
@@ -129,12 +129,18 @@ igraph_error_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
 
     va_start(ap, n);
     while (1) {
+        igraph_error_t err;
         int num = va_arg(ap, int);
         if (num == 0) {
             break;
         }
-        IGRAPH_CHECK(igraph_vector_int_push_back(&shifts, num));
+        err = igraph_vector_int_push_back(&shifts, num);
+        if (err != IGRAPH_SUCCESS) {
+            va_end(ap);
+            IGRAPH_ERROR("", err);
+        }
     }
+    va_end(ap);
     if (igraph_vector_int_size(&shifts) == 0) {
         repeats = 0;
     } else {

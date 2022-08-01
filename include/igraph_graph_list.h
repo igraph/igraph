@@ -23,9 +23,9 @@
 #ifndef IGRAPH_GRAPH_LIST_H
 #define IGRAPH_GRAPH_LIST_H
 
-#include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 

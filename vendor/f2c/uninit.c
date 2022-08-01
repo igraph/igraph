@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include "arith.h"
 
+#include "igraph_error.h"
+
 #define TYSHORT 2
 #define TYLONG 3
 #define TYREAL 4
@@ -65,9 +67,8 @@ double _0 = 0.;
 
 void unsupported_error()
 {
-  fprintf(stderr,"Runtime Error: Your Architecture is not supported by the"
-                       " -trapuv option of f2c\n");
-  exit(-1);
+  IGRAPH_FATAL("Runtime Error: Your Architecture is not supported by the"
+               " -trapuv option of f2c");
 }
 
 
@@ -217,7 +218,7 @@ ieeeuserhand(unsigned exception[5], int val[2])
 	else if(exception[0]==_INVALID) fprintf(stderr,"invalid operation\n");
 	else fprintf(stderr,"\tunknown reason\n");
 	fflush(stderr);
-	abort();
+	IGRAPH_FATAL("ieee0() aborting");
 }
 
  static void
@@ -228,7 +229,7 @@ ieeeuserhand2(unsigned int **j)
 #endif
 {
 	fprintf(stderr,"ieee0() aborting because of confusion\n");
-	abort();
+	IGRAPH_FATAL("ieee0() aborting");
 }
 
  static void

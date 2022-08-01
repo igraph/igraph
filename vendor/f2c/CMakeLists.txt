@@ -103,6 +103,10 @@ target_include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# Since these are included as object files, they should call the
+# function as is (without visibility specification)
+target_compile_definitions(f2c_vendored PRIVATE IGRAPH_STATIC)
+
 if (WIN32)
   target_compile_definitions(f2c_vendored PRIVATE MSDOS)
 endif()

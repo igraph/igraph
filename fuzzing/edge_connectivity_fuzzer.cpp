@@ -30,7 +30,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     igraph_t graph;
     igraph_vector_int_t edges;
 
-    igraph_set_error_handler(&igraph_error_handler_ignore);
+    igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     if (Size % 2 == 1 || Size > 65280) {
         return 0;

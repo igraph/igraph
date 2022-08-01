@@ -41,7 +41,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
@@ -58,11 +58,11 @@ jobs:
     #    uses a compiled language
 
     - run: |
-        cmake -GNinja -B build
+        cmake -GNinja -B build -DFLEX_KEEP_LINE_NUMBERS=ON
         cmake --build build
         # Remove temporary CMake stuff so the code analysis does not run on
         # them
         rm -rf build/CMakeFiles/CMakeTmp
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2

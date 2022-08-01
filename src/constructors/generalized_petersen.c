@@ -20,6 +20,7 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
 
 /**
  * \function igraph_generalized_petersen
@@ -59,19 +60,24 @@
 igraph_error_t igraph_generalized_petersen(igraph_t *graph, igraph_integer_t n, igraph_integer_t k) {
     /* This is a generalized Petersen graph constructor */
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_nodes = 2*n;
+    igraph_integer_t no_of_nodes, no_of_edges2;
     igraph_integer_t i;
 
     if (n < 3) {
         IGRAPH_ERRORF("n = %" IGRAPH_PRId " must be at least 3.", IGRAPH_EINVAL, n);
     }
 
-    if (! (k > 0 && 2*k < n)) {
+    IGRAPH_SAFE_MULT(n, 2, &no_of_nodes);
+
+    /* The seemingly redundant k < n check avoids integer overflow on 2*k in 2*k < n.
+     * Note that 2*n has already been checked not to overflow above. */
+    if (! (k > 0 && k < n && 2*k < n)) {
         IGRAPH_ERRORF("k = %" IGRAPH_PRId " must be positive and less than n/2 with n = %" IGRAPH_PRId ".", IGRAPH_EINVAL, k, n);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 3*n));
+    IGRAPH_SAFE_MULT(n, 6, &no_of_edges2);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
 
     for (i = 0; i < n; i++) {
         igraph_vector_int_push_back(&edges, i);

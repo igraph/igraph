@@ -27,7 +27,6 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
-#include "igraph_random.h"
 
 #include "core/interruption.h"
 
@@ -106,7 +105,7 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
 
     links = IGRAPH_CALLOC(ecount, igraph_i_multilevel_link);
     if (links == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, links);
 
@@ -201,7 +200,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
     n = igraph_vector_int_size(edges);
     links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);
     if (links == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, links);
 
@@ -377,7 +376,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
       IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_vector_init_seq(&node_order, 0, vcount - 1));
+    IGRAPH_CHECK(igraph_vector_init_range(&node_order, 0, vcount));
     IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
     IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
 
@@ -396,7 +395,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     communities.membership = membership;
     communities.item = IGRAPH_CALLOC(vcount, igraph_i_multilevel_community);
     if (communities.item == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, communities.item);
 
@@ -634,7 +633,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_destroy, &g);
 
     if (weights) {
-        IGRAPH_CHECK(igraph_vector_copy(&w, weights));
+        IGRAPH_CHECK(igraph_vector_init_copy(&w, weights));
         IGRAPH_FINALLY(igraph_vector_destroy, &w);
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&w, igraph_ecount(&g));
@@ -702,7 +701,6 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     if (modularity && igraph_vector_size(modularity) == 0) {
         igraph_vector_int_t tmp;
         igraph_real_t mod;
-        int i;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, vcount);
         for (i = 0; i < vcount; i++) {
             VECTOR(tmp)[i] = i;

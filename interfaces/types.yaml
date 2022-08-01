@@ -54,6 +54,14 @@ OUTFILE:
     # A file, already open for writing
     CTYPE: FILE*
 
+DOUBLE:
+    # A C double
+    CTYPE: double
+
+VOID:
+    # C void
+    CTYPE: void
+
 ###############################################################################
 # Vectors, matrices and other template types
 ###############################################################################
@@ -150,7 +158,7 @@ EDGE_INDICES:
 EDGESET:
     # An igraph edge sequence. This is an ugly hybrid type; when it is an
     # IN argument in generated code, it is an igraph_es_t, but when it is an
-    # OUT argument, it is an igraph_vector_t. This should be fixed for 0.10.
+    # OUT argument, it is an igraph_vector_int_t. This should be fixed for 0.10.
     CTYPE:
         IN: igraph_es_t
         OUT: igraph_vector_int_t
@@ -165,10 +173,16 @@ VERTEX_INDICES:
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
+VERTEX_INDEX_PAIRS:
+    # An integer vector containing pairs of vertex indices, in a flattened
+    # representation
+    CTYPE: igraph_vector_int_t
+    FLAGS: BY_REF
+
 VERTEXSET:
     # An igraph vertex sequence. This is an ugly hybrid type; when it is an
     # IN argument in generated code, it is an igraph_vs_t, but when it is an
-    # OUT argument, it is an igraph_vector_t. This should be fixed for 0.10.
+    # OUT argument, it is an igraph_vector_int_t. This should be fixed for 0.10.
     CTYPE:
         IN: igraph_vs_t
         OUT: igraph_vector_int_t
@@ -325,6 +339,18 @@ EIGENWHICHPOS:
     CTYPE: igraph_eigen_which_position_t
     FLAGS: ENUM
 
+ERDOS_RENYI_TYPE:
+    # Enum that says wheter a GNM (n vertices, m edges) or
+    # GNP (n vertices, every edge exists with probability p)
+    # graph is created
+    CTYPE: igraph_erdos_renyi_t
+    FLAGS: ENUM
+
+FAS_ALGORITHM:
+    # Enum representing feedback arc set algorithms
+    CTYPE: igraph_fas_algorithm_t
+    FLAGS: ENUM
+
 GETADJACENCY:
     # Enum storing how to retrieve the adjacency matrix from a graph
     CTYPE: igraph_get_adjacency_t
@@ -335,11 +361,29 @@ GREEDY_COLORING_HEURISTIC:
     CTYPE: igraph_coloring_greedy_t
     FLAGS: ENUM
 
+IMITATE_ALGORITHM:
+    # This enum controls which algorithm to use in stochastic imitation
+    CTYPE: igraph_imitate_algorithm_t
+    FLAGS: ENUM
+
+LAPLACIAN_NORMALIZATION:
+    # Enum representing the possible normalization methods of a Laplacian
+    # matrix
+    CTYPE: igraph_laplacian_normalization_t
+    FLAGS: ENUM
+
 LAYOUT_GRID:
     # Whether to use the fast (but less accurate) grid-based version of a
     # layout algorithm that supports it (typically the Fruchterman-Reingold
     # layout)
     CTYPE: igraph_layout_grid_t
+    FLAGS: ENUM
+
+LOOPS:
+    # Enum that describes how loop edges should be handled in undirected graphs
+    # in functions that support it. Possible options are: no loops, loops
+    # counted once, loops counted twice
+    CTYPE: igraph_loops_t
     FLAGS: ENUM
 
 LSETYPE:
@@ -352,6 +396,16 @@ NEIMODE:
     # Enum that describes how a particular function should take into account
     # the neighbors of vertices
     CTYPE: igraph_neimode_t
+    FLAGS: ENUM
+
+OPTIMALITY:
+    # This enum controls which algorithm to use in deterministic optimal imitation
+    CTYPE: igraph_optimal_t
+    FLAGS: ENUM
+
+ORDER:
+    # Whether ordering should be ascending or descending
+    CTYPE: igraph_order_t
     FLAGS: ENUM
 
 PAGERANKALGO:
@@ -379,6 +433,11 @@ RECIP:
 REWIRING_MODE:
     # Enum for the rewiring modes of igraph_rewire()
     CTYPE: igraph_rewiring_t
+    FLAGS: ENUM
+
+ROOTCHOICE:
+    # Enum for the heuristic of igraph_roots_for_tree_layout()
+    CTYPE: igraph_root_choice_t
     FLAGS: ENUM
 
 RWSTUCK:
@@ -433,6 +492,12 @@ TREE_MODE:
     CTYPE: igraph_tree_mode_t
     FLAGS: ENUM
 
+VCONNNEI:
+    # Enum specifying what to do in vertex connectivity tests when the two
+    # vertices being tested are already connected
+    CTYPE: igraph_vconn_nei_t
+    FLAGS: ENUM
+
 WHEEL_MODE:
     # Enum that describes how a star graph should be constructed
     CTYPE: igraph_wheel_mode_t
@@ -446,6 +511,11 @@ EDGE_TYPE_SW:
     # Flag bitfield that specifies what sort of edges are allowed in an
     # algorithm
     CTYPE: igraph_edge_type_sw_t
+    FLAGS: BITS
+
+WRITE_GML_SW:
+    # Flag bitfield that specifies how to write GML files.
+    CTYPE: igraph_write_gml_sw_t
     FLAGS: BITS
 
 ###############################################################################
@@ -560,9 +630,6 @@ PLFIT:
     # Structure representing the result of a power-law fitting algorithms
     CTYPE: igraph_plfit_result_t
     FLAGS: BY_REF
-
-VCONNNEI:
-    CTYPE: igraph_vconn_nei_t
 
 VERTEX_ATTRIBUTE_COMBINATION:
     # Structure specifying how the attributes of vertices should be combined

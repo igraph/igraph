@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define DUMP() do {             \
         igraph_vector_complex_print(&values);   \

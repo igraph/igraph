@@ -29,6 +29,8 @@
 #include "igraph_random.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 typedef struct {
     igraph_integer_t no;
     igraph_psumtree_t *sumtrees;
@@ -105,12 +107,17 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
                      IGRAPH_EINVAL,
                      agebins, igraph_vector_size(preference));
     }
-    if (nodes < 0 ) {
+    if (nodes < 0) {
         IGRAPH_ERRORF("Number of nodes should be non-negative, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      nodes);
     }
-    if (agebins < 1 ) {
+    if (edges_per_node < 0) {
+        IGRAPH_ERRORF("Number of edges per node should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_node);
+    }
+    if (agebins < 1) {
         IGRAPH_ERRORF("Number of age bins should be at least 1, received %" IGRAPH_PRId ".",
                      IGRAPH_EINVAL,
                      agebins);
@@ -136,13 +143,13 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
 
     lastcit = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (!lastcit) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, lastcit);
 
     index = IGRAPH_CALLOC(no_of_nodes + 1, igraph_integer_t);
     if (!index) {
-        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, index);
 
@@ -163,7 +170,13 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
         for (j = 0; j < edges_per_node; j++) {
             igraph_integer_t to;
             igraph_real_t sum = igraph_psumtree_sum(&sumtree);
-            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weight,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            }
             igraph_vector_int_push_back(&edges, i);
             igraph_vector_int_push_back(&edges, to);
             lastcit[to] = i + 1;
@@ -253,6 +266,11 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     if (igraph_vector_int_size(types) != nodes) {
         IGRAPH_ERRORF("Length of types vector (%" IGRAPH_PRId ") must match number of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(types), nodes);
+    }
+    if (edges_per_step < 0) {
+        IGRAPH_ERRORF("Number of edges per step should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_step);
     }
 
     if (nodes == 0) {
@@ -369,6 +387,8 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  * \param pref The preference matrix, a square matrix is required,
  *     both the number of rows and columns should be the maximum
  *     element in \p types plus one (types are numbered from zero).
+ * \param edges_per_step Integer constant, the number of edges to add
+ *     in each time step.
  * \param directed Logical constant, whether to create a directed
  *     network.
  * \return Error code.
@@ -388,12 +408,17 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     igraph_psumtree_t *sumtrees;
     igraph_vector_t sums;
     igraph_integer_t no_of_types;
-    igraph_integer_t i, j;
+    igraph_integer_t i, j, no_of_edges, no_of_edge_endpoints;
 
     if (igraph_vector_int_size(types) != nodes) {
         IGRAPH_ERRORF("Length of types vector (%" IGRAPH_PRId ") not equal to number"
                       " of nodes (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL, igraph_vector_int_size(types), nodes);
+    }
+    if (edges_per_step < 0 ) {
+        IGRAPH_ERRORF("Number of edges per step should be non-negative, received %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL,
+                     edges_per_step);
     }
 
     /* avoid calling vector_max on empty vector */
@@ -423,7 +448,7 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
 
     str.sumtrees = sumtrees = IGRAPH_CALLOC(no_of_types, igraph_psumtree_t);
     if (!sumtrees) {
-        IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Citing-cited type game failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_i_citing_cited_type_game_free, &str);
 
@@ -433,7 +458,9 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     }
     IGRAPH_VECTOR_INIT_FINALLY(&sums, no_of_types);
 
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, nodes * edges_per_step));
+    IGRAPH_SAFE_MULT(nodes, edges_per_step, &no_of_edges);
+    IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edge_endpoints);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edge_endpoints));
 
     /* First node */
     for (i = 0; i < no_of_types; i++) {
@@ -452,7 +479,13 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
         igraph_real_t sum = VECTOR(sums)[type];
         for (j = 0; j < edges_per_step; j++) {
             igraph_integer_t to;
-            igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
+            if (sum == 0) {
+                /* If none of the so-far added nodes have positive weight,
+                 * we choose one uniformly to connect to. */
+                to = RNG_INTEGER(0, i-1);
+            } else {
+                igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
+            }
             igraph_vector_int_push_back(&edges, i);
             igraph_vector_int_push_back(&edges, to);
         }
@@ -472,9 +505,11 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
     igraph_i_citing_cited_type_game_free(&str);
     IGRAPH_FINALLY_CLEAN(1);
 
-    igraph_create(graph, &edges, nodes, directed);
+    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+
     igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&sums);
     IGRAPH_FINALLY_CLEAN(2);
+
     return IGRAPH_SUCCESS;
 }

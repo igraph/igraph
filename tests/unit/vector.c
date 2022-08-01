@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int main() {
 
@@ -66,13 +66,13 @@ int main() {
     IGRAPH_ASSERT(igraph_vector_empty(&v));
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_e and igraph_vector_e_ptr\n");
+    printf("Test igraph_vector_get and igraph_vector_get_ptr\n");
     igraph_vector_init(&v, 5);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        *igraph_vector_e_ptr(&v, i) = 100 * i;
+        *igraph_vector_get_ptr(&v, i) = 100 * i;
     }
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_e(&v, i));
+        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_get(&v, i));
     }
     printf("\n");
     igraph_vector_destroy(&v);
@@ -189,10 +189,10 @@ int main() {
     IGRAPH_ASSERT(igraph_is_nan(VECTOR(v)[which_min2]));
     IGRAPH_ASSERT(igraph_is_nan(VECTOR(v)[which_max2]));
 
-    printf("Test igraph_vector_init_copy\n");
+    printf("Test igraph_vector_init_array\n");
     igraph_vector_destroy(&v);
     ptr = (igraph_real_t*) malloc(10 * sizeof(igraph_real_t));
-    igraph_vector_init_copy(&v, ptr, 10);
+    igraph_vector_init_array(&v, ptr, 10);
     free(ptr);
     for (i = 0; i < 10; i++) {
         VECTOR(v)[i] = 100 - i;
@@ -202,7 +202,7 @@ int main() {
 
     printf("Test igraph_vector_copy_to\n");
     ptr = (igraph_real_t*) malloc(10 * sizeof(igraph_real_t));
-    igraph_vector_init_seq(&v, 11, 20);
+    igraph_vector_init_range(&v, 11, 21);
     igraph_vector_copy_to(&v, ptr);
     for (i = 0; i < 10; i++) {
         printf(" %" IGRAPH_PRId "", (igraph_integer_t)ptr[i]);
@@ -211,18 +211,26 @@ int main() {
     free(ptr);
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_init_seq, igraph_vector_sum, igraph_vector_prod\n");
-    igraph_vector_init_seq(&v, 1, 5);
+    printf("Test igraph_vector_init_range, igraph_vector_sum, igraph_vector_prod\n");
+    igraph_vector_init_range(&v, 1, 6);
     printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_sum(&v));
     printf(" %" IGRAPH_PRId "\n", (igraph_integer_t)igraph_vector_prod(&v));
 
     printf("Test igraph_vector_remove_section\n");
     igraph_vector_remove_section(&v, 2, 4);
     print_vector_format(&v, stdout, "%g");
+
+    printf("Test igraph_vector_remove_section with invalid limits\n");
+    igraph_vector_remove_section(&v, -3, -1);
+    igraph_vector_remove_section(&v, 100, 120);
+    igraph_vector_remove_section(&v, 2, 0);
+    print_vector_format(&v, stdout, "%g");
+    igraph_vector_remove_section(&v, 1, 20);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_remove\n");
-    igraph_vector_init_seq(&v, 1, 10);
+    igraph_vector_init_range(&v, 1, 11);
     igraph_vector_remove(&v, 9);
     igraph_vector_remove(&v, 0);
     igraph_vector_remove(&v, 4);
@@ -230,7 +238,7 @@ int main() {
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_remove_fast\n");
-    igraph_vector_init_seq(&v, 1, 10);
+    igraph_vector_init_range(&v, 1, 11);
     igraph_vector_remove_fast(&v, 9);
     igraph_vector_remove_fast(&v, 0);
     igraph_vector_remove_fast(&v, 4);
@@ -238,13 +246,13 @@ int main() {
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_move_interval\n");
-    igraph_vector_init_seq(&v, 0, 9);
+    igraph_vector_init_range(&v, 0, 10);
     igraph_vector_move_interval(&v, 5, 10, 0);
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_isininterval\n");
-    igraph_vector_init_seq(&v, 1, 10);
+    igraph_vector_init_range(&v, 1, 11);
     IGRAPH_ASSERT(igraph_vector_isininterval(&v, 1, 10));
     IGRAPH_ASSERT(!igraph_vector_isininterval(&v, 2, 10));
     IGRAPH_ASSERT(!igraph_vector_isininterval(&v, 1, 9));
@@ -257,7 +265,7 @@ int main() {
     printf("Test igraph_vector_all_e\n");
 
     printf("Test igraph_vector_binsearch\n");
-    igraph_vector_init_seq(&v, 0, 9);
+    igraph_vector_init_range(&v, 0, 10);
     for (i = 0; i < igraph_vector_size(&v); i++) {
         IGRAPH_ASSERT(igraph_vector_binsearch(&v, 0, 0));
     }
@@ -302,10 +310,14 @@ int main() {
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_permdelete\n");
-
     printf("Test order2\n");
     igraph_vector_init_int_end(&v, -1, 10, 9, 8, 7, 6, 7, 8, 9, 10, -1);
+    igraph_vector_order2(&v);
+    print_vector_format(&v, stdout, "%g");
+    igraph_vector_destroy(&v);
+
+    printf("Test order2 on empty vector\n");
+    igraph_vector_init_int_end(&v, -1, -1);
     igraph_vector_order2(&v);
     print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
@@ -352,8 +364,18 @@ int main() {
     }
     igraph_vector_destroy(&v);
 
-    printf("Test igraph_vector_int_init_seq, igraph_vector_int_order1\n");
-    igraph_vector_int_init_seq(&v4, 1, 10);
+    printf("Test range\n");
+
+    igraph_vector_init(&v, 100);
+    igraph_vector_range(&v, 20, 50);
+    IGRAPH_ASSERT(igraph_vector_size(&v) == 30);
+    for (i = 0; i < igraph_vector_size(&v); i++) {
+        IGRAPH_ASSERT(VECTOR(v)[i] == 20 + i);
+    }
+    igraph_vector_destroy(&v);
+
+    printf("Test igraph_vector_int_init_range, igraph_vector_int_order1\n");
+    igraph_vector_int_init_range(&v4, 1, 11);
     igraph_vector_int_init(&v5, 0);
     igraph_vector_int_order1(&v4, &v5, 10);
     print_vector_int(&v5);

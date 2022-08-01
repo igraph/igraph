@@ -46,10 +46,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef USING_R
-    #include <R.h>
-#endif
-
 /**
  * \function igraph_community_to_membership
  * \brief Create membership vector from community structure dendrogram
@@ -238,11 +234,11 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
  *                     vertex, i.e. the component to which it belongs.
  *                     The vector will be altered in-place.
  * \param  new_to_old  Pointer to a vector which will contain the
- *                     old component ID for each new one, or NULL,
+ *                     old component ID for each new one, or \c NULL,
  *                     in which case it is not returned. The vector
  *                     will be resized as needed.
  * \param  nb_clusters Pointer to an integer for the number of
- *                     distinct clusters. If not NULL, this will be
+ *                     distinct clusters. If not \c NULL, this will be
  *                     updated to reflect the number of distinct
  *                     clusters found in membership.
  *
@@ -324,7 +320,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
 /**
  * \ingroup communities
  * \function igraph_compare_communities
- * \brief Compares community structures using various metrics
+ * \brief Compares community structures using various metrics.
  *
  * This function assesses the distance between two community structures
  * using the variation of information (VI) metric of Meila (2003), the
@@ -333,31 +329,75 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * or the adjusted Rand index of Hubert and Arabie (1985).
  *
  * </para><para>
+ * Some of these measures are defined based on the entropy of a discrete
+ * random variable associated with a given clustering \c C of vertices.
+ * Let \c p_i be the probability that a randomly picked vertex would be part
+ * of cluster \c i. Then the entropy of the clustering is
+ *
+ * </para><para>
+ * <code>H(C) = - \sum_i p_i log p_i</code>
+ *
+ * </para><para>
+ * Similarly, we can define the joint entropy of two clusterings \c C_1 and \c C_2
+ * based on the probability \c p_ij that a random vertex is part of cluster \c i
+ * in the first clustering and cluster \c j in the second one:
+ *
+ * </para><para>
+ * <code>H(C_1, C_2) = - \sum_ii p_ij log p_ij</code>
+ *
+ * </para><para>
+ * The mutual information of \c C_1 and \c C_2 is then
+ * <code>MI(C_1, C_2) = H(C_1) + H(C_2) - H(C_1, C_2) >= 0 </code>.
+ * A large mutual information indicates a high overlap between the two clusterings.
+ * The normalized mutual information, as computed by igraph, is
+ *
+ * </para><para>
+ * <code>NMI(C_1, C_2) = 2 MI(C_1, C_2) / (H(C_1) + H(C_2))</code>.
+ *
+ * </para><para>
+ * It takes its value from the interval (0, 1], with 1 achieved when the two clusterings
+ * coincide.
+ *
+ * </para><para>
+ * The variation of information is defined as
+ * <code>VI(C_1, C_2) = [H(C_1) - MI(C_1, C_2)] + [H(C_2) - MI(C_1, C_2)]</code>.
+ * Lower values of the variation of information indicate a smaller difference between
+ * the two clusterings, with <code>VI = 0</code> achieved precisely when they coincide.
+ *
+ * </para><para>
+ * For an explanation of the split-join distance, see \ref igraph_split_join_distance().
+ *
+ * </para><para>
  * References:
  *
  * </para><para>
- * Meila M: Comparing clusterings by the variation of information.
+ * Meilă M: Comparing clusterings by the variation of information.
  * In: Schölkopf B, Warmuth MK (eds.). Learning Theory and Kernel Machines:
  * 16th Annual Conference on Computational Learning Theory and 7th Kernel
  * Workshop, COLT/Kernel 2003, Washington, DC, USA. Lecture Notes in Computer
  * Science, vol. 2777, Springer, 2003. ISBN: 978-3-540-40720-1.
+ * https://doi.org/10.1007/978-3-540-45167-9_14
  *
  * </para><para>
  * Danon L, Diaz-Guilera A, Duch J, Arenas A: Comparing community structure
  * identification. J Stat Mech P09008, 2005.
+ * https://doi.org/10.1088/1742-5468/2005/09/P09008
  *
  * </para><para>
  * van Dongen S: Performance criteria for graph clustering and Markov cluster
  * experiments. Technical Report INS-R0012, National Research Institute for
  * Mathematics and Computer Science in the Netherlands, Amsterdam, May 2000.
+ * https://ir.cwi.nl/pub/4461
  *
  * </para><para>
  * Rand WM: Objective criteria for the evaluation of clustering methods.
  * J Am Stat Assoc 66(336):846-850, 1971.
+ * https://doi.org/10.2307/2284239
  *
  * </para><para>
  * Hubert L and Arabie P: Comparing partitions. Journal of Classification
  * 2:193-218, 1985.
+ * https://doi.org/10.1007/BF01908075
  *
  * \param  comm1   the membership vector of the first community structure
  * \param  comm2   the membership vector of the second community structure
@@ -374,6 +414,8 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  *
  * \return  Error code.
  *
+ * \sa \ref igraph_split_join_distance().
+ *
  * Time complexity: O(n log(n)).
  */
 igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
@@ -386,10 +428,10 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c1, comm1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
@@ -473,7 +515,7 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
  *                     returned here.
  * \return  Error code.
  *
- * \see \ref igraph_compare_communities() with the \c IGRAPH_COMMCMP_SPLIT_JOIN
+ * \sa \ref igraph_compare_communities() with the \c IGRAPH_COMMCMP_SPLIT_JOIN
  * method if you are not interested in the individual distances but only the sum
  * of them.
  *
@@ -490,10 +532,10 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
     }
 
     /* Copy and reindex membership vectors to make sure they are continuous */
-    IGRAPH_CHECK(igraph_vector_int_copy(&c1, comm1));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c1, comm1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c1);
 
-    IGRAPH_CHECK(igraph_vector_int_copy(&c2, comm2));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
     IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
@@ -535,12 +577,12 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
     k2 = igraph_vector_int_max(v2) + 1;
     p1 = IGRAPH_CALLOC(k1, double);
     if (p1 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for computing community entropy.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, p1);
     p2 = IGRAPH_CALLOC(k2, double);
     if (p2 == 0) {
-        IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Insufficient memory for computing community entropy.", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, p2);
 

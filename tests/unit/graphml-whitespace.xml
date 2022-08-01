@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <!-- Created by igraph -->
+  <!-- Testing the effect of whitespace on numeric, Boolean and string attribute values -->
+  <key id="v_weight" for="node" attr.name="weight" attr.type="float"/>
+  <key id="v_name" for="node" attr.name="name" attr.type="string"/>
+  <key id="v_type" for="node" attr.name="type" attr.type="boolean"/>
+  <graph id="G" edgedefault="undirected">
+    <!-- No whitespace -->
+    <node id="n0">
+      <data key="v_weight">1</data>
+      <data key="v_name">spam</data>
+      <data key="v_type">true</data>
+    </node>
+    <!-- Whitespace only -->
+    <node id="n1">
+      <data key="v_weight"> </data>
+      <data key="v_name">  </data>
+      <data key="v_type">   </data>
+    </node>
+    <!-- Leading whitespace -->
+    <node id="n2">
+      <data key="v_weight"> 3</data>
+      <data key="v_name">  ham</data>
+      <data key="v_type">   true</data>
+    </node>
+    <!-- Trailing whitespace -->
+    <node id="n3">
+      <data key="v_weight">4 </data>
+      <data key="v_name">bacon  </data>
+      <data key="v_type">true    </data>
+    </node>
+    <!-- Both leading and trailing whitespace -->
+    <node id="n4">
+      <data key="v_weight"> 5  </data>
+      <data key="v_name">  eggs </data>
+      <data key="v_type">   true     </data>
+    </node>
+    <edge source="n0" target="n1">
+    </edge>
+    <edge source="n1" target="n2">
+    </edge>
+    <edge source="n1" target="n3">
+    </edge>
+    <edge source="n2" target="n3">
+    </edge>
+  </graph>
+</graphml>

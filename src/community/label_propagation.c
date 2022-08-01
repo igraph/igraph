@@ -100,9 +100,12 @@
  *   in the future; please do not rely on it.
  * \param fixed Boolean vector denoting which labels are fixed. Of course
  *   this makes sense only if you provided an initial state, otherwise
- *   this element will be ignored. Also note that vertices without labels
- *   cannot be fixed. If they are, this vector will be modified to
- *   make it consistent with \p initial.
+ *   this element will be ignored. Note that vertices without labels
+ *   cannot be fixed. The fixed status will be ignord for these with a
+ *   warning. Also note that label numbers by themselves have no meaning,
+ *   and igraph may renumber labels. However, co-membership constraints
+ *   will be respected: two vertices can be fixed to be in the same or in
+ *   different communities.
  * \param modularity If not a null pointer, then it must be a pointer
  *   to a real number. The modularity score of the detected community
  *   structure is stored here. Note that igraph will calculate the
@@ -135,7 +138,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
      * away the constness, and promise ourselves that we will make a proper
      * copy of 'fixed' into 'fixed_copy' as soon as we start mutating it */
-    igraph_vector_bool_t* fixed_copy = (igraph_vector_bool_t*) fixed;
+    igraph_vector_bool_t *fixed_copy = (igraph_vector_bool_t *) fixed;
 
     /* The implementation uses a trick to avoid negative array indexing:
      * elements of the membership vector are increased by 1 at the start
@@ -190,11 +193,11 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                         if (fixed_copy == fixed) {
                             fixed_copy = IGRAPH_CALLOC(1, igraph_vector_bool_t);
                             if (fixed_copy == 0) {
-                                IGRAPH_ERROR("Failed to copy 'fixed' vector.", IGRAPH_ENOMEM);
+                                IGRAPH_ERROR("Failed to copy 'fixed' vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
                             }
 
                             IGRAPH_FINALLY(igraph_free, fixed_copy);
-                            IGRAPH_CHECK(igraph_vector_bool_copy(fixed_copy, fixed));
+                            IGRAPH_CHECK(igraph_vector_bool_init_copy(fixed_copy, fixed));
                             IGRAPH_FINALLY(igraph_vector_bool_destroy, fixed_copy);
                         }
 
@@ -247,7 +250,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             }
         }
     } else {
-        IGRAPH_CHECK(igraph_vector_int_init_seq(&node_order, 0, no_of_nodes - 1));
+        IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
     }
 

@@ -28,6 +28,7 @@
 
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_graph_list.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"

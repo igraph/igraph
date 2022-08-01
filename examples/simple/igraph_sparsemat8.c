@@ -43,7 +43,7 @@ int main() {
     for (i = 0; i < 10; i++) {
         igraph_sparsemat_entry(&spmat, INT(DIM1 - 1), INT(DIM2 - 1), 1.0);
     }
-    igraph_sparsemat_copy(&spmat2, &spmat);
+    igraph_sparsemat_init_copy(&spmat2, &spmat);
 
     igraph_matrix_init(&mat, 0, 0);
     igraph_sparsemat_as_matrix(&mat, &spmat);
@@ -58,7 +58,7 @@ int main() {
 
     igraph_sparsemat_compress(&spmat, &spmat2);
     igraph_sparsemat_destroy(&spmat);
-    igraph_sparsemat_copy(&spmat, &spmat2);
+    igraph_sparsemat_init_copy(&spmat, &spmat2);
 
     igraph_matrix_init(&mat2, 0, 0);
     igraph_sparsemat_as_matrix(&mat2, &spmat);

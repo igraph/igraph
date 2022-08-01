@@ -46,11 +46,11 @@
 #include "pottsmodel_2.h"
 
 #include "igraph_community.h"
-#include "igraph_error.h"
-#include "igraph_random.h"
-#include "core/math.h"
-#include "igraph_interface.h"
 #include "igraph_components.h"
+#include "igraph_error.h"
+#include "igraph_interface.h"
+#include "igraph_random.h"
+
 #include "core/interruption.h"
 #include "core/exceptions.h"
 
@@ -194,11 +194,7 @@ igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                igraph_real_t coolfact,
                                igraph_spincomm_update_t update_rule,
                                igraph_real_t gamma,
-                               /* the rest is for the NegSpin implementation */
                                igraph_spinglass_implementation_t implementation,
-                               /*                 igraph_matrix_t *adhesion, */
-                               /*                 igraph_matrix_t *normalised_adhesion, */
-                               /*                 igraph_real_t *polarization, */
                                igraph_real_t gamma_minus) {
 
     IGRAPH_HANDLE_EXCEPTIONS(
@@ -216,8 +212,6 @@ igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                     spins, parupdate, starttemp,
                     stoptemp, coolfact,
                     update_rule, gamma,
-                    /*                       adhesion, normalised_adhesion, */
-                    /*                       polarization, */
                     gamma_minus);
             break;
         default:
@@ -289,8 +283,8 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         }
         if (csize) {
             /* 0 clusters for 0 nodes, 1 cluster for 1 node */
-            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_fill(membership, 1);
+            IGRAPH_CHECK(igraph_vector_int_resize(csize, no_of_nodes));
+            igraph_vector_int_fill(csize, 1);
         }
         return IGRAPH_SUCCESS;
     }
@@ -576,8 +570,8 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         }
         if (csize) {
             /* 0 clusters for 0 nodes, 1 cluster for 1 node */
-            IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-            igraph_vector_int_fill(membership, 1);
+            IGRAPH_CHECK(igraph_vector_int_resize(csize, no_of_nodes));
+            igraph_vector_int_fill(csize, 1);
         }
         return IGRAPH_SUCCESS;
     }
@@ -589,7 +583,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
     }
 
-    if (weights) {
+    if (weights && igraph_vector_size(weights) > 0) {
         igraph_vector_minmax(weights, &d_n, &d_p);
     } else {
         d_n = d_p = 1;

@@ -25,6 +25,7 @@
 #define IGRAPH_CLIQUES_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_list.h"
@@ -48,7 +49,7 @@ IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_count(const igraph_t *graph,
                                                igraph_integer_t min_size,
                                                igraph_integer_t max_size);
 IGRAPH_EXPORT igraph_error_t igraph_maximal_cliques_subset(
-   const igraph_t *graph, igraph_vector_int_t *subset,
+   const igraph_t *graph, const igraph_vector_int_t *subset,
    igraph_vector_int_list_t *res, igraph_integer_t *no,
    FILE *outfile, igraph_integer_t min_size, igraph_integer_t max_size
 );
@@ -90,16 +91,16 @@ IGRAPH_EXPORT igraph_error_t igraph_independence_number(const igraph_t *graph, i
  * See the details at the documentation of \ref
  * igraph_cliques_callback().
  *
- * \param clique The current clique. Destroying and freeing
- *   this vector is left to the user.
- *   Use \ref igraph_vector_destroy() and \ref igraph_free()
- *   to do this.
+ * \param clique The current clique. The clique is owned by the clique search
+ *   routine. You do not need to destroy or free it if you do not want to store
+ *   it; however, if you want to hold on to it for a longer period of time, you
+ *   need to make a copy of it on your own and store the copy itself.
  * \param arg This extra argument was passed to \ref
  *   igraph_cliques_callback() when it was called.
  * \return Error code; \c IGRAPH_SUCCESS to continue the search or
  *   \c IGRAPH_STOP to stop the search without signaling an error.
  */
-typedef igraph_error_t igraph_clique_handler_t(igraph_vector_int_t *clique, void *arg);
+typedef igraph_error_t igraph_clique_handler_t(const igraph_vector_int_t *clique, void *arg);
 
 IGRAPH_EXPORT igraph_error_t igraph_cliques_callback(const igraph_t *graph,
                                           igraph_integer_t min_size, igraph_integer_t max_size,

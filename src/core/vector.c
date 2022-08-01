@@ -21,10 +21,11 @@
 
 */
 
+#include "igraph_complex.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_complex.h"
+#include "igraph_nongraph.h"
 
 #include <float.h>
 
@@ -58,8 +59,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
-#include "core/math.h"
-
 #include "core/indheap.h"
 
 /**
@@ -67,7 +66,6 @@
  * \function igraph_vector_floor
  * \brief Transform a real vector to an integer vector by flooring each element.
  *
- * </para><para>
  * Flooring means rounding down to the nearest integer.
  *
  * \param from The original real vector object.
@@ -103,7 +101,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 
     igraph_indheap_t heap;
 
-    igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v));
+    IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
     IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
 
     igraph_vector_clear(v);
@@ -119,18 +117,18 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 
 /**
  * \ingroup vector
- * \function igraph_vector_int_order
+ * \function igraph_vector_int_pair_order
  * \brief Calculate the order of the elements in a pair of integer vectors of
  * equal length.
  *
- * </para><para>
  * The smallest element will have order zero, the second smallest
  * order one, etc.
+ *
  * \param v The original \ref igraph_vector_int_t object.
  * \param v2 A secondary key, another \ref igraph_vector_int_t object.
  * \param res An initialized \ref igraph_vector_int_t object, it will be
- *    resized to match the size of \p v. The
- *    result of the computation will be stored here.
+ *    resized to match the size of \p v. The result of the computation will
+ *    be stored here.
  * \param nodes Hint, the largest element in \p v.
  * \return Error code:
  *         \c IGRAPH_ENOMEM: out of memory
@@ -341,6 +339,18 @@ igraph_error_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_complex_real
+ * \brief Gives the real part of a complex vector.
+ *
+ * \param v Pointer to a complex vector.
+ * \param real Pointer to an initialized vector. The result will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(n), n is the number of elements in the vector.
+ */
+
 igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
                                igraph_vector_t *real) {
     igraph_integer_t i, n = igraph_vector_complex_size(v);
@@ -352,6 +362,18 @@ igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_complex_imag
+ * \brief Gives the imaginary part of a complex vector.
+ *
+ * \param v Pointer to a complex vector.
+ * \param real Pointer to an initialized vector. The result will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(n), n is the number of elements in the vector.
+ */
+
 igraph_error_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
                                igraph_vector_t *imag) {
     igraph_integer_t i, n = igraph_vector_complex_size(v);
@@ -362,6 +384,19 @@ igraph_error_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_complex_realimag
+ * \brief Gives the real and imaginary parts of a complex vector.
+ *
+ * \param v Pointer to a complex vector.
+ * \param real Pointer to an initialized vector. The real part will be stored here.
+ * \param imag Pointer to an initialized vector. The imaginary part will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(n), n is the number of elements in the vector.
+ */
 
 igraph_error_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
                                    igraph_vector_t *real,
@@ -377,6 +412,19 @@ igraph_error_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_complex_create
+ * \brief Creates a complex vector from a real and imaginary part.
+ *
+ * \param v Pointer to an uninitialized complex vector.
+ * \param real Pointer to the real part of the complex vector.
+ * \param imag Pointer to the imaginary part of the complex vector.
+ * \return Error code.
+ *
+ * Time complexity: O(n), n is the number of elements in the vector.
+ */
 
 igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
                                  const igraph_vector_t *real,
@@ -396,6 +444,19 @@ igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_complex_create_polar
+ * \brief Creates a complex matrix from a magnitude and an angle.
+ *
+ * \param m Pointer to an uninitialized complex vector.
+ * \param r Pointer to a real vector containing magnitudes.
+ * \param theta Pointer to a real vector containing arguments (phase angles).
+ * \return Error code.
+ *
+ * Time complexity: O(n), n is the number of elements in the vector.
+ */
+
 igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
                                        const igraph_vector_t *r,
                                        const igraph_vector_t *theta) {
@@ -414,6 +475,46 @@ igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_vector_complex_all_almost_e
+ * \brief Are all elements almost equal?
+ *
+ * Checks if the elements of two complex vectors are equal within a relative tolerance.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \param eps Relative tolerance, see \ref igraph_complex_almost_equals() for details.
+ * \return True if the two vectors are almost equal, false if there is at least
+ *     one differing element or if the vectors are not of the same size.
+ */
+igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *lhs,
+                                                 const igraph_vector_complex_t *rhs,
+                                                 igraph_real_t eps) {
+
+    igraph_integer_t n = igraph_vector_complex_size(lhs);
+
+    if (lhs == rhs) {
+        return 1;
+    }
+
+    if (igraph_vector_complex_size(rhs) != n) {
+        return 0;
+    }
+
+    for (igraph_integer_t i=0; i < n; i++) {
+        if (! igraph_complex_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
+            return 0;
+    }
+
+    return 1;
+}
+
+/**
+ * Deprecated in favour of \ref igraph_vector_all_almost_e() which uses
+ * relative tolerances. Will be removed in 0.11.
+ *
+ * Checks if two vectors are equal within an absolute tolerance.
+ */
 igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
                                   const igraph_vector_t *rhs,
                                   igraph_real_t tol) {
@@ -441,13 +542,65 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
     }
 }
 
+/**
+ * \function igraph_vector_all_almost_e
+ * \brief Are all elements almost equal?
+ *
+ * Checks if the elements of two vectors are equal within a relative tolerance.
+ *
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \param eps Relative tolerance, see \ref igraph_almost_equals() for details.
+ * \return True if the two vectors are almost equal, false if there is at least
+ *     one differing element or if the vectors are not of the same size.
+ */
+igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lhs,
+                                         const igraph_vector_t *rhs,
+                                         igraph_real_t eps) {
+
+    igraph_integer_t n = igraph_vector_size(lhs);
+
+    if (lhs == rhs) {
+        return 1;
+    }
+
+    if (igraph_vector_size(rhs) != n) {
+        return 0;
+    }
+
+    for (igraph_integer_t i=0; i < n; i++) {
+        if (! igraph_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
+            return 0;
+    }
+
+    return 1;
+}
+
+/**
+ * \function igraph_vector_zapsmall
+ * \brief Replaces small elements of a vector by exact zeros.
+ *
+ * Vector elements which are smaller in magnitude than the given absolute
+ * tolerance will be replaced by exact zeros. The default tolerance
+ * corresponds to two-thirds of the representable digits of \type igraph_real_t,
+ * i.e. <code>DBL_EPSILON^(2/3)</code> which is approximately <code>10^-10</code>.
+ *
+ * \param v   The vector to process, it will be changed in-place.
+ * \param tol Tolerance value. Numbers smaller than this in magnitude will
+ *            be replaced by zeros. Pass in zero to use the default tolerance.
+ *            Must not be negative.
+ * \return Error code.
+ *
+ * \sa \ref igraph_vector_all_almost_e() and \ref igraph_almost_equals() to
+ * perform comparisons with relative tolerances.
+ */
 igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
     igraph_integer_t i, n = igraph_vector_size(v);
     if (tol < 0.0) {
-        IGRAPH_ERROR("`tol' tolerance must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Tolerance must be positive or zero.", IGRAPH_EINVAL);
     }
     if (tol == 0.0) {
-        tol = sqrt(DBL_EPSILON);
+        tol = pow(DBL_EPSILON, 2.0/3);
     }
     for (i = 0; i < n; i++) {
         igraph_real_t val = VECTOR(*v)[i];
@@ -459,18 +612,66 @@ igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
 }
 
 /**
+ * \function igraph_vector_complex_zapsmall
+ * \brief Replaces small elements of a complex vector by exact zeros.
+ *
+ * Similarly to \ref igraph_vector_zapsmall(), small elements will be replaced
+ * by zeros. The operation is performed separately on the real and imaginary
+ * parts of the numbers. This way, complex numbers with a large real part and
+ * tiny imaginary part will effectively be transformed to real numbers.
+ * The default tolerance
+ * corresponds to two-thirds of the representable digits of \type igraph_real_t,
+ * i.e. <code>DBL_EPSILON^(2/3)</code> which is approximately <code>10^-10</code>.
+ *
+ * \param v   The vector to process, it will be changed in-place.
+ * \param tol Tolerance value. Real and imaginary parts smaller than this in
+ *            magnitude will be replaced by zeros. Pass in zero to use the default
+ *            tolerance. Must not be negative.
+ * \return Error code.
+ *
+ * \sa \ref igraph_vector_complex_all_almost_e() and
+ * \ref igraph_complex_almost_equals() to perform comparisons with relative
+ * tolerances.
+ */
+igraph_error_t igraph_vector_complex_zapsmall(igraph_vector_complex_t *v, igraph_real_t tol) {
+    igraph_integer_t i, n = igraph_vector_complex_size(v);
+    if (tol < 0.0) {
+        IGRAPH_ERROR("Tolerance must be positive or zero.", IGRAPH_EINVAL);
+    }
+    if (tol == 0.0) {
+        tol = pow(DBL_EPSILON, 2.0/3);
+    }
+    for (i = 0; i < n; i++) {
+        igraph_complex_t val = VECTOR(*v)[i];
+        igraph_bool_t zapped = false;
+        if (IGRAPH_REAL(val) < tol && IGRAPH_REAL(val) > -tol) {
+            IGRAPH_REAL(val) = 0.0;
+            zapped = true;
+        }
+        if (IGRAPH_IMAG(val) < tol && IGRAPH_IMAG(val) > -tol) {
+            IGRAPH_IMAG(val) = 0.0;
+            zapped = true;
+        }
+        if (zapped) {
+            VECTOR(*v)[i] = val;
+        }
+    }
+    return IGRAPH_SUCCESS;
+}
+
+/**
  * \ingroup vector
  * \function igraph_vector_is_nan
  * \brief Check for each element if it is NaN.
  *
- * </para><para>
  * \param v The \type igraph_vector_t object to check.
  * \param is_nan The resulting boolean vector indicating for each element
  *               whether it is NaN or not.
  * \return Error code,
- *         \c IGRAPH_ENOMEM if there is not enough
- *         memory. Note that this function \em never returns an error
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *         Note that this function \em never returns an error
  *         if the vector \p is_nan will already be large enough.
+ *
  * Time complexity: O(n), the number of elements.
  */
 igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool_t *is_nan)
@@ -493,7 +694,6 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
  * \function igraph_vector_is_any_nan
  * \brief Check if any element is NaN.
  *
- * </para><para>
  * \param v The \type igraph_vector_t object to check.
  * \return 1 if any element is NaN, 0 otherwise.
  *

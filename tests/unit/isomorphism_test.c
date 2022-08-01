@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void random_permutation(igraph_vector_int_t *vec) {
     /* We just do size(vec) * 2 swaps */
     igraph_integer_t one, two, tmp, i, n = igraph_vector_int_size(vec);
     for (i = 0; i < 2 * n; i++) {
-        one = (double)rand() / RAND_MAX * n;
-        two = (double)rand() / RAND_MAX * n;
+        one = RNG_INTEGER(0, n - 1);
+        two = RNG_INTEGER(0, n - 1);
         tmp = one;
         one = two;
         two = tmp;
@@ -115,7 +115,7 @@ void test_bliss() {
     igraph_vector_int_list_t generators;
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
-    igraph_vector_int_init_seq(&perm, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_int_init_range(&perm, 0, igraph_vcount(&ring1));
     random_permutation(&perm);
     igraph_permute_vertices(&ring1, &ring2, &perm);
 
@@ -166,7 +166,7 @@ void test_bliss() {
                "Note that the generator set is not guaranteed to be minimal.\n");
     igraph_vector_int_list_clear(&generators);
 
-    igraph_vector_int_init_seq(&color, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_int_init_range(&color, 0, igraph_vcount(&ring1));
 
     igraph_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "1") != 0) {
@@ -209,12 +209,16 @@ void test_bug_995() {
 
 int main() {
 
-    srand(293847); /* rand() is used in random_permutation() */
+    igraph_rng_seed(igraph_rng_default(), 293847); /* make tests deterministic */
+
+    RNG_BEGIN();
 
     test3();
     test4();
     test_bliss();
     test_bug_995();
+
+    RNG_END();
 
     VERIFY_FINALLY_STACK();
 
