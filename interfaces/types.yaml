@@ -492,6 +492,10 @@ TREE_MODE:
     CTYPE: igraph_tree_mode_t
     FLAGS: ENUM
 
+VCONNNEI:
+    CTYPE: igraph_vconn_nei_t
+    FLAGS: ENUM
+
 WHEEL_MODE:
     # Enum that describes how a star graph should be constructed
     CTYPE: igraph_wheel_mode_t
@@ -624,9 +628,6 @@ PLFIT:
     # Structure representing the result of a power-law fitting algorithms
     CTYPE: igraph_plfit_result_t
     FLAGS: BY_REF
-
-VCONNNEI:
-    CTYPE: igraph_vconn_nei_t
 
 VERTEX_ATTRIBUTE_COMBINATION:
     # Structure specifying how the attributes of vertices should be combined
