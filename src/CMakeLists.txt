@@ -310,6 +310,9 @@ add_library(
   $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
 )
 
+# Required by Xcode new build system
+add_dependencies(igraph parsersources)
+
 # Set soname for the library
 set_target_properties(igraph PROPERTIES VERSION "3.0.0")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
