@@ -6,9 +6,10 @@
 
  - `igraph_reverse_edges()` reverses the specified edges in the graph while preserving all attributes.
 
-### Changes
+### Changed
 
  - The `IGRAPH_ARPACK_PROD` error code is no longer used. Instead, the specific error encountered while doing matrix multiplication is reported.
+ - XML external entities are not resolved any more when parsing GraphML files to prevent XML external entity injection (XXE) attacks. Standard XML entities like `&lt;` or `&quot;` still work.
 
 ### Fixed
 
