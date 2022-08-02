@@ -123,9 +123,12 @@ igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vec
 		}
 	}
 	igraph_vector_int_t vectorlist;
-	igraph_vector_int_init(&vectorlist,1);
+	IGRAPH_CHECK(igraph_vector_int_init(&vectorlist,1));
+	IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist);
+
 	igraph_vector_int_t edgelist;
-	igraph_vector_int_init(&edgelist,1);
+	IGRAPH_CHECK(igraph_vector_int_init(&edgelist,1));
+	IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist);
 
 	igraph_get_shortest_path_dijkstra(graph,&vectorlist,&edgelist,q,min_col_num,weights,IGRAPH_ALL);
 	// for (auto i = 0 ; i < igraph_vector_int_size(&vectorlist); i++)
@@ -139,7 +142,13 @@ igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vec
 	// 	std::cout << VECTOR(edgelist)[i] << " ";
 	// }
 	// std::cout << std::endl;
+
 	// igraph_integer_t combination_value  = Combination(SetD.size(), SetD.size() -1);
+	igraph_vector_destroy(&vectorlist);
+	igraph_vector_destroy(&edgelist);
+	
+	IGRAPH_FINALLY_CLEAN(2);
+
 	return IGRAPH_SUCCESS;
 
 }
