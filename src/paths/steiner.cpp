@@ -144,9 +144,9 @@ igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vec
 	// std::cout << std::endl;
 
 	// igraph_integer_t combination_value  = Combination(SetD.size(), SetD.size() -1);
-	igraph_vector_destroy(&vectorlist);
-	igraph_vector_destroy(&edgelist);
-	
+	igraph_vector_int_destroy(&vectorlist);
+	igraph_vector_int_destroy(&edgelist);
+
 	IGRAPH_FINALLY_CLEAN(2);
 
 	return IGRAPH_SUCCESS;
