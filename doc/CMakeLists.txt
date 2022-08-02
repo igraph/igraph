@@ -220,7 +220,7 @@ if(DOC_BUILD_SUPPORTED)
     COMMENT "Parsing documentation chunks from source code"
   )
 
-  set(DOCXML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/doc/xmlstamp)
+  set(DOCXML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/xmlstamp)
   add_custom_command(
     OUTPUT ${DOCXML_STAMP}
     COMMAND ${CMAKE_COMMAND} -E touch ${DOCXML_STAMP}
