@@ -128,17 +128,17 @@ igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vec
 	igraph_vector_int_init(&edgelist,1);
 
 	igraph_get_shortest_path_dijkstra(graph,&vectorlist,&edgelist,q,min_col_num,weights,IGRAPH_ALL);
-	// for (auto i = 0 ; i < igraph_vector_int_size(&vectorlist); i++)
-	// {
-	// 	std::cout << VECTOR(vectorlist)[i] << " ";
-	// }
-	// std::cout << std::endl;
+	for (auto i = 0 ; i < igraph_vector_int_size(&vectorlist); i++)
+	{
+		std::cout << VECTOR(vectorlist)[i] << " ";
+	}
+	std::cout << std::endl;
 
-	// for (auto i = 0 ; i < igraph_vector_int_size(&edgelist); i++)
-	// {
-	// 	std::cout << VECTOR(edgelist)[i] << " ";
-	// }
-	// std::cout << std::endl;
+	for (auto i = 0 ; i < igraph_vector_int_size(&edgelist); i++)
+	{
+		std::cout << VECTOR(edgelist)[i] << " ";
+	}
+	std::cout << std::endl;
 	// igraph_integer_t combination_value  = Combination(SetD.size(), SetD.size() -1);
 	return IGRAPH_SUCCESS;
 
