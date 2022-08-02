@@ -1,0 +1,24 @@
+No vertices:
+( )
+
+one vertex, empty subset:
+( 0 )
+
+Graph with unconnected vertices, loops and multiple edges, empty subsets:
+( 0 0 0 0 0 0 )
+
+Same graph, every vertex as a subset:
+( 0 1 0 0 0 0 )
+
+Same graph, every vertex and next one as a subset:
+( 2 1 1 2 0 0 )
+
+Same situation, but with weights:
+( 0 0.1 0.4 1.1 0 0 )
+
+Same situation, no weights, but undirected graph:
+( 2 1 1 2 0 0 )
+
+Same graph, whole graph as subset:
+( 8 )
+

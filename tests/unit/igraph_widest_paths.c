@@ -168,8 +168,8 @@ int main() {
     igraph_small(&g, n, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
 
     igraph_matrix_init(&res1, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -189,8 +189,8 @@ int main() {
     igraph_vector_init_real(&w, m+3, -1.0, 2.0, 3.0, 2.0, 5.0, 1.0);
 
     igraph_matrix_init(&res1, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -210,8 +210,8 @@ int main() {
     igraph_vector_init_real(&w, m, -1.0, IGRAPH_NAN, 3.0);
 
     igraph_matrix_init(&res1, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -251,8 +251,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -277,7 +277,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -302,8 +302,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -331,7 +331,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -356,7 +356,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -382,7 +382,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -409,7 +409,7 @@ int main() {
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -447,8 +447,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
     run_widest_paths(&g, &w, &res1, &res2, &from, &to, IGRAPH_OUT);
@@ -476,7 +476,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 3);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -502,7 +502,7 @@ int main() {
     igraph_matrix_init(&res1, 1, n);
     igraph_matrix_init(&res2, 1, n);
     igraph_vs_1(&from, 0);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 
@@ -527,8 +527,8 @@ int main() {
 
     igraph_matrix_init(&res1, n, n);
     igraph_matrix_init(&res2, n, n);
-    igraph_vs_seq(&from, 0, n-1);
-    igraph_vs_seq(&to, 0, n-1);
+    igraph_vs_range(&from, 0, n);
+    igraph_vs_range(&to, 0, n);
 
     init_vertices_and_edges(n, &vertices, &edges, &parents, &inbound_edges, &vertices2, &edges2);
 

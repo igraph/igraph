@@ -31,7 +31,7 @@ int main() {
     igraph_vector_init(&x, nc);
 
     /* Fill with arbitrary values. Should be zeroes by beta. */
-    igraph_vector_init_seq(&y1, 1, nr);
+    igraph_vector_init_range(&y1, 1, nr + 1);
     igraph_vector_init_copy(&y2, &y1);
 
     for (i=0; i < nr; ++i) {

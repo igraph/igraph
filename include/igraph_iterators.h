@@ -27,6 +27,7 @@
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
@@ -43,7 +44,7 @@ typedef enum {
     IGRAPH_VS_1,
     IGRAPH_VS_VECTORPTR,
     IGRAPH_VS_VECTOR,
-    IGRAPH_VS_SEQ,
+    IGRAPH_VS_RANGE,
     IGRAPH_VS_NONADJ,
 } igraph_vs_type_t;
 
@@ -57,9 +58,9 @@ typedef struct igraph_vs_t {
             igraph_neimode_t mode;
         } adj;                              /* adjacent vertices  */
         struct {
-            igraph_integer_t from;
-            igraph_integer_t to;
-        } seq;                              /* sequence of vertices from:to */
+            igraph_integer_t start;         /* first index (inclusive) */
+            igraph_integer_t end;           /* last index (exclusive) */
+        } range;                            /* range of vertices */
     } data;
 } igraph_vs_t;
 
@@ -87,8 +88,11 @@ IGRAPH_EXPORT igraph_error_t igraph_vs_vector_small(igraph_vs_t *vs, ...);
 IGRAPH_EXPORT igraph_error_t igraph_vs_vector_copy(igraph_vs_t *vs,
                                         const igraph_vector_int_t *v);
 
-IGRAPH_EXPORT igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to);
-IGRAPH_EXPORT igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
+
+IGRAPH_EXPORT igraph_error_t igraph_vs_range(igraph_vs_t *vs, igraph_integer_t start, igraph_integer_t end);
+IGRAPH_EXPORT igraph_vs_t igraph_vss_range(igraph_integer_t start, igraph_integer_t end);
 
 IGRAPH_EXPORT void igraph_vs_destroy(igraph_vs_t *vs);
 
@@ -107,7 +111,7 @@ IGRAPH_EXPORT igraph_vs_type_t igraph_vs_type(const igraph_vs_t *vs);
 /* -------------------------------------------------- */
 
 typedef enum {
-    IGRAPH_VIT_SEQ,
+    IGRAPH_VIT_RANGE,
     IGRAPH_VIT_VECTOR,
     IGRAPH_VIT_VECTORPTR,
 } igraph_vit_type_t;
@@ -115,8 +119,8 @@ typedef enum {
 typedef struct igraph_vit_t {
     igraph_vit_type_t type;
     igraph_integer_t pos;
-    igraph_integer_t start;
-    igraph_integer_t end;
+    igraph_integer_t start; /* first index */
+    igraph_integer_t end;   /* one past last index */
     const igraph_vector_int_t *vec;
 } igraph_vit_t;
 
@@ -211,7 +215,7 @@ typedef struct igraph_vit_t {
  * Time complexity: O(1).
  */
 #define IGRAPH_VIT_GET(vit)  \
-    ((igraph_integer_t)(((vit).type == IGRAPH_VIT_SEQ) ? (vit).pos : \
+    ((igraph_integer_t)(((vit).type == IGRAPH_VIT_RANGE) ? (vit).pos : \
                         VECTOR(*(vit).vec)[(vit).pos]))
 
 IGRAPH_EXPORT igraph_error_t igraph_vit_create(const igraph_t *graph,
@@ -233,7 +237,7 @@ typedef enum {
     IGRAPH_ES_1,
     IGRAPH_ES_VECTORPTR,
     IGRAPH_ES_VECTOR,
-    IGRAPH_ES_SEQ,
+    IGRAPH_ES_RANGE,
     IGRAPH_ES_PAIRS,
     IGRAPH_ES_PATH,
     IGRAPH_ES_UNUSED_WAS_MULTIPAIRS,  /* placeholder for deprecated IGRAPH_ES_MULTIPAIRS from igraph 0.10 */
@@ -251,9 +255,9 @@ typedef struct igraph_es_t {
             igraph_neimode_t mode;
         } incident;
         struct {
-            igraph_integer_t from;
-            igraph_integer_t to;
-        } seq;
+            igraph_integer_t start; /* first index (inclusive) */
+            igraph_integer_t end;   /* last index (exclusive) */
+        } range;
         struct {
             const igraph_vector_int_t *ptr;
             igraph_bool_t mode;
@@ -283,8 +287,11 @@ IGRAPH_EXPORT igraph_error_t igraph_es_vector(igraph_es_t *es,
                                    const igraph_vector_int_t *v);
 IGRAPH_EXPORT igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v);
 
-IGRAPH_EXPORT igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
-IGRAPH_EXPORT igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT igraph_error_t igraph_es_range(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT igraph_es_t igraph_ess_range(igraph_integer_t from, igraph_integer_t to);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
 IGRAPH_EXPORT igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_int_t *v);
 
@@ -319,7 +326,7 @@ IGRAPH_EXPORT igraph_es_type_t igraph_es_type(const igraph_es_t *es);
 /* -------------------------------------------------- */
 
 typedef enum {
-    IGRAPH_EIT_SEQ,
+    IGRAPH_EIT_RANGE,
     IGRAPH_EIT_VECTOR,
     IGRAPH_EIT_VECTORPTR,
 } igraph_eit_type_t;
@@ -327,8 +334,8 @@ typedef enum {
 typedef struct igraph_eit_t {
     igraph_eit_type_t type;
     igraph_integer_t pos;
-    igraph_integer_t start;
-    igraph_integer_t end;
+    igraph_integer_t start; /* first index */
+    igraph_integer_t end;   /* one past last index */
     const igraph_vector_int_t *vec;
 } igraph_eit_t;
 
@@ -400,7 +407,7 @@ typedef struct igraph_eit_t {
  * Time complexity: O(1).
  */
 #define IGRAPH_EIT_GET(eit)  \
-    (igraph_integer_t)((((eit).type == IGRAPH_EIT_SEQ) ? (eit).pos : \
+    (igraph_integer_t)((((eit).type == IGRAPH_EIT_RANGE) ? (eit).pos : \
                         VECTOR(*(eit).vec)[(eit).pos]))
 
 IGRAPH_EXPORT igraph_error_t igraph_eit_create(const igraph_t *graph,

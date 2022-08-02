@@ -468,6 +468,16 @@ igraph_error_t igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
         IGRAPH_ERRORF(msg, IGRAPH_EINVAL, options->simmer_damping_mult);
     }
 
+    if (weights) {
+        igraph_integer_t no_of_edges = igraph_ecount(graph);
+        if (igraph_vector_size(weights) != no_of_edges) {
+            IGRAPH_ERROR("Length of weight vector does not match number of edges.", IGRAPH_EINVAL);
+        }
+        if (no_of_edges > 0 && igraph_vector_min(weights) <= 0) {
+            IGRAPH_ERROR("Weights must be positive for DrL layout.", IGRAPH_EINVAL);
+        }
+    }
+
     IGRAPH_HANDLE_EXCEPTIONS(
         RNG_BEGIN();
 

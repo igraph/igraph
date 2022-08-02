@@ -628,7 +628,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
     }
 
     /* Create an index vector that sorts the vertices by decreasing in-degree */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&index_array, 0, vcount - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&index_array, 0, vcount));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &index_array);
 
     /* Set up the auxiliary struct for sorting */

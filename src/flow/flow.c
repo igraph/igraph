@@ -40,6 +40,7 @@
 #include "core/buckets.h"
 #include "core/cutheap.h"
 #include "core/interruption.h"
+#include "math/safe_intop.h"
 
 #include "config.h"
 
@@ -171,7 +172,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
     igraph_vector_int_t edges;
     igraph_vector_t newcapacity;
     igraph_t newgraph;
-    igraph_integer_t i;
+    igraph_integer_t i, size;
 
     /* We need to convert this to directed by hand, since we need to be
        sure that the edge IDs will be handled properly to build the new
@@ -179,9 +180,10 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&newcapacity, no_of_edges * 2);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 4));
+    IGRAPH_SAFE_MULT(no_of_edges, 4, &size);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, size));
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
-    IGRAPH_CHECK(igraph_vector_int_resize(&edges, no_of_edges * 4));
+    IGRAPH_CHECK(igraph_vector_int_resize(&edges, size));
     for (i = 0; i < no_of_edges; i++) {
         VECTOR(edges)[no_of_edges * 2 + i * 2] = VECTOR(edges)[i * 2 + 1];
         VECTOR(edges)[no_of_edges * 2 + i * 2 + 1] = VECTOR(edges)[i * 2];
@@ -1172,49 +1174,6 @@ igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
                           cut, partition, partition2,
                           source, target, capacity, 0);
 }
-
-/* This is a flow-based version, but there is a better one
-   for undirected graphs */
-
-/* igraph_error_t igraph_i_mincut_value_undirected(const igraph_t *graph, */
-/*                   igraph_real_t *res, */
-/*                   const igraph_vector_t *capacity) { */
-
-/*   igraph_integer_t no_of_edges=igraph_ecount(graph); */
-/*   igraph_integer_t no_of_nodes=igraph_vcount(graph); */
-/*   igraph_vector_int_t edges; */
-/*   igraph_vector_t newcapacity; */
-/*   igraph_t newgraph; */
-/*   igraph_integer_t i; */
-
-/*   /\* We need to convert this to directed by hand, since we need to be */
-/*      sure that the edge IDs will be handled properly to build the new */
-/*      capacity vector. *\/ */
-
-/*   IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0); */
-/*   IGRAPH_VECTOR_INT_INIT_FINALLY(&newcapacity, no_of_edges*2); */
-/*   IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges*4)); */
-/*   IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0)); */
-/*   IGRAPH_CHECK(igraph_vector_int_resize(&edges, no_of_edges*4)); */
-/*   for (i=0; i<no_of_edges; i++) { */
-/*     VECTOR(edges)[no_of_edges*2+i*2] = VECTOR(edges)[i*2+1]; */
-/*     VECTOR(edges)[no_of_edges*2+i*2+1] = VECTOR(edges)[i*2]; */
-/*     VECTOR(newcapacity)[i] = VECTOR(newcapacity)[no_of_edges+i] =  */
-/*       capacity ? VECTOR(*capacity)[i] : 1.0 ; */
-/*   } */
-
-/*   IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_DIRECTED)); */
-/*   IGRAPH_FINALLY(igraph_destroy, &newgraph); */
-
-/*   IGRAPH_CHECK(igraph_mincut_value(&newgraph, res, &newcapacity)); */
-
-/*   igraph_destroy(&newgraph); */
-/*   igraph_vector_int_destroy(&edges); */
-/*   igraph_vector_destroy(&newcapacity); */
-/*   IGRAPH_FINALLY_CLEAN(3); */
-
-/*   return 0; */
-/* } */
 
 /*
  * This is the Stoer-Wagner algorithm, it works for calculating the

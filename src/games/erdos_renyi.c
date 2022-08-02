@@ -28,6 +28,7 @@
 #include "igraph_random.h"
 
 #include "random/random_internal.h"
+#include "math/safe_intop.h"
 
 /**
  * \section about_games
@@ -52,10 +53,10 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_integer_t vsize;
 
     if (n < 0) {
-        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
     if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid probability given", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid probability given.", IGRAPH_EINVAL);
     }
 
     if (p == 0.0 || no_of_nodes == 0) {
@@ -66,6 +67,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
         igraph_integer_t i;
         igraph_real_t maxedges = n, last;
+        igraph_integer_t maxedges_int;
+
         if (directed && loops) {
             maxedges *= n;
         } else if (directed && !loops) {
@@ -76,8 +79,12 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             maxedges *= (n - 1) / 2.0;
         }
 
+        if (maxedges > IGRAPH_MAX_EXACT_REAL) {
+            IGRAPH_ERROR("Too many vertices, overflow in maximum number of edges.", IGRAPH_EOVERFLOW);
+        }
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&s, (maxedges * p * 1.1)));
+        IGRAPH_CHECK(igraph_i_safe_floor(maxedges * p * 1.1, &maxedges_int));
+        IGRAPH_CHECK(igraph_vector_reserve(&s, maxedges_int));
 
         RNG_BEGIN();
 
@@ -165,7 +172,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     } else {
 
         igraph_integer_t i;
-        double maxedges = n;
+        igraph_real_t maxedges = n;
         if (directed && loops) {
             maxedges *= n;
         } else if (directed && !loops) {
@@ -177,7 +184,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
         }
 
         if (no_of_edges > maxedges) {
-            IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Too many edges requested compared to the number of vertices.", IGRAPH_EINVAL);
         }
 
         if (maxedges == no_of_edges) {

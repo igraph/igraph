@@ -25,6 +25,7 @@
 #define IGRAPH_COCITATION_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"

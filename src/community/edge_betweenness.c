@@ -369,6 +369,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * then after a while one of these components falls off to two smaller
  * components, etc. until all edges are removed. This is a divisive
  * hierarchical approach, the result is a dendrogram.
+ *
  * \param graph The input graph.
  * \param result Pointer to an initialized vector, the result will be
  *     stored here, the IDs of the removed edges in the order of their

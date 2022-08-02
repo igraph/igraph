@@ -24,7 +24,7 @@ int main() {
                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                  -1);
 
-    igraph_vs_seq(&vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&vertices, 0, igraph_vcount(&g));
 
     printf("\nDirected multi:\n");
     igraph_adjacent_triangles(&g, &res, igraph_vss_all());

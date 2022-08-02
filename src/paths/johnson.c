@@ -26,6 +26,7 @@
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
 /**
  * \function igraph_distances_johnson
  * \brief Weighted shortest path lengths between vertices, using Johnson's algorithm.
@@ -80,6 +81,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     igraph_integer_t i, ptr;
     igraph_integer_t nr, nc;
     igraph_vit_t fromvit;
+    igraph_integer_t no_edges_reserved;
 
     /* If no weights, then we can just run the unweighted version */
     if (!weights) {
@@ -122,10 +124,13 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     IGRAPH_CHECK(igraph_empty(&newgraph, no_of_nodes + 1, igraph_is_directed(graph)));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
+    IGRAPH_SAFE_MULT(no_of_nodes, 2, &no_edges_reserved);
+    IGRAPH_SAFE_ADD(no_edges_reserved, no_of_edges * 2, &no_edges_reserved);
+
     /* Add a new node to the graph, plus edges from it to all the others. */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2 + no_of_nodes * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_edges_reserved);
     igraph_get_edgelist(graph, &edges, /*bycol=*/ 0); /* reserved */
-    igraph_vector_int_resize(&edges, no_of_edges * 2 + no_of_nodes * 2); /* reserved */
+    igraph_vector_int_resize(&edges, no_edges_reserved); /* reserved */
     for (i = 0, ptr = no_of_edges * 2; i < no_of_nodes; i++) {
         VECTOR(edges)[ptr++] = no_of_nodes;
         VECTOR(edges)[ptr++] = i;

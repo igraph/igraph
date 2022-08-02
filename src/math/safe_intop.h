@@ -25,7 +25,14 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "config.h"
+
+#include <float.h>
+
 __BEGIN_DECLS
+
+/* Largest positive value for igraph_real_t that can safely represent integers. */
+#define IGRAPH_MAX_EXACT_REAL ((double)(1LL << DBL_MANT_DIG))
 
 /* These macros raise an error if the operation would result in an overflow.
  * They must only be used in functions that return an igraph_error_t.
@@ -34,7 +41,7 @@ __BEGIN_DECLS
  * https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard
  */
 
-#if defined(__GNUC__)
+#ifdef HAVE_BUILTIN_OVERFLOW
 
 #define IGRAPH_SAFE_ADD(a, b, res) \
     do { \
@@ -103,7 +110,7 @@ __BEGIN_DECLS
         *(res) = _safe_prod; \
     } while (0)
 
-#endif
+#endif /* HAVE_BUILTIN_OVERFLOW */
 
 /* Overflow-safe calculation of "n choose 2" = n*(n-1) / 2, assuming that n >= 0. */
 #define IGRAPH_SAFE_N_CHOOSE_2(n, res) \
@@ -112,6 +119,10 @@ __BEGIN_DECLS
         if (_safe_n % 2 == 0) IGRAPH_SAFE_MULT(_safe_n / 2, _safe_n - 1, res); \
         else IGRAPH_SAFE_MULT(_safe_n, (_safe_n - 1) / 2, res); \
     } while (0)
+
+igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t* result);
+igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t* result);
+igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result);
 
 igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res);

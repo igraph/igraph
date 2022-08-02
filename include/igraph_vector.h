@@ -24,10 +24,11 @@
 #ifndef IGRAPH_VECTOR_H
 #define IGRAPH_VECTOR_H
 
+#include "igraph_complex.h"
 #include "igraph_constants.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
-#include "igraph_complex.h"
 
 __BEGIN_DECLS
 
@@ -140,6 +141,7 @@ IGRAPH_EXPORT igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lh
                                                        igraph_real_t eps);
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
+IGRAPH_EXPORT igraph_error_t igraph_vector_complex_zapsmall(igraph_vector_complex_t *v, igraph_real_t tol) ;
 
 IGRAPH_EXPORT igraph_error_t igraph_vector_order2(igraph_vector_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_int_t *res,

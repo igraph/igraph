@@ -40,8 +40,8 @@ long vector_bool_count(const igraph_vector_bool_t *vec) {
 int main() {
     igraph_t g;
     igraph_vector_t type_dist;
-    igraph_matrix_t pref_mat;
-    igraph_vector_int_t types, in_types, out_types;
+    igraph_matrix_t pref_mat, type_dist_mat;
+    igraph_vector_int_t types, out_types, in_types;
     igraph_bool_t connected, has_loop, has_multi;
     igraph_vector_bool_t is_loop;
     igraph_integer_t i, j, count;
@@ -57,8 +57,8 @@ int main() {
     }
 
     /* undirected, no loops */
-    IGRAPH_CHECK(igraph_preference_game(&g, 1000, 3, &type_dist, /*fixed_sizes=*/ 0,
-                                        &pref_mat, &types, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS));
+    igraph_preference_game(&g, 1000, 3, &type_dist, /*fixed_sizes=*/ 0,
+                           &pref_mat, &types, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 1000);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
@@ -85,8 +85,8 @@ int main() {
     }
 
     /* directed, no loops */
-    IGRAPH_CHECK(igraph_preference_game(&g, 1000, 3, &type_dist, /*fixed_sizes=*/0,
-                                        &pref_mat, &types, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS));
+    igraph_preference_game(&g, 1000, 3, &type_dist, /*fixed_sizes=*/0,
+                           &pref_mat, &types, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 1000);
     IGRAPH_ASSERT(igraph_is_directed(&g));
@@ -108,8 +108,8 @@ int main() {
         MATRIX(pref_mat, i, i) = 1.0;
     }
 
-    IGRAPH_CHECK(igraph_preference_game(&g, 100, 3, &type_dist, /*fixed_sizes=*/ 0,
-                                        &pref_mat, &types, IGRAPH_UNDIRECTED, IGRAPH_LOOPS));
+    igraph_preference_game(&g, 100, 3, &type_dist, /*fixed_sizes=*/ 0,
+                           &pref_mat, &types, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 100);
     IGRAPH_ASSERT(igraph_ecount(&g) >= 1395);
@@ -128,8 +128,8 @@ int main() {
     igraph_destroy(&g);
 
     /* directed, loops */
-    IGRAPH_CHECK(igraph_preference_game(&g, 100, 3, &type_dist, /*fixed_sizes=*/ 0,
-                                        &pref_mat, NULL, IGRAPH_DIRECTED, IGRAPH_LOOPS));
+    igraph_preference_game(&g, 100, 3, &type_dist, /*fixed_sizes=*/ 0,
+                           &pref_mat, NULL, IGRAPH_DIRECTED, IGRAPH_LOOPS);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 100);
     IGRAPH_ASSERT(igraph_ecount(&g) >= 2700);
@@ -144,14 +144,14 @@ int main() {
     igraph_destroy(&g);
 
     /* fixed sizes, divide evenly */
-    IGRAPH_CHECK(igraph_matrix_resize(&pref_mat, 9, 9));
+    igraph_matrix_resize(&pref_mat, 9, 9);
     for (i = 0; i < 9; i++) {
         for (j = 0; j < 9; j++) {
             MATRIX(pref_mat, i, j) = (j == i + 1 || j == i - 1) ? 0.1 : 0;
         }
     }
-    IGRAPH_CHECK(igraph_preference_game(&g, 50, 9, /*type_dist=*/ 0, /*fixed_sizes=*/ 1,
-                                        &pref_mat, &types, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS));
+    igraph_preference_game(&g, 50, 9, /*type_dist=*/ 0, /*fixed_sizes=*/ 1,
+                           &pref_mat, &types, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 50);
     IGRAPH_ASSERT(!igraph_is_directed(&g));
@@ -178,8 +178,8 @@ int main() {
 
     /* Asymmetric preference game */
 
-    igraph_vector_int_init(&in_types, 0);
     igraph_vector_int_init(&out_types, 0);
+    igraph_vector_int_init(&in_types, 0);
 
     /* directed, no loops */
     igraph_matrix_resize(&pref_mat, 2, 3);
@@ -190,7 +190,7 @@ int main() {
     MATRIX(pref_mat, 1, 1) = 1;
     MATRIX(pref_mat, 1, 2) = 1;
 
-    IGRAPH_CHECK(igraph_asymmetric_preference_game(&g, 100, 2, 3, NULL, &pref_mat, &in_types, &out_types, IGRAPH_NO_LOOPS));
+    igraph_asymmetric_preference_game(&g, 100, 2, 3, NULL, &pref_mat, &out_types, &in_types, IGRAPH_NO_LOOPS);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 100);
     IGRAPH_ASSERT(igraph_ecount(&g) == 9900);
@@ -211,7 +211,7 @@ int main() {
     MATRIX(pref_mat, 1, 0) = 1;
     MATRIX(pref_mat, 1, 1) = 1;
 
-    IGRAPH_CHECK(igraph_asymmetric_preference_game(&g, 100, 2, 2, NULL, &pref_mat, NULL, NULL, IGRAPH_LOOPS));
+    igraph_asymmetric_preference_game(&g, 100, 2, 2, NULL, &pref_mat, NULL, NULL, IGRAPH_LOOPS);
 
     IGRAPH_ASSERT(igraph_vcount(&g) == 100);
     IGRAPH_ASSERT(igraph_ecount(&g) == 10000);
@@ -227,11 +227,38 @@ int main() {
 
     igraph_destroy(&g);
 
+    /* check that vertex out-/in-types are generated correctly; here pref_mat does not matter */
+
+    igraph_matrix_resize(&pref_mat, 3, 2);
+    igraph_matrix_null(&pref_mat);
+
+    igraph_matrix_init(&type_dist_mat, 3, 2);
+    igraph_matrix_null(&type_dist_mat);
+    MATRIX(type_dist_mat, 2, 0) = 1; /* all out-types are 2, all in-types are 0 */
+
+    igraph_asymmetric_preference_game(&g, 10, 3, 2, &type_dist_mat, &pref_mat, &out_types, &in_types, IGRAPH_LOOPS);
+    {
+        /* Check that all out-types are 2 and all in-types are 0 */
+        igraph_vector_int_t v;
+        igraph_vector_int_init(&v, igraph_vcount(&g));
+
+        igraph_vector_int_fill(&v, 2);
+        IGRAPH_ASSERT(igraph_vector_int_all_e(&out_types, &v));
+
+        igraph_vector_int_fill(&v, 0);
+        IGRAPH_ASSERT(igraph_vector_int_all_e(&in_types, &v));
+
+        igraph_vector_int_destroy(&v);
+    }
+
+    igraph_destroy(&g);
+
+    igraph_matrix_destroy(&type_dist_mat);
     igraph_vector_destroy(&type_dist);
     igraph_matrix_destroy(&pref_mat);
 
-    igraph_vector_int_destroy(&in_types);
     igraph_vector_int_destroy(&out_types);
+    igraph_vector_int_destroy(&in_types);
 
     VERIFY_FINALLY_STACK();
 

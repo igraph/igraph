@@ -25,6 +25,8 @@
 #include "igraph_structural.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 #include <math.h>
 
 static igraph_error_t igraph_i_laplacian_validate_weights(
@@ -259,7 +261,13 @@ igraph_error_t igraph_get_laplacian_sparse(
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_t degree;
     igraph_integer_t i;
-    igraph_integer_t nz = directed ? no_of_edges + no_of_nodes : no_of_edges * 2 + no_of_nodes;
+    igraph_integer_t nz;
+   
+    if (directed) {
+        IGRAPH_SAFE_ADD(no_of_edges, no_of_nodes, &nz);
+    } else {
+        IGRAPH_SAFE_ADD(no_of_edges * 2, no_of_nodes, &nz);
+    }
 
     IGRAPH_ASSERT(sparseres != NULL);
 

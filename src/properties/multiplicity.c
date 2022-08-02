@@ -51,6 +51,18 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
 
+    if (
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI)
+    ) {
+        /* use the cached result */
+        *res = (
+            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP) &&
+            !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)
+        );
+        return IGRAPH_SUCCESS;
+    }
+
     if (vc == 0 || ec == 0) {
         *res = 1;
     } else {
@@ -75,6 +87,13 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
         IGRAPH_FINALLY_CLEAN(1);
     }
 
+    /* If the graph turned out to be simple, we can cache that it has no loop
+     * and no multiple edges */
+    if (*res) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, 0);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, 0);
+    }
+
     return IGRAPH_SUCCESS;
 }
 
@@ -86,6 +105,11 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  * </para><para>
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
+ *
+ * </para><para>
+ * The return value of this function is cached in the graph itself; calling
+ * the function multiple times with no modifications to the graph in between
+ * will return a cached value in O(1) time.
  *
  * \param graph The input graph.
  * \param res Pointer to a boolean variable, the result will be stored here.
@@ -103,6 +127,8 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t ec = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
+
+    IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_HAS_MULTI, res);
 
     if (vc == 0 || ec == 0) {
         *res = 0;
@@ -136,6 +162,8 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
         igraph_vector_int_destroy(&neis);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
+    igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, *res);
 
     return IGRAPH_SUCCESS;
 }
@@ -274,7 +302,9 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * \function igraph_is_mutual
  * \brief Check whether some edges of a directed graph are mutual.
  *
- * An (A,B) edge is mutual if the graph contains the (B,A) edge too.
+ * An (A,B) non-loop directed edge is mutual if the graph contains
+ * the (B,A) edge too. Whether directed self-loops are considered mutual
+ * is controlled by the \p loops parameter.
  *
  * </para><para>
  * An undirected graph only has mutual edges, by definition.
@@ -284,14 +314,13 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * (A,B) edges and one (B,A) edge, then all three are considered to be
  * mutual.
  *
- * </para><para>
- * Self-loops are always mutual.
- *
  * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
  *        here.
  * \param es The sequence of edges to check. Supply
  *        \ref igraph_ess_all() to check all edges.
+ * \param loops Boolean, whether to consider directed self-loops
+ *        to be mutual.
  * \return Error code.
  *
  * Time complexity: O(n log(d)), n is the number of edges supplied, d
@@ -299,7 +328,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
  * supplied edges. An upper limit of the time complexity is O(n log(|E|)),
  * |E| is the number of edges in the graph.
  */
-igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
+igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es, igraph_bool_t loops) {
 
     igraph_eit_t eit;
     igraph_lazy_adjlist_t adjlist;
@@ -327,6 +356,11 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
         igraph_integer_t from = IGRAPH_FROM(graph, edge);
         igraph_integer_t to = IGRAPH_TO(graph, edge);
 
+        if (from == to) {
+            VECTOR(*res)[i] = loops;
+            continue; /* no need to do binsearch for self-loops */
+        }
+
         /* Check whether there is a to->from edge, search for from in the
            out-list of to */
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
@@ -337,6 +371,95 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_has_mutual
+ * \brief Check whether a directed graph has any mutual edges.
+ *
+ * An (A,B) non-loop directed edge is mutual if the graph contains
+ * the (B,A) edge too. Whether directed self-loops are considered mutual
+ * is controlled by the \p loops parameter.
+ *
+ * </para><para>
+ * An undirected graph only has mutual edges, by definition.
+ *
+ * </para><para>
+ * Edge multiplicity is not considered here, e.g. if there are two
+ * (A,B) edges and one (B,A) edge, then all three are considered to be
+ * mutual.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to a boolean, the result will be stored here.
+ * \param loops Boolean, whether to consider directed self-loops
+ *        to be mutual.
+ * \return Error code.
+ *
+ * Time complexity: O(|E| log(d)) where d is the maximum in-degree.
+ */
+igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igraph_bool_t loops) {
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_lazy_adjlist_t adjlist;
+
+    if (! igraph_is_directed(graph)) {
+        /* In undirected graphs, all edges are considered mutual, so we just check
+         * if there are any edges. */
+        *res = no_of_edges > 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+        if (igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL)) {
+            /* we know that the graph has at least one mutual non-loop edge
+             * (because the cache only stores non-loop edges) */
+            *res = 1;
+            return IGRAPH_SUCCESS;
+        } else if (loops) {
+            /* no non-loop mutual edges, but maybe we have loops? */
+            return igraph_has_loop(graph, res);
+        } else {
+            /* no non-loop mutual edges, and loops are not to be treated as mutual */
+            *res = 0;
+            return IGRAPH_SUCCESS;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+
+    *res = 0; /* assume no mutual edges */
+    for (igraph_integer_t edge=0; edge < no_of_edges; edge++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_integer_t to = IGRAPH_TO(graph, edge);
+
+        if (from == to) {
+            if (loops) {
+                *res = 1;
+                break;
+            }
+            continue; /* no need to do binsearch for self-loops */
+        }
+
+        /* Check whether there is a to->from edge, search for from in the
+           out-list of to */
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
+        IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+        if (igraph_vector_int_binsearch2(neis, from)) {
+            *res = 1;
+            break;
+        }
+    }
+
+    igraph_lazy_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* cache the result if loops are not treated as mutual */
+    if (!loops) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MUTUAL, *res);
+    }
 
     return IGRAPH_SUCCESS;
 }

@@ -13,6 +13,8 @@
 #cmakedefine HAVE_XLOCALE 1
 #cmakedefine HAVE__CONFIGTHREADLOCALE 1
 
+#cmakedefine HAVE_BUILTIN_OVERFLOW 1
+
 #cmakedefine HAVE__UMUL128 1
 #cmakedefine HAVE___UINT128_T 1
 

@@ -376,7 +376,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
       IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_vector_init_seq(&node_order, 0, vcount - 1));
+    IGRAPH_CHECK(igraph_vector_init_range(&node_order, 0, vcount));
     IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
     IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
 

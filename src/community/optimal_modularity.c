@@ -71,6 +71,7 @@
  * \param weights Vector giving the weights of the edges. If it is
  *        \c NULL then each edge is supposed to have the same weight.
  * \return Error code.
+ *         When GLPK is not available, \c IGRAPH_UNIMPLEMENTED is returned.
  *
  * \sa \ref igraph_modularity(), \ref igraph_community_fastgreedy()
  * for an algorithm that finds a local optimum in a greedy way.

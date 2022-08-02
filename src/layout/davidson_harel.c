@@ -188,11 +188,11 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&perm, 0, no_nodes));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
     IGRAPH_VECTOR_INIT_FINALLY(&try_x, no_tries);
     IGRAPH_VECTOR_INIT_FINALLY(&try_y, no_tries);
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&try_idx, 0, no_tries - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&try_idx, 0, no_tries));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &try_idx);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 100);
 
