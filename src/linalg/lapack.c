@@ -858,6 +858,7 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     int error = *info;
     igraph_vector_t *myreal = valuesreal, *myimag = valuesimag, vreal, vimag;
     igraph_vector_t *myscale = scale, vscale;
+    igraph_real_t dummy;   /* to prevent some Clang sanitizer warnings */
 
     if (igraph_matrix_ncol(A) != n) {
         IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx).", IGRAPH_NONSQUARE);
@@ -925,11 +926,11 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 
     igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy, 0, 0),
                   &lda, VECTOR(*myreal), VECTOR(*myimag),
-                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                   ilo, ihi, VECTOR(*myscale), abnrm,
-                  rconde ? VECTOR(*rconde) : 0,
-                  rcondv ? VECTOR(*rcondv) : 0,
+                  rconde ? VECTOR(*rconde) : &dummy,
+                  rcondv ? VECTOR(*rcondv) : &dummy,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     lwork = (int) VECTOR(work)[0];
@@ -937,11 +938,11 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 
     igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy, 0, 0),
                   &lda, VECTOR(*myreal), VECTOR(*myimag),
-                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                   ilo, ihi, VECTOR(*myscale), abnrm,
-                  rconde ? VECTOR(*rconde) : 0,
-                  rcondv ? VECTOR(*rcondv) : 0,
+                  rconde ? VECTOR(*rconde) : &dummy,
+                  rcondv ? VECTOR(*rcondv) : &dummy,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     if (*info < 0) {
