@@ -77,7 +77,10 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The input graph. Its edges are ignored by this function.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param center The id of the vertex to put in the center.
+ * \param center The id of the vertex to put in the center. You can set it to
+ *        any arbitrary value for the special case when the input graph has no
+ *        vertices; otherwise it must be between 0 and the number of vertices
+ *        minus 1.
  * \param order A numeric vector giving the order of the vertices
  *      (including the center vertex!). If a null pointer, then the
  *      vertices are placed in increasing vertex id order.
@@ -96,7 +99,7 @@ int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     igraph_real_t step;
     igraph_real_t phi;
 
-    if (center < 0 || center >= no_of_nodes) {
+    if (no_of_nodes > 0 && (center < 0 || center >= no_of_nodes)) {
         IGRAPH_ERROR("The given center is not a vertex of the graph.", IGRAPH_EINVAL);
     }
     if (order && igraph_vector_size(order) != no_of_nodes) {
@@ -107,7 +110,7 @@ int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
 
     if (no_of_nodes == 1) {
         MATRIX(*res, 0, 0) = MATRIX(*res, 0, 1) = 0.0;
-    } else {
+    } else if (no_of_nodes > 1) {
         for (i = 0, step = 2 * M_PI / (no_of_nodes - 1), phi = 0;
              i < no_of_nodes; i++) {
             long int node = order ? (long int) VECTOR(*order)[i] : i;

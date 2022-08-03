@@ -40,6 +40,10 @@ int main() {
     igraph_t g;
     igraph_vector_t order;
 
+    printf("No vertices.\n");
+    igraph_small(&g, 0, 0, -1);
+    print_and_destroy(&g, 0, NULL, IGRAPH_SUCCESS);
+
     printf("Star of 8 points and a center:\n");
     igraph_small(&g, 9, 0, -1);
     print_and_destroy(&g, 0, NULL, IGRAPH_SUCCESS);
