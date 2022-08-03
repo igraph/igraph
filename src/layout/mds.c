@@ -196,7 +196,7 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
     if (dim <= 1) {
         IGRAPH_ERROR("dim must be positive", IGRAPH_EINVAL);
     }
-    if (dim > no_of_nodes) {
+    if (no_of_nodes > 0 && dim > no_of_nodes) {
         IGRAPH_ERROR("dim must be less than the number of nodes", IGRAPH_EINVAL);
     }
 

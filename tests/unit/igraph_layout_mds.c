@@ -36,6 +36,13 @@ int main() {
 
     srand(42); /* make tests deterministic */
 
+    igraph_small(&g, 0, 0, -1);
+    igraph_matrix_init(&coords, 0, 0);
+    igraph_layout_mds(&g, &coords, 0, 2);
+    print_matrix(&coords);
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
+
     igraph_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
     igraph_layout_mds(&g, &coords, 0, 2);
@@ -49,7 +56,7 @@ int main() {
             MATRIX(coords, i, 1) *= -1;
         }
     }
-    igraph_matrix_print(&coords);
+    print_matrix(&coords);
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
 
