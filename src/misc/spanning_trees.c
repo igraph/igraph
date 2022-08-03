@@ -129,8 +129,9 @@ int igraph_minimum_spanning_tree(const igraph_t* graph,
 int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
         igraph_t *mst) {
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, igraph_vcount(graph) - 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_nodes > 0 ? no_of_nodes - 1 : 0);
     IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, &edges));
     IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
                                        igraph_ess_vector(&edges), /* delete_vertices = */ 0));
