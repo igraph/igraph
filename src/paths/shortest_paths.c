@@ -944,7 +944,9 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
     igraph_integer_t i, j, n;
     igraph_integer_t *already_added;
     igraph_integer_t nodes_reached;
-    igraph_integer_t ifrom = -1, ito = -1;
+    /* from/to are initialized to 0 because in a singleton graph, or in an edgeless graph
+     * with unconn = true, the diameter path will be considered to consist of vertex 0 only. */
+    igraph_integer_t ifrom = 0, ito = 0;
     igraph_real_t ires = 0;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
@@ -1138,7 +1140,9 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
     igraph_integer_t source, j;
     igraph_neimode_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
-    igraph_integer_t ifrom = -1, ito = -1;
+    /* from/to are initialized to 0 because in a singleton graph, or in an edgeless graph
+     * with unconn = true, the diameter path will be considered to consist of vertex 0 only. */
+    igraph_integer_t ifrom = 0, ito = 0;
     igraph_real_t ires = 0;
     igraph_integer_t nodes_reached = 0;
 
