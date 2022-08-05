@@ -905,12 +905,12 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
  *
  * \param graph The graph object.
- * \param pres Pointer to a real number, if not \c NULL then it will contain
+ * \param res Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
- * \param pfrom Pointer to an integer, if not \c NULL it will be set to the
+ * \param from Pointer to an integer, if not \c NULL it will be set to the
  *        source vertex of the diameter path. If the graph has no diameter path,
  *        it will be set to -1.
- * \param pto Pointer to an integer, if not \c NULL it will be set to the
+ * \param to Pointer to an integer, if not \c NULL it will be set to the
  *        target vertex of the diameter path. If the graph has no diameter path,
  *        it will be set to -1.
  * \param vertex_path Pointer to an initialized vector. If not \c NULL the actual
@@ -936,8 +936,8 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
  * \example examples/simple/igraph_diameter.c
  */
 
-igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
-                    igraph_integer_t *pfrom, igraph_integer_t *pto,
+igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
+                    igraph_integer_t *from, igraph_integer_t *to,
                     igraph_vector_int_t *vertex_path, igraph_vector_int_t *edge_path,
                     igraph_bool_t directed, igraph_bool_t unconn) {
 
@@ -945,8 +945,8 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     igraph_integer_t i, j, n;
     igraph_integer_t *already_added;
     igraph_integer_t nodes_reached;
-    igraph_integer_t from = 0, to = 0;
-    igraph_real_t res = 0;
+    igraph_integer_t ifrom = -1, ito = -1;
+    igraph_real_t ires = 0;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
@@ -956,8 +956,8 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     /* See https://github.com/igraph/igraph/issues/1538#issuecomment-724071857
      * for why we return NaN for the null graph. */
     if (no_of_nodes == 0) {
-        if (pres) {
-            *pres = IGRAPH_NAN;
+        if (res) {
+            *res = IGRAPH_NAN;
         }
         if (vertex_path) {
             igraph_vector_int_clear(vertex_path);
@@ -965,11 +965,11 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
         if (edge_path) {
             igraph_vector_int_clear(edge_path);
         }
-        if (pfrom) {
-            *pfrom = -1;
+        if (from) {
+            *from = -1;
         }
-        if (pto) {
-            *pto = -1;
+        if (to) {
+            *to = -1;
         }
         return IGRAPH_SUCCESS;
     }
@@ -1002,10 +1002,10 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
         while (!igraph_dqueue_int_empty(&q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-            if (actdist > res) {
-                res = actdist;
-                from = i;
-                to = actnode;
+            if (actdist > ires) {
+                ires = actdist;
+                ifrom = i;
+                ito = actnode;
             }
 
             neis = igraph_adjlist_get(&allneis, actnode);
@@ -1024,9 +1024,9 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
 
         /* not connected, return IGRAPH_INFINITY */
         if (nodes_reached != no_of_nodes && !unconn) {
-            res = IGRAPH_INFINITY;
-            from = -1;
-            to = -1;
+            ires = IGRAPH_INFINITY;
+            ifrom = -1;
+            ito = -1;
             break;
         }
     } /* for i<no_of_nodes */
@@ -1034,17 +1034,17 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     IGRAPH_PROGRESS("Diameter: ", 100.0, NULL);
 
     /* return the requested info */
-    if (pres != 0) {
-        *pres = res;
+    if (res != 0) {
+        *res = ires;
     }
-    if (pfrom != 0) {
-        *pfrom = from;
+    if (from != 0) {
+        *from = ifrom;
     }
-    if (pto != 0) {
-        *pto = to;
+    if (to != 0) {
+        *to = ito;
     }
     if ((vertex_path) || (edge_path)) {
-        if (! igraph_finite(res)) {
+        if (! igraph_finite(ires)) {
             if (vertex_path) {
                 igraph_vector_int_clear(vertex_path);
             }
@@ -1053,7 +1053,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
             }
         } else {
             IGRAPH_CHECK(igraph_get_shortest_path(graph, vertex_path, edge_path,
-                                                  from, to, dirmode));
+                                                  ifrom, ito, dirmode));
         }
     }
 
@@ -1077,12 +1077,12 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
  * \param graph The input graph, can be directed or undirected.
  * \param weights The edge weights of the graph. Can be \c NULL for an
  *        unweighted graph.
- * \param pres Pointer to a real number, if not \c NULL then it will contain
+ * \param res Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
- * \param pfrom Pointer to an integer, if not \c NULL it will be set to the
+ * \param from Pointer to an integer, if not \c NULL it will be set to the
  *        source vertex of the diameter path. If the graph has no diameter path,
  *        it will be set to -1.
- * \param pto Pointer to an integer, if not \c NULL it will be set to the
+ * \param to Pointer to an integer, if not \c NULL it will be set to the
  *        target vertex of the diameter path. If the graph has no diameter path,
  *        it will be set to -1.
  * \param vertex_path Pointer to an initialized vector. If not \c NULL the actual
@@ -1108,9 +1108,9 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
 
 igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                              const igraph_vector_t *weights,
-                             igraph_real_t *pres,
-                             igraph_integer_t *pfrom,
-                             igraph_integer_t *pto,
+                             igraph_real_t *res,
+                             igraph_integer_t *from,
+                             igraph_integer_t *to,
                              igraph_vector_int_t *vertex_path,
                              igraph_vector_int_t *edge_path,
                              igraph_bool_t directed,
@@ -1139,15 +1139,15 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
     igraph_integer_t source, j;
     igraph_neimode_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
-    igraph_integer_t from = -1, to = -1;
-    igraph_real_t res = 0;
+    igraph_integer_t ifrom = -1, ito = -1;
+    igraph_real_t ires = 0;
     igraph_integer_t nodes_reached = 0;
 
     /* See https://github.com/igraph/igraph/issues/1538#issuecomment-724071857
      * for why we return NaN for the null graph. */
     if (no_of_nodes == 0) {
-        if (pres) {
-            *pres = IGRAPH_NAN;
+        if (res) {
+            *res = IGRAPH_NAN;
         }
         if (vertex_path) {
             igraph_vector_int_clear(vertex_path);
@@ -1155,20 +1155,20 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
         if (edge_path) {
             igraph_vector_int_clear(edge_path);
         }
-        if (pfrom) {
-            *pfrom = -1;
+        if (from) {
+            *from = -1;
         }
-        if (pto) {
-            *pto = -1;
+        if (to) {
+            *to = -1;
         }
         return IGRAPH_SUCCESS;
     }
 
     if (!weights) {
         igraph_real_t diameter;
-        IGRAPH_CHECK(igraph_diameter(graph, &diameter, pfrom, pto, vertex_path, edge_path, directed, unconn));
-        if (pres) {
-            *pres = diameter;
+        IGRAPH_CHECK(igraph_diameter(graph, &diameter, from, to, vertex_path, edge_path, directed, unconn));
+        if (res) {
+            *res = diameter;
         }
         return IGRAPH_SUCCESS;
     }
@@ -1209,8 +1209,8 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
             igraph_vector_int_t *neis;
             igraph_integer_t nlen;
 
-            if (mindist > res) {
-                res = mindist; from = source; to = minnei;
+            if (mindist > ires) {
+                ires = mindist; ifrom = source; ito = minnei;
             }
             nodes_reached++;
 
@@ -1238,15 +1238,15 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
 
         /* not connected, return infinity */
         if (nodes_reached != no_of_nodes && !unconn) {
-            res = IGRAPH_INFINITY;
-            from = to = -1;
+            ires = IGRAPH_INFINITY;
+            ifrom = ito = -1;
             break;
         }
 
     } /* source < no_of_nodes */
 
     /* Compensate for the +1 that we have added to distances */
-    res -= 1;
+    ires -= 1;
 
     igraph_inclist_destroy(&inclist);
     igraph_2wheap_destroy(&Q);
@@ -1254,17 +1254,17 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
 
     IGRAPH_PROGRESS("Weighted diameter: ", 100.0, NULL);
 
-    if (pres) {
-        *pres = res;
+    if (res) {
+        *res = ires;
     }
-    if (pfrom) {
-        *pfrom = from;
+    if (from) {
+        *from = ifrom;
     }
-    if (pto) {
-        *pto = to;
+    if (to) {
+        *to = ito;
     }
     if ((vertex_path) || (edge_path)) {
-        if (!igraph_finite(res)) {
+        if (!igraph_finite(ires)) {
             if (vertex_path){
                 igraph_vector_int_clear(vertex_path);
             }
@@ -1274,7 +1274,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
         } else {
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph,
                             /*vertices=*/ vertex_path, /*edges=*/ edge_path,
-                            from, to,
+                            ifrom, ito,
                             weights, dirmode));
         }
     }
