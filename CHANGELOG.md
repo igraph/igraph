@@ -791,6 +791,7 @@ Some of the highlights are:
  - The core data structures (vector, etc.) have overflow checks now.
  - Deterministic graph generators have overflow checks now.
  - `igraph_sparsemat_getelements_sorted()` did not sort the elements for triplet matrices correctly; this is fixed now.
+ - `igraph_random_walk()` took one fewer steps than specified.
 
 ### Deprecated
 
