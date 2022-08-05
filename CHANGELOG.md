@@ -316,6 +316,9 @@ Some of the highlights are:
  - `igraph_girth()` now uses an `igraph_vector_int_t` for its
    `circle` parameter.
 
+ - `igraph_girth()` now uses `igraph_real_t` as the return value so we can
+   return infinity for graphs with no cycles (instead of zero).
+
  - The `igraph_vector_ptr_t` cliques parameter in `igraph_graphlets()`
    now contains `igraph_vector_int_t`, not `igraph_vector_t`.
 

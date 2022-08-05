@@ -803,7 +803,7 @@ igraph_count_multiple:
     DEPS: es ON graph
 
 igraph_girth:
-    PARAMS: GRAPH graph, OUT INTEGER girth, OUT VERTEXSET circle
+    PARAMS: GRAPH graph, OUT REAL girth, OUT VERTEXSET circle
     DEPS: circle ON graph
 
 igraph_is_perfect:
@@ -980,7 +980,7 @@ igraph_eccentricity:
 
 igraph_eccentricity_dijkstra:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL, 
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
         OUT VERTEX_QTY res, VERTEXSET vids=ALL,
         NEIMODE mode=ALL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
