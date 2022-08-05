@@ -562,11 +562,11 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
  * by \ref igraph_vs_all() or \ref igraph_vss_all(). Note that the
  * vertex selector might contain all vertices in a given graph but if
  * it wasn't created by the two constructors mentioned here the return
- * value will be \c FALSE.
+ * value will be \c false.
  *
  * \param vs Pointer to a vertex selector object.
- * \return \c TRUE (1) if the vertex selector contains all vertices and
- *         \c FALSE (0) otherwise.
+ * \return \c true if the vertex selector contains all vertices and
+ *         \c false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -1490,8 +1490,8 @@ void igraph_es_destroy(igraph_es_t *es) {
  * \brief Check whether an edge selector includes all edges.
  *
  * \param es Pointer to an edge selector object.
- * \return TRUE (1) if <code>es</code> was created with \ref
- * igraph_es_all() or \ref igraph_ess_all(), and FALSE (0) otherwise.
+ * \return \c true if \p es was created with \ref
+ * igraph_es_all() or \ref igraph_ess_all(), and \c false otherwise.
  *
  * Time complexity: O(1).
  */

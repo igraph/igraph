@@ -290,7 +290,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
  *
  * </para><para>
  * If no vertex pairs can be included in the calculation, for example because the graph
- * has fewer than two vertices, or if the graph has no edges and \c unconn is set to \c TRUE,
+ * has fewer than two vertices, or if the graph has no edges and \c unconn is set to \c true,
  * NaN is returned.
  *
  * \param graph The graph object.
@@ -301,8 +301,8 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
  * \param directed Boolean, whether to consider directed
  *    paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *    \c TRUE, only those vertex pairs will be included in the calculation
- *    between which there is a path. If \c FALSE, \c IGRAPH_INFINITY is returned
+ *    \c true, only those vertex pairs will be included in the calculation
+ *    between which there is a path. If \c false, \c IGRAPH_INFINITY is returned
  *    for disconnected graphs.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for data structures
@@ -329,7 +329,7 @@ igraph_error_t igraph_average_path_length(const igraph_t *graph,
  *
  * </para><para>
  * If no vertex pairs can be included in the calculation, for example because the graph
- * has fewer than two vertices, or if the graph has no edges and \c unconn is set to \c TRUE,
+ * has fewer than two vertices, or if the graph has no edges and \c unconn is set to \c true,
  * NaN is returned.
  *
  * </para><para>
@@ -347,8 +347,8 @@ igraph_error_t igraph_average_path_length(const igraph_t *graph,
  *       version, \ref igraph_average_path_length() is called.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
- * \param unconn If \c TRUE, only those pairs are considered for the calculation
- *    between which there is a path. If \c FALSE, \c IGRAPH_INFINITY is returned
+ * \param unconn If \c true, only those pairs are considered for the calculation
+ *    between which there is a path. If \c false, \c IGRAPH_INFINITY is returned
  *    for disconnected graphs.
  * \return Error code:
  *         \clist
@@ -922,7 +922,7 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE the longest geodesic within a component
+ *        \c true the longest geodesic within a component
  *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
@@ -1094,7 +1094,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE the longest geodesic within a component
+ *        \c true the longest geodesic within a component
  *        will be returned, otherwise \c IGRAPH_INFINITY is
  *        returned.
  * \return Error code.

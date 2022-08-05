@@ -29,7 +29,6 @@
  * \function igraph_maxdegree
  * \brief The maximum degree in a graph (or set of vertices).
  *
- * </para><para>
  * The largest in-, out- or total degree of the specified vertices is
  * calculated. If the graph has no vertices, or \p vids is empty,
  * 0 is returned, as this is the smallest possible value for degrees.
@@ -51,7 +50,7 @@
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
- * Time complexity: O(v) if loops is TRUE, and O(v*d) otherwise. v is the number
+ * Time complexity: O(v) if \p loops is \c true, and O(v*d) otherwise. v is the number
  * of vertices for which the degree will be calculated, and d is their
  * (average) degree.
  */

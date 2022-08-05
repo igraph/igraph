@@ -126,7 +126,7 @@ void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h) {
  * \brief Decides whether a heap object is empty.
  *
  * \param h The heap object.
- * \return \c TRUE if the heap is empty, \c FALSE otherwise.
+ * \return \c true if the heap is empty, \c false otherwise.
  *
  * TIme complexity: O(1).
  */

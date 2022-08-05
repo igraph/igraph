@@ -131,9 +131,9 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  *     the number of spins is high the number of clusters in the
  *     result might be small.
  * \param parupdate A logical constant, whether to update all spins in
- *     parallel. The default for this argument was \c FALSE (i.e. 0) in
- *     the original code. It is not implemented in the \c
- *     IGRAPH_SPINCOMM_INP_NEG implementation.
+ *     parallel. The default for this argument was \c false in
+ *     the original code. It is not implemented in the
+ *     \c IGRAPH_SPINCOMM_INP_NEG implementation.
  * \param starttemp Real number, the temperature at the start. The
  *     value of this argument was 1.0 in the original code.
  * \param stoptemp Real number, the algorithm stops at this

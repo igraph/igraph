@@ -133,7 +133,7 @@ void FUNCTION(igraph_dqueue, clear)(TYPE(igraph_dqueue)* q) {
  * more memory.
  *
  * \param q The queue.
- * \return \c TRUE if \p q is full, \c FALSE otherwise.
+ * \return \c true if \p q is full, \c false otherwise.
  *
  * Time complecity: O(1).
  */

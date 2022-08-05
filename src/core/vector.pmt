@@ -2356,7 +2356,7 @@ void FUNCTION(igraph_vector, add_constant)(TYPE(igraph_vector) *v, BASE plus) {
  * linear search.
  * \param v The input vector.
  * \param e The element to look for.
- * \return \c TRUE if the element is found and \c FALSE otherwise.
+ * \return \c true if the element is found and \c false otherwise.
  *
  * Time complexity: O(n), the length of the vector.
  */
@@ -2390,7 +2390,7 @@ igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v,
  * \param what The element to find.
  * \param pos If not \c NULL then the index of the found element is
  *    stored here.
- * \return Boolean, \c TRUE if the element was found, \c FALSE
+ * \return Boolean, \c true if the element was found, \c false
  *   otherwise.
  *
  * Time complexity: O(m), the number of elements to search, the length
@@ -2941,8 +2941,8 @@ void FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
  *
  * Checks whether all elements of a vector are zero.
  * \param v The input vector
- * \return Boolean, \c TRUE if the vector contains only zeros, \c
- *    FALSE otherwise.
+ * \return Boolean, \c true if the vector contains only zeros, \c
+ *    false otherwise.
  *
  * Time complexity: O(n), the number of elements.
  */

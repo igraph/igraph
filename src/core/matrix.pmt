@@ -1422,7 +1422,7 @@ void FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
  *
  * Checks whether all elements are zero.
  * \param m The input matrix.
- * \return Boolean, \c TRUE is \p m contains only zeros and \c FALSE
+ * \return Boolean, \c true is \p m contains only zeros and \c false
  *   otherwise.
  *
  * Time complexity: O(mn), the number of elements.
@@ -1439,8 +1439,8 @@ igraph_bool_t FUNCTION(igraph_matrix, isnull)(const TYPE(igraph_matrix) *m) {
  * It is possible to have a matrix with zero rows or zero columns, or
  * even both. This functions checks for these.
  * \param m The input matrix.
- * \return Boolean, \c TRUE if the matrix contains zero elements, and
- *    \c FALSE otherwise.
+ * \return Boolean, \c true if the matrix contains zero elements, and
+ *    \c false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -1455,8 +1455,8 @@ igraph_bool_t FUNCTION(igraph_matrix, empty)(const TYPE(igraph_matrix) *m) {
  *
  * A non-square matrix is not symmetric by definition.
  * \param m The input matrix.
- * \return Boolean, \c TRUE if the matrix is square and symmetric, \c
- *    FALSE otherwise.
+ * \return Boolean, \c true if the matrix is square and symmetric, \c
+ *    false otherwise.
  *
  * Time complexity: O(mn), the number of elements. O(1) for non-square
  * matrices.
@@ -1574,7 +1574,7 @@ igraph_error_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
  * Search for the given element in the matrix.
  * \param m The input matrix.
  * \param e The element to search for.
- * \return Boolean, \c TRUE if the matrix contains \p e, \c FALSE
+ * \return Boolean, \c true if the matrix contains \p e, \c false
  * otherwise.
  *
  * Time complexity: O(mn), the number of elements.
@@ -1601,7 +1601,7 @@ igraph_bool_t FUNCTION(igraph_matrix, contains)(const TYPE(igraph_matrix) *m,
  *    found, then this is set to its row index.
  * \param col Pointer to an <type>igraph_integer_t</type>. If the element is
  *    found, then this is set to its column index.
- * \return Boolean, \c TRUE if the element is found, \c FALSE
+ * \return Boolean, \c true if the element is found, \c false
  *    otherwise.
  *
  * Time complexity: O(mn), the number of elements.

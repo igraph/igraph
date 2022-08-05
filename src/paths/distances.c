@@ -33,7 +33,7 @@
 
 /* When vid_ecc is not NULL, only one vertex ID should be passed in vids.
  * vid_ecc will then return the id of the vertex farthest from the one in
- * vids. If unconn == FALSE and not all other vertices were reachable from
+ * vids. If unconn == false and not all other vertices were reachable from
  * the single given vertex, -1 is returned in vid_ecc. */
 static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
@@ -419,15 +419,15 @@ igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
  * \param vid_start Id of the starting vertex. If this is negative, a
  *        random starting vertex is chosen.
  * \param from Pointer to an integer, if not \c NULL it will be set to the
- *        source vertex of the diameter path. If \p unconn is FALSE, and
+ *        source vertex of the diameter path. If \p unconn is \c false, and
  *        a disconnected graph is detected, this is set to -1.
  * \param to Pointer to an integer, if not \c NULL it will be set to the
- *        target vertex of the diameter path. If \p unconn is FALSE, and
+ *        target vertex of the diameter path. If \p unconn is \c false, and
  *        a disconnected graph is detected, this is set to -1.
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE the longest geodesic within a component
+ *        \c true the longest geodesic within a component
  *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
  * \return Error code.
  *
@@ -659,7 +659,7 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE the longest geodesic within a component
+ *        \c true the longest geodesic within a component
  *        will be returned, otherwise \c IGRAPH_INFINITY is
  *        returned.
  * \return Error code.

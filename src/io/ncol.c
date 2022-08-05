@@ -68,7 +68,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  *        the <code>.ncol</code> file. If it is not \c NULL and some unknown
  *        vertex names are found in the <code>.ncol</code> file then new vertex
  *        ids will be assigned to them.
- * \param names Logical value, if TRUE the symbolic names of the
+ * \param names Logical value, if \c true the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
  * \param weights Whether to add the weights of the edges to the

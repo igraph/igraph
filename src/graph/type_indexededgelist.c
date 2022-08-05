@@ -1080,8 +1080,8 @@ static igraph_error_t igraph_i_create_start_vectors(
  * \brief Is this a directed graph?
  *
  * \param graph The graph.
- * \return Logical value, <code>TRUE</code> if the graph is directed,
- * <code>FALSE</code> otherwise.
+ * \return Logical value, \c true if the graph is directed,
+ * \c false otherwise.
  *
  * Time complexity: O(1)
  *
@@ -1123,11 +1123,8 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
- * Time complexity: O(v) if
- * loops is
- * TRUE, and
- * O(v*d)
- * otherwise. v is the number of
+ * Time complexity: O(v) if \p loops is \c true, and
+ * O(v*d) otherwise. v is the number of
  * vertices for which the degree will be calculated, and
  * d is their (average) degree.
  *

@@ -573,15 +573,15 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
  *
  * </para><para>
  * Note that this function can operate in two modes, depending on the
- * \p multiple argument. If it is \c FALSE (i.e. 0), then a single edge is
+ * \p multiple argument. If it is \c false, then a single edge is
  * created for every non-zero element in the incidence matrix. If \p
- * multiple is \c TRUE (i.e. 1), then the matrix elements are rounded up
+ * multiple is \c true, then the matrix elements are rounded up
  * to the closest non-negative integer to get the number of edges to
  * create between a pair of vertices.
  *
  * </para><para>
  * This function does not create multiple edges if \p multiple is
- * \c FALSE, but might create some if it is \c TRUE.
+ * \c false, but might create some if it is \c true.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param types Pointer to an initialized boolean vector, or a null

@@ -1837,7 +1837,7 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
         }
     }
 
-    /* Add NaN/FALSE/"" for the existing vertices for numeric, boolean and string attributes. */
+    /* Add NaN/false/"" for the existing vertices for numeric, boolean and string attributes. */
     if (newattrs != 0) {
         for (i = 0; i < newattrs; i++) {
             igraph_attribute_record_t *tmp = VECTOR(*nattr)[ VECTOR(news)[i] ];
@@ -1935,7 +1935,7 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
                 break;
             }
         } else {
-            /* No such attribute, append NaN/FALSE/"". */
+            /* No such attribute, append NaN/false/"". */
             igraph_vector_t *oldnum = (igraph_vector_t *)oldrec->value;
             igraph_strvector_t *oldstr = (igraph_strvector_t*)oldrec->value;
             igraph_vector_bool_t *oldbool = (igraph_vector_bool_t *)oldrec->value;
@@ -3388,7 +3388,7 @@ igraph_error_t igraph_cattribute_list(const igraph_t *graph,
  * \param type The type of the attribute, \c IGRAPH_ATTRIBUTE_GRAPH,
  *        \c IGRAPH_ATTRIBUTE_VERTEX or \c IGRAPH_ATTRIBUTE_EDGE.
  * \param name Character constant, the name of the attribute.
- * \return Logical value, TRUE if the attribute exists, FALSE otherwise.
+ * \return Logical value, \c true if the attribute exists, \c false otherwise.
  *
  * Time complexity: O(A), the number of (graph, vertex or edge)
  * attributes, assuming attribute names are not too long.
