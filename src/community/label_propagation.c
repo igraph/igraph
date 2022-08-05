@@ -76,7 +76,7 @@
  *    undirected.
  * \param membership The membership vector, the result is returned here.
  *    For each vertex it gives the ID of its community (label).
- * \param mode Whether to consider edge directions for the label proppagation,
+ * \param mode Whether to consider edge directions for the label propagation,
  *    and if so, which direction the labels should propagate. Ignored for
  *    undirected graphs. \c IGRAPH_ALL means to ignore edge directions (even
  *    in directed graphs). \c IGRAPH_OUT means to propagate labels along the
