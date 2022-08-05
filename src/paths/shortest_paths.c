@@ -25,7 +25,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_memory.h"
 #include "igraph_progress.h"
-#include "igraph_qsort.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
