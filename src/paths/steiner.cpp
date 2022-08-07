@@ -260,7 +260,10 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 			igraph_vector_int_destroy(&vectorlist_2);
 			igraph_vector_int_destroy(&vectorlist_1);
 			
-			IGRAPH_FINALLY_CLEAN(2);
+			igraph_vector_int_destroy(&edgelist_1);
+			igraph_vector_int_destroy(&edgelist_2);
+
+			IGRAPH_FINALLY_CLEAN(4);
 
 			std::set<igraph_integer_t> min_F;
 			min_F.insert(F1); 
@@ -522,7 +525,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res,igraph_
 	igraph_vector_int_destroy(&vectorlist_all);
 	
 
-	IGRAPH_FINALLY_CLEAN(5);
+	IGRAPH_FINALLY_CLEAN(3);
 
 	return IGRAPH_SUCCESS;
 	
