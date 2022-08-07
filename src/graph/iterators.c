@@ -832,7 +832,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
             IGRAPH_ERROR("Cannot create sequence iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
         }
         if (vs.data.range.end < 0 || vs.data.range.end > igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create sequece iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create sequence iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
         }
         vit->type = IGRAPH_VIT_RANGE;
         vit->pos = vs.data.range.start;
@@ -2009,7 +2009,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
             IGRAPH_ERROR("Cannot create sequence iterator, starting edge ID out of range.", IGRAPH_EINVAL);
         }
         if (es.data.range.end < 0 || es.data.range.end > igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create sequece iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create sequence iterator, ending edge ID out of range.", IGRAPH_EINVAL);
         }
         eit->type = IGRAPH_EIT_RANGE;
         eit->pos = es.data.range.start;
