@@ -184,7 +184,7 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 			igraph_integer_t holder = fetchIndexofMapofSets(D);
 			for (igraph_integer_t i=1; i <= numElementsScan; i++){
 			
-				igraph_integer_t value = igraph_matrix_get(dp_cache,holder - i,k);
+				//igraph_integer_t value = igraph_matrix_get(dp_cache,holder - i,k);
 				std::set<igraph_integer_t> F = fetchSetsBasedonIndex(holder - i);
 
 				std::set<igraph_integer_t> E;
