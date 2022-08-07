@@ -98,14 +98,28 @@ std::set<igraph_integer_t> fetchSetsBasedonIndex(igraph_integer_t index)
 	return std::set<igraph_integer_t>();
 }
 
-igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vector_t *weights,
-                                       igraph_matrix_t dp_cache, igraph_integer_t indexD , igraph_integer_t q, igraph_neimode_t mode)
+igraph_integer_t factorial ( igraph_integer_t n)
 {
-	
+	igraph_integer_t answer = 1;
+	for (igraph_integer_t i = 1 ; i <= n; i ++)
+	{
+		answer *= i;
+	}
+	return answer;
+}
+
+igraph_integer_t Combination (igraph_integer_t n, igraph_integer_t r)
+{
+	return factorial(n)/ (factorial(n-r) * factorial(r));
+}
+
+
+igraph_integer_t findMinimumK (igraph_matrix_t* dp_cache, igraph_integer_t indexD, igraph_integer_t q ) {
+
 	igraph_integer_t min_col_num = -1;
 	igraph_integer_t min_sum_for_col;
 
-	for (igraph_integer_t i = 0; i < dp_cache.ncol ; i++)
+	for (igraph_integer_t i = 0; i < dp_cache->ncol ; i++)
 	{
 		if ( q != i)
 		{
@@ -113,41 +127,157 @@ igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vec
 			if (min_col_num == -1)
 			{
 				min_col_num = i;
-				min_sum_for_col = (igraph_matrix_get(&dp_cache,q,i) + igraph_matrix_get(&dp_cache,indexD,i));
+				min_sum_for_col = (igraph_matrix_get(dp_cache,q,i) + igraph_matrix_get(dp_cache,indexD,i));
 			}
-			else if ((igraph_matrix_get(&dp_cache,q,i) + igraph_matrix_get(&dp_cache,indexD,i)) < min_sum_for_col )
+			else if ((igraph_matrix_get(dp_cache,q,i) + igraph_matrix_get(dp_cache,indexD,i)) < min_sum_for_col )
 			{
 				min_col_num = i;
-				min_sum_for_col = (igraph_matrix_get(&dp_cache,q,i) + igraph_matrix_get(&dp_cache,indexD,i));
+				min_sum_for_col = (igraph_matrix_get(dp_cache,q,i) + igraph_matrix_get(dp_cache,indexD,i));
 			}
 		}
 	}
-	igraph_vector_int_t vectorlist;
-	IGRAPH_CHECK(igraph_vector_int_init(&vectorlist,1));
-	IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist);
 
-	igraph_vector_int_t edgelist;
-	IGRAPH_CHECK(igraph_vector_int_init(&edgelist,1));
-	IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist);
+	return min_col_num;
+}
 
-	igraph_get_shortest_path_dijkstra(graph,&vectorlist,&edgelist,q,min_col_num,weights,IGRAPH_ALL);
-	// for (auto i = 0 ; i < igraph_vector_int_size(&vectorlist); i++)
-	// {
-	// 	std::cout << VECTOR(vectorlist)[i] << " ";
-	// }
-	// std::cout << std::endl;
 
-	// for (auto i = 0 ; i < igraph_vector_int_size(&edgelist); i++)
-	// {
-	// 	std::cout << VECTOR(edgelist)[i] << " ";
-	// }
-	// std::cout << std::endl;
 
+static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igraph_vector_t *weights,
+                                       igraph_matrix_t* dp_cache, igraph_integer_t indexD , igraph_integer_t q, igraph_neimode_t mode,igraph_vector_int_t *vectorlist_all,igraph_vector_int_t *edgelist_all)
+{
+	
 	// igraph_integer_t combination_value  = Combination(SetD.size(), SetD.size() -1);
-	igraph_vector_int_destroy(&vectorlist);
-	igraph_vector_int_destroy(&edgelist);
+	
+	std::set<igraph_integer_t> C = fetchSetsBasedonIndex(indexD);
 
-	IGRAPH_FINALLY_CLEAN(2);
+	igraph_integer_t m = q;
+	int len = C.size();
+	std::set<igraph_integer_t> D = C;		
+
+	while(D.size() > 1) {
+	
+		indexD = fetchIndexofMapofSets(D);
+		igraph_integer_t k = findMinimumK(dp_cache,indexD,m);
+		//std::cout << "K,m" << k << ' ' << m << std::endl;
+		igraph_vector_int_t vectorlist;
+		IGRAPH_CHECK(igraph_vector_int_init(&vectorlist,1));
+		IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist);
+
+		igraph_vector_int_t edgelist;
+		IGRAPH_CHECK(igraph_vector_int_init(&edgelist,1));
+		IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist);
+
+		igraph_get_shortest_path_dijkstra(graph,&vectorlist,&edgelist,m,k,weights,IGRAPH_ALL);
+
+		//std::cout << "EdgeList" << std::endl;
+		
+
+		igraph_vector_int_append(vectorlist_all,&vectorlist);
+		igraph_vector_int_append(edgelist_all,&edgelist);
+
+		igraph_integer_t min_E_value = IGRAPH_INTEGER_MAX;
+		std::set<igraph_integer_t> min_F;
+		if (D.size() > 2) {
+			igraph_integer_t numElementsScan = Combination(len,D.size() - 1);
+			igraph_integer_t min_value = IGRAPH_INTEGER_MAX;
+			
+			igraph_integer_t holder = fetchIndexofMapofSets(D);
+			for (igraph_integer_t i=1; i <= numElementsScan; i++){
+			
+				igraph_integer_t value = igraph_matrix_get(dp_cache,holder - i,k);
+				std::set<igraph_integer_t> F = fetchSetsBasedonIndex(holder - i);
+
+				std::set<igraph_integer_t> E;
+				//std::cout << "Till Here - Fetching E" << std::endl;
+				std::set_difference(D.begin(),D.end(),F.begin(),F.end(),std::inserter(E, E.end()));
+				
+				//std::cout << "E" << *E.begin() << std::endl;
+
+				igraph_integer_t temp_value = igraph_matrix_get(dp_cache,k,*E.begin()) + igraph_matrix_get(dp_cache,k,holder - i) ;
+				
+				if (temp_value < min_value) {
+					min_value = temp_value;
+					min_E_value = *E.begin();
+					min_F = F;
+				}
+			}
+
+			igraph_vector_int_t vectorlist_1;
+			IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_1,1));
+			IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist_1);
+
+			igraph_vector_int_t edgelist_1;
+			IGRAPH_CHECK(igraph_vector_int_init(&edgelist_1,1));
+			IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist_1);
+
+			igraph_get_shortest_path_dijkstra(graph,&vectorlist_1,&edgelist_1,k,min_E_value,weights,IGRAPH_ALL);
+			
+			
+			igraph_vector_int_append(vectorlist_all,&vectorlist_1);
+			igraph_vector_int_append(edgelist_all,&edgelist_1);
+
+			igraph_vector_int_destroy(&vectorlist);
+			igraph_vector_int_destroy(&edgelist);
+			igraph_vector_int_destroy(&vectorlist_1);
+			igraph_vector_int_destroy(&edgelist_1);
+			IGRAPH_FINALLY_CLEAN(4);
+
+		}
+		else {
+			
+			igraph_integer_t E1,F1;
+
+			E1 = *D.begin();
+			F1 = *next(D.begin(),1);;	
+			
+			//std::cout << "E1:" <<E1 << std::endl;
+
+			igraph_vector_int_t vectorlist_1;
+			IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_1,1));
+			IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist_1);
+
+			igraph_vector_int_t edgelist_1;
+			IGRAPH_CHECK(igraph_vector_int_init(&edgelist_1,1));
+			IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist_1);
+
+			igraph_get_shortest_path_dijkstra(graph,&vectorlist_1,&edgelist_1,k,E1,weights,IGRAPH_ALL);
+
+			igraph_vector_int_t vectorlist_2;
+			IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_2,1));
+			IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist_2);
+
+			igraph_vector_int_t edgelist_2;
+			IGRAPH_CHECK(igraph_vector_int_init(&edgelist_2,1));
+			IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist_2);
+
+			igraph_get_shortest_path_dijkstra(graph,&vectorlist_2,&edgelist_2,k,F1,weights,IGRAPH_ALL);
+
+			igraph_vector_int_append(vectorlist_all,&vectorlist_1);
+			igraph_vector_int_append(vectorlist_all,&vectorlist_2);
+
+			igraph_vector_int_append(edgelist_all,&edgelist_1);
+			igraph_vector_int_append(edgelist_all,&edgelist_2);
+
+			igraph_vector_int_destroy(&vectorlist_2);
+			igraph_vector_int_destroy(&edgelist_2);
+			igraph_vector_int_destroy(&vectorlist_1);
+			igraph_vector_int_destroy(&edgelist_1);
+			IGRAPH_FINALLY_CLEAN(4);
+
+			std::set<igraph_integer_t> min_F;
+			min_F.insert(F1); 
+
+			//std::cout << "Got till here!" << std::endl;
+
+		}
+		
+		m = k;
+		D = min_F;			
+		
+
+	}
+	
+
 
 	return IGRAPH_SUCCESS;
 
@@ -234,10 +364,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 		//std::cout << std::endl;
 	}
 
-//	printf("Matrix Filled\n");
 	
-
-
 	allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_vertices);
 
 	for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++)
@@ -364,32 +491,44 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 		newSet.insert(VECTOR(steiner_terminals_copy)[i]);
 	}
 	igraph_integer_t indexD = fetchIndexofMapofSets(newSet);
-	generate_steiner_tree_appx(graph,weights,dp_cache,indexD,q,IGRAPH_ALL);
-	igraph_matrix_destroy(&distance);
 	
+	igraph_vector_int_t vectorlist_all;
+	igraph_vector_int_t edgelist_all;
+
+	IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_all,1));
+	IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist_all);
+
+	IGRAPH_CHECK(igraph_vector_int_init(&edgelist_all,1));
+	IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist_all);
+
+	IGRAPH_CHECK(generate_steiner_tree_appx(graph,weights,&dp_cache,indexD,q,IGRAPH_ALL,&vectorlist_all,&edgelist_all));
+	
+	/*
+	for (igraph_integer_t i =0; i< igraph_vector_int_size(&vectorlist_all); i++) {
+		std::cout << VECTOR(vectorlist_all)[i] << std::endl;
+	}
+
+	std::cout << std::endl ;
+
+	igraph_vector_int_remove(&edgelist_all,0);
+	for (igraph_integer_t i =0; i< igraph_vector_int_size(&edgelist_all); i++) {
+		std::cout << VECTOR(edgelist_all)[i] << std::endl;
+	}
+	*/
+
+
+	igraph_matrix_destroy(&distance);	
 	igraph_vector_int_destroy(&steiner_terminals_copy);
 	
 	igraph_matrix_destroy(&dp_cache);
+	igraph_vector_int_destroy(&vectorlist_all);
+	igraph_vector_int_destroy(&edgelist_all);
 
-	IGRAPH_FINALLY_CLEAN(3);
+	IGRAPH_FINALLY_CLEAN(5);
 
 	return IGRAPH_SUCCESS;
 	
 
 }
 
-igraph_integer_t factorial ( igraph_integer_t n)
-{
-	igraph_integer_t answer = 1;
-	for (igraph_integer_t i = 1 ; i <= n; i ++)
-	{
-		answer *= i;
-	}
-	return answer;
-}
-
-igraph_integer_t Combination (igraph_integer_t n, igraph_integer_t r)
-{
-	return factorial(n)/ (factorial(n-r) * factorial(r));
-}
 
