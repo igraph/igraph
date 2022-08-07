@@ -113,7 +113,7 @@ static void igraph_rng_pcg64_destroy(void *vstate) {
  *
  * </para><para>
  * The generator was ported from the original source code published by the
- * authors at https://github.com/imneme/pcg-c .
+ * authors at https://github.com/imneme/pcg-c.
  */
 
 const igraph_rng_type_t igraph_rngtype_pcg64 = {
