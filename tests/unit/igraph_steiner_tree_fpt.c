@@ -16,6 +16,9 @@
 
 #include <igraph.h>
 #include "test_utilities.h"
+#include "igraph_memory.h"
+#include "igraph_types.h"
+#include "igraph_adjlist.h"
 
 int main()
 {
@@ -97,13 +100,24 @@ int main()
     
     printf("No vertices, not directed:\n");
     igraph_real_t val1,val2;
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_ALL, &weights_empty,&val1) == IGRAPH_FAILURE);
+    igraph_vector_int_t res_tree,res_tree_1;
+    
+    IGRAPH_CHECK(igraph_vector_int_init(&res_tree,1));
+    IGRAPH_CHECK(igraph_vector_int_init(&res_tree_1,1));
+
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_ALL, &weights_empty,&val1,&res_tree) == IGRAPH_FAILURE);
     printf("%.2f\n",val1);
     IGRAPH_ASSERT(val1 == 0);
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm,&steiner_terminals, IGRAPH_ALL, &weights_lm,&val2) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm,&steiner_terminals, IGRAPH_ALL, &weights_lm,&val2,&res_tree_1) == IGRAPH_SUCCESS);
     printf("%.2f\n",val2);
     IGRAPH_ASSERT(val2 == 5);
+    
+    for (igraph_integer_t i=0; i < igraph_vector_int_size(&res_tree_1); ++i){
+      printf("%d,",VECTOR(res_tree_1)[i]);
+    }
+
+
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
     igraph_vector_destroy(&weights_empty);

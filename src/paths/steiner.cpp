@@ -16,7 +16,7 @@
 
 std::map<std::set<igraph_integer_t>, igraph_integer_t> subsetMap;
 
-void printSubsets(std::set<std::set<igraph_integer_t>> allSubsets)
+static void printSubsets(std::set<std::set<igraph_integer_t>> allSubsets)
 {
 	printf("Subsets :\n{\n");
 	for (auto i = allSubsets.begin() ; i != allSubsets.end() ; ++i )
@@ -216,11 +216,10 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 			igraph_vector_int_append(vectorlist_all,&vectorlist_1);
 			igraph_vector_int_append(edgelist_all,&edgelist_1);
 
-			igraph_vector_int_destroy(&vectorlist);
-			igraph_vector_int_destroy(&edgelist);
+		
 			igraph_vector_int_destroy(&vectorlist_1);
 			igraph_vector_int_destroy(&edgelist_1);
-			IGRAPH_FINALLY_CLEAN(4);
+			IGRAPH_FINALLY_CLEAN(2);
 
 		}
 		else {
@@ -259,10 +258,9 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 			igraph_vector_int_append(edgelist_all,&edgelist_2);
 
 			igraph_vector_int_destroy(&vectorlist_2);
-			igraph_vector_int_destroy(&edgelist_2);
 			igraph_vector_int_destroy(&vectorlist_1);
-			igraph_vector_int_destroy(&edgelist_1);
-			IGRAPH_FINALLY_CLEAN(4);
+			
+			IGRAPH_FINALLY_CLEAN(2);
 
 			std::set<igraph_integer_t> min_F;
 			min_F.insert(F1); 
@@ -274,7 +272,9 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 		m = k;
 		D = min_F;			
 		
-
+		igraph_vector_int_destroy(&vectorlist);
+		igraph_vector_int_destroy(&edgelist);
+		IGRAPH_FINALLY_CLEAN(2);
 	}
 	
 
@@ -285,7 +285,7 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,const igraph_vector_int_t* steiner_terminals,
-igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
+igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res,igraph_vector_int_t *res_tree)
 {
 	if (mode != IGRAPH_ALL)
 	{
@@ -493,16 +493,14 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 	igraph_integer_t indexD = fetchIndexofMapofSets(newSet);
 	
 	igraph_vector_int_t vectorlist_all;
-	igraph_vector_int_t edgelist_all;
+	
 
 	IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_all,1));
-	IGRAPH_FINALLY(igraph_vector_int_destroy,&vectorlist_all);
-
-	IGRAPH_CHECK(igraph_vector_int_init(&edgelist_all,1));
-	IGRAPH_FINALLY(igraph_vector_int_destroy,&edgelist_all);
-
-	IGRAPH_CHECK(generate_steiner_tree_appx(graph,weights,&dp_cache,indexD,q,IGRAPH_ALL,&vectorlist_all,&edgelist_all));
 	
+
+	IGRAPH_CHECK(generate_steiner_tree_appx(graph,weights,&dp_cache,indexD,q,IGRAPH_ALL,&vectorlist_all,res_tree));
+	igraph_vector_int_remove(res_tree,0);
+
 	/*
 	for (igraph_integer_t i =0; i< igraph_vector_int_size(&vectorlist_all); i++) {
 		std::cout << VECTOR(vectorlist_all)[i] << std::endl;
@@ -510,7 +508,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 
 	std::cout << std::endl ;
 
-	igraph_vector_int_remove(&edgelist_all,0);
+	
 	for (igraph_integer_t i =0; i< igraph_vector_int_size(&edgelist_all); i++) {
 		std::cout << VECTOR(edgelist_all)[i] << std::endl;
 	}
@@ -522,7 +520,7 @@ igraph_neimode_t mode, const igraph_vector_t *weights,igraph_real_t *res)
 	
 	igraph_matrix_destroy(&dp_cache);
 	igraph_vector_int_destroy(&vectorlist_all);
-	igraph_vector_int_destroy(&edgelist_all);
+	
 
 	IGRAPH_FINALLY_CLEAN(5);
 
