@@ -23,11 +23,19 @@
 #include <stdio.h>
 #include <unistd.h>     /* unlink */
 
+void igraph_stdwar_print_warning(const char *reason, const char *file,
+                                 int line) {
+    fprintf(stdout,
+        "STDWAR: Warning at %s:%i : %s\n", file, line, reason);
+}
+
 int main() {
     igraph_t g;
-    igraph_error_handler_t* oldhandler;
+    igraph_error_handler_t* olderrorhandler;
     int result;
     FILE *ifile, *ofile;
+
+    igraph_set_warning_handler(igraph_stdwar_print_warning);
 
     igraph_set_attribute_table(&igraph_cattribute_table);
 
@@ -39,7 +47,7 @@ int main() {
 
     /* GraphML support is an optional feature so we disable the error handler
      * temporarily to handle the case when it is not implemented */
-    oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
+    olderrorhandler = igraph_set_error_handler(igraph_error_handler_ignore);
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         /* maybe it is simply disabled at compile-time */
         if (result == IGRAPH_UNIMPLEMENTED) {
@@ -47,7 +55,7 @@ int main() {
         }
         return 1;
     }
-    igraph_set_error_handler(oldhandler);
+    igraph_set_error_handler(olderrorhandler);
 
     fclose(ifile);
 

@@ -2,7 +2,10 @@
 #include <igraph.h>
 
 #include <locale.h>
+#include <string.h>
 #include <stdio.h>
+
+#define LOCNAME "de_DE"
 
 int main() {
     const char *filename = "weighted.gml";
@@ -12,11 +15,13 @@ int main() {
     /* Attempt to set a locale that uses a decimal comma. Locale names
      * differ between platforms, and not all locales are available,
      * so the locale change may not be successful. */
-    const char *locname = setlocale(LC_ALL, "de_DE");
+    const char *locname = setlocale(LC_ALL, LOCNAME);
     struct lconv *lc = localeconv();
-    fprintf(stderr, "setlocale() returned '%s', decimal point is '%s'\n",
-            locname ? locname : "NULL",
-            lc->decimal_point);
+    if ((locname == NULL) || (strcmp(locname, LOCNAME))) {
+        fprintf(stderr, "Warning: setlocale() returned '%s', decimal point is '%s'\n",
+              locname ? locname : "NULL",
+              lc->decimal_point);
+    }
 
     FILE *file = fopen(filename, "r");
     if (! file) {
