@@ -13,6 +13,7 @@
 #include <set>
 #include <iostream>
 #include <algorithm>
+#include <iterator>
 
 std::map<std::set<igraph_integer_t>, igraph_integer_t> subsetMap;
 
