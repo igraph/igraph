@@ -154,7 +154,7 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 	igraph_integer_t m = q;
 	int len = C.size();
 	std::set<igraph_integer_t> D = C;		
-
+	
 	while(D.size() > 1) {
 	
 		indexD = fetchIndexofMapofSets(D);
@@ -180,7 +180,7 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 		std::set<igraph_integer_t> min_F;
 		if (D.size() > 2) {
 			igraph_integer_t numElementsScan = Combination(len,D.size() - 1);
-			igraph_integer_t min_value = IGRAPH_INTEGER_MAX;
+			igraph_real_t min_value = IGRAPH_INFINITY;
 			
 			igraph_integer_t holder = fetchIndexofMapofSets(D);
 			for (igraph_integer_t i=1; i <= numElementsScan; i++){
@@ -193,8 +193,7 @@ static igraph_error_t generate_steiner_tree_appx(const igraph_t* graph,const igr
 				std::set_difference(D.begin(),D.end(),F.begin(),F.end(),std::inserter(E, E.end()));
 				
 				//std::cout << "E" << *E.begin() << std::endl;
-
-				igraph_integer_t temp_value = igraph_matrix_get(dp_cache,k,*E.begin()) + igraph_matrix_get(dp_cache,k,holder - i) ;
+				igraph_real_t temp_value = igraph_matrix_get(dp_cache,*E.begin(),k) + igraph_matrix_get(dp_cache,holder - i,k) ;
 				
 				if (temp_value < min_value) {
 					min_value = temp_value;
