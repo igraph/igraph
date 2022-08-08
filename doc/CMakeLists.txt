@@ -240,7 +240,11 @@ if(DOC_BUILD_SUPPORTED)
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/html/*.png ${CMAKE_CURRENT_BINARY_DIR}/html
       COMMAND ${CMAKE_COMMAND} -E touch ${HTML_STAMP}
       MAIN_DEPENDENCY igraph-docs.xml
-      DEPENDS docxml
+      # The DEPENDS clause below needs to list both the xmlstamp file and the
+      # target that creates it. The former is needed to make Ninja rebuild the
+      # HTML files if the source is modified. The latter is needed to make the
+      # XCode build system happy.
+      DEPENDS ${DOCXML_STAMP} docxml
       COMMENT "Generating HTML documentation with xmlto"
     )
 
@@ -265,7 +269,11 @@ if(DOC_BUILD_SUPPORTED)
       ARGS
       -E remove igraph-docs-with-resolved-includes-tmp.xml
       MAIN_DEPENDENCY igraph-docs.xml
-      DEPENDS docxml
+      # The DEPENDS clause below needs to list both the xmlstamp file and the
+      # target that creates it. The former is needed to make Ninja rebuild the
+      # PDF file if the source is modified. The latter is needed to make the
+      # XCode build system happy.
+      DEPENDS ${DOCXML_STAMP} docxml
       COMMENT "Resolving includes in DocBook XML source"
     )
 
