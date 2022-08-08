@@ -268,13 +268,6 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_feedback_arc_set_undirected
-  igraph_rewire # Uses internal igraph_i_rewire
-  igraph_unfold_tree
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
   coreness
@@ -292,12 +285,15 @@ add_legacy_tests(
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
+  igraph_diameter
+  igraph_diameter_dijkstra
   igraph_diversity
   igraph_distances_johnson
   igraph_eccentricity
   igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
+  igraph_feedback_arc_set_undirected
   igraph_get_all_simple_paths
   igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
@@ -326,9 +322,11 @@ add_legacy_tests(
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
+  igraph_rewire # Uses internal igraph_i_rewire
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
+  igraph_unfold_tree
   igraph_widest_paths
   harmonic_centrality
   random_spanning_tree
