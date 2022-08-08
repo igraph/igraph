@@ -1323,10 +1323,7 @@ igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, in
 
     va_start(ap, first);
     num = first;
-    while (1) {
-        if (num == -1) {
-            break;
-        }
+    while (num != -1) {
         n++;
         num = va_arg(ap, int);
     }
@@ -1399,10 +1396,7 @@ igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int
 
     va_start(ap, first);
     num = first;
-    while (1) {
-        if (num == -1) {
-            break;
-        }
+    while (num != -1) {
         n++;
         num = va_arg(ap, int);
     }
