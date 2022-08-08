@@ -1305,6 +1305,10 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
  *
  * \param es Pointer to an uninitialized edge selector object.
  * \param directed Whether the graph is directed or not.
+ * \param ... The additional arguments give the edges to be included in the
+ *        selector, as pairs of vertex IDs. The last argument must be -1.
+ *        The \p first parameter is present for technical reasons and represents
+ *        the first variadic argument.
  * \return Error code.
  * \sa \ref igraph_es_pairs(), \ref igraph_es_destroy()
  *

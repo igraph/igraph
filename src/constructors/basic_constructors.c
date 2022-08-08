@@ -120,7 +120,8 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  *        \endclist
  * \param ... The additional arguments giving the edges of the
  *        graph. Don't forget to supply an additional '-1' after the last
- *        (meaningful) argument.
+ *        (meaningful) argument. The \p first parameter is present for
+ *        technical reasons and represents the first variadic argument.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
