@@ -285,6 +285,12 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
  */
 
 igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_integer_t n) {
+    if (n < 0) {
+        IGRAPH_ERRORF("Number of vertices should be non-negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
+    }
+    if (n == 0) {
+        n = 1;
+    }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->left,      n - 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&hrg->right,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY    (&hrg->prob,      n - 1);
