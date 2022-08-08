@@ -114,7 +114,7 @@ int main()
     IGRAPH_ASSERT(val2 == 5);
     
     for (igraph_integer_t i=0; i < igraph_vector_int_size(&res_tree_1); ++i){
-      printf("%d,",VECTOR(res_tree_1)[i]);
+      printf("%"IGRAPH_PRId",",VECTOR(res_tree_1)[i]);
     }
 
 
