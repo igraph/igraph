@@ -297,11 +297,11 @@ IGRAPH_EXPORT igraph_error_t igraph_es_vector_copy(igraph_es_t *es, const igraph
 
 IGRAPH_EXPORT igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
                                   igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...);
+IGRAPH_EXPORT igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, int first, ...);
 
 IGRAPH_EXPORT igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
                                  igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...);
+IGRAPH_EXPORT igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int first, ...);
 
 IGRAPH_EXPORT igraph_error_t igraph_es_all_between(
     igraph_es_t *es, igraph_integer_t from, igraph_integer_t to,

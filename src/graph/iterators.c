@@ -1311,32 +1311,37 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
  * Time complexity: O(n), the number of edges being selected.
  */
 
-igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, int first, ...) {
     va_list ap;
     igraph_integer_t i, n = 0;
     igraph_vector_int_t *vec;
+    int num;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
-    va_start(ap, directed);
+    va_start(ap, first);
+    num = first;
     while (1) {
-        int num = va_arg(ap, int);
         if (num == -1) {
             break;
         }
         n++;
+        num = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
-    va_start(ap, directed);
-    for (i = 0; i < n; i++) {
-        VECTOR(*vec)[i] = va_arg(ap, int);
+    if (n > 0) {
+        va_start(ap, first);
+        VECTOR(*vec)[0] = first;
+        for (i = 1; i < n; i++) {
+            VECTOR(*vec)[i] = va_arg(ap, int);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -1382,32 +1387,37 @@ igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int first, ...) {
     va_list ap;
     igraph_integer_t i, n = 0;
     igraph_vector_int_t *vec;
+    int num;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
-    va_start(ap, directed);
+    va_start(ap, first);
+    num = first;
     while (1) {
-        int num = va_arg(ap, int);
         if (num == -1) {
             break;
         }
         n++;
+        num = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
-    va_start(ap, directed);
-    for (i = 0; i < n; i++) {
-        VECTOR(*vec)[i] = va_arg(ap, int);
+    if (n > 0) {
+        va_start(ap, first);
+        VECTOR(*vec)[0] = first;
+        for (i = 1; i < n; i++) {
+            VECTOR(*vec)[i] = va_arg(ap, int);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
 
