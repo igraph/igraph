@@ -126,7 +126,8 @@ int main()
     igraph_vector_int_destroy(&steiner_terminals);
     igraph_vector_int_destroy(&steiner_terminals_null);
 
-   
+   igraph_vector_int_destroy(&res_tree);
+   igraph_vector_int_destroy(&res_tree_1);
 
     VERIFY_FINALLY_STACK();
     
