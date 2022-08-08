@@ -6,7 +6,6 @@ if(MSVC)
 endif()
 
 if (NOT MSVC)
-  check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
   check_c_compiler_flag("-Wno-unknown-warning-option" COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG)
 endif()
 
@@ -46,7 +45,6 @@ macro(use_all_warnings TARGET_NAME)
         -Wall -Wextra -pedantic
         -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
       >
-      $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
       $<$<BOOL:${COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
