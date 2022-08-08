@@ -130,19 +130,17 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  */
 
 igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
-                 ...) {
+                            int first, ...) {
     igraph_vector_int_t edges;
     va_list ap;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    va_start(ap, directed);
-    while (1) {
-        int num = va_arg(ap, int);
-        if (num == -1) {
-            break;
-        }
+    va_start(ap, first);
+    int num = first;
+    while (num != -1) {
         igraph_vector_int_push_back(&edges, num);
+        num = va_arg(ap, int);
     }
     va_end(ap);
 
