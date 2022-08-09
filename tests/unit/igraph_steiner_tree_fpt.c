@@ -99,7 +99,8 @@ int main()
                                                 -1);
     
     //printf("No vertices, not directed:\n");
-    igraph_real_t val1,val2;
+    //igraph_real_t val1,val2;
+    igraph_real_t val2;
     igraph_vector_int_t res_tree,res_tree_1;
     
     IGRAPH_CHECK(igraph_vector_int_init(&res_tree,1));
