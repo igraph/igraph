@@ -14,7 +14,7 @@ igraph_empty:
     PARAMS: OUT GRAPH graph, INTEGER n=0, BOOLEAN directed=True
 
 igraph_add_edges:
-    PARAMS: INOUT GRAPH graph, VECTOR_INT edges, ATTRIBUTES attr
+    PARAMS: INOUT GRAPH graph, VERTEX_INDEX_PAIRS edges, ATTRIBUTES attr
 
 igraph_add_vertices:
     PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
@@ -23,16 +23,16 @@ igraph_copy:
     PARAMS: OUT GRAPH to, IN GRAPH from
 
 igraph_delete_edges:
-    PARAMS: INOUT GRAPH graph, EDGESET edges
+    PARAMS: INOUT GRAPH graph, EDGE_SELECTOR edges
     DEPS: edges ON graph
 
 igraph_delete_vertices:
-    PARAMS: INOUT GRAPH graph, VERTEXSET vertices
+    PARAMS: INOUT GRAPH graph, VERTEX_SELECTOR vertices
     DEPS: vertices ON graph
 
 igraph_delete_vertices_idx:
     PARAMS: |-
-        INOUT GRAPH graph, VERTEXSET vertices,
+        INOUT GRAPH graph, VERTEX_SELECTOR vertices,
         OPTIONAL OUT VECTOR_INT idx,
         OPTIONAL OUT VECTOR_INT invidx
     DEPS: vertices ON graph
@@ -46,7 +46,7 @@ igraph_ecount:
     RETURN: INTEGER
 
 igraph_neighbors:
-    PARAMS: GRAPH graph, OUT VERTEXSET neis, VERTEX vid, NEIMODE mode=ALL
+    PARAMS: GRAPH graph, OUT VERTEX_INDICES neis, VERTEX vid, NEIMODE mode=ALL
 
 igraph_is_directed:
     PARAMS: GRAPH graph
@@ -54,7 +54,7 @@ igraph_is_directed:
 
 igraph_degree:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR_INT res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT VECTOR_INT res, VERTEX_SELECTOR vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops
     DEPS: vids ON graph
 
@@ -62,7 +62,7 @@ igraph_edge:
     PARAMS: GRAPH graph, INTEGER eid, OUT INTEGER from, OUT INTEGER to
 
 igraph_edges:
-    PARAMS: GRAPH graph, EDGESET eids, OUT VECTOR_INT edges
+    PARAMS: GRAPH graph, EDGE_SELECTOR eids, OUT VECTOR_INT edges
     DEPS: eids ON graph
 
 igraph_empty_attrs:
@@ -75,16 +75,16 @@ igraph_get_eid:
 
 igraph_get_eids:
     PARAMS: |-
-        GRAPH graph, OUT EDGESET eids, VECTOR_INT pairs,
+        GRAPH graph, OUT EDGE_INDICES eids, VECTOR_INT pairs,
         BOOLEAN directed=True, BOOLEAN error=True
 
 igraph_get_all_eids_between:
     PARAMS: |-
-        GRAPH graph, OUT EDGESET eids, VERTEX from, VERTEX to,
+        GRAPH graph, OUT EDGE_INDICES eids, VERTEX from, VERTEX to,
         BOOLEAN directed=True
 
 igraph_incident:
-    PARAMS: GRAPH graph, OUT EDGESET eids, VERTEX vid, NEIMODE mode=ALL
+    PARAMS: GRAPH graph, OUT EDGE_INDICES eids, VERTEX vid, NEIMODE mode=ALL
 
 igraph_is_same_graph:
     PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN res
@@ -424,7 +424,7 @@ igraph_closeness:
         GRAPH graph, OUT VERTEX_QTY res,
         OPTIONAL OUT VECTOR_INT reachable_count,
         OPTIONAL OUT BOOLEAN all_reachable,
-        VERTEXSET vids=ALL,
+        VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False
     DEPS: vids ON graph, weights ON graph, res ON graph vids
@@ -434,15 +434,15 @@ igraph_closeness_cutoff:
         GRAPH graph, OUT VERTEX_QTY res,
         OPTIONAL OUT VECTOR_INT reachable_count,
         OPTIONAL OUT BOOLEAN all_reachable,
-        VERTEXSET vids=ALL,
+        VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL,
         BOOLEAN normalized=False, REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_distances:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
-        VERTEXSET to=ALL, NEIMODE mode=OUT
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph
 
 igraph_get_shortest_path:
@@ -470,7 +470,7 @@ igraph_get_shortest_paths:
     PARAMS: |-
         GRAPH graph,
         OPTIONAL OUT VERTEXSET_LIST vertices, OPTIONAL OUT EDGESET_LIST edges,
-        VERTEX from, VERTEXSET to=ALL, NEIMODE mode=OUT,
+        VERTEX from, VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT,
         OPTIONAL OUT VECTOR_INT parents,
         OPTIONAL OUT VECTOR_INT inbound_edges
     DEPS: edges ON graph, from ON graph, to ON graph
@@ -479,19 +479,19 @@ igraph_get_all_shortest_paths:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
-        VERTEX from, VERTEXSET to, NEIMODE mode=OUT
+        VERTEX from, VERTEX_SELECTOR to, NEIMODE mode=OUT
     DEPS: edges ON graph, from ON graph, to ON graph
 
 igraph_distances_dijkstra:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
-        VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_shortest_paths_dijkstra:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
-        OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEXSET to=ALL,
+        OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEX_SELECTOR to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
         OPTIONAL OUT VECTOR_INT parents=0,
         OPTIONAL OUT VECTOR_INT inbound_edges=0
@@ -502,7 +502,7 @@ igraph_get_shortest_paths_dijkstra:
 igraph_get_shortest_paths_bellman_ford:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
-        OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEXSET to=ALL,
+        OPTIONAL OUT EDGESET_LIST edges, VERTEX from, VERTEX_SELECTOR to=ALL,
         EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
         OPTIONAL OUT VECTOR_INT parents=0,
         OPTIONAL OUT VECTOR_INT inbound_edges=0
@@ -514,27 +514,27 @@ igraph_get_all_shortest_paths_dijkstra:
     PARAMS: |-
         GRAPH graph, OPTIONAL OUT VERTEXSET_LIST vertices,
         OPTIONAL OUT EDGESET_LIST edges, OPTIONAL OUT VECTOR_INT nrgeo,
-        VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights,
+        VERTEX from, VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights,
         NEIMODE mode=OUT
     DEPS: |-
         weights ON graph, from ON graph, to ON graph, vertices ON graph, edges ON graph
 
 igraph_distances_bellman_ford:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
-        VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_distances_johnson:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
-        VERTEXSET to=ALL, EDGEWEIGHTS weights
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_all_simple_paths:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSET res, VERTEX from,
-        VERTEXSET to=ALL, INTEGER cutoff=-1, NEIMODE mode=OUT
+        GRAPH graph, OUT VERTEX_INDICES res, VERTEX from,
+        VERTEX_SELECTOR to=ALL, INTEGER cutoff=-1, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, res ON graph
 
 igraph_get_k_shortest_paths:
@@ -558,7 +558,7 @@ igraph_get_widest_paths:
     PARAMS: |-
         GRAPH graph,
         OPTIONAL OUT VERTEXSET_LIST vertices, OPTIONAL OUT EDGESET_LIST edges,
-        VERTEX from, VERTEXSET to=ALL, EDGEWEIGHTS weights=NULL,
+        VERTEX from, VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights=NULL,
         NEIMODE mode=OUT, OPTIONAL OUT VECTOR_INT parents,
         OPTIONAL OUT VECTOR_INT inbound_edges
     DEPS: |-
@@ -567,44 +567,42 @@ igraph_get_widest_paths:
 
 igraph_widest_path_widths_dijkstra:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
-        VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_widest_path_widths_floyd_warshall:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL,
-        VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_spanner:
     PARAMS: |-
-        GRAPH graph, OUT EDGESET spanner, REAL stretch, EDGEWEIGHTS weights
+        GRAPH graph, OUT EDGE_INDICES spanner, REAL stretch, EDGEWEIGHTS weights
     DEPS: weights ON graph
 
 igraph_subcomponent:
-    # TODO(ntamas): vid is a double; this is correct but this is actually
-    # a mistake in 0.9.x. This should be fixed in 0.10.
-    PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
+    PARAMS: GRAPH graph, OUT VERTEX_INDICES res, VERTEX vid, NEIMODE mode=ALL
     DEPS: vid ON graph, res ON graph
 
 igraph_betweenness:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_betweenness_cutoff:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         BOOLEAN directed=True, EDGEWEIGHTS weights=NULL,
         REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
 igraph_betweenness_subset:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
-        BOOLEAN directed=True, VERTEXSET sources=ALL, VERTEXSET targets=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
+        BOOLEAN directed=True, VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL,
         EDGEWEIGHTS weights=NULL
     DEPS: |-
         vids ON graph, weights ON graph, res ON graph, sources ON graph, targets ON graph
@@ -623,21 +621,21 @@ igraph_edge_betweenness_cutoff:
 
 igraph_edge_betweenness_subset:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, EDGESET eids=ALL,
-        BOOLEAN directed=True, VERTEXSET sources=ALL, VERTEXSET targets=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, EDGE_SELECTOR eids=ALL,
+        BOOLEAN directed=True, VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL,
         EDGEWEIGHTS weights=NULL
     DEPS: |-
         eids ON graph, weights ON graph, res ON graph, sources ON graph, targets ON graph
 
 igraph_harmonic_centrality:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_harmonic_centrality_cutoff:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, BOOLEAN normalized=False,
         REAL cutoff=-1
     DEPS: vids ON graph, weights ON graph, res ON graph vids
@@ -646,7 +644,7 @@ igraph_pagerank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         OUT VERTEX_QTY vector, OUT REAL value,
-        VERTEXSET vids=ALL, BOOLEAN directed=True,
+        VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85, EDGEWEIGHTS weights=NULL,
         INOUT PAGERANKOPT options=NULL
     DEPS: |-
@@ -657,7 +655,7 @@ igraph_personalized_pagerank:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         OUT VERTEX_QTY vector, OUT REAL value,
-        VERTEXSET vids=ALL, BOOLEAN directed=True,
+        VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85, OPTIONAL VECTOR personalized,
         OPTIONAL EDGEWEIGHTS weights,
         INOUT PAGERANKOPT options=NULL
@@ -669,9 +667,9 @@ igraph_personalized_pagerank_vs:
     PARAMS: |-
         GRAPH graph, PAGERANKALGO algo=PRPACK,
         PRIMARY OUT VERTEX_QTY vector, OUT REAL value,
-        VERTEXSET vids=ALL, BOOLEAN directed=True,
+        VERTEX_SELECTOR vids=ALL, BOOLEAN directed=True,
         REAL damping=0.85,
-        VERTEXSET reset_vids,
+        VERTEX_SELECTOR reset_vids,
         OPTIONAL EDGEWEIGHTS weights=NULL,
         INOUT PAGERANKOPT options=NULL
     DEPS: |-
@@ -682,15 +680,15 @@ igraph_rewire:
     PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRING_MODE mode=SIMPLE
 
 igraph_induced_subgraph:
-    PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl=AUTO
+    PARAMS: GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl=AUTO
     DEPS: vids ON graph
 
 igraph_subgraph_edges:
-    PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
+    PARAMS: GRAPH graph, OUT GRAPH res, EDGE_SELECTOR eids, BOOLEAN delete_vertices=True
     DEPS: eids ON graph
 
 igraph_reverse_edges:
-    PARAMS: INOUT GRAPH graph, EDGESET eids=ALL
+    PARAMS: INOUT GRAPH graph, EDGE_SELECTOR eids=ALL
     DEPS: eids ON graph
 
 igraph_average_path_length:
@@ -717,14 +715,14 @@ igraph_transitivity_undirected:
     PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITY_MODE mode=NAN
 
 igraph_transitivity_local_undirected:
-    PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, TRANSITIVITY_MODE mode=NAN
+    PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL, TRANSITIVITY_MODE mode=NAN
 
 igraph_transitivity_avglocal_undirected:
     PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITY_MODE mode=NAN
 
 igraph_transitivity_barrat:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL,
         EDGEWEIGHTS weights=NULL, TRANSITIVITY_MODE mode=NAN
     DEPS: res ON graph, vids ON graph, weights ON graph
 
@@ -734,12 +732,12 @@ igraph_reciprocity:
         RECIP mode=Default
 
 igraph_constraint:
-    PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, OPTIONAL EDGEWEIGHTS weights
+    PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL, OPTIONAL EDGEWEIGHTS weights
     DEPS: vids ON graph, weights ON graph
 
 igraph_maxdegree:
     PARAMS: |-
-        GRAPH graph, OUT INTEGER res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT INTEGER res, VERTEX_SELECTOR vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=True
     DEPS: vids ON graph
 
@@ -748,20 +746,20 @@ igraph_density:
 
 igraph_neighborhood_size:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR_INT res, VERTEXSET vids, INTEGER order,
+        GRAPH graph, OUT VECTOR_INT res, VERTEX_SELECTOR vids, INTEGER order,
         NEIMODE mode=ALL, INTEGER mindist=0
     DEPS: vids ON graph
 
 igraph_neighborhood:
     PARAMS: |-
         GRAPH graph, OUT VERTEXSET_LIST res,
-        VERTEXSET vids, INTEGER order,
+        VERTEX_SELECTOR vids, INTEGER order,
         NEIMODE mode=ALL, INTEGER mindist=0
     DEPS: res ON graph, vids ON graph
 
 igraph_neighborhood_graphs:
     PARAMS: |-
-        GRAPH graph, OUT GRAPH_LIST res, VERTEXSET vids,
+        GRAPH graph, OUT GRAPH_LIST res, VERTEX_SELECTOR vids,
         INTEGER order,
         NEIMODE mode=ALL, INTEGER mindist=0
     DEPS: vids ON graph
@@ -772,11 +770,11 @@ igraph_topological_sorting:
 igraph_feedback_arc_set:
     # Default algorithm is the approximate method because it is faster and the
     # function is _not_ called igraph_minimum_feedback_arc_set
-    PARAMS: GRAPH graph, OUT EDGESET result, EDGEWEIGHTS weights=NULL, FAS_ALGORITHM algo=APPROX_EADES
+    PARAMS: GRAPH graph, OUT EDGE_INDICES result, EDGEWEIGHTS weights=NULL, FAS_ALGORITHM algo=APPROX_EADES
     DEPS: result ON graph, weights ON graph
 
 igraph_is_loop:
-    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGE_SELECTOR es=ALL
     DEPS: es ON graph
 
 igraph_is_dag:
@@ -789,7 +787,7 @@ igraph_is_simple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_is_multiple:
-    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGE_SELECTOR es=ALL
     DEPS: es ON graph
 
 igraph_has_loop:
@@ -799,11 +797,11 @@ igraph_has_multiple:
     PARAMS: GRAPH graph, OUT BOOLEAN res
 
 igraph_count_multiple:
-    PARAMS: GRAPH graph, OUT VECTOR_INT res, EDGESET es=ALL
+    PARAMS: GRAPH graph, OUT VECTOR_INT res, EDGE_SELECTOR es=ALL
     DEPS: es ON graph
 
 igraph_girth:
-    PARAMS: GRAPH graph, OUT REAL girth, OUT VERTEXSET circle
+    PARAMS: GRAPH graph, OUT REAL girth, OUT VERTEX_INDICES circle
     DEPS: circle ON graph
 
 igraph_is_perfect:
@@ -840,32 +838,13 @@ igraph_hub_and_authority_scores:
         OUT REAL value, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
         INOUT ARPACKOPT options=arpack_defaults
 
-igraph_arpack_rssolve:
-    # TODO(ntamas): this should probably not be exposed to higher-level
-    # interfaces; igraph's goal is not to provide an ARPACK wrapper
-    PARAMS: |-
-        ARPACKFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
-        INOUT ARPACKSTORAGE storage, OPTIONAL OUT VECTOR values, OPTIONAL OUT MATRIX vectors
-
-igraph_arpack_rnsolve:
-    # TODO(ntamas): this should probably not be exposed to higher-level
-    # interfaces; igraph's goal is not to provide an ARPACK wrapper
-    PARAMS: |-
-        ARPACKFUNC fun, EXTRA extra, INOUT ARPACKOPT options=arpack_defaults,
-        INOUT ARPACKSTORAGE storage, OPTIONAL OUT MATRIX values, OPTIONAL OUT MATRIX vectors
-
-igraph_arpack_unpack_complex:
-    # TODO(ntamas): this should probably not be exposed to higher-level
-    # interfaces; igraph's goal is not to provide an ARPACK wrapper
-    PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
-
 igraph_unfold_tree:
     PARAMS: |-
         GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR_INT roots,
         OPTIONAL OUT INDEX_VECTOR vertex_index
 
 igraph_is_mutual:
-    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL, BOOLEAN loops=True
+    PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGE_SELECTOR es=ALL, BOOLEAN loops=True
     DEPS: es ON graph
 
 igraph_has_mutual:
@@ -884,7 +863,7 @@ igraph_is_chordal:
 
 igraph_avg_nearest_neighbor_degree:
     PARAMS: |-
-        GRAPH graph, VERTEXSET vids=ALL,
+        GRAPH graph, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL, NEIMODE neighbor_degree_mode=ALL,
         OPTIONAL OUT VERTEX_QTY knn, OPTIONAL OUT VECTOR knnk,
         EDGEWEIGHTS weights=NULL
@@ -892,7 +871,7 @@ igraph_avg_nearest_neighbor_degree:
 
 igraph_strength:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL, BOOLEAN loops=True, EDGEWEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
@@ -974,14 +953,14 @@ igraph_contract_vertices:
 
 igraph_eccentricity:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL
     DEPS: vids ON graph, res ON graph vids
 
 igraph_eccentricity_dijkstra:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL,
-        OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         NEIMODE mode=ALL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
@@ -1012,18 +991,18 @@ igraph_pseudo_diameter_dijkstra:
 igraph_diversity:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEX_QTY res,
-        VERTEXSET vids=ALL
+        VERTEX_SELECTOR vids=ALL
     DEPS: weights ON graph, vids ON graph, res ON graph vids
 
 igraph_random_walk:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEXSET vertices, OUT EDGESET edges,
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEX_INDICES vertices, OUT EDGE_INDICES edges,
         VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
     DEPS: start ON graph, weights ON graph, vertices ON graph, edges ON graph
 
 igraph_random_edge_walk:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT EDGESET edgewalk,
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT EDGE_INDICES edgewalk,
         VERTEX start, NEIMODE mode=OUT, INTEGER steps, RWSTUCK stuck=RETURN
     DEPS: start ON graph, weights ON graph, edgewalk ON graph
 
@@ -1033,7 +1012,7 @@ igraph_global_efficiency:
 
 igraph_local_efficiency:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, VERTEXSET vids=ALL,
+        GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
         EDGEWEIGHTS weights=NULL, BOOLEAN directed=True, NEIMODE mode=ALL
     DEPS: vids ON graph, weights ON graph, res ON graph vids
 
@@ -1184,7 +1163,7 @@ igraph_decompose:
         INTEGER maxcompno=-1, INTEGER minelements=1
 
 igraph_articulation_points:
-    PARAMS: GRAPH graph, OUT VERTEXSET res
+    PARAMS: GRAPH graph, OUT VERTEX_INDICES res
     DEPS: res ON graph
 
 igraph_biconnected_components:
@@ -1193,13 +1172,13 @@ igraph_biconnected_components:
         OPTIONAL OUT EDGESET_LIST tree_edges,
         OPTIONAL OUT EDGESET_LIST component_edges,
         OPTIONAL OUT VERTEXSET_LIST components,
-        OUT VERTEXSET articulation_points
+        OUT VERTEX_INDICES articulation_points
     DEPS: |-
         tree_edges ON graph, component_edges ON graph,
         components ON graph, articulation_points ON graph
 
 igraph_bridges:
-    PARAMS: GRAPH graph, OUT EDGESET res
+    PARAMS: GRAPH graph, OUT EDGE_INDICES res
     DEPS: res ON graph
 
 #######################################
@@ -1295,7 +1274,7 @@ igraph_layout_random:
     PARAMS: GRAPH graph, OUT MATRIX res
 
 igraph_layout_circle:
-    PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET order=ALL
+    PARAMS: GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR order=ALL
     DEPS: order ON graph
 
 igraph_layout_star:
@@ -1349,7 +1328,7 @@ igraph_layout_reingold_tilford_circular:
 
 igraph_roots_for_tree_layout:
     PARAMS: |-
-        GRAPH graph, NEIMODE mode=OUT, OUT VERTEXSET roots, ROOTCHOICE heuristic
+        GRAPH graph, NEIMODE mode=OUT, OUT VERTEX_INDICES roots, ROOTCHOICE heuristic
     DEPS: roots ON graph
 
 igraph_layout_random_3d:
@@ -1455,22 +1434,22 @@ igraph_layout_umap_3d:
 #######################################
 
 igraph_cocitation:
-    PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+    PARAMS: GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR vids=ALL
     DEPS: vids ON graph
 
 igraph_bibcoupling:
-    PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+    PARAMS: GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR vids=ALL
     DEPS: vids ON graph
 
 igraph_similarity_dice:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
     DEPS: vids ON graph
 
 igraph_similarity_dice_es:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res, EDGESET es=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT VECTOR res, EDGE_SELECTOR es=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
     DEPS: es ON graph
 
@@ -1481,18 +1460,18 @@ igraph_similarity_dice_pairs:
     DEPS: pairs ON graph
 
 igraph_similarity_inverse_log_weighted:
-    PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL
+    PARAMS: GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR vids=ALL, NEIMODE mode=ALL
     DEPS: vids ON graph
 
 igraph_similarity_jaccard:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR vids=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
     DEPS: vids ON graph res, mode ON vids
 
 igraph_similarity_jaccard_es:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR res, EDGESET es=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT VECTOR res, EDGE_SELECTOR es=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
     DEPS: es ON graph
 
@@ -1688,7 +1667,7 @@ igraph_hrg_consensus:
 
 igraph_hrg_predict:
     PARAMS: |-
-        GRAPH graph, OUT VERTEXSET edges, OUT VECTOR prob,
+        GRAPH graph, OUT VERTEX_INDICES edges, OUT VECTOR prob,
         INOUT HRG hrg=Default, BOOLEAN start=False,
         INTEGER num_samples=10000, INTEGER num_bins=25
     DEPS: edges ON graph
@@ -1756,7 +1735,7 @@ igraph_read_graph_edgelist:
 
 igraph_read_graph_ncol:
     PARAMS: |-
-        OUT GRAPH graph, INFILE instream, OPTIONAL STRVECTOR predefnames,
+        OUT GRAPH graph, INFILE instream, OPTIONAL VECTOR_STR predefnames,
         BOOLEAN names=True, ADD_WEIGHTS weights=True, BOOLEAN directed=True
 
 igraph_read_graph_lgl:
@@ -1773,7 +1752,7 @@ igraph_read_graph_graphml:
 igraph_read_graph_dimacs_flow:
     PARAMS: |-
         OUT GRAPH graph, INFILE instream,
-        OPTIONAL OUT STRVECTOR problem, OPTIONAL OUT VECTOR_INT label,
+        OPTIONAL OUT VECTOR_STR problem, OPTIONAL OUT VECTOR_INT label,
         OPTIONAL OUT INTEGER source, OPTIONAL OUT INTEGER target,
         OPTIONAL OUT VECTOR capacity, BOOLEAN directed=True
 
@@ -1841,7 +1820,7 @@ igraph_triad_census:
     RETURN: ERROR
 
 igraph_adjacent_triangles:
-    PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL
+    PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL
     DEPS: vids ON graph
 
 igraph_local_scan_0:
@@ -1893,7 +1872,7 @@ igraph_local_scan_subset_ecount:
     DEPS: weights ON graph
 
 igraph_list_triangles:
-    PARAMS: GRAPH graph, OUT VERTEXSET res
+    PARAMS: GRAPH graph, OUT VERTEX_INDICES res
     DEPS: res ON graph
 
 #######################################
@@ -1938,7 +1917,7 @@ igraph_compose:
 
 igraph_induced_subgraph_map:
     PARAMS: |-
-        GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl,
+        GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl,
         OPTIONAL OUT INDEX_VECTOR map, OPTIONAL OUT INDEX_VECTOR invmap
     DEPS: vids ON graph
 
@@ -2054,7 +2033,7 @@ igraph_cohesion:
 igraph_dominator_tree:
     PARAMS: |-
         GRAPH graph, VERTEX root, OUT INDEX_VECTOR dom,
-        OPTIONAL OUT GRAPH domtree, OUT VERTEXSET leftout,
+        OPTIONAL OUT GRAPH domtree, OUT VERTEX_INDICES leftout,
         NEIMODE mode=OUT
     DEPS: root ON graph, leftout ON graph
 
@@ -2083,11 +2062,11 @@ igraph_even_tarjan_reduction:
         capacity ON graphbar
 
 igraph_is_separator:
-    PARAMS: GRAPH graph, VERTEXSET candidate, OUT BOOLEAN res
+    PARAMS: GRAPH graph, VERTEX_SELECTOR candidate, OUT BOOLEAN res
     DEPS: candidate ON graph
 
 igraph_is_minimal_separator:
-    PARAMS: GRAPH graph, VERTEXSET candidate, OUT BOOLEAN res
+    PARAMS: GRAPH graph, VERTEX_SELECTOR candidate, OUT BOOLEAN res
     DEPS: candidate ON graph
 
 igraph_all_minimal_st_separators:
@@ -2386,11 +2365,11 @@ igraph_is_eulerian:
     PARAMS: GRAPH graph, OUT BOOLEAN has_path, OUT BOOLEAN has_cycle
 
 igraph_eulerian_path:
-    PARAMS: GRAPH graph, OPTIONAL OUT EDGESET edge_res, OPTIONAL OUT VERTEXSET vertex_res
+    PARAMS: GRAPH graph, OPTIONAL OUT EDGE_INDICES edge_res, OPTIONAL OUT VERTEX_INDICES vertex_res
     DEPS: edge_res ON graph, vertex_res ON graph
 
 igraph_eulerian_cycle:
-    PARAMS: GRAPH graph, OPTIONAL OUT EDGESET edge_res, OPTIONAL OUT VERTEXSET vertex_res
+    PARAMS: GRAPH graph, OPTIONAL OUT EDGE_INDICES edge_res, OPTIONAL OUT VERTEX_INDICES vertex_res
     DEPS: edge_res ON graph, vertex_res ON graph
 
 #######################################
@@ -2414,7 +2393,7 @@ igraph_is_tree:
     DEPS: root ON graph
 
 igraph_is_forest:
-    PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OPTIONAL OUT VERTEXSET roots, NEIMODE mode=OUT
+    PARAMS: GRAPH graph, PRIMARY OUT BOOLEAN res, OPTIONAL OUT VERTEX_INDICES roots, NEIMODE mode=OUT
     DEPS: roots ON graph
 
 igraph_from_prufer:
@@ -2424,7 +2403,7 @@ igraph_to_prufer:
     PARAMS: GRAPH graph, OUT INDEX_VECTOR prufer
 
 igraph_minimum_spanning_tree:
-    PARAMS: GRAPH graph, OUT EDGESET res, EDGEWEIGHTS weights=NULL
+    PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGEWEIGHTS weights=NULL
     DEPS: res ON graph, weights ON graph
 
 igraph_minimum_spanning_tree_unweighted:
@@ -2434,7 +2413,7 @@ igraph_minimum_spanning_tree_prim:
     PARAMS: GRAPH graph, OUT GRAPH mst, EDGEWEIGHTS weights
 
 igraph_random_spanning_tree:
-    PARAMS: GRAPH graph, OUT EDGESET res, OPTIONAL VERTEX vid
+    PARAMS: GRAPH graph, OUT EDGE_INDICES res, OPTIONAL VERTEX vid
     DEPS: res ON graph, vid ON graph
 
 igraph_tree_game:
