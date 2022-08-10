@@ -56,6 +56,12 @@ int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
                        igraph_real_t miny, igraph_real_t maxy, igraph_real_t deltay) {
     long int i;
 
+    IGRAPH_ASSERT(minx <= maxx);
+    IGRAPH_ASSERT(miny <= maxy);
+    IGRAPH_ASSERT(deltax > 0 && deltay > 0);
+    IGRAPH_ASSERT(igraph_finite(minx) && igraph_finite(maxx) && igraph_finite(miny) && igraph_finite(maxy));
+    IGRAPH_ASSERT(igraph_finite(deltax) && igraph_finite(deltay));
+
     grid->coords = coords;
     grid->minx = minx;
     grid->maxx = maxx;
