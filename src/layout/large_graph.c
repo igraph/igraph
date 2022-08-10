@@ -128,7 +128,9 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&layers, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, 0);
-    IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
+    if (no_of_nodes > 0) {
+        IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
+    }
     no_of_layers = igraph_vector_int_size(&layers) - 1;
 
     /* Check whether we have reached all the nodes -- if not, the graph is
