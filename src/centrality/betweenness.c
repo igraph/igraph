@@ -42,7 +42,7 @@
  * sense in the context of the remaining three functions as well.
  */
 
-/*
+/**
  * Internal function to calculate the single source shortest paths for the
  * vertex unweighted case.
  *
@@ -54,7 +54,7 @@
  *                 to each node; must be filled with zeros initially
  * \param  stack   stack in which the nodes are pushed in the order they are
  *                 discovered during the traversal
- * \param  fathers adjacent list that starts empty and that stores the IDs
+ * \param  parents adjacent list that starts empty and that stores the IDs
  *                 of the vertices that lead to a given node during the traversal
  * \param  adjlist the adjacency list of the graph
  * \param  cutoff  cutoff length of shortest paths
@@ -64,8 +64,8 @@ static igraph_error_t igraph_i_sspf(
         igraph_vector_t *dist,
         igraph_real_t *nrgeo,
         igraph_stack_int_t *stack,
-        igraph_adjlist_t *fathers,
-        igraph_adjlist_t *adjlist,
+        igraph_adjlist_t *parents,
+        const igraph_adjlist_t *adjlist,
         igraph_real_t cutoff) {
 
     igraph_dqueue_int_t queue;
@@ -87,7 +87,7 @@ static igraph_error_t igraph_i_sspf(
             /* Reset variables if node is too distant */
             VECTOR(*dist)[actnode] = 0;
             nrgeo[actnode] = 0;
-            igraph_vector_int_clear(igraph_adjlist_get(fathers, actnode));
+            igraph_vector_int_clear(igraph_adjlist_get(parents, actnode));
             continue;
         }
 
@@ -109,7 +109,7 @@ static igraph_error_t igraph_i_sspf(
             if (VECTOR(*dist)[neighbor] == VECTOR(*dist)[actnode] + 1 &&
                 (VECTOR(*dist)[neighbor] <= cutoff + 1 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
-                v = igraph_adjlist_get(fathers, neighbor);
+                v = igraph_adjlist_get(parents, neighbor);
                 IGRAPH_CHECK(igraph_vector_int_push_back(v, actnode));
                 nrgeo[neighbor] += nrgeo[actnode];
             }
@@ -122,7 +122,7 @@ static igraph_error_t igraph_i_sspf(
     return IGRAPH_SUCCESS;
 }
 
-/*
+/**
  * Internal function to calculate the single source shortest paths for the
  * edge unweighted case.
  *
@@ -134,7 +134,7 @@ static igraph_error_t igraph_i_sspf(
  *                 to each node; must be filled with zeros initially
  * \param  stack   stack in which the nodes are pushed in the order they are
  *                 discovered during the traversal
- * \param  fathers incidence list that starts empty and that stores the IDs
+ * \param  parents incidence list that starts empty and that stores the IDs
  *                 of the edges that lead to a given node during the traversal
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
@@ -145,7 +145,7 @@ static igraph_error_t igraph_i_sspf_edge(
         igraph_vector_t *dist,
         igraph_real_t *nrgeo,
         igraph_stack_int_t *stack,
-        igraph_inclist_t *fathers,
+        igraph_inclist_t *parents,
         const igraph_inclist_t *inclist,
         igraph_real_t cutoff) {
 
@@ -168,7 +168,7 @@ static igraph_error_t igraph_i_sspf_edge(
             /* Reset variables if node is too distant */
             VECTOR(*dist)[actnode] = 0;
             nrgeo[actnode] = 0;
-            igraph_vector_int_clear(igraph_inclist_get(fathers, actnode));
+            igraph_vector_int_clear(igraph_inclist_get(parents, actnode));
             continue;
         }
 
@@ -191,7 +191,7 @@ static igraph_error_t igraph_i_sspf_edge(
             if (VECTOR(*dist)[neighbor] == VECTOR(*dist)[actnode] + 1 &&
                 (VECTOR(*dist)[neighbor] <= cutoff + 1 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
-                v = igraph_inclist_get(fathers, neighbor);
+                v = igraph_inclist_get(parents, neighbor);
                 IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                 nrgeo[neighbor] += nrgeo[actnode];
             }
@@ -204,7 +204,7 @@ static igraph_error_t igraph_i_sspf_edge(
     return IGRAPH_SUCCESS;
 }
 
-/*
+/**
  * Internal function to calculate the single source shortest paths for the vertex
  * weighted case.
  *
@@ -217,7 +217,7 @@ static igraph_error_t igraph_i_sspf_edge(
  *                 to each node; must be filled with zeros initially
  * \param  stack   stack in which the nodes are pushed in the order they are
  *                 discovered during the traversal
- * \param  fathers adjacency list that starts empty and that stores the IDs
+ * \param  parents adjacency list that starts empty and that stores the IDs
  *                 of the vertices that lead to a given node during the traversal
  * \param  inclist the incidence list of the graph
  * \param  cutoff  cutoff length of shortest paths
@@ -229,116 +229,7 @@ static igraph_error_t igraph_i_sspf_weighted(
         igraph_real_t *nrgeo,
         const igraph_vector_t *weights,
         igraph_stack_int_t *stack,
-        igraph_adjlist_t *fathers,
-        igraph_inclist_t *inclist,
-        igraph_real_t cutoff) {
-
-    const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
-
-    int cmp_result;
-    igraph_2wheap_t queue;
-    const igraph_vector_int_t *neis;
-    igraph_vector_int_t *v;
-    igraph_integer_t nlen;
-
-    /* TODO: this is an O|V| step here. We could save some time by pre-allocating
-     * the two-way heap in the caller and re-using it here */
-    IGRAPH_CHECK(igraph_2wheap_init(&queue, igraph_vcount(graph)));
-    IGRAPH_FINALLY(igraph_2wheap_destroy, &queue);
-
-    igraph_2wheap_push_with_index(&queue, source, -1.0);
-    VECTOR(*dist)[source] = 1.0;
-    nrgeo[source] = 1;
-
-    while (!igraph_2wheap_empty(&queue)) {
-        igraph_integer_t minnei = igraph_2wheap_max_index(&queue);
-        igraph_real_t mindist = -igraph_2wheap_delete_max(&queue);
-
-        /* Ignore vertices that are more distant than the cutoff */
-        if (cutoff >= 0 && mindist > cutoff + 1.0) {
-            /* Reset variables if node is too distant */
-            VECTOR(*dist)[minnei] = 0;
-            nrgeo[minnei] = 0;
-            igraph_vector_int_clear(igraph_adjlist_get(fathers, minnei));
-            continue;
-        }
-
-        /* Record that we have visited this node */
-        IGRAPH_CHECK(igraph_stack_int_push(stack, minnei));
-
-        /* Now check all neighbors of 'minnei' for a shorter path */
-        neis = igraph_inclist_get(inclist, minnei);
-        nlen = igraph_vector_int_size(neis);
-        for (igraph_integer_t j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
-            igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
-            igraph_real_t curdist = VECTOR(*dist)[to];
-
-            if (curdist == 0) {
-                /* this means curdist is infinity */
-                cmp_result = -1;
-            } else {
-                cmp_result = igraph_cmp_epsilon(altdist, curdist, eps);
-            }
-
-            if (curdist == 0) {
-                /* This is the first non-infinite distance */
-                v = igraph_adjlist_get(fathers, to);
-                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
-                VECTOR(*v)[0] = minnei;
-                nrgeo[to] = nrgeo[minnei];
-                VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&queue, to, -altdist));
-            } else if (cmp_result < 0) {
-                /* This is a shorter path */
-                v = igraph_adjlist_get(fathers, to);
-                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
-                VECTOR(*v)[0] = minnei;
-                nrgeo[to] = nrgeo[minnei];
-                VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_modify(&queue, to, -altdist));
-            } else if (cmp_result == 0 && (altdist <= cutoff + 1.0 || cutoff < 0)) {
-                /* Only add if the node is not more distant than the cutoff */
-                v = igraph_adjlist_get(fathers, to);
-                IGRAPH_CHECK(igraph_vector_int_push_back(v, minnei));
-                nrgeo[to] += nrgeo[minnei];
-            }
-        }
-    }
-
-    igraph_2wheap_destroy(&queue);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
-/*
- * Internal function to calculate the single source shortest paths for the edge
- * weighted case.
- *
- * \param  graph   the graph to calculate the single source shortest paths on
- * \param  weights the weights of the edges
- * \param  source  the source node
- * \param  dist    distance of each node from the source node \em plus one;
- *                 must be filled with zeros initially
- * \param  nrgeo   vector storing the number of geodesics from the source node
- *                 to each node; must be filled with zeros initially
- * \param  stack   stack in which the nodes are pushed in the order they are
- *                 discovered during the traversal
- * \param  fathers incidence list that starts empty and that stores the IDs
- *                 of the edges that lead to a given node during the traversal
- * \param  inclist the incidence list of the graph
- * \param  cutoff  cutoff length of shortest paths
- */
-static igraph_error_t igraph_i_sspf_weighted_edge(
-        const igraph_t *graph,
-        igraph_integer_t source,
-        igraph_vector_t *dist,
-        igraph_real_t *nrgeo,
-        const igraph_vector_t *weights,
-        igraph_stack_int_t *stack,
-        igraph_inclist_t *fathers,
+        igraph_adjlist_t *parents,
         const igraph_inclist_t *inclist,
         igraph_real_t cutoff) {
 
@@ -368,7 +259,7 @@ static igraph_error_t igraph_i_sspf_weighted_edge(
             /* Reset variables if node is too distant */
             VECTOR(*dist)[minnei] = 0;
             nrgeo[minnei] = 0;
-            igraph_vector_int_clear(igraph_inclist_get(fathers, minnei));
+            igraph_vector_int_clear(igraph_adjlist_get(parents, minnei));
             continue;
         }
 
@@ -393,7 +284,116 @@ static igraph_error_t igraph_i_sspf_weighted_edge(
 
             if (curdist == 0) {
                 /* This is the first non-infinite distance */
-                v = igraph_inclist_get(fathers, to);
+                v = igraph_adjlist_get(parents, to);
+                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
+                VECTOR(*v)[0] = minnei;
+                nrgeo[to] = nrgeo[minnei];
+                VECTOR(*dist)[to] = altdist;
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&queue, to, -altdist));
+            } else if (cmp_result < 0) {
+                /* This is a shorter path */
+                v = igraph_adjlist_get(parents, to);
+                IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
+                VECTOR(*v)[0] = minnei;
+                nrgeo[to] = nrgeo[minnei];
+                VECTOR(*dist)[to] = altdist;
+                IGRAPH_CHECK(igraph_2wheap_modify(&queue, to, -altdist));
+            } else if (cmp_result == 0 && (altdist <= cutoff + 1.0 || cutoff < 0)) {
+                /* Only add if the node is not more distant than the cutoff */
+                v = igraph_adjlist_get(parents, to);
+                IGRAPH_CHECK(igraph_vector_int_push_back(v, minnei));
+                nrgeo[to] += nrgeo[minnei];
+            }
+        }
+    }
+
+    igraph_2wheap_destroy(&queue);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * Internal function to calculate the single source shortest paths for the edge
+ * weighted case.
+ *
+ * \param  graph   the graph to calculate the single source shortest paths on
+ * \param  weights the weights of the edges
+ * \param  source  the source node
+ * \param  dist    distance of each node from the source node \em plus one;
+ *                 must be filled with zeros initially
+ * \param  nrgeo   vector storing the number of geodesics from the source node
+ *                 to each node; must be filled with zeros initially
+ * \param  stack   stack in which the nodes are pushed in the order they are
+ *                 discovered during the traversal
+ * \param  parents incidence list that starts empty and that stores the IDs
+ *                 of the edges that lead to a given node during the traversal
+ * \param  inclist the incidence list of the graph
+ * \param  cutoff  cutoff length of shortest paths
+ */
+static igraph_error_t igraph_i_sspf_weighted_edge(
+        const igraph_t *graph,
+        igraph_integer_t source,
+        igraph_vector_t *dist,
+        igraph_real_t *nrgeo,
+        const igraph_vector_t *weights,
+        igraph_stack_int_t *stack,
+        igraph_inclist_t *parents,
+        const igraph_inclist_t *inclist,
+        igraph_real_t cutoff) {
+
+    const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
+
+    int cmp_result;
+    igraph_2wheap_t queue;
+    const igraph_vector_int_t *neis;
+    igraph_vector_int_t *v;
+    igraph_integer_t nlen;
+
+    /* TODO: this is an O|V| step here. We could save some time by pre-allocating
+     * the two-way heap in the caller and re-using it here */
+    IGRAPH_CHECK(igraph_2wheap_init(&queue, igraph_vcount(graph)));
+    IGRAPH_FINALLY(igraph_2wheap_destroy, &queue);
+
+    igraph_2wheap_push_with_index(&queue, source, -1.0);
+    VECTOR(*dist)[source] = 1.0;
+    nrgeo[source] = 1;
+
+    while (!igraph_2wheap_empty(&queue)) {
+        igraph_integer_t minnei = igraph_2wheap_max_index(&queue);
+        igraph_real_t mindist = -igraph_2wheap_delete_max(&queue);
+
+        /* Ignore vertices that are more distant than the cutoff */
+        if (cutoff >= 0 && mindist > cutoff + 1.0) {
+            /* Reset variables if node is too distant */
+            VECTOR(*dist)[minnei] = 0;
+            nrgeo[minnei] = 0;
+            igraph_vector_int_clear(igraph_inclist_get(parents, minnei));
+            continue;
+        }
+
+        /* Record that we have visited this node */
+        IGRAPH_CHECK(igraph_stack_int_push(stack, minnei));
+
+        /* Now check all neighbors of 'minnei' for a shorter path */
+        neis = igraph_inclist_get(inclist, minnei);
+        nlen = igraph_vector_int_size(neis);
+        for (igraph_integer_t j = 0; j < nlen; j++) {
+            igraph_integer_t edge = VECTOR(*neis)[j];
+            igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
+            igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
+            igraph_real_t curdist = VECTOR(*dist)[to];
+
+            if (curdist == 0) {
+                /* this means curdist is infinity */
+                cmp_result = -1;
+            } else {
+                cmp_result = igraph_cmp_epsilon(altdist, curdist, eps);
+            }
+
+            if (curdist == 0) {
+                /* This is the first non-infinite distance */
+                v = igraph_inclist_get(parents, to);
                 IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
                 VECTOR(*v)[0] = edge;
                 nrgeo[to] = nrgeo[minnei];
@@ -401,7 +401,7 @@ static igraph_error_t igraph_i_sspf_weighted_edge(
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&queue, to, -altdist));
             } else if (cmp_result < 0) {
                 /* This is a shorter path */
-                v = igraph_inclist_get(fathers, to);
+                v = igraph_inclist_get(parents, to);
                 IGRAPH_CHECK(igraph_vector_int_resize(v, 1));
                 VECTOR(*v)[0] = edge;
                 nrgeo[to] = nrgeo[minnei];
@@ -409,7 +409,7 @@ static igraph_error_t igraph_i_sspf_weighted_edge(
                 IGRAPH_CHECK(igraph_2wheap_modify(&queue, to, -altdist));
             } else if (cmp_result == 0 && (altdist <= cutoff + 1.0 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
-                v = igraph_inclist_get(fathers, to);
+                v = igraph_inclist_get(parents, to);
                 IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                 nrgeo[to] += nrgeo[minnei];
             }
@@ -539,7 +539,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_adjlist_t adjlist, fathers;
+    igraph_adjlist_t adjlist, parents;
     igraph_inclist_t inclist;
     igraph_integer_t source, j, neighbor;
     igraph_stack_int_t S;
@@ -568,8 +568,8 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
+    IGRAPH_CHECK(igraph_adjlist_init_empty(&parents, no_of_nodes));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &parents);
 
     IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
@@ -577,15 +577,11 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
-    if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(nrgeo, "Insufficient memory for betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
-    if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmpscore, "Insufficient memory for betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     if (igraph_vs_is_all(&vids)) {
@@ -606,7 +602,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
          * - the 'dist' vector contains zeros only
          * - the 'nrgeo' array contains zeros only
          * - the 'tmpscore' array contains zeros only
-         * - the 'fathers' adjacency list contains empty vectors only
+         * - the 'parents' adjacency list contains empty vectors only
          */
 
         IGRAPH_PROGRESS("Betweenness centrality: ", 100.0 * source / no_of_nodes, 0);
@@ -614,16 +610,16 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, cutoff));
+            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, cutoff));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &fathers, &adjlist, cutoff));
+            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &parents, &adjlist, cutoff));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
             igraph_integer_t actnode = igraph_stack_int_pop(&S);
-            igraph_vector_int_t *neis = igraph_adjlist_get(&fathers, actnode);
+            igraph_vector_int_t *neis = igraph_adjlist_get(&parents, actnode);
             igraph_integer_t nneis = igraph_vector_int_size(neis);
             igraph_real_t coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
 
@@ -674,7 +670,7 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
     IGRAPH_FREE(tmpscore);
     igraph_vector_destroy(&dist);
     igraph_stack_int_destroy(&S);
-    igraph_adjlist_destroy(&fathers);
+    igraph_adjlist_destroy(&parents);
     if (weights) {
         igraph_inclist_destroy(&inclist);
     } else {
@@ -766,7 +762,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
                                    const igraph_vector_t *weights, igraph_real_t cutoff) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_inclist_t inclist, fathers;
+    igraph_inclist_t inclist, parents;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_vector_t dist;
     igraph_real_t *nrgeo;
@@ -779,15 +775,13 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
-    IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
+    IGRAPH_CHECK(igraph_inclist_init_empty(&parents, no_of_nodes));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &parents);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
-    if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(nrgeo, "Insufficient memory for edge betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
@@ -810,7 +804,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
          * - the 'dist' vector contains zeros only
          * - the 'nrgeo' array contains zeros only
          * - the 'tmpscore' array contains zeros only
-         * - the 'fathers' incidence list contains empty vectors only
+         * - the 'parents' incidence list contains empty vectors only
          */
 
         IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0 * source / no_of_nodes, 0);
@@ -818,16 +812,16 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, cutoff));
+            IGRAPH_CHECK(igraph_i_sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, cutoff));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf_edge(graph, source, &dist, nrgeo, &S, &fathers, &inclist, cutoff));
+            IGRAPH_CHECK(igraph_i_sspf_edge(graph, source, &dist, nrgeo, &S, &parents, &inclist, cutoff));
         }
 
         /* Aggregate betweenness scores for the edges we have reached in this
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
             igraph_integer_t actnode = igraph_stack_int_pop(&S);
-            igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, actnode);
+            igraph_vector_int_t *fatv = igraph_inclist_get(&parents, actnode);
             igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             igraph_real_t coeff = (1 + tmpscore[actnode]) / nrgeo[actnode];
 
@@ -856,7 +850,7 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
 
     igraph_stack_int_destroy(&S);
     igraph_inclist_destroy(&inclist);
-    igraph_inclist_destroy(&fathers);
+    igraph_inclist_destroy(&parents);
     igraph_vector_destroy(&dist);
     IGRAPH_FREE(tmpscore);
     IGRAPH_FREE(nrgeo);
@@ -911,7 +905,7 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_sources;
     igraph_integer_t no_of_processed_sources;
-    igraph_adjlist_t adjlist, fathers;
+    igraph_adjlist_t adjlist, parents;
     igraph_inclist_t inclist;
     igraph_integer_t source, j;
     igraph_stack_int_t S;
@@ -936,8 +930,8 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
+    IGRAPH_CHECK(igraph_adjlist_init_empty(&parents, no_of_nodes));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &parents);
 
     IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
     IGRAPH_FINALLY(igraph_stack_int_destroy, &S);
@@ -945,21 +939,15 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
-    if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(nrgeo, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
-    if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmpscore, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
-    if (is_target == 0) {
-        IGRAPH_ERROR("Insufficient memory for betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(is_target, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
@@ -1002,7 +990,7 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
          * - the 'dist' vector contains zeros only
          * - the 'nrgeo' array contains zeros only
          * - the 'tmpscore' array contains zeros only
-         * - the 'fathers' adjacency list contains empty vectors only
+         * - the 'parents' adjacency list contains empty vectors only
          */
 
         /* TODO: there is more room for optimization here; the single-source
@@ -1014,16 +1002,16 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, -1));
+            IGRAPH_CHECK(igraph_i_sspf_weighted(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &fathers, &adjlist, -1));
+            IGRAPH_CHECK(igraph_i_sspf(source, &dist, nrgeo, &S, &parents, &adjlist, -1));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
             igraph_integer_t actnode = igraph_stack_int_pop(&S);
-            igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, actnode);
+            igraph_vector_int_t *fatv = igraph_adjlist_get(&parents, actnode);
             igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             igraph_real_t coeff;
 
@@ -1081,7 +1069,7 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
     IGRAPH_FREE(nrgeo);
     igraph_vector_destroy(&dist);
     igraph_stack_int_destroy(&S);
-    igraph_adjlist_destroy(&fathers);
+    igraph_adjlist_destroy(&parents);
     if (weights) {
         igraph_inclist_destroy(&inclist);
     } else {
@@ -1135,7 +1123,7 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_sources;
     igraph_integer_t no_of_processed_sources;
-    igraph_inclist_t inclist, fathers;
+    igraph_inclist_t inclist, parents;
     igraph_vit_t vit;
     igraph_eit_t eit;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
@@ -1152,9 +1140,7 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
     is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
-    if (is_target == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(is_target, "Insufficient memory for subset edge betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
@@ -1167,21 +1153,17 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode, IGRAPH_NO_LOOPS));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-    IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
-    IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
+    IGRAPH_CHECK(igraph_inclist_init_empty(&parents, no_of_nodes));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &parents);
 
     IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
 
     nrgeo = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
-    if (nrgeo == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(nrgeo, "Insufficient memory for subset edge betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, nrgeo);
 
     tmpscore = IGRAPH_CALLOC(no_of_nodes, igraph_real_t);
-    if (tmpscore == 0) {
-        IGRAPH_ERROR("Insufficient memory for edge betweenness calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmpscore, "Insufficient memory for subset edge betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
     IGRAPH_CHECK(igraph_stack_int_init(&S, no_of_nodes));
@@ -1219,7 +1201,7 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
          * - the 'dist' vector contains zeros only
          * - the 'nrgeo' array contains zeros only
          * - the 'tmpscore' array contains zeros only
-         * - the 'fathers' incidence list contains empty vectors only
+         * - the 'parents' incidence list contains empty vectors only
          */
 
         /* TODO: there is more room for optimization here; the single-source
@@ -1231,16 +1213,16 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
 
         /* Conduct a single-source shortest path search from the source node */
         if (weights) {
-            IGRAPH_CHECK(igraph_i_sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &fathers, &inclist, -1));
+            IGRAPH_CHECK(igraph_i_sspf_weighted_edge(graph, source, &dist, nrgeo, weights, &S, &parents, &inclist, -1));
         } else {
-            IGRAPH_CHECK(igraph_i_sspf_edge(graph, source, &dist, nrgeo, &S, &fathers, &inclist, -1));
+            IGRAPH_CHECK(igraph_i_sspf_edge(graph, source, &dist, nrgeo, &S, &parents, &inclist, -1));
         }
 
         /* Aggregate betweenness scores for the nodes we have reached in this
          * traversal */
         while (!igraph_stack_int_empty(&S)) {
             igraph_integer_t actnode = igraph_stack_int_pop(&S);
-            igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, actnode);
+            igraph_vector_int_t *fatv = igraph_inclist_get(&parents, actnode);
             igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             igraph_real_t coeff;
 
@@ -1297,7 +1279,7 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
     IGRAPH_FREE(tmpscore);
     IGRAPH_FREE(nrgeo);
     igraph_vector_destroy(&dist);
-    igraph_inclist_destroy(&fathers);
+    igraph_inclist_destroy(&parents);
     igraph_inclist_destroy(&inclist);
     IGRAPH_FREE(is_target);
     IGRAPH_FINALLY_CLEAN(7);
