@@ -15,6 +15,7 @@ igraph_empty:
 
 igraph_add_edges:
     PARAMS: INOUT GRAPH graph, VERTEX_INDEX_PAIRS edges, ATTRIBUTES attr
+    DEPS: edges ON graph
 
 igraph_add_vertices:
     PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
@@ -75,8 +76,9 @@ igraph_get_eid:
 
 igraph_get_eids:
     PARAMS: |-
-        GRAPH graph, OUT EDGE_INDICES eids, VECTOR_INT pairs,
+        GRAPH graph, OUT EDGE_INDICES eids, VERTEX_INDEX_PAIRS pairs,
         BOOLEAN directed=True, BOOLEAN error=True
+    DEPS: edges ON graph
 
 igraph_get_all_eids_between:
     PARAMS: |-
