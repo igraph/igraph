@@ -23,7 +23,6 @@
 
 #include "igraph_layout.h"
 
-#include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_random.h"
@@ -112,6 +111,31 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
     igraph_real_t frk = sqrt(area / no_of_nodes);
     igraph_real_t H_n = 0;
+
+    /* TODO: is zero okay? */
+    if (maxit < 0) {
+        IGRAPH_ERRORF("Maximum number of iterations must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, maxit);
+    }
+
+    if (maxdelta <= 0) {
+        IGRAPH_ERRORF("Maximum delta must be positive, got %g.", IGRAPH_EINVAL, maxdelta);
+    }
+
+    if (area <= 0) {
+        IGRAPH_ERRORF("Placement area size must be positive, got %g.", IGRAPH_EINVAL, area);
+    }
+
+    if (coolexp <= 0) {
+        IGRAPH_ERRORF("Cooling exponent must be positive, got %g.", IGRAPH_EINVAL, coolexp);
+    }
+
+    if (repulserad <= 0) {
+        IGRAPH_ERRORF("Repusion cutoff radius must be positive, got %g.", IGRAPH_EINVAL, repulserad);
+    }
+
+    if (cellsize <= 0) {
+        IGRAPH_ERRORF("Cell size must be positive, got %g.", IGRAPH_EINVAL, cellsize);
+    }
 
     IGRAPH_CHECK(igraph_minimum_spanning_tree_unweighted(graph, &mst));
     IGRAPH_FINALLY(igraph_destroy, &mst);
