@@ -78,7 +78,7 @@ igraph_get_eids:
     PARAMS: |-
         GRAPH graph, OUT EDGE_INDICES eids, VERTEX_INDEX_PAIRS pairs,
         BOOLEAN directed=True, BOOLEAN error=True
-    DEPS: edges ON graph
+    DEPS: pairs ON graph
 
 igraph_get_all_eids_between:
     PARAMS: |-
