@@ -94,7 +94,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     igraph_bool_t negative_weights = 0;
 
     if (no_of_nodes > INT_MAX) {
-        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
     if (igraph_ecount(graph) == 0) {
@@ -327,7 +327,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     }
 
     if (no_of_nodes > INT_MAX) {
-        IGRAPH_ERROR("Graph has too many vertices for ARPACK", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
     options->n = (int) no_of_nodes;
