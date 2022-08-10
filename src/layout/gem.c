@@ -159,7 +159,7 @@ int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* choose a vertex v to update */
-        if (!perm_pointer) {
+        if (perm_pointer <= 0) {
             igraph_vector_int_shuffle(&perm);
             perm_pointer = no_nodes - 1;
         }
