@@ -22,6 +22,7 @@ int main() {
     igraph_t graph;
     igraph_matrix_t res;
     igraph_bool_t use_seed;
+    igraph_bool_t do_not_use_seed;
     igraph_integer_t maxiter;
     igraph_real_t temp_max;
     igraph_real_t temp_min;
@@ -29,6 +30,7 @@ int main() {
 
     igraph_rng_seed(igraph_rng_default(), 42);
     use_seed = 1;
+    do_not_use_seed = 0;
     maxiter = 10;
     temp_max = 1;
     temp_min = 0.1;
@@ -43,7 +45,7 @@ int main() {
     igraph_destroy(&graph);
     igraph_matrix_destroy(&res);
 
-    printf("Check seeded 1-vertex graph,  no iterations.\n");
+    printf("Check seeded 1-vertex graph, no iterations.\n");
     maxiter = 0;
     igraph_small(&graph, 1, IGRAPH_UNDIRECTED, -1);
     {
@@ -53,6 +55,25 @@ int main() {
 
     igraph_layout_gem(&graph, &res, use_seed, maxiter, temp_max, temp_min, temp_init);
     igraph_matrix_print(&res);
+    igraph_destroy(&graph);
+    igraph_matrix_destroy(&res);
+    maxiter = 40;
+
+    printf("Check if 0 vertex graph crashes without a seed.\n");
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_matrix_init(&res, 0, 2);
+
+    igraph_layout_gem(&graph, &res, do_not_use_seed, maxiter, temp_max, temp_min, temp_init);
+    igraph_matrix_print(&res);
+    igraph_destroy(&graph);
+    igraph_matrix_destroy(&res);
+
+    printf("Check unseeded 1-vertex graph.\n");
+    maxiter = 40;
+    igraph_small(&graph, 1, IGRAPH_UNDIRECTED, -1);
+    igraph_matrix_init(&res, 0, 2);
+
+    igraph_layout_gem(&graph, &res, do_not_use_seed, maxiter, temp_max, temp_min, temp_init);
     igraph_destroy(&graph);
     igraph_matrix_destroy(&res);
 

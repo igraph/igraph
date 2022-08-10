@@ -795,6 +795,7 @@ Some of the highlights are:
  - Deterministic graph generators have overflow checks now.
  - `igraph_sparsemat_getelements_sorted()` did not sort the elements for triplet matrices correctly; this is fixed now.
  - `igraph_random_walk()` took one fewer steps than specified.
+ - `igraph_layout_gem()` does not crash any more for graphs with only a single vertex.
 
 ### Deprecated
 
