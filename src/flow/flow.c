@@ -2055,7 +2055,7 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
 igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                igraph_bool_t checks) {
 
-    igraph_bool_t ret = 0;
+    igraph_bool_t ret = false;
 
     if (checks) {
         IGRAPH_CHECK(igraph_i_connectivity_checks(graph, res, &ret));
@@ -2146,7 +2146,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
 
 igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
                              igraph_bool_t checks) {
-    igraph_bool_t ret = 0;
+    igraph_bool_t ret = false;
     igraph_integer_t number_of_nodes = igraph_vcount(graph);
 
     /* igraph_mincut_value returns infinity for the singleton graph,

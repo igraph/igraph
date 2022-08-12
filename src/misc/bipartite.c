@@ -851,7 +851,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     igraph_vector_char_t seen;
     igraph_dqueue_int_t Q;
     igraph_vector_int_t neis;
-    igraph_bool_t bi = 1;
+    igraph_bool_t bi = true;
     igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_char_init(&seen, no_of_nodes));
@@ -880,7 +880,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                 if (VECTOR(seen)[nei]) {
                     igraph_integer_t neitype = VECTOR(seen)[nei];
                     if (neitype == acttype) {
-                        bi = 0;
+                        bi = false;
                         break;
                     }
                 } else {

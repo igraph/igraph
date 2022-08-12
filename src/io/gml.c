@@ -424,7 +424,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_t trie;
     igraph_vector_int_t edges;
     igraph_bool_t directed = IGRAPH_UNDIRECTED;
-    igraph_bool_t has_directed = 0;
+    igraph_bool_t has_directed = false;
     igraph_gml_tree_t *gtree;
     igraph_integer_t gidx;
     igraph_trie_t vattrnames;
@@ -436,7 +436,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_vector_ptr_t *attrs[3];
     igraph_integer_t edgeptr = 0;
     igraph_i_gml_parsedata_t context;
-    igraph_bool_t entity_warned = 0; /* used to warn at most once about unsupported entities */
+    igraph_bool_t entity_warned = false; /* used to warn at most once about unsupported entities */
 
     attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
 
@@ -575,7 +575,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             }
         } else if (!strcmp(name, "edge")) {
             igraph_gml_tree_t *edge;
-            igraph_bool_t has_source = 0, has_target = 0;
+            igraph_bool_t has_source = false, has_target = false;
             no_of_edges++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
                 IGRAPH_ERRORF("'edge' is not a list in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
@@ -1040,7 +1040,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* Check whether there is an 'id' node attribute if the supplied is 0 */
     if (!id) {
-        igraph_bool_t found = 0;
+        igraph_bool_t found = false;
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
             const char *n = igraph_strvector_get(&vnames, i);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {

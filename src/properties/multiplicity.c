@@ -68,7 +68,7 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     } else {
         igraph_vector_int_t neis;
         igraph_integer_t i, j, n;
-        igraph_bool_t found = 0;
+        igraph_bool_t found = false;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc; i++) {
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
@@ -135,7 +135,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     } else {
         igraph_vector_int_t neis;
         igraph_integer_t i, j, n;
-        igraph_bool_t found = 0;
+        igraph_bool_t found = false;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc && !found; i++) {
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, i,

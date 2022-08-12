@@ -63,7 +63,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
     igraph_integer_t ncol = igraph_matrix_ncol(vecs);
     int i, j;
     igraph_vector_int_t edges;
-    igraph_bool_t warned_neg = 0, warned_big = 0;
+    igraph_bool_t warned_neg = false, warned_big = false;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 

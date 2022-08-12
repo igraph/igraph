@@ -296,7 +296,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_integer_t no, kept = 0;
         igraph_integer_t cptr = 0;
         igraph_integer_t nsepv = 0;
-        igraph_bool_t addedsep = 0;
+        igraph_bool_t addedsep = false;
 
         IGRAPH_STATUSF(("Candidate %li: %li vertices,",
                         0, Qptr, mynodes));

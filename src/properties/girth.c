@@ -72,11 +72,11 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
     igraph_lazy_adjlist_t adjlist;
     igraph_integer_t mincirc = IGRAPH_INTEGER_MAX, minvertex = 0;
     igraph_integer_t node;
-    igraph_bool_t triangle = 0;
+    igraph_bool_t triangle = false;
     igraph_vector_int_t *neis;
     igraph_vector_int_t level;
     igraph_integer_t stoplevel = no_of_nodes + 1;
-    igraph_bool_t anycircle = 0;
+    igraph_bool_t anycircle = false;
     igraph_integer_t t1 = 0, t2 = 0;
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));

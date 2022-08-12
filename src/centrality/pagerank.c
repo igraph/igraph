@@ -627,7 +627,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     } else {
 
         igraph_inclist_t inclist;
-        igraph_bool_t negative_weight_warned = 0;
+        igraph_bool_t negative_weight_warned = false;
         igraph_i_pagerank_data2_t data;
 
         data.graph = graph;

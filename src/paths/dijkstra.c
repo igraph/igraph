@@ -717,7 +717,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
     unsigned char *is_target;
     igraph_integer_t i, n, to_reach;
-    igraph_bool_t free_vertices = 0;
+    igraph_bool_t free_vertices = false;
     int cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 

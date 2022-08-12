@@ -258,7 +258,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
     unsigned int code = 0;
     unsigned int mul, idx;
 
-    igraph_bool_t terminate = 0;
+    igraph_bool_t terminate = false;
 
     if (igraph_is_directed(graph)) {
         switch (size) {
@@ -402,7 +402,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
                     );
 
                     if (ret == IGRAPH_STOP) {
-                        terminate = 1;
+                        terminate = true;
                         break;
                     }
 

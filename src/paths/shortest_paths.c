@@ -1503,10 +1503,10 @@ igraph_error_t igraph_get_k_shortest_paths(
             /* Remove edges that are part of the previous shortest paths which share the same root path. */
             for (i_path = 0; i_path < i_path_current; i_path++) {
                 igraph_vector_int_t *path_check = igraph_vector_int_list_get_ptr(edge_paths, i_path);
-                igraph_bool_t equal = 1;
+                igraph_bool_t equal = true;
                 for (i = 0; i < nr_edges_root; i++) {
                     if (VECTOR(path_root)[i] != VECTOR(*path_check)[i]) {
-                        equal = 0;
+                        equal = false;
                         break;
                     }
                 }

@@ -254,7 +254,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * \example examples/simple/igraph_kary_tree.c
  */
 igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
-    igraph_bool_t is_tree = 0;
+    igraph_bool_t is_tree = false;
     igraph_bool_t treat_as_undirected = !igraph_is_directed(graph) || mode == IGRAPH_ALL;
     igraph_integer_t iroot = 0;
     igraph_integer_t visited_count;

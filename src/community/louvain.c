@@ -353,7 +353,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
     int pass;
-    igraph_bool_t changed = 0;
+    igraph_bool_t changed = false;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
     igraph_vector_int_t edges;

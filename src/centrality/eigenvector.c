@@ -91,7 +91,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
     igraph_vector_t degree;
     igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_bool_t negative_weights = 0;
+    igraph_bool_t negative_weights = false;
 
     if (no_of_nodes > INT_MAX) {
         IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
@@ -261,7 +261,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     igraph_bool_t dag;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
-    igraph_bool_t negative_weights = 0;
+    igraph_bool_t negative_weights = false;
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */

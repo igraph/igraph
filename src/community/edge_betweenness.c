@@ -435,7 +435,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_vector_t eb;
     igraph_integer_t maxedge, pos;
     igraph_integer_t from, to;
-    igraph_bool_t result_owned = 0;
+    igraph_bool_t result_owned = false;
     igraph_stack_int_t stack = IGRAPH_STACK_NULL;
     igraph_real_t steps, steps_done;
 

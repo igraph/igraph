@@ -407,8 +407,8 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
     igraph_real_t trace, det, tsq4_minus_d;
     igraph_complex_t eval1, eval2;
     igraph_complex_t evec1[2], evec2[2];
-    igraph_bool_t swap_evals = 0;
-    igraph_bool_t complex_evals = 0;
+    igraph_bool_t swap_evals = false;
+    igraph_bool_t complex_evals = false;
     int nev = options->nev;
 
     if (nev <= 0) {
@@ -929,7 +929,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_vector_t *values, igraph_matrix_t *vectors) {
 
     igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
-    igraph_bool_t free_them = 0;
+    igraph_bool_t free_them = false;
     int *select, i;
 
     int ido = 0;
@@ -1191,7 +1191,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_matrix_t *values, igraph_matrix_t *vectors) {
 
     igraph_real_t *v, *workl, *workd, *dr, *di, *resid, *workev;
-    igraph_bool_t free_them = 0;
+    igraph_bool_t free_them = false;
     int *select, i;
 
     int ido = 0;

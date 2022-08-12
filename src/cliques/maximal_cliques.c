@@ -200,7 +200,7 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
 
     for (j = PS; j <= PE; j++) {
         igraph_integer_t vcand = VECTOR(*PX)[j];
-        igraph_bool_t nei = 0;
+        igraph_bool_t nei = false;
         igraph_integer_t k = 0;
         for (k = 0; k < pivotvectlen; k++) {
             igraph_integer_t unv = VECTOR(*pivotvectneis)[k];

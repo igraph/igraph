@@ -110,7 +110,7 @@ igraph_error_t igraph_union_many(
 
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_integer_t no_of_nodes = 0;
-    igraph_bool_t directed = 1;
+    igraph_bool_t directed = true;
     igraph_vector_int_t edges;
     igraph_vector_int_list_t edge_vects, order_vects;
     igraph_vector_int_t no_edges;

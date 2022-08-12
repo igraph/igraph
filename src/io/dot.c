@@ -39,14 +39,14 @@
 static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
     /* do we have to escape the string at all? */
     igraph_integer_t i, j, len = strlen(orig), newlen = 0;
-    igraph_bool_t need_quote = 0, is_number = 1;
+    igraph_bool_t need_quote = false, is_number = true;
 
     /* first, check whether the string is equal to some reserved word, or empty */
     if (!strcasecmp(orig, "graph") || !strcasecmp(orig, "digraph") ||
         !strcasecmp(orig, "node") || !strcasecmp(orig, "edge") ||
         !strcasecmp(orig, "strict") || !strcasecmp(orig, "subgraph") || len == 0) {
-        need_quote = 1;
-        is_number = 0;
+        need_quote = true;
+        is_number = false;
     }
 
     /* next, check whether we need to escape the string for any other reason.

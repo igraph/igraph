@@ -22,24 +22,8 @@
 */
 
 #include "igraph_community.h"
-#include "igraph_constructors.h"
 #include "igraph_memory.h"
-#include "igraph_random.h"
-#include "igraph_arpack.h"
-#include "igraph_adjlist.h"
-#include "igraph_interface.h"
-#include "igraph_components.h"
-#include "igraph_dqueue.h"
-#include "igraph_progress.h"
-#include "igraph_stack.h"
 #include "igraph_sparsemat.h"
-#include "igraph_statusbar.h"
-#include "igraph_conversion.h"
-#include "igraph_centrality.h"
-#include "igraph_structural.h"
-
-#include "core/indheap.h"
-#include "core/interruption.h"
 
 #include "config.h"
 
@@ -105,7 +89,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     igraph_vector_t tmp;
     igraph_vector_bool_t already_merged;
     igraph_vector_int_t own_membership;
-    igraph_bool_t using_own_membership = 0;
+    igraph_bool_t using_own_membership = false;
 
     if (steps > igraph_matrix_int_nrow(merges)) {
         IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"

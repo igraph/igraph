@@ -334,7 +334,7 @@ static void igraph_i_fastgreedy_community_list_remove2(
 static void igraph_i_fastgreedy_community_remove_nei(
         igraph_i_fastgreedy_community_list* list, igraph_integer_t c, igraph_integer_t k) {
     igraph_integer_t i, n;
-    igraph_bool_t rescan = 0;
+    igraph_bool_t rescan = false;
     igraph_i_fastgreedy_commpair *p;
     igraph_i_fastgreedy_community *comm;
     igraph_real_t olddq;
@@ -392,7 +392,7 @@ static void igraph_i_fastgreedy_community_sort_neighbors_of(
         igraph_i_fastgreedy_commpair* changed_pair) {
     igraph_vector_ptr_t* vec;
     igraph_integer_t i, n;
-    igraph_bool_t can_skip_sort = 0;
+    igraph_bool_t can_skip_sort = false;
     igraph_i_fastgreedy_commpair *other_pair;
 
     vec = &list->e[index].neis;

@@ -40,7 +40,7 @@
 static igraph_bool_t igraph_i_cattribute_find(const igraph_vector_ptr_t *ptrvec,
                                               const char *name, igraph_integer_t *idx) {
     igraph_integer_t i, n = igraph_vector_ptr_size(ptrvec);
-    igraph_bool_t l = 0;
+    igraph_bool_t l = false;
     for (i = 0; !l && i < n; i++) {
         igraph_attribute_record_t *rec = VECTOR(*ptrvec)[i];
         l = !strcmp(rec->name, name);
@@ -371,7 +371,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, ig
         igraph_attribute_record_t *newrec = 0;
         const char *name = oldrec->name;
         igraph_integer_t j = -1;
-        igraph_bool_t l = 0;
+        igraph_bool_t l = false;
         if (nattr) {
             l = igraph_i_cattribute_find(nattr, name, &j);
         }
@@ -1892,7 +1892,7 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
         igraph_attribute_record_t *newrec = NULL;
         const char *name = oldrec->name;
         igraph_integer_t j = -1;
-        igraph_bool_t l = 0;
+        igraph_bool_t l = false;
         if (nattr) {
             l = igraph_i_cattribute_find(nattr, name, &j);
         }
@@ -2486,7 +2486,7 @@ static igraph_error_t igraph_i_cattribute_gettype(const igraph_t *graph,
     igraph_vector_ptr_t *attr[3] = { &at->gal, &at->val, &at->eal };
     igraph_vector_ptr_t *al;
     igraph_integer_t j;
-    igraph_bool_t l = 0;
+    igraph_bool_t l = false;
 
     switch (elemtype) {
     case IGRAPH_ATTRIBUTE_GRAPH:

@@ -745,7 +745,7 @@ static igraph_error_t igraph_i_sparsemat_is_symmetric_triplet(const igraph_spars
 }
 
 igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
-    igraph_bool_t res = 0;
+    igraph_bool_t res = false;
 
     if (A->cs->m != A->cs->n) {
         return false;

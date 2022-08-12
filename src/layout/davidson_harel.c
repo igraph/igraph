@@ -150,7 +150,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     igraph_integer_t no_edges = igraph_ecount(graph);
     float width = sqrt(no_nodes) * 10, height = width;
     igraph_vector_int_t perm;
-    igraph_bool_t fine_tuning = 0;
+    igraph_bool_t fine_tuning = false;
     igraph_integer_t round, i;
     igraph_vector_t try_x, try_y;
     igraph_vector_int_t try_idx;
