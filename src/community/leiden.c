@@ -828,7 +828,7 @@ static igraph_error_t igraph_i_community_leiden(
             /* If refinement didn't aggregate anything, we aggregate on the basis of
              * the actual clustering */
             if (nb_refined_clusters >= igraph_vcount(i_graph)) {
-                igraph_vector_int_update(&refined_membership, i_membership);
+                IGRAPH_CHECK(igraph_vector_int_update(&refined_membership, i_membership));
                 nb_refined_clusters = *nb_clusters;
             }
 
@@ -1002,7 +1002,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
             IGRAPH_ERROR("Membership vector should be supplied and initialized, "
                          "even when not starting optimization from it", IGRAPH_EINVAL);
 
-        igraph_vector_int_resize(membership, n);
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
         for (i = 0; i < n; i++) {
             VECTOR(*membership)[i] = i;
         }
@@ -1016,9 +1016,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     /* Check edge weights to possibly use default */
     if (!edge_weights) {
         i_edge_weights = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (i_edge_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for edge weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(i_edge_weights, "Leiden algorithm failed, could not allocate memory for edge weights.");
         IGRAPH_FINALLY(igraph_free, i_edge_weights);
         IGRAPH_CHECK(igraph_vector_init(i_edge_weights, igraph_ecount(graph)));
         IGRAPH_FINALLY(igraph_vector_destroy, i_edge_weights);
@@ -1030,9 +1028,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     /* Check edge weights to possibly use default */
     if (!node_weights) {
         i_node_weights = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (i_node_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(i_node_weights, "Leiden algorithm failed, could not allocate memory for node weights.");
         IGRAPH_FINALLY(igraph_free, i_node_weights);
         IGRAPH_CHECK(igraph_vector_init(i_node_weights, n));
         IGRAPH_FINALLY(igraph_vector_destroy, i_node_weights);
