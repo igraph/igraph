@@ -24,9 +24,7 @@
 #include "igraph_scan.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_centrality.h"
 #include "igraph_dqueue.h"
-#include "igraph_eigen.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
@@ -34,7 +32,6 @@
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
-#include "properties/properties_internal.h"
 
 /**
  * \section about_local_scan
@@ -98,7 +95,7 @@ static igraph_error_t igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_
                 j++;
             } else {
                 VECTOR(*v)[j] = igraph_vector_int_tail(v);
-                IGRAPH_CHECK(igraph_vector_int_pop_back(v));
+                igraph_vector_int_pop_back(v);
                 l--;
             }
         }
