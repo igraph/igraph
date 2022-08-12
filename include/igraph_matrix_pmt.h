@@ -246,7 +246,7 @@ IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_co
                                                                 const igraph_matrix_t *r,
                                                                 const igraph_matrix_t *theta);
 
-IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
+IGRAPH_EXPORT igraph_bool_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
                                                                 igraph_matrix_complex_t *rhs,
                                                                 igraph_real_t eps);
 
