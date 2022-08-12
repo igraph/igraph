@@ -122,14 +122,14 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
     igraph_integer_t np = 0, hp = 0;
 
     if (hlen < nlen) {
-        return 0;
+        return false;
     }
 
     while (np < nlen && hp < hlen) {
         if (VECTOR(*needle)[np] == VECTOR(*haystack)[hp]) {
             np++; hp++;
         } else if (VECTOR(*needle)[np] < VECTOR(*haystack)[hp]) {
-            return 0;
+            return false;
         } else {
             hp++;
         }

@@ -2960,7 +2960,7 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
 
     if (!l) {
         IGRAPH_WARNINGF("Graph attribute '%s' does not exist, returning default boolean attribute value.", name);
-        return 0;
+        return false;
     }
 
     rec = VECTOR(*gal)[j];
@@ -3068,7 +3068,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
 
     if (!l) {
         IGRAPH_WARNINGF("Vertex attribute '%s' does not exist, returning default boolean attribute value.", name);
-        return 0;
+        return false;
     }
 
     rec = VECTOR(*val)[j];
@@ -3178,7 +3178,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
 
     if (!l) {
         IGRAPH_WARNINGF("Edge attribute '%s' does not exist, returning default boolean attribute value.", name);
-        return 0;
+        return false;
     }
 
     rec = VECTOR(*eal)[j];

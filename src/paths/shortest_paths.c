@@ -1312,11 +1312,11 @@ static igraph_bool_t igraph_i_has_edge_with_infinite_weight(
     for (i = 0; i < n; i++) {
         igraph_integer_t edge = VECTOR(*path)[i];
         if (!IGRAPH_FINITE(VECTOR(*weights)[edge])) {
-            return 1;
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }
 
 static igraph_real_t igraph_i_get_total_weight_of_path(

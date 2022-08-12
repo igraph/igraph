@@ -46,7 +46,7 @@ igraph_bool_t igraph_i_layout_segments_intersect(float p0_x, float p0_y,
     s1 = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y));
     s2 = (-s2_x * s1_y + s1_x * s2_y);
     if (s2 == 0) {
-        return 0;
+        return false;
     }
     t1 = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x));
     t2 = (-s2_x * s1_y + s1_x * s2_y);

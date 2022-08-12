@@ -52,11 +52,11 @@ void igraph_gml_yyset_in(FILE *in_str, void *yyscanner);
 static igraph_bool_t needs_coding(const char *str) {
     while (*str) {
         if (*str == '&' || *str == '"') {
-            return 1;
+            return true;
         }
         str++;
     }
-    return 0;
+    return false;
 }
 
 /* Encode & and " character in 'src' to &amp; and &quot;

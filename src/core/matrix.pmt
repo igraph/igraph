@@ -1467,7 +1467,7 @@ igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m
     igraph_integer_t n = m->nrow;
     igraph_integer_t r, c;
     if (m->ncol != n) {
-        return 0;
+        return false;
     }
     for (r = 1; r < n; r++) {
         for (c = 0; c < r; c++) {
@@ -1475,16 +1475,16 @@ igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m
             BASE a2 = MATRIX(*m, c, r);
 #ifdef EQ
             if (!EQ(a1, a2)) {
-                return 0;
+                return false;
             }
 #else
             if (a1 != a2) {
-                return 0;
+                return false;
             }
 #endif
         }
     }
-    return 1;
+    return true;
 }
 
 /**

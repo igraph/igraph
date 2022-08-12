@@ -494,19 +494,19 @@ igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *
     igraph_integer_t n = igraph_vector_complex_size(lhs);
 
     if (lhs == rhs) {
-        return 1;
+        return true;
     }
 
     if (igraph_vector_complex_size(rhs) != n) {
-        return 0;
+        return false;
     }
 
     for (igraph_integer_t i=0; i < n; i++) {
         if (! igraph_complex_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
-            return 0;
+            return false;
     }
 
-    return 1;
+    return true;
 }
 
 /**
@@ -526,7 +526,7 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 
     s = igraph_vector_size(lhs);
     if (s != igraph_vector_size(rhs)) {
-        return 0;
+        return false;
     } else {
         if (tol == 0) {
             tol = DBL_EPSILON;
@@ -535,10 +535,10 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
             igraph_real_t l = VECTOR(*lhs)[i];
             igraph_real_t r = VECTOR(*rhs)[i];
             if (l < r - tol || l > r + tol) {
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -561,19 +561,19 @@ igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lhs,
     igraph_integer_t n = igraph_vector_size(lhs);
 
     if (lhs == rhs) {
-        return 1;
+        return true;
     }
 
     if (igraph_vector_size(rhs) != n) {
-        return 0;
+        return false;
     }
 
     for (igraph_integer_t i=0; i < n; i++) {
         if (! igraph_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
-            return 0;
+            return false;
     }
 
-    return 1;
+    return true;
 }
 
 /**
@@ -707,9 +707,9 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
     ptr = v->stor_begin;
     while (ptr < v->end) {
         if (igraph_is_nan(*ptr)) {
-            return 1;
+            return true;
         }
         ptr++;
     }
-    return 0;
+    return false;
 }

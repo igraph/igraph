@@ -118,7 +118,7 @@ static igraph_bool_t igraph_i_fastgreedy_community_rescan_max(igraph_i_fastgreed
     n = igraph_vector_ptr_size(&comm->neis);
     if (n == 0) {
         comm->maxdq = 0;
-        return 1;
+        return true;
     }
 
     best = (igraph_i_fastgreedy_commpair*)VECTOR(comm->neis)[0];
@@ -134,9 +134,9 @@ static igraph_bool_t igraph_i_fastgreedy_community_rescan_max(igraph_i_fastgreed
 
     if (best != comm->maxdq) {
         comm->maxdq = best;
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 

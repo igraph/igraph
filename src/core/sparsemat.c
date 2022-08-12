@@ -748,7 +748,7 @@ igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
     igraph_bool_t res = 0;
 
     if (A->cs->m != A->cs->n) {
-        return 0;
+        return false;
     }
 
     /* TODO(ntamas): return values from igraph_i_sparsemat_is_symmetric_... are

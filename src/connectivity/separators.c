@@ -323,12 +323,12 @@ static igraph_bool_t igraph_i_separators_is_not_seen_yet(
     for (co = 0; co < nocomps; co++) {
         igraph_vector_int_t *act = igraph_vector_int_list_get_ptr(comps, co);
         if (igraph_vector_int_all_e(act, newc)) {
-            return 0;
+            return false;
         }
     }
 
     /* If not found, then it is new */
-    return 1;
+    return true;
 }
 
 static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separators,
