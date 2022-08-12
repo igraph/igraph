@@ -884,7 +884,7 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
     return IGRAPH_SUCCESS;
 }
 
-#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Writing GML format failed.", IGRAPH_EFILE); } while (0)
+#define CHECK(cmd) do { int ret=cmd; if (ret<0) IGRAPH_ERROR("Writing GML format failed.", IGRAPH_EFILE); } while (0)
 
 /**
  * \function igraph_write_graph_gml
@@ -969,7 +969,6 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
 igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                                       igraph_write_gml_sw_t options,
                                       const igraph_vector_t *id, const char *creator) {
-    igraph_error_t ret;
     igraph_strvector_t gnames, vnames, enames; /* attribute names */
     igraph_vector_int_t gtypes, vtypes, etypes; /* attribute types */
     igraph_integer_t gattr_no, vattr_no, eattr_no; /* attribute counts */

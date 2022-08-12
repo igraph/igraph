@@ -34,7 +34,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write DOT format failed.", IGRAPH_EFILE); } while (0)
+#define CHECK(cmd) do { int ret=cmd; if (ret<0) IGRAPH_ERROR("Write DOT format failed.", IGRAPH_EFILE); } while (0)
 
 static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
     /* do we have to escape the string at all? */
@@ -136,7 +136,6 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
  * \example examples/simple/dot.c
  */
 igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
-    igraph_error_t ret;
     igraph_integer_t i, j;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
