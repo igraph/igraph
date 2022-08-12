@@ -37,7 +37,7 @@
 
 int igraph_gml_yylex_init_extra (igraph_i_gml_parsedata_t* user_defined,
                                  void* scanner);
-void igraph_gml_yylex_destroy (void *scanner );
+int igraph_gml_yylex_destroy (void *scanner );
 int igraph_gml_yyparse (igraph_i_gml_parsedata_t* context);
 void igraph_gml_yyset_in  (FILE * in_str, void* yyscanner );
 

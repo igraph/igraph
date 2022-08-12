@@ -29,7 +29,7 @@
 
 int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
                                 void* scanner);
-void igraph_dl_yylex_destroy (void *scanner );
+int igraph_dl_yylex_destroy (void *scanner );
 int igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
 void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
 

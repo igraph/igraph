@@ -31,7 +31,7 @@
 
 int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
                                   void* scanner);
-void igraph_ncol_yylex_destroy (void *scanner );
+int igraph_ncol_yylex_destroy (void *scanner );
 int igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
 void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
 

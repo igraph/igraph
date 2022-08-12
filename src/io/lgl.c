@@ -31,7 +31,7 @@
 
 int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
                                  void* scanner);
-void igraph_lgl_yylex_destroy (void *scanner );
+int igraph_lgl_yylex_destroy (void *scanner );
 int igraph_lgl_yyparse (igraph_i_lgl_parsedata_t* context);
 void igraph_lgl_yyset_in  (FILE * in_str, void* yyscanner );
 
