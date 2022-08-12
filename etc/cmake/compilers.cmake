@@ -49,9 +49,8 @@ macro(use_all_warnings TARGET_NAME)
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
-        # disable #188: enumerated type mixed with another type; affecting IGRAPH_CHECK
         # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED
-        -wd279 -wd188 -wd592 -diag-disable=remark
+        -wd279 -wd592 -diag-disable=remark
       >
     )
   endif()
