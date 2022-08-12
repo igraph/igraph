@@ -2015,7 +2015,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     }
 
     /* Now the edges */
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &it));
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
     while (!IGRAPH_EIT_END(it)) {
         igraph_integer_t from, to;

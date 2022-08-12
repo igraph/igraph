@@ -744,7 +744,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, dq);
     debug("Creating community pair list\n");
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &edgeit));
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
     pairs = IGRAPH_CALLOC(2 * no_of_edges, igraph_i_fastgreedy_commpair);
     if (pairs == 0) {

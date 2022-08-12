@@ -166,7 +166,7 @@ void igraph_i_property_cache_invalidate_conditionally(
     maybe_keep = graph->cache->known & invalidate & (keep_when_false | keep_when_true);
 
     if (maybe_keep) {
-        for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
+        for (int prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
             mask = 1 << prop;
             if (maybe_keep & mask) {
                 /* if we get here, we know that the property is cached; we have
