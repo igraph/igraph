@@ -417,8 +417,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 	if (mode != IGRAPH_ALL)
 	{
 		*res = 0;
-		IGRAPH_ERROR("Currently this function only supports undirected graphs while the graph's mode is not undirected.\n", IGRAPH_FAILURE);
-		return IGRAPH_FAILURE;
+		IGRAPH_ERROR("Currently this function only supports undirected graphs while the graph's mode is not undirected.", IGRAPH_FAILURE);
 	}
 
 	igraph_integer_t no_of_vertices = igraph_vcount(graph);
@@ -427,8 +426,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 	if (no_of_vertices == 0 || (no_of_vertices == 1)) // graph is empty
 	{
 		*res = 0;
-		IGRAPH_ERRORF("The graph has %" IGRAPH_PRId " vertex because of which this function cannot run.\n", IGRAPH_FAILURE, no_of_vertices);
-		return IGRAPH_FAILURE;
+		IGRAPH_ERRORF("The graph has %" IGRAPH_PRId " vertex because of which this function cannot run.", IGRAPH_EINVAL, no_of_vertices);
 	}
 
 	/*
@@ -450,8 +448,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 	if (igraph_vector_size(weights) != no_of_edges)
 	{
 		*res = 0;
-		IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges \n", IGRAPH_FAILURE, igraph_vector_size(weights), no_of_edges);
-		return IGRAPH_FAILURE;
+		IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges.", IGRAPH_FAILURE, igraph_vector_size(weights), no_of_edges);
 	}
 	IGRAPH_CHECK(igraph_matrix_init(&distance, no_of_vertices, no_of_vertices));
 	IGRAPH_FINALLY(igraph_matrix_destroy, &distance);

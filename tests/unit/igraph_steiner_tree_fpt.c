@@ -16,13 +16,10 @@
 
 #include <igraph.h>
 #include "test_utilities.h"
-#include "igraph_memory.h"
-#include "igraph_types.h"
-#include "igraph_adjlist.h"
 
 int main()
 {
-   // printf("Starting Tests\n");
+   //printf("Starting Tests\n");
     igraph_t g_empty, g_lm;
 
     igraph_vector_int_t steiner_terminals,steiner_terminals_null;
@@ -98,17 +95,16 @@ int main()
                                                 5, 6, 
                                                 -1);
     
-    //printf("No vertices, not directed:\n");
-    //igraph_real_t val1,val2;
-    igraph_real_t val2;
+    printf("No vertices, not directed:\n");
+    igraph_real_t val1,val2;
     igraph_vector_int_t res_tree,res_tree_1;
     
     IGRAPH_CHECK(igraph_vector_int_init(&res_tree,1));
     IGRAPH_CHECK(igraph_vector_int_init(&res_tree_1,1));
 
-   //  IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_ALL, &weights_empty,&val1,&res_tree) == IGRAPH_FAILURE);
-   //  printf("%.2f\n",val1);
-   //  IGRAPH_ASSERT(val1 == 0);
+   CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, IGRAPH_ALL, &weights_empty,&val1,&res_tree) , IGRAPH_EINVAL);
+   printf("%.2f\n",val1);
+   IGRAPH_ASSERT(val1 == 0);
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm,&steiner_terminals, IGRAPH_ALL, &weights_lm,&val2,&res_tree_1) == IGRAPH_SUCCESS);
     printf("%.2f\n",val2);
