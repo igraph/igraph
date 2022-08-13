@@ -527,6 +527,9 @@ Some of the highlights are:
    Functions that used `igraph_spmatrix_t` in the library now use
    `igraph_sparsemat_t`.
 
+ - `igraph_sparsemat_is_symmetric()` now returns an error code and the result
+   itself is provided in an output argument.
+
  - `igraph_stochastic_imitation()` now expects the list of strategies
    in an `igraph_vector_int_t` instead of an `igraph_int_t`.
 
