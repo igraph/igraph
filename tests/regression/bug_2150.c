@@ -26,7 +26,7 @@
 
 /* Regression test for https://github.com/igraph/igraph/issues/2150 */
 
-int main(int argc, char *argv[]) {
+int main() {
     igraph_t graph;
     igraph_vector_t w;
     igraph_vector_int_list_t res;

@@ -85,7 +85,7 @@ void check_consecutive_bits(const igraph_vector_int_t* numbers, uint8_t num_bits
     n = igraph_vector_int_size(numbers);
 
     for (j = 0; j < 4; j++) {
-        mask = (1 << (j + 1)) - 1;
+        mask = ((igraph_integer_t) 1 << (j + 1)) - 1;
         igraph_vector_bool_init(&seen, mask + 1);
         for (i = 0; i < num_bits - j; i++, mask <<= 1) {
             still_needed = (1 << (j + 1));
