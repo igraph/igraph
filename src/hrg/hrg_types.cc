@@ -41,6 +41,7 @@
 #include "igraph_constructors.h"
 #include "igraph_random.h"
 
+#include <stdexcept>
 #include <climits>
 
 using namespace std;
@@ -1442,7 +1443,7 @@ bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
     igraph_integer_t size = igraph_hrg_size(hrg);
 
     if (size > INT_MAX) {
-        IGRAPH_ERROR("Hierarchical random graph too large for the HRG module", IGRAPH_EOVERFLOW);
+        throw std::range_error("Hierarchical random graph too large for the HRG module");
     }
 
     n = (int) size;

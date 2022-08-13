@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <new>
+#include <stdexcept>
 
 /* igraph functions which may be called from C code must not throw C++ exceptions.
  * This includes all public functions. This macro is meant to handle exceptions thrown
@@ -19,8 +20,9 @@
 #define IGRAPH_HANDLE_EXCEPTIONS_END \
     } \
     catch (const std::bad_alloc &e) { IGRAPH_ERROR(e.what(), IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */ } \
-    catch (const std::exception &e) { IGRAPH_ERROR(e.what(), IGRAPH_FAILURE); } \
-    catch (...) { IGRAPH_ERROR("Unknown exception caught.", IGRAPH_FAILURE); }
+    catch (const std::range_error &e) { IGRAPH_ERROR(e.what(), IGRAPH_EOVERFLOW); /* LCOV_EXCL_LINE */ } \
+    catch (const std::exception &e) { IGRAPH_ERROR(e.what(), IGRAPH_FAILURE); /* LCOV_EXCL_LINE */ } \
+    catch (...) { IGRAPH_ERROR("Unknown exception caught.", IGRAPH_FAILURE); /* LCOV_EXCL_LINE */ }
 
 #define IGRAPH_HANDLE_EXCEPTIONS(code) \
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN; \
