@@ -368,8 +368,6 @@ igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t
             return igraph_local_scan_k_ecount(graph, 1, res, weights, mode);
         }
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
