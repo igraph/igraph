@@ -134,7 +134,7 @@ void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context) {
     }
 
     if (context->scanner != 0) {
-        igraph_gml_yylex_destroy(context->scanner);
+        (void) igraph_gml_yylex_destroy(context->scanner);
         context->scanner = 0;
     }
 }

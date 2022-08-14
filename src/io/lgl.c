@@ -35,6 +35,11 @@ int igraph_lgl_yylex_destroy (void *scanner );
 int igraph_lgl_yyparse (igraph_i_lgl_parsedata_t* context);
 void igraph_lgl_yyset_in  (FILE * in_str, void* yyscanner );
 
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_lgl_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_lgl_yylex_destroy(scanner);
+}
+
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_lgl
@@ -120,7 +125,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     context.eof = 0;
 
     igraph_lgl_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_lgl_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_lgl_yylex_destroy_wrapper, context.scanner);
 
     igraph_lgl_yyset_in(instream, context.scanner);
 
