@@ -201,7 +201,7 @@ static igraph_error_t igraph_i_hrg_getgraph(const igraph_t *igraph,
     igraph_integer_t i;
 
     if (no_of_nodes > INT_MAX) {
-        IGRAPH_ERROR("Graph too large for the HRG module", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph too large for the HRG module.", IGRAPH_EOVERFLOW);
     }
 
     // Create graph
@@ -236,7 +236,7 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
     igraph_integer_t i;
 
     if (no_of_nodes > INT_MAX) {
-        IGRAPH_ERROR("Graph too large for the HRG module", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph too large for the HRG module.", IGRAPH_EOVERFLOW);
     }
 
     // Create graphs
@@ -418,7 +418,7 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
     if (start) {
         if (igraph_hrg_size(hrg) != no_of_nodes) {
             delete d;
-            IGRAPH_ERROR("Invalid HRG to start from", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid HRG to start from.", IGRAPH_EINVAL);
         }
         // Convert the igraph graph
         IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
@@ -508,7 +508,7 @@ igraph_error_t igraph_hrg_sample_many(
     dendro d;
 
     if (num_samples < 0) {
-        IGRAPH_ERROR("Number of samples must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of samples must be non-negative.", IGRAPH_EINVAL);
     }
 
     if (num_samples == 0) {
@@ -660,7 +660,7 @@ igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
     dendro *d;
 
     if (start && !hrg) {
-        IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`hrg' must be given if `start' is true.", IGRAPH_EINVAL);
     }
 
     RNG_BEGIN();
@@ -857,7 +857,7 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
     simpleGraph *sg;
 
     if (start && !hrg) {
-        IGRAPH_ERROR("`hrg' must be given is `start' is true", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`hrg' must be given if `start' is true.", IGRAPH_EINVAL);
     }
 
     RNG_BEGIN();
@@ -935,29 +935,29 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
 
     // At least three vertices are required
     if (no_of_nodes < 3) {
-        IGRAPH_ERROR("HRG tree must have at least three vertices",
+        IGRAPH_ERROR("HRG tree must have at least three vertices.",
                      IGRAPH_EINVAL);
     }
 
     // Prob vector was given
     if (!prob) {
-        IGRAPH_ERROR("Probability vector must be given for HRG",
+        IGRAPH_ERROR("Probability vector must be given for HRG.",
                      IGRAPH_EINVAL);
     }
 
     // Length of prob vector
     if (igraph_vector_size(prob) != no_of_nodes) {
-        IGRAPH_ERROR("HRG probability vector of wrong size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("HRG probability vector of wrong size.", IGRAPH_EINVAL);
     }
 
     // Must be a directed graph
     if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("HRG graph must be directed", IGRAPH_EINVAL);
+        IGRAPH_ERROR("HRG graph must be directed.", IGRAPH_EINVAL);
     }
 
     // Number of nodes must be odd
     if (no_of_nodes % 2 == 0) {
-        IGRAPH_ERROR("Complete HRG graph must have odd number of vertices",
+        IGRAPH_ERROR("Complete HRG graph must have odd number of vertices.",
                      IGRAPH_EINVAL);
     }
 
@@ -973,12 +973,12 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
         case 1: d1++; break;
         default:
             IGRAPH_ERROR("HRG nodes must have in-degree one, except for the "
-                         "root vertex", IGRAPH_EINVAL);
+                         "root vertex.", IGRAPH_EINVAL);
         }
     }
     if (d1 != no_of_nodes - 1 || d0 != 1) {
         IGRAPH_ERROR("HRG nodes must have in-degree one, except for the "
-                     "root vertex", IGRAPH_EINVAL);
+                     "root vertex.", IGRAPH_EINVAL);
     }
 
     // Every internal vertex must have out-degree two,
@@ -993,7 +993,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
         case 2: d2++; break;
         default:
             IGRAPH_ERROR("HRG nodes must have out-degree 2 (internal nodes) or "
-                         "degree 0 (leaves)", IGRAPH_EINVAL);
+                         "degree 0 (leaves).", IGRAPH_EINVAL);
         }
     }
 
