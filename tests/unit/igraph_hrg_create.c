@@ -21,14 +21,49 @@
 
 int main() {
     igraph_hrg_t hrg;
-    igraph_t graph;
+    igraph_t graph, new_graph;
     igraph_vector_t prob;
 
-    igraph_vector_init_real(&prob, 3, 0.1, 0.9);
-    igraph_hrg_init(&hrg, 0);
+    igraph_rng_seed(igraph_rng_default(), 42);
 
+    printf("Two leaf nodes which are always connected:\n");
+    igraph_vector_init_real(&prob, 1, 1.0);
+    igraph_hrg_init(&hrg, 0);
     igraph_small(&graph, 3, IGRAPH_DIRECTED, 0,1, 0,2, -1);
+    /* the graph and the prob form the hrg dendrogram with probabilities. So you're not just using some graph */
+    /* igraph_hrg_fit is used if you just have some graph that you'd want to do HRG analysis on */
     igraph_hrg_create(&hrg, &graph, &prob);
+    igraph_hrg_game(&new_graph, &hrg);
+    print_graph_canon(&new_graph);
+    igraph_destroy(&graph);
+    igraph_destroy(&new_graph);
+    igraph_vector_destroy(&prob);
+
+    printf("Four leaf nodes, one node connected to all others:\n");
+    igraph_vector_init_real(&prob, 3, 1.0, 0.0, 0.0);
+    igraph_small(&graph, 7, IGRAPH_DIRECTED, 0,3, 0,1, 1,4, 1,2, 2,5, 2,6, -1);
+    igraph_hrg_create(&hrg, &graph, &prob);
+    igraph_hrg_game(&new_graph, &hrg);
+    print_graph_canon(&new_graph);
+
+    igraph_destroy(&graph);
+    igraph_destroy(&new_graph);
+    igraph_vector_destroy(&prob);
+
+    VERIFY_FINALLY_STACK();
+
+    printf("Check error handling for wrong number of probabilities:\n");
+    igraph_vector_init_real(&prob, 3, 1.0, 0.0, 0.0);
+    igraph_small(&graph, 3, IGRAPH_DIRECTED, 0,1, 0,2, -1);
+    CHECK_ERROR(igraph_hrg_create(&hrg, &graph, &prob), IGRAPH_EINVAL);
+
+    igraph_destroy(&graph);
+    igraph_vector_destroy(&prob);
+
+    printf("Check error handling for non-tree:\n");
+    igraph_vector_init_real(&prob, 1, 1.0);
+    igraph_small(&graph, 3, IGRAPH_DIRECTED, 0,0, 0,2, -1);
+    CHECK_ERROR(igraph_hrg_create(&hrg, &graph, &prob), IGRAPH_EINVAL);
 
     igraph_destroy(&graph);
     igraph_vector_destroy(&prob);
