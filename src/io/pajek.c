@@ -40,6 +40,11 @@ int igraph_pajek_yylex_destroy (void *scanner );
 int igraph_pajek_yyparse (igraph_i_pajek_parsedata_t* context);
 void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
 
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_pajek_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_pajek_yylex_destroy(scanner);
+}
+
 void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
     const igraph_integer_t attr_count = igraph_vector_ptr_size(attrs);
     for (igraph_integer_t i = 0; i < attr_count; i++) {
@@ -191,7 +196,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_pajek_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_pajek_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_pajek_yylex_destroy_wrapper, context.scanner);
 
     igraph_pajek_yyset_in(instream, context.scanner);
 
