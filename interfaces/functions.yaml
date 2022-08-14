@@ -1814,7 +1814,7 @@ igraph_motifs_randesu_no:
     PARAMS: GRAPH graph, OUT INTEGER no, INTEGER size=3, VECTOR cut_prob
 
 igraph_dyad_census:
-    PARAMS: GRAPH graph, OUT INTEGER mut, OUT INTEGER asym, OUT INTEGER null
+    PARAMS: GRAPH graph, OUT REAL mut, OUT REAL asym, OUT REAL null
     RETURN: ERROR
 
 igraph_triad_census:

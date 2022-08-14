@@ -240,6 +240,9 @@ Some of the highlights are:
  - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its
    `dom` and `leftout` arguments instead of an `igraph_vector_t`.
 
+ - `igraph_dyad_census()` now uses `igraph_real_t` instead of `igraph_integer_t` for
+    its output arguments, and it no longer returns -1 when overflow occurs.
+
  - `igraph_edges()` now takes an `igraph_vector_int_t` for its
    `edges` argument instead of an `igraph_vector_t`.
 
