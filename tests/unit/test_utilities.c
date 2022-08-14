@@ -572,6 +572,8 @@ void print_attributes(const igraph_t *g) {
 expect_warning_context_t expect_warning_ctx;
 
 void record_last_warning(const char *reason, const char *file, int line) {
+    IGRAPH_UNUSED(file); IGRAPH_UNUSED(line);
+
     if (expect_warning_ctx.observed) {
         igraph_free(expect_warning_ctx.observed);
     }
