@@ -1025,7 +1025,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
         }
     }
 
-    igraph_hrg_resize(hrg, no_of_internal + 1);
+    IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_internal + 1));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t ri = VECTOR(idx)[i];
