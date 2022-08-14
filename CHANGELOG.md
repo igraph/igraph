@@ -710,6 +710,8 @@ Some of the highlights are:
 
  - `igraph_is_mutual()` has an additional parameter which controls whether directed self-loops are considered mutual.
 
+ - `igraph_hrg_create()` now takes a vector of probabilities corresponding to the internal nodes of the dendogram. It used to also take probabilities for the leaf nodes and then ignore them.
+
 ### Added
 
  - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.

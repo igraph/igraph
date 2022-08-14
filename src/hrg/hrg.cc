@@ -909,8 +909,7 @@ igraph_error_t igraph_hrg_predict(const igraph_t *graph,
  *    binary tree, with n-1 internal and n leaf vertices. The root
  *    vertex must have in-degree zero.
  * \param prob The vector of probabilities, this is used to label the
- *    internal nodes of the hierarchical random graph. The values
- *    corresponding to the leaves are ignored.
+ *    internal nodes of the hierarchical random graph.
  * \return Error code.
  *
  * Time complexity: O(n), the number of vertices in the tree.
@@ -946,8 +945,10 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     }
 
     // Length of prob vector
-    if (igraph_vector_size(prob) != no_of_nodes) {
-        IGRAPH_ERROR("HRG probability vector of wrong size.", IGRAPH_EINVAL);
+    if (igraph_vector_size(prob) != no_of_nodes / 2) {
+        IGRAPH_ERRORF("HRG probability vector size (%" IGRAPH_PRId ") should be equal "
+                "to the number of internal nodes (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+                igraph_vector_size(prob), no_of_nodes / 2);
     }
 
     // Must be a directed graph
