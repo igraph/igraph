@@ -54,6 +54,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
         -DDIFF_TOOL=${DIFF_TOOL}
         -DFC_TOOL=${FC_TOOL}
         -DIGRAPH_VERSION=${PACKAGE_VERSION}
+        -DCROSSCOMPILING_EMULATOR=${CROSSCOMPILING_EMULATOR}
         -P ${CMAKE_SOURCE_DIR}/etc/cmake/run_legacy_test.cmake
     )
     set_property(TEST ${TEST_NAME} PROPERTY SKIP_REGULAR_EXPRESSION "Test skipped")
