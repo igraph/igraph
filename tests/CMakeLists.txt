@@ -126,7 +126,6 @@ add_examples(
   igraph_degree
   igraph_delete_edges
   igraph_delete_vertices
-  igraph_empty
   igraph_get_eid
   igraph_get_eids
   igraph_is_directed
@@ -138,6 +137,7 @@ add_legacy_tests(
   igraph_add_edges
   igraph_add_vertices
   igraph_edges
+  igraph_empty
   igraph_is_same_graph
   igraph_i_incident
   igraph_i_neighbors
