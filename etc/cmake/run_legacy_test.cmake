@@ -13,19 +13,6 @@
 # - IGRAPH_VERSION: version string of igraph that should be replaced in
 #   expected outputs
 
-function(print_file FILENAME)
-  # Replacement of "cmake -E cat" for older CMake versions. cat was added in
-  # CMake 3.18
-  file(TO_NATIVE_PATH "${FILENAME}" FILENAME_NATIVE)
-  if(UNIX OR APPLE)
-    # Most likely Linux or macOS
-    execute_process(COMMAND "/bin/sh" "-c" "cat ${FILENAME_NATIVE}")
-  elseif(WIN32)
-    # Most likely Windows
-    execute_process(COMMAND "cmd" "/c" "type" "${FILENAME_NATIVE}")
-  endif()
-endfunction()
-
 get_filename_component(WORK_DIR ${EXPECTED_OUTPUT_FILE} DIRECTORY)
 
 execute_process(
@@ -40,7 +27,7 @@ if(ERROR_CODE EQUAL 77)
 elseif(ERROR_CODE)
   set(MESSAGE "Test exited abnormally with error: ${ERROR_CODE}")
   file(WRITE ${OBSERVED_OUTPUT_FILE} "${MESSAGE}\n=========================================\n${OBSERVED_OUTPUT}")
-  print_file("${OBSERVED_OUTPUT_FILE}")
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E cat "${OBSERVED_OUTPUT_FILE}")
   file(REMOVE ${DIFF_FILE})
   message(FATAL_ERROR "Exiting test.")
 else()
