@@ -843,17 +843,17 @@ static int igraph_i_transitivity_barrat4(const igraph_t *graph,
 
 /**
  * \function igraph_transitivity_barrat
- * Weighted transitivity, as defined by A. Barrat.
+ * \brief Weighted transitivity, as defined by A. Barrat.
  *
  * This is a local transitivity, i.e. a vertex-level index. For a
  * given vertex \c i, from all triangles in which it participates we
  * consider the weight of the edges incident on \c i. The transitivity
  * is the sum of these weights divided by twice the strength of the
  * vertex (see \ref igraph_strength()) and the degree of the vertex
- * minus one. See   Alain Barrat, Marc Barthelemy, Romualdo
+ * minus one. See equation (5) in Alain Barrat, Marc Barthelemy, Romualdo
  * Pastor-Satorras, Alessandro Vespignani: The architecture of complex
  * weighted networks, Proc. Natl. Acad. Sci. USA 101, 3747 (2004) at
- * http://arxiv.org/abs/cond-mat/0311416 for the exact formula.
+ * https://doi.org/10.1073/pnas.0400087101 for the exact formula.
  *
  * \param graph The input graph. Edge directions are ignored for
  *   directed graphs. Note that the function does \em not work for

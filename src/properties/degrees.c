@@ -207,16 +207,21 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  * </para><para>
  * The weighted version computes a weighted average of the neighbor degrees as
  *
+ * </para><para>
  * <code>k_nn_u = 1/s_u sum_v w_uv k_v</code>,
  *
+ * </para><para>
  * where <code>s_u = sum_v w_uv</code> is the sum of the incident edge weights
  * of vertex \c u, i.e. its strength.
  * The sum runs over the neighbors \c v of vertex \c u
  * as indicated by \p mode. <code>w_uv</code> denotes the weighted adjacency matrix
  * and <code>k_v</code> is the neighbors' degree, specified by \p neighbor_degree_mode.
+ * This is equation (6) in the reference below.
  *
  * </para><para>
  * Reference:
+ *
+ * </para><para>
  * A. Barrat, M. Barthélemy, R. Pastor-Satorras, and A. Vespignani,
  * The architecture of complex weighted networks,
  * Proc. Natl. Acad. Sci. USA 101, 3747 (2004).
