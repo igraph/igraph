@@ -121,8 +121,7 @@ add_legacy_tests(
 # basic.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_add_edges
-  igraph_add_vertices
+  creation
   igraph_copy
   igraph_degree
   igraph_delete_edges
@@ -136,6 +135,8 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_add_edges
+  igraph_add_vertices
   igraph_edges
   igraph_is_same_graph
   igraph_i_incident

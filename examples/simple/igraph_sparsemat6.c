@@ -26,7 +26,6 @@
 int main() {
     igraph_matrix_t mat, mat2, mat3;
     igraph_sparsemat_t spmat, spmat2;
-    int i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -35,9 +34,9 @@ int main() {
 #define NUM_NONZEROS 15
 
     igraph_matrix_init(&mat, NROW, NCOL);
-    for (i = 0; i < NUM_NONZEROS; i++) {
-        int r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
-        int c = igraph_rng_get_integer(igraph_rng_default(), 0, NCOL - 1);
+    for (igraph_integer_t i = 0; i < NUM_NONZEROS; i++) {
+        igraph_integer_t r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
+        igraph_integer_t c = igraph_rng_get_integer(igraph_rng_default(), 0, NCOL - 1);
         igraph_real_t val = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         MATRIX(mat, r, c) = val;
     }
