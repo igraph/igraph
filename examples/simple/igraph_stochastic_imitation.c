@@ -40,7 +40,8 @@ igraph_error_t error_tests() {
     igraph_t g, h;
     igraph_vector_t quant;
     igraph_vector_int_t strat;
-    igraph_integer_t i, n, ret;
+    igraph_integer_t i, n;
+    igraph_error_t ret;
     strategy_test_t *test;
 
     /* nonempty graph */
@@ -154,7 +155,8 @@ igraph_error_t petersen_game_test() {
     igraph_vector_t quant;
     igraph_vector_int_t strat, stratcopy, *knownstrats;
     igraph_vector_int_t known0, known2, known4;
-    igraph_integer_t i, k, n, ret;
+    igraph_integer_t i, k, n;
+    igraph_error_t ret;
     int nvert;
     strategy_test_t *test;
 
