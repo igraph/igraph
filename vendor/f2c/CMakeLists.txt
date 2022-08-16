@@ -15,13 +15,15 @@ set(
 if(F2C_EXTERNAL_ARITH_HEADER)
   configure_file(${F2C_EXTERNAL_ARITH_HEADER} arith.h COPYONLY)
 else()
-  if (CMAKE_CROSSCOMPILING)
+  if (CMAKE_CROSSCOMPILING AND NOT CMAKE_CROSSCOMPILING_EMULATOR)
     # Warn only, as in some circumstances, such as macOS with Rosetta,
-    # arithchk can be run through emulation and the build with not fail.
+    # arithchk can still be run through emulation and the build with not fail.
     message(WARNING 
-      "Cross-compiling with internal ARPACK, BLAS or LAPACK, "
-      "but F2C_EXTERNAL_ARITH_HEADER was not set. The build is likely to fail. "
-      "See igraph's installation instructions for more information.")
+      "Cross-compiling with internal ARPACK, BLAS or LAPACK, but "
+	  "F2C_EXTERNAL_ARITH_HEADER was not set and no cross-compiling "
+	  "emulator was provided in CMAKE_CROSSCOMPILING_EMULATOR either. "
+	  "The build is likely to fail. See igraph's installation instructions "
+	  "for more information.")
   endif()
   add_custom_command(
     OUTPUT arith.h

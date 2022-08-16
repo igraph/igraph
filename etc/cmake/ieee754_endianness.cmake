@@ -6,7 +6,17 @@ cmake_push_check_state(RESET)
 # only when not cross-compiling; during cross-compilation, the host architecture
 # might have different endianness conventions than the target, and we are running
 # the test on the host here
-if(NOT CMAKE_CROSSCOMPILING)
+if(CMAKE_CROSSCOMPILING AND NOT CMAKE_CROSSCOMPILING_EMULATOR)
+    # If we are cross-compiling and we have no emulator, let's just assume that
+    # IEEE754 doubles use the same endianness as uint64_t
+    set(IEEE754_DOUBLE_ENDIANNESS_MATCHES YES)
+    message(WARNING "\
+igraph is being cross-compiled, therefore we cannot validate whether the \
+endianness of IEEE754 doubles is the same as the endianness of uint64_t. \
+Most likely it is, unless you are compiling for some esoteric platform, \
+in which case you need make sure that this is the case on your own.\
+")
+else()
     if(NOT DEFINED CACHE{IEEE754_DOUBLE_ENDIANNESS_MATCHES})
         try_run(
             IEEE754_DOUBLE_ENDIANNESS_TEST_EXIT_CODE
@@ -32,16 +42,6 @@ if(NOT CMAKE_CROSSCOMPILING)
         )
         mark_as_advanced(IEEE754_DOUBLE_ENDIANNESS_MATCHES)
     endif()
-else()
-    # If we are cross-compiling, let's just assume that IEEE754 doubles use the
-    # same endianness as uint64_t
-    set(IEEE754_DOUBLE_ENDIANNESS_MATCHES YES)
-    message(WARNING "\
-igraph is being cross-compiled, therefore we cannot validate whether the \
-endianness of IEEE754 doubles is the same as the endianness of uint64_t. \
-Most likely it is, unless you are compiling for some esoteric platform, \
-in which case you need make sure that this is the case on your own.\
-")
 endif()
 
 cmake_pop_check_state()
