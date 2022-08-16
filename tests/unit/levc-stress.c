@@ -31,8 +31,7 @@
 
 int main() {
 
-    int k;
-    for (k = 0; k < 20; k++) {
+    for (int k = 0; k < 20; k++) {
         igraph_t g;
         igraph_matrix_int_t merges;
         igraph_vector_int_t membership;
@@ -40,6 +39,8 @@ int main() {
         double modularity;
         igraph_vector_t history;
         FILE *DLFile = fopen("input.dl", "r");
+
+        IGRAPH_ASSERT(DLFile != NULL);
 
         igraph_read_graph_dl(&g, DLFile, /*directed=*/ 0);
         fclose(DLFile);
