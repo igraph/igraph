@@ -32,7 +32,7 @@
 int main() {
     igraph_t g;
     igraph_matrix_t coords, dist_mat;
-    int i, j;
+    igraph_integer_t i, j;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
@@ -84,7 +84,7 @@ int main() {
             dist_sq += sqr(MATRIX(coords, i, 0) - MATRIX(coords, j, 0));
             dist_sq += sqr(MATRIX(coords, i, 1) - MATRIX(coords, j, 1));
             if (fabs(sqrt(dist_sq) - MATRIX(dist_mat, i, j)) > 1e-2) {
-                printf("dist(%d,%d) should be %.4f, but it is %.4f\n",
+                printf("dist(%" IGRAPH_PRId ", %" IGRAPH_PRId ") should be %.4f, but it is %.4f\n",
                        i, j, MATRIX(dist_mat, i, j), sqrt(dist_sq));
                 return 1;
             }

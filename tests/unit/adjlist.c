@@ -273,7 +273,6 @@ int test_multiedge_elimination_for_directed_graph() {
 }
 
 int main() {
-    int retval;
 
     RUN_TEST(test_simple_trees);
 

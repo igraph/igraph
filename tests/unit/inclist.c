@@ -196,7 +196,6 @@ int test_adjlist_from_inclist() {
 }
 
 int main() {
-    int retval;
 
     RUN_TEST(test_loop_elimination_for_undirected_graph);
     RUN_TEST(test_loop_elimination_for_directed_graph);

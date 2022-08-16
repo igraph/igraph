@@ -94,8 +94,8 @@ int test_from_prufer_back_to_prufer_with_resize2() {
 }
 
 int random_tree(int size, igraph_t* tree, igraph_vector_int_t* prufer) {
-    int i, j;
-    int prufer_length;
+    igraph_integer_t i, j;
+    igraph_integer_t prufer_length;
 
     if (size < 0) {
         return IGRAPH_EINVAL;

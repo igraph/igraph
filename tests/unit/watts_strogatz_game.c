@@ -29,13 +29,9 @@
 #define N 1000
 
 igraph_bool_t has_loops(const igraph_t *graph) {
-    int i, n = igraph_ecount(graph);
-    for (i = 0; i < n; i++) {
-        if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
-            return 1;
-        }
-    }
-    return 0;
+    igraph_bool_t res;
+    igraph_has_loop(graph, &res);
+    return res;
 }
 
 igraph_bool_t has_multiple(const igraph_t *graph) {
@@ -45,7 +41,7 @@ igraph_bool_t has_multiple(const igraph_t *graph) {
 }
 
 #define ERR() do {              \
-        printf("Seed: %d\n", seed);           \
+        printf("Seed: %" IGRAPH_PRIu "\n", seed);           \
         igraph_write_graph_edgelist(&ws, stdout); \
     } while (0)
 
@@ -58,7 +54,8 @@ int main() {
 
     igraph_t ws;
     igraph_bool_t sim, seen_loops, seen_multiple;
-    int i, seed = 1305473657;
+    igraph_integer_t i;
+    igraph_uint_t seed = 1305473657;
 
     igraph_rng_seed(igraph_rng_default(), seed);
 

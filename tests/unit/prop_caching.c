@@ -112,7 +112,6 @@ int test_basic_operations_undirected() {
 }
 
 int main() {
-    int retval;
 
     RUN_TEST(test_basic_operations_directed);
     RUN_TEST(test_basic_operations_undirected);
