@@ -519,9 +519,13 @@ $ cmake .. \
       makes use of f2c, which compiles and runs the <literal>arithchk</literal>
       program at build time to detect the floating point characteristics of the
       current system. It writes the results into the <literal>arith.h</literal>
-      header. Since running this program is not possible when cross-compiling,
-      igraph's build system allows specifying a pre-generated version of this
-      header file through the <literal>F2C_EXTERNAL_ARITH_HEADER</literal>
+      header. However, running this program is not possible when cross-compiling
+      without providing a userspace emulator that can run executables of the
+      target platform on the host system. Therefore, when cross-compiling, you
+      either need to provide such an emulator with the
+      <literal>CMAKE_CROSSCOMPILING_EMULATOR</literal> option, or you need to
+      specify a pre-generated version of the <literal>arith.h</literal> header
+      file through the <literal>F2C_EXTERNAL_ARITH_HEADER</literal>
       CMake option. An example version of this header follows for the
       x86_64 and arm64 target architecures on macOS. Warning: Do not use this
       version of <literal>arith.h</literal> on other systems or architectures.
@@ -544,14 +548,23 @@ $ cmake .. \
       matches the endianness of <literal>double</literal> on the platform
       being compiled. This is needed to ensure that certain functions in igraph's
       random number generator work properly. However, it is not possible to
-      execute this check when cross-compiling, so in this case igraph simply
-      assumes that the endianness matches (which is the case for the vast
-      majority of platforms anyway). The only case where you might run into
-      problems is when you cross-compile for Apple Silicon (<literal>arm64</literal>)
-      from an Intel-based Mac, in which case CMake might not realize that you
-      are cross-compiling and will try to execute the check anyway. You can
-      work around this by setting <literal>IEEE754_DOUBLE_ENDIANNESS_MATCHES</literal>
-      to <literal>ON</literal> explicitly before invoking CMake.
+      execute this check when cross-compiling without an emulator, so in this
+      case igraph simply assumes that the endianness matches (which is the case
+      for the vast majority of platforms anyway). The only case where you might
+      run into problems is when you cross-compile for Apple Silicon
+      (<literal>arm64</literal>) from an Intel-based Mac, in which case CMake
+      might not realize that you are cross-compiling and will try to execute
+      the check anyway. You can work around this by setting
+      <literal>IEEE754_DOUBLE_ENDIANNESS_MATCHES</literal> to <literal>ON</literal>
+      explicitly before invoking CMake.
+    </para>
+    <para>
+      Providing an emulator in <literal>CMAKE_CROSSCOMPILING_EMULATOR</literal>
+      has the added benefit that you can run the compiled unit tests on the
+      host platform. We have experimented with cross-compiling to 64-bit ARM
+      CPUs (<literal>aarch64</literal>) on 64-bit Intel CPUs (<literal>amd64</literal>),
+      and we can confirm that using <literal>qemu-aarch64</literal> works as a
+      cross-compiling emulator in this setup.
     </para>
   </section>
   <section id="igraph-Installation-additional-notes">
