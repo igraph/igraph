@@ -352,7 +352,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
-    int pass;
+    int pass; /* used only for debugging */
     igraph_bool_t changed = false;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
@@ -625,7 +625,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     igraph_vector_int_t m;
     igraph_vector_int_t level_membership;
     igraph_real_t prev_q = -1, q = -1;
-    int i, level = 1;
+    igraph_integer_t i, level = 1;
     igraph_integer_t vcount = igraph_vcount(graph);
 
     /* Make a copy of the original graph, we will do the merges on the copy */

@@ -201,7 +201,7 @@ static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_pt
 static void igraph_i_cattribute_destroy(igraph_t *graph) {
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *als[3] = { &attr->gal, &attr->val, &attr->eal };
-    for (int a = 0; a < 3; a++) {
+    for (size_t a = 0; a < 3; a++) {
         igraph_i_attribute_list_destroy(als[a]);
     }
     IGRAPH_FREE(graph->attr); /* sets to NULL */
@@ -212,12 +212,11 @@ static void igraph_i_cattribute_destroy(igraph_t *graph) {
 static void igraph_i_cattribute_copy_free(igraph_i_cattributes_t *attr) {
     igraph_vector_ptr_t *als[3] = { &attr->gal, &attr->val, &attr->eal };
     igraph_integer_t i, n;
-    int a;
     igraph_vector_t *num;
     igraph_strvector_t *str;
     igraph_vector_bool_t *boolvec;
     igraph_attribute_record_t *rec;
-    for (a = 0; a < 3; a++) {
+    for (size_t a = 0; a < 3; a++) {
         n = igraph_vector_ptr_size(als[a]);
         for (i = 0; i < n; i++) {
             rec = VECTOR(*als[a])[i];
@@ -253,7 +252,6 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
                                                  &attrfrom->eal
                                                };
     igraph_integer_t i, n;
-    int a;
     igraph_bool_t copy[3] = { ga, va, ea };
     to->attr = attrto = IGRAPH_CALLOC(1, igraph_i_cattributes_t);
     if (!attrto) {
@@ -267,7 +265,7 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
     IGRAPH_FINALLY(igraph_i_cattribute_copy_free, attrto);
 
     alto[0] = &attrto->gal; alto[1] = &attrto->val; alto[2] = &attrto->eal;
-    for (a = 0; a < 3; a++) {
+    for (size_t a = 0; a < 3; a++) {
         if (copy[a]) {
             n = igraph_vector_ptr_size(alfrom[a]);
             IGRAPH_CHECK(igraph_vector_ptr_resize(alto[a], n));

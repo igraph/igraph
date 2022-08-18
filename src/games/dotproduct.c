@@ -61,7 +61,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
 
     igraph_integer_t nrow = igraph_matrix_nrow(vecs);
     igraph_integer_t ncol = igraph_matrix_ncol(vecs);
-    int i, j;
+    igraph_integer_t i, j;
     igraph_vector_int_t edges;
     igraph_bool_t warned_neg = false, warned_big = false;
 
@@ -70,7 +70,7 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
     RNG_BEGIN();
 
     for (i = 0; i < ncol; i++) {
-        int from = directed ? 0 : i + 1;
+        igraph_integer_t from = directed ? 0 : i + 1;
         igraph_vector_t v1;
         igraph_vector_view(&v1, &MATRIX(*vecs, 0, i), nrow);
         for (j = from; j < ncol; j++) {
@@ -82,13 +82,11 @@ igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *v
             igraph_vector_view(&v2, &MATRIX(*vecs, 0, j), nrow);
             igraph_blas_ddot(&v1, &v2, &prob);
             if (prob < 0 && ! warned_neg) {
-                warned_neg = 1;
-                IGRAPH_WARNING("Negative connection probability in "
-                               "dot-product graph");
+                warned_neg = true;
+                IGRAPH_WARNING("Negative connection probability in dot-product graph.");
             } else if (prob > 1 && ! warned_big) {
-                warned_big = 1;
-                IGRAPH_WARNING("Greater than 1 connection probability in "
-                               "dot-product graph");
+                warned_big = true;
+                IGRAPH_WARNING("Greater than 1 connection probability in dot-product graph.");
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             } else if (RNG_UNIF01() < prob) {

@@ -997,13 +997,12 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
             IGRAPH_ERROR("Initial membership length does not equal the number of vertices", IGRAPH_EINVAL);
         }
     } else {
-        int i;
         if (!membership)
             IGRAPH_ERROR("Membership vector should be supplied and initialized, "
                          "even when not starting optimization from it", IGRAPH_EINVAL);
 
         IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
-        for (i = 0; i < n; i++) {
+        for (igraph_integer_t i = 0; i < n; i++) {
             VECTOR(*membership)[i] = i;
         }
     }
