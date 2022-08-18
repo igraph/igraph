@@ -572,7 +572,7 @@ $ cmake .. \
     <itemizedlist>
       <listitem>
         <para>
-          As of igraph 0.9, there is no tangible benefit to using an
+          As of igraph 0.10, there is no tangible benefit to using an
           external GMP, as igraph does not yet use GMP in any
           performance-critical way. The bundled Mini-GMP is sufficient.
         </para>
