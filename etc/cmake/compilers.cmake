@@ -43,7 +43,7 @@ macro(use_all_warnings TARGET_NAME)
   else()
     target_compile_options(${TARGET_NAME} PRIVATE
       # GCC-style compilers:
-      $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
+      $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel,IntelLLVM>:
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
         -Wall -Wextra -pedantic
         -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
@@ -54,6 +54,10 @@ macro(use_all_warnings TARGET_NAME)
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
         # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED
         -wd279 -wd592 -diag-disable=remark
+      >
+      # Intel LLVM:
+      $<$<C_COMPILER_ID:IntelLLVM>:
+        -fp-model=precise # The default 'fast' mode is not compatible with igraph's extensive use of NaN/Inf
       >
     )
   endif()
