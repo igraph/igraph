@@ -14,7 +14,7 @@ int main() {
     value.as_uint64_t = 4841376218035192321ULL;
     if (value.as_double == 4510218239279617.0) {
 		/* endianness of uint64_t and double match */
-		printf("OK\n");
+		printf("Test is OK\n");
     }
     /* we always return 0, even for a negative result, this is because we
 	 * need to tell on the CMake side whether a compiler misconfiguration
