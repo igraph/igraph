@@ -909,6 +909,10 @@ Some of the highlights are:
    `igraph_es_range()` and `igraph_ess_range()` because these use C-style
    intervals (closed from the left, open from the right).
 
+ - `igraph_zeroin()` is deprecated and will be removed in 0.11, with no
+   replacement. The function is not graph-related and was never part of the
+   public API.
+
 ### Other
 
  - Documentation improvements
