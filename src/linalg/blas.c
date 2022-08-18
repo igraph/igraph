@@ -55,8 +55,8 @@
  * \example examples/simple/blas.c
  */
 igraph_error_t igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
-                       const igraph_matrix_t* a, const igraph_vector_t* x,
-                       igraph_real_t beta, igraph_vector_t* y) {
+                       const igraph_matrix_t *a, const igraph_vector_t *x,
+                       igraph_real_t beta, igraph_vector_t *y) {
     char trans = transpose ? 'T' : 'N';
     int m, n;
     int inc = 1;
