@@ -134,11 +134,11 @@ if(MSVC)
   )
 else()
   target_compile_options(arithchk PRIVATE 
-    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-format-zero-length>
+    $<$<C_COMPILER_ID:GCC,Clang,AppleClang,IntelLLVM>:-Wno-format-zero-length>
   )
   target_compile_options(
     f2c_vendored PRIVATE 
-    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-parentheses -Wno-pointer-to-int-cast -Wno-implicit-function-declaration -Wno-format-zero-length>
+    $<$<C_COMPILER_ID:GCC,Clang,AppleClang,IntelLLVM>:-Wno-parentheses -Wno-pointer-to-int-cast -Wno-implicit-function-declaration -Wno-format-zero-length>
     $<$<C_COMPILER_ID:Intel>:-Wno-parentheses -Wno-pointer-to-int-cast -Wno-implicit-function-declaration>
   )
 endif()
