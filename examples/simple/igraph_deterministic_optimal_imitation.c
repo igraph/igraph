@@ -53,27 +53,27 @@ igraph_error_t error_tests() {
         /* test parameters */
         /*--graph--vertex--optimality--quantities--strategies--mode--retval--*/
         /* null pointer for graph */
-        strategy_test_t null_graph = { NULL, 0, 0, NULL, NULL, IGRAPH_ALL,
+        strategy_test_t null_graph = { NULL, 0, IGRAPH_MINIMUM, NULL, NULL, IGRAPH_ALL,
                                        IGRAPH_EINVAL
                                      };
         /* null pointer for quantities vector */
-        strategy_test_t null_quant = { &g, 0, 0, NULL, NULL, IGRAPH_ALL,
+        strategy_test_t null_quant = { &g, 0, IGRAPH_MINIMUM, NULL, NULL, IGRAPH_ALL,
                                        IGRAPH_EINVAL
                                      };
         /* null pointer for strategies vector */
-        strategy_test_t null_strat = { &g, 0, 0, &quant, NULL, IGRAPH_ALL,
+        strategy_test_t null_strat = { &g, 0, IGRAPH_MINIMUM, &quant, NULL, IGRAPH_ALL,
                                        IGRAPH_EINVAL
                                      };
         /* empty graph */
-        strategy_test_t empty_graph = {&h, 0, 0, &quant, &strat, IGRAPH_ALL,
+        strategy_test_t empty_graph = {&h, 0, IGRAPH_MINIMUM, &quant, &strat, IGRAPH_ALL,
                                        IGRAPH_EINVAL
                                       };
         /* length of quantities vector different from number of vertices */
-        strategy_test_t qdiff_length = {&g, 0, 0, &quant, &strat, IGRAPH_ALL,
+        strategy_test_t qdiff_length = {&g, 0, IGRAPH_MINIMUM, &quant, &strat, IGRAPH_ALL,
                                         IGRAPH_EINVAL
                                        };
         /* length of strategies vector different from number of vertices */
-        strategy_test_t sdiff_length = {&g, 0, 0, &quant, &strat, IGRAPH_ALL,
+        strategy_test_t sdiff_length = {&g, 0, IGRAPH_MINIMUM, &quant, &strat, IGRAPH_ALL,
                                         IGRAPH_EINVAL
                                        };
         strategy_test_t *all_checks[] = {/* 1 */ &null_graph,

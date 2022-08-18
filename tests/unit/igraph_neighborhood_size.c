@@ -68,15 +68,14 @@ int main() {
     print_vector_int(&result);
 
     VERIFY_FINALLY_STACK();
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Negative order.\n");
-    IGRAPH_ASSERT(igraph_neighborhood_size(&g_lm, &result, vids, /*order*/ -4,
-                  /*mode*/ IGRAPH_ALL, /*mindist*/ 4) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_neighborhood_size(&g_lm, &result, vids, /*order*/ -4,
+                  /*mode*/ IGRAPH_ALL, /*mindist*/ 4), IGRAPH_EINVAL);
 
     printf("Negative mindist.\n");
-    IGRAPH_ASSERT(igraph_neighborhood_size(&g_lm, &result, vids, /*order*/ 4,
-                  /*mode*/ IGRAPH_ALL, /*mindist*/ -4) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_neighborhood_size(&g_lm, &result, vids, /*order*/ 4,
+                  /*mode*/ IGRAPH_ALL, /*mindist*/ -4), IGRAPH_EINVAL);
 
     igraph_vector_int_destroy(&result);
     igraph_destroy(&g_empty);

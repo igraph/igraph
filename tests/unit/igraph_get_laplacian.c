@@ -60,8 +60,8 @@ int main() {
                         (directed ? "" : "un")
                       );
 
-                test_laplacian(directed ? &g_e_dir : &g_e_un, weighted ? &weights_e : NULL, directed, normalization);
-                test_laplacian(directed ? &g_dir : &g_un, weighted ? &weights : NULL, directed, normalization);
+                test_laplacian(directed ? &g_e_dir : &g_e_un, weighted ? &weights_e : NULL, directed, (igraph_laplacian_normalization_t) normalization);
+                test_laplacian(directed ? &g_dir : &g_un, weighted ? &weights : NULL, directed, (igraph_laplacian_normalization_t) normalization);
             }
         }
     }

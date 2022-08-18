@@ -239,7 +239,7 @@ int main() {
     {
         int e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
         matrix_init_int_row_major(&adjmatrix, 3, 3, e);
-        check_error(&adjmatrix, 42, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
+        check_error(&adjmatrix, (igraph_adjacency_t) 42, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
         igraph_matrix_destroy(&adjmatrix);
     }
     printf("\nCheck handling of non-symmetric matrix for IGRAPH_ADJ_UNDIRECTED.\n");

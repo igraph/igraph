@@ -192,9 +192,7 @@ void test_errors() {
     igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 3, 2, 2, 0, 1, -1);
     igraph_sparsemat_init(&m, 2, 2, 0);
 
-    igraph_set_error_handler(&igraph_error_handler_ignore);
-    IGRAPH_ASSERT(igraph_get_adjacency_sparse(&graph, &m, 42, NULL, IGRAPH_LOOPS_ONCE) == IGRAPH_EINVAL);
-    igraph_set_error_handler(&igraph_error_handler_abort);
+    CHECK_ERROR(igraph_get_adjacency_sparse(&graph, &m, (igraph_get_adjacency_t) 42, NULL, IGRAPH_LOOPS_ONCE), IGRAPH_EINVAL);
 
     igraph_sparsemat_destroy(&m);
     igraph_destroy(&graph);

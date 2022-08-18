@@ -35,10 +35,10 @@ int test_from_prufer_back_to_prufer() {
     igraph_bool_t success = 0;
 
     igraph_vector_int_view(&expected_prufer, prufer, 4);
-    IGRAPH_CHECK(igraph_from_prufer(&graph, &expected_prufer));
+    igraph_from_prufer(&graph, &expected_prufer);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&output_prufer, 4));
-    IGRAPH_CHECK(igraph_to_prufer(&graph, &output_prufer));
+    igraph_vector_int_init(&output_prufer, 4);
+    igraph_to_prufer(&graph, &output_prufer);
 
     success = igraph_vector_int_all_e(&expected_prufer, &output_prufer);
 

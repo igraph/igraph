@@ -38,7 +38,7 @@ igraph_error_t bfs_callback(const igraph_t *graph,
     IGRAPH_UNUSED(dist);
     IGRAPH_UNUSED(extra);
     printf(" %" IGRAPH_PRId, vid);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int main() {

@@ -68,7 +68,7 @@ int main() {
     }
 
     printf("Check for invalid mode error handling.\n");
-    CHECK_ERROR(igraph_subcomponent(&g_1, &result, 0, 100), IGRAPH_EINVMODE);
+    CHECK_ERROR(igraph_subcomponent(&g_1, &result, 0, (igraph_neimode_t) 100), IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

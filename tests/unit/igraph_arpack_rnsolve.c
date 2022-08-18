@@ -34,7 +34,7 @@ igraph_error_t cb2(igraph_real_t *to, const igraph_real_t *from, int n, void *ex
     cb2_data_t *data = (cb2_data_t*) extra;
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
                                            data->A, from, /*beta=*/ 0.0, to);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int check_eigenvector(

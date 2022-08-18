@@ -64,7 +64,7 @@ igraph_error_t error_tests() {
     strategy_test_t qdiff_length = {&g, 0, IGRAPH_IMITATE_BLIND, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
     /* length of strategies vector different from number of vertices */
     strategy_test_t sdiff_length = {&g, 0, IGRAPH_IMITATE_BLIND, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    strategy_test_t unknown_algo = {&g, 0, -1, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
+    strategy_test_t unknown_algo = {&g, 0, (igraph_imitate_algorithm_t) -1, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
     strategy_test_t *all_checks[] = {/* 1 */ &null_graph,
                                              /* 2 */ &null_quant,
                                              /* 3 */ &null_strat,
