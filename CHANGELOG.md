@@ -916,6 +916,7 @@ Some of the highlights are:
 ### Other
 
  - Documentation improvements
+ - Support for the Intel's LLVM-based compiler
 
 ## [Unreleased 0.9]
 
