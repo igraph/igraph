@@ -19,7 +19,7 @@ void random_permutation(igraph_vector_int_t *vec) {
 
 
 void test3() {
-    int i, j;
+    igraph_integer_t i, j;
     igraph_graph_list_t graphs3;
     igraph_t g;
 
@@ -41,7 +41,7 @@ void test3() {
                 NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL
             );
             if (iso) {
-                printf("Bliss failure, 3 vertex directed graphs of isoclass %d and %d are not isomorphic. Bliss reports otherwise.\n", i, j);
+                printf("Bliss failure, 3 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. Bliss reports otherwise.\n", i, j);
             }
         }
 
@@ -54,7 +54,7 @@ void test3() {
                 NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
             );
             if (iso) {
-                printf("VF2 failure, 3 vertex directed graphs of isoclass %d and %d are not isomorphic. VF2 reports otherwise.\n", i, j);
+                printf("VF2 failure, 3 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. VF2 reports otherwise.\n", i, j);
             }
         }
 
@@ -63,7 +63,7 @@ void test3() {
 
 
 void test4() {
-    int i, j;
+    igraph_integer_t i, j;
     igraph_graph_list_t graphs4;
     igraph_t g;
 
@@ -85,7 +85,7 @@ void test4() {
                 NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL
             );
             if (iso) {
-                printf("Bliss failure, 4 vertex directed graphs of isoclass %d and %d are not isomorphic. Bliss reports otherwise.\n", i, j);
+                printf("Bliss failure, 4 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. Bliss reports otherwise.\n", i, j);
             }
         }
 
@@ -98,7 +98,7 @@ void test4() {
                 NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
             );
             if (iso) {
-                printf("VF2 failure, 4 vertex directed graphs of isoclass %d and %d are not isomorphic. VF2 reports otherwise.\n", i, j);
+                printf("VF2 failure, 4 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. VF2 reports otherwise.\n", i, j);
             }
         }
 
