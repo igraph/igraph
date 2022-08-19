@@ -26,13 +26,13 @@ else()
             RUN_OUTPUT_VARIABLE IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT
         )
         if(IEEE754_DOUBLE_ENDIANNESS_TEST_EXIT_CODE EQUAL 0)
-			if(IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT STREQUAL OK)
+            if(IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT STREQUAL "OK\n")
                 set(TEST_RESULT YES)
             else()
                 set(TEST_RESULT NO)
             endif()
         else()
-            message(FATAL_ERROR "IEEE754 double endianness test terminated abnormally")
+            message(FATAL_ERROR "IEEE754 double endianness test terminated abnormally.")
         endif()
 
         set(
@@ -47,5 +47,5 @@ endif()
 cmake_pop_check_state()
 
 if(NOT IEEE754_DOUBLE_ENDIANNESS_MATCHES)
-    message(FATAL_ERROR "igraph only supports platforms where IEEE754 doubles have the same endianness as uint64_t")
+    message(FATAL_ERROR "igraph only supports platforms where IEEE754 doubles have the same endianness as uint64_t.")
 endif()
