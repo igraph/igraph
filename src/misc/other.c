@@ -87,7 +87,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
 /**
  * \ingroup nongraph
  * \function igraph_convex_hull
- * \brief Determines the convex hull of a given set of points in the 2D plane
+ * \brief Determines the convex hull of a given set of points in the 2D plane.
  *
  * </para><para>
  * The convex hull is determined by the Graham scan algorithm.
@@ -111,9 +111,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
  * \return Error code:
  *         \c IGRAPH_ENOMEM: not enough memory
  *
- * Time complexity: O(n log(n)) where n is the number of vertices
- *
- * \example examples/simple/igraph_convex_hull.c
+ * Time complexity: O(n log(n)) where n is the number of vertices.
  */
 igraph_error_t igraph_convex_hull(
     const igraph_matrix_t *data, igraph_vector_int_t *resverts,

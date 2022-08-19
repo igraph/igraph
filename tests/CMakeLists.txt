@@ -488,7 +488,6 @@ add_legacy_tests(
 # other.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_convex_hull
   igraph_power_law_fit
 )
 
@@ -496,6 +495,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_almost_e
   igraph_almost_equals
+  igraph_convex_hull
   igraph_power_law_fit
   overflow
   prop_caching
