@@ -20,10 +20,10 @@ else()
     # arithchk can still be run through emulation and the build with not fail.
     message(WARNING 
       "Cross-compiling with internal ARPACK, BLAS or LAPACK, but "
-	  "F2C_EXTERNAL_ARITH_HEADER was not set and no cross-compiling "
-	  "emulator was provided in CMAKE_CROSSCOMPILING_EMULATOR either. "
-	  "The build is likely to fail. See igraph's installation instructions "
-	  "for more information.")
+      "F2C_EXTERNAL_ARITH_HEADER was not set and no cross-compiling "
+      "emulator was provided in CMAKE_CROSSCOMPILING_EMULATOR either. "
+      "The build is likely to fail. See igraph's installation instructions "
+      "for more information.")
   endif()
   add_custom_command(
     OUTPUT arith.h
@@ -117,7 +117,7 @@ if (MSVC)
   target_include_directories(
     f2c_vendored
     PUBLIC
-	${PROJECT_SOURCE_DIR}/msvc/include
+    ${PROJECT_SOURCE_DIR}/msvc/include
   )
 endif()
 
