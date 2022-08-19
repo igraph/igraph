@@ -11,9 +11,9 @@ void random_permutation(igraph_vector_int_t *vec) {
     for (i = 0; i < 2 * n; i++) {
         one = RNG_INTEGER(0, n - 1);
         two = RNG_INTEGER(0, n - 1);
-        tmp = one;
-        one = two;
-        two = tmp;
+        tmp = VECTOR(*vec)[one];
+        VECTOR(*vec)[one] = VECTOR(*vec)[two];
+        VECTOR(*vec)[two] = tmp;
     }
 }
 
