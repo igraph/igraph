@@ -2057,6 +2057,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                 ret = fprintf(outstream, "      <data key=\"%s%s\">", eprefix,
                               name_escaped);
                 IGRAPH_FREE(name_escaped);
+                if (ret < 0) {
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
+                }
                 IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                              igraph_ess_1(edge), &strv));
                 s = igraph_strvector_get(&strv, 0);
