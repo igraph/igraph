@@ -25,8 +25,11 @@ else()
             ${PROJECT_SOURCE_DIR}/etc/cmake/ieee754_endianness_check.c
             RUN_OUTPUT_VARIABLE IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT
         )
+        # Strip trailing newline, which is necessary on some platforms (such as node.js)
+        # to complete printing the output.
+        string(STRIP "${IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT}" IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT)
         if(IEEE754_DOUBLE_ENDIANNESS_TEST_EXIT_CODE EQUAL 0)
-            if(IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT STREQUAL "OK\n")
+            if(IEEE754_DOUBLE_ENDIANNESS_TEST_RESULT STREQUAL "OK")
                 set(TEST_RESULT YES)
             else()
                 set(TEST_RESULT NO)
