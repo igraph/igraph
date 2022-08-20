@@ -27,7 +27,6 @@ int main() {
 
     igraph_t g;
     igraph_vector_int_t v1, v2;
-    int ret;
 
     /* simple use */
     igraph_vector_int_init(&v1, 8);
@@ -64,23 +63,6 @@ int main() {
         return 3;
     }
     igraph_destroy(&g);
-
-    /* error: IGRAPH_EINVEVECTOR */
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    igraph_vector_int_resize(&v1, 9);
-    VECTOR(v1)[8] = 0;
-    ret = igraph_create(&g, &v1, 0, 0);
-    if (ret != IGRAPH_EINVEVECTOR) {
-        return 4;
-    }
-
-    /* error: IGRAPH_EINVVID */
-    igraph_vector_int_resize(&v1, 8);
-    VECTOR(v1)[7] = -1;
-    ret = igraph_create(&g, &v1, 10, 1);
-    if (ret != IGRAPH_EINVVID) {
-        return 5;
-    }
     igraph_vector_int_destroy(&v1);
     igraph_vector_int_destroy(&v2);
 

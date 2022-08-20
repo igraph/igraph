@@ -190,7 +190,9 @@ add_legacy_tests(
   erdos_renyi_game_gnp
   full
   igraph_adjacency
+  igraph_atlas
   igraph_barabasi_aging_game
+  igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_circulant
@@ -198,6 +200,7 @@ add_legacy_tests(
   igraph_citing_cited_type_game
   igraph_correlated_game
   igraph_correlated_pair_game
+  igraph_create
   igraph_degree_sequence_game
   igraph_dot_product_game
   igraph_establishment_game
@@ -712,6 +715,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_bipartite_create
   igraph_get_incidence
   igraph_incidence
 )

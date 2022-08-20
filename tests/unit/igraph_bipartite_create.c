@@ -1,8 +1,5 @@
-/* -*- mode: C -*-  */
-/*
-   IGraph library.
-   Copyright (C) 2008-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+/* IGraph library.
+   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,32 +12,28 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
+#include "test_utilities.h"
 
 int main() {
-
-    igraph_integer_t edges2[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 1, 4, 1, 6, 0, 3 };
-    igraph_t g;
-    igraph_vector_bool_t types;
+    igraph_integer_t edges3[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 2, 4, 1, 6, 0, 3 };
     igraph_vector_int_t edges;
+    igraph_vector_bool_t types;
+    igraph_t g;
     igraph_integer_t i;
 
-    igraph_vector_int_view(&edges, edges2, sizeof(edges2) / sizeof(edges2[0]));
+    igraph_vector_int_view(&edges, edges3, sizeof(edges3) / sizeof(edges3[0]));
     igraph_vector_bool_init(&types, igraph_vector_int_max(&edges) + 1);
     for (i = 0; i < igraph_vector_bool_size(&types); i++) {
         VECTOR(types)[i] = i % 2;
     }
-    igraph_create_bipartite(&g, &types, &edges, /*directed=*/ 1);
-    igraph_write_graph_edgelist(&g, stdout);
-    igraph_vector_bool_destroy(&types);
-    igraph_destroy(&g);
+    CHECK_ERROR(igraph_create_bipartite(&g, &types, &edges, /*directed=*/ 1), IGRAPH_EINVAL);
 
+    igraph_vector_bool_destroy(&types);
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
