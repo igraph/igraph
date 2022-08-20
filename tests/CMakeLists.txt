@@ -428,6 +428,7 @@ add_legacy_tests(
   igraph_get_isomorphisms_vf2
   igraph_get_subisomorphisms_vf2
   igraph_subisomorphic
+  igraph_subisomorphic_lad
   igraph_isomorphic_bliss
   isomorphism_test
   isoclasses
