@@ -27,7 +27,6 @@
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_qsort.h"
 #include "igraph_vector_list.h"
 
