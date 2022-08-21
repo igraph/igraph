@@ -1,8 +1,5 @@
-/* -*- mode: C -*-  */
-/*
-   IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+/* IGraph library.
+   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,29 +12,21 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
+#include "test_utilities.h"
 
 int main() {
-
     igraph_t g;
-    igraph_es_t es;
 
-    igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,3, -1);
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,0, -1);
+    /* vertex does not exist */
+    CHECK_ERROR(igraph_delete_vertices(&g, igraph_vss_1(3)), IGRAPH_EINVVID);
 
-    igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 3, 2, -1);
-    igraph_delete_edges(&g, es);
-    if (igraph_ecount(&g) != 3) {
-        return 1;
-    }
-
-    igraph_es_destroy(&es);
     igraph_destroy(&g);
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

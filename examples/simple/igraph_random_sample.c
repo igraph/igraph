@@ -33,45 +33,6 @@ typedef struct {
     igraph_error_t retval;
 } sampling_test_t;
 
-/* Error tests. Don't be afraid to crash the library function.
- */
-int error_test() {
-    igraph_vector_int_t V;
-    int i, n;
-    igraph_error_t ret;
-    sampling_test_t *test;
-
-    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
-    igraph_vector_int_init(&V, /*size*/ 0);
-
-    /* test parameters */
-    /*----------low----high----length----retval----------*/
-    /* lower limit is greater than upper limit */
-    sampling_test_t lower_bigger = {300, 200, 10, IGRAPH_EINVAL};
-    /* sample size is greater than size of candidate pool */
-    sampling_test_t sample_size_bigger = {200, 300, 500, IGRAPH_EINVAL};
-
-    sampling_test_t *all_checks[] = {/* 1 */ &lower_bigger,
-                                     /* 2 */ &sample_size_bigger};
-
-    /* failure is the mother of success */
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    n = 2;
-    for (i = 0; i < n; i++) {
-        test = all_checks[i];
-        ret = igraph_random_sample(&V, test->low, test->high, test->length);
-        if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", i + 1);
-            return IGRAPH_FAILURE;
-        }
-    }
-    igraph_set_error_handler(igraph_error_handler_abort);
-
-    igraph_vector_int_destroy(&V);
-
-    return IGRAPH_SUCCESS;
-}
-
 /* Get a few random samples and test their properties.
  */
 int random_sample_test() {
@@ -203,10 +164,6 @@ int rare_test() {
 int main() {
     int ret;
 
-    ret = error_test();
-    if (ret) {
-        return 1;
-    }
     ret = random_sample_test();
     if (ret) {
         return 2;

@@ -136,11 +136,16 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_add_edges
   igraph_add_vertices
+  igraph_degree
+  igraph_delete_edges
+  igraph_delete_vertices
   igraph_edges
   igraph_empty
+  igraph_get_eid
   igraph_is_same_graph
   igraph_i_incident
   igraph_i_neighbors
+  igraph_neighbors
 )
 
 # iterators.at
@@ -767,7 +772,10 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_deterministic_optimal_imitation
   igraph_moran_process
+  igraph_roulette_wheel_imitation
+  igraph_stochastic_imitation
 )
 
 # mt.at -- only if we have pthreads
@@ -797,6 +805,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_random_sample
   igraph_rng_get_integer
   mt
   random_sampling
@@ -814,6 +823,11 @@ add_legacy_tests(
 # matching.at
 add_examples(
   FOLDER examples/simple NAMES
+  igraph_maximum_bipartite_matching
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   igraph_maximum_bipartite_matching
 )
 
