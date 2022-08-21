@@ -47,7 +47,6 @@ int main() {
 
     igraph_t g;
     igraph_vector_int_t v;
-    igraph_vector_int_t v2;
     igraph_vector_int_t seq;
     igraph_integer_t mdeg;
 
@@ -152,7 +151,6 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&v);
-    igraph_vector_int_destroy(&v2);
 
     return 0;
 }
