@@ -32,8 +32,7 @@ void print_vector_int(igraph_vector_int_t *v, FILE *f) {
     fprintf(f, "\n");
 }
 
-int check_simple() {
-
+int main() {
     igraph_t g;
     igraph_integer_t nodes = 100;
     igraph_integer_t edges = 1000;
@@ -103,20 +102,6 @@ int check_simple() {
     igraph_vector_int_destroy(&path);
     igraph_vector_int_destroy(&pairs);
     igraph_vector_int_destroy(&eids);
-
-    return 0;
-}
-
-int main() {
-    int ret;
-
-    RNG_BEGIN();
-
-    if ( (ret = check_simple()) != 0) {
-        return ret;
-    }
-
-    RNG_END();
 
     return 0;
 }
