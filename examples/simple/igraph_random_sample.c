@@ -35,7 +35,7 @@ typedef struct {
 
 /* Get a few random samples and test their properties.
  */
-int random_sample_test() {
+igraph_error_t random_sample_test() {
     const igraph_integer_t min = -1000;
     const igraph_integer_t max = 1000;
     igraph_integer_t low;       /* lower limit */
