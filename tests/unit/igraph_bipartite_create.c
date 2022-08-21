@@ -30,6 +30,7 @@ int main() {
     for (i = 0; i < igraph_vector_bool_size(&types); i++) {
         VECTOR(types)[i] = i % 2;
     }
+    /* Not a bipartite graph, vertices 2 and 4 are connected */
     CHECK_ERROR(igraph_create_bipartite(&g, &types, &edges, /*directed=*/ 1), IGRAPH_EINVAL);
 
     igraph_vector_bool_destroy(&types);

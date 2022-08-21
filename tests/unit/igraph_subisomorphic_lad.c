@@ -36,6 +36,7 @@ int main() {
     igraph_vector_int_init(&map, 0);
     igraph_vector_int_list_init(&maps, 0);
     igraph_small(&pattern, 0, IGRAPH_DIRECTED, -1);
+    /* pattern and target differ in directedness */
     CHECK_ERROR(igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0,
                                       &iso, &map, &maps, /*induced=*/ 0,
                                       /*time_limit=*/ 0), IGRAPH_EINVAL);
