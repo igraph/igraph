@@ -33,9 +33,8 @@ typedef struct {
     igraph_error_t retval;
 } sampling_test_t;
 
-/* Get a few random samples and test their properties.
- */
-igraph_error_t random_sample_test() {
+/* Get a few random samples and test their properties. */
+int random_sample_test() {
     const igraph_integer_t min = -1000;
     const igraph_integer_t max = 1000;
     igraph_integer_t low;       /* lower limit */
@@ -45,7 +44,7 @@ igraph_error_t random_sample_test() {
     igraph_real_t sP;           /* population total sum */
     igraph_real_t ss;           /* sample total sum */
     igraph_vector_int_t V;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 57); /* make tests deterministic */
 
@@ -64,12 +63,12 @@ igraph_error_t random_sample_test() {
     igraph_random_sample(&V, low, high, length);
     if (length != igraph_vector_int_size(&V)) {
         printf("Requested vector length and resulting length mismatch.\n");
-        return IGRAPH_FAILURE;
+        return 1;
     }
     for (i = 0; i < length - 1; i++) {
         if (VECTOR(V)[i] >= VECTOR(V)[i + 1]) {
             printf("Sample not in increasing order.\n");
-            return IGRAPH_FAILURE;
+            return 1;
         }
     }
     igraph_vector_int_destroy(&V);
@@ -94,16 +93,15 @@ igraph_error_t random_sample_test() {
     ss = igraph_vector_int_sum(&V);
     if (ss > sP) {
         printf("Sum of sampled sequence exceeds sum of whole population.\n");
-        return IGRAPH_FAILURE;
+        return 1;
     }
     igraph_vector_int_destroy(&V);
 
-    return IGRAPH_SUCCESS;
+    return 0;
 }
 
 int equal_test() {
     igraph_vector_int_t V;
-    int i;
 
     igraph_vector_int_init(&V, 0);
 
@@ -127,7 +125,7 @@ int equal_test() {
     if (igraph_vector_int_size(&V) != 11) {
         return 5;
     }
-    for (i = 0; i < 11; i++)
+    for (igraph_integer_t i = 0; i < 11; i++)
         if (VECTOR(V)[i] != i + 2) {
             return 6;
         }

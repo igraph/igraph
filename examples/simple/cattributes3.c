@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int mf(const igraph_vector_t *input, igraph_real_t *output) {
+igraph_error_t mf(const igraph_vector_t *input, igraph_real_t *output) {
     *output = 0.0;
     return 0;
 }
