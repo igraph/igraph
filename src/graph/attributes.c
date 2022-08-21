@@ -512,8 +512,8 @@ igraph_error_t igraph_attribute_combination(
     IGRAPH_CHECK(igraph_attribute_combination_init(comb));
 
     va_start(ap, comb);
-    while (1) {
-        igraph_function_pointer_t func = 0;
+    while (true) {
+        igraph_function_pointer_t func = NULL;
         igraph_attribute_combination_type_t type;
         const char *name;
 
