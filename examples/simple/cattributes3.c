@@ -29,8 +29,8 @@ igraph_error_t mf(const igraph_vector_t *input, igraph_real_t *output) {
 }
 
 static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {
-    igraph_simplify(g, /*multiple=*/ 1, /*loops=*/ 1, comb);
-    igraph_write_graph_graphml(g, stdout, /*prefixattr=*/ 1);
+    igraph_simplify(g, /*multiple=*/ true, /*loops=*/ true, comb);
+    igraph_write_graph_graphml(g, stdout, /*prefixattr=*/ true);
     igraph_attribute_combination_destroy(comb);
     igraph_destroy(g);
 }

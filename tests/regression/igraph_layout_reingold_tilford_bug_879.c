@@ -36,7 +36,7 @@ int main() {
 
     f = fopen("igraph_layout_reingold_tilford_bug_879.in", "r");
     IGRAPH_ASSERT(f != NULL);
-    igraph_read_graph_edgelist(&g, f, 0, 0);
+    igraph_read_graph_edgelist(&g, f, 0, IGRAPH_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
     igraph_vector_int_init(&roots, 0);
     igraph_vector_int_push_back(&roots, 0);

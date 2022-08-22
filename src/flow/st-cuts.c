@@ -1415,8 +1415,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     ));
     IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL,
                                           /*vertex_comb=*/ 0));
-    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ 1, /*loops=*/ 1,
-                                 /*edge_comb=*/ 0));
+    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true,
+                                 /*edge_comb=*/ NULL));
 
     newsource = VECTOR(NtoL)[source];
     newtarget = VECTOR(NtoL)[target];

@@ -99,7 +99,7 @@ int main() {
     ofile = fopen("test2.graphml", "w");
     /* If we can't create the test file, just skip the test */
     if (ofile) {
-        if ((result = igraph_write_graph_graphml(&g, ofile, /*prefixattr=*/ 1))) {
+        if ((result = igraph_write_graph_graphml(&g, ofile, /*prefixattr=*/ true))) {
             printf("Received unexpected return code: %d\n", result);
             return 1;
         }
