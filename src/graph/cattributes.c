@@ -1590,6 +1590,36 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \section c_attribute_combination_functions
+ *
+ * <para>
+ * The C attribute handler supports combining the attributes of multiple
+ * vertices of edges into a single attribute during a vertex or edge contraction
+ * operation via a user-defined function. This is achieved by setting the
+ * type of the attribute combination to \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION
+ * and passing in a pointer to the custom combination function when specifying
+ * attribute combinations in \ref igraph_attribute_combination() or
+ * \ref igraph_attribute_combination_add() . For the C attribute handler, the
+ * signature of the function depends on the type of the underlying attribute.
+ * For numeric attributes, use:
+ * \verbatim igraph_error_t function(const igraph_vector_t *input, igraph_real_t *output); \endverbatim
+ * where \p input will receive a vector containing the value of the attribute
+ * for all the vertices or edges being combined, and \p output must be filled
+ * by the function to the combined value. Similarly, for Boolean attributes, the
+ * function takes a boolean vector in \p input and must return the combined Boolean
+ * value in \p output:
+ * \verbatim igraph_error_t function(const igraph_vector_bool_t *input, igraph_bool_t *output); \endverbatim
+ * For string attributes, the signature is slightly different:
+ * \verbatim igraph_error_t function(const igraph_strvector_t *input, char **output); \endverbatim
+ * In case of strings, all strings in the input vector are \em owned by igraph
+ * and must not be modified or freed in the combination handler. The string
+ * returned to the caller in \p output remains owned by the caller; igraph will
+ * make a copy it and store the copy in the appropriate part of the data
+ * structure holding the vertex or edge attributes.
+ * </para>
+ */
+
 typedef struct {
     igraph_attribute_combination_type_t type;
     union {

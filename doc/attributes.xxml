@@ -25,6 +25,7 @@
 <!-- doxrox-include igraph_attribute_combination_remove -->
 <!-- doxrox-include igraph_attribute_combination_destroy -->
 <!-- doxrox-include igraph_attribute_combination_type_t -->
+<!-- doxrox-include igraph_attribute_combination -->
 </section>
 
 <section id="accessing-attributes-from-c">
@@ -112,6 +113,12 @@
 <!-- doxrox-include DELVAS -->
 <!-- doxrox-include DELEAS -->
 <!-- doxrox-include DELALL -->
+</section>
+
+<section id="c-attribute-combination-functions"><title>Custom attribute combination functions</title>
+
+<!-- doxrox-include c_attribute_combination_functions -->
+
 </section>
 
 </section>

@@ -353,7 +353,13 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
  * \param type The type of the attribute combination. See \ref
  *             igraph_attribute_combination_type_t for the options.
  * \param func Function to be used if \p type is
- *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION. This function is called
+ *             by the concrete attribute handler attached to igraph, and its
+ *             calling signature depends completely on the attribute handler.
+ *             For instance, if you are using attributes from C and you have
+ *             attached the C attribute handler, you need to follow the
+ *             documentation of the <link linkend="c-attribute-combination-functions">C attribute handler</link>
+ *             for more details.
  * \return Error code.
  *
  * Time complexity: O(n), where n is the number of current attribute
