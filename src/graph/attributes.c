@@ -496,7 +496,7 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
  *             igraph_attribute_combination_type_t for the options.
  * \param func Function to be used if \p type is
  *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
- * The list is closed by IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ * The list is closed by setting the name to \c IGRAPH_NO_MORE_ATTRIBUTES.
  * \return Error code.
  *
  * Time complexity: O(n^2), where n is the number attribute
