@@ -29,6 +29,25 @@
     #define snprintf _snprintf
 #endif
 
+/* The number of digits chosen here will be used in all places where
+ * igraph_real_fprintf_precise() is used, including all textual graph
+ * formats such as GML, GraphML, Pajek, etc. DBL_DIG digits are sufficient
+ * to losslessly preserve the decimal reprensentation during a
+ * decimal (textual) -> binary -> decimal (textual) round-trip conversion.
+ * This many digits are however not sufficient for a lossless
+ * binary -> decimal -> binary conversion. Thus, writing numerical attributes
+ * to a file and reading them back in may cause a tiny change in the last
+ * binary digit of numbers. This change is less than 10^-15, thus acceptable.
+ *
+ * We could output more digits, but that would come with its own problem:
+ * It would sometimes cause a change in the decimal representation, which
+ * is surprising to users. For example, printf("%.17g\n", 100.1) will
+ * output 100.09999999999999 instead of 100.1. We can prevent this by
+ * using DBL_DIG == 15 digits instead of 17, which would be requires
+ * for a lossless binary -> decimal -> binary round-tripping.
+ *
+ * This justifies using DBL_DIG digits, and not more, in all places.
+ */
 #ifdef DBL_DIG
     /* Use DBL_DIG to determine the maximum precision used for %g */
     #define STRINGIFY_HELPER(x) #x
