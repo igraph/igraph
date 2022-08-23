@@ -1216,58 +1216,14 @@ int igraph_biconnected_components(const igraph_t *graph,
 }
 
 
-/* igraph_bridges -- find all bridges in the graph */
-/* The algorithm is based on https://www.geeksforgeeks.org/bridge-in-a-graph/
-   but instead of keeping track of the parent of each vertex in the DFS tree
-   we keep track of its incoming edge. This is necessary to support multigraphs. */
-
-static int igraph_i_bridges_rec(
-        const igraph_t *graph, const igraph_inclist_t *il, igraph_integer_t u,
-        igraph_integer_t *time, igraph_vector_t *bridges, igraph_vector_bool_t *visited,
-        igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *incoming_edge)
-{
-    igraph_vector_int_t *incedges;
-    long nc; /* neighbour count */
-    long i;
-
-    VECTOR(*visited)[u] = 1;
-
-    *time += 1;
-
-    VECTOR(*disc)[u] = *time;
-    VECTOR(*low)[u] = *time;
-
-    incedges = igraph_inclist_get(il, u);
-    nc = igraph_vector_int_size(incedges);
-    for (i = 0; i < nc; ++i) {
-        long edge = (long) VECTOR(*incedges)[i];
-        igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
-
-        if (! VECTOR(*visited)[v]) {
-            VECTOR(*incoming_edge)[v] = edge;
-            IGRAPH_CHECK(igraph_i_bridges_rec(graph, il, v, time, bridges, visited, disc, low, incoming_edge));
-
-            VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*low)[v] ? VECTOR(*low)[u] : VECTOR(*low)[v];
-
-            if (VECTOR(*low)[v] > VECTOR(*disc)[u]) {
-                IGRAPH_CHECK(igraph_vector_push_back(bridges, edge));
-            }
-        } else if (edge != VECTOR(*incoming_edge)[u]) {
-            VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*disc)[v] ? VECTOR(*low)[u] : VECTOR(*disc)[v];
-        }
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \function igraph_bridges
- * Find all bridges in a graph.
+ * \brief Find all bridges in a graph.
  *
  * An edge is a bridge if its removal increases the number of (weakly)
  * connected components in the graph.
  *
- * \param graph The input graph.
+ * \param graph The input graph. It will be treated as undirected.
  * \param res Pointer to an initialized vector, the
  *    bridges will be stored here as edge indices.
  * \return Error code.
@@ -1278,48 +1234,111 @@ static int igraph_i_bridges_rec(
  */
 
 int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
+    /* The algorithm is based on https://www.geeksforgeeks.org/bridge-in-a-graph/
+       but instead of keeping track of the parent of each vertex in the DFS tree
+       we keep track of its incoming edge. This is necessary to support multigraphs.
+       Additionally, we use explicit stacks instead of recursion to avoid
+       stack overflow. */
+
+    long no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t il;
     igraph_vector_bool_t visited;
-    igraph_vector_int_t disc, low;
+    igraph_vector_int_t vis; /* vis[u] time when vertex u was first visited */
+    igraph_vector_int_t low; /* low[u] is the lowest visit time of vertices reachable from u */
     igraph_vector_int_t incoming_edge;
-    long n;
-    long i;
+    igraph_stack_int_t su, si;
     igraph_integer_t time;
-
-    n = igraph_vcount(graph);
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
-    IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
+    IGRAPH_CHECK(igraph_vector_bool_init(&visited, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&disc, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &disc);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vis, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&low, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&incoming_edge, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &incoming_edge);
-    for (i = 0; i < n; ++i) {
-        VECTOR(incoming_edge)[i] = -1;
-    }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incoming_edge, no_of_nodes);
+    igraph_vector_int_fill(&incoming_edge, -1);
+
+    IGRAPH_CHECK(igraph_stack_int_init(&su, 0));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &su);
+
+    IGRAPH_CHECK(igraph_stack_int_init(&si, 0));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &si);
 
     igraph_vector_clear(bridges);
 
     time = 0;
-    for (i = 0; i < n; ++i)
-        if (! VECTOR(visited)[i]) {
-            IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &incoming_edge));
-        }
+    for (long start = 0; start < no_of_nodes; ++start) {
+        if (! VECTOR(visited)[start]) {
+            /* Perform a DFS from 'start'.
+             * The top of the su stack is u, the vertex currently being visited.
+             * The top of the si stack is i, the index of u's neighbour that will
+             * be processed next. */
 
+            IGRAPH_CHECK(igraph_stack_int_push(&su, start));
+            IGRAPH_CHECK(igraph_stack_int_push(&si, 0));
+
+            while (! igraph_stack_int_empty(&su)) {
+                long u = igraph_stack_int_pop(&su);
+                long i = igraph_stack_int_pop(&si);
+
+                if (i == 0) {
+                    /* We are at the first step of visiting vertex u. */
+
+                    VECTOR(visited)[u] = 1;
+
+                    time += 1;
+
+                    VECTOR(vis)[u] = time;
+                    VECTOR(low)[u] = time;
+                }
+
+                igraph_vector_int_t *incedges = igraph_inclist_get(&il, u);
+
+                if (i < igraph_vector_int_size(incedges)) {
+                    IGRAPH_CHECK(igraph_stack_int_push(&su, u));
+                    IGRAPH_CHECK(igraph_stack_int_push(&si, i+1));
+
+                    long edge = (long) VECTOR(*incedges)[i];
+                    igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
+
+                    if (! VECTOR(visited)[v]) {
+                        VECTOR(incoming_edge)[v] = edge;
+
+                        IGRAPH_CHECK(igraph_stack_int_push(&su, v));
+                        IGRAPH_CHECK(igraph_stack_int_push(&si, 0));
+                    } else if (edge != VECTOR(incoming_edge)[u]) {
+                        VECTOR(low)[u] = VECTOR(low)[u] < VECTOR(vis)[v] ? VECTOR(low)[u] : VECTOR(vis)[v];
+                    }
+                } else {
+                    /* We are done visiting vertex u, so it won't be put back on the stack.
+                     * We are ready to update the 'low' value of its parent w, and decide
+                     * whether its incoming edge is a bridge. */
+
+                    long edge = VECTOR(incoming_edge)[u];
+                    if (edge >= 0) {
+                        long w = IGRAPH_OTHER(graph, edge, u); /* parent of u in DFS tree */
+                        VECTOR(low)[w] = VECTOR(low)[w] < VECTOR(low)[u] ? VECTOR(low)[w] : VECTOR(low)[u];
+                        if (VECTOR(low)[u] > VECTOR(vis)[w]) {
+                            IGRAPH_CHECK(igraph_vector_push_back(bridges, edge));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    igraph_stack_int_destroy(&si);
+    igraph_stack_int_destroy(&su);
     igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);
-    igraph_vector_int_destroy(&disc);
+    igraph_vector_int_destroy(&vis);
     igraph_vector_bool_destroy(&visited);
     igraph_inclist_destroy(&il);
-    IGRAPH_FINALLY_CLEAN(5);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
