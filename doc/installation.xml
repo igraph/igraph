@@ -7,6 +7,18 @@
 <chapter id="igraph-Installation">
 <title>Installation</title>
 
+<para>
+  This chapter describes building igraph from source code and installing it.
+  The source archive of the latest stable release is always available
+  <ulink url="https://igraph.org/c/#downloads">from the igraph website</ulink>.
+  igraph is also included in many Linux distributions, as well as several package
+  managers such as <ulink url="https://vcpkg.io/">vcpkg</ulink> (convenient on Windows),
+  <ulink url="https://www.macports.org/">MacPorts</ulink> (macOS) and
+  <ulink url="https://brew.sh/">Homebrew</ulink> (macOS), which provide an easier
+  means of installation. If you decide to use them, please consult their documentation
+  on how to install packages.
+</para>
+
 <section id="igraph-Installation-prerequisites">
   <title>Prerequisites</title>
   <para>
