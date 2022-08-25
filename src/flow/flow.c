@@ -690,14 +690,14 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
 
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
-        VECTOR(added)[target] = 1;
+        VECTOR(added)[target] = true;
         marked++;
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
                 igraph_integer_t nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
-                    VECTOR(added)[nei] = 1;
+                    VECTOR(added)[nei] = true;
                     marked++;
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                 }

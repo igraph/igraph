@@ -125,13 +125,13 @@ igraph_error_t igraph_convex_hull(
 
     no_of_nodes = igraph_matrix_nrow(data);
     if (igraph_matrix_ncol(data) != 2) {
-        IGRAPH_ERROR("matrix must have 2 columns", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Only two-dimensional point sets are supports, matrix must have two columns.", IGRAPH_EINVAL);
     }
     if (no_of_nodes == 0) {
-        if (resverts != 0) {
+        if (resverts) {
             igraph_vector_int_clear(resverts);
         }
-        if (rescoords != 0) {
+        if (rescoords) {
             IGRAPH_CHECK(igraph_matrix_resize(rescoords, 0, 2));
         }
         /**************************** this is an exit here *********/
@@ -350,13 +350,13 @@ igraph_error_t igraph_vertex_path_from_edge_path(
 
             case IGRAPH_ALL:
                 if (from == start) {
-                    next_edge_ok = 1;
+                    next_edge_ok = true;
                     next_start = to;
                 } else if (to == start) {
-                    next_edge_ok = 1;
+                    next_edge_ok = true;
                     next_start = from;
                 } else {
-                    next_edge_ok = 0;
+                    next_edge_ok = false;
                 }
                 break;
 

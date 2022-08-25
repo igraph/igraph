@@ -53,7 +53,7 @@ igraph_bool_t igraph_i_layout_segments_intersect(float p0_x, float p0_y,
     s = s1 / s2;
     t = t1 / t2;
 
-    return s >= 0 && s <= 1 && t >= 0 && t <= 1 ? 1 : 0;
+    return s >= 0 && s <= 1 && t >= 0 && t <= 1;
 }
 
 /* not 'static', used in tests */

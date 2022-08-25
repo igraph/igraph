@@ -154,7 +154,7 @@ igraph_error_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
     igraph_integer_t i, j, nei, vertices_left;
 
     if (!igraph_is_directed(graph)) {
-        *res = 0;
+        *res = false;
         return IGRAPH_SUCCESS;
     }
 
@@ -260,7 +260,7 @@ igraph_error_t igraph_transitive_closure_dag(const igraph_t *graph, igraph_t *cl
                 node = igraph_stack_int_pop(&path);
                 if (!VECTOR(done)[node]) {
                     igraph_vector_int_pop_back(&ancestors);
-                    VECTOR(done)[node] = 1;
+                    VECTOR(done)[node] = true;
                 }
                 n = igraph_vector_int_size(&ancestors);
                 for (j = 0; j < n; j++) {

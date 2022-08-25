@@ -355,7 +355,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, ig
                 IGRAPH_FINALLY(igraph_free, newbool);
                 IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, origlen);
                 newrec->value = newbool;
-                igraph_vector_bool_fill(newbool, 0);
+                igraph_vector_bool_fill(newbool, false);
             }
             IGRAPH_CHECK(igraph_vector_ptr_push_back(val, newrec));
             IGRAPH_FINALLY_CLEAN(4);
@@ -1898,7 +1898,7 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
                 IGRAPH_FINALLY(igraph_free, newbool);
                 IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, origlen);
                 newrec->value = newbool;
-                igraph_vector_bool_fill(newbool, 0);
+                igraph_vector_bool_fill(newbool, false);
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
@@ -3718,7 +3718,7 @@ igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, log);
         IGRAPH_VECTOR_BOOL_INIT_FINALLY(log, igraph_vcount(graph));
-        igraph_vector_bool_fill(log, 0);
+        igraph_vector_bool_fill(log, false);
         VECTOR(*log)[vid] = value;
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
@@ -3907,7 +3907,7 @@ igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, log);
         IGRAPH_VECTOR_BOOL_INIT_FINALLY(log, igraph_ecount(graph));
-        igraph_vector_bool_fill(log, 0);
+        igraph_vector_bool_fill(log, false);
         VECTOR(*log)[eid] = value;
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));

@@ -28,7 +28,6 @@
 #include "igraph_components.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_stack.h"
 #include "igraph_visitor.h"
@@ -678,10 +677,8 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
 
     IGRAPH_UNUSED(X);
 
-    IGRAPH_CHECK(igraph_stack_int_init(&stack, 10));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
-    IGRAPH_CHECK(igraph_vector_bool_init(&nomark, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &nomark);
+    IGRAPH_STACK_INT_INIT_FINALLY(&stack, 10);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&nomark, no_of_nodes);
 
     data.stack = &stack;
     data.nomark = &nomark;
@@ -693,7 +690,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
        TODO: actually, we could just use GammaX to return the minimal
        elements. */
     for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(nomark)[i] = VECTOR(*GammaX)[i] == 0 ? 1 : 0;
+        VECTOR(nomark)[i] = (VECTOR(*GammaX)[i] == 0);
     }
 
     /* We do a reverse DFS from root. If, along a path we find a GammaX

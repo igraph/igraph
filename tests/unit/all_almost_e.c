@@ -81,5 +81,7 @@ int main() {
     igraph_matrix_complex_destroy(&cm2);
     igraph_matrix_complex_destroy(&cm1);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

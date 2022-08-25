@@ -21,13 +21,10 @@
 
 */
 
-#include <limits.h>
-
 #include "igraph_lapack.h"
-
-#include "igraph_memory.h"
-
 #include "linalg/lapack_internal.h"
+
+#include <limits.h>
 
 #define BASE_FORTRAN_INT
 #include "igraph_pmt.h"

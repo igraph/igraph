@@ -351,7 +351,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
     }
 
     if (chordal) {
-        *chordal = 1;
+        *chordal = true;
     }
 
     /*********************/
@@ -412,7 +412,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
                 if (VECTOR(mark)[x] != w + 1) {
 
                     if (chordal) {
-                        *chordal = 0;
+                        *chordal = false;
                     }
 
                     if (my_fill_in) {

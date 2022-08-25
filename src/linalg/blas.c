@@ -22,12 +22,10 @@
 
 */
 
-#include <limits.h>
-
-#include "igraph_error.h"
 #include "igraph_blas.h"
-
 #include "linalg/blas_internal.h"
+
+#include <limits.h>
 
 /**
  * \function igraph_blas_dgemv

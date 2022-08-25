@@ -16,9 +16,10 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "misc/order_cycle.h"
+
 #include "igraph_interface.h"
 
-#include "misc/order_cycle.h"
 #include "core/exceptions.h"
 
 #include <map>

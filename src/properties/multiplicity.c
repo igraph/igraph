@@ -64,7 +64,7 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     }
 
     if (vc == 0 || ec == 0) {
-        *res = 1;
+        *res = true;
     } else {
         igraph_vector_int_t neis;
         igraph_integer_t i, j, n;
@@ -75,10 +75,10 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
             n = igraph_vector_int_size(&neis);
             for (j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
-                    found = 1; break;
+                    found = true; break;
                 }
                 if (j > 0 && VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
-                    found = 1; break;
+                    found = true; break;
                 }
             }
         }
@@ -131,7 +131,7 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
     IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_HAS_MULTI, res);
 
     if (vc == 0 || ec == 0) {
-        *res = 0;
+        *res = false;
     } else {
         igraph_vector_int_t neis;
         igraph_integer_t i, j, n;
@@ -147,13 +147,13 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
                      * list, so check the next item as well */
                     if (directed) {
                         /* Directed, so this is a real multiple edge */
-                        found = 1; break;
+                        found = true; break;
                     } else if (VECTOR(neis)[j - 1] != i) {
                         /* Undirected, but not a loop edge */
-                        found = 1; break;
+                        found = true; break;
                     } else if (j < n - 1 && VECTOR(neis)[j] == VECTOR(neis)[j + 1]) {
                         /* Undirected, loop edge, multiple times */
-                        found = 1; break;
+                        found = true; break;
                     }
                 }
             }
@@ -216,14 +216,14 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
 
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
 
-        VECTOR(*res)[i] = 0;
+        VECTOR(*res)[i] = false;
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
             igraph_integer_t e2 = VECTOR(*neis)[j];
             igraph_integer_t to2 = IGRAPH_OTHER(graph, e2, from);
             if (to2 == to && e2 < e) {
-                VECTOR(*res)[i] = 1;
+                VECTOR(*res)[i] = true;
             }
         }
     }
@@ -342,7 +342,7 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
     /* An undirected graph has mutual edges by definition,
        res is already properly resized */
     if (! igraph_is_directed(graph)) {
-        igraph_vector_bool_fill(res, 1);
+        igraph_vector_bool_fill(res, true);
         igraph_eit_destroy(&eit);
         IGRAPH_FINALLY_CLEAN(1);
         return IGRAPH_SUCCESS;
@@ -415,14 +415,14 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igra
         if (igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MUTUAL)) {
             /* we know that the graph has at least one mutual non-loop edge
              * (because the cache only stores non-loop edges) */
-            *res = 1;
+            *res = true;
             return IGRAPH_SUCCESS;
         } else if (loops) {
             /* no non-loop mutual edges, but maybe we have loops? */
             return igraph_has_loop(graph, res);
         } else {
             /* no non-loop mutual edges, and loops are not to be treated as mutual */
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
     }
@@ -430,14 +430,14 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igra
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
-    *res = 0; /* assume no mutual edges */
+    *res = false; /* assume no mutual edges */
     for (igraph_integer_t edge=0; edge < no_of_edges; edge++) {
         igraph_integer_t from = IGRAPH_FROM(graph, edge);
         igraph_integer_t to = IGRAPH_TO(graph, edge);
 
         if (from == to) {
             if (loops) {
-                *res = 1;
+                *res = true;
                 break;
             }
             continue; /* no need to do binsearch for self-loops */
@@ -448,7 +448,7 @@ igraph_error_t igraph_has_mutual(const igraph_t *graph, igraph_bool_t *res, igra
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, to);
         IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
         if (igraph_vector_int_binsearch2(neis, from)) {
-            *res = 1;
+            *res = true;
             break;
         }
     }

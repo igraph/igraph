@@ -748,7 +748,7 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
     }
 
     for (i = 0; i < no_of_nodes; i++) {
-        n1 += VECTOR(*types)[i] == 0 ? 1 : 0;
+        n1 += VECTOR(*types)[i] == false ? 1 : 0;
     }
     n2 = no_of_nodes - n1;
 

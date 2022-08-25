@@ -63,7 +63,7 @@ int main() {
     for (i = 0; i < N; i++) {
         SEED();
         igraph_watts_strogatz_game(&ws, /*dim=*/ 1, /*size=*/ 5, /*nei=*/ 1,
-                                   /*p=*/ 0.5, /*loops=*/ 0, /*multiple=*/ 0);
+                                   /*p=*/ 0.5, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
         igraph_is_simple(&ws, &sim);
         if (!sim) {
             ERR();
@@ -85,7 +85,7 @@ int main() {
     for (i = 0; i < N; i++) {
         SEED();
         igraph_watts_strogatz_game(&ws, /*dim=*/ 1, /*size=*/ 5, /*nei=*/ 1,
-                                   /*p=*/ 0.5, /*loops=*/ 0, /*multiple=*/ 1);
+                                   /*p=*/ 0.5, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE);
         if (has_loops(&ws)) {
             ERR();
             return 3;
@@ -101,7 +101,7 @@ int main() {
     for (i = 0; i < N; i++) {
         SEED();
         igraph_watts_strogatz_game(&ws, /*dim=*/ 1, /*size=*/ 5, /*nei=*/ 1,
-                                   /*p=*/ 0.5, /*loops=*/ 1, /*multiple=*/ 0);
+                                   /*p=*/ 0.5, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
         if (has_multiple(&ws)) {
             return 5;
         }
@@ -115,7 +115,7 @@ int main() {
     for (i = 0; i < N; i++) {
         SEED();
         igraph_watts_strogatz_game(&ws, /*dim=*/ 1, /*size=*/ 5, /*nei=*/ 1,
-                                   /*p=*/ 0.5, /*loops=*/ 1, /*multiple=*/ 1);
+                                   /*p=*/ 0.5, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
         seen_loops = seen_loops || has_loops(&ws);
         seen_multiple = seen_multiple || has_multiple(&ws);
         igraph_destroy(&ws);

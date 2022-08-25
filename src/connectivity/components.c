@@ -425,16 +425,16 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     if (no_of_nodes == 0) {
         /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1539
          * for the reasoning behind the change */
-        *res = 0;
+        *res = false;
     } else if (no_of_nodes == 1) {
-        *res = 1;
+        *res = true;
     } else if (mode == IGRAPH_WEAK) {
         IGRAPH_CHECK(igraph_is_connected_weak(graph, res));
     } else {   /* mode == IGRAPH_STRONG */
         /* A strongly connected graph has at least as many edges as vertices,
          * except for the singleton graph, which is handled above. */
         if (igraph_ecount(graph) < no_of_nodes) {
-            *res = 0;
+            *res = false;
         } else {
             IGRAPH_CHECK(igraph_i_connected_components_strong(graph, NULL, NULL, &no));
             *res = (no == 1);
@@ -458,13 +458,13 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
     /* By convention, the null graph is not considered connected.
      * See https://github.com/igraph/igraph/issues/1538 */
     if (no_of_nodes == 0) {
-        *res = 0;
+        *res = false;
         goto exit;
     }
 
     /* A connected graph has at least |V| - 1 edges. */
     if (no_of_edges < no_of_nodes - 1) {
-        *res = 0;
+        *res = false;
         goto exit;
     }
 
