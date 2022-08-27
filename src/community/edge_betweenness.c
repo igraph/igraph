@@ -334,7 +334,7 @@ static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * in the network. The algorithm was invented by M. Girvan and
  * M. Newman, see: M. Girvan and M. E. J. Newman: Community structure in
  * social and biological networks, Proc. Nat. Acad. Sci. USA 99, 7821-7826
- * (2002).
+ * (2002). https://doi.org/10.1073/pnas.122653799
  *
  * </para><para>
  * The idea is that the betweenness of the edges connecting two
@@ -342,10 +342,16 @@ static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * between nodes in separate communities go through them. So we
  * gradually remove the edge with highest betweenness from the
  * network, and recalculate edge betweenness after every removal.
- * This way sooner or later the network falls off to two components,
- * then after a while one of these components falls off to two smaller
- * components, etc. until all edges are removed. This is a divisive
- * hierarchical approach, the result is a dendrogram.
+ * This way sooner or later the network splits into two components,
+ * then after a while one of these components splits again into two smaller
+ * components, and so on until all edges are removed. This is a divisive
+ * hierarchical approach, the result of which is a dendrogram.
+ *
+ * </para><para>
+ * In directed graphs, when \p directed is set to true, the directed version
+ * of betweenness and modularity are used, however, only splits into
+ * \em weakly connected components are detected.
+ *
  * \param graph The input graph.
  * \param result Pointer to an initialized vector, the result will be
  *     stored here, the ids of the removed edges in the order of their
@@ -362,7 +368,7 @@ static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  *     igraph_community_walktrap() for details. The matrix will be
  *     resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
- *     NULL then all edge removals which separated the network into
+ *     \c NULL then all edge removals which separated the network into
  *     more components are marked here.
  * \param modularity If not a null pointer, then the modularity values
  *     of the different divisions are stored here, in the order
@@ -370,9 +376,10 @@ static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  *     take weights into account if \p weights is not null.
  * \param membership If not a null pointer, then the membership vector,
  *     corresponding to the highest modularity value, is stored here.
- * \param directed Logical constant, whether to calculate directed
- *    betweenness (i.e. directed paths) for directed graphs. It is
- *    ignored for undirected graphs.
+ * \param directed Logical constant. Controls whether to calculate directed
+ *    betweenness (i.e. directed paths) for directed graphs, and whether
+ *    to use the directed version of modularity. It is ignored for undirected
+ *    graphs.
  * \param weights An optional vector containing edge weights. If null,
  *     the unweighted edge betweenness scores will be calculated and
  *     used. If not null, the weighted edge betweenness scores will be
