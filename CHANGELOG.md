@@ -946,6 +946,7 @@ Some of the highlights are:
  - `igraph_asymmetric_preference_game()` interpreted its `type_dist_matrix` argument incorrectly.
  - Fixed incorrect result of `igraph_community_spinglass()` for null and singleton graphs.
  - `igraph_layout_gem()` does not crash any more for graphs with only a single vertex.
+ - `igraph_bridges()` no longer uses recursion and thus is no longer prone to stack overflow.
  - Include paths of dependent packages would be specified incorrectly in some environments.
 
 ### Other
