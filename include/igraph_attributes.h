@@ -420,6 +420,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_e(igraph_t *graph, const char *name)
 IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
                                                 igraph_bool_t v, igraph_bool_t e);
 
+IGRAPH_EXPORT igraph_error_t igraph_print_attributes(const igraph_t *g);
 /**
  * \define GAN
  * Query a numeric graph attribute.
