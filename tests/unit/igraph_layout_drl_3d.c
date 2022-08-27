@@ -36,7 +36,7 @@ int main() {
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    igraph_layout_drl_options_init(&options, IGRAPH_LAYOUT_DRL_COARSEST);
+    igraph_layout_drl_options_init(&options, IGRAPH_LAYOUT_DRL_REFINE);
 
     printf("The Zachary karate club.\n");
     igraph_famous(&g, "zachary");
@@ -51,10 +51,10 @@ int main() {
     printf("Negative damping.\n");
     igraph_matrix_init(&result, 0, 0);
     for (i = 0; i < 6; i++) {
-        *damping_muls[i] *= -1.0;
+        *damping_muls[i] = -1.0;
         CHECK_ERROR(igraph_layout_drl_3d(&g, &result, /*use_seed*/ 0, &options,
                     /*weights*/ NULL), IGRAPH_EINVAL);
-        *damping_muls[i] *= -1.0;
+        *damping_muls[i] = 1.0;
     }
     igraph_matrix_destroy(&result);
     igraph_destroy(&g);
