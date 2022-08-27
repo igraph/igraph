@@ -375,6 +375,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_layout_drl
+  igraph_layout_drl_3d
   igraph_layout_bipartite
   igraph_layout_fruchterman_reingold
   igraph_layout_fruchterman_reingold_3d
