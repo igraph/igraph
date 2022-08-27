@@ -52,7 +52,7 @@ int main() {
 
     VERIFY_FINALLY_STACK();
 
-    printf("Check error handling for wrong number of probabilities:\n");
+    printf("Check error handling for wrong number of probabilities.\n");
     igraph_vector_init_real(&prob, 3, 1.0, 0.0, 0.0);
     igraph_small(&graph, 3, IGRAPH_DIRECTED, 0,1, 0,2, -1);
     CHECK_ERROR(igraph_hrg_create(&hrg, &graph, &prob), IGRAPH_EINVAL);
@@ -60,11 +60,15 @@ int main() {
     igraph_destroy(&graph);
     igraph_vector_destroy(&prob);
 
-    printf("Check error handling for non-tree:\n");
+    printf("Check error handling for graph with loop.\n");
     igraph_vector_init_real(&prob, 1, 1.0);
     igraph_small(&graph, 3, IGRAPH_DIRECTED, 0,0, 0,2, -1);
     CHECK_ERROR(igraph_hrg_create(&hrg, &graph, &prob), IGRAPH_EINVAL);
+    igraph_destroy(&graph);
 
+    printf("Check error handling for graph with no edges.\n");
+    igraph_small(&graph, 3, IGRAPH_DIRECTED, -1);
+    CHECK_ERROR(igraph_hrg_create(&hrg, &graph, &prob), IGRAPH_EINVAL);
     igraph_destroy(&graph);
     igraph_vector_destroy(&prob);
     igraph_hrg_destroy(&hrg);

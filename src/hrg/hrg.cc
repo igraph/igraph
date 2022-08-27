@@ -30,6 +30,7 @@
 #include "igraph_attributes.h"
 #include "igraph_hrg.h"
 #include "igraph_random.h"
+#include "igraph_structural.h"
 
 #include "core/exceptions.h"
 
@@ -927,6 +928,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     igraph_integer_t ii = 0, il = 0;
     igraph_vector_int_t neis;
     igraph_vector_t path;
+    igraph_bool_t simple;
 
     // --------------------------------------------------------
     // CHECKS
@@ -960,6 +962,11 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     if (no_of_nodes % 2 == 0) {
         IGRAPH_ERROR("Complete HRG graph must have odd number of vertices.",
                      IGRAPH_EINVAL);
+    }
+
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
+    if (!simple) {
+        IGRAPH_ERROR("HRG graph must be a simple graph.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 0);

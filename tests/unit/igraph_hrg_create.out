@@ -1,0 +1,17 @@
+Two leaf nodes which are always connected:
+directed: false
+vcount: 2
+edges: {
+0 1
+}
+Four leaf nodes, one node connected to all others:
+directed: false
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+}
+Check error handling for wrong number of probabilities.
+Check error handling for graph with loop.
+Check error handling for graph with no edges.
