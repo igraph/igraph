@@ -755,6 +755,12 @@ add_examples(
   igraph_minimal_separators
   igraph_minimum_size_separators
 )
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_cohesive_blocks
+)
+
 add_legacy_tests(
   FOLDER tests/regression NAMES
   bug-1033045
