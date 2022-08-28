@@ -733,6 +733,11 @@ add_examples(
   centralization
 )
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  centralization
+)
+
 # eulerian.at
 add_legacy_tests(
   FOLDER tests/unit NAMES
