@@ -32,7 +32,8 @@ Some of the highlights are:
 
  - `igraph_bool_t` is now a C99 `bool` and not an `int`. Similarly,
    `igraph_vector_bool_t` now consumes `sizeof(bool)` bytes per entry only, not
-   `sizeof(int)`.
+   `sizeof(int)`. The standard constants `true` and `false` may be used for Boolean
+   values for readability. 
 
  - The random number generator interface, `igraph_rng_type_t`, has been overhauled.
    Check the declaration of the type for details.
@@ -759,6 +760,7 @@ Some of the highlights are:
  - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
  - `igraph_eccentricity()` and `igraph_eccentricity_dijkstra()` find the longest among all shortest paths from vertices.
+ - `igraph_vector_complex_zapsmall()` and `igraph_matrix_complex_zapsmall()` for replacing small components of complex vector or matrix elements with exact zeros.
 
 ### Removed
 
@@ -783,6 +785,7 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
  - Foreign format readers now present more informative error messages.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
+ - The default tolerance of the zapsmall functions is now `eps^(2/3)` instead of `eps^(1/2)` where eps is the machine epsilon of `igraph_real_t`.
  - It is now possible to override the uniform integer and the Poisson samplers in the random number generator interface.
 
 ### Fixed
@@ -916,8 +919,8 @@ Some of the highlights are:
 
 ### Other
 
- - Documentation improvements
- - Support for the Intel's LLVM-based compiler
+ - Documentation improvements.
+ - Support for the Intel's LLVM-based compiler.
 
 ## [Unreleased 0.9]
 
