@@ -14,6 +14,8 @@ Some of the highlights are:
 
  - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most previous uses of the non-managed `igraph_vector_ptr_t`. Functions that previously used `igraph_vector_ptr_t` to return results and relied on the user to manage memory appropriately are now using `igraph_vector_list_t`, `igraph_graph_list_t` or similar and manage memory on their own.
 
+ - Some simple graph properties, such as whether a graph contains self-loops or multi-edges, or whether it is connected, are now cached in the graph data structure. Querying these properties for a second time will take constant computational time. The `igraph_invalidate_cache()` function is provided for debugging purposes. It will invaidate all cache entries.
+
  - File format readers are much more robust and more tolerant of invalid input.
 
  - igraph is much more resilient to overflow errors.
@@ -761,6 +763,7 @@ Some of the highlights are:
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
  - `igraph_eccentricity()` and `igraph_eccentricity_dijkstra()` find the longest among all shortest paths from vertices.
  - `igraph_vector_complex_zapsmall()` and `igraph_matrix_complex_zapsmall()` for replacing small components of complex vector or matrix elements with exact zeros.
+ - `igraph_invalidate_cache()` invalidates all cached graph properties, forcing their recomputation next time they are requested.
 
 ### Removed
 
