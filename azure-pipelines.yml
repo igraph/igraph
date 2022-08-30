@@ -11,7 +11,9 @@ jobs:
   # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
   - job: linux_static_vendored
     steps:
-      - script: sudo apt-get install ninja-build ccache language-pack-de -y
+      - script: |
+          sudo apt-get update
+          sudo apt-get install ninja-build ccache language-pack-de -y
         displayName: Install dependencies
 
       - script: |
