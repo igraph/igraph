@@ -209,9 +209,9 @@ igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD
  */
 
 igraph_error_t generate_steiner_tree_appx(const igraph_t *graph, const igraph_vector_t *weights,
-										  igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_neimode_t mode, igraph_vector_int_t *vectorlist_all, igraph_vector_int_t *edgelist_all)
+										  igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_vector_int_t *vectorlist_all, igraph_vector_int_t *edgelist_all)
 {
-
+	
 	std::set<igraph_integer_t> C = fetchSetsBasedonIndex(indexD);
 
 	// Initially the value of m is the vertex that was removed from Steiner Terminals
@@ -412,32 +412,47 @@ igraph_error_t generate_steiner_tree_appx(const igraph_t *graph, const igraph_ve
  */
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph_vector_int_t *steiner_terminals,
-											 igraph_neimode_t mode, const igraph_vector_t *weights, igraph_real_t *res, igraph_vector_int_t *res_tree)
+											  const igraph_vector_t *weights, igraph_real_t *res, igraph_vector_int_t *res_tree)
 {
-	if (mode != IGRAPH_ALL)
-	{
-		*res = 0;
-		IGRAPH_ERROR("Currently this function only supports undirected graphs while the graph's mode is not undirected.", IGRAPH_FAILURE);
-	}
+	igraph_bool_t IsConnected;
+	igraph_is_connected(graph,&IsConnected,IGRAPH_WEAK);
 
+	if (!IsConnected)
+	{
+		IGRAPH_ERROR("The graph is disconnected.",IGRAPH_EINVAL);
+	}
 	igraph_integer_t no_of_vertices = igraph_vcount(graph);
 	igraph_integer_t no_of_edges = igraph_ecount(graph);
 
 	if (no_of_vertices == 0 || (no_of_vertices == 1)) // graph is empty
 	{
-		*res = 0;
-		IGRAPH_ERRORF("The graph has %" IGRAPH_PRId " vertex because of which this function cannot run.", IGRAPH_EINVAL, no_of_vertices);
+		igraph_error_t x = igraph_minimum_spanning_tree(graph, res_tree,weights);
+		*res = 0.0;
+		return x;
 	}
 
 	/*
 	 *	If the steiner terminals is number of vertices in graph then problem
 	 *	is reduced to minimum spanning tree which is tractable.
 	 */
-
+	igraph_real_t min = igraph_vector_min(weights);
+    if (min < 0) {
+        IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
+	}
+	else if (min = 0){
+		IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
+	}
 	if (igraph_vector_int_size(steiner_terminals) == no_of_vertices)
 	{
-		*res = 0;
-		return igraph_minimum_spanning_tree(graph, res_tree, weights);
+
+		igraph_error_t result  = igraph_minimum_spanning_tree(graph, res_tree, weights);
+		igraph_real_t size_value = 0.0;
+		for (igraph_integer_t i = 0; i < igraph_vector_int_size(res_tree); i++)
+		{
+			size_value  += VECTOR(*weights)[VECTOR(*res_tree)[i]];
+		}
+		*res = size_value;
+		return result;
 	}
 	igraph_vector_int_t steiner_terminals_copy;
 	igraph_matrix_t dp_cache; // dynamic programming table
@@ -614,7 +629,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
 	IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_all, 1));
 
-	IGRAPH_CHECK(generate_steiner_tree_appx(graph, weights, &dp_cache, indexD, q, IGRAPH_ALL, &vectorlist_all, res_tree));
+	IGRAPH_CHECK(generate_steiner_tree_appx(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree));
 
 	// Default vector initiation add 0 and hence it's removed.
 	igraph_vector_int_remove(res_tree, 0);

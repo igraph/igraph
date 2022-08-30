@@ -238,7 +238,7 @@ IGRAPH_EXPORT igraph_error_t igraph_spanner(const igraph_t *graph,
 
 IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph,
                                                            const igraph_vector_int_t *steiner_terminals,
-                                                           igraph_neimode_t mode, const igraph_vector_t *weights,
+                                                         const igraph_vector_t *weights,
                                                            igraph_real_t *result,igraph_vector_int_t *res_tree);
 
 
