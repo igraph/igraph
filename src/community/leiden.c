@@ -960,6 +960,9 @@ static igraph_error_t igraph_i_community_leiden(
  * \param start Start from membership vector. If this is true, the optimization
  *    will start from the provided membership vector. If this is false, the
  *    optimization will start from a singleton partition.
+ * \param n_iterations Iterate the core Leiden algorithm for the indicated number 
+ *    of times. If this is a negative number, it will continue iterating until 
+ *    the quality no longer changed.
  * \param membership The membership vector. This is both used as the initial
  *    membership from which optimisation starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
@@ -979,6 +982,7 @@ static igraph_error_t igraph_i_community_leiden(
 igraph_error_t igraph_community_leiden(const igraph_t *graph,
                             const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
                             const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
+                            const igraph_integer_t n_iterations,
                             igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_vector_t *i_edge_weights, *i_node_weights;
     igraph_integer_t i_nb_clusters;
@@ -1036,10 +1040,29 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
         i_node_weights = (igraph_vector_t*)node_weights;
     }
 
-    /* Perform actual Leiden algorithm */
-    IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
-                                           resolution_parameter, beta,
-                                           membership, nb_clusters, quality));
+    /* Perform actual Leiden algorithm iteratively. We either
+     * perform a fixed number of iterations, or we perform
+     * iterations until the quality remains unchanged. Note that
+     * the Leiden algorithm can still change in a subsequent 
+     * iteration. 
+     */
+    igraph_bool_t stop = n_iterations >= 0 ? n_iterations == 0 : false;
+    igraph_integer_t itr = 0;
+    igraph_real_t prev_quality = -IGRAPH_INFINITY;
+    while (!stop) {
+        IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
+                                               resolution_parameter, beta,
+                                               membership, nb_clusters, quality));
+        if (n_iterations >= 0) {
+            itr++;
+            if (itr >= n_iterations)
+                stop = true;
+        }
+        else if (prev_quality == *quality)
+            stop = true;
+
+        prev_quality = *quality;
+    }
 
     if (!edge_weights) {
         igraph_vector_destroy(i_edge_weights);
