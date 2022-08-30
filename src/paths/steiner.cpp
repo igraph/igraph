@@ -439,7 +439,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     if (min < 0) {
         IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
 	}
-	else if (min = 0){
+	else if (min == 0){
 		IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
 	}
 	if (igraph_vector_int_size(steiner_terminals) == no_of_vertices)
