@@ -420,7 +420,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 	if (!IsConnected)
 	{
 		*res = 0.0;
-		igraph_vector_int_init(res_tree,0);
+		res_tree = nullptr;
 		IGRAPH_ERROR("The graph is disconnected.",IGRAPH_EINVAL);
 	}
 	igraph_integer_t no_of_vertices = igraph_vcount(graph);
