@@ -419,6 +419,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
 	if (!IsConnected)
 	{
+		*res = 0.0;
+		igraph_vector_int_init(res_tree,0);
 		IGRAPH_ERROR("The graph is disconnected.",IGRAPH_EINVAL);
 	}
 	igraph_integer_t no_of_vertices = igraph_vcount(graph);
@@ -437,9 +439,11 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 	 */
 	igraph_real_t min = igraph_vector_min(weights);
     if (min < 0) {
+		*res = IGRAPH_INFINITY;
         IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
 	}
 	else if (min == 0){
+		*res = IGRAPH_INFINITY;
 		IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
 	}
 	if (igraph_vector_int_size(steiner_terminals) == no_of_vertices)
