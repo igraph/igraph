@@ -971,7 +971,7 @@ static igraph_error_t igraph_i_community_leiden(
  *    optimization will start from a singleton partition.
  * \param n_iterations Iterate the core Leiden algorithm for the indicated number 
  *    of times. If this is a negative number, it will continue iterating until 
- *    an iteration that did not improve the quality.
+ *    an iteration did not change the clustering.
  * \param membership The membership vector. This is both used as the initial
  *    membership from which optimisation starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
