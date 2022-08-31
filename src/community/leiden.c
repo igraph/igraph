@@ -40,6 +40,7 @@
  *
  * This function considers each node and greedily moves it to a neighboring
  * community that maximizes the improvement in the quality of a partition.
+ * Only moves that strictly improve the quality are considered.
  *
  * The nodes are examined in a queue, and initially all nodes are put in the
  * queue in a random order. Nodes are popped from the queue when they are
@@ -160,6 +161,9 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         for (i = 0; i < nb_neigh_clusters; i++) {
             c = VECTOR(neighbor_clusters)[i];
             diff = VECTOR(edge_weights_per_cluster)[c] - VECTOR(*node_weights)[v] * VECTOR(cluster_weights)[c] * resolution_parameter;
+            /* Only consider strictly improving moves.
+             * Note that this is important in considering convergence.
+             */
             if (diff > max_diff) {
                 best_cluster = c;
                 max_diff = diff;
@@ -917,15 +921,16 @@ static igraph_error_t igraph_i_community_leiden(
  * from the resolution-limit (see preprint http://arxiv.org/abs/1104.3083).
  *
  * </para><para>
- * The Leiden algorithm consists of three phases: (1) local moving of nodes,
- * (2) refinement of the partition and (3) aggregation of the network based on
- * the refined partition, using the non-refined partition to create an initial
+ * The Leiden algorithm consists of three phases: (1) local moving of nodes, (2)
+ * refinement of the partition and (3) aggregation of the network based on the
+ * refined partition, using the non-refined partition to create an initial
  * partition for the aggregate network. In the local move procedure in the
- * Leiden algorithm, only nodes whose neighborhood has changed are visited. The
- * refinement is done by restarting from a singleton partition within each
- * cluster and gradually merging the subclusters. When aggregating, a single
- * cluster may then be represented by several nodes (which are the subclusters
- * identified in the refinement).
+ * Leiden algorithm, only nodes whose neighborhood has changed are visited. Only
+ * moves that strictly improve the quality function are made. The refinement is
+ * done by restarting from a singleton partition within each cluster and
+ * gradually merging the subclusters. When aggregating, a single cluster may
+ * then be represented by several nodes (which are the subclusters identified in
+ * the refinement).
  *
  * </para><para>
  * The Leiden algorithm provides several guarantees. The Leiden algorithm is
@@ -934,10 +939,10 @@ static igraph_error_t igraph_i_community_leiden(
  * connected and well-separated. After an iteration in which nothing has
  * changed, all nodes and some parts are guaranteed to be locally optimally
  * assigned. Note that even if a single iteration did not result in any change,
- * it is still possible that a subsequent iteration might find some 
- * improvement. Each iteration explores different subsets of nodes to consider 
- * for moving from one cluster to another. Finally, asymptotically, all subsets 
- * of all clusters are guaranteed to be locally optimally assigned. For more 
+ * it is still possible that a subsequent iteration might find some
+ * improvement. Each iteration explores different subsets of nodes to consider
+ * for moving from one cluster to another. Finally, asymptotically, all subsets
+ * of all clusters are guaranteed to be locally optimally assigned. For more
  * details, please see Traag, Waltman &amp; van Eck (2019).
  *
  * </para><para>
@@ -969,8 +974,8 @@ static igraph_error_t igraph_i_community_leiden(
  * \param start Start from membership vector. If this is true, the optimization
  *    will start from the provided membership vector. If this is false, the
  *    optimization will start from a singleton partition.
- * \param n_iterations Iterate the core Leiden algorithm for the indicated number 
- *    of times. If this is a negative number, it will continue iterating until 
+ * \param n_iterations Iterate the core Leiden algorithm for the indicated number
+ *    of times. If this is a negative number, it will continue iterating until
  *    an iteration did not change the clustering.
  * \param membership The membership vector. This is both used as the initial
  *    membership from which optimisation starts and is updated in place. It
