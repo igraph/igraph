@@ -144,7 +144,7 @@ igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD
     return min_col_num;
 }
 
-/* \function generate_steiner_tree_appx()
+/* \function generate_steiner_tree_exact()
  *
  *   Generation of the Steiner Tree based on calculation of minimum distances in DP table.
  *
