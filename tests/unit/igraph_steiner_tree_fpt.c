@@ -102,7 +102,7 @@ int main()
    IGRAPH_CHECK(igraph_vector_int_init(&res_tree,1));
    IGRAPH_CHECK(igraph_vector_int_init(&res_tree_1,1));
 
-   CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, &weights_empty,&val1,&res_tree) , IGRAPH_EINVAL);
+   IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, &weights_empty,&val1,&res_tree) == IGRAPH_SUCCESS);
    printf("%.2f\n",val1);
    IGRAPH_ASSERT(val1 == 0);
    printf("Un-Directed graph with loops and multi-edges, select none:\n");

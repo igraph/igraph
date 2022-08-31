@@ -1,10 +1,6 @@
-#include "igraph_paths.h"
-#include "igraph_adjlist.h"
-#include "igraph_types.h"
-#include "igraph_memory.h"
-#include "igraph_error.h"
+
 #include "igraph.h"
-#include "igraph_interface.h"
+#include "core/exceptions.h"
 
 #include <cstring>
 #include <cmath>
@@ -70,7 +66,7 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset,std::ma
             return it->second;
         }
     }
-    return -1;
+	IGRAPH_FATAL("The Subset's index that you tried to find doesn't exist. Hence the code won't run.");
 }
 
 /*
@@ -85,7 +81,7 @@ std::set<igraph_integer_t> fetchSetsBasedonIndex(igraph_integer_t index,std::map
             return it->first;
         }
     }
-    return std::set<igraph_integer_t>();
+    IGRAPH_FATAL("The index that you tried to find doesn't exist. Hence the code won't run.");
 }
 
 /*
@@ -188,7 +184,7 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
     // Initially the value of m is the vertex that was removed from Steiner Terminals
     igraph_integer_t m = q;
 
-    int len = C.size();
+    igraph_integer_t len = C.size();
     std::set<igraph_integer_t> D = C;
 
     while (D.size() > 1) {
@@ -352,18 +348,6 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
  *
  * \param steiner_terminals Pointer to a vector, this will contain vertices
  *
- * \param mode How to determine the local neighborhood of each vertex
- *  in directed graphs. Ignored in undirected graphs.
- * \clist
- *         \cli IGRAPH_ALL
- *              take both in- and out-neighbours;
- *              this is a reasonable default for high-level interfaces.
- *         \cli IGRAPH_OUT
- *              take only out-neighbours
- *         \cli IGRAPH_IN
- *              take only in-neighbours
- *         \endclist
- *
  * \param weights The edge weights. All edge weights must be
  *       non-negative. Additionally, no edge weight may be NaN.
  *
@@ -378,22 +362,25 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph_vector_int_t *steiner_terminals,
         const igraph_vector_t *weights, igraph_real_t *res, igraph_vector_int_t *res_tree) {
-    igraph_bool_t IsConnected;
-    igraph_is_connected(graph, &IsConnected, IGRAPH_WEAK);
-
-    if (!IsConnected) {
+	IGRAPH_HANDLE_EXCEPTIONS_BEGIN
+    
+    
+	igraph_integer_t no_of_vertices = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+	if (no_of_vertices == 0 || (no_of_vertices == 1)) { // graph is empty
+        IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, res_tree, weights));
         *res = 0.0;
-        res_tree = nullptr;
+        return IGRAPH_SUCCESS;
+    }
+	igraph_bool_t IsConnected;
+	igraph_is_connected(graph, &IsConnected, IGRAPH_WEAK);
+    if (!IsConnected) {
+
         IGRAPH_ERROR("The graph is disconnected.", IGRAPH_EINVAL);
     }
-    igraph_integer_t no_of_vertices = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    
 
-    if (no_of_vertices == 0 || (no_of_vertices == 1)) { // graph is empty
-        igraph_error_t x = igraph_minimum_spanning_tree(graph, res_tree, weights);
-        *res = 0.0;
-        return x;
-    }
+    
 
     /*
      *  If the steiner terminals is number of vertices in graph then problem
@@ -401,21 +388,19 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      */
     igraph_real_t min = igraph_vector_min(weights);
     if (min < 0) {
-        *res = IGRAPH_INFINITY;
         IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
     } else if (min == 0) {
-        *res = IGRAPH_INFINITY;
         IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
     }
     if (igraph_vector_int_size(steiner_terminals) == no_of_vertices) {
 
-        igraph_error_t result  = igraph_minimum_spanning_tree(graph, res_tree, weights);
+        IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, res_tree, weights));
         igraph_real_t size_value = 0.0;
         for (igraph_integer_t i = 0; i < igraph_vector_int_size(res_tree); i++) {
             size_value  += VECTOR(*weights)[VECTOR(*res_tree)[i]];
         }
         *res = size_value;
-        return result;
+		return IGRAPH_SUCCESS;
     }
 	
 
@@ -426,7 +411,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     igraph_matrix_t distance;
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        *res = 0;
         IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges.", IGRAPH_FAILURE, igraph_vector_size(weights), no_of_edges);
     }
     IGRAPH_CHECK(igraph_matrix_init(&distance, no_of_vertices, no_of_vertices));
@@ -437,7 +421,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      *  and returns distance matrix. The Dreyfus - Wagner algorithm needs complete graph
      *   hence this step is necessary.
      */
-    igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights);
+    IGRAPH_CHECK(igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights));
 
     /*
         Setting distance from vertex to itself as 0.
@@ -567,7 +551,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     *res = distance2;
 
     std::set<igraph_integer_t> newSet;
-    for (auto i = 0; i < igraph_vector_int_size(&steiner_terminals_copy); i++) {
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(&steiner_terminals_copy); i++) {
         newSet.insert(VECTOR(steiner_terminals_copy)[i]);
     }
     igraph_integer_t indexD = fetchIndexofMapofSets(newSet,&subsetMap);
@@ -588,6 +572,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     igraph_vector_int_destroy(&vectorlist_all);
 
     IGRAPH_FINALLY_CLEAN(3);
-
+	IGRAPH_HANDLE_EXCEPTIONS_END
     return IGRAPH_SUCCESS;
 }
