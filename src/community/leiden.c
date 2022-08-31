@@ -1058,8 +1058,9 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
             if (itr >= n_iterations)
                 stop = true;
         }
-        else if (prev_quality == *quality)
+        else if (prev_quality == *quality) {
             stop = true;
+        }
 
         prev_quality = *quality;
     }
