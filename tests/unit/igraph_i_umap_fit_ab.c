@@ -34,13 +34,13 @@ int main () {
     igraph_real_t a, b, min_dist;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
-    double min_dists[6] = {0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0};
+    double min_dists[7] = {0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0};
 
     RNG_BEGIN();
 
     /* test with various typical min_dist values. Originally there is a scaling sigma
      * factor, but it's 1.0 in all default cases so we fix it for now */
-    for (i = 0; i < 6; i++) {
+    for (i = 0; i < 7; i++) {
         igraph_i_umap_fit_ab(min_dists[i], &a, &b);
         printf("%f, %.1f, %.1f\n", min_dists[i], a, b);
     }

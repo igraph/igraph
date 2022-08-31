@@ -405,6 +405,7 @@ add_legacy_tests(
   igraph_i_layout_sphere
   igraph_layout_davidson_harel # Uses igraph_i_layout_segments_intersect and igraph_i_layout_point_segment_dist2
   igraph_layout_merge # Uses igraph_i_layout_merge functions
+  igraph_i_umap_fit_ab
 )
 
 # visitors.at

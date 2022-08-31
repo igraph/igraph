@@ -24,6 +24,8 @@
 #include "igraph_random.h"
 #include "igraph_nongraph.h"
 
+#include "layout/layout_internal.h"
+
 #include <math.h>
 
 
