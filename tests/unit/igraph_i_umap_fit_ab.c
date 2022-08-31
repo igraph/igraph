@@ -31,10 +31,10 @@
 
 int main () {
     int i;
-    igraph_real_t a, b, min_dist;
+    igraph_real_t a, b;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
-    double min_dists[7] = {0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0};
+    igraph_real_t min_dists[7] = {0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0};
 
     RNG_BEGIN();
 
