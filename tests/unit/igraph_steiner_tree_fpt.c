@@ -17,114 +17,113 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main()
-{
-   //printf("Starting Tests\n");
-   igraph_t g_empty, g_lm;
+int main() {
+    //printf("Starting Tests\n");
+    igraph_t g_empty, g_lm;
 
-   igraph_vector_int_t steiner_terminals,steiner_terminals_null;
-   igraph_vector_t weights_empty, weights_lm;
+    igraph_vector_int_t steiner_terminals, steiner_terminals_null;
+    igraph_vector_t weights_empty, weights_lm;
 
-   igraph_vector_init(&weights_empty, 0);
+    igraph_vector_init(&weights_empty, 0);
 
-   igraph_vector_int_init(&steiner_terminals, 4);
-   igraph_vector_int_init(&steiner_terminals_null, 0);
+    igraph_vector_int_init(&steiner_terminals, 4);
+    igraph_vector_int_init(&steiner_terminals_null, 0);
 
-   VECTOR(steiner_terminals)[0] = 0;
-   VECTOR(steiner_terminals)[1] = 1;
-   VECTOR(steiner_terminals)[2] = 2;
-   VECTOR(steiner_terminals)[3] = 3;
+    VECTOR(steiner_terminals)[0] = 0;
+    VECTOR(steiner_terminals)[1] = 1;
+    VECTOR(steiner_terminals)[2] = 2;
+    VECTOR(steiner_terminals)[3] = 3;
 
-   igraph_vector_init(&weights_lm, 21);
+    igraph_vector_init(&weights_lm, 21);
 
-   VECTOR(weights_lm)[0] = 2;
-   VECTOR(weights_lm)[1] = 2;
-   VECTOR(weights_lm)[2] = 2;
-   VECTOR(weights_lm)[3] = 1;
-   VECTOR(weights_lm)[4] = 1;
-   VECTOR(weights_lm)[5] = 2;
+    VECTOR(weights_lm)[0] = 2;
+    VECTOR(weights_lm)[1] = 2;
+    VECTOR(weights_lm)[2] = 2;
+    VECTOR(weights_lm)[3] = 1;
+    VECTOR(weights_lm)[4] = 1;
+    VECTOR(weights_lm)[5] = 2;
 
-   VECTOR(weights_lm)[6] = 2;
-   VECTOR(weights_lm)[7] = 2;
-   VECTOR(weights_lm)[8] = 2;
-   VECTOR(weights_lm)[9] = 1;
-   VECTOR(weights_lm)[10] = 2;
+    VECTOR(weights_lm)[6] = 2;
+    VECTOR(weights_lm)[7] = 2;
+    VECTOR(weights_lm)[8] = 2;
+    VECTOR(weights_lm)[9] = 1;
+    VECTOR(weights_lm)[10] = 2;
 
-   VECTOR(weights_lm)[11] = 2;
-   VECTOR(weights_lm)[12] = 2;
-   VECTOR(weights_lm)[13] = 2;
-   VECTOR(weights_lm)[14] = 1;
-    
-   VECTOR(weights_lm)[15] = 1;
-   VECTOR(weights_lm)[16] = 2;
-   VECTOR(weights_lm)[17] = 1;
+    VECTOR(weights_lm)[11] = 2;
+    VECTOR(weights_lm)[12] = 2;
+    VECTOR(weights_lm)[13] = 2;
+    VECTOR(weights_lm)[14] = 1;
 
-   VECTOR(weights_lm)[18] = 2;
-   VECTOR(weights_lm)[19] = 1;
+    VECTOR(weights_lm)[15] = 1;
+    VECTOR(weights_lm)[16] = 2;
+    VECTOR(weights_lm)[17] = 1;
 
-   VECTOR(weights_lm)[20] = 1;
+    VECTOR(weights_lm)[18] = 2;
+    VECTOR(weights_lm)[19] = 1;
 
-   igraph_empty(&g_empty, 0, 0);
+    VECTOR(weights_lm)[20] = 1;
 
-   igraph_small(&g_lm, 7, IGRAPH_UNDIRECTED, 
-                                                0, 1,
-                                                0, 2,
-                                                0, 3, 
-                                                0, 4, 
-                                                0, 5, 
-                                                0, 6, 
-                                                
-                                                1, 2, 
-                                                1, 3, 
-                                                1, 4, 
-                                                1, 5, 
-                                                1, 6,
+    igraph_empty(&g_empty, 0, 0);
 
-                                                2, 3, 
-                                                2, 4, 
-                                                2, 5, 
-                                                2, 6, 
-                                                
-                                                3, 4, 
-                                                3, 5, 
-                                                3, 6, 
-                                                
-                                                4, 5, 
-                                                4, 6, 
-                                                
-                                                5, 6, 
-                                                -1);
-    
-   printf("No vertices, not directed:\n");
-   igraph_real_t val1,val2;
-   igraph_vector_int_t res_tree,res_tree_1;
-    
-   IGRAPH_CHECK(igraph_vector_int_init(&res_tree,1));
-   IGRAPH_CHECK(igraph_vector_int_init(&res_tree_1,1));
+    igraph_small(&g_lm, 7, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 0, 2,
+                 0, 3,
+                 0, 4,
+                 0, 5,
+                 0, 6,
 
-   CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_empty,&steiner_terminals_null, &weights_empty,&val1,&res_tree) , IGRAPH_EINVAL);
-   printf("%.2f\n",val1);
-   IGRAPH_ASSERT(val1 == 0);
-   printf("Un-Directed graph with loops and multi-edges, select none:\n");
-   IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm,&steiner_terminals, &weights_lm,&val2,&res_tree_1) == IGRAPH_SUCCESS);
-   printf("%.2f\n",val2);
-   IGRAPH_ASSERT(val2 == 5);
-    
-   print_vector_int(&res_tree_1);
+                 1, 2,
+                 1, 3,
+                 1, 4,
+                 1, 5,
+                 1, 6,
+
+                 2, 3,
+                 2, 4,
+                 2, 5,
+                 2, 6,
+
+                 3, 4,
+                 3, 5,
+                 3, 6,
+
+                 4, 5,
+                 4, 6,
+
+                 5, 6,
+                 -1);
+
+    printf("No vertices, not directed:\n");
+    igraph_real_t val1, val2;
+    igraph_vector_int_t res_tree, res_tree_1;
+
+    IGRAPH_CHECK(igraph_vector_int_init(&res_tree, 1));
+    IGRAPH_CHECK(igraph_vector_int_init(&res_tree_1, 1));
+
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, &steiner_terminals_null, &weights_empty, &val1, &res_tree) == IGRAPH_SUCCESS);
+    printf("%.2f\n", val1);
+    IGRAPH_ASSERT(val1 == 0);
+    printf("Un-Directed graph with loops and multi-edges, select none:\n");
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals, &weights_lm, &val2, &res_tree_1) == IGRAPH_SUCCESS);
+    printf("%.2f\n", val2);
+    IGRAPH_ASSERT(val2 == 5);
+
+    print_vector_int(&res_tree_1);
 
 
-   igraph_destroy(&g_empty);
-   igraph_destroy(&g_lm);
-   igraph_vector_destroy(&weights_empty);
-   igraph_vector_destroy(&weights_lm);
+    igraph_destroy(&g_empty);
+    igraph_destroy(&g_lm);
+    igraph_vector_destroy(&weights_empty);
+    igraph_vector_destroy(&weights_lm);
 
-   igraph_vector_int_destroy(&steiner_terminals);
-   igraph_vector_int_destroy(&steiner_terminals_null);
+    igraph_vector_int_destroy(&steiner_terminals);
+    igraph_vector_int_destroy(&steiner_terminals_null);
 
-   igraph_vector_int_destroy(&res_tree);
-   igraph_vector_int_destroy(&res_tree_1);
+    igraph_vector_int_destroy(&res_tree);
+    igraph_vector_int_destroy(&res_tree_1);
 
-   VERIFY_FINALLY_STACK();
-    
-   return 0;
+    VERIFY_FINALLY_STACK();
+
+    return 0;
 }
