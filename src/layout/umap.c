@@ -272,13 +272,14 @@ static igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t
 {
     /* Grid points */
     igraph_vector_t x;
-     /* Make a lattice from 0 to this distance */
-    igraph_integer_t nr_points = 100;
-    igraph_real_t end_point = min_dist*30; /* Need to sample decently around the kink I guess? */
-    /* Initial values: a^-2b is the point where f(x) = 0.5, so around min_dist
-     * Therefore, initial a is 1/sqrt(min_dist) */
-    igraph_real_t b = 1.;
-    igraph_real_t a = 1. / sqrt(min_dist);
+     /* Make a lattice from 0 to 3 * sigma with 300 points. This is what
+      * umap.umap_.fit_ab_params does, but sigma is fixed to 1.0 here since
+      * that's the default value used in scanpy and by virtually everyone */
+    igraph_integer_t nr_points = 300;
+    igraph_real_t end_point = 3.0;
+    /* Initial values takes as reasonable assumptions from typical min_dist values */
+    igraph_real_t b = 0.8;
+    igraph_real_t a = 1.8;
     /* deltas */
     igraph_real_t da, db;
     /* Residuals */
