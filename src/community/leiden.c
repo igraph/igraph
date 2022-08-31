@@ -56,7 +56,8 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
         const igraph_real_t resolution_parameter,
         igraph_integer_t *nb_clusters,
-        igraph_vector_int_t *membership) {
+        igraph_vector_int_t *membership,
+        igraph_bool_t *changed) {
 
     igraph_dqueue_int_t unstable_nodes;
     igraph_real_t max_diff = 0.0, diff = 0.0;
@@ -179,6 +180,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
 
         /* Add stable neighbours that are not part of the new cluster to the queue */
         if (best_cluster != current_cluster) {
+            *changed = true;
             VECTOR(*membership)[v] = best_cluster;
 
             for (i = 0; i < degree; i++) {
@@ -707,7 +709,8 @@ static igraph_error_t igraph_i_community_leiden(
         const igraph_t *graph,
         igraph_vector_t *edge_weights, igraph_vector_t *node_weights,
         const igraph_real_t resolution_parameter, const igraph_real_t beta,
-        igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
+        igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality,
+        igraph_bool_t *changed) {
     igraph_integer_t nb_refined_clusters;
     igraph_integer_t i, c, n = igraph_vcount(graph);
     igraph_t aggregated_graph, *i_graph;
@@ -777,6 +780,8 @@ static igraph_error_t igraph_i_community_leiden(
         IGRAPH_ERROR("Too many communities in membership vector", IGRAPH_EINVAL);
     }
 
+    /* We start out with no changes, whenever a node is moved, this will be set to true. */
+    *changed = false;
     do {
 
         /* Get incidence list for fast iteration */
@@ -789,7 +794,8 @@ static igraph_error_t igraph_i_community_leiden(
                      i_edge_weights, i_node_weights,
                      resolution_parameter,
                      nb_clusters,
-                     i_membership));
+                     i_membership,
+                     changed));
 
         /* We only continue clustering if not all clusters are represented by a
          * single node yet
@@ -1050,23 +1056,13 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
      * iteration may still find some improvement. This is because
      * each iteration explores different subsets of nodes.
      */
-    igraph_bool_t stop = n_iterations >= 0 ? n_iterations == 0 : false;
-    igraph_integer_t itr = 0;
-    igraph_real_t prev_quality = -IGRAPH_INFINITY;
-    while (!stop) {
+    igraph_bool_t changed=false;
+    for (igraph_integer_t itr = 0; 
+         n_iterations >= 0 ? itr < n_iterations : !changed; 
+         itr++) {
         IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
                                                resolution_parameter, beta,
-                                               membership, nb_clusters, quality));
-        if (n_iterations >= 0) {
-            itr++;
-            if (itr >= n_iterations)
-                stop = true;
-        }
-        else if (prev_quality == *quality) {
-            stop = true;
-        }
-
-        prev_quality = *quality;
+                                               membership, nb_clusters, quality, &changed));
     }
 
     if (!edge_weights) {
