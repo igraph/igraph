@@ -927,9 +927,12 @@ static igraph_error_t igraph_i_community_leiden(
  * next iteration. At each iteration all clusters are guaranteed to be
  * connected and well-separated. After an iteration in which nothing has
  * changed, all nodes and some parts are guaranteed to be locally optimally
- * assigned. Finally, asymptotically, all subsets of all clusters are
- * guaranteed to be locally optimally assigned. For more details, please see
- * Traag, Waltman &amp; van Eck (2019).
+ * assigned. Note that even if a single iteration did not result in any change,
+ * it is still possible that a subsequent iteration might find some 
+ * improvement. Each iteration explores different subsets of nodes to consider 
+ * for moving from one cluster to another. Finally, asymptotically, all subsets 
+ * of all clusters are guaranteed to be locally optimally assigned. For more 
+ * details, please see Traag, Waltman &amp; van Eck (2019).
  *
  * </para><para>
  * The objective function being optimized is
@@ -962,7 +965,7 @@ static igraph_error_t igraph_i_community_leiden(
  *    optimization will start from a singleton partition.
  * \param n_iterations Iterate the core Leiden algorithm for the indicated number 
  *    of times. If this is a negative number, it will continue iterating until 
- *    the quality no longer changed.
+ *    an iteration that did not improve the quality.
  * \param membership The membership vector. This is both used as the initial
  *    membership from which optimisation starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
@@ -1042,9 +1045,10 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
 
     /* Perform actual Leiden algorithm iteratively. We either
      * perform a fixed number of iterations, or we perform
-     * iterations until the quality remains unchanged. Note that
-     * the Leiden algorithm can still change in a subsequent 
-     * iteration. 
+     * iterations until the quality remains unchanged. Even if
+     * a single iteration did not change anything, a subsequent
+     * iteration may still find some improvement. This is because
+     * each iteration explores different subsets of nodes.
      */
     igraph_bool_t stop = n_iterations >= 0 ? n_iterations == 0 : false;
     igraph_integer_t itr = 0;
