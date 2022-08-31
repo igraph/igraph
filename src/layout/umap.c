@@ -268,7 +268,7 @@ static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals,
  * For instance, if b = 1, a -> 0.01*a moves the fit a decade towards larger min_dist,
  * and a -> 100*a moves the fit a decade towards smaller min_dist.
  * */
-static igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, igraph_real_t *b_p)
+igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, igraph_real_t *b_p)
 {
     /* Grid points */
     igraph_vector_t x;
