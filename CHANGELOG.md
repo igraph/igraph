@@ -721,6 +721,8 @@ Some of the highlights are:
 
  - `igraph_community_leiden` has an additional parameter to indicate the number of iterations to perform (PR #2177).
 
+ - `igraph_hrg_create()` now takes a vector of probabilities corresponding to the internal nodes of the dendogram. It used to also take probabilities for the leaf nodes and then ignore them.
+
 ### Added
 
  - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.
@@ -810,6 +812,7 @@ Some of the highlights are:
  - Deterministic graph generators have overflow checks now.
  - `igraph_sparsemat_getelements_sorted()` did not sort the elements for triplet matrices correctly; this is fixed now.
  - `igraph_random_walk()` took one fewer steps than specified.
+ - `igraph_hrg_init()` does not throw an assertion error anymore for zero vertices.
 
 ### Deprecated
 

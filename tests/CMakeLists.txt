@@ -761,6 +761,7 @@ add_legacy_tests(
   igraph_hrg
   igraph_hrg2
   igraph_hrg3
+  igraph_hrg_create
 )
 
 # microscopic.at
