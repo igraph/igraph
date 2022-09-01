@@ -719,6 +719,8 @@ Some of the highlights are:
 
  - `igraph_is_mutual()` has an additional parameter which controls whether directed self-loops are considered mutual.
 
+ - `igraph_community_leiden` has an additional parameter to indicate the number of iterations to perform (PR #2177).
+
 ### Added
 
  - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.
