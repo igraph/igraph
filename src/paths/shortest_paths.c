@@ -1312,11 +1312,11 @@ static igraph_bool_t igraph_i_has_edge_with_infinite_weight(
     for (i = 0; i < n; i++) {
         igraph_integer_t edge = VECTOR(*path)[i];
         if (!IGRAPH_FINITE(VECTOR(*weights)[edge])) {
-            return 1;
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }
 
 static igraph_real_t igraph_i_get_total_weight_of_path(
@@ -1503,10 +1503,10 @@ igraph_error_t igraph_get_k_shortest_paths(
             /* Remove edges that are part of the previous shortest paths which share the same root path. */
             for (i_path = 0; i_path < i_path_current; i_path++) {
                 igraph_vector_int_t *path_check = igraph_vector_int_list_get_ptr(edge_paths, i_path);
-                igraph_bool_t equal = 1;
+                igraph_bool_t equal = true;
                 for (i = 0; i < nr_edges_root; i++) {
                     if (VECTOR(path_root)[i] != VECTOR(*path_check)[i]) {
-                        equal = 0;
+                        equal = false;
                         break;
                     }
                 }

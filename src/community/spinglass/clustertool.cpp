@@ -238,7 +238,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     unsigned long changes, runs;
-    igraph_bool_t use_weights = 0;
+    igraph_bool_t use_weights = false;
     bool zeroT;
     double kT, acc, prob;
 
@@ -436,7 +436,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                       igraph_spincomm_update_t update_rule,
                                       igraph_real_t gamma) {
     IGRAPH_HANDLE_EXCEPTIONS(
-        igraph_bool_t use_weights = 0;
+        igraph_bool_t use_weights = false;
         double prob;
         char startnode[255];
 
@@ -518,7 +518,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     unsigned long changes, runs;
-    igraph_bool_t use_weights = 0;
+    igraph_bool_t use_weights = false;
     bool zeroT;
     double kT, acc;
     igraph_real_t d_n;

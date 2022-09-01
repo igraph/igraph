@@ -83,15 +83,15 @@ static void debug(const char* fmt, ...) {
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-igraph_error_t igraph_is_matching(const igraph_t* graph,
-                       const igraph_vector_bool_t* types, const igraph_vector_int_t* matching,
-                       igraph_bool_t* result) {
+igraph_error_t igraph_is_matching(const igraph_t *graph,
+                       const igraph_vector_bool_t *types, const igraph_vector_int_t *matching,
+                       igraph_bool_t *result) {
     igraph_integer_t i, j, no_of_nodes = igraph_vcount(graph);
     igraph_bool_t conn;
 
     /* Checking match vector length */
     if (igraph_vector_int_size(matching) != no_of_nodes) {
-        *result = 0; return IGRAPH_SUCCESS;
+        *result = false; return IGRAPH_SUCCESS;
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -99,7 +99,7 @@ igraph_error_t igraph_is_matching(const igraph_t* graph,
 
         /* Checking range of each element in the match vector */
         if (j < -1 || j >= no_of_nodes) {
-            *result = 0; return IGRAPH_SUCCESS;
+            *result = false; return IGRAPH_SUCCESS;
         }
         /* When i is unmatched, we're done */
         if (j == -1) {
@@ -107,7 +107,7 @@ igraph_error_t igraph_is_matching(const igraph_t* graph,
         }
         /* Matches must be mutual */
         if (VECTOR(*matching)[j] != i) {
-            *result = 0; return IGRAPH_SUCCESS;
+            *result = false; return IGRAPH_SUCCESS;
         }
         /* Matched vertices must be connected */
         IGRAPH_CHECK(igraph_are_connected(graph, i,
@@ -117,7 +117,7 @@ igraph_error_t igraph_is_matching(const igraph_t* graph,
             IGRAPH_CHECK(igraph_are_connected(graph, j,
                                               i, &conn));
             if (!conn) {
-                *result = 0; return IGRAPH_SUCCESS;
+                *result = false; return IGRAPH_SUCCESS;
             }
         }
     }
@@ -130,12 +130,12 @@ igraph_error_t igraph_is_matching(const igraph_t* graph,
                 continue;
             }
             if (VECTOR(*types)[i] == VECTOR(*types)[j]) {
-                *result = 0; return IGRAPH_SUCCESS;
+                *result = false; return IGRAPH_SUCCESS;
             }
         }
     }
 
-    *result = 1;
+    *result = true;
     return IGRAPH_SUCCESS;
 }
 
@@ -165,16 +165,17 @@ igraph_error_t igraph_is_matching(const igraph_t* graph,
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-igraph_error_t igraph_is_maximal_matching(const igraph_t* graph,
-                               const igraph_vector_bool_t* types, const igraph_vector_int_t* matching,
-                               igraph_bool_t* result) {
+igraph_error_t igraph_is_maximal_matching(const igraph_t *graph,
+                               const igraph_vector_bool_t *types, const igraph_vector_int_t *matching,
+                               igraph_bool_t *result) {
+
     igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t neis;
     igraph_bool_t valid;
 
     IGRAPH_CHECK(igraph_is_matching(graph, types, matching, &valid));
     if (!valid) {
-        *result = 0; return IGRAPH_SUCCESS;
+        *result = false; return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
@@ -207,14 +208,15 @@ igraph_error_t igraph_is_maximal_matching(const igraph_t* graph,
 }
 
 static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
-        const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
-        igraph_vector_int_t* matching);
+        const igraph_t *graph,
+        const igraph_vector_bool_t *types, igraph_integer_t *matching_size,
+        igraph_vector_int_t *matching);
+
 static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
-        const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
-        igraph_real_t* matching_weight, igraph_vector_int_t* matching,
-        const igraph_vector_t* weights, igraph_real_t eps);
+        const igraph_t *graph,
+        const igraph_vector_bool_t *types, igraph_integer_t *matching_size,
+        igraph_real_t *matching_weight, igraph_vector_int_t *matching,
+        const igraph_vector_t *weights, igraph_real_t eps);
 
 #define MATCHED(v) (VECTOR(match)[v] != -1)
 #define UNMATCHED(v) (!MATCHED(v))
@@ -280,10 +282,10 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-igraph_error_t igraph_maximum_bipartite_matching(const igraph_t* graph,
-                                      const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
-                                      igraph_real_t* matching_weight, igraph_vector_int_t* matching,
-                                      const igraph_vector_t* weights, igraph_real_t eps) {
+igraph_error_t igraph_maximum_bipartite_matching(const igraph_t *graph,
+                                      const igraph_vector_bool_t *types, igraph_integer_t *matching_size,
+                                      igraph_real_t *matching_weight, igraph_vector_int_t *matching,
+                                      const igraph_vector_t *weights, igraph_real_t eps) {
 
     /* Sanity checks */
     if (igraph_vector_bool_size(types) < igraph_vcount(graph)) {
@@ -326,9 +328,9 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * http://www.cerfacs.fr/algor/reports/2011/TR_PA_11_33.pdf
  */
 static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
-        const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
-        igraph_vector_int_t* matching) {
+        const igraph_t *graph,
+        const igraph_vector_bool_t *types, igraph_integer_t *matching_size,
+        igraph_vector_int_t *matching) {
     igraph_integer_t i, j, k, n, no_of_nodes = igraph_vcount(graph);
     igraph_integer_t num_matched;             /* number of matched vertex pairs */
     igraph_vector_int_t match;       /* will store the matching */
@@ -464,9 +466,9 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted(
 }
 
 static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
-        const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_vector_int_t* labels,
-        igraph_vector_int_t* match, igraph_bool_t smaller_set) {
+        const igraph_t *graph,
+        const igraph_vector_bool_t *types, igraph_vector_int_t *labels,
+        igraph_vector_int_t *match, igraph_bool_t smaller_set) {
     igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
     igraph_dqueue_int_t q;
     igraph_vector_int_t neis;
@@ -534,10 +536,10 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * weights are integers, you can safely set \c eps to zero.
  */
 static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
-        const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
-        igraph_real_t* matching_weight, igraph_vector_int_t* matching,
-        const igraph_vector_t* weights, igraph_real_t eps) {
+        const igraph_t *graph,
+        const igraph_vector_bool_t *types, igraph_integer_t *matching_size,
+        igraph_real_t *matching_weight, igraph_vector_int_t *matching,
+        const igraph_vector_t *weights, igraph_real_t eps) {
     igraph_integer_t i, j, k, n, no_of_nodes, no_of_edges;
     igraph_integer_t u, v, w, msize;
     igraph_t newgraph;
@@ -1016,9 +1018,9 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
-                            igraph_real_t* matching_weight, igraph_vector_int_t* matching,
-                            const igraph_vector_t* weights) {
+igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *matching_size,
+                            igraph_real_t *matching_weight, igraph_vector_int_t *matching,
+                            const igraph_vector_t *weights) {
     IGRAPH_UNUSED(graph);
     IGRAPH_UNUSED(matching_size);
     IGRAPH_UNUSED(matching_weight);

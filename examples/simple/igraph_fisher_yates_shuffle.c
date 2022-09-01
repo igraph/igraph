@@ -27,7 +27,6 @@
 int main() {
     igraph_real_t d;
     igraph_vector_t u, v;
-    int ret;
     igraph_integer_t i, k, n;
 
     /********************************
@@ -98,8 +97,8 @@ int main() {
 
     /* empty sequence */
     igraph_vector_init(&v, 0);
-    ret = igraph_vector_shuffle(&v);
+    igraph_vector_shuffle(&v);
     igraph_vector_destroy(&v);
 
-    return ret == 0 ? 0 : 6;
+    return 0;
 }

@@ -216,5 +216,5 @@ igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
     igraph_vector_destroy(&g);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return (iter < maxit) ? 0 : IGRAPH_DIVERGED;
+    return (iter < maxit) ? IGRAPH_SUCCESS : IGRAPH_DIVERGED;
 }

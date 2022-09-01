@@ -251,7 +251,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_multi_loops(const igraph_
         igraph_integer_t d = VECTOR(*degrees)[i];
 
         if (d < 0) {
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
         sum_parity = (sum_parity + d) & 1;
@@ -275,7 +275,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igra
 
     /* Zero-length sequences are considered graphical. */
     if (n == 0) {
-        *res = 1;
+        *res = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -284,7 +284,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopless_multi(const igra
         igraph_integer_t d = VECTOR(*degrees)[i];
 
         if (d < 0) {
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
         dsum += d;
@@ -312,7 +312,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
 
     /* Zero-length sequences are considered graphical. */
     if (n == 0) {
-        *res = 1;
+        *res = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -351,7 +351,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
 
     igraph_vector_int_reverse_sort(&work);
 
-    *res = 1;
+    *res = true;
     w = n - 1; b = 0; s = 0; c = 0;
     for (k = 0; k < n; k++) {
         b += VECTOR(work)[k];
@@ -362,7 +362,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_loopy_simple(const igraph
             w--;
         }
         if (b > c + s + 2*(k + 1)) {
-            *res = 0;
+            *res = false;
             break;
         }
         if (w == k) {
@@ -392,7 +392,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
     igraph_integer_t zverovich_bound;
 
     if (p == 0) {
-        *res = 1;
+        *res = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -413,7 +413,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
         igraph_integer_t d = VECTOR(*degrees)[i];
 
         if (d < 0 || d >= p) {
-            *res = 0;
+            *res = false;
             goto finish;
         }
 
@@ -427,12 +427,12 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
     }
 
     if (dsum % 2 != 0) {
-        *res = 0;
+        *res = false;
         goto finish;
     }
 
     if (n == 0) {
-        *res = 1;
+        *res = true;
         goto finish; /* all degrees are zero => graphical */
     }
 
@@ -460,7 +460,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
     }
 
     if (dmin*n >= zverovich_bound) {
-        *res = 1;
+        *res = true;
         goto finish;
     }
 
@@ -469,7 +469,7 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
         igraph_integer_t run_size, v;
 
         if (dk < k+1) {
-            *res = 1;
+            *res = true;
             goto finish;
         }
 
@@ -485,13 +485,13 @@ static igraph_error_t igraph_i_is_graphical_undirected_simple(const igraph_vecto
             }
             k += run_size;
             if (sum_deg > k*(n-1) - k*sum_ni + sum_ini) {
-                *res = 0;
+                *res = false;
                 goto finish;
             }
         }
     }
 
-    *res = 1;
+    *res = true;
 
 finish:
     igraph_vector_int_destroy(&num_degs);
@@ -520,7 +520,7 @@ static igraph_error_t igraph_i_is_graphical_directed_loopy_multi(const igraph_ve
         igraph_integer_t din  = VECTOR(*in_degrees)[i];
 
         if (dout < 0 || din < 0) {
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
 
@@ -553,7 +553,7 @@ static igraph_error_t igraph_i_is_graphical_directed_loopless_multi(const igraph
         igraph_integer_t d = dout + din;
 
         if (dout < 0 || din < 0) {
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
 
@@ -623,7 +623,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 
     vcount = igraph_vector_int_size(out_degrees);
     if (vcount == 0) {
-        *res = 1;
+        *res = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -651,7 +651,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
 #define INDEGREE(x) (VECTOR(*in_degrees)[VECTOR(index_array)[x]])
 #define OUTDEGREE(x) (VECTOR(*out_degrees)[VECTOR(index_array)[x]])
 
-    *res = 1;
+    *res = true;
     lhs = 0;
     for (i = 0; i < vcount; i++) {
         lhs += INDEGREE(i);
@@ -672,7 +672,7 @@ static igraph_error_t igraph_i_is_graphical_directed_simple(const igraph_vector_
         }
 
         if (lhs > rhs) {
-            *res = 0;
+            *res = false;
             break;
         }
     }
@@ -704,7 +704,7 @@ static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_int_t *d
         igraph_integer_t d = VECTOR(*degrees1)[i];
 
         if (d < 0) {
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
 
@@ -716,7 +716,7 @@ static igraph_error_t igraph_i_is_bigraphical_multi(const igraph_vector_int_t *d
         igraph_integer_t d = VECTOR(*degrees2)[i];
 
         if (d < 0) {
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
 
@@ -741,7 +741,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
     igraph_integer_t lhs_sum, partial_rhs_sum;
 
     if (n1 == 0 && n2 == 0) {
-        *res = 1;
+        *res = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -797,7 +797,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
      * of the inequality's right-hand-side.
      */
 
-    *res = 1; /* be optimistic */
+    *res = true; /* be optimistic */
     lhs_sum = 0;
     partial_rhs_sum = 0; /* the sum of those elements in sorted_deg2 which are <= (k+1) */
     i = 0; /* points past the first element of sorted_deg2 which > (k+1) */
@@ -817,7 +817,7 @@ static igraph_error_t igraph_i_is_bigraphical_simple(const igraph_vector_int_t *
 
         /* rhs_sum for a given k is partial_rhs_sum + (n2 - i) * (k+1) */
         if (lhs_sum > partial_rhs_sum + (n2 - i) * (k+1) ) {
-            *res = 0;
+            *res = false;
             break;
         }
     }

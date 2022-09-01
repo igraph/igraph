@@ -14,6 +14,8 @@ Some of the highlights are:
 
  - There is a new fully memory-managed container type for lists of vectors (`igraph_vector_list_t`), replacing most previous uses of the non-managed `igraph_vector_ptr_t`. Functions that previously used `igraph_vector_ptr_t` to return results and relied on the user to manage memory appropriately are now using `igraph_vector_list_t`, `igraph_graph_list_t` or similar and manage memory on their own.
 
+ - Some simple graph properties, such as whether a graph contains self-loops or multi-edges, or whether it is connected, are now cached in the graph data structure. Querying these properties for a second time will take constant computational time. The `igraph_invalidate_cache()` function is provided for debugging purposes. It will invaidate all cache entries.
+
  - File format readers are much more robust and more tolerant of invalid input.
 
  - igraph is much more resilient to overflow errors.
@@ -32,7 +34,8 @@ Some of the highlights are:
 
  - `igraph_bool_t` is now a C99 `bool` and not an `int`. Similarly,
    `igraph_vector_bool_t` now consumes `sizeof(bool)` bytes per entry only, not
-   `sizeof(int)`.
+   `sizeof(int)`. The standard constants `true` and `false` may be used for Boolean
+   values for readability. 
 
  - The random number generator interface, `igraph_rng_type_t`, has been overhauled.
    Check the declaration of the type for details.
@@ -239,6 +242,9 @@ Some of the highlights are:
 
  - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its
    `dom` and `leftout` arguments instead of an `igraph_vector_t`.
+
+ - `igraph_dyad_census()` now uses `igraph_real_t` instead of `igraph_integer_t` for
+    its output arguments, and it no longer returns -1 when overflow occurs.
 
  - `igraph_edges()` now takes an `igraph_vector_int_t` for its
    `edges` argument instead of an `igraph_vector_t`.
@@ -527,6 +533,9 @@ Some of the highlights are:
    Functions that used `igraph_spmatrix_t` in the library now use
    `igraph_sparsemat_t`.
 
+ - `igraph_sparsemat_is_symmetric()` now returns an error code and the result
+   itself is provided in an output argument.
+
  - `igraph_stochastic_imitation()` now expects the list of strategies
    in an `igraph_vector_int_t` instead of an `igraph_int_t`.
 
@@ -710,6 +719,8 @@ Some of the highlights are:
 
  - `igraph_is_mutual()` has an additional parameter which controls whether directed self-loops are considered mutual.
 
+ - `igraph_community_leiden` has an additional parameter to indicate the number of iterations to perform (PR #2177).
+
  - `igraph_hrg_create()` now takes a vector of probabilities corresponding to the internal nodes of the dendogram. It used to also take probabilities for the leaf nodes and then ignore them.
 
 ### Added
@@ -719,6 +730,7 @@ Some of the highlights are:
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
  - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
  - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
+ - `igraph_matrix_view_from_vector()` allows interpreting the data stored in a vector as a matrix of the specified size.
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
  - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
  - `igraph_generalized_petersen()` to create generalized Petersen graphs (#1844, thanks to @alexsyou).
@@ -754,6 +766,8 @@ Some of the highlights are:
  - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
  - `igraph_eccentricity()` and `igraph_eccentricity_dijkstra()` find the longest among all shortest paths from vertices.
+ - `igraph_vector_complex_zapsmall()` and `igraph_matrix_complex_zapsmall()` for replacing small components of complex vector or matrix elements with exact zeros.
+ - `igraph_invalidate_cache()` invalidates all cached graph properties, forcing their recomputation next time they are requested.
 
 ### Removed
 
@@ -778,6 +792,7 @@ Some of the highlights are:
  - `igraph_write_graph_gml()` and `igraph_read_graph_gml()` now have limited support for entity encoding.
  - Foreign format readers now present more informative error messages.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now counts loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
+ - The default tolerance of the zapsmall functions is now `eps^(2/3)` instead of `eps^(1/2)` where eps is the machine epsilon of `igraph_real_t`.
  - It is now possible to override the uniform integer and the Poisson samplers in the random number generator interface.
 
 ### Fixed
@@ -906,9 +921,14 @@ Some of the highlights are:
    `igraph_es_range()` and `igraph_ess_range()` because these use C-style
    intervals (closed from the left, open from the right).
 
+ - `igraph_zeroin()` is deprecated and will be removed in 0.11, with no
+   replacement. The function is not graph-related and was never part of the
+   public API.
+
 ### Other
 
- - Documentation improvements
+ - Documentation improvements.
+ - Support for the Intel's LLVM-based compiler.
 
 ## [Unreleased 0.9]
 
@@ -936,6 +956,9 @@ Some of the highlights are:
  - `igraph_layout_kamada_kawai()`, `igraph_layout_fruchterman_reingold()`, `igraph_layout_drl()`, as well as their 3D versions now check for non-positive weights.
  - `igraph_asymmetric_preference_game()` interpreted its `type_dist_matrix` argument incorrectly.
  - Fixed incorrect result of `igraph_community_spinglass()` for null and singleton graphs.
+ - `igraph_layout_gem()` does not crash any more for graphs with only a single vertex.
+ - `igraph_bridges()` no longer uses recursion and thus is no longer prone to stack overflow.
+ - Include paths of dependent packages would be specified incorrectly in some environments.
 
 ### Other
 

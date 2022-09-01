@@ -38,7 +38,7 @@
  * \param inverse An initialized vector. The inverse of \p permutation will be stored here.
  * \return Error code.
  */
-static int igraph_i_invert_permutation(const igraph_vector_int_t *permutation, igraph_vector_int_t *inverse) {
+static igraph_error_t igraph_i_invert_permutation(const igraph_vector_int_t *permutation, igraph_vector_int_t *inverse) {
     const igraph_integer_t n = igraph_vector_int_size(permutation);
 
     IGRAPH_CHECK(igraph_vector_int_resize(inverse, n));

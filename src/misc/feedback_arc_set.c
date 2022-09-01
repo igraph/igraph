@@ -22,17 +22,18 @@
 
 */
 
+#include "igraph_structural.h"
+#include "misc/feedback_arc_set.h"
+
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_structural.h"
 #include "igraph_vector_list.h"
 #include "igraph_visitor.h"
 
 #include "internal/glpk_support.h"
 #include "math/safe_intop.h"
-#include "misc/feedback_arc_set.h"
 
 #include <limits.h>
 

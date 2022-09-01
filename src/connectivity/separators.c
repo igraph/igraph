@@ -323,12 +323,12 @@ static igraph_bool_t igraph_i_separators_is_not_seen_yet(
     for (co = 0; co < nocomps; co++) {
         igraph_vector_int_t *act = igraph_vector_int_list_get_ptr(comps, co);
         if (igraph_vector_int_all_e(act, newc)) {
-            return 0;
+            return false;
         }
     }
 
     /* If not found, then it is new */
-    return 1;
+    return true;
 }
 
 static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separators,
@@ -695,7 +695,7 @@ igraph_error_t igraph_minimum_size_separators(
     /* Work on a copy of 'graph' */
     IGRAPH_CHECK(igraph_copy(&graph_copy, graph));
     IGRAPH_FINALLY(igraph_destroy, &graph_copy);
-    IGRAPH_CHECK(igraph_simplify(&graph_copy, /* multiple */ 1, /* loops */ 1, NULL));
+    IGRAPH_CHECK(igraph_simplify(&graph_copy, /* multiple */ true, /* loops */ true, NULL));
 
     /* ---------------------------------------------------------------- */
     /* 2 Find k vertices with the largest degrees (x1;..,xk). Check

@@ -67,9 +67,6 @@ public :
     // destructor
     ~degree_sequence();
 
-    // unbind the deg[] vector (so that it doesn't get deleted when the class is destroyed)
-    void detach();
-
     // compute total number of arcs
     void compute_total();
 

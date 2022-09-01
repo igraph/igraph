@@ -36,7 +36,7 @@
 #include <string.h>
 
 int igraph_gml_yylex_init_extra(igraph_i_gml_parsedata_t *user_defined, void *scanner);
-void igraph_gml_yylex_destroy(void *scanner);
+int igraph_gml_yylex_destroy(void *scanner);
 int igraph_gml_yyparse(igraph_i_gml_parsedata_t *context);
 void igraph_gml_yyset_in(FILE *in_str, void *yyscanner);
 
@@ -52,11 +52,11 @@ void igraph_gml_yyset_in(FILE *in_str, void *yyscanner);
 static igraph_bool_t needs_coding(const char *str) {
     while (*str) {
         if (*str == '&' || *str == '"') {
-            return 1;
+            return true;
         }
         str++;
     }
-    return 0;
+    return false;
 }
 
 /* Encode & and " character in 'src' to &amp; and &quot;
@@ -254,7 +254,7 @@ void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t *context) {
     }
 
     if (context->scanner != 0) {
-        igraph_gml_yylex_destroy(context->scanner);
+        (void) igraph_gml_yylex_destroy(context->scanner);
         context->scanner = 0;
     }
 }
@@ -424,7 +424,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_t trie;
     igraph_vector_int_t edges;
     igraph_bool_t directed = IGRAPH_UNDIRECTED;
-    igraph_bool_t has_directed = 0;
+    igraph_bool_t has_directed = false;
     igraph_gml_tree_t *gtree;
     igraph_integer_t gidx;
     igraph_trie_t vattrnames;
@@ -436,7 +436,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_vector_ptr_t *attrs[3];
     igraph_integer_t edgeptr = 0;
     igraph_i_gml_parsedata_t context;
-    igraph_bool_t entity_warned = 0; /* used to warn at most once about unsupported entities */
+    igraph_bool_t entity_warned = false; /* used to warn at most once about unsupported entities */
 
     attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
 
@@ -575,7 +575,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             }
         } else if (!strcmp(name, "edge")) {
             igraph_gml_tree_t *edge;
-            igraph_bool_t has_source = 0, has_target = 0;
+            igraph_bool_t has_source = false, has_target = false;
             no_of_edges++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
                 IGRAPH_ERRORF("'edge' is not a list in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
@@ -884,7 +884,7 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
     return IGRAPH_SUCCESS;
 }
 
-#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Writing GML format failed.", IGRAPH_EFILE); } while (0)
+#define CHECK(cmd) do { int ret=cmd; if (ret<0) IGRAPH_ERROR("Writing GML format failed.", IGRAPH_EFILE); } while (0)
 
 /**
  * \function igraph_write_graph_gml
@@ -969,7 +969,6 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
 igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                                       igraph_write_gml_sw_t options,
                                       const igraph_vector_t *id, const char *creator) {
-    igraph_error_t ret;
     igraph_strvector_t gnames, vnames, enames; /* attribute names */
     igraph_vector_int_t gtypes, vtypes, etypes; /* attribute types */
     igraph_integer_t gattr_no, vattr_no, eattr_no; /* attribute counts */
@@ -1041,7 +1040,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* Check whether there is an 'id' node attribute if the supplied is 0 */
     if (!id) {
-        igraph_bool_t found = 0;
+        igraph_bool_t found = false;
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
             const char *n = igraph_strvector_get(&vnames, i);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {

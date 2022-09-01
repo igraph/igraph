@@ -92,10 +92,8 @@ VECTOR_COMPLEX:
     # A vector of igraph complex numbers
     CTYPE: igraph_vector_complex_t
 
-STRVECTOR:
+VECTOR_STR:
     # A vector of strings
-    # TODO(ntamas): maybe rename this to igraph_vector_str_t and VECTOR_STR
-    # for consistency?
     CTYPE: igraph_strvector_t
     FLAGS: BY_REF
 
@@ -107,14 +105,6 @@ VECTOR_LIST:
 VECTOR_INT_LIST:
     # A list containing vectors of integers
     CTYPE: igraph_vector_int_list_t
-    FLAGS: BY_REF
-
-VECTORM1:
-    # A vector of integer indices that should adapt to the conventions of the
-    # host language (i.e. 1-based for R, Mathematica, Octave etc, 0-based for
-    # Python and similar).
-    # TODO(ntamas): should be replaced with INDEX_VECTOR
-    CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
 MATRIX:
@@ -142,7 +132,7 @@ SPARSEMAT:
     FLAGS: BY_REF
 
 ###############################################################################
-# Vertices, edges, vertex and edge sequences
+# Vertices, edges, vertex and edge selectors
 ###############################################################################
 
 EDGE:
@@ -150,26 +140,20 @@ EDGE:
     CTYPE: igraph_integer_t
 
 EDGE_INDICES:
-    # An integer vector containing edges indices. Consistent in its in- and
-    # out-type, unlike EDGESET
+    # An integer vector containing edge indices.
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
-EDGESET:
-    # An igraph edge sequence. This is an ugly hybrid type; when it is an
-    # IN argument in generated code, it is an igraph_es_t, but when it is an
-    # OUT argument, it is an igraph_vector_int_t. This should be fixed for 0.10.
-    CTYPE:
-        IN: igraph_es_t
-        OUT: igraph_vector_int_t
+EDGE_SELECTOR:
+    # An igraph edge selector. Typically used only as an input argument type.
+    CTYPE: igraph_es_t
 
 VERTEX:
     # A single vertex index
     CTYPE: igraph_integer_t
 
 VERTEX_INDICES:
-    # An integer vector containing vertex indices. Consistent in its in- and
-    # out-type, unlike VERTEXSET
+    # An integer vector containing vertex indices.
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
@@ -179,13 +163,9 @@ VERTEX_INDEX_PAIRS:
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
-VERTEXSET:
-    # An igraph vertex sequence. This is an ugly hybrid type; when it is an
-    # IN argument in generated code, it is an igraph_vs_t, but when it is an
-    # OUT argument, it is an igraph_vector_int_t. This should be fixed for 0.10.
-    CTYPE:
-        IN: igraph_vs_t
-        OUT: igraph_vector_int_t
+VERTEX_SELECTOR:
+    # An igraph vertex selector. Typically used only as an input argument type.
+    CTYPE: igraph_vs_t
 
 ###############################################################################
 # Specialized vectors with semantic meaning
@@ -215,10 +195,6 @@ EDGEWEIGHTS:
 EDGESET_LIST:
     # A list containing vectors of igraph integers where each such
     # vector represents a sequence of edge indices.
-    #
-    # TODO(ntamas): the name is slightly inconsistent because EDGESET is
-    # the abstract type for igraph_es_t, but an EDGESET_LIST is _not_ a
-    # vector of igraph_es_t objects
     CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
@@ -249,10 +225,6 @@ SIR_LIST:
 VERTEXSET_LIST:
     # A list containing vectors of igraph integers where each such
     # vector represents a sequence of vertex indices.
-    #
-    # TODO(ntamas): the name is slightly inconsistent because VERTEXSET is
-    # the abstract type for igraph_vs_t, but a VERTEXSET_LIST is _not_ a
-    # vector of igraph_vs_t objects
     CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 

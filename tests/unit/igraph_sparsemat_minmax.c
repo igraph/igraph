@@ -37,7 +37,7 @@ typedef igraph_error_t fun(igraph_sparsemat_t *A, igraph_vector_t *res);
 
 int doit(int which) {
 
-    int i;
+    igraph_integer_t  i;
     igraph_sparsemat_t A, A2;
     igraph_vector_t vec;
     fun *colfun, *rowfun;
@@ -234,6 +234,8 @@ int main() {
     if (res) {
         return res;
     }
+
+    VERIFY_FINALLY_STACK();
 
     res = doit(/*which=*/ MAX);
     if (res) {

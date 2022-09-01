@@ -948,7 +948,7 @@ igraph_error_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, ig
 igraph_error_t igraph_2wheap_check(const igraph_2wheap_t *h) {
     igraph_integer_t size = igraph_2wheap_size(h);
     igraph_integer_t i;
-    igraph_bool_t error = 0;
+    igraph_bool_t error = false;
 
     /* Check the heap property */
     for (i = 0; i < size; i++) {
@@ -956,18 +956,18 @@ igraph_error_t igraph_2wheap_check(const igraph_2wheap_t *h) {
             break;
         }
         if (VECTOR(h->data)[LEFTCHILD(i)] > VECTOR(h->data)[i]) {
-            error = 1; break;
+            error = true; break;
         }
         if (RIGHTCHILD(i) >= size) {
             break;
         }
         if (VECTOR(h->data)[RIGHTCHILD(i)] > VECTOR(h->data)[i]) {
-            error = 1; break;
+            error = true; break;
         }
     }
 
     if (error) {
-        IGRAPH_ERROR("Inconsistent heap", IGRAPH_EINTERNAL);
+        IGRAPH_ERROR("Inconsistent heap.", IGRAPH_EINTERNAL);
     }
 
     return IGRAPH_SUCCESS;

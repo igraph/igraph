@@ -615,7 +615,7 @@ igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
             /* Search for a neighbor that was not yet visited */
-            igraph_bool_t any = 0;
+            igraph_bool_t any = false;
             igraph_integer_t nei = 0;
             while (!any && (*ptr) < n) {
                 nei = VECTOR(*neis)[(*ptr)];

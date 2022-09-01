@@ -36,9 +36,14 @@
 
 int igraph_pajek_yylex_init_extra(igraph_i_pajek_parsedata_t* user_defined,
                                   void* scanner);
-void igraph_pajek_yylex_destroy (void *scanner );
+int igraph_pajek_yylex_destroy (void *scanner );
 int igraph_pajek_yyparse (igraph_i_pajek_parsedata_t* context);
 void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
+
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_pajek_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_pajek_yylex_destroy(scanner);
+}
 
 void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
     const igraph_integer_t attr_count = igraph_vector_ptr_size(attrs);
@@ -191,7 +196,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_pajek_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_pajek_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_pajek_yylex_destroy_wrapper, context.scanner);
 
     igraph_pajek_yyset_in(instream, context.scanner);
 
@@ -330,7 +335,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
 static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     igraph_integer_t destlen = 0;
-    igraph_bool_t need_escape = 0;
+    igraph_bool_t need_escape = false;
 
     /* Determine whether the string contains characters to be escaped */
     const char *s;
@@ -446,7 +451,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     igraph_integer_t i, j;
 
     igraph_attribute_type_t vtypes[V_LAST], etypes[E_LAST];
-    igraph_bool_t write_vertex_attrs = 0;
+    igraph_bool_t write_vertex_attrs = false;
 
     /* Same order as the #define's */
     const char *vnames[] = { "id", "x", "y", "z", "shape", "xfact", "yfact",
@@ -511,7 +516,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     const char *s;
     char *escaped;
 
-    igraph_bool_t bipartite = 0;
+    igraph_bool_t bipartite = false;
     igraph_vector_int_t bip_index, bip_index2;
     igraph_vector_bool_t bvec;
     igraph_integer_t notop = 0, nobottom = 0;

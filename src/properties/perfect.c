@@ -75,7 +75,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
 
     // All graphs with less than 5 vertices are perfect.
     if (no_of_nodes < 5) {
-        *perfect = 1;
+        *perfect = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -87,7 +87,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
     // we limit this check for small graphs only.
     if ( no_of_nodes < 10000 &&
          (no_of_edges < 5 || no_of_edges > (no_of_nodes - 1) * no_of_nodes / 2 - 5)) {
-        *perfect = 1;
+        *perfect = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -95,13 +95,13 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
     // Possibly more optimizations found here: http://www.or.uni-bonn.de/~hougardy/paper/ClassesOfPerfectGraphs.pdf
     IGRAPH_CHECK(igraph_is_bipartite(graph, &is_bipartite, NULL));
     if (is_bipartite) {
-        *perfect = 1;
+        *perfect = true;
         return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_is_chordal(graph, NULL, NULL, &is_chordal, NULL, NULL));
     if (is_chordal) {
-        *perfect = 1;
+        *perfect = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -112,13 +112,13 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
 
     IGRAPH_CHECK(igraph_is_bipartite(&comp_graph, &is_bipartite, NULL));
     if (is_bipartite) {
-        *perfect = 1;
+        *perfect = true;
         goto clean1;
     }
 
     IGRAPH_CHECK(igraph_is_chordal(&comp_graph, NULL, NULL, &is_chordal, NULL, NULL));
     if (is_chordal) {
-        *perfect = 1;
+        *perfect = true;
         goto clean1;
     }
 
@@ -130,13 +130,13 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
     // the graph isn't perfect.
     IGRAPH_CHECK(igraph_girth(graph, &girth, NULL));
     if ((girth > 3) && (((igraph_integer_t)girth) % 2 == 1)) {
-        *perfect = 0;
+        *perfect = false;
         goto clean1;
     }
 
     IGRAPH_CHECK(igraph_girth(&comp_graph, &comp_girth, NULL));
     if ((comp_girth > 3) && (((igraph_integer_t)comp_girth) % 2 == 1)) {
-        *perfect = 0;
+        *perfect = false;
         goto clean1;
     }
 
@@ -157,7 +157,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
         if (cycle_len > girth) {
             IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
             if (iso) {
-                *perfect = 0;
+                *perfect = false;
                 goto clean2;
             }
         }
@@ -165,7 +165,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
         if (cycle_len > comp_girth) {
             IGRAPH_CHECK(igraph_subisomorphic_lad(&cycle, &comp_graph, NULL, &iso, NULL, NULL, /* induced */ 1, 0));
             if (iso) {
-                *perfect = 0;
+                *perfect = false;
                 goto clean2;
             }
         }
@@ -174,7 +174,7 @@ igraph_error_t igraph_is_perfect(const igraph_t *graph, igraph_bool_t *perfect) 
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    *perfect = 1;
+    *perfect = true;
 
 clean1:
     /* normal exit route */

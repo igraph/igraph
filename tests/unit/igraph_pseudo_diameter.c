@@ -32,7 +32,7 @@ int main() {
     igraph_t g;
     igraph_real_t result;
     igraph_error_handler_t *ehandler;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

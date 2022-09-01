@@ -1964,7 +1964,7 @@ igraph_bool_t FUNCTION(igraph_vector, all_e)(const TYPE(igraph_vector) *lhs,
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
-        return 0;
+        return false;
     } else {
         for (i = 0; i < s; i++) {
             BASE l = VECTOR(*lhs)[i];
@@ -1974,10 +1974,10 @@ igraph_bool_t FUNCTION(igraph_vector, all_e)(const TYPE(igraph_vector) *lhs,
 #else
             if (l != r) {
 #endif
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -2014,16 +2014,16 @@ igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
-        return 0;
+        return false;
     } else {
         for (i = 0; i < s; i++) {
             BASE l = VECTOR(*lhs)[i];
             BASE r = VECTOR(*rhs)[i];
             if (l >= r) {
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -2053,16 +2053,16 @@ igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
-        return 0;
+        return false;
     } else {
         for (i = 0; i < s; i++) {
             BASE l = VECTOR(*lhs)[i];
             BASE r = VECTOR(*rhs)[i];
             if (l <= r) {
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -2092,16 +2092,16 @@ FUNCTION(igraph_vector, all_le)(const TYPE(igraph_vector) *lhs,
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
-        return 0;
+        return false;
     } else {
         for (i = 0; i < s; i++) {
             BASE l = VECTOR(*lhs)[i];
             BASE r = VECTOR(*rhs)[i];
             if (l > r) {
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -2131,16 +2131,16 @@ FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
-        return 0;
+        return false;
     } else {
         for (i = 0; i < s; i++) {
             BASE l = VECTOR(*lhs)[i];
             BASE r = VECTOR(*rhs)[i];
             if (l < r) {
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -2250,7 +2250,7 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
             if (pos != 0) {
                 *pos = middle;
             }
-            return 1;
+            return true;
         }
     }
 
@@ -2259,7 +2259,7 @@ igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vecto
         *pos = left;
     }
 
-    return 0;
+    return false;
 }
 
 /**
@@ -2292,11 +2292,11 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
         } else if (what > VECTOR(*v)[middle]) {
             left = middle + 1;
         } else {
-            return 1;
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }
 
 #endif
@@ -2370,11 +2370,11 @@ igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v,
 #else
         if (*p == e) {
 #endif
-            return 1;
+            return true;
         }
         p++;
     }
-    return 0;
+    return false;
 }
 
 /**
@@ -2416,9 +2416,9 @@ igraph_bool_t FUNCTION(igraph_vector, search)(const TYPE(igraph_vector) *v,
         if (pos != 0) {
             *pos = i;
         }
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 
@@ -2965,7 +2965,7 @@ igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v) {
 
 #ifndef NOTORDERED
 
-int FUNCTION(igraph_i_vector, intersect_sorted)(
+igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
     const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
     const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
     TYPE(igraph_vector) *result);
@@ -3018,14 +3018,14 @@ igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vecto
     return IGRAPH_SUCCESS;
 }
 
-int FUNCTION(igraph_i_vector, intersect_sorted)(
+igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
     const TYPE(igraph_vector) *v1, igraph_integer_t begin1, igraph_integer_t end1,
     const TYPE(igraph_vector) *v2, igraph_integer_t begin2, igraph_integer_t end2,
     TYPE(igraph_vector) *result) {
     igraph_integer_t size1, size2, probe1, probe2;
 
     if (begin1 == end1 || begin2 == end2) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     size1 = end1 - begin1;
@@ -3059,7 +3059,7 @@ int FUNCTION(igraph_i_vector, intersect_sorted)(
                      ));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

@@ -34,36 +34,32 @@ int main() {
     /*   igraph_set_attribute_table(&igraph_cattribute_table); */
 
     ifile = fopen("pajek1.net", "r");
-    if (ifile == 0) {
-        return 1;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
     igraph_write_graph_pajek(&g, stdout);
     igraph_destroy(&g);
 
     ifile = fopen("pajek2.net", "r");
-    if (ifile == 0) {
-        return 2;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
     igraph_write_graph_pajek(&g, stdout);
     igraph_destroy(&g);
 
     ifile = fopen("pajek3.net", "r");
-    if (ifile == 0) {
-        return 3;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
     igraph_write_graph_pajek(&g, stdout);
     igraph_destroy(&g);
 
     ifile = fopen("pajek4.net", "r");
-    if (ifile == 0) {
-        return 4;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
     igraph_write_graph_pajek(&g, stdout);

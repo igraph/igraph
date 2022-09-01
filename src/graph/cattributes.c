@@ -40,7 +40,7 @@
 static igraph_bool_t igraph_i_cattribute_find(const igraph_vector_ptr_t *ptrvec,
                                               const char *name, igraph_integer_t *idx) {
     igraph_integer_t i, n = igraph_vector_ptr_size(ptrvec);
-    igraph_bool_t l = 0;
+    igraph_bool_t l = false;
     for (i = 0; !l && i < n; i++) {
         igraph_attribute_record_t *rec = VECTOR(*ptrvec)[i];
         l = !strcmp(rec->name, name);
@@ -201,7 +201,7 @@ static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_pt
 static void igraph_i_cattribute_destroy(igraph_t *graph) {
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *als[3] = { &attr->gal, &attr->val, &attr->eal };
-    for (int a = 0; a < 3; a++) {
+    for (size_t a = 0; a < 3; a++) {
         igraph_i_attribute_list_destroy(als[a]);
     }
     IGRAPH_FREE(graph->attr); /* sets to NULL */
@@ -212,12 +212,11 @@ static void igraph_i_cattribute_destroy(igraph_t *graph) {
 static void igraph_i_cattribute_copy_free(igraph_i_cattributes_t *attr) {
     igraph_vector_ptr_t *als[3] = { &attr->gal, &attr->val, &attr->eal };
     igraph_integer_t i, n;
-    int a;
     igraph_vector_t *num;
     igraph_strvector_t *str;
     igraph_vector_bool_t *boolvec;
     igraph_attribute_record_t *rec;
-    for (a = 0; a < 3; a++) {
+    for (size_t a = 0; a < 3; a++) {
         n = igraph_vector_ptr_size(als[a]);
         for (i = 0; i < n; i++) {
             rec = VECTOR(*als[a])[i];
@@ -253,7 +252,6 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
                                                  &attrfrom->eal
                                                };
     igraph_integer_t i, n;
-    int a;
     igraph_bool_t copy[3] = { ga, va, ea };
     to->attr = attrto = IGRAPH_CALLOC(1, igraph_i_cattributes_t);
     if (!attrto) {
@@ -267,7 +265,7 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
     IGRAPH_FINALLY(igraph_i_cattribute_copy_free, attrto);
 
     alto[0] = &attrto->gal; alto[1] = &attrto->val; alto[2] = &attrto->eal;
-    for (a = 0; a < 3; a++) {
+    for (size_t a = 0; a < 3; a++) {
         if (copy[a]) {
             n = igraph_vector_ptr_size(alfrom[a]);
             IGRAPH_CHECK(igraph_vector_ptr_resize(alto[a], n));
@@ -357,7 +355,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, ig
                 IGRAPH_FINALLY(igraph_free, newbool);
                 IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, origlen);
                 newrec->value = newbool;
-                igraph_vector_bool_fill(newbool, 0);
+                igraph_vector_bool_fill(newbool, false);
             }
             IGRAPH_CHECK(igraph_vector_ptr_push_back(val, newrec));
             IGRAPH_FINALLY_CLEAN(4);
@@ -371,7 +369,7 @@ static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, ig
         igraph_attribute_record_t *newrec = 0;
         const char *name = oldrec->name;
         igraph_integer_t j = -1;
-        igraph_bool_t l = 0;
+        igraph_bool_t l = false;
         if (nattr) {
             l = igraph_i_cattribute_find(nattr, name, &j);
         }
@@ -1592,6 +1590,36 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \section c_attribute_combination_functions
+ *
+ * <para>
+ * The C attribute handler supports combining the attributes of multiple
+ * vertices of edges into a single attribute during a vertex or edge contraction
+ * operation via a user-defined function. This is achieved by setting the
+ * type of the attribute combination to \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION
+ * and passing in a pointer to the custom combination function when specifying
+ * attribute combinations in \ref igraph_attribute_combination() or
+ * \ref igraph_attribute_combination_add() . For the C attribute handler, the
+ * signature of the function depends on the type of the underlying attribute.
+ * For numeric attributes, use:
+ * \verbatim igraph_error_t function(const igraph_vector_t *input, igraph_real_t *output); \endverbatim
+ * where \p input will receive a vector containing the value of the attribute
+ * for all the vertices or edges being combined, and \p output must be filled
+ * by the function to the combined value. Similarly, for Boolean attributes, the
+ * function takes a boolean vector in \p input and must return the combined Boolean
+ * value in \p output:
+ * \verbatim igraph_error_t function(const igraph_vector_bool_t *input, igraph_bool_t *output); \endverbatim
+ * For string attributes, the signature is slightly different:
+ * \verbatim igraph_error_t function(const igraph_strvector_t *input, char **output); \endverbatim
+ * In case of strings, all strings in the input vector are \em owned by igraph
+ * and must not be modified or freed in the combination handler. The string
+ * returned to the caller in \p output remains owned by the caller; igraph will
+ * make a copy it and store the copy in the appropriate part of the data
+ * structure holding the vertex or edge attributes.
+ * </para>
+ */
+
 typedef struct {
     igraph_attribute_combination_type_t type;
     union {
@@ -1870,7 +1898,7 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
                 IGRAPH_FINALLY(igraph_free, newbool);
                 IGRAPH_VECTOR_BOOL_INIT_FINALLY(newbool, origlen);
                 newrec->value = newbool;
-                igraph_vector_bool_fill(newbool, 0);
+                igraph_vector_bool_fill(newbool, false);
             } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                 igraph_strvector_t *newstr = IGRAPH_CALLOC(1, igraph_strvector_t);
                 if (!newstr) {
@@ -1892,7 +1920,7 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
         igraph_attribute_record_t *newrec = NULL;
         const char *name = oldrec->name;
         igraph_integer_t j = -1;
-        igraph_bool_t l = 0;
+        igraph_bool_t l = false;
         if (nattr) {
             l = igraph_i_cattribute_find(nattr, name, &j);
         }
@@ -2486,7 +2514,7 @@ static igraph_error_t igraph_i_cattribute_gettype(const igraph_t *graph,
     igraph_vector_ptr_t *attr[3] = { &at->gal, &at->val, &at->eal };
     igraph_vector_ptr_t *al;
     igraph_integer_t j;
-    igraph_bool_t l = 0;
+    igraph_bool_t l = false;
 
     switch (elemtype) {
     case IGRAPH_ATTRIBUTE_GRAPH:
@@ -2960,7 +2988,7 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
 
     if (!l) {
         IGRAPH_WARNINGF("Graph attribute '%s' does not exist, returning default boolean attribute value.", name);
-        return 0;
+        return false;
     }
 
     rec = VECTOR(*gal)[j];
@@ -3068,7 +3096,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
 
     if (!l) {
         IGRAPH_WARNINGF("Vertex attribute '%s' does not exist, returning default boolean attribute value.", name);
-        return 0;
+        return false;
     }
 
     rec = VECTOR(*val)[j];
@@ -3178,7 +3206,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
 
     if (!l) {
         IGRAPH_WARNINGF("Edge attribute '%s' does not exist, returning default boolean attribute value.", name);
-        return 0;
+        return false;
     }
 
     rec = VECTOR(*eal)[j];
@@ -3690,7 +3718,7 @@ igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, log);
         IGRAPH_VECTOR_BOOL_INIT_FINALLY(log, igraph_vcount(graph));
-        igraph_vector_bool_fill(log, 0);
+        igraph_vector_bool_fill(log, false);
         VECTOR(*log)[vid] = value;
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
@@ -3879,7 +3907,7 @@ igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
         }
         IGRAPH_FINALLY(igraph_free, log);
         IGRAPH_VECTOR_BOOL_INIT_FINALLY(log, igraph_ecount(graph));
-        igraph_vector_bool_fill(log, 0);
+        igraph_vector_bool_fill(log, false);
         VECTOR(*log)[eid] = value;
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));

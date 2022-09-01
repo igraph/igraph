@@ -51,11 +51,11 @@ igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
 
     IGRAPH_RETURN_IF_CACHED_BOOL(graph, IGRAPH_PROP_HAS_LOOP, res);
 
-    *res = 0;
+    *res = false;
 
     for (i = 0; i < m; i++) {
         if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
-            *res = 1;
+            *res = true;
             break;
         }
     }
@@ -95,7 +95,7 @@ igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
 
     for (i = 0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t e = IGRAPH_EIT_GET(eit);
-        VECTOR(*res)[i] = (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e)) ? 1 : 0;
+        VECTOR(*res)[i] = (IGRAPH_FROM(graph, e) == IGRAPH_TO(graph, e));
     }
 
     igraph_eit_destroy(&eit);

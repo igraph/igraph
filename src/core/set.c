@@ -275,7 +275,7 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
     right = igraph_set_size(set) - 1;
 
     if (right == -1) {
-        return 0;    /* the set is empty */
+        return false;    /* the set is empty */
     }
 
     /* search for the new element */
@@ -286,7 +286,7 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
         } else if (SET(*set)[middle] < e) {
             left = middle;
         } else {
-            return 1;
+            return true;
         }
     }
 
@@ -321,9 +321,9 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t *stat
     if (*state < igraph_set_size(set)) {
         *element = set->stor_begin[*state];
         *state = *state + 1;
-        return 1;
+        return true;
     } else {
         *element = 0;
-        return 0;
+        return false;
     }
 }

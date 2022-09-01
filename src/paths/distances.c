@@ -450,7 +450,7 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
     igraph_integer_t ito, ifrom;
-    igraph_bool_t inf = 0;
+    igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
         IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);
@@ -685,7 +685,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     igraph_real_t ecc_u;
     igraph_integer_t vid_ecc;
     igraph_integer_t ito, ifrom;
-    igraph_bool_t inf = 0;
+    igraph_bool_t inf = false;
 
     if (vid_start >= no_of_nodes) {
         IGRAPH_ERROR("Starting vertex ID for pseudo-diameter out of range.", IGRAPH_EINVAL);

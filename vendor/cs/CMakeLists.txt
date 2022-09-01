@@ -87,7 +87,7 @@ if (MSVC)
 else()
   target_compile_options(
     cxsparse_vendored PRIVATE
-    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-unused-variable>
+    $<$<C_COMPILER_ID:GCC,Clang,AppleClang,IntelLLVM>:-Wno-unused-variable>
   )
 endif()
 

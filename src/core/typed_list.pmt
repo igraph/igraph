@@ -1034,6 +1034,7 @@ static igraph_error_t INTERNAL_FUNCTION(init_slice)(const TYPE* list, ITEM_TYPE*
 }
 
 static void INTERNAL_FUNCTION(destroy_slice)(const TYPE* list, ITEM_TYPE* start, ITEM_TYPE* end) {
+    IGRAPH_UNUSED(list);
     for (; start < end; start++) {
         INTERNAL_FUNCTION(destroy_item)(start);
     }

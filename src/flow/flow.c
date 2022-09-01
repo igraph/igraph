@@ -690,14 +690,14 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
 
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
-        VECTOR(added)[target] = 1;
+        VECTOR(added)[target] = true;
         marked++;
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
                 igraph_integer_t nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
-                    VECTOR(added)[nei] = 1;
+                    VECTOR(added)[nei] = true;
                     marked++;
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                 }
@@ -2055,7 +2055,7 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
 igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                igraph_bool_t checks) {
 
-    igraph_bool_t ret = 0;
+    igraph_bool_t ret = false;
 
     if (checks) {
         IGRAPH_CHECK(igraph_i_connectivity_checks(graph, res, &ret));
@@ -2146,7 +2146,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
 
 igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
                              igraph_bool_t checks) {
-    igraph_bool_t ret = 0;
+    igraph_bool_t ret = false;
     igraph_integer_t number_of_nodes = igraph_vcount(graph);
 
     /* igraph_mincut_value returns infinity for the singleton graph,

@@ -744,24 +744,24 @@ static igraph_error_t igraph_i_sparsemat_is_symmetric_triplet(const igraph_spars
     return IGRAPH_SUCCESS;
 }
 
-igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
-    igraph_bool_t res = 0;
+/**
+ * \function igraph_sparsemat_is_symmetric
+ * \brief Returns whether a sparse matrix is symmetric.
+ *
+ * \param A The input matrix
+ * \param result Pointer to an \c igraph_bool_t ; the result is provided here.
+ * \return Error code.
+ */
 
+igraph_error_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A, igraph_bool_t *result) {
     if (A->cs->m != A->cs->n) {
-        return 0;
-    }
-
-    /* TODO(ntamas): return values from igraph_i_sparsemat_is_symmetric_... are
-     * ignored here; this should be fixed. Right now these functions don't
-     * change 'res' if they fail so we will report matrices as not being
-     * symmetric if an error happens */
-    if (igraph_sparsemat_is_cc(A)) {
-        igraph_i_sparsemat_is_symmetric_cc(A, &res);
+        *result = false;
+    } else if (igraph_sparsemat_is_cc(A)) {
+        IGRAPH_CHECK(igraph_i_sparsemat_is_symmetric_cc(A, result));
     } else {
-        igraph_i_sparsemat_is_symmetric_triplet(A, &res);
+        IGRAPH_CHECK(igraph_i_sparsemat_is_symmetric_triplet(A, result));
     }
-
-    return res;
+    return IGRAPH_SUCCESS;
 }
 
 /**

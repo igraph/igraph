@@ -17,7 +17,7 @@ foreach(FORMAT dl gml lgl ncol pajek)
     if (BISON_VERSION VERSION_GREATER_EQUAL 3)
       set(bison_no_deprecated -Wno-deprecated)
     endif()
-	if (NOT FLEX_KEEP_LINE_NUMBERS)
+    if (NOT FLEX_KEEP_LINE_NUMBERS)
       set(bison_hide_line_numbers --no-lines)
       set(flex_hide_line_numbers --noline)
     endif()
@@ -349,14 +349,14 @@ target_include_directories(
   ${PROJECT_SOURCE_DIR}/vendor
 
   # Vendored library include paths
-  $<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>
-  $<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
+  "$<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>"
+  "$<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>"
 
   # Include paths for dependencies
-  $<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>
-  $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
-  $<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>
-  $<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>
+  "$<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>"
+  "$<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>"
+  "$<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>"
+  "$<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>"
 )
 
 if(MATH_LIBRARY)

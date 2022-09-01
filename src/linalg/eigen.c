@@ -936,7 +936,7 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
         igraph_matrix_complex_t *vectors) {
     igraph_vector_int_t idx;
     igraph_vector_t mag;
-    igraph_bool_t hasmag = 0;
+    igraph_bool_t hasmag = false;
     int nev;
     int howmany = 0, start = 0;
     igraph_integer_t i;

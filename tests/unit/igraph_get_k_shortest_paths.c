@@ -124,16 +124,14 @@ int main() {
     printf("Directed unweighted graph:\n");
     call_and_print(&g_sz, NULL, 4, 0, 4, IGRAPH_OUT);
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
-
     printf("Zero vertices, from and to don't exist:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_0, &weights, NULL, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_get_k_shortest_paths(&g_0, &weights, NULL, &paths, 4, 0, 0, IGRAPH_ALL), IGRAPH_EINVVID);
 
     printf("Wrong weights length:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_wiki, &weights, NULL, &paths, 4, 0, 5, IGRAPH_ALL) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_get_k_shortest_paths(&g_wiki, &weights, NULL, &paths, 4, 0, 5, IGRAPH_ALL), IGRAPH_EINVAL);
 
     printf("Non-existent mode:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_1, &weights, NULL, &paths, 4, 0, 0, 100) == IGRAPH_EINVMODE);
+    CHECK_ERROR(igraph_get_k_shortest_paths(&g_1, &weights, NULL, &paths, 4, 0, 0, (igraph_neimode_t) 100), IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

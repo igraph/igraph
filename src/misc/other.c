@@ -87,7 +87,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
 /**
  * \ingroup nongraph
  * \function igraph_convex_hull
- * \brief Determines the convex hull of a given set of points in the 2D plane
+ * \brief Determines the convex hull of a given set of points in the 2D plane.
  *
  * </para><para>
  * The convex hull is determined by the Graham scan algorithm.
@@ -111,9 +111,7 @@ igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t 
  * \return Error code:
  *         \c IGRAPH_ENOMEM: not enough memory
  *
- * Time complexity: O(n log(n)) where n is the number of vertices
- *
- * \example examples/simple/igraph_convex_hull.c
+ * Time complexity: O(n log(n)) where n is the number of vertices.
  */
 igraph_error_t igraph_convex_hull(
     const igraph_matrix_t *data, igraph_vector_int_t *resverts,
@@ -127,13 +125,13 @@ igraph_error_t igraph_convex_hull(
 
     no_of_nodes = igraph_matrix_nrow(data);
     if (igraph_matrix_ncol(data) != 2) {
-        IGRAPH_ERROR("matrix must have 2 columns", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Only two-dimensional point sets are supports, matrix must have two columns.", IGRAPH_EINVAL);
     }
     if (no_of_nodes == 0) {
-        if (resverts != 0) {
+        if (resverts) {
             igraph_vector_int_clear(resverts);
         }
-        if (rescoords != 0) {
+        if (rescoords) {
             IGRAPH_CHECK(igraph_matrix_resize(rescoords, 0, 2));
         }
         /**************************** this is an exit here *********/
@@ -352,13 +350,13 @@ igraph_error_t igraph_vertex_path_from_edge_path(
 
             case IGRAPH_ALL:
                 if (from == start) {
-                    next_edge_ok = 1;
+                    next_edge_ok = true;
                     next_start = to;
                 } else if (to == start) {
-                    next_edge_ok = 1;
+                    next_edge_ok = true;
                     next_start = from;
                 } else {
-                    next_edge_ok = 0;
+                    next_edge_ok = false;
                 }
                 break;
 

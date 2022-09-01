@@ -47,14 +47,15 @@
  * \section about_rngs
  *
  * <section id="about-random-numbers-in-igraph">
- * <title>About random numbers in igraph, use cases</title>
+ * <title>About random numbers in igraph</title>
  *
  * <para>
- * Some algorithms in igraph, e.g. the generation of random graphs,
- * require random number generators (RNGs). Prior to version 0.6
- * igraph did not have a sophisticated way to deal with random number
- * generators at the C level, but this has changed. From version 0.6
- * different and multiple random number generators are supported.
+ * Some algorithms in igraph, such as sampling from random graph models,
+ * require random number generators (RNGs). igraph includes a flexible
+ * RNG framework that allows hooking up arbitrary random number generators,
+ * and comes with several ready-to-use generators. This framework is used
+ * in igraph's high-level interfaces to integrate with the host language's
+ * own RNG.
  * </para>
  * </section>
  *
@@ -150,7 +151,7 @@ extern IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default; /* defined in rng_
  * \function igraph_rng_set_default
  * \brief Set the default igraph random number generator.
  *
- * This function \em copies the internal structure of the given \c igraph_rng_t
+ * This function \em copies the internal structure of the given \type igraph_rng_t
  * object to igraph's internal default RNG structure. The structure itself
  * contains two pointers only, one to the "methods" of the RNG and one to the
  * memory buffer holding the internal state of the RNG. This means that if you
@@ -184,7 +185,7 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
  * \sa igraph_rng_set_default()
  */
 
-igraph_rng_t *igraph_rng_default() {
+igraph_rng_t *igraph_rng_default(void) {
     return &igraph_i_rng_default;
 }
 
@@ -213,14 +214,15 @@ static double igraph_i_rpois(igraph_rng_t *rng, double rate);
 
 /**
  * \function igraph_rng_init
- * \brief Initialize a random number generator.
+ * \brief Initializes a random number generator.
  *
  * This function allocates memory for a random number generator, with
  * the given type, and sets its seed to the default.
  *
  * \param rng Pointer to an uninitialized RNG.
- * \param type The type of the RNG, like \ref igraph_rngtype_mt19937 or
- * \ref igraph_rngtype_glibc2.
+ * \param type The type of the RNG, such as \ref igraph_rngtype_mt19937,
+ * \ref igraph_rngtype_glibc2, \ref igraph_rngtype_pcg32 or
+ * \ref igraph_rngtype_pcg64.
  * \return Error code.
  */
 
@@ -232,7 +234,7 @@ igraph_error_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type)
 
 /**
  * \function igraph_rng_destroy
- * \brief Deallocate memory associated with a random number generator.
+ * \brief Deallocates memory associated with a random number generator.
  *
  * \param rng The RNG to destroy. Do not destroy an RNG that is used
  *    as the default igraph RNG.
@@ -246,7 +248,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_seed
- * \brief Set the seed of a random number generator.
+ * \brief Seeds a random number generator.
  *
  * \param rng The RNG.
  * \param seed The new seed.
@@ -264,7 +266,7 @@ igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
 
 /**
  * \function igraph_rng_bits
- * \brief Query the number of random bits that a random number generator can generate in a single round.
+ * \brief The number of random bits that a random number generator can produces in a single round.
  *
  * \param rng The RNG.
  * \return The number of random bits that can be generated in a single round
@@ -278,7 +280,7 @@ IGRAPH_EXPORT igraph_integer_t igraph_rng_bits(const igraph_rng_t* rng) {
 
 /**
  * \function igraph_rng_max
- * \brief Query the maximum possible integer for a random number generator.
+ * \brief The maximum possible integer for a random number generator.
  *
  * Note that this number is only for informational purposes; it returns the
  * maximum possible integer that can be generated with the RNG with a single
@@ -305,7 +307,7 @@ igraph_uint_t igraph_rng_max(const igraph_rng_t *rng) {
 
 /**
  * \function igraph_rng_name
- * \brief Query the type of a random number generator.
+ * \brief The type of a random number generator.
  *
  * \param rng The RNG.
  * \return The name of the type of the generator. Do not deallocate or

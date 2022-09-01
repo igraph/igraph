@@ -25,13 +25,10 @@
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_qsort.h"
 #include "igraph_vector_list.h"
 
 #include "operators/misc_internal.h"
-
-#include <limits.h>
 
 /**
  * \function igraph_intersection
@@ -109,12 +106,12 @@ igraph_error_t igraph_intersection_many(
 
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_integer_t no_of_nodes = 0;
-    igraph_bool_t directed = 1;
+    igraph_bool_t directed = true;
     igraph_vector_int_t edges;
     igraph_vector_int_list_t edge_vects, order_vects;
     igraph_integer_t i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
     igraph_vector_int_t no_edges;
-    igraph_bool_t allne = no_of_graphs == 0 ? 0 : 1, allsame = 0;
+    igraph_bool_t allne = no_of_graphs == 0 ? false : true, allsame = false;
     igraph_integer_t idx = 0;
 
     /* Check directedness */

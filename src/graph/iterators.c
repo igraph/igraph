@@ -832,7 +832,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
             IGRAPH_ERROR("Cannot create sequence iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
         }
         if (vs.data.range.end < 0 || vs.data.range.end > igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create sequece iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create sequence iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
         }
         vit->type = IGRAPH_VIT_RANGE;
         vit->pos = vs.data.range.start;
@@ -1305,38 +1305,44 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
  *
  * \param es Pointer to an uninitialized edge selector object.
  * \param directed Whether the graph is directed or not.
+ * \param ... The additional arguments give the edges to be included in the
+ *        selector, as pairs of vertex IDs. The last argument must be -1.
+ *        The \p first parameter is present for technical reasons and represents
+ *        the first variadic argument.
  * \return Error code.
  * \sa \ref igraph_es_pairs(), \ref igraph_es_destroy()
  *
  * Time complexity: O(n), the number of edges being selected.
  */
 
-igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, int first, ...) {
     va_list ap;
     igraph_integer_t i, n = 0;
     igraph_vector_int_t *vec;
+    int num;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
-    va_start(ap, directed);
-    while (1) {
-        int num = va_arg(ap, int);
-        if (num == -1) {
-            break;
-        }
+    va_start(ap, first);
+    num = first;
+    while (num != -1) {
         n++;
+        num = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
-    va_start(ap, directed);
-    for (i = 0; i < n; i++) {
-        VECTOR(*vec)[i] = va_arg(ap, int);
+    if (n > 0) {
+        va_start(ap, first);
+        VECTOR(*vec)[0] = first;
+        for (i = 1; i < n; i++) {
+            VECTOR(*vec)[i] = va_arg(ap, int);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -1382,32 +1388,34 @@ igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int first, ...) {
     va_list ap;
     igraph_integer_t i, n = 0;
     igraph_vector_int_t *vec;
+    int num;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
-    va_start(ap, directed);
-    while (1) {
-        int num = va_arg(ap, int);
-        if (num == -1) {
-            break;
-        }
+    va_start(ap, first);
+    num = first;
+    while (num != -1) {
         n++;
+        num = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
-    va_start(ap, directed);
-    for (i = 0; i < n; i++) {
-        VECTOR(*vec)[i] = va_arg(ap, int);
+    if (n > 0) {
+        va_start(ap, first);
+        VECTOR(*vec)[0] = first;
+        for (i = 1; i < n; i++) {
+            VECTOR(*vec)[i] = va_arg(ap, int);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -2009,7 +2017,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
             IGRAPH_ERROR("Cannot create sequence iterator, starting edge ID out of range.", IGRAPH_EINVAL);
         }
         if (es.data.range.end < 0 || es.data.range.end > igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create sequece iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Cannot create sequence iterator, ending edge ID out of range.", IGRAPH_EINVAL);
         }
         eit->type = IGRAPH_EIT_RANGE;
         eit->pos = es.data.range.start;

@@ -124,7 +124,6 @@ int test_small_graph() {
 }
 
 int main() {
-    int retval;
 
     RUN_TEST(test_ring);
     RUN_TEST(test_small_graph);

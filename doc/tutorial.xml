@@ -31,7 +31,7 @@ Second, <command>igraph</command> uses the
 <type>igraph_integer_t</type> type for integers instead of
 <type>int</type> or <type>long int</type>, and it also uses the
 <type>igraph_real_t</type> type for real numbers instead of
-<type>double</type>. Depending on how igraph was compiled, and whether you are
+<type>double</type>. Depending on how <command>igraph</command> was compiled, and whether you are
 using a 32-bit or 64-bit system, <type>igraph_integer_t</type> may be a 32-bit
 or 64-bit integer.
 </para></listitem>
@@ -76,7 +76,7 @@ target_link_libraries(igraph_test PUBLIC igraph::igraph)
 
 <para>
 To compile the project, create a new directory called <filename>build</filename> in
-the root of the igraph source tree, and switch to it:
+the root of the <command>igraph</command> source tree, and switch to it:
 <programlisting>
 mkdir build
 cd build
@@ -91,7 +91,7 @@ cmake ..
 </para>
 
 <para>
-If igraph was installed at a non-standard location, specify its prefix
+If <command>igraph</command> was installed at a non-standard location, specify its prefix
 using the <option>-DCMAKE_PREFIX_PATH=...</option> option. The prefix must be
 the same directory that was specified as the <option>CMAKE_INSTALL_PREFIX</option>
 when compiling igraph.
@@ -105,10 +105,10 @@ cmake --build .
 </para>
 
 <note><title>C++ must be enabled in igraph projects</title>
-<para>Parts of igraph are implemented in C++; therefore, any CMake target that
-depends on igraph should use the C++ linker. Furthermore, OpenMP support in
+<para>Parts of <command>igraph</command> are implemented in C++; therefore, any CMake target that
+depends on <command>igraph</command> should use the C++ linker. Furthermore, OpenMP support in
 igraph works correctly only if C++ is enabled in the CMake project. The script
-that finds igraph on the host machine will throw an error if C++ support is
+that finds <command>igraph</command> on the host machine will throw an error if C++ support is
 not enabled in the CMake project.</para>
 
 <para>C++ support is enabled by default when no languages are explicitly

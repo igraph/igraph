@@ -48,7 +48,7 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
     igraph_vector_t dispx, dispy;
     igraph_real_t temp = start_temp;
     igraph_real_t difftemp = start_temp / niter;
-    igraph_bool_t conn = 1;
+    igraph_bool_t conn = true;
     igraph_real_t C = 0;
 
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
@@ -500,7 +500,7 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     igraph_vector_t dispx, dispy, dispz;
     igraph_real_t temp = start_temp;
     igraph_real_t difftemp = start_temp / niter;
-    igraph_bool_t conn = 1;
+    igraph_bool_t conn = true;
     igraph_real_t C = 0;
 
     if (niter < 0) {

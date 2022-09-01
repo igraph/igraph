@@ -224,7 +224,7 @@ int main() {
     IGRAPH_ASSERT(fabs(avg_local - vector_avg(&result1)) < 1e-14);
 
     printf("\nUndirected simple:\n");
-    igraph_simplify(&g, 1, 1, NULL);
+    igraph_simplify(&g, true, true, NULL);
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
     IGRAPH_ASSERT(vector_equal(&result1, &result3));
