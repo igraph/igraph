@@ -54,6 +54,10 @@ IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_i_layout_segments_intersect(float p0_
                                                                        float p2_x, float p2_y,
                                                                        float p3_x, float p3_y);
 
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist,
+                                                          igraph_real_t *a_p,
+                                                          igraph_real_t *b_p);
+
 igraph_error_t igraph_i_layout_random_bounded(
         const igraph_t *graph, igraph_matrix_t *res,
         const igraph_vector_t *minx, const igraph_vector_t *maxx,
