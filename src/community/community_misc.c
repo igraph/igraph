@@ -360,6 +360,28 @@ static int igraph_i_split_join_distance(const igraph_vector_t *v1,
  * the two clusterings, with <code>VI = 0</code> achieved precisely when they coincide.
  *
  * </para><para>
+ * The Rand index is defined as the probability that the two clusterings agree
+ * about the cluster memberships of a randomly chosen vertex \em pair. All vertex
+ * pairs are considered, and the two clusterings are considered to be in agreement
+ * about the memberships of a vertex pair if either the two vertices are in the
+ * same cluster in both clusterings, or they are in different clusters in both
+ * clusterings. The Rand index is then the number of vertex pairs in agreement,
+ * divided by the total number of vertex pairs. A Rand index of zero means that
+ * the two clusterings disagree about the membership of all vertex pairs, while
+ * 1 means that the two clusterings are identical.
+ *
+ * </para><para>
+ * The adjusted Rand index is similar to the Rand index, but it takes into
+ * account that agreement between the two clusterings may also occur by chance
+ * even if the two clusterings are chosen completely randomly. The adjusted
+ * Rand index therefore subtracts the expected fraction of agreements from the
+ * value of the Rand index, and divides the result by one minus the expected
+ * fraction of agreements. The maximum value of the adjusted Rand index is
+ * still 1 (similarly to the Rand index), indicating maximum agreement, but
+ * the value may be less than zero if there is \em less agreement between the
+ * two clusterings than what would be expected by chance.
+ *
+ * </para><para>
  * For an explanation of the split-join distance, see \ref igraph_split_join_distance().
  *
  * </para><para>
