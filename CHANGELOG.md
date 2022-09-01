@@ -46,6 +46,9 @@ Some of the highlights are:
    `igraph_vector_long_t`) are therefore removed; you should use the corresponding
    `int` variant instead, whose elements are of type `igraph_integer_t`.
 
+ - Generic data types based on `float` were removed as they were not used
+   anywhere in the library.
+
  - Several igraph functions that used to take a `long int` or return a
    `long int` now takes or returns an `igraph_integer_t` instead to make the
    APIs more consistent. Similarly, igraph functions that used `igraph_vector_t`
@@ -56,6 +59,9 @@ Some of the highlights are:
  - Similarly, igraph functions that used to accept the `long` variant of a
    generic igraph data type (e.g., `igraph_vector_long_t`) now take the `int`
    variant of the same data type.
+
+ - The type `igraph_stack_ptr_t` and its associated functions were removed. Use
+   `igraph_vector_ptr_t` and associated functions instead.
 
  - Error handlers should no longer perform a `longjmp()`. Doing so will introduce
    memory leaks, as resource cleanup is now done in multiple stages, through
@@ -236,9 +242,6 @@ Some of the highlights are:
 
  - `igraph_diameter()` and `igraph_diameter_dijkstra()` now use `igraph_vector_int_t`
    vectors to return the list of vertex and edge IDs in the diameter.
-
- - `igraph_dnorm()` was removed. This is not really a breaking change as the
-   function was never documented, but it was exposed from one of the headers.
 
  - `igraph_dominator_tree()` now takes an `igraph_vector_int_t` for its
    `dom` and `leftout` arguments instead of an `igraph_vector_t`.
@@ -773,11 +776,12 @@ Some of the highlights are:
  - `igraph_betweenness_subset()` and `igraph_edge_betweenness_subset()` calculates betweenness and edge betweenness scores using shortest paths between a subset of vertices only (PR #1711, thanks to Guy Rozenberg)
  - `igraph_graph_center()` finds the central vertices of the graph. The central vertices are the ones having a minimum eccentricity (PR #2084, thanks to Pradeep Krishnamurthy).
  - `igraph_calloc()` and `igraph_realloc()` are now publicly exposed; these functions provide variants of `calloc()` and `realloc()` that can safely be deallocated within igraph functions.
- - `igraph_heap_clear()` removes all elements from an `igraph_heap_t` with a single call.
+ - `igraph_heap_clear()` and `igraph_heap_min_clear()` remove all elements from an `igraph_heap_t` or an `igraph_heap_min_t`, respectively.
 
 ### Removed
 
- - The type `igraph_stack_ptr_t`, `igraph_stack_ptr_free_all()` and `igraph_stack_ptr_destroy_all()` are removed. Use `igraph_vector_ptr_t` and associated functions instead.
+ - `igraph_adjlist_remove_duplicate()`, `igraph_betweenness_estimate()`, `igraph_closeness_estimate()`, `igraph_edge_betweenness_estimate()`, `igraph_inclist_remove_duplicate()`, `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` were deprecated earlier in 0.9.0 and are now removed in this release.
+ - `igraph_dnorm()` was removed. This is not really a breaking change as the function was never documented, but it was exposed from one of the headers.
 
 ### Changed
 
