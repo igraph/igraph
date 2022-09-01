@@ -35,7 +35,7 @@ Some of the highlights are:
  - `igraph_bool_t` is now a C99 `bool` and not an `int`. Similarly,
    `igraph_vector_bool_t` now consumes `sizeof(bool)` bytes per entry only, not
    `sizeof(int)`. The standard constants `true` and `false` may be used for Boolean
-   values for readability. 
+   values for readability.
 
  - The random number generator interface, `igraph_rng_type_t`, has been overhauled.
    Check the declaration of the type for details.
@@ -765,9 +765,15 @@ Some of the highlights are:
  - `igraph_local_scan_subset_ecount()` counts the number of edges in induced sugraphs from a subset of vertices.
  - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
- - `igraph_eccentricity()` and `igraph_eccentricity_dijkstra()` find the longest among all shortest paths from vertices.
+ - `igraph_eccentricity_dijkstra()` finds the longest weighted path length among all shortest paths between a set of vertices.
  - `igraph_vector_complex_zapsmall()` and `igraph_matrix_complex_zapsmall()` for replacing small components of complex vector or matrix elements with exact zeros.
  - `igraph_invalidate_cache()` invalidates all cached graph properties, forcing their recomputation next time they are requested.
+ - `igraph_pseudo_diameter()` and `igraph_pseudo_diameter_dijkstra()` to determine a lower bound for the diameter of a graph (unweighted or weighted).
+ - `igraph_trussness()` calculates the trussness of each edge in the graph (PR #1034, thanks to Alex Perrone and Fabio Zanini)
+ - `igraph_betweenness_subset()` and `igraph_edge_betweenness_subset()` calculates betweenness and edge betweenness scores using shortest paths between a subset of vertices only (PR #1711, thanks to Guy Rozenberg)
+ - `igraph_graph_center()` finds the central vertices of the graph. The central vertices are the ones having a minimum eccentricity (PR #2084, thanks to Pradeep Krishnamurthy).
+ - `igraph_calloc()` and `igraph_realloc()` are now publicly exposed; these functions provide variants of `calloc()` and `realloc()` that can safely be deallocated within igraph functions.
+ - `igraph_heap_clear()` removes all elements from an `igraph_heap_t` with a single call.
 
 ### Removed
 
@@ -1149,7 +1155,6 @@ Some of the highlights are:
 
 ### Added
 
- - `igraph_trussness()` calculates the trussness of each edge in the graph (PR #1034, thanks to Alex Perrone and Fabio Zanini)
  - OpenMP is now enabled and used by certain functions (notably PageRank calculation) when the compiler supports it. Set `IGRAPH_OPENMP_SUPPORT=OFF` at configuration time to disable this.
 
 ### Fixed
