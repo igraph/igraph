@@ -21,9 +21,10 @@
 
 */
 
-#include "test_utilities.h"
-#include "graph/attributes.h"
 #include <igraph.h>
+
+#include "test_utilities.h"
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -132,9 +133,8 @@ int main() {
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     ifile = fopen("links.net", "r");
-    if (ifile == 0) {
-        return 10;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
 

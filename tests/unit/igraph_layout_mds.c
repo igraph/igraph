@@ -32,11 +32,18 @@
 int main() {
     igraph_t g;
     igraph_matrix_t coords, dist_mat;
-    int i, j;
+    igraph_integer_t i, j;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
     RNG_BEGIN();
+
+    igraph_small(&g, 0, 0, -1);
+    igraph_matrix_init(&coords, 0, 0);
+    igraph_layout_mds(&g, &coords, 0, 2);
+    print_matrix(&coords);
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
 
     igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
@@ -51,7 +58,7 @@ int main() {
             MATRIX(coords, i, 1) *= -1;
         }
     }
-    igraph_matrix_print(&coords);
+    print_matrix(&coords);
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
 
@@ -77,7 +84,7 @@ int main() {
             dist_sq += sqr(MATRIX(coords, i, 0) - MATRIX(coords, j, 0));
             dist_sq += sqr(MATRIX(coords, i, 1) - MATRIX(coords, j, 1));
             if (fabs(sqrt(dist_sq) - MATRIX(dist_mat, i, j)) > 1e-2) {
-                printf("dist(%d,%d) should be %.4f, but it is %.4f\n",
+                printf("dist(%" IGRAPH_PRId ", %" IGRAPH_PRId ") should be %.4f, but it is %.4f\n",
                        i, j, MATRIX(dist_mat, i, j), sqrt(dist_sq));
                 return 1;
             }

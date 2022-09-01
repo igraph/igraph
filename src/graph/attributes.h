@@ -23,20 +23,19 @@
 #include "igraph_decls.h"
 #include "igraph_strvector.h"
 #include "igraph_types.h"
-#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
     do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
-        igraph_error_t igraph_i_ret2=0; \
+        igraph_error_t igraph_i_ret2=IGRAPH_SUCCESS; \
         if ((from)->attr) { \
             IGRAPH_CHECK(igraph_i_ret2=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
         } else { \
-            (to)->attr = 0; \
+            (to)->attr = NULL; \
         } \
-        if (igraph_i_ret2 != 0) { \
+        if (igraph_i_ret2 != IGRAPH_SUCCESS) { \
             IGRAPH_ERROR("", igraph_i_ret2); \
         } \
     } while(0)

@@ -573,15 +573,15 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
  *
  * </para><para>
  * Note that this function can operate in two modes, depending on the
- * \p multiple argument. If it is \c FALSE (i.e. 0), then a single edge is
+ * \p multiple argument. If it is \c false, then a single edge is
  * created for every non-zero element in the incidence matrix. If \p
- * multiple is \c TRUE (i.e. 1), then the matrix elements are rounded up
+ * multiple is \c true, then the matrix elements are rounded up
  * to the closest non-negative integer to get the number of edges to
  * create between a pair of vertices.
  *
  * </para><para>
  * This function does not create multiple edges if \p multiple is
- * \c FALSE, but might create some if it is \c TRUE.
+ * \c false, but might create some if it is \c true.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param types Pointer to an initialized boolean vector, or a null
@@ -748,7 +748,7 @@ igraph_error_t igraph_get_incidence(const igraph_t *graph,
     }
 
     for (i = 0; i < no_of_nodes; i++) {
-        n1 += VECTOR(*types)[i] == 0 ? 1 : 0;
+        n1 += VECTOR(*types)[i] == false ? 1 : 0;
     }
     n2 = no_of_nodes - n1;
 
@@ -851,7 +851,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     igraph_vector_char_t seen;
     igraph_dqueue_int_t Q;
     igraph_vector_int_t neis;
-    igraph_bool_t bi = 1;
+    igraph_bool_t bi = true;
     igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_char_init(&seen, no_of_nodes));
@@ -880,7 +880,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                 if (VECTOR(seen)[nei]) {
                     igraph_integer_t neitype = VECTOR(seen)[nei];
                     if (neitype == acttype) {
-                        bi = 0;
+                        bi = false;
                         break;
                     }
                 } else {

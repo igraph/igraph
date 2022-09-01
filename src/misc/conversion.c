@@ -981,7 +981,7 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
     igraph_vector_int_t neighbors;
     igraph_integer_t prufer_index = 0;
     igraph_integer_t n = igraph_vcount(graph);
-    igraph_bool_t is_tree = 0;
+    igraph_bool_t is_tree = false;
 
     IGRAPH_CHECK(igraph_is_tree(graph, &is_tree, NULL, IGRAPH_ALL));
 

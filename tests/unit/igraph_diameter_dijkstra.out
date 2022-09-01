@@ -5,7 +5,21 @@ Edges:
 Vertices:
 ( )
 
+Graph with zero nodes, weighted:
+Diameter: NaN, from -1 to -1
+Edges:
+( )
+Vertices:
+( )
+
 Graph with one node:
+Diameter: 0, from 0 to 0
+Edges:
+( )
+Vertices:
+( 0 )
+
+Graph with one node, weighted:
 Diameter: 0, from 0 to 0
 Edges:
 ( )

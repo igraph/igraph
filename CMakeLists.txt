@@ -1,6 +1,7 @@
 # Minimum CMake that we require is 3.18.
 # Some of the recent features we use:
 #  * --ignore-eol when comparing unit test results with expected outcomes (3.14)
+#  * CROSSCOMPILING_EMULATOR can be a semicolon-separated list to pass arguments (3.15)
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 cmake_minimum_required(VERSION 3.18...3.22)

@@ -302,7 +302,7 @@ igraph_i_set_attribute_table(const igraph_attribute_table_t * table) {
 }
 
 igraph_bool_t igraph_has_attribute_table() {
-    return igraph_i_attribute_table != 0;
+    return igraph_i_attribute_table != NULL;
 }
 
 
@@ -353,7 +353,13 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
  * \param type The type of the attribute combination. See \ref
  *             igraph_attribute_combination_type_t for the options.
  * \param func Function to be used if \p type is
- *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION. This function is called
+ *             by the concrete attribute handler attached to igraph, and its
+ *             calling signature depends completely on the attribute handler.
+ *             For instance, if you are using attributes from C and you have
+ *             attached the C attribute handler, you need to follow the
+ *             documentation of the <link linkend="c-attribute-combination-functions">C attribute handler</link>
+ *             for more details.
  * \return Error code.
  *
  * Time complexity: O(n), where n is the number of current attribute
@@ -496,7 +502,7 @@ igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combina
  *             igraph_attribute_combination_type_t for the options.
  * \param func Function to be used if \p type is
  *             \c IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
- * The list is closed by IGRAPH_ATTRIBUTE_COMBINE_FUNCTION.
+ * The list is closed by setting the name to \c IGRAPH_NO_MORE_ATTRIBUTES.
  * \return Error code.
  *
  * Time complexity: O(n^2), where n is the number attribute
@@ -512,8 +518,8 @@ igraph_error_t igraph_attribute_combination(
     IGRAPH_CHECK(igraph_attribute_combination_init(comb));
 
     va_start(ap, comb);
-    while (1) {
-        igraph_function_pointer_t func = 0;
+    while (true) {
+        igraph_function_pointer_t func = NULL;
         igraph_attribute_combination_type_t type;
         const char *name;
 

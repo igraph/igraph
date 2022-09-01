@@ -410,7 +410,7 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
     igraph_integer_t i, l;
     igraph_attribute_record_t idrec, eidrec;
     const char *idstr = "id";
-    igraph_bool_t already_has_vertex_id = 0, already_has_edge_id = 0;
+    igraph_bool_t already_has_vertex_id = false, already_has_edge_id = false;
     igraph_vector_ptr_t vattr, eattr, gattr;
     igraph_integer_t esize;
 
@@ -618,7 +618,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     igraph_integer_t id;
     int i;
     igraph_i_graphml_attribute_record_t *rec = NULL;
-    igraph_bool_t skip = 0;
+    igraph_bool_t skip = false;
 
     if (!state->successful) {
         /* Parser is already in an error state */
@@ -1065,7 +1065,7 @@ static igraph_error_t igraph_i_graphml_sax_handler_start_element_ns_inner(
     xmlChar* attr_value = 0;
     igraph_integer_t id1, id2;
     int i;
-    igraph_bool_t tag_is_unknown = 0;
+    igraph_bool_t tag_is_unknown = false;
 
     IGRAPH_UNUSED(prefix);
     IGRAPH_UNUSED(nb_namespaces);
@@ -2015,7 +2015,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
     }
 
     /* Now the edges */
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &it));
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
     while (!IGRAPH_EIT_END(it)) {
         igraph_integer_t from, to;
@@ -2057,6 +2057,9 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
                 ret = fprintf(outstream, "      <data key=\"%s%s\">", eprefix,
                               name_escaped);
                 IGRAPH_FREE(name_escaped);
+                if (ret < 0) {
+                    IGRAPH_ERROR("Write failed.", IGRAPH_EFILE);
+                }
                 IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
                              igraph_ess_1(edge), &strv));
                 s = igraph_strvector_get(&strv, 0);

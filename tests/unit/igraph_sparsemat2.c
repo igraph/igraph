@@ -24,113 +24,13 @@
 #define NCOMPLEX  /* to make it compile with MSVC on Windows */
 
 #include <igraph.h>
-#include "linalg/blas_internal.h"
-#include "linalg/arpack_internal.h"
 
 #include "test_utilities.h"
 
-int igraph_matrix_dgemv(const igraph_matrix_t *m,
-                        const igraph_vector_t *v,
-                        igraph_vector_t *res,
-                        igraph_real_t alpha,
-                        igraph_real_t beta,
-                        igraph_bool_t transpose_m) {
-
-    int nrow = igraph_matrix_nrow(m);
-    int ncol = igraph_matrix_ncol(m);
-    igraph_integer_t vlen = igraph_vector_size(v);
-    int one = 1;
-    char t = transpose_m ? 't' : 'n';
-    igraph_integer_t input_len  = transpose_m ? nrow : ncol;
-    igraph_integer_t output_len = transpose_m ? ncol : nrow;
-
-    if (vlen != input_len) {
-        IGRAPH_ERROR("Matrix and vector sizes are incompatible", IGRAPH_EINVAL);
-    }
-
-    if (beta != 0 && igraph_vector_size(res) != output_len) {
-        IGRAPH_ERROR("Non-zero beta and bad `res' vector size, possible mistake",
-                     IGRAPH_EINVAL);
-    }
-
-    IGRAPH_CHECK(igraph_vector_resize(res, output_len));
-
-    igraphdgemv_(&t, &nrow, &ncol, &alpha, &MATRIX(*m, 0, 0),
-                 &nrow, VECTOR(*v), &one, &beta, VECTOR(*res), &one);
-
-    return 0;
-}
-
-int igraph_matrix_vector_prod(const igraph_matrix_t *m,
-                              const igraph_vector_t *v,
-                              igraph_vector_t *res) {
-    return igraph_matrix_dgemv(m, v, res, 1.0, 0.0, /*transpose=*/ 0);
-}
-
-int my_dgemv(const igraph_matrix_t *m,
-             const igraph_vector_t *v,
-             igraph_vector_t *res,
-             igraph_real_t alpha,
-             igraph_real_t beta,
-             igraph_bool_t transpose_m) {
-
-    int nrow = igraph_matrix_nrow(m);
-    int ncol = igraph_matrix_ncol(m);
-    igraph_integer_t vlen = igraph_vector_size(v);
-    int one = 1;
-    char t = transpose_m ? 't' : 'n';
-    igraph_integer_t input_len  = transpose_m ? nrow : ncol;
-    igraph_integer_t output_len = transpose_m ? ncol : nrow;
-
-    if (vlen != input_len) {
-        IGRAPH_ERROR("Matrix and vector sizes are incompatible", IGRAPH_EINVAL);
-    }
-
-    if (beta != 0 && igraph_vector_size(res) != output_len) {
-        IGRAPH_ERROR("Non-zero beta and bad `res' vector size, possible mistake",
-                     IGRAPH_EINVAL);
-    }
-
-    IGRAPH_CHECK(igraph_vector_resize(res, output_len));
-
-    igraphdgemv_(&t, &nrow, &ncol, &alpha, &MATRIX(*m, 0, 0),
-                 &nrow, VECTOR(*v), &one, &beta, VECTOR(*res), &one);
-
-    return 0;
-}
-
-int my_gaxpy(const igraph_matrix_t *m,
+igraph_error_t my_gaxpy(const igraph_matrix_t *m,
              const igraph_vector_t *v,
              igraph_vector_t *res) {
-    return my_dgemv(m, v, res, 1.0, 0.0, /*transpose=*/ 0);
-}
-
-int my_dgemm(const igraph_matrix_t *m1,
-             const igraph_matrix_t *m2,
-             igraph_matrix_t *res) {
-
-    igraph_integer_t m1_r = igraph_matrix_nrow(m1);
-    igraph_integer_t m1_c = igraph_matrix_ncol(m1);
-    igraph_integer_t m2_r = igraph_matrix_nrow(m2);
-    igraph_integer_t m2_c = igraph_matrix_ncol(m2);
-    igraph_integer_t i, j, k;
-
-    if (m1_c != m2_r) {
-        IGRAPH_ERROR("Cannot multiply matrices, invalid dimensions", IGRAPH_EINVAL);
-    }
-
-    IGRAPH_CHECK(igraph_matrix_resize(res, m1_r, m2_c));
-    igraph_matrix_null(res);
-
-    for (i = 0; i < m1_r; i++) {
-        for (j = 0; j < m2_c; j++) {
-            for (k = 0; k < m1_c /* which is also m2_r*/; k++) {
-                MATRIX(*res, i, j) += MATRIX(*m1, i, k) * MATRIX(*m2, k, j);
-            }
-        }
-    }
-
-    return 0;
+    return igraph_blas_dgemv(false, 1.0, m, v, 0.0, res);
 }
 
 igraph_bool_t check_same(const igraph_sparsemat_t *A,
@@ -230,7 +130,7 @@ int main() {
     igraph_sparsemat_destroy(&B);
 
     igraph_matrix_init(&O, 0, 0);
-    my_dgemm(&M, &N, &O);
+    igraph_blas_dgemm(false, false, 1.0, &M, &N, 0.0, &O);
     igraph_sparsemat_multiply(&C, &D, &A);
 
     if (! check_same(&A, &O)) {

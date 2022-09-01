@@ -40,6 +40,7 @@
  *
  * This function considers each node and greedily moves it to a neighboring
  * community that maximizes the improvement in the quality of a partition.
+ * Only moves that strictly improve the quality are considered.
  *
  * The nodes are examined in a queue, and initially all nodes are put in the
  * queue in a random order. Nodes are popped from the queue when they are
@@ -56,7 +57,8 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
         const igraph_real_t resolution_parameter,
         igraph_integer_t *nb_clusters,
-        igraph_vector_int_t *membership) {
+        igraph_vector_int_t *membership,
+        igraph_bool_t *changed) {
 
     igraph_dqueue_int_t unstable_nodes;
     igraph_real_t max_diff = 0.0, diff = 0.0;
@@ -159,6 +161,9 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
         for (i = 0; i < nb_neigh_clusters; i++) {
             c = VECTOR(neighbor_clusters)[i];
             diff = VECTOR(edge_weights_per_cluster)[c] - VECTOR(*node_weights)[v] * VECTOR(cluster_weights)[c] * resolution_parameter;
+            /* Only consider strictly improving moves.
+             * Note that this is important in considering convergence.
+             */
             if (diff > max_diff) {
                 best_cluster = c;
                 max_diff = diff;
@@ -179,6 +184,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
 
         /* Add stable neighbours that are not part of the new cluster to the queue */
         if (best_cluster != current_cluster) {
+            *changed = true;
             VECTOR(*membership)[v] = best_cluster;
 
             for (i = 0; i < degree; i++) {
@@ -707,7 +713,8 @@ static igraph_error_t igraph_i_community_leiden(
         const igraph_t *graph,
         igraph_vector_t *edge_weights, igraph_vector_t *node_weights,
         const igraph_real_t resolution_parameter, const igraph_real_t beta,
-        igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
+        igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality,
+        igraph_bool_t *changed) {
     igraph_integer_t nb_refined_clusters;
     igraph_integer_t i, c, n = igraph_vcount(graph);
     igraph_t aggregated_graph, *i_graph;
@@ -777,6 +784,8 @@ static igraph_error_t igraph_i_community_leiden(
         IGRAPH_ERROR("Too many communities in membership vector", IGRAPH_EINVAL);
     }
 
+    /* We start out with no changes, whenever a node is moved, this will be set to true. */
+    *changed = false;
     do {
 
         /* Get incidence list for fast iteration */
@@ -789,7 +798,8 @@ static igraph_error_t igraph_i_community_leiden(
                      i_edge_weights, i_node_weights,
                      resolution_parameter,
                      nb_clusters,
-                     i_membership));
+                     i_membership,
+                     changed));
 
         /* We only continue clustering if not all clusters are represented by a
          * single node yet
@@ -828,7 +838,7 @@ static igraph_error_t igraph_i_community_leiden(
             /* If refinement didn't aggregate anything, we aggregate on the basis of
              * the actual clustering */
             if (nb_refined_clusters >= igraph_vcount(i_graph)) {
-                igraph_vector_int_update(&refined_membership, i_membership);
+                IGRAPH_CHECK(igraph_vector_int_update(&refined_membership, i_membership));
                 nb_refined_clusters = *nb_clusters;
             }
 
@@ -911,15 +921,16 @@ static igraph_error_t igraph_i_community_leiden(
  * from the resolution-limit (see preprint http://arxiv.org/abs/1104.3083).
  *
  * </para><para>
- * The Leiden algorithm consists of three phases: (1) local moving of nodes,
- * (2) refinement of the partition and (3) aggregation of the network based on
- * the refined partition, using the non-refined partition to create an initial
+ * The Leiden algorithm consists of three phases: (1) local moving of nodes, (2)
+ * refinement of the partition and (3) aggregation of the network based on the
+ * refined partition, using the non-refined partition to create an initial
  * partition for the aggregate network. In the local move procedure in the
- * Leiden algorithm, only nodes whose neighborhood has changed are visited. The
- * refinement is done by restarting from a singleton partition within each
- * cluster and gradually merging the subclusters. When aggregating, a single
- * cluster may then be represented by several nodes (which are the subclusters
- * identified in the refinement).
+ * Leiden algorithm, only nodes whose neighborhood has changed are visited. Only
+ * moves that strictly improve the quality function are made. The refinement is
+ * done by restarting from a singleton partition within each cluster and
+ * gradually merging the subclusters. When aggregating, a single cluster may
+ * then be represented by several nodes (which are the subclusters identified in
+ * the refinement).
  *
  * </para><para>
  * The Leiden algorithm provides several guarantees. The Leiden algorithm is
@@ -927,9 +938,12 @@ static igraph_error_t igraph_i_community_leiden(
  * next iteration. At each iteration all clusters are guaranteed to be
  * connected and well-separated. After an iteration in which nothing has
  * changed, all nodes and some parts are guaranteed to be locally optimally
- * assigned. Finally, asymptotically, all subsets of all clusters are
- * guaranteed to be locally optimally assigned. For more details, please see
- * Traag, Waltman &amp; van Eck (2019).
+ * assigned. Note that even if a single iteration did not result in any change,
+ * it is still possible that a subsequent iteration might find some
+ * improvement. Each iteration explores different subsets of nodes to consider
+ * for moving from one cluster to another. Finally, asymptotically, all subsets
+ * of all clusters are guaranteed to be locally optimally assigned. For more
+ * details, please see Traag, Waltman &amp; van Eck (2019).
  *
  * </para><para>
  * The objective function being optimized is
@@ -960,6 +974,9 @@ static igraph_error_t igraph_i_community_leiden(
  * \param start Start from membership vector. If this is true, the optimization
  *    will start from the provided membership vector. If this is false, the
  *    optimization will start from a singleton partition.
+ * \param n_iterations Iterate the core Leiden algorithm for the indicated number
+ *    of times. If this is a negative number, it will continue iterating until
+ *    an iteration did not change the clustering.
  * \param membership The membership vector. This is both used as the initial
  *    membership from which optimisation starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
@@ -979,6 +996,7 @@ static igraph_error_t igraph_i_community_leiden(
 igraph_error_t igraph_community_leiden(const igraph_t *graph,
                             const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
                             const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
+                            const igraph_integer_t n_iterations,
                             igraph_vector_int_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_vector_t *i_edge_weights, *i_node_weights;
     igraph_integer_t i_nb_clusters;
@@ -997,13 +1015,12 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
             IGRAPH_ERROR("Initial membership length does not equal the number of vertices", IGRAPH_EINVAL);
         }
     } else {
-        int i;
         if (!membership)
             IGRAPH_ERROR("Membership vector should be supplied and initialized, "
                          "even when not starting optimization from it", IGRAPH_EINVAL);
 
-        igraph_vector_int_resize(membership, n);
-        for (i = 0; i < n; i++) {
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, n));
+        for (igraph_integer_t i = 0; i < n; i++) {
             VECTOR(*membership)[i] = i;
         }
     }
@@ -1016,9 +1033,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     /* Check edge weights to possibly use default */
     if (!edge_weights) {
         i_edge_weights = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (i_edge_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for edge weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(i_edge_weights, "Leiden algorithm failed, could not allocate memory for edge weights.");
         IGRAPH_FINALLY(igraph_free, i_edge_weights);
         IGRAPH_CHECK(igraph_vector_init(i_edge_weights, igraph_ecount(graph)));
         IGRAPH_FINALLY(igraph_vector_destroy, i_edge_weights);
@@ -1030,9 +1045,7 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
     /* Check edge weights to possibly use default */
     if (!node_weights) {
         i_node_weights = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (i_node_weights == 0) {
-            IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(i_node_weights, "Leiden algorithm failed, could not allocate memory for node weights.");
         IGRAPH_FINALLY(igraph_free, i_node_weights);
         IGRAPH_CHECK(igraph_vector_init(i_node_weights, n));
         IGRAPH_FINALLY(igraph_vector_destroy, i_node_weights);
@@ -1041,10 +1054,21 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
         i_node_weights = (igraph_vector_t*)node_weights;
     }
 
-    /* Perform actual Leiden algorithm */
-    IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
-                                           resolution_parameter, beta,
-                                           membership, nb_clusters, quality));
+    /* Perform actual Leiden algorithm iteratively. We either
+     * perform a fixed number of iterations, or we perform
+     * iterations until the quality remains unchanged. Even if
+     * a single iteration did not change anything, a subsequent
+     * iteration may still find some improvement. This is because
+     * each iteration explores different subsets of nodes.
+     */
+    igraph_bool_t changed=false;
+    for (igraph_integer_t itr = 0; 
+         n_iterations >= 0 ? itr < n_iterations : !changed; 
+         itr++) {
+        IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
+                                               resolution_parameter, beta,
+                                               membership, nb_clusters, quality, &changed));
+    }
 
     if (!edge_weights) {
         igraph_vector_destroy(i_edge_weights);

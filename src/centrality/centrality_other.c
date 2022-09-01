@@ -35,16 +35,16 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
     igraph_real_t mi, ma;
 
     if (n == 0) {
-        return 0;
+        return false;
     }
 
     igraph_vector_minmax(vector, &mi, &ma);
 
     if (mi >= 0) {
-        return 0;
+        return false;
     }
     if (ma <= 0) {
-        return 1;
+        return true;
     }
 
     /* is the most negative value larger in magnitude than the most positive? */

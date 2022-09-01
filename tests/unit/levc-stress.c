@@ -31,8 +31,7 @@
 
 int main() {
 
-    int k;
-    for (k = 0; k < 20; k++) {
+    for (int k = 0; k < 20; k++) {
         igraph_t g;
         igraph_matrix_int_t merges;
         igraph_vector_int_t membership;
@@ -41,7 +40,9 @@ int main() {
         igraph_vector_t history;
         FILE *DLFile = fopen("input.dl", "r");
 
-        igraph_read_graph_dl(&g, DLFile, /*directed=*/ 0);
+        IGRAPH_ASSERT(DLFile != NULL);
+
+        igraph_read_graph_dl(&g, DLFile, IGRAPH_UNDIRECTED);
         fclose(DLFile);
 
         igraph_matrix_int_init(&merges, 0, 0);
@@ -49,13 +50,13 @@ int main() {
         igraph_vector_init(&history, 0);
         igraph_arpack_options_init(&options);
 
-        igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges,
+        igraph_community_leading_eigenvector(&g, /*weights=*/ NULL, &merges,
                                              &membership, igraph_vcount(&g),
                                              &options, &modularity,
-                                             /*start=*/ 0, /*eigenvalues=*/ 0,
-                                             /*eigenvectors=*/ 0, &history,
-                                             /*callback=*/ 0,
-                                             /*callback_extra=*/ 0);
+                                             /*start=*/ 0, /*eigenvalues=*/ NULL,
+                                             /*eigenvectors=*/ NULL, &history,
+                                             /*callback=*/ NULL,
+                                             /*callback_extra=*/ NULL);
 
         igraph_vector_destroy(&history);
         igraph_vector_int_destroy(&membership);

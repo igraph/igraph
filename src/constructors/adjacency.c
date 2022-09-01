@@ -1039,7 +1039,10 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
+    igraph_bool_t sym;
+
+    IGRAPH_CHECK(igraph_sparsemat_is_symmetric(adjmatrix, &sym));
+    if (!sym) {
         IGRAPH_ERROR(
             "Adjacency matrix should be symmetric to produce an undirected graph.",
             IGRAPH_EINVAL
@@ -1304,7 +1307,10 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_undirected (
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
-    if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
+    igraph_bool_t sym;
+
+    IGRAPH_CHECK(igraph_sparsemat_is_symmetric(adjmatrix, &sym));
+    if (!sym) {
         IGRAPH_ERROR(
             "Adjacency matrix should be symmetric to produce an undirected graph.",
             IGRAPH_EINVAL

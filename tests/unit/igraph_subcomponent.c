@@ -34,7 +34,7 @@ int main() {
     igraph_t g_0, g_1, g_lm, g_lmu;
     igraph_vector_int_t result;
     igraph_vector_int_init(&result, 0);
-    int i;
+    igraph_integer_t i;
 
     igraph_small(&g_0, 0, 0, -1);
     igraph_small(&g_1, 1, 0, -1);
@@ -68,7 +68,7 @@ int main() {
     }
 
     printf("Check for invalid mode error handling.\n");
-    CHECK_ERROR(igraph_subcomponent(&g_1, &result, 0, 100), IGRAPH_EINVMODE);
+    CHECK_ERROR(igraph_subcomponent(&g_1, &result, 0, (igraph_neimode_t) 100), IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

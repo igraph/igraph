@@ -765,7 +765,7 @@ igraph_error_t igraph_i_graphlets_project(
     igraph_vector_int_destroy(&vclidx);
     IGRAPH_FINALLY_CLEAN(8);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**

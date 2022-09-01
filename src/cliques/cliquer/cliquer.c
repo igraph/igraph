@@ -588,7 +588,8 @@ static igraph_error_t weighted_clique_search_single(int *table, int min_weight,
 			if (g->weights[table[i]] <= max_weight) {
 				set_empty(best_clique);
 				SET_ADD_ELEMENT(best_clique,table[i]);
-				return g->weights[table[i]];
+				*result = g->weights[table[i]];
+				return IGRAPH_SUCCESS;
 			}
 		}
 
@@ -1343,6 +1344,7 @@ igraph_error_t clique_unweighted_find_all(
 	for (i=0; i < g->n-1; i++)
 		if (clique_size[table[i]] >= min_size)
 			break;
+
 	retval = unweighted_clique_search_all(table, i, min_size, max_size, maximal, g, opts, &count);
 
   cleanreturn:

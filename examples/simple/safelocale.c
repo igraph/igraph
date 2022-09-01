@@ -3,6 +3,7 @@
 
 #include <locale.h>
 #include <stdio.h>
+#include <string.h>
 
 int main() {
     const char *filename = "weighted.gml";
@@ -14,9 +15,13 @@ int main() {
      * so the locale change may not be successful. */
     const char *locname = setlocale(LC_ALL, "de_DE");
     struct lconv *lc = localeconv();
-    fprintf(stderr, "setlocale() returned '%s', decimal point is '%s'\n",
-            locname ? locname : "NULL",
-            lc->decimal_point);
+    if (strcmp(lc->decimal_point, ",")) {
+        /* If decimal point is not a comma, presumably because the requested
+         * locale was not available, report locale information. */
+        fprintf(stderr, "setlocale() returned '%s', decimal point is '%s'\n",
+                locname ? locname : "NULL",
+                lc->decimal_point);
+    }
 
     FILE *file = fopen(filename, "r");
     if (! file) {

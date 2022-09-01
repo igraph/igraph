@@ -341,7 +341,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
         } else if ( VECTOR(*row)[0] == VECTOR(work)[0] ) {
             IGRAPH_CHECK(cycle_add(row, &work, &tmp));
             if (igraph_vector_int_empty(&tmp)) {
-                *independent = 0;
+                *independent = false;
                 igraph_vector_int_destroy(&work);
                 igraph_vector_int_destroy(&tmp);
                 IGRAPH_FINALLY_CLEAN(2);
@@ -354,7 +354,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
     }
 
     /* 'cycle' was linearly independent, insert new row into matrix */
-    *independent = 1;
+    *independent = true;
     IGRAPH_CHECK(igraph_vector_int_list_insert(reduced_matrix, i, &work)); /* transfers ownership */
 
     igraph_vector_int_destroy(&tmp);
@@ -439,7 +439,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
         mark = 0;
         for (i=0; i < no_of_nodes; ++i) {
             igraph_integer_t degree = VECTOR(degrees)[i];
-            igraph_bool_t vis = VECTOR(visited)[i] % 3; /* was vertex i visited already? */
+            igraph_bool_t vis = VECTOR(visited)[i] % 3 != 0; /* was vertex i visited already? */
 
             /* Generally, we only need to run a BFS from vertices of degree 3 or greater.
              * The exception is a connected component which is itself a cycle, and therefore

@@ -38,6 +38,11 @@
 
 #include <inttypes.h>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4146) /* "unary minus operator applied to unsigned type, result still unsigned" */
+#endif
+
 #if __SIZEOF_INT128__
     typedef __uint128_t pcg128_t;
     #define PCG_128BIT_CONSTANT(high,low) \
@@ -2543,6 +2548,10 @@ extern void     pcg64_advance(pcg128_t delta);
 
 #if __cplusplus
 }
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 #endif /* PCG_VARIANTS_H_INCLUDED */

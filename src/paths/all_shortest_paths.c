@@ -23,7 +23,6 @@
 
 #include "igraph_paths.h"
 
-#include "igraph_adjlist.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
@@ -301,7 +300,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     if (edges) {
         igraph_vector_int_list_clear(edges);
     }
-    j = 0;
+
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t fatherptr = VECTOR(ptrhead)[i];
 

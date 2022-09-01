@@ -310,6 +310,10 @@ static igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t
         VECTOR(x)[i] = (end_point / nr_points) * i + 0.001; /* added a 0.001 to prevent NaNs */
     }
 
+    /* Initialize squared_sum_res_old to a dummy value to prevent some compilers
+     * from complaining about uninitialized values */
+    squared_sum_res_old = IGRAPH_INFINITY;
+
 #ifdef UMAP_DEBUG
     printf("start fit_ab\n");
 #endif
@@ -669,7 +673,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
             if (avoid_neighbor_repulsion) {
                 /* NOTE: the efficiency of this step could be improved but it
                  * should be only used for small graphs anyway, so it's fine */
-                igraph_bool_t skip = 0;
+                igraph_bool_t skip = false;
                 igraph_incident(graph, &neis, from, IGRAPH_ALL);
                 nneis = igraph_vector_int_size(&neis);
                 for (igraph_integer_t k = 0; k < nneis; k++) {
@@ -735,7 +739,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(const ig
      * relies on an approximation that only works if the graph is sparse, which is never
      * quite true for small graphs (i.e. |V| << |E| << |V|^2 is hard to judge if
      * |V| is small) */
-    igraph_bool_t avoid_neighbor_repulsion = 0;
+    igraph_bool_t avoid_neighbor_repulsion = false;
     if (igraph_vcount(graph) < 100) {
         avoid_neighbor_repulsion = 1;
     }
@@ -876,7 +880,7 @@ static igraph_error_t igraph_i_layout_umap(
         /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
         if (no_of_nodes <= 1)
             return IGRAPH_SUCCESS;
-        
+
     } else {
          /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
          if (no_of_nodes <= 1) {

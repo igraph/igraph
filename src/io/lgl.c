@@ -31,9 +31,14 @@
 
 int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
                                  void* scanner);
-void igraph_lgl_yylex_destroy (void *scanner );
+int igraph_lgl_yylex_destroy (void *scanner );
 int igraph_lgl_yyparse (igraph_i_lgl_parsedata_t* context);
 void igraph_lgl_yyset_in  (FILE * in_str, void* yyscanner );
+
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_lgl_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_lgl_yylex_destroy(scanner);
+}
 
 /**
  * \ingroup loadsave
@@ -65,7 +70,7 @@ vertex3name [optionalWeight] \endverbatim
  * in \a igraph it is not an error to have multiple and loop edges.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.
- * \param names Logical value, if TRUE the symbolic names of the
+ * \param names Logical value, if \c true the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
  * \param weights Whether to add the weights of the edges to the
@@ -123,7 +128,7 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_lgl_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_lgl_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_lgl_yylex_destroy_wrapper, context.scanner);
 
     igraph_lgl_yyset_in(instream, context.scanner);
 
@@ -224,17 +229,15 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
  * \param weights The name of a numerical edge attribute, which will be
  *        written as weights to the file. Supply \c NULL to skip writing
  *        edge weights.
- * \param isolates Logical, if TRUE isolated vertices are also written
- *        to the file. If FALSE they will be omitted.
+ * \param isolates Logical, if \c true isolated vertices are also written
+ *        to the file. If \c false they will be omitted.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error
  *         writing the file.
  *
- * Time complexity: O(|E|), the
- * number of edges if \p isolates is
- * FALSE, O(|V|+|E|) otherwise. All
- * file operations are expected to have time complexity
- * O(1).
+ * Time complexity: O(|E|), the number of edges if \p isolates is \c false,
+ * O(|V|+|E|) otherwise. All file operations are expected to have
+ * time complexity O(1).
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  *

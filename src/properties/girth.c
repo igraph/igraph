@@ -41,10 +41,7 @@
  *
  * </para><para>
  * For graphs that contain no cycles, and only for such graphs,
- * zero is returned. Note that in some applications, it is customary
- * to define the girth of acyclic graphs to be infinity. However, infinity
- * is not representable as an \c igraph_integer_t, therefore zero is used
- * for this case.
+ * infinity is returned.
  *
  * </para><para>
  * This implementation is based on Alon Itai and Michael Rodeh:
@@ -53,7 +50,7 @@
  * computing \eme, 1-10, 1977. The first implementation of this
  * function was done by Keith Briggs, thanks Keith.
  * \param graph The input graph.
- * \param girth Pointer to an integer, if not \c NULL then the result
+ * \param girth Pointer to an \c igraph_real_t, if not \c NULL then the result
  *     will be stored here.
  * \param circle Pointer to an initialized vector, the vertex IDs in
  *     the shortest circle will be stored here. If \c NULL then it is
@@ -67,7 +64,7 @@
  *
  * \example examples/simple/igraph_girth.c
  */
-igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
+igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
                  igraph_vector_int_t *circle) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -75,11 +72,11 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     igraph_lazy_adjlist_t adjlist;
     igraph_integer_t mincirc = IGRAPH_INTEGER_MAX, minvertex = 0;
     igraph_integer_t node;
-    igraph_bool_t triangle = 0;
+    igraph_bool_t triangle = false;
     igraph_vector_int_t *neis;
     igraph_vector_int_t level;
     igraph_integer_t stoplevel = no_of_nodes + 1;
-    igraph_bool_t anycircle = 0;
+    igraph_bool_t anycircle = false;
     igraph_integer_t t1 = 0, t2 = 0;
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
@@ -155,7 +152,8 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 
     if (girth) {
         if (mincirc == IGRAPH_INTEGER_MAX) {
-            *girth = mincirc = 0;
+            *girth = IGRAPH_INFINITY;
+            mincirc = 0;
         } else {
             *girth = mincirc;
         }

@@ -328,7 +328,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     igraph_integer_t len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
     igraph_integer_t newlen;
     igraph_integer_t i;
-    igraph_bool_t error = 0;
+    igraph_bool_t error = false;
     char* tmp;
 
     IGRAPH_SAFE_ADD(len1, len2, &newlen);
@@ -337,7 +337,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     for (i = 0; i < len2; i++) {
         tmp = strdup(from->stor_begin[i]);
         if (!tmp) {
-            error = 1;
+            error = true;
             break;
         } else {
             *(to->end) = tmp;

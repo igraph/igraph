@@ -287,15 +287,12 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 igraph_error_t igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
                             igraph_integer_t n, igraph_real_t p_or_m,
                             igraph_bool_t directed, igraph_bool_t loops) {
-    igraph_error_t retval;
 
     if (type == IGRAPH_ERDOS_RENYI_GNP) {
-        retval = igraph_erdos_renyi_game_gnp(graph, n, p_or_m, directed, loops);
+        return igraph_erdos_renyi_game_gnp(graph, n, p_or_m, directed, loops);
     } else if (type == IGRAPH_ERDOS_RENYI_GNM) {
-        retval = igraph_erdos_renyi_game_gnm(graph, n, (igraph_integer_t) p_or_m, directed, loops);
+        return igraph_erdos_renyi_game_gnm(graph, n, (igraph_integer_t) p_or_m, directed, loops);
     } else {
         IGRAPH_ERROR("Invalid type", IGRAPH_EINVAL);
     }
-
-    return retval;
 }

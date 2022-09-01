@@ -146,7 +146,7 @@ igraph_error_t FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, igraph_int
  * \brief Decides whether a stack object is empty.
  *
  * \param s The stack object.
- * \return Boolean, \c TRUE if the stack is empty, \c FALSE
+ * \return Boolean, \c true if the stack is empty, \c false
  * otherwise.
  *
  * Time complexity: O(1).

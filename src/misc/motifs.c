@@ -258,7 +258,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
     unsigned int code = 0;
     unsigned int mul, idx;
 
-    igraph_bool_t terminate = 0;
+    igraph_bool_t terminate = false;
 
     if (igraph_is_directed(graph)) {
         switch (size) {
@@ -402,7 +402,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
                     );
 
                     if (ret == IGRAPH_STOP) {
-                        terminate = 1;
+                        terminate = true;
                         break;
                     }
 
@@ -941,13 +941,12 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
  *
  * \param graph The input graph. For an undirected graph, there are no
  *    asymmetric connections.
- * \param mut Pointer to an integer, the number of mutual dyads is
+ * \param mut Pointer to a real, the number of mutual dyads is
  *    stored here.
- * \param asym Pointer to an integer, the number of asymmetric dyads
+ * \param asym Pointer to a real, the number of asymmetric dyads
  *    is stored here.
- * \param null Pointer to an integer, the number of null dyads is
- *    stored here. In case of an integer overflow (i.e. too many
- *    null dyads), -1 will be returned.
+ * \param null Pointer to a real, the number of null dyads is
+ *    stored here.
  * \return Error code.
  *
  * \sa \ref igraph_reciprocity(), \ref igraph_triad_census().
@@ -955,10 +954,14 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
-                       igraph_integer_t *asym, igraph_integer_t *null) {
+igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_real_t *mut,
+                       igraph_real_t *asym, igraph_real_t *null) {
 
-    igraph_integer_t nonrec = 0, rec = 0;
+    /* This function operates with a floating point type instead of an
+     * integer type in order to avoid integer overflow, which is likely
+     * for 'null' in large graphs on 32-bit systems. */
+
+    igraph_real_t nonrec = 0, rec = 0;
     igraph_vector_int_t inneis, outneis;
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t i;
@@ -999,17 +1002,8 @@ igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 
     *mut = rec / 2;
     *asym = nonrec / 2;
-    if (vc % 2) {
-        *null = vc * ((vc - 1) / 2);
-    } else {
-        *null = (vc / 2) * (vc - 1);
-    }
-    if (*null < vc && vc > 2) {
-        IGRAPH_WARNING("Integer overflow, returning -1.");
-        *null = -1;
-    } else {
-        *null = *null - (*mut) - (*asym);
-    }
+    *null = 0.5 * vc * (vc - 1.0) - (*mut + *asym);
+    if (*null == 0.0) *null = 0.0; /* avoid returning -0.0 */
 
     return IGRAPH_SUCCESS;
 }

@@ -80,7 +80,7 @@ static igraph_error_t igraph_i_isomorphic_small(
  *    error is triggered.
  * \oli If one of the graphs has multi-edges then an error is triggered.
  * \oli If the two graphs does not have the same number of vertices
- *    and edges it returns with \c FALSE.
+ *    and edges it returns with \c false.
  * \oli Otherwise, if the \ref igraph_isoclass() function supports both
  *    graphs (which is true for directed graphs with 3 and 4 vertices, and
  *    undirected graphs with 3-6 vertices), an O(1) algorithm is used with
@@ -93,8 +93,8 @@ static igraph_error_t igraph_i_isomorphic_small(
  *
  * \param graph1 The first graph.
  * \param graph2 The second graph.
- * \param iso Pointer to a logical variable, will be set to TRUE (1)
- *        if the two graphs are isomorphic, and FALSE (0) otherwise.
+ * \param iso Pointer to a logical variable, will be set to \c true
+ *        if the two graphs are isomorphic, and \c false otherwise.
  * \return Error code.
  * \sa \ref igraph_isoclass(), \ref igraph_isoclass_subgraph(),
  * \ref igraph_isoclass_create().

@@ -16,6 +16,8 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "misc/order_cycle.h"
+
 #include "igraph_interface.h"
 
 #include "core/exceptions.h"
@@ -36,7 +38,7 @@ struct eid_pair_t : public std::pair<igraph_integer_t, igraph_integer_t> {
  * representing a graph cycle. It produces a vector \p res containing the
  * same IDs in cycle order. \p res must be initialized when calling this function.
  */
-extern "C" igraph_error_t igraph_i_order_cycle(
+igraph_error_t igraph_i_order_cycle(
         const igraph_t *graph,
         const igraph_vector_int_t *cycle,
         igraph_vector_int_t *res) {

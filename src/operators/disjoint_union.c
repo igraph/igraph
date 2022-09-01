@@ -25,8 +25,6 @@
 #include "igraph_constructors.h"
 #include "igraph_interface.h"
 
-#include "operators/misc_internal.h"
-
 /**
  * \function igraph_disjoint_union
  * \brief Creates the union of two disjoint graphs
@@ -133,7 +131,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
 igraph_error_t igraph_disjoint_union_many(igraph_t *res,
                                const igraph_vector_ptr_t *graphs) {
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
-    igraph_bool_t directed = 1;
+    igraph_bool_t directed = true;
     igraph_vector_int_t edges;
     igraph_integer_t no_of_edges = 0;
     igraph_integer_t shift = 0;

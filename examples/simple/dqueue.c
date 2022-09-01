@@ -26,7 +26,6 @@
 int main() {
 
     igraph_dqueue_t q;
-    int i;
 
     /* igraph_dqueue_init, igraph_dqueue_destroy, igraph_dqueue_empty */
     igraph_dqueue_init(&q, 5);
@@ -64,7 +63,7 @@ int main() {
     if (igraph_dqueue_size(&q) != 0) {
         return 7;
     }
-    for (i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         igraph_dqueue_push(&q, i);
     }
     igraph_dqueue_clear(&q);
@@ -77,10 +76,10 @@ int main() {
 
     /* igraph_dqueue_head, igraph_dqueue_back, igraph_dqueue_pop_back */
     igraph_dqueue_init(&q, 0);
-    for (i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         igraph_dqueue_push(&q, i);
     }
-    for (i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         if (igraph_dqueue_head(&q) != 0) {
             return 9;
         }

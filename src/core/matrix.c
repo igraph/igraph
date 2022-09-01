@@ -255,7 +255,7 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
  * \return True if the two matrices are almost equal, false if there is at least
  *     one differing element or if the matrices are not of the same dimensions.
  */
-igraph_error_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
+igraph_bool_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
                                                   igraph_matrix_complex_t *rhs,
                                                   igraph_real_t eps) {
     return lhs->ncol == rhs->ncol && lhs->nrow == rhs->nrow &&

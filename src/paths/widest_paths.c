@@ -341,7 +341,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
  *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
- * \param edges Pointer to an uninitialized vector or a null
+ * \param edges Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
  * \param from The id of the source vertex.
