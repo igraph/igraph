@@ -914,8 +914,7 @@ igraph_error_t FUNCTION(igraph_vector, permute)(TYPE(igraph_vector)* v, const ig
 /**
  * \ingroup vector
  * \function igraph_vector_sort_cmp
- * \brief Internal comparison function of vector elements, used by
- * \ref igraph_vector_sort().
+ * \brief Internal comparison function of vector elements, used by \ref igraph_vector_sort().
  */
 
 static int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
@@ -928,8 +927,7 @@ static int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
 /**
  * \ingroup vector
  * \function igraph_vector_reverse_sort_cmp
- * \brief Internal comparison function of vector elements, used by
- * \ref igraph_vector_reverse_sort().
+ * \brief Internal comparison function of vector elements, used by \ref igraph_vector_reverse_sort().
  */
 
 static int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
@@ -1013,7 +1011,7 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
 
 /**
  * \function igraph_vector_qsort_ind
- * \brief Return a permutation of indices that sorts a vector
+ * \brief Returns a permutation of indices that sorts a vector.
  *
  * Takes an unsorted array \c v as input and computes an array of
  * indices inds such that v[ inds[i] ], with i increasing from 0, is
@@ -1813,8 +1811,7 @@ void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, igraph_integer_t el
 /**
  * \ingroup vector
  * \function igraph_vector_remove_fast
- * \brief Removes a single element from a vector, \em not keeping the order of
- * the remaining elements.
+ * \brief Removes a single element from a vector, \em not keeping the order of the remaining elements.
  *
  * This function removes the element with the given element from the vector by
  * swapping it with the last element and then popping it off. You can use this
@@ -1880,8 +1877,7 @@ igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
 /**
  * \ingroup vector
  * \function igraph_vector_isininterval
- * \brief Checks if all elements of a vector are in the given
- * interval.
+ * \brief Checks if all elements of a vector are in the given interval.
  *
  * \param v The vector object.
  * \param low The lower limit of the interval (inclusive).
@@ -2306,7 +2302,7 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
 
 /**
  * \function igraph_vector_scale
- * \brief Multiply all elements of a vector by a constant
+ * \brief Multiplies all elements of a vector by a constant.
  *
  * \param v The vector.
  * \param by The constant.
@@ -2382,11 +2378,12 @@ igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector) *v,
 
 /**
  * \function igraph_vector_search
- * \brief Search from a given position
+ * \brief Searches in a vector from a given position.
  *
  * The supplied element \p what is searched in vector \p v, starting
  * from element index \p from. If found then the index of the first
  * instance (after \p from) is stored in \p pos.
+ *
  * \param v The input vector.
  * \param from The index to start searching from. No range checking is
  *     performed.
@@ -2495,7 +2492,7 @@ igraph_error_t FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *
 
 /**
  * \function igraph_vector_maxdifference
- * \brief The maximum absolute difference of \p m1 and \p m2
+ * \brief The maximum absolute difference of \p m1 and \p m2.
  *
  * The element with the largest absolute value in \p m1 - \p m2 is
  * returned. Both vectors must be non-empty, but they not need to have
@@ -2630,7 +2627,7 @@ igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
 /**
  * \ingroup vector
  * \function igraph_vector_shuffle
- * \brief Shuffles a vector in-place using the Fisher-Yates method
+ * \brief Shuffles a vector in-place using the Fisher-Yates method.
  *
  * </para><para>
  * The Fisher-Yates shuffle ensures that every permutation is
@@ -2975,7 +2972,7 @@ igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
 
 /**
  * \function igraph_vector_intersect_sorted
- * \brief Calculates the intersection of two sorted vectors
+ * \brief Calculates the intersection of two sorted vectors.
  *
  * The elements that are contained in both vectors are stored in the result
  * vector. All three vectors must be initialized.
@@ -3067,7 +3064,7 @@ igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
 
 /**
  * \function igraph_vector_difference_sorted
- * \brief Calculates the difference between two sorted vectors (considered as sets)
+ * \brief Calculates the difference between two sorted vectors (considered as sets).
  *
  * The elements that are contained in only the first vector but not the second are
  * stored in the result vector. All three vectors must be initialized.

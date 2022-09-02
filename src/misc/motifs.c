@@ -925,9 +925,8 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
 
 /**
  * \function igraph_dyad_census
- * \brief Calculating the dyad census as defined by Holland and Leinhardt.
+ * \brief Dyad census, as defined by Holland and Leinhardt.
  *
- * </para><para>
  * Dyad census means classifying each pair of vertices of a directed
  * graph into three categories: mutual (there is at least one edge from
  * \c a to \c b and also from \c b to \c a); asymmetric (there is at least
@@ -1075,7 +1074,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
 
 /**
  * \function igraph_triad_census
- * \brief Triad census, as defined by Davis and Leinhardt
+ * \brief Triad census, as defined by Davis and Leinhardt.
  *
  * </para><para>
  * Calculating the triad census means classifying every triple of

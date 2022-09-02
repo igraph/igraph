@@ -117,8 +117,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 /**
  * \ingroup vector
  * \function igraph_vector_int_pair_order
- * \brief Calculate the order of the elements in a pair of integer vectors of
- * equal length.
+ * \brief Calculates the order of the elements in a pair of integer vectors of equal length.
  *
  * The smallest element will have order zero, the second smallest
  * order one, etc.

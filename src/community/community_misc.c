@@ -32,7 +32,7 @@
 
 /**
  * \function igraph_community_to_membership
- * \brief Create membership vector from community structure dendrogram
+ * \brief Creates a membership vector from a community structure dendrogram.
  *
  * This function creates a membership vector from a community
  * structure dendrogram. A membership vector contains for each vertex
@@ -206,7 +206,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
 
 /**
  * \function igraph_reindex_membership
- * \brief Makes the IDs in a membership vector continuous
+ * \brief Makes the IDs in a membership vector contiguous.
  *
  * This function reindexes component IDs in a membership vector
  * in a way that the new IDs start from zero and go up to C-1,
@@ -458,7 +458,7 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
 /**
  * \ingroup communities
  * \function igraph_split_join_distance
- * \brief Calculates the split-join distance of two community structures
+ * \brief Calculates the split-join distance of two community structures.
  *
  * The split-join distance between partitions A and B is the sum of the
  * projection distance of A from B and the projection distance of B from

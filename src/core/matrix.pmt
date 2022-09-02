@@ -1381,7 +1381,7 @@ void FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_which_minmax
- * \brief Indices of the minimum and maximum elements
+ * \brief Indices of the minimum and maximum elements.
  *
  * Handy if you need the indices of the smallest and largest
  * elements. The matrix is traversed only once. The matrix must be

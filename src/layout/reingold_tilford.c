@@ -666,7 +666,7 @@ igraph_error_t igraph_roots_for_tree_layout(
 
 /**
  * \function igraph_layout_reingold_tilford
- * \brief Reingold-Tilford layout for tree graphs
+ * \brief Reingold-Tilford layout for tree graphs.
  *
  * </para><para>
  * Arranges the nodes in a tree where the given node is used as the root.
@@ -943,7 +943,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
 /**
  * \function igraph_layout_reingold_tilford_circular
- * \brief Circular Reingold-Tilford layout for trees
+ * \brief Circular Reingold-Tilford layout for trees.
  *
  * </para><para>
  * This layout is almost the same as \ref igraph_layout_reingold_tilford(), but

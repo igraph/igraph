@@ -2961,7 +2961,7 @@ igraph_integer_t igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
 
 /**
  * \function igraph_sparsemat_getelements
- * \brief Returns all elements of a sparse matrix
+ * \brief Returns all elements of a sparse matrix.
  *
  * This function will return the elements of a sparse matrix in three vectors.
  * Two vectors will indicate where the elements are located, and one will

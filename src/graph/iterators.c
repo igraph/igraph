@@ -944,7 +944,7 @@ igraph_error_t igraph_es_all(igraph_es_t *es,
 
 /**
  * \function igraph_ess_all
- * \brief Edge set, all edges (immediate version)
+ * \brief Edge set, all edges (immediate version).
  *
  * The immediate version of the all-edges selector.
  *

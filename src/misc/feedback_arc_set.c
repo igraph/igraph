@@ -40,10 +40,8 @@
 /**
  * \ingroup structural
  * \function igraph_feedback_arc_set
- * \brief Calculates a feedback arc set of the graph using different
- *        algorithms.
+ * \brief Feedback arc set of a graph using exact or heuristic methods.
  *
- * </para><para>
  * A feedback arc set is a set of edges whose removal makes the graph acyclic.
  * We are usually interested in \em minimum feedback arc sets, i.e. sets of edges
  * whose total weight is minimal among all the feedback arc sets.

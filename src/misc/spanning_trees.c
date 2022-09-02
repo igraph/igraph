@@ -28,7 +28,6 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
-#include "igraph_progress.h"
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
@@ -424,7 +423,7 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
 
 /**
  * \function igraph_random_spanning_tree
- * \brief Uniformly sample the spanning trees of a graph
+ * \brief Uniformly samples the spanning trees of a graph.
  *
  * Performs a loop-erased random walk on the graph to uniformly sample
  * its spanning trees. Edge directions are ignored.

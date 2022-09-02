@@ -73,7 +73,7 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
 
 /**
  * \function igraph_read_graph_pajek
- * \brief Reads a file in Pajek format
+ * \brief Reads a file in Pajek format.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param file An already opened file handler.

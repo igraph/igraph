@@ -38,7 +38,7 @@
 /**
  * \ingroup conversion
  * \function igraph_get_adjacency
- * \brief Returns the adjacency matrix of a graph
+ * \brief The adjacency matrix of a graph.
  *
  * </para><para>
  * The result is an adjacency matrix. Entry i, j of the matrix
@@ -313,7 +313,7 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
 /**
  * \ingroup conversion
  * \function igraph_get_edgelist
- * \brief Returns the list of edges in a graph
+ * \brief The list of edges in a graph.
  *
  * </para><para>The order of the edges is given by the edge IDs.
  * \param graph Pointer to the graph object
@@ -879,7 +879,7 @@ igraph_error_t igraph_get_stochastic(
 
 /**
  * \function igraph_get_stochastic_sparse
- * \brief Stochastic adjacency matrix of a graph
+ * \brief The stochastic adjacency matrix of a graph.
  *
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise or column-wise, such that

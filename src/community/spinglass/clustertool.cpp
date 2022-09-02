@@ -90,7 +90,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
 
 /**
  * \function igraph_community_spinglass
- * \brief Community detection based on statistical mechanics
+ * \brief Community detection based on statistical mechanics.
  *
  * This function implements the community structure detection
  * algorithm proposed by Joerg Reichardt and Stefan Bornholdt.
@@ -366,7 +366,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
 
 /**
  * \function igraph_community_spinglass_single
- * \brief Community of a single node based on statistical mechanics
+ * \brief Community of a single node based on statistical mechanics.
  *
  * This function implements the community structure detection
  * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. It is

@@ -178,7 +178,7 @@ igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids, igraph_vect
 
 /**
  * \function igraph_invalidate_cache
- * \brief Invalidates the internal cache of an igraph graph
+ * \brief Invalidates the internal cache of an igraph graph.
  *
  * </para><para>
  * igraph graphs cache some basic properties about themselves in an internal

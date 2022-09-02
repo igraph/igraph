@@ -29,7 +29,7 @@
 /**
  * \ingroup structural
  * \function igraph_are_connected
- * \brief Decides whether two vertices are connected
+ * \brief Decides whether two vertices are connected.
  *
  * \param graph The graph object.
  * \param v1 The first vertex.

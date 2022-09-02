@@ -606,7 +606,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 /**
  * \ingroup interface
  * \function igraph_delete_vertices_idx
- * \brief Removes some vertices (with all their edges) from the graph
+ * \brief Removes some vertices (with all their edges) from the graph.
  *
  * </para><para>
  * This function changes the IDs of the vertices (except in some very

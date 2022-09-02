@@ -105,7 +105,7 @@ static igraph_error_t igraph_i_handle_plfit_error(int code) {
 /**
  * \ingroup nongraph
  * \function igraph_power_law_fit
- * \brief Fits a power-law distribution to a vector of numbers
+ * \brief Fits a power-law distribution to a vector of numbers.
  *
  * This function fits a power-law distribution to a vector containing samples
  * from a distribution (that is assumed to follow a power-law of course). In
@@ -238,7 +238,7 @@ igraph_error_t igraph_power_law_fit(
 /**
  * \ingroup nongraph
  * \function igraph_plfit_result_calculate_p_value
- * \brief Calculates the p-value of a fitter power-law model
+ * \brief Calculates the p-value of a fitted power-law model.
  *
  * </para><para>
  * The p-value is calculated by resampling the input data many times in a way

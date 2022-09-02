@@ -240,7 +240,7 @@ BASE FUNCTION(igraph_dqueue, pop)(TYPE(igraph_dqueue)* q) {
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_pop_back
- * \brief Remove the tail
+ * \brief Removes the tail.
  *
  * Removes and returns the last element in the queue. The queue must
  * be non-empty.

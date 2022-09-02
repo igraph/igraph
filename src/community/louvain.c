@@ -317,7 +317,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
 /**
  * \ingroup communities
  * \function igraph_i_community_multilevel_step
- * \brief Performs a single step of the multi-level modularity optimization method
+ * \brief Performs a single step of the multi-level modularity optimization method.
  *
  * This function implements a single step of the multi-level modularity optimization
  * algorithm for finding community structure, see VD Blondel, J-L Guillaume,

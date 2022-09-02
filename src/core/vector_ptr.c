@@ -673,7 +673,7 @@ static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const v
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_sort_ind
- * \brief Return a permutation of indices that sorts a vector of pointers
+ * \brief Returns a permutation of indices that sorts a vector of pointers.
  *
  * Takes an unsorted array \c v as input and computes an array of
  * indices inds such that v[ inds[i] ], with i increasing from 0, is

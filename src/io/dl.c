@@ -40,7 +40,7 @@ void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
 
 /**
  * \function igraph_read_graph_dl
- * \brief Read a file in the DL format of UCINET
+ * \brief Reads a file in the DL format of UCINET.
  *
  * This is a simple textual file format used by UCINET. See
  * http://www.analytictech.com/networks/dataentry.htm for

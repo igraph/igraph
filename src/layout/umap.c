@@ -930,7 +930,7 @@ static igraph_error_t igraph_i_layout_umap(
 
 /**
  * \function igraph_layout_umap
- * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
+ * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction.
  *
  * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
  * (most commonly by far, 2D). The algorithm is probabilistic and introduces
@@ -1049,8 +1049,8 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \function igraph_layout_umap_3d
  * \brief 3D layout using UMAP.
  *
- * This is the 3D version of the UMAP algorithm (see \ref
- * igraph_layout_umap() for the 2D version).
+ * This is the 3D version of the UMAP algorithm
+ * (see \ref igraph_layout_umap() for the 2D version).
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
  * \param res Pointer to the n by 3 matrix where the layout coordinates will be stored.
