@@ -561,7 +561,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     igraph_vector_int_t vectorlist_all;
 
     IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_all, 1));
-
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist_all);
     IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree, &subsetMap));
 
     // Default vector initiation add 0 and hence it's removed.
@@ -573,7 +573,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     igraph_matrix_destroy(&dp_cache);
     igraph_vector_int_destroy(&vectorlist_all);
 
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(4);
     IGRAPH_HANDLE_EXCEPTIONS_END
     return IGRAPH_SUCCESS;
 }
