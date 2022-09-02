@@ -98,7 +98,6 @@ igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_in
 }
 
 igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
-
     igraph_indheap_t heap;
 
     IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
