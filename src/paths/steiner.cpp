@@ -335,9 +335,11 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
  *
  * </para><para>
  * Reference:
+ *
+ * </para><para>
  * S.E Dreyfus, R.A Wagner
- * The steiner problem in graphs
- * Networks Journal, 1971
+ * The Steiner problem in graphs
+ * Networks 1, 195-207 (1971).
  * https://doi.org/10.1002/net.3230010302
  *
  * \param graph The graph object.
