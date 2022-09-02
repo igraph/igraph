@@ -202,10 +202,10 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
         IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist);
 
-        igraph_get_shortest_path_dijkstra(graph, &vectorlist, &edgelist, m, k, weights, IGRAPH_ALL);
+        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist, &edgelist, m, k, weights, IGRAPH_ALL));
 
-        igraph_vector_int_append(vectorlist_all, &vectorlist);
-        igraph_vector_int_append(edgelist_all, &edgelist);
+        IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist));
+        IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist));
 
         igraph_integer_t min_E_value = IGRAPH_INTEGER_MAX;
         std::set<igraph_integer_t> min_F;
@@ -252,10 +252,10 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
             IGRAPH_CHECK(igraph_vector_int_init(&edgelist_1, 1));
             IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist_1);
 
-            igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL);
+            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL));
 
-            igraph_vector_int_append(vectorlist_all, &vectorlist_1);
-            igraph_vector_int_append(edgelist_all, &edgelist_1);
+            IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
+            IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
 
             igraph_vector_int_destroy(&vectorlist_1);
             igraph_vector_int_destroy(&edgelist_1);
@@ -279,7 +279,7 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
             IGRAPH_CHECK(igraph_vector_int_init(&edgelist_1, 1));
             IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist_1);
 
-            igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, E1, weights, IGRAPH_ALL);
+            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, E1, weights, IGRAPH_ALL));
 
             igraph_vector_int_t vectorlist_2;
             IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_2, 1));
@@ -289,13 +289,13 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
             IGRAPH_CHECK(igraph_vector_int_init(&edgelist_2, 1));
             IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist_2);
 
-            igraph_get_shortest_path_dijkstra(graph, &vectorlist_2, &edgelist_2, k, F1, weights, IGRAPH_ALL);
+            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_2, &edgelist_2, k, F1, weights, IGRAPH_ALL));
 
-            igraph_vector_int_append(vectorlist_all, &vectorlist_1);
-            igraph_vector_int_append(vectorlist_all, &vectorlist_2);
+            IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
+            IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_2));
 
-            igraph_vector_int_append(edgelist_all, &edgelist_1);
-            igraph_vector_int_append(edgelist_all, &edgelist_2);
+            IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
+            IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_2));
 
             igraph_vector_int_destroy(&vectorlist_2);
             igraph_vector_int_destroy(&vectorlist_1);
@@ -373,7 +373,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
         return IGRAPH_SUCCESS;
     }
     igraph_bool_t IsConnected;
-    igraph_is_connected(graph, &IsConnected, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &IsConnected, IGRAPH_WEAK));
     if (!IsConnected) {
 
         IGRAPH_ERROR("The graph is disconnected.", IGRAPH_EINVAL);
