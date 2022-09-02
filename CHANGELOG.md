@@ -374,10 +374,9 @@ Some of the highlights are:
  - `igraph_is_graphical()` and `igraph_is_bigraphical()` now take degree
    sequences represented as `igraph_vector_int_t` instead of `igraph_vector_t`.
 
- - `igraph_is_matching()`, `igraph_is_maximal_matching()`,
-   `igraph_maximum_bipartite_matching` and `igraph_maximum_matching()` now
-   use an `igraph_vector_int_t` to return the matching instead of an
-   `igraph_vector_long_t`.
+ - `igraph_is_matching()`, `igraph_is_maximal_matching()` and
+   `igraph_maximum_bipartite_matching` now use an `igraph_vector_int_t` to
+   return the matching instead of an `igraph_vector_long_t`.
 
  - The `vids` parameter for `igraph_isoclass_subgraph()` is now an
    `igraph_vector_int_t` instead of `igraph_vector_t`.
@@ -781,7 +780,8 @@ Some of the highlights are:
 ### Removed
 
  - `igraph_adjlist_remove_duplicate()`, `igraph_betweenness_estimate()`, `igraph_closeness_estimate()`, `igraph_edge_betweenness_estimate()`, `igraph_inclist_remove_duplicate()`, `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` were deprecated earlier in 0.9.0 and are now removed in this release.
- - `igraph_dnorm()` was removed. This is not really a breaking change as the function was never documented, but it was exposed from one of the headers.
+ - `igraph_dnorm()`, `igraph_strvector_move_interval()`, `igraph_strvector_permdelete()` and `igraph_strvector_remove_negidx()` were removed. These are not breaking changes as the functions were never documented, they were only exposed from one of the headers.
+ - `igraph_eigen_laplacian()`, `igraph_es_fromto()` and `igraph_maximum_matching()` were removed. These are not breaking changes either as the functions were never implemented, they returned an error code unconditionally.
 
 ### Changed
 
