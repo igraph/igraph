@@ -735,7 +735,7 @@ Some of the highlights are:
  - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API where it was used to hold a variable-length list of vectors. The type contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There is also a variant named `igraph_vector_int_list_t` for vectors of `igraph_vector_int_t` objects.
  - A new container type, `igraph_matrix_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API where it was used to hold a variable-length list of matrices. The type contains `igraph_matrix_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually).
  - A new container type, `igraph_graph_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API where it was used to hold a variable-length list of graphs. The type contains `igraph_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually).
- - The vector container type, `igraph_vector_t`, has been extended with a new variant whose functions all start with `igraph_vector_fortran_int_...`. This vector container can be used for interfacing with Fortran code, assuming that C's `int` type is compatible with Fortran integers. Note that `igraph_vector_int_t` is not suitable any more, as the elements of `igraph_vector_int_t` are of type `igraph_integer_t`, whose size may differ on 32-bit and 64-bit platforms, depending on how igraph was compiled.
+ - The vector container type, `igraph_vector_t`, has been extended with a new variant whose functions all start with `igraph_vector_fortran_int_...`. This vector container can be used for interfacing with Fortran code as it guarantees that the integers in the vector are compatible with Fortran integers. Note that `igraph_vector_int_t` is not suitable any more, as the elements of `igraph_vector_int_t` are of type `igraph_integer_t`, whose size may differ on 32-bit and 64-bit platforms, depending on how igraph was compiled.
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
  - `igraph_vector_permute()` functions to permute a vector based on an index vector.
  - `igraph_vector_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
@@ -961,9 +961,9 @@ Some of the highlights are:
 ### Other
 
  - Documentation improvements.
- - Support for the Intel's LLVM-based compiler.
+ - Support for Intel's LLVM-based compiler.
 
-## [Unreleased 0.9]
+## [0.9.10] - 2022-09-02
 
 ### Added
 
@@ -1594,7 +1594,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.9.9..HEAD
+[Unreleased]: https://github.com/igraph/igraph/compare/0.9.10..HEAD
+[0.9.10]: https://github.com/igraph/igraph/compare/0.9.9...0.9.10
 [0.9.9]: https://github.com/igraph/igraph/compare/0.9.8...0.9.9
 [0.9.8]: https://github.com/igraph/igraph/compare/0.9.7...0.9.8
 [0.9.7]: https://github.com/igraph/igraph/compare/0.9.6...0.9.7
