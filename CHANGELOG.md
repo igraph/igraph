@@ -659,6 +659,12 @@ Some of the highlights are:
    `igraph_community_multilevel()` additionaly uses a `igraph_matrix_int_t`
    instead of `igraph_matrix_t()` for its memberships parameter.
 
+ - Functions related to spectral coarse graining (i.e. all functions starting
+   with `igraph_scg_...`) were separated into a project of its own. If you wish
+   to keep on using these functions, please refer to the repository hosting the
+   spectral coarse graining code at https://github.com/igraph/igraph-scg . The
+   spectral coarse graining code was updated to support igraph 0.10.
+
  - `IGRAPH_TOTAL` was removed from the `igraph_neimode_t` enum; use the equivalent
    `IGRAPH_ALL` instead.
 
