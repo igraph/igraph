@@ -22,6 +22,12 @@ IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
         igraph_bool_t complete,
         igraph_bool_t use_cycle_order);
 
+IGRAPH_EXPORT igraph_error_t igraph_simple_cycles(
+        const igraph_t *graph,
+        igraph_vector_int_list_t *result,
+        igraph_integer_t bfs_cutoff
+);
+
 __END_DECLS
 
 #endif
