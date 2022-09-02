@@ -28,7 +28,6 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_memory.h"
 
 #include "core/math.h"
 #include "random/random_internal.h"
@@ -182,7 +181,7 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
  *
  * \return A pointer to the default random number generator.
  *
- * \sa igraph_rng_set_default()
+ * \sa \ref igraph_rng_set_default()
  */
 
 igraph_rng_t *igraph_rng_default(void) {

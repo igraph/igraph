@@ -208,7 +208,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
 
 /**
  * \function igraph_arpack_options_get_default
- * \brief Return a pointer to a "default" ARPACK options object
+ * \brief Returns a pointer to a "default" ARPACK options object.
  *
  * This function is used by other igraph functions taking an \ref igraph_arpack_options_t
  * object as an argument to get a reference to a pre-initialized "default"
@@ -221,7 +221,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
  *
  * Time complexity: O(1).
  */
-igraph_arpack_options_t* igraph_arpack_options_get_default() {
+igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
     igraph_i_arpack_options_default = igraph_i_arpack_options_pristine;
     return &igraph_i_arpack_options_default;
 }

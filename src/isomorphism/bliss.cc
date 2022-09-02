@@ -256,7 +256,7 @@ public:
  *    when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
  *
- * \sa igraph_is_same_graph()
+ * \sa \ref igraph_is_same_graph()
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */

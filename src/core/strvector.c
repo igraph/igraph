@@ -316,7 +316,7 @@ igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
  * \param from The second string vector, it is kept unchanged.
  * \return Error code.
  *
- * \sa igraph_strvector_merge()
+ * \sa \ref igraph_strvector_merge()
  *
  * Time complexity: O(n+l2), n is the number of strings in the new
  * string vector, l2 is the total length of strings in the \p from
@@ -367,7 +367,7 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
  * \param from The source vector. It will be cleared.
  * \return Error code.
  *
- * \sa igraph_strvector_append()
+ * \sa \ref igraph_strvector_append()
  *
  * Time complexity: O(l2) if \p to has sufficient capacity, O(2*l1+l2) otherwise,
  *   where l1 and l2 are the lengths of \p to and \from respectively.

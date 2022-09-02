@@ -192,8 +192,8 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *     the weighted modularity scores will be calculated. Ignored if both
  *     \p modularity and \p membership are \c NULL pointers.
  * \param res Pointer to an initialized matrix, if not \c NULL then the
- *    dendrogram will be stored here, in the same form as for the \ref
- *    igraph_community_walktrap() function: the matrix has two columns
+ *    dendrogram will be stored here, in the same form as for the
+ *    \ref igraph_community_walktrap() function: the matrix has two columns
  *    and each line is a merge given by the IDs of the merged
  *    components. The component IDs are numbered from zero and
  *    component IDs smaller than the number of vertices in the graph
@@ -387,9 +387,8 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  *     then merges performed by the algorithm are stored here. Even if
  *     this is a divisive algorithm, we can replay it backwards and
  *     note which two clusters were merged. Clusters are numbered from
- *     zero, see the \p merges argument of \ref
- *     igraph_community_walktrap() for details. The matrix will be
- *     resized as needed.
+ *     zero, see the \p merges argument of \ref igraph_community_walktrap()
+ *     for details. The matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
  *     \c NULL then the indices into \p result of all edges which caused
  *     one of the \p merges will be put here. This is equivalent to all edge removals

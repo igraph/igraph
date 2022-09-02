@@ -710,7 +710,7 @@ igraph_error_t igraph_roots_for_tree_layout(
  *
  * Added in version 0.2.
  *
- * \sa \ref igraph_layout_reingold_tilford_circular(), \sa igraph_roots_for_tree_layout()
+ * \sa \ref igraph_layout_reingold_tilford_circular(), \ref igraph_roots_for_tree_layout()
  *
  * \example examples/simple/igraph_layout_reingold_tilford.c
  */

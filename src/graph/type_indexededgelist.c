@@ -1731,7 +1731,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
  *
  * Time complexity: O(E), the number of edges in the graphs.
  *
- * \sa igraph_isomorphic() to test if two graphs are isomorphic.
+ * \sa \ref igraph_isomorphic() to test if two graphs are isomorphic.
  */
 
 igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res) {

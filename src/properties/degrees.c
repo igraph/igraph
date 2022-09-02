@@ -478,7 +478,7 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
  * \param only_indices If true, then return a sorted list of indices
  *        into a vector corresponding to \c vids, rather than a list
  *        of vertex IDs. This parameter is ignored if \c vids is set
- *        to all vertices via igraph_vs_all() or igraph_vss_all(),
+ *        to all vertices via \ref igraph_vs_all() or \ref igraph_vss_all(),
  *        because in this case the indices and vertex IDs are the
  *        same.
  * \return Error code:

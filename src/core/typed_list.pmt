@@ -971,7 +971,7 @@ igraph_error_t FUNCTION(sort_ind)(
  *    Use \ref igraph_vector_all_e() to consider vector equivalent only
  *    when their contents are identical.
  *
- * \sa igraph_vector_list_sort()
+ * \sa \ref igraph_vector_list_sort()
  *
  * Time complexity: O(n), the number of items in the list.
  */

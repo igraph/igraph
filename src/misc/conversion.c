@@ -84,7 +84,7 @@
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
- * \sa igraph_get_adjacency_sparse() if you want a sparse matrix representation
+ * \sa \ref igraph_get_adjacency_sparse() if you want a sparse matrix representation
  *
  * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  */
@@ -182,7 +182,7 @@ igraph_error_t igraph_get_adjacency(
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
- * \sa igraph_get_adjacency(), the dense version of this function.
+ * \sa \ref igraph_get_adjacency(), the dense version of this function.
  *
  * Time complexity: TODO.
  */
@@ -822,7 +822,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  *
  * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  *
- * \sa igraph_get_stochastic_sparse(), the sparse version of this
+ * \sa \ref igraph_get_stochastic_sparse(), the sparse version of this
  * function.
  */
 
@@ -894,7 +894,7 @@ igraph_error_t igraph_get_stochastic(
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  *
- * \sa igraph_get_stochastic(), the dense version of this function.
+ * \sa \ref igraph_get_stochastic(), the dense version of this function.
  */
 
 igraph_error_t igraph_get_stochastic_sparse(

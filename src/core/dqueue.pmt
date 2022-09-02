@@ -129,7 +129,7 @@ void FUNCTION(igraph_dqueue, clear)(TYPE(igraph_dqueue)* q) {
  * \function igraph_dqueue_full
  * \brief Check whether the queue is full.
  *
- * If a queue is full the next igraph_dqueue_push() operation will allocate
+ * If a queue is full the next \ref igraph_dqueue_push() operation will allocate
  * more memory.
  *
  * \param q The queue.

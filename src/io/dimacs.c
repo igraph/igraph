@@ -320,7 +320,7 @@ igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
  *
  * Time complexity: O(|E|), the number of edges in the graph.
  *
- * \sa igraph_read_graph_dimacs_flow()
+ * \sa \ref igraph_read_graph_dimacs_flow()
  */
 igraph_error_t igraph_write_graph_dimacs_flow(const igraph_t *graph, FILE *outstream,
                               igraph_integer_t source, igraph_integer_t target,

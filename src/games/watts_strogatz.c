@@ -43,8 +43,7 @@
  * \param dim The dimension of the lattice.
  * \param size The size of the lattice along each dimension.
  * \param nei The size of the neighborhood for each vertex. This is
- *    the same as the \p nei argument of \ref
- *    igraph_connect_neighborhood().
+ *    the same as the \p nei argument of \ref igraph_connect_neighborhood().
  * \param p The rewiring probability. A real number between zero and
  *   one (inclusive).
  * \param loops Logical, whether to generate loop edges.

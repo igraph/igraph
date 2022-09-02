@@ -219,14 +219,14 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * \brief Decides whether the graph is a tree.
  *
  * An undirected graph is a tree if it is connected and has no cycles.
- * </para><para>
  *
+ * </para><para>
  * In the directed case, a possible additional requirement is that all
  * edges are oriented away from a root (out-tree or arborescence) or all edges
  * are oriented towards a root (in-tree or anti-arborescence).
  * This test can be controlled using the \p mode parameter.
- * </para><para>
  *
+ * </para><para>
  * By convention, the null graph (i.e. the graph with no vertices) is considered not to be a tree.
  *
  * \param graph The graph object to analyze.
@@ -248,7 +248,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * Time complexity: At most O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa igraph_is_weakly_connected()
+ * \sa \ref igraph_is_connected()
  *
  * \example examples/simple/igraph_kary_tree.c
  */

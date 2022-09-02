@@ -298,7 +298,7 @@ void igraph_vector_ptr_clear(igraph_vector_ptr_t* v) {
  * \param v The pointer vector.
  * \param e The new element to include in the pointer vector.
  * \return Error code.
- * \sa igraph_vector_push_back() for the corresponding operation of
+ * \sa \ref igraph_vector_push_back() for the corresponding operation of
  * the ordinary vector type.
  *
  * Time complexity: O(1) or O(n), n is the number of elements in the
