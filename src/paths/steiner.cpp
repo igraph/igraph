@@ -1,6 +1,15 @@
-
-#include "igraph.h"
+#include "igraph_types.h"
+#include "igraph_memory.h"
+#include "igraph_error.h"
 #include "core/exceptions.h"
+#include "igraph_vector.h"
+#include "igraph_matrix.h"
+#include "igraph_datatype.h"
+#include "igraph_error.h"
+#include "igraph_paths.h"
+#include "igraph_components.h"
+#include "igraph_interface.h"
+#include "igraph_structural.h"
 
 #include <cstring>
 #include <cmath>
