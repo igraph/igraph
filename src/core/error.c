@@ -297,7 +297,7 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
  * will only unwind the current level of the finally stack, not any of the lower
  * levels. This mechanism is used to allow some functions to pause stack unwinding
  * until they can restore their data structures into a consistent state.
- * See igraph_add_edges() for an example usage.
+ * See \ref igraph_add_edges() for an example usage.
  */
 void IGRAPH_FINALLY_ENTER(void) {
     int no = igraph_i_finally_stack_size;
