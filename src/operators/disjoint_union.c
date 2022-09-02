@@ -27,9 +27,8 @@
 
 /**
  * \function igraph_disjoint_union
- * \brief Creates the union of two disjoint graphs
+ * \brief Creates the union of two disjoint graphs.
  *
- * </para><para>
  * First the vertices of the second graph will be relabeled with new
  * vertex IDs to have two disjoint sets of vertex IDs, then the union
  * of the two graphs will be formed.
@@ -101,7 +100,6 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  * \function igraph_disjoint_union_many
  * \brief The disjint union of many graphs.
  *
- * </para><para>
  * First the vertices in the graphs will be relabeled with new vertex
  * IDs to have pairwise disjoint vertex ID sets and then the union of
  * the graphs is formed.

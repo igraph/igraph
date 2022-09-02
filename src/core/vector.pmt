@@ -634,6 +634,7 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
  * \ingroup vector
  * \function igraph_vector_get
  * \brief Access an element of a vector.
+ *
  * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the index of the first
  *    element is zero.
@@ -652,7 +653,8 @@ BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t
 /**
  * \ingroup vector
  * \function igraph_vector_get_ptr
- * \brief Get the address of an element of a vector
+ * \brief Get the address of an element of a vector.
+ *
  * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the position of the first
  *   element is zero.
@@ -683,7 +685,8 @@ BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, igraph_integer_t p
 /**
  * \ingroup vector
  * \function igraph_vector_e_ptr
- * \brief Get the address of an element of a vector
+ * \brief Get the address of an element of a vector.
+ *
  * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the position of the first
  *   element is zero.
@@ -701,6 +704,7 @@ BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_inte
  * \ingroup vector
  * \function igraph_vector_set
  * \brief Assignment to an element of a vector.
+ *
  * \param v The \type igraph_vector_t element.
  * \param pos Position of the element to set.
  * \param value New value of the element.
@@ -723,6 +727,7 @@ void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, igraph_integer_t pos, 
  * it makes no sense to call this function on a just initialized
  * vector. Thus if you want to construct a vector of zeros, then you should
  * use \ref igraph_vector_init().
+ *
  * \param v The vector object.
  *
  * Time complexity: O(n), the size of
@@ -739,9 +744,10 @@ void FUNCTION(igraph_vector, null)      (TYPE(igraph_vector)* v) {
 
 /**
  * \function igraph_vector_fill
- * \brief Fill a vector with a constant element
+ * \brief Fill a vector with a constant element.
  *
  * Sets each element of the vector to the supplied constant.
+ *
  * \param vector The vector to work on.
  * \param e The element to fill with.
  *
@@ -797,9 +803,9 @@ igraph_error_t FUNCTION(igraph_vector, range)(TYPE(igraph_vector) *v, BASE from,
  * \function igraph_vector_tail
  * \brief Returns the last element in a vector.
  *
- * </para><para>
  * It is an error to call this function on an empty vector, the result
  * is undefined.
+ *
  * \param v The vector object.
  * \return The last element.
  *
@@ -817,8 +823,8 @@ BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v) {
  * \function igraph_vector_pop_back
  * \brief Removes and returns the last element of a vector.
  *
- * </para><para>
  * It is an error to call this function with an empty vector.
+ *
  * \param v The vector object.
  * \return The removed last element.
  *
@@ -843,7 +849,6 @@ BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
  * \function igraph_vector_permute
  * \brief Permutes the elements of a vector in place according to an index vector.
  *
- * </para><para>
  * This function takes a vector \c v and a corresponding index vector \c ind,
  * and permutes the elements of \c v such that \c v[ind[i]] is moved to become
  * \c v[i] after the function is executed.

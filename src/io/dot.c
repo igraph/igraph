@@ -116,7 +116,7 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
 
 /**
  * \function igraph_write_graph_dot
- * \brief Write the graph to a stream in DOT format
+ * \brief Write the graph to a stream in DOT format.
  *
  * DOT is the format used by the widely known GraphViz software, see
  * http://www.graphviz.org for details. The grammar of the DOT format

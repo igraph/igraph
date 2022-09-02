@@ -94,7 +94,7 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 
 /**
  * \function igraph_diversity
- * Structural diversity index of the vertices
+ * \brief Structural diversity index of the vertices.
  *
  * This measure was defined in Nathan Eagle, Michael Macy and Rob
  * Claxton: Network Diversity and Economic Development, Science 328,

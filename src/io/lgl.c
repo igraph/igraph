@@ -43,9 +43,8 @@ void igraph_lgl_yylex_destroy_wrapper (void *scanner ) {
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_lgl
- * \brief Reads a graph from an <code>.lgl</code> file
+ * \brief Reads a graph from an <code>.lgl</code> file.
  *
- * </para><para>
  * The <code>.lgl</code> format is used by the Large Graph
  * Layout visualization software
  * (http://lgl.sourceforge.net), it can
@@ -209,9 +208,8 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_lgl
- * \brief Writes the graph to a file in <code>.lgl</code> format
+ * \brief Writes the graph to a file in <code>.lgl</code> format.
  *
- * </para><para>
  * <code>.lgl</code> is a format used by LGL, see \ref
  * igraph_read_graph_lgl() for details.
  *

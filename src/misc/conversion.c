@@ -367,7 +367,7 @@ igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *r
 
 /**
  * \function igraph_to_directed
- * \brief Convert an undirected graph to a directed one
+ * \brief Convert an undirected graph to a directed one.
  *
  * </para><para>
  * If the supplied graph is directed, this function does nothing.
@@ -947,7 +947,7 @@ igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
 /**
  * \ingroup conversion
  * \function igraph_to_prufer
- * \brief Converts a tree to its Pr&uuml;fer sequence
+ * \brief Converts a tree to its Pr&uuml;fer sequence.
  *
  * A Pr&uuml;fer sequence is a unique sequence of integers associated
  * with a labelled tree. A tree on n >= 2 vertices can be represented by a

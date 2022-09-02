@@ -36,7 +36,6 @@
  * \function igraph_union
  * \brief Calculates the union of two graphs.
  *
- * </para><para>
  * The number of vertices in the result is that of the larger graph
  * from the two arguments. The result graph contains edges which are
  * present in at least one of the operand graphs.
@@ -72,7 +71,6 @@ igraph_error_t igraph_union(igraph_t *res,
  * \function igraph_union_many
  * \brief Creates the union of many graphs.
  *
- * </para><para>
  * The result graph will contain as many vertices as the largest graph
  * among the arguments does, and an edge will be included in it if it
  * is part of at least one operand graph.
