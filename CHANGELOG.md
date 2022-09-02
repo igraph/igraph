@@ -291,6 +291,7 @@ Some of the highlights are:
  - `igraph_get_eids_multi()` was removed as its design was fundamentally broken;
    there was no way to retrieve the IDs of all edges between a specific pair of
    vertices without knowing in advance how many such edges there are in the graph.
+   Use `igraph_get_all_eids_between()` instead.
 
  - `igraph_get_incidence()` now returns the vertex IDs corresponding to the
    rows and columns of the incidence matrix as `igraph_vector_int_t`.
@@ -522,9 +523,6 @@ Some of the highlights are:
    use an `igraph_vector_int_t` to return the vertex IDs instead of an
    `igraph_vector_t`.
 
- - `igraph_spanner()` now uses an `igraph_vector_int_t` to return the vector
-   of edge IDs in the spanner instead of an `igraph_vector_t`.
-
  - `igraph_spanning_tree()`, `igraph_minimum_spanning_tree()` and
    `igraph_random_spanning_tree()` now all use an `igraph_vector_int_t` to
    return the vector of edge IDs in the spanning tree instead of an
@@ -734,10 +732,13 @@ Some of the highlights are:
 ### Added
 
  - A new integer type, `igraph_uint_t` has been added. This is the unsigned pair of `igraph_integer_t` and they are always consistent in size.
- - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API. It contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There are specializations for all vector types, such as for `igraph_vector_int_list_t`.
+ - A new container type, `igraph_vector_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API where it was used to hold a variable-length list of vectors. The type contains `igraph_vector_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually). There is also a variant named `igraph_vector_int_list_t` for vectors of `igraph_vector_int_t` objects.
+ - A new container type, `igraph_matrix_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API where it was used to hold a variable-length list of matrices. The type contains `igraph_matrix_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually).
+ - A new container type, `igraph_graph_list_t` has been added, replacing most uses of `igraph_vector_ptr_t` in the API where it was used to hold a variable-length list of graphs. The type contains `igraph_t` objects, and it is fully memory managed (i.e. its contents do not need to be allocated and destroyed manually).
+ - The vector container type, `igraph_vector_t`, has been extended with a new variant whose functions all start with `igraph_vector_fortran_int_...`. This vector container can be used for interfacing with Fortran code, assuming that C's `int` type is compatible with Fortran integers. Note that `igraph_vector_int_t` is not suitable any more, as the elements of `igraph_vector_int_t` are of type `igraph_integer_t`, whose size may differ on 32-bit and 64-bit platforms, depending on how igraph was compiled.
  - `igraph_adjlist_init_from_inclist()` to create an adjacency list from an already existing incidence list by resolving edge IDs to their corresponding endpoints. This function is useful for algorithms when both an adjacency and an incidence list is needed and they should be in the same order.
- - `igraph_vector_*_permute()` functions to permute a vector based on an index vector.
- - `igraph_vector_*_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
+ - `igraph_vector_permute()` functions to permute a vector based on an index vector.
+ - `igraph_vector_remove_fast()` functions to remove an item from a vector by swapping it with the last element and then popping it off. It allows one to remove an item from a vector in constant time if the order of items does not matter.
  - `igraph_matrix_view_from_vector()` allows interpreting the data stored in a vector as a matrix of the specified size.
  - `igraph_vector_ptr_sort_ind()` to obtain an index vector that would sort a vector of pointers based on some comparison function.
  - `igraph_hub_and_authority_scores()` calculates the hub and authority scores of a graph as a matching pair.
@@ -745,43 +746,53 @@ Some of the highlights are:
  - `igraph_circulant()` to create circulant graphs (#1856, thanks to @Gomango999).
  - `igraph_symmetric_tree()` to create a tree with the specified number of branches at each level (#1859, thanks to @YuliYudith and @DoruntinaM).
  - `igraph_regular_tree()` creates a regular tree where all internal vertices have the same total degree.
+ - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
  - `igraph_is_forest()` to check whether a graph is a forest (#1888, thanks to @rohitt28).
  - `igraph_is_acyclic()` to check whether a graph is acyclic (#1945, thanks to @borsgeorgica).
+ - `igraph_is_perfect()` to check whether a graph is a perfect graph (#1730, thanks to @guyroznb).
  - `igraph_es_all_between()` to create an edge selector that selects all edges between a pair of vertices.
  - `igraph_blas_dgemm()` to multiply two matrices.
  - `igraph_wheel()` to create a wheel graph (#1938, thanks to @kwofach).
  - `igraph_stack_capacity()` to query the capacity of a stack.
  - `igraph_almost_equals()` and `igraph_cmp_epsilon()` to compare floating point numbers with a relative tolerance.
  - `igraph_complex_almost_equals()` to compare complex numbers with a relative tolerance.
+ - `igraph_sparsemat_get()` to retrieve a single element of a sparse matrix.
+ - `igraph_sparsemat_normalize_rows()` and `igraph_sparsemat_normalize_cols()` to normalize sparse matrices row-wise or column-wise.
  - `igraph_vector_all_almost_e()`, `igraph_vector_complex_all_almost_e()`, `igraph_matrix_all_almost_e()`, `igraph_matrix_complex_all_almost_e()` for elementwise comparisons of floating point vector and matrices with a relative tolerance.
  - `igraph_vector_range()` to fill an existing vector with a range of increasing numbers.
  - `igraph_roots_for_tree_layout()` computes a set of roots suitable for a nice tree layout.
  - `igraph_fundamental_cycles()` computes a fundamental cycle basis (experimental).
  - `igraph_minimum_cycle_basis()` computes an unweighted minimum cycle basis (experimental).
  - `igraph_strvector_merge()` moves all strings from one string vectors to the end of another without re-allocating them.
- - `igraph_get_k_shortest_paths()` finds the k shortest paths between a source and a target vertex (#1763, thanks to @GroteGnoom)
+ - `igraph_strvector_push_back_len()` adds a new string to the end of a string vector and allows the user to specify the length of the string being added.
+ - `igraph_strvector_reserve()` reserves space for a given number of string pointers in a string vector.
+ - `igraph_strvector_capacity()` returns the maximum number of strings that can be stored in a string vector without reallocating the memory block holding the pointers to the individual strings.
+ - `igraph_get_all_eids_between()` returns the IDs of all edges between a pair of vertices.
+ - `igraph_get_k_shortest_paths()` finds the k shortest paths between a source and a target vertex.
  - `igraph_get_widest_path()`, `igraph_get_widest_paths()`, `igraph_widest_path_widths_dijkstra()` and `igraph_widest_path_widths_floyd_warshall()` to find widest paths (#1893, thanks to @Gomango999).
- - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix, with various kinds of normalizations. They replace the now-deprecated `igraph_laplacian()`. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
+ - `igraph_get_laplacian()` and `igraph_get_laplacian_sparse()` return the Laplacian matrix of the graph as a dense or sparse matrix, with various kinds of normalizations. They replace the now-deprecated `igraph_laplacian()` function. This makes the API consistent with `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()`.
  - `igraph_enter_safelocale()` and `igraph_exit_safelocale()` for temporarily setting the locale to C. Foreign format readers and writers require a locale which uses a decimal point instead of decimal comma.
  - `igraph_vertex_path_from_edge_path()` converts a sequence of edge IDs representing a path to an equivalent sequence of vertex IDs that represent the vertices the path travelled through.
- - `igraph_graph_count()` gives the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
+ - `igraph_graph_count()` returns the number of unlabelled graphs on a given number of vertices. It is meant to find the maximum isoclass value.
  - `igraph_rngtype_pcg32` and `igraph_rngtype_pcg64` implement 32-bit and 64-bit variants of the PCG random number generator.
  - `igraph_rng_get_pois()` generates random variates from the Poisson distribution.
  - `igraph_sparse_adjacency()` and `igraph_sparse_weighted_adjacency()` constructs graphs from (weighted) sparse matrices.
  - `igraph_full_multipartite()` generates full multipartite graphs (a generalization of bipartite graphs to multiple groups).
- - `igraph_turan()` generates Turán graphs.
+ - `igraph_turan()` generates Turán graphs (#2088, thanks to @pradkrish)
  - `igraph_local_scan_subset_ecount()` counts the number of edges in induced sugraphs from a subset of vertices.
- - `igraph_has_mutual()` checks if a directed graph has any mutual edges.
  - `igraph_vs_range()`, `igraph_vss_range()`, `igraph_es_range()` and `igraph_ess_range()` creates vertex and edge sequences from C-style intervals (closed from the left, open from the right).
  - `igraph_eccentricity_dijkstra()` finds the longest weighted path length among all shortest paths between a set of vertices.
  - `igraph_vector_complex_zapsmall()` and `igraph_matrix_complex_zapsmall()` for replacing small components of complex vector or matrix elements with exact zeros.
- - `igraph_invalidate_cache()` invalidates all cached graph properties, forcing their recomputation next time they are requested.
+ - `igraph_invalidate_cache()` invalidates all cached graph properties, forcing their recomputation next time they are requested. This function should not be needed in everyday usage, but may be useful in debugging and benchmarking.
  - `igraph_pseudo_diameter()` and `igraph_pseudo_diameter_dijkstra()` to determine a lower bound for the diameter of a graph (unweighted or weighted).
- - `igraph_trussness()` calculates the trussness of each edge in the graph (PR #1034, thanks to Alex Perrone and Fabio Zanini)
- - `igraph_betweenness_subset()` and `igraph_edge_betweenness_subset()` calculates betweenness and edge betweenness scores using shortest paths between a subset of vertices only (PR #1711, thanks to Guy Rozenberg)
- - `igraph_graph_center()` finds the central vertices of the graph. The central vertices are the ones having a minimum eccentricity (PR #2084, thanks to Pradeep Krishnamurthy).
+ - `igraph_spanner()` calculates a spanner of a graph with a given stretch factor (#1752, thanks to @guyroznb)
+ - `igraph_trussness()` calculates the trussness of each edge in the graph (#1034, thanks to @alexperrone)
+ - `igraph_betweenness_subset()` and `igraph_edge_betweenness_subset()` calculates betweenness and edge betweenness scores using shortest paths between a subset of vertices only (#1711, thanks to @guyroznb)
+ - `igraph_graph_center()` finds the central vertices of the graph. The central vertices are the ones having a minimum eccentricity (PR #2084, thanks to @pradkrish).
  - `igraph_calloc()` and `igraph_realloc()` are now publicly exposed; these functions provide variants of `calloc()` and `realloc()` that can safely be deallocated within igraph functions.
  - `igraph_heap_clear()` and `igraph_heap_min_clear()` remove all elements from an `igraph_heap_t` or an `igraph_heap_min_t`, respectively.
+ - `igraph_vector_lex_cmp_untyped()` and `igraph_vector_colex_cmp_untyped()` for lexicographic and colexicographic comparison of vectors, similarly to `igraph_vector_lex_cmp()` and `igraph_vector_colex_cmp()`. The difference between the two variants is that the untyped versions declare the vectors as `const void*`, making the functions suitable as comparators for `qsort()`.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` to lay out a graph in 2D or 3D space using the UMAP dimensionality reduction algorithm.
 
 ### Removed
 
@@ -844,7 +855,7 @@ Some of the highlights are:
 
  - `igraph_get_stochastic_sparsemat()` is deprecated in favour of `igraph_get_stochastic_sparse()`,
    and will be removed in 0.11. Note that `igraph_get_stochastic_sparse()` takes an
-   _initialized_ sparse matrix as input, unlike `igraph_get_stochastic_sparsemat()` which
+   _initialized_ sparse matrix as input, unlike `igraph_get_stochastic_sparsemat()`, which
    takes an uninitialized one.
 
  - `igraph_isomorphic_34()` has been deprecated in favour of `igraph_isomorphic()`.
@@ -885,6 +896,12 @@ Some of the highlights are:
    the old name was unfortunate because these functions calculated _path lengths_
    only and not the paths themselves. The old names are deprecated and will be
    removed in 0.11.
+
+ - `igraph_sparsemat_copy()`, `igraph_sparsemat_diag()` and `igraph_sparsemat_eye()`
+   have been renamed to `igraph_sparsemat_init_copy()`,
+   `igraph_sparsemat_init_diag()` and `igraph_sparsemat_init_eye()` to indicate
+   that they _initialize_ a new sparse matrix. The old names are deprecated and
+   will be removed in 0.11.
 
  - `igraph_strvector_add()` has been renamed to `igraph_strvector_push_back()`
    for sake of consistency with other vector-like data structures; the old name
