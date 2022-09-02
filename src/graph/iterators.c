@@ -1142,29 +1142,6 @@ igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v) {
 }
 
 /**
- * \function igraph_es_fromto
- * \brief Edge selector, all edges between two vertex sets.
- *
- * This function is not implemented yet.
- *
- * \param es Pointer to an uninitialized edge selector.
- * \param from Vertex selector, their outgoing edges will be
- *        selected.
- * \param to Vertex selector, their incoming edges will be selected
- *        from the previous selection.
- * \return Error code.
- * \sa \ref igraph_es_destroy()
- *
- * Time complexity: O(1).
- */
-
-igraph_error_t igraph_es_fromto(igraph_es_t *es, igraph_vs_t from, igraph_vs_t to) {
-    IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
-    IGRAPH_ERROR("igraph_es_fromto not implemented yet.", IGRAPH_UNIMPLEMENTED);
-    /* TODO */
-}
-
-/**
  * \function igraph_es_range
  * \brief Edge selector, a sequence of edge IDs.
  *
