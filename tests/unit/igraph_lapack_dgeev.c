@@ -18,6 +18,7 @@
 
 #include <igraph.h>
 #include <stdio.h>
+#include "test_utilities.h"
 
 #define DIM 10
 
@@ -216,6 +217,8 @@ int main() {
     igraph_matrix_destroy(&vectors_right);
     igraph_matrix_destroy(&vectors_left);
     igraph_matrix_destroy(&A);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
