@@ -711,6 +711,7 @@ add_legacy_tests(
   igraph_arpack_unpack_complex
   igraph_blas_dgemm
   igraph_eigenvector_centrality
+  igraph_lapack_dgeev
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs
