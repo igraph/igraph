@@ -179,6 +179,8 @@ igraph_i_fundamental_cycles_bfs(
  * \function igraph_fundamental_cycles
  * \brief Finds a fundamental cycle basis.
  *
+ * \experimental
+ *
  * This function computes a fundamental cycle basis associated with a breadth-first
  * search tree of the graph.
  *
@@ -199,8 +201,6 @@ igraph_i_fundamental_cycles_bfs(
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
- *
- * \experimental
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                          igraph_vector_int_list_t *result,
@@ -371,6 +371,23 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \function igraph_minimum_cycle_basis
  * \brief Computes a minimum weight cycle basis.
  *
+ * \experimental
+ *
+ * This function computes a minimum weight cycle basis of a graph. Currently,
+ * a modified version of Horton's algorithm is used that allows for cutoffs.
+ *
+ * </para><para>
+ * Edge directions are ignored. Multi-edges and self-loops are supported.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Horton, J. D. (1987)
+ * A polynomial-time algorithm to find the shortest cycle basis of a graph,
+ * SIAM Journal on Computing, 16 (2): 358–366.
+ * https://doi.org/10.1137%2F0216026
+ *
  * \param graph The graph object.
  * \param result An initialized integer vector list, the elements of the cycle
  *   basis will be stored here as vectors of edge IDs.
@@ -393,8 +410,6 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \return Error code.
  *
  * Time complexity: TODO.
- *
- * \experimental
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                           igraph_vector_int_list_t *result,
