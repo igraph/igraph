@@ -46,10 +46,12 @@
  *        be stored here. It will be resized if needed.
  * \return Error code.
  *
- * Added in version 0.2. This function is experimental.
+ * Added in version 0.2.
  *
  * </para><para>
  * Time complexity: TODO.
+ *
+ * \experimental
  */
 
 igraph_error_t igraph_layout_merge_dla(
