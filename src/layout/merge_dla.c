@@ -34,6 +34,8 @@
  * \function igraph_layout_merge_dla
  * \brief Merges multiple layouts by using a DLA algorithm.
  *
+ * \experimental
+ *
  * First each layout is covered by a circle. Then the layout of the
  * largest graph is placed at the origin. Then the other layouts are
  * placed by the DLA algorithm, larger ones first and smaller ones
@@ -50,8 +52,6 @@
  *
  * </para><para>
  * Time complexity: TODO.
- *
- * \experimental
  */
 
 igraph_error_t igraph_layout_merge_dla(
