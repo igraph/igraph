@@ -28,7 +28,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_flow.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_structural.h"
 #include "igraph_vector.h"
