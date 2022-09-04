@@ -3153,25 +3153,8 @@ igraph_error_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v, con
 
 #ifndef USING_R
 igraph_error_t FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v) {
-    igraph_integer_t i, n = FUNCTION(igraph_vector, size)(v);
-    if (n != 0) {
-#ifdef PRINTFUNC
-        PRINTFUNC(VECTOR(*v)[0]);
-#else
-        printf(OUT_FORMAT, VECTOR(*v)[0]);
-#endif
-    }
-    for (i = 1; i < n; i++) {
-#ifdef PRINTFUNC
-        putchar(' '); PRINTFUNC(VECTOR(*v)[i]);
-#else
-        printf(" " OUT_FORMAT, VECTOR(*v)[i]);
-#endif
-    }
-    printf("\n");
-    return IGRAPH_SUCCESS;
+    return FUNCTION(igraph_vector, fprint)(v, stdout);
 }
-
 #endif
 
 igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FILE *file) {
