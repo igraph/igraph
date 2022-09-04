@@ -156,6 +156,7 @@ int main() {
 
     ret = check_jaccard_all(&g, &m, IGRAPH_ALL, 1);
     igraph_matrix_print(&m);
+    printf("==========\n");
     if (ret) {
         return 1;
     }
@@ -165,42 +166,50 @@ int main() {
 
     ret = check_jaccard_all(&g, &m, IGRAPH_OUT, 1);
     igraph_matrix_print(&m);
+    printf("==========\n");
     if (ret) {
         return 3;
     }
 
     ret = check_jaccard_all(&g, &m, IGRAPH_IN, 0);
     igraph_matrix_print(&m);
+    printf("==========\n");
     if (ret) {
         return 4;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_ALL, 1);
     igraph_matrix_print(&m);
+    printf("==========\n");
     if (ret) {
         return 5;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_OUT, 1);
     igraph_matrix_print(&m);
+    printf("==========\n");
     if (ret) {
         return 6;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_IN, 0);
     igraph_matrix_print(&m);
+    printf("==========\n");
     if (ret) {
         return 7;
     }
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_ALL);
     igraph_matrix_print(&m);
+    printf("==========\n");
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_OUT);
     igraph_matrix_print(&m);
+    printf("==========\n");
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_IN);
     igraph_matrix_print(&m);
+    printf("==========\n");
 
     igraph_matrix_destroy(&m);
     igraph_destroy(&g);
