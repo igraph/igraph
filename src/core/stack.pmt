@@ -24,6 +24,7 @@
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
+
 #include "config.h"
 
 #include <string.h>         /* memcpy & co. */
@@ -275,32 +276,32 @@ BASE FUNCTION(igraph_stack, top)(const TYPE(igraph_stack)* s) {
     return *(s->end - 1);
 }
 
-#if defined (OUT_FORMAT)
-#ifndef USING_R
+#if defined(OUT_FORMAT) || defined(FPRINTFUNC)
 
+#ifndef USING_R
 igraph_error_t FUNCTION(igraph_stack, print)(const TYPE(igraph_stack) *s) {
-    igraph_integer_t i, n = FUNCTION(igraph_stack, size)(s);
-    if (n != 0) {
-        printf(OUT_FORMAT, s->stor_begin[0]);
-    }
-    for (i = 1; i < n; i++) {
-        printf(" " OUT_FORMAT, s->stor_begin[i]);
-    }
-    printf("\n");
-    return IGRAPH_SUCCESS;
+    return FUNCTION(igraph_stack, fprint)(s, stdout);
 }
-#endif
+#endif /* USING_R */
 
 igraph_error_t FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack) *s, FILE *file) {
     igraph_integer_t i, n = FUNCTION(igraph_stack, size)(s);
     if (n != 0) {
+#ifdef FPRINTFUNC
+        FPRINTFUNC(file, s->stor_begin[0]);
+#else
         fprintf(file, OUT_FORMAT, s->stor_begin[0]);
+#endif
     }
     for (i = 1; i < n; i++) {
+#ifdef FPRINTFUNC
+        fputc(' ', file); fprintf(file, OUT_FORMAT, s->stor_begin[i]);
+#else
         fprintf(file, " " OUT_FORMAT, s->stor_begin[i]);
+#endif
     }
     fprintf(file, "\n");
     return IGRAPH_SUCCESS;
 }
 
-#endif
+#endif /* defined(OUT_FORMAT) || defined(FPRINTFUNC) */

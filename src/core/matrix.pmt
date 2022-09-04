@@ -1705,7 +1705,7 @@ igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
 #endif /* USING_R */
 #endif /* OUT_FORMAT */
 
-#if defined(OUT_FORMAT) || defined(PRINTFUNC)
+#if defined(OUT_FORMAT) || defined(FPRINTFUNC)
 
 #ifndef USING_R
 
@@ -1771,4 +1771,4 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
     return IGRAPH_SUCCESS;
 }
 
-#endif /* defined(OUT_FORMAT) || defined(PRINTFUNC) */
+#endif /* defined(OUT_FORMAT) || defined(FPRINTFUNC) */
