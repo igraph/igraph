@@ -1684,14 +1684,8 @@ igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m
     return IGRAPH_SUCCESS;
 }
 
-#if defined(OUT_FORMAT) || defined(PRINTFUNC)
-
+#ifdef OUT_FORMAT
 #ifndef USING_R
-
-igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
-    return FUNCTION(igraph_matrix, fprint)(m, stdout);
-}
-
 igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
                                     const char *format) {
     igraph_integer_t nr = FUNCTION(igraph_matrix, nrow)(m);
@@ -1709,6 +1703,16 @@ igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
     }
 
     return IGRAPH_SUCCESS;
+}
+#endif /* USING_R */
+#endif /* OUT_FORMAT */
+
+#if defined(OUT_FORMAT) || defined(PRINTFUNC)
+
+#ifndef USING_R
+
+igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
+    return FUNCTION(igraph_matrix, fprint)(m, stdout);
 }
 
 #endif /* USING_R */
