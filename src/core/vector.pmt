@@ -3133,7 +3133,7 @@ igraph_error_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vect
 
 #endif
 
-#if defined(OUT_FORMAT)
+#if defined(OUT_FORMAT) || defined(PRINTFUNC)
 
 #ifndef USING_R
 igraph_error_t FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v) {
@@ -3191,7 +3191,7 @@ igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FIL
     return IGRAPH_SUCCESS;
 }
 
-#endif
+#endif /* defined(OUT_FORMAT) || defined(PRINTFUNC) */
 
 igraph_error_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
                                    TYPE(igraph_vector) *newv,

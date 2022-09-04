@@ -35,8 +35,10 @@
     #define BASE_VECTOR igraph_vector_t
     #define BASE_MATRIX igraph_matrix_t
     #define SHORT
-    #define OUT_FORMAT "%G"
+    #define OUT_FORMAT "%g"
     #define PRINTFUNC(val) igraph_real_printf(val)
+    #define SNPRINTFUNC(str, size, val) igraph_real_snprintf(str, size, val)
+    #define FPRINTFUNC_ALIGNED(file, width, val) igraph_real_fprintf_aligned(file, width, val)
     #define FPRINTFUNC(file, val) igraph_real_fprintf(file, val)
     #define ZERO 0.0
     #define ONE 1.0
@@ -95,6 +97,10 @@
     #define BASE_VECTOR igraph_vector_complex_t
     #define BASE_MATRIX igraph_matrix_complex_t
     #define SHORT complex
+    #define PRINTFUNC(val) igraph_complex_printf(val)
+    #define SNPRINTFUNC(str, size, val) igraph_complex_snprintf(str, size, val)
+    #define FPRINTFUNC_ALIGNED(file, width, val) igraph_complex_fprintf_aligned(file, width, val)
+    #define FPRINTFUNC(file, val) igraph_complex_fprintf(file, val)
     #define ZERO {{0.0, 0.0}}
     #define ONE {{1.0, 0.0}}
     #define MULTIPLICITY 2

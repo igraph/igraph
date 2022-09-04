@@ -306,37 +306,6 @@ igraph_error_t igraph_vector_int_rank(
     return IGRAPH_SUCCESS;
 }
 
-#ifndef USING_R
-igraph_error_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
-    if (n != 0) {
-        igraph_complex_t z = VECTOR(*v)[0];
-        printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    for (i = 1; i < n; i++) {
-        igraph_complex_t z = VECTOR(*v)[i];
-        printf(" %g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    printf("\n");
-    return IGRAPH_SUCCESS;
-}
-#endif
-
-igraph_error_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
-                                 FILE *file) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
-    if (n != 0) {
-        igraph_complex_t z = VECTOR(*v)[0];
-        fprintf(file, "%g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    for (i = 1; i < n; i++) {
-        igraph_complex_t z = VECTOR(*v)[i];
-        fprintf(file, " %g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    fprintf(file, "\n");
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \ingroup vector
  * \function igraph_vector_complex_real

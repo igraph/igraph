@@ -23,31 +23,6 @@
 
 #include <igraph.h>
 
-int print_matrix(const igraph_matrix_t *m) {
-    igraph_integer_t nrow = igraph_matrix_nrow(m);
-    igraph_integer_t ncol = igraph_matrix_ncol(m);
-    igraph_integer_t i, j;
-    igraph_real_t val;
-
-    for (i = 0; i < nrow; i++) {
-        printf("%" IGRAPH_PRId ":", i);
-        for (j = 0; j < ncol; j++) {
-            val = MATRIX(*m, i, j);
-            if (igraph_is_inf(val)) {
-                if (val < 0) {
-                    printf("-inf");
-                } else {
-                    printf(" inf");
-                }
-            } else {
-                printf(" %3.0f", val);
-            }
-        }
-        printf("\n");
-    }
-    return 0;
-}
-
 int main() {
 
     igraph_t g;
@@ -73,7 +48,7 @@ int main() {
     igraph_matrix_init(&res, 0, 0);
     igraph_distances_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(),
                                   &weights, IGRAPH_OUT);
-    print_matrix(&res);
+    igraph_matrix_print(&res);
 
     igraph_matrix_destroy(&res);
     igraph_destroy(&g);
@@ -92,7 +67,7 @@ int main() {
     igraph_matrix_init(&res, 0, 0);
     igraph_distances_bellman_ford(&g, &res, igraph_vss_all(),
                                   igraph_vss_all(), &weights, IGRAPH_OUT);
-    print_matrix(&res);
+    igraph_matrix_print(&res);
 
     /***************************************/
 
