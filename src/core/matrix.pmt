@@ -1723,19 +1723,24 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
     char format[ sizeof(OUT_FORMAT) + 1 ] = "%*";
     strcpy(format + 2, (const char *) OUT_FORMAT + 1);
 
-    /* First we detect the width needed for each matrix column. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&column_width, nc);
-    igraph_vector_int_fill(&column_width, 1); /* minimum width */
+
+    /* First we detect the width needed for each matrix column.
+     * snprintf() may be passed a NULL pointer with a buffer size of 0.
+     * It will then return the number of characters that would have been written,
+     * without writing anything. */
     for (j = 0; j < nc; j++) {
         for (i = 0; i < nr; i++) {
-            char buf[14];
-            igraph_integer_t width;
+            const int min_width = 1; /* minimum field width */
+            int width;
 #ifdef SNPRINTFUNC
-            SNPRINTFUNC(buf, sizeof(buf) / sizeof(buf[0]), MATRIX(*m, i, j));
+            width = SNPRINTFUNC(NULL, 0, MATRIX(*m, i, j));
 #else
-            snprintf(buf, sizeof(buf) / sizeof(buf[0]), OUT_FORMAT, MATRIX(*m, i, j));
+            width = snprintf(NULL, 0, OUT_FORMAT, MATRIX(*m, i, j));
 #endif
-            width = strlen(buf);
+            if (width < min_width) {
+                width = min_width;
+            }
             if (width > VECTOR(column_width)[j]) {
                 VECTOR(column_width)[j] = width;
             }
