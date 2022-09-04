@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_types.h"
 
 #include <float.h>
@@ -73,10 +74,8 @@ int igraph_real_fprintf(FILE *file, igraph_real_t val) {
         } else {
             return fprintf(file, "Inf");
         }
-    } else {
-        /* fallback */
-        return fprintf(file, "%g", val);
     }
+    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");
 }
 
 #ifndef USING_R
@@ -96,10 +95,8 @@ int igraph_real_fprintf_aligned(FILE *file, int width, igraph_real_t val) {
         } else {
             return fprintf(file, "%*s", width, "Inf");
         }
-    } else {
-        /* fallback */
-        return fprintf(file, "%*g", width, val);
     }
+    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");
 }
 
 #ifndef USING_R
@@ -119,10 +116,8 @@ int igraph_real_snprintf(char* str, size_t size, igraph_real_t val) {
         } else {
             return snprintf(str, size, "Inf");
         }
-    } else {
-        /* fallback */
-        return snprintf(str, size, "%g", val);
     }
+    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");
 }
 
 int igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
@@ -136,10 +131,8 @@ int igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
         } else {
             return fprintf(file, "Inf");
         }
-    } else {
-        /* fallback */
-        return fprintf(file, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     }
+    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");
 }
 
 #ifndef USING_R
@@ -159,8 +152,6 @@ int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val) {
         } else {
             return snprintf(str, size, "Inf");
         }
-    } else {
-        /* fallback */
-        return snprintf(str, size, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     }
+    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");
 }

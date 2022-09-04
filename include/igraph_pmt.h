@@ -35,8 +35,9 @@
     #define BASE_VECTOR igraph_vector_t
     #define BASE_MATRIX igraph_matrix_t
     #define SHORT
-    #define OUT_FORMAT "%G"
+    #define OUT_FORMAT "%g"
     #define PRINTFUNC(val) igraph_real_printf(val)
+    #define SNPRINTFUNC(str, size, val) igraph_real_snprintf(str, size, val)
     #define PRINTFUNC_ALIGNED(width, val) igraph_real_printf_aligned(width, val)
     #define FPRINTFUNC(file, val) igraph_real_fprintf(file, val)
     #define ZERO 0.0
