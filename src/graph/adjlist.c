@@ -472,12 +472,12 @@ igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) 
 #define ADJLIST_CANON_EDGE(from, to, directed) \
     do {                     \
         igraph_integer_t temp;         \
-        if((!directed) && from < to) {     \
+        if ((!directed) && from < to) {     \
             temp = to;               \
             to = from;               \
             from = temp;             \
         }                      \
-    } while(0);
+    } while (0);
 
 igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed) {
     igraph_vector_int_t* fromvec;

@@ -1336,7 +1336,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 #define R_D_negInonint(x) (x < 0. || R_D_nonint(x))
 
 #define R_D_nonint_check(x)                 \
-    if(R_D_nonint(x)) {                  \
+    if (R_D_nonint(x)) {                  \
         MATHLIB_WARNING("non-integer x = %f", x);   \
         return R_D__0;                  \
     }

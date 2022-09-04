@@ -98,7 +98,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_int_list_t vids_by_type;
     igraph_real_t maxcum, maxedges;
 
-    if(nodes < 0){
+    if (nodes < 0) {
         IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
 
@@ -405,7 +405,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     igraph_vector_int_list_t vids_by_intype, vids_by_outtype;
     igraph_real_t maxcum, maxedges;
 
-    if(nodes < 0){
+    if (nodes < 0) {
         IGRAPH_ERROR("The number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 

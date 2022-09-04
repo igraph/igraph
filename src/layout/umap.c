@@ -873,17 +873,17 @@ static igraph_error_t igraph_i_layout_umap(
     IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
 
     if (use_seed) {
-        if((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
-          IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
-                  IGRAPH_EINVAL, no_of_nodes, ndim,
-                  igraph_matrix_nrow(res),
-                  igraph_matrix_ncol(res));
+        if ((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
+            IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
+                          IGRAPH_EINVAL, no_of_nodes, ndim,
+                          igraph_matrix_nrow(res),
+                          igraph_matrix_ncol(res));
         }
 
         /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
-        if (no_of_nodes <= 1)
+        if (no_of_nodes <= 1) {
             return IGRAPH_SUCCESS;
-
+        }
     } else {
          /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
          if (no_of_nodes <= 1) {

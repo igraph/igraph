@@ -1248,7 +1248,8 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                 *(result) = e; \
                 if (result_pos != 0) { *(result_pos) = start; } \
             } \
-        } } while(0)
+        } \
+    } while (0)
 
 #define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid) \
     do { \
