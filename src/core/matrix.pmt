@@ -1720,7 +1720,7 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
 
     /* Insert dynamic width specifier '*' in format string. */
     char format[ sizeof(OUT_FORMAT) + 1 ] = "%*";
-    strcpy(format + 2, OUT_FORMAT + 1);
+    strcpy(format + 2, (const char *) OUT_FORMAT + 1);
 
     /* First we detect the width needed for each matrix column. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&column_width, nc);
