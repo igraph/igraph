@@ -308,6 +308,7 @@ add_legacy_tests(
   igraph_get_shortest_paths2
   igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
+  igraph_get_shortest_paths_dijkstra
   igraph_graph_center
   igraph_has_mutual
   igraph_is_bipartite
