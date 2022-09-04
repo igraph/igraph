@@ -37,7 +37,6 @@ int main() {
     igraph_matrix_init(&vectors_right, 0, 0);
     igraph_vector_init(&values_real, 0);
     igraph_vector_init(&values_imag, 0);
-    igraph_matrix_null(&A);
     MATRIX(A, 0, 0) = 1.0;
     MATRIX(A, 0, 1) = 1.0;
     MATRIX(A, 1, 0) = -1.0;
