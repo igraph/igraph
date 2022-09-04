@@ -155,60 +155,61 @@ int main() {
     igraph_matrix_init(&m, 0, 0);
 
     ret = check_jaccard_all(&g, &m, IGRAPH_ALL, 1);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
     if (ret) {
         return 1;
     }
 
     igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
+    printf("==========\n");
 
     ret = check_jaccard_all(&g, &m, IGRAPH_OUT, 1);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
     if (ret) {
         return 3;
     }
 
     ret = check_jaccard_all(&g, &m, IGRAPH_IN, 0);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
     if (ret) {
         return 4;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_ALL, 1);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
     if (ret) {
         return 5;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_OUT, 1);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
     if (ret) {
         return 6;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_IN, 0);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
     if (ret) {
         return 7;
     }
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_ALL);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_OUT);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_IN);
-    igraph_matrix_print(&m);
+    igraph_matrix_printf(&m, "%.2f");
     printf("==========\n");
 
     igraph_matrix_destroy(&m);
