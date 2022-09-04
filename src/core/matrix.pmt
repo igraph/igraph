@@ -1724,7 +1724,7 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
 
     /* First we detect the width needed for each matrix column. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&column_width, nc);
-    igraph_vector_int_fill(&column_width, 2); /* minimum width */
+    igraph_vector_int_fill(&column_width, 1); /* minimum width */
     for (j = 0; j < nc; j++) {
         for (i = 0; i < nr; i++) {
             char buf[14];
