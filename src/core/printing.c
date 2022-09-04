@@ -85,26 +85,26 @@ int igraph_real_printf(igraph_real_t val) {
 }
 #endif
 
-int igraph_real_fprintf_aligned(FILE *file, igraph_real_t val) {
+int igraph_real_fprintf_aligned(FILE *file, int width, igraph_real_t val) {
     if (igraph_finite(val)) {
-        return fprintf(file, "%8g", val);
+        return fprintf(file, "%*g", width, val);
     } else if (igraph_is_nan(val)) {
-        return fprintf(file, "     NaN");
+        return fprintf(file, "%*s", width, "NaN");
     } else if (igraph_is_inf(val)) {
         if (val < 0) {
-            return fprintf(file, "    -Inf");
+            return fprintf(file, "%*s", width, "-Inf");
         } else {
-            return fprintf(file, "     Inf");
+            return fprintf(file, "%*s", width, "Inf");
         }
     } else {
         /* fallback */
-        return fprintf(file, "%8g", val);
+        return fprintf(file, "%*g", width, val);
     }
 }
 
 #ifndef USING_R
-int igraph_real_printf_aligned(igraph_real_t val) {
-    return igraph_real_fprintf_aligned(stdout, val);
+int igraph_real_printf_aligned(int width, igraph_real_t val) {
+    return igraph_real_fprintf_aligned(stdout, width, val);
 }
 #endif
 

@@ -1702,7 +1702,7 @@ igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
                 putchar(' ');
             }
 #ifdef PRINTFUNC_ALIGNED
-            PRINTFUNC_ALIGNED(MATRIX(*m, i, j));
+            PRINTFUNC_ALIGNED(8, MATRIX(*m, i, j));
 #else
             printf(format, MATRIX(*m, i, j));
 #endif

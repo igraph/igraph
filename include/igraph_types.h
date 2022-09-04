@@ -127,8 +127,9 @@ typedef IGRAPH_BOOL_TYPE igraph_bool_t;
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */
 IGRAPH_EXPORT int igraph_real_printf(igraph_real_t val);
-IGRAPH_EXPORT int igraph_real_printf_aligned(igraph_real_t val);
 IGRAPH_EXPORT int igraph_real_fprintf(FILE *file, igraph_real_t val);
+IGRAPH_EXPORT int igraph_real_printf_aligned(int width, igraph_real_t val);
+IGRAPH_EXPORT int igraph_real_fprintf_aligned(FILE *file, int width, igraph_real_t val);
 IGRAPH_EXPORT int igraph_real_snprintf(char* str, size_t size, igraph_real_t val);
 
 /* Replacements for printf that print doubles in the same way on all platforms
