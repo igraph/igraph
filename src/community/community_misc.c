@@ -25,8 +25,6 @@
 #include "igraph_memory.h"
 #include "igraph_sparsemat.h"
 
-#include "config.h"
-
 #include <string.h>
 #include <math.h>
 

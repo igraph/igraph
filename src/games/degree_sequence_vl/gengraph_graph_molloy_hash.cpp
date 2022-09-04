@@ -35,8 +35,6 @@
 #include "igraph_statusbar.h"
 #include "igraph_progress.h"
 
-#include "config.h"
-
 namespace gengraph {
 
 //_________________________________________________________________________

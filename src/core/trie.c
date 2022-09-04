@@ -28,8 +28,6 @@
 #include "core/trie.h"
 #include "internal/hacks.h" /* strdup */
 
-#include "config.h"
-
 #include <string.h>
 
 

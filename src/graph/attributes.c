@@ -27,13 +27,11 @@
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strdup */
 
-#include "config.h"
-
 #include <string.h>
 #include <stdarg.h>
 
 /* Should you ever want to have a thread-local attribute handler table, prepend
- * IGRAPH_THREAD_LOCAL to the following declaration */
+ * IGRAPH_THREAD_LOCAL to the following declaration and #include "config.h". */
 igraph_attribute_table_t *igraph_i_attribute_table = 0;
 
 igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr) {

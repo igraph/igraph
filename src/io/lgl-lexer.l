@@ -44,7 +44,6 @@
 
 */
 
-#include "config.h"
 #include <stdlib.h>
 
 #include "io/lgl-header.h"

@@ -42,8 +42,6 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
-#include "config.h"
-
 /*
  * Some general remarks about the functions in this file.
  *
