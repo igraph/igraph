@@ -304,6 +304,7 @@ Some of the highlights are:
 
  - `igraph_degree_sequence_game()` now supports an additional method, `IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE`, an edge-switching MCMC sampler.
  - `igraph_get_adjacency()` and `igraph_get_adjacency_sparse()` now count loop edges _twice_ in undirected graphs when using `IGRAPH_GET_ADJACENCY_BOTH`. This is to ensure consistency with `IGRAPH_GET_ADJACENCY_UPPER` and `IGRAPH_GET_ADJACENCY_LOWER` such that the sum of the upper and the lower triangle matrix is equal to the full adjacency matrix even in the presence of loop edges.
+ - `igraph_matrix_print()` and `igraph_matrix_fprint()` functions now align columns when priting.
  - `igraph_read_graph_gml()` now supports graph attributes (in addition to vertex and edge attributes).
  - `igraph_read_graph_gml()` now uses NaN as the default numerical attribute values instead of 0.
  - The Pajek parser in `igraph_read_graph_pajek()` is now less strict and accepts more files.
