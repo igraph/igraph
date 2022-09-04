@@ -2773,7 +2773,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_3[ number];
+            code = igraph_i_isographs_3[number];
             power = 32;
 
             break;
@@ -2786,7 +2786,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_4[ number];
+            code = igraph_i_isographs_4[number];
             power = 2048;
 
             break;
@@ -2806,7 +2806,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_3u[ number];
+            code = igraph_i_isographs_3u[number];
             power = 4;
 
             break;
@@ -2819,7 +2819,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_4u[ number];
+            code = igraph_i_isographs_4u[number];
             power = 32;
 
             break;
@@ -2832,7 +2832,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_5u[ (long int) number];
+            code = igraph_i_isographs_5u[number];
             power = 512;
 
             break;
@@ -2845,7 +2845,7 @@ igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_6u[ (long int) number];
+            code = igraph_i_isographs_6u[number];
             power = 16384;
 
             break;

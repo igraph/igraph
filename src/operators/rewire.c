@@ -172,8 +172,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
 
             /* If we are still okay, we can perform the rewiring */
             if (ok) {
-                /* printf("Deleting: %ld -> %ld, %ld -> %ld\n",
-                              (long)a, (long)b, (long)c, (long)d); */
+                /* printf("Deleting: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
+                              a, b, c, d); */
                 if (use_adjlist) {
                     /* Replace entry in sorted adjlist: */
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
@@ -185,8 +185,8 @@ igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewir
                     IGRAPH_CHECK(igraph_delete_edges(graph, es));
                     VECTOR(edgevec)[0] = a; VECTOR(edgevec)[1] = d;
                     VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
-                    /* printf("Adding: %ld -> %ld, %ld -> %ld\n",
-                                (long)a, (long)d, (long)c, (long)b); */
+                    /* printf("Adding: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
+                                a, d, c, b); */
                     IGRAPH_CHECK(igraph_add_edges(graph, &edgevec, 0));
                 }
                 num_successful_swaps++;
