@@ -178,7 +178,7 @@
 #endif
 
 #ifdef FPRINTFUNC
-    #undef PRINTFUNC
+    #undef FPRINTFUNC
 #endif
 
 #ifdef UNSIGNED
