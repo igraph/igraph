@@ -1687,6 +1687,7 @@ igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m
 #ifdef OUT_FORMAT
 
 #ifndef USING_R
+
 igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
     return FUNCTION(igraph_matrix, fprint)(m, stdout);
 }
@@ -1710,7 +1711,7 @@ igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
     return IGRAPH_SUCCESS;
 }
 
-#endif
+#endif /* USING_R */
 
 igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FILE *file) {
     igraph_integer_t nr = FUNCTION(igraph_matrix, nrow)(m);
@@ -1761,4 +1762,4 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
     return IGRAPH_SUCCESS;
 }
 
-#endif
+#endif /* OUT_FORMAT */
