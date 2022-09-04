@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_complex.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
 
@@ -101,7 +102,7 @@ int igraph_real_printf_aligned(int width, igraph_real_t val) {
 }
 #endif
 
-int igraph_real_snprintf(char* str, size_t size, igraph_real_t val) {
+int igraph_real_snprintf(char *str, size_t size, igraph_real_t val) {
     if (igraph_finite(val)) {
         return snprintf(str, size, "%g", val);
     } else if (igraph_is_nan(val)) {
@@ -137,7 +138,7 @@ int igraph_real_printf_precise(igraph_real_t val) {
 }
 #endif
 
-int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val) {
+int igraph_real_snprintf_precise(char *str, size_t size, igraph_real_t val) {
     if (igraph_finite(val)) {
         return snprintf(str, size, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     } else if (igraph_is_nan(val)) {
@@ -151,3 +152,82 @@ int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val) {
     }
     IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");  /* LCOV_EXCL_LINE */
 }
+
+#define PROPAGATE() \
+    do { \
+        if (res < 0) { \
+            return -1; \
+        } \
+        cnt += res; \
+    } while (0)
+
+int igraph_complex_fprintf(FILE *file, igraph_complex_t val) {
+    int res, cnt = 0;
+    igraph_real_t re = IGRAPH_REAL(val), im = IGRAPH_IMAG(val);
+    res = igraph_real_fprintf(file, re);
+    PROPAGATE();
+    if (! signbit(im)) {
+        res = fprintf(file, "+");
+        PROPAGATE();
+    }
+    res = igraph_real_fprintf(file, im);
+    PROPAGATE();
+    res = fprintf(file, "i");
+    PROPAGATE();
+    return cnt;
+}
+
+#undef PROPAGATE
+
+#ifndef USING_R
+int igraph_complex_printf(igraph_complex_t val) {
+    return igraph_complex_fprintf(stdout, val);
+}
+#endif
+
+#define PROPAGATE() \
+    do { \
+        if (res < 0) { \
+            return -1; \
+        } \
+        cnt += res; \
+        /* remember that 'size' is unsigned, can't check if size - res < 0! */ \
+        if (size > res) size -= res; \
+        else size = 0; \
+        if (size == 0) str = NULL; else str += res; \
+    } while (0)
+
+int igraph_complex_snprintf(char *str, size_t size, igraph_complex_t val) {
+    int res, cnt = 0;
+    igraph_real_t re = IGRAPH_REAL(val), im = IGRAPH_IMAG(val);
+    res = igraph_real_snprintf(str, size, re);
+    PROPAGATE();
+    if (! signbit(im)) {
+        res = snprintf(str, size, "+");
+        PROPAGATE();
+    }
+    res = igraph_real_snprintf(str, size, im);
+    PROPAGATE();
+    res = snprintf(str, size, "i");
+    PROPAGATE();
+    return cnt;
+}
+
+int igraph_complex_fprintf_aligned(FILE *file, int width, igraph_complex_t val) {
+    /* Most characters produces by %g is 13, so including 'i' and null terminator we
+     * need up to 13 + 13 + 1 + 1 = 28 characters in total. */
+    char buf[28];
+
+    if (igraph_complex_snprintf(buf, sizeof(buf) / sizeof(buf[0]), val) < 0) {
+        return -1;
+    }
+    return fprintf(file, "%*s", width, buf);
+}
+
+#ifndef USING_R
+int igraph_complex_printf_aligned(int width, igraph_complex_t val) {
+    return igraph_complex_fprintf_aligned(stdout, width, val);
+}
+#endif
+
+#undef PROPAGATE

@@ -1684,7 +1684,7 @@ igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m
     return IGRAPH_SUCCESS;
 }
 
-#ifdef OUT_FORMAT
+#if defined(OUT_FORMAT) || defined(PRINTFUNC)
 
 #ifndef USING_R
 
@@ -1719,9 +1719,11 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
     igraph_integer_t i, j;
     igraph_vector_int_t column_width;
 
+#ifdef OUT_FORMAT
     /* Insert dynamic width specifier '*' in format string. */
     char format[ sizeof(OUT_FORMAT) + 1 ] = "%*";
     strcpy(format + 2, (const char *) OUT_FORMAT + 1);
+#endif
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&column_width, nc);
 
@@ -1767,4 +1769,4 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
     return IGRAPH_SUCCESS;
 }
 
-#endif /* OUT_FORMAT */
+#endif /* defined(OUT_FORMAT) || defined(PRINTFUNC) */
