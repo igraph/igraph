@@ -38,7 +38,7 @@
     #define OUT_FORMAT "%g"
     #define PRINTFUNC(val) igraph_real_printf(val)
     #define SNPRINTFUNC(str, size, val) igraph_real_snprintf(str, size, val)
-    #define PRINTFUNC_ALIGNED(width, val) igraph_real_printf_aligned(width, val)
+    #define FPRINTFUNC_ALIGNED(file, width, val) igraph_real_fprintf_aligned(file, width, val)
     #define FPRINTFUNC(file, val) igraph_real_fprintf(file, val)
     #define ZERO 0.0
     #define ONE 1.0

@@ -1688,50 +1688,7 @@ igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m
 
 #ifndef USING_R
 igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
-    igraph_integer_t nr = FUNCTION(igraph_matrix, nrow)(m);
-    igraph_integer_t nc = FUNCTION(igraph_matrix, ncol)(m);
-    igraph_integer_t i, j;
-    igraph_vector_int_t column_width;
-    char buf[20];
-    char format[ sizeof(OUT_FORMAT) + 1 ] = "%*";
-    strcpy(format + 2, OUT_FORMAT + 1);
-
-    /* First we detect the width needed for each matrix column. */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&column_width, nc);
-    igraph_vector_int_fill(&column_width, 2); /* minimum width */
-    for (j = 0; j < nc; j++) {
-        for (i = 0; i < nr; i++) {
-            igraph_integer_t width;
-#ifdef SNPRINTFUNC
-            SNPRINTFUNC(buf, sizeof(buf) / sizeof(buf[0]), MATRIX(*m, i, j));
-#else
-            snprintf(buf, sizeof(buf) / sizeof(buf[0]), OUT_FORMAT, MATRIX(*m, i, j));
-#endif
-            width = strlen(buf);
-            if (width > VECTOR(column_width)[j]) {
-                VECTOR(column_width)[j] = width;
-            }
-        }
-    }
-
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
-            if (j != 0) {
-                putchar(' ');
-            }
-#ifdef PRINTFUNC_ALIGNED
-            PRINTFUNC_ALIGNED(VECTOR(column_width)[j], MATRIX(*m, i, j));
-#else
-            printf(format, MATRIX(*m, i, j));
-#endif
-        }
-        printf("\n");
-    }
-
-    igraph_vector_int_destroy(&column_width);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
+    return FUNCTION(igraph_matrix, fprint)(m, stdout);
 }
 
 igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
@@ -1755,21 +1712,51 @@ igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
 
 #endif
 
-igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
-                                    FILE *file) {
-
+igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FILE *file) {
     igraph_integer_t nr = FUNCTION(igraph_matrix, nrow)(m);
     igraph_integer_t nc = FUNCTION(igraph_matrix, ncol)(m);
     igraph_integer_t i, j;
+    igraph_vector_int_t column_width;
+
+    /* Insert dynamic width specifier '*' in format string. */
+    char format[ sizeof(OUT_FORMAT) + 1 ] = "%*";
+    strcpy(format + 2, OUT_FORMAT + 1);
+
+    /* First we detect the width needed for each matrix column. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&column_width, nc);
+    igraph_vector_int_fill(&column_width, 2); /* minimum width */
+    for (j = 0; j < nc; j++) {
+        for (i = 0; i < nr; i++) {
+            char buf[14];
+            igraph_integer_t width;
+#ifdef SNPRINTFUNC
+            SNPRINTFUNC(buf, sizeof(buf) / sizeof(buf[0]), MATRIX(*m, i, j));
+#else
+            snprintf(buf, sizeof(buf) / sizeof(buf[0]), OUT_FORMAT, MATRIX(*m, i, j));
+#endif
+            width = strlen(buf);
+            if (width > VECTOR(column_width)[j]) {
+                VECTOR(column_width)[j] = width;
+            }
+        }
+    }
+
     for (i = 0; i < nr; i++) {
         for (j = 0; j < nc; j++) {
             if (j != 0) {
                 fputc(' ', file);
             }
-            fprintf(file, OUT_FORMAT, MATRIX(*m, i, j));
+#ifdef FPRINTFUNC_ALIGNED
+            FPRINTFUNC_ALIGNED(file, VECTOR(column_width)[j], MATRIX(*m, i, j));
+#else
+            fprintf(file, format, VECTOR(column_width)[j], MATRIX(*m, i, j));
+#endif
         }
         fprintf(file, "\n");
     }
+
+    igraph_vector_int_destroy(&column_width);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
