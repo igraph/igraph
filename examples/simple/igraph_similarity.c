@@ -24,17 +24,6 @@
 
 #include <igraph.h>
 
-void print_matrix(igraph_matrix_t *m, FILE *f) {
-    igraph_integer_t i, j;
-    for (i = 0; i < igraph_matrix_nrow(m); i++) {
-        for (j = 0; j < igraph_matrix_ncol(m); j++) {
-            fprintf(f, " %.2f", MATRIX(*m, i, j));
-        }
-        fprintf(f, "\n");
-    }
-    fprintf(f, "==========\n");
-}
-
 int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
                       igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_vector_int_t pairs;
@@ -166,52 +155,52 @@ int main() {
     igraph_matrix_init(&m, 0, 0);
 
     ret = check_jaccard_all(&g, &m, IGRAPH_ALL, 1);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
     if (ret) {
         return 1;
     }
 
     igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
 
     ret = check_jaccard_all(&g, &m, IGRAPH_OUT, 1);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
     if (ret) {
         return 3;
     }
 
     ret = check_jaccard_all(&g, &m, IGRAPH_IN, 0);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
     if (ret) {
         return 4;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_ALL, 1);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
     if (ret) {
         return 5;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_OUT, 1);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
     if (ret) {
         return 6;
     }
 
     ret = check_dice_all(&g, &m, IGRAPH_IN, 0);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
     if (ret) {
         return 7;
     }
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_ALL);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_OUT);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
 
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_IN);
-    print_matrix(&m, stdout);
+    igraph_matrix_print(&m);
 
     igraph_matrix_destroy(&m);
     igraph_destroy(&g);
