@@ -39,10 +39,9 @@ int main() {
 
     igraph_t g;
     igraph_matrix_t m;
-    int ret;
     igraph_vector_int_t pairs;
     igraph_vector_t res;
-    igraph_integer_t i, j, k, n;
+    igraph_integer_t i, j, n;
 
     igraph_small(&g, 0, IGRAPH_DIRECTED,
                  0, 1, 2, 1, 2, 0, 3, 0,
