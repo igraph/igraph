@@ -72,7 +72,7 @@ int igraph_real_fprintf(FILE *file, igraph_real_t val) {
             return fprintf(file, "Inf");
         }
     }
-    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");  /* LCOV_EXCL_LINE */
+    IGRAPH_FATAL("Value is not finite, not infinite and not NaN either!");  /* LCOV_EXCL_LINE */
 }
 
 #ifndef USING_R
@@ -93,7 +93,7 @@ int igraph_real_fprintf_aligned(FILE *file, int width, igraph_real_t val) {
             return fprintf(file, "%*s", width, "Inf");
         }
     }
-    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");  /* LCOV_EXCL_LINE */
+    IGRAPH_FATAL("Value is not finite, not infinite and not NaN either!");  /* LCOV_EXCL_LINE */
 }
 
 #ifndef USING_R
@@ -114,7 +114,7 @@ int igraph_real_snprintf(char *str, size_t size, igraph_real_t val) {
             return snprintf(str, size, "Inf");
         }
     }
-    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");  /* LCOV_EXCL_LINE */
+    IGRAPH_FATAL("Value is not finite, not infinite and not NaN either!");  /* LCOV_EXCL_LINE */
 }
 
 int igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
@@ -129,7 +129,7 @@ int igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
             return fprintf(file, "Inf");
         }
     }
-    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");  /* LCOV_EXCL_LINE */
+    IGRAPH_FATAL("Value is not finite, not infinite and not NaN either!");  /* LCOV_EXCL_LINE */
 }
 
 #ifndef USING_R
@@ -150,7 +150,7 @@ int igraph_real_snprintf_precise(char *str, size_t size, igraph_real_t val) {
             return snprintf(str, size, "Inf");
         }
     }
-    IGRAPH_FATAL("Value is neither finite, nor infinite, nor NaN!");  /* LCOV_EXCL_LINE */
+    IGRAPH_FATAL("Value is not finite, not infinite and not NaN either!");  /* LCOV_EXCL_LINE */
 }
 
 #define PROPAGATE() \
