@@ -319,7 +319,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
         already_added[i] = 1;
         /* add all edges of the first vertex */
-        igraph_incident(graph, &adj, i, mode);
+        IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
         adj_size = igraph_vector_int_size(&adj);
         for (j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
