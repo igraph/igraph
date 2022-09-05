@@ -527,7 +527,7 @@ igraph_error_t igraph_attribute_combination(
             break;
         }
 
-        type = (igraph_attribute_combination_type_t)va_arg(ap, int);
+        type = (igraph_attribute_combination_type_t) va_arg(ap, int);
         if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
             func = va_arg(ap, igraph_function_pointer_t);
         }
@@ -536,7 +536,11 @@ igraph_error_t igraph_attribute_combination(
             name = 0;
         }
 
-        IGRAPH_CHECK(igraph_attribute_combination_add(comb, name, type, func));
+        igraph_error_t ret = igraph_attribute_combination_add(comb, name, type, func);
+        if (ret != IGRAPH_SUCCESS) {
+            va_end(ap);
+            return ret;
+        }
     }
 
     va_end(ap);
