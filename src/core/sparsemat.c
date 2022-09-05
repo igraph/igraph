@@ -2418,10 +2418,9 @@ static igraph_error_t igraph_i_sparsemat_rowmins_triplet(const igraph_sparsemat_
     CS_INT i;
     CS_INT *pi = A->cs->i;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pi++, px++) {
         if (*px < VECTOR(*res)[ *pi ]) {
@@ -2437,7 +2436,6 @@ static igraph_error_t igraph_i_sparsemat_rowmins_cc(igraph_sparsemat_t *A,
     CS_INT ne;
     CS_ENTRY *px;
     CS_INT *pi;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2446,7 +2444,7 @@ static igraph_error_t igraph_i_sparsemat_rowmins_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
 
     for (; pi < A->cs->i + ne; pi++, px++) {
         if (*px < VECTOR(*res)[ *pi ]) {
@@ -2472,10 +2470,9 @@ static igraph_error_t igraph_i_sparsemat_rowmaxs_triplet(const igraph_sparsemat_
     CS_INT i;
     CS_INT *pi = A->cs->i;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pi++, px++) {
         if (*px > VECTOR(*res)[ *pi ]) {
@@ -2491,7 +2488,6 @@ static igraph_error_t igraph_i_sparsemat_rowmaxs_cc(igraph_sparsemat_t *A,
     CS_INT ne;
     CS_ENTRY *px;
     CS_INT *pi;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2500,7 +2496,7 @@ static igraph_error_t igraph_i_sparsemat_rowmaxs_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
 
     for (; pi < A->cs->i + ne; pi++, px++) {
         if (*px > VECTOR(*res)[ *pi ]) {
@@ -2525,10 +2521,9 @@ static igraph_error_t igraph_i_sparsemat_colmins_triplet(const igraph_sparsemat_
     CS_INT i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pp++, px++) {
         if (*px < VECTOR(*res)[ *pp ]) {
@@ -2546,7 +2541,6 @@ static igraph_error_t igraph_i_sparsemat_colmins_cc(igraph_sparsemat_t *A,
     CS_INT *pp;
     CS_INT *pi;
     double *pr;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2556,7 +2550,7 @@ static igraph_error_t igraph_i_sparsemat_colmins_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     pr = VECTOR(*res);
 
     for (; pp < A->cs->p + n; pp++, pr++) {
@@ -2583,10 +2577,9 @@ static igraph_error_t igraph_i_sparsemat_colmaxs_triplet(const igraph_sparsemat_
     CS_INT i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pp++, px++) {
         if (*px > VECTOR(*res)[ *pp ]) {
@@ -2604,7 +2597,6 @@ static igraph_error_t igraph_i_sparsemat_colmaxs_cc(igraph_sparsemat_t *A,
     CS_INT *pp;
     CS_INT *pi;
     double *pr;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2614,7 +2606,7 @@ static igraph_error_t igraph_i_sparsemat_colmaxs_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
     pr = VECTOR(*res);
 
     for (; pp < A->cs->p + n; pp++, pr++) {
@@ -2643,11 +2635,10 @@ static igraph_error_t igraph_i_sparsemat_which_min_rows_triplet(igraph_sparsemat
     CS_INT *pi = A->cs->i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
     IGRAPH_CHECK(igraph_vector_int_resize(pos, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     igraph_vector_int_null(pos);
 
     for (i = 0; i < A->cs->nz; i++, pi++, px++, pp++) {
@@ -2711,11 +2702,10 @@ static igraph_error_t igraph_i_sparsemat_which_min_cols_triplet(igraph_sparsemat
     CS_INT *pi = A->cs->i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->n));
     IGRAPH_CHECK(igraph_vector_int_resize(pos, A->cs->n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     igraph_vector_int_null(pos);
 
     for (i = 0; i < A->cs->nz; i++, pi++, pp++, px++) {
@@ -2735,7 +2725,6 @@ static igraph_error_t igraph_i_sparsemat_which_min_cols_cc(igraph_sparsemat_t *A
     CS_ENTRY *px;
     double *pr;
     igraph_integer_t *ppos;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2743,7 +2732,7 @@ static igraph_error_t igraph_i_sparsemat_which_min_cols_cc(igraph_sparsemat_t *A
     px = A->cs->x;
 
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     pr = VECTOR(*res);
     IGRAPH_CHECK(igraph_vector_int_resize(pos, n));
     igraph_vector_int_null(pos);
