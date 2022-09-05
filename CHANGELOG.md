@@ -5,6 +5,7 @@
 ### Fixed
 
  - Corrected a regression (compared to igraph 0.9) in weighted clique search functions.
+ - `igraph_girth()` no longer fails when the graph has no cycles and the `girth` parameter is set to `NULL`.
 
 ## [0.10.0] - 2022-09-05
 
