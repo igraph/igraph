@@ -825,7 +825,6 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
         if (multiple == IGRAPH_NO_MULTIPLE) {
             /* We need to get rid of multiple edges completely (including
              * multiple loop edges), but keep one edge from each loop edge */
-            /* TODO(ntamas): think this through! */
             for (i = 0; i < n; i++) {
                 if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
@@ -852,7 +851,6 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     } else if (loops == IGRAPH_LOOPS_TWICE && multiple == IGRAPH_NO_MULTIPLE) {
         /* We need to get rid of multiple edges completely (including
          * multiple loop edges), but keep both edge from each loop edge */
-        /* TODO(ntamas): think this through! */
         for (i = 0; i < n; i++) {
             if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                 VECTOR(*v)[p] = VECTOR(*v)[i];
