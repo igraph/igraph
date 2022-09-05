@@ -30,6 +30,7 @@
 #include "igraph_vector.h"
 
 #include "core/math.h"
+#include "math/safe_intop.h"
 #include "random/random_internal.h"
 
 #include "config.h" /* IGRAPH_THREAD_LOCAL, HAVE___UINT128_T, HAVE__UMUL128 */
@@ -880,7 +881,10 @@ static void igraph_i_random_sample_alga(igraph_vector_int_t *res,
 
 igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l, igraph_integer_t h,
                          igraph_integer_t length) {
-    igraph_integer_t N = h - l + 1;
+    igraph_integer_t N; /* := h - l + 1 */
+    IGRAPH_SAFE_ADD(h, -l, &N);
+    IGRAPH_SAFE_ADD(N, 1, &N);
+
     igraph_integer_t n = length;
 
     igraph_real_t nreal = length;
@@ -1056,10 +1060,10 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
 
 igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
                     igraph_real_t h, igraph_integer_t length) {
-/* This function is the 'real' version of igraph_random_sample, and was added
- * so erdos_renyi_game can use a random sample of doubles instead of integers
- * to prevent overflows on systems with 32-bits igraph_integer_t.
- */
+    /* This function is the 'real' version of igraph_random_sample, and was added
+     * so erdos_renyi_game can use a random sample of doubles instead of integers
+     * to prevent overflows on systems with 32-bits igraph_integer_t.
+     */
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
 
@@ -1080,6 +1084,11 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
     /* now we know that l <= h */
     if (length > N) {
         IGRAPH_ERROR("Sample size exceeds size of candidate pool.", IGRAPH_EINVAL);
+    }
+
+    /* ensure that we work in the range where igraph_real_t can represent integers exactly */
+    if (h > IGRAPH_MAX_EXACT_REAL || l < -IGRAPH_MAX_EXACT_REAL || N > IGRAPH_MAX_EXACT_REAL) {
+        IGRAPH_ERROR("Sampling interval too large.", IGRAPH_EOVERFLOW);
     }
 
     /* treat rare cases quickly */
