@@ -9,6 +9,10 @@
  - `igraph_write_graph_gml()` did not respect entity encoding options when writing the `Creator` line.
  - Fixed potential memory leak on out-of-memory condition in `igraph_asymmetric_preference_game()`.
 
+### Changes
+
+ - `igraph_write_graph_leda()` can now write boolean attributes.
+
 ## [0.10.0] - 2022-09-05
 
 ### Release notes
