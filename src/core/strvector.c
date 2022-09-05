@@ -264,15 +264,16 @@ void igraph_strvector_remove(igraph_strvector_t *sv, igraph_integer_t elem) {
  */
 
 igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
-                          const igraph_strvector_t *from) {
+                                          const igraph_strvector_t *from) {
+    igraph_integer_t from_size = igraph_strvector_size(from);
     igraph_integer_t i, j;
 
-    to->stor_begin = IGRAPH_CALLOC(igraph_strvector_size(from), char*);
+    to->stor_begin = IGRAPH_CALLOC(from_size, char*);
     if (to->stor_begin == NULL) {
         IGRAPH_ERROR("Cannot copy string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
-    for (i = 0; i < igraph_strvector_size(from); i++) {
+    for (i = 0; i < from_size; i++) {
         to->stor_begin[i] = strdup(igraph_strvector_get(from, i));
         if (to->stor_begin[i] == NULL) {
             /* LCOV_EXCL_START */
@@ -285,7 +286,7 @@ igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
         }
     }
 
-    to->stor_end = to->stor_begin + igraph_strvector_size(from);
+    to->stor_end = to->stor_begin + from_size;
     to->end = to->stor_end;
 
     return IGRAPH_SUCCESS;
