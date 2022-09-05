@@ -8,13 +8,16 @@ on:
   schedule:
     - cron: '0 3 * * *'
 
+  push:
+    branches: [ master ]
+
 jobs:
   coverity:
     runs-on: ubuntu-latest
 
     steps:
     - name: Install dependencies
-      run: sudo apt-get install bison flex libglpk-dev libarpack2-dev libxml2-dev
+      run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -25,7 +28,7 @@ jobs:
       run: cmake -E make_directory ${{github.workspace}}/build
 
     - name: Configure
-      run: cmake -G"Unix Makefiles" -B ${{github.workspace}}/build -DFLEX_KEEP_LINE_NUMBERS=ON
+      run: cmake -G"Unix Makefiles" -B ${{github.workspace}}/build -DFLEX_KEEP_LINE_NUMBERS=ON -DUSE_CCACHE=OFF
 
     - uses: vapier/coverity-scan-action@v1
       with:
