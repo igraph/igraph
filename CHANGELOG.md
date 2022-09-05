@@ -329,7 +329,7 @@ Some of the highlights are:
  - The GML parser now supports nodes with no id field.
  - The GML parser now performs more stringent checks on the input file, such as verifying that `id`, `source`, `target` and `directed` fields are not duplicated.
  - The core data structures (vector, etc.) have overflow checks now.
- - Deterministic graph generators have overflow checks now.
+ - Deterministic graph generators, as well as most random ones, have overflow checks now.
  - Graphs no longer lose all their attributes after calling `igraph_contract_vertices()`.
  - `igraph_hrg_init()` does not throw an assertion error anymore for zero vertices.
  - `igraph_matrix_complex_create()` and `igraph_matrix_complex_create_polar()` now set their sizes correctly.
