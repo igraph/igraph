@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+ - Corrected a regression (compared to igraph 0.9) in weighted clique search functions.
+
 ## [0.10.0] - 2022-09-05
 
 ### Release notes
