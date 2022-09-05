@@ -154,12 +154,12 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
         } /* while q !empty */
     } /* node */
 
+    if (mincirc == LONG_MAX) {
+        mincirc = 0;
+    }
+
     if (girth) {
-        if (mincirc == LONG_MAX) {
-            *girth = mincirc = 0;
-        } else {
-            *girth = (igraph_integer_t) mincirc;
-        }
+        *girth = (igraph_integer_t) mincirc;
     }
 
     /* Store the actual circle, if needed */
