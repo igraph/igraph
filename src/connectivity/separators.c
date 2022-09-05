@@ -287,8 +287,8 @@ static igraph_error_t igraph_i_connected_components_leaveout(const igraph_adjlis
         }
 
         VECTOR(*leaveout)[i] = *mark;
-        igraph_dqueue_int_push(Q, i);
-        igraph_vector_int_push_back(components, i);
+        IGRAPH_CHECK(igraph_dqueue_int_push(Q, i));
+        IGRAPH_CHECK(igraph_vector_int_push_back(components, i));
 
         while (!igraph_dqueue_int_empty(Q)) {
             igraph_integer_t act_node = igraph_dqueue_int_pop(Q);
@@ -301,11 +301,11 @@ static igraph_error_t igraph_i_connected_components_leaveout(const igraph_adjlis
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(Q, nei));
                 VECTOR(*leaveout)[nei] = *mark;
-                igraph_vector_int_push_back(components, nei);
+                IGRAPH_CHECK(igraph_vector_int_push_back(components, nei));
             }
         }
 
-        igraph_vector_int_push_back(components, -1);
+        IGRAPH_CHECK(igraph_vector_int_push_back(components, -1));
     }
 
     UPDATEMARK();
@@ -360,7 +360,7 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
             for (j = 0; j < nn; j++) {
                 igraph_integer_t nei = VECTOR(*neis)[j];
                 if (VECTOR(*leaveout)[nei] != *mark) {
-                    igraph_vector_int_push_back(sorter, nei);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(sorter, nei));
                     VECTOR(*leaveout)[nei] = *mark;
                 }
             }

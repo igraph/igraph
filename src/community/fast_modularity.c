@@ -780,8 +780,8 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         pairs[i + 1].dq = pairs[i].dq;
         pairs[i + 1].opposite = &pairs[i];
         /* Link the pair to the communities */
-        igraph_vector_ptr_push_back(&communities.e[from].neis, &pairs[i]);
-        igraph_vector_ptr_push_back(&communities.e[to].neis, &pairs[i + 1]);
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(&communities.e[from].neis, &pairs[i]));
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(&communities.e[to].neis, &pairs[i + 1]));
         /* Update maximums */
         if (communities.e[from].maxdq == 0 || *communities.e[from].maxdq->dq < *pairs[i].dq) {
             communities.e[from].maxdq = &pairs[i];

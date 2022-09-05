@@ -117,7 +117,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
     /* Iterate over vertices x, like in the paper */
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         /* Edges into this vertex */
-        igraph_incident(graph, &eids, i, IGRAPH_ALL);
+        IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_ALL));
         no_of_neis = igraph_vector_int_size(&eids);
 
         /* Vertex has no neighbors */
@@ -677,7 +677,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
                 /* NOTE: the efficiency of this step could be improved but it
                  * should be only used for small graphs anyway, so it's fine */
                 igraph_bool_t skip = false;
-                igraph_incident(graph, &neis, from, IGRAPH_ALL);
+                IGRAPH_CHECK(igraph_incident(graph, &neis, from, IGRAPH_ALL));
                 nneis = igraph_vector_int_size(&neis);
                 for (igraph_integer_t k = 0; k < nneis; k++) {
                     igraph_integer_t eid2 = VECTOR(neis)[k];

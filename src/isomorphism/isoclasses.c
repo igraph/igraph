@@ -2696,7 +2696,7 @@ igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vect
 
     for (i = 0; i < subgraph_size; i++) {
         igraph_integer_t from = VECTOR(*vids)[i];
-        igraph_neighbors(graph, &neis, from, IGRAPH_OUT);
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
         s = igraph_vector_int_size(&neis);
         for (j = 0; j < s; j++) {
             igraph_integer_t nei = VECTOR(neis)[j], to;

@@ -221,7 +221,7 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
         IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVAL);
     }
 
-    igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, no_of_nodes);

@@ -1266,8 +1266,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, e));
+    IGRAPH_CHECK(igraph_vector_resize(weights, e/2));
 
     return IGRAPH_SUCCESS;
 }
@@ -1376,7 +1376,7 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
-    igraph_vector_resize(weights, no_of_edges);
+    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
 
     /* Collect the edges */
     switch (mode) {

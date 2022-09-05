@@ -236,8 +236,8 @@ static igraph_error_t igraph_i_multilevel_community_links(
     for (i = 0; i < n; i++) {
         to_community = links[i].community;
         if (to_community != last) {
-            igraph_vector_push_back(links_community, to_community);
-            igraph_vector_push_back(links_weight, links[i].weight);
+            IGRAPH_CHECK(igraph_vector_push_back(links_community, to_community));
+            IGRAPH_CHECK(igraph_vector_push_back(links_weight, links[i].weight));
             last = to_community;
             c++;
         } else {

@@ -368,7 +368,7 @@ static igraph_error_t igraph_i_sparsemat_index_rows(const igraph_sparsemat_t *A,
     IGRAPH_CHECK(igraph_sparsemat_init(&II2, idx_rows, nrow, idx_rows));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &II2);
     for (k = 0; k < idx_rows; k++) {
-        igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&II2, &II));
     igraph_sparsemat_destroy(&II2);
@@ -405,7 +405,7 @@ static igraph_error_t igraph_i_sparsemat_index_cols(const igraph_sparsemat_t *A,
     IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, ncol, idx_cols, idx_cols));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &JJ2);
     for (k = 0; k < idx_cols; k++) {
-        igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&JJ2, &JJ));
     igraph_sparsemat_destroy(&JJ2);
@@ -1328,8 +1328,8 @@ static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A
         p++;
     }
 
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, w);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, w); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1455,7 +1455,7 @@ static igraph_error_t igraph_i_sparsemat_eye_triplet(
     IGRAPH_CHECK(igraph_sparsemat_init(A, n, n, nzmax));
 
     for (i = 0; i < n; i++) {
-        igraph_sparsemat_entry(A, i, i, value);
+        IGRAPH_CHECK(igraph_sparsemat_entry(A, i, i, value));
     }
 
     return IGRAPH_SUCCESS;
@@ -1533,7 +1533,7 @@ static igraph_error_t igraph_i_sparsemat_init_diag_triplet(
     IGRAPH_CHECK(igraph_sparsemat_init(A, n, n, nzmax));
 
     for (i = 0; i < n; i++) {
-        igraph_sparsemat_entry(A, i, i, VECTOR(*values)[i]);
+        IGRAPH_CHECK(igraph_sparsemat_entry(A, i, i, VECTOR(*values)[i]));
     }
 
     return IGRAPH_SUCCESS;

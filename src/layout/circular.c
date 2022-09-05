@@ -57,7 +57,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
     igraph_matrix_null(res);
 
-    igraph_vit_create(graph, order, &vit);
+    IGRAPH_CHECK(igraph_vit_create(graph, order, &vit));
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_real_t phi = 2 * M_PI / vs_size * i;
         igraph_integer_t idx = IGRAPH_VIT_GET(vit);

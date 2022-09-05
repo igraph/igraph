@@ -86,7 +86,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
 
     /* Add to the queue */
     for (i = 0; i < n; i++) {
-        igraph_dqueue_int_push(&unstable_nodes, VECTOR(node_order)[i]);
+        IGRAPH_CHECK(igraph_dqueue_int_push(&unstable_nodes, VECTOR(node_order)[i]));
     }
 
     /* Initialize cluster weights and nb nodes */
@@ -105,7 +105,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     IGRAPH_FINALLY(igraph_stack_int_destroy, &empty_clusters);
     for (c = 0; c < n; c++)
         if (VECTOR(nb_nodes_per_cluster)[c] == 0) {
-            igraph_stack_int_push(&empty_clusters, c);
+            IGRAPH_CHECK(igraph_stack_int_push(&empty_clusters, c));
         }
 
     /* Initialize vectors to be used in calculating differences */

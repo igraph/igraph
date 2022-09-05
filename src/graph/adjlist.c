@@ -423,8 +423,8 @@ igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
     igraph_integer_t i;
     igraph_integer_t n = al->length;
     igraph_vector_int_t mark;
-    igraph_vector_int_init(&mark, n);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, n);
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_integer_t j, l = igraph_vector_int_size(v);

@@ -333,7 +333,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
                 if (w_edge_lengths != 0) {
                     igraph_integer_t len, j;
-                    igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
                     len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];
@@ -349,7 +349,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
                 if (w_edge_crossings != 0) {
                     igraph_integer_t len, j, no = 0;
-                    igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
                     len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];
