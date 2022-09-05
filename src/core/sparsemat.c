@@ -494,7 +494,7 @@ igraph_error_t igraph_sparsemat_index(const igraph_sparsemat_t *A,
     IGRAPH_CHECK(igraph_sparsemat_init(&II2, idx_rows, nrow, idx_rows));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &II2);
     for (k = 0; k < idx_rows; k++) {
-        igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&II2, &II));
     igraph_sparsemat_destroy(&II2);
@@ -505,7 +505,7 @@ igraph_error_t igraph_sparsemat_index(const igraph_sparsemat_t *A,
     IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, ncol, idx_cols, idx_cols));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &JJ2);
     for (k = 0; k < idx_cols; k++) {
-        igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&JJ2, &JJ));
     igraph_sparsemat_destroy(&JJ2);
