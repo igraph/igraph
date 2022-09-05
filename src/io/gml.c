@@ -1000,7 +1000,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     } else {
         if (needs_coding(creator)) {
             char *d;
-            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW | options));
+            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
             IGRAPH_FINALLY(igraph_free, d);
             CHECK(fprintf(outstream,
                           "Creator \"%s\"\n",
