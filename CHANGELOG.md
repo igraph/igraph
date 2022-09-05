@@ -7,6 +7,7 @@
  - Corrected a regression (compared to igraph 0.9) in weighted clique search functions.
  - `igraph_girth()` no longer fails when the graph has no cycles and the `girth` parameter is set to `NULL`.
  - `igraph_write_graph_gml()` did not respect entity encoding options when writing the `Creator` line.
+ - Fixed potential memory leak on out-of-memory condition in `igraph_asymmetric_preference_game()`.
 
 ## [0.10.0] - 2022-09-05
 
