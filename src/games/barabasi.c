@@ -243,7 +243,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
         }
     } else {
         /* Any weight may be used for the first node. In the first step, it will be connected to
-         * with certaintly, after which its weight will be set appropriately. */
+         * with certainty, after which its weight will be set appropriately. */
         IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, 1.0));
     }
 
@@ -366,7 +366,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
         }
     } else {
         /* Any weight may be used for the first node. In the first step, it will be connected to
-         * with certaintly, after which its weight will be set appropriately. */
+         * with certainty, after which its weight will be set appropriately. */
         IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, 1.0));
     }
 
@@ -752,7 +752,7 @@ igraph_error_t igraph_barabasi_aging_game(igraph_t *graph,
 
     /* First node: */
     /* Any weight may be used for the first node. In the first step, it will be connected to
-     * with certaintly, after which its weight will be set appropriately. */
+     * with certainty, after which its weight will be set appropriately. */
     IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, 1.0));
 
     /* And the rest: */
