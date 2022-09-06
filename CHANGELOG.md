@@ -7,7 +7,9 @@
  - Corrected a regression (compared to igraph 0.9) in weighted clique search functions.
  - `igraph_girth()` no longer fails when the graph has no cycles and the `girth` parameter is set to `NULL`.
  - `igraph_write_graph_gml()` did not respect entity encoding options when writing the `Creator` line.
- - Fixed potential memory leak on out-of-memory condition in `igraph_asymmetric_preference_game()`.
+ - Fixed potential memory leak on out-of-memory condition in `igraph_asymmetric_preference_game()`, `igraph_vs_copy()` and `igraph_es_copy()`.
+ - Fixed an assertion failure in `igraph_barabasi_game()` and `igraph_barabasi_aging_game()` when passing in negative degree exponents.
+ - Fixed a compilation failure with some old Clang versions.
 
 ### Changes
 
