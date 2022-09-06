@@ -204,6 +204,7 @@ int main() {
     /****************************************************/
 
     igraph_psumtree_init(&tree, 9);
+    igraph_error_handler_t *handler = igraph_set_error_handler(&igraph_error_handler_ignore);
     if (igraph_psumtree_update(&tree, 2, -2) == IGRAPH_SUCCESS) {
         return 12;
     }
@@ -213,6 +214,7 @@ int main() {
     if (igraph_psumtree_update(&tree, 2, IGRAPH_NAN) == IGRAPH_SUCCESS) {
         return 14;
     }
+    igraph_set_error_handler(handler);
     igraph_psumtree_destroy(&tree);
 
     RNG_END();
