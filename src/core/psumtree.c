@@ -213,7 +213,7 @@ int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
     const igraph_vector_t *tree = &t->v;
     igraph_real_t difference;
 
-    if (new_value >= 0) {
+    if (new_value >= 0 && igraph_finite(new_value)) {
         idx = idx + t->offset + 1;
         difference = new_value - VECTOR(*tree)[idx - 1];
 
@@ -224,8 +224,10 @@ int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
 
         return IGRAPH_SUCCESS;
     } else {
-        /* caters for negative values and NaN */
-        return IGRAPH_EINVAL;
+        /* Caters for negative values, infinity and NaN. */
+        IGRAPH_ERRORF("Trying to use negative or non-finite weight (%g) when "
+                      "sampling from discrete distribution using prefix sum trees.",
+                      IGRAPH_EINVAL, new_value);
     }
 }
 
