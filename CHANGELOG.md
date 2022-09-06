@@ -15,6 +15,10 @@
 
  - `igraph_write_graph_leda()` can now write boolean attributes.
 
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.0] - 2022-09-05
 
 ### Release notes
