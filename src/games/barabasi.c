@@ -443,32 +443,61 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * \function igraph_barabasi_game
  * \brief Generates a graph based on the Barab&aacute;si-Albert model.
  *
+ * This function implements several variants of the preferential attachment
+ * process, including linear and non-linear varieties of the Barabási-Albert
+ * and Price models. The graph construction starts with a single vertex,
+ * or an existing graph given by the \p start_from parameter. Then new vertices
+ * are added one at a time. Each new vertex connects to \p m existing vertices,
+ * choosing them with probabilities proportional to
+ *
+ * </para><para>
+ * <code>d^power + A</code>,
+ *
+ * </para><para>
+ * where \c d is the in- or total degree of the existing vertex (controlled
+ * by the \p outpref argument), while \p power and \p A are given by
+ * parameters. The <emphasis>constant attractiveness</emphasis> \p A
+ * is used to ensure that vertices with zero in-degree can also be
+ * connected to with non-zero probability.
+ *
+ * </para><para>
+ * Barabási, A.-L. and Albert R. 1999. Emergence of scaling in
+ * random networks, Science, 286 509--512.
+ * https://doi.org/10.1126/science.286.5439.509
+ *
+ * </para><para>
+ * de Solla Price, D. J. 1965. Networks of Scientific Papers, Science,
+ * 149 510--515.
+ * https://doi.org/10.1126/science.149.3683.510
+ *
  * \param graph An uninitialized graph object.
  * \param n The number of vertices in the graph.
- * \param power Power of the preferential attachment. The probability
- *        that a vertex is cited is proportional to d^power+A, where
- *        d is its degree (see also the \p outpref argument), power
- *        and A are given by arguments. In the classic preferential
- *        attachment model power=1.
+ * \param power Power of the preferential attachment. In the classic preferential
+ *        attachment model <code>power=1</code>. Other values allow for
+ *        sampling from a non-linear preferential attachment model.
+ *        Negative values are only allowed when no zero-degree vertices
+ *        are present during the construction process, i.e. when
+ *        the starting graph has no isolated vertices and \p outpref
+ *        is set to \c true.
  * \param m The number of outgoing edges generated for each
- *        vertex. (Only if \p outseq is \c NULL.)
+ *        vertex. Only used when \p outseq is \c NULL.
  * \param outseq Gives the (out-)degrees of the vertices. If this is
- *        constant, this can be a NULL pointer or an empty (but
- *        initialized!) vector, in this case \p m contains
- *        the constant out-degree. The very first vertex has by definition
- *        no outgoing edges, so the first number in this vector is
- *        ignored.
+ *        constant, this can be a \c NULL pointer or an empty vector.
+ *        In this case \p m contains the constant out-degree.
+ *        The very first vertex has by definition no outgoing edges,
+ *        so the first number in this vector is ignored.
  * \param outpref Boolean, if true not only the in- but also the out-degree
  *        of a vertex increases its citation probability. I.e., the
  *        citation probability is determined by the total degree of
  *        the vertices. Ignored and assumed to be true if the graph
  *        being generated is undirected.
- * \param A The probability that a vertex is cited is proportional to
- *        d^power+A, where d is its degree (see also the \p outpref
- *        argument), power and A are given by arguments. In the
- *        previous versions of the function this parameter was
- *        implicitly set to one.
+ * \param A The constant attractiveness of vertices. When \p outpref
+ *        is set to \c false, it should be positive to ensure that
+ *        zero in-degree vertices can be connected to as well.
  * \param directed Boolean, whether to generate a directed graph.
+ *        Edge directions are kept track of during the construction
+ *        process, but are discarded from the graph when this parameter
+ *        is set to \c false.
  * \param algo The algorithm to use to generate the network. Possible
  *        values:
  *        \clist
@@ -490,7 +519,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *          edges are allowed. This method was implemented under the
  *          name \c igraph_nonlinear_barabasi_game before version 0.6.
  *        \endclist
- * \param start_from Either a null pointer, or a graph. In the former
+ * \param start_from Either a \c NULL pointer, or a graph. In the former
  *        case, the starting configuration is a clique of size \p m.
  *        In the latter case, the graph is a starting configuration.
  *        The graph must be non-empty, i.e. it must have at least one
@@ -499,8 +528,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *        information on the vertices that are not in the \p
  *        start_from graph.
  * \return Error code:
- *         \c IGRAPH_EINVAL: invalid \p n,
- *         \p m or \p outseq parameter.
+ *         \c IGRAPH_EINVAL: invalid \p n, \p m, \p A or \p outseq parameter.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
@@ -544,11 +572,10 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     if (start_from && start_nodes == 0) {
         IGRAPH_ERROR("Cannot start from an empty graph.", IGRAPH_EINVAL);
     }
-    if (outseq != 0 && igraph_vector_int_size(outseq) != 0 &&
-        igraph_vector_int_size(outseq) != newn) {
+    if (outseq && ! igraph_vector_int_empty(outseq) && igraph_vector_int_size(outseq) != newn) {
         IGRAPH_ERROR("Invalid out-degree sequence length.", IGRAPH_EINVAL);
     }
-    if ( (outseq == 0 || igraph_vector_int_size(outseq) == 0) && m < 0) {
+    if ( (outseq == NULL || igraph_vector_int_empty(outseq)) && m < 0) {
         IGRAPH_ERROR("Number of edges added per step must not be negative.", IGRAPH_EINVAL);
     }
     if (outseq && igraph_vector_int_min(outseq) < 0) {
