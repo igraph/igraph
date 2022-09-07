@@ -550,6 +550,12 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
                      IGRAPH_EINVAL);
     }
 
+    if (power <= 0) {
+        IGRAPH_ERRORF("Preferential attachment exponent must be positive, got %g.",
+                      IGRAPH_EINVAL,
+                      power);
+    }
+
     if (n == 0) {
         return igraph_empty(graph, 0, directed);
     }
@@ -681,6 +687,12 @@ int igraph_barabasi_aging_game(igraph_t *graph,
         IGRAPH_ERRORF("Zero age appeal must be non-negative, got %g.",
                       IGRAPH_EINVAL,
                       zero_age_appeal);
+    }
+
+    if (pa_exp <= 0) {
+        IGRAPH_ERRORF("Preferential attachment exponent must be positive, got %g.",
+                      IGRAPH_EINVAL,
+                      pa_exp);
     }
 
     if (no_of_nodes == 0) {

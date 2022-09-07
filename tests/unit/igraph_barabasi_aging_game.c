@@ -64,26 +64,6 @@ int main() {
     IGRAPH_ASSERT(tree);
     igraph_destroy(&g);
 
-    printf("Prefer old vertices to make a star of triple edges:\n");
-    IGRAPH_ASSERT(igraph_barabasi_aging_game(
-        &g, /*nodes*/ 5, /*m: edges_per_step*/ 3,
-        /*outseq: edges per step as vector*/ NULL, /*outpref*/ 1,
-        /*pa_exp*/ 0.0, /*aging_exp*/ 10, /*aging_bin*/ 6,
-        /*zero_deg_appeal*/ 1.0, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.0,
-        /*age_coef */ 1, /*directed*/ 1) == IGRAPH_SUCCESS);
-    print_graph_canon(&g);
-    igraph_destroy(&g);
-
-    printf("Prefer new vertices to make a line of double edges:\n");
-    IGRAPH_ASSERT(igraph_barabasi_aging_game(
-        &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
-        /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
-        /*pa_exp*/ 0.0, /*aging_exp*/ -10, /*aging_bin*/ 6,
-        /*zero_deg_appeal*/ 0.1, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.1,
-        /*age_coef */ 1, /*directed*/ 1) == IGRAPH_SUCCESS);
-    print_graph_canon(&g);
-    igraph_destroy(&g);
-
     printf("Increasing thickness of the line using outseq:\n");
     igraph_vector_init_int(&outseq, 5, 1, 2, 3, 4, 5);
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
