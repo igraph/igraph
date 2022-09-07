@@ -17,6 +17,7 @@
 
 ### Other
 
+ - Support for ARM64 on Windows.
  - Documentation improvements.
 
 ## [0.10.0] - 2022-09-05
