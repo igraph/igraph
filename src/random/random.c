@@ -451,6 +451,35 @@ static uint64_t igraph_i_rng_get_uint64(igraph_rng_t *rng) {
     return igraph_i_rng_get_random_bits(rng, 64);
 }
 
+#if ! defined(HAVE__UMUL128) && ! defined(HAVE___UINT128_T)
+/* Portable but slow fallback implementation of unsigned
+ * 64-bit multiplication obtaining a 128-bit result.
+ * The signature is analogous to MSVC's _umul128().
+ * Based on https://stackoverflow.com/a/28904636/695132
+ */
+static uint64_t igraph_i_umul128(uint64_t a, uint64_t b, uint64_t *hi) {
+    uint64_t a_lo = (uint32_t) a;
+    uint64_t a_hi = a >> 32;
+    uint64_t b_lo = (uint32_t) b;
+    uint64_t b_hi = b >> 32;
+
+    uint64_t a_x_b_hi  = a_hi * b_hi;
+    uint64_t a_x_b_mid = a_hi * b_lo;
+    uint64_t b_x_a_mid = b_hi * a_lo;
+    uint64_t a_x_b_lo  = a_lo * b_lo;
+
+    uint64_t carry_bit = ((uint64_t) (uint32_t) a_x_b_mid +
+                          (uint64_t) (uint32_t) b_x_a_mid +
+                          (a_x_b_lo >> 32) ) >> 32;
+
+    *hi = a_x_b_hi +
+          (a_x_b_mid >> 32) + (b_x_a_mid >> 32) +
+          carry_bit;
+
+    return a*b;
+}
+#endif
+
 /**
  * Generates a random integer in the range [0; range) (upper bound exclusive),
  * restricted to at most 64 bits.
@@ -463,7 +492,7 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
     /* Debiased integer multiplication -- Lemire's method
      * from https://www.pcg-random.org/posts/bounded-rands.html */
     uint64_t x, l, t = (-range) % range;
-#ifdef HAVE__UMUL128
+#if defined(HAVE__UMUL128)
     /* MSVC has _umul128() so we use that */
     uint64_t hi;
     do {
@@ -481,7 +510,13 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
     } while (l < t);
     return m >> 64;
 #else
-#  error "igraph requires __uint128_t or _umul128() in 64-bit mode"
+    /* slow fallback implementation */
+    uint64_t hi;
+    do {
+        x = igraph_i_rng_get_uint64(rng);
+        l = igraph_i_umul128(x, range, &hi);
+    } while (l < t);
+    return hi;
 #endif
 }
 
