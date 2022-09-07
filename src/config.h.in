@@ -15,7 +15,7 @@
 
 #cmakedefine HAVE_BUILTIN_OVERFLOW 1
 
-#cmakedefine HAVE__UMUL128 1
+#cmakedefine HAVE___UMULH 1
 #cmakedefine HAVE___UINT128_T 1
 
 #cmakedefine HAVE_GLPK 1
