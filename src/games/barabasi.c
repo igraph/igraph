@@ -495,9 +495,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *        is set to \c false, it should be positive to ensure that
  *        zero in-degree vertices can be connected to as well.
  * \param directed Boolean, whether to generate a directed graph.
- *        Edge directions are kept track of during the construction
- *        process, but are discarded from the graph when this parameter
- *        is set to \c false.
+ *        When set to \c false, outpref is assumed to be \c true.
  * \param algo The algorithm to use to generate the network. Possible
  *        values:
  *        \clist
@@ -550,20 +548,14 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     igraph_integer_t newn = start_from ? n - start_nodes : n;
 
     /* Fix obscure parameterizations */
-    if (outseq && igraph_vector_int_size(outseq) == 0) {
-        outseq = 0;
+    if (outseq && igraph_vector_int_empty(outseq)) {
+        outseq = NULL;
     }
     if (!directed) {
-        outpref = 1;
+        outpref = true;
     }
 
     /* Check arguments */
-
-    if (algo != IGRAPH_BARABASI_BAG &&
-        algo != IGRAPH_BARABASI_PSUMTREE &&
-        algo != IGRAPH_BARABASI_PSUMTREE_MULTIPLE) {
-        IGRAPH_ERROR("Invalid algorithm.", IGRAPH_EINVAL);
-    }
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     } else if (newn < 0) {
@@ -572,10 +564,10 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     if (start_from && start_nodes == 0) {
         IGRAPH_ERROR("Cannot start from an empty graph.", IGRAPH_EINVAL);
     }
-    if (outseq && ! igraph_vector_int_empty(outseq) && igraph_vector_int_size(outseq) != newn) {
+    if (outseq && igraph_vector_int_size(outseq) != newn) {
         IGRAPH_ERROR("Invalid out-degree sequence length.", IGRAPH_EINVAL);
     }
-    if ( (outseq == NULL || igraph_vector_int_empty(outseq)) && m < 0) {
+    if (!outseq && m < 0) {
         IGRAPH_ERROR("Number of edges added per step must not be negative.", IGRAPH_EINVAL);
     }
     if (outseq && igraph_vector_int_min(outseq) < 0) {
@@ -591,7 +583,7 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     }
     if (algo == IGRAPH_BARABASI_BAG) {
         if (power != 1) {
-            IGRAPH_ERROR("Power must be one for 'bag' algorithm.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Power must be one for bag algorithm.", IGRAPH_EINVAL);
         }
         if (A != 1) {
             IGRAPH_ERROR("Constant attractiveness (A) must be one for bag algorithm.",
@@ -610,19 +602,20 @@ igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
         return igraph_empty(graph, 0, directed);
     }
 
-    if (algo == IGRAPH_BARABASI_BAG) {
-        return igraph_i_barabasi_game_bag(graph, n, m, outseq, outpref, directed,
-                                          start_from);
-    } else if (algo == IGRAPH_BARABASI_PSUMTREE) {
+    switch (algo) {
+    case IGRAPH_BARABASI_BAG:
+        return igraph_i_barabasi_game_bag(graph, n, m, outseq, outpref, directed, start_from);
+
+    case IGRAPH_BARABASI_PSUMTREE:
         return igraph_i_barabasi_game_psumtree(graph, n, power, m, outseq,
                                                outpref, A, directed, start_from);
-    } else if (algo == IGRAPH_BARABASI_PSUMTREE_MULTIPLE) {
+    case IGRAPH_BARABASI_PSUMTREE_MULTIPLE:
         return igraph_i_barabasi_game_psumtree_multiple(graph, n, power, m,
-                outseq, outpref, A,
-                directed, start_from);
+                                                        outseq, outpref, A,
+                                                        directed, start_from);
+    default:
+        IGRAPH_ERROR("Invalid algorithm for Barabasi game.", IGRAPH_EINVAL);
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 /* Attraction function for barabasi_aging_game.
