@@ -265,7 +265,7 @@ igraph_error_t igraph_power_law_fit(
  * generators are used differently between runs. If you want to obtain
  * reproducible results, seed igraph's master RNG appropriately, and force the
  * number of OpenMP threads to 1 early in your program, either by calling
- * \c omp_set_num_threads(1) or by setting the value of the \c OMP_NUM_THREADS
+ * <code>omp_set_num_threads(1)</code> or by setting the value of the \c OMP_NUM_THREADS
  * environment variable to 1.
  *
  * \param model The fitted power-law model from the \ref igraph_power_law_fit()
