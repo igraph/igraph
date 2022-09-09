@@ -256,6 +256,18 @@ igraph_error_t igraph_power_law_fit(
  * 0.25 divided by the square of the required precision. For instance, a required
  * precision of 0.01 means that 2500 samples will be drawn.
  *
+ * </para><para>
+ * If igraph is compiled with OpenMP support, this function will use parallel
+ * OpenMP threads for the resampling. Each OpenMP thread gets its own instance
+ * of a random number generator. However, since the scheduling of OpenMP threads
+ * is outside our control, we cannot guarantee how many resampling instances the
+ * threads are asked to execute, thus it may happen that the random number
+ * generators are used differently between runs. If you want to obtain
+ * reproducible results, seed igraph's master RNG appropriately, and force the
+ * number of OpenMP threads to 1 early in your program, either by calling
+ * \c omp_set_num_threads(1) or by setting the value of the \c OMP_NUM_THREADS
+ * environment variable to 1.
+ *
  * \param model The fitted power-law model from the \ref igraph_power_law_fit()
  *        function
  * \param result The calculated p-value is returned here
