@@ -116,7 +116,7 @@ static double* extract_smaller(double* begin, double* end, double xmin,
     size_t counter = count_smaller(begin, end, xmin);
     double *p, *result;
 
-    result = calloc(counter, sizeof(double));
+    result = calloc(counter > 0 ? counter : 1, sizeof(double));
     if (result == 0)
         return 0;
 
@@ -350,7 +350,7 @@ static int plfit_i_calculate_p_value_continuous(double* xs, size_t n,
 #endif
 
         /* Allocate memory to sample into */
-        ys = calloc(n, sizeof(double));
+        ys = calloc(n > 0 ? n : 1, sizeof(double));
         if (ys == 0) {
             retval = PLFIT_ENOMEM;
         } else {
@@ -1071,7 +1071,7 @@ static int plfit_i_calculate_p_value_discrete(double* xs, size_t n,
 #endif
 
         /* Allocate memory to sample into */
-        ys = calloc(n, sizeof(double));
+        ys = calloc(n > 0 ? n : 1, sizeof(double));
         if (ys == 0) {
             retval = PLFIT_ENOMEM;
         } else {
