@@ -128,8 +128,9 @@ static igraph_error_t igraph_i_handle_plfit_error(int code) {
  * details:
  *
  * </para><para>
- * Aaron Clauset, Cosma R .Shalizi and Mark E.J. Newman: Power-law
+ * Aaron Clauset, Cosma R. Shalizi and Mark E.J. Newman: Power-law
  * distributions in empirical data. SIAM Review 51(4):661-703, 2009.
+ * https://doi.org/10.1137/070710111
  *
  * \param data vector containing the samples for which a power-law distribution
  *             is to be fitted. Note that you have to provide the \em samples,
