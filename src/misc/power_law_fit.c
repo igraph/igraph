@@ -178,7 +178,7 @@ igraph_error_t igraph_power_law_fit(
     plfit_result_t plfit_result;
     plfit_continuous_options_t cont_options;
     plfit_discrete_options_t disc_options;
-    igraph_bool_t discrete = force_continuous ? 0 : 1;
+    igraph_bool_t discrete = force_continuous ? false : true;
     igraph_bool_t finite_size_correction;
 
     int retval;
@@ -190,8 +190,8 @@ igraph_error_t igraph_power_law_fit(
     if (discrete) {
         /* Does the vector contain discrete values only? */
         for (i = 0; i < n; i++) {
-            if ((igraph_integer_t)(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
-                discrete = 0;
+            if (trunc(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
+                discrete = false;
                 break;
             }
         }
