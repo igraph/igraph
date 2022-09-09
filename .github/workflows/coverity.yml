@@ -25,8 +25,9 @@ jobs:
     - name: Create build environment
       run: cmake -E make_directory ${{github.workspace}}/build
 
+    # Compile in Debug configuration to preserve assertions.
     - name: Configure
-      run: cmake -G"Unix Makefiles" -B ${{github.workspace}}/build -DFLEX_KEEP_LINE_NUMBERS=ON -DUSE_CCACHE=OFF
+      run: cmake -G"Unix Makefiles" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug -DFLEX_KEEP_LINE_NUMBERS=ON -DUSE_CCACHE=OFF
 
     - uses: vapier/coverity-scan-action@v1
       with:
