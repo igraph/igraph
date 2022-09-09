@@ -502,7 +502,7 @@ add_examples(
   igraph_power_law_fit
 )
 # igraph_power_law_fit() output is only deterministic when running with 1 thread
-set_property(TEST example::igraph_power_law_fit PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
+set_property(TEST example::igraph_power_law_fit APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -515,7 +515,7 @@ add_legacy_tests(
   zapsmall
 )
 # igraph_power_law_fit() output is only deterministic when running with 1 thread
-set_property(TEST test::igraph_power_law_fit PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
+set_property(TEST test::igraph_power_law_fit APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
 
 # operators.at
 add_examples(
