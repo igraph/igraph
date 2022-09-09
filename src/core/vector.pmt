@@ -770,10 +770,9 @@ void FUNCTION(igraph_vector, fill)      (TYPE(igraph_vector)* v, BASE e) {
  * \function igraph_vector_range
  * \brief Updates a vector to store a range.
  *
- * </para><para>
  * Sets the elements of the vector to contain the numbers \p start, \p start+1,
  * ..., \p end-1. Note that the range is closed from the left and open from the
- * right, according to C conventions.
+ * right, according to C conventions. The vector will be resized to fit the range.
  *
  * \param v The vector to update.
  * \param start The lower limit in the range (inclusive).
