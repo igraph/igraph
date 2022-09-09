@@ -1168,8 +1168,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1202,8 +1202,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_min (
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1236,8 +1236,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_plus (
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1266,8 +1266,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
             VECTOR(*edges)[e++] = to;
         }
     }
-    IGRAPH_CHECK(igraph_vector_int_resize(edges, e));
-    IGRAPH_CHECK(igraph_vector_resize(weights, e/2));
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1296,8 +1296,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1340,8 +1340,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1368,8 +1368,7 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
-        IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
-               "form.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed form.", IGRAPH_EINVAL);
     }
     if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
         IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
