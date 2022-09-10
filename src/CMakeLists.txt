@@ -1,5 +1,4 @@
 
-
 # Traverse subdirectories
 add_subdirectory(centrality/prpack)
 add_subdirectory(cliques/cliquer)
