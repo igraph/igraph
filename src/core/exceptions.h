@@ -1,6 +1,8 @@
 #ifndef IGRAPH_HANDLE_EXCEPTIONS_H
 #define IGRAPH_HANDLE_EXCEPTIONS_H
 
+#include "igraph_error.h"
+
 #include <exception>
 #include <new>
 #include <stdexcept>
