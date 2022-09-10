@@ -232,6 +232,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_square_lattice
   igraph_static_power_law_game
+  igraph_trussness
   igraph_turan
   igraph_wheel
   igraph_weighted_adjacency
@@ -240,7 +241,6 @@ add_legacy_tests(
   tree_game
   ring
   watts_strogatz_game
-  truss
 )
 
 # structural_properties.at
