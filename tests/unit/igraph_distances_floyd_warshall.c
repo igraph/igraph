@@ -1,0 +1,107 @@
+/*
+   IGraph library.
+   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#include <igraph.h>
+#include "test_utilities.h"
+
+int main() {
+    igraph_t g;
+    igraph_matrix_t d, d2;
+    igraph_vector_t weights;
+
+    igraph_matrix_init(&d, 0, 0);
+    igraph_matrix_init(&d2, 0, 0);
+
+    igraph_small(&g, 9, IGRAPH_DIRECTED,
+                 0,1, 1,2, 2,2, 2,3, 3,0, 0,4, 4,5, 3,0, 6,7, 5,4, 9,9,
+                 -1);
+
+    printf("Unweighted directed\n");
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, NULL);
+    print_matrix(&d);
+
+    igraph_distances(&g, &d2, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
+
+    printf("Unweighted directed, 'in' mode\n");
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_IN, NULL);
+    print_matrix(&d);
+
+    igraph_distances(&g, &d2, igraph_vss_all(), igraph_vss_all(), IGRAPH_IN);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
+
+    printf("\nUnweighted undirected\n");
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_ALL, NULL);
+    print_matrix(&d);
+
+    igraph_distances(&g, &d2, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
+
+    igraph_vector_init_int(&weights, igraph_ecount(&g),
+                           2, 1, 5, 1, 2, 6, 8, 3, 3, 2, 3);
+
+    printf("\nWeighted directed\n");
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights);
+    print_matrix(&d);
+
+    igraph_distances_bellman_ford(&g, &d2, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
+
+    printf("\nWeighted undirected\n");
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_ALL, &weights);
+    print_matrix(&d);
+
+    igraph_distances_bellman_ford(&g, &d2, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_ALL);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
+
+    VECTOR(weights)[1] = -2;
+    printf("\nNegative weight, directed\n");
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights);
+    print_matrix(&d);
+
+    igraph_distances_bellman_ford(&g, &d2, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
+
+    /* Check bad inputs */
+
+    /* Negative weight edge in undirected graph */
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_ALL, &weights), IGRAPH_ENEGLOOP);
+
+    /* Negative cycle in directed graph */
+    VECTOR(weights)[1] = -10;
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights), IGRAPH_ENEGLOOP);
+
+    /* Negative self-loop in directed graph */
+    VECTOR(weights)[1] = 1;
+    VECTOR(weights)[10] = -1;
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights), IGRAPH_ENEGLOOP);
+
+    /* NaN weight */
+    VECTOR(weights)[1] = IGRAPH_NAN;
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights), IGRAPH_EINVAL);
+
+    igraph_vector_destroy(&weights);
+
+    igraph_destroy(&g);
+
+    igraph_matrix_destroy(&d2);
+    igraph_matrix_destroy(&d);
+
+    VERIFY_FINALLY_STACK();
+    return 0;
+}
