@@ -171,7 +171,8 @@ igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD
     return min_col_num;
 }
 
-/* \function generate_steiner_tree_exact()
+/**
+ *  \function generate_steiner_tree_exact()
  *
  *   Generation of the Steiner Tree based on calculation of minimum distances in DP table.
  *
@@ -347,18 +348,17 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
     return IGRAPH_SUCCESS;
 }
 
-/* \function  igraph_steiner_dreyfus_wagner
- *  \brief This function calculates Steiner Tree on undirected graph using Dreyfus-Wagner algorithm
+/**
+ * \function  igraph_steiner_dreyfus_wagner
+ * \brief This function calculates Steiner Tree on undirected graph using Dreyfus-Wagner algorithm
  *
+ * Steiner Tree is a tree with minimum length connecting steiner terminals which are subset of vertices
+ * in a graph. If Steiner terminals equal to number of vertices in the graph then problem is reduced
+ * to minimum spanning tree.
+ * The Steiner Tree problem is NP-Hard but since it's FPT, Dreyfus-Wagner algorithm is able to calculate
+ * Exact value of Steiner Tree on smaller graphs.
  *
- *  </para><para>
- *   Steiner Tree is a tree with minimum length connecting steiner terminals which are subset of vertices
- *   in a graph. If Steiner terminals equal to number of vertices in the graph then problem is reduced
- *   to minimum spanning tree.
- *  The Steiner Tree problem is NP-Hard but since it's FPT, Dreyfus-Wagner algorithm is able to calculate
- *  Exact value of Steiner Tree on smaller graphs.
- *
- *  The algorithm uses Dynamic Programming approach and it assumes the graph is undirected.
+ * The algorithm uses Dynamic Programming approach and it assumes the graph is undirected.
  *
  * </para><para>
  * Reference:
@@ -370,23 +370,18 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
  * https://doi.org/10.1002/net.3230010302
  *
  * \param graph The graph object.
- *
  * \param res Pointer to a real number, this will contain the result which is distance of Steiner Tree.
- *
  * \param res_tree Pointer to a vector, this will contain the Edges that are part of Steiner Tree
- *
  * \param steiner_terminals Pointer to a vector, this will contain vertices
- *
  * \param weights The edge weights. All edge weights must be
- *       non-negative. Additionally, no edge weight may be NaN.
- *
- * \return Error code:IGRAPH_ERROR
+ *        non-negative. Additionally, no edge weight may be NaN.
+ * \return Error code.
  *
  * Time complexity: O( 3^k ∗ V + 2^k ∗V^2 + V∗(V+E) ∗ log(V) )
  * where V is vertices and E is edges in the graph and k is set of steiner terminals.
  * It's recommended that V <= 50 and k < 11
  *
- * \sa \ref igraph_distances_johnson(), generateSubsets(), fetchIndexofMapofSets(), generate_steiner_tree_appx()
+ * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_spanner()
  */
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph_vector_int_t *steiner_terminals,
@@ -596,11 +591,10 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
     igraph_matrix_destroy(&distance);
     igraph_vector_int_destroy(&steiner_terminals_copy);
-
     igraph_matrix_destroy(&dp_cache);
     igraph_vector_int_destroy(&vectorlist_all);
-
     IGRAPH_FINALLY_CLEAN(4);
+
     IGRAPH_HANDLE_EXCEPTIONS_END
     return IGRAPH_SUCCESS;
 }

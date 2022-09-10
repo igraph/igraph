@@ -158,6 +158,7 @@
 <!-- doxrox-include igraph_minimum_spanning_tree -->
 <!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
+<!-- doxrox-include igraph_steiner_dreyfus_wagner -->
 <!-- doxrox-include igraph_random_spanning_tree -->
 <!-- doxrox-include igraph_is_tree -->
 <!-- doxrox-include igraph_is_forest -->
