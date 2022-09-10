@@ -380,7 +380,7 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
  * Time complexity: O( 3^k ∗ V + 2^k ∗ V^2 + V∗(V+E) ∗ log(V) )
  * where V and E are the number of vertices and edges
  * and k is the number of Steiner terminals.
- * It's recommended that V &le;= 50 and k &le; 11
+ * It's recommended that V &lt;= 50 and k &lt; 11
  *
  * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_spanner()
  */
