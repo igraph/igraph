@@ -53,11 +53,6 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t
         } \
     } while (0)
 
-#define IGRAPH_ALLOW_INTERRUPTION_NORETURN() \
-    do { \
-        if (igraph_i_interruption_handler) { igraph_allow_interruption(NULL); } \
-    } while (0)
-
 __END_DECLS
 
 #endif
