@@ -377,9 +377,10 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
  *        non-negative. Additionally, no edge weight may be NaN.
  * \return Error code.
  *
- * Time complexity: O( 3^k ∗ V + 2^k ∗V^2 + V∗(V+E) ∗ log(V) )
- * where V is vertices and E is edges in the graph and k is set of steiner terminals.
- * It's recommended that V <= 50 and k < 11
+ * Time complexity: O( 3^k ∗ V + 2^k ∗ V^2 + V∗(V+E) ∗ log(V) )
+ * where V and E are the number of vertices and edges
+ * and k is the number of Steiner terminals.
+ * It's recommended that V &le;= 50 and k &le; 11
  *
  * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_spanner()
  */
@@ -407,7 +408,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
 
     /*
-     *  If the steiner terminals is number of vertices in graph then problem
+     *  If the Steiner terminals is number of vertices in graph then problem
      *  is reduced to minimum spanning tree which is tractable.
      */
     igraph_real_t min = igraph_vector_min(weights);
