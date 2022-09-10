@@ -64,7 +64,7 @@ prpack_base_graph::prpack_base_graph(const prpack_csc* g) {
 prpack_base_graph::prpack_base_graph(const prpack_int64_csc* g) {
     initialize();
     // TODO remove the assert and add better behavior
-    assert(num_vs <= std::numeric_limits<int>::max());
+    assert(g->num_vs <= std::numeric_limits<int>::max());
     num_vs = (int)g->num_vs;
     num_es = (int)g->num_es;
     // fill in heads and tails
