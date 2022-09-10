@@ -900,7 +900,7 @@ void FUNCTION(sort)(TYPE *v, int (*cmp)(const ITEM_TYPE*, const ITEM_TYPE*)) {
 /**
  * \ingroup vector_list
  * \function igraph_vector_list_sort_ind
- * \brief Return a permutation of indices that sorts the list
+ * \brief Returns a permutation of indices that sorts the list.
  *
  * Takes an unsorted list \p v as input and computes an array of
  * indices \p inds such that v[ inds[i] ], with i increasing from 0, is
@@ -971,7 +971,7 @@ igraph_error_t FUNCTION(sort_ind)(
  *    Use \ref igraph_vector_all_e() to consider vector equivalent only
  *    when their contents are identical.
  *
- * \sa igraph_vector_list_sort()
+ * \sa \ref igraph_vector_list_sort()
  *
  * Time complexity: O(n), the number of items in the list.
  */

@@ -155,8 +155,8 @@ static const char *igraph_i_error_strings[] = {
 };
 
 const char *igraph_strerror(const igraph_error_t igraph_errno) {
-    if (igraph_errno < 0 ||
-        ((size_t) igraph_errno) >= sizeof(igraph_i_error_strings) / sizeof(char *)) {
+    if ((int) igraph_errno < 0 ||
+        (int) igraph_errno >= sizeof(igraph_i_error_strings) / sizeof(igraph_i_error_strings[0])) {
         IGRAPH_FATALF("Invalid error code %d; no error string available.", (int) igraph_errno);
     }
     return igraph_i_error_strings[igraph_errno];
@@ -297,7 +297,7 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
  * will only unwind the current level of the finally stack, not any of the lower
  * levels. This mechanism is used to allow some functions to pause stack unwinding
  * until they can restore their data structures into a consistent state.
- * See igraph_add_edges() for an example usage.
+ * See \ref igraph_add_edges() for an example usage.
  */
 void IGRAPH_FINALLY_ENTER(void) {
     int no = igraph_i_finally_stack_size;

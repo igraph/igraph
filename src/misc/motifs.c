@@ -169,10 +169,9 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
         }
     } else if (size == 4) {
         if (directed) {
-            int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
-                                    28, 33, 34, 39, 62, 120
-                                  };
-            int i, n = sizeof(not_connected) / sizeof(not_connected[0]);
+            const int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
+                                          28, 33, 34, 39, 62, 120 };
+            size_t i, n = sizeof(not_connected) / sizeof(not_connected[0]);
             for (i = 0; i < n; i++) {
                 VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
             }
@@ -182,17 +181,17 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
         }
     } else if (size == 5) {
         /* undirected only */
-        int not_connected[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 19 };
-        int i, n = sizeof(not_connected) / sizeof(int);
+        const int not_connected[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 19 };
+        size_t i, n = sizeof(not_connected) / sizeof(int);
         for (i = 0; i < n; i++) {
             VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
         }
     } else if (size == 6) {
         /* undirected only */
-        int not_connected[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-                               19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 38,
-                               44, 50, 51, 54, 74, 77, 89, 120};
-        int i, n = sizeof(not_connected) / sizeof(int);
+        const int not_connected[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                                     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                     30, 31, 32, 33, 35, 38, 44, 50, 51, 54, 74, 77, 89, 120};
+        size_t i, n = sizeof(not_connected) / sizeof(int);
         for (i = 0; i < n; i++) {
             VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
         }
@@ -925,9 +924,8 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
 
 /**
  * \function igraph_dyad_census
- * \brief Calculating the dyad census as defined by Holland and Leinhardt.
+ * \brief Dyad census, as defined by Holland and Leinhardt.
  *
- * </para><para>
  * Dyad census means classifying each pair of vertices of a directed
  * graph into three categories: mutual (there is at least one edge from
  * \c a to \c b and also from \c b to \c a); asymmetric (there is at least
@@ -1075,7 +1073,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
 
 /**
  * \function igraph_triad_census
- * \brief Triad census, as defined by Davis and Leinhardt
+ * \brief Triad census, as defined by Davis and Leinhardt.
  *
  * </para><para>
  * Calculating the triad census means classifying every triple of

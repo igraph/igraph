@@ -28,7 +28,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
-#include "igraph_memory.h"
 #include "igraph_statusbar.h"
 #include "igraph_structural.h"
 
@@ -582,7 +581,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&tosplit, 100);
     for (i = 0; i < communities; i++) {
         if (VECTOR(idx)[i] > 2) {
-            igraph_dqueue_int_push(&tosplit, i);
+            IGRAPH_CHECK(igraph_dqueue_int_push(&tosplit, i));
         }
     }
     for (i = 1; i < communities; i++) {

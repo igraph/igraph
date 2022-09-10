@@ -606,7 +606,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 /**
  * \ingroup interface
  * \function igraph_delete_vertices_idx
- * \brief Removes some vertices (with all their edges) from the graph
+ * \brief Removes some vertices (with all their edges) from the graph.
  *
  * </para><para>
  * This function changes the IDs of the vertices (except in some very
@@ -1248,7 +1248,8 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                 *(result) = e; \
                 if (result_pos != 0) { *(result_pos) = start; } \
             } \
-        } } while(0)
+        } \
+    } while (0)
 
 #define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid) \
     do { \
@@ -1731,7 +1732,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
  *
  * Time complexity: O(E), the number of edges in the graphs.
  *
- * \sa igraph_isomorphic() to test if two graphs are isomorphic.
+ * \sa \ref igraph_isomorphic() to test if two graphs are isomorphic.
  */
 
 igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res) {

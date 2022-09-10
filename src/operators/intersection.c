@@ -34,7 +34,6 @@
  * \function igraph_intersection
  * \brief Collect the common edges from two graphs.
  *
- * </para><para>
  * The result graph contains only edges present both in the first and
  * the second graph. The number of vertices in the result graph is the
  * same as the larger from the two arguments.
@@ -71,7 +70,6 @@ igraph_error_t igraph_intersection(igraph_t *res,
  * \function igraph_intersection_many
  * \brief The intersection of more than two graphs.
  *
- * </para><para>
  * This function calculates the intersection of the graphs stored in
  * the \p graphs argument. Only those edges will be included in the
  * result graph which are part of every graph in \p graphs.

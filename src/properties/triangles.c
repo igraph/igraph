@@ -189,7 +189,7 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
             maxdegree = deg;
         }
     }
-    igraph_vector_int_order1(&degree, &order, maxdegree + 1);
+    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree + 1));
     igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_VECTOR_INIT_FINALLY(&rank, affected_nodes);

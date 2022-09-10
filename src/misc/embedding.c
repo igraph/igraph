@@ -1091,7 +1091,7 @@ igraph_error_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
 
 /**
  * \function igraph_dim_select
- * Dimensionality selection
+ * \brief Dimensionality selection.
  *
  * Dimensionality selection for singular values using
  * profile likelihood.

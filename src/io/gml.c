@@ -146,7 +146,7 @@ static igraph_error_t entity_decode(const char *src, char **dest, igraph_bool_t 
                     } else {
                         IGRAPH_WARNINGF("One or more unknown entities will be returned verbatim (%.*s).", j+1, s);
                     }
-                    *warned = 1; /* warn only once */
+                    *warned = true; /* warn only once */
                 }
                 *d++ = *s++;
             }
@@ -582,7 +582,6 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                               igraph_gml_tree_line(gtree, i));
             }
             edge = igraph_gml_tree_get_tree(gtree, i);
-            has_source = has_target = 0;
             for (igraph_integer_t j = 0; j < igraph_gml_tree_length(edge); j++) {
                 const char *name = igraph_gml_tree_name(edge, j);
                 igraph_i_gml_tree_type_t type = igraph_gml_tree_type(edge, j);
@@ -596,7 +595,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                       IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(edge, j));
                     }
-                    has_source = 1;
+                    has_source = true;
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERRORF("Non-integer 'source' for an edge in GML file, line %" IGRAPH_PRId ".",
                                       IGRAPH_PARSEERROR,
@@ -609,7 +608,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                       IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(edge, j));
                     }
-                    has_target = 1;
+                    has_target = true;
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERRORF("Non-integer 'target' for an edge in GML file, line %" IGRAPH_PRId ".",
                                       IGRAPH_PARSEERROR,
@@ -645,7 +644,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 if (dir) {
                     directed = IGRAPH_DIRECTED;
                 }
-                has_directed = 1;
+                has_directed = true;
             } else {
                 IGRAPH_WARNINGF("Invalid type for 'directed' attribute on line %" IGRAPH_PRId ", assuming undirected.",
                                 igraph_gml_tree_line(gtree, i));
@@ -862,7 +861,7 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
     igraph_integer_t n = igraph_vector_size(v);
 
     if (n < 2) {
-        *res = 1;
+        *res = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -870,10 +869,10 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
     IGRAPH_FINALLY(igraph_vector_destroy, &u);
     igraph_vector_sort(&u);
 
-    *res = 1;
+    *res = true;
     for (igraph_integer_t i=1; i < n; i++) {
         if (VECTOR(u)[i-1] == VECTOR(u)[i]) {
-            *res = 0;
+            *res = false;
             break;
         }
     }
@@ -1000,7 +999,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     } else {
         if (needs_coding(creator)) {
             char *d;
-            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW | options));
+            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
             IGRAPH_FINALLY(igraph_free, d);
             CHECK(fprintf(outstream,
                           "Creator \"%s\"\n",
@@ -1044,7 +1043,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
             const char *n = igraph_strvector_get(&vnames, i);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                found = 1; break;
+                found = true; break;
             }
         }
         if (found) {

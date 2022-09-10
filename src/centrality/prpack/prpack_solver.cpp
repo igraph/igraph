@@ -42,10 +42,12 @@ prpack_solver::prpack_solver(prpack_base_graph* g, bool owns_bg) {
     TIME(read_time, bg = g);
 }
 
+#if 0
 prpack_solver::prpack_solver(const char* filename, const char* format, const bool weighted) {
     initialize();
     TIME(read_time, bg = new prpack_base_graph(filename, format, weighted));
 }
+#endif
 
 prpack_solver::~prpack_solver() {
 	if (owns_bg) {

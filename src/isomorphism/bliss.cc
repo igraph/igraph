@@ -256,7 +256,7 @@ public:
  *    when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
  *
- * \sa igraph_is_same_graph()
+ * \sa \ref igraph_is_same_graph()
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
@@ -527,7 +527,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         VECTOR(perm2)[i] = VECTOR(*mymap12)[ VECTOR(perm1)[i] ];
     }
     /* Copy it to mymap12 */
-    igraph_vector_int_update(mymap12, &perm2);
+    IGRAPH_CHECK(igraph_vector_int_update(mymap12, &perm2));
 
     igraph_vector_int_destroy(&perm1);
     igraph_vector_int_destroy(&perm2);

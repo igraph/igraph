@@ -73,6 +73,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/kwofach"><img src="https://avatars.githubusercontent.com/u/97578264?v=4?s=100" width="100px;" alt=""/><br /><sub><b>kwofach</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=kwofach" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Gomango999"><img src="https://avatars.githubusercontent.com/u/37771462?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kevin Zhu</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Gomango999" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/pradkrish"><img src="https://avatars.githubusercontent.com/u/47261443?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pradeep Krishnamurthy</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=pradkrish" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/flange-ipb"><img src="https://avatars.githubusercontent.com/u/34936695?v=4?s=100" width="100px;" alt=""/><br /><sub><b>flange-ipb</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=flange-ipb" title="Code">💻</a></td>
   </tr>
 </table>
 

@@ -383,11 +383,11 @@ typedef enum {
 
 /**
  * \typedef igraph_error_t
- * \brief Type alias because igraph_error_t used to be an integer, and was used
- *          slightly differenly than igraph_error_type_t.
+ * \brief Return type for functions returning an error code.
  *
  * This type is used as the return type of igraph functions that return an
- * error code.
+ * error code. It is a type alias because \type igraph_error_t used to be
+ * an \c int, and was used slightly differenly than \type igraph_error_type_t.
  */
 typedef igraph_error_type_t igraph_error_t;
 
@@ -465,7 +465,7 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
 
 /**
  * \define IGRAPH_ERROR
- * \brief Trigger an error.
+ * \brief Triggers an error.
  *
  * \a igraph functions usually use this macro when they notice an error.
  * It calls
@@ -497,7 +497,7 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
 
 /**
  * \function igraph_error
- * \brief Triggers an error.
+ * \brief Reports an error.
  *
  * \a igraph functions usually call this function (most often via the
  * \ref IGRAPH_ERROR macro) if they notice an error.
@@ -550,7 +550,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, 
 
 /**
  * \function igraph_errorf
- * \brief Triggers an error, printf-like version.
+ * \brief Reports an error, printf-like version.
  *
  * \param reason Textual description of the error, interpreted as
  *               a \c printf format string.
@@ -860,10 +860,11 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning
- * \brief Triggers a warning.
+ * \brief Reports a warning.
  *
  * Call this function if you want to trigger a warning from within
  * a function that uses \a igraph.
+ *
  * \param reason Textual description of the warning.
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
@@ -899,11 +900,12 @@ IGRAPH_EXPORT void igraph_warning(const char *reason, const char *file, int line
 
 /**
  * \function igraph_warningf
- * \brief Triggers a warning, printf-like version.
+ * \brief Reports a warning, printf-like version.
  *
  * This function is similar to \ref igraph_warning(), but
  * uses a printf-like syntax. It substitutes the additional arguments
  * into the \p reason template string and calls \ref igraph_warning().
+ *
  * \param reason Textual description of the warning, a template string
  *        with the same syntax as the standard printf C library function.
  * \param file The source file in which the warning was noticed.

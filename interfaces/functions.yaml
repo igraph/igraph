@@ -1601,7 +1601,8 @@ igraph_community_leiden:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL VERTEXWEIGHTS vertex_weights,
-        REAL resolution, REAL beta, BOOLEAN start, OPTIONAL INOUT VECTOR_INT membership,
+        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2, 
+        OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_weights ON graph
 

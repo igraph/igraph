@@ -73,7 +73,7 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
 
 /**
  * \function igraph_read_graph_pajek
- * \brief Reads a file in Pajek format
+ * \brief Reads a file in Pajek format.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param file An already opened file handler.
@@ -174,11 +174,11 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&vattrnames, 1);
-    igraph_vector_ptr_init(&vattrs, 0);
+    IGRAPH_CHECK(igraph_vector_ptr_init(&vattrs, 0));
     IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &vattrs);
 
     IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 1);
-    igraph_vector_ptr_init(&eattrs, 0);
+    IGRAPH_CHECK(igraph_vector_ptr_init(&eattrs, 0));
     IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &eattrs);
 
     context.directed = false; /* assume undirected until an element implying directedness is encountered */
@@ -532,7 +532,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     /* Check if graph is bipartite */
     if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, "type")) {
         igraph_attribute_type_t type_type;
-        igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX, "type");
+        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX, "type"));
         if (type_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
             igraph_integer_t bptr = 0, tptr = 0;
             bipartite = 1; write_vertex_attrs = 1;
@@ -651,8 +651,8 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
                 fputc(' ', outstream);
                 igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
                 if (vtypes[V_Z] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                    igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_Z],
-                            igraph_vss_1(id), &numv);
+                    IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_Z],
+                            igraph_vss_1(id), &numv));
                     fputc(' ', outstream);
                     igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
                 }

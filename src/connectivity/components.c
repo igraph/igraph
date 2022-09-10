@@ -487,7 +487,7 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
 
         igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actnode, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (igraph_integer_t i = 0; i < nei_count; i++) {

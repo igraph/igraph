@@ -24,17 +24,6 @@
 
 #include <igraph.h>
 
-void print_matrix(igraph_matrix_t *m, FILE *f) {
-    igraph_integer_t i, j;
-    for (i = 0; i < igraph_matrix_nrow(m); i++) {
-        for (j = 0; j < igraph_matrix_ncol(m); j++) {
-            fprintf(f, " %.2f", MATRIX(*m, i, j));
-        }
-        fprintf(f, "\n");
-    }
-    fprintf(f, "==========\n");
-}
-
 int main() {
 
     igraph_t g;
@@ -61,7 +50,7 @@ int main() {
 
     printf("Jaccard similarity:\n");
     igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
-    print_matrix(&m, stdout);
+    igraph_matrix_printf(&m, "%.2f");
 
     printf("\nJaccard similarity, pairs:\n");
     igraph_similarity_jaccard_pairs(&g, &res, &pairs, IGRAPH_ALL, 0);
@@ -73,7 +62,7 @@ int main() {
 
     printf("\nDice similarity:\n");
     igraph_similarity_dice(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
-    print_matrix(&m, stdout);
+    igraph_matrix_printf(&m, "%.2f");
 
     printf("\nDice similarity, pairs:\n");
     igraph_similarity_dice_pairs(&g, &res, &pairs, IGRAPH_ALL, 0);
@@ -85,7 +74,7 @@ int main() {
 
     printf("\nWeighted inverse log similarity:\n");
     igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_ALL);
-    print_matrix(&m, stdout);
+    igraph_matrix_printf(&m, "%.2f");
 
     igraph_matrix_destroy(&m);
     igraph_destroy(&g);

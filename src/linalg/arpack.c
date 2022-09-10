@@ -208,7 +208,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
 
 /**
  * \function igraph_arpack_options_get_default
- * \brief Return a pointer to a "default" ARPACK options object
+ * \brief Returns a pointer to a "default" ARPACK options object.
  *
  * This function is used by other igraph functions taking an \ref igraph_arpack_options_t
  * object as an argument to get a reference to a pre-initialized "default"
@@ -221,7 +221,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
  *
  * Time complexity: O(1).
  */
-igraph_arpack_options_t* igraph_arpack_options_get_default() {
+igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
     igraph_i_arpack_options_default = igraph_i_arpack_options_pristine;
     return &igraph_i_arpack_options_default;
 }
@@ -891,7 +891,7 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
 
 /**
  * \function igraph_arpack_rssolve
- * \brief ARPACK solver for symmetric matrices
+ * \brief ARPACK solver for symmetric matrices.
  *
  * This is the ARPACK solver for symmetric matrices. Please use
  * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
@@ -1140,7 +1140,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
 /**
  * \function igraph_arpack_rnsolve
- * \brief ARPACK solver for non-symmetric matrices
+ * \brief ARPACK solver for non-symmetric matrices.
  *
  * Please always consider calling \ref igraph_arpack_rssolve() if your
  * matrix is symmetric, it is much faster.
@@ -1416,7 +1416,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
 /**
  * \function igraph_arpack_unpack_complex
- * \brief Make the result of the non-symmetric ARPACK solver more readable
+ * \brief Makes the result of the non-symmetric ARPACK solver more readable.
  *
  * This function works on the output of \ref igraph_arpack_rnsolve and
  * brushes it up a bit: it only keeps \p nev eigenvalues/vectors and

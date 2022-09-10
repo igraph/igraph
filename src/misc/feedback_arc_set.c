@@ -40,10 +40,8 @@
 /**
  * \ingroup structural
  * \function igraph_feedback_arc_set
- * \brief Calculates a feedback arc set of the graph using different
- *        algorithms.
+ * \brief Feedback arc set of a graph using exact or heuristic methods.
  *
- * </para><para>
  * A feedback arc set is a set of edges whose removal makes the graph acyclic.
  * We are usually interested in \em minimum feedback arc sets, i.e. sets of edges
  * whose total weight is minimal among all the feedback arc sets.
@@ -236,11 +234,11 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 VECTOR(indegrees)[i] = VECTOR(outdegrees)[i] = -1;
             } else {
                 /* This is a source */
-                igraph_dqueue_int_push(&sources, i);
+                IGRAPH_CHECK(igraph_dqueue_int_push(&sources, i));
             }
         } else if (VECTOR(outdegrees)[i] == 0) {
             /* This is a sink */
-            igraph_dqueue_int_push(&sinks, i);
+            IGRAPH_CHECK(igraph_dqueue_int_push(&sinks, i));
         }
     }
 

@@ -298,7 +298,7 @@ void igraph_vector_ptr_clear(igraph_vector_ptr_t* v) {
  * \param v The pointer vector.
  * \param e The new element to include in the pointer vector.
  * \return Error code.
- * \sa igraph_vector_push_back() for the corresponding operation of
+ * \sa \ref igraph_vector_push_back() for the corresponding operation of
  * the ordinary vector type.
  *
  * Time complexity: O(1) or O(n), n is the number of elements in the
@@ -673,7 +673,7 @@ static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const v
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_sort_ind
- * \brief Return a permutation of indices that sorts a vector of pointers
+ * \brief Returns a permutation of indices that sorts a vector of pointers.
  *
  * Takes an unsorted array \c v as input and computes an array of
  * indices inds such that v[ inds[i] ], with i increasing from 0, is

@@ -314,7 +314,7 @@ static igraph_error_t igraph_i_is_eulerian_directed(
 /**
  * \ingroup Eulerian
  * \function igraph_is_eulerian
- * \brief Checks whether an Eulerian path or cycle exists
+ * \brief Checks whether an Eulerian path or cycle exists.
  *
  * An Eulerian path traverses each edge of the graph precisely once. A closed
  * Eulerian path is referred to as an Eulerian cycle.
@@ -576,7 +576,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
 /**
  * \ingroup Eulerian
  * \function igraph_eulerian_cycle
- * \brief Finds an Eulerian cycle
+ * \brief Finds an Eulerian cycle.
  *
  * Finds an Eulerian cycle, if it exists. An Eulerian cycle is a closed path
  * that traverses each edge precisely once.
@@ -635,7 +635,7 @@ igraph_error_t igraph_eulerian_cycle(
 /**
  * \ingroup Eulerian
  * \function igraph_eulerian_path
- * \brief Finds an Eulerian path
+ * \brief Finds an Eulerian path.
  *
  * Finds an Eulerian path, if it exists. An Eulerian path traverses
  * each edge precisely once.

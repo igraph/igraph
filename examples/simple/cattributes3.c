@@ -25,7 +25,7 @@
 
 igraph_error_t mf(const igraph_vector_t *input, igraph_real_t *output) {
     *output = 0.0;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *comb) {

@@ -59,9 +59,8 @@ static igraph_error_t igraph_i_isomorphic_small(
 
 /**
  * \function igraph_isomorphic
- * \brief Decides whether two graphs are isomorphic
+ * \brief Are two graphs isomorphic?
  *
- * </para><para>
  * In simple terms, two graphs are isomorphic if they become indistinguishable
  * from each other once their vertex labels are removed (rendering the vertices
  * within each graph indistiguishable). More precisely, two graphs are isomorphic

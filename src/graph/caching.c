@@ -127,8 +127,7 @@ void igraph_i_property_cache_invalidate_all(const igraph_t *graph) {
 }
 
 /**
- * \brief Invalidates all but a few cached properties of the graph, subject to
- *        specific conditions.
+ * \brief Invalidates all but a few cached properties of the graph, subject to specific conditions.
  *
  * This function is typically called after the graph is modified if we know that
  * the modification does not affect certain cached properties in certain cases.

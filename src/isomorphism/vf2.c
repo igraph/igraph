@@ -755,7 +755,7 @@ static igraph_error_t igraph_i_isomorphic_vf2_cb(
 
 /**
  * \function igraph_isomorphic_vf2
- * \brief Isomorphism via VF2
+ * \brief Isomorphism via VF2.
  *
  * </para><para>
  * This function performs the VF2 algorithm via calling \ref
@@ -853,7 +853,7 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
 
 /**
  * \function igraph_count_isomorphisms_vf2
- * \brief Number of isomorphisms via VF2
+ * \brief Number of isomorphisms via VF2.
  *
  * This function counts the number of isomorphic mappings between two
  * graphs. It uses the generic \ref igraph_get_isomorphisms_vf2_callback()
@@ -989,7 +989,7 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 
 /**
  * \function igraph_get_subisomorphisms_vf2_callback
- * \brief Generic VF2 function for subgraph isomorphism problems
+ * \brief Generic VF2 function for subgraph isomorphism problems.
  *
  * This function is the pair of \ref igraph_get_isomorphisms_vf2_callback(),
  * for subgraph isomorphism problems. It searches for subgraphs of \p

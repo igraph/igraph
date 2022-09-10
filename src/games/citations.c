@@ -177,8 +177,8 @@ igraph_error_t igraph_lastcit_game(igraph_t *graph,
             } else {
                 igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
             }
-            igraph_vector_int_push_back(&edges, i);
-            igraph_vector_int_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, i);  /* reserved */
+            igraph_vector_int_push_back(&edges, to); /* reserved */
             lastcit[to] = i + 1;
             IGRAPH_CHECK(igraph_psumtree_update(&sumtree, to, VECTOR(*preference)[0]));
         }
@@ -312,8 +312,8 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
             } else {
                 to = i + 1;
             }
-            igraph_vector_int_push_back(&edges, i);
-            igraph_vector_int_push_back(&edges, to - 1);
+            igraph_vector_int_push_back(&edges, i);      /* reserved */
+            igraph_vector_int_push_back(&edges, to - 1); /* reserved */
         }
         type = VECTOR(*types)[i];
         if (type >= pref_len) {
@@ -324,7 +324,7 @@ igraph_error_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
             goto err_pref_neg;
         }
         sum += nnval;
-        igraph_vector_push_back(&cumsum, sum);
+        igraph_vector_push_back(&cumsum, sum); /* reserved */
     }
 
     RNG_END();
@@ -486,8 +486,8 @@ igraph_error_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t n
             } else {
                 igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
             }
-            igraph_vector_int_push_back(&edges, i);
-            igraph_vector_int_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, i);  /* reserved */
+            igraph_vector_int_push_back(&edges, to); /* reserved */
         }
 
         /* add i */

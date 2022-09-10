@@ -94,7 +94,7 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 
 /**
  * \function igraph_diversity
- * Structural diversity index of the vertices
+ * \brief Structural diversity index of the vertices.
  *
  * This measure was defined in Nathan Eagle, Michael Macy and Rob
  * Claxton: Network Diversity and Economic Development, Science 328,
@@ -282,8 +282,8 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t ip, op;
-        igraph_neighbors(graph, &inneis, i, IGRAPH_IN);
-        igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
+        IGRAPH_CHECK(igraph_neighbors(graph, &inneis, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_neighbors(graph, &outneis, i, IGRAPH_OUT));
 
         ip = op = 0;
         while (ip < igraph_vector_int_size(&inneis) &&

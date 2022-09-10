@@ -28,15 +28,15 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_memory.h"
 
 #include "core/math.h"
+#include "math/safe_intop.h"
 #include "random/random_internal.h"
 
 #include "config.h" /* IGRAPH_THREAD_LOCAL, HAVE___UINT128_T, HAVE__UMUL128 */
 
-#ifdef HAVE__UMUL128
-#include <intrin.h> /* _umul128() is defined in intrin.h */
+#if defined(HAVE__UMUL128) || defined(HAVE___UMULH)
+#include <intrin.h> /* _umul128() or __umulh() are defined in intrin.h */
 #endif
 
 #include <assert.h>
@@ -182,7 +182,7 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
  *
  * \return A pointer to the default random number generator.
  *
- * \sa igraph_rng_set_default()
+ * \sa \ref igraph_rng_set_default()
  */
 
 igraph_rng_t *igraph_rng_default(void) {
@@ -451,6 +451,44 @@ static uint64_t igraph_i_rng_get_uint64(igraph_rng_t *rng) {
     return igraph_i_rng_get_random_bits(rng, 64);
 }
 
+#if !defined(HAVE___UINT128_T)
+static uint64_t igraph_i_umul128(uint64_t a, uint64_t b, uint64_t *hi) {
+#if defined(HAVE__UMUL128)
+    /* MSVC has _umul128() on x64 but not on arm64 */
+    return _umul128(a, b, hi);
+#elif defined(HAVE___UMULH)
+    /* MSVC has __umulh() on arm64 */
+    *hi = __umulh(a, b);
+    return a*b;
+#else
+    /* Portable but slow fallback implementation of unsigned
+     * 64-bit multiplication obtaining a 128-bit result.
+     * Based on https://stackoverflow.com/a/28904636/695132
+     */
+
+    uint64_t a_lo = (uint32_t) a;
+    uint64_t a_hi = a >> 32;
+    uint64_t b_lo = (uint32_t) b;
+    uint64_t b_hi = b >> 32;
+
+    uint64_t a_x_b_hi  = a_hi * b_hi;
+    uint64_t a_x_b_mid = a_hi * b_lo;
+    uint64_t b_x_a_mid = b_hi * a_lo;
+    uint64_t a_x_b_lo  = a_lo * b_lo;
+
+    uint64_t carry_bit = ((uint64_t) (uint32_t) a_x_b_mid +
+                          (uint64_t) (uint32_t) b_x_a_mid +
+                          (a_x_b_lo >> 32) ) >> 32;
+
+    *hi = a_x_b_hi +
+          (a_x_b_mid >> 32) + (b_x_a_mid >> 32) +
+          carry_bit;
+
+    return a*b;
+#endif
+}
+#endif /* !defined(HAVE___UINT128_T) */
+
 /**
  * Generates a random integer in the range [0; range) (upper bound exclusive),
  * restricted to at most 64 bits.
@@ -463,15 +501,7 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
     /* Debiased integer multiplication -- Lemire's method
      * from https://www.pcg-random.org/posts/bounded-rands.html */
     uint64_t x, l, t = (-range) % range;
-#ifdef HAVE__UMUL128
-    /* MSVC has _umul128() so we use that */
-    uint64_t hi;
-    do {
-        x = igraph_i_rng_get_uint64(rng);
-        l = _umul128(x, range, &hi);
-    } while (l < t);
-    return hi;
-#elif defined(HAVE___UINT128_T)
+#if defined(HAVE___UINT128_T)
     /* gcc and clang have __uint128_t */
     __uint128_t m;
     do {
@@ -481,7 +511,12 @@ static uint64_t igraph_i_rng_get_uint64_bounded(igraph_rng_t *rng, uint64_t rang
     } while (l < t);
     return m >> 64;
 #else
-#  error "igraph requires __uint128_t or _umul128() in 64-bit mode"
+    uint64_t hi;
+    do {
+        x = igraph_i_rng_get_uint64(rng);
+        l = igraph_i_umul128(x, range, &hi);
+    } while (l < t);
+    return hi;
 #endif
 }
 
@@ -881,7 +916,10 @@ static void igraph_i_random_sample_alga(igraph_vector_int_t *res,
 
 igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l, igraph_integer_t h,
                          igraph_integer_t length) {
-    igraph_integer_t N = h - l + 1;
+    igraph_integer_t N; /* := h - l + 1 */
+    IGRAPH_SAFE_ADD(h, -l, &N);
+    IGRAPH_SAFE_ADD(N, 1, &N);
+
     igraph_integer_t n = length;
 
     igraph_real_t nreal = length;
@@ -1057,10 +1095,10 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
 
 igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
                     igraph_real_t h, igraph_integer_t length) {
-/* This function is the 'real' version of igraph_random_sample, and was added
- * so erdos_renyi_game can use a random sample of doubles instead of integers
- * to prevent overflows on systems with 32-bits igraph_integer_t.
- */
+    /* This function is the 'real' version of igraph_random_sample, and was added
+     * so erdos_renyi_game can use a random sample of doubles instead of integers
+     * to prevent overflows on systems with 32-bits igraph_integer_t.
+     */
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
 
@@ -1081,6 +1119,11 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
     /* now we know that l <= h */
     if (length > N) {
         IGRAPH_ERROR("Sample size exceeds size of candidate pool.", IGRAPH_EINVAL);
+    }
+
+    /* ensure that we work in the range where igraph_real_t can represent integers exactly */
+    if (h > IGRAPH_MAX_EXACT_REAL || l < -IGRAPH_MAX_EXACT_REAL || N > IGRAPH_MAX_EXACT_REAL) {
+        IGRAPH_ERROR("Sampling interval too large.", IGRAPH_EOVERFLOW);
     }
 
     /* treat rare cases quickly */
@@ -1337,7 +1380,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
 #define R_D_negInonint(x) (x < 0. || R_D_nonint(x))
 
 #define R_D_nonint_check(x)                 \
-    if(R_D_nonint(x)) {                  \
+    if (R_D_nonint(x)) {                  \
         MATHLIB_WARNING("non-integer x = %f", x);   \
         return R_D__0;                  \
     }

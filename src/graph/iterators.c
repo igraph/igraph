@@ -604,8 +604,10 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
     case IGRAPH_VS_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy vertex selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     default:
         break;
@@ -944,7 +946,7 @@ igraph_error_t igraph_es_all(igraph_es_t *es,
 
 /**
  * \function igraph_ess_all
- * \brief Edge set, all edges (immediate version)
+ * \brief Edge set, all edges (immediate version).
  *
  * The immediate version of the all-edges selector.
  *
@@ -1139,29 +1141,6 @@ igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v) {
     es.type = IGRAPH_ES_VECTORPTR;
     es.data.vecptr = v;
     return es;
-}
-
-/**
- * \function igraph_es_fromto
- * \brief Edge selector, all edges between two vertex sets.
- *
- * This function is not implemented yet.
- *
- * \param es Pointer to an uninitialized edge selector.
- * \param from Vertex selector, their outgoing edges will be
- *        selected.
- * \param to Vertex selector, their incoming edges will be selected
- *        from the previous selection.
- * \return Error code.
- * \sa \ref igraph_es_destroy()
- *
- * Time complexity: O(1).
- */
-
-igraph_error_t igraph_es_fromto(igraph_es_t *es, igraph_vs_t from, igraph_vs_t to) {
-    IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
-    IGRAPH_ERROR("igraph_es_fromto not implemented yet.", IGRAPH_UNIMPLEMENTED);
-    /* TODO */
 }
 
 /**
@@ -1523,15 +1502,19 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     case IGRAPH_ES_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     case IGRAPH_ES_PATH:
     case IGRAPH_ES_PAIRS:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.path.ptr));
         dest->data.path.ptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     default:
         break;
@@ -1963,7 +1946,7 @@ static igraph_error_t igraph_i_eit_all_between(
  *
  * Time complexity: depends on the type of the edge selector. For edge
  * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
- * \ref igraph_es_1(), igraph_es_vector(), igraph_es_seq() it is
+ * \ref igraph_es_1(), \ref igraph_es_vector(), \ref igraph_es_seq() it is
  * O(1). For \ref igraph_es_incident() it is O(d) where d is the number of
  * incident edges of the vertex.
  */

@@ -99,7 +99,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
         igraph_integer_t root = VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
-        igraph_dqueue_int_push(&Q, root);
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, root));
 
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
@@ -119,8 +119,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
                     if (! VECTOR(seen_vertices)[nei]) {
 
-                        igraph_vector_int_push_back(&edges, from);
-                        igraph_vector_int_push_back(&edges, to);
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
 
                         VECTOR(seen_vertices)[nei] = 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
@@ -133,11 +133,11 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                         }
 
                         if (from == nei) {
-                            igraph_vector_int_push_back(&edges, v_ptr++);
-                            igraph_vector_int_push_back(&edges, to);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v_ptr++));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
                         } else {
-                            igraph_vector_int_push_back(&edges, from);
-                            igraph_vector_int_push_back(&edges, v_ptr++);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v_ptr++));
                         }
                     }
                 }
@@ -219,14 +219,14 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * \brief Decides whether the graph is a tree.
  *
  * An undirected graph is a tree if it is connected and has no cycles.
- * </para><para>
  *
+ * </para><para>
  * In the directed case, a possible additional requirement is that all
  * edges are oriented away from a root (out-tree or arborescence) or all edges
  * are oriented towards a root (in-tree or anti-arborescence).
  * This test can be controlled using the \p mode parameter.
- * </para><para>
  *
+ * </para><para>
  * By convention, the null graph (i.e. the graph with no vertices) is considered not to be a tree.
  *
  * \param graph The graph object to analyze.
@@ -248,7 +248,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * Time complexity: At most O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa igraph_is_weakly_connected()
+ * \sa \ref igraph_is_connected()
  *
  * \example examples/simple/igraph_kary_tree.c
  */

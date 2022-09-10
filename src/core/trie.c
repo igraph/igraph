@@ -23,13 +23,10 @@
 
 #include "igraph_types.h"
 #include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_error.h"
 
 #include "core/trie.h"
 #include "internal/hacks.h" /* strdup */
-
-#include "config.h"
 
 #include <string.h>
 
@@ -58,8 +55,8 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
  *
  * \param t An uninitialized trie.
  * \param storekeys Specifies whether keys are stored for reverse lookup.
- * \return Error code: errors by igraph_strvector_init(),
- *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
+ * \return Error code: Errors by \ref igraph_strvector_init(),
+ *         \ref igraph_vector_ptr_init() and \ref igraph_vector_init() might be returned.
  */
 
 igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {

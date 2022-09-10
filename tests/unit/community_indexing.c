@@ -64,7 +64,7 @@ int main() {
     igraph_community_leading_eigenvector(&graph, NULL, NULL, &membership, igraph_vcount(&graph), NULL, NULL, false, NULL, NULL, NULL, NULL, NULL);
     check(&membership);
 
-    igraph_community_leiden(&graph, NULL, NULL, 1, 0.01, false, &membership, NULL, NULL);
+    igraph_community_leiden(&graph, NULL, NULL, 1, 0.01, 1, false, &membership, NULL, NULL);
     check(&membership);
 
     igraph_community_multilevel(&graph, NULL, 1, &membership, NULL, NULL);

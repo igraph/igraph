@@ -23,7 +23,6 @@
 
 #include "igraph_memory.h"
 #include "igraph_error.h"
-#include "config.h"
 
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
@@ -129,7 +128,7 @@ void FUNCTION(igraph_dqueue, clear)(TYPE(igraph_dqueue)* q) {
  * \function igraph_dqueue_full
  * \brief Check whether the queue is full.
  *
- * If a queue is full the next igraph_dqueue_push() operation will allocate
+ * If a queue is full the next \ref igraph_dqueue_push() operation will allocate
  * more memory.
  *
  * \param q The queue.
@@ -240,7 +239,7 @@ BASE FUNCTION(igraph_dqueue, pop)(TYPE(igraph_dqueue)* q) {
 /**
  * \ingroup dqueue
  * \function igraph_dqueue_pop_back
- * \brief Remove the tail
+ * \brief Removes the tail.
  *
  * Removes and returns the last element in the queue. The queue must
  * be non-empty.

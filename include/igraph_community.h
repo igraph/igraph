@@ -231,6 +231,7 @@ IGRAPH_EXPORT igraph_error_t igraph_community_leiden(const igraph_t *graph,
                                           const igraph_real_t resolution_parameter,
                                           const igraph_real_t beta,
                                           const igraph_bool_t start,
+                                          const igraph_integer_t n_iterations,
                                           igraph_vector_int_t *membership,
                                           igraph_integer_t *nb_clusters,
                                           igraph_real_t *quality);
