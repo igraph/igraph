@@ -35,8 +35,6 @@
 #include "igraph_statusbar.h"
 #include "igraph_progress.h"
 
-#include "config.h"
-
 namespace gengraph {
 
 //_________________________________________________________________________
@@ -117,7 +115,6 @@ graph_molloy_hash::graph_molloy_hash(igraph_integer_t *svg) {
     degree_sequence dd(n, svg);
     // Build neigh[] and alloc links[]
     alloc(dd);
-    dd.detach();
     // Read links[]
     restore(svg + n);
 }

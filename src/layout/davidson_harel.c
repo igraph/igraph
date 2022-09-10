@@ -46,14 +46,14 @@ igraph_bool_t igraph_i_layout_segments_intersect(float p0_x, float p0_y,
     s1 = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y));
     s2 = (-s2_x * s1_y + s1_x * s2_y);
     if (s2 == 0) {
-        return 0;
+        return false;
     }
     t1 = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x));
     t2 = (-s2_x * s1_y + s1_x * s2_y);
     s = s1 / s2;
     t = t1 / t2;
 
-    return s >= 0 && s <= 1 && t >= 0 && t <= 1 ? 1 : 0;
+    return s >= 0 && s <= 1 && t >= 0 && t <= 1;
 }
 
 /* not 'static', used in tests */
@@ -150,7 +150,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
     igraph_integer_t no_edges = igraph_ecount(graph);
     float width = sqrt(no_nodes) * 10, height = width;
     igraph_vector_int_t perm;
-    igraph_bool_t fine_tuning = 0;
+    igraph_bool_t fine_tuning = false;
     igraph_integer_t round, i;
     igraph_vector_t try_x, try_y;
     igraph_vector_int_t try_idx;
@@ -333,7 +333,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
                 if (w_edge_lengths != 0) {
                     igraph_integer_t len, j;
-                    igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
                     len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];
@@ -349,7 +349,7 @@ igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix
 
                 if (w_edge_crossings != 0) {
                     igraph_integer_t len, j, no = 0;
-                    igraph_neighbors(graph, &neis, v, IGRAPH_ALL);
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
                     len = igraph_vector_int_size(&neis);
                     for (j = 0; j < len; j++) {
                         igraph_integer_t u = VECTOR(neis)[j];

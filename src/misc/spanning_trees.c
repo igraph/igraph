@@ -28,7 +28,6 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_operators.h"
-#include "igraph_progress.h"
 #include "igraph_random.h"
 #include "igraph_structural.h"
 
@@ -130,8 +129,9 @@ igraph_error_t igraph_minimum_spanning_tree(
 igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
         igraph_t *mst) {
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, igraph_vcount(graph) - 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_nodes > 0 ? no_of_nodes - 1 : 0);
     IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, &edges));
     IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
                                        igraph_ess_vector(&edges), /* delete_vertices = */ 0));
@@ -280,7 +280,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
     char *added_edges;
 
     igraph_d_indheap_t heap = IGRAPH_D_INDHEAP_NULL;
-    igraph_integer_t mode = IGRAPH_ALL;
+    igraph_neimode_t mode = IGRAPH_ALL;
 
     igraph_vector_int_t adj;
 
@@ -319,7 +319,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
         already_added[i] = 1;
         /* add all edges of the first vertex */
-        igraph_incident(graph, &adj, i, (igraph_neimode_t) mode);
+        IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
         adj_size = igraph_vector_int_size(&adj);
         for (j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
@@ -348,7 +348,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
                     added_edges[edge] = 1;
                     IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
                     /* add all outgoing edges */
-                    igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
+                    IGRAPH_CHECK(igraph_incident(graph, &adj, to, mode));
                     adj_size = igraph_vector_int_size(&adj);
                     for (j = 0; j < adj_size; j++) {
                         igraph_integer_t edgeno = VECTOR(adj)[j];
@@ -423,7 +423,7 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
 
 /**
  * \function igraph_random_spanning_tree
- * \brief Uniformly sample the spanning trees of a graph
+ * \brief Uniformly samples the spanning trees of a graph.
  *
  * Performs a loop-erased random walk on the graph to uniformly sample
  * its spanning trees. Edge directions are ignored.

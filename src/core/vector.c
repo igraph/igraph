@@ -98,7 +98,6 @@ igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_in
 }
 
 igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
-
     igraph_indheap_t heap;
 
     IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
@@ -118,8 +117,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 /**
  * \ingroup vector
  * \function igraph_vector_int_pair_order
- * \brief Calculate the order of the elements in a pair of integer vectors of
- * equal length.
+ * \brief Calculates the order of the elements in a pair of integer vectors of equal length.
  *
  * The smallest element will have order zero, the second smallest
  * order one, etc.
@@ -308,37 +306,6 @@ igraph_error_t igraph_vector_int_rank(
     return IGRAPH_SUCCESS;
 }
 
-#ifndef USING_R
-igraph_error_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
-    if (n != 0) {
-        igraph_complex_t z = VECTOR(*v)[0];
-        printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    for (i = 1; i < n; i++) {
-        igraph_complex_t z = VECTOR(*v)[i];
-        printf(" %g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    printf("\n");
-    return IGRAPH_SUCCESS;
-}
-#endif
-
-igraph_error_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
-                                 FILE *file) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
-    if (n != 0) {
-        igraph_complex_t z = VECTOR(*v)[0];
-        fprintf(file, "%g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    for (i = 1; i < n; i++) {
-        igraph_complex_t z = VECTOR(*v)[i];
-        fprintf(file, " %g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    fprintf(file, "\n");
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \ingroup vector
  * \function igraph_vector_complex_real
@@ -494,19 +461,19 @@ igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *
     igraph_integer_t n = igraph_vector_complex_size(lhs);
 
     if (lhs == rhs) {
-        return 1;
+        return true;
     }
 
     if (igraph_vector_complex_size(rhs) != n) {
-        return 0;
+        return false;
     }
 
     for (igraph_integer_t i=0; i < n; i++) {
         if (! igraph_complex_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
-            return 0;
+            return false;
     }
 
-    return 1;
+    return true;
 }
 
 /**
@@ -526,7 +493,7 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 
     s = igraph_vector_size(lhs);
     if (s != igraph_vector_size(rhs)) {
-        return 0;
+        return false;
     } else {
         if (tol == 0) {
             tol = DBL_EPSILON;
@@ -535,10 +502,10 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
             igraph_real_t l = VECTOR(*lhs)[i];
             igraph_real_t r = VECTOR(*rhs)[i];
             if (l < r - tol || l > r + tol) {
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -561,19 +528,19 @@ igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lhs,
     igraph_integer_t n = igraph_vector_size(lhs);
 
     if (lhs == rhs) {
-        return 1;
+        return true;
     }
 
     if (igraph_vector_size(rhs) != n) {
-        return 0;
+        return false;
     }
 
     for (igraph_integer_t i=0; i < n; i++) {
         if (! igraph_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
-            return 0;
+            return false;
     }
 
-    return 1;
+    return true;
 }
 
 /**
@@ -684,7 +651,7 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
     IGRAPH_ASSERT(is_nan->stor_begin != NULL);
     IGRAPH_CHECK(igraph_vector_bool_resize(is_nan, igraph_vector_size(v)));
     for (ptr = v->stor_begin, ptr_nan = is_nan->stor_begin; ptr < v->end; ptr++, ptr_nan++) {
-        *ptr_nan = igraph_is_nan(*ptr) ? 1 : 0;
+        *ptr_nan = igraph_is_nan(*ptr);
     }
     return IGRAPH_SUCCESS;
 }
@@ -707,9 +674,9 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
     ptr = v->stor_begin;
     while (ptr < v->end) {
         if (igraph_is_nan(*ptr)) {
-            return 1;
+            return true;
         }
         ptr++;
     }
-    return 0;
+    return false;
 }

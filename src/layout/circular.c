@@ -31,19 +31,18 @@
 /**
  * \ingroup layout
  * \function igraph_layout_circle
- * \brief Places the vertices uniformly on a circle, in the order of vertex IDs.
+ * \brief Places the vertices uniformly on a circle in arbitrary order.
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
  * \param order The order of the vertices on the circle. The vertices
  *        not included here, will be placed at (0,0). Supply
- *        \ref igraph_vss_all() here for all vertices, in the order of
- *        their vertex IDs.
+ *        \ref igraph_vss_all() here to place vertices in the
+ *        order of their vertex IDs.
  * \return Error code.
  *
- * Time complexity: O(|V|), the
- * number of vertices.
+ * Time complexity: O(|V|), the number of vertices.
  */
 igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_vs_t order) {
@@ -58,7 +57,7 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
     igraph_matrix_null(res);
 
-    igraph_vit_create(graph, order, &vit);
+    IGRAPH_CHECK(igraph_vit_create(graph, order, &vit));
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_real_t phi = 2 * M_PI / vs_size * i;
         igraph_integer_t idx = IGRAPH_VIT_GET(vit);
@@ -77,7 +76,10 @@ igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The input graph. Its edges are ignored by this function.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param center The id of the vertex to put in the center.
+ * \param center The id of the vertex to put in the center. You can set it to
+ *        any arbitrary value for the special case when the input graph has no
+ *        vertices; otherwise it must be between 0 and the number of vertices
+ *        minus 1.
  * \param order A numeric vector giving the order of the vertices
  *      (including the center vertex!). If a null pointer, then the
  *      vertices are placed in increasing vertex ID order.
@@ -96,7 +98,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     igraph_real_t step;
     igraph_real_t phi;
 
-    if (center < 0 || center >= no_of_nodes) {
+    if (no_of_nodes > 0 && (center < 0 || center >= no_of_nodes)) {
         IGRAPH_ERROR("The given center is not a vertex of the graph.", IGRAPH_EINVAL);
     }
     if (order && igraph_vector_int_size(order) != no_of_nodes) {
@@ -107,7 +109,7 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
 
     if (no_of_nodes == 1) {
         MATRIX(*res, 0, 0) = MATRIX(*res, 0, 1) = 0.0;
-    } else {
+    } else if (no_of_nodes > 1) {
         for (i = 0, step = 2 * M_PI / (no_of_nodes - 1), phi = 0;
              i < no_of_nodes; i++) {
             igraph_integer_t node = order ? VECTOR(*order)[i] : i;
@@ -133,9 +135,11 @@ igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
  *
  * </para><para>
  * The algorithm was described in the following paper:
+ *
+ * </para><para>
  * Distributing many points on a sphere by E.B. Saff and
  * A.B.J. Kuijlaars, \emb Mathematical Intelligencer \eme 19.1 (1997)
- * 5--11.
+ * 5--11. https://doi.org/10.1007/BF03024331
  *
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will

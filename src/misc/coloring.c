@@ -69,7 +69,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
     IGRAPH_FINALLY(igraph_2wheap_destroy, &cn);
     for (i = 0; i < vc; ++i)
         if (i != vertex) {
-            igraph_2wheap_push_with_index(&cn, i, 0);    /* should not fail since memory was already reserved */
+            igraph_2wheap_push_with_index(&cn, i, 0); /* should not fail since memory was already reserved */
         }
 
     while (1) {

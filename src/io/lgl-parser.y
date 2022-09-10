@@ -47,7 +47,6 @@
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
-#include "config.h"
 
 #include "io/lgl-header.h"
 #include "io/parsers/lgl-parser.h"

@@ -39,7 +39,7 @@ int main() {
     /* 1 edge per vertex with citation makes a tree */
 
     igraph_growing_random_game(&g, /* n: vertices */ 20, /* m: edges_per_vertex */ 1, /* directed */ 0, /* citation */ 1);
-    igraph_is_tree(&g, &tree, /* root*/ NULL, /*unused mode*/ 0);
+    igraph_is_tree(&g, &tree, /* root */ NULL, /* unused mode */ IGRAPH_ALL);
     IGRAPH_ASSERT(tree);
     igraph_destroy(&g);
 

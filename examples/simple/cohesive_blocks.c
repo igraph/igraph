@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int doit(igraph_t *g) {
+void doit(igraph_t *g) {
 
     igraph_vector_int_list_t blocks;
     igraph_vector_int_t cohesion;
@@ -56,13 +56,11 @@ int doit(igraph_t *g) {
     igraph_vector_int_destroy(&parent);
     igraph_destroy(&block_tree);
 
-    return 0;
 }
 
 int main() {
 
     igraph_t g;
-    int ret;
 
     /* --------------------------------------------------------*/
     /* The graph from the Moody-White paper                    */
@@ -91,9 +89,7 @@ int main() {
                  21, 22,
                  -1);
 
-    if ( (ret = doit(&g)) ) {
-        return ret;
-    }
+    doit(&g);
     igraph_destroy(&g);
     printf("--\n");
 
@@ -107,9 +103,7 @@ int main() {
                  3, 6, 3, 7, 4, 5, 5, 6, 6, 7,
                  -1);
 
-    if ( (ret = doit(&g)) ) {
-        return ret;
-    }
+    doit(&g);
     igraph_destroy(&g);
     printf("--\n");
 
@@ -135,9 +129,7 @@ int main() {
                  16, 17,
                  -1);
 
-    if ( (ret = doit(&g)) ) {
-        return ret;
-    }
+    doit(&g);
     igraph_destroy(&g);
     printf("--\n");
 
@@ -174,9 +166,7 @@ int main() {
                  32, 33,
                  -1);
 
-    if ( (ret = doit(&g)) ) {
-        return ret;
-    }
+    doit(&g);
     igraph_destroy(&g);
     printf("--\n");
 

@@ -127,8 +127,7 @@ void igraph_i_property_cache_invalidate_all(const igraph_t *graph) {
 }
 
 /**
- * \brief Invalidates all but a few cached properties of the graph, subject to
- *        specific conditions.
+ * \brief Invalidates all but a few cached properties of the graph, subject to specific conditions.
  *
  * This function is typically called after the graph is modified if we know that
  * the modification does not affect certain cached properties in certain cases.
@@ -166,7 +165,7 @@ void igraph_i_property_cache_invalidate_conditionally(
     maybe_keep = graph->cache->known & invalidate & (keep_when_false | keep_when_true);
 
     if (maybe_keep) {
-        for (igraph_cached_property_t prop = 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
+        for (igraph_cached_property_t prop = (igraph_cached_property_t ) 0; prop < IGRAPH_PROP_I_SIZE; ++prop) {
             mask = 1 << prop;
             if (maybe_keep & mask) {
                 /* if we get here, we know that the property is cached; we have

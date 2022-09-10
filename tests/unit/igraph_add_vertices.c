@@ -22,12 +22,12 @@
 */
 
 #include <igraph.h>
+#include "test_utilities.h"
 
 int main() {
 
     igraph_t g1;
     igraph_vector_int_t v1;
-    int ret;
 
     /* Create a graph */
     igraph_vector_int_init(&v1, 8);
@@ -44,24 +44,18 @@ int main() {
 
     /* Add more vertices */
     igraph_add_vertices(&g1, 10, 0);
-    if (igraph_vcount(&g1) != 14) {
-        return 1;
-    }
+    IGRAPH_ASSERT(igraph_vcount(&g1) == 14);
 
     /* Add more vertices */
     igraph_add_vertices(&g1, 0, 0);
-    if (igraph_vcount(&g1) != 14) {
-        return 2;
-    }
+    IGRAPH_ASSERT(igraph_vcount(&g1) == 14);
 
     /* Error */
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    ret = igraph_add_vertices(&g1, -1, 0);
-    if (ret != IGRAPH_EINVAL) {
-        return 3;
-    }
+    CHECK_ERROR(igraph_add_vertices(&g1, -1, 0), IGRAPH_EINVAL);
 
     igraph_destroy(&g1);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

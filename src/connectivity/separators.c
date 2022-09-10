@@ -28,7 +28,6 @@
 #include "igraph_dqueue.h"
 #include "igraph_flow.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_operators.h"
 #include "igraph_structural.h"
 #include "igraph_vector.h"
@@ -288,8 +287,8 @@ static igraph_error_t igraph_i_connected_components_leaveout(const igraph_adjlis
         }
 
         VECTOR(*leaveout)[i] = *mark;
-        igraph_dqueue_int_push(Q, i);
-        igraph_vector_int_push_back(components, i);
+        IGRAPH_CHECK(igraph_dqueue_int_push(Q, i));
+        IGRAPH_CHECK(igraph_vector_int_push_back(components, i));
 
         while (!igraph_dqueue_int_empty(Q)) {
             igraph_integer_t act_node = igraph_dqueue_int_pop(Q);
@@ -302,11 +301,11 @@ static igraph_error_t igraph_i_connected_components_leaveout(const igraph_adjlis
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(Q, nei));
                 VECTOR(*leaveout)[nei] = *mark;
-                igraph_vector_int_push_back(components, nei);
+                IGRAPH_CHECK(igraph_vector_int_push_back(components, nei));
             }
         }
 
-        igraph_vector_int_push_back(components, -1);
+        IGRAPH_CHECK(igraph_vector_int_push_back(components, -1));
     }
 
     UPDATEMARK();
@@ -323,12 +322,12 @@ static igraph_bool_t igraph_i_separators_is_not_seen_yet(
     for (co = 0; co < nocomps; co++) {
         igraph_vector_int_t *act = igraph_vector_int_list_get_ptr(comps, co);
         if (igraph_vector_int_all_e(act, newc)) {
-            return 0;
+            return false;
         }
     }
 
     /* If not found, then it is new */
-    return 1;
+    return true;
 }
 
 static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separators,
@@ -361,7 +360,7 @@ static igraph_error_t igraph_i_separators_store(igraph_vector_int_list_t *separa
             for (j = 0; j < nn; j++) {
                 igraph_integer_t nei = VECTOR(*neis)[j];
                 if (VECTOR(*leaveout)[nei] != *mark) {
-                    igraph_vector_int_push_back(sorter, nei);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(sorter, nei));
                     VECTOR(*leaveout)[nei] = *mark;
                 }
             }
@@ -695,7 +694,7 @@ igraph_error_t igraph_minimum_size_separators(
     /* Work on a copy of 'graph' */
     IGRAPH_CHECK(igraph_copy(&graph_copy, graph));
     IGRAPH_FINALLY(igraph_destroy, &graph_copy);
-    IGRAPH_CHECK(igraph_simplify(&graph_copy, /* multiple */ 1, /* loops */ 1, NULL));
+    IGRAPH_CHECK(igraph_simplify(&graph_copy, /* multiple */ true, /* loops */ true, NULL));
 
     /* ---------------------------------------------------------------- */
     /* 2 Find k vertices with the largest degrees (x1;..,xk). Check

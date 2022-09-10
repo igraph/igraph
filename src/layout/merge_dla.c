@@ -25,7 +25,6 @@
 #include "igraph_progress.h"
 #include "igraph_random.h"
 
-#include "core/grid.h"
 #include "core/interruption.h"
 #include "core/math.h"
 #include "layout/merge_grid.h"
@@ -33,13 +32,15 @@
 
 /**
  * \function igraph_layout_merge_dla
- * \brief Merge multiple layouts by using a DLA algorithm
+ * \brief Merges multiple layouts by using a DLA algorithm.
  *
- * </para><para>
+ * \experimental
+ *
  * First each layout is covered by a circle. Then the layout of the
  * largest graph is placed at the origin. Then the other layouts are
  * placed by the DLA algorithm, larger ones first and smaller ones
  * last.
+ *
  * \param thegraphs Pointer vector containing the graph objects of
  *        which the layouts will be merged.
  * \param coords List of matrices with the 2D layouts of the graphs in \p thegraphs.
@@ -47,7 +48,7 @@
  *        be stored here. It will be resized if needed.
  * \return Error code.
  *
- * Added in version 0.2. This function is experimental.
+ * Added in version 0.2.
  *
  * </para><para>
  * Time complexity: TODO.

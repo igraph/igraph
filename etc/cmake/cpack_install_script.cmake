@@ -70,6 +70,11 @@ if(CPACK_SOURCE_INSTALLED_DIRECTORIES)
     )
     file(
         INSTALL
+        "${SOURCE_DIR}/tools/strip_licenses_from_examples.py"
+        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/tools"
+    )
+    file(
+        INSTALL
         "${CPACK_PACKAGE_DIRECTORY}/doc/html"
         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/doc"
     )

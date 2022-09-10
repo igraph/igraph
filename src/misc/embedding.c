@@ -25,7 +25,6 @@
 
 #include "igraph_adjlist.h"
 #include "igraph_blas.h"
-#include "igraph_centrality.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
 
@@ -378,10 +377,8 @@ static igraph_error_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_
 static igraph_error_t igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
                               int n, void *extra) {
 
-    int i;
-
     igraph_i_lsembedding_dad(to, from, n, extra);
-    for (i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         to[i] = from[i] - to[i];
     }
 
@@ -390,10 +387,9 @@ static igraph_error_t igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_
 
 static igraph_error_t igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
                                int n, void *extra) {
-    int i;
 
     igraph_i_lsembedding_dadw(to, from, n, extra);
-    for (i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         to[i] = from[i] - to[i];
     }
 
@@ -1095,7 +1091,7 @@ igraph_error_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
 
 /**
  * \function igraph_dim_select
- * Dimensionality selection
+ * \brief Dimensionality selection.
  *
  * Dimensionality selection for singular values using
  * profile likelihood.

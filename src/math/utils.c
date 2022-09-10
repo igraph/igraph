@@ -69,7 +69,7 @@ int igraph_is_neginf(double x) {
  *         the given level of tolerance, false otherwise.
  */
 igraph_bool_t igraph_almost_equals(double a, double b, double eps) {
-    return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
+    return igraph_cmp_epsilon(a, b, eps) == 0;
 }
 
 /* Use value-safe floating point math for igraph_cmp_epsilon() with

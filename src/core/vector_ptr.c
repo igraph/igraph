@@ -298,7 +298,7 @@ void igraph_vector_ptr_clear(igraph_vector_ptr_t* v) {
  * \param v The pointer vector.
  * \param e The new element to include in the pointer vector.
  * \return Error code.
- * \sa igraph_vector_push_back() for the corresponding operation of
+ * \sa \ref igraph_vector_push_back() for the corresponding operation of
  * the ordinary vector type.
  *
  * Time complexity: O(1) or O(n), n is the number of elements in the
@@ -662,18 +662,18 @@ typedef int cmp_t (const void *, const void *);
  * Comparison function passed to qsort_r from  igraph_vector_ptr_sort_ind
  */
 static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const void *p2) {
-    cmp_t* cmp = (cmp_t*) thunk;
+    cmp_t *cmp = (cmp_t *) thunk;
     uintptr_t *pa = (uintptr_t*) p1;
     uintptr_t *pb = (uintptr_t*) p2;
-    void** item_a_ptr = (void**) *pa;
-    void** item_b_ptr = (void**) *pb;
+    void **item_a_ptr = (void**) *pa;
+    void **item_b_ptr = (void**) *pb;
     return cmp(*item_a_ptr, *item_b_ptr);
 }
 
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_sort_ind
- * \brief Return a permutation of indices that sorts a vector of pointers
+ * \brief Returns a permutation of indices that sorts a vector of pointers.
  *
  * Takes an unsorted array \c v as input and computes an array of
  * indices inds such that v[ inds[i] ], with i increasing from 0, is
@@ -700,7 +700,7 @@ static int igraph_vector_ptr_i_sort_ind_cmp(void *thunk, const void *p1, const v
  */
 
 igraph_error_t igraph_vector_ptr_sort_ind(igraph_vector_ptr_t *v,
-        igraph_vector_int_t *inds, cmp_t cmp) {
+        igraph_vector_int_t *inds, cmp_t *cmp) {
     igraph_integer_t i;
     uintptr_t *vind, first;
     igraph_integer_t n = igraph_vector_ptr_size(v);

@@ -43,7 +43,7 @@
  * \param m The number of edges to add in a time step (i.e. after
  *        adding a vertex).
  * \param directed Boolean, whether to generate a directed graph.
- * \param citation Boolean, if \c TRUE, the edges always
+ * \param citation Boolean, if \c true, the edges always
  *        originate from the most recently added vertex and are
  *        connected to a previous vertex.
  * \return Error code:

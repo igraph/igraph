@@ -87,7 +87,7 @@ igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
-    IGRAPH_CHECK(igraph_simplify(graph, 1 /* true */, 1 /* true */, NULL));
+    IGRAPH_CHECK(igraph_simplify(graph, true, true, NULL));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 

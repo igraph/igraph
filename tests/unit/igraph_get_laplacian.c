@@ -30,7 +30,7 @@ void test_laplacian(igraph_t *g, const igraph_vector_t *w, igraph_bool_t dir, ig
 
     igraph_get_laplacian(g, &m, IGRAPH_OUT, normalization, w);
     igraph_get_laplacian_sparse(g, &m_sparse, IGRAPH_OUT, normalization, w);
-    igraph_matrix_printf(&m, "%9g");
+    igraph_matrix_print(&m);
     igraph_sparsemat_as_matrix(&m_converted_sparse, &m_sparse);
     IGRAPH_ASSERT(igraph_matrix_all_almost_e(&m, &m_converted_sparse, 1e-15));
 
@@ -60,8 +60,8 @@ int main() {
                         (directed ? "" : "un")
                       );
 
-                test_laplacian(directed ? &g_e_dir : &g_e_un, weighted ? &weights_e : NULL, directed, normalization);
-                test_laplacian(directed ? &g_dir : &g_un, weighted ? &weights : NULL, directed, normalization);
+                test_laplacian(directed ? &g_e_dir : &g_e_un, weighted ? &weights_e : NULL, directed, (igraph_laplacian_normalization_t) normalization);
+                test_laplacian(directed ? &g_dir : &g_un, weighted ? &weights : NULL, directed, (igraph_laplacian_normalization_t) normalization);
             }
         }
     }

@@ -78,7 +78,7 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
     igraph_vector_int_t edges;
     igraph_integer_t nodes;
     igraph_integer_t i, j;
-    igraph_bool_t end = 0;
+    igraph_bool_t end = false;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 

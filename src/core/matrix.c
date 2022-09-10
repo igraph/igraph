@@ -54,47 +54,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
-#ifndef USING_R
-igraph_error_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
-
-    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
-    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
-    igraph_integer_t i, j;
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
-            igraph_complex_t z = MATRIX(*m, i, j);
-            if (j != 0) {
-                putchar(' ');
-            }
-            printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-        }
-        printf("\n");
-    }
-
-    return IGRAPH_SUCCESS;
-}
-#endif
-
-igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
-                                 FILE *file) {
-
-    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
-    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
-    igraph_integer_t i, j;
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
-            igraph_complex_t z = MATRIX(*m, i, j);
-            if (j != 0) {
-                fputc(' ', file);
-            }
-            fprintf(file, "%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-        }
-        fprintf(file, "\n");
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \ingroup matrix
  * \function igraph_matrix_complex_real
@@ -255,7 +214,7 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
  * \return True if the two matrices are almost equal, false if there is at least
  *     one differing element or if the matrices are not of the same dimensions.
  */
-igraph_error_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
+igraph_bool_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
                                                   igraph_matrix_complex_t *rhs,
                                                   igraph_real_t eps) {
     return lhs->ncol == rhs->ncol && lhs->nrow == rhs->nrow &&

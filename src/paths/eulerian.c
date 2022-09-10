@@ -40,7 +40,8 @@ The function returns one of the following values
 has_path is set to 1 if a path exists, 0 otherwise
 has_cycle is set to 1 if a cycle exists, 0 otherwise
 */
-static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
+static igraph_error_t igraph_i_is_eulerian_undirected(
+        const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
     igraph_integer_t odd;
     igraph_vector_int_t degree;
     igraph_vector_int_t csize;
@@ -57,8 +58,8 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
 
     if (igraph_ecount(graph) == 0 || n <= 1) {
         start_of_path = 0; /* in case the graph has one vertex with self-loops */
-        *has_path = 1;
-        *has_cycle = 1;
+        *has_path = true;
+        *has_cycle = true;
         return  IGRAPH_SUCCESS;
     }
 
@@ -74,8 +75,8 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
             cluster_count++;
             if (cluster_count > 1) {
                 /* disconnected edges, they'll never reach each other */
-                *has_path = 0;
-                *has_cycle = 0;
+                *has_path = false;
+                *has_cycle = false;
                 igraph_vector_int_destroy(&csize);
                 IGRAPH_FINALLY_CLEAN(1);
 
@@ -120,8 +121,8 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
         if (es + ens > 1) {
             /* 2+ singletons with self loops or singleton with self-loops and
              * 1+ edges in the non-singleton part of the graph. */
-            *has_path = 0;
-            *has_cycle = 0;
+            *has_path = false;
+            *has_cycle = false;
             igraph_vector_int_destroy(&nonsingleton);
             igraph_vector_int_destroy(&degree);
             IGRAPH_FINALLY_CLEAN(2);
@@ -135,14 +136,14 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
 
     /* this is the usual algorithm on the connected part of the graph */
     if (odd > 2) {
-        *has_path = 0;
-        *has_cycle = 0;
+        *has_path = false;
+        *has_cycle = false;
     } else if (odd == 2) {
-        *has_path = 1;
-        *has_cycle = 0;
+        *has_path = true;
+        *has_cycle = false;
     } else {
-        *has_path = 1;
-        *has_cycle = 1;
+        *has_path = true;
+        *has_cycle = true;
     }
 
     /* set start of path if there is one but there is no cycle */
@@ -162,7 +163,8 @@ static igraph_error_t igraph_i_is_eulerian_undirected(const igraph_t *graph, igr
 }
 
 
-static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle,                                         igraph_integer_t *start_of_path) {
+static igraph_error_t igraph_i_is_eulerian_directed(
+        const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
     igraph_integer_t incoming_excess, outgoing_excess, n;
     igraph_integer_t i, vsize;
     igraph_integer_t cluster_count;
@@ -179,8 +181,8 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
 
     if (igraph_ecount(graph) == 0 || n <= 1) {
         start_of_path = 0; /* in case the graph has one vertex with self-loops */
-        *has_path = 1;
-        *has_cycle = 1;
+        *has_path = true;
+        *has_cycle = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -200,8 +202,8 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
             cluster_count++;
             if (cluster_count > 1) {
                 /* weakly disconnected edges, they'll never reach each other */
-                *has_path = 0;
-                *has_cycle = 0;
+                *has_path = false;
+                *has_cycle = false;
                 igraph_vector_int_destroy(&csize);
                 IGRAPH_FINALLY_CLEAN(1);
 
@@ -249,8 +251,8 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
         if (es + ens > 1) {
             /* 2+ singletons with self loops or singleton with self-loops and
              * 1+ edges in the non-singleton part of the graph. */
-            *has_path = 0;
-            *has_cycle = 0;
+            *has_path = false;
+            *has_cycle = false;
             igraph_vector_int_destroy(&nonsingleton);
             igraph_vector_int_destroy(&in_degree);
             igraph_vector_int_destroy(&out_degree);
@@ -284,8 +286,8 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
          * 1. 1+ vertices have 2+ in/out
          * 2. 2+ nodes have 1+ in/out */
         if (incoming_excess > 1 || outgoing_excess > 1) {
-            *has_path = 0;
-            *has_cycle = 0;
+            *has_path = false;
+            *has_cycle = false;
             igraph_vector_int_destroy(&nonsingleton);
             igraph_vector_int_destroy(&in_degree);
             igraph_vector_int_destroy(&out_degree);
@@ -295,7 +297,7 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
         }
     }
 
-    *has_path = 1;
+    *has_path = true;
     /* perfect edge balance -> strong connectivity */
     *has_cycle = (incoming_excess == 0) && (outgoing_excess == 0);
     /* either way, the start was set already */
@@ -312,7 +314,7 @@ static igraph_error_t igraph_i_is_eulerian_directed(const igraph_t *graph, igrap
 /**
  * \ingroup Eulerian
  * \function igraph_is_eulerian
- * \brief Checks whether an Eulerian path or cycle exists
+ * \brief Checks whether an Eulerian path or cycle exists.
  *
  * An Eulerian path traverses each edge of the graph precisely once. A closed
  * Eulerian path is referred to as an Eulerian cycle.
@@ -340,7 +342,10 @@ igraph_error_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path
 }
 
 
-static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res, igraph_integer_t start_of_path) {
+static igraph_error_t igraph_i_eulerian_path_undirected(
+        const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res,
+        igraph_integer_t start_of_path) {
+
     igraph_integer_t curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;
@@ -453,7 +458,10 @@ static igraph_error_t igraph_i_eulerian_path_undirected(const igraph_t *graph, i
 }
 
 /* solution adapted from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/ */
-static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res, igraph_integer_t start_of_path) {
+static igraph_error_t igraph_i_eulerian_path_directed(
+        const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res,
+        igraph_integer_t start_of_path) {
+
     igraph_integer_t curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;
@@ -568,7 +576,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igr
 /**
  * \ingroup Eulerian
  * \function igraph_eulerian_cycle
- * \brief Finds an Eulerian cycle
+ * \brief Finds an Eulerian cycle.
  *
  * Finds an Eulerian cycle, if it exists. An Eulerian cycle is a closed path
  * that traverses each edge precisely once.
@@ -595,7 +603,9 @@ static igraph_error_t igraph_i_eulerian_path_directed(const igraph_t *graph, igr
  *
  */
 
-igraph_error_t igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res) {
+igraph_error_t igraph_eulerian_cycle(
+        const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res) {
+
     igraph_bool_t has_cycle;
     igraph_bool_t has_path;
     igraph_integer_t start_of_path = 0;
@@ -625,7 +635,7 @@ igraph_error_t igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_int_t 
 /**
  * \ingroup Eulerian
  * \function igraph_eulerian_path
- * \brief Finds an Eulerian path
+ * \brief Finds an Eulerian path.
  *
  * Finds an Eulerian path, if it exists. An Eulerian path traverses
  * each edge precisely once.
@@ -652,7 +662,9 @@ igraph_error_t igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_int_t 
  *
  */
 
-igraph_error_t igraph_eulerian_path(const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res) {
+igraph_error_t igraph_eulerian_path(
+        const igraph_t *graph, igraph_vector_int_t *edge_res, igraph_vector_int_t *vertex_res) {
+
     igraph_bool_t has_cycle;
     igraph_bool_t has_path;
     igraph_integer_t start_of_path = 0;

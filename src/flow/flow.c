@@ -42,8 +42,6 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
-#include "config.h"
-
 /*
  * Some general remarks about the functions in this file.
  *
@@ -413,7 +411,7 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
 
 /**
  * \function igraph_maxflow
- * Maximum network flow between a pair of vertices
+ * \brief Maximum network flow between a pair of vertices.
  *
  * </para><para>This function implements the Goldberg-Tarjan algorithm for
  * calculating value of the maximum flow in a directed or undirected
@@ -690,14 +688,14 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
 
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
-        VECTOR(added)[target] = 1;
+        VECTOR(added)[target] = true;
         marked++;
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
                 igraph_integer_t nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
-                    VECTOR(added)[nei] = 1;
+                    VECTOR(added)[nei] = true;
                     marked++;
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                 }
@@ -1030,7 +1028,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
 /**
  * \function igraph_maxflow_value
- * \brief Maximum flow in a network with the push/relabel algorithm
+ * \brief Maximum flow in a network with the push/relabel algorithm.
  *
  * </para><para>This function implements the Goldberg-Tarjan algorithm for
  * calculating value of the maximum flow in a directed or undirected
@@ -1090,7 +1088,7 @@ igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 
 /**
  * \function igraph_st_mincut_value
- * \brief The minimum s-t cut in a graph
+ * \brief The minimum s-t cut in a graph.
  *
  * </para><para> The minimum s-t cut in a weighted (=valued) graph is the
  * total minimum edge weight needed to remove from the graph to
@@ -1101,6 +1099,7 @@ igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
  * <para> The minimum s-t cut between two vertices is known to be same
  * as the maximum flow between these two vertices. So this function
  * calls \ref igraph_maxflow_value() to do the calculation.
+ *
  * \param graph The input graph.
  * \param value Pointer to a real variable, the result will be stored
  *        here.
@@ -1131,13 +1130,14 @@ igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *valu
 
 /**
  * \function igraph_st_mincut
- * Minimum cut between a source and a target vertex
+ * \brief Minimum cut between a source and a target vertex.
  *
  * Finds the edge set that has the smallest total capacity among all
  * edge sets that disconnect the source and target vertices.
  *
  * </para><para>The calculation is performed using maximum flow
  * techniques, by calling \ref igraph_maxflow().
+ *
  * \param graph The input graph.
  * \param value Pointer to a real variable, the value of the cut is
  *        stored here.
@@ -1582,6 +1582,7 @@ static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
  * </para><para>
  * The first implementation of the actual cut calculation for
  * undirected graphs was made by Gregory Benison, thanks Greg.
+ *
  * \param graph The input graph.
  * \param value Pointer to a float, the value of the cut will be
  *    stored here.
@@ -1643,7 +1644,7 @@ static igraph_error_t igraph_i_mincut_value_undirected(const igraph_t *graph,
 
 /**
  * \function igraph_mincut_value
- * \brief The minimum edge cut in a graph
+ * \brief The minimum edge cut in a graph.
  *
  * </para><para> The minimum edge cut in a graph is the total minimum
  * weight of the edges needed to remove from the graph to make the
@@ -1867,7 +1868,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
 
 /**
  * \function igraph_st_vertex_connectivity
- * \brief The vertex connectivity of a pair of vertices
+ * \brief The vertex connectivity of a pair of vertices.
  *
  * </para><para>The vertex connectivity of two vertices (\c source and
  * \c target) is the minimum number of vertices that have to be
@@ -1880,6 +1881,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
  *
  * <para>The current implementation uses maximum flow calculations to
  * obtain the result.
+ *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
  * \param source The id of the source vertex.
@@ -2026,7 +2028,7 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
 
 /**
  * \function igraph_vertex_connectivity
- * The vertex connectivity of a graph
+ * \brief The vertex connectivity of a graph.
  *
  * </para><para> The vertex connectivity of a graph is the minimum
  * vertex connectivity along each pairs of vertices in the graph.
@@ -2035,6 +2037,7 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
  * cohesion as defined in Douglas R. White and Frank Harary: The
  * cohesiveness of blocks in social networks: node connectivity and
  * conditional density, Sociological Methodology 31:305--359, 2001.
+ *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
  * \param checks Logical constant. Whether to check that the graph is
@@ -2055,7 +2058,7 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
 igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                igraph_bool_t checks) {
 
-    igraph_bool_t ret = 0;
+    igraph_bool_t ret = false;
 
     if (checks) {
         IGRAPH_CHECK(igraph_i_connectivity_checks(graph, res, &ret));
@@ -2075,7 +2078,7 @@ igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_
 
 /**
  * \function igraph_st_edge_connectivity
- * \brief Edge connectivity of a pair of vertices
+ * \brief Edge connectivity of a pair of vertices.
  *
  * </para><para> The edge connectivity of two vertices (\c source and
  * \c target) in a graph is the minimum number of edges that
@@ -2084,6 +2087,7 @@ igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_
  *
  * <para>This function uses the maximum flow algorithm to calculate
  * the edge connectivity.
+ *
  * \param graph The input graph, it has to be directed.
  * \param res Pointer to an integer, the result will be stored here.
  * \param source The id of the source vertex.
@@ -2125,6 +2129,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
  * defined in Douglas R. White and Frank Harary: The cohesiveness of
  * blocks in social networks: node connectivity and conditional
  * density, Sociological Methodology 31:305--359, 2001.
+ *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
  * \param checks Logical constant. Whether to check that the graph is
@@ -2146,7 +2151,7 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
 
 igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
                              igraph_bool_t checks) {
-    igraph_bool_t ret = 0;
+    igraph_bool_t ret = false;
     igraph_integer_t number_of_nodes = igraph_vcount(graph);
 
     /* igraph_mincut_value returns infinity for the singleton graph,
@@ -2184,6 +2189,7 @@ igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t 
  *
  * <para> Note that the number of disjoint paths is the same as the
  * edge connectivity of the two vertices using uniform edge weights.
+ *
  * \param graph The input graph, can be directed or undirected.
  * \param res Pointer to an integer variable, the result will be
  *        stored here.
@@ -2226,6 +2232,7 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_
  * <para> Note that the number of vertex-disjoint paths is the same as
  * the vertex connectivity of the two vertices in most cases (if the
  * two vertices are not connected by an edge).
+ *
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be
  *        stored here.
@@ -2308,6 +2315,7 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
  * conditional density, (Sociological Methodology 31:305--359, 2001)
  * and basically it is the edge connectivity of the graph
  * with uniform edge weights.
+ *
  * \param graph The input graph, either directed or undirected.
  * \param res Pointer to an integer, the result will be stored here.
  * \param checks Logical constant. Whether to check that the graph is
@@ -2339,8 +2347,8 @@ igraph_error_t igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
  * </para><para> This quantity was defined by White and Harary in <quote>The
  * cohesiveness of blocks in social networks: node connectivity and
  * conditional density</quote>, (Sociological Methodology 31:305--359, 2001)
- * and it is the same as the vertex connectivity of a
- * graph.
+ * and it is the same as the vertex connectivity of a graph.
+ *
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be
  *        stored here.

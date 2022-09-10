@@ -106,15 +106,15 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
         added[node] = i + 1;
         igraph_dqueue_int_clear(&q);
         if (order > 0) {
-            igraph_dqueue_int_push(&q, node);
-            igraph_dqueue_int_push(&q, 0);
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, node));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         }
 
         while (!igraph_dqueue_int_empty(&q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
-            igraph_neighbors(graph, &neis, actnode, mode);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
@@ -380,15 +380,15 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
             IGRAPH_CHECK(igraph_vector_int_push_back(&tmp, node));
         }
         if (order > 0) {
-            igraph_dqueue_int_push(&q, node);
-            igraph_dqueue_int_push(&q, 0);
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, node));
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
         }
 
         while (!igraph_dqueue_int_empty(&q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
-            igraph_neighbors(graph, &neis, actnode, mode);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {

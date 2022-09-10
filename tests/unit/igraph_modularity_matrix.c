@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 void test_print_destroy(igraph_t *g, igraph_vector_t *weights, float resolution, igraph_matrix_t *modmat, igraph_bool_t directed) {
-    int i, j;
+    igraph_integer_t i, j;
     IGRAPH_ASSERT(igraph_modularity_matrix(g, weights, resolution, modmat, directed) == IGRAPH_SUCCESS);
     for (i = 0; i < igraph_matrix_nrow(modmat); i++) {
         for (j = 0; j < igraph_matrix_ncol(modmat); j++) {
@@ -43,7 +43,7 @@ int main() {
     igraph_vector_int_t membership;
     igraph_matrix_t modmat;
     igraph_real_t modularity, test_modularity;
-    int i, j;
+    igraph_integer_t i, j;
 
     printf("No vertices:\n");
     igraph_small(&g, 0, /*directed*/0, -1);

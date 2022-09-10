@@ -22,53 +22,36 @@
 */
 
 #include <igraph.h>
+#include "test_utilities.h"
 
 int main() {
 
     igraph_t g;
     igraph_vector_int_t v;
-    int ret;
 
     /* Create graph */
-    igraph_vector_int_init(&v, 8);
-    VECTOR(v)[0] = 0;
-    VECTOR(v)[1] = 1;
-    VECTOR(v)[2] = 1;
-    VECTOR(v)[3] = 2;
-    VECTOR(v)[4] = 2;
-    VECTOR(v)[5] = 3;
-    VECTOR(v)[6] = 2;
-    VECTOR(v)[7] = 2;
-    igraph_create(&g, &v, 0, 1);
+    igraph_small(&g, 0, IGRAPH_DIRECTED,
+                 0, 1, 1, 2, 2, 3, 2, 2,
+                 -1);
 
     /* Add edges */
-    igraph_vector_int_resize(&v, 4);
-    VECTOR(v)[0] = 2;
-    VECTOR(v)[1] = 1;
-    VECTOR(v)[2] = 3;
-    VECTOR(v)[3] = 3;
+    igraph_vector_int_init_int(&v, 4, 2, 1, 3, 3);
     igraph_add_edges(&g, &v, 0);
 
     /* Check result */
     igraph_get_edgelist(&g, &v, 0);
-    igraph_vector_int_sort(&v);
-    igraph_vector_int_print(&v);
+    print_vector_int(&v);
 
     /* Error, vector length */
-    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_vector_int_resize(&v, 3);
     VECTOR(v)[0] = 0;
     VECTOR(v)[1] = 1;
     VECTOR(v)[2] = 2;
-    ret = igraph_add_edges(&g, &v, 0);
-    if (ret != IGRAPH_EINVEVECTOR) {
-        return 1;
-    }
+    CHECK_ERROR(igraph_add_edges(&g, &v, 0), IGRAPH_EINVEVECTOR);
 
     /* Check result */
     igraph_get_edgelist(&g, &v, 0);
-    igraph_vector_int_sort(&v);
-    igraph_vector_int_print(&v);
+    print_vector_int(&v);
 
     /* Error, vector IDs */
     igraph_vector_int_resize(&v, 4);
@@ -76,18 +59,16 @@ int main() {
     VECTOR(v)[1] = 1;
     VECTOR(v)[2] = 2;
     VECTOR(v)[3] = 4;
-    ret = igraph_add_edges(&g, &v, 0);
-    if (ret != IGRAPH_EINVVID) {
-        return 2;
-    }
+    CHECK_ERROR(igraph_add_edges(&g, &v, 0), IGRAPH_EINVVID);
 
     /* Check result */
     igraph_get_edgelist(&g, &v, 0);
-    igraph_vector_int_sort(&v);
-    igraph_vector_int_print(&v);
+    print_vector_int(&v);
 
     igraph_vector_int_destroy(&v);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

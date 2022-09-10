@@ -43,8 +43,7 @@
  * \param dim The dimension of the lattice.
  * \param size The size of the lattice along each dimension.
  * \param nei The size of the neighborhood for each vertex. This is
- *    the same as the \p nei argument of \ref
- *    igraph_connect_neighborhood().
+ *    the same as the \p nei argument of \ref igraph_connect_neighborhood().
  * \param p The rewiring probability. A real number between zero and
  *   one (inclusive).
  * \param loops Logical, whether to generate loop edges.
@@ -86,10 +85,10 @@ igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
     igraph_vector_int_fill(&dimvector, size);
 
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&periodic, dim);
-    igraph_vector_bool_fill(&periodic, 1);
+    igraph_vector_bool_fill(&periodic, true);
 
     IGRAPH_CHECK(igraph_square_lattice(graph, &dimvector, nei, IGRAPH_UNDIRECTED,
-                                0 /* mutual */, &periodic));
+                                /* mutual */ false, &periodic));
 
     igraph_vector_bool_destroy(&periodic);
     igraph_vector_int_destroy(&dimvector);

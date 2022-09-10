@@ -31,9 +31,14 @@
 
 int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
                                   void* scanner);
-void igraph_ncol_yylex_destroy (void *scanner );
+int igraph_ncol_yylex_destroy (void *scanner );
 int igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
 void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
+
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_ncol_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_ncol_yylex_destroy(scanner);
+}
 
 /**
  * \ingroup loadsave
@@ -68,7 +73,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  *        the <code>.ncol</code> file. If it is not \c NULL and some unknown
  *        vertex names are found in the <code>.ncol</code> file then new vertex
  *        ids will be assigned to them.
- * \param names Logical value, if TRUE the symbolic names of the
+ * \param names Logical value, if \c true the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
  * \param weights Whether to add the weights of the edges to the
@@ -143,7 +148,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_ncol_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_ncol_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_ncol_yylex_destroy_wrapper, context.scanner);
 
     igraph_ncol_yyset_in(instream, context.scanner);
 

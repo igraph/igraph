@@ -72,46 +72,46 @@ static igraph_error_t igraph_i_maximal_cliques_up(
         igraph_vector_int_t *R,
         igraph_vector_int_t *H);
 
-#define PRINT_PX do {                              \
-        int j;                                 \
-        printf("PX=");                             \
-        for (j=0; j<PS; j++) {                         \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf("( ");                              \
-        for (; j<=PE; j++) {                           \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf("| ");                              \
-        for (; j<=XE; j++) {                           \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf(") ");                              \
-        for (; j<igraph_vector_int_size(PX); j++) {                \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf("\n");                              \
+#define PRINT_PX do { \
+        igraph_integer_t j; \
+        printf("PX="); \
+        for (j=0; j<PS; j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf("( "); \
+        for (; j<=PE; j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf("| "); \
+        for (; j<=XE; j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf(") "); \
+        for (; j<igraph_vector_int_size(PX); j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf("\n"); \
     } while (0);
 
-#define PRINT_PX1 do {                             \
-        int j;                                 \
-        printf("PX=");                             \
-        for (j=0; j<PS; j++) {                         \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf("( ");                              \
-        for (; j<=*PE; j++) {                          \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf("| ");                              \
-        for (; j<=XE; j++) {                           \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf(") ");                              \
-        for (; j<igraph_vector_int_size(PX); j++) {                \
-            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]);                       \
-        }                                      \
-        printf("\n");                              \
+#define PRINT_PX1 do { \
+        igraph_integer_t j; \
+        printf("PX="); \
+        for (j=0; j<PS; j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf("( "); \
+        for (; j<=*PE; j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf("| "); \
+        for (; j<=XE; j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf(") "); \
+        for (; j<igraph_vector_int_size(PX); j++) { \
+            printf("%" IGRAPH_PRId " ", VECTOR(*PX)[j]); \
+        } \
+        printf("\n"); \
     } while (0)
 
 static igraph_error_t igraph_i_maximal_cliques_reorder_adjlists(
@@ -200,7 +200,7 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
 
     for (j = PS; j <= PE; j++) {
         igraph_integer_t vcand = VECTOR(*PX)[j];
-        igraph_bool_t nei = 0;
+        igraph_bool_t nei = false;
         igraph_integer_t k = 0;
         for (k = 0; k < pivotvectlen; k++) {
             igraph_integer_t unv = VECTOR(*pivotvectneis)[k];
@@ -221,13 +221,13 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
     return IGRAPH_SUCCESS;
 }
 
-#define SWAP(p1,p2) do {            \
-        igraph_integer_t v1=VECTOR(*PX)[p1];         \
-        igraph_integer_t v2=VECTOR(*PX)[p2];         \
-        VECTOR(*PX)[p1] = v2;           \
-        VECTOR(*PX)[p2] = v1;           \
-        VECTOR(*pos)[v1] = (p2)+1;          \
-        VECTOR(*pos)[v2] = (p1)+1;          \
+#define SWAP(p1,p2) do { \
+        igraph_integer_t v1=VECTOR(*PX)[p1]; \
+        igraph_integer_t v2=VECTOR(*PX)[p2]; \
+        VECTOR(*PX)[p1] = v2; \
+        VECTOR(*PX)[p2] = v1; \
+        VECTOR(*pos)[v1] = (p2)+1; \
+        VECTOR(*pos)[v2] = (p1)+1; \
     } while (0)
 
 static igraph_error_t igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,

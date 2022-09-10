@@ -28,7 +28,7 @@ int main() {
     FILE *file;
 
     file = fopen("empty", "r");
-    IGRAPH_ASSERT(file);
+    IGRAPH_ASSERT(file != NULL);
 
     /* Formats for which an emtpy file is valid */
 

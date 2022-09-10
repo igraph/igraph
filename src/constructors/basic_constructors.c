@@ -120,7 +120,8 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  *        \endclist
  * \param ... The additional arguments giving the edges of the
  *        graph. Don't forget to supply an additional '-1' after the last
- *        (meaningful) argument.
+ *        (meaningful) argument. The \p first parameter is present for
+ *        technical reasons and represents the first variadic argument.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
@@ -130,19 +131,17 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  */
 
 igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
-                 ...) {
+                            int first, ...) {
     igraph_vector_int_t edges;
     va_list ap;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    va_start(ap, directed);
-    while (1) {
-        int num = va_arg(ap, int);
-        if (num == -1) {
-            break;
-        }
+    va_start(ap, first);
+    int num = first;
+    while (num != -1) {
         igraph_vector_int_push_back(&edges, num);
+        num = va_arg(ap, int);
     }
     va_end(ap);
 

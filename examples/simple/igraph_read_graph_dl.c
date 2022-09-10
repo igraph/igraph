@@ -31,31 +31,24 @@ int main() {
                             "fullmatrix3.dl", "fullmatrix4.dl",
                             "edgelist1.dl", "edgelist2.dl", "edgelist3.dl",
                             "edgelist4.dl", "edgelist5.dl", "edgelist6.dl",
-                            "edgelist7.dl", "nodelist1.dl", "nodelist2.dl"
-                          };
-    int no_files = sizeof(files) / sizeof(const char*);
-    int i, ret;
-    igraph_t g;
+                            "edgelist7.dl", "nodelist1.dl", "nodelist2.dl" };
+    igraph_t graph;
     FILE *infile;
 
     /* Turn on attribute handling. */
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    for (i = 0; i < no_files; i++) {
+    for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
         printf("Doing %s\n", files[i]);
         infile = fopen(files[i], "r");
         if (!infile) {
             printf("Cannot open file: %s\n", files[i]);
             abort();
         }
-        igraph_read_graph_dl(&g, infile, /*directed=*/ 1);
-        ret = fclose(infile);
-        if (ret) {
-            printf("Cannot close file: %s\n", files[i]);
-            abort();
-        }
-        igraph_write_graph_edgelist(&g, stdout);
-        igraph_destroy(&g);
+        igraph_read_graph_dl(&graph, infile, IGRAPH_DIRECTED);
+        fclose(infile);
+        igraph_write_graph_edgelist(&graph, stdout);
+        igraph_destroy(&graph);
     }
 
     if (IGRAPH_FINALLY_STACK_SIZE() != 0) {

@@ -60,7 +60,7 @@
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
  *
- * \example examples/simple/igraph_empty.c
+ * \example examples/simple/creation.c
  */
 igraph_error_t igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     return igraph_empty_attrs(graph, n, directed, 0);
@@ -178,7 +178,7 @@ igraph_error_t igraph_edges(const igraph_t *graph, igraph_es_t eids, igraph_vect
 
 /**
  * \function igraph_invalidate_cache
- * \brief Invalidates the internal cache of an igraph graph
+ * \brief Invalidates the internal cache of an igraph graph.
  *
  * </para><para>
  * igraph graphs cache some basic properties about themselves in an internal

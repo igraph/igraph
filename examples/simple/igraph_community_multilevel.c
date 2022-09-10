@@ -53,7 +53,7 @@ int main() {
     igraph_vector_int_t edges;
     igraph_vector_int_t membership;
     igraph_matrix_int_t memberships;
-    int i, j, k;
+    igraph_integer_t i, j, k;
 
     igraph_vector_init(&modularity, 0);
     igraph_vector_int_init(&membership, 0);

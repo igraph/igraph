@@ -22,12 +22,10 @@
 
 */
 
-#include <limits.h>
-
-#include "igraph_error.h"
 #include "igraph_blas.h"
-
 #include "linalg/blas_internal.h"
+
+#include <limits.h>
 
 /**
  * \function igraph_blas_dgemv
@@ -55,8 +53,8 @@
  * \example examples/simple/blas.c
  */
 igraph_error_t igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
-                       const igraph_matrix_t* a, const igraph_vector_t* x,
-                       igraph_real_t beta, igraph_vector_t* y) {
+                       const igraph_matrix_t *a, const igraph_vector_t *x,
+                       igraph_real_t beta, igraph_vector_t *y) {
     char trans = transpose ? 'T' : 'N';
     int m, n;
     int inc = 1;
@@ -137,7 +135,7 @@ igraph_error_t igraph_blas_dgemm(igraph_bool_t transpose_a, igraph_bool_t transp
         IGRAPH_ERROR("Matrix B too large for BLAS.", IGRAPH_EOVERFLOW);
     }
     if (beta == 0) {
-        igraph_matrix_resize(c, nrow_oa, ncol_ob);
+        IGRAPH_CHECK(igraph_matrix_resize(c, nrow_oa, ncol_ob));
     }
 
     m = (int) nrow_oa;

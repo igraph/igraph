@@ -119,7 +119,7 @@
 /**
  * \ingroup vector_list
  * \section igraph_vector_list_constructors_and_destructors Constructors and
- * Destructors
+ * destructors
  *
  * <para>\type igraph_vector_list_t objects have to be initialized before using
  * them, this is analogous to calling a constructor on them.

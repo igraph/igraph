@@ -134,7 +134,7 @@ int main() {
                  0, 8, 1, 8, 2, 8, 3, 8, 4, 8, 4, 9, 5, 9, 6, 9, 7, 9, 0, 9,
                  -1);
     igraph_vector_bool_init(&types, igraph_vcount(&g));
-    igraph_vector_bool_fill(&types, 1);
+    igraph_vector_bool_fill(&types, true);
     VECTOR(types)[8] = VECTOR(types)[9] = 0;
 
     igraph_vector_int_init(&mult1, 0);

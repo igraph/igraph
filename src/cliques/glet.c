@@ -140,7 +140,7 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
     igraph_integer_t c, nc = igraph_vector_int_list_size(cliques);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_i_subclique_next_free_t freedata = { 0, 0, 0, nc };
+    igraph_i_subclique_next_free_t freedata = { NULL, NULL, NULL, nc };
 
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Invalid length of weight vector", IGRAPH_EINVAL);
@@ -151,20 +151,17 @@ static igraph_error_t igraph_i_subclique_next(const igraph_t *graph,
     }
 
     IGRAPH_FINALLY(igraph_i_subclique_next_free, &freedata);
+
     *resultids = IGRAPH_CALLOC(nc, igraph_vector_int_t);
-    if (!*resultids) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(*resultids, "Cannot calculate next cliques.");
     freedata.resultids = *resultids;
+
     *resultweights = IGRAPH_CALLOC(nc, igraph_vector_t);
-    if (!*resultweights) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(*resultweights, "Cannot calculate next cliques.");
     freedata.resultweights = *resultweights;
+
     *result = IGRAPH_CALLOC(nc, igraph_t);
-    if (!*result) {
-        IGRAPH_ERROR("Cannot calculate next cliques", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(*result, "Cannot calculate next cliques.");
     freedata.result = *result;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&newedges, 100);
@@ -316,11 +313,11 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     igraph_vector_int_t subv;
     igraph_t subg;
     igraph_integer_t i, j, nocliques;
-    igraph_t *newgraphs = 0;
-    igraph_vector_t *newweights = 0;
-    igraph_vector_int_t *newids = 0;
+    igraph_t *newgraphs = NULL;
+    igraph_vector_t *newweights = NULL;
+    igraph_vector_int_t *newids = NULL;
     igraph_vector_t clique_thr, next_thr;
-    igraph_i_subclique_next_free_t freedata = { 0, 0, 0, 0 };
+    igraph_i_subclique_next_free_t freedata = { NULL, NULL, NULL, 0 };
 
     IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&mycliques, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&subv, 0);
@@ -360,9 +357,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_ptr_resize(cliques, igraph_vector_ptr_size(cliques) + nocliques));
     for (i = 0, j = igraph_vector_ptr_size(cliques) - 1; i < nocliques; i++, j--) {
         igraph_vector_int_t *cl = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (!cl) {
-            IGRAPH_ERROR("Cannot find graphlets", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(cl, "Cannot find graphlets.");
         IGRAPH_FINALLY(igraph_free, cl);
 
         *cl = igraph_vector_int_list_pop_back(&mycliques);
@@ -765,7 +760,7 @@ igraph_error_t igraph_i_graphlets_project(
     igraph_vector_int_destroy(&vclidx);
     IGRAPH_FINALLY_CLEAN(8);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -865,7 +860,7 @@ igraph_error_t igraph_graphlets(const igraph_t *graph,
     igraph_vector_destroy(&thresholds);
     IGRAPH_FINALLY_CLEAN(1);
 
-    IGRAPH_CHECK(igraph_graphlets_project(graph, weights, cliques, Mu, /*startMu=*/ 0, niter));
+    IGRAPH_CHECK(igraph_graphlets_project(graph, weights, cliques, Mu, /*startMu=*/ false, niter));
 
     nocliques = igraph_vector_int_list_size(cliques);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, nocliques);

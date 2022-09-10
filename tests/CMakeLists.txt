@@ -121,13 +121,11 @@ add_legacy_tests(
 # basic.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_add_edges
-  igraph_add_vertices
+  creation
   igraph_copy
   igraph_degree
   igraph_delete_edges
   igraph_delete_vertices
-  igraph_empty
   igraph_get_eid
   igraph_get_eids
   igraph_is_directed
@@ -136,10 +134,18 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_add_edges
+  igraph_add_vertices
+  igraph_degree
+  igraph_delete_edges
+  igraph_delete_vertices
   igraph_edges
+  igraph_empty
+  igraph_get_eid
   igraph_is_same_graph
   igraph_i_incident
   igraph_i_neighbors
+  igraph_neighbors
 )
 
 # iterators.at
@@ -189,7 +195,9 @@ add_legacy_tests(
   erdos_renyi_game_gnp
   full
   igraph_adjacency
+  igraph_atlas
   igraph_barabasi_aging_game
+  igraph_barabasi_game
   igraph_bipartite_game
   igraph_callaway_traits_game
   igraph_circulant
@@ -197,6 +205,7 @@ add_legacy_tests(
   igraph_citing_cited_type_game
   igraph_correlated_game
   igraph_correlated_pair_game
+  igraph_create
   igraph_degree_sequence_game
   igraph_dot_product_game
   igraph_establishment_game
@@ -268,13 +277,6 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_feedback_arc_set_undirected
-  igraph_rewire # Uses internal igraph_i_rewire
-  igraph_unfold_tree
-)
-
-add_legacy_tests(
-  FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
   coreness
@@ -292,12 +294,15 @@ add_legacy_tests(
   igraph_convergence_degree
   igraph_count_multiple
   igraph_density
+  igraph_diameter
+  igraph_diameter_dijkstra
   igraph_diversity
   igraph_distances_johnson
   igraph_eccentricity
   igraph_eccentricity_dijkstra
   igraph_edge_betweenness
   igraph_edge_betweenness_subset
+  igraph_feedback_arc_set_undirected
   igraph_get_all_simple_paths
   igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
@@ -327,9 +332,11 @@ add_legacy_tests(
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
+  igraph_rewire # Uses internal igraph_i_rewire
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
+  igraph_unfold_tree
   igraph_widest_paths
   harmonic_centrality
   random_spanning_tree
@@ -343,6 +350,7 @@ add_legacy_tests(
   bug_1760
   bug_1814
   bug_1970
+  bug_2150
 )
 
 # components.at
@@ -368,6 +376,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_layout_drl
+  igraph_layout_drl_3d
   igraph_layout_bipartite
   igraph_layout_fruchterman_reingold
   igraph_layout_fruchterman_reingold_3d
@@ -397,6 +406,7 @@ add_legacy_tests(
   igraph_i_layout_sphere
   igraph_layout_davidson_harel # Uses igraph_i_layout_segments_intersect and igraph_i_layout_point_segment_dist2
   igraph_layout_merge # Uses igraph_i_layout_merge functions
+  igraph_i_umap_fit_ab
 )
 
 # visitors.at
@@ -426,6 +436,7 @@ add_legacy_tests(
   igraph_get_isomorphisms_vf2
   igraph_get_subisomorphisms_vf2
   igraph_subisomorphic
+  igraph_subisomorphic_lad
   igraph_isomorphic_bliss
   isomorphism_test
   isoclasses
@@ -489,19 +500,23 @@ add_legacy_tests(
 # other.at
 add_examples(
   FOLDER examples/simple NAMES
-  igraph_convex_hull
   igraph_power_law_fit
 )
+# igraph_power_law_fit() output is only deterministic when running with 1 thread
+set_property(TEST example::igraph_power_law_fit APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_almost_e
   igraph_almost_equals
+  igraph_convex_hull
   igraph_power_law_fit
   overflow
   prop_caching
   zapsmall
 )
+# igraph_power_law_fit() output is only deterministic when running with 1 thread
+set_property(TEST test::igraph_power_law_fit APPEND PROPERTY ENVIRONMENT "OMP_NUM_THREADS=1")
 
 # operators.at
 add_examples(
@@ -713,6 +728,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_bipartite_create
   igraph_get_incidence
   igraph_incidence
 )
@@ -751,6 +767,7 @@ add_legacy_tests(
   igraph_hrg
   igraph_hrg2
   igraph_hrg3
+  igraph_hrg_create
 )
 
 # microscopic.at
@@ -763,7 +780,10 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_deterministic_optimal_imitation
   igraph_moran_process
+  igraph_roulette_wheel_imitation
+  igraph_stochastic_imitation
 )
 
 # mt.at -- only if we have pthreads
@@ -793,6 +813,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_random_sample
   igraph_rng_get_integer
   mt
   random_sampling
@@ -810,6 +831,11 @@ add_legacy_tests(
 # matching.at
 add_examples(
   FOLDER examples/simple NAMES
+  igraph_maximum_bipartite_matching
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   igraph_maximum_bipartite_matching
 )
 
@@ -900,6 +926,7 @@ add_benchmarks(
   igraph_coloring
   igraph_decompose
   igraph_maximal_cliques
+  igraph_neighborhood
   igraph_pagerank
   igraph_pagerank_weighted
   igraph_power_law_fit

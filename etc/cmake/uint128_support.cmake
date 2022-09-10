@@ -18,6 +18,20 @@ check_cxx_source_compiles("
     HAVE__UMUL128
 )
 
+# Check whether the compiler supports the __umulh() intrinsic
+check_cxx_source_compiles("
+    #include <intrin.h>
+
+    int main() {
+        unsigned long long a = 0, b = 0;
+        volatile unsigned long long c;
+        c = __umulh(a, b);
+        return 0;
+    }
+    "
+    HAVE___UMULH
+)
+
 # Check whether the compiler has __uint128_t
 check_type_size("__uint128_t" UINT128 LANGUAGE CXX)
 if(UINT128 EQUAL 16)

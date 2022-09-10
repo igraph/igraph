@@ -5,18 +5,17 @@
 
 #include "prpack_base_graph.h"
 
-struct igraph_s;
-struct igraph_vector_t;
+#include "igraph_datatype.h"
+#include "igraph_vector.h"
 
 namespace prpack {
 
-    class prpack_igraph_graph : public prpack_base_graph {
-
-        public:
-            // constructors
-            explicit prpack_igraph_graph(const struct igraph_s* g,
-					const struct igraph_vector_t* weights = 0,
-					bool directed = true);
+    class prpack_igraph_graph : public prpack_base_graph {        
+    public:
+        // constructors
+        explicit prpack_igraph_graph(const igraph_t *g,
+                                     const igraph_vector_t *weights = 0,
+                                     bool directed = true);
     };
 
 }
