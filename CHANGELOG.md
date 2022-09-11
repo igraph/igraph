@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Fixes
+
+ - `igraph_trussness()` is now interruptible.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.1] - 2022-09-08
 
 ### Fixed
