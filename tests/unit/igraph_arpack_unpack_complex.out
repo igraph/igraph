@@ -1,8 +1,12 @@
 Empty vectors and values:
 vectors in:
+[ 0-by-0 ]
 values in:
+[ 0-by-0 ]
 vectors out:
+[ 0-by-0 ]
 values out:
+[ 0-by-0 ]
 
 Real vectors and values:
 vectors in:
@@ -92,12 +96,14 @@ values out:
 
 No vectors but there are values:
 vectors in:
+[ 0-by-0 ]
 values in:
 [   1.00   0.00
     2.00   1.00
     2.00  -1.00
     3.00   0.00 ]
 vectors out:
+[ 0-by-8 ]
 values out:
 [   1.00   0.00
     2.00   1.00
@@ -111,10 +117,9 @@ vectors in:
     9.00  10.00  11.00  12.00
    13.00  14.00  15.00  16.00 ]
 values in:
+[ 0-by-0 ]
 vectors out:
-[
- 
- 
-  ]
+[ 4-by-0 ]
 values out:
+[ 0-by-0 ]
 
