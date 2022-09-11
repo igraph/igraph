@@ -159,6 +159,10 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
         long int ffrom = IGRAPH_FROM(graph, i);
         long int tto = IGRAPH_TO(graph, i);
         VECTOR(newweights)[i] += MATRIX(bfres, 0, ffrom) - MATRIX(bfres, 0, tto);
+
+        /* If a weight becomes slightly negative due to roundoff errors,
+           snap it to exact zero. */
+        if (VECTOR(newweights)[i] < 0) VECTOR(newweights)[i] = 0;
     }
 
     /* Run Dijkstra's algorithm on the new weights */
