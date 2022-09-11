@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
+
 ### Fixed
 
  - `igraph_trussness()` is now interruptible.
