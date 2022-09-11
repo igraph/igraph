@@ -246,7 +246,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* This is a shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                    igraph_2wheap_modify(&Q, tto, -altdist);
                 }
             }
         } /* !igraph_2wheap_empty(&Q) */
@@ -631,7 +631,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* This is a shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(Q, tto, -altdist));
+                    igraph_2wheap_modify(Q, tto, -altdist);
                 }
             }
 
@@ -1233,7 +1233,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* A shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                    igraph_2wheap_modify(&Q, tto, -altdist);
                 }
             }
 

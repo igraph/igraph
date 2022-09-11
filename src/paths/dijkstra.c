@@ -209,7 +209,7 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* This is a shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                    igraph_2wheap_modify(&Q, tto, -altdist);
                 }
             }
 
@@ -450,7 +450,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
                 parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                igraph_2wheap_modify(&Q, tto, -altdist);
             }
         }
     } /* !igraph_2wheap_empty(&Q) */
@@ -876,7 +876,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 igraph_vector_int_clear(parent_edge_vec);
                 IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
 
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                igraph_2wheap_modify(&Q, tto, -altdist);
             }
         }
     } /* !igraph_2wheap_empty(&Q) */

@@ -297,7 +297,7 @@ static igraph_error_t igraph_i_sspf_weighted(
                 VECTOR(*v)[0] = minnei;
                 nrgeo[to] = nrgeo[minnei];
                 VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_modify(&queue, to, -altdist));
+                igraph_2wheap_modify(&queue, to, -altdist);
             } else if (cmp_result == 0 && (altdist <= cutoff + 1.0 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
                 v = igraph_adjlist_get(parents, to);
@@ -406,7 +406,7 @@ static igraph_error_t igraph_i_sspf_weighted_edge(
                 VECTOR(*v)[0] = edge;
                 nrgeo[to] = nrgeo[minnei];
                 VECTOR(*dist)[to] = altdist;
-                IGRAPH_CHECK(igraph_2wheap_modify(&queue, to, -altdist));
+                igraph_2wheap_modify(&queue, to, -altdist);
             } else if (cmp_result == 0 && (altdist <= cutoff + 1.0 || cutoff < 0)) {
                 /* Only add if the node is not more distant than the cutoff */
                 v = igraph_inclist_get(parents, to);
