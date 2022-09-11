@@ -2,9 +2,10 @@
 
 ## [Unreleased]
 
-### Fixes
+### Fixed
 
  - `igraph_trussness()` is now interruptible.
+ - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
 
 ### Other
 
