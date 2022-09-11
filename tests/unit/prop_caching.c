@@ -4,7 +4,7 @@
 
 /*
  * This test tries to ensure that property caching works correctly in the most
- * "dangerous" scenarios (goijg from disconnected to connected graphs and
+ * "dangerous" scenarios (going from disconnected to connected graphs and
  * back). Feel free to extend the file later on with regression tests for any
  * issues that we might find related to caching.
  *
