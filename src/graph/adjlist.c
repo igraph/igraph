@@ -940,6 +940,22 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
+    /*if we already know there are no multi-edges, they don't need to be removed*/
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        multiple = IGRAPH_MULTIPLE;
+    }
+
+    /*if we already know there are no loops, they don't need to be removed*/
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        if (mode == IGRAPH_ALL) {
+            loops = IGRAPH_LOOPS_TWICE;
+        } else {
+            loops = IGRAPH_LOOPS_ONCE;
+        }
+    }
+
     al->mode = mode;
     al->loops = loops;
     al->multiple = multiple;
