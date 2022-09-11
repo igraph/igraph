@@ -150,6 +150,22 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
+    /*if we already know there are no multi-edges, they don't need to be removed*/
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        multiple = IGRAPH_MULTIPLE;
+    }
+
+    /*if we already know there are no loops, they don't need to be removed*/
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        if (mode == IGRAPH_ALL) {
+            loops = IGRAPH_LOOPS_TWICE;
+        } else {
+            loops = IGRAPH_LOOPS_ONCE;
+        }
+    }
+
     for (igraph_integer_t i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
