@@ -101,8 +101,11 @@ igraph_error_t igraph_distances_floyd_warshall(
         /* Iteration order matters for performance!
          * First j, then i, because matrices are stored as column-major. */
         for (igraph_integer_t j=0; j < no_of_nodes; j++) {
+            igraph_real_t dkj = MATRIX(*res, k, j);
+            if (dkj == IGRAPH_INFINITY) continue;
+
             for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-                igraph_real_t di = MATRIX(*res, i, k) + MATRIX(*res, k, j);
+                igraph_real_t di = MATRIX(*res, i, k) + dkj;
                 igraph_real_t dd = MATRIX(*res, i, j);
                 if (di < dd) {
                     MATRIX(*res, i, j) = di;
