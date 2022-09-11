@@ -1,3 +1,9 @@
+Null graph
+[ 0-by-0 ]
+
+Singleton graph
+[        0 ]
+
 Unweighted directed
 [        0        1        2        3        1        2      Inf      Inf      Inf      Inf
          3        0        1        2        4        5      Inf      Inf      Inf      Inf
@@ -9,6 +15,7 @@ Unweighted directed
        Inf      Inf      Inf      Inf      Inf      Inf      Inf        0      Inf      Inf
        Inf      Inf      Inf      Inf      Inf      Inf      Inf      Inf        0      Inf
        Inf      Inf      Inf      Inf      Inf      Inf      Inf      Inf      Inf        0 ]
+
 Unweighted directed, 'in' mode
 [        0        3        2        1      Inf      Inf      Inf      Inf      Inf      Inf
          1        0        3        2      Inf      Inf      Inf      Inf      Inf      Inf

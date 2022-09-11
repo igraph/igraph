@@ -27,18 +27,30 @@ int main() {
     igraph_matrix_init(&d, 0, 0);
     igraph_matrix_init(&d2, 0, 0);
 
+    printf("Null graph\n");
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, NULL);
+    print_matrix(&d);
+    igraph_destroy(&g);
+
+    printf("\nSingleton graph\n");
+    igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
+    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, NULL);
+    print_matrix(&d);
+    igraph_destroy(&g);
+
     igraph_small(&g, 9, IGRAPH_DIRECTED,
                  0,1, 1,2, 2,2, 2,3, 3,0, 0,4, 4,5, 3,0, 6,7, 5,4, 9,9,
                  -1);
 
-    printf("Unweighted directed\n");
+    printf("\nUnweighted directed\n");
     igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, NULL);
     print_matrix(&d);
 
     igraph_distances(&g, &d2, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT);
     IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
 
-    printf("Unweighted directed, 'in' mode\n");
+    printf("\nUnweighted directed, 'in' mode\n");
     igraph_distances_floyd_warshall(&g, &d, IGRAPH_IN, NULL);
     print_matrix(&d);
 
