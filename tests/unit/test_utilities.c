@@ -74,6 +74,11 @@ void print_vector_int_list(const igraph_vector_int_list_t *v) {
 /* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
 void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) {
     igraph_integer_t i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
+    if (nrow == 0 || ncol == 0) {
+        /* When the matrix is empty, output the dimensions */
+        fprintf(f, "[ %" IGRAPH_PRId "-by-%" IGRAPH_PRId" ]\n", nrow, ncol);
+        return;
+    }
     for (i = 0; i < nrow; i++) {
         fprintf(f, i == 0 ? "[" : " ");
         for (j = 0; j < ncol; j++) {
@@ -90,6 +95,11 @@ void print_matrix(const igraph_matrix_t *m) {
 
 void print_matrix_int(const igraph_matrix_int_t *m) {
     igraph_integer_t i, j, nrow = igraph_matrix_int_nrow(m), ncol = igraph_matrix_int_ncol(m);
+    if (nrow == 0 || ncol == 0) {
+        /* When the matrix is empty, output the dimensions */
+        printf("[ %" IGRAPH_PRId "-by-%" IGRAPH_PRId" ]\n", nrow, ncol);
+        return;
+    }
     for (i = 0; i < nrow; i++) {
         printf(i == 0 ? "[" : " ");
         for (j = 0; j < ncol; j++) {

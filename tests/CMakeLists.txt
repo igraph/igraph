@@ -297,6 +297,7 @@ add_legacy_tests(
   igraph_diameter
   igraph_diameter_dijkstra
   igraph_diversity
+  igraph_distances_floyd_warshall
   igraph_distances_johnson
   igraph_eccentricity
   igraph_eccentricity_dijkstra
@@ -924,6 +925,7 @@ add_benchmarks(
   igraph_closeness_weighted
   igraph_coloring
   igraph_decompose
+  igraph_distances
   igraph_maximal_cliques
   igraph_neighborhood
   igraph_pagerank
