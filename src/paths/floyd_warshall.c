@@ -63,7 +63,7 @@ igraph_error_t igraph_distances_floyd_warshall(
     igraph_bool_t in = false, out = false;
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     if (! igraph_is_directed(graph)) {
@@ -84,6 +84,10 @@ igraph_error_t igraph_distances_floyd_warshall(
         IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
     }
 
+    if (weights && igraph_vector_is_any_nan(weights)) {
+        IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+    }
+
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_fill(res, IGRAPH_INFINITY);
 
@@ -95,10 +99,6 @@ igraph_error_t igraph_distances_floyd_warshall(
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
         igraph_real_t w = weights ? VECTOR(*weights)[e] : 1;
-
-        if (weights && igraph_is_nan(w)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
-        }
 
         if (w < 0) {
             if (mode == IGRAPH_ALL) {
