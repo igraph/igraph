@@ -90,7 +90,7 @@ static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, i
  */
 
 static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& subsetMap) {
-    
+
     for (const auto & it : subsetMap) {
         if (it.first == subset) {
             return it.second;
@@ -104,7 +104,7 @@ static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& 
  *
  */
 
-static int_set fetchSetsBasedonIndex(igraph_integer_t index,const  dictionary& subsetMap) {
+static int_set fetchSetsBasedonIndex(igraph_integer_t index, const  dictionary& subsetMap) {
     for (const auto &it : subsetMap) {
         if (it.second == index) {
             return it.first;
@@ -298,7 +298,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             E1 = *D.begin();
             F1 = *next(D.begin(), 1);
-            
+
 
             igraph_vector_int_t vectorlist_1;
             IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_1, 1));
@@ -505,10 +505,10 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
             for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
                 igraph_real_t distance1 = IGRAPH_INFINITY;
-                
+
 
                 for (auto E :  D) {
-                    
+
                     if (E != j) {
                         igraph_integer_t distanceEJ = MATRIX(distance, E, j);
 
