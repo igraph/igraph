@@ -28,6 +28,7 @@
 #include "igraph_structural.h"
 
 #include "core/exceptions.h"
+#include "core/interruption.h"
 
 #include <cstring>
 #include <cmath>
@@ -39,6 +40,8 @@
 #include <iterator>
 
 
+typedef std::set<igraph_integer_t> int_set;
+typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
 /*
  *  Generates Subsets of length > 1 for list of integer values.
  *  As algorithm computes the minimum distance between set of variables ranging from
@@ -48,9 +51,9 @@
  *
  */
 
-std::set<std::set<igraph_integer_t>> generateSubsets(igraph_vector_int_t steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, std::map<std::set<igraph_integer_t>, igraph_integer_t>* subsetMap) {
+static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap) {
     igraph_integer_t count = ((igraph_integer_t)1 << n);
-    std::set<std::set<igraph_integer_t>> allSubsets;
+    std::set<int_set> allSubsets;
     igraph_integer_t subsetIndex = graphsize;
 
     // The outer for loop will run 2^n times to get all subset .
@@ -59,7 +62,7 @@ std::set<std::set<igraph_integer_t>> generateSubsets(igraph_vector_int_t steiner
     for (igraph_integer_t i = 0; i < count; i++) {
         // The inner for loop will run n times , As the maximum number of elements a set can have is n
         // This loop will generate a subset
-        std::set<igraph_integer_t> newSubset;
+        int_set newSubset;
         for (igraph_integer_t j = 0; j < n; j++) {
             // This if condition will check if jth bit in binary representation of  i  is set or not
             // if the value of (i & (1 << j)) is greater than 0 , include arr[j] in the current subset
@@ -72,7 +75,7 @@ std::set<std::set<igraph_integer_t>> generateSubsets(igraph_vector_int_t steiner
         if (newSubset.size() > 1) {
             if (allSubsets.find(newSubset) == allSubsets.end()) {
                 allSubsets.insert(newSubset);
-                (*subsetMap).insert(std::make_pair(newSubset, subsetIndex));
+                subsetMap.insert(std::make_pair(newSubset, subsetIndex));
                 subsetIndex++;
             }
         }
@@ -86,11 +89,11 @@ std::set<std::set<igraph_integer_t>> generateSubsets(igraph_vector_int_t steiner
  * the value of subset from DP table.
  */
 
-igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset, std::map<std::set<igraph_integer_t>, igraph_integer_t>* subsetMap) {
-    std::map<std::set<igraph_integer_t>, igraph_integer_t>::iterator it;
-    for (it = subsetMap->begin(); it != subsetMap->end(); ++it) {
-        if (it->first == subset) {
-            return it->second;
+static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& subsetMap) {
+
+    for (const auto & it : subsetMap) {
+        if (it.first == subset) {
+            return it.second;
         }
     }
     IGRAPH_FATAL("The Subset's index that you tried to find doesn't exist. Hence the code won't run.");
@@ -101,11 +104,10 @@ igraph_integer_t fetchIndexofMapofSets(std::set<igraph_integer_t> subset, std::m
  *
  */
 
-std::set<igraph_integer_t> fetchSetsBasedonIndex(igraph_integer_t index, std::map<std::set<igraph_integer_t>, igraph_integer_t>* subsetMap) {
-    std::map<std::set<igraph_integer_t>, igraph_integer_t>::iterator it;
-    for (it = subsetMap->begin(); it != subsetMap->end(); ++it) {
-        if (it->second == index) {
-            return it->first;
+static int_set fetchSetsBasedonIndex(igraph_integer_t index, const  dictionary& subsetMap) {
+    for (const auto &it : subsetMap) {
+        if (it.second == index) {
+            return it.first;
         }
     }
     IGRAPH_FATAL("The index that you tried to find doesn't exist. Hence the code won't run.");
@@ -117,7 +119,7 @@ std::set<igraph_integer_t> fetchSetsBasedonIndex(igraph_integer_t index, std::ma
  *
  */
 
-igraph_integer_t factorial(igraph_integer_t n) {
+static igraph_integer_t factorial(igraph_integer_t n) {
     igraph_integer_t answer = 1;
     for (igraph_integer_t i = 1; i <= n; i++) {
         answer *= i;
@@ -132,7 +134,7 @@ igraph_integer_t factorial(igraph_integer_t n) {
  *
  */
 
-igraph_integer_t Combination(igraph_integer_t n, igraph_integer_t r) {
+static igraph_integer_t Combination(igraph_integer_t n, igraph_integer_t r) {
     return factorial(n) / (factorial(n - r) * factorial(r));
 }
 
@@ -150,7 +152,7 @@ igraph_integer_t Combination(igraph_integer_t n, igraph_integer_t r) {
  *  \param q vertex from who minimum path needs tp be calculated
  */
 
-igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q) {
+static igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q) {
 
     igraph_integer_t min_col_num = -1;
     igraph_integer_t min_sum_for_col;
@@ -204,16 +206,15 @@ igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD
  *
  */
 
-igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_vector_t *weights,
-        igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_vector_int_t *vectorlist_all, igraph_vector_int_t *edgelist_all, std::map<std::set<igraph_integer_t>, igraph_integer_t>* subsetMap) {
+static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_vector_int_t *vectorlist_all, igraph_vector_int_t *edgelist_all, const dictionary& subsetMap) {
 
-    std::set<igraph_integer_t> C = fetchSetsBasedonIndex(indexD, subsetMap);
-
+    int_set C = fetchSetsBasedonIndex(indexD, subsetMap);
     // Initially the value of m is the vertex that was removed from Steiner Terminals
     igraph_integer_t m = q;
 
     igraph_integer_t len = C.size();
-    std::set<igraph_integer_t> D = C;
+    int_set D = C;
 
     while (D.size() > 1) {
 
@@ -236,7 +237,7 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
         IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist));
 
         igraph_integer_t min_E_value = IGRAPH_INTEGER_MAX;
-        std::set<igraph_integer_t> min_F;
+        int_set min_F;
         /*
          *  When the size of subset is > 2 we need to split the subset into E and F
          *  where E is singleton and F is subset of size (D.size() - 1)
@@ -256,10 +257,10 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
             for (igraph_integer_t i = 1; i <= numElementsScan; i++) {
 
                 // retrieving the set associated with index = holder - i from subsetMap
+                IGRAPH_ALLOW_INTERRUPTION();
+                int_set F = fetchSetsBasedonIndex(holder - i, subsetMap);
 
-                std::set<igraph_integer_t> F = fetchSetsBasedonIndex(holder - i, subsetMap);
-
-                std::set<igraph_integer_t> E;
+                int_set E;
 
                 std::set_difference(D.begin(), D.end(), F.begin(), F.end(), std::inserter(E, E.end()));
 
@@ -297,7 +298,7 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
 
             E1 = *D.begin();
             F1 = *next(D.begin(), 1);
-            ;
+
 
             igraph_vector_int_t vectorlist_1;
             IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_1, 1));
@@ -333,7 +334,7 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
 
             IGRAPH_FINALLY_CLEAN(4);
 
-            std::set<igraph_integer_t> min_F;
+            int_set min_F;
             min_F.insert(F1);
         }
 
@@ -432,7 +433,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     igraph_vector_int_t steiner_terminals_copy;
     igraph_matrix_t dp_cache; // dynamic programming table
     igraph_integer_t q;
-    std::set<std::set<igraph_integer_t>> allSubsets;
+    std::set<int_set> allSubsets;
     igraph_matrix_t distance;
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -476,6 +477,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      *  distance between same vertices in distance matrix
      */
     for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
+        IGRAPH_ALLOW_INTERRUPTION();
         for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
             MATRIX(dp_cache, i, j) = MATRIX(distance, i, j);
         }
@@ -487,49 +489,48 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     * The index would be used in DP table
     *
     */
-    std::map<std::set<igraph_integer_t>, igraph_integer_t> subsetMap;
-    allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_vertices, &subsetMap);
+    dictionary subsetMap;
+    allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_vertices, subsetMap);
 
     for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++) {
         for (igraph_integer_t i = 0; i < (igraph_integer_t)allSubsets.size(); i++) {
             auto it = allSubsets.begin();
             std::advance(it, i);
-            std::set<igraph_integer_t> D = *it;
+            int_set D = *it;
             igraph_integer_t indexOfSubsetD;
-            indexOfSubsetD = fetchIndexofMapofSets(D, &subsetMap);
+            indexOfSubsetD = fetchIndexofMapofSets(D, subsetMap);
 
+            IGRAPH_ALLOW_INTERRUPTION();
             for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
                 MATRIX(dp_cache, indexOfSubsetD, j) = IGRAPH_INFINITY;
             }
 
             for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
                 igraph_real_t distance1 = IGRAPH_INFINITY;
-                std::set<igraph_integer_t>::iterator subset_D_iterator;
 
-                for (subset_D_iterator = D.begin(); subset_D_iterator != D.end(); subset_D_iterator++) {
-                    igraph_integer_t E = *subset_D_iterator;
+
+                for (auto E :  D) {
+
                     if (E != j) {
                         igraph_integer_t distanceEJ = MATRIX(distance, E, j);
 
-                        std::set<igraph_integer_t> DMinusE = D;
+                        int_set DMinusE = D;
 
                         /*
                          *  A set with Singleton value E removed from subset D
                          */
-                        for (std::set<igraph_integer_t>::iterator iter = DMinusE.begin(); iter != DMinusE.end();) {
-                            if (*iter == E) {
+                        for (auto iter :  DMinusE) {
+                            if (iter == E) {
                                 iter = DMinusE.erase(iter);
                                 break;
                             }
-                            ++iter;
                         }
 
                         igraph_integer_t indexOfSubsetDMinusE;
                         if (DMinusE.size() == 1) {
-                            std::set<igraph_integer_t>::iterator node = DMinusE.begin();
-                            indexOfSubsetDMinusE = *node;
+                            indexOfSubsetDMinusE = *DMinusE.begin();
                         } else {
-                            indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE, &subsetMap);
+                            indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE, subsetMap);
                         }
 
                         if ((distanceEJ + MATRIX(dp_cache, indexOfSubsetDMinusE, j)) < distance1) {
@@ -549,11 +550,12 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
     for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
         igraph_real_t distance1 = IGRAPH_INFINITY;
+        IGRAPH_ALLOW_INTERRUPTION();
         for (igraph_integer_t subset_C_iterator = 0; subset_C_iterator < igraph_vector_int_size(steiner_terminals); subset_C_iterator++) {
             igraph_integer_t F = VECTOR(steiner_terminals_copy)[subset_C_iterator];
             igraph_integer_t distanceFJ = MATRIX(distance, F, j);
 
-            std::set<igraph_integer_t> CMinusF;
+            int_set CMinusF;
 
             for (igraph_integer_t k = 0; k < igraph_vector_int_size(steiner_terminals); k++) {
 
@@ -562,7 +564,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
                 }
             }
 
-            igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(CMinusF, &subsetMap);
+            igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(CMinusF, subsetMap);
 
             if (distanceFJ != 0 && (distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j)) < distance1)) {
                 distance1 = distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j));
@@ -575,17 +577,17 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     }
     *res = distance2;
 
-    std::set<igraph_integer_t> newSet;
+    int_set newSet;
     for (igraph_integer_t i = 0; i < igraph_vector_int_size(&steiner_terminals_copy); i++) {
         newSet.insert(VECTOR(steiner_terminals_copy)[i]);
     }
-    igraph_integer_t indexD = fetchIndexofMapofSets(newSet, &subsetMap);
+    igraph_integer_t indexD = fetchIndexofMapofSets(newSet, subsetMap);
 
     igraph_vector_int_t vectorlist_all;
 
     IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_all, 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist_all);
-    IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree, &subsetMap));
+    IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree, subsetMap));
 
     // Default vector initiation add 0 and hence it's removed.
     igraph_vector_int_remove(res_tree, 0);
