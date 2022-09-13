@@ -28,6 +28,7 @@
 #include "igraph_structural.h"
 
 #include "core/exceptions.h"
+#include "core/interruption.h"
 
 #include <cstring>
 #include <cmath>
@@ -89,10 +90,10 @@ static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, i
  */
 
 static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& subsetMap) {
-    dictionary::const_iterator it;
-    for (it = subsetMap.begin(); it != subsetMap.end(); ++it) {
-        if (it->first == subset) {
-            return it->second;
+    
+    for (const auto & it : subsetMap) {
+        if (it.first == subset) {
+            return it.second;
         }
     }
     IGRAPH_FATAL("The Subset's index that you tried to find doesn't exist. Hence the code won't run.");
@@ -104,10 +105,9 @@ static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& 
  */
 
 static int_set fetchSetsBasedonIndex(igraph_integer_t index,const  dictionary& subsetMap) {
-    dictionary::const_iterator it;
-    for (it = subsetMap.begin(); it != subsetMap.end(); ++it) {
-        if (it->second == index) {
-            return it->first;
+    for (const auto &it : subsetMap) {
+        if (it.second == index) {
+            return it.first;
         }
     }
     IGRAPH_FATAL("The index that you tried to find doesn't exist. Hence the code won't run.");
@@ -210,7 +210,6 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
         igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_vector_int_t *vectorlist_all, igraph_vector_int_t *edgelist_all, const dictionary& subsetMap) {
 
     int_set C = fetchSetsBasedonIndex(indexD, subsetMap);
-
     // Initially the value of m is the vertex that was removed from Steiner Terminals
     igraph_integer_t m = q;
 
@@ -506,10 +505,10 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
             for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
                 igraph_real_t distance1 = IGRAPH_INFINITY;
-                int_set::iterator subset_D_iterator;
+                
 
-                for (subset_D_iterator = D.begin(); subset_D_iterator != D.end(); subset_D_iterator++) {
-                    igraph_integer_t E = *subset_D_iterator;
+                for (auto E :  D) {
+                    
                     if (E != j) {
                         igraph_integer_t distanceEJ = MATRIX(distance, E, j);
 
@@ -518,18 +517,16 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
                         /*
                          *  A set with Singleton value E removed from subset D
                          */
-                        for (int_set::iterator iter = DMinusE.begin(); iter != DMinusE.end();) {
-                            if (*iter == E) {
+                        for (auto iter :  DMinusE) {
+                            if (iter == E) {
                                 iter = DMinusE.erase(iter);
                                 break;
                             }
-                            ++iter;
                         }
 
                         igraph_integer_t indexOfSubsetDMinusE;
                         if (DMinusE.size() == 1) {
-                            int_set::iterator node = DMinusE.begin();
-                            indexOfSubsetDMinusE = *node;
+                            indexOfSubsetDMinusE = *DMinusE.begin();
                         } else {
                             indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE, subsetMap);
                         }
