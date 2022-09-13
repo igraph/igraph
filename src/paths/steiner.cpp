@@ -257,7 +257,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
             for (igraph_integer_t i = 1; i <= numElementsScan; i++) {
 
                 // retrieving the set associated with index = holder - i from subsetMap
-
+                IGRAPH_ALLOW_INTERRUPTION();
                 int_set F = fetchSetsBasedonIndex(holder - i, subsetMap);
 
                 int_set E;
@@ -477,6 +477,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      *  distance between same vertices in distance matrix
      */
     for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
+        IGRAPH_ALLOW_INTERRUPTION();
         for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
             MATRIX(dp_cache, i, j) = MATRIX(distance, i, j);
         }
@@ -499,6 +500,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
             igraph_integer_t indexOfSubsetD;
             indexOfSubsetD = fetchIndexofMapofSets(D, subsetMap);
 
+            IGRAPH_ALLOW_INTERRUPTION();
             for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
                 MATRIX(dp_cache, indexOfSubsetD, j) = IGRAPH_INFINITY;
             }
@@ -548,6 +550,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
     for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
         igraph_real_t distance1 = IGRAPH_INFINITY;
+        IGRAPH_ALLOW_INTERRUPTION();
         for (igraph_integer_t subset_C_iterator = 0; subset_C_iterator < igraph_vector_int_size(steiner_terminals); subset_C_iterator++) {
             igraph_integer_t F = VECTOR(steiner_terminals_copy)[subset_C_iterator];
             igraph_integer_t distanceFJ = MATRIX(distance, F, j);
