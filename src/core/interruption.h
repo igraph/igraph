@@ -30,8 +30,7 @@
 
 __BEGIN_DECLS
 
-extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t
-*igraph_i_interruption_handler;
+extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_handler;
 
 /**
  * \define IGRAPH_ALLOW_INTERRUPTION

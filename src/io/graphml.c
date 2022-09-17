@@ -22,6 +22,7 @@
 */
 
 #include "igraph_foreign.h"
+
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"

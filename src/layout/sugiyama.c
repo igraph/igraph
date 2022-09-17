@@ -23,6 +23,7 @@
 */
 
 #include "igraph_layout.h"
+
 #include "igraph_components.h"
 #include "igraph_constants.h"
 #include "igraph_constructors.h"

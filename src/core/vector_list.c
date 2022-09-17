@@ -20,8 +20,6 @@
 
 */
 
-#include "igraph_error.h"
-#include "igraph_types.h"
 #include "igraph_vector_list.h"
 
 #define VECTOR_LIST

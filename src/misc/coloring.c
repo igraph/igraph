@@ -19,6 +19,7 @@
 */
 
 #include "igraph_coloring.h"
+
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 

@@ -25,8 +25,6 @@
 #include "igraph_nongraph.h"
 #include "igraph_types.h"
 
-#include "config.h"
-
 #include <math.h>
 #include <float.h>
 

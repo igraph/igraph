@@ -21,9 +21,10 @@
 
 */
 
+#include "igraph_graph_list.h"
+
 #include "igraph_error.h"
 #include "igraph_interface.h"
-#include "igraph_graph_list.h"
 #include "igraph_types.h"
 
 #define GRAPH_LIST
