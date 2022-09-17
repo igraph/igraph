@@ -33,6 +33,8 @@
  *
  * \param graph The graph object.
  * \param res An intialized matrix, the distances will be stored here.
+ * \param weights The edge weights. If \c NULL, all weights are assumed to be 1.
+ *   Negative weights are allowed, but the graph must not contain negative cycles.
  * \param mode The type of shortest paths to be use for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -44,9 +46,8 @@
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param weights The edge weights. If \c NULL, all weights are assumed to be 1.
- *   Negative weights are allowed, but the graph must not contain negative cycles.
- * \return Error code.
+ * \return Error code. \c IGRAPH_ENEGLOOP is returned if a negative-weight
+ *   cycle is found.
  *
  * \sa \ref igraph_distances(), \ref igraph_distances_dijkstra(),
  * \ref igraph_distances_bellman_ford(), \ref igraph_distances_johnson()
@@ -56,7 +57,7 @@
  */
 igraph_error_t igraph_distances_floyd_warshall(
         const igraph_t *graph, igraph_matrix_t *res,
-        igraph_neimode_t mode, const igraph_vector_t *weights) {
+        const igraph_vector_t *weights, igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);

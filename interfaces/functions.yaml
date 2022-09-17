@@ -535,7 +535,7 @@ igraph_distances_johnson:
 
 igraph_distances_floyd_warshall:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL
+        GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
     DEPS: weights ON graph
 
 igraph_get_all_simple_paths:

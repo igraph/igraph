@@ -29,13 +29,13 @@ int main() {
 
     printf("Null graph\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, NULL);
+    igraph_distances_floyd_warshall(&g, &d, NULL, IGRAPH_OUT);
     print_matrix(&d);
     igraph_destroy(&g);
 
     printf("\nSingleton graph\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, NULL);
+    igraph_distances_floyd_warshall(&g, &d, NULL, IGRAPH_OUT);
     print_matrix(&d);
     igraph_destroy(&g);
 
@@ -44,21 +44,21 @@ int main() {
                  -1);
 
     printf("\nUnweighted directed\n");
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, NULL);
+    igraph_distances_floyd_warshall(&g, &d, NULL, IGRAPH_OUT);
     print_matrix(&d);
 
     igraph_distances(&g, &d2, igraph_vss_all(), igraph_vss_all(), IGRAPH_OUT);
     IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
 
     printf("\nUnweighted directed, 'in' mode\n");
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_IN, NULL);
+    igraph_distances_floyd_warshall(&g, &d, NULL, IGRAPH_IN);
     print_matrix(&d);
 
     igraph_distances(&g, &d2, igraph_vss_all(), igraph_vss_all(), IGRAPH_IN);
     IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
 
     printf("\nUnweighted undirected\n");
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_ALL, NULL);
+    igraph_distances_floyd_warshall(&g, &d, NULL, IGRAPH_ALL);
     print_matrix(&d);
 
     igraph_distances(&g, &d2, igraph_vss_all(), igraph_vss_all(), IGRAPH_ALL);
@@ -68,14 +68,14 @@ int main() {
                            2, 1, 5, 1, 2, 6, 8, 3, 3, 2, 3);
 
     printf("\nWeighted directed\n");
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights);
+    igraph_distances_floyd_warshall(&g, &d, &weights, IGRAPH_OUT);
     print_matrix(&d);
 
     igraph_distances_bellman_ford(&g, &d2, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT);
     IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
 
     printf("\nWeighted undirected\n");
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_ALL, &weights);
+    igraph_distances_floyd_warshall(&g, &d, &weights, IGRAPH_ALL);
     print_matrix(&d);
 
     igraph_distances_bellman_ford(&g, &d2, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_ALL);
@@ -83,7 +83,7 @@ int main() {
 
     VECTOR(weights)[1] = -2;
     printf("\nNegative weight, directed\n");
-    igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights);
+    igraph_distances_floyd_warshall(&g, &d, &weights, IGRAPH_OUT);
     print_matrix(&d);
 
     igraph_distances_bellman_ford(&g, &d2, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT);
@@ -92,20 +92,20 @@ int main() {
     /* Check bad inputs */
 
     /* Negative weight edge in undirected graph */
-    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_ALL, &weights), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, &weights, IGRAPH_ALL), IGRAPH_ENEGLOOP);
 
     /* Negative cycle in directed graph */
     VECTOR(weights)[1] = -10;
-    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, &weights, IGRAPH_OUT), IGRAPH_ENEGLOOP);
 
     /* Negative self-loop in directed graph */
     VECTOR(weights)[1] = 1;
     VECTOR(weights)[10] = -1;
-    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights), IGRAPH_ENEGLOOP);
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, &weights, IGRAPH_OUT), IGRAPH_ENEGLOOP);
 
     /* NaN weight */
     VECTOR(weights)[1] = IGRAPH_NAN;
-    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, IGRAPH_OUT, &weights), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_distances_floyd_warshall(&g, &d, &weights, IGRAPH_OUT), IGRAPH_EINVAL);
 
     igraph_vector_destroy(&weights);
 
