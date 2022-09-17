@@ -31,6 +31,7 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
+#include "core/math.h"
 
 /**
  * \ingroup generators
@@ -385,7 +386,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
     if (finite_size_correction && alpha_out < -0.5) {
         /* See the Cho et al paper, first page first column + footnote 7 */
         j += pow(no_of_nodes, 1 + 0.5 / alpha_out) *
-             pow(10 * sqrt(2) * (1 + alpha_out), -1.0 / alpha_out) - 1;
+             pow(10 * M_SQRT2 * (1 + alpha_out), -1.0 / alpha_out) - 1;
     }
     if (j < no_of_nodes) {
         j = no_of_nodes;
@@ -409,7 +410,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         if (finite_size_correction && alpha_in < -0.5) {
             /* See the Cho et al paper, first page first column + footnote 7 */
             j += pow(no_of_nodes, 1 + 0.5 / alpha_in) *
-                 pow(10 * sqrt(2) * (1 + alpha_in), -1.0 / alpha_in) - 1;
+                 pow(10 * M_SQRT2 * (1 + alpha_in), -1.0 / alpha_in) - 1;
         }
         if (j < no_of_nodes) {
             j = no_of_nodes;
