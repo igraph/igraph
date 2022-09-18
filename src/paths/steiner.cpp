@@ -91,9 +91,9 @@ static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, i
 
 static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& subsetMap) {
 
-    for (const auto & it : subsetMap) {
-        if (it.first == subset) {
-            return it.second;
+    for (const auto & kv : subsetMap) {
+        if (kv.first == subset) {
+            return kv.second;
         }
     }
     IGRAPH_FATAL("The Subset's index that you tried to find doesn't exist. Hence the code won't run.");
@@ -105,9 +105,9 @@ static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& 
  */
 
 static int_set fetchSetsBasedonIndex(igraph_integer_t index, const  dictionary& subsetMap) {
-    for (const auto &it : subsetMap) {
-        if (it.second == index) {
-            return it.first;
+    for (const auto &kv : subsetMap) {
+        if (kv.second == index) {
+            return kv.first;
         }
     }
     IGRAPH_FATAL("The index that you tried to find doesn't exist. Hence the code won't run.");
