@@ -21,20 +21,27 @@
 
 int main() {
     //printf("Starting Tests\n");
-    igraph_t g_empty, g_lm;
+    igraph_t g_empty, g_lm, g_disconnected;
 
-    igraph_vector_int_t steiner_terminals, steiner_terminals_null;
-    igraph_vector_t weights_empty, weights_lm;
+    igraph_vector_int_t steiner_terminals, steiner_terminals_null,steiner_terminals_disconnected;
+    igraph_vector_t weights_empty, weights_lm, weights_disconnected;
 
     igraph_vector_init(&weights_empty, 0);
 
     igraph_vector_int_init(&steiner_terminals, 4);
     igraph_vector_int_init(&steiner_terminals_null, 0);
+    igraph_vector_int_init(&steiner_terminals_disconnected, 4);
 
     VECTOR(steiner_terminals)[0] = 0;
     VECTOR(steiner_terminals)[1] = 1;
     VECTOR(steiner_terminals)[2] = 2;
     VECTOR(steiner_terminals)[3] = 3;
+
+    VECTOR(steiner_terminals_disconnected)[0] = 0;
+    VECTOR(steiner_terminals_disconnected)[1] = 1;
+    VECTOR(steiner_terminals_disconnected)[2] = 2;
+    VECTOR(steiner_terminals_disconnected)[3] = 6;
+
 
     igraph_vector_init(&weights_lm, 21);
 
@@ -64,6 +71,34 @@ int main() {
     VECTOR(weights_lm)[19] = 1;
 
     VECTOR(weights_lm)[20] = 1;
+
+
+    igraph_vector_init(&weights_disconnected, 15);
+
+    VECTOR(weights_disconnected)[0] = 2;
+    VECTOR(weights_disconnected)[1] = 2;
+    VECTOR(weights_disconnected)[2] = 2;
+    VECTOR(weights_disconnected)[3] = 1;
+    VECTOR(weights_disconnected)[4] = 1;
+
+    VECTOR(weights_disconnected)[5] = 2;
+    VECTOR(weights_disconnected)[6] = 2;
+    VECTOR(weights_disconnected)[7] = 2;
+    VECTOR(weights_disconnected)[8] = 1;
+    
+
+    VECTOR(weights_disconnected)[9] = 2;
+    VECTOR(weights_disconnected)[10] = 2;
+    VECTOR(weights_disconnected)[11] = 2;
+    
+
+    VECTOR(weights_disconnected)[12] = 1;
+    VECTOR(weights_disconnected)[13] = 2;
+
+    VECTOR(weights_disconnected)[14] = 2;
+    
+
+
 
     igraph_empty(&g_empty, 0, 0);
 
@@ -96,12 +131,40 @@ int main() {
                  5, 6,
                  -1);
 
+
+    igraph_small(&g_disconnected, 7, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 0, 2,
+                 0, 3,
+                 0, 4,
+                 0, 5,
+
+                 1, 2,
+                 1, 3,
+                 1, 4,
+                 1, 5,
+                 
+
+                 2, 3,
+                 2, 4,
+                 2, 5,
+                 
+
+                 3, 4,
+                 3, 5,
+                 
+
+                 4, 5,
+                 
+                 -1);
+
     printf("No vertices, not directed:\n");
-    igraph_real_t val1, val2;
-    igraph_vector_int_t res_tree, res_tree_1;
+    igraph_real_t val1, val2,val3;
+    igraph_vector_int_t res_tree, res_tree_1,res_tree_2;
 
     IGRAPH_CHECK(igraph_vector_int_init(&res_tree, 1));
     IGRAPH_CHECK(igraph_vector_int_init(&res_tree_1, 1));
+    IGRAPH_CHECK(igraph_vector_int_init(&res_tree_2, 1));
 
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, &steiner_terminals_null, &weights_empty, &val1, &res_tree) == IGRAPH_SUCCESS);
     printf("%.2f\n", val1);
@@ -112,18 +175,25 @@ int main() {
     IGRAPH_ASSERT(val2 == 5);
 
     print_vector_int(&res_tree_1);
-
+    // This is the only way to check !IGRAPH_SUCCESS return types
+    CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_disconnected, &steiner_terminals_disconnected, &weights_disconnected, &val3, &res_tree_2), IGRAPH_EINVAL);
+    //printf("The graph is disconnected and steiner terminals are not in same connected component");
 
     igraph_destroy(&g_empty);
     igraph_destroy(&g_lm);
+    igraph_destroy(&g_disconnected);
+
     igraph_vector_destroy(&weights_empty);
     igraph_vector_destroy(&weights_lm);
+    igraph_vector_destroy(&weights_disconnected);
 
     igraph_vector_int_destroy(&steiner_terminals);
     igraph_vector_int_destroy(&steiner_terminals_null);
+    igraph_vector_int_destroy(&steiner_terminals_disconnected);
 
     igraph_vector_int_destroy(&res_tree);
     igraph_vector_int_destroy(&res_tree_1);
+    igraph_vector_int_destroy(&res_tree_2);
 
     VERIFY_FINALLY_STACK();
 

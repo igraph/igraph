@@ -297,8 +297,7 @@ igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_v
 
             E1 = *D.begin();
             F1 = *next(D.begin(), 1);
-            ;
-
+            
             igraph_vector_int_t vectorlist_1;
             IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_1, 1));
             IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist_1);
@@ -399,10 +398,50 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     }
     igraph_bool_t IsConnected;
     IGRAPH_CHECK(igraph_is_connected(graph, &IsConnected, IGRAPH_WEAK));
-    if (!IsConnected) {
+    
+	if (!IsConnected) {
 
-        IGRAPH_ERROR("The graph is disconnected.", IGRAPH_EINVAL);
+		//printf("We are here");
+        igraph_vector_int_t membership;
+		igraph_vector_int_t csize;
+		igraph_integer_t component_id = -1;
+
+		IGRAPH_CHECK(igraph_vector_int_init(&membership, 1));
+		IGRAPH_CHECK(igraph_vector_int_init(&csize, 1));
+		
+		IGRAPH_FINALLY(igraph_vector_int_destroy, &membership);
+		IGRAPH_FINALLY(igraph_vector_int_destroy, &csize);
+
+		IGRAPH_CHECK(igraph_connected_components(graph,&membership,&csize, NULL,IGRAPH_WEAK));
+        
+        //printf("We are here connected components");
+
+		for (igraph_integer_t i = 0; i < igraph_vector_int_size(steiner_terminals); i++) {
+			for (igraph_integer_t j = 0; j < igraph_vector_int_size(&membership); j++) {
+        		if ( j == VECTOR(*steiner_terminals)[i]) {
+					
+					/*
+						1. If steiner terminal gets matched for first time, store it's component_id
+						2. If the steiner_terminal has different component_id that 
+						previously observed, steiner terminals are in different components and hence throw error.
+					*/
+					
+					if (component_id == -1) {
+						component_id = VECTOR(membership)[j];
+					}
+					else if (VECTOR(membership)[j] != component_id){
+						IGRAPH_ERROR("The graph is disconnected and steiner terminals are not in same connected component", IGRAPH_EINVAL);
+					}
+				}
+    		}
+		}
+	
+		igraph_vector_int_destroy(&membership);
+		igraph_vector_int_destroy(&csize);
+		IGRAPH_FINALLY_CLEAN(2);
+        
     }
+        
 
 
 
@@ -448,14 +487,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      */
     IGRAPH_CHECK(igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights));
 
-    /*
-        Setting distance from vertex to itself as 0.
-    */
-    for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
-        if (MATRIX(distance, i, i) != 0) {
-            MATRIX(distance, i, i) = 0;
-        }
-    }
     IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy, steiner_terminals));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &steiner_terminals_copy);
     igraph_vector_int_sort(&steiner_terminals_copy);
@@ -599,3 +630,4 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     IGRAPH_HANDLE_EXCEPTIONS_END
     return IGRAPH_SUCCESS;
 }
+
