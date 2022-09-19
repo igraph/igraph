@@ -5,8 +5,12 @@ if(MSVC)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS) # necessary to compile for UWP
 endif()
 
-if (NOT MSVC)
-  check_c_compiler_flag("-Wno-unknown-warning-option" COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG)
+if(NOT MSVC)
+  # Even though we will later use 'no-unknown-warning-option', we perform the test for
+  # 'unknown-warning-option', without the 'no-' prefix. This is necessary because GCC
+  # will accept any warning option starting with 'no-', and will not error, yet it still
+  # prints a message about the unrecognized option.
+  check_c_compiler_flag("-Wunknown-warning-option" COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG)
 endif()
 
 set(
@@ -48,7 +52,7 @@ macro(use_all_warnings TARGET_NAME)
         -Wall -Wextra -pedantic
         -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
       >
-      $<$<BOOL:${COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
+      $<$<BOOL:${COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
