@@ -11,7 +11,8 @@
 
 <para>
 The following short example program demonstrates the basic usage of
-the <command>igraph</command> library.
+the <command>igraph</command> library. Save it into a file named
+<filename>igraph_test.c</filename>.
 <xi:include href="../examples/tutorial/tutorial1.c.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </para>
 
