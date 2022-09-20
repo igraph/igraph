@@ -523,8 +523,8 @@ igraph_get_all_shortest_paths_dijkstra:
 
 igraph_steiner_dreyfus_wagner:
     PARAMS: |-
-        GRAPH graph, VERTEXSET_LIST steiner_terminals, EDGEWEIGHTS weights,
-        OUT INTEGER res, OUT VERTEXSET_LIST res_tree
+        GRAPH graph, VERTEX_INT steiner_terminals, EDGEWEIGHTS weights,
+        OUT Double res, OUT VERTEX_INT res_tree
     DEPS:
         weights ON graph, steiner_terminals ON graph
 
