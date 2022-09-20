@@ -582,6 +582,9 @@ static igraph_error_t igraph_i_eulerian_path_directed(
  * that traverses each edge precisely once.
  *
  * </para><para>
+ * If the graph has no edges, a zero-length cycle is returned.
+ *
+ * </para><para>
  * This function uses Hierholzer's algorithm.
  *
  * \param graph The graph object.
@@ -639,6 +642,9 @@ igraph_error_t igraph_eulerian_cycle(
  *
  * Finds an Eulerian path, if it exists. An Eulerian path traverses
  * each edge precisely once.
+ *
+ * </para><para>
+ * If the graph has no edges, a zero-length path is returned.
  *
  * </para><para>
  * This function uses Hierholzer's algorithm.
