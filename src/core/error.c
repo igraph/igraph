@@ -143,7 +143,8 @@ static const char *igraph_i_error_strings[] = {
     /* 51 */ "Internal attribute handler error",
     /* 52 */ "Unimplemented attribute combination for this type",
     /* 53 */ "LAPACK call resulted in an error",
-    /* 54 */ "Internal DrL error",
+    /* 54 */ "Internal DrL error; this error should never be visible to the user, "
+    "please report this error along with the steps to reproduce it.",
     /* 55 */ "Integer or double overflow",
     /* 56 */ "Internal GPLK error",
     /* 57 */ "CPU time exceeded",
@@ -151,7 +152,8 @@ static const char *igraph_i_error_strings[] = {
     /* 59 */ "Random walk got stuck",
     /* 60 */ "Search stopped; this error should never be visible to the user, "
     "please report this error along with the steps to reproduce it.",
-    /* 61 */ "Result too large"
+    /* 61 */ "Result too large",
+    /* 62 */ "Input problem has no solution"
 };
 
 const char *igraph_strerror(const igraph_error_t igraph_errno) {

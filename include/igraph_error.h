@@ -291,12 +291,15 @@ __BEGIN_DECLS
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
  * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
- * \enumval IGRAPH_EDRL Internal error in the DrL layout generator.
+ * \enumval IGRAPH_EDRL Internal error in the DrL layout generator; not used
+ *   any more (replaced by IGRAPH_EINTERNAL).
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
  * \enumval IGRAPH_EGLP Internal GLPK error.
  * \enumval IGRAPH_CPUTIME CPU time exceeded.
  * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
+ * \enumval IGRAPH_ERANGE Maximum vertex or edge count exceeded.
+ * \enumval IGRAPH_ENOSOL Input problem has no solution.
  */
 
 typedef enum {
@@ -360,7 +363,8 @@ typedef enum {
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
     IGRAPH_STOP              = 60,
-    IGRAPH_ERANGE            = 61
+    IGRAPH_ERANGE            = 61,
+    IGRAPH_ENOSOL            = 62
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in core/error.c

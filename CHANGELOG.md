@@ -10,6 +10,11 @@
 
  - `igraph_trussness()` is now interruptible.
  - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
+ - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
+
+### Deprecated
+
+ - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
 
 ### Other
 

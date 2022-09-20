@@ -189,7 +189,7 @@ void DensityGrid::Subtract(Node &N) {
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
         igraph_error("Exceeded density grid in DrL", IGRAPH_FILE_BASENAME,
-                     __LINE__, IGRAPH_EDRL);
+                     __LINE__, IGRAPH_FAILURE);
         return;
 #endif
     }
@@ -233,7 +233,7 @@ void DensityGrid::Add(Node &N) {
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
         igraph_error("Exceeded density grid in DrL", IGRAPH_FILE_BASENAME,
-                     __LINE__, IGRAPH_EDRL);
+                     __LINE__, IGRAPH_FAILURE);
         return;
 #endif
     }
