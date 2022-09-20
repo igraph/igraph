@@ -25,6 +25,7 @@
 #define IGRAPH_ERROR_H
 
 #include "igraph_decls.h"
+#include "igraph_config.h"
 
 #include <stdarg.h>
 
@@ -356,7 +357,7 @@ typedef enum {
     IGRAPH_EATTRIBUTES       = 51,
     IGRAPH_EATTRCOMBINE      = 52,
     IGRAPH_ELAPACK           = 53,
-    IGRAPH_EDRL              = 54,
+    IGRAPH_EDRL IGRAPH_DEPRECATED_ENUMVAL = 54,
     IGRAPH_EOVERFLOW         = 55,
     IGRAPH_EGLP              = 56,
     IGRAPH_CPUTIME           = 57,
