@@ -522,11 +522,11 @@ igraph_get_all_shortest_paths_dijkstra:
         weights ON graph, from ON graph, to ON graph, vertices ON graph, edges ON graph
 
 igraph_steiner_dreyfus_wagner:
-PARAMS: |-
-    GRAPH graph, VECTOR_INT steiner_terminals, EDGEWEIGHTS weights,
-    OUT DOUBLE res, OUT VECTOR_INT res_tree
-DEPS:
-    weights ON graph, steiner_terminals ON graph
+    PARAMS: |-
+        GRAPH graph, VECTOR_INT steiner_terminals, EDGEWEIGHTS weights,
+        OUT DOUBLE res, OUT VECTOR_INT res_tree
+    DEPS:
+        weights ON graph, steiner_terminals ON graph
 
 igraph_distances_bellman_ford:
     PARAMS: |-
