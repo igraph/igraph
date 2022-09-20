@@ -595,7 +595,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
  *        \clist
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
- *        \cli IGRAPH_EINVVID
+ *        \cli IGRAPH_EINVAL
  *           graph does not have an Eulerian cycle.
  *        \endclist
  *
@@ -654,7 +654,7 @@ igraph_error_t igraph_eulerian_cycle(
  *        \clist
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
- *        \cli IGRAPH_EINVVID
+ *        \cli IGRAPH_EINVAL
  *           graph does not have an Eulerian path.
  *        \endclist
  *
