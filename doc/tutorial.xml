@@ -113,8 +113,9 @@ that finds <command>igraph</command> on the host machine will throw an error if 
 not enabled in the CMake project.</para>
 
 <para>C++ support is enabled by default when no languages are explicitly
-specified in CMake's <code>project</code> command. If you do specify some
-languages explicitly, make sure to also include <code>CXX</code>.
+specified in CMake's <ulink url="https://cmake.org/cmake/help/latest/command/project.html"><code>project</code></ulink>
+command, e.g. <code>project(igraph_test)</code>. If you do specify some languages explicitly, 
+make sure to also include <code>CXX</code>, e.g. <code>project(igraph_test C CXX)</code>.
 </para>
 </note>
 
