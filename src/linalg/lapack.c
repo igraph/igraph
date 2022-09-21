@@ -746,7 +746,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Permuting rows and columns will not change the condition numbers
  * (in exact arithmetic) but diagonal scaling will.  For further
  * explanation of balancing, see section 4.10.2 of the LAPACK
- * Users' Guide.
+ * Users' Guide. Note that the eigenvectors obtained for the balanced
+ * matrix are backtransformed to those of \p A.
  *
  * \param balance Scalar that indicated, whether the input matrix
  *   should be balanced. Possible values:
