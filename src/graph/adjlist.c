@@ -844,8 +844,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 } else {
                     if (VECTOR(*v)[i] == index) {
                         *has_loops = 1;
-                    }
-                    if (i != n - 1 && VECTOR(*v)[i + 1] == VECTOR(*v)[i]) {
+                    } else if (i != n - 1 && VECTOR(*v)[i + 1] == VECTOR(*v)[i]) {
                         *has_multiple = 1;
                     }
                 }
@@ -869,7 +868,20 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
-                } else {
+                } else if (
+                        /* If this is not a loop then we have a multigraph.
+                           Else we have at least two loops.
+                           The v vector comes from a call to igraph_neighbors.
+                           This will count loops twice if mode == IGRAPH_ALL.
+                           So if mode != IGRAPH_ALL,
+                           then we have a multigraph.
+                           If mode == IGRAPH_ALL and we have three loops
+                           then we also have a multigraph
+                           */
+                        (VECTOR(*v)[i] != index) ||
+                       (mode != IGRAPH_ALL)  ||
+                       (mode == IGRAPH_ALL && i < n - 2 && VECTOR(*v)[i + 2] == VECTOR(*v)[i])
+                       ){
                     *has_multiple = 1;
                 }
             }
