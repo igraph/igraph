@@ -1795,7 +1795,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
 
     IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
     if (done) {
-        return (IGRAPH_SUCCESS);
+        return IGRAPH_SUCCESS;
     }
 
     /* Create the new graph */
@@ -1849,7 +1849,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
 
     IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
     if (done) {
-        return (IGRAPH_SUCCESS);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_copy(&newgraph, graph));
@@ -1889,9 +1889,9 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
  * \param neighbors A constant giving what to do if the two vertices
  *     are connected. Possible values:
  *     \c IGRAPH_VCONN_NEI_ERROR, stop with an error message,
- *     \c IGRAPH_VCONN_NEGATIVE, return -1.
- *     \c IGRAPH_VCONN_NUMBER_OF_NODES, return the number of nodes.
- *     \c IGRAPH_VCONN_IGNORE, ignore the fact that the two vertices
+ *     \c IGRAPH_VCONN_NEI_NEGATIVE, return -1.
+ *     \c IGRAPH_VCONN_NEI_NUMBER_OF_NODES, return the number of nodes.
+ *     \c IGRAPH_VCONN_NEI_IGNORE, ignore the fact that the two vertices
  *        are connected and calculate the number of vertices needed
  *        to eliminate all paths except for the trivial (direct) paths
  *        between \p source and \p vertex. TODO: what about neighbors?
