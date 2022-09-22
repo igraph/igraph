@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
+#include "core/interruption.h"
 #include "core/trie.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strcasecmp & strdup */
@@ -1644,6 +1645,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
                 if (!state.successful) {
                     break;
                 }
+                IGRAPH_ALLOW_INTERRUPTION();
             }
             xmlParseChunk(ctxt, buffer, res, 1);
         }
