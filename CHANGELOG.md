@@ -6,6 +6,10 @@
 
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
 
+### Changes
+
+ - `igraph_edge()` now checks that the input edge ID is valid.
+
 ### Fixed
 
  - `igraph_trussness()` is now interruptible.
