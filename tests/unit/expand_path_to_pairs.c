@@ -22,25 +22,25 @@
 igraph_error_t test_path_expansion() {
     igraph_vector_int_t path;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
+    igraph_vector_int_init(&path, 0);
     IGRAPH_CHECK(igraph_expand_path_to_pairs(&path));
     print_vector_int(&path);
     igraph_vector_int_destroy(&path);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
+    igraph_vector_int_init(&path, 0);
     igraph_vector_int_push_back(&path, 0);
     IGRAPH_CHECK(igraph_expand_path_to_pairs(&path));
     print_vector_int(&path);
     igraph_vector_int_destroy(&path);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
+    igraph_vector_int_init(&path, 0);
     igraph_vector_int_push_back(&path, 0);
     igraph_vector_int_push_back(&path, 1);
     IGRAPH_CHECK(igraph_expand_path_to_pairs(&path));
     print_vector_int(&path);
     igraph_vector_int_destroy(&path);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
+    igraph_vector_int_init(&path, 0);
     igraph_vector_int_push_back(&path, 2);
     igraph_vector_int_push_back(&path, 3);
     igraph_vector_int_push_back(&path, 5);
