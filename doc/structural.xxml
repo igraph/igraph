@@ -189,6 +189,7 @@
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
+<!-- doxrox-include igraph_count_multiple_1 -->
 </section>
 
 <section id="mixing-patterns"><title>Mixing patterns</title>

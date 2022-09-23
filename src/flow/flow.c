@@ -1726,6 +1726,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
                                                     igraph_bool_t *done,
                                                     igraph_integer_t *no_conn) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t eid;
     igraph_bool_t conn;
     *done = 1;
     *no_conn = 0;
@@ -1760,16 +1761,11 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
         }
         break;
     case IGRAPH_VCONN_NEI_IGNORE:
-        {
-            igraph_integer_t eid;
-            igraph_vector_int_t multi;
-            igraph_get_eid(graph, &eid, source, target, /*directed=*/1, /*error=*/ 0);
-            if (eid >= 0) {
-                igraph_vector_int_view(&multi, no_conn, 1);
-                igraph_count_multiple(graph, &multi, igraph_ess_1(eid));
-            }
-            break;
+        IGRAPH_CHECK(igraph_get_eid(graph, &eid, source, target, /*directed=*/1, /*error=*/ 0));
+        if (eid >= 0) {
+            IGRAPH_CHECK(igraph_count_multiple_1(graph, no_conn, eid));
         }
+        break;
     default:
         IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'.", IGRAPH_EINVAL);
         break;
