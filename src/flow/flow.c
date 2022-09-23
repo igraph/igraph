@@ -1761,7 +1761,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
         }
         break;
     case IGRAPH_VCONN_NEI_IGNORE:
-        IGRAPH_CHECK(igraph_get_eid(graph, &eid, source, target, /*directed=*/1, /*error=*/ 0));
+        IGRAPH_CHECK(igraph_get_eid(graph, &eid, source, target, IGRAPH_DIRECTED, /*error=*/ false));
         if (eid >= 0) {
             IGRAPH_CHECK(igraph_count_multiple_1(graph, no_conn, eid));
         }

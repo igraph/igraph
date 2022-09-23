@@ -251,8 +251,8 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
             ncommon = igraph_vector_int_size(&commonNeighbors);
             for (j = 0; j < ncommon; j++) {
                 n = VECTOR(commonNeighbors)[j];  // the common neighbor
-                IGRAPH_CHECK(igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, 1));
-                IGRAPH_CHECK(igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, 1));
+                IGRAPH_CHECK(igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, /* error= */ true));
+                IGRAPH_CHECK(igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, /* error= */ true));
 
                 e1_complete = completed[e1] == 1;
                 e2_complete = completed[e2] == 1;
