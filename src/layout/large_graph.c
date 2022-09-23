@@ -276,8 +276,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
             for (k = 0; k < igraph_vector_int_size(&eids); k++) {
                 igraph_integer_t eid = VECTOR(eids)[k];
-                igraph_integer_t from, to;
-                igraph_edge(graph, eid, &from, &to);
+                igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
                 if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
                     (to   != vid && igraph_2dgrid_in(&grid, to))) {
                     igraph_vector_int_push_back(&edges, eid);
@@ -306,10 +305,10 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             /* attractive "forces" along the edges */
             for (jj = 0; jj < igraph_vector_int_size(&edges); jj++) {
-                igraph_integer_t from, to;
+                igraph_integer_t from = IGRAPH_FROM(graph, VECTOR(edges)[jj]);
+                igraph_integer_t to = IGRAPH_TO(graph, VECTOR(edges)[jj]);
                 igraph_real_t xd, yd, dist, force;
                 IGRAPH_ALLOW_INTERRUPTION();
-                igraph_edge(graph, VECTOR(edges)[jj], &from, &to);
                 xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
                 yd = MATRIX(*res, from, 1) - MATRIX(*res, to, 1);
                 dist = sqrt(xd*xd + yd*yd);

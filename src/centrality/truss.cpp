@@ -227,7 +227,8 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
             vec[level].erase(seed);  // remove the first element
 
             /* Find the vertices of this edge */
-            igraph_edge(graph, seed, &fromVertex, &toVertex);
+            fromVertex = IGRAPH_FROM(graph, seed);
+            toVertex = IGRAPH_TO(graph, seed);
 
             /* Find neighbors of both vertices. If they run into each other,
              * there is a triangle. Because we sorted the adjacency list already,
