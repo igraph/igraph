@@ -5,6 +5,7 @@
 ### Added
 
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
+ - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
 
 ### Changed
 
