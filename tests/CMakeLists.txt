@@ -815,7 +815,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_random_sample
   igraph_rng_get_integer
-  mt
   random_sampling
   rng_reproducibility
   rng_init_destroy_max_bits_name_set_default
