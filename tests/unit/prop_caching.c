@@ -98,6 +98,8 @@ int test_basic_operations_directed() {
     test_basic_operations(&g);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
 
@@ -107,6 +109,8 @@ int test_basic_operations_undirected() {
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     test_basic_operations(&g);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

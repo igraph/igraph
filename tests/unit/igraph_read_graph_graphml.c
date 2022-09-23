@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <unistd.h>     /* unlink */
 
+#include "test_utilities.h"
+
 void custom_warning_handler (const char *reason, const char *file,
                              int line) {
     IGRAPH_UNUSED(file);
@@ -204,6 +206,8 @@ int main() {
     igraph_read_graph_graphml(&g, ifile, 0);
     fclose(ifile);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

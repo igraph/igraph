@@ -185,5 +185,7 @@ int main() {
     test_opposite_sides_of_zero();
     test_very_close_to_zero();
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

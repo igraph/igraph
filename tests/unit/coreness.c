@@ -207,4 +207,8 @@ int main() {
     igraph_grg_game(&g, 100, 0.2, /* torus = */ 0, /* x = */ 0, /* y = */ 0);
     test_graph(&g, /* print = */ 0);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
+
+    return 0;
 }

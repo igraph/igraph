@@ -55,5 +55,7 @@ igraph_error_t test_path_expansion() {
 int main() {
     IGRAPH_ASSERT(test_path_expansion() == IGRAPH_SUCCESS);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
