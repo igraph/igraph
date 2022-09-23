@@ -31,7 +31,6 @@
  * \function igraph_is_simple
  * \brief Decides whether the input graph is a simple graph.
  *
- * </para><para>
  * A graph is a simple graph if it does not contain loop edges and
  * multiple edges.
  *
@@ -102,7 +101,6 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_has_multiple
  * \brief Check whether the graph has at least one multiple edge.
  *
- * </para><para>
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
  *
@@ -172,13 +170,13 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_is_multiple
  * \brief Find the multiple edges in a graph.
  *
- * </para><para>
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
  *
  * </para><para>
  * Note that this function returns true only for the second or more
  * appearances of the multiple edges.
+ *
  * \param graph The input graph.
  * \param res Pointer to a boolean vector, the result will be stored
  *        here. It will be resized as needed.
@@ -236,15 +234,12 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
 
 /**
  * \function igraph_count_multiple
- * \brief Count the number of appearances of the edges in a graph.
+ * \brief The multiplicity of some edges in a graph.
  *
- * </para><para>
- * If the graph has no multiple edges then the result vector will be
- * filled with ones.
- * (An edge is a multiple edge if there is another
- * edge with the same head and tail vertices in the graph.)
+ * An edge is called a multiple edge when there is one or more other
+ * edge between the same two vertices. The multiplicity of an edge
+ * is the number of edges between its endpoints.
  *
- * </para><para>
  * \param graph The input graph.
  * \param res Pointer to a vector, the result will be stored
  *        here. It will be resized as needed.
@@ -300,7 +295,7 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
 
 /**
  * \function igraph_count_multiple_1
- * \brief Determine the multiplicity of a single edge in a graph.
+ * \brief The multiplicity of a single edge in a graph.
  *
  * \param graph The input graph.
  * \param res Pointer to an iteger, the result will be stored here.
