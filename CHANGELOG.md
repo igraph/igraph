@@ -6,7 +6,7 @@
 
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
 
-### Changes
+### Changed
 
  - `igraph_edge()` now checks that the input edge ID is valid.
 
@@ -35,7 +35,7 @@
  - Fixed an assertion failure in `igraph_barabasi_game()` and `igraph_barabasi_aging_game()` when passing in negative degree exponents.
  - Fixed a compilation failure with some old Clang versions.
 
-### Changes
+### Changed
 
  - `igraph_write_graph_leda()` can now write boolean attributes.
 
