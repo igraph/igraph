@@ -67,7 +67,7 @@
  *    for undirected graphs.
  * \return Error code.
  *
- * Time complexity: O(s*|E|log|E|+|V|), where |V| is the number of
+ * Time complexity: O(s*|E|log|V|+|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
  * \sa \ref igraph_distances() for a (slightly) faster unweighted
@@ -209,7 +209,7 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* This is a shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                    igraph_2wheap_modify(&Q, tto, -altdist);
                 }
             }
 
@@ -312,7 +312,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
+ * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
  * \sa \ref igraph_distances_dijkstra() if you only need the path length but
@@ -450,7 +450,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
                 parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                igraph_2wheap_modify(&Q, tto, -altdist);
             }
         }
     } /* !igraph_2wheap_empty(&Q) */
@@ -581,7 +581,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  *        ignored for undirected graphs.
  * \return Error code.
  *
- * Time complexity: O(|E|log|E|+|V|), |V| is the number of vertices,
+ * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
  * |E| is the number of edges in the graph.
  *
  * \sa \ref igraph_get_shortest_paths_dijkstra() for the version with
@@ -685,7 +685,7 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
+ * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
  * \sa \ref igraph_distances_dijkstra() if you only need the path
@@ -876,7 +876,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 igraph_vector_int_clear(parent_edge_vec);
                 IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
 
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                igraph_2wheap_modify(&Q, tto, -altdist);
             }
         }
     } /* !igraph_2wheap_empty(&Q) */

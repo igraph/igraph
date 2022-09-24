@@ -25,7 +25,6 @@
 
 #include "igraph_attributes.h"
 #include "igraph_constructors.h"
-#include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_types.h"

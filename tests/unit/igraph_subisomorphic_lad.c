@@ -94,6 +94,8 @@ void test_motifs() {
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
+    /* The graph is chosen to have approximately 50% density
+     * so that most motifs have a high chance of appearing. */
     igraph_erdos_renyi_game_gnm(&graph, 30, 400, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
 
     igraph_graph_count(3, IGRAPH_DIRECTED, &count);
@@ -111,7 +113,9 @@ void test_motifs_undirected() {
 
     igraph_rng_seed(igraph_rng_default(), 137);
 
-    igraph_erdos_renyi_game_gnm(&graph, 18, 100, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    /* The graph is chosen to have slightly higher than 50% density
+     * so that most connected motifs have a high chance of appearing. */
+    igraph_erdos_renyi_game_gnm(&graph, 18, 80, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     igraph_graph_count(3, IGRAPH_UNDIRECTED, &count);
     test_k_motifs(&graph, 3, count, IGRAPH_UNDIRECTED);
@@ -121,8 +125,10 @@ void test_motifs_undirected() {
 
     igraph_destroy(&graph);
 
-    /* Use a smaller graph so that the test would not take too long. */
-    igraph_erdos_renyi_game_gnm(&graph, 9, 36, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    /* Use a smaller graph so that the test would not take too long.
+     * The graph is chosen to have slightly higher than 50% density
+     * so that most connected motifs have a high chance of appearing. */
+    igraph_erdos_renyi_game_gnm(&graph, 12, 36, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     igraph_graph_count(5, IGRAPH_UNDIRECTED, &count);
     test_k_motifs(&graph, 5, count, IGRAPH_UNDIRECTED);

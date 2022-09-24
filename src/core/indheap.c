@@ -217,7 +217,7 @@ igraph_error_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_intege
  * \brief Modifies an element in an indexed heap.
  */
 
-igraph_error_t igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem) {
+void igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem) {
     igraph_integer_t i, n;
 
     IGRAPH_ASSERT(h != 0);
@@ -231,13 +231,11 @@ igraph_error_t igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, 
         }
 
     if (i == n) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     /* maintain indheap */
     igraph_indheap_i_build(h, 0);
-
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -930,7 +928,7 @@ igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, igraph_integer_
     return tmp;
 }
 
-igraph_error_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, igraph_real_t elem) {
+void igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, igraph_real_t elem) {
 
     igraph_integer_t pos = VECTOR(h->index2)[idx] - 2;
 
@@ -939,8 +937,6 @@ igraph_error_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, ig
     VECTOR(h->data)[pos] = elem;
     igraph_i_2wheap_sink(h, pos);
     igraph_i_2wheap_shift_up(h, pos);
-
-    return IGRAPH_SUCCESS;
 }
 
 /* Check that the heap is in a consistent state */

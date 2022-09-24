@@ -29,7 +29,6 @@
    homePage: http://www.irit.fr/~Emmanuel.Navarro/
 */
 
-#include "igraph_interface.h"
 #include "igraph_community.h"
 
 #include "core/exceptions.h"

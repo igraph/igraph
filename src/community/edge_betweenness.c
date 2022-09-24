@@ -679,7 +679,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
-                            IGRAPH_CHECK(igraph_2wheap_modify(&heap, to, -altdist));
+                            igraph_2wheap_modify(&heap, to, -altdist);
                         } else if (altdist == curdist - 1) {
                             /* Another path with the same length */
                             v = igraph_inclist_get(&fathers, to);

@@ -232,6 +232,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_square_lattice
   igraph_static_power_law_game
+  igraph_trussness
   igraph_turan
   igraph_wheel
   igraph_weighted_adjacency
@@ -240,7 +241,6 @@ add_legacy_tests(
   tree_game
   ring
   watts_strogatz_game
-  truss
 )
 
 # structural_properties.at
@@ -297,6 +297,7 @@ add_legacy_tests(
   igraph_diameter
   igraph_diameter_dijkstra
   igraph_diversity
+  igraph_distances_floyd_warshall
   igraph_distances_johnson
   igraph_eccentricity
   igraph_eccentricity_dijkstra
@@ -834,7 +835,6 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_random_sample
   igraph_rng_get_integer
-  mt
   random_sampling
   rng_reproducibility
   rng_init_destroy_max_bits_name_set_default
@@ -944,6 +944,7 @@ add_benchmarks(
   igraph_closeness_weighted
   igraph_coloring
   igraph_decompose
+  igraph_distances
   igraph_maximal_cliques
   igraph_neighborhood
   igraph_pagerank

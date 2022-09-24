@@ -178,7 +178,7 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
             } else if (altdist < curdist) {
                 /* This is a shorter path */
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                igraph_2wheap_modify(&Q, tto, -altdist);
             }
         }
     }

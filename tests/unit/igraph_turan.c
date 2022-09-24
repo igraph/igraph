@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.h"
+
 int main() {
     igraph_t g_turan;
     igraph_t g_multipartite;
@@ -35,8 +37,7 @@ int main() {
     igraph_vector_int_init(&types_turan, 0);
     igraph_turan(&g_turan, &types_turan, 0, 10);
 
-    printf("\nEdge list:\n");
-    igraph_write_graph_edgelist(&g_turan, stdout);
+    print_graph_canon(&g_turan);
 
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types_turan);
@@ -49,8 +50,7 @@ int main() {
     igraph_vector_int_init(&types_turan, 0);
     igraph_turan(&g_turan, &types_turan, 10, 1);
 
-    printf("\nEdge list:\n");
-    igraph_write_graph_edgelist(&g_turan, stdout);
+    print_graph_canon(&g_turan);
 
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types_turan);
@@ -64,8 +64,7 @@ int main() {
     igraph_vector_int_init(&types_turan, 0);
     igraph_turan(&g_turan, &types_turan, 4, 6);
 
-    printf("\nEdge list:\n");
-    igraph_write_graph_edgelist(&g_turan, stdout);
+    print_graph_canon(&g_turan);
 
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types_turan);
@@ -87,8 +86,7 @@ int main() {
     igraph_turan(&g_turan, &types_turan, 13, 4);
 
     printf("\nTuran graph with 13 vertices and 4 partitions:");
-    printf("\nEdge list:\n");
-    igraph_write_graph_edgelist(&g_turan, stdout);
+    print_graph_canon(&g_turan);
 
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types_turan);
@@ -118,8 +116,7 @@ int main() {
     igraph_turan(&g_turan, &types_turan, 8, 3);
 
     printf("\nTuran graph with 8 vertices and 3 partitions:");
-    printf("\nEdge list:\n");
-    igraph_write_graph_edgelist(&g_turan, stdout);
+    print_graph_canon(&g_turan);
 
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types_turan);
@@ -149,8 +146,7 @@ int main() {
     igraph_turan(&g_turan, &types_turan, 6, 3);
 
     printf("\nTuran graph with 6 vertices and 3 partitions:");
-    printf("\nEdge list:\n");
-    igraph_write_graph_edgelist(&g_turan, stdout);
+    print_graph_canon(&g_turan);
 
     printf("\nPartition type:\n");
     igraph_vector_int_print(&types_turan);
@@ -165,6 +161,8 @@ int main() {
     igraph_vector_int_destroy(&types_turan);
     igraph_destroy(&g_turan);
     igraph_destroy(&g_multipartite);
+
+    VERIFY_FINALLY_STACK();
 
     return IGRAPH_SUCCESS;
 }

@@ -629,7 +629,6 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                 igraph_vector_int_t *membership) {
     igraph_integer_t no_of_edges, no_of_nodes, no_of_joins, total_joins;
     igraph_integer_t i, j, k, n, m, from, to, dummy, best_no_of_joins;
-    igraph_integer_t ffrom, fto;
     igraph_eit_t edgeit;
     igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
     igraph_i_fastgreedy_community_list communities;
@@ -754,10 +753,9 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     loop_weight_sum = 0;
     for (i = 0, j = 0; !IGRAPH_EIT_END(edgeit); i += 2, j++, IGRAPH_EIT_NEXT(edgeit)) {
         igraph_integer_t eidx = IGRAPH_EIT_GET(edgeit);
-        igraph_edge(graph, eidx, &ffrom, &fto);
 
         /* Create the pairs themselves */
-        from = ffrom; to = fto;
+        from = IGRAPH_FROM(graph, eidx); to = IGRAPH_TO(graph, eidx);
         if (from == to) {
             loop_weight_sum += weights ? 2 * VECTOR(*weights)[eidx] : 2;
             continue;

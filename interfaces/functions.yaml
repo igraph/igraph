@@ -533,6 +533,11 @@ igraph_distances_johnson:
         VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights
     DEPS: from ON graph, to ON graph, weights ON graph
 
+igraph_distances_floyd_warshall:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
+    DEPS: weights ON graph
+
 igraph_get_all_simple_paths:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_INDICES res, VERTEX from,

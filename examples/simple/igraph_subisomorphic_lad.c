@@ -34,7 +34,6 @@ void print_maps(igraph_vector_int_t *map, igraph_vector_int_list_t *maps) {
     igraph_vector_int_list_clear(maps);
 }
 
-
 int main() {
     igraph_t target, pattern;
     igraph_bool_t iso;

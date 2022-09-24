@@ -37,7 +37,7 @@ int main() {
     /* A directed ring, a single strongly connected component */
     igraph_ring(&ring, 10, IGRAPH_DIRECTED, 0, 1);
     igraph_decompose(&ring, &complist, IGRAPH_STRONG, -1, 0);
-    igraph_write_graph_edgelist(igraph_graph_list_get_ptr(&complist, 0), stdout);
+    print_graph(igraph_graph_list_get_ptr(&complist, 0));
     igraph_destroy(&ring);
 
     /* a toy graph, three components maximum, with at least 2 vertices each */
@@ -51,7 +51,7 @@ int main() {
                  -1);
     igraph_decompose(&g, &complist, IGRAPH_STRONG, 3, 2);
     for (i = 0; i < igraph_graph_list_size(&complist); i++) {
-        igraph_write_graph_edgelist(igraph_graph_list_get_ptr(&complist, i), stdout);
+        print_graph(igraph_graph_list_get_ptr(&complist, i));
     }
     igraph_destroy(&g);
 

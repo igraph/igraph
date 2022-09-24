@@ -55,7 +55,7 @@ void igraph_indheap_clear(igraph_indheap_t *h);
 igraph_bool_t igraph_indheap_empty(const igraph_indheap_t* h);
 igraph_error_t igraph_indheap_push(igraph_indheap_t* h, igraph_real_t elem);
 igraph_error_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem);
-igraph_error_t igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem);
+void igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem);
 igraph_real_t igraph_indheap_max(const igraph_indheap_t* h);
 igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h);
 igraph_integer_t igraph_indheap_size(const igraph_indheap_t *h);
@@ -132,7 +132,7 @@ IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap
 IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, igraph_integer_t idx);
 IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h);
 IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, igraph_integer_t *idx);
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, igraph_real_t elem);
+IGRAPH_PRIVATE_EXPORT void igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, igraph_real_t elem);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_2wheap_check(const igraph_2wheap_t *h);
 
 __END_DECLS

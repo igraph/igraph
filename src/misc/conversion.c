@@ -315,7 +315,8 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
  * \function igraph_get_edgelist
  * \brief The list of edges in a graph.
  *
- * </para><para>The order of the edges is given by the edge IDs.
+ * The order of the edges is given by the edge IDs.
+ *
  * \param graph Pointer to the graph object
  * \param res Pointer to an initialized vector object, it will be
  *        resized.
@@ -327,8 +328,7 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
  *
  * \sa \ref igraph_edges() to return the result only for some edge IDs.
  *
- * Time complexity: O(|E|), the
- * number of edges in the graph.
+ * Time complexity: O(|E|), the number of edges in the graph.
  */
 
 igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol) {
@@ -571,10 +571,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
 
         while (!IGRAPH_EIT_END(eit)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-            igraph_integer_t from, to;
-            igraph_edge(graph, edge, &from, &to);
-            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
-            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, IGRAPH_FROM(graph, edge)));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, IGRAPH_TO(graph, edge)));
             IGRAPH_EIT_NEXT(eit);
         }
 

@@ -51,7 +51,7 @@ int main() {
     igraph_vector_int_print(&map);
     printf("Inverse map: ");
     igraph_vector_int_print(&invmap);
-    igraph_write_graph_edgelist(&sub, stdout);
+    print_graph(&sub);
 
     igraph_vector_int_destroy(&keep);
     igraph_vector_int_destroy(&map);

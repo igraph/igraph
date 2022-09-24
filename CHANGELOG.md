@@ -2,6 +2,29 @@
 
 ## [Unreleased]
 
+### Added
+
+ - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
+ - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
+
+### Changed
+
+ - `igraph_edge()` now checks that the input edge ID is valid.
+
+### Fixed
+
+ - `igraph_trussness()` is now interruptible.
+ - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
+ - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
+
+### Deprecated
+
+ - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.1] - 2022-09-08
 
 ### Fixed
@@ -13,7 +36,7 @@
  - Fixed an assertion failure in `igraph_barabasi_game()` and `igraph_barabasi_aging_game()` when passing in negative degree exponents.
  - Fixed a compilation failure with some old Clang versions.
 
-### Changes
+### Changed
 
  - `igraph_write_graph_leda()` can now write boolean attributes.
 
