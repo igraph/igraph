@@ -67,7 +67,6 @@ add_library(
   core/vector_list.c
   core/vector_ptr.c
 
-  math/bfgs.c
   math/complex.c
   math/safe_intop.c
   math/utils.c
