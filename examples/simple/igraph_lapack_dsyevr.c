@@ -28,8 +28,6 @@ int main() {
     igraph_matrix_t A;
     igraph_matrix_t vectors;
     igraph_vector_t values;
-    int il, iu;
-    igraph_real_t vl, vu;
 
     igraph_matrix_init(&A, 2, 2);
     igraph_matrix_init(&vectors, 0, 0);
@@ -42,10 +40,8 @@ int main() {
 
     printf("Take a subset:\n");
 
-    il = 1;
-    iu = 1;
     igraph_lapack_dsyevr(&A, IGRAPH_LAPACK_DSYEV_SELECT, /*vl=*/ 0, /*vu=*/ 0,
-                         /*vestimate=*/ 0, /*il=*/ il, /*iu=*/ iu,
+                         /*vestimate=*/ 0, /*il=*/ 1, /*iu=*/ 1,
                          /*abstol=*/ 1e-10, &values, &vectors,
                          /*support=*/ 0);
     printf("eigenvalues:\n");
@@ -55,13 +51,8 @@ int main() {
 
     printf("\nTake a subset based on an interval:\n");
 
-    il = 1;
-    iu = 1;
-    vl = 3;
-    vu = 4;
-
-    igraph_lapack_dsyevr(&A, IGRAPH_LAPACK_DSYEV_INTERVAL, vl, vu,
-                         /*vestimate=*/ iu - il + 1, /*il=*/ 0, /*iu=*/ 0,
+    igraph_lapack_dsyevr(&A, IGRAPH_LAPACK_DSYEV_INTERVAL, /*vl*/ 3, /*vu*/ 4,
+                         /*vestimate=*/ 1, /*il=*/ 0, /*iu=*/ 0,
                          /*abstol=*/ 1e-10, &values, &vectors,
                          /*support=*/ 0);
 
