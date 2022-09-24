@@ -1,14 +1,13 @@
 eigenvalues:
 1+1i 1-1i
+
 left eigenvectors:
-0.707107        0
-       0 0.707107
+0.707107+0i 0+0.707107i
+0.707107-0i 0-0.707107i
+
 right eigenvectors:
-0.707107        0
-       0 0.707107
-Balance factor, low:
-1
-Balance factor, high:
-2
+0.707107+0i 0+0.707107i
+0.707107-0i 0-0.707107i
+
 One-norm of the balanced matrix:
 2
