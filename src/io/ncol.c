@@ -27,7 +27,8 @@
 
 #include "graph/attributes.h"
 
-#include "ncol-header.h"
+#include "io/ncol-header.h"
+#include "io/parsers/ncol-parser.h"
 
 int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
                                   void* scanner);

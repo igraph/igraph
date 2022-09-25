@@ -29,7 +29,9 @@
 #include "core/trie.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strdup, strncasecmp */
+
 #include "io/gml-header.h"
+#include "io/parsers/gml-parser.h"
 
 #include <ctype.h>
 #include <time.h>
