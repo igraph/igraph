@@ -911,7 +911,7 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
  * \param vectors If not a null pointer, then it must be a pointer to
  *     an initialized matrix. The eigenvectors will be stored in the
  *     columns of the matrix. The matrix will be resized as needed.
- *     Either this or the \p vectors argument must be non-null if the
+ *     Either this or the \p storage argument must be non-null if the
  *     ARPACK iteration is started from a given starting vector. If
  *     both are given \p vectors take precedence.
  * \return Error code.
@@ -1027,7 +1027,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
             IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
         }
         if (vectors && (igraph_matrix_nrow(vectors) != options->n ||
-                        igraph_matrix_ncol(vectors) != 1)) {
+                        igraph_matrix_ncol(vectors) < 1)) {
             IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
         }
         if (vectors) {
