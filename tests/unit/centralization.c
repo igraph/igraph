@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,78 +13,62 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
-#include <math.h>
+#include "test_utilities.h"
 
 int main() {
-
     igraph_t g;
     igraph_real_t cent;
     igraph_arpack_options_t arpack_options;
 
-    /****************************/
-    /* undirected star */
-    igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, /*center=*/ 0);
-
-    igraph_centralization_degree(&g, /*res=*/ NULL,
-                                 /*mode=*/ IGRAPH_ALL, IGRAPH_NO_LOOPS,
+    igraph_star(&g, 10, IGRAPH_STAR_IN, /*center=*/ 0);
+    igraph_centralization_degree(&g,
+                                 /*res=*/ NULL,
+                                 /*mode=*/ IGRAPH_IN, IGRAPH_NO_LOOPS,
                                  &cent, /*theoretical_max=*/ NULL,
                                  /*normalized=*/ true);
-    if (cent != 1.0) {
-        fprintf(stderr, "undirected star, degree: %g\n", cent);
-        return 21;
-    }
+    printf("in-star, degree: %g\n", cent);
 
     igraph_centralization_betweenness(&g, /*res=*/ NULL,
                                       IGRAPH_UNDIRECTED, &cent,
                                       /*theoretical_max=*/ NULL,
                                       /*normalized=*/ true);
-    if (cent != 1.0) {
-        fprintf(stderr, "undirected star, betweenness: %g\n", cent);
-        return 22;
-    }
-
-    igraph_centralization_closeness(&g, /*res=*/ NULL,
-                                    IGRAPH_ALL, &cent,
-                                    /*theoretical_max=*/ NULL,
-                                    /*normalized=*/ true);
-
-    if (!igraph_almost_equals(cent, 1.0, 1e-8)) {
-        fprintf(stderr, "undirected star, closeness: %g\n", cent);
-        return 23;
-    }
-
+    printf("in-star, betweenness: %g\n", cent);
     igraph_destroy(&g);
 
-    /****************************/
-    /* single dyad */
 
-    igraph_small(&g, /*n=*/ 10, /*directed=*/ 0,
-                 0, 1, -1);
+    igraph_star(&g, 10, IGRAPH_STAR_OUT, /*center=*/ 0);
+    igraph_centralization_degree(&g, /*res=*/ NULL,
+                                 /*mode=*/ IGRAPH_OUT, IGRAPH_NO_LOOPS,
+                                 &cent, /*theoretical_max=*/ NULL,
+                                 /*normalized=*/ true);
+    printf("out-star, degree: %g\n", cent);
 
+    igraph_centralization_betweenness(&g, /*res=*/ NULL,
+                                      IGRAPH_UNDIRECTED, &cent,
+                                      /*theoretical_max=*/ NULL,
+                                      /*normalized=*/ true);
+    printf("out-star, betweenness: %g\n", cent);
+    igraph_destroy(&g);
+
+    igraph_small(&g, /*n=*/ 10, /*directed=*/ 0, 0, 1, -1);
     igraph_arpack_options_init(&arpack_options);
     igraph_centralization_eigenvector_centrality(
                 &g,
                 /*vector=*/ NULL,
                 /*value=*/ NULL,
                 IGRAPH_DIRECTED,
-                /*scale=*/ true,
+                /*scale=*/ false,
                 &arpack_options, &cent,
                 /*theoretical_max=*/ NULL,
                 /*normalized=*/ true);
 
-    if (!igraph_almost_equals(cent, 1.0, 1e-8)) {
-        fprintf(stderr, "dyad, eigenvector centrality: %g\n", cent);
-        return 24;
-    }
+    printf("dyad, eigenvector centrality, not scaled: %g\n", cent);
 
     igraph_destroy(&g);
-
+    VERIFY_FINALLY_STACK();
     return 0;
 }

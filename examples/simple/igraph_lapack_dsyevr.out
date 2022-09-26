@@ -1,0 +1,13 @@
+Take a subset:
+eigenvalues:
+1.38197
+eigenvectors:
+0.850651
+0.525731
+
+Take a subset based on an interval:
+eigenvalues:
+3.61803
+eigenvectors:
+-0.525731
+ 0.850651

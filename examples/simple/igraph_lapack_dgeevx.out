@@ -1,0 +1,13 @@
+eigenvalues:
+1+1i 1-1i
+
+left eigenvectors:
+0.707107+0i 0+0.707107i
+0.707107-0i 0-0.707107i
+
+right eigenvectors:
+0.707107+0i 0+0.707107i
+0.707107-0i 0-0.707107i
+
+One-norm of the balanced matrix:
+2
