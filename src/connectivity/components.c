@@ -731,7 +731,6 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
     igraph_integer_t no_of_clusters = 0;
-    igraph_integer_t act_cluster_size;
 
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
     const igraph_vector_int_t* tmp;
@@ -853,7 +852,6 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
         /* this node is gone for any future components */
         VECTOR(next_nei)[grandfather] = 1;
-        act_cluster_size = 1;
 
         /* add to component */
         IGRAPH_CHECK(igraph_vector_int_push_back(&verts, grandfather));
@@ -879,7 +877,6 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
                 VECTOR(next_nei)[neighbor] = 1;
-                act_cluster_size++;
 
                 /* add to component */
                 IGRAPH_CHECK(igraph_vector_int_push_back(&verts, neighbor));

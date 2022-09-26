@@ -11,6 +11,7 @@ if(NOT MSVC)
   # will accept any warning option starting with 'no-', and will not error, yet it still
   # prints a message about the unrecognized option.
   check_c_compiler_flag("-Wunknown-warning-option" COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG)
+  check_c_compiler_flag("-Wunused-but-set-variable" COMPILER_SUPPORTS_UNUSED_BUT_SET_VARIABLE_FLAG)
 endif()
 
 set(
@@ -51,8 +52,10 @@ macro(use_all_warnings TARGET_NAME)
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
         -Wall -Wextra -pedantic
         -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
+        -Wno-error=strict-prototypes
       >
       $<$<BOOL:${COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
+      $<$<BOOL:${COMPILER_SUPPORTS_UNUSED_BUT_SET_VARIABLE_FLAG}>:-Wno-unused-but-set-variable>
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
         # disable #279: controlling expression is constant; affecting assert(condition && "message")

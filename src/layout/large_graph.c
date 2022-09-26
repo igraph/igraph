@@ -210,7 +210,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         igraph_integer_t it = 0;
         igraph_real_t epsilon = 10e-6;
         igraph_real_t maxchange = epsilon + 1;
-        igraph_integer_t pairs;
+        /* igraph_integer_t pairs; */
         igraph_real_t sconst = sqrt(area / M_PI) / H_n;
         igraph_2dgrid_iterator_t vidit;
 
@@ -324,7 +324,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             }
 
             /* repulsive "forces" of the vertices nearby */
-            pairs = 0;
+            /* pairs = 0; */
             igraph_2dgrid_reset(&grid, &vidit);
             while ( (vid = igraph_2dgrid_next(&grid, &vidit) - 1) != -1) {
                 while ( (nei = igraph_2dgrid_next_nei(&grid, &vidit) - 1) != -1) {
@@ -333,7 +333,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                     igraph_real_t dist = sqrt(xd*xd + yd*yd);
                     igraph_real_t force;
                     if (dist < cellsize) {
-                        pairs++;
+                        /* pairs++; */
                         if (dist == 0) {
                             dist = epsilon;
                         };
