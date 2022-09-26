@@ -43,7 +43,6 @@
  ***************************************************************************/
 
 #include "pottsmodel_2.h"
-#include "NetRoutines.h"
 
 #include "igraph_random.h"
 #include "core/interruption.h"
@@ -585,7 +584,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
     unsigned long changes/*, degree, problemcount */;
     //HugeArray<int> neighbours;
     double h, delta = 0, norm, r, beta, minweight, prefac = 0, w, degree;
-    bool cyclic = false, found;
+    bool cyclic = false/*, found*/;
     unsigned long number_of_nodes;
 
     sweep = 0;
@@ -660,11 +659,11 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
             r = RNG_UNIF(0, norm);
             /* norm*double(rand())/double(RAND_MAX + 1.0); */
             new_spin = 1;
-            found = false;
-            while (!found && new_spin <= q) {
+            //found = false;
+            while (/*!found &&*/ new_spin <= q) {
                 if (r <= weights[new_spin]) {
                     spin_opt = new_spin;
-                    found = true;
+                    // found = true;
                     break;
                 } else {
                     r -= weights[new_spin];
@@ -759,7 +758,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     double degree, w, delta = 0, h;
     //HugeArray<int> neighbours;
     double norm, r, beta, minweight, prefac = 0;
-    bool found;
+    //bool found;
     igraph_integer_t number_of_nodes;
     sweep = 0;
     changes = 0;
@@ -839,11 +838,11 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
             /*      r = norm*double(rand())/double(RAND_MAX + 1.0); */
             r = RNG_UNIF(0, norm);
             new_spin = 1;
-            found = false;
-            while (!found && new_spin <= q) {
+            //found = false;
+            while (/*!found &&*/ new_spin <= q) {
                 if (r <= weights[new_spin]) {
                     spin_opt = new_spin;
-                    found = true;
+                    //found = true;
                     break;
                 } else {
                     r -= weights[new_spin];
