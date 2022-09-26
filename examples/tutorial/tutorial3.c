@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-int main() {
+int main(void) {
   igraph_t graph;
   igraph_vector_int_t v;
   igraph_vector_int_t result;
