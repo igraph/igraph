@@ -305,10 +305,12 @@ add_legacy_tests(
   igraph_edge_betweenness_subset
   igraph_feedback_arc_set_undirected
   igraph_get_all_simple_paths
+  igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
+  igraph_get_shortest_paths_dijkstra
   igraph_graph_center
   igraph_has_mutual
   igraph_is_bipartite
@@ -333,6 +335,7 @@ add_legacy_tests(
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
+  igraph_similarity
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
@@ -435,6 +438,7 @@ add_legacy_tests(
   bliss_automorphisms
   igraph_get_isomorphisms_vf2
   igraph_get_subisomorphisms_vf2
+  igraph_isomorphic_vf2
   igraph_subisomorphic
   igraph_subisomorphic_lad
   igraph_isomorphic_bliss
@@ -578,10 +582,12 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_dominator_tree
   igraph_st_mincut_value
   igraph_vertex_disjoint_paths
   igraph_adhesion
   igraph_cohesion
+  igraph_maxflow
   igraph_residual_graph
   igraph_edge_disjoint_paths
   igraph_st_edge_connectivity
@@ -714,9 +720,12 @@ add_legacy_tests(
   igraph_arpack_unpack_complex
   igraph_blas_dgemm
   igraph_eigenvector_centrality
+  igraph_lapack_dgeev
+  igraph_lapack_dgeevx
   igraph_lapack_dgehrd
   igraph_lapack_dgetrf
   igraph_lapack_dgetrs
+  igraph_lapack_dsyevr
 )
 
 # bipartite.at
@@ -739,6 +748,11 @@ add_examples(
   centralization
 )
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  centralization
+)
+
 # eulerian.at
 add_legacy_tests(
   FOLDER tests/unit NAMES
@@ -756,6 +770,12 @@ add_examples(
   igraph_minimal_separators
   igraph_minimum_size_separators
 )
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_cohesive_blocks
+)
+
 add_legacy_tests(
   FOLDER tests/regression NAMES
   bug-1033045
