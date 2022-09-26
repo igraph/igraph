@@ -9,7 +9,7 @@ void sort_and_print_vector(igraph_vector_int_t *v) {
     print_vector_int(v);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t bridges;
 

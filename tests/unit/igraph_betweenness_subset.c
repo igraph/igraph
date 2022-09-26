@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t edges;
     igraph_vector_t bet, bet2, weights;

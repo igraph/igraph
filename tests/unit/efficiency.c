@@ -96,7 +96,7 @@ int test_graph(const char* name, const igraph_t* graph, const igraph_real_t* wei
     return 0;
 }
 
-int test_ring() {
+int test_ring(void) {
     int result;
     igraph_t graph;
     const igraph_real_t weights_array[] = {1, 1, 1, 1};
@@ -110,7 +110,7 @@ int test_ring() {
     return result;
 }
 
-int test_small_graph() {
+int test_small_graph(void) {
     int result;
     igraph_t graph;
     const igraph_real_t weights_array[] = {4, 4, 4, 3, 1, 5, 1, 2, 4, 5, 3, 5, 5, 4, 1, 1, 5, 4, 1, 1, 2, 1, 3, 5};
@@ -127,7 +127,7 @@ int test_small_graph() {
     return result;
 }
 
-int main() {
+int main(void) {
 
     RUN_TEST(test_ring);
     RUN_TEST(test_small_graph);

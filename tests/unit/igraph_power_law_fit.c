@@ -33,7 +33,7 @@ void print_result(const igraph_plfit_result_t* result) {
     printf("====================\n");
 }
 
-int test_continuous() {
+int test_continuous(void) {
     igraph_plfit_result_t result;
     igraph_vector_t vector;
     double data[] = { 1.52219974, 6.80675663, 1.02798042, 1.31180733, 3.97473174,
@@ -222,7 +222,7 @@ int test_continuous() {
     return 0;
 }
 
-int test_discrete() {
+int test_discrete(void) {
     igraph_plfit_result_t result;
     igraph_vector_t vector;
     igraph_real_t p;
@@ -309,7 +309,7 @@ int test_discrete() {
     return 0;
 }
 
-int main() {
+int main(void) {
     int retval;
 
     /* Seed random number generator to ensure reproducibility. */

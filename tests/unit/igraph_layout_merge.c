@@ -28,7 +28,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     /*******************/
     /* Testing the DLA */

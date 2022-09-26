@@ -20,7 +20,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     igraph_t left, right, uni;
     igraph_vector_ptr_t glist;
     igraph_integer_t i, n;

@@ -24,7 +24,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_matrix_t m;

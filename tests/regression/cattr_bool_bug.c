@@ -13,7 +13,7 @@ void check_attr(igraph_t *graph) {
     IGRAPH_ASSERT(igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, "weight"));
 }
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_error_handler_t* oldhandler;

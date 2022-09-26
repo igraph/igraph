@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t separators;
     igraph_integer_t i, n;

@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <unistd.h> /* unlink */
 
-int main() {
+int main(void) {
     igraph_t graph;
     const char *infilename  = "test.graphml";
     const char *outfilename = "test2.graphml";

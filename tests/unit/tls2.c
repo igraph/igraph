@@ -182,7 +182,7 @@ void *thread_function(void *arg) {
     return 0;
 }
 
-int main() {
+int main(void) {
     pthread_t thread_id1, thread_id2;
     void *exit_status1, *exit_status2;
     igraph_matrix_t m1, m2;

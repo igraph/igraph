@@ -50,8 +50,8 @@ macro(use_all_warnings TARGET_NAME)
       $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel,IntelLLVM>:
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
         -Wall -Wextra -pedantic
+        -Wstrict-prototypes
         -Wno-unused-function -Wno-unused-parameter -Wno-unused-but-set-variable -Wno-sign-compare
-        -Wno-error=strict-prototypes # temporary hack, needed for main() in tests
       >
       $<$<BOOL:${COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
       # Intel compiler:

@@ -69,7 +69,7 @@ void print_and_destroy_items(igraph_vector_int_list_t* vec) {
     igraph_vector_int_list_clear(vec);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t vertices, edges;

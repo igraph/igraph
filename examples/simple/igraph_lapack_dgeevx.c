@@ -36,7 +36,7 @@ void matrix_to_complex_vectors(igraph_vector_complex_t *c1, igraph_vector_comple
     IGRAPH_IMAG(VECTOR(*c2)[1]) = -MATRIX(*m, 1, 1);
 }
 
-int main() {
+int main(void) {
 
     igraph_matrix_t A;
     igraph_matrix_t vectors_left, vectors_right;

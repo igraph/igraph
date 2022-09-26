@@ -10,7 +10,7 @@
     printf("\n");
 
 
-int main() {
+int main(void) {
     igraph_t graph;
 
     igraph_kary_tree(&graph, 0, 1, IGRAPH_TREE_UNDIRECTED);

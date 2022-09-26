@@ -34,7 +34,7 @@ typedef struct {
 } sampling_test_t;
 
 /* Get a few random samples and test their properties. */
-int random_sample_test() {
+int random_sample_test(void) {
     const igraph_integer_t min = -1000;
     const igraph_integer_t max = 1000;
     igraph_integer_t low;       /* lower limit */
@@ -100,7 +100,7 @@ int random_sample_test() {
     return 0;
 }
 
-int equal_test() {
+int equal_test(void) {
     igraph_vector_int_t V;
 
     igraph_vector_int_init(&V, 0);
@@ -134,7 +134,7 @@ int equal_test() {
     return 0;
 }
 
-int rare_test() {
+int rare_test(void) {
     igraph_vector_int_t V;
 
     igraph_vector_int_init(&V, 0);
@@ -159,7 +159,7 @@ int rare_test() {
     return 0;
 }
 
-int main() {
+int main(void) {
     int ret;
 
     ret = random_sample_test();

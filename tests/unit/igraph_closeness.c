@@ -3,7 +3,7 @@
 #include "test_utilities.h"
 
 
-void simple_test_case_no_weights_undirected() {
+void simple_test_case_no_weights_undirected(void) {
 
     igraph_t g;
     igraph_vector_t vector_actual_results;
@@ -40,7 +40,7 @@ void simple_test_case_no_weights_undirected() {
     igraph_destroy(&g);
 }
 
-void simple_test_case_with_weights_undirected() {
+void simple_test_case_with_weights_undirected(void) {
 
     igraph_t g;
     igraph_vector_int_t vector_edges;
@@ -85,7 +85,7 @@ void simple_test_case_with_weights_undirected() {
     igraph_destroy(&g);
 }
 
-void advanced_test_case_no_weights_undirected() {
+void advanced_test_case_no_weights_undirected(void) {
 
     igraph_t g;
     igraph_vector_t vector_actual_results;
@@ -128,7 +128,7 @@ void advanced_test_case_no_weights_undirected() {
     igraph_destroy(&g);
 }
 
-void advanced_test_case_with_weights() {
+void advanced_test_case_with_weights(void) {
 
     igraph_t g;
     igraph_vector_int_t vector_edges;
@@ -189,7 +189,7 @@ void advanced_test_case_with_weights() {
     igraph_destroy(&g);
 }
 
-void test_cutoff() {
+void test_cutoff(void) {
 
     igraph_t g;
     igraph_vector_t closeness;
@@ -223,7 +223,7 @@ void test_cutoff() {
     igraph_destroy(&g);
 }
 
-void test_cutoff_directed() {
+void test_cutoff_directed(void) {
 
     igraph_t g;
     igraph_vector_t closeness;
@@ -257,7 +257,7 @@ void test_cutoff_directed() {
     igraph_destroy(&g);
 }
 
-void test_cutoff_weighted() {
+void test_cutoff_weighted(void) {
 
     igraph_t g;
     igraph_vector_t closeness;
@@ -294,7 +294,7 @@ void test_cutoff_weighted() {
     igraph_destroy(&g);
 }
 
-void test_edge_cases() {
+void test_edge_cases(void) {
 
     igraph_t g;
     igraph_vector_t closeness;
@@ -326,7 +326,7 @@ void test_edge_cases() {
 
 }
 
-int main() {
+int main(void) {
 
     simple_test_case_no_weights_undirected();
     simple_test_case_with_weights_undirected();

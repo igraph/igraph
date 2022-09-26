@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_real_t cent;
     igraph_arpack_options_t arpack_options;

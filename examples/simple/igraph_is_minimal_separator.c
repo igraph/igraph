@@ -26,7 +26,7 @@
 
 #define FAIL(msg, error) do { printf(msg "\n") ; return error; } while (0)
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_vector_int_t sep;

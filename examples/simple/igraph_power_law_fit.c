@@ -22,7 +22,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t degree;
     igraph_plfit_result_t model;

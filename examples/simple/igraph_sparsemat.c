@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_sparsemat_t A, B, C, D;
     igraph_t G, H;

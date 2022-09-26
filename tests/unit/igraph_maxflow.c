@@ -149,7 +149,7 @@ int check_flow(int errorinc,
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t flow_value;

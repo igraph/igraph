@@ -28,7 +28,7 @@ void check(igraph_t *graph, igraph_vs_t *vs) {
     }
 }
 
-int main() {
+int main(void) {
     igraph_t g, g_no_vertices, g_no_edges;
     igraph_vs_t vs, vs_copy;
     igraph_vector_int_t v;

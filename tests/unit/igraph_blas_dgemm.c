@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_matrix_t a, b, c, d, e;
 
     igraph_matrix_init(&c, 0, 0);

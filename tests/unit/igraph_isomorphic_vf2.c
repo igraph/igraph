@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t ring1, ring2;
     igraph_vector_int_t color1, color2;
     igraph_vector_int_t perm;

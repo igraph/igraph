@@ -68,7 +68,7 @@ void check_print_destroy_simple(igraph_t *g1, igraph_t *g2) {
     check_print_destroy(g1, g2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, IGRAPH_SUCCESS);
 }
 
-int main() {
+int main(void) {
     igraph_t ring, ring_dir;
     igraph_t ring_plus, ring_plus_dir;
     igraph_t ring_loop;

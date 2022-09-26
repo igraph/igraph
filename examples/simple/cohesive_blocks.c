@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_list_t blocks;
     igraph_vector_int_t cohesion;

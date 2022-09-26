@@ -38,7 +38,7 @@ void check_output(const igraph_t *graph, igraph_bool_t *res, igraph_neimode_t mo
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_bool_t res;
     igraph_neimode_t mode;

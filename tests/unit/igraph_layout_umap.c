@@ -110,7 +110,7 @@ void check_graph_singleton(const igraph_matrix_t *layout) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t graph, empty_graph, singleton_graph;
     igraph_vector_t distances;
     igraph_matrix_t layout;

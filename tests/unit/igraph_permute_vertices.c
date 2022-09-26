@@ -18,7 +18,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph, pgraph;
     igraph_vector_int_t perm;
 

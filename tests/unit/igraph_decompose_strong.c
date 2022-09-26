@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t ring, g;
     igraph_graph_list_t complist;

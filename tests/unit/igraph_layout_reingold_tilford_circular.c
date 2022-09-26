@@ -25,7 +25,7 @@ void chop_print_destroy(igraph_matrix_t *result) {
     igraph_matrix_destroy(result);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t result;
     igraph_vector_int_t roots, rootlevel;

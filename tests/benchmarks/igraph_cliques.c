@@ -3,7 +3,7 @@
 
 #include "bench.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_list_t res;
     igraph_integer_t res_int;

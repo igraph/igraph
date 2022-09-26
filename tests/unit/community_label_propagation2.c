@@ -5,7 +5,7 @@
 
 /* Test case for bug #1852 */
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t membership, initial_labels;
 

@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t paths, paths_edge;
     igraph_vector_int_t nrgeo;

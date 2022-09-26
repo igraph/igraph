@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t g1, g2, res;
     igraph_vector_int_t v;

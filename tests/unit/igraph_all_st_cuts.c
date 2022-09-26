@@ -57,7 +57,7 @@ int test_all_st_cuts(const igraph_t *graph,
     return 0;
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_list_t cuts, partition1s;
     igraph_integer_t i, n;

@@ -109,7 +109,7 @@ int check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* pare
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;

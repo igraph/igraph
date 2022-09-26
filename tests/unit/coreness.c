@@ -140,7 +140,7 @@ void remove_some_edges(igraph_t* graph, igraph_real_t prob) {
     igraph_vector_int_destroy(&to_remove);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
 
     igraph_rng_seed(igraph_rng_default(), 137);

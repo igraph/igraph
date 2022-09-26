@@ -18,7 +18,7 @@ void random_permutation(igraph_vector_int_t *vec) {
 }
 
 
-void test3() {
+void test3(void) {
     igraph_integer_t i, j;
     igraph_graph_list_t graphs3;
     igraph_t g;
@@ -62,7 +62,7 @@ void test3() {
 }
 
 
-void test4() {
+void test4(void) {
     igraph_integer_t i, j;
     igraph_graph_list_t graphs4;
     igraph_t g;
@@ -106,7 +106,7 @@ void test4() {
 }
 
 
-void test_bliss() {
+void test_bliss(void) {
     igraph_t ring1, ring2, directed_ring;
     igraph_vector_int_t perm;
     igraph_bool_t iso;
@@ -191,7 +191,7 @@ void test_bliss() {
     igraph_destroy(&directed_ring);
 }
 
-void test_bug_995() {
+void test_bug_995(void) {
     igraph_t g1, g2;
     igraph_bool_t result;
 
@@ -207,7 +207,7 @@ void test_bug_995() {
     igraph_destroy(&g2);
 }
 
-int main() {
+int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 293847); /* make tests deterministic */
 

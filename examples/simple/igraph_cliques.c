@@ -93,7 +93,7 @@ void test_callback(const igraph_t *graph) {
 }
 
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t result;

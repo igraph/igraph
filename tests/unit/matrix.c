@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_matrix_t m, m1;
     igraph_integer_t i, j, k;
 

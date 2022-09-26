@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
 
     igraph_matrix_t A;
     igraph_matrix_t vectors_left, vectors_right;

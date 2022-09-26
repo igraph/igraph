@@ -41,7 +41,7 @@ void fixup_modularity(igraph_vector_t *modularity) {
     }
 }
 
-int main() {
+int main(void) {
   igraph_t graph;
 
   igraph_matrix_int_t merges;

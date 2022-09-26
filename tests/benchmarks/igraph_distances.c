@@ -6,7 +6,7 @@
 #define TOSTR1(x) #x
 #define TOSTR(x) TOSTR1(x)
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t res;
     igraph_vector_t weights;

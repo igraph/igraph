@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_bool_t type;
     igraph_bool_t typev[] = { false, true, false, true, false, true, false, true, false, true };

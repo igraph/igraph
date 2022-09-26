@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g_in;
     igraph_t g_out;
     FILE *file;

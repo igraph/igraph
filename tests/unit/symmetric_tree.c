@@ -24,7 +24,7 @@
     igraph_vector_int_destroy(&v); \
     printf("\n");
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_t v;

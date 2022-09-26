@@ -136,7 +136,7 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_matrix_t m;

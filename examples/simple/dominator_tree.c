@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     igraph_t g, domtree;
     igraph_vector_int_t dom;
     igraph_vector_int_t leftout;

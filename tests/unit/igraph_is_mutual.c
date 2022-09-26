@@ -29,7 +29,7 @@ void call_and_print(igraph_t *graph, igraph_es_t es, igraph_bool_t loops) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_lm, g_lmu;
     igraph_vector_bool_t result;
 

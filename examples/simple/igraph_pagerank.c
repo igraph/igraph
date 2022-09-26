@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <float.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t pagerank;
     igraph_real_t value;

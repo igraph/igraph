@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_vector_int_t comm1, comm2;
     igraph_integer_t distance12, distance21;
 

@@ -59,7 +59,7 @@ void check_error(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loo
     igraph_sparsemat_destroy(&sparse_adjmatrix_comp);
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t adjmatrix;
 
     printf("\n0x0 matrix:\n");

@@ -78,7 +78,7 @@ igraph_real_t infomap_test(const igraph_t * g, igraph_bool_t smoke_test) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t weights;
     igraph_real_t codelength;

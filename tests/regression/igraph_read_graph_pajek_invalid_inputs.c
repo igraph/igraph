@@ -52,7 +52,7 @@ int test_file(const char* fname) {
     }                       \
 }
 
-int main() {
+int main(void) {
     int index = 0;
 
     /* Turn on attribute handling */

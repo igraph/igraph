@@ -9,7 +9,7 @@ void snap_to_zero(igraph_real_t* value) {
     }
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_matrix_t layout;
     igraph_integer_t i;

@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t pref_empty, pref_bipartite, pref_line;
     igraph_vector_int_t types_empty, types_bipartite, types_line;

@@ -26,7 +26,7 @@ void warning_handler_print_stdout(const char *reason, const char *file,
     fprintf(stdout, "Warning: %s\n", reason);
 }
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_simple;
     igraph_vector_t result, weights_none, weights_simple;
 

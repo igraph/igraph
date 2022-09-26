@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int test_weighted_graph_from_mit_notes() {
+int test_weighted_graph_from_mit_notes(void) {
     /* Test graph from the following lecture notes:
      * http://math.mit.edu/~goemans/18433S07/matching-notes.pdf
      */
@@ -76,7 +76,7 @@ int test_weighted_graph_from_mit_notes() {
     return 0;
 }
 
-int test_weighted_graph_generated() {
+int test_weighted_graph_generated(void) {
     /* Several randomly generated small test graphs */
     igraph_t graph;
     igraph_vector_bool_t types;
@@ -128,7 +128,7 @@ int test_weighted_graph_generated() {
     return 0;
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_bool_t types;
     igraph_vector_t weights;

@@ -1,7 +1,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main(){
+int main(void){
     igraph_t g;
     igraph_integer_t vcount = 1000;
     igraph_real_t pf = 0.2;

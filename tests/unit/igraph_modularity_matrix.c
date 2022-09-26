@@ -37,7 +37,7 @@ void test_print_destroy(igraph_t *g, igraph_vector_t *weights, float resolution,
     }
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t weights;
     igraph_vector_int_t membership;

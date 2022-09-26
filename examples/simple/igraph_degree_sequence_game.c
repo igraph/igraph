@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t outdeg, indeg;
     igraph_vector_int_t vec;

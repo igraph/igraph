@@ -25,7 +25,7 @@ void print_and_destroy(igraph_t *g, igraph_integer_t source, igraph_integer_t ta
     igraph_destroy(g);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_integer_t res;
 

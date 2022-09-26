@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g, domtree;
     igraph_vector_int_t dom;
     igraph_vector_int_t leftout;

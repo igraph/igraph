@@ -24,7 +24,7 @@
 
 #include "test_utilities.h"
 
-void simple_tests() {
+void simple_tests(void) {
     int i;
 
     /* Seed the RNG, generate 10 random integers */
@@ -132,7 +132,7 @@ void check_consecutive_bits(const igraph_vector_int_t* numbers, uint8_t num_bits
     }
 }
 
-void stress_tests() {
+void stress_tests(void) {
     igraph_rng_t rng;
     const igraph_rng_type_t* rng_types[] = {
         &igraph_rngtype_mt19937,
@@ -202,7 +202,7 @@ void stress_tests() {
     igraph_vector_int_destroy(&numbers);
 }
 
-int main() {
+int main(void) {
     simple_tests();
     stress_tests();
 

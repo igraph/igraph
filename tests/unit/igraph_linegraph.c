@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g_start, g_line, g_test;
     igraph_bool_t same;
 

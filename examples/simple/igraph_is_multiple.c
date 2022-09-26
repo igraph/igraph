@@ -31,7 +31,7 @@ void print_vector(igraph_vector_bool_t *v, FILE *f) {
     fprintf(f, "\n");
 }
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_vector_bool_t v;

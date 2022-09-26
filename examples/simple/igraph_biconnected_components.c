@@ -33,7 +33,7 @@ void sort_and_print_vector(igraph_vector_int_t *v) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t result;

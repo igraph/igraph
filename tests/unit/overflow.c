@@ -5,7 +5,7 @@
 #define EXPECT_SUCC(expr) IGRAPH_ASSERT((expr) == IGRAPH_SUCCESS)
 #define EXPECT_FAIL(expr) IGRAPH_ASSERT((expr) != IGRAPH_SUCCESS)
 
-int main() {
+int main(void) {
     igraph_integer_t res;
 
     igraph_set_error_handler(igraph_error_handler_printignore);

@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g, sub;
     igraph_vector_int_t map, invmap;
     igraph_vector_int_t keep;

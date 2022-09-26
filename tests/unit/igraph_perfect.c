@@ -20,7 +20,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph, comp_graph;
     igraph_bool_t is_perfect;
     igraph_error_handler_t *ehandler;

@@ -167,7 +167,7 @@ int check_lattice(const lat_test_t *test) {
     return 0;
 }
 
-int main() {
+int main(void) {
     int i, ret;
 
     i = 0;

@@ -43,7 +43,7 @@ void check_convex_hull(igraph_matrix_t *coords) {
     igraph_matrix_destroy(&resmat);
 }
 
-void test_simple() {
+void test_simple(void) {
     igraph_real_t coords_array[][2] = {
         {3, 2}, {5, 1}, {4, 4}, {6, 4}, {4, 3},
         {2, 5}, {1, 3}, {2, 4}, {6, 3}, {9, 2}
@@ -60,7 +60,7 @@ void test_simple() {
     igraph_matrix_destroy(&coords);
 }
 
-void test_collinear() {
+void test_collinear(void) {
     igraph_real_t coords_array[][2] =
     {{3, 2}, {5, 1}, {7, 0}, {9, -1}, {11, -2}};
     igraph_matrix_t coords;
@@ -75,7 +75,7 @@ void test_collinear() {
     igraph_matrix_destroy(&coords);
 }
 
-void test_degenerate() {
+void test_degenerate(void) {
     igraph_matrix_t coords;
 
     printf("test_degenerate\n");
@@ -98,7 +98,7 @@ void test_degenerate() {
     igraph_matrix_destroy(&coords);
 }
 
-void test_bug_805() {
+void test_bug_805(void) {
     igraph_real_t coords_array[][2] = {
         {0, 0}, {1, 0}, {0.707, 0.707}, {0, 1}, {-0.707, 0.707}, {-1, 0},
         {-0.707, -0.707}, {0, -1}, {0.707, -0.707}, {2, 0}, {1.414, 1.414}, {0, 2},
@@ -119,7 +119,7 @@ void test_bug_805() {
     igraph_matrix_destroy(&coords);
 }
 
-void test_bug_1115() {
+void test_bug_1115(void) {
     igraph_real_t coords_array[][2] = {
         {37, 52}, {49, 49}, {52, 64}, {20, 26}, {40, 30}, {21, 47}, {17, 63}, {31, 62},
         {52, 33}, {51, 21}, {42, 41}, {31, 32}, {5, 25}, {12, 42}, {36, 16}, {52, 41},
@@ -141,7 +141,7 @@ void test_bug_1115() {
     igraph_matrix_destroy(&coords);
 }
 
-int main() {
+int main(void) {
 
     test_simple();
 

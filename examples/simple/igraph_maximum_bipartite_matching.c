@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     /* Test graph from the LEDA tutorial:
      * http://www.leda-tutorial.org/en/unofficial/ch05s03s05.html
      */

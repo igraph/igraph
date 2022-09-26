@@ -37,7 +37,7 @@ long vector_bool_count(const igraph_vector_bool_t *vec) {
     return cnt;
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t type_dist;
     igraph_matrix_t pref_mat, type_dist_mat;

@@ -47,7 +47,7 @@ static void weight_test(igraph_t *g, igraph_attribute_combination_type_t weight_
     simplify_write_destroy(&g2, &comb);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g, g2;
     igraph_vector_t weight;

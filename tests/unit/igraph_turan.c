@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g_turan;
     igraph_t g_multipartite;
     igraph_vector_int_t partitions;
