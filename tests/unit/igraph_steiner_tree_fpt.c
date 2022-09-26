@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     //printf("Starting Tests\n");
     igraph_t g_empty, g_lm, g_disconnected;
 
