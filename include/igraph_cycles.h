@@ -26,7 +26,7 @@ typedef struct igraph_simple_cycle_search_state_t {
   igraph_integer_t N;
   igraph_adjlist_t AK;
   igraph_adjlist_t B;
-  igraph_stack_t stack;
+  igraph_stack_int_t stack;
   igraph_vector_bool_t blocked;
 } igraph_simple_cycle_search_state_t;
 
