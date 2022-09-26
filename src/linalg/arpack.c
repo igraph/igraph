@@ -26,6 +26,7 @@
 #include "linalg/arpack_internal.h"
 
 #include "igraph_memory.h"
+#include "igraph_random.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -1021,8 +1022,9 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     options->iparam[8] = 0;   // return value
     options->iparam[9] = 0;   // return value
     options->iparam[10] = 0;  // return value
-    options->info = options->start;
+    options->info = 1;  // always use a provided starting vector
     if (options->start) {
+        // user provided the starting vector so we just use that
         if (!storage && !vectors) {
             IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
         }
@@ -1035,6 +1037,14 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                 resid[i] = MATRIX(*vectors, i, 0);
             }
         }
+    } else {
+        // we need to generate a random vector on our own; let's not rely on
+        // ARPACK to do so because we want to use our own RNG
+        RNG_BEGIN();
+        for (i = 0; i < options->n; i++) {
+            resid[i] = RNG_UNIF(-1, 1);
+        }
+        RNG_END();
     }
 
     /* Ok, we have everything */
@@ -1288,7 +1298,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     options->iparam[8] = 0;   // return value
     options->iparam[9] = 0;   // return value
     options->iparam[10] = 0;  // return value
-    options->info = options->start;
+    options->info = 1;  // always use a provided starting vector
     if (options->start) {
         if (!storage && !vectors) {
             IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
@@ -1302,6 +1312,14 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                 resid[i] = MATRIX(*vectors, i, 0);
             }
         }
+    } else {
+        // we need to generate a random vector on our own; let's not rely on
+        // ARPACK to do so because we want to use our own RNG
+        RNG_BEGIN();
+        for (i = 0; i < options->n; i++) {
+            resid[i] = RNG_UNIF(-1, 1);
+        }
+        RNG_END();
     }
 
     /* Ok, we have everything */
