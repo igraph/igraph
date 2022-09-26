@@ -1,3 +1,6 @@
+directed: false
+vcount: 11
+edges: {
 0 10
 1 10
 2 10
@@ -8,7 +11,11 @@
 7 10
 8 10
 9 10
+}
 --
+directed: false
+vcount: 11
+edges: {
 0 10
 1 10
 2 10
@@ -19,3 +26,4 @@
 7 10
 8 10
 9 10
+}

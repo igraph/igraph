@@ -547,7 +547,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         VECTOR(from)[i] = VECTOR(*mymap12)[ IGRAPH_FROM(graph1, i) ];
         VECTOR(to)[i]   = VECTOR(*mymap12)[ IGRAPH_TO  (graph1, i) ];
         if (! directed && VECTOR(from)[i] < VECTOR(to)[i]) {
-            igraph_real_t tmp = VECTOR(from)[i];
+            igraph_integer_t tmp = VECTOR(from)[i];
             VECTOR(from)[i] = VECTOR(to)[i];
             VECTOR(to)[i] = tmp;
         }
@@ -558,7 +558,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     for (i = 0, j = no_of_edges; i < no_of_edges; i++, j++) {
         VECTOR(to2)[i] = VECTOR(from2)[j];
         if (! directed && VECTOR(from2)[i] < VECTOR(to2)[i]) {
-            igraph_real_t tmp = VECTOR(from2)[i];
+            igraph_integer_t tmp = VECTOR(from2)[i];
             VECTOR(from2)[i] = VECTOR(to2)[i];
             VECTOR(to2)[i] = tmp;
         }

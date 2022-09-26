@@ -30,7 +30,7 @@ void print_and_destroy(igraph_t *g, igraph_vector_t *res, igraph_bool_t directed
 
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t res;
 

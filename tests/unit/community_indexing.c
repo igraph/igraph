@@ -33,7 +33,7 @@ void check(const igraph_vector_int_t *m) {
     igraph_vector_int_destroy(&m2);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t membership;
     igraph_vector_t modularity; /* non-optional for walktrap */

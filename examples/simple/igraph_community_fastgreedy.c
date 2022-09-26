@@ -54,7 +54,7 @@ void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_int_t *merges
     igraph_vector_int_destroy(&our_membership);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t modularity, weights;
     igraph_vector_int_t membership;

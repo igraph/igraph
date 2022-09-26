@@ -10,7 +10,7 @@ igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
     return IGRAPH_SUCCESS; /* Return 'IGRAPH_SUCCESS': do not interrupt the search. */
 }
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_vector_t hist;

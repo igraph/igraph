@@ -22,7 +22,6 @@
 #include "gengraph_graph_molloy_optimized.h"
 #include "gengraph_graph_molloy_hash.h"
 #include "gengraph_degree_sequence.h"
-#include "gengraph_random.h"
 
 #include "igraph_datatype.h"
 #include "igraph_graphicality.h"

@@ -27,7 +27,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_i_cutheap_t ch;
     igraph_integer_t i;
 

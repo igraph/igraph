@@ -18,7 +18,7 @@ igraph_error_t interruption_handler(void *data) {
     }
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t res;
     igraph_error_handler_t *ehandler;

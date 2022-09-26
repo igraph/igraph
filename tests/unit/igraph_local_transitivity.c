@@ -65,7 +65,7 @@ igraph_real_t vector_avg(const igraph_vector_t *v) {
     return sum / count;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t result1, result2, result3;

@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <math.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t x, y;
     igraph_vector_t weights;

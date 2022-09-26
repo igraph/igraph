@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_matrix_t m;
     igraph_vector_t x, y, z;
     igraph_real_t xz, xx;

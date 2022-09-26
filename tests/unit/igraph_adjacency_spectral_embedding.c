@@ -35,7 +35,7 @@
 
 */
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_matrix_t U, V;

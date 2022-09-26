@@ -13,7 +13,7 @@ void rand_weight_vec(igraph_vector_t *vec, const igraph_t *graph) {
 #define TOSTR1(x) #x
 #define TOSTR(x) TOSTR1(x)
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t closeness, weight;
 

@@ -38,8 +38,7 @@ int print_and_destroy(igraph_t *g,
             printf("Cut %" IGRAPH_PRId ":\n", i);
             m = igraph_vector_int_size(vec2);
             for (e = 0; e < m; e++) {
-                igraph_integer_t from, to;
-                igraph_edge(g, VECTOR(*vec2)[e], &from, &to);
+                igraph_integer_t from = IGRAPH_FROM(g, VECTOR(*vec2)[e]), to = IGRAPH_TO(g, VECTOR(*vec2)[e]);
                 if (igraph_is_directed(g)) {
                     printf("  %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n", from, to);
                 } else {
@@ -58,7 +57,7 @@ int print_and_destroy(igraph_t *g,
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t partitions;

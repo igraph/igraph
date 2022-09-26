@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
 
     igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,0, -1);

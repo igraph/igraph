@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_psumtree_t tree;
     igraph_vector_t vec;
     igraph_integer_t i, idx;

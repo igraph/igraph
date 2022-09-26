@@ -195,7 +195,7 @@ int test_adjlist_from_inclist(void) {
     return 0;
 }
 
-int main() {
+int main(void) {
 
     RUN_TEST(test_loop_elimination_for_undirected_graph);
     RUN_TEST(test_loop_elimination_for_directed_graph);

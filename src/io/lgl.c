@@ -27,7 +27,8 @@
 
 #include "graph/attributes.h"
 
-#include "lgl-header.h"
+#include "io/lgl-header.h"
+#include "io/parsers/lgl-parser.h"
 
 int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
                                  void* scanner);

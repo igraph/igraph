@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     /*igraph_subisomorphic now calls igraph_subisomorphic_vf2, most of
       the testing is done through calling that directly*/
     igraph_t g1, g2;

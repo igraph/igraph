@@ -28,7 +28,7 @@ void call_and_print(igraph_integer_t n, igraph_integer_t m, igraph_vector_t *rho
 }
 
 
-int main() {
+int main(void) {
     igraph_matrix_t pref_matrix;
     igraph_vector_t rho;
 

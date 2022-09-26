@@ -143,7 +143,7 @@ void print_results(igraph_integer_t n, igraph_matrix_t *res1, igraph_matrix_t *r
 }
 
 
-int main() {
+int main(void) {
 
     igraph_integer_t n, m;
     igraph_t g;

@@ -33,7 +33,7 @@ void compute_and_print(igraph_t *graph, igraph_vector_t *weights, igraph_bool_t 
     printf("\n\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_2, g_3, g_lm;
     igraph_vector_t weights_0, weights_3, weights_lm, weights_lm_neg;
     igraph_real_t result;

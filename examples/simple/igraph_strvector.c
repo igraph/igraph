@@ -31,7 +31,7 @@ void strvector_print(const igraph_strvector_t sv) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
 
     igraph_strvector_t sv1, sv2;
 

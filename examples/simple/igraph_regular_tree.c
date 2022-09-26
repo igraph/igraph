@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t tree;
     igraph_vector_t eccentricity;
     igraph_bool_t is_tree;

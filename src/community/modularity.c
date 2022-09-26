@@ -242,7 +242,8 @@ static igraph_error_t igraph_i_modularity_matrix_get_adjacency(
     } else {
         for (; !IGRAPH_EIT_END(edgeit); IGRAPH_EIT_NEXT(edgeit)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, edge, &from, &to);
+            from = IGRAPH_FROM(graph, edge);
+            to = IGRAPH_TO(graph, edge);
             MATRIX(*res, from, to) += 1;
             if (!directed) {
                 MATRIX(*res, to, from) += 1;

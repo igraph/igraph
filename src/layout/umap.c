@@ -18,11 +18,12 @@
    */
 
 #include "igraph_layout.h"
+
 #include "igraph_interface.h"
 #include "igraph_lapack.h"
 #include "igraph_matrix.h"
-#include "igraph_random.h"
 #include "igraph_nongraph.h"
+#include "igraph_random.h"
 
 #include "layout/layout_internal.h"
 

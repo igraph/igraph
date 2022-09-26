@@ -435,7 +435,7 @@ void    do_benchmark(igraph_t *g, igraph_vs_t vids, igraph_integer_t repeat)
     igraph_vector_int_list_destroy(&result_adjl2);
 }
 
-int main() {
+int main(void) {
     igraph_t g_full, g_ring, g_er;
     igraph_vs_t vids_all, vids_50, vids_5000, vids_200;
 

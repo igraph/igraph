@@ -22,7 +22,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t graph, ring;
     igraph_vector_int_t order, rank, father, pred, succ, dist;

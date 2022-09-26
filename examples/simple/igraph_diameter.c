@@ -10,7 +10,7 @@ void print_vector_int(igraph_vector_int_t *v) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t result;

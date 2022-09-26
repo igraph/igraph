@@ -37,7 +37,7 @@ int print_and_clear_vector_int_list(igraph_vector_int_list_t *list) {
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t left, right, uni;
     igraph_vector_int_t v;

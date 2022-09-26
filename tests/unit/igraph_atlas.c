@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
 
     CHECK_ERROR(igraph_atlas(&g, -1), IGRAPH_EINVAL);

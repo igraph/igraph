@@ -47,7 +47,7 @@ void show_results(igraph_t *g, igraph_vector_int_t *membership, igraph_matrix_in
     fprintf(f, "\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t modularity;
     igraph_vector_int_t edges;

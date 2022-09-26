@@ -154,9 +154,9 @@ int check_lattice(const lat_test_t *test) {
     igraph_isomorphic(&graph, &othergraph, &iso);
     if (!iso) {
         printf("--\n");
-        igraph_write_graph_edgelist(&graph, stdout);
+        print_graph(&graph);
         printf("--\n");
-        igraph_write_graph_edgelist(&othergraph, stdout);
+        print_graph(&othergraph);
         igraph_destroy(&graph);
         igraph_destroy(&othergraph);
         return 50;
@@ -167,7 +167,7 @@ int check_lattice(const lat_test_t *test) {
     return 0;
 }
 
-int main() {
+int main(void) {
     int i, ret;
 
     i = 0;

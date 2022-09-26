@@ -44,7 +44,7 @@ void random_walk(igraph_t *graph, igraph_vector_t *weights,
     igraph_vector_int_destroy(&edges);
 }
 
-int main() {
+int main(void) {
     igraph_t g_1, g_line, g_full, g_loop, g_de_bruijn;
     igraph_vector_int_t vertices, edges;
     igraph_vector_t g_line_weights, g_de_bruijn_weights, error_weights;

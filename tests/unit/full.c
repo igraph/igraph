@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_integer_t n_vertices = 10;
 

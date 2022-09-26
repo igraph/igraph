@@ -287,7 +287,6 @@ cmake --build . --target check --config Release
           <para>
             Optional external libraries for better performance:
             <literal>mingw-w64-x86_64-openblas</literal>,
-            <literal>mingw-w64-x86_64-suitesparse</literal>,
             <literal>mingw-w64-x86_64-arpack</literal>,
             <literal>mingw-w64-x86_64-glpk</literal>
           </para>
@@ -312,7 +311,7 @@ cmake --build . --target check --config Release
 pacman -S \
   mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake \
   mingw-w64-x86_64-gmp mingw-w64-x86_64-libxml2 \
-  mingw-w64-x86_64-openblas mingw-w64-x86_64-suitesparse mingw-w64-x86_64-arpack \
+  mingw-w64-x86_64-openblas mingw-w64-x86_64-arpack \
   mingw-w64-x86_64-glpk diffutils git bison flex
 </programlisting>
       <para>

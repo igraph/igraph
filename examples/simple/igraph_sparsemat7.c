@@ -28,7 +28,7 @@
 
 #define RANDINT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-int main() {
+int main(void) {
     igraph_matrix_t mat;
     igraph_sparsemat_t spmat, spmat2;
     igraph_real_t m1, m2;

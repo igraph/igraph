@@ -3,7 +3,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t global, global2, global3;

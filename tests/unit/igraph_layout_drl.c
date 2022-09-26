@@ -61,7 +61,7 @@ void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
     igraph_matrix_destroy(result);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t result;
     igraph_layout_drl_options_t options;

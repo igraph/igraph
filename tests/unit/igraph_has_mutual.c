@@ -18,7 +18,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_bool_t has_mutual;
 

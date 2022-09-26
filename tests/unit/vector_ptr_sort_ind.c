@@ -32,7 +32,7 @@ static int compare_first_items(const void* a, const void* b) {
     return VECTOR(*vec1)[0] - VECTOR(*vec2)[0];
 }
 
-int main() {
+int main(void) {
     igraph_vector_ptr_t vectors;
     igraph_vector_t* vec;
     igraph_vector_int_t indices;

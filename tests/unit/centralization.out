@@ -1,0 +1,5 @@
+in-star, degree: 1
+in-star, betweenness: 1
+out-star, degree: 1
+out-star, betweenness: 1
+dyad, eigenvector centrality, not scaled: 1

@@ -9,7 +9,7 @@ void handler(const char *reason, const char *file, int line) {
     exit(0); /* We use exit(0) instead of abort() to allow the test to succeed. */
 }
 
-int main() {
+int main(void) {
     igraph_set_fatal_handler(&handler);
 
     igraph_fatal("REASON", "FILENAME", 123);

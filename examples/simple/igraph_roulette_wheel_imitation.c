@@ -41,7 +41,7 @@ typedef struct {
  * perspective (whether local or global) could affect the range of
  * possible strategies a vertex could adopt.
  */
-igraph_error_t roulette_test() {
+igraph_error_t roulette_test(void) {
     igraph_t g;
     igraph_bool_t success;
     igraph_vector_t quant;
@@ -132,7 +132,7 @@ igraph_error_t roulette_test() {
 /* It is possible for a vertex to retain its current strategy. This can
  * happen both in the local and global perspectives.
  */
-igraph_error_t retain_strategy_test() {
+igraph_error_t retain_strategy_test(void) {
     igraph_t g;
     igraph_integer_t max, min, v;
     igraph_vector_t quant;
@@ -195,7 +195,7 @@ igraph_error_t retain_strategy_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_error_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 3241);

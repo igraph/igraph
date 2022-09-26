@@ -67,7 +67,6 @@ add_library(
   core/vector_list.c
   core/vector_ptr.c
 
-  math/bfgs.c
   math/complex.c
   math/safe_intop.c
   math/utils.c
@@ -240,6 +239,7 @@ add_library(
   paths/dijkstra.c
   paths/distances.c
   paths/eulerian.c
+  paths/floyd_warshall.c
   paths/histogram.c
   paths/johnson.c
   paths/random_walk.c

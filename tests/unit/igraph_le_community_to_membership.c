@@ -29,7 +29,7 @@ void print_and_destroy(igraph_vector_int_t *membership, igraph_vector_int_t *csi
     igraph_matrix_int_destroy(mat);
 }
 
-int main() {
+int main(void) {
     igraph_matrix_int_t merges;
     igraph_vector_int_t membership;
     igraph_vector_int_t csize;

@@ -24,6 +24,7 @@
 #include "igraph_community.h"
 
 #include "igraph_constructors.h"
+#include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
@@ -110,10 +111,8 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < ecount; i++) {
-        igraph_integer_t from, to;
-        igraph_edge(graph, i, &from, &to);
-        links[i].from = from;
-        links[i].to = to;
+        links[i].from = IGRAPH_FROM(graph, i);
+        links[i].to = IGRAPH_TO(graph, i);
         links[i].id = i;
     }
 
@@ -273,9 +272,6 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
-    igraph_integer_t i;
-    igraph_eit_t eit;
-
     if (no_of_nodes == 0) {
         return IGRAPH_SUCCESS;
     }
@@ -285,23 +281,15 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*no_of_edges);
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
-    /* Create the new edgelist */
-    igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
-    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-    i = 0;
-    while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t from, to;
-        IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(eit), &from, &to));
-        VECTOR(edges)[i++] = VECTOR(*membership)[from];
-        VECTOR(edges)[i++] = VECTOR(*membership)[to];
-        IGRAPH_EIT_NEXT(eit);
+    /* Create the new edgelist */    
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));
+    for (igraph_integer_t i=0; i < 2*no_of_edges; i++) {
+        VECTOR(edges)[i] = VECTOR(*membership)[ VECTOR(edges)[i] ];
     }
-    igraph_eit_destroy(&eit);
-    IGRAPH_FINALLY_CLEAN(1);
 
     /* Create the new graph */
     igraph_destroy(graph);
@@ -352,7 +340,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
-    int pass; /* used only for debugging */
+    /* int pass; // used only for debugging */
     igraph_bool_t changed = false;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
@@ -409,9 +397,8 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
     /* Some more initialization :) */
     for (i = 0; i < ecount; i++) {
-        igraph_integer_t ffrom, fto;
+        igraph_integer_t ffrom = IGRAPH_FROM(graph, i), fto = IGRAPH_TO(graph, i);
         igraph_real_t weight = 1;
-        igraph_edge(graph, i, &ffrom, &fto);
 
         weight = VECTOR(*weights)[i];
         communities.item[ffrom].weight_all += weight;
@@ -422,7 +409,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     }
 
     q = igraph_i_multilevel_community_modularity(&communities, resolution);
-    pass = 1;
+    /* pass = 1; */
 
     do { /* Pass begin */
         igraph_integer_t temp_communities_no = communities.communities_no;
@@ -505,7 +492,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
         if (changed && (q > pass_q)) {
             /* debug("Pass %d (changed: %d) Communities: %ld Modularity from %lf to %lf\n",
               pass, changed, communities.communities_no, (double) pass_q, (double) q); */
-            pass++;
+            /* pass++; */
         } else {
             /* No changes or the modularity became worse, restore last membership */
             IGRAPH_CHECK(igraph_vector_int_update(communities.membership, &temp_membership));

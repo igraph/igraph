@@ -32,7 +32,7 @@ int is_almost_one(igraph_real_t x) {
     return 1;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t res, reset, weights;

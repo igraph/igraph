@@ -29,7 +29,7 @@
 
 #include "test_utilities.h"
 
-int intersect() {
+int intersect(void) {
 
     float negative[][8] = {
         { 1, 2, 2, 2, 1, 1, 2, 1 }, /* 1 */
@@ -76,7 +76,7 @@ int intersect() {
     return 0;
 }
 
-int distance() {
+int distance(void) {
 
     igraph_real_t configs[][7] = {
         { 1, 1, 2, 0, 2, 3, 1.0 }, /* 1 */
@@ -103,7 +103,7 @@ int distance() {
     return 0;
 }
 
-void check_layout_davidson_harel() {
+void check_layout_davidson_harel(void) {
     igraph_t g;
     igraph_matrix_t res;
     igraph_bool_t use_seed;
@@ -162,7 +162,7 @@ void check_layout_davidson_harel() {
     igraph_matrix_destroy(&res);
 }
 
-int main() {
+int main(void) {
     int res1, res2;
 
     res1 = intersect();

@@ -67,7 +67,7 @@
  *    for undirected graphs.
  * \return Error code.
  *
- * Time complexity: O(s*|E|log|E|+|V|), where |V| is the number of
+ * Time complexity: O(s*|E|log|V|+|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
  * \sa \ref igraph_distances() for a (slightly) faster unweighted
@@ -312,7 +312,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
+ * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
  * \sa \ref igraph_distances_dijkstra() if you only need the path length but
@@ -581,7 +581,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  *        ignored for undirected graphs.
  * \return Error code.
  *
- * Time complexity: O(|E|log|E|+|V|), |V| is the number of vertices,
+ * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
  * |E| is the number of edges in the graph.
  *
  * \sa \ref igraph_get_shortest_paths_dijkstra() for the version with
@@ -685,7 +685,7 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
+ * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
  * \sa \ref igraph_distances_dijkstra() if you only need the path

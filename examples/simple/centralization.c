@@ -24,64 +24,11 @@
 #include <igraph.h>
 #include <math.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t cent;
     igraph_arpack_options_t arpack_options;
-
-    /****************************/
-    /* in-star */
-    igraph_star(&g, 10, IGRAPH_STAR_IN, /*center=*/ 0);
-
-    igraph_centralization_degree(&g,
-                                 /*res=*/ NULL,
-                                 /*mode=*/ IGRAPH_IN, IGRAPH_NO_LOOPS,
-                                 &cent, /*theoretical_max=*/ NULL,
-                                 /*normalized=*/ true);
-    if (cent != 1.0) {
-        fprintf(stderr, "in-star, degree: %g\n", cent);
-        return 1;
-    }
-
-    igraph_centralization_betweenness(&g, /*res=*/ NULL,
-                                      IGRAPH_UNDIRECTED, &cent,
-                                      /*theoretical_max=*/ NULL,
-                                      /*normalized=*/ true);
-    if (cent != 1.0) {
-        fprintf(stderr, "in-star, betweenness: %g\n", cent);
-        return 2;
-    }
-
-    /* Skip closeness, as it is not well-defined for disconnected graphs such as an in-star. */
-
-    igraph_destroy(&g);
-
-    /****************************/
-    /* out-star */
-    igraph_star(&g, 10, IGRAPH_STAR_OUT, /*center=*/ 0);
-
-    igraph_centralization_degree(&g, /*res=*/ NULL,
-                                 /*mode=*/ IGRAPH_OUT, IGRAPH_NO_LOOPS,
-                                 &cent, /*theoretical_max=*/ NULL,
-                                 /*normalized=*/ true);
-    if (cent != 1.0) {
-        fprintf(stderr, "out-star, degree: %g\n", cent);
-        return 11;
-    }
-
-    igraph_centralization_betweenness(&g, /*res=*/ NULL,
-                                      IGRAPH_UNDIRECTED, &cent,
-                                      /*theoretical_max=*/ NULL,
-                                      /*normalized=*/ true);
-    if (cent != 1.0) {
-        fprintf(stderr, "out-star, betweenness: %g\n", cent);
-        return 12;
-    }
-
-    /* Skip closeness, as it is not well-defined for disconnected graphs such as an out-star. */
-
-    igraph_destroy(&g);
 
     /****************************/
     /* undirected star */
@@ -137,21 +84,6 @@ int main() {
     if (!igraph_almost_equals(cent, 1.0, 1e-8)) {
         fprintf(stderr, "dyad, eigenvector centrality: %g\n", cent);
         return 24;
-    }
-
-    igraph_centralization_eigenvector_centrality(
-                &g,
-                /*vector=*/ NULL,
-                /*value=*/ NULL,
-                IGRAPH_DIRECTED,
-                /*scale=*/ false,
-                &arpack_options, &cent,
-                /*theoretical_max=*/ NULL,
-                /*normalized=*/ true);
-
-    if (!igraph_almost_equals(cent, 1.0, 1e-8)) {
-        fprintf(stderr, "dyad, eigenvector centrality, not scaled: %g\n", cent);
-        return 25;
     }
 
     igraph_destroy(&g);

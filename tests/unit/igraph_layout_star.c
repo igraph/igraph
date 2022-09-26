@@ -36,7 +36,7 @@ void print_and_destroy(igraph_t *g, igraph_integer_t center, igraph_vector_int_t
 
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t order;
 

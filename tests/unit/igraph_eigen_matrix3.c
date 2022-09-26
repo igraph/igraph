@@ -30,7 +30,7 @@
         igraph_vector_complex_print(&values2);  \
     } while(0)
 
-int main() {
+int main(void) {
 
     const int nodes = 10, skip = 3;
     igraph_matrix_t mat2;

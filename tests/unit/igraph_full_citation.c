@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g, g_test;
     igraph_bool_t same;
     igraph_integer_t n_vertices = 4;

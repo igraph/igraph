@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_heap_t h_max;
     igraph_heap_min_t h_min;

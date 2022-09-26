@@ -319,7 +319,6 @@ igraph_error_t igraph_vertex_path_from_edge_path(
    igraph_neimode_t mode
 ) {
     igraph_integer_t i, no_of_edges;
-    igraph_integer_t from, to;
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_bool_t next_edge_ok;
     igraph_integer_t next_start;
@@ -334,8 +333,10 @@ igraph_error_t igraph_vertex_path_from_edge_path(
     }
 
     for (i = 0; i < no_of_edges; i++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, VECTOR(*edge_path)[i]);
+        igraph_integer_t to = IGRAPH_TO(graph, VECTOR(*edge_path)[i]);
+
         igraph_vector_int_push_back(vertex_path, start);  /* reserved */
-        IGRAPH_CHECK(igraph_edge(graph, VECTOR(*edge_path)[i], &from, &to));
 
         switch (mode) {
             case IGRAPH_OUT:
