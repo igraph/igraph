@@ -16,6 +16,7 @@
  - `igraph_trussness()` is now interruptible.
  - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
+ - Addressed new warnings introduced by Clang 15.
 
 ### Removed
 
