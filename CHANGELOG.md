@@ -11,6 +11,14 @@
 
  - `igraph_edge()` now checks that the input edge ID is valid.
 
+ - `igraph_community_leading_eigenvector()`,
+   `igraph_adjacency_spectral_embedding()`,
+   `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and
+   `igraph_arpack_rnsolve()` now generate a random starting vector using
+   igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so.
+   This makes sure that the results obtained from these functions remain the
+   same if igraph's RNG is seeded with the same value.
+
 ### Fixed
 
  - `igraph_trussness()` is now interruptible.
