@@ -29,7 +29,6 @@
 #include "gengraph_graph_molloy_optimized.h"
 
 #include "igraph_error.h"
-#include "igraph_statusbar.h"
 #include "igraph_progress.h"
 
 
@@ -364,12 +363,11 @@ bool graph_molloy_opt::havelhakimi() {
             /* Cannot use IGRAPH_ERRORF() as this function does not return
              * an error code. This situation should only occur when the degree
              * sequence is not graphical, but that is already checked at the top
-             * level. Therefore, we report EINTERNAL, as triggering this
+             * level. Therefore, we use IGRAPH_FATAL(), as triggering this
              * indicates a bug. */
-            igraph_errorf("Error in graph_molloy_opt::havelhakimi(): "
+            IGRAPH_FATALF("Error in graph_molloy_opt::havelhakimi(): "
                           "Couldn't bind vertex %" IGRAPH_PRId " entirely (%" IGRAPH_PRId " edges remaining)",
-                          IGRAPH_FILE_BASENAME, __LINE__,
-                          IGRAPH_EINTERNAL, v, dv);
+                          v, dv);
             return false;
         }
     }
