@@ -22,7 +22,7 @@
 #define DEGREE_SEQUENCE_H
 
 #include "igraph_types.h"
-#include "igraph_datatype.h"
+#include "igraph_vector.h"
 
 namespace gengraph {
 

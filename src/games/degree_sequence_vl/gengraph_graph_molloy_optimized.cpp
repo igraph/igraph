@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cmath>
 #include <limits>
+#include <stdexcept>
 
 #include "gengraph_qsort.h"
 #include "gengraph_degree_sequence.h"
@@ -440,11 +441,7 @@ bool graph_molloy_opt::make_connected() {
             if (deg[v0] == 0) {
                 delete[] dist;
                 delete[] buff;
-                /* Cannot use IGRAPH_ERROR() as this function does not return an error code. */
-                igraph_error("Cannot create connected graph from degree sequence: "
-                              "vertex with degree 0 found.",
-                              IGRAPH_FILE_BASENAME, __LINE__,
-                              IGRAPH_EINVAL);
+                // 0-degree vertex found, cannot create connected graph
                 return false;
             }
             dist[v0] = 0; // root
@@ -691,8 +688,7 @@ igraph_integer_t graph_molloy_opt::breadth_path_search(igraph_integer_t src, igr
                 }
             } else if (d == nd) {
                 if ((paths[w] += p) == numeric_limits<double>::infinity()) {
-                    IGRAPH_ERROR("Fatal error : too many (>MAX_DOUBLE) possible"
-                                 " paths in graph", IGRAPH_EOVERFLOW);
+                    throw std::runtime_error("Fatal error: too many (>MAX_DOUBLE) possible paths in graph.");
                 }
             }
         }

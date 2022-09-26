@@ -25,6 +25,8 @@
 #include "gengraph_hash.h"
 #include "gengraph_degree_sequence.h"
 
+#include "igraph_datatype.h"
+
 #include <string.h>
 #include <assert.h>
 // This class handles graphs with a constant degree sequence.
