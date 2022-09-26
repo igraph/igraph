@@ -31,6 +31,9 @@
 #include <list>
 #include <vector>
 
+#define IGRAPH_CYCLE_FOUND 0
+#define IGRAPH_ERROR_NO_CYCLE_FOUND 3
+
 // Johnson's cycle detection algorithm
 
 igraph_error_t igraph_simple_cycles_unblock(igraph_simple_cycle_search_state_t *state, igraph_integer_t V)
@@ -97,6 +100,7 @@ igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_
 {
   igraph_integer_t N = igraph_vcount(graph);
 
+  state->N = N;
   igraph_stack_init(&state->stack, N); // maximum size per cycle.
   igraph_vector_bool_init(&state->blocked, N);
   igraph_adjlist_init(graph, &state->AK, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE); // TODO: understand what we actually want to include
@@ -111,42 +115,61 @@ igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_sear
   igraph_adjlist_destroy(&state->B);
 };
 
-igraph_error_t igraph_simple_cycles(
+igraph_error_t igraph_simple_cycles_search_one(
+    igraph_simple_cycle_search_state_t *state, igraph_integer_t start, igraph_vector_int_t *result)
+{
+  for (igraph_integer_t i = s; i < state->N; ++i)
+  {
+    VECTOR(state->blocked)
+    [i] = false;
+    igraph_vector_int_clear(&state->B.adjs[i]);
+  }
+
+  bool found = false;
+  igraph_simple_cycles_circuit(graph, s, s, &state->stack, &state->blocked, &found);
+
+  for (igraph_integer_t i = s + 1; s < state->N; ++i)
+  {
+    // we want to remove the element with value s, not at position s
+    igraph_integer_t pos;
+    if (igraph_vector_search(state->B.adjs[i], 0, s, &pos))
+      igraph_vector_int_remove(&state->B.adjs[i], pos);
+  }
+
+  if (found)
+  {
+    // return stack // TODO: currently, only the nodes are returned
+    igraph_vector_resize(result, igraph_stack_size(state->stack));
+    for (igraph_integer_t i = 0; i < igraph_stack_size(state->stack); i++)
+    {
+      VECTOR(result)
+      [i] = igraph_stack_get(state->stack, i);
+    }
+    return IGRAPH_CYCLE_FOUND;
+  } else {
+    return IGRAPH_ERROR_NO_CYCLE_FOUND;
+  }
+}
+
+igraph_error_t igraph_simple_cycles_search_all(
     const igraph_t *graph,
-    igraph_vector_int_list_t *result,
-    igraph_integer_t bfs_cutoff)
+    igraph_vector_int_list_t *result)
 {
   igraph_simple_cycle_search_state_t state;
-  igraph_integer_t N = igraph_vcount(graph);
   igraph_simple_cycle_search_state_init(&state, graph);
 
+  int nfound = 0;
+  igraph_vector_int_list_init(result, state.N);
+
   // TODO: depending on the graph, it is rather unreasonable to search cycles from each and every node
-  for (igraph_integer_t s = 0; s < N; ++s)
+  for (igraph_integer_t s = 0; s < state->N; ++s)
   {
-    for (igraph_integer_t i = s; i < N; ++i)
+    if (igraph_simple_cycles_search_one(&state, s, &result[nfound]) == IGRAPH_CYCLE_FOUND);
     {
-      VECTOR(state->blocked)
-      [i] = false;
-      igraph_vector_int_clear(&state->B.adjs[i]);
-    }
-
-    bool found = false;
-    // TODO: here, handle found cases again
-    igraph_simple_cycles_circuit(graph, s, s, &stack, &blocked, &found);
-
-    for (igraph_integer_t i = s + 1; s < N; ++i)
-    {
-      // we want to remove the element with value s, not at position s
-      igraph_integer_t pos;
-      if (igraph_vector_search(state->B.adjs[i], 0, s, &pos))
-        igraph_vector_int_remove(&state->B.adjs[i], pos);
+      nfound += 1;
     }
   }
 
+  igraph_vector_int_list_resize(result, nfound);
   igraph_simple_cycle_search_state_destroy(&state);
 }
-
-//
-igraph_adjlist_destroy(&AK);
-igraph_adjlist_destroy(&B);
-igraph_stack_destroy(&stack);
