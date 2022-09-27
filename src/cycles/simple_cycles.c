@@ -26,6 +26,7 @@
 
 #include "core/interruption.h"
 
+#define NO_ERRROR 0
 #define IGRAPH_CYCLE_FOUND 0
 #define IGRAPH_ERROR_NO_CYCLE_FOUND 3
 
@@ -36,15 +37,19 @@ igraph_error_t igraph_simple_cycles_unblock(igraph_simple_cycle_search_state_t *
   VECTOR(state->blocked)
   [V] = false;
 
-  while (!igraph_vector_int_empty(&state->B.adjs[V]))
+  while (!igraph_vector_int_empty(igraph_adjlist_get(&state->B, V)))
   {
-    igraph_integer_t W = igraph_vector_int_pop_front(state->B.adjs[V]);
+    // NOTE: pop front is highly inefficient. Check frequency of call, possibly replace adjlist
+    // probably with a vector of lists
+    igraph_integer_t W = igraph_vector_int_pop_front(igraph_adjlist_get(&state->B, V));
 
     if (VECTOR(state->blocked)[W])
     {
       igraph_simple_cycles_unblock(state, W);
     }
   }
+
+  return NO_ERRROR;
 }
 
 igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state, igraph_integer_t V, igraph_integer_t S, bool *found)
@@ -54,9 +59,9 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
   VECTOR(state->blocked)
   [V] = true;
 
-  for (igraph_integer_t i = 0; i < igraph_vector_int_size(&state->AK.adjs[V]); ++i)
+  for (igraph_integer_t i = 0; i < igraph_vector_int_size(igraph_adjlist_get(&state->AK, V)); ++i)
   {
-    igraph_integer_t W = VECTOR(state->AK.adjs[V])[i];
+    igraph_integer_t W = VECTOR(*igraph_adjlist_get(&state->AK, V))[i];
     if (W == S)
     {
       // found a loop -> TODO: return stack!
@@ -74,13 +79,13 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
   }
   else
   {
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(&state->AK.adjs[V]); ++i)
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(igraph_adjlist_get(&state->AK, V)); ++i)
     {
-      igraph_integer_t W = VECTOR(state->AK.adjs[V])[i];
+      igraph_integer_t W = VECTOR(*igraph_adjlist_get(&state->AK, V))[i];
       igraph_integer_t pos;
-      if (!igraph_vector_int_search(&state->B.adjs[W], 0, V, &pos))
+      if (!igraph_vector_int_search(igraph_adjlist_get(&state->B, W), 0, V, &pos))
       {
-        igraph_vector_int_push_back(&state->B.adjs[W], V);
+        igraph_vector_int_push_back(igraph_adjlist_get(&state->B, W), V);
       }
     }
   }
@@ -88,6 +93,8 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
   igraph_stack_int_pop(&state->stack); // _back
   // return result
   *found = localFound;
+
+  return NO_ERRROR;
 }
 
 igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_state_t *state, const igraph_t *graph)
@@ -99,6 +106,8 @@ igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_
   igraph_vector_bool_init(&state->blocked, N);
   igraph_adjlist_init(graph, &state->AK, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE); // TODO: understand what we actually want to include
   igraph_adjlist_init_empty(&state->B, N);
+
+  return NO_ERRROR;
 }
 
 igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state)
@@ -107,6 +116,8 @@ igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_sear
   igraph_vector_bool_destroy(&state->blocked);
   igraph_adjlist_destroy(&state->AK);
   igraph_adjlist_destroy(&state->B);
+
+  return NO_ERRROR;
 }
 
 igraph_error_t igraph_simple_cycles_search_one(
@@ -116,7 +127,7 @@ igraph_error_t igraph_simple_cycles_search_one(
   {
     VECTOR(state->blocked)
     [i] = false;
-    igraph_vector_int_clear(&state->B.adjs[i]);
+    igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
   }
 
   bool found = false;
@@ -126,8 +137,8 @@ igraph_error_t igraph_simple_cycles_search_one(
   {
     // we want to remove the element with value s, not at position s
     igraph_integer_t pos;
-    if (igraph_vector_int_search(&state->B.adjs[i], 0, s, &pos))
-      igraph_vector_int_remove(&state->B.adjs[i], pos);
+    if (igraph_vector_int_search(igraph_adjlist_get(&state->B, i), 0, s, &pos))
+      igraph_vector_int_remove(igraph_adjlist_get(&state->B, i), pos);
   }
 
   if (found)
@@ -172,4 +183,6 @@ igraph_error_t igraph_simple_cycles_search_all(
 
   // igraph_vector_int_list_resize(result, nfound);
   igraph_simple_cycle_search_state_destroy(&state);
+
+  return NO_ERRROR;
 }

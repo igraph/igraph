@@ -17,30 +17,31 @@
 */
 
 #include <igraph.h>
+#include "igraph_cycles.h"
 #include "test_utilities.h"
 
-int main()
+int main(void)
 {
   igraph_t g_cycle, g_no_cycle;
 
   // first test: star graph, does not have a cycle
   igraph_vector_int_list_t resultsT1;
-  igraph_vector_int_list_t_init(&resultsT1, 0);
+  igraph_vector_int_list_init(&resultsT1, 0);
   igraph_star(&g_no_cycle, 7, IGRAPH_STAR_UNDIRECTED, 1);
   // call cycles finder, expect 0 cycle to be found
-  igraph_simple_cylces_search_all(&g_no_cycle, &resultsT1);
-  IGRAPH_ASSERT(igraph_list_size(resultsT1) == 0);
+  igraph_simple_cycles_search_all(&g_no_cycle, &resultsT1);
+  IGRAPH_ASSERT(igraph_vector_int_list_size(&resultsT1) == 0);
   // clean up
-  igraph_vector_int_list_t_destroy(&resultsT1);
+  igraph_vector_int_list_destroy(&resultsT1);
   igraph_destroy(&g_no_cycle);
 
   igraph_vector_int_list_t resultsT2;
-  igraph_vector_int_list_t_init(&resultsT2, 0);
+  igraph_vector_int_list_init(&resultsT2, 0);
   igraph_ring(&g_cycle, 10, false, true, true);
   // call cycles finder, expect 1 cycle to be found
-  igraph_simple_cylces_search_all(&g_no_cycle, &resultsT2);
-  IGRAPH_ASSERT(igraph_list_size(resultsT2) == 1);
+  igraph_simple_cycles_search_all(&g_no_cycle, &resultsT2);
+  IGRAPH_ASSERT(igraph_vector_int_list_size(&resultsT2) == 1);
   // clean up
-  igraph_vector_int_list_t_destroy(&resultsT2);
+  igraph_vector_int_list_destroy(&resultsT2);
   igraph_destroy(&g_cycle);
 }
