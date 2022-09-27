@@ -486,6 +486,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     igraph_vector_int_t idx, idx2;
     igraph_vector_t mymerges;
     igraph_vector_t strength, tmp;
+    igraph_vector_t start_vec;
     igraph_integer_t staken = 0;
     igraph_adjlist_t adjlist;
     igraph_inclist_t inclist;
@@ -689,12 +690,16 @@ igraph_error_t igraph_community_leading_eigenvector(
          * start vector -- we want to use our own RNG. Also, we want to generate
          * values close to +1 and -1 as this is what the eigenvector should
          * look like if there _is_ some kind of a community structure at this
-         * step to discover */
+         * step to discover. Experiments showed that shuffling a vector
+         * containing equal number of +/-1 values yields convergence in most
+         * cases */
         options->start = 1;
-        RNG_BEGIN();
         for (i = 0; i < options->n; i++) {
-            storage.resid[i] = pow(RNG_UNIF(-1, 1), 3);
+            storage.resid[i] = i % 2 ? 1 : -1;
         }
+        igraph_vector_view(&start_vec, storage.resid, options->n);
+        RNG_BEGIN();
+        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
         RNG_END();
 
         {
@@ -727,16 +732,11 @@ igraph_error_t igraph_community_leading_eigenvector(
         options->nconv = 0;
         options->lworkl = 0;    /* we surely have enough space */
 
-        /* Use a random start vector, but don't let ARPACK generate the
-         * start vector -- we want to use our own RNG. Also, we want to generate
-         * values close to +1 and -1 as this is what the eigenvector should
-         * look like if there _is_ some kind of a community structure at this
-         * step to discover */
+        /* Use a random start vector; see comments above */
         options->start = 1;
+        igraph_vector_view(&start_vec, storage.resid, options->n);
         RNG_BEGIN();
-        for (i = 0; i < options->n; i++) {
-            storage.resid[i] = pow(RNG_UNIF(-1, 1), 3);
-        }
+        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
         RNG_END();
 
         {
