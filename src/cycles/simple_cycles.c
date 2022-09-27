@@ -18,6 +18,7 @@
 
 #include "igraph_cycles.h"
 
+#include <stdlib.h>
 #include "igraph_adjlist.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
@@ -26,7 +27,6 @@
 
 #include "core/interruption.h"
 
-#define NO_ERRROR 0
 #define IGRAPH_CYCLE_FOUND 0
 #define IGRAPH_ERROR_NO_CYCLE_FOUND 3
 
@@ -49,13 +49,14 @@ igraph_error_t igraph_simple_cycles_unblock(igraph_simple_cycle_search_state_t *
     }
   }
 
-  return NO_ERRROR;
+  return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state, igraph_integer_t V, igraph_integer_t S, bool *found)
 {
   bool localFound = false;
   igraph_stack_int_push(&state->stack, V);
+  printf("Pushing to stack, stack size is %lld\n", igraph_stack_int_size(&state->stack));
   VECTOR(state->blocked)
   [V] = true;
 
@@ -64,18 +65,25 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
     igraph_integer_t W = VECTOR(*igraph_adjlist_get(&state->AK, V))[i];
     if (W == S)
     {
-      // found a loop -> TODO: return stack!
       localFound = true;
     }
     else if (!(VECTOR(state->blocked)[W]))
     {
       igraph_simple_cycles_circuit(state, W, S, &localFound);
     }
+    // found a loop -> return stack!
+    // TODO: somehow, continue the loop again
+    if (localFound)
+    {
+      break;
+    }
   }
+  *found = localFound;
 
   if (localFound)
   {
     igraph_simple_cycles_unblock(state, V);
+    return IGRAPH_SUCCESS;
   }
   else
   {
@@ -92,9 +100,8 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
 
   igraph_stack_int_pop(&state->stack); // _back
   // return result
-  *found = localFound;
 
-  return NO_ERRROR;
+  return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_state_t *state, const igraph_t *graph)
@@ -107,7 +114,7 @@ igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_
   igraph_adjlist_init(graph, &state->AK, IGRAPH_ALL, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE); // TODO: understand what we actually want to include
   igraph_adjlist_init_empty(&state->B, N);
 
-  return NO_ERRROR;
+  return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state)
@@ -117,7 +124,7 @@ igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_sear
   igraph_adjlist_destroy(&state->AK);
   igraph_adjlist_destroy(&state->B);
 
-  return NO_ERRROR;
+  return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_simple_cycles_search_one(
@@ -127,28 +134,34 @@ igraph_error_t igraph_simple_cycles_search_one(
   {
     VECTOR(state->blocked)
     [i] = false;
-    igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
+      igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
   }
 
   bool found = false;
   igraph_simple_cycles_circuit(state, s, s, &found);
 
-  for (igraph_integer_t i = s + 1; s < state->N; ++i)
+  for (igraph_integer_t i = s; i < state->N; ++i)
   {
-    // we want to remove the element with value s, not at position s
+    // we want to remove the vertex with value s, not at position s
     igraph_integer_t pos;
-    if (igraph_vector_int_search(igraph_adjlist_get(&state->B, i), 0, s, &pos))
-      igraph_vector_int_remove(igraph_adjlist_get(&state->B, i), pos);
+    if (igraph_vector_int_search(igraph_adjlist_get(&state->AK, i), 0, s, &pos))
+    {
+      igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
+    }
   }
 
   if (found)
   {
+    printf("Found cycle, stack size is %lld\n", igraph_stack_int_size(&state->stack));
     // return stack // TODO: currently, only the nodes are returned
     igraph_vector_int_resize(result, igraph_stack_int_size(&state->stack));
     for (igraph_integer_t i = igraph_stack_int_size(&state->stack) - 1; i >= 0; --i)
     {
+      printf("Setting result value %lld\n", i);
       VECTOR(*result)
       [i] = igraph_stack_int_pop(&state->stack); // igraph_stack_int_get(&state->stack, i);
+      printf("Set result value %lld\n", VECTOR(*result)
+                                            [i]);
     }
     return IGRAPH_CYCLE_FOUND;
   }
@@ -173,9 +186,10 @@ igraph_error_t igraph_simple_cycles_search_all(
   {
     igraph_vector_int_t res;
     igraph_vector_int_init(&res, 0);
-    if (igraph_simple_cycles_search_one(&state, s, &res) == IGRAPH_CYCLE_FOUND)
+    if (igraph_simple_cycles_search_one(&state, s, &res) == IGRAPH_CYCLE_FOUND && igraph_vector_int_size(&res) > 0)
     {
       // nfound += 1;
+      printf("Found one. adding to all results.\n");
       igraph_vector_int_list_push_back_copy(result, &res);
       igraph_vector_int_empty(&res);
     }
@@ -184,5 +198,5 @@ igraph_error_t igraph_simple_cycles_search_all(
   // igraph_vector_int_list_resize(result, nfound);
   igraph_simple_cycle_search_state_destroy(&state);
 
-  return NO_ERRROR;
+  return IGRAPH_SUCCESS;
 }

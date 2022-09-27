@@ -109,6 +109,20 @@ int main(void) {
     printf("\n");
     igraph_vector_destroy(&v);
 
+    printf("Test igraph_vector_pop_front\n");
+    igraph_vector_init(&v, 10);
+    for (i = 0; i < igraph_vector_size(&v); i++) {
+        VECTOR(v)[i] = i + 1;
+    }
+    int j =0;
+    while (!igraph_vector_empty(&v)) {
+        printf(" %" IGRAPH_PRId "", (igraph_integer_t)++j);
+        // printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_get(&v, 0));
+        printf(" %" IGRAPH_PRId "", (igraph_integer_t)igraph_vector_pop_front(&v));
+    }
+    printf("\n");
+    igraph_vector_destroy(&v);
+
     printf("Test igraph_vector_resize, igraph_vector_sort\n");
     igraph_vector_init(&v, 20);
     for (i = 0; i < 10; i++) {
