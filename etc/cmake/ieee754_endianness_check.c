@@ -10,7 +10,7 @@ union {
     double as_double;
 } value;
 
-int main() {
+int main(void) {
     value.as_uint64_t = 4841376218035192321ULL;
     if (value.as_double == 4510218239279617.0) {
         /* endianness of uint64_t and double match */

@@ -36,7 +36,7 @@ igraph_bool_t compare_degrees(const igraph_vector_int_t* expected, const igraph_
     return 1;
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t outdeg, indeg, empty;
     igraph_vector_int_t degrees;

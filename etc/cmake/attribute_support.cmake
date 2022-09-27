@@ -14,7 +14,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   # Require compiling with no warning:
   set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -Werror")
   check_c_source_compiles(
-    "enum { A __attribute__ ((deprecated)) = 0 }; int main() { return 0; }"
+    "enum { A __attribute__ ((deprecated)) = 0 }; int main(void) { return 0; }"
     COMPILER_HAS_DEPRECATED_ENUMVAL_ATTR
   )
   cmake_pop_check_state()

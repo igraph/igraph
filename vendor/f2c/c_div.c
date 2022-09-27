@@ -4,7 +4,7 @@ extern "C" {
 #endif
 
 #ifdef KR_headers
-extern VOID sig_die();
+extern void sig_die(void);
 VOID c_div(c, a, b)
 f2c_complex *a, *b, *c;
 #else

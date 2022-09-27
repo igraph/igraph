@@ -56,7 +56,7 @@ public:
    * Remove all the elements in the heap.
    * Time complexity is O(1).
    */
-  void clear() {n = 0; }
+  void clear(void) {n = 0; }
 
   /**
    * Insert the element \a e in the heap.
@@ -69,19 +69,19 @@ public:
    * Return the smallest element in the heap.
    * Time complexity is O(1).
    */
-  unsigned int smallest() const;
+  unsigned int smallest(void) const;
 
   /**
    * Remove and return the smallest element in the heap.
    * Time complexity is O(log(N)), where N is the number of elements
    * currently in the heap.
    */
-  unsigned int remove();
+  unsigned int remove(void);
 
   /**
    * Get the number of elements in the heap.
    */
-  unsigned int size() const {return n; }
+  unsigned int size(void) const {return n; }
 };
 
 } // namespace bliss

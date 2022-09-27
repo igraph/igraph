@@ -58,7 +58,7 @@ void doit(igraph_t *g) {
 
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
 

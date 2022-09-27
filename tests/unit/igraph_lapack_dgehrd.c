@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     int nodes = 10;
     igraph_t tree;

@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_matrix_t res;
     igraph_bool_t use_seed;

@@ -19,7 +19,7 @@ void matmul(const igraph_matrix_t *A, const igraph_vector_t *x, igraph_vector_t 
     }
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t A;
     igraph_vector_t x, y1, y2;
     igraph_integer_t i, j;

@@ -27,7 +27,7 @@ void print_check_destroy(igraph_t *graph, igraph_vector_int_list_t *result) {
     igraph_destroy(graph);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t result;
     igraph_integer_t rank;

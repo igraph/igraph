@@ -73,7 +73,7 @@ public:
    * Reset the orbits so that each element forms an orbit of its own.
    * Time complexity is O(N).
    */
-  void reset();
+  void reset(void);
 
   /**
    * Merge the orbits of the elements \a e1 and \a e2.
@@ -104,7 +104,7 @@ public:
    * Get the number of orbits.
    * Time complexity is O(1).
    */
-  unsigned int nof_orbits() const {return _nof_orbits; }
+  unsigned int nof_orbits(void) const {return _nof_orbits; }
 };
 
 } // namespace bliss

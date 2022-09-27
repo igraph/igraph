@@ -259,6 +259,7 @@ igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
     igraph_integer_t sp = -1;
     igraph_real_t angle, len;
     igraph_integer_t steps = 0;
+    IGRAPH_UNUSED(steps); // required because set but not used
 
     /* The graph is not used, only its coordinates */
     IGRAPH_UNUSED(actg);

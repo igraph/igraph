@@ -125,7 +125,7 @@ int check_eigenvectors(
 
 #define DIM 10
 
-int main() {
+int main(void) {
     igraph_matrix_t A;
     igraph_matrix_t values, vectors;
     igraph_arpack_options_t options;

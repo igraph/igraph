@@ -165,7 +165,7 @@ public:
     void add_neighbor(Neighbor* N);
     void update_neighbor(Neighbor* N, double new_delta_sigma);
 
-    void manage_memory();
+    void manage_memory(void);
 
 };
 

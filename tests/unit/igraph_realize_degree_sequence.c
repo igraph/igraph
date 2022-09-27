@@ -55,7 +55,7 @@ void directed_print_destroy(igraph_vector_int_t *ods, igraph_vector_int_t *ids) 
 }
 
 
-int main() {
+int main(void) {
     igraph_vector_int_t ds, ods, ids;
 
     igraph_set_error_handler(&igraph_error_handler_ignore);

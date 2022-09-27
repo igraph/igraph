@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
 
     igraph_set_warning_handler(igraph_warning_handler_ignore);

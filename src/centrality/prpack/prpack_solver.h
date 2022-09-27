@@ -27,7 +27,7 @@ namespace prpack {
             prpack_preprocessed_scc_graph* sccg;
 			bool owns_bg;
             // methods
-            void initialize();
+            void initialize(void);
             static prpack_result* solve_via_ge(
                     const double alpha,
                     const double tol,
@@ -163,7 +163,7 @@ namespace prpack {
             // destructor
             ~prpack_solver();
             // methods
-            int get_num_vs();
+            int get_num_vs(void);
             prpack_result* solve(const double alpha, const double tol, const char* method);
             prpack_result* solve(
                     const double alpha,

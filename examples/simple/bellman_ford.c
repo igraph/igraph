@@ -48,7 +48,7 @@ int print_matrix(const igraph_matrix_t *m) {
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t weights;

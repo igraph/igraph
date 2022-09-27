@@ -24,7 +24,7 @@ void sort_and_print(igraph_vector_int_t *vec) {
     print_vector_int(vec);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_t cut, partition, partition2;

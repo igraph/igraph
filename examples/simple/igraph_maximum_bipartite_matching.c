@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int test_graph_from_leda_tutorial() {
+int test_graph_from_leda_tutorial(void) {
     /* Test graph from the LEDA tutorial:
      * http://www.leda-tutorial.org/en/unofficial/ch05s03s05.html
      */
@@ -76,7 +76,7 @@ int test_graph_from_leda_tutorial() {
     return 0;
 }
 
-int test_weighted_graph_from_mit_notes() {
+int test_weighted_graph_from_mit_notes(void) {
     /* Test graph from the following lecture notes:
      * http://math.mit.edu/~goemans/18433S07/matching-notes.pdf
      */
@@ -134,7 +134,7 @@ int test_weighted_graph_from_mit_notes() {
     return 0;
 }
 
-int test_weighted_graph_generated() {
+int test_weighted_graph_generated(void) {
     /* Several randomly generated small test graphs */
     igraph_t graph;
     igraph_vector_bool_t types;
@@ -186,7 +186,7 @@ int test_weighted_graph_generated() {
     return 0;
 }
 
-int main() {
+int main(void) {
     if (test_graph_from_leda_tutorial()) {
         return 1;
     }

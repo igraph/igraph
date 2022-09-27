@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-igraph_error_t test_directed() {
+igraph_error_t test_directed(void) {
     igraph_t g;
     igraph_es_t es;
     igraph_eit_t eit;
@@ -110,7 +110,7 @@ igraph_error_t test_directed() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t test_undirected() {
+igraph_error_t test_undirected(void) {
     igraph_t g;
     igraph_es_t es;
     igraph_eit_t eit;
@@ -194,7 +194,7 @@ igraph_error_t test_undirected() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     IGRAPH_ASSERT(test_undirected() == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(test_directed() == IGRAPH_SUCCESS);
 

@@ -71,7 +71,7 @@ void call_and_print(
 }
 
 
-int main() {
+int main(void) {
     /* Wiki example taken from https://en.wikipedia.org/wiki/Yen's_algorithm */
     igraph_t g_0, g_1, g_2, g_2c, g_wiki, g_wiki_u, g_sz;
     igraph_vector_t weights, weights_wiki, weights_inf;

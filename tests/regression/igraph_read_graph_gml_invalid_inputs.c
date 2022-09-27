@@ -59,7 +59,7 @@ int test_file(const char* fname) {
     VERIFY_FINALLY_STACK(); \
 }
 
-int main() {
+int main(void) {
     int index = 0;
 
     /* We do not care about errors; all we care about is that the library

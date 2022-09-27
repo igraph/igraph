@@ -39,7 +39,7 @@ void test_laplacian(igraph_t *g, const igraph_vector_t *w, igraph_bool_t dir, ig
     igraph_sparsemat_destroy(&m_sparse);
 }
 
-int main() {
+int main(void) {
     igraph_t g_e_un, g_e_dir, g_un, g_dir;
     igraph_vector_t weights, weights_e;
     char *n[]  = {"none", "symmetric", "left", "right"};

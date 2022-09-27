@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_matrix_t mat, mat2, mat3;
     igraph_sparsemat_t spmat, spmat2;
 

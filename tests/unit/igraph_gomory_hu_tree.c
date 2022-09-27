@@ -157,7 +157,7 @@ igraph_error_t validate_tree(const igraph_t *graph, const igraph_t *tree,
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_t tree;

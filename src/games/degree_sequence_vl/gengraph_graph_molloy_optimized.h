@@ -50,14 +50,14 @@ private:
     // Allocate memory according to degree_sequence (for constructor use only!!)
     void alloc(degree_sequence &);
     // Compute #edges
-    inline void refresh_nbarcs() {
+    inline void refresh_nbarcs(void) {
         a = 0;
         for (igraph_integer_t* d = deg + n; d != deg; ) {
             a += *(--d);
         }
     }
     // Build neigh with deg and links
-    void compute_neigh();
+    void compute_neigh(void);
     // Swap edges. The swap MUST be valid !!!
     inline void swap_edges(igraph_integer_t from1, igraph_integer_t to1, igraph_integer_t from2, igraph_integer_t to2) {
         fast_rpl(neigh[from1], to1, to2);
@@ -110,7 +110,7 @@ public:
         return deg[v];
     };
     // Detach deg[] and neigh[]
-    void detach();
+    void detach(void);
     // Destroy deg and links
     ~graph_molloy_opt();
     // Create graph from file (stdin not supported unless rewind() possible)
@@ -122,7 +122,7 @@ public:
     // Create hard copy of graph
     igraph_integer_t *hard_copy();
     // Remove unused edges, updates neigh[], recreate links[]
-    void clean();
+    void clean(void);
     // nb arcs
     inline igraph_integer_t nbarcs() {
         return a;
@@ -180,7 +180,7 @@ public:
     // Restore degs[] and neigh[]. Assume that links[] has only been permuted
     void restore_degs_and_neigh(igraph_integer_t* backup_degs);
     // sort adjacency lists
-    void sort();
+    void sort(void);
     // count cycles passing through vertex v
     int cycles(int v);
     // remove vertex (i.e. remove all edges adjacent to vertex)

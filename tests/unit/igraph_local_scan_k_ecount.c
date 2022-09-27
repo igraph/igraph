@@ -27,7 +27,7 @@ void call_and_print(igraph_t *graph, int k, igraph_vector_t *weights, igraph_nei
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_lmu, g_lm, g_lm_nl;
     igraph_vector_t weights, result;
 

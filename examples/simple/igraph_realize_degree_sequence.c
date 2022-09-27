@@ -1,7 +1,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main(){
+int main(void){
     igraph_t g1, g2, g3;
     igraph_integer_t nodes = 500, A = 0, power = 1, m = 1;
     igraph_real_t assortativity;

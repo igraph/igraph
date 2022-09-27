@@ -30,7 +30,7 @@ void check(igraph_t *graph, igraph_es_t *es) {
     igraph_eit_destroy(&eit);
 }
 
-int main() {
+int main(void) {
     igraph_t g, g_no_vertices, g_no_edges;
     igraph_es_t es, es_copy;
     igraph_vector_int_t v, check_as_vector;

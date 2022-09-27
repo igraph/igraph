@@ -39,7 +39,7 @@ void print_array(const igraph_array3_t *a) {
     }
 }
 
-int main() {
+int main(void) {
     igraph_array3_t a;
     igraph_integer_t i, j, k;
     igraph_integer_t s = 1;

@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_simple, g_ml;
     igraph_real_t result;
 

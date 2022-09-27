@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t v;
     igraph_matrix_int_t result;

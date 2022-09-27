@@ -91,7 +91,7 @@ private:
     DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n);
     ~DLItem();
 public:
-    void del() {
+    void del(void) {
         delete item;
     }
 };
@@ -120,7 +120,7 @@ public:
     int Enqueue(L_DATA);
     L_DATA Dequeue();
     unsigned long Is_In_List(L_DATA);
-    void delete_items();
+    void delete_items(void);
 };
 
 template <class L_DATA>
@@ -362,7 +362,7 @@ public:
     unsigned long Get_Frequency() {
         return (frequency);
     }
-    void IncreaseFrequency() {
+    void IncreaseFrequency(void) {
         frequency++;
     }
     void Set_Links_IC(unsigned long lic) {

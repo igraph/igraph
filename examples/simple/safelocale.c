@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     const char *filename = "weighted.gml";
     igraph_t graph;
     igraph_safelocale_t loc;

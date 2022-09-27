@@ -5,7 +5,7 @@ include(CheckCXXSourceCompiles)
 cmake_push_check_state(RESET)
 
 check_cxx_source_compiles("
-    int main() {
+    int main(void) {
         long long a=1, b=2, c;
         __builtin_add_overflow(a, b, &c);
         __builtin_mul_overflow(a, b, &c);

@@ -4,7 +4,7 @@ extern "C" {
 #endif
 
 #ifdef KR_headers
-ftnint iargc_()
+ftnint iargc_(void)
 #else
 ftnint iargc_(void)
 #endif

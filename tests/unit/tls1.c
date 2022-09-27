@@ -30,7 +30,7 @@ void *thread_function(void *arg) {
     return 0;
 }
 
-int main() {
+int main(void) {
     pthread_t thread_id;
     void *exit_status;
 

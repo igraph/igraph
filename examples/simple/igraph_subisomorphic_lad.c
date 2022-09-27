@@ -104,7 +104,7 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
     igraph_vector_destroy(&cut_prob);
 }
 
-void test_motifs() {
+void test_motifs(void) {
     igraph_t graph;
     igraph_integer_t count;
 
@@ -121,7 +121,7 @@ void test_motifs() {
     igraph_destroy(&graph);
 }
 
-void test_motifs_undirected() {
+void test_motifs_undirected(void) {
     igraph_t graph;
     igraph_integer_t count;
 
@@ -150,7 +150,7 @@ void test_motifs_undirected() {
 }
 
 
-int main() {
+int main(void) {
     igraph_t target, pattern;
     igraph_bool_t iso;
     igraph_vector_int_t map;

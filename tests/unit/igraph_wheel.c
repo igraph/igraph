@@ -26,7 +26,7 @@ void call_and_print(igraph_t *graph, igraph_integer_t n, igraph_wheel_mode_t mod
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
 
     printf("-- Test graph with 1 vertex --\n");

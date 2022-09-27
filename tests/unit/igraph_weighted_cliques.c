@@ -63,7 +63,7 @@ void print_and_clear_weighted_clique_list(igraph_vector_int_list_t *cliques, con
     igraph_vector_int_list_clear(cliques);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
 
     const igraph_integer_t n = 10; /* number of vertices in test graph */

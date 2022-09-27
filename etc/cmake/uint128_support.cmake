@@ -7,7 +7,7 @@ cmake_push_check_state(RESET)
 check_cxx_source_compiles("
     #include <intrin.h>
 
-    int main() {
+    int main(void) {
         unsigned long long a = 0, b = 0;
         unsigned long long c;
         volatile unsigned long long d;

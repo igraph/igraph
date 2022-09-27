@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t outseq;
     igraph_rng_seed(igraph_rng_default(), 42);

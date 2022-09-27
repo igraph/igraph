@@ -60,7 +60,7 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
     return success;
 }
 
-int main() {
+int main(void) {
 
     igraph_sparsemat_t A, B, C;
     igraph_vector_t b, x;

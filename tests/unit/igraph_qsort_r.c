@@ -41,7 +41,7 @@ int comp(void *extra, const void *a, const void *b) {
     return 0;
 }
 
-int main() {
+int main(void) {
     const int len = 100;
     igraph_vector_t v;
     igraph_vector_int_t idx;

@@ -23,7 +23,8 @@
 /* This test verifies that trying to read an empty file does not cause
  * a crash or fatal error in any of the file format readers. */
 
-int main() {
+int main(void)
+{
     igraph_t graph;
     FILE *file;
 

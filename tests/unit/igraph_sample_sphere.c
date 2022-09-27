@@ -47,7 +47,7 @@ void check(igraph_bool_t volume, igraph_integer_t dim, igraph_integer_t n, igrap
     igraph_matrix_destroy(&samples);
 }
 
-int main() {
+int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

@@ -11,7 +11,7 @@ namespace prpack {
     class prpack_base_graph {
         private:
             // helper methods
-            void initialize();
+            void initialize(void);
             void read_smat(std::FILE* f, const bool weighted);
             void read_edges(std::FILE* f);
             void read_ascii(std::FILE* f);
@@ -34,7 +34,7 @@ namespace prpack {
             // destructor
             ~prpack_base_graph();
             // operations
-            void normalize_weights();
+            void normalize_weights(void);
     };
 
 }

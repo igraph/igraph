@@ -2,7 +2,7 @@
 
 #include "bench.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t res;
     igraph_arpack_options_t arpack_opts;

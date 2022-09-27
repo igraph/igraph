@@ -25,7 +25,7 @@ void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob) {
     printf("Result: %" IGRAPH_PRId "\n\n", result);
 }
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_50_full, g_4_3_1;
     igraph_vector_t cut_prob_0_3;
     igraph_vector_t cut_prob_0_4;

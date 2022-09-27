@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <assert.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t edges;
 

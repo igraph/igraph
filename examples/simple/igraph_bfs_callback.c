@@ -38,7 +38,7 @@ igraph_error_t bfs_callback(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_t graph, ring;
 
     /* Create a disjoint union of two rings */

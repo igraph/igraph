@@ -19,7 +19,7 @@
 #include "core/math.h"
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_matrix_complex_t c;
     igraph_matrix_t real;
     igraph_matrix_t imag;

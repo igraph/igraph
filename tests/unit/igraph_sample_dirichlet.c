@@ -34,7 +34,7 @@ void check_result(igraph_matrix_t *res, igraph_integer_t n)
 }
 
 
-int main() {
+int main(void) {
     igraph_vector_t alpha;
     igraph_matrix_t res;
 

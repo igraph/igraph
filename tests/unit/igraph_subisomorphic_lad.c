@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t pattern, target;
     igraph_bool_t iso;
     igraph_vector_int_t map;

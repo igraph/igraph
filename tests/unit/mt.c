@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
 
     igraph_integer_t i;
     for (i = 0; i < 1000; i++) {

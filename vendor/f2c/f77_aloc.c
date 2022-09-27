@@ -8,7 +8,7 @@ static integer memfailure = 3;
 
 #ifdef KR_headers
 extern char *malloc();
-extern void exit_();
+extern void exit_(void);
 
  char *
 F77_aloc(Len, whence) integer Len; char *whence;

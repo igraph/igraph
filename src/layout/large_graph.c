@@ -211,6 +211,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t epsilon = 10e-6;
         igraph_real_t maxchange = epsilon + 1;
         igraph_integer_t pairs;
+    IGRAPH_UNUSED(pairs); // required because set but not used
         igraph_real_t sconst = sqrt(area / M_PI) / H_n;
         igraph_2dgrid_iterator_t vidit;
 

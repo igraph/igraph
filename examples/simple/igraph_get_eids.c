@@ -32,7 +32,7 @@ void print_vector_int(igraph_vector_int_t *v, FILE *f) {
     fprintf(f, "\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_integer_t nodes = 100;
     igraph_integer_t edges = 1000;

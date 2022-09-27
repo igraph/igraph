@@ -51,7 +51,7 @@ class DensityGrid {
 public:
 
     // Methods
-    void Init();
+    void Init(void);
     void Subtract(Node &n, bool first_add, bool fine_first_add, bool fineDensity);
     void Add(Node &n, bool fineDensity );
     float GetDensity(float Nx, float Ny, bool fineDensity);

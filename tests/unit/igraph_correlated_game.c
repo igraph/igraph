@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g1, g2;
 
     igraph_rng_seed(igraph_rng_default(), 9275);

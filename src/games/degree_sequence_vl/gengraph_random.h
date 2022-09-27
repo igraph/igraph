@@ -168,9 +168,9 @@ public:
 
 //   double nfix(slong h, ulong i);
 //   double efix(ulong j, ulong i);
-//   void zigset();
+//   void zigset(void);
 
-//   inline void init()
+//   inline void init(void)
 //     { ulong yo = time(0) + getpid();
 //       z = w = jsr = jcong = yo; }
 //   inline void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ )

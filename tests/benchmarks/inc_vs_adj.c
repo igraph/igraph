@@ -431,7 +431,7 @@ void do_benchmarks(char *name, igraph_t *g, int repeat) {
     igraph_incadjlist_sep_destroy(&incadj_sep);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
 
     igraph_rng_seed(igraph_rng_default(), 42);
