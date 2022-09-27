@@ -58,7 +58,7 @@ int main(void) {
     igraph_small(&g, 0, 0, -1);
     igraph_matrix_init(&result, 0, 0);
     igraph_layout_fruchterman_reingold_3d(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 100, /*start_temp*/ 1.0, 
+                  /*niter*/ 100, /*start_temp*/ 1.0,
                   /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
                   /*maxy*/ NULL, /*minz*/ NULL, /*maxz*/ NULL);
     print_matrix(&result);
@@ -70,7 +70,7 @@ int main(void) {
     igraph_matrix_init(&result, 0, 0);
     make_box(1, 1.0, bounds);
     igraph_layout_fruchterman_reingold_3d(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 100, /*start_temp*/ 1.0, 
+                  /*niter*/ 100, /*start_temp*/ 1.0,
                   /*weights*/ NULL, &bounds[0], &bounds[1], &bounds[2], &bounds[3], &bounds[4], &bounds[5]);
     check_and_destroy(&result, 1.0);
     igraph_destroy(&g);
@@ -84,7 +84,7 @@ int main(void) {
     printf("Without weights, grid or bounds.\n");
     igraph_matrix_init(&result, 0, 0);
     igraph_layout_fruchterman_reingold_3d(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 100, /*start_temp*/ 10.0, 
+                  /*niter*/ 100, /*start_temp*/ 10.0,
                   /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
                   /*maxy*/ NULL, /*minz*/ NULL, /*maxz*/ NULL);
     check_and_destroy(&result, 50.0);
@@ -92,7 +92,7 @@ int main(void) {
     printf("With weights.\n");
     igraph_matrix_init(&result, 0, 0);
     igraph_layout_fruchterman_reingold_3d(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 100, /*start_temp*/ 1.0, 
+                  /*niter*/ 100, /*start_temp*/ 1.0,
                   /*weight*/ NULL, /*minx*/ NULL, /*maxx*/ NULL, /*miny*/ NULL,
                   /*maxy*/ NULL, /*minz*/ NULL, /*maxz*/ NULL);
     check_and_destroy(&result, 50.0);
@@ -100,7 +100,7 @@ int main(void) {
     printf("With weights and high temperature.\n");
     igraph_matrix_init(&result, 0, 0);
     igraph_layout_fruchterman_reingold_3d(&g, &result, /*use_seed*/ 0,
-                  /*niter*/ 10, /*start_temp*/ 1e10, 
+                  /*niter*/ 10, /*start_temp*/ 1e10,
                   &weights, &bounds[0], &bounds[1], &bounds[2], &bounds[3], &bounds[4], &bounds[5]);
     check_and_destroy(&result, 1.0);
 

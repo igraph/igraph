@@ -285,7 +285,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
-    /* Create the new edgelist */    
+    /* Create the new edgelist */
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));
     for (igraph_integer_t i=0; i < 2*no_of_edges; i++) {
         VECTOR(edges)[i] = VECTOR(*membership)[ VECTOR(edges)[i] ];
