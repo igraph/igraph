@@ -56,6 +56,8 @@ int main(void) {
     igraph_reciprocity(&g, &res, 0, IGRAPH_RECIPROCITY_DEFAULT);
     igraph_destroy(&g);
 
+    //is this supposed to mean res - (2.0 / 3.0) or (res - 2.0) / 3.0?
+    //some parantheses here would make it more obvious
     if (fabs(res - 2.0 / 3.0) > 1e-15) {
         fprintf(stderr, "%f != %f\n", res, 2.0 / 3.0);
         return 3;
