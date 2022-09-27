@@ -732,6 +732,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
     igraph_integer_t no_of_clusters = 0;
     igraph_integer_t act_cluster_size;
+    IGRAPH_UNUSED(act_cluster_size); // required because set but not read/used
 
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
     const igraph_vector_int_t* tmp;

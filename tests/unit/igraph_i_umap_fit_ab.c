@@ -29,7 +29,7 @@
 
 #include "test_utilities.h"
 
-int main () {
+int main(void)() {
     size_t i;
     igraph_real_t a, b;
 

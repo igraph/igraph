@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_vector_t v;
 
     igraph_vector_init_range(&v, 1, 1001);

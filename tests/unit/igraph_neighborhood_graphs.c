@@ -36,7 +36,7 @@ void print_and_clear(igraph_graph_list_t *result) {
     igraph_graph_list_clear(result);
 }
 
-int main() {
+int main(void) {
     igraph_t g_empty, g_lm;
     igraph_graph_list_t result;
     igraph_vs_t vids;

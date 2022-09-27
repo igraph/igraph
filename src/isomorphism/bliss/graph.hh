@@ -119,7 +119,7 @@ public:
   /**
    * Return the number of vertices in the graph.
    */
-  virtual unsigned int get_nof_vertices() const = 0;
+  virtual unsigned int get_nof_vertices(void) const = 0;
 
   /**
    * Return a new graph that is the result of applying the permutation \a perm
@@ -191,7 +191,7 @@ public:
    * Get a hash value for the graph.
    * \return  the hash value
    */
-  virtual unsigned int get_hash() = 0;
+  virtual unsigned int get_hash(void) = 0;
 
   /**
    * Disable/enable the "long prune" method.
@@ -293,11 +293,11 @@ protected:
   /** \internal
    * Initialize the "long prune" data structures.
    */
-  void long_prune_init();
+  void long_prune_init(void);
   /** \internal
    * Release the memory allocated for "long prune" data structures.
    */
-  void long_prune_deallocate();
+  void long_prune_deallocate(void);
   void long_prune_add_automorphism(const unsigned int *aut);
   std::vector<bool>& long_prune_get_fixed(const unsigned int index);
   std::vector<bool>& long_prune_allocget_fixed(const unsigned int index);
@@ -315,7 +315,7 @@ protected:
   Heap neighbour_heap;
   virtual bool split_neighbourhood_of_unit_cell(Partition::Cell * const) = 0;
   virtual bool split_neighbourhood_of_cell(Partition::Cell * const) = 0;
-  void refine_to_equitable();
+  void refine_to_equitable(void);
   void refine_to_equitable(Partition::Cell * const unit_cell);
   void refine_to_equitable(Partition::Cell * const unit_cell1,
                            Partition::Cell * const unit_cell2);
@@ -367,10 +367,10 @@ protected:
   std::vector<unsigned int> certificate_best_path;
 
   unsigned int certificate_index;
-  virtual void initialize_certificate() = 0;
+  virtual void initialize_certificate(void) = 0;
 
-  virtual void remove_duplicate_edges() = 0;
-  virtual void make_initial_equitable_partition() = 0;
+  virtual void remove_duplicate_edges(void) = 0;
+  virtual void make_initial_equitable_partition(void) = 0;
   virtual Partition::Cell* find_next_cell_to_be_splitted(Partition::Cell *cell) = 0;
 
 
@@ -510,17 +510,17 @@ protected:
     ~Vertex();
     void add_edge(const unsigned int other_vertex);
     void remove_duplicate_edges(std::vector<bool>& tmp);
-    void sort_edges();
+    void sort_edges(void);
 
     unsigned int color;
     std::vector<unsigned int> edges;
-    unsigned int nof_edges() const {
+    unsigned int nof_edges(void) const {
       return static_cast<unsigned int>(edges.size());
     }
   };
   std::vector<Vertex> vertices;
-  void sort_edges();
-  void remove_duplicate_edges();
+  void sort_edges(void);
+  void remove_duplicate_edges(void);
 
   /** \internal
    * Partition independent invariant.
@@ -571,9 +571,9 @@ protected:
   Partition::Cell* sh_first_largest_max_neighbours();
 
 
-  void make_initial_equitable_partition();
+  void make_initial_equitable_partition(void);
 
-  void initialize_certificate();
+  void initialize_certificate(void);
 
   bool is_automorphism(unsigned int* const perm) const;
 
@@ -607,12 +607,12 @@ public:
   /**
    * \copydoc AbstractGraph::get_hash()
    */
-  virtual unsigned int get_hash();
+  virtual unsigned int get_hash(void);
 
   /**
    * Return the number of vertices in the graph.
    */
-  unsigned int get_nof_vertices() const {
+  unsigned int get_nof_vertices(void) const {
     return static_cast<unsigned int>(vertices.size());
   }
 
@@ -712,15 +712,15 @@ protected:
     void add_edge_to(const unsigned int dest_vertex);
     void add_edge_from(const unsigned int source_vertex);
     void remove_duplicate_edges(std::vector<bool>& tmp);
-    void sort_edges();
+    void sort_edges(void);
     unsigned int color;
     std::vector<unsigned int> edges_out;
     std::vector<unsigned int> edges_in;
-    unsigned int nof_edges_in() const { return static_cast<unsigned int>(edges_in.size()); }
-    unsigned int nof_edges_out() const { return static_cast<unsigned int>(edges_out.size()); }
+    unsigned int nof_edges_in(void) const { return static_cast<unsigned int>(edges_in.size()); }
+    unsigned int nof_edges_out(void) const { return static_cast<unsigned int>(edges_out.size()); }
   };
   std::vector<Vertex> vertices;
-  void remove_duplicate_edges();
+  void remove_duplicate_edges(void);
 
   /** \internal
    * Partition independent invariant.
@@ -782,13 +782,13 @@ protected:
   Partition::Cell* sh_first_smallest_max_neighbours();
   Partition::Cell* sh_first_largest_max_neighbours();
 
-  void make_initial_equitable_partition();
+  void make_initial_equitable_partition(void);
 
-  void initialize_certificate();
+  void initialize_certificate(void);
 
   bool is_automorphism(unsigned int* const perm) const;
 
-  void sort_edges();
+  void sort_edges(void);
 
   bool nucr_find_first_component(const unsigned int level);
   bool nucr_find_first_component(const unsigned int level,
@@ -818,12 +818,12 @@ public:
   /**
    * \copydoc AbstractGraph::get_hash()
    */
-  virtual unsigned int get_hash();
+  virtual unsigned int get_hash(void);
 
   /**
    * Return the number of vertices in the graph.
    */
-  unsigned int get_nof_vertices() const { return static_cast<unsigned int>(vertices.size()); }
+  unsigned int get_nof_vertices(void) const { return static_cast<unsigned int>(vertices.size()); }
 
   /**
    * Add a new vertex with color 'color' in the graph and return its index.

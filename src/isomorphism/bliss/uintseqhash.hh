@@ -35,13 +35,13 @@ public:
   UintSeqHash& operator=(const UintSeqHash &other) {h = other.h; return *this; }
 
   /** Reset the hash value. */
-  void reset() {h = 0; }
+  void reset(void) {h = 0; }
 
   /** Add the unsigned int \a n to the sequence. */
   void update(unsigned int n);
 
   /** Get the hash value of the sequence seen so far. */
-  unsigned int get_value() const {return h; }
+  unsigned int get_value(void) const {return h; }
 
   /** Compare the hash values of this and \a other.
    * Return -1/0/1 if the value of this is smaller/equal/greater than

@@ -20,7 +20,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_integer_t n_vertices = 10;
 

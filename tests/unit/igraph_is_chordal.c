@@ -39,7 +39,7 @@ void call_and_print(igraph_t *graph, igraph_vector_int_t *alpha, igraph_vector_i
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_lmu;
     igraph_bool_t chordal;
     igraph_vector_int_t alpha, alpham1;

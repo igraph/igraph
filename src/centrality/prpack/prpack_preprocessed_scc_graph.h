@@ -9,7 +9,7 @@ namespace prpack {
     class prpack_preprocessed_scc_graph : public prpack_preprocessed_graph {
         private:
             // helper methods
-            void initialize();
+            void initialize(void);
             void initialize_weighted(const prpack_base_graph* bg);
             void initialize_unweighted(const prpack_base_graph* bg);
         public:

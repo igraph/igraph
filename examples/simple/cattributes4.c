@@ -29,7 +29,7 @@ static void simplify_write_destroy(igraph_t *g, igraph_attribute_combination_t *
     igraph_destroy(g);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g, g2;
     igraph_attribute_combination_t comb;

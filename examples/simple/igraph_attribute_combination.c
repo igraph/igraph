@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
 
     igraph_attribute_combination_t comb;

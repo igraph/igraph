@@ -44,7 +44,7 @@ void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn,
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g_ring, g_0, g_1, g_2, g_lm;
     igraph_vector_t weights, weights_neg, weights_0;
 

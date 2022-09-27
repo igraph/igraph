@@ -583,6 +583,8 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
     unsigned int sweep;
     long max_q;
     unsigned long changes, /*degree,*/ problemcount;
+    IGRAPH_UNUSED(problemcount); // required because set but not read/used
+
     //HugeArray<int> neighbours;
     double h, delta = 0, norm, r, beta, minweight, prefac = 0, w, degree;
     bool cyclic = false, found;
@@ -754,6 +756,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     unsigned int sweep;
     long max_q, rn;
     unsigned long changes, /*degree,*/ problemcount;
+    IGRAPH_UNUSED(problemcount); // required because set but not read/used
     double degree, w, delta = 0, h;
     //HugeArray<int> neighbours;
     double norm, r, beta, minweight, prefac = 0;
@@ -1778,6 +1781,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
     unsigned long new_spin, spin_opt, old_spin;
     unsigned int sweep; //current sweep
     unsigned long changes, problemcount; //Number of changes and number of problems encountered
+    IGRAPH_UNUSED(problemcount); // required because set but not read/used
 
     double exp_old_spin; //The expectation value for the old spin
     double exp_spin; //The expectation value for the other spin(s)

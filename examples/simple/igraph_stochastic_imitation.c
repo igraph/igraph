@@ -37,7 +37,7 @@ typedef struct {
 /* Updating the strategy of an isolated vertex. In this case, the strategies
  * vector should not change at all.
  */
-igraph_error_t isolated_vertex_test() {
+igraph_error_t isolated_vertex_test(void) {
     igraph_t g;
     igraph_vector_t quant;
     igraph_vector_int_t strat, v;
@@ -86,7 +86,7 @@ igraph_error_t isolated_vertex_test() {
  * default strategies vector. Some vertices are chosen for strategy revision,
  * each one via a different stochastic imitation rule.
  */
-igraph_error_t petersen_game_test() {
+igraph_error_t petersen_game_test(void) {
     igraph_t g;
     igraph_bool_t success;
     igraph_vector_t quant;
@@ -164,7 +164,7 @@ igraph_error_t petersen_game_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_error_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 547612);

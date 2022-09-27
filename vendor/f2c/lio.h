@@ -54,7 +54,7 @@ typedef union
 } flex;
 #ifdef KR_headers
 extern int (*f__lioproc)(), (*l_getc)(), (*l_ungetc)();
-extern int l_read(), l_write();
+extern int l_read(void), l_write();
 #else
 #ifdef __cplusplus
 extern "C" {

@@ -29,7 +29,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     for (int k = 0; k < 20; k++) {
         igraph_t g;

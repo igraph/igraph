@@ -53,7 +53,7 @@ void print_hub_and_authority(igraph_t *g, igraph_vector_t *weights, igraph_bool_
     igraph_vector_destroy(&authority_vector);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t weights;
     igraph_arpack_options_t options;

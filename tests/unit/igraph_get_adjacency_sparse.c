@@ -31,7 +31,7 @@ void print_sparse_matrix(const igraph_sparsemat_t* sm) {
 }
 
 
-void test_undirected() {
+void test_undirected(void) {
     igraph_t graph;
     igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
     igraph_vector_t weights;
@@ -138,7 +138,7 @@ void test_undirected() {
     VERIFY_FINALLY_STACK();
 }
 
-void test_directed() {
+void test_directed(void) {
     igraph_t graph;
     igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
     igraph_vector_t weights;
@@ -185,7 +185,7 @@ void test_directed() {
     VERIFY_FINALLY_STACK();
 }
 
-void test_errors() {
+void test_errors(void) {
     igraph_t graph;
     igraph_sparsemat_t m;
 
@@ -200,7 +200,7 @@ void test_errors() {
     VERIFY_FINALLY_STACK();
 }
 
-int main() {
+int main(void) {
 
     test_undirected();
     test_directed();

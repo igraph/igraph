@@ -52,9 +52,9 @@ public:
 
     void swap(FlowGraph &fgraph);
 
-    void initiate();
-    void eigenvector();
-    void calibrate();
+    void initiate(void);
+    void eigenvector(void);
+    void calibrate(void);
 
     void back_to(const FlowGraph &fgraph);
 

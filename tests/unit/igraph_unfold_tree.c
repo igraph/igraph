@@ -39,7 +39,7 @@ void print_and_destroy(igraph_t *g, igraph_vector_int_t *roots) {
     igraph_vector_int_destroy(&vertex_index);
 }
 
-int main() {
+int main(void) {
     igraph_t g, tree;
     igraph_vector_int_t roots;
 

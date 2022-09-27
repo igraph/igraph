@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t karate;
     igraph_vector_int_t edges;
     igraph_vector_t prob;

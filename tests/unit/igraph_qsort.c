@@ -38,7 +38,7 @@ int comp(const void *a, const void *b) {
     return 0;
 }
 
-int main() {
+int main(void) {
     const int len = 100;
     igraph_vector_t v;
     int i;

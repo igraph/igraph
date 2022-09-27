@@ -58,7 +58,7 @@ int print_and_destroy(igraph_t *g,
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t partitions;

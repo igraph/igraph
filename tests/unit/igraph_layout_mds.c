@@ -29,7 +29,7 @@
 
 #define sqr(x) ((x)*(x))
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t coords, dist_mat;
     igraph_integer_t i, j;

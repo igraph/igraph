@@ -89,7 +89,7 @@ void test_graph(igraph_bool_t directed) {
     VERIFY_FINALLY_STACK();
 }
 
-int main() {
+int main(void) {
 
     test_graph(/* directed = */ 0);
     test_graph(/* directed = */ 1);

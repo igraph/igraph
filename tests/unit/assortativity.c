@@ -49,7 +49,7 @@ void assortativity_unnormalized(const igraph_t *graph, igraph_real_t *res, igrap
     }
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t assort, assort2, assort_unnorm, modularity;

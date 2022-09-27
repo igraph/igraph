@@ -20,7 +20,7 @@
 #include <igraph.h>
 #include <stdarg.h>
 
-int main() {
+int main(void) {
     igraph_matrix_t mat;
     igraph_t g;
     int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 1, 0 }, { 0, 1, 0, 0 } };

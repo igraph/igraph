@@ -25,7 +25,7 @@
 
 #include <math.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t v, weights;

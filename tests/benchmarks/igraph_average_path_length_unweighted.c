@@ -3,7 +3,7 @@
 
 #include "bench.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_real_t avglen;
     igraph_matrix_t mat;

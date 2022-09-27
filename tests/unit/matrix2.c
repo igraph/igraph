@@ -45,7 +45,7 @@ void byrow(igraph_matrix_t *m) {
     }
 
 
-int main() {
+int main(void) {
     igraph_matrix_t m, m2;
     igraph_vector_t v;
     igraph_vector_int_t index;

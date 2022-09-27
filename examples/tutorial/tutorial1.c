@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-int main() {
+int main(void) {
   igraph_integer_t num_vertices = 1000;
   igraph_integer_t num_edges = 1000;
   igraph_real_t diameter;

@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 
-int main() {
+int main(void) {
     /*most functionality is currently tested in
       igraph_get_shortest_paths_bellman_ford(), which is called by
       igraph_get_shortest_path_bellman_ford()*/

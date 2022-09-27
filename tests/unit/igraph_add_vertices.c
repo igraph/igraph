@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g1;
     igraph_vector_int_t v1;

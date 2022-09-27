@@ -10,7 +10,7 @@ void rand_weight_vec(igraph_vector_t *vec, const igraph_t *graph) {
     }
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t res, weights;
     igraph_arpack_options_t arpack_opts;

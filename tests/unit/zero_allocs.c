@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     int *a = IGRAPH_CALLOC(0, int);
 
     IGRAPH_ASSERT(a);

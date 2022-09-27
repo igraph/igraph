@@ -228,6 +228,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reserve)(
         TYPE(igraph_vector)* v, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, push_back)(TYPE(igraph_vector)* v, BASE e);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v);
+IGRAPH_EXPORT BASE FUNCTION(igraph_vector, pop_front)(TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, insert)(
         TYPE(igraph_vector) *v, igraph_integer_t pos, BASE value);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, remove)(

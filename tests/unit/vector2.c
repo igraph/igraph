@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_vector_t v1, v2, v3;
     igraph_real_t min, max;

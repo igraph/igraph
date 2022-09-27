@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g_empty, g_empty_dir, g_lm;
     igraph_matrix_t result;
     igraph_vs_t vids;

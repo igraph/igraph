@@ -1,7 +1,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     igraph_integer_t nodes = 120, types = 4;
 
     igraph_matrix_t pref_matrix;

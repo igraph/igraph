@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <limits.h>
 
-int main() {
+int main(void) {
 
     igraph_t g, gbar;
     igraph_integer_t k1, k2 = INT_MAX;

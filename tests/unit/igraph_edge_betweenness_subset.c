@@ -21,7 +21,7 @@
 
 
 /* https://github.com/igraph/igraph/issues/950 */
-void test_bug950_edge() {
+void test_bug950_edge(void) {
     /* Testing the case of weighted graphs with multiple alternate
      * paths to the same node with slightly different weights due to
      * floating point inaccuracies. */
@@ -62,7 +62,7 @@ void test_bug950_edge() {
     igraph_destroy(&g);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_es_t es;
     igraph_vector_t eb, bet, bet2, weights;

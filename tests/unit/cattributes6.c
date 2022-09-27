@@ -119,7 +119,7 @@ static void check_vector_queries(const igraph_t *g) {
     igraph_vector_int_destroy(&vtypes);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g, g2;
     FILE *ifile;

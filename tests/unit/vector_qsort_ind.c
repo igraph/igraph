@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_vector_t vector;
     igraph_vector_int_t indices;
     igraph_real_t values[] = { 87, 23, 8, 82, 94, 56, 36, 33, 76, 66 };

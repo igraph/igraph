@@ -57,9 +57,9 @@ typedef union
 #ifdef KR_headers
 extern int (*f__doed)(),(*f__doned)();
 extern int (*f__dorevert)();
-extern int rd_ed(),rd_ned();
-extern int w_ed(),w_ned();
-extern int signbit_f2c();
+extern int rd_ed(void),rd_ned();
+extern int w_ed(void),w_ned();
+extern int signbit_f2c(void);
 extern char *f__fmtbuf;
 #else
 #ifdef __cplusplus

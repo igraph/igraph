@@ -49,10 +49,10 @@ public:
   bool is_empty() const;
 
   /** Return the number of elements in the queue. */
-  unsigned int size() const;
+  unsigned int size(void) const;
 
   /** Remove all the elements in the queue. */
-  void clear();
+  void clear(void);
 
   /** Return (but don't remove) the first element in the queue. */
   Type front() const;

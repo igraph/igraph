@@ -105,7 +105,7 @@ int fit_discrete(double known_xmin) {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_vector_init(&data, 0);

@@ -31,7 +31,7 @@ void prepare_weights_vector(igraph_vector_t* weights, const igraph_t* graph) {
     }
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
 
     igraph_vector_int_t v;

@@ -53,7 +53,7 @@ igraph_bool_t compat_not0(const igraph_t *graph1,
     return g1_num != 0;
 }
 
-int match_rings() {
+int match_rings(void) {
 
     igraph_t r1, r2;
     igraph_bool_t iso;
@@ -148,7 +148,7 @@ int match_rings() {
     return 0;
 }
 
-int match_rings_open_closed() {
+int match_rings_open_closed(void) {
     igraph_t ro, rc;
     igraph_bool_t iso;
     igraph_integer_t count;
@@ -248,7 +248,7 @@ int match_rings_open_closed() {
 
 /* ----------------------------------------------------------- */
 
-int main() {
+int main(void) {
     match_rings();
     match_rings_open_closed();
 

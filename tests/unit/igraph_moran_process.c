@@ -36,7 +36,7 @@ typedef struct {
 
 /* Error tests, i.e. we expect errors to be raised for each test.
  */
-int error_tests() {
+int error_tests(void) {
     igraph_t g, gzero, h;
     igraph_vector_t quant, quantnvert, quantzero;
     igraph_vector_int_t strat, stratnvert, stratzero;
@@ -133,7 +133,7 @@ int error_tests() {
 
 /* One iteration of the Moran process on a simple digraph.
  */
-int moran_one_test() {
+int moran_one_test(void) {
     igraph_t g;
     igraph_integer_t u = -1;  /* vertex chosen for reproduction */
     igraph_integer_t v = -1;  /* clone of u */
@@ -211,7 +211,7 @@ int moran_one_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 1298);
 

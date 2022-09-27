@@ -152,7 +152,7 @@ int test_num = 0;
         return test_num; \
     }
 
-int main() {
+int main(void) {
 
     RNG_BEGIN();
 

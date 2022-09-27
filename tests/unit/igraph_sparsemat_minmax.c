@@ -227,7 +227,7 @@ int doit(int which) {
     return 0;
 }
 
-int main() {
+int main(void) {
     int res;
 
     res = doit(/*which=*/ MIN);

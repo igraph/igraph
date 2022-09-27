@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_marked_queue_int_t Q;
     igraph_integer_t i;
 

@@ -70,7 +70,7 @@ void print_cliques(igraph_vector_int_list_t *cliques) {
     }
 }
 
-int main() {
+int main(void) {
 
     igraph_t g, g2, cli;
     igraph_vector_int_t perm;

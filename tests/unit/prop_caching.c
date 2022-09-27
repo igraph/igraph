@@ -91,7 +91,7 @@ void test_basic_operations(igraph_t* graph) {
     validate_properties(graph);
 }
 
-int test_basic_operations_directed() {
+int test_basic_operations_directed(void) {
     igraph_t g;
 
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
@@ -101,7 +101,7 @@ int test_basic_operations_directed() {
     return 0;
 }
 
-int test_basic_operations_undirected() {
+int test_basic_operations_undirected(void) {
     igraph_t g;
 
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
@@ -111,7 +111,7 @@ int test_basic_operations_undirected() {
     return 0;
 }
 
-int main() {
+int main(void) {
 
     RUN_TEST(test_basic_operations_directed);
     RUN_TEST(test_basic_operations_undirected);

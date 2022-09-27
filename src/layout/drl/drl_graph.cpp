@@ -1289,6 +1289,7 @@ float graph::get_tot_energy ( ) {
 
 int graph::draw_graph(igraph_matrix_t *res) {
     int count_iter = 0;
+    IGRAPH_UNUSED(count_iter); // required because set but not used
     while (ReCompute()) {
         IGRAPH_ALLOW_INTERRUPTION();
         count_iter++;

@@ -129,7 +129,7 @@ int gss(double a, double b, double *min, double *fmin,
  * The warning flag is 1 if the last optimization was run on a function that
  * was not U-shaped.
  */
-unsigned short int gss_get_warning_flag();
+unsigned short int gss_get_warning_flag(void);
 
 /**
  * Initialize GSS parameters to the default values.

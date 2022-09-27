@@ -7,7 +7,7 @@ extern "C" {
 /* called when a subscript is out of range */
 
 #ifdef KR_headers
-extern VOID sig_die();
+extern void sig_die(void);
 integer s_rnge(varn, offset, procn, line) char *varn, *procn; ftnint offset, line;
 #else
 extern VOID sig_die(const char*,int);

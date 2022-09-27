@@ -121,7 +121,7 @@ public:
   /**
    * Get a new backtrack point for the current partition
    */
-  BacktrackPoint set_backtrack_point();
+  BacktrackPoint set_backtrack_point(void);
 
   /**
    * Backtrack to the point \a p and remove it.
@@ -179,7 +179,7 @@ public:
    */
   bool is_discrete() const {return(free_cells == 0); }
 
-  unsigned int nof_discrete_cells() const {return(discrete_cell_count); }
+  unsigned int nof_discrete_cells(void) const {return(discrete_cell_count); }
 
   /*
    * Splits the Cell \a cell into [cell_1,...,cell_n]
@@ -198,8 +198,8 @@ public:
   /*
    * Routines for component recursion
    */
-  void cr_init();
-  void cr_free();
+  void cr_init(void);
+  void cr_free(void);
   unsigned int cr_get_level(const unsigned int cell_index) const;
   unsigned int cr_split_level(const unsigned int level,
                               const std::vector<unsigned int>& cells);
@@ -220,7 +220,7 @@ private:
     unsigned int level;
     CRCell* next;
     CRCell** prev_next_ptr;
-    void detach() {
+    void detach(void) {
       if(next)
         next->prev_next_ptr = prev_next_ptr;
       *(prev_next_ptr) = next;
@@ -242,7 +242,7 @@ private:
   unsigned int cr_max_level;
   void cr_create_at_level(const unsigned int cell_index, unsigned int level);
   void cr_create_at_level_trailed(const unsigned int cell_index, unsigned int level);
-  unsigned int cr_get_backtrack_point();
+  unsigned int cr_get_backtrack_point(void);
   void cr_goto_backtrack_point(const unsigned int btpoint);
 
 

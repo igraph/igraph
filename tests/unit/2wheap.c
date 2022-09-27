@@ -28,7 +28,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_vector_t elems;
     igraph_2wheap_t Q;

@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int test_simple_trees() {
+int test_simple_trees(void) {
     igraph_t g, g2;
     igraph_adjlist_t adjlist;
     igraph_bool_t iso;
@@ -74,7 +74,7 @@ int test_simple_trees() {
     igraph_lazy_adjlist_destroy(&lazy_adjlist); \
 }
 
-int test_loop_elimination_for_undirected_graph() {
+int test_loop_elimination_for_undirected_graph(void) {
     igraph_t g;
     igraph_adjlist_t adjlist;
     igraph_lazy_adjlist_t lazy_adjlist;
@@ -114,7 +114,7 @@ int test_loop_elimination_for_undirected_graph() {
     return 0;
 }
 
-int test_loop_elimination_for_directed_graph() {
+int test_loop_elimination_for_directed_graph(void) {
     igraph_t g;
     igraph_adjlist_t adjlist;
     igraph_lazy_adjlist_t lazy_adjlist;
@@ -170,7 +170,7 @@ int test_loop_elimination_for_directed_graph() {
     return 0;
 }
 
-int test_multiedge_elimination_for_undirected_graph() {
+int test_multiedge_elimination_for_undirected_graph(void) {
     igraph_t g;
     igraph_adjlist_t adjlist;
     igraph_lazy_adjlist_t lazy_adjlist;
@@ -213,7 +213,7 @@ int test_multiedge_elimination_for_undirected_graph() {
     return 0;
 }
 
-int test_multiedge_elimination_for_directed_graph() {
+int test_multiedge_elimination_for_directed_graph(void) {
     igraph_t g;
     igraph_adjlist_t adjlist;
     igraph_lazy_adjlist_t lazy_adjlist;
@@ -272,7 +272,7 @@ int test_multiedge_elimination_for_directed_graph() {
     return 0;
 }
 
-int main() {
+int main(void) {
 
     RUN_TEST(test_simple_trees);
 

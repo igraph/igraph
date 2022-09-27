@@ -115,7 +115,7 @@ public:
     // add weight to (i,j)'s histogram
     bool addAdjacencyObs(const int, const int, const double, const double);
     // add to obs_count and total_weight
-    void addAdjacencyEnd();
+    void addAdjacencyEnd(void);
     // true if (i,j) is already in graph
     bool doesLinkExist(const int, const int);
     // returns degree of vertex i
@@ -131,19 +131,19 @@ public:
     // returns bin_resolution
     double getBinResolution();
     // returns num_bins
-    int getNumBins();
+    int getNumBins(void);
     // returns m
-    int numLinks();
+    int numLinks(void);
     // returns n
-    int numNodes();
+    int numNodes(void);
     // returns total_weight
     double getTotalWeight();
     // reset edge (i,j)'s histogram
     void resetAdjacencyHistogram(const int, const int);
     // reset all edge histograms
-    void resetAllAdjacencies();
+    void resetAllAdjacencies(void);
     // clear all links from graph
-    void resetLinks();
+    void resetLinks(void);
     // allocate edge histograms
     void setAdjacencyHistograms(const igraph_integer_t);
     // set name of vertex i

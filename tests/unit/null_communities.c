@@ -9,7 +9,7 @@
  *  - In hierarchical methods, the modularity vector should have size 1.
  */
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t modularity;
     igraph_vector_int_t membership;

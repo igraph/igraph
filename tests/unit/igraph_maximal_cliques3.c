@@ -39,7 +39,7 @@ void print_and_destroy(igraph_vector_int_list_t *cliques) {
     igraph_vector_int_list_destroy(cliques);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t cliques;
 

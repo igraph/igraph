@@ -19,7 +19,7 @@
 #include <igraph_paths.h>
 #include "test_utilities.h"
 
-igraph_error_t test_path_expansion() {
+igraph_error_t test_path_expansion(void) {
     igraph_vector_int_t path;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
@@ -52,7 +52,7 @@ igraph_error_t test_path_expansion() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     IGRAPH_ASSERT(test_path_expansion() == IGRAPH_SUCCESS);
 
     return 0;

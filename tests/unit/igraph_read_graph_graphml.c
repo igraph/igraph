@@ -69,7 +69,7 @@ void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_error_handler_t* oldhandler;
     igraph_warning_handler_t* oldwarnhandler;

@@ -152,14 +152,14 @@ public:
     // corresponding node
     elementsp* findItem(const std::string);
     // update total_count and total_weight
-    void finishedThisRound();
+    void finishedThisRound(void);
     // insert a new key with stored value
     bool insertItem(std::string, double);
-    void clearTree();
+    void clearTree(void);
     // delete a node with given key
     void deleteItem(std::string);
     // delete the entire tree
-    void deleteTree();
+    void deleteTree(void);
     // return array of keys in tree
     std::string* returnArrayOfKeys();
     // return list of keys in tree
@@ -171,7 +171,7 @@ public:
     // returns the minimum key in the tree
     keyValuePairSplit returnMinKey();
     // returns number of items in tree
-    int returnNodecount();
+    int returnNodecount(void);
     // returns list of splits with given number of Ms
     keyValuePairSplit* returnTheseSplits(const int);
     // returns sum of stored values

@@ -2,7 +2,7 @@
 #include "f2c.h"
 
 #ifdef KR_headers
-extern void f_exit();
+extern void f_exit(void);
 int s_stop(s, n) char *s; ftnlen n;
 #else
 #undef abs
