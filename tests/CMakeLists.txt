@@ -268,7 +268,6 @@ add_examples(
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
-  igraph_reciprocity
   igraph_similarity
   igraph_simplify
   igraph_topological_sorting
@@ -334,6 +333,7 @@ add_legacy_tests(
   igraph_pseudo_diameter
   igraph_pseudo_diameter_dijkstra
   igraph_random_walk
+  igraph_reciprocity
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_similarity
   igraph_transitive_closure_dag
