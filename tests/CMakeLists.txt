@@ -178,7 +178,6 @@ add_examples(
   igraph_full
   igraph_grg_game
   igraph_kary_tree
-  igraph_lcf
   igraph_realize_degree_sequence
   igraph_regular_tree
   igraph_ring
@@ -221,6 +220,7 @@ add_legacy_tests(
   igraph_hsbm_list_game
   igraph_k_regular_game
   igraph_lastcit_game
+  igraph_lcf
   igraph_linegraph
   igraph_kautz
   igraph_preference_game
