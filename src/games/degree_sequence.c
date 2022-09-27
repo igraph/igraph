@@ -35,6 +35,7 @@
 
 #include "core/interruption.h"
 #include "core/set.h"
+#include "games/degree_sequence_vl/degree_sequence_vl.h"
 #include "math/safe_intop.h"
 
 static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *graph,
@@ -670,12 +671,6 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
     return IGRAPH_SUCCESS;
 }
 
-
-/* This is in gengraph_mr-connected.cpp */
-
-igraph_error_t igraph_degree_sequence_game_vl(igraph_t *graph,
-                                   const igraph_vector_int_t *out_seq,
-                                   const igraph_vector_int_t *in_seq);
 
 /**
  * \ingroup generators

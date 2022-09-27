@@ -32,9 +32,9 @@
  * Drop-in replacement for strdup.
  * Used only in compilers that do not have strdup or _strdup
  */
-char* igraph_i_strdup(const char *s) {
+char *igraph_i_strdup(const char *s) {
     size_t n = strlen(s) + 1;
-    char* result = (char*)malloc(sizeof(char) * n);
+    char *result = malloc(sizeof(char) * n);
     if (result) {
         memcpy(result, s, n);
     }
@@ -53,7 +53,7 @@ char *igraph_i_strndup(const char *s1, size_t n) {
      */
     for (i = 0; s1[i] != '\0' && i < n; i++) {}
     n = i;
-    char* result = malloc(sizeof(char) * (n + 1));
+    char *result = malloc(sizeof(char) * (n + 1));
     if (result) {
         memcpy(result, s1, n);
         result[n] = '\0';

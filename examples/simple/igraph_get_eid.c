@@ -36,7 +36,7 @@ int main(void) {
     igraph_vector_int_init(&hist, 9);
 
     for (i = 1; i < 10; i++) {
-        igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ 1);
+        igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ true);
         VECTOR(hist)[ eid ] = 1;
     }
 
@@ -52,16 +52,15 @@ int main(void) {
     igraph_vector_int_init(&hist, 9);
 
     for (i = 1; i < 10; i++) {
-        igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ 1);
+        igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ true);
         VECTOR(hist)[ eid ] += 1;
-        igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ 1);
+        igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ true);
         VECTOR(hist)[ eid ] += 1;
     }
     igraph_vector_int_print(&hist);
 
     igraph_vector_int_destroy(&hist);
     igraph_destroy(&g);
-
 
     return 0;
 }

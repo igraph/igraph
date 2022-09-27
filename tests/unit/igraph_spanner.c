@@ -86,8 +86,7 @@ void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch,
     igraph_destroy(&spanner_graph);
 }
 
-int main(void)
-{
+int main(void) {
     igraph_t graph;
     igraph_vector_t weights;
     igraph_vector_int_t spanner;

@@ -487,7 +487,7 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
 
         igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actnode, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (igraph_integer_t i = 0; i < nei_count; i++) {
@@ -731,8 +731,6 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
     igraph_integer_t no_of_clusters = 0;
-    igraph_integer_t act_cluster_size;
-    IGRAPH_UNUSED(act_cluster_size); // required because set but not read/used
 
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
     const igraph_vector_int_t* tmp;
@@ -854,7 +852,6 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
         /* this node is gone for any future components */
         VECTOR(next_nei)[grandfather] = 1;
-        act_cluster_size = 1;
 
         /* add to component */
         IGRAPH_CHECK(igraph_vector_int_push_back(&verts, grandfather));
@@ -880,7 +877,6 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
                 VECTOR(next_nei)[neighbor] = 1;
-                act_cluster_size++;
 
                 /* add to component */
                 IGRAPH_CHECK(igraph_vector_int_push_back(&verts, neighbor));

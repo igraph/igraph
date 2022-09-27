@@ -135,7 +135,7 @@ igraph_error_t igraph_blas_dgemm(igraph_bool_t transpose_a, igraph_bool_t transp
         IGRAPH_ERROR("Matrix B too large for BLAS.", IGRAPH_EOVERFLOW);
     }
     if (beta == 0) {
-        igraph_matrix_resize(c, nrow_oa, ncol_ob);
+        IGRAPH_CHECK(igraph_matrix_resize(c, nrow_oa, ncol_ob));
     }
 
     m = (int) nrow_oa;

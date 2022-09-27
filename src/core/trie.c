@@ -23,12 +23,9 @@
 
 #include "igraph_types.h"
 #include "igraph_memory.h"
-#include "igraph_error.h"
 
 #include "core/trie.h"
 #include "internal/hacks.h" /* strdup */
-
-#include "config.h"
 
 #include <string.h>
 

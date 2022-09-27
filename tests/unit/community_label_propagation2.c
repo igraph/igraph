@@ -63,5 +63,7 @@ int main(void) {
     igraph_vector_int_destroy(&initial_labels);
     igraph_vector_int_destroy(&membership);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

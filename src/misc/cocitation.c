@@ -23,6 +23,7 @@
 */
 
 #include "igraph_cocitation.h"
+
 #include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
@@ -358,7 +359,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
             v1 = igraph_lazy_adjlist_get(&al, i);
             IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, i, &k)) {
-                igraph_vector_int_insert(v1, k, i);
+                IGRAPH_CHECK(igraph_vector_int_insert(v1, k, i));
             }
         }
     }

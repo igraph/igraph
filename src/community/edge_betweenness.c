@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         VECTOR(mymembership)[i] = i;
     }
     if (membership) {
-        igraph_vector_int_update(membership, &mymembership);
+        IGRAPH_CHECK(igraph_vector_int_update(membership, &mymembership));
     }
 
     IGRAPH_CHECK(igraph_modularity(graph, &mymembership, weights,
@@ -146,7 +146,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                 if (actmod > maxmod) {
                     maxmod = actmod;
                     if (membership) {
-                        igraph_vector_int_update(membership, &mymembership);
+                        IGRAPH_CHECK(igraph_vector_int_update(membership, &mymembership));
                     }
                 }
             }
@@ -257,13 +257,13 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     /* catch null graph early */
     if (no_of_nodes == 0) {
         if (res) {
-            igraph_matrix_int_resize(res, 0, 2);
+            IGRAPH_CHECK(igraph_matrix_int_resize(res, 0, 2));
         }
         if (bridges) {
             igraph_vector_int_clear(bridges);
         }
         if (modularity) {
-            igraph_vector_resize(modularity, 1);
+            IGRAPH_CHECK(igraph_vector_resize(modularity, 1));
             VECTOR(*modularity)[0] = IGRAPH_NAN;
         }
         if (membership) {
@@ -644,7 +644,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(double));
                 memset(tmpscore, 0, (size_t) no_of_nodes * sizeof(double));
 
-                igraph_2wheap_push_with_index(&heap, source, 0);
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&heap, source, 0));
                 distance[source] = 1.0;
                 nrgeo[source] = 1;
 
@@ -652,7 +652,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     igraph_integer_t minnei = igraph_2wheap_max_index(&heap);
                     igraph_real_t mindist = -igraph_2wheap_delete_max(&heap);
 
-                    igraph_stack_int_push(&stack, minnei);
+                    IGRAPH_CHECK(igraph_stack_int_push(&stack, minnei));
 
                     neip = igraph_inclist_get(elist_out_p, minnei);
                     neino = igraph_vector_int_size(neip);
@@ -679,11 +679,11 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
-                            IGRAPH_CHECK(igraph_2wheap_modify(&heap, to, -altdist));
+                            igraph_2wheap_modify(&heap, to, -altdist);
                         } else if (altdist == curdist - 1) {
                             /* Another path with the same length */
                             v = igraph_inclist_get(&fathers, to);
-                            igraph_vector_int_push_back(v, edge);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                             nrgeo[to] += nrgeo[minnei];
                         }
                     }

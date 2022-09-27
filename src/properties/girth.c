@@ -153,10 +153,13 @@ igraph_error_t igraph_girth(const igraph_t *graph, igraph_real_t *girth,
     if (girth) {
         if (mincirc == IGRAPH_INTEGER_MAX) {
             *girth = IGRAPH_INFINITY;
-            mincirc = 0;
         } else {
             *girth = mincirc;
         }
+    }
+
+    if (mincirc == IGRAPH_INTEGER_MAX) {
+        mincirc = 0;
     }
 
     /* Store the actual circle, if needed */

@@ -21,7 +21,7 @@
 
 /* Default cliquer options */
 IGRAPH_THREAD_LOCAL clique_options clique_default_options = {
-    reorder_by_default, NULL, /*clique_print_time*/ NULL, NULL, NULL, NULL, NULL, 0
+	reorder_by_default, NULL, /*clique_print_time*/ NULL, NULL, NULL, NULL, NULL, 0
 };
 
 
@@ -140,10 +140,10 @@ static igraph_error_t false_function(set_t clique,graph_t *g,clique_options *opt
  */
 static int unweighted_clique_search_single(int *table, int min_size,
 					   graph_t *g, clique_options *opts) {
-    /*
+	/*
     struct tms tms;
 	struct timeval timeval;
-    */
+	*/
 	int i,j;
 	int v,w;
 	int *newtable;
@@ -181,7 +181,7 @@ static int unweighted_clique_search_single(int *table, int min_size,
 			clique_size[v]=clique_size[w];
 		}
 
-        /*
+		/*
 		if (opts && opts->time_function) {
 			gettimeofday(&timeval,NULL);
 			times(&tms);
@@ -200,7 +200,7 @@ static int unweighted_clique_search_single(int *table, int min_size,
 				return 0;
 			}
 		}
-        */
+		*/
 
 		if (min_size) {
 			if (clique_size[v]>=min_size) {
@@ -338,10 +338,10 @@ static igraph_error_t unweighted_clique_search_all(
 	int *table, int start, int min_size, int max_size, boolean maximal,
 	graph_t *g, clique_options *opts, CLIQUER_LARGE_INT *num_found
 ) {
-    /*
+	/*
 	struct timeval timeval;
 	struct tms tms;
-    */
+	*/
 	int i, j;
 	int v;
 	int *newtable;
@@ -558,10 +558,10 @@ static igraph_error_t sub_unweighted_all(int *table, int size, int min_size, int
 static igraph_error_t weighted_clique_search_single(int *table, int min_weight,
 					 int max_weight, graph_t *g,
 					 clique_options *opts, int *result) {
-    /*
+	/*
 	struct timeval timeval;
 	struct tms tms;
-    */
+	*/
 	int i,j;
 	int v;
 	int *newtable;
@@ -613,7 +613,8 @@ static igraph_error_t weighted_clique_search_single(int *table, int min_weight,
 	if (min_weight && (search_weight >= min_weight)) {
 		if (search_weight <= max_weight) {
 			/* Found suitable clique. */
-			return search_weight;
+			*result = search_weight;
+			return IGRAPH_SUCCESS;
 		}
 		search_weight=min_weight-1;
 	}

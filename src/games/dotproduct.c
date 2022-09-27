@@ -22,9 +22,10 @@
 */
 
 #include "igraph_games.h"
-#include "igraph_random.h"
-#include "igraph_constructors.h"
+
 #include "igraph_blas.h"
+#include "igraph_constructors.h"
+#include "igraph_random.h"
 
 /**
  * \function igraph_dot_product_game

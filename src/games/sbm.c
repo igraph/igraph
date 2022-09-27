@@ -22,11 +22,12 @@
 
 */
 
-#include "igraph_vector.h"
+#include "igraph_games.h"
+
+#include "igraph_constructors.h"
 #include "igraph_matrix.h"
 #include "igraph_random.h"
-#include "igraph_constructors.h"
-#include "igraph_games.h"
+#include "igraph_vector.h"
 
 #include "core/interruption.h"
 #include "math/safe_intop.h"

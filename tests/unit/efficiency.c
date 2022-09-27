@@ -105,6 +105,8 @@ int test_ring(void) {
     result = test_graph("Ring graph", &graph, weights_array);
     igraph_destroy(&graph);
 
+    VERIFY_FINALLY_STACK();
+
     return result;
 }
 
@@ -119,6 +121,8 @@ int test_small_graph(void) {
                  -1);
     result = test_graph("Small test graph", &graph, weights_array);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return result;
 }

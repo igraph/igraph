@@ -4,7 +4,8 @@ pool:
 variables:
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  ASAN_OPTIONS: color=always
+  CCACHE_MAXSIZE: 256M
+  ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
   OMP_NUM_THREADS: 1
 
 jobs:
@@ -100,7 +101,7 @@ jobs:
       # https://github.com/alpinelinux/alpine-chroot-install
       - bash: |
           set -e
-          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.13.2/alpine-chroot-install && echo '60c7e0b5d82e21d1a549fc9a46ba3b36688c09dc  alpine-chroot-install' | sha1sum -c || exit 1
+          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.14.0/alpine-chroot-install && echo 'ccbf65f85cdc351851f8ad025bb3e65bae4d5b06  alpine-chroot-install' | sha1sum -c || exit 1
           alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
           sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex gmp-dev'
           mkdir build && cd build

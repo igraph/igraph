@@ -103,8 +103,8 @@ igraph_error_t igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertice
  * the edge will be placed here.
  * \param to Pointer to an \type igraph_integer_t. The head (target) of the
  * edge will be placed here.
- * \return Error code. The current implementation always returns with
- * success.
+ * \return Error code.
+ *
  * \sa \ref igraph_get_eid() for the opposite operation;
  *     \ref igraph_edges() to get the endpoints of several edges;
  *     \ref IGRAPH_TO(), \ref IGRAPH_FROM() and \ref IGRAPH_OTHER() for
@@ -118,6 +118,10 @@ igraph_error_t igraph_edge(
     const igraph_t *graph, igraph_integer_t eid,
     igraph_integer_t *from, igraph_integer_t *to
 ) {
+
+    if (eid < 0 || eid >= igraph_ecount(graph)) {
+        IGRAPH_ERROR("Invalid edge ID when retrieving edge endpoints.", IGRAPH_EINVAL);
+    }
 
     if (igraph_is_directed(graph)) {
         *from = IGRAPH_FROM(graph, eid);

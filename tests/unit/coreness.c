@@ -96,7 +96,7 @@ void add_loop_and_multiple_edges(igraph_t* graph, igraph_real_t loop_prob, igrap
 
     n = igraph_vcount(graph);
     for (i = 0; i < n; i++) {
-        if (igraph_rng_get_unif01(igraph_rng_default()) < loop_prob) {
+        if (RNG_UNIF01() < loop_prob) {
             igraph_vector_int_push_back(&extra_edges, i);
             igraph_vector_int_push_back(&extra_edges, i);
         }
@@ -104,18 +104,18 @@ void add_loop_and_multiple_edges(igraph_t* graph, igraph_real_t loop_prob, igrap
 
     n = igraph_ecount(graph);
     for (i = 0; i < n; i++) {
-        if (igraph_rng_get_unif01(igraph_rng_default()) < multi_prob) {
+        if (RNG_UNIF01() < multi_prob) {
             igraph_edge(graph, i, &from, &to);
             igraph_vector_int_push_back(&extra_edges, from);
             igraph_vector_int_push_back(&extra_edges, to);
         }
     }
 
+    RNG_END();
+
     igraph_add_edges(graph, &extra_edges, 0);
 
     igraph_vector_int_destroy(&extra_edges);
-
-    RNG_END();
 }
 
 void remove_some_edges(igraph_t* graph, igraph_real_t prob) {
@@ -207,4 +207,8 @@ int main(void) {
     igraph_grg_game(&g, 100, 0.2, /* torus = */ 0, /* x = */ 0, /* y = */ 0);
     test_graph(&g, /* print = */ 0);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
+
+    return 0;
 }

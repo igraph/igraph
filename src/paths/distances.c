@@ -178,7 +178,7 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
             } else if (altdist < curdist) {
                 /* This is a shorter path */
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                igraph_2wheap_modify(&Q, tto, -altdist);
             }
         }
     }
@@ -491,9 +491,9 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
         ecc_u = VECTOR(ecc_vec)[0];
 
         if (!unconn && vid_ecc == -1) {
-            inf = 1;
+            inf = true;
         } else {
-            while (1) {
+            while (true) {
                 IGRAPH_ALLOW_INTERRUPTION();
 
                 ito = vid_ecc;
@@ -542,7 +542,7 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
         /* A directed graph is strongly connected iff all vertices are reachable
          * from vid_start both when moving along or moving opposite the edge directions. */
         if (!unconn && (vid_ecc_out == -1 || vid_ecc_in == -1)) {
-            inf = 1;
+            inf = true;
         } else {
             if (VECTOR(ecc_out)[0] > VECTOR(ecc_in)[0]) {
                 vid_ecc = vid_ecc_out;
@@ -780,7 +780,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
         /* A directed graph is strongly connected iff all vertices are reachable
          * from vid_start both when moving along or moving opposite the edge directions. */
         if (!unconn && (vid_ecc_out == -1 || vid_ecc_in == -1)) {
-            inf = 1;
+            inf = true;
         } else {
             if (ecc_out > ecc_in) {
                 vid_ecc = vid_ecc_out;

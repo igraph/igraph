@@ -22,10 +22,12 @@
 */
 
 #include "igraph_foreign.h"
+
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
+#include "core/interruption.h"
 #include "core/trie.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strcasecmp & strdup */
@@ -94,7 +96,7 @@ typedef struct igraph_i_graphml_attribute_record_t {
     union {
         igraph_real_t as_numeric;
         igraph_bool_t as_boolean;
-        char* as_string;
+        char *as_string;
     } default_value;   /* Default value of the attribute, if any */
     igraph_attribute_record_t record;
 } igraph_i_graphml_attribute_record_t;
@@ -229,8 +231,9 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
     } else if (rec->record.type == IGRAPH_ATTRIBUTE_UNSPECIFIED) {
         /* no value was set */
     }
-    if (rec->id != 0) {
-        IGRAPH_FREE(rec->id);
+    if (rec->id != NULL) {
+        xmlFree((void *) rec->id);
+        rec->id = NULL;
     }
     if (rec->record.name != 0) {
         IGRAPH_FREE(rec->record.name);
@@ -300,17 +303,15 @@ static void igraph_i_graphml_parser_state_destroy(struct igraph_i_graphml_parser
     igraph_vector_ptr_destroy_all(&state->g_attrs);
 
     if (state->data_key) {
-        free(state->data_key);
+        xmlFree((void *) state->data_key);
         state->data_key = NULL;
     }
     if (state->data_char) {
-        free(state->data_char);
-        state->data_char = NULL;
+        IGRAPH_FREE(state->data_char);
     }
 
     if (state->error_message) {
-        free(state->error_message);
-        state->error_message = NULL;
+        IGRAPH_FREE(state->error_message);
     }
 }
 
@@ -725,16 +726,14 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     }
 
     /* throw an error if there is no ID; this is a clear violation of the GraphML DTD */
-    if (rec->id == 0) {
+    if (rec->id == NULL) {
         IGRAPH_ERROR("Found <key> tag with no 'id' attribute.", IGRAPH_PARSEERROR);
     }
 
     /* in case of a missing attr.name attribute, use the id as the attribute name */
-    if (rec->record.name == 0) {
+    if (rec->record.name == NULL) {
         rec->record.name = strdup(rec->id);
-        if (rec->record.name == 0) {
-            IGRAPH_ERROR("Cannot duplicate attribute ID as name.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(rec->record.name, "Cannot duplicate attribute ID as name.");
     }
 
     /* if the attribute type is missing, ignore the attribute with a warning */
@@ -755,8 +754,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
              * Free everything and return. */
             if (rec) {
                 igraph_i_graphml_attribute_record_destroy(rec);
-                igraph_free(rec);
-                rec = NULL;
+                IGRAPH_FREE(rec);
             }
             IGRAPH_FINALLY_CLEAN(2);
             goto exit;
@@ -846,16 +844,16 @@ static igraph_error_t igraph_i_graphml_attribute_data_setup(
 
         if (xmlStrEqual(*it, toXmlChar("key"))) {
             if (state->data_key) {
-                free(state->data_key);
+                xmlFree((void *) state->data_key);
+                state->data_key = NULL;
             }
             state->data_key = xmlStrndup(XML_ATTR_VALUE(it));
             if (state->data_key == 0) {
                 return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
             }
             if (state->data_char) {
-                free(state->data_char);
+                IGRAPH_FREE(state->data_char);
             }
-            state->data_char = NULL;
             state->data_type = type;
         } else {
             /* ignore */
@@ -1039,7 +1037,7 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
         }
 
         if (graphmlrec->default_value.as_string != 0) {
-            free(graphmlrec->default_value.as_string);
+            IGRAPH_FREE(graphmlrec->default_value.as_string);
         }
         graphmlrec->default_value.as_string = str;
         str = NULL;
@@ -1647,6 +1645,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
                 if (!state.successful) {
                     break;
                 }
+                IGRAPH_ALLOW_INTERRUPTION();
             }
             xmlParseChunk(ctxt, buffer, res, 1);
         }
@@ -1679,7 +1678,7 @@ igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream, igraph
 
     /* ...and we can also put the error message pointer on the FINALLY stack */
     if (error_message != NULL) {
-        IGRAPH_FINALLY(free, error_message);
+        IGRAPH_FINALLY(igraph_free, error_message);
     }
 
     /* Trigger the stored error if needed */

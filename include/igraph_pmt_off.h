@@ -169,8 +169,16 @@
     #undef PRINTFUNC
 #endif
 
+#ifdef SNPRINTFUNC
+    #undef SNPRINTFUNC
+#endif
+
+#ifdef FPRINTFUNC_ALIGNED
+    #undef FPRINTFUNC_ALIGNED
+#endif
+
 #ifdef FPRINTFUNC
-    #undef PRINTFUNC
+    #undef FPRINTFUNC
 #endif
 
 #ifdef UNSIGNED

@@ -69,7 +69,7 @@ typedef igraph_error_t igraph_status_handler_t(const char *message, void *data);
 
 IGRAPH_EXPORT extern igraph_status_handler_t igraph_status_handler_stderr;
 
-IGRAPH_EXPORT igraph_status_handler_t * igraph_set_status_handler(igraph_status_handler_t new_handler);
+IGRAPH_EXPORT igraph_status_handler_t *igraph_set_status_handler(igraph_status_handler_t new_handler);
 
 IGRAPH_EXPORT igraph_error_t igraph_status(const char *message, void *data);
 

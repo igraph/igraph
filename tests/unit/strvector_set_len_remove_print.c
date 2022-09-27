@@ -19,8 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main(void)
-{
+int main(void) {
     igraph_strvector_t sv;
     char *test_string = "This is a string.";
     char *test_string2 = "A completely different one.";

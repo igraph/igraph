@@ -23,8 +23,7 @@
 
 #include <igraph.h>
 
-int main(void)
-{
+int main(void) {
 
     igraph_t g;
     igraph_vs_t vs;

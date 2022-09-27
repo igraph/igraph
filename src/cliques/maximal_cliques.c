@@ -295,7 +295,7 @@ static igraph_error_t igraph_i_maximal_cliques_up(
     igraph_integer_t vv;
 
     IGRAPH_UNUSED(PS);
-    IGRAPH_UNUSED(PE); // required because set but not read/used
+    IGRAPH_UNUSED(PE);
     IGRAPH_UNUSED(XE);
     IGRAPH_UNUSED(adjlist);
 

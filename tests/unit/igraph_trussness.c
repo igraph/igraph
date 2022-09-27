@@ -32,18 +32,17 @@
 #include "test_utilities.h"
 
 void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
-    igraph_integer_t i, n;
-    igraph_integer_t from, to;
-    n = igraph_vector_int_size(trussness);
-    printf("fromNode,toNode,truss\n");
+    igraph_integer_t i, n = igraph_vector_int_size(trussness);
+
+    printf("fromNode, toNode, trussness\n");
     for (i=0; i < n; i++) {
+        igraph_integer_t from, to;
         igraph_edge(graph, i, &from, &to);
-        printf("%" IGRAPH_PRId ",%" IGRAPH_PRId ",%" IGRAPH_PRId "\n", from, to, VECTOR(*trussness)[i]);
+        printf("%" IGRAPH_PRId ", %" IGRAPH_PRId ", %" IGRAPH_PRId "\n", from, to, VECTOR(*trussness)[i]);
     }
 
     igraph_vector_int_destroy(trussness);
     igraph_destroy(graph);
-
 }
 
 int main(void) {
@@ -100,7 +99,6 @@ int main(void) {
     print_and_destroy(&graph, &trussness);
 
     VERIFY_FINALLY_STACK();
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     /* Multigraph */
     printf("\nTrying multigraph:\n");
@@ -108,7 +106,7 @@ int main(void) {
     igraph_to_directed(&graph, IGRAPH_TO_DIRECTED_MUTUAL);
     igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_EACH, 0);
     igraph_vector_int_init(&trussness, 0);
-    IGRAPH_ASSERT(igraph_trussness(&graph, &trussness) == IGRAPH_UNIMPLEMENTED);
+    CHECK_ERROR(igraph_trussness(&graph, &trussness), IGRAPH_UNIMPLEMENTED);
     igraph_vector_int_destroy(&trussness);
     igraph_destroy(&graph);
 

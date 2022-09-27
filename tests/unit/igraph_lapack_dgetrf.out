@@ -10,9 +10,9 @@ Starting matrix:
 2 2 3
 1 1 1
 Returned matrix:
-7 8 9
+       7         8        9
 0.285714 -0.285714 0.428571
-0.142857 0.5 -0.5
+0.142857       0.5     -0.5
 Returned pivot indices:
 1 2 3
 info: 0
@@ -22,9 +22,9 @@ Starting matrix:
 2 2 3
 7 8 9
 Returned matrix:
-7 8 9
+       7         8        9
 0.285714 -0.285714 0.428571
-0.142857 0.5 -0.5
+0.142857       0.5     -0.5
 Returned pivot indices:
 3 2 3
 info: 0
@@ -34,8 +34,8 @@ Starting matrix:
 3 4 5
 6 7 8
 Returned matrix:
-6 7 8
-0 1 2
+  6   7 8
+  0   1 2
 0.5 0.5 0
 info: 3
 
@@ -43,7 +43,7 @@ Starting matrix:
 1 2 3
 4 5 6
 Returned matrix:
-4 5 6
+   4    5   6
 0.25 0.75 1.5
 Returned pivot indices:
 2 2
@@ -54,7 +54,7 @@ Starting matrix:
 3 4
 5 6
 Returned matrix:
-5 6
+  5   6
 0.2 0.8
 0.6 0.5
 Returned pivot indices:

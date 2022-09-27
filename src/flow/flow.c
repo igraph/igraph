@@ -42,8 +42,6 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
-#include "config.h"
-
 /*
  * Some general remarks about the functions in this file.
  *
@@ -1728,6 +1726,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
                                                     igraph_bool_t *done,
                                                     igraph_integer_t *no_conn) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t eid;
     igraph_bool_t conn;
     *done = 1;
     *no_conn = 0;
@@ -1762,16 +1761,11 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
         }
         break;
     case IGRAPH_VCONN_NEI_IGNORE:
-        {
-            igraph_integer_t eid;
-            igraph_vector_int_t multi;
-            igraph_get_eid(graph, &eid, source, target, /*directed=*/1, /*error=*/ 0);
-            if (eid >= 0) {
-                igraph_vector_int_view(&multi, no_conn, 1);
-                igraph_count_multiple(graph, &multi, igraph_ess_1(eid));
-            }
-            break;
+        IGRAPH_CHECK(igraph_get_eid(graph, &eid, source, target, IGRAPH_DIRECTED, /*error=*/ false));
+        if (eid >= 0) {
+            IGRAPH_CHECK(igraph_count_multiple_1(graph, no_conn, eid));
         }
+        break;
     default:
         IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'.", IGRAPH_EINVAL);
         break;
@@ -1797,7 +1791,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
 
     IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
     if (done) {
-        return (IGRAPH_SUCCESS);
+        return IGRAPH_SUCCESS;
     }
 
     /* Create the new graph */
@@ -1851,7 +1845,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
 
     IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
     if (done) {
-        return (IGRAPH_SUCCESS);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_copy(&newgraph, graph));
@@ -1891,9 +1885,9 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
  * \param neighbors A constant giving what to do if the two vertices
  *     are connected. Possible values:
  *     \c IGRAPH_VCONN_NEI_ERROR, stop with an error message,
- *     \c IGRAPH_VCONN_NEGATIVE, return -1.
- *     \c IGRAPH_VCONN_NUMBER_OF_NODES, return the number of nodes.
- *     \c IGRAPH_VCONN_IGNORE, ignore the fact that the two vertices
+ *     \c IGRAPH_VCONN_NEI_NEGATIVE, return -1.
+ *     \c IGRAPH_VCONN_NEI_NUMBER_OF_NODES, return the number of nodes.
+ *     \c IGRAPH_VCONN_NEI_IGNORE, ignore the fact that the two vertices
  *        are connected and calculate the number of vertices needed
  *        to eliminate all paths except for the trivial (direct) paths
  *        between \p source and \p vertex. TODO: what about neighbors?

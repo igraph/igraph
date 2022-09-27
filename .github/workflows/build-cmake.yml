@@ -11,6 +11,8 @@ on:
 
 env:
   OMP_NUM_THREADS: 1
+  CCACHE_DIR: ${{ github.workspace }}/ccache
+  CCACHE_MAXSIZE: 128M
 
 jobs:
   build:
@@ -37,7 +39,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-          install: git base-devel mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-ninja mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-suitesparse mingw-w64-${{ matrix.arch }}-lapack
+          install: git base-devel mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-ninja mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-ccache mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-lapack
           update: true
 
       - name: Checkout
@@ -49,14 +51,28 @@ jobs:
         run: |
           mkdir -p build-${{ matrix.arch }}
           cd build-${{ matrix.arch }}
-          cmake .. -GNinja -DBUILD_SHARED_LIBS=${{ matrix.shared_libs == 'shared' && 'ON' || 'OFF' }} -DIGRAPH_GLPK_SUPPORT=ON -DIGRAPH_GRAPHML_SUPPORT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DBLA_VENDOR=Generic -DIGRAPH_PRINT_ARITH_HEADER=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DFLEX_KEEP_LINE_NUMBERS=ON -DFORCE_COLORED_OUTPUT=ON -DIGRAPH_OPENMP_SUPPORT=ON
+          cmake .. -GNinja -DBUILD_SHARED_LIBS=${{ matrix.shared_libs == 'shared' && 'ON' || 'OFF' }} -DIGRAPH_GLPK_SUPPORT=ON -DIGRAPH_GRAPHML_SUPPORT=ON -DIGRAPH_ENABLE_TLS=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DBLA_VENDOR=Generic -DIGRAPH_PRINT_ARITH_HEADER=ON -DFLEX_KEEP_LINE_NUMBERS=ON -DFORCE_COLORED_OUTPUT=ON -DIGRAPH_OPENMP_SUPPORT=ON
+
+      - name: Ccache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-msys2-${{ matrix.arch }}-${{ matrix.shared_libs }}-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            ccache-msys2-${{ matrix.arch }}-${{ matrix.shared_libs }}-${{ github.ref_name }}-
+            ccache-msys2-${{ matrix.arch }}-${{ matrix.shared_libs }}-
+            ccache-msys2-${{ matrix.arch }}-
 
       - name: Build
         run: cmake --build . --target build_tests
         working-directory: build-${{ matrix.arch }}
+
       - name: Test
         run: ctest -j $(nproc) --output-on-failure --timeout 180
         working-directory: build-${{ matrix.arch }}
+
+      - name: Ccache stats
+        run: ccache -sv
 
       - name: Generate Artifacts upon Failure
         if: ${{ failure() }}

@@ -31,7 +31,6 @@
  * \function igraph_is_simple
  * \brief Decides whether the input graph is a simple graph.
  *
- * </para><para>
  * A graph is a simple graph if it does not contain loop edges and
  * multiple edges.
  *
@@ -102,7 +101,6 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_has_multiple
  * \brief Check whether the graph has at least one multiple edge.
  *
- * </para><para>
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
  *
@@ -172,13 +170,13 @@ igraph_error_t igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
  * \function igraph_is_multiple
  * \brief Find the multiple edges in a graph.
  *
- * </para><para>
  * An edge is a multiple edge if there is another
  * edge with the same head and tail vertices in the graph.
  *
  * </para><para>
  * Note that this function returns true only for the second or more
  * appearances of the multiple edges.
+ *
  * \param graph The input graph.
  * \param res Pointer to a boolean vector, the result will be stored
  *        here. It will be resized as needed.
@@ -234,18 +232,14 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
     return IGRAPH_SUCCESS;
 }
 
-
 /**
  * \function igraph_count_multiple
- * \brief Count the number of appearances of the edges in a graph.
+ * \brief The multiplicity of some edges in a graph.
  *
- * </para><para>
- * If the graph has no multiple edges then the result vector will be
- * filled with ones.
- * (An edge is a multiple edge if there is another
- * edge with the same head and tail vertices in the graph.)
+ * An edge is called a multiple edge when there is one or more other
+ * edge between the same two vertices. The multiplicity of an edge
+ * is the number of edges between its endpoints.
  *
- * </para><para>
  * \param graph The input graph.
  * \param res Pointer to a vector, the result will be stored
  *        here. It will be resized as needed.
@@ -253,7 +247,10 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
  *        to check all edges.
  * \return Error code.
  *
- * \sa \ref igraph_is_multiple() and \ref igraph_simplify().
+ * \sa \ref igraph_count_multiple_1() if you only need the multiplicity of a
+ * single edge; \ref igraph_is_multiple() if you are only interested in whether
+ * the graph has at least one edge with multiplicity greater than one;
+ * \ref igraph_simplify() to ensure that the graph has no multiple edges.
  *
  * Time complexity: O(E d), E is the number of edges to check and d is the
  * average degree (out-degree in directed graphs) of the vertices at the
@@ -262,12 +259,12 @@ igraph_error_t igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *r
 igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t *res, igraph_es_t es) {
     igraph_eit_t eit;
     igraph_integer_t i, j, n;
-    igraph_lazy_inclist_t inclist;
+    igraph_lazy_adjlist_t adjlist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
-    IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
     IGRAPH_CHECK(igraph_vector_int_resize(res, IGRAPH_EIT_SIZE(eit)));
 
@@ -275,25 +272,65 @@ igraph_error_t igraph_count_multiple(const igraph_t *graph, igraph_vector_int_t 
         igraph_integer_t e = IGRAPH_EIT_GET(eit);
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
-        igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, from);
+        igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, from);
 
-        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+        IGRAPH_CHECK_OOM(neis, "Failed to query adjacent vertices.");
 
         VECTOR(*res)[i] = 0;
 
         n = igraph_vector_int_size(neis);
         for (j = 0; j < n; j++) {
-            igraph_integer_t e2 = VECTOR(*neis)[j];
-            igraph_integer_t to2 = IGRAPH_OTHER(graph, e2, from);
-            if (to2 == to) {
+            if (VECTOR(*neis)[j] == to) {
                 VECTOR(*res)[i]++;
             }
         }
     }
 
-    igraph_lazy_inclist_destroy(&inclist);
+    igraph_lazy_adjlist_destroy(&adjlist);
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_count_multiple_1
+ * \brief The multiplicity of a single edge in a graph.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an iteger, the result will be stored here.
+ * \param eid The ID of the edge to check.
+ * \return Error code.
+ *
+ * \sa \ref igraph_count_multiple() if you need the multiplicity of multiple
+ * edges; \ref igraph_is_multiple() if you are only interested in whether the
+ * graph has at least one edge with multiplicity greater than one;
+ * \ref igraph_simplify() to ensure that the graph has no multiple edges.
+ *
+ * Time complexity: O(d), where d is the out-degree of the tail of the edge.
+ */
+igraph_error_t igraph_count_multiple_1(const igraph_t *graph, igraph_integer_t *res, igraph_integer_t eid)
+{
+    igraph_integer_t i, n, count;
+    igraph_integer_t from = IGRAPH_FROM(graph, eid);
+    igraph_integer_t to = IGRAPH_TO(graph, eid);
+    igraph_vector_int_t vids;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
+    IGRAPH_CHECK(igraph_neighbors(graph, &vids, from, IGRAPH_OUT));
+
+    count = 0;
+    n = igraph_vector_int_size(&vids);
+    for (i = 0; i < n; i++) {
+        if (VECTOR(vids)[i] == to) {
+            count++;
+        }
+    }
+
+    igraph_vector_int_destroy(&vids);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    *res = count;
 
     return IGRAPH_SUCCESS;
 }

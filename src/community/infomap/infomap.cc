@@ -29,7 +29,6 @@
    homePage: http://www.irit.fr/~Emmanuel.Navarro/
 */
 
-#include "igraph_interface.h"
 #include "igraph_community.h"
 
 #include "core/exceptions.h"
@@ -147,7 +146,6 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
 
             oldCodeLength = greedy.codeLength;
             bool moved = true;
-            // igraph_integer_t Nloops = 0;
             //igraph_integer_t count = 0;
             double inner_oldCodeLength = 1000;
 
@@ -155,7 +153,6 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
                 inner_oldCodeLength = greedy.codeLength;
                 moved = greedy.optimize();
 
-                // Nloops++;
                 //count++;
 
                 if (fabs(greedy.codeLength - inner_oldCodeLength) < 1.0e-10)

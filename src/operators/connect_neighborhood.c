@@ -93,14 +93,14 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
 
     for (i = 0; i < no_of_nodes; i++) {
         added[i] = i + 1;
-        igraph_neighbors(graph, &neis, i, mode);
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, mode));
         in = igraph_vector_int_size(&neis);
         if (order > 1) {
             for (j = 0; j < in; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];
                 added[nei] = i + 1;
-                igraph_dqueue_int_push(&q, nei);
-                igraph_dqueue_int_push(&q, 1);
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, 1));
             }
         }
 
@@ -108,7 +108,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
             igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
-            igraph_neighbors(graph, &neis, actnode, mode);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
             n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {

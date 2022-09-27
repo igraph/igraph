@@ -37,7 +37,7 @@ void
 4 5 0 |{}|
 ===
 LEDA.GRAPH
-float
+double
 void
 -1
 # Vertices
@@ -76,7 +76,7 @@ void
 ===
 LEDA.GRAPH
 void
-float
+double
 -2
 # Vertices
 5
@@ -113,16 +113,16 @@ string
 4 5 0 |{spam}|
 ===
 LEDA.GRAPH
-void
-float
+bool
+double
 -2
 # Vertices
 5
-|{}|
-|{}|
-|{}|
-|{}|
-|{}|
+|{false|}
+|{true|}
+|{false|}
+|{true|}
+|{false|}
 # Edges
 5
 1 2 0 |{123456789}|

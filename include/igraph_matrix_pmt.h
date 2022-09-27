@@ -225,10 +225,15 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, remove_row)(
 /*------------------------*/
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
-                                                  const char *format);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
-                                                  FILE *file);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FILE *file);
+
+#ifdef OUT_FORMAT
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m, const char *format);
+#endif /* OUT_FORMAT */
+
+/*-----------------------------------------*/
+/* Operations specific to complex matrices */
+/*-----------------------------------------*/
 
 #ifdef BASE_COMPLEX
 
@@ -250,7 +255,7 @@ IGRAPH_EXPORT igraph_bool_t igraph_matrix_complex_all_almost_e(igraph_matrix_com
                                                                 igraph_matrix_complex_t *rhs,
                                                                 igraph_real_t eps);
 
-#endif
+#endif /* BASE_COMPLEX */
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
     TYPE(igraph_matrix) *m, igraph_integer_t *index, igraph_integer_t nremove);

@@ -18,11 +18,12 @@
    */
 
 #include "igraph_layout.h"
+
 #include "igraph_interface.h"
 #include "igraph_lapack.h"
 #include "igraph_matrix.h"
-#include "igraph_random.h"
 #include "igraph_nongraph.h"
+#include "igraph_random.h"
 
 #include "layout/layout_internal.h"
 
@@ -117,7 +118,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
     /* Iterate over vertices x, like in the paper */
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         /* Edges into this vertex */
-        igraph_incident(graph, &eids, i, IGRAPH_ALL);
+        IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_ALL));
         no_of_neis = igraph_vector_int_size(&eids);
 
         /* Vertex has no neighbors */
@@ -677,7 +678,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
                 /* NOTE: the efficiency of this step could be improved but it
                  * should be only used for small graphs anyway, so it's fine */
                 igraph_bool_t skip = false;
-                igraph_incident(graph, &neis, from, IGRAPH_ALL);
+                IGRAPH_CHECK(igraph_incident(graph, &neis, from, IGRAPH_ALL));
                 nneis = igraph_vector_int_size(&neis);
                 for (igraph_integer_t k = 0; k < nneis; k++) {
                     igraph_integer_t eid2 = VECTOR(neis)[k];
@@ -873,17 +874,17 @@ static igraph_error_t igraph_i_layout_umap(
     IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
 
     if (use_seed) {
-        if((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
-          IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
-                  IGRAPH_EINVAL, no_of_nodes, ndim,
-                  igraph_matrix_nrow(res),
-                  igraph_matrix_ncol(res));
+        if ((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
+            IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
+                          IGRAPH_EINVAL, no_of_nodes, ndim,
+                          igraph_matrix_nrow(res),
+                          igraph_matrix_ncol(res));
         }
 
         /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
-        if (no_of_nodes <= 1)
+        if (no_of_nodes <= 1) {
             return IGRAPH_SUCCESS;
-
+        }
     } else {
          /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
          if (no_of_nodes <= 1) {
@@ -932,7 +933,9 @@ static igraph_error_t igraph_i_layout_umap(
  * \function igraph_layout_umap
  * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction.
  *
- * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
+ * \experimental
+ *
+ * UMAP is mostly used to embed high-dimensional vectors in a low-dimensional space
  * (most commonly by far, 2D). The algorithm is probabilistic and introduces
  * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
  * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
@@ -952,10 +955,11 @@ static igraph_error_t igraph_i_layout_umap(
  *
  * </para><para>
  *
- * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
+ * <code>corr(v1, v2) = v1 . v2 / [ sqrt(v1 . v1) * sqrt(v2 . v2) ]</code>,
  *
  * </para><para>
  *
+ * where <code>.</code> denotes the dot product.
  * In this case, the associated distance is usually defined as:
  *
  * </para><para>
@@ -984,7 +988,7 @@ static igraph_error_t igraph_i_layout_umap(
  * </para><para>
  *
  * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
- *    weighted or unweighted. If unsure, compute a knn.
+ *    weighted or unweighted. If unsure, compute a k-nearest neighbors graph.
  *
  * </para><para>
  *
@@ -1017,21 +1021,19 @@ static igraph_error_t igraph_i_layout_umap(
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
- *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
+ *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
+ *   That is fine here too. If this argument \c NULL, all lengths are assumed to be the same.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
  *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
  *   number.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
- *   (less than 50k edges), 50 epochs are used for larger graphs.
+ *   (less than 50000 edges), 50 epochs are used for larger graphs.
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
  *
  * \return Error code.
- *
- * \experimental
  */
 igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   igraph_matrix_t *res,
@@ -1049,6 +1051,8 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \function igraph_layout_umap_3d
  * \brief 3D layout using UMAP.
  *
+ * \experimental
+ *
  * This is the 3D version of the UMAP algorithm
  * (see \ref igraph_layout_umap() for the 2D version).
  *
@@ -1058,21 +1062,19 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
- *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
+ *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
+ *   That is fine here too. If this argument is \c NULL, all lengths are assumed to be the same.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
  *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
  *   number.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
- *   (less than 50k edges), 50 epochs are used for larger graphs.
+ *   (less than 50000 edges), 50 epochs are used for larger graphs.
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
  *
  * \return Error code.
- *
- * \experimental
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_matrix_t *res,

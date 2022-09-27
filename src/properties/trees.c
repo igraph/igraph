@@ -99,7 +99,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
         igraph_integer_t root = VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
-        igraph_dqueue_int_push(&Q, root);
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, root));
 
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
@@ -119,8 +119,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
                     if (! VECTOR(seen_vertices)[nei]) {
 
-                        igraph_vector_int_push_back(&edges, from);
-                        igraph_vector_int_push_back(&edges, to);
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
 
                         VECTOR(seen_vertices)[nei] = 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
@@ -133,11 +133,11 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                         }
 
                         if (from == nei) {
-                            igraph_vector_int_push_back(&edges, v_ptr++);
-                            igraph_vector_int_push_back(&edges, to);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v_ptr++));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
                         } else {
-                            igraph_vector_int_push_back(&edges, from);
-                            igraph_vector_int_push_back(&edges, v_ptr++);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v_ptr++));
                         }
                     }
                 }

@@ -246,7 +246,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* This is a shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                    igraph_2wheap_modify(&Q, tto, -altdist);
                 }
             }
         } /* !igraph_2wheap_empty(&Q) */
@@ -631,7 +631,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* This is a shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(Q, tto, -altdist));
+                    igraph_2wheap_modify(Q, tto, -altdist);
                 }
             }
 
@@ -1233,7 +1233,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
                     /* A shorter path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                    igraph_2wheap_modify(&Q, tto, -altdist);
                 }
             }
 
@@ -1342,6 +1342,19 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  * \function igraph_get_k_shortest_paths
  * \brief k shortest paths between two vertices.
  *
+ * This function returns the \p k shortest paths between two vertices, in order of
+ * increasing lengths.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Yen, Jin Y.:
+ * An algorithm for finding shortest routes from all source nodes to a given
+ * destination in general networks.
+ * Quarterly of Applied Mathematics. 27 (4): 526–530. (1970)
+ * https://doi.org/10.1090/qam/253822
+ *
  * \param graph The graph object.
  * \param weights The edge weights of the graph. Can be \c NULL for an
  *        unweighted graph. Infinite weights will be treated as missing
@@ -1381,6 +1394,9 @@ static igraph_real_t igraph_i_get_total_weight_of_path(
  *        \cli IGRAPH_EINVAL
  *           Invalid argument.
  *        \endclist
+ *
+ * \sa \ref igraph_get_all_simple_paths(), \ref igraph_get_shortest_paths(),
+ * \ref igraph_get_shortest_paths_dijkstra()
  *
  * Time complexity:  k |V| (|V| log|V| + |E|), where |V| is the number of vertices,
  *                  and |E| is the number of edges.

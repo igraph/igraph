@@ -26,8 +26,7 @@
 
 #include "test_utilities.h"
 
-igraph_bool_t test_from_prufer_back_to_prufer(void)
-{
+igraph_bool_t test_from_prufer_back_to_prufer(void) {
     igraph_t graph;
     igraph_integer_t prufer[] = {2, 3, 2, 3};
 
@@ -49,8 +48,7 @@ igraph_bool_t test_from_prufer_back_to_prufer(void)
     return success;
 }
 
-igraph_bool_t test_from_prufer_back_to_prufer_with_resize(void)
-{
+igraph_bool_t test_from_prufer_back_to_prufer_with_resize(void) {
     igraph_t graph;
     igraph_integer_t prufer[] = {0, 2, 4, 1, 1, 0};
 
@@ -72,8 +70,7 @@ igraph_bool_t test_from_prufer_back_to_prufer_with_resize(void)
     return success;
 }
 
-igraph_bool_t test_from_prufer_back_to_prufer_with_resize2(void)
-{
+igraph_bool_t test_from_prufer_back_to_prufer_with_resize2(void) {
     igraph_t graph;
     igraph_integer_t prufer[] = {2, 4, 5, 1, 3};
 
@@ -161,8 +158,7 @@ int test_num = 0;
         return test_num; \
     }
 
-int main(void)
-{
+int main(void) {
 
     RNG_BEGIN();
 

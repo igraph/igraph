@@ -222,8 +222,6 @@ int main(void) {
     );
     igraph_vector_int_list_destroy(&list);
 
-    /* TODO(ntamas): test insert, insert_copy, insert_new, swap, swap_elements */
-
     VERIFY_FINALLY_STACK();
 
     return 0;

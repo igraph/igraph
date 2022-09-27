@@ -604,8 +604,10 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
     case IGRAPH_VS_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy vertex selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     default:
         break;
@@ -1500,15 +1502,19 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     case IGRAPH_ES_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     case IGRAPH_ES_PATH:
     case IGRAPH_ES_PAIRS:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.path.ptr));
         dest->data.path.ptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     default:
         break;

@@ -639,8 +639,8 @@ igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_integer_
                     VECTOR(*res)[node] += w;
                 }
                 if (dist <= k && VECTOR(marked)[nei] != node + 1) {
-                    igraph_dqueue_int_push(&Q, nei);
-                    igraph_dqueue_int_push(&Q, dist);
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, dist));
                     VECTOR(marked)[nei] = node + 1;
                 }
             }

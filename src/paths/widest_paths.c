@@ -27,7 +27,6 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_qsort.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"
@@ -226,7 +225,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
                 /* This is a wider path */
                 VECTOR(widths)[tto] = altwidth;
                 parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, altwidth));
+                igraph_2wheap_modify(&Q, tto, altwidth);
             }
         }
     } /* !igraph_2wheap_empty(&Q) */
@@ -721,7 +720,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, altwidth));
                 } else if (altwidth > curwidth) {
                     /* This is a wider path */
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, altwidth));
+                    igraph_2wheap_modify(&Q, tto, altwidth);
                 }
             }
 

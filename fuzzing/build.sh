@@ -4,7 +4,10 @@ export DEPS_PATH=/src/deps
 mkdir $DEPS_PATH
 
 # Build libxml2 without ICU support, https://github.com/igraph/igraph/issues/1992 
-cd $SRC/libxml2-2.9.13 
+cd $SRC
+wget https://download.gnome.org/sources/libxml2/2.10/libxml2-2.10.2.tar.xz
+tar xf libxml2-2.10.2.tar.xz
+cd libxml2-2.10.2
 mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$DEPS_PATH -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLIBXML2_WITH_ICU=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_LZMA=OFF
 make install -j$(nproc)

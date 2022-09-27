@@ -25,8 +25,6 @@
 #include "igraph_memory.h"
 #include "igraph_sparsemat.h"
 
-#include "config.h"
-
 #include <string.h>
 #include <math.h>
 
@@ -631,9 +629,9 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
         ));
     }
 
-    igraph_sparsemat_compress(&mu, &m);
+    IGRAPH_CHECK(igraph_sparsemat_compress(&mu, &m));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
-    igraph_sparsemat_dupl(&m);
+    IGRAPH_CHECK(igraph_sparsemat_dupl(&m));
 
     IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
     while (!igraph_sparsemat_iterator_end(&mit)) {
@@ -776,7 +774,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
     /* Find the row/columnwise maxima */
     igraph_sparsemat_compress(&mu, &m);
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
-    igraph_sparsemat_dupl(&m);
+    IGRAPH_CHECK(igraph_sparsemat_dupl(&m));
     IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
     while (!igraph_sparsemat_iterator_end(&mit)) {
         igraph_real_t value = igraph_sparsemat_iterator_get(&mit);
@@ -889,7 +887,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
     rand = 0.0;
     igraph_sparsemat_compress(&mu, &m);
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
-    igraph_sparsemat_dupl(&m);
+    IGRAPH_CHECK(igraph_sparsemat_dupl(&m));
 
     IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
     while (!igraph_sparsemat_iterator_end(&mit)) {

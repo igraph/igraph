@@ -234,11 +234,11 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
                 VECTOR(indegrees)[i] = VECTOR(outdegrees)[i] = -1;
             } else {
                 /* This is a source */
-                igraph_dqueue_int_push(&sources, i);
+                IGRAPH_CHECK(igraph_dqueue_int_push(&sources, i));
             }
         } else if (VECTOR(outdegrees)[i] == 0) {
             /* This is a sink */
-            igraph_dqueue_int_push(&sinks, i);
+            IGRAPH_CHECK(igraph_dqueue_int_push(&sinks, i));
         }
     }
 

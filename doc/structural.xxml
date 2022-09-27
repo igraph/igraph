@@ -22,6 +22,7 @@
 <!-- doxrox-include igraph_distances_dijkstra -->
 <!-- doxrox-include igraph_distances_bellman_ford -->
 <!-- doxrox-include igraph_distances_johnson -->
+<!-- doxrox-include igraph_distances_floyd_warshall -->
 <!-- doxrox-include igraph_get_shortest_paths -->
 <!-- doxrox-include igraph_get_shortest_path -->
 <!-- doxrox-include igraph_get_shortest_paths_dijkstra -->
@@ -188,6 +189,7 @@
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
+<!-- doxrox-include igraph_count_multiple_1 -->
 </section>
 
 <section id="mixing-patterns"><title>Mixing patterns</title>

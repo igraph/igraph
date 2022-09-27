@@ -64,7 +64,7 @@ prpack_base_graph::prpack_base_graph(const prpack_csc* g) {
 prpack_base_graph::prpack_base_graph(const prpack_int64_csc* g) {
     initialize();
     // TODO remove the assert and add better behavior
-    assert(num_vs <= std::numeric_limits<int>::max());
+    assert(g->num_vs <= std::numeric_limits<int>::max());
     num_vs = (int)g->num_vs;
     num_es = (int)g->num_es;
     // fill in heads and tails
@@ -138,6 +138,7 @@ prpack_base_graph::prpack_base_graph(const prpack_edge_list* g) {
     delete[] osets;
 }
 
+#if 0
 prpack_base_graph::prpack_base_graph(const char* filename, const char* format, const bool weighted) {
     initialize();
     FILE* f = fopen(filename, "r");
@@ -159,6 +160,7 @@ prpack_base_graph::prpack_base_graph(const char* filename, const char* format, c
     }
     fclose(f);
 }
+#endif
 
 prpack_base_graph::~prpack_base_graph() {
     delete[] heads;
@@ -166,6 +168,7 @@ prpack_base_graph::~prpack_base_graph() {
     delete[] vals;
 }
 
+#if 0
 void prpack_base_graph::read_smat(FILE* f, const bool weighted) {
     // read in header
     double ignore = 0.0;
@@ -275,6 +278,7 @@ void prpack_base_graph::read_ascii(FILE* f) {
     }
     delete[] al;
 }
+#endif
 
 prpack_base_graph::prpack_base_graph(int nverts, int nedges,
         std::pair<int,int>* edges) {

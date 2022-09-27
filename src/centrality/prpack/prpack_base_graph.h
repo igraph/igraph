@@ -11,10 +11,12 @@ namespace prpack {
     class prpack_base_graph {
         private:
             // helper methods
-            void initialize(void);
+            void initialize();
+#if 0
             void read_smat(std::FILE* f, const bool weighted);
             void read_edges(std::FILE* f);
             void read_ascii(std::FILE* f);
+#endif
         public:
             // instance variables
             int num_vs;
@@ -29,7 +31,9 @@ namespace prpack {
             prpack_base_graph(const prpack_int64_csc* g);
             prpack_base_graph(const prpack_csr* g);
             prpack_base_graph(const prpack_edge_list* g);
+#if 0
             prpack_base_graph(const char* filename, const char* format, const bool weighted);
+#endif
             prpack_base_graph(int nverts, int nedges, std::pair<int,int>* edges);
             // destructor
             ~prpack_base_graph();

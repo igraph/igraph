@@ -1248,7 +1248,8 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                 *(result) = e; \
                 if (result_pos != 0) { *(result_pos) = start; } \
             } \
-        } } while(0)
+        } \
+    } while (0)
 
 #define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid) \
     do { \
@@ -1277,26 +1278,26 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  * \function igraph_get_eid
  * \brief Get the edge ID from the end points of an edge.
  *
- * For undirected graphs \c pfrom and \c pto are exchangeable.
+ * For undirected graphs \c from and \c to are exchangeable.
  *
  * \param graph The graph object.
  * \param eid Pointer to an integer, the edge ID will be stored here.
- * \param pfrom The starting point of the edge.
- * \param pto The end point of the edge.
+ * \param from The starting point of the edge.
+ * \param to The end point of the edge.
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge
  *        was not found. If it is false, then -1 will be assigned to \p eid.
- *        Note that invalid vertex IDs in input arguments (\p pfrom or \p pto)
+ *        Note that invalid vertex IDs in input arguments (\p from or \p to)
  *        always return an error code.
  * \return Error code.
  * \sa \ref igraph_edge() for the opposite operation, \ref igraph_get_all_eids_between()
  *     to retrieve all edge IDs between a pair of vertices.
  *
  * Time complexity: O(log (d)), where d is smaller of the out-degree
- * of \c pfrom and in-degree of \c pto if \p directed is true. If \p directed
+ * of \c from and in-degree of \c to if \p directed is true. If \p directed
  * is false, then it is O(log(d)+log(d2)), where d is the same as before and
- * d2 is the minimum of the out-degree of \c pto and the in-degree of \c pfrom.
+ * d2 is the minimum of the out-degree of \c to and the in-degree of \c from.
  *
  * \example examples/simple/igraph_get_eid.c
  *
@@ -1304,14 +1305,13 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  */
 
 igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
-                   igraph_integer_t pfrom, igraph_integer_t pto,
+                   igraph_integer_t from, igraph_integer_t to,
                    igraph_bool_t directed, igraph_bool_t error) {
 
-    igraph_integer_t from = pfrom, to = pto;
-    igraph_integer_t nov = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    if (from < 0 || to < 0 || from > nov - 1 || to > nov - 1) {
-        IGRAPH_ERROR("cannot get edge ID", IGRAPH_EINVVID);
+    if (from < 0 || to < 0 || from >= no_of_nodes || to >= no_of_nodes) {
+        IGRAPH_ERROR("Cannot get edge ID.", IGRAPH_EINVVID);
     }
 
     *eid = -1;

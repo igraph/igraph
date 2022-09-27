@@ -42,7 +42,7 @@ igraph_bool_t has_multiple(const igraph_t *graph) {
 
 #define ERR() do {              \
         printf("Seed: %" IGRAPH_PRIu "\n", seed);           \
-        igraph_write_graph_edgelist(&ws, stdout); \
+        print_graph(&ws); \
     } while (0)
 
 #define SEED() do {                         \

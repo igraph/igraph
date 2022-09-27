@@ -42,7 +42,6 @@
 
 */
 
-#include "config.h"
 #include <stdlib.h>
 
 #include "io/gml-header.h"

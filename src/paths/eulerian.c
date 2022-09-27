@@ -323,8 +323,7 @@ static igraph_error_t igraph_i_is_eulerian_directed(
  * \param has_path Pointer to a Boolean, will be set to true if an Eulerian path exists.
  * \param has_cycle Pointer to a Boolean, will be set to true if an Eulerian cycle exists.
  * \return Error code:
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
+ *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges.
  *
@@ -582,6 +581,9 @@ static igraph_error_t igraph_i_eulerian_path_directed(
  * that traverses each edge precisely once.
  *
  * </para><para>
+ * If the graph has no edges, a zero-length cycle is returned.
+ *
+ * </para><para>
  * This function uses Hierholzer's algorithm.
  *
  * \param graph The graph object.
@@ -595,7 +597,7 @@ static igraph_error_t igraph_i_eulerian_path_directed(
  *        \clist
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
- *        \cli IGRAPH_EINVVID
+ *        \cli IGRAPH_ENOSOL
  *           graph does not have an Eulerian cycle.
  *        \endclist
  *
@@ -614,7 +616,7 @@ igraph_error_t igraph_eulerian_cycle(
         IGRAPH_CHECK(igraph_i_is_eulerian_directed(graph, &has_path, &has_cycle, &start_of_path));
 
         if (!has_cycle) {
-            IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_ENOSOL);
         }
 
         IGRAPH_CHECK(igraph_i_eulerian_path_directed(graph, edge_res, vertex_res, start_of_path));
@@ -622,7 +624,7 @@ igraph_error_t igraph_eulerian_cycle(
         IGRAPH_CHECK(igraph_i_is_eulerian_undirected(graph, &has_path, &has_cycle, &start_of_path));
 
         if (!has_cycle) {
-            IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_ENOSOL);
         }
 
         IGRAPH_CHECK(igraph_i_eulerian_path_undirected(graph, edge_res, vertex_res, start_of_path));
@@ -641,6 +643,9 @@ igraph_error_t igraph_eulerian_cycle(
  * each edge precisely once.
  *
  * </para><para>
+ * If the graph has no edges, a zero-length path is returned.
+ *
+ * </para><para>
  * This function uses Hierholzer's algorithm.
  *
  * \param graph The graph object.
@@ -654,7 +659,7 @@ igraph_error_t igraph_eulerian_cycle(
  *        \clist
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
- *        \cli IGRAPH_EINVVID
+ *        \cli IGRAPH_ENOSOL
  *           graph does not have an Eulerian path.
  *        \endclist
  *
@@ -673,14 +678,14 @@ igraph_error_t igraph_eulerian_path(
         IGRAPH_CHECK(igraph_i_is_eulerian_directed(graph, &has_path, &has_cycle, &start_of_path));
 
         if (!has_path) {
-            IGRAPH_ERROR("The graph does not have an Eulerian path.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The graph does not have an Eulerian path.", IGRAPH_ENOSOL);
         }
         IGRAPH_CHECK(igraph_i_eulerian_path_directed(graph, edge_res, vertex_res, start_of_path));
     } else {
         IGRAPH_CHECK(igraph_i_is_eulerian_undirected(graph, &has_path, &has_cycle, &start_of_path));
 
         if (!has_path) {
-            IGRAPH_ERROR("The graph does not have an Eulerian path.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("The graph does not have an Eulerian path.", IGRAPH_ENOSOL);
         }
 
         IGRAPH_CHECK(igraph_i_eulerian_path_undirected(graph, edge_res, vertex_res, start_of_path));

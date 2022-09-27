@@ -651,12 +651,12 @@ igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
                       igraph_vector_int_t *p) {
     AP *ap;
 
-    if(n != igraph_matrix_nrow(c)) {
+    if (n != igraph_matrix_nrow(c)) {
         IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
                       "not equal to number of agents (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       n, igraph_matrix_nrow(c));
     }
-    if(n != igraph_matrix_ncol(c)) {
+    if (n != igraph_matrix_ncol(c)) {
         IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
                       "not equal to number of tasks (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       n, igraph_matrix_ncol(c));

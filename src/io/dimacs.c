@@ -70,36 +70,43 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  *
  * This function reads the DIMACS file format, more specifically the
  * version for network flow problems, see the files at
- * ftp://dimacs.rutgers.edu/pub/netflow/general-info/
+ * http://archive.dimacs.rutgers.edu/pub/netflow/general-info/
  *
  * </para><para>
  * This is a line-oriented text file (ASCII) format. The first
  * character of each line defines the type of the line. If the first
- * character is <code>c</code> the line is a comment line and it is
- * ignored. There is one problem line (<code>p</code> in the file, it
+ * character is \c c the line is a comment line and it is
+ * ignored. There is one problem line (\c p in the file), it
  * must appear before any node and arc descriptor lines. The problem
  * line has three fields separated by spaces: the problem type
- * (<code>min</code>, <code>max</code> or <code>asn</code>), the
- * number of vertices and number of edges in the graph.
- * Exactly two node identification lines are expected
- * (<code>n</code>), one for the source, one for the target vertex.
- * These have two fields: the id of the vertex and the type of the
- * vertex, either <code>s</code> (=source) or <code>t</code>
- * (=target). Arc lines start with <code>a</code> and have three
- * fields: the source vertex, the target vertex and the edge capacity.
+ * (\c max or \c edge), the number of vertices,
+ * and number of edges in the graph. In MAX problems,
+ * exactly two node identification lines are expected
+ * (\c n), one for the source, and one for the target vertex.
+ * These have two fields: the ID of the vertex and the type of the
+ * vertex, either \c s ( = source) or \c t ( = target).
+ * Arc lines start with \c a and have three fields: the source vertex,
+ * the target vertex and the edge capacity. In EDGE problems,
+ * there may be a node line (\c n) for each node. It specifies the
+ * node index and an integer node label. Nodes for which no explicit
+ * label was specified will use their index as label. In EDGE problems,
+ * each edge is specified as an edge line (\c e).
  *
  * </para><para>
- * Vertex IDs are numbered from 1.
+ * Within DIMACS files, vertex IDs are numbered from 1.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The file to read from.
- * \param source Pointer to an integer, the id of the source node will
+ * \param problem If not \c NULL, it will contain the problem type.
+ * \param label If not \c NULL, node labels will be stored here for \c edge
+ *    problems. Ignored for \c max problems.
+ * \param source Pointer to an integer, the ID of the source node will
  *    be stored here. (The igraph vertex ID, which is one less than
- *    the actual number in the file.) It is ignored if
- *    <code>NULL</code>.
- * \param target Pointer to an integer, the (igraph) id of the target
- *    node will be stored here. It is ignored if <code>NULL</code>.
+ *    the actual number in the file.) It is ignored if \c NULL.
+ * \param target Pointer to an integer, the (igraph) ID of the target
+ *    node will be stored here. It is ignored if \c NULL.
  * \param capacity Pointer to an initialized vector, the capacity of
- *    the edges will be stored here if not <code>NULL</code>.
+ *    the edges will be stored here if not \ NULL.
  * \param directed Boolean, whether to create a directed graph.
  * \return Error code.
  *
@@ -108,13 +115,14 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  *
  * \sa \ref igraph_write_graph_dimacs()
  */
-igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
-                             igraph_strvector_t *problem,
-                             igraph_vector_int_t *label,
-                             igraph_integer_t *source,
-                             igraph_integer_t *target,
-                             igraph_vector_t *capacity,
-                             igraph_bool_t directed) {
+igraph_error_t igraph_read_graph_dimacs_flow(
+        igraph_t *graph, FILE *instream,
+        igraph_strvector_t *problem,
+        igraph_vector_int_t *label,
+        igraph_integer_t *source,
+        igraph_integer_t *target,
+        igraph_vector_t *capacity,
+        igraph_bool_t directed) {
 
     igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = -1;
@@ -123,10 +131,11 @@ igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
     igraph_integer_t ttarget = -1;
     char prob[21];
     char c;
-    int problem_type = 0;
-
-#define PROBLEM_EDGE  1
-#define PROBLEM_MAX   2
+    enum {
+        PROBLEM_NONE,
+        PROBLEM_EDGE,
+        PROBLEM_MAX
+    } problem_type = PROBLEM_NONE;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     if (capacity) {
@@ -135,7 +144,7 @@ igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
 
     while (!feof(instream)) {
         int read;
-        char str[3];
+        char str[2];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -177,11 +186,7 @@ igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
                 /* edge list */
                 problem_type = PROBLEM_EDGE;
                 if (label) {
-                    igraph_integer_t i;
-                    IGRAPH_CHECK(igraph_vector_int_resize(label, no_of_nodes));
-                    for (i = 0; i < no_of_nodes; i++) {
-                        VECTOR(*label)[i] = i + 1;
-                    }
+                    IGRAPH_CHECK(igraph_vector_int_range(label, 1, no_of_nodes+1));
                 }
             } else if (!strcmp(prob, "max")) {
                 /* maximum flow problem */
@@ -225,10 +230,15 @@ igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE *instream,
                     IGRAPH_ERROR("Invalid node descriptor line in DIMACS file.",
                                  IGRAPH_PARSEERROR);
                 }
-            } else {
+            } else { /* PROBLEM_EDGE */
                 read = fscanf(instream, "%" IGRAPH_PRId " %" IGRAPH_PRId "", &tmp, &tmp2);
                 EXPECT(read, 1);
                 if (label) {
+                    if (tmp < 0 || tmp >= no_of_nodes) {
+                        IGRAPH_ERRORF("Invalid node index %" IGRAPH_PRId " in DIMACS file. "
+                                      "Number of nodes was given as %" IGRAPH_PRId".",
+                                      IGRAPH_PARSEERROR, tmp, no_of_nodes);
+                    }
                     VECTOR(*label)[tmp] = tmp2;
                 }
             }

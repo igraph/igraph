@@ -210,8 +210,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         igraph_integer_t it = 0;
         igraph_real_t epsilon = 10e-6;
         igraph_real_t maxchange = epsilon + 1;
-        igraph_integer_t pairs;
-    IGRAPH_UNUSED(pairs); // required because set but not used
+        /* igraph_integer_t pairs; */
         igraph_real_t sconst = sqrt(area / M_PI) / H_n;
         igraph_2dgrid_iterator_t vidit;
 
@@ -277,8 +276,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
             for (k = 0; k < igraph_vector_int_size(&eids); k++) {
                 igraph_integer_t eid = VECTOR(eids)[k];
-                igraph_integer_t from, to;
-                igraph_edge(graph, eid, &from, &to);
+                igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
                 if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
                     (to   != vid && igraph_2dgrid_in(&grid, to))) {
                     igraph_vector_int_push_back(&edges, eid);
@@ -307,10 +305,10 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             /* attractive "forces" along the edges */
             for (jj = 0; jj < igraph_vector_int_size(&edges); jj++) {
-                igraph_integer_t from, to;
+                igraph_integer_t from = IGRAPH_FROM(graph, VECTOR(edges)[jj]);
+                igraph_integer_t to = IGRAPH_TO(graph, VECTOR(edges)[jj]);
                 igraph_real_t xd, yd, dist, force;
                 IGRAPH_ALLOW_INTERRUPTION();
-                igraph_edge(graph, VECTOR(edges)[jj], &from, &to);
                 xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
                 yd = MATRIX(*res, from, 1) - MATRIX(*res, to, 1);
                 dist = sqrt(xd*xd + yd*yd);
@@ -326,7 +324,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             }
 
             /* repulsive "forces" of the vertices nearby */
-            pairs = 0;
+            /* pairs = 0; */
             igraph_2dgrid_reset(&grid, &vidit);
             while ( (vid = igraph_2dgrid_next(&grid, &vidit) - 1) != -1) {
                 while ( (nei = igraph_2dgrid_next_nei(&grid, &vidit) - 1) != -1) {
@@ -335,7 +333,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                     igraph_real_t dist = sqrt(xd*xd + yd*yd);
                     igraph_real_t force;
                     if (dist < cellsize) {
-                        pairs++;
+                        /* pairs++; */
                         if (dist == 0) {
                             dist = epsilon;
                         };
