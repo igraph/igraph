@@ -36,8 +36,7 @@ int main(void) {
     igraph_vs_size(&g, &vs, &size);
     printf("%" IGRAPH_PRId " ", size);
     igraph_vit_create(&g, vs, &vit);
-    while (!IGRAPH_VIT_END(vit))
-    {
+    while (!IGRAPH_VIT_END(vit)) {
         printf("%" IGRAPH_PRId " ", IGRAPH_VIT_GET(vit));
         IGRAPH_VIT_NEXT(vit);
     }
@@ -51,8 +50,7 @@ int main(void) {
     igraph_full(&g, 10, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
     igraph_vs_nonadj(&vs, 0, IGRAPH_ALL);
     igraph_vit_create(&g, vs, &vit);
-    while (!IGRAPH_VIT_END(vit))
-    {
+    while (!IGRAPH_VIT_END(vit)) {
         printf("%" IGRAPH_PRId " ", IGRAPH_VIT_GET(vit));
         IGRAPH_VIT_NEXT(vit);
     }
@@ -61,6 +59,7 @@ int main(void) {
     igraph_vit_destroy(&vit);
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
+
 
     return 0;
 }

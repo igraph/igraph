@@ -268,15 +268,15 @@ public:
     // constructor / destructor
     dendro(); ~dendro();
     // build dendrogram from g
-    void buildDendrogram(void);
+    void buildDendrogram();
     // delete dendrograph in prep for importDendrogramStructure
-    void clearDendrograph(void);
+    void clearDendrograph();
     // read dendrogram structure from HRG structure
     bool importDendrogramStructure(const igraph_hrg_t *hrg);
     // (consensus tree) delete splits with less than 0.5 weight
-    void cullSplitHist(void);
+    void cullSplitHist();
     // return size of consensus split
-    int getConsensusSize(void);
+    int getConsensusSize();
     // return split tree with consensus splits
     splittree* getConsensusSplits();
     // return likelihood of G given D
@@ -286,7 +286,7 @@ public:
     // return total weight of splittree
     double getSplitTotalWeight();
     // make random G from D
-    void makeRandomGraph(void);
+    void makeRandomGraph();
     // make single MCMC move
     bool monteCarloMove(double&, bool&, const double);
     // record consensus tree from splithist
@@ -297,15 +297,15 @@ public:
     // record G structure to igraph graph
     void recordGraphStructure(igraph_t *graph);
     // force refresh of log-likelihood value
-    void refreshLikelihood(void);
+    void refreshLikelihood();
     // sample dendrogram edge likelihoods and update edge histograms
-    void sampleAdjacencyLikelihoods(void);
+    void sampleAdjacencyLikelihoods();
     // reset the dendrograph structures
-    void resetDendrograph(void);
+    void resetDendrograph();
     // sample dendrogram's splits and update the split histogram
     bool sampleSplitLikelihoods(igraph_integer_t&);
     // reset splits histogram
-    void resetAllSplits(void);
+    void resetAllSplits();
 };
 
 } // namespace fitHRG

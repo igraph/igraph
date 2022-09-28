@@ -49,7 +49,7 @@ class Stats
   /** \internal The maximal depth of the search tree. */
   unsigned long int max_level;
   /** \internal Reset the statistics. */
-  void reset(void)
+  void reset()
   {
     group_size.assign(1);
     group_size_approx = 1.0;
@@ -69,17 +69,17 @@ public:
    * the size of the automorphism group. */
   long double get_group_size_approx() const {return group_size_approx;}
   /** The number of nodes in the search tree. */
-  long unsigned int get_nof_nodes(void) const {return nof_nodes;}
+  long unsigned int get_nof_nodes() const {return nof_nodes;}
   /** The number of leaf nodes in the search tree. */
-  long unsigned int get_nof_leaf_nodes(void) const {return nof_leaf_nodes;}
+  long unsigned int get_nof_leaf_nodes() const {return nof_leaf_nodes;}
   /** The number of bad nodes in the search tree. */
-  long unsigned int get_nof_bad_nodes(void) const {return nof_bad_nodes;}
+  long unsigned int get_nof_bad_nodes() const {return nof_bad_nodes;}
   /** The number of canonical representative updates. */
-  long unsigned int get_nof_canupdates(void) const {return nof_canupdates;}
+  long unsigned int get_nof_canupdates() const {return nof_canupdates;}
   /** The number of generator permutations. */
-  long unsigned int get_nof_generators(void) const {return nof_generators;}
+  long unsigned int get_nof_generators() const {return nof_generators;}
   /** The maximal depth of the search tree. */
-  unsigned long int get_max_level(void) const {return max_level;}
+  unsigned long int get_max_level() const {return max_level;}
 };
 
 } // namespace bliss

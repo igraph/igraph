@@ -4,7 +4,7 @@ extern "C" {
 #endif
 
 #ifdef KR_headers
-extern void sig_die(void);
+extern VOID sig_die();
 VOID z_div(c, a, b) doublecomplex *a, *b, *c;
 #else
 extern void sig_die(const char*, int);

@@ -81,11 +81,11 @@ typedef struct
 #define Void /*void*/
 extern int (*f__getn)();	/* for formatted input */
 extern void (*f__putn)();	/* for formatted output */
-extern void x_putc(void);
+extern void x_putc();
 extern long f__inode();
-extern void sig_die(void);
+extern VOID sig_die();
 extern int (*f__donewrec)(), t_putc(), x_wSL();
-extern int c_sfe(void), err__fl(), xrd_SL(), f__putbuf();
+extern int c_sfe(), err__fl(), xrd_SL(), f__putbuf();
 #else
 #define Void void
 #ifdef __cplusplus

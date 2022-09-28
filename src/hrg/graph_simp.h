@@ -132,11 +132,11 @@ public:
     // return pointer to a node
     simpleVert* getNode(const int);
     // returns num_groups
-    int getNumGroups(void);
+    int getNumGroups();
     // returns m
-    int getNumLinks(void);
+    int getNumLinks();
     // returns n
-    int getNumNodes(void);
+    int getNumNodes();
     // set name of vertex i
     bool setName(const int, const std::string);
 

@@ -521,7 +521,6 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     igraph_vector_int_t bip_index, bip_index2;
     igraph_vector_bool_t bvec;
     igraph_integer_t notop = 0, nobottom = 0;
-    IGRAPH_UNUSED(notop); // required because set but not used
 
     IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
     IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);

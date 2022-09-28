@@ -78,12 +78,12 @@ public:
   }
 
   /** Remove all the elements in the stack. */
-  void clean(void) {cursor = entries; }
+  void clean() {cursor = entries; }
 
   /**
    * Get the number of elements in the stack.
    */
-  unsigned int size(void) const {return cursor - entries; }
+  unsigned int size() const {return cursor - entries; }
 
   /**
    * Return the i:th element in the stack, where \a i is in the range
@@ -97,7 +97,7 @@ public:
   }
 
   /** Return the capacity (NOT the number of elements) of the stack. */
-  int capacity(void) const {return kapacity; }
+  int capacity() const {return kapacity; }
 private:
   int kapacity;
   Type *entries;

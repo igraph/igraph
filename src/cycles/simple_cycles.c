@@ -52,7 +52,7 @@ igraph_error_t igraph_simple_cycles_unblock(igraph_simple_cycle_search_state_t *
   return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state, igraph_integer_t V, igraph_integer_t S, bool *found)
+igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state, igraph_integer_t V, igraph_integer_t S, igraph_vector_int_list_t *results, bool *found)
 {
   bool localFound = false;
   igraph_stack_int_push(&state->stack, V);
@@ -66,16 +66,25 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
     if (W == S)
     {
       localFound = true;
+      // copy output: from stack to vector
+      igraph_integer_t i = 0;
+      igraph_vector_int_t res;
+      igraph_vector_int_init(&res, igraph_stack_int_size(&state->stack));
+      while (!igraph_stack_int_empty(&state->stack))
+      {
+        printf("Setting result value %lld\n", i);
+        VECTOR(res)
+        [i] = igraph_stack_int_pop(&state->stack); // igraph_stack_int_get(&state->stack, i);
+        printf("Set result value %lld\n", VECTOR(res)
+                                              [i]);
+        i += 1;
+      }
+      igraph_vector_int_list_push_back_copy(results, &res);
+      igraph_vector_int_destroy(&res);
     }
-    else if (!(VECTOR(state->blocked)[W]))
+    else if (W > S && !(VECTOR(state->blocked)[W]))
     {
-      igraph_simple_cycles_circuit(state, W, S, &localFound);
-    }
-    // found a loop -> return stack!
-    // TODO: somehow, continue the loop again
-    if (localFound)
-    {
-      break;
+      igraph_simple_cycles_circuit(state, W, S, results, &localFound);
     }
   }
   *found = localFound;
@@ -83,7 +92,6 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
   if (localFound)
   {
     igraph_simple_cycles_unblock(state, V);
-    return IGRAPH_SUCCESS;
   }
   else
   {
@@ -98,7 +106,10 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
     }
   }
 
-  igraph_stack_int_pop(&state->stack); // _back
+  if (igraph_stack_int_size(&state->stack) > 0)
+  {
+    igraph_stack_int_pop(&state->stack); // _back
+  }
   // return result
 
   return IGRAPH_SUCCESS;
@@ -128,41 +139,31 @@ igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_sear
 }
 
 igraph_error_t igraph_simple_cycles_search_one(
-    igraph_simple_cycle_search_state_t *state, igraph_integer_t s, igraph_vector_int_t *result)
+    igraph_simple_cycle_search_state_t *state, igraph_integer_t s, igraph_vector_int_list_t *results)
 {
   for (igraph_integer_t i = s; i < state->N; ++i)
   {
     VECTOR(state->blocked)
     [i] = false;
-      igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
+    igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
   }
 
   bool found = false;
-  igraph_simple_cycles_circuit(state, s, s, &found);
+  igraph_simple_cycles_circuit(state, s, s, results, &found);
 
-  for (igraph_integer_t i = s; i < state->N; ++i)
-  {
-    // we want to remove the vertex with value s, not at position s
-    igraph_integer_t pos;
-    if (igraph_vector_int_search(igraph_adjlist_get(&state->AK, i), 0, s, &pos))
-    {
-      igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
-    }
-  }
+  // for (igraph_integer_t i = s; i < state->N; ++i)
+  // {
+  //   // we want to remove the vertex with value s, not at position s
+  //   igraph_integer_t pos;
+  //   if (igraph_vector_int_search(igraph_adjlist_get(&state->AK, i), 0, s, &pos))
+  //   {
+  //     igraph_vector_int_remove(igraph_adjlist_get(&state->AK, i), pos);
+  //   }
+  // }
 
   if (found)
   {
-    printf("Found cycle, stack size is %lld\n", igraph_stack_int_size(&state->stack));
-    // return stack // TODO: currently, only the nodes are returned
-    igraph_vector_int_resize(result, igraph_stack_int_size(&state->stack));
-    for (igraph_integer_t i = igraph_stack_int_size(&state->stack) - 1; i >= 0; --i)
-    {
-      printf("Setting result value %lld\n", i);
-      VECTOR(*result)
-      [i] = igraph_stack_int_pop(&state->stack); // igraph_stack_int_get(&state->stack, i);
-      printf("Set result value %lld\n", VECTOR(*result)
-                                            [i]);
-    }
+    // TODO: currently, only the nodes are returned
     return IGRAPH_CYCLE_FOUND;
   }
   else
@@ -184,15 +185,18 @@ igraph_error_t igraph_simple_cycles_search_all(
   // TODO: depending on the graph, it is rather unreasonable to search cycles from each and every node
   for (igraph_integer_t s = 0; s < state.N; ++s)
   {
-    igraph_vector_int_t res;
-    igraph_vector_int_init(&res, 0);
-    if (igraph_simple_cycles_search_one(&state, s, &res) == IGRAPH_CYCLE_FOUND && igraph_vector_int_size(&res) > 0)
+    igraph_vector_int_list_t res;
+    igraph_vector_int_list_init(&res, 0);
+    if (igraph_simple_cycles_search_one(&state, s, &res) == IGRAPH_CYCLE_FOUND)
     {
       // nfound += 1;
-      printf("Found one. adding to all results.\n");
-      igraph_vector_int_list_push_back_copy(result, &res);
-      igraph_vector_int_empty(&res);
+      printf("Found %lld. adding to all results.\n", igraph_vector_int_list_size(&res));
+      for (igraph_integer_t i = 0; i < igraph_vector_int_list_size(&res); i++)
+      {
+        igraph_vector_int_list_push_back_copy(result, igraph_vector_int_list_get_ptr(&res, i));
+      }
     }
+    igraph_vector_int_list_clear(&res);
   }
 
   // igraph_vector_int_list_resize(result, nfound);

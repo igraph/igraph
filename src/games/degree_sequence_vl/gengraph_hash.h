@@ -32,18 +32,18 @@
 namespace gengraph {
 
 #ifdef _HASH_PROFILE
-    void _hash_add_iter(void);
-    void _hash_add_call(void);
-    void _hash_put_iter(void);
-    void _hash_put_call(void);
-    void _hash_rm_iter(void);
-    void _hash_rm_call(void);
-    void _hash_find_iter(void);
-    void _hash_find_call(void);
-    void _hash_rand_iter(void);
-    void _hash_rand_call(void);
-    void _hash_expand_call(void);
-    void _hash_prof(void);
+    void _hash_add_iter();
+    void _hash_add_call();
+    void _hash_put_iter();
+    void _hash_put_call();
+    void _hash_rm_iter();
+    void _hash_rm_call();
+    void _hash_find_iter();
+    void _hash_find_call();
+    void _hash_rand_iter();
+    void _hash_rand_call();
+    void _hash_expand_call();
+    void _hash_prof();
     #define _HASH_ADD_ITER()  _hash_add_iter()
     #define _HASH_ADD_CALL()  _hash_add_call()
     #define _HASH_PUT_ITER()  _hash_put_iter()

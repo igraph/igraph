@@ -9,7 +9,7 @@ extern char *f__icend;
 extern icilist *f__svic;
 extern int f__icnum;
 #ifdef KR_headers
-extern void z_putc(void);
+extern void z_putc();
 #else
 extern void z_putc(int);
 #endif

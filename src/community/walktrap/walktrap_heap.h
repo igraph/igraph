@@ -115,7 +115,7 @@ private:
     void move_down(int index);
 
 public:
-    int get_max_community(void);              // return the community with the maximal delta_sigma
+    int get_max_community();              // return the community with the maximal delta_sigma
     void remove_community(int community);         // remove a community;
     void update(int community);               // update (or insert if necessary) the community
     long memory();                    // the memory used in Bytes.

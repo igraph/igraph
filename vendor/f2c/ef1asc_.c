@@ -10,7 +10,7 @@ extern "C" {
 #define EVEN(x)	( ( (x)+ M) & (~M) )
 
 #ifdef KR_headers
-extern void s_copy(void);
+extern VOID s_copy();
 ef1asc_(a, la, b, lb) ftnint *a, *b; ftnlen *la, *lb;
 #else
 extern void s_copy(char*,char*,ftnlen,ftnlen);

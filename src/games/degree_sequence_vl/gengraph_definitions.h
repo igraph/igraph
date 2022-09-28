@@ -42,7 +42,7 @@ namespace gengraph {
 #define VERBOSE_NONE 0
 #define VERBOSE_SOME 1
 #define VERBOSE_LOTS 2
-int VERBOSE(void);
+int VERBOSE();
 void SET_VERBOSE(int v);
 
 // Random number generator
@@ -175,7 +175,7 @@ inline double random_float() {
 static int _random_bits_stored = 0;
 static long _random_bits = 0;
 
-inline int random_bit(void) {
+inline int random_bit() {
     long a = _random_bits;
     _random_bits = a >> 1;
     if (_random_bits_stored--) {
@@ -188,7 +188,7 @@ inline int random_bit(void) {
 }
 
 // Hash Profiling (see hash.h)
-void _hash_prof(void);
+void _hash_prof();
 
 } // namespace gengraph
 

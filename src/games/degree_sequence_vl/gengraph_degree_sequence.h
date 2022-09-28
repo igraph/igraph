@@ -68,13 +68,13 @@ public :
     ~degree_sequence();
 
     // compute total number of arcs
-    void compute_total(void);
+    void compute_total();
 
     // raw print (vertex by vertex)
-    void print(void);
+    void print();
 
     // distribution print (degree frequency)
-    void print_cumul(void);
+    void print_cumul();
 
     // is degree sequence realizable ?
     bool havelhakimi();

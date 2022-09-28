@@ -45,7 +45,7 @@ double my_random01() {
 namespace gengraph {
 
 static int VERB;
-int VERBOSE(void) {
+int VERBOSE() {
     return VERB;
 }
 void SET_VERBOSE(int v) {
@@ -64,40 +64,40 @@ static unsigned long _hash_find_c = 0;
 static unsigned long _hash_rand_i = 0;
 static unsigned long _hash_rand_c = 0;
 static unsigned long _hash_expand = 0;
-inline void _hash_add_iter(void)  {
+inline void _hash_add_iter()  {
     _hash_add_i++;
 }
-inline void _hash_add_call(void)  {
+inline void _hash_add_call()  {
     _hash_add_c++;
 }
-inline void _hash_put_iter(void)  {
+inline void _hash_put_iter()  {
     _hash_put_i++;
 }
-inline void _hash_put_call(void)  {
+inline void _hash_put_call()  {
     _hash_put_c++;
 }
-inline void _hash_rm_iter(void)   {
+inline void _hash_rm_iter()   {
     _hash_rm_i++;
 }
-inline void _hash_rm_call(void)   {
+inline void _hash_rm_call()   {
     _hash_rm_c++;
 }
-inline void _hash_find_iter(void) {
+inline void _hash_find_iter() {
     _hash_find_i++;
 }
-inline void _hash_find_call(void) {
+inline void _hash_find_call() {
     _hash_find_c++;
 }
-inline void _hash_rand_iter(void) {
+inline void _hash_rand_iter() {
     _hash_rand_i++;
 }
-inline void _hash_rand_call(void) {
+inline void _hash_rand_call() {
     _hash_rand_c++;
 }
-inline void _hash_expand_call(void) {
+inline void _hash_expand_call() {
     _hash_expand++;
 }
-// void _hash_prof(void) {
+// void _hash_prof() {
 //   fprintf(stderr,"HASH_ADD : %lu / %lu\n", _hash_add_c , _hash_add_i);
 //   fprintf(stderr,"HASH_PUT : %lu / %lu\n", _hash_put_c , _hash_put_i);
 //   fprintf(stderr,"HASH_FIND: %lu / %lu\n", _hash_find_c, _hash_find_i);

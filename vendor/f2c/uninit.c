@@ -65,7 +65,7 @@ static unsigned Long rnan = RNAN,
 
 double _0 = 0.;
 
-void unsupported_error(void)
+void unsupported_error()
 {
   IGRAPH_FATAL("Runtime Error: Your Architecture is not supported by the"
                " -trapuv option of f2c");

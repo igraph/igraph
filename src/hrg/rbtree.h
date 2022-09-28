@@ -141,7 +141,7 @@ public:
     // increment the value of the given key
     void incrementValue(int key);
     // delete the entire tree
-    void deleteTree(void);
+    void deleteTree();
     // return array of keys in tree
     int* returnArrayOfKeys();
     // return list of keys in tree
@@ -153,7 +153,7 @@ public:
     // returns the minimum key in the tree
     keyValuePair returnMinKey();
     // returns number of items in tree
-    int returnNodecount(void);
+    int returnNodecount();
 };
 
 }

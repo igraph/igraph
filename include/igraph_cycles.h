@@ -38,7 +38,7 @@ IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_destroy(
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_one(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t start,
-    igraph_vector_int_t *result);
+    igraph_vector_int_list_t *result);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_all(
     const igraph_t *graph, igraph_vector_int_list_t *result);

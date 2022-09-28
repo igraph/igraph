@@ -5,9 +5,9 @@ extern "C" {
 #endif
 
 #ifdef KR_headers
-extern void sig_die(void);
+extern VOID sig_die();
 
-int abort_(void)
+int abort_()
 #else
 extern void sig_die(const char*,int);
 

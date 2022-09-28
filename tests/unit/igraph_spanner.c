@@ -16,12 +16,12 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+
 #include <igraph.h>
 #include "test_utilities.h"
 #include <stdlib.h>
 
-void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch, igraph_vector_t *weights)
-{
+void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch, igraph_vector_t *weights) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_t spanner_graph;
@@ -30,18 +30,14 @@ void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch,
 
     /* create the spanner graph with igraph_subgraph_edges() as recommended in the docs,
        then compare it with the original graph and validate the stretch factor */
-    if (weights)
-    {
+    if (weights) {
         igraph_cattribute_EAN_setv(graph, "weight", weights);
     }
     igraph_subgraph_edges(graph, &spanner_graph, igraph_ess_vector(spanner), 0);
     igraph_vector_init(&spanner_weights, igraph_vector_int_size(spanner));
-    if (weights)
-    {
+    if (weights){
         igraph_cattribute_EANV(&spanner_graph, "weight", igraph_ess_all(IGRAPH_EDGEORDER_ID), &spanner_weights);
-    }
-    else
-    {
+    } else {
         igraph_vector_fill(&spanner_weights, 1);
     }
 
@@ -50,8 +46,7 @@ void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch,
 
     // compare number of edges. We expect the number of edges to decrease in
     // all cases but the trivial ones
-    if (stretch > 1 && no_of_edges > 1)
-    {
+    if (stretch > 1 && no_of_edges > 1) {
         IGRAPH_ASSERT(igraph_ecount(&spanner_graph) < no_of_edges);
     }
 
@@ -60,19 +55,17 @@ void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch,
     // to gauge whether the algorithm is not simply keeping most of the edges
     printf(
         "%" IGRAPH_PRId ", %" IGRAPH_PRId " --> %" IGRAPH_PRId "\n",
-        no_of_nodes, no_of_edges, igraph_ecount(&spanner_graph));
+        no_of_nodes, no_of_edges, igraph_ecount(&spanner_graph)
+    );
 
     // Validate the stretch factor
     igraph_matrix_init(&res_spanner, 0, 0);
     igraph_matrix_init(&res_graph, 0, 0);
     igraph_distances_dijkstra(graph, &res_graph, igraph_vss_all(), igraph_vss_all(), weights, IGRAPH_ALL);
     igraph_distances_dijkstra(&spanner_graph, &res_spanner, igraph_vss_all(), igraph_vss_all(), &spanner_weights, IGRAPH_ALL);
-    for (igraph_integer_t x = 0; x < no_of_nodes; x++)
-    {
-        for (igraph_integer_t y = 0; y < no_of_nodes; y++)
-        {
-            if (x == y)
-            {
+    for (igraph_integer_t x = 0; x < no_of_nodes; x++) {
+        for (igraph_integer_t y = 0; y < no_of_nodes; y++) {
+            if (x == y) {
                 continue;
             }
             IGRAPH_ASSERT(MATRIX(res_spanner, x, y) <= MATRIX(res_graph, x, y) * stretch);
@@ -113,11 +106,9 @@ int main(void) {
     igraph_full(&graph, 20, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
-    for (int i = 0; i < no_of_edges; i++)
-    {
+    for (int i = 0; i < no_of_edges; i++) {
         double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
-        VECTOR(weights)
-        [i] = generated_number;
+        VECTOR(weights)[i] = generated_number;
     }
     igraph_spanner(&graph, &spanner, 10, &weights);
     test_spanner(&graph, &spanner, 10, &weights);
@@ -136,11 +127,9 @@ int main(void) {
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.25, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
-    for (igraph_integer_t i = 0; i < no_of_edges; i++)
-    {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
-        VECTOR(weights)
-        [i] = generated_number;
+        VECTOR(weights)[i] = generated_number;
     }
     igraph_spanner(&graph, &spanner, 7, &weights);
     test_spanner(&graph, &spanner, 7, &weights);
@@ -176,26 +165,20 @@ int main(void) {
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.9, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
-    for (igraph_integer_t i = 0; i < no_of_edges; i++)
-    {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         double generated_number = igraph_rng_get_unif(igraph_rng_default(), 1, 100);
-        VECTOR(weights)
-        [i] = generated_number;
+        VECTOR(weights)[i] = generated_number;
     }
 
     printf("Negative weight\n");
-    VECTOR(weights)
-    [10] = -42;
+    VECTOR(weights)[10] = -42;
     IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 7, &weights) == IGRAPH_EINVAL);
-    VECTOR(weights)
-    [10] = 42;
+    VECTOR(weights)[10] = 42;
 
     printf("NaN weight\n");
-    VECTOR(weights)
-    [10] = IGRAPH_NAN;
+    VECTOR(weights)[10] = IGRAPH_NAN;
     IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 7, &weights) == IGRAPH_EINVAL);
-    VECTOR(weights)
-    [10] = 42;
+    VECTOR(weights)[10] = 42;
 
     printf("Invalid spanning factor\n");
     IGRAPH_ASSERT(igraph_spanner(&graph, &spanner, 0.5, &weights) == IGRAPH_EINVAL);

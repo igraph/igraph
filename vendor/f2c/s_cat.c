@@ -9,8 +9,8 @@
 #undef abs
 #ifdef KR_headers
  extern char *F77_aloc();
- extern void free(void);
- extern void exit_(void);
+ extern void free();
+ extern void exit_();
 #else
 #undef min
 #undef max

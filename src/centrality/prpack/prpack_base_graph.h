@@ -38,7 +38,7 @@ namespace prpack {
             // destructor
             ~prpack_base_graph();
             // operations
-            void normalize_weights(void);
+            void normalize_weights();
     };
 
 }

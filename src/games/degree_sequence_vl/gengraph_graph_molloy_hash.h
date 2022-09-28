@@ -59,9 +59,9 @@ private:
     // The array containing pointers to adjacency list of every vertices
     igraph_integer_t **neigh;
     // Counts total size
-    void compute_size(void);
+    void compute_size();
     // Build neigh with deg and links
-    void compute_neigh(void);
+    void compute_neigh();
     // Allocate memory according to degree_sequence (for constructor use only!!)
     igraph_integer_t alloc(degree_sequence &);
     // Add edge (u,v). Return FALSE if vertex a is already full.
@@ -142,7 +142,7 @@ public:
     // Restore from backup
     void restore(igraph_integer_t* back);
     //Clear hash tables
-    void init(void);
+    void init();
     // nb arcs
     inline igraph_integer_t nbarcs() {
         return a;
