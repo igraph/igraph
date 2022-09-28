@@ -106,10 +106,9 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (already_counted == 0) {
-        IGRAPH_ERROR("Insufficient memory for graph distance calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(already_counted, "Insufficient memory for graph distance calculation.");
     IGRAPH_FINALLY(igraph_free, already_counted);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     all_to = igraph_vs_is_all(&to);
@@ -317,10 +316,9 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     }
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parent_eids == 0) {
-        IGRAPH_ERROR("Insufficient memory for shortest path calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for shortest path calculation.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
