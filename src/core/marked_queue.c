@@ -106,7 +106,7 @@ igraph_error_t igraph_marked_queue_int_as_vector(const igraph_marked_queue_int_t
     igraph_integer_t i, p, n = igraph_dqueue_int_size(&q->Q);
     IGRAPH_CHECK(igraph_vector_int_resize(vec, q->size));
     for (i = 0, p = 0; i < n; i++) {
-        igraph_real_t e = igraph_dqueue_int_e(&q->Q, i);
+        igraph_real_t e = igraph_dqueue_int_get(&q->Q, i);
         if (e != BATCH_MARKER) {
             VECTOR(*vec)[p++] = e;
         }
