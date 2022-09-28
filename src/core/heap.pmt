@@ -90,7 +90,7 @@ igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, const BAS
     h->end = h->stor_end;
     h->destroy = true;
 
-    memcpy(h->stor_begin, data, (size_t) len * sizeof(igraph_real_t));
+    memcpy(h->stor_begin, data, (size_t) len * sizeof(BASE));
 
     FUNCTION(igraph_heap, i_build) (h->stor_begin, h->end - h->stor_begin, 0);
 
