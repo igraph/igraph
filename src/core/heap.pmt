@@ -62,7 +62,7 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_
     IGRAPH_CHECK_OOM(h->stor_begin, "Cannot initialize heap.");
     h->stor_end = h->stor_begin + capacity;
     h->end = h->stor_begin;
-    h->destroy = 1;
+    h->destroy = true;
 
     return IGRAPH_SUCCESS;
 }
@@ -83,12 +83,12 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_
  * Time complexity: O(n), the number of elements in the heap.
  */
 
-igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, igraph_integer_t len) {
+igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, const BASE *data, igraph_integer_t len) {
     h->stor_begin = IGRAPH_CALLOC(len, BASE);
     IGRAPH_CHECK_OOM(h->stor_begin, "Cannot initialize heap from array.");
     h->stor_end = h->stor_begin + len;
     h->end = h->stor_end;
-    h->destroy = 1;
+    h->destroy = true;
 
     memcpy(h->stor_begin, data, (size_t) len * sizeof(igraph_real_t));
 

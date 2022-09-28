@@ -86,7 +86,7 @@ void igraph_indheap_clear(igraph_indheap_t *h) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, igraph_real_t* data, igraph_integer_t len) {
+igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, const igraph_real_t *data, igraph_integer_t len) {
     igraph_integer_t i;
     igraph_integer_t alloc_size;
 
