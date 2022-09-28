@@ -841,48 +841,6 @@ BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
     return *(v->end);
 }
 
-/**
- * \ingroup vector
- * \function igraph_vector_pop_front
- * \brief Removes and returns the first element of a vector.
- *
- * It is an error to call this function with an empty vector.
- * It is generally not recommended to call this function, as it is highly inefficient.
- *
- * \param v The vector object.
- * \return The removed first element.
- *
- * Time complexity: O(N), N being the size of the vector.
- */
-
-BASE FUNCTION(igraph_vector, pop_front)(TYPE(igraph_vector)* v) {
-    IGRAPH_ASSERT(v != NULL);
-    IGRAPH_ASSERT(v->stor_begin != NULL);
-    IGRAPH_ASSERT(v->end != NULL);
-    IGRAPH_ASSERT(v->end != v->stor_begin);
-
-    // TODO: decide whether to implement this more efficiently, 
-    // e.g. by recording the offset occurred, being less memory efficient,
-    // but getting to O(1), too, by:
-    // return *(v->stor_begin)++;
-    // (but freeing (v->stor_begin)-(v->offset_front)) in the igraph_vector_destroy
-
-    BASE el_to_return = *(v->stor_begin);
-    igraph_integer_t vSize = FUNCTION(igraph_vector, size)(v);
-    igraph_integer_t alloc_size;
-    alloc_size = vSize -1 > 0 ? vSize-1 : 1;
-    BASE* stor_begin_new = IGRAPH_CALLOC(alloc_size, BASE);
-    if (vSize > 1){
-        memcpy(stor_begin_new, &v->stor_begin[1], (size_t)((vSize - 1)*sizeof(BASE)));
-    }
-    IGRAPH_FREE(v->stor_begin);
-    v->stor_begin = stor_begin_new;
-    v->stor_end = stor_begin_new + alloc_size;
-    v->end = v->stor_begin + (vSize -1);
-
-    return el_to_return;
-}
-
 #ifndef NOTORDERED
 
 /**

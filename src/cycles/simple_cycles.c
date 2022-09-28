@@ -32,20 +32,18 @@
 
 // Johnson's cycle detection algorithm
 
-igraph_error_t igraph_simple_cycles_unblock(igraph_simple_cycle_search_state_t *state, igraph_integer_t V)
+igraph_error_t igraph_simple_cycles_unblock(igraph_simple_cycle_search_state_t *state, igraph_integer_t u)
 {
   VECTOR(state->blocked)
-  [V] = false;
+  [u] = false;
 
-  while (!igraph_vector_int_empty(igraph_adjlist_get(&state->B, V)))
+  while (!igraph_vector_int_empty(igraph_adjlist_get(&state->B, u)))
   {
-    // NOTE: pop front is highly inefficient. Check frequency of call, possibly replace adjlist
-    // probably with a vector of lists
-    igraph_integer_t W = igraph_vector_int_pop_front(igraph_adjlist_get(&state->B, V));
+    igraph_integer_t w = igraph_vector_int_pop_back(igraph_adjlist_get(&state->B, u));
 
-    if (VECTOR(state->blocked)[W])
+    if (VECTOR(state->blocked)[w])
     {
-      igraph_simple_cycles_unblock(state, W);
+      igraph_simple_cycles_unblock(state, w);
     }
   }
 

@@ -113,7 +113,6 @@
 <!-- doxrox-include igraph_vector_resize_min -->
 <!-- doxrox-include igraph_vector_push_back -->
 <!-- doxrox-include igraph_vector_pop_back -->
-<!-- doxrox-include igraph_vector_pop_front -->
 <!-- doxrox-include igraph_vector_insert -->
 <!-- doxrox-include igraph_vector_remove -->
 <!-- doxrox-include igraph_vector_remove_section -->
