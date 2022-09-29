@@ -28,7 +28,7 @@ int main(void)
   // test: one cycle, expect to find 1
   igraph_vector_int_list_t resultsT2;
   igraph_vector_int_list_init(&resultsT2, 0);
-  igraph_ring(&g_cycle, 10, /*directed=*/0, /*mutual=*/0, /*circular=*/1);
+  igraph_ring(&g_cycle, 10, /*directed=*/1, /*mutual=*/0, /*circular=*/1);
   // call cycles finder, expect 1 cycle to be found
   printf("Created ring\n");
   igraph_simple_cycles_search_all(&g_cycle, &resultsT2);
@@ -49,7 +49,7 @@ int main(void)
   // test: star graph, does not have a cycle
   igraph_vector_int_list_t resultsT1;
   igraph_vector_int_list_init(&resultsT1, 0);
-  igraph_star(&g_no_cycle, 7, IGRAPH_STAR_UNDIRECTED, 1);
+  igraph_star(&g_no_cycle, 7, IGRAPH_STAR_OUT, 1);
   printf("Created star\n");
   // call cycles finder, expect 0 cycle to be found
   igraph_simple_cycles_search_all(&g_no_cycle, &resultsT1);
