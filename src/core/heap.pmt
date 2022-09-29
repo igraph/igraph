@@ -64,7 +64,6 @@ igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_
     }
     h->stor_end = h->stor_begin + capacity;
     h->end = h->stor_begin;
-    h->destroy = 1;
 
     return IGRAPH_SUCCESS;
 }
@@ -92,7 +91,6 @@ igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* dat
     }
     h->stor_end = h->stor_begin + len;
     h->end = h->stor_end;
-    h->destroy = 1;
 
     memcpy(h->stor_begin, data, (size_t) len * sizeof(igraph_real_t));
 
@@ -112,10 +110,8 @@ igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* dat
  */
 
 void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h) {
-    if (h->destroy) {
-        if (h->stor_begin != NULL) {
-            IGRAPH_FREE(h->stor_begin); /* sets to NULL */
-        }
+    if (h->stor_begin != NULL) {
+        IGRAPH_FREE(h->stor_begin); /* sets to NULL */
     }
 }
 
