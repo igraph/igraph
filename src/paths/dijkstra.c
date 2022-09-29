@@ -36,23 +36,19 @@
 #include <string.h>   /* memset */
 
 /**
- * \function igraph_distances_dijkstra
- * \brief Weighted shortest path lengths between vertices.
+ * \function igraph_distances_dijkstra_cutoff
+ * \brief Weighted shortest path lengths between vertices, with cutoff.
  *
- * This function implements Dijkstra's algorithm, which can find
- * the weighted shortest path lengths from a source vertex to all
- * other vertices. This function allows specifying a set of source
- * and target vertices. The algorithm is run independently for each
- * source and the results are retained only for the specified targets.
- * This implementation uses a binary heap for efficiency.
+ * This function is similar to \ref igraph_distances_dijkstra(), but
+ * paths longer than \p cutoff will not be considered.
  *
  * \param graph The input graph, can be directed.
  * \param res The result, a matrix. A pointer to an initialized matrix
  *    should be passed here. The matrix will be resized as needed.
  *    Each row contains the distances from a single source, to the
- *    vertices given in the \c to argument.
- *    Unreachable vertices has distance
- *    \c IGRAPH_INFINITY.
+ *    vertices given in the \p to argument.
+ *    Vertices that are not reachable within distance \p cutoff will
+ *    be assigned distance \c IGRAPH_INFINITY.
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
@@ -65,24 +61,26 @@
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
  *    for undirected graphs.
+ * \param cutoff The maximal length of paths that will be considered.
+ *    When the distance of two vertices is greater than this value,
+ *    it will be returned as \c IGRAPH_INFINITY.
  * \return Error code.
  *
  * Time complexity: O(s*|E|log|V|+|V|), where |V| is the number of
  * vertices, |E| the number of edges and s the number of sources.
  *
- * \sa \ref igraph_distances() for a (slightly) faster unweighted
- * version or \ref igraph_distances_bellman_ford() for a weighted
- * variant that works in the presence of negative edge weights (but no
- * negative loops)
+ * \sa \ref igraph_distances_cutoff() for a (slightly) faster unweighted
+ * version.
  *
- * \example examples/simple/dijkstra.c
+ * \example examples/simple/distances.c
  */
-igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    const igraph_vs_t from,
                                    const igraph_vs_t to,
                                    const igraph_vector_t *weights,
-                                   igraph_neimode_t mode) {
+                                   igraph_neimode_t mode,
+                                   igraph_real_t cutoff) {
 
     /* Implementation details. This is the basic Dijkstra algorithm,
        with a binary heap. The heap is indexed, i.e. it stores not only
@@ -110,7 +108,7 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     igraph_vector_int_t indexv;
 
     if (!weights) {
-        return igraph_distances(graph, res, from, to, mode);
+        return igraph_distances_cutoff(graph, res, from, to, mode, cutoff);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -180,6 +178,10 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
             igraph_vector_int_t *neis;
             igraph_integer_t nlen;
 
+            if (cutoff >= 0 && (mindist - 1.0) > cutoff) {
+                continue;
+            }
+
             if (all_to) {
                 MATRIX(*res, i, minnei) = mindist - 1.0;
             } else {
@@ -231,6 +233,55 @@ igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_distances_dijkstra
+ * \brief Weighted shortest path lengths between vertices.
+ *
+ * This function implements Dijkstra's algorithm, which can find
+ * the weighted shortest path lengths from a source vertex to all
+ * other vertices. This function allows specifying a set of source
+ * and target vertices. The algorithm is run independently for each
+ * source and the results are retained only for the specified targets.
+ * This implementation uses a binary heap for efficiency.
+ *
+ * \param graph The input graph, can be directed.
+ * \param res The result, a matrix. A pointer to an initialized matrix
+ *    should be passed here. The matrix will be resized as needed.
+ *    Each row contains the distances from a single source, to the
+ *    vertices given in the \p to argument.
+ *    Unreachable vertices have distance \c IGRAPH_INFINITY.
+ * \param from The source vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
+ * \param weights The edge weights. All edge weights must be
+ *    non-negative for Dijkstra's algorithm to work. Additionally, no
+ *    edge weight may be NaN. If either case does not hold, an error
+ *    is returned. If this is a null pointer, then the unweighted
+ *    version, \ref igraph_distances() is called.
+ * \param mode For directed graphs; whether to follow paths along edge
+ *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
+ *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
+ *    for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(s*|E|log|V|+|V|), where |V| is the number of
+ * vertices, |E| the number of edges and s the number of sources.
+ *
+ * \sa \ref igraph_distances() for a (slightly) faster unweighted
+ * version or \ref igraph_distances_bellman_ford() for a weighted
+ * variant that works in the presence of negative edge weights (but no
+ * negative loops)
+ *
+ * \example examples/simple/distances.c
+ */
+igraph_error_t igraph_distances_dijkstra(const igraph_t *graph,
+                                         igraph_matrix_t *res,
+                                         const igraph_vs_t from,
+                                         const igraph_vs_t to,
+                                         const igraph_vector_t *weights,
+                                         igraph_neimode_t mode) {
+    return igraph_distances_dijkstra_cutoff(graph, res, from, to, weights, mode, -1);
+}
 
 /**
  * \function igraph_shortest_paths_dijkstra
