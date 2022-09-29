@@ -90,10 +90,9 @@ igraph_error_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_int
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate neighborhood size.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Cannot calculate neighborhood size.");
     IGRAPH_FINALLY(igraph_free, added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -219,10 +218,9 @@ igraph_error_t igraph_neighborhood(const igraph_t *graph, igraph_vector_int_list
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Cannot calculate neighborhood size.");
     IGRAPH_FINALLY(igraph_free, added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -359,18 +357,16 @@ igraph_error_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_graph_li
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-
-    igraph_graph_list_clear(res);
-
+    IGRAPH_CHECK_OOM(added, "Cannot calculate neighborhood size");
     IGRAPH_FINALLY(igraph_free, added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
+
+    igraph_graph_list_clear(res);
 
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_integer_t node = IGRAPH_VIT_GET(vit);

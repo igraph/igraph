@@ -46,7 +46,7 @@ int main(void) {
     {
         igraph_vector_init_real(&rho, 3, 0.6, 0.4, 0.0);
 
-        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0}; 
+        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         matrix_init_real_row_major(&pref_matrix, 3, 3, elems);
 
         printf("One block, two clusters, 6 and 4 vertices in cluster, complete bipartite.\n");
@@ -59,7 +59,7 @@ int main(void) {
     {
         igraph_vector_init_real(&rho, 3, 0.6, 0.4, 0.0);
 
-        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0}; 
+        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         matrix_init_real_row_major(&pref_matrix, 3, 3, elems);
 
         printf("Two blocks, two clusters each, 3 and 2 vertices in cluster, each vertex connected to every other, except those in the same cluster.\n");

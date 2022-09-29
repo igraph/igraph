@@ -49,7 +49,7 @@ typedef struct s_indheap {
 #define IGRAPH_INDHEAP_NULL { 0,0,0,0,0 }
 
 igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_integer_t size);
-igraph_error_t igraph_indheap_init_array(igraph_indheap_t *t, igraph_real_t* data, igraph_integer_t len);
+igraph_error_t igraph_indheap_init_array(igraph_indheap_t *t, const igraph_real_t *data, igraph_integer_t len);
 void igraph_indheap_destroy(igraph_indheap_t* h);
 void igraph_indheap_clear(igraph_indheap_t *h);
 igraph_bool_t igraph_indheap_empty(const igraph_indheap_t* h);

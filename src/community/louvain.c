@@ -105,9 +105,7 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
     IGRAPH_CHECK(igraph_vector_int_resize(eids, ecount));
 
     links = IGRAPH_CALLOC(ecount, igraph_i_multilevel_link);
-    if (links == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(links, "Multi-level community structure detection failed.");
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < ecount; i++) {
@@ -198,9 +196,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
 
     n = igraph_vector_int_size(edges);
     links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);
-    if (links == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(links, "Multi-level community structure detection failed.");
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < n; i++) {
@@ -285,7 +281,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
-    /* Create the new edgelist */    
+    /* Create the new edgelist */
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));
     for (igraph_integer_t i=0; i < 2*no_of_edges; i++) {
         VECTOR(edges)[i] = VECTOR(*membership)[ VECTOR(edges)[i] ];
@@ -382,9 +378,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     communities.weight_sum = 2 * igraph_vector_sum(weights);
     communities.membership = membership;
     communities.item = IGRAPH_CALLOC(vcount, igraph_i_multilevel_community);
-    if (communities.item == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(communities.item, "Multi-level community structure detection failed.");
     IGRAPH_FINALLY(igraph_free, communities.item);
 
     /* Still initializing the communities data structure */

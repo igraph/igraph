@@ -198,7 +198,7 @@ int main(void) {
 
     igraph_matrix_destroy(&m);
     igraph_destroy(&g);
-    
+
     VERIFY_FINALLY_STACK();
 
     return 0;

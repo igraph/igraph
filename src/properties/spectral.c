@@ -262,7 +262,7 @@ igraph_error_t igraph_get_laplacian_sparse(
     igraph_vector_t degree;
     igraph_integer_t i;
     igraph_integer_t nz;
-   
+
     if (directed) {
         IGRAPH_SAFE_ADD(no_of_edges, no_of_nodes, &nz);
     } else {
