@@ -21,49 +21,79 @@
 #include "test_utilities.h"
 #include <stdlib.h>
 
-int main(void)
+void checkGraphForNrOfCycles(igraph_t *graph, const igraph_integer_t expectedNrOfCycles)
 {
-  igraph_t g_cycle, g_no_cycle;
-
-  // test: one cycle, expect to find 1
-  igraph_vector_int_list_t resultsT2;
-  igraph_vector_int_list_init(&resultsT2, 0);
-  igraph_ring(&g_cycle, 10, /*directed=*/1, /*mutual=*/0, /*circular=*/1);
-  // call cycles finder, expect 1 cycle to be found
-  printf("Created ring\n");
-  igraph_simple_cycles_search_all(&g_cycle, &resultsT2);
-  printf("Finished search, found %" IGRAPH_PRId "\n", igraph_vector_int_list_size(&resultsT2));
-  if (igraph_vector_int_list_size(&resultsT2) > 1)
-  {
-    printf("Unexpectedly found circles: ");
-    for (int i = 0; i < igraph_vector_int_list_size(&resultsT2); i++)
-    {
-      print_vector_int(igraph_vector_int_list_get_ptr(&resultsT2, i));
-    }
-  }
-  IGRAPH_ASSERT(igraph_vector_int_list_size(&resultsT2) == 1);
-  // clean up
-  igraph_vector_int_list_destroy(&resultsT2);
-  igraph_destroy(&g_cycle);
-
-  // test: star graph, does not have a cycle
   igraph_vector_int_list_t resultsT1;
   igraph_vector_int_list_init(&resultsT1, 0);
-  igraph_star(&g_no_cycle, 7, IGRAPH_STAR_OUT, 1);
-  printf("Created star\n");
-  // call cycles finder, expect 0 cycle to be found
-  igraph_simple_cycles_search_all(&g_no_cycle, &resultsT1);
-  printf("Finished search, found %" IGRAPH_PRId "\n", igraph_vector_int_list_size(&resultsT1));
-  if (igraph_vector_int_list_size(&resultsT1) > 0)
+  igraph_simple_cycles_search_all(graph, &resultsT1);
+  printf("Finished search, found %" IGRAPH_PRId " cylces.\n\n", igraph_vector_int_list_size(&resultsT1));
+  if (igraph_vector_int_list_size(&resultsT1) != expectedNrOfCycles)
   {
-    printf("Unexpectedly found circle: ");
-    print_vector_int(igraph_vector_int_list_get_ptr(&resultsT1, 0));
+    printf("Unexpectedly found %" IGRAPH_PRId " cycles instead of %" IGRAPH_PRId ": ", igraph_vector_int_list_size(&resultsT1), expectedNrOfCycles);
+    for (int i = 0; i < igraph_vector_int_list_size(&resultsT1); i++)
+    {
+      print_vector_int(igraph_vector_int_list_get_ptr(&resultsT1, i));
+    }
   }
-  IGRAPH_ASSERT(igraph_vector_int_list_size(&resultsT1) == 0);
-  // clean up
+
+  IGRAPH_ASSERT(igraph_vector_int_list_size(&resultsT1) == expectedNrOfCycles);
   igraph_vector_int_list_destroy(&resultsT1);
+}
+
+int main(void)
+{
+
+  igraph_t g_wheel_undirected;
+  igraph_wheel(&g_wheel_undirected, 10, IGRAPH_WHEEL_UNDIRECTED, 0);
+  printf("\nCreated undirected wheel\n");
+  // call cycles finder, expect 10 cycle to be found
+  checkGraphForNrOfCycles(&g_wheel_undirected, 10);
+  // clean up
+  igraph_destroy(&g_wheel_undirected);
+
+  igraph_t g_cycle;
+  // test: one cycle, expect to find 1
+  igraph_ring(&g_cycle, 10, /*directed=*/1, /*mutual=*/0, /*circular=*/1);
+  printf("\nCreated ring\n");
+  // call cycles finder, expect 1 cycle to be found
+  checkGraphForNrOfCycles(&g_cycle, 1);
+  // clean up
+  igraph_destroy(&g_cycle);
+
+  igraph_t g_no_cycle;
+  // test: star graph, does not have a cycle
+  igraph_star(&g_no_cycle, 7, IGRAPH_STAR_OUT, 1);
+  printf("\nCreated star\n");
+  // call cycles finder, expect 0 cycle to be found
+  checkGraphForNrOfCycles(&g_no_cycle, 0);
+  // clean up
   igraph_destroy(&g_no_cycle);
 
+  igraph_t g_ring_undirected;
+  // test: one cycle, expect to find 1
+  igraph_ring(&g_ring_undirected, 10, /*directed=*/0, /*mutual=*/0, /*circular=*/1);
+  printf("\nCreated undirected ring\n");
+  // call cycles finder, expect 1 cycle to be found
+  checkGraphForNrOfCycles(&g_ring_undirected, 1);
+  // clean up
+  igraph_destroy(&g_ring_undirected);
+
+  igraph_t g_star_undirected;
+  // test: star graph, does not have a cycle
+  igraph_star(&g_star_undirected, 7, IGRAPH_STAR_UNDIRECTED, 1);
+  printf("\nCreated undirected star\n");
+  // call cycles finder, expect 0 cycle to be found
+  checkGraphForNrOfCycles(&g_star_undirected, 0);
+  // clean up
+  igraph_destroy(&g_star_undirected);
+
+  igraph_t g_wheel;
+  igraph_wheel(&g_wheel, 10, IGRAPH_WHEEL_OUT, 0);
+  printf("\nCreated directed wheel\n");
+  // call cycles finder, expect 10 cycle to be found
+  checkGraphForNrOfCycles(&g_wheel, 1);
+  // clean up
+  igraph_destroy(&g_wheel);
   // clean up test
   VERIFY_FINALLY_STACK();
   return 0;

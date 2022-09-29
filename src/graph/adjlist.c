@@ -408,6 +408,23 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
 }
 
 /**
+ * \function igraph_adjlist_reverse_sort
+ * \brief Sorts each vector in an adjacency list in descending order.
+ *
+ * Sorts every vector of the adjacency list in descending order.
+ * \param al The adjacency list.
+ *
+ * Time complexity: O(n log n), n is the total number of elements in
+ * the adjacency list.
+ */
+void igraph_adjlist_reverse_sort(igraph_adjlist_t *al) {
+    igraph_integer_t i;
+    for (i = 0; i < al->length; i++) {
+        igraph_vector_int_reverse_sort(&al->adjs[i]);
+    }
+}
+
+/**
  * \function igraph_adjlist_simplify
  * \brief Simplifies an adjacency list.
  *

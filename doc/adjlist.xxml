@@ -18,6 +18,7 @@
 <!-- doxrox-include igraph_adjlist_size -->
 <!-- doxrox-include igraph_adjlist_clear -->
 <!-- doxrox-include igraph_adjlist_sort -->
+<!-- doxrox-include igraph_adjlist_reverse_sort -->
 <!-- doxrox-include igraph_adjlist_simplify -->
 </section>
 

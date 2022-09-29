@@ -22,12 +22,14 @@ IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
     igraph_integer_t bfs_cutoff, igraph_bool_t complete,
     igraph_bool_t use_cycle_order, const igraph_vector_t *weights);
 
+// simple cycle search, johnson
 typedef struct igraph_simple_cycle_search_state_t {
   igraph_integer_t N;
   igraph_adjlist_t AK;
   igraph_adjlist_t B;
   igraph_stack_int_t stack;
   igraph_vector_bool_t blocked;
+  igraph_bool_t directed;
 } igraph_simple_cycle_search_state_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_init(

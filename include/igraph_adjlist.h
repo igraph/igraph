@@ -56,6 +56,7 @@ IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_from_inclist(
 IGRAPH_EXPORT void igraph_adjlist_destroy(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_clear(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_sort(igraph_adjlist_t *al);
+IGRAPH_EXPORT void igraph_adjlist_reverse_sort(igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al);
 IGRAPH_EXPORT igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
