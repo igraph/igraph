@@ -47,6 +47,10 @@ IGRAPH_EXPORT igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
                                              const igraph_vs_t vids,
                                              const igraph_vector_t *weights,
                                              const igraph_transitivity_mode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_ecc(const igraph_t *graph,
+                                        igraph_vector_t *res,
+                                        const igraph_es_t eids,
+                                        igraph_integer_t k);
 
 __END_DECLS
 
