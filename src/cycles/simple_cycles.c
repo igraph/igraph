@@ -18,15 +18,13 @@
 
 #include "igraph_cycles.h"
 
-#include <stdlib.h>
+// #include <stdlib.h>
 #include "igraph_adjlist.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
-#include "../../tests/unit/test_utilities.h"
-
 #include "core/interruption.h"
 
 #define IGRAPH_CYCLE_FOUND 0
@@ -52,15 +50,12 @@ igraph_error_t igraph_simple_cycles_unblock(igraph_simple_cycle_search_state_t *
   return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state, igraph_integer_t V, igraph_integer_t S, igraph_vector_int_list_t *results, bool *found, igraph_integer_t depth)
+igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *state, igraph_integer_t V, igraph_integer_t S, igraph_vector_int_list_t *results, bool *found)
 {
   bool local_found = false;
   // stack v
-  if (V != S)
-  {
-    igraph_stack_int_push(&state->stack, V);
-  }
-  printf("Pushing %lld to stack, stack size is %lld, result size is %lld, depth %lld\n", V, igraph_stack_int_size(&state->stack), igraph_vector_int_list_size(results), depth);
+  igraph_stack_int_push(&state->stack, V);
+  // printf("Pushing %lld to stack, stack size is %lld, result size is %lld\n", V, igraph_stack_int_size(&state->stack), igraph_vector_int_list_size(results));
   VECTOR(state->blocked)
   [V] = true;
 
@@ -70,68 +65,71 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
     igraph_integer_t W = VECTOR(*igraph_adjlist_get(&state->AK, V))[i];
     // NOTE: possibly dangerous fix for undirected graphs,
     // disabling finding any two-vertex-loops
-    if (W == S && (state->directed || depth > 1)) // or depth > 1
+    if (W == S)
     {
-      local_found = true;
-      depth = 0;
-      // output circuit composed of stack followed by s
-      igraph_stack_int_push(&state->stack, S);
-      printf("Found cycle with size %lld\n", igraph_stack_int_size(&state->stack));
+      if ((state->directed || igraph_stack_int_size(&state->stack) > 2))
+      {
+        local_found = true;
+        // output circuit composed of stack
+        // printf("Found cycle with size %lld\n", igraph_stack_int_size(&state->stack));
 
-      // copy output: from stack to vector
-      igraph_integer_t res_idx = 0;
-      igraph_vector_int_t res;
-      igraph_vector_int_init(&res, igraph_stack_int_size(&state->stack));
-      while (!igraph_stack_int_empty(&state->stack))
-      {
-        printf("Setting result value %lld\n", res_idx);
-        VECTOR(res)
-        [res_idx] = igraph_stack_int_pop(&state->stack); // igraph_stack_int_get(&state->stack, i);
-        printf("Set result value %lld\n", VECTOR(res)
-                                              [res_idx]);
-        res_idx += 1;
-      }
-      igraph_vector_int_sort(&res);
-      // undirected graphs lead to every cycle being found twice.
-      // this is our naïve filter for now
-      if (!state->directed)
-      {
-        igraph_bool_t duplicate_found = false;
-        for (igraph_integer_t results_idx = 0; results_idx < igraph_vector_int_list_size(results); ++results_idx)
+        // copy output: from stack to vector
+        igraph_integer_t res_idx = 0;
+        igraph_vector_int_t res;
+        igraph_vector_int_init(&res, igraph_stack_int_size(&state->stack));
+        while (!igraph_stack_int_empty(&state->stack))
         {
-          if (igraph_vector_int_size(igraph_vector_int_list_get_ptr(results, results_idx)) != igraph_vector_int_size(&res))
+          VECTOR(res)
+          [res_idx] = igraph_stack_int_pop(&state->stack); // igraph_stack_int_get(&state->stack, i);
+          res_idx += 1;
+        }
+        // we actually want to keep the stack; maybe a different data structure would be better after all?
+        for (igraph_integer_t stack_idx = igraph_vector_int_size(&res) - 1; stack_idx >= 0; --stack_idx)
+        {
+          igraph_stack_int_push(&state->stack, igraph_vector_int_get(&res, stack_idx));
+        }
+        igraph_vector_int_sort(&res);
+        // undirected graphs lead to every cycle being found twice.
+        // this is our naïve filter for now
+        if (!state->directed)
+        {
+          igraph_bool_t duplicate_found = false;
+          for (igraph_integer_t results_idx = 0; results_idx < igraph_vector_int_list_size(results); ++results_idx)
           {
-            continue;
-          }
-          igraph_bool_t discrepancy_found = false;
-          for (igraph_integer_t res_idx = 0; res_idx < igraph_vector_int_size(&res); ++res_idx)
-          {
-            if (igraph_vector_int_get(&res, res_idx) != igraph_vector_int_get(igraph_vector_int_list_get_ptr(results, results_idx), res_idx))
+            if (igraph_vector_int_size(igraph_vector_int_list_get_ptr(results, results_idx)) != igraph_vector_int_size(&res))
             {
-              discrepancy_found = true;
+              continue;
+            }
+            igraph_bool_t discrepancy_found = false;
+            for (igraph_integer_t res_idx = 0; res_idx < igraph_vector_int_size(&res); ++res_idx)
+            {
+              if (igraph_vector_int_get(&res, res_idx) != igraph_vector_int_get(igraph_vector_int_list_get_ptr(results, results_idx), res_idx))
+              {
+                discrepancy_found = true;
+                break;
+              }
+            }
+            if (!discrepancy_found)
+            {
+              // found this loop already.
+              duplicate_found = true;
               break;
             }
           }
-          if (!discrepancy_found)
+          if (duplicate_found)
           {
-            // found this loop already.
-            duplicate_found = true;
-            break;
+            igraph_vector_int_destroy(&res);
+            continue;
           }
         }
-        if (duplicate_found)
-        {
-          igraph_vector_int_destroy(&res);
-          continue;
-        }
+        // end filter
+        igraph_vector_int_list_push_back_copy(results, &res);
+        igraph_vector_int_destroy(&res);
       }
-      // end filter
-      igraph_vector_int_list_push_back_copy(results, &res);
-      igraph_vector_int_destroy(&res);
     }
     else if (!(VECTOR(state->blocked)[W]))
     {
-      igraph_simple_cycles_circuit(state, W, S, results, &local_found, depth + 1);
+      igraph_simple_cycles_circuit(state, W, S, results, &local_found);
     }
   }
   *found = local_found;
@@ -154,10 +152,10 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
     }
   }
 
-  if (V != S && igraph_stack_int_size(&state->stack) > 0)
+  if (igraph_stack_int_size(&state->stack) > 0)
   {
     // unstack v
-    printf("Unstacking %lld\n", V);
+    // printf("Unstacking %lld\n", V);
     igraph_stack_int_pop(&state->stack); // _back
   }
   // return result
@@ -176,63 +174,14 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
  */
 igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_state_t *state, const igraph_t *graph)
 {
-  printf("\n\nInitialization\n");
   igraph_integer_t N = igraph_vcount(graph);
 
   state->N = N;
   igraph_stack_int_init(&state->stack, N); // maximum size per cycle.
   igraph_vector_bool_init(&state->blocked, N);
   igraph_adjlist_init(graph, &state->AK, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE); // TODO: understand what we actually want to include
-  // igraph_adjlist_reverse_sort(&state->AK);                                                 // here is where the time complexity comes in
-  // // remove all neighbours where the indices do not follow the expected order
-  // for (igraph_integer_t i = N - 1; i >= 0; --i)
-  // {
-  //   igraph_vector_int_t *curr_adjs = igraph_adjlist_get(&state->AK, i);
-  //   igraph_integer_t nCurr_adjs = igraph_vector_int_size(curr_adjs);
-  //   for (igraph_integer_t j = nCurr_adjs - 1; j >= 0; --j)
-  //   {
-  //     if (igraph_vector_int_get(curr_adjs, j) < i)
-  //     {
-  //       igraph_vector_int_push_back(igraph_adjlist_get(&state->AK, igraph_vector_int_pop_back(curr_adjs)), i);
-  //     }
-  //     else
-  //     {
-  //       // as they are sorted, we can break out of the loop
-  //       break;
-  //     }
-  //   }
-  // }
-
   igraph_adjlist_sort(&state->AK);
   state->directed = igraph_is_directed(graph);
-  // if (!igraph_is_directed(graph))
-  // {
-  //   // filter out all back-and-forth edges
-  //   for (igraph_integer_t i = 0; i < N; ++i)
-  //   {
-  //     igraph_vector_int_t *neighs = igraph_adjlist_get(&state->AK, i);
-  //     igraph_integer_t nCurr_neighs = igraph_vector_int_size(neighs);
-  //     igraph_integer_t pos;
-  //     for (igraph_integer_t j = nCurr_neighs - 1; j >= 0; --j)
-  //     {
-  //       igraph_integer_t neigh_val = igraph_vector_int_get(neighs, j);
-  //       if (neigh_val < i)
-  //       {
-  //         // as they are sorted, we can break out of the loop
-  //         break;
-  //       }
-  //       if (igraph_vector_int_search(igraph_adjlist_get(&state->AK, neigh_val), 0, i, &pos))
-  //       {
-  //         igraph_vector_int_remove(igraph_adjlist_get(&state->AK, neigh_val), pos);
-  //       }
-  //     }
-  //   }
-  // }
-
-  for (igraph_integer_t j = 0; j < igraph_adjlist_size(&state->AK); ++j)
-  {
-    print_vector_int(igraph_adjlist_get(&state->AK, j));
-  }
   igraph_adjlist_init_empty(&state->B, N);
 
   return IGRAPH_SUCCESS;
@@ -252,7 +201,7 @@ igraph_error_t igraph_simple_cycles_search_one(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t s, igraph_vector_int_list_t *results)
 {
   // L3:
-  for (igraph_integer_t i = 0; i < state->N; ++i)
+  for (igraph_integer_t i = s; i < state->N; ++i)
   {
     VECTOR(state->blocked)
     [i] = false;
@@ -260,7 +209,7 @@ igraph_error_t igraph_simple_cycles_search_one(
   }
 
   bool found = false;
-  igraph_simple_cycles_circuit(state, s, s, results, &found, 0);
+  igraph_simple_cycles_circuit(state, s, s, results, &found);
 
   for (igraph_integer_t i = 0; i < state->N; ++i)
   {
@@ -296,28 +245,19 @@ igraph_error_t igraph_simple_cycles_search_all(
   igraph_simple_cycle_search_state_t state;
   igraph_simple_cycle_search_state_init(&state, graph);
 
-  // int nfound = 0;
   // igraph_vector_int_list_init(result, 0); // state.N);
 
   // TODO: depending on the graph, it is rather unreasonable to search cycles from each and every node
   igraph_integer_t s = 0;
   while (s < state.N)
   {
-    // if (!igraph_adjlist_empty(&state.AK))
-    // {
     if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, s)))
     {
       igraph_simple_cycles_search_one(&state, s, result);
     }
     s += 1;
-    // }
-    // else
-    // {
-    //   s = state.N;
-    // }
   }
 
-  // igraph_vector_int_list_resize(result, nfound);
   igraph_simple_cycle_search_state_destroy(&state);
 
   return IGRAPH_SUCCESS;
