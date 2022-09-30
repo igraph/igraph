@@ -63,7 +63,8 @@
  *    for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
  *    When the distance of two vertices is greater than this value,
- *    it will be returned as \c IGRAPH_INFINITY.
+ *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs are
+ *    treated as infinity.
  * \return Error code.
  *
  * Time complexity: O(s*|E|log|V|+|V|), where |V| is the number of
