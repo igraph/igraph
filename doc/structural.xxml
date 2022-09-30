@@ -19,7 +19,9 @@
 
 <section id="shortest-path-related-functions"><title>(Shortest)-path related functions</title>
 <!-- doxrox-include igraph_distances -->
+<!-- doxrox-include igraph_distances_cutoff -->
 <!-- doxrox-include igraph_distances_dijkstra -->
+<!-- doxrox-include igraph_distances_dijkstra_cutoff -->
 <!-- doxrox-include igraph_distances_bellman_ford -->
 <!-- doxrox-include igraph_distances_johnson -->
 <!-- doxrox-include igraph_distances_floyd_warshall -->
