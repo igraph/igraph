@@ -24,12 +24,12 @@ IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
 
 // simple cycle search, johnson
 typedef struct igraph_simple_cycle_search_state_t {
-  igraph_integer_t N;
-  igraph_adjlist_t AK;
-  igraph_adjlist_t B;
-  igraph_stack_int_t stack;
-  igraph_vector_bool_t blocked;
-  igraph_bool_t directed;
+    igraph_integer_t N;
+    igraph_adjlist_t AK;
+    igraph_adjlist_t B;
+    igraph_stack_int_t stack;
+    igraph_vector_bool_t blocked;
+    igraph_bool_t directed;
 } igraph_simple_cycle_search_state_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_init(
@@ -38,12 +38,14 @@ IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_init(
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_destroy(
     igraph_simple_cycle_search_state_t *state);
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_one(
+IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_from_one_vertex(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t start,
-    igraph_vector_int_list_t *result);
+    igraph_vector_int_list_t *result,
+    igraph_simple_cycle_search_mode_t search_mode);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_all(
-    const igraph_t *graph, igraph_vector_int_list_t *result);
+    const igraph_t *graph, igraph_vector_int_list_t *result,
+    igraph_simple_cycle_search_mode_t search_mode);
 
 __END_DECLS
 

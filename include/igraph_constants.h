@@ -199,6 +199,9 @@ typedef enum { IGRAPH_RANDOM_WALK_STUCK_ERROR = 0,
                IGRAPH_RANDOM_WALK_STUCK_RETURN
              } igraph_random_walk_stuck_t;
 
+typedef enum { IGRAPH_UNDIRECTED_SEARCH_BOTH = 0,
+               IGRAPH_UNDIRECTED_SEARCH_ONE = 1,
+             } igraph_simple_cycle_search_mode_t;
 
 __END_DECLS
 
