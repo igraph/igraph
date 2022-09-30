@@ -131,28 +131,20 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
     igraph_integer_t noroots = roots ? igraph_vector_int_size(roots) : 1;
 
     if (!roots && (root < 0 || root >= no_of_nodes)) {
-        IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid root vertex in BFS.", IGRAPH_EINVVID);
     }
 
-    if (roots && noroots > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(roots, &min, &max);
-        if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
-        }
+    if (roots && !igraph_vector_int_isininterval(roots, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("Invalid root vertex in BFS.", IGRAPH_EINVVID);
     }
 
-    if (restricted && igraph_vector_int_size(restricted) > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(restricted, &min, &max);
-        if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid vertex ID in restricted set", IGRAPH_EINVAL);
-        }
+    if (restricted && !igraph_vector_int_isininterval(restricted, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("Invalid vertex ID in restricted set.", IGRAPH_EINVVID);
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {

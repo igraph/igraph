@@ -213,12 +213,8 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
-    if (igraph_vector_int_size(ipiv) > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(ipiv, &min, &max);
-        if (max > n || min < 1) {
+    if (! igraph_vector_int_isininterval(ipiv, 1, n)) {
             IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
-        }
     }
     if (igraph_vector_int_size(ipiv) != n) {
         IGRAPH_ERROR("Pivot vector length must match number of matrix rows.", IGRAPH_EINVAL);
