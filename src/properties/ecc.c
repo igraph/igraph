@@ -271,9 +271,10 @@ static igraph_error_t igraph_i_ecc4(
  * is defined based on the number of k-cycles the edge participates in,
  * <code>z^(k)_ij</code>, and the largest number of such cycles it could
  * participate in given the degree of its endpoints, <code>s^(k)_ij</code>.
+ * The original definition given in the reference below is:
  *
  * </para><para>
- * <code>C^(k)_ij = (z^(k) + 1) / s^(k)_ij</code>
+ * <code>C^(k)_ij = (z^(k)_ij + 1) / s^(k)_ij</code>
  *
  * </para><para>
  * For <code>k=3</code>, <code>s^(k)_ij = min(d_i - 1, d_j - 1)</code>,
@@ -281,14 +282,21 @@ static igraph_error_t igraph_i_ecc4(
  * For <code>k=4</code>, <code>s^(k)_ij = (d_i - 1) (d_j - 1)</code>.
  *
  * </para><para>
- * This function ignores edge multiplicities when listing k-cycles, but
- * not in any other parts of the calculation.
+ * The \p normalize and \p offset parameters allow for skipping normalization
+ * by <code>s^(k)</code> and offsetting the cycle count <code>z^(k)</code>
+ * by one in the numerator of <code>C^(k)</code>. Set both to \c true to
+ * compute the original definition of this metric.
+ *
+ * </para><para>
+ * This function ignores edge multiplicities when listing k-cycles
+ * (i.e. <code>z^(k)</code>), but not when computing the maximum number of
+ * cycles an edge can participate in (<code>s^(k)</code>).
  *
  * </para><para>
  * Reference:
  *
  * </para><para>
- * F. Radicchi, C. Castellano, F. Cecconi, V. Loreto, and D. Paris,
+ * F. Radicchi, C. Castellano, F. Cecconi, V. Loreto, and D. Parisi,
  * PNAS 101, 2658 (2004).
  * https://doi.org/10.1073/pnas.0400054101
  *
@@ -297,13 +305,20 @@ static igraph_error_t igraph_i_ecc4(
  * \param eids The edges for which the edge clustering coefficient will be computed.
  * \param k Size of cycles to use in calculation. Must be at least 3. Currently
  *   only values of 3 and 4 are supported.
+ * \param offset Boolean, whether to add one to cycle counts. When \c false,
+ *   <code>z^(k)</code> is used instead of <code>z^(k) + 1</code>. In this case
+ *   the maximum value of the normalized metric is 1. For <code>k=3</code> this
+ *   is achieved for all edges in a complete graph.
+ * \param normalize Boolean, whether to normalize cycle counts by the maximum
+ *   possible count <code>s^(k)</code> given the degrees.
  * \return Error code.
  *
  * Time complexity: When \p k is 3, O(|V| d log d + |E| d).
  * When \p k is 4, O(|V| d log d + |E| d^2). d denotes the degree of vertices.
  */
 igraph_error_t igraph_ecc(const igraph_t *graph, igraph_vector_t *res,
-                          const igraph_es_t eids, igraph_integer_t k) {
+                          const igraph_es_t eids, igraph_integer_t k,
+                          igraph_bool_t offset, igraph_bool_t normalize) {
 
     if (k < 3) {
         IGRAPH_ERRORF("Cycle size for edge clustering coefficient must be at least 3, got %" IGRAPH_PRId ".",
@@ -313,12 +328,12 @@ igraph_error_t igraph_ecc(const igraph_t *graph, igraph_vector_t *res,
     switch (k) {
     case 3:
         if (igraph_es_is_all(&eids)) {
-            return igraph_i_ecc3_1(graph, res, eids, true, true);
+            return igraph_i_ecc3_1(graph, res, eids, offset, normalize);
         } else {
-            return igraph_i_ecc3_2(graph, res, eids, true, true);
+            return igraph_i_ecc3_2(graph, res, eids, offset, normalize);
         }
     case 4:
-        return igraph_i_ecc4(graph, res, eids, true, true);
+        return igraph_i_ecc4(graph, res, eids, offset, normalize);
     default:
         IGRAPH_ERROR("Edge clustering coefficient calculation is only implemented for cycle sizes 3 and 4.",
                      IGRAPH_UNIMPLEMENTED);
