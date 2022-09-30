@@ -172,6 +172,7 @@
 <!-- doxrox-include igraph_transitivity_local_undirected -->
 <!-- doxrox-include igraph_transitivity_avglocal_undirected -->
 <!-- doxrox-include igraph_transitivity_barrat -->
+<!-- doxrox-include igraph_ecc -->
 </section>
 
 <section id="directedness-conversion"><title>Directedness conversion</title>
