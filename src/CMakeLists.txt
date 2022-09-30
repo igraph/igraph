@@ -247,6 +247,7 @@ add_library(
   paths/simple_paths.c
   paths/sparsifier.c
   paths/unweighted.c
+  paths/voronoi.c
   paths/widest_paths.c
 
   properties/basic_properties.c
