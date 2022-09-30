@@ -22,6 +22,8 @@
 #include "igraph_iterators.h"
 #include "igraph_adjlist.h"
 
+#include "core/interruption.h"
+
 /* Computes the size of the intersection of two sorted vectors, treated as sets.
  * It is assumed that the vectors contain no duplicates. */
 static igraph_integer_t vector_int_intersection_size_sorted(
@@ -80,6 +82,8 @@ static igraph_error_t igraph_i_ecc3_1(
 
         igraph_real_t z; /* number of triangles the edge participates in */
         igraph_real_t s; /* max number of triangles the edge could be part of */
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         if (v1 == v2) {
             /* A self-loop isn't, and cannot be part of any triangles. */
@@ -140,6 +144,8 @@ static igraph_error_t igraph_i_ecc3_2(
 
         igraph_real_t z; /* number of triangles the edge participates in */
         igraph_real_t s; /* max number of triangles the edge could be part of */
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         if (v1 == v2) {
             /* A self-loop isn't, and cannot be part of any triangles. */
@@ -217,6 +223,8 @@ static igraph_error_t igraph_i_ecc4(
 
         igraph_real_t z; /* number of 4-cycles the edge participates in */
         igraph_real_t s; /* max number of 4-cycles the edge could be part of */
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
         if (v1 == v2) {
             z = 0.0;
