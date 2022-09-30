@@ -381,15 +381,13 @@ igraph_error_t igraph_square_lattice(
     /* init coords & weights */
 
     coords = IGRAPH_CALLOC(dims, igraph_integer_t);
-    if (coords == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(coords, "Lattice creation failed.");
     IGRAPH_FINALLY(igraph_free, coords);
+
     weights = IGRAPH_CALLOC(dims, igraph_integer_t);
-    if (weights == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(weights, "Lattice creation failed.");
     IGRAPH_FINALLY(igraph_free, weights);
+
     if (dims > 0) {
         weights[0] = 1;
         for (i = 1; i < dims; i++) {

@@ -28,7 +28,7 @@ typedef struct TYPE(igraph_heap) {
 } TYPE(igraph_heap);
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t size);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *t, BASE* data, igraph_integer_t len);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *t, const BASE *data, igraph_integer_t len);
 IGRAPH_EXPORT void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h);
 IGRAPH_EXPORT void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_heap, empty)(const TYPE(igraph_heap)* h);

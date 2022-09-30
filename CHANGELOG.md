@@ -4,6 +4,7 @@
 
 ### Added
 
+ - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculates shortest paths with an upper limit on the total path length.
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
 
@@ -11,8 +12,7 @@
 
  - `igraph_edge()` now checks that the input edge ID is valid.
 
- - `igraph_community_leading_eigenvector()`,
-   `igraph_adjacency_spectral_embedding()`,
+ - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`,
    `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and
    `igraph_arpack_rnsolve()` now generate a random starting vector using
    igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so.
@@ -22,8 +22,10 @@
 ### Fixed
 
  - `igraph_trussness()` is now interruptible.
+ - `igraph_spanner()` is now interruptible.
  - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
+ - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
  - Addressed new warnings introduced by Clang 15.
 
 ### Removed

@@ -247,7 +247,7 @@ add_legacy_tests(
 add_examples(
   FOLDER examples/simple NAMES
   bellman_ford
-  dijkstra
+  distances
   igraph_assortativity_degree
   igraph_assortativity_nominal
   igraph_average_path_length

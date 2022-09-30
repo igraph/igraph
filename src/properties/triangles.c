@@ -334,7 +334,7 @@ static igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *grap
 
 /**
  * \function igraph_transitivity_local_undirected
- * \brief Calculates the local transitivity (clustering coefficient) of a graph.
+ * \brief The local transitivity (clustering coefficient) of some vertices.
  *
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the local transitivity, this
@@ -811,7 +811,7 @@ static igraph_error_t igraph_i_transitivity_barrat4(
 
 /**
  * \function igraph_transitivity_barrat
- * \brief Weighted transitivity, as defined by A. Barrat.
+ * \brief Weighted local transitivity of some vertices, as defined by A. Barrat.
  *
  * This is a local transitivity, i.e. a vertex-level index. For a
  * given vertex \c i, from all triangles in which it participates we
