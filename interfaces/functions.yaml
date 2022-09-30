@@ -745,6 +745,12 @@ igraph_transitivity_barrat:
         EDGEWEIGHTS weights=NULL, TRANSITIVITY_MODE mode=NAN
     DEPS: res ON graph, vids ON graph, weights ON graph
 
+igraph_ecc:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, EDGE_SELECTOR eids=ALL,
+        INTEGER k=3, BOOLEAN offset=False, BOOLEAN normalize=True
+    DEPS: res ON graph, eids ON graph
+
 igraph_reciprocity:
     PARAMS: |-
         GRAPH graph, OUT REAL res, BOOLEAN ignore_loops=True,
