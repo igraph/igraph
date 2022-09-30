@@ -44,7 +44,7 @@
  *        vertices in the \p to argument. One row of the matrix shows the
  *        distances from/to a given vertex to the ones in \p to.
  *        For the unreachable vertices \c IGRAPH_INFINITY is returned.
- * \param from The source vertices.
+ * \param from The source vertices._d
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
  * \param mode The type of shortest paths to be used for the
@@ -60,7 +60,8 @@
  *        \endclist
  * \param cutoff The maximal length of paths that will be considered.
  *    When the distance of two vertices is greater than this value,
- *    it will be returned as \c IGRAPH_INFINITY.
+ *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs are
+ *    treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
