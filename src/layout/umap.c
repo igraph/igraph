@@ -26,6 +26,7 @@
 #include "igraph_random.h"
 
 #include "layout/layout_internal.h"
+#include "core/interruption.h"
 
 #include <math.h>
 
@@ -616,6 +617,8 @@ static igraph_error_t igraph_i_umap_apply_forces(
      * not be doing UMAP.
      * */
     igraph_vector_int_t neis, negative_vertices;
+    igraph_integer_t loop_count = 0;
+    igraph_integer_t interrupt_period = 10000;
 
     /* Initialize vectors */
     IGRAPH_VECTOR_INIT_FINALLY(&from_emb, ndim);
@@ -666,6 +669,10 @@ static igraph_error_t igraph_i_umap_apply_forces(
         /* Random other nodes are repelled from one (the first) vertex */
         IGRAPH_CHECK(igraph_random_sample(&negative_vertices, 0, no_of_nodes - 2, n_random_vertices));
         for (igraph_integer_t j = 0; j < n_random_vertices; j++) {
+            loop_count++;
+            if (loop_count % interrupt_period == 0) {
+                IGRAPH_ALLOW_INTERRUPTION();
+            }
             /* Get random neighbor */
             to = VECTOR(negative_vertices)[j];
             /* obviously you cannot repel yourself */

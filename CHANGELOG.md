@@ -23,6 +23,7 @@
  - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
  - Addressed new warnings introduced by Clang 15.
  - `igraph_layout_umap_3d()` now actually uses three dimensions.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
 
 ### Removed
 
