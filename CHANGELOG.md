@@ -22,6 +22,7 @@
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
  - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
  - Addressed new warnings introduced by Clang 15.
+ - `igraph_layout_umap_3d()` now actually uses three dimensions.
 
 ### Removed
 

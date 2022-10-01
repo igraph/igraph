@@ -1084,5 +1084,5 @@ igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_integer_t epochs,
                                      igraph_real_t sampling_prob) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, sampling_prob, 2);
+            distances, min_dist, epochs, sampling_prob, 3);
 }
