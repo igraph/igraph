@@ -34,34 +34,41 @@ int main(void) {
     igraph_small(&g_empty_dir, 0, 1, -1);
     igraph_small(&g_lm, 6, 1, 0,1, 0,2, 1,1, 1,2, 1,3, 2,0, 2,3, 3,4, 3,4, -1);
 
-    igraph_set_error_handler(igraph_error_handler_printignore);
-
     printf("No vertices, not directed:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_empty, &result, vids, vids, &weights_empty) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_empty, &result, vids, vids, &weights_empty, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix(&result);
 
     printf("No vertices, directed:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_empty_dir, &result, vids, vids, &weights_empty) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_empty_dir, &result, vids, vids, &weights_empty, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix(&result);
 
-    printf("Directed graph with loops and multi-edges with negative loop:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm_neg_loop) == IGRAPH_ENEGLOOP);
-
     printf("Directed graph with loops and multi-edges:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix(&result);
 
     printf("Directed graph with loops and multi-edges, select vertices 1 and 2:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_range(1, 3), igraph_vss_range(1, 3), &weights_lm) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_range(1, 3), igraph_vss_range(1, 3), &weights_lm, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix(&result);
 
     printf("Directed graph with loops and multi-edges, select 0 -> 2:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_1(0), igraph_vss_1(2), &weights_lm) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_1(0), igraph_vss_1(2), &weights_lm, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix(&result);
 
     printf("Directed graph with loops and multi-edges, select none:\n");
-    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_none(), igraph_vss_none(), &weights_lm) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, igraph_vss_none(), igraph_vss_none(), &weights_lm, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_matrix(&result);
+
+    printf("Directed graph with loops and multi-edges, IGRAPH_IN:\n");
+    IGRAPH_ASSERT(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_IN) == IGRAPH_SUCCESS);
+    print_matrix(&result);
+
+    VERIFY_FINALLY_STACK();
+
+    printf("Checking error for directed graph with loops and multi-edges with negative loop.\n");
+    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm_neg_loop, IGRAPH_OUT), IGRAPH_ENEGLOOP);
+
+    printf("Directed graph with loops and multi-edges, IGRAPH_ALL:\n");
+    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_ALL), IGRAPH_EINVAL);
 
     igraph_matrix_destroy(&result);
     igraph_destroy(&g_empty);
