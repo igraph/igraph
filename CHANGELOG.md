@@ -18,6 +18,7 @@
    igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so.
    This makes sure that the results obtained from these functions remain the
    same if igraph's RNG is seeded with the same value.
+ - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
 
 ### Fixed
 
