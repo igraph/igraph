@@ -554,6 +554,7 @@ igraph_voronoi:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT membership, OUT VECTOR distances,
         VECTOR_INT generators, VECTOR weights, NEIMODE mode=OUT, VORONOI_TIEBREAKER tiebreaker=RANDOM
+    DEPS: weights ON graph
 
 igraph_get_all_simple_paths:
     PARAMS: |-
