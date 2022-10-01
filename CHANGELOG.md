@@ -7,6 +7,7 @@
  - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculate shortest paths with an upper limit on the path length.
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
+ - `igraph_dqueue_get()` accesses an element in a queue by index.
 
 ### Changed
 
@@ -29,6 +30,7 @@
 ### Deprecated
 
  - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
+ - The undocumented function `igraph_dqueue_e()` is now deprecated and replaced by `igraph_dqueue_get()`.
 
 ### Other
 

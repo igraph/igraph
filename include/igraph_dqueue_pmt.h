@@ -46,4 +46,5 @@ IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, back)(const TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, push)(TYPE(igraph_dqueue)* q, BASE elem);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
-IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, igraph_integer_t idx);
+IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, get)(const TYPE(igraph_dqueue) *q, igraph_integer_t idx);
+IGRAPH_DEPRECATED IGRAPH_EXPORT BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, igraph_integer_t idx);
