@@ -408,7 +408,7 @@ igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FIL
  * \brief Access an element in a queue.
  *
  * \param q The queue.
- * \param idx The index of the element withint the queue.
+ * \param idx The index of the element within the queue.
  * \return The desired element.
  *
  * Time complexity: O(1).
