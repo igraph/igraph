@@ -92,12 +92,9 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
        From now on we use a 2-way heap, so the distances can be queried
        directly from the heap.
 
-       Dirty tricks:
-       - the opposite of the distance is stored in the heap, as it is a
+       Tricks:
+       - The opposite of the distance is stored in the heap, as it is a
          maximum heap and we need a minimum heap.
-       - we don't use IGRAPH_INFINITY in the res matrix during the
-         computation, as IGRAPH_FINITE() might involve a function call
-         and we want to spare that. -1 will denote infinity instead.
     */
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -172,8 +169,14 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
 
         igraph_integer_t reached = 0;
         igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
+
         igraph_2wheap_clear(&Q);
-        igraph_2wheap_push_with_index(&Q, source, -1.0);
+
+        /* Many systems distinguish between +0.0 and -0.0.
+         * Since we store negative distances in the heap,
+         * we must insert -0.0 in order to get +0.0 as the
+         * final distance result. */
+        igraph_2wheap_push_with_index(&Q, source, -0.0);
 
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
@@ -181,15 +184,15 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
             igraph_vector_int_t *neis;
             igraph_integer_t nlen;
 
-            if (cutoff >= 0 && (mindist - 1.0) > cutoff) {
+            if (cutoff >= 0 && mindist > cutoff) {
                 continue;
             }
 
             if (all_to) {
-                MATRIX(*res, i, minnei) = mindist - 1.0;
+                MATRIX(*res, i, minnei) = mindist;
             } else {
                 if (VECTOR(indexv)[minnei]) {
-                    MATRIX(*res, i, VECTOR(indexv)[minnei] - 1) = mindist - 1.0;
+                    MATRIX(*res, i, VECTOR(indexv)[minnei] - 1) = mindist;
                     reached++;
                     if (reached == no_of_to) {
                         igraph_2wheap_clear(&Q);
@@ -204,17 +207,23 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_integer_t edge = VECTOR(*neis)[j];
+                igraph_real_t weight = VECTOR(*weights)[edge];
+
+                /* Optimization: do not follow infinite-weight edges. */
+                if (weight == IGRAPH_INFINITY) continue;
+
                 igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
-                igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
-                igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
-                igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
-                igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
-                if (!has) {
+                igraph_real_t altdist = mindist + weight;
+
+                if (! igraph_2wheap_has_elem(&Q, tto)) {
                     /* This is the first non-infinite distance */
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
-                } else if (altdist < curdist) {
-                    /* This is a shorter path */
-                    igraph_2wheap_modify(&Q, tto, -altdist);
+                } else if (igraph_2wheap_has_active(&Q, tto)) {
+                    igraph_real_t curdist = -igraph_2wheap_get(&Q, tto);
+                    if (altdist < curdist) {
+                        /* This is a shorter path */
+                        igraph_2wheap_modify(&Q, tto, -altdist);
+                    }
                 }
             }
 
