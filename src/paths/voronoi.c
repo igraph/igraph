@@ -351,11 +351,11 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
  *    \cli IGRAPH_VORONOI_LAST assign the vertex to the last generator point.
  *    \cli IGRAPH_VORONOI_RANDOM assign the vertex to a random generator point.
  *    \endclist
- *    Note that \c IGRAPH_VORONOI_RANDOM does not guarantee that all vertices
- *    of the subgraphs induced by the partitions will be reachable from the
- *    generator. For example, if 1 and 2 are chosen as genrators for the graph
- *    <code>4-3-2, 2-1</code>, then 3 and 4 may be randomly assigned to different
- *    partitions.
+ *    Note that \c IGRAPH_VORONOI_RANDOM does not guarantee that all partitions
+ *    will be contiguous. For example, if 1 and 2 are chosen as generators for the
+ *    graph <code>1-3, 2-3, 3-4</code>, then 3 and 4 are at equal distance from
+ *    both generators. If 3 is assigned to 2 but 4 is assigned to 1, then the
+ *    partition {1, 4} will not induce a connected subgraph.
  * \return Error code.
  *
  * \sa \ref igraph_distances(), \ref igraph_distances_dijkstra().
