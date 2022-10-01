@@ -56,6 +56,11 @@
  * \param weights Optional edge weights. If it is a null-pointer, then
  *   the unweighted breadth-first search based \ref igraph_distances() will
  *   be called.
+ * \param mode For directed graphs; whether to follow paths along edge
+ *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
+ *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
+ *    for undirected graphs. \c IGRAPH_ALL should not be used with
+ *    negative weights.
  * \return Error code.
  *
  * Time complexity: O(s|V|log|V|+|V||E|), |V| and |E| are the number
