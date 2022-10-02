@@ -532,8 +532,8 @@ static igraph_error_t igraph_i_umap_compute_cross_entropy(const igraph_t *graph,
 
 
 /* clip forces to avoid too rapid shifts */
-static void igraph_i_umap_clip_force(igraph_real_t *force, igraph_real_t limit) {
-    *force  = fmax(fmin(*force, limit), -limit);
+static igraph_real_t igraph_i_umap_clip_force(igraph_real_t force, igraph_real_t limit) {
+    return fmax(fmin(force, limit), -limit);
 }
 
 /*xd is difference in x direction, mu is a weight */
@@ -557,7 +557,7 @@ static igraph_error_t igraph_i_umap_attract(
     for (igraph_integer_t d = 0; d != ndim; d++) {
         VECTOR(*forces)[d] = force * VECTOR(*delta)[d];
         /* clip force to avoid too rapid change */
-        igraph_i_umap_clip_force(&(VECTOR(*forces)[d]), 3);
+        VECTOR(*forces)[d] = igraph_i_umap_clip_force(VECTOR(*forces)[d], 3);
 
 #ifdef UMAP_DEBUG
         printf("force attractive: delta[%d] = %g, forces[%d] = %g\n", d, VECTOR(*delta)[d], d, VECTOR(*forces)[d]);
@@ -589,7 +589,7 @@ static igraph_error_t igraph_i_umap_repel(
         VECTOR(*forces)[d] = force * VECTOR(*delta)[d];
 
         /* clip force to avoid too rapid change */
-        igraph_i_umap_clip_force(&(VECTOR(*forces)[d]), 3);
+        VECTOR(*forces)[d] = igraph_i_umap_clip_force(VECTOR(*forces)[d], 3);
 
 #ifdef UMAP_DEBUG
         printf("force repulsive: delta[%d] = %g, forces[%d] = %g\n", d, VECTOR(*delta)[d], d, VECTOR(*forces)[d]);
