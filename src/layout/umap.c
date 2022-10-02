@@ -532,11 +532,8 @@ static igraph_error_t igraph_i_umap_compute_cross_entropy(const igraph_t *graph,
 
 
 /* clip forces to avoid too rapid shifts */
-static igraph_error_t igraph_i_umap_clip_force(igraph_real_t *force, igraph_real_t limit) {
-
+static void igraph_i_umap_clip_force(igraph_real_t *force, igraph_real_t limit) {
     *force  = fmax(fmin(*force, limit), -limit);
-
-    return IGRAPH_SUCCESS;
 }
 
 /*xd is difference in x direction, mu is a weight */

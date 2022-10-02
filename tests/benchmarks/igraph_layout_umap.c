@@ -45,7 +45,7 @@ int main(void) {
 
 #undef EPOCHS
 #undef REP
-#define EPOCHS 5
+#define EPOCHS 60
 #define REP 1
 #define VCOUNT 10000
 #define DENS 0.001
@@ -59,7 +59,7 @@ int main(void) {
     }
     RNG_END();
 
-    BENCH("Larger graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP) ", vertices: " TOSTR(VCOUNT) ", density: " TOSTR(DENS), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0.8) , REP);
+    BENCH("Larger graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP) ", vertices: " TOSTR(VCOUNT) ", density: " TOSTR(DENS), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0.05) , REP);
     );
 
 
