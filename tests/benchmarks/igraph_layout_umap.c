@@ -31,8 +31,9 @@ int main(void) {
 
 #define EPOCHS 5000
 #define REP 40
+#define SAMP_PROB 0.8
 
-    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0.8) , REP);
+    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP) ", sampling prob: " TOSTR(SAMP_PROB), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, SAMP_PROB) , REP);
     );
 
 #undef EPOCHS
@@ -40,11 +41,13 @@ int main(void) {
 #define EPOCHS 500
 #define REP 400
 
-    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0.8) , REP);
+    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP) ", sampling prob: " TOSTR(SAMP_PROB), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, SAMP_PROB) , REP);
     );
 
 #undef EPOCHS
 #undef REP
+#undef SAMP_PROB
+#define SAMP_PROB 0.05
 #define EPOCHS 60
 #define REP 1
 #define VCOUNT 10000
@@ -59,7 +62,7 @@ int main(void) {
     }
     RNG_END();
 
-    BENCH("Larger graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP) ", vertices: " TOSTR(VCOUNT) ", density: " TOSTR(DENS), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0.05) , REP);
+    BENCH("Larger graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP) ", sampling prob: " TOSTR(SAMP_PROB), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, SAMP_PROB) , REP);
     );
 
 
