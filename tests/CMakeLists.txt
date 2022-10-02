@@ -946,6 +946,7 @@ add_benchmarks(
   igraph_coloring
   igraph_decompose
   igraph_distances
+  igraph_ecc
   igraph_maximal_cliques
   igraph_neighborhood
   igraph_pagerank
