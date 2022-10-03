@@ -59,12 +59,12 @@ __BEGIN_DECLS
 #undef BASE_INT
 
 #define IGRAPH_DQUEUE_NULL { 0,0,0,0 }
-#define IGRAPH_DQUEUE_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_dqueue_init(v, size)); \
-        IGRAPH_FINALLY(igraph_dqueue_destroy, v); } while (0)
-#define IGRAPH_DQUEUE_INT_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_dqueue_int_init(v, size)); \
-        IGRAPH_FINALLY(igraph_dqueue_int_destroy, v); } while (0)
+#define IGRAPH_DQUEUE_INIT_FINALLY(q, capacity) \
+    do { IGRAPH_CHECK(igraph_dqueue_init(q, capacity)); \
+        IGRAPH_FINALLY(igraph_dqueue_destroy, q); } while (0)
+#define IGRAPH_DQUEUE_INT_INIT_FINALLY(q, capacity) \
+    do { IGRAPH_CHECK(igraph_dqueue_int_init(q, capacity)); \
+        IGRAPH_FINALLY(igraph_dqueue_int_destroy, q); } while (0)
 
 __END_DECLS
 

@@ -7,6 +7,7 @@
  - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculate shortest paths with an upper limit on the path length.
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
+ - `igraph_dqueue_get()` accesses an element in a queue by index.
 
 ### Changed
 
@@ -21,6 +22,8 @@
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
  - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
  - Addressed new warnings introduced by Clang 15.
+ - `igraph_layout_umap_3d()` now actually uses three dimensions.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
 
 ### Removed
 
@@ -29,6 +32,7 @@
 ### Deprecated
 
  - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
+ - The undocumented function `igraph_dqueue_e()` is now deprecated and replaced by `igraph_dqueue_get()`.
 
 ### Other
 
