@@ -47,18 +47,16 @@ static igraph_integer_t vector_int_intersection_size_sorted(
     return count;
 }
 
-/* Get a neighbour list from a lazy adjacency list, and sort it if is hasn't been sorted
- * yet. Assumes the presence of the 'al_retrieved' boolean vector to keep track of what
- * has been retrieved/sorted so far. */
+/* Get a neighbour list from a lazy adjacency list, and sort it if is hasn't been sorted yet. */
 #define AL_SORTED_GET(al, v, res) \
     do { \
+        igraph_bool_t had = igraph_lazy_adjlist_has(&al, v); \
         res = igraph_lazy_adjlist_get(&al, v); \
-        if (! VECTOR(al_retrieved)[v]) { \
+        if (! had) { \
             /* OOM error can only occur when originally retrieving a neighbour list, \
              * not on subsequent call to lazy_adjlist_get(). */ \
             IGRAPH_CHECK_OOM(res, "Not enough memory for edge clustering coefficient."); \
             igraph_vector_int_sort(res); \
-            VECTOR(al_retrieved)[v] = true; \
         } \
     } while(0)
 
@@ -131,11 +129,7 @@ static igraph_error_t igraph_i_ecc3_2(
         const igraph_t *graph, igraph_vector_t *res,
         const igraph_es_t eids, igraph_bool_t offset, igraph_bool_t normalize) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    /* For each vertex, we keep track of whether the neighbour list was already
-     * retrieved in the boolean array 'al_retrieved'. */
     igraph_lazy_adjlist_t al;
-    igraph_vector_bool_t al_retrieved;
     igraph_eit_t eit;
     const igraph_real_t c = offset ? 1.0 : 0.0;
 
@@ -146,8 +140,6 @@ static igraph_error_t igraph_i_ecc3_2(
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
-
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&al_retrieved, no_of_nodes);
 
     for (igraph_integer_t i=0;
          ! IGRAPH_EIT_END(eit);
@@ -182,10 +174,9 @@ static igraph_error_t igraph_i_ecc3_2(
         if (normalize) VECTOR(*res)[i] /= s;
     }
 
-    igraph_vector_bool_destroy(&al_retrieved);
     igraph_eit_destroy(&eit);
     igraph_lazy_adjlist_destroy(&al);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -277,9 +268,7 @@ static igraph_error_t igraph_i_ecc4_2(
         const igraph_t *graph, igraph_vector_t *res,
         const igraph_es_t eids, igraph_bool_t offset, igraph_bool_t normalize) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t al;
-    igraph_vector_bool_t al_retrieved;
     igraph_eit_t eit;
     igraph_real_t c = offset ? 1.0 : 0.0;
 
@@ -290,8 +279,6 @@ static igraph_error_t igraph_i_ecc4_2(
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
-
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&al_retrieved, no_of_nodes);
 
     for (igraph_integer_t i=0;
          ! IGRAPH_EIT_END(eit);
@@ -351,10 +338,9 @@ static igraph_error_t igraph_i_ecc4_2(
         if (normalize) VECTOR(*res)[i] /= s;
     }
 
-    igraph_vector_bool_destroy(&al_retrieved);
     igraph_eit_destroy(&eit);
     igraph_lazy_adjlist_destroy(&al);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
