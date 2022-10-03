@@ -254,6 +254,7 @@ add_library(
   properties/convergence_degree.c
   properties/dag.c
   properties/degrees.c
+  properties/ecc.c
   properties/girth.c
   properties/loops.c
   properties/multiplicity.c
