@@ -92,7 +92,8 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
                 }
                 // undirected graphs lead to every cycle being found twice.
                 // this is our naïve filter for now
-                if (!state->directed && search_mode == IGRAPH_UNDIRECTED_SEARCH_ONE)
+                igraph_bool_t persist_result = true;
+                if (!state->directed && search_mode == IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE)
                 {
                     igraph_vector_int_sort(&res);
                     igraph_bool_t duplicate_found = false;
@@ -120,13 +121,13 @@ igraph_error_t igraph_simple_cycles_circuit(igraph_simple_cycle_search_state_t *
                     }
                     if (duplicate_found)
                     {
-                        igraph_vector_int_destroy(&res);
-                        IGRAPH_FINALLY_CLEAN(1);
-                        continue;
+                        persist_result = false;
                     }
                 }
                 // end filter
-                IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(results, &res));
+                if (persist_result) {
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(results, &res));
+                }
                 igraph_vector_int_destroy(&res);
                 IGRAPH_FINALLY_CLEAN(1);
             }
@@ -232,10 +233,10 @@ igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_sear
  * \param search_mode What to do with undirected graphs. Ignored for directed graphs.
  *                    Possible values:
  *        \clist
- *        \cli IGRAPH_UNDIRECTED_SEARCH_BOTH
+ *        \cli IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH
  *          For undirected graphs, each loop will be returned twice,
  *          each once in one and once in the other direction.
- *        \cli IGRAPH_UNDIRECTED_SEARCH_ONE
+ *        \cli IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE
  *          For undirected graphs, the double loops will be filtered out.
  *          This has considerable performance implications, currently,
  *          and additionally leads to the returned loops' vertices being sorted.

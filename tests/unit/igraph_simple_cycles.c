@@ -47,7 +47,7 @@ int main(void)
     igraph_ring(&g_ring, 10, /*directed=*/1, /*mutual=*/0, /*circular=*/1);
     printf("\nCreated ring\n");
     // call cycles finder, expect 1 cycle to be found
-    checkGraphForNrOfCycles(&g_ring, 1, IGRAPH_UNDIRECTED_SEARCH_ONE);
+    checkGraphForNrOfCycles(&g_ring, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     // clean up
     igraph_destroy(&g_ring);
 
@@ -56,7 +56,7 @@ int main(void)
     igraph_star(&g_star, 7, IGRAPH_STAR_OUT, 1);
     printf("\nCreated star\n");
     // call cycles finder, expect 0 cycle to be found
-    checkGraphForNrOfCycles(&g_star, 0, IGRAPH_UNDIRECTED_SEARCH_ONE);
+    checkGraphForNrOfCycles(&g_star, 0, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     // clean up
     igraph_destroy(&g_star);
 
@@ -64,7 +64,7 @@ int main(void)
     igraph_wheel(&g_wheel, 10, IGRAPH_WHEEL_OUT, 0);
     printf("\nCreated directed wheel\n");
     // call cycles finder, expect 1 cycle to be found
-    checkGraphForNrOfCycles(&g_wheel, 1, IGRAPH_UNDIRECTED_SEARCH_ONE);
+    checkGraphForNrOfCycles(&g_wheel, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     // clean up
     igraph_destroy(&g_wheel);
 
@@ -73,8 +73,8 @@ int main(void)
     igraph_ring(&g_ring_undirected, 10, /*directed=*/0, /*mutual=*/0, /*circular=*/1);
     printf("\nCreated undirected ring\n");
     // call cycles finder, expect 1 cycle to be found
-    checkGraphForNrOfCycles(&g_ring_undirected, 1, IGRAPH_UNDIRECTED_SEARCH_ONE);    
-    checkGraphForNrOfCycles(&g_ring_undirected, 2, IGRAPH_UNDIRECTED_SEARCH_BOTH);
+    checkGraphForNrOfCycles(&g_ring_undirected, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);    
+    checkGraphForNrOfCycles(&g_ring_undirected, 2, IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH);
 
 
     igraph_t g_star_undirected;
@@ -82,15 +82,15 @@ int main(void)
     igraph_star(&g_star_undirected, 7, IGRAPH_STAR_UNDIRECTED, 1);
     printf("\nCreated undirected star\n");
     // call cycles finder, expect 0 cycle to be found
-    checkGraphForNrOfCycles(&g_star_undirected, 0, IGRAPH_UNDIRECTED_SEARCH_ONE);
+    checkGraphForNrOfCycles(&g_star_undirected, 0, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
 
     igraph_t g_ring_plus_star_undirected;
     igraph_disjoint_union(&g_ring_plus_star_undirected, &g_ring_undirected, &g_star_undirected);
     printf("\nCreated union of undirected wheel and star\n");
     // call cycles finder, expect 1 cycle to be found
-    checkGraphForNrOfCycles(&g_ring_plus_star_undirected, 1, IGRAPH_UNDIRECTED_SEARCH_ONE);
+    checkGraphForNrOfCycles(&g_ring_plus_star_undirected, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     igraph_add_edge(&g_ring_plus_star_undirected, 7, 13); // add a random edge between the two structures to make them connected
-    checkGraphForNrOfCycles(&g_ring_plus_star_undirected, 1, IGRAPH_UNDIRECTED_SEARCH_ONE);
+    checkGraphForNrOfCycles(&g_ring_plus_star_undirected, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     // clean up
     igraph_destroy(&g_ring_plus_star_undirected);
     igraph_destroy(&g_star_undirected);
@@ -109,7 +109,7 @@ int main(void)
     // 9 cycles of 4 nodes
     // 9 cycles of 3 nodes,
     // )
-    checkGraphForNrOfCycles(&g_wheel_undirected, 65, IGRAPH_UNDIRECTED_SEARCH_ONE);
+    checkGraphForNrOfCycles(&g_wheel_undirected, 65, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     // clean up
     igraph_destroy(&g_wheel_undirected);
 
