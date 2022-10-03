@@ -162,7 +162,7 @@ static igraph_error_t igraph_i_ecc3_2(
                 /* OOM error can only occur when originally retrieving a neighbour list,
                  * not on subsequent call to lazy_adjlist_get(). */
                 IGRAPH_CHECK_OOM(a2, "Not enough memory for edge clustering coefficient.");
-                igraph_vector_int_sort(a1);
+                igraph_vector_int_sort(a2);
                 VECTOR(al_retrieved)[v2] = true;
             }
 
