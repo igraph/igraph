@@ -2003,7 +2003,7 @@ igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_e
             igraph_integer_t no_of_edges = igraph_ecount(graph);
             if (es.data.range.start < 0 ||
                 es.data.range.start > no_of_edges ||
-                (no_of_edges > 0 && es.data.range.start == 0)) {
+                (no_of_edges > 0 && es.data.range.start == no_of_edges)) {
                 IGRAPH_ERROR("Cannot create range iterator, starting edge ID out of range.", IGRAPH_EINVAL);
             }
             if (es.data.range.end < 0 || es.data.range.end > no_of_edges) {
