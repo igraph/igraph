@@ -105,9 +105,42 @@ void get_ecc3(const igraph_t *g, igraph_vector_t *res, igraph_bool_t offset, igr
     igraph_vector_int_destroy(&triangles_vec);
 }
 
+/* These are globals, as they're used both from test_ecc() and main() */
+igraph_vector_t ecc1, ecc2, ecc3;
+
+void test_ecc(const igraph_t *g) {
+    printf("k=3\n");
+    igraph_ecc(g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
+    print_vector(&ecc1);
+
+    if (igraph_ecount(g) > 0) {
+        igraph_ecc(g, &ecc2, igraph_ess_range(0, igraph_ecount(g)), 3, false, true);
+        print_vector(&ecc2);
+        IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
+    } else {
+        printf("skipping on empty graph\n");
+    }
+
+    get_ecc3(g, &ecc3, false, true);
+    print_vector(&ecc3);
+
+    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc3));
+
+    printf("\nk=4\n");
+    igraph_ecc(g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
+    print_vector(&ecc1);
+
+    if (igraph_ecount(g) > 0) {
+        igraph_ecc(g, &ecc2, igraph_ess_range(0, igraph_ecount(g)), 4, false, true);
+        print_vector(&ecc2);
+        IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
+    } else {
+        printf("skipping on empty graph\n");
+    }
+}
+
 int main(void) {
     igraph_t g;
-    igraph_vector_t ecc1, ecc2, ecc3;
 
     igraph_vector_init(&ecc1, 0);
     igraph_vector_init(&ecc2, 0);
@@ -117,91 +150,33 @@ int main(void) {
 
     printf("Null graph:\n");
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
-
-    printf("k=3\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
-    print_vector(&ecc1);
-
-    printf("\nk=4\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
-    print_vector(&ecc1);
-
+    test_ecc(&g);
     igraph_destroy(&g);
 
     /* Singleton */
 
     printf("\nSingleton graph:\n");
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
-
-    printf("k=3\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
-    print_vector(&ecc1);
-
-    printf("\nk=4\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
-    print_vector(&ecc1);
-
+    test_ecc(&g);
     igraph_destroy(&g);
 
     /* P_2 */
 
     printf("\nP_2 graph\n");
     igraph_full(&g, 2, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-
-    printf("k=3\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
-    print_vector(&ecc1);
-
-    printf("\nk=4\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
-    print_vector(&ecc1);
-
+    test_ecc(&g);
     igraph_destroy(&g);
 
     /* K_5 */
 
     printf("\nK_5 graph:\n");
     igraph_full(&g, 5, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-
-    printf("k=3\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
-    print_vector(&ecc1);
-
-    igraph_ecc(&g, &ecc2, igraph_ess_range(0, igraph_ecount(&g)), 3, false, true);
-    print_vector(&ecc2);
-
-    get_ecc3(&g, &ecc3, false, true);
-    print_vector(&ecc3);
-
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc3));
-
-    printf("\nk=4\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
-    print_vector(&ecc1);
-
+    test_ecc(&g);
     igraph_destroy(&g);
 
     printf("\nK_5 graph with self-loops:\n");
     igraph_full(&g, 5, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-
-    printf("k=3\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
-    print_vector(&ecc1);
-
-    igraph_ecc(&g, &ecc2, igraph_ess_range(0, igraph_ecount(&g)), 3, false, true);
-    print_vector(&ecc2);
-
-    get_ecc3(&g, &ecc3, false, true);
-    print_vector(&ecc3);
-
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc3));
-
-    printf("\nk=4\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
-    print_vector(&ecc1);
-
+    test_ecc(&g);
     igraph_destroy(&g);
 
     /* Multigraph */
@@ -210,24 +185,7 @@ int main(void) {
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
         0,1, 1,2, 2,0, 0,1, 1,3, 3,4, 4,0, 0,5, 5,5, 5,5, 1,4,
         -1);
-
-    printf("k=3\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
-    print_vector(&ecc1);
-
-    igraph_ecc(&g, &ecc2, igraph_ess_range(0, igraph_ecount(&g)), 3, false, true);
-    print_vector(&ecc2);
-
-    get_ecc3(&g, &ecc3, false, true);
-    print_vector(&ecc3);
-
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc3));
-
-    printf("\nk=4\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
-    print_vector(&ecc1);
-
+    test_ecc(&g);
     igraph_destroy(&g);
 
     /* Karate club */
@@ -235,22 +193,7 @@ int main(void) {
     printf("\nZachary karate club:\n");
     igraph_famous(&g, "Zachary");
 
-    printf("k=3\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
-    print_vector(&ecc1);
-
-    igraph_ecc(&g, &ecc2, igraph_ess_range(0, igraph_ecount(&g)), 3, false, true);
-    print_vector(&ecc2);
-
-    get_ecc3(&g, &ecc3, false, true);
-    print_vector(&ecc3);
-
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
-    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc3));
-
-    printf("\nk=4\n");
-    igraph_ecc(&g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
-    print_vector(&ecc1);
+    test_ecc(&g);
 
     /* Check invalid input */
 
