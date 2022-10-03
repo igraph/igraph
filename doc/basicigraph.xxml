@@ -194,6 +194,7 @@ Upper and lower limits of <type>igraph_integer_t</type> and
 <!-- doxrox-include igraph_neighbors -->
 <!-- doxrox-include igraph_incident -->
 <!-- doxrox-include igraph_degree -->
+<!-- doxrox-include igraph_degree_1 -->
 </section>
 
 <section id="adding-and-deleting-vertices-and-edges"><title>Adding and deleting vertices and edges</title>

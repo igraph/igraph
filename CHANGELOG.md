@@ -1,24 +1,20 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [develop]
+
+## [master]
 
 ### Added
 
- - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculates shortest paths with an upper limit on the total path length.
+ - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculate shortest paths with an upper limit on the path length.
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
+ - `igraph_dqueue_get()` accesses an element in a queue by index.
 
 ### Changed
 
  - `igraph_edge()` now checks that the input edge ID is valid.
-
- - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`,
-   `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and
-   `igraph_arpack_rnsolve()` now generate a random starting vector using
-   igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so.
-   This makes sure that the results obtained from these functions remain the
-   same if igraph's RNG is seeded with the same value.
- - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
+ - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`, `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()` now generate a random starting vector using igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so. This makes sure that the results obtained from these functions remain the same if igraph's RNG is seeded with the same value.
 
 ### Fixed
 
@@ -28,6 +24,8 @@
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
  - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
  - Addressed new warnings introduced by Clang 15.
+ - `igraph_layout_umap_3d()` now actually uses three dimensions.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
 
 ### Removed
 
@@ -36,6 +34,7 @@
 ### Deprecated
 
  - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
+ - The undocumented function `igraph_dqueue_e()` is now deprecated and replaced by `igraph_dqueue_get()`.
 
 ### Other
 
@@ -1065,7 +1064,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.10.1..HEAD
+[develop]: https://github.com/igraph/igraph/compare/master..develop
+[master]: https://github.com/igraph/igraph/compare/0.10.1..master
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0
 [0.9.10]: https://github.com/igraph/igraph/compare/0.9.9...0.9.10

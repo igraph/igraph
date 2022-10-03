@@ -95,8 +95,8 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
