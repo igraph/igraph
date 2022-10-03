@@ -47,6 +47,21 @@ static igraph_integer_t vector_int_intersection_size_sorted(
     return count;
 }
 
+/* Get a neighbour list from a lazy adjacency list, and sort it if is hasn't been sorted
+ * yet. Assumes the presence of the 'al_retrieved' boolean vector to keep track of what
+ * has been retrieved/sorted so far. */
+#define AL_SORTED_GET(al, v, res) \
+    do { \
+        res = igraph_lazy_adjlist_get(&al, v); \
+        if (! VECTOR(al_retrieved)[v]) { \
+            /* OOM error can only occur when originally retrieving a neighbour list, \
+             * not on subsequent call to lazy_adjlist_get(). */ \
+            IGRAPH_CHECK_OOM(res, "Not enough memory for edge clustering coefficient."); \
+            igraph_vector_int_sort(res); \
+            VECTOR(al_retrieved)[v] = true; \
+        } \
+    } while(0)
+
 
 /* Optimized for the case when computing ECC for all edges. */
 static igraph_error_t igraph_i_ecc3_1(
@@ -151,23 +166,9 @@ static igraph_error_t igraph_i_ecc3_2(
             z = 0.0;
             s = 0.0;
         } else {
-            igraph_vector_int_t *a1 = igraph_lazy_adjlist_get(&al, v1);
-            if (! VECTOR(al_retrieved)[v1]) {
-                /* OOM error can only occur when originally retrieving a neighbour list,
-                 * not on subsequent call to lazy_adjlist_get(). */
-                IGRAPH_CHECK_OOM(a1, "Not enough memory for edge clustering coefficient.");
-                igraph_vector_int_sort(a1);
-                VECTOR(al_retrieved)[v1] = true;
-            }
-
-            igraph_vector_int_t *a2 = igraph_lazy_adjlist_get(&al, v2);
-            if (! VECTOR(al_retrieved)[v2]) {
-                /* OOM error can only occur when originally retrieving a neighbour list,
-                 * not on subsequent call to lazy_adjlist_get(). */
-                IGRAPH_CHECK_OOM(a2, "Not enough memory for edge clustering coefficient.");
-                igraph_vector_int_sort(a2);
-                VECTOR(al_retrieved)[v2] = true;
-            }
+            igraph_vector_int_t *a1, *a2;
+            AL_SORTED_GET(al, v1, a1);
+            AL_SORTED_GET(al, v2, a2);
 
             igraph_integer_t d1, d2;
             IGRAPH_CHECK(igraph_degree_1(graph, &d1, v1, IGRAPH_ALL, IGRAPH_LOOPS));
@@ -325,14 +326,8 @@ static igraph_error_t igraph_i_ecc4_2(
 
             z = 0.0;
 
-            igraph_vector_int_t *a1 = igraph_lazy_adjlist_get(&al, v1);
-            if (! VECTOR(al_retrieved)[v1]) {
-                /* OOM error can only occur when originally retrieving a neighbour list,
-                 * not on subsequent call to lazy_adjlist_get(). */
-                IGRAPH_CHECK_OOM(a1, "Not enough memory for edge clustering coefficient.");
-                igraph_vector_int_sort(a1);
-                VECTOR(al_retrieved)[v1] = true;
-            }
+            igraph_vector_int_t *a1;
+            AL_SORTED_GET(al, v1, a1);
             const igraph_integer_t n = igraph_vector_int_size(a1);
 
             for (igraph_integer_t j=0; j < n; j++) {
@@ -342,23 +337,9 @@ static igraph_error_t igraph_i_ecc4_2(
 
                 if (v3 == v2) continue;
 
-                igraph_vector_int_t *a2 = igraph_lazy_adjlist_get(&al, v2);
-                if (! VECTOR(al_retrieved)[v2]) {
-                    /* OOM error can only occur when originally retrieving a neighbour list,
-                     * not on subsequent call to lazy_adjlist_get(). */
-                    IGRAPH_CHECK_OOM(a2, "Not enough memory for edge clustering coefficient.");
-                    igraph_vector_int_sort(a2);
-                    VECTOR(al_retrieved)[v2] = true;
-                }
-
-                igraph_vector_int_t *a3 = igraph_lazy_adjlist_get(&al, v3);
-                if (! VECTOR(al_retrieved)[v3]) {
-                    /* OOM error can only occur when originally retrieving a neighbour list,
-                     * not on subsequent call to lazy_adjlist_get(). */
-                    IGRAPH_CHECK_OOM(a3, "Not enough memory for edge clustering coefficient.");
-                    igraph_vector_int_sort(a3);
-                    VECTOR(al_retrieved)[v3] = true;
-                }
+                igraph_vector_int_t *a2, *a3;
+                AL_SORTED_GET(al, v2, a2);
+                AL_SORTED_GET(al, v3, a3);
 
                 z += vector_int_intersection_size_sorted(a2, a3) - 1.0;
             }
