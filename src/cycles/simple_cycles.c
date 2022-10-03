@@ -195,6 +195,8 @@ igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
 
+    IGRAPH_FINALLY_CLEAN(4);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -212,13 +214,9 @@ igraph_error_t igraph_simple_cycle_search_state_init(igraph_simple_cycle_search_
 igraph_error_t igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state)
 {
     igraph_stack_int_destroy(&state->stack);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_bool_destroy(&state->blocked);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_adjlist_destroy(&state->AK);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_adjlist_destroy(&state->B);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -294,6 +292,7 @@ igraph_error_t igraph_simple_cycles_search_all(
 {
     igraph_simple_cycle_search_state_t state;
     IGRAPH_CHECK(igraph_simple_cycle_search_state_init(&state, graph));
+    IGRAPH_FINALLY(igraph_simple_cycle_search_state_destroy, &state);
 
     // igraph_vector_int_list_init(result, 0); // state.N);
 
@@ -309,6 +308,7 @@ igraph_error_t igraph_simple_cycles_search_all(
     }
 
     IGRAPH_CHECK(igraph_simple_cycle_search_state_destroy(&state));
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
