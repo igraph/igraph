@@ -275,7 +275,7 @@ static igraph_error_t igraph_i_ecc4(
  *
  * \experimental
  *
- * The edge clustering coefficient <code>C^(k)_ij</code> of an edge $(i, j)$
+ * The edge clustering coefficient <code>C^(k)_ij</code> of an edge (i, j)
  * is defined based on the number of k-cycles the edge participates in,
  * <code>z^(k)_ij</code>, and the largest number of such cycles it could
  * participate in given the degree of its endpoints, <code>s^(k)_ij</code>.
