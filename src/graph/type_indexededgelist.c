@@ -1094,6 +1094,67 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
 
 /**
  * \ingroup interface
+ * \function igraph_degree_1
+ * \brief The degree of of a single vertex in the graph.
+ *
+ * This function calculates the in-, out- or total degree of a single vertex.
+ * For a single vertex, it is more efficient than calling \ref igraph_degree().
+ *
+ * \param graph The graph.
+ * \param deg Pointer to the integer where the computed degree will be stored.
+ * \param vid The vertex for which the degree will be calculated.
+ * \param mode Defines the type of the degree for directed graphs. Valid modes are:
+ *        \c IGRAPH_OUT, out-degree;
+ *        \c IGRAPH_IN, in-degree;
+ *        \c IGRAPH_ALL, total degree (sum of the in- and out-degree).
+ *        This parameter is ignored for undirected graphs.
+ * \param loops Boolean, gives whether the self-loops should be
+ *        counted.
+ * \return Error code.
+ *
+ * \sa \ref igraph_degree() to compute the degree of several vertices at once.
+ *
+ * Time complexity: O(1) if \p loops is \c true, and
+ * O(d) otherwise, where d is the degree.
+ */
+igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
+                               igraph_integer_t vid, igraph_neimode_t mode, igraph_bool_t loops) {
+
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    *deg = 0;
+    if (mode & IGRAPH_OUT) {
+        *deg += (VECTOR(graph->os)[vid + 1] - VECTOR(graph->os)[vid]);
+    }
+    if (mode & IGRAPH_IN) {
+        *deg += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
+    }
+    if (! loops) {
+        /* When loops should not be counted, we remove their contribution from the
+         * previously computed degree. */
+        if (mode & IGRAPH_OUT) {
+            for (igraph_integer_t i = VECTOR(graph->os)[vid]; i < VECTOR(graph->os)[vid + 1]; i++) {
+                if (VECTOR(graph->to)[ VECTOR(graph->oi)[i] ] == vid) {
+                    *deg -= 1;
+                }
+            }
+        }
+        if (mode & IGRAPH_IN) {
+            for (igraph_integer_t i = VECTOR(graph->is)[vid]; i < VECTOR(graph->is)[vid + 1]; i++) {
+                if (VECTOR(graph->from)[ VECTOR(graph->ii)[i] ] == vid) {
+                    *deg -= 1;
+                }
+            }
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup interface
  * \function igraph_degree
  * \brief The degree of some vertices in a graph.
  *
@@ -1129,7 +1190,8 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * d is their (average) degree.
  *
  * \sa \ref igraph_strength() for the version that takes into account
- * edge weights.
+ * edge weights; \ref igraph_degree_1() to efficiently compute the
+ * degree of a single vertex.
  *
  * \example examples/simple/igraph_degree.c
  */

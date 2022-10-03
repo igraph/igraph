@@ -944,6 +944,7 @@ add_benchmarks(
   igraph_closeness_weighted
   igraph_coloring
   igraph_decompose
+  igraph_degree
   igraph_distances
   igraph_layout_umap
   igraph_maximal_cliques
