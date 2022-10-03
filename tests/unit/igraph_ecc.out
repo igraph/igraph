@@ -1,22 +1,22 @@
 Null graph:
 k=3
 ( )
-skipping on empty graph
+( )
 ( )
 
 k=4
 ( )
-skipping on empty graph
+( )
 
 Singleton graph:
 k=3
 ( )
-skipping on empty graph
+( )
 ( )
 
 k=4
 ( )
-skipping on empty graph
+( )
 
 P_2 graph
 k=3

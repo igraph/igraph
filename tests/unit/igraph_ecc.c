@@ -113,13 +113,9 @@ void test_ecc(const igraph_t *g) {
     igraph_ecc(g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 3, false, true);
     print_vector(&ecc1);
 
-    if (igraph_ecount(g) > 0) {
-        igraph_ecc(g, &ecc2, igraph_ess_range(0, igraph_ecount(g)), 3, false, true);
-        print_vector(&ecc2);
-        IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
-    } else {
-        printf("skipping on empty graph\n");
-    }
+    igraph_ecc(g, &ecc2, igraph_ess_range(0, igraph_ecount(g)), 3, false, true);
+    print_vector(&ecc2);
+    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
 
     get_ecc3(g, &ecc3, false, true);
     print_vector(&ecc3);
@@ -130,13 +126,9 @@ void test_ecc(const igraph_t *g) {
     igraph_ecc(g, &ecc1, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true);
     print_vector(&ecc1);
 
-    if (igraph_ecount(g) > 0) {
-        igraph_ecc(g, &ecc2, igraph_ess_range(0, igraph_ecount(g)), 4, false, true);
-        print_vector(&ecc2);
-        IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
-    } else {
-        printf("skipping on empty graph\n");
-    }
+    igraph_ecc(g, &ecc2, igraph_ess_range(0, igraph_ecount(g)), 4, false, true);
+    print_vector(&ecc2);
+    IGRAPH_ASSERT(vec_equal(&ecc1, &ecc2));
 }
 
 int main(void) {
