@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [master]
 
 ### Added
 
@@ -8,6 +8,7 @@
  - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
  - `igraph_dqueue_get()` accesses an element in a queue by index.
+ - `igraph_degree_1()` efficiently retrieves the degee of a single vertex.
 
 ### Changed
 
@@ -24,6 +25,7 @@
  - Addressed new warnings introduced by Clang 15.
  - `igraph_layout_umap_3d()` now actually uses three dimensions.
  - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
+ - `igraph_vit_create()` and `igraph_eit_create()` no longer fails when trying to create an iterator for the null graph or edgeless graph from an empty range-based vertex or edge selector.
 
 ### Removed
 
@@ -1062,7 +1064,7 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.10.1..HEAD
+[master]: https://github.com/igraph/igraph/compare/0.10.1..master
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0
 [0.9.10]: https://github.com/igraph/igraph/compare/0.9.9...0.9.10
