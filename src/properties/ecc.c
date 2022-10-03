@@ -114,7 +114,6 @@ static igraph_error_t igraph_i_ecc3_2(
         const igraph_es_t eids, igraph_bool_t offset, igraph_bool_t normalize) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_int_t degree;
     /* For each vertex, we keep track of whether the neighbour list was already
      * retrieved in the boolean array 'al_retrieved'. */
     igraph_lazy_adjlist_t al;
@@ -124,9 +123,6 @@ static igraph_error_t igraph_i_ecc3_2(
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
     IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
@@ -170,7 +166,9 @@ static igraph_error_t igraph_i_ecc3_2(
                 VECTOR(al_retrieved)[v2] = true;
             }
 
-            igraph_integer_t d1 = VECTOR(degree)[v1], d2 = VECTOR(degree)[v2];
+            igraph_integer_t d1, d2;
+            IGRAPH_CHECK(igraph_degree_1(graph, &d1, v1, IGRAPH_ALL, IGRAPH_LOOPS));
+            IGRAPH_CHECK(igraph_degree_1(graph, &d2, v2, IGRAPH_ALL, IGRAPH_LOOPS));
 
             z = vector_int_intersection_size_sorted(a1, a2);
             s = (d1 < d2 ? d1 : d2) - 1.0;
@@ -182,9 +180,8 @@ static igraph_error_t igraph_i_ecc3_2(
 
     igraph_vector_bool_destroy(&al_retrieved);
     igraph_eit_destroy(&eit);
-    igraph_vector_int_destroy(&degree);
     igraph_lazy_adjlist_destroy(&al);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
