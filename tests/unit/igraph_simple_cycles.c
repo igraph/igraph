@@ -73,7 +73,7 @@ int main(void)
     igraph_ring(&g_ring_undirected, 10, /*directed=*/0, /*mutual=*/0, /*circular=*/1);
     printf("\nCreated undirected ring\n");
     // call cycles finder, expect 1 cycle to be found
-    checkGraphForNrOfCycles(&g_ring_undirected, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);    
+    checkGraphForNrOfCycles(&g_ring_undirected, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     checkGraphForNrOfCycles(&g_ring_undirected, 2, IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH);
 
 
