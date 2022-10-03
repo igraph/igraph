@@ -9,6 +9,7 @@
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
  - `igraph_dqueue_get()` accesses an element in a queue by index.
  - `igraph_degree_1()` efficiently retrieves the degee of a single vertex.
+ - `igraph_lazy_adjlist_has()` and `igraph_lazy_inclist_has()` to check if adjacent vertiex / incident edges has already been computed and stored for a given vertex in a lazy adjlist / inclist.
 
 ### Changed
 
