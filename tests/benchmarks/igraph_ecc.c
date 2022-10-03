@@ -20,6 +20,10 @@
           REPEAT(igraph_ecc(&g, &ecc, igraph_ess_vector(&eids), 3, false, true), SREP); \
     ); \
     \
+    BENCH(" 4 vc=" TOSTR(VCOUNT) ", ec=" TOSTR(ECOUNT) ", k=4, all, " TOSTR(REP) "x", \
+          REPEAT(igraph_ecc(&g, &ecc, igraph_ess_all(IGRAPH_EDGEORDER_ID), 4, false, true), REP); \
+    ); \
+    \
     BENCH(" 4 vc=" TOSTR(VCOUNT) ", ec=" TOSTR(ECOUNT) ", k=4, subset: all, " TOSTR(REP) "x", \
           REPEAT(igraph_ecc(&g, &ecc, igraph_ess_range(0, igraph_ecount(&g)), 4, false, true), REP); \
     ); \
