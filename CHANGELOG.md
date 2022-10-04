@@ -21,13 +21,14 @@
 
  - `igraph_trussness()` is now interruptible.
  - `igraph_spanner()` is now interruptible.
+ - `igraph_layout_umap()` and `igraph_layout_umap3d()` are now interruptible.
  - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
  - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
- - Addressed new warnings introduced by Clang 15.
  - `igraph_layout_umap_3d()` now actually uses three dimensions.
  - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
  - `igraph_vit_create()` and `igraph_eit_create()` no longer fails when trying to create an iterator for the null graph or edgeless graph from an empty range-based vertex or edge selector.
+ - Addressed new warnings introduced by Clang 15.
 
 ### Removed
 
