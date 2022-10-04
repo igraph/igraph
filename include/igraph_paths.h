@@ -278,6 +278,13 @@ IGRAPH_EXPORT igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *
                                              const igraph_vs_t to,
                                              const igraph_vector_t *weights,
                                              igraph_neimode_t mode);
+IGRAPH_EXPORT igraph_error_t igraph_voronoi(const igraph_t *graph,
+                                            igraph_vector_int_t *membership,
+                                            igraph_vector_t *distances,
+                                            const igraph_vector_int_t *generators,
+                                            const igraph_vector_t *weights,
+                                            igraph_neimode_t mode,
+                                            igraph_voronoi_tiebreaker_t tiebreaker);
 
 IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
 

@@ -201,6 +201,11 @@ typedef enum { IGRAPH_RANDOM_WALK_STUCK_ERROR = 0,
                IGRAPH_RANDOM_WALK_STUCK_RETURN
              } igraph_random_walk_stuck_t;
 
+typedef enum { IGRAPH_VORONOI_FIRST = 0,
+               IGRAPH_VORONOI_LAST,
+               IGRAPH_VORONOI_RANDOM
+             } igraph_voronoi_tiebreaker_t;
+
 
 __END_DECLS
 

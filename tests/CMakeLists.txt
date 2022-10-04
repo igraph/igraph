@@ -341,6 +341,7 @@ add_legacy_tests(
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
   igraph_unfold_tree
+  igraph_voronoi
   igraph_widest_paths
   harmonic_centrality
   random_spanning_tree
@@ -956,6 +957,7 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_random_walk
   igraph_transitivity
+  igraph_voronoi
   inc_vs_adj
 )
 
