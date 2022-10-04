@@ -6,10 +6,13 @@
 
 ### Added
 
- - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculate shortest paths with an upper limit on the path length.
- - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
+ - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculate shortest paths with an upper limit on the path length (experimental functions).
+ - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs (experimental function).
+ - `igraph_ecc()` computes the edge clustering coefficient of some edges (experimental function).
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
  - `igraph_dqueue_get()` accesses an element in a queue by index.
+ - `igraph_degree_1()` efficiently retrieves the degee of a single vertex.
+ - `igraph_lazy_adjlist_has()` and `igraph_lazy_inclist_has()` to check if adjacent vertiex / incident edges has already been computed and stored for a given vertex in a lazy adjlist / inclist.
 
 ### Changed
 
@@ -20,12 +23,14 @@
 
  - `igraph_trussness()` is now interruptible.
  - `igraph_spanner()` is now interruptible.
+ - `igraph_layout_umap()` and `igraph_layout_umap3d()` are now interruptible.
  - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
  - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
- - Addressed new warnings introduced by Clang 15.
  - `igraph_layout_umap_3d()` now actually uses three dimensions.
  - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
+ - `igraph_vit_create()` and `igraph_eit_create()` no longer fails when trying to create an iterator for the null graph or edgeless graph from an empty range-based vertex or edge selector.
+ - Addressed new warnings introduced by Clang 15.
 
 ### Removed
 
