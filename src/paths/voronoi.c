@@ -232,8 +232,6 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
             igraph_integer_t vid = igraph_2wheap_max_index(&q);
             igraph_real_t dist = -igraph_2wheap_deactivate_max(&q);
 
-            IGRAPH_ASSERT(dist >= 0);
-
             igraph_real_t md = VECTOR(*mindist)[vid];
 
             int cmp_result = igraph_cmp_epsilon(dist, md, IGRAPH_SHORTEST_PATH_EPSILON);
