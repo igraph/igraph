@@ -553,8 +553,8 @@ igraph_distances_floyd_warshall:
 igraph_voronoi:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT membership, OUT VECTOR distances,
-        VECTOR_INT generators, VECTOR weights, NEIMODE mode=OUT, VORONOI_TIEBREAKER tiebreaker=RANDOM
-    DEPS: weights ON graph
+        VERTEX_INDICES generators, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, VORONOI_TIEBREAKER tiebreaker=RANDOM
+    DEPS: weights ON graph, generators ON graph
 
 igraph_get_all_simple_paths:
     PARAMS: |-

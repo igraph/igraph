@@ -47,7 +47,7 @@ static igraph_error_t igraph_i_voronoi(
      * without needing to store all of them. */
     igraph_vector_int_t tie_count;
 
-    igraph_adjlist_init(graph, &al, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -55,6 +55,7 @@ static igraph_error_t igraph_i_voronoi(
 
     if (tiebreaker == IGRAPH_VORONOI_RANDOM) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&tie_count, no_of_nodes);
+        RNG_BEGIN();
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
@@ -120,11 +121,9 @@ static igraph_error_t igraph_i_voronoi(
                      * encountering the kth same-distance generator. This ensures
                      * that one of these generators is selected uniformly at random. */
                     VECTOR(tie_count)[vid]++;
-                    RNG_BEGIN();
                     if (RNG_UNIF01() < 1.0 / VECTOR(tie_count)[vid]) {
                         VECTOR(*membership)[vid] = i;
                     }
-                    RNG_END();
                     break;
                 }
             }
@@ -144,6 +143,7 @@ static igraph_error_t igraph_i_voronoi(
     }
 
     if (tiebreaker == IGRAPH_VORONOI_RANDOM) {
+        RNG_END();
         igraph_vector_int_destroy(&tie_count);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -199,6 +199,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
 
     if (tiebreaker == IGRAPH_VORONOI_RANDOM) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&tie_count, no_of_nodes);
+        RNG_BEGIN();
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
@@ -225,7 +226,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
         /* We store negative distances in the maximum heap. Since some systems
          * distinguish between -0.0 and +0.0, we need -0.0 to ensure +0.0 as
          * the final result. */
-        igraph_2wheap_push_with_index(&q, g, -0.0);
+        IGRAPH_CHECK(igraph_2wheap_push_with_index(&q, g, -0.0));
 
         while (!igraph_2wheap_empty(&q)) {
             igraph_integer_t vid = igraph_2wheap_max_index(&q);
@@ -265,11 +266,9 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
                      * encountering the kth same-distance generator. This ensures
                      * that one of these generators is selected uniformly at random. */
                     VECTOR(tie_count)[vid]++;
-                    RNG_BEGIN();
                     if (RNG_UNIF01() < 1.0 / VECTOR(tie_count)[vid]) {
                         VECTOR(*membership)[vid] = i;
                     }
-                    RNG_END();
                     break;
                 }
             }
@@ -303,6 +302,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
     }
 
     if (tiebreaker == IGRAPH_VORONOI_RANDOM) {
+        RNG_END();
         igraph_vector_int_destroy(&tie_count);
         IGRAPH_FINALLY_CLEAN(1);
     }
