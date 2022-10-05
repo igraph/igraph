@@ -6,7 +6,7 @@ name: Coverity
 # Build once at 3 AM UTC every day.
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 jobs:
