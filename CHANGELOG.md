@@ -34,6 +34,7 @@
 ### Removed
 
  - Removed unused and undocumented `igraph_bfgs()` function.
+ - Removed the undocumented function `igraph_complex_mod()`. Use `igraph_complex_abs()` instead, as it has identical functionality.
 
 ### Deprecated
 
