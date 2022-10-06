@@ -203,8 +203,8 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  * </para><para>
  * The original C++ implementation of Martin Rosvall is used,
  * see http://www.tp.umu.se/~rosvall/downloads/infomap_undir.tgz .
- * Intergation in igraph was done by Emmanuel Navarro (who is grateful to
- * Martin Rosvall and Carl T. Bergstrom for providing this source code.)
+ * Integration in igraph was done by Emmanuel Navarro (who is grateful to
+ * Martin Rosvall and Carl T. Bergstrom for providing this source code).
  *
  * </para><para>
  * Note that the graph must not contain isolated vertices.
@@ -215,11 +215,19 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  *
  * \param graph The input graph.
  * \param e_weights Numeric vector giving the weights of the edges.
+ *     The random walker will favour edges with high weights over
+ *     edges with low weights; the probability of picking a particular
+ *     outbound edge from a node is directly proportional to its weight.
  *     If it is a NULL pointer then all edges will have equal
  *     weights. The weights are expected to be positive.
  * \param v_weights Numeric vector giving the weights of the vertices.
- *     If it is a NULL pointer then all vertices will have equal
- *     weights. The weights are expected to be positive.
+ *     Vertices with higher weights are favoured by the random walker
+ *     when it needs to "teleport" to a new node after getting stuck in
+ *     a sink node (i.e. a node with no outbound edges). The probability
+ *     of picking a vertex when the random walker teleports is directly
+ *     proportional to the weight of the vertex. If this argument is a NULL
+ *     pointer then all vertices will have equal weights. Weights are expected
+ *     to be positive.
  * \param nb_trials The number of attempts to partition the network
  *     (can be any integer value equal or larger than 1).
  * \param membership Pointer to a vector. The membership vector is
