@@ -1284,6 +1284,18 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * Temporarily removes all edges incident on the vertex with the given ID from
+ * the graph by setting the weights of these edges to infinity.
+ *
+ * \param graph   the graph
+ * \param weights the weights of the edges of the graph
+ * \param vid     the ID of the vertex to remove
+ * \param edges_removed  vector that records the IDs of the edges that were
+ *        "removed" (i.e. their weights were set to infinity)
+ * \param eids    temporary vector that is used to retrieve the IDs of the
+ *        incident edges, to make this function free of memory allocations
+ */
 static igraph_error_t igraph_i_semidelete_vertex(
     const igraph_t *graph, igraph_vector_t *weights,
     igraph_integer_t vid, igraph_vector_int_t *edges_removed,
@@ -1421,6 +1433,10 @@ igraph_error_t igraph_get_k_shortest_paths(
     igraph_vector_int_t eids;
     igraph_real_t path_weight, shortest_path_weight;
     igraph_integer_t edge_paths_owned = 0;
+
+    if (!igraph_is_directed(graph) && (mode == IGRAPH_IN || mode == IGRAPH_OUT)) {
+        mode = IGRAPH_ALL;
+    }
 
     if (vertex_paths) {
         igraph_vector_int_list_clear(vertex_paths);

@@ -20,6 +20,7 @@
 
 ### Fixed
 
+ - Fixed a bug in `igraph_get_k_shortest_paths()` that sometimes yielded incorrect results on undirected graphs when the `mode` argument was set to `IGRAPH_OUT` or `IGRAPH_IN`.
  - `igraph_trussness()` is now interruptible.
  - `igraph_spanner()` is now interruptible.
  - `igraph_layout_umap()` and `igraph_layout_umap3d()` are now interruptible.
