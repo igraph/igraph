@@ -291,11 +291,11 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         maxchange = epsilon + 1;
         while (it < maxit && maxchange > epsilon) {
             igraph_integer_t jj;
-            igraph_real_t t = maxdelta * pow((maxit - it) / (double)maxit, coolexp);
+            igraph_real_t t = maxdelta * pow((maxit - it) / (igraph_real_t) maxit, coolexp);
             igraph_integer_t vid, nei;
 
             IGRAPH_PROGRESS("Large graph layout",
-                            100.0 * ((actlayer - 1.0) / (no_of_layers - 1.0) + ((float)it) / (maxit * (no_of_layers - 1.0))),
+                            100.0 * ((actlayer - 1.0) / (no_of_layers - 1.0) + (it) / (maxit * (no_of_layers - 1.0))),
                             0);
 
             /* init */
