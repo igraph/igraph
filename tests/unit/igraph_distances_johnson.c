@@ -62,7 +62,9 @@ int main(void) {
 
     printf("Directed graph with loops and multi-edges, IGRAPH_IN:\n");
     igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_IN);
+    igraph_distances_bellman_ford(&g_lm, &bf_result, vids, vids, &weights_lm, IGRAPH_IN);
     print_matrix(&result);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&result, &bf_result));
 
     VERIFY_FINALLY_STACK();
 
@@ -73,6 +75,7 @@ int main(void) {
     CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_ALL), IGRAPH_ENEGLOOP);
 
     igraph_matrix_destroy(&result);
+    igraph_matrix_destroy(&bf_result);
     igraph_destroy(&g_empty);
     igraph_destroy(&g_empty_dir);
     igraph_destroy(&g_lm);
