@@ -819,6 +819,13 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_bool_t *has_multiple
 
 ) {
+    igraph_bool_t dummy1, dummy2;
+    if (has_loops == NULL) {
+        has_loops = &dummy1;
+    }
+    if (has_multiple == NULL) {
+        has_multiple = &dummy2;
+    }
     igraph_integer_t i, p = 0;
     igraph_integer_t n = igraph_vector_int_size(v);
 
@@ -1059,8 +1066,6 @@ igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al) {
 
 igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, igraph_integer_t no) {
     igraph_error_t ret;
-    igraph_bool_t has_loops = 0;
-    igraph_bool_t has_multiple = 0;
 
     if (al->adjs[no] == NULL) {
         al->adjs[no] = IGRAPH_CALLOC(1, igraph_vector_int_t);
@@ -1082,15 +1087,9 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
         }
 
         ret = igraph_i_simplify_sorted_int_adjacency_vector_in_place(
-            al->adjs[no], no, al->mode, al->loops, al->multiple, &has_loops,
-            &has_multiple
+            al->adjs[no], no, al->mode, al->loops, al->multiple, NULL,
+            NULL
         );
-        if (has_loops) {
-            igraph_i_property_cache_set_bool(al->graph, IGRAPH_PROP_HAS_LOOP, true);
-        }
-        if (has_multiple) {
-            igraph_i_property_cache_set_bool(al->graph, IGRAPH_PROP_HAS_MULTI, true);
-        }
         if (ret != IGRAPH_SUCCESS) {
             igraph_vector_int_destroy(al->adjs[no]);
             IGRAPH_FREE(al->adjs[no]);
