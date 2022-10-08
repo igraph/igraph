@@ -272,7 +272,6 @@ int test_multiedge_elimination_for_directed_graph(void) {
     return 0;
 }
 
-<<<<<<< HEAD
 int test_caching() {
     igraph_t g_simple, g_loop, g_multiloop, g_multi, g_multi_and_loop;
     char *g_desc[] = {"simple", "loop", "multiloop", "multi", "multi and loop"};
