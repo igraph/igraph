@@ -116,14 +116,9 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
         }
     }
 
-    if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Johnson's shortest path: undirected graph and negative weight.",
-                     IGRAPH_EINVAL);
-    }
-
-    if (mode == IGRAPH_ALL) {
-        IGRAPH_ERROR("Mode IGRAPH_ALL used with negative weight. This will cause a negative loop.",
-                     IGRAPH_EINVAL);
+    if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
+        IGRAPH_ERROR("Undirected graph with negative weight.",
+                     IGRAPH_ENEGLOOP);
     }
 
     /* ------------------------------------------------------------ */

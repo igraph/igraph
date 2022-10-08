@@ -68,7 +68,7 @@ int main(void) {
     CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm_neg_loop, IGRAPH_OUT), IGRAPH_ENEGLOOP);
 
     printf("Directed graph with loops and multi-edges, IGRAPH_ALL:\n");
-    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_ALL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_distances_johnson(&g_lm, &result, vids, vids, &weights_lm, IGRAPH_ALL), IGRAPH_ENEGLOOP);
 
     igraph_matrix_destroy(&result);
     igraph_destroy(&g_empty);
