@@ -543,7 +543,7 @@ void igraph_rng_set_default(igraph_rng_t *rng) {
  * \sa igraph_rng_set_default()
  */
 
-igraph_rng_t *igraph_rng_default() {
+igraph_rng_t *igraph_rng_default(void) {
     return &igraph_i_rng_default;
 }
 

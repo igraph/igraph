@@ -62,7 +62,7 @@
  * Note that some of the other #ifndef USING_R's in this file are still needed
  * to avoid references to fprintf and stderr.
  */
-static IGRAPH_NORETURN void igraph_abort() {
+static IGRAPH_NORETURN void igraph_abort(void) {
 #ifndef USING_R
 #ifdef IGRAPH_SANITIZER_AVAILABLE
     fprintf(stderr, "\nStack trace:\n");

@@ -267,6 +267,7 @@ static int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
     int tmp = VECTOR(*PX)[*PE];
 
     IGRAPH_UNUSED(PS);
+    IGRAPH_UNUSED(PE);
     IGRAPH_UNUSED(XE);
     IGRAPH_UNUSED(adjlist);
 
@@ -288,6 +289,7 @@ static int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
     int vv;
 
     IGRAPH_UNUSED(PS);
+    IGRAPH_UNUSED(PE);
     IGRAPH_UNUSED(XE);
     IGRAPH_UNUSED(adjlist);
 

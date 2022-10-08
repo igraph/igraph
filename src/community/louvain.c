@@ -340,7 +340,7 @@ static int igraph_i_community_multilevel_step(
     long int vcount = igraph_vcount(graph);
     long int ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
-    int pass;
+    /* int pass; */
     igraph_bool_t changed = 0;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
@@ -410,7 +410,7 @@ static int igraph_i_community_multilevel_step(
     }
 
     q = igraph_i_multilevel_community_modularity(&communities, resolution);
-    pass = 1;
+    /* pass = 1; */
 
     do { /* Pass begin */
         long int temp_communities_no = communities.communities_no;
@@ -495,7 +495,7 @@ static int igraph_i_community_multilevel_step(
         if (changed && (q > pass_q)) {
             /* debug("Pass %d (changed: %d) Communities: %ld Modularity from %lf to %lf\n",
               pass, changed, communities.communities_no, (double) pass_q, (double) q); */
-            pass++;
+            /* pass++; */
         } else {
             /* No changes or the modularity became worse, restore last membership */
             IGRAPH_CHECK(igraph_vector_update(communities.membership, &temp_membership));

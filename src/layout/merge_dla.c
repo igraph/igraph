@@ -260,7 +260,6 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                               igraph_real_t killr) {
     long int sp = -1;
     igraph_real_t angle, len;
-    long int steps = 0;
 
     /* The graph is not used, only its coordinates */
     IGRAPH_UNUSED(actg);
@@ -268,7 +267,6 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
     while (sp < 0) {
         /* start particle */
         do {
-            steps++;
             angle = RNG_UNIF(0, 2 * M_PI);
             len = RNG_UNIF(.5 * startr, startr);
             *x = cx + len * cos(angle);
@@ -278,7 +276,6 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 
         while (sp < 0 && DIST(*x, *y) < killr) {
             igraph_real_t nx, ny;
-            steps++;
             angle = RNG_UNIF(0, 2 * M_PI);
             len = RNG_UNIF(0, startr / 100);
             nx = *x + len * cos(angle);

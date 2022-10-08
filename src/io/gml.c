@@ -511,13 +511,11 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 }
 
 static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
-    int no = 1;
     char strno[50];
     size_t i, len = strlen(orig), newlen = 0, plen = 0;
 
     /* do we need a prefix? */
     if (len == 0 || !isalpha(orig[0])) {
-        no++;
         snprintf(strno, sizeof(strno) - 1, "igraph");
         plen = newlen = strlen(strno);
     }

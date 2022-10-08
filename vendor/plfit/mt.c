@@ -17,7 +17,7 @@
 
 #include "plfit_mt.h"
 
-static uint16_t get_random_uint16() {
+static uint16_t get_random_uint16(void) {
     return RNG_INT31() & 0xFFFF;
 }
 

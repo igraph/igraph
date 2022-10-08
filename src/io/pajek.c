@@ -492,6 +492,8 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
     igraph_vector_bool_t bvec;
     long int notop = 0, nobottom = 0;
 
+    IGRAPH_UNUSED(notop);
+
     IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
     IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
 

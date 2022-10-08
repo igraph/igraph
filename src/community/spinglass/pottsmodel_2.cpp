@@ -580,7 +580,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
     unsigned int *SPIN, *P_SPIN;
     unsigned int sweep;
     long max_q;
-    unsigned long changes, /*degree,*/ problemcount;
+    unsigned long changes /*, degree, problemcount*/;
     //HugeArray<int> neighbours;
     double h, delta = 0, norm, r, beta, minweight, prefac = 0, w, degree;
     bool cyclic = false, found;
@@ -598,7 +598,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
         SPIN = i_iter.First(new_spins);
         while (!net_iter.End()) {
             // Initialize neighbours and weights
-            problemcount = 0;
+            //problemcount = 0;
             for (unsigned int i = 0; i <= q; i++) {
                 neighbours[i] = 0;
                 weights[i] = 0;
@@ -669,10 +669,12 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
                 }
                 new_spin++;
             }
+            /*
             if (!found) {
-//         printf(".");
+                printf(".");
                 problemcount++;
             }
+            */
             //Put new spin on list
             *SPIN = spin_opt;
 
@@ -751,7 +753,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     unsigned int new_spin, spin_opt, old_spin;
     unsigned int sweep;
     long max_q, rn;
-    unsigned long changes, /*degree,*/ problemcount;
+    unsigned long changes /*, degree, problemcount*/;
     double degree, w, delta = 0, h;
     //HugeArray<int> neighbours;
     double norm, r, beta, minweight, prefac = 0;
@@ -772,7 +774,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
 
             node = net->node_list->Get(rn);
             // initialize the neighbours and the weights
-            problemcount = 0;
+            // problemcount = 0;
             for (unsigned int i = 0; i <= q; i++) {
                 neighbours[i] = 0.0;
                 weights[i] = 0.0;
@@ -846,10 +848,12 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
                 }
                 new_spin++;
             }
+            /*
             if (!found) {
-//         printf(".");
+                printf(".");
                 problemcount++;
             }
+            */
             //-------------------------------
             //now set the new spin
             new_spin = spin_opt;
@@ -1775,7 +1779,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
      */
     unsigned int new_spin, spin_opt, old_spin;
     unsigned int sweep; //current sweep
-    unsigned long changes, problemcount; //Number of changes and number of problems encountered
+    unsigned long changes/*, problemcount*/; //Number of changes and number of problems encountered
 
     double exp_old_spin; //The expectation value for the old spin
     double exp_spin; //The expectation value for the other spin(s)
@@ -1819,7 +1823,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
 
             /*******************************************/
             // initialize the neighbours and the weights
-            problemcount = 0;
+            // problemcount = 0;
             for (unsigned int i = 0; i <= q; i++) {
                 neighbours[i] = 0.0;
                 weights[i] = 0.0;
@@ -1920,9 +1924,11 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
 
             //Some weird thing happened. We haven't found a new spin
             //while that shouldn't be the case. Numerical problems?
+            /*
             if (!found) {
                 problemcount++;
             }
+            */
 
             new_spin = spin_opt;
             //If there wasn't a problem we should have found

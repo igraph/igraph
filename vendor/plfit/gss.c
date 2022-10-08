@@ -57,7 +57,7 @@ void gss_parameter_init(gss_parameter_t *param) {
     memcpy(param, &_defparam, sizeof(*param));
 }
 
-unsigned short int gss_get_warning_flag() {
+unsigned short int gss_get_warning_flag(void) {
 	return gss_i_warning_flag;
 }
 

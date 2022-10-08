@@ -33,7 +33,7 @@ macro(use_all_warnings TARGET_NAME)
       $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
         -Wall -Wextra -pedantic
-        -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
+        -Wno-unused-function -Wno-unused-parameter -Wno-unused-but-set-variable -Wno-sign-compare
       >
       $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
       $<$<BOOL:${COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
