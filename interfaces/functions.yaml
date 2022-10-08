@@ -542,7 +542,7 @@ igraph_distances_bellman_ford:
 igraph_distances_johnson:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_distances_floyd_warshall:
