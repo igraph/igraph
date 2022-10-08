@@ -2,7 +2,6 @@ No vertices, not directed:
 [ 0-by-0 ]
 No vertices, directed:
 [ 0-by-0 ]
-Directed graph with loops and multi-edges with negative loop:
 Directed graph with loops and multi-edges:
 [        0       -1       -3        1        6      Inf
          1        0       -2        2        7      Inf
@@ -17,3 +16,12 @@ Directed graph with loops and multi-edges, select 0 -> 2:
 [       -3 ]
 Directed graph with loops and multi-edges, select none:
 [ 0-by-0 ]
+Directed graph with loops and multi-edges, IGRAPH_IN:
+[        0        1        3      Inf      Inf      Inf
+        -1        0        2      Inf      Inf      Inf
+        -3       -2        0      Inf      Inf      Inf
+         1        2        4        0      Inf      Inf
+         6        7        9        5        0      Inf
+       Inf      Inf      Inf      Inf      Inf        0 ]
+Checking error for directed graph with loops and multi-edges with negative loop.
+Directed graph with loops and multi-edges, IGRAPH_ALL:

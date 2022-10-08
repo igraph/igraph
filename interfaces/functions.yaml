@@ -542,7 +542,7 @@ igraph_distances_bellman_ford:
 igraph_distances_johnson:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_distances_floyd_warshall:
@@ -1630,7 +1630,7 @@ igraph_community_leiden:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL VERTEXWEIGHTS vertex_weights,
-        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2, 
+        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_weights ON graph
