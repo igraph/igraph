@@ -24,7 +24,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t vids, layers, parents;
 

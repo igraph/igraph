@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_sparsemat_t spmat;
     igraph_matrix_t mat;
     igraph_integer_t p[] = {0, 1, 3};

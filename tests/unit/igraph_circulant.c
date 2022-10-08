@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t graph, graph_test;
     igraph_vector_int_t shifts;

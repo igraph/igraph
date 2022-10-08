@@ -39,15 +39,15 @@
  * </para><para>
  * Note that potentially there are exponentially many
  * paths between two vertices of a graph, and you may
- * run out of memory when using this function, if your
- * graph is lattice-like.
+ * run out of memory when using this function when the
+ * graph has many cycles. Consider using the \p cutoff
+ * parameter when you do not need long paths.
  *
- * </para><para>
- * This function currently ignored multiple and loop edges.
  * \param graph The input graph.
- * \param res Initialized integer vector, all paths are
- *        returned here, separated by -1 markers. The paths
- *        are included in arbitrary order, as they are found.
+ * \param res Initialized integer vector. The paths are
+ *        returned here in terms of their vertices, separated
+ *        by -1 markers. The paths are included in arbitrary
+ *        order, as they are found.
  * \param from The start vertex.
  * \param to The target vertices.
  * \param cutoff Maximum length of path that is considered. If
@@ -55,6 +55,8 @@
  * \param mode The type of the paths to consider, it is ignored
  *        for undirected graphs.
  * \return Error code.
+ *
+ * \sa \ref igraph_get_k_shortest_paths()
  *
  * Time complexity: O(n!) in the worst case, n is the number of
  * vertices.

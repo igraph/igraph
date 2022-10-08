@@ -1034,7 +1034,7 @@ static int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const v
  * position in the array. Use this to set the values of inds.
  */
 
-igraph_error_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, qsort_ind)(const TYPE(igraph_vector) *v,
         igraph_vector_int_t *inds, igraph_order_t order) {
     igraph_integer_t i, n = FUNCTION(igraph_vector, size)(v);
     BASE **vind, *first;

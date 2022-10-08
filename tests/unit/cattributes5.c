@@ -44,7 +44,7 @@ static void type_test(igraph_t *g, igraph_attribute_combination_type_t type_attr
     simplify_write_destroy(&g2, &comb);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g, g2;
     igraph_attribute_combination_t comb;

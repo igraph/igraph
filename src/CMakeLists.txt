@@ -67,7 +67,6 @@ add_library(
   core/vector_list.c
   core/vector_ptr.c
 
-  math/bfgs.c
   math/complex.c
   math/safe_intop.c
   math/utils.c
@@ -240,6 +239,7 @@ add_library(
   paths/dijkstra.c
   paths/distances.c
   paths/eulerian.c
+  paths/floyd_warshall.c
   paths/histogram.c
   paths/johnson.c
   paths/random_walk.c
@@ -247,6 +247,7 @@ add_library(
   paths/simple_paths.c
   paths/sparsifier.c
   paths/unweighted.c
+  paths/voronoi.c
   paths/widest_paths.c
 
   properties/basic_properties.c
@@ -254,6 +255,7 @@ add_library(
   properties/convergence_degree.c
   properties/dag.c
   properties/degrees.c
+  properties/ecc.c
   properties/girth.c
   properties/loops.c
   properties/multiplicity.c

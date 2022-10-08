@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     FILE *file;
     igraph_t graph;
     igraph_error_t err;

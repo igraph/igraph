@@ -23,7 +23,6 @@
 #ifndef IGRAPH_VECTOR_LIST_H
 #define IGRAPH_VECTOR_LIST_H
 
-#include "igraph_constants.h"
 #include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"

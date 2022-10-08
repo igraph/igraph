@@ -18,6 +18,7 @@
 */
 
 #include "igraph_structural.h"
+
 #include "igraph_bipartite.h"
 #include "igraph_constructors.h"
 #include "igraph_interface.h"

@@ -39,7 +39,7 @@ void create_test_matrix(
     igraph_sparsemat_compress(spmat, spmat_comp);
 }
 
-int main() {
+int main(void) {
     igraph_sparsemat_t spmat;
     igraph_sparsemat_t spmat_comp;
 

@@ -213,12 +213,8 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
-    if (igraph_vector_int_size(ipiv) > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(ipiv, &min, &max);
-        if (max > n || min < 1) {
+    if (! igraph_vector_int_isininterval(ipiv, 1, n)) {
             IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
-        }
     }
     if (igraph_vector_int_size(ipiv) != n) {
         IGRAPH_ERROR("Pivot vector length must match number of matrix rows.", IGRAPH_EINVAL);
@@ -746,7 +742,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Permuting rows and columns will not change the condition numbers
  * (in exact arithmetic) but diagonal scaling will.  For further
  * explanation of balancing, see section 4.10.2 of the LAPACK
- * Users' Guide.
+ * Users' Guide. Note that the eigenvectors obtained for the balanced
+ * matrix are backtransformed to those of \p A.
  *
  * \param balance Scalar that indicated, whether the input matrix
  *   should be balanced. Possible values:
@@ -777,12 +774,14 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   stored in a compressed form. If the j-th eigenvalue is real then
  *   column j contains the corresponding eigenvector. If the j-th and
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
- *   and (j+1)-th columns contain their corresponding eigenvectors.
+ *   and (j+1)-th columns contain the real and imaginary parts of the
+ *   corresponding eigenvectors.
  * \param vectorsright An initialized matrix or a NULL pointer. If not
  *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo
- * \param ihi \p ilo and \p ihi are integer values determined when A was
+ * \param ihi if not NULL, \p ilo and \p ihi point to integer values
+ *   determined when A was
  *   balanced.  The balanced A(i,j) = 0 if I>J and
  *   J=1,...,ilo-1 or I=ihi+1,...,N.
  * \param scale Pointer to an initialized vector or a NULL pointer. If
@@ -856,7 +855,15 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     igraph_vector_t *myreal = valuesreal, *myimag = valuesimag, vreal, vimag;
     igraph_vector_t *myscale = scale, vscale;
     igraph_real_t dummy;   /* to prevent some Clang sanitizer warnings */
+    int ilo_dummy;
+    int ihi_dummy;
 
+    if (ilo == NULL) {
+        ilo = &ilo_dummy;
+    }
+    if (ihi == NULL) {
+        ihi = &ihi_dummy;
+    }
     if (igraph_matrix_ncol(A) != n) {
         IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx).", IGRAPH_NONSQUARE);
     }

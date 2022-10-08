@@ -40,7 +40,7 @@ void init_all(igraph_vector_t *result, igraph_vector_int_t *i, igraph_vector_int
     igraph_sparsemat_init(spmat, 0, 0, 0);
 }
 
-int main() {
+int main(void) {
     igraph_sparsemat_t spmat;
     igraph_sparsemat_t spmat_comp;
     igraph_vector_t result;

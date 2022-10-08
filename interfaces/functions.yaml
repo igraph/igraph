@@ -447,6 +447,12 @@ igraph_distances:
         VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph
 
+igraph_distances_cutoff:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT, REAL cutoff=-1
+    DEPS: from ON graph, to ON graph
+
 igraph_get_shortest_path:
     PARAMS: |-
         GRAPH graph,
@@ -488,6 +494,12 @@ igraph_distances_dijkstra:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
         VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+    DEPS: from ON graph, to ON graph, weights ON graph
+
+igraph_distances_dijkstra_cutoff:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT, REAL cutoff=-1
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_shortest_paths_dijkstra:
@@ -532,6 +544,17 @@ igraph_distances_johnson:
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
         VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights
     DEPS: from ON graph, to ON graph, weights ON graph
+
+igraph_distances_floyd_warshall:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
+    DEPS: weights ON graph
+
+igraph_voronoi:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR_INT membership, OUT VECTOR distances,
+        VERTEX_INDICES generators, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, VORONOI_TIEBREAKER tiebreaker=RANDOM
+    DEPS: weights ON graph, generators ON graph
 
 igraph_get_all_simple_paths:
     PARAMS: |-
@@ -727,6 +750,12 @@ igraph_transitivity_barrat:
         GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL,
         EDGEWEIGHTS weights=NULL, TRANSITIVITY_MODE mode=NAN
     DEPS: res ON graph, vids ON graph, weights ON graph
+
+igraph_ecc:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, EDGE_SELECTOR eids=ALL,
+        INTEGER k=3, BOOLEAN offset=False, BOOLEAN normalize=True
+    DEPS: res ON graph, eids ON graph
 
 igraph_reciprocity:
     PARAMS: |-

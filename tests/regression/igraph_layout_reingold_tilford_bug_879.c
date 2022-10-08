@@ -26,7 +26,7 @@
 
 #include "../unit/test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     FILE *f;

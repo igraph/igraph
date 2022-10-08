@@ -88,7 +88,7 @@ void print_attributes(const igraph_t *g) {
     igraph_vector_int_destroy(&gtypes);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t y;
 

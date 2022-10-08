@@ -29,7 +29,7 @@
 
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-int main() {
+int main(void) {
     int runs = 100;
     const int noelements = 20;
     igraph_sparsemat_t A;

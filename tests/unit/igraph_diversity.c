@@ -4,7 +4,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t result;
     igraph_vector_t weights;

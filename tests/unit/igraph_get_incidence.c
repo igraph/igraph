@@ -40,7 +40,7 @@ void call_and_print(igraph_t *graph, igraph_vector_bool_t *types) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_mu, g_mun;
     igraph_vector_bool_t t_0, t_1, t_mu;
     igraph_matrix_t result;

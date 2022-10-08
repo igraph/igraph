@@ -28,6 +28,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
+#include "igraph_random.h"
 #include "igraph_statusbar.h"
 #include "igraph_structural.h"
 
@@ -485,6 +486,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     igraph_vector_int_t idx, idx2;
     igraph_vector_t mymerges;
     igraph_vector_t strength, tmp;
+    igraph_vector_t start_vec;
     igraph_integer_t staken = 0;
     igraph_adjlist_t adjlist;
     igraph_inclist_t inclist;
@@ -625,7 +627,6 @@ igraph_error_t igraph_community_leading_eigenvector(
     }
 
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    options->start = 0;
     options->which[0] = 'L'; options->which[1] = 'A';
 
     /* Memory for ARPACK */
@@ -685,10 +686,22 @@ igraph_error_t igraph_community_leading_eigenvector(
         options->lworkl = 0;        /* we surely have enough space */
         extra.comm = comm;
 
-        /* We try calling the solver twice, once from a random starting
-           point, once from a fixed one. This is because for some hard
-           cases it tends to fail. We need to suppress error handling for
-           the first call. */
+        /* Use a random start vector, but don't let ARPACK generate the
+         * start vector -- we want to use our own RNG. Also, we want to generate
+         * values close to +1 and -1 as this is what the eigenvector should
+         * look like if there _is_ some kind of a community structure at this
+         * step to discover. Experiments showed that shuffling a vector
+         * containing equal number of +/-1 values yields convergence in most
+         * cases */
+        options->start = 1;
+        for (i = 0; i < options->n; i++) {
+            storage.resid[i] = i % 2 ? 1 : -1;
+        }
+        igraph_vector_view(&start_vec, storage.resid, options->n);
+        RNG_BEGIN();
+        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
+        RNG_END();
+
         {
             igraph_error_t retval;
             igraph_error_handler_t *errh =
@@ -700,25 +713,6 @@ igraph_error_t igraph_community_leading_eigenvector(
             igraph_set_warning_handler(warnh);
             if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
                 IGRAPH_ERROR("ARPACK call failed", retval);
-            }
-            if (options->nconv < 1) {
-                /* Call again from a fixed starting point. Note that we cannot use a
-                 * fixed all-1 starting vector as sometimes ARPACK would return a
-                 * 'starting vector is zero' error -- this is of course not true but
-                 * it's a result of ARPACK >= 3.6.3 trying to force the starting vector
-                 * into the range of OP (i.e. the matrix being solved). The initial
-                 * vector we use here seems to work, but I have no theoretical argument
-                 * for its usage; it just happens to work. */
-                options->start = 1;
-                options->info = 0;
-                options->ncv = 0;
-                options->lworkl = 0;    /* we surely have enough space */
-                for (i = 0; i < options->n ; i++) {
-                    storage.resid[i] = i % 2 ? 1 : -1;
-                }
-                IGRAPH_CHECK(igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
-                                                   /*values=*/ 0, /*vectors=*/ 0));
-                options->start = 0;
             }
         }
 
@@ -734,9 +728,16 @@ igraph_error_t igraph_community_leading_eigenvector(
         options->info = 0;
         options->nev = 1;
         options->ldv = 0;
+        options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
         options->nconv = 0;
         options->lworkl = 0;    /* we surely have enough space */
-        options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
+
+        /* Use a random start vector; see comments above */
+        options->start = 1;
+        igraph_vector_view(&start_vec, storage.resid, options->n);
+        RNG_BEGIN();
+        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
+        RNG_END();
 
         {
             igraph_error_t retval;
@@ -747,27 +748,13 @@ igraph_error_t igraph_community_leading_eigenvector(
             if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
                 IGRAPH_ERROR("ARPACK call failed", retval);
             }
-            if (options->nconv < 1) {
-                /* Call again from a fixed starting point. See the comment a few lines
-                 * above about the exact choice of this starting vector */
-                options->start = 1;
-                options->info = 0;
-                options->ncv = 0;
-                options->lworkl = 0;    /* we surely have enough space */
-                for (i = 0; i < options->n; i++) {
-                    storage.resid[i] = i % 2 ? 1 : -1;
-                }
-                IGRAPH_CHECK(igraph_arpack_rssolve(arpcb1, &extra, options, &storage,
-                                                   /*values=*/ 0, /*vectors=*/ 0));
-                options->start = 0;
-            }
         }
 
         if (options->nconv < 1) {
             IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
         }
 
-        /* Ok, we have the leading eigenvector of the modularity matrix*/
+        /* Ok, we have the leading eigenvector of the modularity matrix */
 
         /* ---------------------------------------------------------------*/
         /* To avoid numeric errors */

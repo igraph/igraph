@@ -89,8 +89,8 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
@@ -165,6 +165,10 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
         igraph_integer_t ffrom = IGRAPH_FROM(graph, i);
         igraph_integer_t tto = IGRAPH_TO(graph, i);
         VECTOR(newweights)[i] += MATRIX(bfres, 0, ffrom) - MATRIX(bfres, 0, tto);
+
+        /* If a weight becomes slightly negative due to roundoff errors,
+           snap it to exact zero. */
+        if (VECTOR(newweights)[i] < 0) VECTOR(newweights)[i] = 0;
     }
 
     /* Run Dijkstra's algorithm on the new weights */

@@ -18,12 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "gengraph_definitions.h"
-#include <stdexcept>
-#include <cassert>
-#include <cstdlib>
-#include <cstdio>
-#include <cmath>
 
 #include "gengraph_qsort.h"
 #include "gengraph_hash.h"
@@ -34,6 +28,12 @@
 #include "igraph_error.h"
 #include "igraph_statusbar.h"
 #include "igraph_progress.h"
+
+#include <stdexcept>
+#include <cassert>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
 
 namespace gengraph {
 

@@ -430,9 +430,8 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
 
     /* Collect the vertex and edge IDs that will remain */
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t from, to;
         igraph_integer_t eid = IGRAPH_EIT_GET(eit);
-        IGRAPH_CHECK(igraph_edge(graph, eid, &from, &to));
+        igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
         eremain[eid] = vremain[from] = vremain[to] = 1;
     }
 

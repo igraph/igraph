@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-int main() {
+int main(void) {
 
     igraph_t ring, g, *component;
     igraph_graph_list_t complist;

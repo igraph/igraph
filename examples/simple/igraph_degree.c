@@ -29,7 +29,7 @@ igraph_bool_t handshaking_lemma(igraph_t *g, igraph_vector_int_t *v) {
     return igraph_vector_int_sum(v) == 2 * igraph_ecount(g);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_t v;

@@ -13,7 +13,7 @@
     igraph_famous(&graph, name); \
     TEST_GRAPH(name);
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_bliss_info_t info;
 

@@ -32,7 +32,7 @@ igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t hist;

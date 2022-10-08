@@ -29,7 +29,8 @@
 
 #include "graph/attributes.h"
 
-#include "pajek-header.h"
+#include "io/pajek-header.h"
+#include "io/parsers/pajek-parser.h"
 
 #include <ctype.h>
 #include <string.h>

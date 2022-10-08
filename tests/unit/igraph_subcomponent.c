@@ -30,7 +30,7 @@ void call_and_print(igraph_t *graph, igraph_integer_t vertex, igraph_neimode_t m
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_lm, g_lmu;
     igraph_vector_int_t result;
     igraph_vector_int_init(&result, 0);

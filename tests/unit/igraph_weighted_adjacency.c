@@ -143,7 +143,7 @@ void check_error(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loo
     igraph_vector_destroy(&weights);
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t mat;
     igraph_matrix_t mat_sym;
     int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 4, 0 }, { 0, 1, 0, 0 } };

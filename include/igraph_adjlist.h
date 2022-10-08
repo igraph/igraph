@@ -124,6 +124,19 @@ IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al);
 
 /**
+ * \define igraph_lazy_adjlist_has
+ * \brief Are adjacenct vertices already stored in a lazy adjacency list?
+ *
+ * \param al The lazy adjacency list.
+ * \param no The vertex ID to query.
+ * \return True if the adjacent vertices of this vertex are already computed
+ *   and stored, false otherwise.
+ *
+ * Time complexity: O(1).
+ */
+#define igraph_lazy_adjlist_has(al,no) ((igraph_bool_t) (al)->adjs[(igraph_integer_t)(no)])
+
+/**
  * \define igraph_lazy_adjlist_get
  * \brief Query neighbor vertices.
  *
@@ -134,16 +147,20 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlis
  *
  * \param al The lazy adjacency list.
  * \param no The vertex ID to query.
- * \return Pointer to a vector, or \c NULL upon error.
+ * \return Pointer to a vector, or \c NULL upon error. Errors can only
+ *   occur the first time this function is called for a given vertex.
  *   It is safe to modify this vector,
  *   modification does not affect the original graph.
+ *
+ * \sa \ref igraph_lazy_adjlist_has() to check if this function has
+ *   already been called for a vertex.
  *
  * Time complexity: O(d), the number of neighbor vertices for the
  * first time, O(1) for subsequent calls.
  */
 #define igraph_lazy_adjlist_get(al,no) \
-    ((al)->adjs[(igraph_integer_t)(no)] != 0 ? ((al)->adjs[(igraph_integer_t)(no)]) : \
-     (igraph_i_lazy_adjlist_get_real(al, no)))
+    (igraph_lazy_adjlist_has(al,no) ? ((al)->adjs[(igraph_integer_t)(no)]) \
+                                    : (igraph_i_lazy_adjlist_get_real(al, no)))
 IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, igraph_integer_t no);
 
 typedef struct igraph_lazy_inclist_t {
@@ -163,6 +180,19 @@ IGRAPH_EXPORT void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
 IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclist_t *il);
 
 /**
+ * \define igraph_lazy_inclist_has
+ * \brief Are incident edges already stored in a lazy inclist?
+ *
+ * \param il The lazy incidence list.
+ * \param no The vertex ID to query.
+ * \return True if the incident edges of this vertex are already computed
+ *   and stored, false otherwise.
+ *
+ * Time complexity: O(1).
+ */
+#define igraph_lazy_inclist_has(il,no) ((igraph_bool_t) (il)->incs[(igraph_integer_t)(no)])
+
+/**
  * \define igraph_lazy_inclist_get
  * \brief Query incident edges.
  *
@@ -171,19 +201,23 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclis
  * operations are needed when the incident edges of the same vertex are
  * queried again.
  *
- * \param al The lazy incidence list object.
+ * \param il The lazy incidence list object.
  * \param no The vertex ID to query.
- * \return Pointer to a vector, or \c NULL upon error.
+ * \return Pointer to a vector, or \c NULL upon error. Errors can only
+ *   occur the first time this function is called for a given vertex.
  *   It is safe to modify this vector,
  *   modification does not affect the original graph.
+ *
+ * \sa \ref igraph_lazy_inclist_has() to check if this function has
+ *   already been called for a vertex.
  *
  * Time complexity: O(d), the number of incident edges for the first
  * time, O(1) for subsequent calls with the same \p no argument.
  */
-#define igraph_lazy_inclist_get(al,no) \
-    ((al)->incs[(igraph_integer_t)(no)] != 0 ? ((al)->incs[(igraph_integer_t)(no)]) : \
-     (igraph_i_lazy_inclist_get_real(al, no)))
-IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al, igraph_integer_t no);
+#define igraph_lazy_inclist_get(il,no) \
+    (igraph_lazy_inclist_has(il,no) ? ((il)->incs[(igraph_integer_t)(no)]) \
+                                    : (igraph_i_lazy_inclist_get_real(il,no)))
+IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il, igraph_integer_t no);
 
 __END_DECLS
 

@@ -28,7 +28,7 @@ void print_result(igraph_t *g, igraph_integer_t start_vid, igraph_bool_t directe
     printf(", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n\n", from, to);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_real_t result;
     igraph_error_handler_t *ehandler;

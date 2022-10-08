@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <string.h>
 
-int main() {
+int main(void) {
 
     char tmp[100];
     const char *string;

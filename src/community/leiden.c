@@ -669,8 +669,8 @@ static igraph_error_t igraph_i_community_leiden_quality(
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t e = IGRAPH_EIT_GET(eit), from, to;
-        IGRAPH_CHECK(igraph_edge(graph, e, &from, &to));
+        igraph_integer_t e = IGRAPH_EIT_GET(eit);
+        igraph_integer_t from = IGRAPH_FROM(graph, e), to = IGRAPH_TO(graph, e);
         total_edge_weight += VECTOR(*edge_weights)[e];
         /* We add the internal edge weights */
         if (VECTOR(*membership)[from] == VECTOR(*membership)[to]) {
@@ -1062,8 +1062,8 @@ igraph_error_t igraph_community_leiden(const igraph_t *graph,
      * each iteration explores different subsets of nodes.
      */
     igraph_bool_t changed=false;
-    for (igraph_integer_t itr = 0; 
-         n_iterations >= 0 ? itr < n_iterations : !changed; 
+    for (igraph_integer_t itr = 0;
+         n_iterations >= 0 ? itr < n_iterations : !changed;
          itr++) {
         IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
                                                resolution_parameter, beta,

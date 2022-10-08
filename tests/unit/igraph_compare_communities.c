@@ -41,7 +41,7 @@ void compare_and_print(igraph_vector_int_t *comm1, igraph_vector_int_t *comm2, i
 }
 
 
-int main() {
+int main(void) {
     igraph_vector_int_t comm1, comm2;
 
     igraph_set_error_handler(igraph_error_handler_ignore);

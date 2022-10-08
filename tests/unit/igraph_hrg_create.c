@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_hrg_t hrg;
     igraph_t graph, new_graph;
     igraph_vector_t prob;

@@ -29,7 +29,7 @@ void call_and_print(igraph_t *graph, igraph_integer_t pnode, igraph_neimode_t mo
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_1, g_lm, g_lmu, g_s1, g_s2;
 
     igraph_small(&g_1, 1, 0, -1);

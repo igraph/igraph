@@ -18,7 +18,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_vector_int_t v;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */

@@ -46,7 +46,7 @@ igraph_bool_t is_forest(const igraph_t *graph) {
 
 /* This test generates 'trials' random graphs, allowing self-loops and
  * multi-edges, and exercises the forest detection function on each. */
-int main() {
+int main(void) {
     const igraph_integer_t n = 100; /* vertex count */
     const igraph_integer_t m = n / 2; /* edge count */
     const igraph_integer_t trials = 300;

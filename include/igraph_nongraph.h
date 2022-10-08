@@ -94,11 +94,6 @@ IGRAPH_EXPORT igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igra
                                        igraph_integer_t length);
 IGRAPH_EXPORT igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_int_t *resverts,
                                      igraph_matrix_t *rescoords);
-IGRAPH_EXPORT igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
-                              igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
-                              igraph_integer_t maxit, igraph_integer_t trace,
-                              igraph_real_t abstol, igraph_real_t reltol, igraph_integer_t nREPORT, void *ex,
-                              igraph_integer_t *fncount, igraph_integer_t *grcount);
 IGRAPH_EXPORT igraph_bool_t igraph_almost_equals(double a, double b, double eps);
 IGRAPH_EXPORT int igraph_cmp_epsilon(double a, double b, double eps);
 

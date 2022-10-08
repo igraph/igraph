@@ -19,11 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "gengraph_definitions.h"
-#include "gengraph_random.h"
 #include "gengraph_degree_sequence.h"
-#include "gengraph_hash.h"
-
-#include "igraph_statusbar.h"
 
 #include <cstdio>
 #include <cstdlib>

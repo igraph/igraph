@@ -26,6 +26,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_blas.h"
 #include "igraph_interface.h"
+#include "igraph_random.h"
 #include "igraph_structural.h"
 
 #include "core/math.h"
@@ -698,7 +699,7 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&tmpD, no);
 
     options->n = (int) vc;
-    options->start = 0;   /* random start vector */
+    options->start = 1; /* no random start vector */
     options->nev = (int) no;
     switch (which) {
     case IGRAPH_EIGEN_LM:
@@ -717,6 +718,14 @@ static igraph_error_t igraph_i_spectral_embedding(const igraph_t *graph,
     if (options->ncv > options->n) {
         options->ncv = options->n;
     }
+
+    /* We provide a random start vector to ARPACK on our own to ensure that
+     * we use igraph's RNG and not the one from ARPACK (which relies on LAPACK) */
+    RNG_BEGIN();
+    for (i = 0; i < vc; i++) {
+        MATRIX(*X, i, 0) = RNG_UNIF(-1, 1);
+    }
+    RNG_END();
 
     IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &tmpD, X));
 

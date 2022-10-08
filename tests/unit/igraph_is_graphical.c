@@ -75,7 +75,7 @@ cleanup:
 }
 
 
-int main() {
+int main(void) {
     igraph_vector_int_t ds, ods, ids;
 
     igraph_set_error_handler(&igraph_error_handler_ignore);

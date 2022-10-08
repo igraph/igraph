@@ -20,7 +20,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t res;
 

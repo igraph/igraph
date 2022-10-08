@@ -38,7 +38,7 @@ void print_cliques_and_mu(igraph_vector_int_list_t* cliques, igraph_vector_t* mu
     print_vector_format(mu, stdout, "%.5f");
 }
 
-void test_graphlets_candidate_basis_simple() {
+void test_graphlets_candidate_basis_simple(void) {
     igraph_t g;
     igraph_vector_int_list_t cliques;
     igraph_vector_t thresholds;
@@ -68,7 +68,7 @@ void test_graphlets_candidate_basis_simple() {
     VERIFY_FINALLY_STACK();
 }
 
-void test_graphlets_filtering() {
+void test_graphlets_filtering(void) {
     igraph_t g;
     igraph_vector_int_list_t cliques;
     igraph_vector_t thresholds;
@@ -90,7 +90,7 @@ void test_graphlets_filtering() {
     VERIFY_FINALLY_STACK();
 }
 
-void test_zachary_random_weights() {
+void test_zachary_random_weights(void) {
     igraph_t g;
     igraph_vector_int_list_t cliques;
     igraph_vector_t thresholds;
@@ -118,7 +118,7 @@ void test_zachary_random_weights() {
 
 }
 
-void test_projection() {
+void test_projection(void) {
     igraph_t g;
     igraph_vector_int_list_t cliques;
     igraph_vector_t mu;
@@ -140,7 +140,7 @@ void test_projection() {
     VERIFY_FINALLY_STACK();
 }
 
-int main() {
+int main(void) {
     test_graphlets_candidate_basis_simple();
     test_graphlets_filtering();
     test_zachary_random_weights();

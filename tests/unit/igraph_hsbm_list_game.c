@@ -28,7 +28,7 @@ void call_and_print(igraph_integer_t n, igraph_vector_int_t *mlist, igraph_vecto
 }
 
 
-int main() {
+int main(void) {
     igraph_matrix_t pref_matrix;
     igraph_matrix_list_t pref_matrix_list;
     igraph_vector_t rho;
@@ -56,7 +56,7 @@ int main() {
         igraph_vector_init_real(&rho, 3, 0.6, 0.4, 0.0);
         igraph_vector_list_push_back(&rholist, &rho);
 
-        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0}; 
+        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         matrix_init_real_row_major(&pref_matrix, 3, 3, elems);
         igraph_matrix_list_push_back(&pref_matrix_list, &pref_matrix);
 
@@ -75,7 +75,7 @@ int main() {
         igraph_vector_init_real(&rho, 3, 0.6, 0.4, 0.0);
         igraph_vector_list_push_back(&rholist, &rho);
 
-        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0}; 
+        igraph_real_t elems[] = {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         matrix_init_real_row_major(&pref_matrix, 3, 3, elems);
         igraph_matrix_list_push_back(&pref_matrix_list, &pref_matrix);
         matrix_init_real_row_major(&pref_matrix, 3, 3, elems);

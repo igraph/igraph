@@ -22,8 +22,6 @@
 
 #include "igraph_constructors.h"
 
-#include "igraph_interface.h"
-
 #include "math/safe_intop.h"
 
 /**

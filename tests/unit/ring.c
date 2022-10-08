@@ -23,7 +23,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     int directed, circular, mutual;
     int n;
 

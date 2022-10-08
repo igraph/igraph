@@ -105,7 +105,7 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
     return result;
 }
 
-int main() {
+int main(void) {
 
     igraph_sparsemat_t A, B;
     igraph_matrix_t M, N;

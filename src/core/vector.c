@@ -21,10 +21,10 @@
 
 */
 
-#include "igraph_complex.h"
-#include "igraph_error.h"
-#include "igraph_types.h"
 #include "igraph_vector.h"
+
+#include "igraph_complex.h"
+#include "igraph_types.h"
 #include "igraph_nongraph.h"
 
 #include <float.h>

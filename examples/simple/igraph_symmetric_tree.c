@@ -1,14 +1,14 @@
 
 #include <igraph.h>
 
-int main() {
-    
+int main(void) {
+
     igraph_t graph;
     igraph_bool_t res;
     igraph_vector_int_t v;
     igraph_vector_int_init_int(&v, 3, 3, 4, 5);
 
-    /* Create a directed symmetric tree with 2 levels - 
+    /* Create a directed symmetric tree with 2 levels -
        3 children in first and 4 children in second level,
        5 children in third level
        with edges pointing towards the root. */

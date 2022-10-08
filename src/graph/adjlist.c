@@ -100,6 +100,11 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
  * adjacency list contains the state of the graph at the time of its
  * initialization.
  *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE or setting \p multiple to a
+ * different value from \c IGRAPH_MULTIPLE.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
  * \param mode Constant specifying whether outgoing
@@ -669,6 +674,10 @@ igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) 
  * argument to control whether this will be the case (\c IGRAPH_LOOPS_TWICE )
  * or not (\c IGRAPH_LOOPS_ONCE or \c IGRAPH_NO_LOOPS).
  *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE.
+ *
  * \param graph The input graph.
  * \param il Pointer to an uninitialized incidence list.
  * \param mode Constant specifying whether incoming edges
@@ -958,6 +967,12 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  * allocates some memory for storing the vectors of an adjacency list,
  * but the neighbor vertices are not queried, only at the \ref
  * igraph_lazy_adjlist_get() calls.
+ *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE or setting \p multiple to a
+ * different value from \c IGRAPH_MULTIPLE.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized adjacency list object.
  * \param mode Constant, it gives whether incoming edges
@@ -1115,6 +1130,10 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
  * will appear in the incidence list \em twice, once for the source vertex
  * and once for the target edge. It also means that the edge IDs of loop edges
  * will appear \em twice for the \em same vertex.
+ *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE.
  *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized incidence list.

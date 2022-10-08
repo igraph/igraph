@@ -21,8 +21,6 @@
 
 */
 
-#include "igraph_memory.h"
-
 #include "core/fixed_vectorlist.h"
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {

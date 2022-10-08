@@ -5,7 +5,7 @@
 
 /* Test case for bug #1852 */
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t membership, initial_labels;
 
@@ -62,6 +62,8 @@ int main() {
 
     igraph_vector_int_destroy(&initial_labels);
     igraph_vector_int_destroy(&membership);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

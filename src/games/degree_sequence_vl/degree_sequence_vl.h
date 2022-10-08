@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,24 +13,22 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <igraph.h>
-#include <stdlib.h>
+#ifndef IGRAPH_GAMES_DEGREE_SEQUENCE_VL_H
+#define IGRAPH_GAMES_DEGREE_SEQUENCE_VL_H
 
-int main() {
+#include "igraph_decls.h"
+#include "igraph_datatype.h"
+#include "igraph_vector.h"
 
-    igraph_integer_t i;
-    for (i = 0; i < 1000; i++) {
-        igraph_real_t r = igraph_rng_get_unif01(igraph_rng_default());
-        if (r < 0 || r > 1) {
-            return 1;
-        }
-    }
+__BEGIN_DECLS
 
-    return 0;
-}
+igraph_error_t igraph_degree_sequence_game_vl(igraph_t *graph,
+                                   const igraph_vector_int_t *out_seq,
+                                   const igraph_vector_int_t *in_seq);
+
+__END_DECLS
+
+#endif /* IGRAPH_GAMES_DEGREE_SEQUENCE_VL_H */

@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <unistd.h>     /* unlink */
 
+#include "test_utilities.h"
+
 void custom_warning_handler (const char *reason, const char *file,
                              int line) {
     IGRAPH_UNUSED(file);
@@ -69,7 +71,7 @@ void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_error_handler_t* oldhandler;
     igraph_warning_handler_t* oldwarnhandler;
@@ -204,6 +206,8 @@ int main() {
     igraph_read_graph_graphml(&g, ifile, 0);
     fclose(ifile);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

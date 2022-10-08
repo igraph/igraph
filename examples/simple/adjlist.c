@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t g, g2;
     igraph_adjlist_t adjlist;

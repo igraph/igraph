@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_matrix_t a, b, c;
 
     igraph_matrix_init(&a, 2, 2);

@@ -18,7 +18,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t y;

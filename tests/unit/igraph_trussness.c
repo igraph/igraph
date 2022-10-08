@@ -33,10 +33,10 @@
 
 void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
     igraph_integer_t i, n = igraph_vector_int_size(trussness);
-    igraph_integer_t from, to;
 
     printf("fromNode, toNode, trussness\n");
     for (i=0; i < n; i++) {
+        igraph_integer_t from, to;
         igraph_edge(graph, i, &from, &to);
         printf("%" IGRAPH_PRId ", %" IGRAPH_PRId ", %" IGRAPH_PRId "\n", from, to, VECTOR(*trussness)[i]);
     }
@@ -45,7 +45,7 @@ void print_and_destroy(igraph_t *graph, igraph_vector_int_t *trussness) {
     igraph_destroy(graph);
 }
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_vector_int_t v;

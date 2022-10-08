@@ -28,7 +28,7 @@ void call_and_print(igraph_integer_t n, igraph_matrix_t *pref_matrix, igraph_vec
 }
 
 
-int main() {
+int main(void) {
     igraph_t result;
     igraph_matrix_t pref_matrix_0, pref_matrix_1, pref_matrix_3, pref_matrix_3u, pref_matrix_nonsq, pref_matrix_oor, pref_matrix_nsym;
     igraph_vector_int_t block_sizes_0, block_sizes_1, block_sizes_3, block_sizes_neg;

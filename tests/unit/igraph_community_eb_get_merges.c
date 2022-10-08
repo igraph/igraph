@@ -42,7 +42,7 @@ void print_and_destroy(igraph_t *g, igraph_bool_t directed, igraph_vector_int_t 
     igraph_destroy(g);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_t edges;
     igraph_vector_t weights;

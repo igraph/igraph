@@ -42,7 +42,7 @@ void print_and_destroy(igraph_t *graph, igraph_neimode_t mode) {
     print_and_destroy_weighted(graph, mode, &weights);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t weights;
     igraph_vector_t ecc;
@@ -97,13 +97,13 @@ int main() {
     igraph_vector_init(&weights, 1);
     igraph_empty(&g, 1, IGRAPH_UNDIRECTED);
     CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
-    
+
     printf("Check NaN weight error.\n");
     igraph_destroy(&g);
     igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,1, -1);
     VECTOR(weights)[0] = IGRAPH_NAN;
     CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);
-    
+
     printf("Check negative weight error.\n");
     VECTOR(weights)[0] = -1;
     CHECK_ERROR(igraph_eccentricity_dijkstra(&g, &weights, &ecc, igraph_vss_all(), IGRAPH_OUT), IGRAPH_EINVAL);

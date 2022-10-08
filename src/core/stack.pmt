@@ -34,17 +34,18 @@
  * \brief Initializes a stack.
  *
  * The initialized stack is always empty.
+ *
  * \param s Pointer to an uninitialized stack.
- * \param size The number of elements to allocate memory for.
+ * \param capacity The number of elements to allocate memory for.
  * \return Error code.
  *
  * Time complexity: O(\p size).
  */
 
-igraph_error_t FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, igraph_integer_t size) {
+igraph_error_t FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, igraph_integer_t capacity) {
     igraph_integer_t alloc_size;
-    IGRAPH_ASSERT(size >= 0);
-    alloc_size = size > 0 ? size : 1;
+    IGRAPH_ASSERT(capacity >= 0);
+    alloc_size = capacity > 0 ? capacity : 1;
     IGRAPH_ASSERT(s != NULL);
     s->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
     if (s->stor_begin == NULL) {

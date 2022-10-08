@@ -22,7 +22,7 @@
 #include "plfit_error.h"
 #include "platform.h"
 
-static char *plfit_i_error_strings[] = {
+static const char *plfit_i_error_strings[] = {
     "No error",
     "Failed",
     "Invalid value",

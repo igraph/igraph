@@ -28,7 +28,7 @@ void print_and_destroy(igraph_t *g, int min, int max) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_empty, g_lm;
 
     igraph_small(&g_empty, 0, 0, -1);

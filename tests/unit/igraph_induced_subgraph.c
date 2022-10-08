@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g, sub;
     igraph_vector_int_t keep;
 
@@ -37,7 +37,7 @@ int main() {
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_COPY_AND_DELETE);
-    igraph_write_graph_edgelist(&sub, stdout);
+    print_graph(&sub);
     igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);
@@ -52,7 +52,7 @@ int main() {
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
-    igraph_write_graph_edgelist(&sub, stdout);
+    print_graph(&sub);
     igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);
@@ -65,7 +65,7 @@ int main() {
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_COPY_AND_DELETE);
-    igraph_write_graph_edgelist(&sub, stdout);
+    print_graph(&sub);
     igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);
@@ -78,7 +78,7 @@ int main() {
     igraph_induced_subgraph(&g, &sub,
                             igraph_vss_vector(&keep),
                             IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
-    igraph_write_graph_edgelist(&sub, stdout);
+    print_graph(&sub);
     igraph_vector_int_destroy(&keep);
     igraph_destroy(&sub);
     igraph_destroy(&g);

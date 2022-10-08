@@ -236,17 +236,9 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     igraph_integer_t no_comps;
     igraph_integer_t no_removed_edges = igraph_vector_int_size(edges);
     igraph_integer_t max_merges;
-    igraph_integer_t min;
-    igraph_integer_t max;
 
-    if (no_removed_edges > 0) {
-        igraph_vector_int_minmax(edges, &min, &max);
-        if (min < 0) {
-            IGRAPH_ERRORF("Edge ids should not be negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, min);
-        }
-        if (max > no_of_edges) {
-            IGRAPH_ERRORF("Edge id %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVAL, max);
-        }
+    if (! igraph_vector_int_isininterval(edges, 0, no_of_edges-1)) {
+        IGRAPH_ERROR("Invalid edge ID.", IGRAPH_EINVAL);
     }
     if (no_removed_edges < no_of_edges) {
             IGRAPH_ERRORF("Number of removed edges (%" IGRAPH_PRId ") should be equal to "
@@ -679,7 +671,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
-                            IGRAPH_CHECK(igraph_2wheap_modify(&heap, to, -altdist));
+                            igraph_2wheap_modify(&heap, to, -altdist);
                         } else if (altdist == curdist - 1) {
                             /* Another path with the same length */
                             v = igraph_inclist_get(&fathers, to);

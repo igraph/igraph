@@ -23,6 +23,7 @@
 */
 
 #include "igraph_layout.h"
+
 #include "igraph_components.h"
 #include "igraph_constants.h"
 #include "igraph_constructors.h"
@@ -1173,7 +1174,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
                 }
                 /* Is the edge between medians[k] and vertex ignored
                  * because of a type 1 conflict? */
-                IGRAPH_CHECK(igraph_get_eid(graph, &eid, vertex, medians[k], 0, 1));
+                IGRAPH_CHECK(igraph_get_eid(graph, &eid, vertex, medians[k], IGRAPH_UNDIRECTED, /* error= */ true));
                 if (VECTOR(*ignored_edges)[eid]) {
                     continue;
                 }

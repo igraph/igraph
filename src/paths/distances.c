@@ -178,7 +178,7 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
             } else if (altdist < curdist) {
                 /* This is a shorter path */
-                IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
+                igraph_2wheap_modify(&Q, tto, -altdist);
             }
         }
     }
@@ -319,8 +319,8 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
@@ -696,8 +696,8 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {
