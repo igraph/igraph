@@ -235,6 +235,7 @@ add_library(
   operators/union.c
 
   paths/all_shortest_paths.c
+  paths/astar.c
   paths/bellman_ford.c
   paths/dijkstra.c
   paths/distances.c
