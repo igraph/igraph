@@ -734,6 +734,9 @@ igraph_error_t igraph_community_leading_eigenvector(
 
         /* Use a random start vector; see comments above */
         options->start = 1;
+        for (i = 0; i < options->n; i++) {
+            storage.resid[i] = i % 2 ? 1 : -1;
+        }
         igraph_vector_view(&start_vec, storage.resid, options->n);
         RNG_BEGIN();
         IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
