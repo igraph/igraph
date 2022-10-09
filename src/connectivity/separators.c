@@ -394,7 +394,7 @@ static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
         igraph_vector_t *vec = VECTOR(*separators)[i];
         if (vec) {
             igraph_vector_destroy(vec);
-            IGRAPH_FREE(vec);
+            IGRAPH_FREE(VECTOR(*separators)[i]);
         }
     }
 }

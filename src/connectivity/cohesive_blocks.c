@@ -42,7 +42,7 @@ static void igraph_i_cohesive_blocks_free_graphs(igraph_vector_ptr_t *ptr) {
         igraph_t *g = VECTOR(*ptr)[i];
         if (g) {
             igraph_destroy(g);
-            igraph_free(g);
+            IGRAPH_FREE(VECTOR(*ptr)[i]);
         }
     }
 }

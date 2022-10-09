@@ -494,7 +494,7 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
     for (i = 0; i < igraph_vector_ptr_size(complist); i++) {
         if (VECTOR(*complist)[i] != 0) {
             igraph_destroy(VECTOR(*complist)[i]);
-            igraph_free(VECTOR(*complist)[i]);
+            IGRAPH_FREE(VECTOR(*complist)[i]);
         }
     }
 }

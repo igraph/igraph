@@ -358,7 +358,7 @@ static void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
         igraph_vector_t *v = VECTOR(*ptr)[i];
         if (v) {
             igraph_vector_destroy(v);
-            igraph_free(v);
+            IGRAPH_FREE(VECTOR(*ptr)[i]);
         }
     }
 }
