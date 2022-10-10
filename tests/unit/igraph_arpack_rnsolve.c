@@ -132,6 +132,8 @@ int main(void) {
     cb2_data_t data = { &A };
     int i, j;
 
+    /* Note: igraph_arpack_rnsolve() uses the RNG to generate a random
+     * starting vector for ARPACK. */
     igraph_rng_seed(igraph_rng_default(), 42 * 42);
 
     igraph_matrix_init(&A, DIM, DIM);
