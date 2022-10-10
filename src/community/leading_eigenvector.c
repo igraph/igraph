@@ -691,16 +691,16 @@ igraph_error_t igraph_community_leading_eigenvector(
          * values close to +1 and -1 as this is what the eigenvector should
          * look like if there _is_ some kind of a community structure at this
          * step to discover. Experiments showed that shuffling a vector
-         * containing equal number of +/-1 values yields convergence in most
-         * cases */
+         * containing equal number of slightly perturbed +/-1 values yields
+         * convergence in most cases. */
         options->start = 1;
-        for (i = 0; i < options->n; i++) {
-            storage.resid[i] = i % 2 ? 1 : -1;
-        }
-        igraph_vector_view(&start_vec, storage.resid, options->n);
         RNG_BEGIN();
-        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
+        for (i = 0; i < options->n; i++) {
+            storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
+        }
         RNG_END();
+        igraph_vector_view(&start_vec, storage.resid, options->n);
+        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
 
         {
             igraph_error_t retval;
@@ -734,13 +734,13 @@ igraph_error_t igraph_community_leading_eigenvector(
 
         /* Use a random start vector; see comments above */
         options->start = 1;
-        for (i = 0; i < options->n; i++) {
-            storage.resid[i] = i % 2 ? 1 : -1;
-        }
-        igraph_vector_view(&start_vec, storage.resid, options->n);
         RNG_BEGIN();
-        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
+        for (i = 0; i < options->n; i++) {
+            storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
+        }
         RNG_END();
+        igraph_vector_view(&start_vec, storage.resid, options->n);
+        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
 
         {
             igraph_error_t retval;
