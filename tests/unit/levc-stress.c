@@ -29,7 +29,8 @@
 
 #include "test_utilities.inc"
 
-int main() {
+int main(void) {
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
     int k;
     for (k = 0; k < 20; k++) {
