@@ -697,6 +697,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
          * containing equal number of slightly perturbed +/-1 values yields
          * convergence in most cases. */
         options->start = 1;
+        options->mxiter = options->mxiter > 10000 ? options->mxiter : 10000;  /* use more iterations, we've had convergence problems with 3000 */
         RNG_BEGIN();
         for (i = 0; i < options->n; i++) {
             storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
