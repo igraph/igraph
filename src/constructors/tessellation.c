@@ -44,11 +44,6 @@
  *        the length of \p row_start_vector.
  * \param row_start_vector Integer vector, defines the leftmost coordinate of
  *        the vertex with the second coordinate equal to the index.
- * \param is_vertex_in_graph A funtion, a predicate that takes coordinates of a vertex (i, j) and some additional \p condition_params.
- *        The predicate is evaluated to true if and only if the vertex corresponding to (i, j) belongs to the graph being constructed.
- *        Typically, composed of linear inqualities.
- *        Can be deduced from \p row_lengths_vector and \p row_start_vector.
- * \param condition_params Integer vector, that contains parameters supplied to \p is_vertex_in_graph.
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid (negative) length of row_lengths_vector does not match the length of the
@@ -56,12 +51,11 @@
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  */
-igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual, igraph_integer_t row_count,
-                                        igraph_vector_int_t row_lengths_vector, igraph_vector_int_t row_start_vector,
-                                        igraph_bool_t(is_vertex_in_graph)(igraph_integer_t, igraph_integer_t, igraph_vector_int_t),
-                                        igraph_vector_int_t condition_params)
+igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual,
+                                                 igraph_vector_int_t row_lengths_vector, igraph_vector_int_t row_start_vector)
 {
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t row_count = igraph_vector_int_size(&row_lengths_vector);
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t row_lengths_prefix_sum_vector;
     igraph_integer_t i, j;
@@ -84,16 +78,16 @@ igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t 
     no_of_nodes = VECTOR(row_lengths_prefix_sum_vector)[row_count];
 
 #define VERTEX_INDEX(i, j) (VECTOR(row_lengths_prefix_sum_vector)[j] + i - VECTOR(row_start_vector)[j])
-#define ADD_EDGE_IJ_KL_IF_EXISTS(i, j, k, l)                             \
-    if (is_vertex_in_graph(k, l, condition_params))                      \
-    {                                                                    \
-        igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));     \
-        igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));     \
-        if (directed && mutual)                                          \
-        {                                                                \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l))); \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j))); \
-        }                                                                \
+#define ADD_EDGE_IJ_KL_IF_EXISTS(i, j, k, l)                                                                            \
+    if (0 <= k && k <= VECTOR(row_start_vector)[l] + VECTOR(row_lengths_vector)[l] - 1 && 0 <= l && l <= row_count - 1) \
+    {                                                                                                                   \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                    \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                    \
+        if (directed && mutual)                                                                                         \
+        {                                                                                                               \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                \
+        }                                                                                                               \
     }
 
     igraph_integer_t k;
@@ -114,17 +108,11 @@ igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t 
     return IGRAPH_SUCCESS;
 }
 
-igraph_bool_t is_vertex_in_graph_triangulated_triangle_shape(igraph_integer_t k, igraph_integer_t l, const igraph_vector_int_t condition_params)
-{
-    return 0 <= k && 0 <= l && k + l <= VECTOR(condition_params)[0] - 1;
-}
-
 igraph_error_t igraph_triangulated_mesh_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual)
 {
     igraph_integer_t row_count = size;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_vector_int_t condition_params;
     igraph_integer_t i;
 
     if (size < 1)
@@ -134,37 +122,28 @@ igraph_error_t igraph_triangulated_mesh_triangle_shape(igraph_t *graph, igraph_i
 
     igraph_vector_int_init(&row_lengths_vector, row_count);
     igraph_vector_int_init(&row_start_vector, row_count);
-    igraph_vector_int_init(&condition_params, 1);
 
-    VECTOR(condition_params)[0] = row_count;
     for (i = 0; i < row_count; i++)
     {
         VECTOR(row_lengths_vector)[i] = size - i;
         VECTOR(row_start_vector)[i] = 0;
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_count, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_triangle_shape, condition_params);
+    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector);
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
-    igraph_vector_int_destroy(&condition_params);
 
     return IGRAPH_SUCCESS;
 }
 
 #define RECTANGLE_MESH_OFFSET(row_index) (row_index % 4 < 2 ? 1 : 0)
 
-igraph_bool_t is_vertex_in_graph_triangulated_rectangle_shape(igraph_integer_t k, igraph_integer_t l, const igraph_vector_int_t condition_params)
-{
-    return RECTANGLE_MESH_OFFSET(l) <= k && 0 <= l && k <= RECTANGLE_MESH_OFFSET(l) + VECTOR(condition_params)[0] - 1 && l <= VECTOR(condition_params)[1] - 1;
-}
-
 igraph_error_t igraph_triangulated_mesh_rectangle_shape(igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y, igraph_bool_t directed, igraph_bool_t mutual)
 {
     igraph_integer_t row_count = size_y;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_vector_int_t condition_params;
     igraph_integer_t i;
 
     if (size_x < 1 || size_y < 1)
@@ -174,10 +153,6 @@ igraph_error_t igraph_triangulated_mesh_rectangle_shape(igraph_t *graph, igraph_
 
     igraph_vector_int_init(&row_lengths_vector, row_count);
     igraph_vector_int_init(&row_start_vector, row_count);
-    igraph_vector_int_init(&condition_params, 2);
-
-    VECTOR(condition_params)[0] = size_x;
-    VECTOR(condition_params)[1] = size_y;
 
     for (i = 0; i < row_count; i++)
     {
@@ -185,20 +160,12 @@ igraph_error_t igraph_triangulated_mesh_rectangle_shape(igraph_t *graph, igraph_
         VECTOR(row_start_vector)[i] = RECTANGLE_MESH_OFFSET(i);
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_count, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_rectangle_shape, condition_params);
+    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector);
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
-    igraph_vector_int_destroy(&condition_params);
 
     return IGRAPH_SUCCESS;
-}
-
-igraph_bool_t is_vertex_in_graph_triangulated_hex_shape(igraph_integer_t k, igraph_integer_t l, igraph_vector_int_t condition_params)
-{
-    return 0 <= k && k <= VECTOR(condition_params)[0] + VECTOR(condition_params)[1] - 2 &&
-           0 <= l && l <= VECTOR(condition_params)[1] + VECTOR(condition_params)[2] - 2 &&
-           VECTOR(condition_params)[1] - 1 <= k + l && k + l <= VECTOR(condition_params)[0] + VECTOR(condition_params)[1] + VECTOR(condition_params)[2] - 3;
 }
 
 igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y, igraph_integer_t size_z, igraph_bool_t directed, igraph_bool_t mutual)
@@ -206,7 +173,6 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
     igraph_integer_t row_count = size_y + size_z - 1;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
-    igraph_vector_int_t condition_params;
     igraph_integer_t i;
 
     if (size_x < 1 || size_y < 1 || size_z < 1)
@@ -216,11 +182,6 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
 
     igraph_vector_int_init(&row_lengths_vector, row_count);
     igraph_vector_int_init(&row_start_vector, row_count);
-    igraph_vector_int_init(&condition_params, 3);
-
-    VECTOR(condition_params)[0] = size_x;
-    VECTOR(condition_params)[1] = size_y;
-    VECTOR(condition_params)[2] = size_z;
 
     igraph_integer_t row_length = size_x;
     igraph_integer_t row_start = size_y - 1;
@@ -248,11 +209,10 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
         }
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_count, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_hex_shape, condition_params);
+    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector);
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
-    igraph_vector_int_destroy(&condition_params);
 
     return IGRAPH_SUCCESS;
 }
@@ -265,6 +225,7 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
  * Creates a triangulated mesh whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
  *
+ * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
  *  more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1)
  *
@@ -285,15 +246,24 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
  *         at least 1.
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
+ *
+ * \example examples/simple/igraph_triangulated_mesh.c
  */
-igraph_error_t igraph_triangulated_mesh(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual) {
+
+igraph_error_t igraph_triangulated_mesh(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual)
+{
     igraph_integer_t num_dims = igraph_vector_int_size(dims);
 
-    switch(num_dims) {
-        case 1: return igraph_triangulated_mesh_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual);
-        case 2: return igraph_triangulated_mesh_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual);
-        case 3: return igraph_triangulated_mesh_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual);
-        default: IGRAPH_ERRORF(
+    switch (num_dims)
+    {
+    case 1:
+        return igraph_triangulated_mesh_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual);
+    case 2:
+        return igraph_triangulated_mesh_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual);
+    case 3:
+        return igraph_triangulated_mesh_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual);
+    default:
+        IGRAPH_ERRORF(
             "The size of dims vector must be either 1, 2, or 3. (%" IGRAPH_PRId ").",
             IGRAPH_EINVAL, num_dims);
     }
