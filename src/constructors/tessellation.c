@@ -29,6 +29,7 @@
  * Creates a triangulated mesh whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
  *
+ * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
  *  more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1)
  *
@@ -56,12 +57,13 @@
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  */
-igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual, igraph_integer_t row_count,
+igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual,
                                         igraph_vector_int_t row_lengths_vector, igraph_vector_int_t row_start_vector,
                                         igraph_bool_t(is_vertex_in_graph)(igraph_integer_t, igraph_integer_t, igraph_vector_int_t),
                                         igraph_vector_int_t condition_params)
 {
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t row_count = igraph_vector_int_size(&row_lengths_vector);
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t row_lengths_prefix_sum_vector;
     igraph_integer_t i, j;
@@ -143,7 +145,7 @@ igraph_error_t igraph_triangulated_mesh_triangle_shape(igraph_t *graph, igraph_i
         VECTOR(row_start_vector)[i] = 0;
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_count, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_triangle_shape, condition_params);
+    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_triangle_shape, condition_params);
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
@@ -185,7 +187,7 @@ igraph_error_t igraph_triangulated_mesh_rectangle_shape(igraph_t *graph, igraph_
         VECTOR(row_start_vector)[i] = RECTANGLE_MESH_OFFSET(i);
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_count, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_rectangle_shape, condition_params);
+    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_rectangle_shape, condition_params);
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
@@ -248,7 +250,7 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
         }
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_count, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_hex_shape, condition_params);
+    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector, is_vertex_in_graph_triangulated_hex_shape, condition_params);
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
@@ -265,6 +267,7 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
  * Creates a triangulated mesh whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
  *
+ * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
  *  more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1)
  *
