@@ -20,9 +20,7 @@
 
 #include "igraph_vector_list.h"
 
-igraph_vector_int_list_t vertices;
-
-static igraph_integer_t igraph_i_number_of_subsets(igraph_integer_t n, igraph_integer_t k){
+static igraph_integer_t igraph_i_number_of_subsets(igraph_integer_t n, igraph_integer_t k) {
     if (n < k) {
         return 0;
     }
@@ -30,18 +28,22 @@ static igraph_integer_t igraph_i_number_of_subsets(igraph_integer_t n, igraph_in
         return 1;
     }
 
-    igraph_integer_t nCk = igraph_number_of_subsets(n - 1, k) + igraph_number_of_subsets(n - 1, k - 1);
-    return nCk;
+    return igraph_i_number_of_subsets(n - 1, k) + igraph_i_number_of_subsets(n - 1, k - 1);
 }
 
-static igraph_i_generate_subsets(igraph_integer_t n, igraph_integer_t k, igraph_integer_t vertex_id, igraph_integer_t size, igraph_integer_t *subset_index, igraph_vector_int_t *subset){
-    if (size == k){
-        igraph_vector_list_insert_copy(&vertices, *subset_index, subset);
+static igraph_error_t igraph_i_generate_subsets(igraph_integer_t n, igraph_integer_t k, igraph_integer_t vertex_id, igraph_integer_t size,
+                              igraph_integer_t *subset_index, igraph_vector_int_t *subset, igraph_vector_int_list_t *vertices) {
+    if (size == k) {
+        IGRAPH_CHECK(igraph_vector_list_insert_copy(vertices, *subset_index, subset));
         (*subset_index)++;
-        return;
+        return IGRAPH_SUCCESS;
     }
-    if (vertex_id > n) return;
+    if (vertex_id > n) {
+        return IGRAPH_SUCCESS;
+    }
+
     VECTOR(*subset)[size] = vertex_id;
-    genSubset(n, k, vertex_id + 1, size + 1, subset_index, subset);
-    genSubset(n, k, vertex_id + 1, size, subset_index, subset);
+    IGRAPH_CHECK(igraph_i_generate_subsets(n, k, vertex_id + 1, size + 1, subset_index, subset, vertices));
+    IGRAPH_CHECK(igraph_i_generate_subsets(n, k, vertex_id + 1, size, subset_index, subset, vertices));
+    return IGRAPH_SUCCESS;
 }
