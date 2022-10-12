@@ -69,8 +69,10 @@
  *    treated as infinity.
  * \return Error code.
  *
- * Time complexity: O(s*|E|log|V|+|V|), where |V| is the number of
- * vertices, |E| the number of edges and s the number of sources.
+ * Time complexity: at most O(s |E| log|V| + |V|), where |V| is the number of
+ * vertices, |E| the number of edges and s the number of sources. The
+ * \p cutoff parameter will limit the number of edges traversed from each
+ * source vertex, which reduces the computation time.
  *
  * \sa \ref igraph_distances_cutoff() for a (slightly) faster unweighted
  * version.
