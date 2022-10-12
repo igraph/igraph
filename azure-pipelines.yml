@@ -3,16 +3,9 @@ pool:
 
 variables:
   CMAKE_GENERATOR: Ninja
-  # Ccache settings
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   CCACHE_MAXSIZE: 256M
-  # Instead of using USE_SANITIZER, we set options manually for better control.
-  # -fno-sanitize-recover=undefined causes UBSan to abort when an issue is detected.
-  # The default UBSan checks are different between compiler versions. We use additional options to make these consistent.
-  SANITIZER_FLAGS: '-g -fno-omit-frame-pointer -Og -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero'
-  # Fine tune sanitizer runtime options.
   ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
-  UBSAN_OPTIONS: print_stacktrace=1:color=always
   OMP_NUM_THREADS: 1
 
 jobs:
@@ -32,7 +25,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DCMAKE_C_FLAGS="$SANITIZER_FLAGS" -DCMAKE_CXX_FLAGS="$SANITIZER_FLAGS"'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og"'
 
   - job: linux_static_vendored_32
     steps:
@@ -42,7 +35,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DCMAKE_C_FLAGS="$SANITIZER_FLAGS" -DCMAKE_CXX_FLAGS="$SANITIZER_FLAGS" -DIGRAPH_INTEGER_SIZE=32'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og" -DIGRAPH_INTEGER_SIZE=32'
 
   - job: linux_static_external
     steps:
@@ -92,7 +85,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DCMAKE_C_FLAGS="$SANITIZER_FLAGS" -DCMAKE_CXX_FLAGS="$SANITIZER_FLAGS" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
 
   - job: linux_x87
     steps:
