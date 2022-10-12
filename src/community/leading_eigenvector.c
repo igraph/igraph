@@ -504,9 +504,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     igraph_arpack_function_t *arpcb1 =
         weights ? igraph_i_community_leading_eigenvector_weighted :
         igraph_i_community_leading_eigenvector;
-    igraph_arpack_function_t *arpcb2 =
-        weights ? igraph_i_community_leading_eigenvector2_weighted :
-        igraph_i_community_leading_eigenvector2;
     igraph_real_t sumweights = 0.0;
 
     if (weights && no_of_edges != igraph_vector_size(weights)) {
@@ -654,7 +651,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
         long int comm = (long int) igraph_dqueue_pop_back(&tosplit);
         /* depth first search */
         long int size = 0;
-        igraph_real_t tmpev;
 
         IGRAPH_STATUSF(("Trying to split community %li... ", 0, comm));
         IGRAPH_ALLOW_INTERRUPTION();
@@ -671,16 +667,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
             continue;
         }
 
-        /* We solve two eigenproblems, one for the original modularity
-           matrix, and one for the modularity matrix after deleting the
-           last row and last column from it. This is a trick to find
-           multiple leading eigenvalues, because ARPACK is sometimes
-           unstable when the first two eigenvalues are requested, but it
-           does much better for the single principal eigenvalue. */
-
-        /* We start with the smaller eigenproblem. */
-
-        options->n = (int) size - 1;
+        options->n = (int) size;
         options->info = 0;
         options->nev = 1;
         options->ldv = 0;
@@ -698,46 +685,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
          * convergence in most cases. */
         options->start = 1;
         options->mxiter = options->mxiter > 10000 ? options->mxiter : 10000;  /* use more iterations, we've had convergence problems with 3000 */
-        RNG_BEGIN();
-        for (i = 0; i < options->n; i++) {
-            storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
-        }
-        RNG_END();
-        igraph_vector_view(&start_vec, storage.resid, options->n);
-        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
-
-        {
-            int retval;
-            igraph_error_handler_t *errh =
-                igraph_set_error_handler(igraph_i_error_handler_none);
-            igraph_warning_handler_t *warnh =
-                igraph_set_warning_handler(igraph_warning_handler_ignore);
-            retval = igraph_arpack_rssolve(arpcb2, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
-            igraph_set_error_handler(errh);
-            igraph_set_warning_handler(warnh);
-            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
-                IGRAPH_ERROR("ARPACK call failed", retval);
-            }
-        }
-
-        if (options->nconv < 1) {
-            IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
-        }
-
-        tmpev = storage.d[0];
-
-        /* Now we do the original eigenproblem, again, twice if needed */
-
-        options->n = (int) size;
-        options->info = 0;
-        options->nev = 1;
-        options->ldv = 0;
-        options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-        options->nconv = 0;
-        options->lworkl = 0;    /* we surely have enough space */
-
-        /* Use a random start vector; see comments above */
-        options->start = 1;
         RNG_BEGIN();
         for (i = 0; i < options->n; i++) {
             storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
@@ -824,18 +771,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
         if (storage.d[0] <= 0) {
             IGRAPH_STATUS("no split.\n", 0);
-            if (history) {
-                IGRAPH_CHECK(igraph_vector_push_back(history,
-                                                     IGRAPH_LEVC_HIST_FAILED));
-                IGRAPH_CHECK(igraph_vector_push_back(history, comm));
-            }
-            continue;
-        }
-
-        /* Check for multiple leading eigenvalues */
-
-        if (fabs(storage.d[0] - tmpev) < 1e-8) {
-            IGRAPH_STATUS("multiple principal eigenvalue, no split.\n", 0);
             if (history) {
                 IGRAPH_CHECK(igraph_vector_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));
