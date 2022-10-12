@@ -17,6 +17,7 @@
 
  - `igraph_edge()` now checks that the input edge ID is valid.
  - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`, `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()` now generate a random starting vector using igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so. This makes sure that the results obtained from these functions remain the same if igraph's RNG is seeded with the same value.
+ - `igraph_community_leading_eigenvector()` does not stop the splitting process any more when there are multiple equally likely splits (indicated by the multiplicity of the leading eigenvector being larger than 1). The algorithm picks an arbitrary split instead and proceeds normally.
 
 ### Fixed
 
@@ -450,7 +451,6 @@ Some of the highlights are:
 
  - The `IGRAPH_ARPACK_PROD` error code is no longer used. Instead, the specific error encountered while doing matrix multiplication is reported.
  - XML external entities are not resolved any more when parsing GraphML files to prevent XML external entity injection (XXE) attacks. Standard XML entities like `&lt;` or `&quot;` still work.
- - `igraph_community_leading_eigenvector()` does not stop the splitting process any more when there are multiple equally likely splits (indicated by the multiplicity of the leading eigenvector being larger than 1). The algorithm picks an arbitrary split instead and proceeds normally.
 
 ### Fixed
 
