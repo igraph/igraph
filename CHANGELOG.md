@@ -10,7 +10,6 @@
 
  - The `IGRAPH_ARPACK_PROD` error code is no longer used. Instead, the specific error encountered while doing matrix multiplication is reported.
  - XML external entities are not resolved any more when parsing GraphML files to prevent XML external entity injection (XXE) attacks. Standard XML entities like `&lt;` or `&quot;` still work.
- - `igraph_community_leading_eigenvector()` does not stop the splitting process any more when there are multiple equally likely splits (indicated by the multiplicity of the leading eigenvector being larger than 1). The algorithm picks an arbitrary split instead and proceeds normally.
 
 ### Fixed
 
