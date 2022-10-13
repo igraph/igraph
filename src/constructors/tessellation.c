@@ -93,16 +93,16 @@ static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, 
     no_of_nodes = VECTOR(row_lengths_prefix_sum_vector)[row_count];
 
 #define VERTEX_INDEX(i, j) (VECTOR(row_lengths_prefix_sum_vector)[j] + i - VECTOR(row_start_vector)[j])
-#define ADD_EDGE_IJ_KL_IF_EXISTS(i, j, k, l)                                                                            \
-    if (0 <= k && k <= VECTOR(row_start_vector)[l] + VECTOR(row_lengths_vector)[l] - 1 && 0 <= l && l <= row_count - 1) \
-    {                                                                                                                   \
-        igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                    \
-        igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                    \
-        if (directed && mutual)                                                                                         \
-        {                                                                                                               \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                \
-        }                                                                                                               \
+#define ADD_EDGE_IJ_KL_IF_EXISTS(i, j, k, l)                                                                                                      \
+    if (VECTOR(row_start_vector)[l] <= k && k <= VECTOR(row_start_vector)[l] + VECTOR(row_lengths_vector)[l] - 1 && 0 <= l && l <= row_count - 1) \
+    {                                                                                                                                             \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                              \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                              \
+        if (directed && mutual)                                                                                                                   \
+        {                                                                                                                                         \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                          \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                          \
+        }                                                                                                                                         \
     }
 
     igraph_integer_t k;
@@ -119,7 +119,8 @@ static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, 
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&row_lengths_prefix_sum_vector);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -178,7 +179,7 @@ static igraph_error_t triangle_lattice_rectangle_shape(igraph_t *graph, igraph_i
     for (i = 0; i < row_count; i++)
     {
         VECTOR(row_lengths_vector)[i] = size_x;
-        VECTOR(row_start_vector)[i] = i % 4 < 2 ? 1 : 0;
+        VECTOR(row_start_vector)[i] = (row_count - i) / 2;
     }
 
     IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, row_lengths_vector, row_start_vector));
@@ -274,9 +275,14 @@ static igraph_error_t triangle_lattice_hex_shape(igraph_t *graph, igraph_integer
  *         at least 1.
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
+ *
  */
 igraph_error_t igraph_triangle_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual)
 {
+    if (dims->stor_begin == NULL)
+    {
+        IGRAPH_ERRORF("dims vector must be initialized  (%" IGRAPH_PRId ").", IGRAPH_EINVAL, (igraph_integer_t) 0);
+    }
     igraph_integer_t num_dims = igraph_vector_int_size(dims);
 
     switch (num_dims)
