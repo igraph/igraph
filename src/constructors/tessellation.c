@@ -23,12 +23,13 @@
 
 /**
  * \ingroup generators
- * \function igraph_triangulated_mesh
- * \brief A triangulated mesh with the given shape.
+ * \function igraph_triangle_lattice
+ * \brief A triangle lattice with the given shape.
  *
- * Creates a triangulated mesh whose vertices have the form (i, j) for non-negative integers i and j
+ * Creates a triangle lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
  *
+ * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
  *  more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1)
  *
@@ -41,7 +42,7 @@
  *        to create all connections as mutual.
  * \param row_lengths_vector Integer vector, defines the number of vertices with
  *        the second coordinate equal to the index. The length of this vector must match
- *        the length of \p row_start_vector.
+ *        the length of \p row_start_vector. All coordinates must be non-negative.
  * \param row_start_vector Integer vector, defines the leftmost coordinate of
  *        the vertex with the second coordinate equal to the index.
  *
@@ -51,8 +52,8 @@
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  */
-igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual,
-                                                 igraph_vector_int_t row_lengths_vector, igraph_vector_int_t row_start_vector)
+static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual,
+                                       igraph_vector_int_t row_lengths_vector, igraph_vector_int_t row_start_vector)
 {
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t row_count = igraph_vector_int_size(&row_lengths_vector);
@@ -68,8 +69,22 @@ igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t 
             IGRAPH_EINVAL, igraph_vector_int_size(&row_start_vector));
     }
 
+    for (i = 0; i < row_count; i++)
+    {
+        if (VECTOR(row_lengths_vector)[i] < 0)
+        {
+            IGRAPH_ERRORF(
+                "row_lengths_vector vector must have non-negative coordinates "
+                "(%" IGRAPH_PRId ").",
+                IGRAPH_EINVAL, VECTOR(row_lengths_vector)[i]);
+        }
+    }
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
     igraph_vector_int_init(&row_lengths_prefix_sum_vector, row_count + 1);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_prefix_sum_vector);
+
     VECTOR(row_lengths_prefix_sum_vector)[0] = 0;
     for (i = 1; i < row_count + 1; i++)
     {
@@ -104,11 +119,12 @@ igraph_error_t igraph_triangulated_mesh_internal(igraph_t *graph, igraph_bool_t 
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
     igraph_vector_int_destroy(&row_lengths_prefix_sum_vector);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_triangulated_mesh_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual)
+static igraph_error_t triangle_lattice_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual)
 {
     igraph_integer_t row_count = size;
     igraph_vector_int_t row_lengths_vector;
@@ -121,7 +137,9 @@ igraph_error_t igraph_triangulated_mesh_triangle_shape(igraph_t *graph, igraph_i
     }
 
     igraph_vector_int_init(&row_lengths_vector, row_count);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_vector);
     igraph_vector_int_init(&row_start_vector, row_count);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_start_vector);
 
     for (i = 0; i < row_count; i++)
     {
@@ -129,17 +147,18 @@ igraph_error_t igraph_triangulated_mesh_triangle_shape(igraph_t *graph, igraph_i
         VECTOR(row_start_vector)[i] = 0;
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector);
+    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, row_lengths_vector, row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
+    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&row_start_vector);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
 
-#define RECTANGLE_MESH_OFFSET(row_index) (row_index % 4 < 2 ? 1 : 0)
-
-igraph_error_t igraph_triangulated_mesh_rectangle_shape(igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y, igraph_bool_t directed, igraph_bool_t mutual)
+static igraph_error_t triangle_lattice_rectangle_shape(igraph_t *graph, igraph_integer_t size_x,
+                                                       igraph_integer_t size_y, igraph_bool_t directed, igraph_bool_t mutual)
 {
     igraph_integer_t row_count = size_y;
     igraph_vector_int_t row_lengths_vector;
@@ -152,23 +171,28 @@ igraph_error_t igraph_triangulated_mesh_rectangle_shape(igraph_t *graph, igraph_
     }
 
     igraph_vector_int_init(&row_lengths_vector, row_count);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_vector);
     igraph_vector_int_init(&row_start_vector, row_count);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_start_vector);
 
     for (i = 0; i < row_count; i++)
     {
         VECTOR(row_lengths_vector)[i] = size_x;
-        VECTOR(row_start_vector)[i] = RECTANGLE_MESH_OFFSET(i);
+        VECTOR(row_start_vector)[i] = i % 4 < 2 ? 1 : 0;
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector);
+    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, row_lengths_vector, row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
+    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&row_start_vector);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y, igraph_integer_t size_z, igraph_bool_t directed, igraph_bool_t mutual)
+static igraph_error_t triangle_lattice_hex_shape(igraph_t *graph, igraph_integer_t size_x,
+                                                 igraph_integer_t size_y, igraph_integer_t size_z, igraph_bool_t directed, igraph_bool_t mutual)
 {
     igraph_integer_t row_count = size_y + size_z - 1;
     igraph_vector_int_t row_lengths_vector;
@@ -181,7 +205,9 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
     }
 
     igraph_vector_int_init(&row_lengths_vector, row_count);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_vector);
     igraph_vector_int_init(&row_start_vector, row_count);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_start_vector);
 
     igraph_integer_t row_length = size_x;
     igraph_integer_t row_start = size_y - 1;
@@ -209,20 +235,22 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
         }
     }
 
-    igraph_triangulated_mesh_internal(graph, directed, mutual, row_lengths_vector, row_start_vector);
+    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, row_lengths_vector, row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
+    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&row_start_vector);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
 
 /**
  * \ingroup generators
- * \function igraph_triangulated_mesh
- * \brief A triangulated mesh with the given shape.
+ * \function igraph_triangle_lattice
+ * \brief A triangle lattice with the given shape.
  *
- * Creates a triangulated mesh whose vertices have the form (i, j) for non-negative integers i and j
+ * Creates a triangle lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
  *
  * </para><para>
@@ -230,11 +258,11 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
  *  more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1)
  *
  * \param graph An uninitialized graph object.
- * \param dims Integer vector, defines the shape of the mesh. (Below the "edge length"s are in terms of graph theoretical path lengths.)
- *        If the size of \p dims is 1 the resulting  mesh has a triangular shape with "edge length" dims[0].
- *        If the size of \p dims is 2 the resulting mesh has a "quasi rectangular" shape with "edge length"s dims[0] and dims[1].
- *        If the size of \p dims is 3 the resulting  mesh has a hexagonal shape with "edge length"s dims[0], dims[1] and dims[2].
- *          (see https://github.com/igraph/igraph/issues/1842  for mesh visualizations)
+ * \param dims Integer vector, defines the shape of the lattice. (Below the "edge length"s are in terms of graph theoretical path lengths.)
+ *        If the size of \p dims is 1 the resulting  lattice has a triangular shape with "edge length" dims[0].
+ *        If the size of \p dims is 2 the resulting lattice has a "quasi rectangular" shape with "edge length"s dims[0] and dims[1].
+ *        If the size of \p dims is 3 the resulting  lattice has a hexagonal shape with "edge length"s dims[0], dims[1] and dims[2].
+ *          (see https://github.com/igraph/igraph/issues/1842  for lattice visualizations)
  * \param directed Boolean, whether to create a directed graph.
  *        If the \c mutual argument is  not set to true,
  *        edges will be directed from lower-index vertices towards
@@ -246,25 +274,26 @@ igraph_error_t igraph_triangulated_mesh_hex_shape(igraph_t *graph, igraph_intege
  *         at least 1.
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
- *
- * \example examples/simple/igraph_triangulated_mesh.c
  */
-
-igraph_error_t igraph_triangulated_mesh(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual)
+igraph_error_t igraph_triangle_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual)
 {
     igraph_integer_t num_dims = igraph_vector_int_size(dims);
 
     switch (num_dims)
     {
     case 1:
-        return igraph_triangulated_mesh_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual);
+        IGRAPH_CHECK(triangle_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
+        break;
     case 2:
-        return igraph_triangulated_mesh_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual);
+        IGRAPH_CHECK(triangle_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
+        break;
     case 3:
-        return igraph_triangulated_mesh_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual);
+        IGRAPH_CHECK(triangle_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
+        break;
     default:
         IGRAPH_ERRORF(
             "The size of dims vector must be either 1, 2, or 3. (%" IGRAPH_PRId ").",
             IGRAPH_EINVAL, num_dims);
     }
+    return IGRAPH_SUCCESS;
 }
