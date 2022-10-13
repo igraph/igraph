@@ -185,7 +185,6 @@ add_examples(
   igraph_small
   igraph_star
   igraph_symmetric_tree
-  igraph_triangulated_mesh
   igraph_weighted_adjacency
 )
 
