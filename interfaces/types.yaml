@@ -470,6 +470,12 @@ VCONNNEI:
     CTYPE: igraph_vconn_nei_t
     FLAGS: ENUM
 
+VORONOI_TIEBREAKER:
+    # Enum specifying what to do when two vertices are at equal distance from
+    # multiple generators while computing Voronoi partitionings
+    CTYPE: igraph_voronoi_tiebreaker_t
+    FLAGS: ENUM
+
 WHEEL_MODE:
     # Enum that describes how a star graph should be constructed
     CTYPE: igraph_wheel_mode_t

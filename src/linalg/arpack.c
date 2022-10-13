@@ -465,7 +465,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
     if (options->which[0] == 'S') {
         if (options->which[1] == 'M') {
             /* eval1 must be the one with the smallest magnitude */
-            swap_evals = (igraph_complex_mod(eval1) > igraph_complex_mod(eval2));
+            swap_evals = (igraph_complex_abs(eval1) > igraph_complex_abs(eval2));
         } else if (options->which[1] == 'R') {
             /* eval1 must be the one with the smallest real part */
             swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
@@ -478,7 +478,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
     } else if (options->which[0] == 'L') {
         if (options->which[1] == 'M') {
             /* eval1 must be the one with the largest magnitude */
-            swap_evals = (igraph_complex_mod(eval1) < igraph_complex_mod(eval2));
+            swap_evals = (igraph_complex_abs(eval1) < igraph_complex_abs(eval2));
         } else if (options->which[1] == 'R') {
             /* eval1 must be the one with the largest real part */
             swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));

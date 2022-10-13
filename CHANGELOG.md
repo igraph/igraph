@@ -1,40 +1,49 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [master]
 
 ### Added
 
- - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculates shortest paths with an upper limit on the total path length.
- - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
+ - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculate shortest paths with an upper limit on the path length (experimental functions).
+ - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs (experimental function).
+ - `igraph_ecc()` computes the edge clustering coefficient of some edges (experimental function).
+ - `igraph_voronoi()` computes a Voronoi partitioning of vertices (experimental function).
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
+ - `igraph_dqueue_get()` accesses an element in a queue by index.
+ - `igraph_degree_1()` efficiently retrieves the degee of a single vertex.
+ - `igraph_lazy_adjlist_has()` and `igraph_lazy_inclist_has()` to check if adjacent vertiex / incident edges has already been computed and stored for a given vertex in a lazy adjlist / inclist.
 
 ### Changed
 
  - `igraph_edge()` now checks that the input edge ID is valid.
-
- - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`,
-   `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and
-   `igraph_arpack_rnsolve()` now generate a random starting vector using
-   igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so.
-   This makes sure that the results obtained from these functions remain the
-   same if igraph's RNG is seeded with the same value.
+ - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`, `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()` now generate a random starting vector using igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so. This makes sure that the results obtained from these functions remain the same if igraph's RNG is seeded with the same value.
+ - `igraph_community_leading_eigenvector()` does not stop the splitting process any more when there are multiple equally likely splits (indicated by the multiplicity of the leading eigenvector being larger than 1). The algorithm picks an arbitrary split instead and proceeds normally.
 
 ### Fixed
 
+ - Fixed a bug in `igraph_get_k_shortest_paths()` that sometimes yielded incorrect results on undirected graphs when the `mode` argument was set to `IGRAPH_OUT` or `IGRAPH_IN`.
  - `igraph_trussness()` is now interruptible.
  - `igraph_spanner()` is now interruptible.
+ - `igraph_layout_umap()` and `igraph_layout_umap3d()` are now interruptible.
  - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
  - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
+ - `igraph_layout_umap_3d()` now actually uses three dimensions.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
+ - `igraph_vit_create()` and `igraph_eit_create()` no longer fails when trying to create an iterator for the null graph or edgeless graph from an empty range-based vertex or edge selector.
+ - `igraph_write_graph_leda()` did not correctly print attribute names in some warning messages.
  - Addressed new warnings introduced by Clang 15.
 
 ### Removed
 
  - Removed unused and undocumented `igraph_bfgs()` function.
+ - Removed the undocumented function `igraph_complex_mod()`. Use `igraph_complex_abs()` instead, as it has identical functionality.
 
 ### Deprecated
 
  - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
+ - The undocumented function `igraph_dqueue_e()` is now deprecated and replaced by `igraph_dqueue_get()`.
+ - `igraph_finite()`, `igraph_is_nan()`, `igraph_is_inf()`, `igraph_is_posinf()` and `igraph_is_neginf()` are now deprecated. They were relics from a time when no standard alternatives existed. Use the C99 standard `isfinite()`, `isnan()` and `isinf()` instead.
 
 ### Other
 
@@ -1064,7 +1073,7 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.10.1..HEAD
+[master]: https://github.com/igraph/igraph/compare/0.10.1..master
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0
 [0.9.10]: https://github.com/igraph/igraph/compare/0.9.9...0.9.10

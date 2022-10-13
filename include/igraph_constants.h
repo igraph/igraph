@@ -47,6 +47,8 @@ typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
 typedef enum { IGRAPH_MINIMUM = 0, IGRAPH_MAXIMUM = 1 } igraph_optimal_t;
 
+/* Do not renumber the following values! Some internal code treats them as bitmasks
+ * and assumes that IGRAPH_ALL == IGRAPH_IN | IGRAPH_OUT and IGRAPH_IN & IGRAPH_OUT == 0. */
 typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3 } igraph_neimode_t;
 
 /* Reverse IGRAPH_OUT to IGRAPH_IN and vice versa. Leave other values alone. */
@@ -198,6 +200,11 @@ typedef enum { IGRAPH_LAYOUT_GRID = 0,
 typedef enum { IGRAPH_RANDOM_WALK_STUCK_ERROR = 0,
                IGRAPH_RANDOM_WALK_STUCK_RETURN
              } igraph_random_walk_stuck_t;
+
+typedef enum { IGRAPH_VORONOI_FIRST = 0,
+               IGRAPH_VORONOI_LAST,
+               IGRAPH_VORONOI_RANDOM
+             } igraph_voronoi_tiebreaker_t;
 
 
 __END_DECLS

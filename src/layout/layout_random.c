@@ -160,16 +160,16 @@ igraph_error_t igraph_i_layout_random_bounded(
         igraph_real_t x2 = maxx ? VECTOR(*maxx)[i] : dmaxx;
         igraph_real_t y1 = miny ? VECTOR(*miny)[i] : dminy;
         igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] : dmaxy;
-        if (!igraph_finite(x1)) {
+        if (!isfinite(x1)) {
             x1 = -width / 2;
         }
-        if (!igraph_finite(x2)) {
+        if (!isfinite(x2)) {
             x2 =  width / 2;
         }
-        if (!igraph_finite(y1)) {
+        if (!isfinite(y1)) {
             y1 = -height / 2;
         }
-        if (!igraph_finite(y2)) {
+        if (!isfinite(y2)) {
             y2 =  height / 2;
         }
         MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
@@ -257,22 +257,22 @@ igraph_error_t igraph_i_layout_random_bounded_3d(
         igraph_real_t y2 = maxy ? VECTOR(*maxy)[i] : dmaxy;
         igraph_real_t z1 = minz ? VECTOR(*minz)[i] : dminz;
         igraph_real_t z2 = maxz ? VECTOR(*maxz)[i] : dmaxz;
-        if (!igraph_finite(x1)) {
+        if (!isfinite(x1)) {
             x1 = -width / 2;
         }
-        if (!igraph_finite(x2)) {
+        if (!isfinite(x2)) {
             x2 =  width / 2;
         }
-        if (!igraph_finite(y1)) {
+        if (!isfinite(y1)) {
             y1 = -height / 2;
         }
-        if (!igraph_finite(y2)) {
+        if (!isfinite(y2)) {
             y2 =  height / 2;
         }
-        if (!igraph_finite(z1)) {
+        if (!isfinite(z1)) {
             z1 = -depth / 2;
         }
-        if (!igraph_finite(z2)) {
+        if (!isfinite(z2)) {
             z2 =  depth / 2;
         }
         MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);

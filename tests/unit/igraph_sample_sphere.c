@@ -36,7 +36,7 @@ void check(igraph_bool_t volume, igraph_integer_t dim, igraph_integer_t n, igrap
             if (positive) {
                 IGRAPH_ASSERT(MATRIX(samples, row, col) >= 0);
             }
-            sum += powf(MATRIX(samples, row, col), 2);
+            sum += MATRIX(samples, row, col) * MATRIX(samples, row, col);
         }
         if (volume) {
             IGRAPH_ASSERT(sum <= radius * radius);

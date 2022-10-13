@@ -527,7 +527,6 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
 
     igraph_integer_t no_of_nodes = igraph_vector_bool_size(types);
     igraph_integer_t no_of_edges = igraph_vector_int_size(edges);
-    igraph_integer_t min_edge = 0, max_edge = 0;
     igraph_integer_t i;
 
     if (no_of_edges % 2 != 0) {
@@ -535,10 +534,7 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
     }
     no_of_edges /= 2;
 
-    if (no_of_edges != 0) {
-        igraph_vector_int_minmax(edges, &min_edge, &max_edge);
-    }
-    if (min_edge < 0 || max_edge >= no_of_nodes) {
+    if (! igraph_vector_int_isininterval(edges, 0, no_of_nodes-1)) {
         IGRAPH_ERROR("Invalid (negative or too large) vertex ID", IGRAPH_EINVVID);
     }
 

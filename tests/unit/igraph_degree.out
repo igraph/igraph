@@ -1,0 +1,6 @@
+out,    loops: ( 1 1 3 1 )
+ in,    loops: ( 0 1 3 2 )
+all,    loops: ( 1 2 6 3 )
+out, no loops: ( 1 1 2 1 )
+ in, no loops: ( 0 1 2 2 )
+all, no loops: ( 1 2 4 3 )

@@ -59,7 +59,7 @@ void test_k_motifs(const igraph_t *graph, const int k, const int class_count, ig
 
     equal = 1 /* true */;
     for (i = 0; i < n; i++) {
-        if (igraph_is_nan(VECTOR(randesu_counts)[i])) {
+        if (isnan(VECTOR(randesu_counts)[i])) {
             continue;
         }
         if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
