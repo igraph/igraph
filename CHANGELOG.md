@@ -43,6 +43,7 @@
 
  - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
  - The undocumented function `igraph_dqueue_e()` is now deprecated and replaced by `igraph_dqueue_get()`.
+ - `igraph_finite()`, `igraph_is_nan()`, `igraph_is_inf()`, `igraph_is_posinf()` and `igraph_is_neginf()` are now deprecated. They were relics from a time when no standard alternatives existed. Use the C99 standard `isfinite()`, `isnan()` and `isinf()` instead.
 
 ### Other
 

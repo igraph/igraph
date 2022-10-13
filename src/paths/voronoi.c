@@ -186,7 +186,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
-        } else if (igraph_is_nan(min)) {
+        } else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }

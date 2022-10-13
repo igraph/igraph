@@ -150,7 +150,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vector_int_empty(&membership));
     IGRAPH_ASSERT(igraph_vector_int_empty(&csize));
     IGRAPH_ASSERT(temperature == 0.01);
-    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    IGRAPH_ASSERT(isnan(modularity));
     igraph_destroy(&g);
 
     printf("\nTrivial case: singleton graph.\n");
@@ -173,7 +173,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 1 && VECTOR(membership)[0] == 0);
     IGRAPH_ASSERT(igraph_vector_int_size(&csize) == 1 && VECTOR(csize)[0] == 1);
     IGRAPH_ASSERT(temperature == 0.01);
-    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    IGRAPH_ASSERT(isnan(modularity));
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&membership);

@@ -123,7 +123,7 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
-        } else if (igraph_is_nan(min)) {
+        } else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -406,7 +406,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
        - the opposite of the distance is stored in the heap, as it is a
          maximum heap and we need a minimum heap.
        - we don't use IGRAPH_INFINITY in the distance vector during the
-         computation, as IGRAPH_FINITE() might involve a function call
+         computation, as isfinite() might involve a function call
          and we want to spare that. So we store distance+1.0 instead of
          distance, and zero denotes infinity.
        - `parent_eids' assigns the inbound edge IDs of all vertices in the
@@ -437,7 +437,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         if (min < 0) {
             IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
         }
-        else if (igraph_is_nan(min)) {
+        else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
         }
     }
@@ -801,7 +801,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         if (min < 0) {
             IGRAPH_ERROR("Edge weights must be non-negative.", IGRAPH_EINVAL);
         }
-        else if (igraph_is_nan(min)) {
+        else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }

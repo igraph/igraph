@@ -154,7 +154,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
                 igraph_real_t minweight = igraph_vector_min(weights);
                 if (minweight < 0) {
                     IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
-                } else if (igraph_is_nan(minweight)) {
+                } else if (isnan(minweight)) {
                     IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
                 }
             }
