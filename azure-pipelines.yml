@@ -75,11 +75,15 @@ jobs:
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
 
-  - job: linux_clang
+  - job: linux_clang_15
     pool:
       vmImage: 'ubuntu-22.04'
     steps:
-      - script: sudo apt-get install ninja-build ccache clang -y
+      - script: |
+          sudo apt-get install ninja-build ccache -y
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 15
         displayName: Install dependencies
 
       - template: .azure/build.yml
