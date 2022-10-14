@@ -245,7 +245,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
 
             /* add an edge */
             igraph_integer_t to, from;
-            IGRAPH_ASSERT(igraph_finite(next_a));
+            IGRAPH_ASSERT(isfinite(next_a));
             if (directed) {
                 to = floor(next_a / no_of_nodes);
                 from = next_a - ((igraph_real_t)to) * no_of_nodes;

@@ -31,7 +31,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_matrix_int_ncol(&merges) == 2);
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
     IGRAPH_ASSERT(igraph_vector_size(&modularity) == 1);
-    IGRAPH_ASSERT(igraph_is_nan(VECTOR(modularity)[0]));
+    IGRAPH_ASSERT(isnan(VECTOR(modularity)[0]));
 
     /* Fast greedy */
 
@@ -45,7 +45,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_matrix_int_ncol(&merges) == 2);
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
     IGRAPH_ASSERT(igraph_vector_size(&modularity) == 1);
-    IGRAPH_ASSERT(igraph_is_nan(VECTOR(modularity)[0]));
+    IGRAPH_ASSERT(isnan(VECTOR(modularity)[0]));
 
     /* Fluid communities */
 
@@ -84,7 +84,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_matrix_int_nrow(&merges) == 0);
     IGRAPH_ASSERT(igraph_matrix_int_ncol(&merges) == 2);
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
-    IGRAPH_ASSERT(igraph_is_nan(m));
+    IGRAPH_ASSERT(isnan(m));
 
     /* Leiden */
 
@@ -94,7 +94,7 @@ int main(void) {
     igraph_community_leiden(&g, NULL, NULL, 1, 0.01, 0, 1, &membership, NULL, &m);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
-    IGRAPH_ASSERT(igraph_is_nan(m));
+    IGRAPH_ASSERT(isnan(m));
 
     /* Multilevel */
 
@@ -105,7 +105,7 @@ int main(void) {
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
     IGRAPH_ASSERT(igraph_vector_size(&modularity) == 1);
-    IGRAPH_ASSERT(igraph_is_nan(VECTOR(modularity)[0]));
+    IGRAPH_ASSERT(isnan(VECTOR(modularity)[0]));
 
     /* Optimal modularity */
     /* Test only when GLPK is available */
@@ -124,7 +124,7 @@ int main(void) {
         if (ret != IGRAPH_UNIMPLEMENTED) {
             IGRAPH_ASSERT(ret == IGRAPH_SUCCESS);
             IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
-            IGRAPH_ASSERT(igraph_is_nan(m));
+            IGRAPH_ASSERT(isnan(m));
         }
     }
 
@@ -136,7 +136,7 @@ int main(void) {
     igraph_community_spinglass(&g, NULL, &m, NULL, &membership, NULL, 5, 0, 1, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_ORIG, 1);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
-    IGRAPH_ASSERT(igraph_is_nan(m));
+    IGRAPH_ASSERT(isnan(m));
 
     m = 2;
     igraph_vector_int_resize(&membership, 1);
@@ -144,7 +144,7 @@ int main(void) {
     igraph_community_spinglass(&g, NULL, &m, NULL, &membership, NULL, 5, 0, 1, 0.01, 0.99, IGRAPH_SPINCOMM_UPDATE_SIMPLE, 1, IGRAPH_SPINCOMM_IMP_NEG, 1);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
-    IGRAPH_ASSERT(igraph_is_nan(m));
+    IGRAPH_ASSERT(isnan(m));
 
     /* Walktrap */
 
@@ -158,7 +158,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_matrix_int_ncol(&merges) == 2);
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
     IGRAPH_ASSERT(igraph_vector_size(&modularity) == 1);
-    IGRAPH_ASSERT(igraph_is_nan(VECTOR(modularity)[0]));
+    IGRAPH_ASSERT(isnan(VECTOR(modularity)[0]));
 
     /* Cleanup */
 

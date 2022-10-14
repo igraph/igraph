@@ -34,9 +34,9 @@ typedef struct TYPE(igraph_stack) {
     BASE* end;
 } TYPE(igraph_stack);
 
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, igraph_integer_t size);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, igraph_integer_t capacity);
 IGRAPH_EXPORT void FUNCTION(igraph_stack, destroy)(TYPE(igraph_stack)* s);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, igraph_integer_t size);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_stack, empty)(TYPE(igraph_stack)* s);
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_stack, size)(const TYPE(igraph_stack)* s);
 IGRAPH_EXPORT void FUNCTION(igraph_stack, clear)(TYPE(igraph_stack)* s);

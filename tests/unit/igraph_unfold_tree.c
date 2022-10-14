@@ -73,7 +73,7 @@ int main(void) {
     printf("Check error for root out of bounds.\n");
     igraph_vector_int_init_int(&roots, 5, -1, 0, 1, 2, 3);
     igraph_small(&g, 6, 1, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, 5,5, 5,5, -1);
-    CHECK_ERROR(igraph_unfold_tree(&g, &tree, IGRAPH_OUT, &roots, NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_unfold_tree(&g, &tree, IGRAPH_OUT, &roots, NULL), IGRAPH_EINVVID);
     igraph_destroy(&g);
     igraph_vector_int_destroy(&roots);
 

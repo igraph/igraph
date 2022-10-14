@@ -659,7 +659,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
             if (minweight < 0) {
                 IGRAPH_ERROR("Weights must not be negative.", IGRAPH_EINVAL);
             }
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }

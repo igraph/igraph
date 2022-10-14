@@ -59,12 +59,12 @@ __BEGIN_DECLS
 #undef BASE_BOOL
 
 #define IGRAPH_STACK_NULL { 0,0,0 }
-#define IGRAPH_STACK_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_stack_init(v, size)); \
-        IGRAPH_FINALLY(igraph_stack_destroy, v); } while (0)
-#define IGRAPH_STACK_INT_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_stack_int_init(v, size)); \
-        IGRAPH_FINALLY(igraph_stack_int_destroy, v); } while (0)
+#define IGRAPH_STACK_INIT_FINALLY(s, capacity) \
+    do { IGRAPH_CHECK(igraph_stack_init(s, capacity)); \
+        IGRAPH_FINALLY(igraph_stack_destroy, s); } while (0)
+#define IGRAPH_STACK_INT_INIT_FINALLY(s, capacity) \
+    do { IGRAPH_CHECK(igraph_stack_int_init(s, capacity)); \
+        IGRAPH_FINALLY(igraph_stack_int_destroy, s); } while (0)
 
 __END_DECLS
 

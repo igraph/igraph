@@ -285,7 +285,8 @@ typedef struct igraph_arpack_storage_t {
     igraph_real_t *resid;
     igraph_real_t *ax;
     int *select;
-    igraph_real_t *di;        /* These two only for non-symmetric problems */
+    /* The following two are only used for non-symmetric problems: */
+    igraph_real_t *di;
     igraph_real_t *workev;
 } igraph_arpack_storage_t;
 

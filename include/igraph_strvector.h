@@ -59,9 +59,9 @@ typedef struct s_igraph_strvector {
 #define STR(sv,i) ((const char *)((sv).stor_begin[(i)]))
 
 #define IGRAPH_STRVECTOR_NULL { 0,0,0 }
-#define IGRAPH_STRVECTOR_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_strvector_init(v, size)); \
-        IGRAPH_FINALLY( igraph_strvector_destroy, v); } while (0)
+#define IGRAPH_STRVECTOR_INIT_FINALLY(sv, size) \
+    do { IGRAPH_CHECK(igraph_strvector_init(sv, size)); \
+        IGRAPH_FINALLY( igraph_strvector_destroy, sv); } while (0)
 
 IGRAPH_EXPORT igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t len);
 IGRAPH_EXPORT void igraph_strvector_destroy(igraph_strvector_t *sv);

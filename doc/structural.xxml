@@ -19,7 +19,9 @@
 
 <section id="shortest-path-related-functions"><title>(Shortest)-path related functions</title>
 <!-- doxrox-include igraph_distances -->
+<!-- doxrox-include igraph_distances_cutoff -->
 <!-- doxrox-include igraph_distances_dijkstra -->
+<!-- doxrox-include igraph_distances_dijkstra_cutoff -->
 <!-- doxrox-include igraph_distances_bellman_ford -->
 <!-- doxrox-include igraph_distances_johnson -->
 <!-- doxrox-include igraph_distances_floyd_warshall -->
@@ -44,6 +46,7 @@
 <!-- doxrox-include igraph_graph_center -->
 <!-- doxrox-include igraph_radius -->
 <!-- doxrox-include igraph_pseudo_diameter -->
+<!-- doxrox-include igraph_voronoi -->
 <!-- doxrox-include igraph_vertex_path_from_edge_path -->
 </section>
 
@@ -171,6 +174,7 @@
 <!-- doxrox-include igraph_transitivity_local_undirected -->
 <!-- doxrox-include igraph_transitivity_avglocal_undirected -->
 <!-- doxrox-include igraph_transitivity_barrat -->
+<!-- doxrox-include igraph_ecc -->
 </section>
 
 <section id="directedness-conversion"><title>Directedness conversion</title>

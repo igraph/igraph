@@ -63,7 +63,6 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_roots = igraph_vector_int_size(roots);
     igraph_integer_t tree_vertex_count = no_of_nodes;
-    igraph_integer_t root_min, root_max;
 
     igraph_vector_int_t edges;
     igraph_vector_bool_t seen_vertices;
@@ -74,11 +73,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     igraph_integer_t i, n, r, v_ptr = no_of_nodes;
 
-    if (no_of_roots > 0) {
-        igraph_vector_int_minmax(roots, &root_min, &root_max);
-        if (root_max >= no_of_nodes || root_min < 0)  {
-            IGRAPH_ERROR("All roots should be vertices of the graph.", IGRAPH_EINVAL);
-        }
+    if (! igraph_vector_int_isininterval(roots, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("All roots should be vertices of the graph.", IGRAPH_EINVVID);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);

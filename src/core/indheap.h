@@ -49,7 +49,7 @@ typedef struct s_indheap {
 #define IGRAPH_INDHEAP_NULL { 0,0,0,0,0 }
 
 igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_integer_t size);
-igraph_error_t igraph_indheap_init_array(igraph_indheap_t *t, igraph_real_t* data, igraph_integer_t len);
+igraph_error_t igraph_indheap_init_array(igraph_indheap_t *t, const igraph_real_t *data, igraph_integer_t len);
 void igraph_indheap_destroy(igraph_indheap_t* h);
 void igraph_indheap_clear(igraph_indheap_t *h);
 igraph_bool_t igraph_indheap_empty(const igraph_indheap_t* h);
@@ -110,9 +110,26 @@ IGRAPH_PRIVATE_EXPORT void igraph_d_indheap_max_index(igraph_d_indheap_t *h, igr
    normal heap does this in O(n) time.... */
 
 typedef struct igraph_2wheap_t {
+    /** Number of items in the heap */
     igraph_integer_t size;
+
+    /** The items themselves in the heap */
     igraph_vector_t data;
+
+    /** An integer index associated to each item in the heap; this vector is
+     * always modified in tandem with \c data . Values in this vector are
+     * between 0 and size-1 */
     igraph_vector_int_t index;
+
+    /**
+     * A _reverse_ index that allows O(1) lookup of the position of a given
+     * value within the \c index member. Note that it uses two special values:
+     * index2[i] == 0 means that \c i is not in \c index at all, while
+     * index2[i] == 1 means that \c i is in \c index but it was _deactivated_.
+     * The semantics of deactivation is up to the user of the data structure
+     * to decide. Other than these two special values, index2[i] == j means
+     * that index[j-2] == i and data[j-2] is the corresponding item in the heap
+     */
     igraph_vector_int_t index2;
 } igraph_2wheap_t;
 
