@@ -374,7 +374,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
     /* Calculate alpha_out */
     if (exponent_out < 2) {
         IGRAPH_ERRORF("Out-degree exponent must be >= 2, got %g.", IGRAPH_EINVAL, exponent_out);
-    } else if (igraph_finite(exponent_out)) {
+    } else if (isfinite(exponent_out)) {
         alpha_out = -1.0 / (exponent_out - 1);
     } else {
         alpha_out = 0.0;
@@ -399,7 +399,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         if (exponent_in < 2) {
             IGRAPH_ERRORF("For directed graphs the in-degree exponent must be >= 2, got %g.",
                           IGRAPH_EINVAL, exponent_in);
-        } else if (igraph_finite(exponent_in)) {
+        } else if (isfinite(exponent_in)) {
             alpha_in = -1.0 / (exponent_in - 1);
         } else {
             alpha_in = 0.0;

@@ -181,7 +181,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     max_dij = 0.0;
     for (i = 0; i < no_nodes; i++) {
         for (j = i + 1; j < no_nodes; j++) {
-            if (!igraph_finite(MATRIX(dij, i, j))) {
+            if (!isfinite(MATRIX(dij, i, j))) {
                 continue;
             }
             if (MATRIX(dij, i, j) > max_dij) {
@@ -495,7 +495,7 @@ igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matri
     max_dij = 0.0;
     for (i = 0; i < no_nodes; i++) {
         for (j = i + 1; j < no_nodes; j++) {
-            if (!igraph_finite(MATRIX(dij, i, j))) {
+            if (!isfinite(MATRIX(dij, i, j))) {
                 continue;
             }
             if (MATRIX(dij, i, j) > max_dij) {

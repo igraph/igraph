@@ -282,7 +282,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         }
     }
 
-    if (names == 0 && weights == 0) {
+    if (names == NULL && weights == NULL) {
         /* No names, no weights */
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t from, to;
@@ -299,7 +299,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             }
             IGRAPH_EIT_NEXT(it);
         }
-    } else if (weights == 0) {
+    } else if (weights == NULL) {
         /* No weights but use names */
         igraph_strvector_t nvec;
         IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
@@ -328,7 +328,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             IGRAPH_EIT_NEXT(it);
         }
         IGRAPH_FINALLY_CLEAN(1);
-    } else if (names == 0) {
+    } else if (names == NULL) {
         /* No names but weights */
         igraph_vector_t wvec;
         IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
@@ -401,17 +401,16 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         igraph_integer_t nov = igraph_vcount(graph);
         igraph_integer_t i;
         int ret = 0;
-        igraph_vector_int_t deg;
+        igraph_integer_t deg;
         igraph_strvector_t nvec;
         const char *str;
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 1);
         IGRAPH_CHECK(igraph_strvector_init(&nvec, 1));
         IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
         for (i = 0; i < nov; i++) {
-            IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_1(i), IGRAPH_ALL, IGRAPH_LOOPS));
-            if (VECTOR(deg)[0] == 0) {
-                if (names == 0) {
+            IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, IGRAPH_ALL, IGRAPH_LOOPS));
+            if (deg == 0) {
+                if (names == NULL) {
                     ret = fprintf(outstream, "# %" IGRAPH_PRId "\n", i);
                 } else {
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
@@ -425,8 +424,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             }
         }
         igraph_strvector_destroy(&nvec);
-        igraph_vector_int_destroy(&deg);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     igraph_eit_destroy(&it);

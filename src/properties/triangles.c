@@ -97,7 +97,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         IGRAPH_CHECK(igraph_transitivity_local_undirected(graph, &vec, igraph_vss_all(), mode));
 
         for (i = 0, nans = 0; i < no_of_nodes; i++) {
-            if (!igraph_is_nan(VECTOR(vec)[i])) {
+            if (!isnan(VECTOR(vec)[i])) {
                 sum += VECTOR(vec)[i];
             } else {
                 nans++;

@@ -820,7 +820,7 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
     for (igraph_integer_t eid = 0; eid != no_of_edges; eid++) {
         if (VECTOR(*distances)[eid] < 0) {
             IGRAPH_ERROR("Distances cannot be negative.", IGRAPH_EINVAL);
-        } else if (igraph_is_nan(VECTOR(*distances)[eid])) {
+        } else if (isnan(VECTOR(*distances)[eid])) {
             IGRAPH_ERROR("Distances cannot contain NaN values.", IGRAPH_EINVAL);
         }
     }

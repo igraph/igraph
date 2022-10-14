@@ -57,12 +57,6 @@ igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
     return 1;
 }
 
-igraph_real_t igraph_complex_mod(igraph_complex_t z) {
-    igraph_real_t x = IGRAPH_REAL(z);
-    igraph_real_t y = IGRAPH_IMAG(z);
-    return hypot(x, y);
-}
-
 igraph_real_t igraph_complex_arg(igraph_complex_t z) {
     igraph_real_t x = IGRAPH_REAL(z);
     igraph_real_t y = IGRAPH_IMAG(z);

@@ -61,11 +61,11 @@
 #endif
 
 int igraph_real_fprintf(FILE *file, igraph_real_t val) {
-    if (igraph_finite(val)) {
+    if (isfinite(val)) {
         return fprintf(file, "%g", val);
-    } else if (igraph_is_nan(val)) {
+    } else if (isnan(val)) {
         return fprintf(file, "NaN");
-    } else if (igraph_is_inf(val)) {
+    } else if (isinf(val)) {
         if (val < 0) {
             return fprintf(file, "-Inf");
         } else {
@@ -82,11 +82,11 @@ int igraph_real_printf(igraph_real_t val) {
 #endif
 
 int igraph_real_fprintf_aligned(FILE *file, int width, igraph_real_t val) {
-    if (igraph_finite(val)) {
+    if (isfinite(val)) {
         return fprintf(file, "%*g", width, val);
-    } else if (igraph_is_nan(val)) {
+    } else if (isnan(val)) {
         return fprintf(file, "%*s", width, "NaN");
-    } else if (igraph_is_inf(val)) {
+    } else if (isinf(val)) {
         if (val < 0) {
             return fprintf(file, "%*s", width, "-Inf");
         } else {
@@ -103,11 +103,11 @@ int igraph_real_printf_aligned(int width, igraph_real_t val) {
 #endif
 
 int igraph_real_snprintf(char *str, size_t size, igraph_real_t val) {
-    if (igraph_finite(val)) {
+    if (isfinite(val)) {
         return snprintf(str, size, "%g", val);
-    } else if (igraph_is_nan(val)) {
+    } else if (isnan(val)) {
         return snprintf(str, size, "NaN");
-    } else if (igraph_is_inf(val)) {
+    } else if (isinf(val)) {
         if (val < 0) {
             return snprintf(str, size, "-Inf");
         } else {
@@ -118,11 +118,11 @@ int igraph_real_snprintf(char *str, size_t size, igraph_real_t val) {
 }
 
 int igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
-    if (igraph_finite(val)) {
+    if (isfinite(val)) {
         return fprintf(file, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
-    } else if (igraph_is_nan(val)) {
+    } else if (isnan(val)) {
         return fprintf(file, "NaN");
-    } else if (igraph_is_inf(val)) {
+    } else if (isinf(val)) {
         if (val < 0) {
             return fprintf(file, "-Inf");
         } else {
@@ -139,11 +139,11 @@ int igraph_real_printf_precise(igraph_real_t val) {
 #endif
 
 int igraph_real_snprintf_precise(char *str, size_t size, igraph_real_t val) {
-    if (igraph_finite(val)) {
+    if (isfinite(val)) {
         return snprintf(str, size, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
-    } else if (igraph_is_nan(val)) {
+    } else if (isnan(val)) {
         return snprintf(str, size, "NaN");
-    } else if (igraph_is_inf(val)) {
+    } else if (isinf(val)) {
         if (val < 0) {
             return snprintf(str, size, "-Inf");
         } else {

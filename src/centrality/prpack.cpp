@@ -54,7 +54,7 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
             if (reset_min < 0) {
                 IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
             }
-            if (igraph_is_nan(reset_min)) {
+            if (isnan(reset_min)) {
                 IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
             }
 
