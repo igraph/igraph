@@ -968,7 +968,7 @@ add_legacy_tests(
   igraph_sample_sphere
 )
 
-# tessellation
+# lattices
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangle_lattice
