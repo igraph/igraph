@@ -16,6 +16,8 @@
 */
 
 #include "igraph_constructors.h"
+#include "math/safe_intop.h"
+#include "core/interruption.h"
 
 /**
  * \ingroup generators
@@ -49,30 +51,30 @@
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  */
 static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual,
-                                       igraph_vector_int_t row_lengths_vector, igraph_vector_int_t row_start_vector)
+                                       const igraph_vector_int_t *row_lengths_vector, const igraph_vector_int_t *row_start_vector)
 {
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t row_count = igraph_vector_int_size(&row_lengths_vector);
+    igraph_integer_t row_count = igraph_vector_int_size(row_lengths_vector);
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t row_lengths_prefix_sum_vector;
     igraph_integer_t i, j;
 
-    if (igraph_vector_int_size(&row_lengths_vector) != igraph_vector_int_size(&row_start_vector))
+    if (igraph_vector_int_size(row_lengths_vector) != igraph_vector_int_size(row_start_vector))
     {
         IGRAPH_ERRORF(
-            "Length of row_lengths_vector vector must match the length of the "
+            "Length of row_lengths_vector vector (%" IGRAPH_PRId ") must match the length of the "
             "row_start_vector (%" IGRAPH_PRId ").",
-            IGRAPH_EINVAL, igraph_vector_int_size(&row_start_vector));
+            IGRAPH_EINVAL,  igraph_vector_int_size(row_lengths_vector), igraph_vector_int_size(row_start_vector));
     }
 
     for (i = 0; i < row_count; i++)
     {
-        if (VECTOR(row_lengths_vector)[i] < 0)
+        if (VECTOR(*row_lengths_vector)[i] < 0)
         {
             IGRAPH_ERRORF(
-                "row_lengths_vector vector must have non-negative coordinates "
-                "(%" IGRAPH_PRId ").",
-                IGRAPH_EINVAL, VECTOR(row_lengths_vector)[i]);
+                "row_lengths_vector vector must have non-negative coordinates, "
+                "was (%" IGRAPH_PRId ") for the (%" IGRAPH_PRId ")-th row.",
+                IGRAPH_EINVAL, VECTOR(*row_lengths_vector)[i], i);
         }
     }
 
@@ -84,58 +86,57 @@ static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, 
     VECTOR(row_lengths_prefix_sum_vector)[0] = 0;
     for (i = 1; i < row_count + 1; i++)
     {
-        VECTOR(row_lengths_prefix_sum_vector)[i] = VECTOR(row_lengths_prefix_sum_vector)[i - 1] + VECTOR(row_lengths_vector)[i - 1];
+        IGRAPH_SAFE_ADD(VECTOR(row_lengths_prefix_sum_vector)[i - 1], VECTOR(*row_lengths_vector)[i - 1], &(VECTOR(row_lengths_prefix_sum_vector)[i]));
     }
     no_of_nodes = VECTOR(row_lengths_prefix_sum_vector)[row_count];
 
-#define VERTEX_INDEX(i, j) (VECTOR(row_lengths_prefix_sum_vector)[j] + i - VECTOR(row_start_vector)[j])
-#define ADD_EDGE_IJ_KL_IF_EXISTS(i, j, k, l, is_just_count)                                                                                       \
-    if (VECTOR(row_start_vector)[l] <= k && k <= VECTOR(row_start_vector)[l] + VECTOR(row_lengths_vector)[l] - 1 && 0 <= l && l <= row_count - 1) \
+#define VERTEX_INDEX(i, j) (VECTOR(row_lengths_prefix_sum_vector)[j] + i - VECTOR(*row_start_vector)[j])
+#define ROW_END(j) (VECTOR(*row_start_vector)[j] + VECTOR(*row_lengths_vector)[j] - 1)
+#define ADD_EDGE_IJ_KL_IF_EXISTS(i, j, k, l)                                                                                                      \
+    if (VECTOR(*row_start_vector)[l] <= k && k <= ROW_END(l) && 0 <= l && l <= row_count - 1)                                                     \
     {                                                                                                                                             \
-        if (is_just_count)                                                                                                                        \
-        {                                                                                                                                         \
-            number_of_edges++;                                                                                                                    \
-        }                                                                                                                                         \
-        else                                                                                                                                      \
-        {                                                                                                                                         \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                          \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                          \
-        }                                                                                                                                         \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                              \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                              \
         if (directed && mutual)                                                                                                                   \
         {                                                                                                                                         \
-            if (is_just_count)                                                                                                                    \
-            {                                                                                                                                     \
-                number_of_edges++;                                                                                                                \
-            }                                                                                                                                     \
-            else                                                                                                                                  \
-            {                                                                                                                                     \
-                igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                      \
-                igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                      \
-            }                                                                                                                                     \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                          \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                          \
         }                                                                                                                                         \
     }
-#define ADD_EDGES(is_just_count)                                                 \
-    for (j = 0; j < row_count; j++)                                              \
-    {                                                                            \
-        for (i = 0; i < VECTOR(row_lengths_vector)[j]; i++)                      \
-        {                                                                        \
-            k = VECTOR(row_start_vector)[j] + i;                                 \
-            ADD_EDGE_IJ_KL_IF_EXISTS(k, j, (k + 1), j, is_just_count);           \
-            if (j < row_count - 1)                                               \
-            {                                                                    \
-                ADD_EDGE_IJ_KL_IF_EXISTS(k, j, k, (j + 1), is_just_count);       \
-                ADD_EDGE_IJ_KL_IF_EXISTS(k, j, (k - 1), (j + 1), is_just_count); \
-            }                                                                    \
-        }                                                                        \
+
+     /* computing the number of edges in the constructed triangle lattice */
+    igraph_integer_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
+    igraph_integer_t multiplier = mutual && directed ? 4 : 2;
+    for (j = 0; j < row_count - 1; j++)
+    {
+        IGRAPH_SAFE_ADD(no_of_edges2, VECTOR(*row_lengths_vector)[j], &no_of_edges2);
+        IGRAPH_SAFE_ADD(no_of_edges2, fmin(ROW_END(j), ROW_END((j + 1))) - fmax(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1]) + 1,
+                        &no_of_edges2);
+        IGRAPH_SAFE_ADD(no_of_edges2, fmin(ROW_END(j), ROW_END((j + 1)) + 1) - fmax(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1] + 1) + 1,
+                        &no_of_edges2);
+    }
+    IGRAPH_SAFE_MULT(no_of_edges2, multiplier, &no_of_edges2);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
+
+    /* constructing the edge array */
+    igraph_integer_t k;
+    for (j = 0; j < row_count; j++)
+    {
+        IGRAPH_ALLOW_INTERRUPTION();
+        for (i = 0; i < VECTOR(*row_lengths_vector)[j]; i++)
+        {
+            k = VECTOR(*row_start_vector)[j] + i;
+            ADD_EDGE_IJ_KL_IF_EXISTS(k, j, (k + 1), j);
+            if (j < row_count - 1)
+            {
+                ADD_EDGE_IJ_KL_IF_EXISTS(k, j, k, (j + 1));
+                ADD_EDGE_IJ_KL_IF_EXISTS(k, j, (k - 1), (j + 1));
+            }
+        }
     }
 
-    igraph_integer_t k;
-    igraph_integer_t number_of_edges = 0;
-    ADD_EDGES(true);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, number_of_edges));
-    ADD_EDGES(false);
-
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+
     igraph_vector_int_destroy(&row_lengths_prefix_sum_vector);
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(2);
@@ -161,7 +162,7 @@ static igraph_error_t triangle_lattice_triangle_shape(igraph_t *graph, igraph_in
         VECTOR(row_start_vector)[i] = 0;
     }
 
-    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, row_lengths_vector, row_start_vector));
+    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     IGRAPH_FINALLY_CLEAN(1);
@@ -190,7 +191,7 @@ static igraph_error_t triangle_lattice_rectangle_shape(igraph_t *graph, igraph_i
         VECTOR(row_start_vector)[i] = (row_count - i) / 2;
     }
 
-    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, row_lengths_vector, row_start_vector));
+    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     IGRAPH_FINALLY_CLEAN(1);
@@ -239,7 +240,7 @@ static igraph_error_t triangle_lattice_hex_shape(igraph_t *graph, igraph_integer
         }
     }
 
-    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, row_lengths_vector, row_start_vector));
+    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     IGRAPH_FINALLY_CLEAN(1);
