@@ -11,11 +11,11 @@
  - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
  - `igraph_dqueue_get()` accesses an element in a queue by index.
  - `igraph_degree_1()` efficiently retrieves the degee of a single vertex.
- - `igraph_lazy_adjlist_has()` and `igraph_lazy_inclist_has()` to check if adjacent vertiex / incident edges has already been computed and stored for a given vertex in a lazy adjlist / inclist.
+ - `igraph_lazy_adjlist_has()` and `igraph_lazy_inclist_has()` to check if adjacent vertices / incident edges have already been computed and stored for a given vertex in a lazy adjlist / inclist.
 
 ### Changed
 
- - `igraph_edge()` now checks that the input edge ID is valid.
+ - `igraph_edge()` now verifies that the input edge ID is valid.
  - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`, `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()` now generate a random starting vector using igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so. This makes sure that the results obtained from these functions remain the same if igraph's RNG is seeded with the same value.
  - `igraph_community_leading_eigenvector()` does not stop the splitting process any more when there are multiple equally likely splits (indicated by the multiplicity of the leading eigenvector being larger than 1). The algorithm picks an arbitrary split instead and proceeds normally.
 
