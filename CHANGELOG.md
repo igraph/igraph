@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [master]
+## [0.10.2] - 2022-10-14
 
 ### Added
 
@@ -33,6 +33,7 @@
  - `igraph_vit_create()` and `igraph_eit_create()` no longer fails when trying to create an iterator for the null graph or edgeless graph from an empty range-based vertex or edge selector.
  - `igraph_write_graph_leda()` did not correctly print attribute names in some warning messages.
  - Addressed new warnings introduced by Clang 15.
+ - In the generated pkg-config file, libxml2 is now placed in the `Requires.private` section instead of the `Libs.private` one.
 
 ### Removed
 
@@ -1073,7 +1074,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.1..master
+[master]: https://github.com/igraph/igraph/compare/0.10.2..master
+[0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0
 [0.9.10]: https://github.com/igraph/igraph/compare/0.9.9...0.9.10
