@@ -19,7 +19,16 @@
 
 */
 
+#include "igraph_paths.h"
 #include "igraph_interface.h"
+#include "igraph_vector_list.h"
+#include "igraph_adjlist.h"
+#include "igraph_memory.h"
+
+#include "core/indheap.h"
+#include "core/interruption.h"
+
+//#include <string.h>   /* memset */
 /**
  * \function igraph_get_shortest_path_dijkstra
  * \brief Weighted shortest path from one vertex to another one.
@@ -63,45 +72,23 @@
 typedef igraph_error_t igraph_astar_heuristic_t(igraph_real_t *result, igraph_integer_t vertex_id, void *extra);
 
 
-igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
-                                      igraph_vector_int_t *vertices,
-                                      igraph_vector_int_t *edges,
-                                      igraph_integer_t from,
-                                      igraph_integer_t to,
-                                      const igraph_vector_t *weights,
-                                      igraph_neimode_t mode,
+igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph, 
+                                       igraph_vector_int_list_t *vertices,
+                                       igraph_vector_int_list_t *edges,
+                                       igraph_integer_t from,
+                                       igraph_vs_t to,
+                                       const igraph_vector_t *weights,
+                                       igraph_neimode_t mode,
+                                       igraph_vector_int_t *parents,
+                                       igraph_vector_int_t *inbound_edges,
                                       igraph_astar_heuristic_t *heuristic,
                                       //extra is needed so users can pass in information to the heuristic
                                       //maybe the whole graph? and also the weights? or a location matrix?
                                       void *extra
                                       ) {
-    //mostly copied from igraph_get_shortest_path_dijkstra
-    //and igraph_get_shortest_paths_dijkstra
  
     igraph_real_t heur_res;
     igraph_bool_t found = false;
-
-    igraph_vector_int_list_t vertices2, *vp = &vertices2;
-    igraph_vector_int_list_t edges2, *ep = &edges2;
-
-    if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_list_init(&vertices2, 1));
-        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &vertices2);
-    } else {
-        vp = NULL;
-    }
-    if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_list_init(&edges2, 1));
-        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &edges2);
-    } else {
-        ep = NULL;
-    }
-
-    /*
-    IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(graph, vp, ep,
-                 from, igraph_vss_1(to),
-                 weights, mode, NULL, NULL));
-                 */
 
     /*just copying stuff from get_shortest_paths that seems to be useful.
       this needs to be fixed using #2221 */
@@ -130,6 +117,9 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
         }
     }
 
+    IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
     if (vertices) {
         IGRAPH_CHECK(igraph_vector_int_list_resize(vertices, IGRAPH_VIT_SIZE(vit)));
     }
@@ -147,24 +137,43 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
     igraph_vector_fill(&dists, -1.0);
 
-    //we don't need to mark any vertices we need to reach, because there's only one, so we're skipping some code here
+    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    if (parent_eids == 0) {
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    }
+    IGRAPH_FINALLY(igraph_free, parent_eids);
+    is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
+    if (is_target == 0) {
+        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    }
+    IGRAPH_FINALLY(igraph_free, is_target);
+
+    /* Mark the vertices we need to reach */
+    to_reach = IGRAPH_VIT_SIZE(vit);
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        if (!is_target[ IGRAPH_VIT_GET(vit) ]) {
+            is_target[ IGRAPH_VIT_GET(vit) ] = 1;
+        } else {
+            to_reach--;       /* this node was given multiple times */
+        }
+    }
     
     VECTOR(dists)[from] = 0.0;  /* zero distance */
     //igraph_2wheap_push_with_index(&Q, from, 0);
     IGRAPH_CHECK(heuristic(&heur_res, from, extra));
     igraph_2wheap_push_with_index(&Q, from, -heur_res);
 
-    while (!igraph_2wheap_empty(&Q)) {
+    while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         igraph_integer_t nlen, minnei = igraph_2wheap_max_index(&Q);
         //so there's the distance, the heuristic, and the sum of the distance and the heuristic, which is the estimate. The estimate should be on the heap, because the minimum estimate should always be handled next
-        igraph_real_t minest = -igraph_2wheap_delete_max(&Q);
+        igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
         igraph_vector_int_t *neis;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (minnei == to) {
-            found = true;
-            break;
+        if (is_target[minnei]) {
+            is_target[minnei] = 0;
+            to_reach--;
         }
 
         /* Now check all neighbors of 'minnei' for a shorter path */
@@ -199,8 +208,41 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
         }
     } /* !igraph_2wheap_empty(&Q) */
 
-    if (!found) {
-        IGRAPH_WARNING("Couldn't reach the vertex");
+    if (to_reach > 0) {
+        IGRAPH_WARNING("Couldn't reach some vertices");
+    }
+
+    /* Create `parents' if needed */
+    if (parents) {
+        IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
+
+        for (i = 0; i < no_of_nodes; i++) {
+            if (i == from) {
+                /* i is the start vertex */
+                VECTOR(*parents)[i] = -1;
+            } else if (parent_eids[i] <= 0) {
+                /* i was not reached */
+                VECTOR(*parents)[i] = -2;
+            } else {
+                /* i was reached via the edge with ID = parent_eids[i] - 1 */
+                VECTOR(*parents)[i] = IGRAPH_OTHER(graph, parent_eids[i] - 1, i);
+            }
+        }
+    }
+
+    /* Create `inbound_edges' if needed */
+    if (inbound_edges) {
+        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
+
+        for (i = 0; i < no_of_nodes; i++) {
+            if (parent_eids[i] <= 0) {
+                /* i was not reached */
+                VECTOR(*inbound_edges)[i] = -1;
+            } else {
+                /* i was reached via the edge with ID = parent_eids[i] - 1 */
+                VECTOR(*inbound_edges)[i] = parent_eids[i] - 1;
+            }
+        }
     }
 
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
@@ -248,16 +290,13 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
             }
         }
     }
-    if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
-        igraph_vector_int_list_destroy(&edges2);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
-    if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
-        igraph_vector_int_list_destroy(&vertices2);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
 
+    igraph_lazy_inclist_destroy(&inclist);
+    igraph_2wheap_destroy(&Q);
+    igraph_vector_destroy(&dists);
+    IGRAPH_FREE(is_target);
+    IGRAPH_FREE(parent_eids);
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(6);
     return IGRAPH_SUCCESS;
 }

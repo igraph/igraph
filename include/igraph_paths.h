@@ -152,16 +152,17 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *g
                                                     igraph_integer_t to,
                                                     const igraph_vector_t *weights,
                                                     igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
-                                                    igraph_vector_int_t *vertices,
-                                                    igraph_vector_int_t *edges,
+IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
+                                                    igraph_vector_int_list_t *vertices,
+                                                    igraph_vector_int_list_t *edges,
                                                     igraph_integer_t from,
-                                                    igraph_integer_t to,
+                                                    igraph_vs_t to,
                                                     const igraph_vector_t *weights,
                                                     igraph_neimode_t mode,
+                                                    igraph_vector_int_t *parents,
+                                                    igraph_vector_int_t *inbound_edges,
                                                     igraph_astar_heuristic_t *heuristic,
-                                                    void *extra
- );
+                                                    void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
                                                 igraph_vector_int_list_t *vertices,
