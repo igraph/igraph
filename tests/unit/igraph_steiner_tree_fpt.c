@@ -20,176 +20,86 @@
 #include "test_utilities.h"
 
 int main(void) {
-    //printf("Starting Tests\n");
-    igraph_t g_empty, g_lm, g_disconnected;
+    igraph_t g_null, g_k7, g_k6_k1;
+    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1;
+    igraph_vector_t weights_null, weights_k7, weights_k6_k1;
 
-    igraph_vector_int_t steiner_terminals, steiner_terminals_null,steiner_terminals_disconnected;
-    igraph_vector_t weights_empty, weights_lm, weights_disconnected;
+    /* Null graph */
+    igraph_empty(&g_null, 0, 0);
+    igraph_vector_init(&weights_null, 0);
+    igraph_vector_int_init(&terminals_null, 0);
 
-    igraph_vector_init(&weights_empty, 0);
-
-    igraph_vector_int_init(&steiner_terminals, 4);
-    igraph_vector_int_init(&steiner_terminals_null, 0);
-    igraph_vector_int_init(&steiner_terminals_disconnected, 4);
-
-    VECTOR(steiner_terminals)[0] = 0;
-    VECTOR(steiner_terminals)[1] = 1;
-    VECTOR(steiner_terminals)[2] = 2;
-    VECTOR(steiner_terminals)[3] = 3;
-
-    VECTOR(steiner_terminals_disconnected)[0] = 0;
-    VECTOR(steiner_terminals_disconnected)[1] = 1;
-    VECTOR(steiner_terminals_disconnected)[2] = 2;
-    VECTOR(steiner_terminals_disconnected)[3] = 6;
-
-
-    igraph_vector_init(&weights_lm, 21);
-
-    VECTOR(weights_lm)[0] = 2;
-    VECTOR(weights_lm)[1] = 2;
-    VECTOR(weights_lm)[2] = 2;
-    VECTOR(weights_lm)[3] = 1;
-    VECTOR(weights_lm)[4] = 1;
-    VECTOR(weights_lm)[5] = 2;
-
-    VECTOR(weights_lm)[6] = 2;
-    VECTOR(weights_lm)[7] = 2;
-    VECTOR(weights_lm)[8] = 2;
-    VECTOR(weights_lm)[9] = 1;
-    VECTOR(weights_lm)[10] = 2;
-
-    VECTOR(weights_lm)[11] = 2;
-    VECTOR(weights_lm)[12] = 2;
-    VECTOR(weights_lm)[13] = 2;
-    VECTOR(weights_lm)[14] = 1;
-
-    VECTOR(weights_lm)[15] = 1;
-    VECTOR(weights_lm)[16] = 2;
-    VECTOR(weights_lm)[17] = 1;
-
-    VECTOR(weights_lm)[18] = 2;
-    VECTOR(weights_lm)[19] = 1;
-
-    VECTOR(weights_lm)[20] = 1;
-
-
-    igraph_vector_init(&weights_disconnected, 15);
-
-    VECTOR(weights_disconnected)[0] = 2;
-    VECTOR(weights_disconnected)[1] = 2;
-    VECTOR(weights_disconnected)[2] = 2;
-    VECTOR(weights_disconnected)[3] = 1;
-    VECTOR(weights_disconnected)[4] = 1;
-
-    VECTOR(weights_disconnected)[5] = 2;
-    VECTOR(weights_disconnected)[6] = 2;
-    VECTOR(weights_disconnected)[7] = 2;
-    VECTOR(weights_disconnected)[8] = 1;
-    
-
-    VECTOR(weights_disconnected)[9] = 2;
-    VECTOR(weights_disconnected)[10] = 2;
-    VECTOR(weights_disconnected)[11] = 2;
-    
-
-    VECTOR(weights_disconnected)[12] = 1;
-    VECTOR(weights_disconnected)[13] = 2;
-
-    VECTOR(weights_disconnected)[14] = 2;
-    
-
-
-
-    igraph_empty(&g_empty, 0, 0);
-
-    igraph_small(&g_lm, 7, IGRAPH_UNDIRECTED,
-                 0, 1,
-                 0, 2,
-                 0, 3,
-                 0, 4,
-                 0, 5,
-                 0, 6,
-
-                 1, 2,
-                 1, 3,
-                 1, 4,
-                 1, 5,
-                 1, 6,
-
-                 2, 3,
-                 2, 4,
-                 2, 5,
-                 2, 6,
-
-                 3, 4,
-                 3, 5,
-                 3, 6,
-
-                 4, 5,
-                 4, 6,
-
+    /* K_7 complete graph with a specific edge ordering. */
+    igraph_small(&g_k7, 7, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6,
+                 1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
+                 2, 3, 2, 4, 2, 5, 2, 6,
+                 3, 4, 3, 5, 3, 6,
+                 4, 5, 4, 6,
                  5, 6,
                  -1);
 
+    igraph_vector_init_int(&weights_k7, 21,
+                           2, 2, 2, 1, 1, 2,
+                           2, 2, 2, 1, 2,
+                           2, 2, 2, 1,
+                           1, 2, 1,
+                           2, 1,
+                           1);
 
-    igraph_small(&g_disconnected, 7, IGRAPH_UNDIRECTED,
-                 0, 1,
-                 0, 2,
-                 0, 3,
-                 0, 4,
-                 0, 5,
+    igraph_vector_int_init_int(&terminals_k7, 4,
+                               0, 1, 2, 3);
 
-                 1, 2,
-                 1, 3,
-                 1, 4,
-                 1, 5,
-                 
-
-                 2, 3,
-                 2, 4,
-                 2, 5,
-                 
-
-                 3, 4,
-                 3, 5,
-                 
-
+    /* Disconnected graph: K_6 with a specific edge order and an additional isolated vertex. */
+    igraph_small(&g_k6_k1, 7, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 0, 4, 0, 5,
+                 1, 2, 1, 3, 1, 4, 1, 5,
+                 2, 3, 2, 4, 2, 5,
+                 3, 4, 3, 5,
                  4, 5,
-                 
                  -1);
+
+    igraph_vector_init_int(&weights_k6_k1, 15,
+                           2, 2, 2, 1, 1,
+                           2, 2, 2, 1,
+                           2, 2, 2,
+                           1, 2,
+                           2);
+
+    igraph_vector_int_init_int(&terminals_k6_k1, 4,
+                               0, 1, 2, 6);
 
     printf("No vertices, not directed:\n");
     igraph_real_t val1, val2,val3;
     igraph_vector_int_t res_tree, res_tree_1,res_tree_2;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&res_tree, 1));
-    IGRAPH_CHECK(igraph_vector_int_init(&res_tree_1, 1));
-    IGRAPH_CHECK(igraph_vector_int_init(&res_tree_2, 1));
+    igraph_vector_int_init(&res_tree, 1);
+    igraph_vector_int_init(&res_tree_1, 1);
+    igraph_vector_int_init(&res_tree_2, 1);
 
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_empty, &steiner_terminals_null, &weights_empty, &val1, &res_tree) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_null, &terminals_null, &weights_null, &val1, &res_tree) == IGRAPH_SUCCESS);
     printf("%.2f\n", val1);
     IGRAPH_ASSERT(val1 == 0);
     printf("Un-Directed graph with loops and multi-edges, select none:\n");
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_lm, &steiner_terminals, &weights_lm, &val2, &res_tree_1) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_k7, &terminals_k7, &weights_k7, &val2, &res_tree_1) == IGRAPH_SUCCESS);
     printf("%.2f\n", val2);
     IGRAPH_ASSERT(val2 == 5);
 
     print_vector_int(&res_tree_1);
-    // This is the only way to check !IGRAPH_SUCCESS return types
-    CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_disconnected, &steiner_terminals_disconnected, &weights_disconnected, &val3, &res_tree_2), IGRAPH_EINVAL);
-    //printf("The graph is disconnected and steiner terminals are not in same connected component");
 
-    igraph_destroy(&g_empty);
-    igraph_destroy(&g_lm);
-    igraph_destroy(&g_disconnected);
+    CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_k6_k1, &terminals_k6_k1, &weights_k6_k1, &val3, &res_tree_2), IGRAPH_EINVAL);
 
-    igraph_vector_destroy(&weights_empty);
-    igraph_vector_destroy(&weights_lm);
-    igraph_vector_destroy(&weights_disconnected);
+    igraph_destroy(&g_null);
+    igraph_destroy(&g_k7);
+    igraph_destroy(&g_k6_k1);
 
-    igraph_vector_int_destroy(&steiner_terminals);
-    igraph_vector_int_destroy(&steiner_terminals_null);
-    igraph_vector_int_destroy(&steiner_terminals_disconnected);
+    igraph_vector_destroy(&weights_null);
+    igraph_vector_destroy(&weights_k7);
+    igraph_vector_destroy(&weights_k6_k1);
+
+    igraph_vector_int_destroy(&terminals_k7);
+    igraph_vector_int_destroy(&terminals_null);
+    igraph_vector_int_destroy(&terminals_k6_k1);
 
     igraph_vector_int_destroy(&res_tree);
     igraph_vector_int_destroy(&res_tree_1);
