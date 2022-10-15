@@ -73,9 +73,9 @@ int main(void) {
     igraph_real_t val1, val2,val3;
     igraph_vector_int_t res_tree, res_tree_1,res_tree_2;
 
-    igraph_vector_int_init(&res_tree, 1);
-    igraph_vector_int_init(&res_tree_1, 1);
-    igraph_vector_int_init(&res_tree_2, 1);
+    igraph_vector_int_init(&res_tree, 0);
+    igraph_vector_int_init(&res_tree_1, 0);
+    igraph_vector_int_init(&res_tree_2, 0);
 
     IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_null, &terminals_null, &weights_null, &val1, &res_tree) == IGRAPH_SUCCESS);
     printf("%.2f\n", val1);
