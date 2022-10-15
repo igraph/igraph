@@ -1,5 +1,11 @@
 # igraph C library changelog
 
+## [master]
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.2] - 2022-10-14
 
 ### Added
