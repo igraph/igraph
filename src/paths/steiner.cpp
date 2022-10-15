@@ -336,7 +336,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
  * \param graph The graph object.
  * \param weights The edge weights. All edge weights must be non-negative.
  *    Additionally, no edge weight may be NaN.
- * \param steiner_terminals Integer vector containing the IDs of the terminal vertices.
+ * \param terminals Integer vector containing the IDs of the terminal vertices.
  * \param res Pointer to a real number, this will contain the result which is distance of Steiner Tree.
  * \param res_tree Pointer to an initialized integer vector, this will contain the IDs of edges
  *    that are part of Steiner tree.
@@ -350,81 +350,75 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
  * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_spanner()
  */
 
-igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph_vector_int_t *steiner_terminals,
-        const igraph_vector_t *weights, igraph_real_t *res, igraph_vector_int_t *res_tree) {
+igraph_error_t igraph_steiner_dreyfus_wagner(
+        const igraph_t *graph, const igraph_vector_int_t *terminals, const igraph_vector_t *weights,
+        igraph_real_t *res, igraph_vector_int_t *res_tree) {
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
-    igraph_integer_t no_of_vertices = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    if (no_of_vertices == 0 || (no_of_vertices == 1)) { // graph is empty
-        IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, res_tree, weights));
+    igraph_integer_t no_of_terminals = igraph_vector_int_size(terminals);
+
+    if (! igraph_vector_int_isininterval(terminals, 0, no_of_nodes)) {
+        IGRAPH_ERROR("Invalid vertex ID given as Steiner terminal.", IGRAPH_EINVVID);
+    }
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
+    }
+
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight < 0) {
+            IGRAPH_ERRORF("Edge weights must be non-negative, got %g.", IGRAPH_EINVAL, minweight);
+        } else if (minweight == 0) {
+            /* TODO: can we support zero edge weights? */
+            IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
+        }
+    }
+
+    /* Handle the cases of the null graph and no terminals. */
+    if (no_of_nodes == 0 || no_of_terminals == 0) {
+        igraph_vector_int_clear(res_tree);
         *res = 0.0;
         return IGRAPH_SUCCESS;
     }
-    igraph_bool_t IsConnected;
-    IGRAPH_CHECK(igraph_is_connected(graph, &IsConnected, IGRAPH_WEAK));
 
-    if (!IsConnected) {
-
-        //printf("We are here");
+    /* Check whether all terminals are within the same connected component. */
+    {
         igraph_vector_int_t membership;
-        igraph_vector_int_t csize;
-        igraph_integer_t component_id = -1;
+        igraph_integer_t no_comps;
 
-        IGRAPH_CHECK(igraph_vector_int_init(&membership, 1));
-        IGRAPH_CHECK(igraph_vector_int_init(&csize, 1));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
+        IGRAPH_CHECK(igraph_connected_components(graph, &membership, NULL, &no_comps, IGRAPH_WEAK));
 
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &membership);
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &csize);
-
-        IGRAPH_CHECK(igraph_connected_components(graph, &membership, &csize, NULL, IGRAPH_WEAK));
-
-        //printf("We are here connected components");
-
-        for (igraph_integer_t i = 0; i < igraph_vector_int_size(steiner_terminals); i++) {
-            for (igraph_integer_t j = 0; j < igraph_vector_int_size(&membership); j++) {
-                if ( j == VECTOR(*steiner_terminals)[i]) {
-
-                    /*
-                        1. If steiner terminal gets matched for first time, store it's component_id
-                        2. If the steiner_terminal has different component_id that
-                        previously observed, steiner terminals are in different components and hence throw error.
-                    */
-
-                    if (component_id == -1) {
-                        component_id = VECTOR(membership)[j];
-                    } else if (VECTOR(membership)[j] != component_id) {
-                        IGRAPH_ERROR("The graph is disconnected and steiner terminals are not in same connected component", IGRAPH_EINVAL);
-                    }
+        if (no_comps > 1) {
+            /* The case of zero terminals was already handled above. */
+            igraph_integer_t component_id = VECTOR(membership)[ VECTOR(*terminals)[0] ];
+            for (igraph_integer_t i=1; i < no_of_terminals; i++) {
+                if (VECTOR(membership)[ VECTOR(*terminals)[i] ] != component_id) {
+                    IGRAPH_ERROR("Not all Steiner terminals are in the same connected component.", IGRAPH_EINVAL);
                 }
             }
         }
 
         igraph_vector_int_destroy(&membership);
-        igraph_vector_int_destroy(&csize);
-        IGRAPH_FINALLY_CLEAN(2);
-
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
-    /*
-     *  If the Steiner terminals is number of vertices in graph then problem
-     *  is reduced to minimum spanning tree which is tractable.
+    /* When every vertex is a Steiner terminal, the probably reduces to
+     * finding a minimum spanning tree.
      */
-    igraph_real_t min = igraph_vector_min(weights);
-    if (min < 0) {
-        IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
-    } else if (min == 0) {
-        IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
-    }
-    if (igraph_vector_int_size(steiner_terminals) == no_of_vertices) {
-
+    if (no_of_terminals == no_of_nodes) {
         IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, res_tree, weights));
-        igraph_real_t size_value = 0.0;
-        for (igraph_integer_t i = 0; i < igraph_vector_int_size(res_tree); i++) {
-            size_value  += VECTOR(*weights)[VECTOR(*res_tree)[i]];
+
+        igraph_real_t tree_weight = 0.0;
+        igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
+        for (igraph_integer_t i = 0; i < tree_size; i++) {
+            tree_weight  += VECTOR(*weights)[VECTOR(*res_tree)[i]];
         }
-        *res = size_value;
+        *res = tree_weight;
         return IGRAPH_SUCCESS;
     }
 
@@ -438,7 +432,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges.", IGRAPH_FAILURE, igraph_vector_size(weights), no_of_edges);
     }
-    IGRAPH_CHECK(igraph_matrix_init(&distance, no_of_vertices, no_of_vertices));
+    IGRAPH_CHECK(igraph_matrix_init(&distance, no_of_nodes, no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &distance);
 
     /*
@@ -448,7 +442,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      */
     IGRAPH_CHECK(igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights));
 
-    IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy, steiner_terminals));
+    IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy, terminals));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &steiner_terminals_copy);
     igraph_vector_int_sort(&steiner_terminals_copy);
     q = VECTOR(steiner_terminals_copy)[0];
@@ -459,7 +453,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy - 1)
      * 2 ^ (number of steiner_terminals_copy - 1) is number of subsets.
      */
-    IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_vertices + pow(2, igraph_vector_int_size(&steiner_terminals_copy) - 1), no_of_vertices));
+    IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy) - 1), no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &dp_cache);
 
     igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
@@ -467,9 +461,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      * for singleton value the distance in dp cahce is just the
      * distance between same vertices in distance matrix
      */
-    for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
             MATRIX(dp_cache, i, j) = MATRIX(distance, i, j);
         }
     }
@@ -479,7 +473,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
      * The index would be used in DP table.
      */
     dictionary subsetMap;
-    allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_vertices, subsetMap);
+    allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_nodes, subsetMap);
 
     for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++) {
         for (igraph_integer_t i = 0; i < (igraph_integer_t)allSubsets.size(); i++) {
@@ -490,11 +484,11 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
             indexOfSubsetD = fetchIndexofMapofSets(D, subsetMap);
 
             IGRAPH_ALLOW_INTERRUPTION();
-            for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
+            for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
                 MATRIX(dp_cache, indexOfSubsetD, j) = IGRAPH_INFINITY;
             }
 
-            for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
+            for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
                 igraph_real_t distance1 = IGRAPH_INFINITY;
 
                 for (auto E :  D) {
@@ -527,7 +521,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
                     }
                 }
 
-                for (igraph_integer_t k = 0; k < no_of_vertices; k++) {
+                for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
                     MATRIX(dp_cache, indexOfSubsetD, k) = std::min(MATRIX(dp_cache, indexOfSubsetD, k), MATRIX(distance, k, j) + distance1);
                 }
             }
@@ -536,16 +530,16 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
     igraph_real_t distance2 = IGRAPH_INFINITY;
 
-    for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
+    for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
         igraph_real_t distance1 = IGRAPH_INFINITY;
         IGRAPH_ALLOW_INTERRUPTION();
-        for (igraph_integer_t subset_C_iterator = 0; subset_C_iterator < igraph_vector_int_size(steiner_terminals); subset_C_iterator++) {
+        for (igraph_integer_t subset_C_iterator = 0; subset_C_iterator < no_of_terminals; subset_C_iterator++) {
             igraph_integer_t F = VECTOR(steiner_terminals_copy)[subset_C_iterator];
             igraph_integer_t distanceFJ = MATRIX(distance, F, j);
 
             int_set CMinusF;
 
-            for (igraph_integer_t k = 0; k < igraph_vector_int_size(steiner_terminals); k++) {
+            for (igraph_integer_t k = 0; k < no_of_terminals; k++) {
 
                 if (VECTOR(steiner_terminals_copy)[k] != F) {
                     CMinusF.insert(VECTOR(steiner_terminals_copy)[k]);
