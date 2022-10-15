@@ -186,12 +186,10 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
         igraph_integer_t k = findMinimumK(dp_cache, indexD, m);
 
         igraph_vector_int_t vectorlist;
-        IGRAPH_CHECK(igraph_vector_int_init(&vectorlist, 1));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist, 0);
 
         igraph_vector_int_t edgelist;
-        IGRAPH_CHECK(igraph_vector_int_init(&edgelist, 1));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, 0);
 
         IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist, &edgelist, m, k, weights, IGRAPH_ALL));
 
@@ -236,12 +234,10 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
             }
 
             igraph_vector_int_t vectorlist_1;
-            IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_1, 1));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist_1);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_1, 0);
 
             igraph_vector_int_t edgelist_1;
-            IGRAPH_CHECK(igraph_vector_int_init(&edgelist_1, 1));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist_1);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist_1, 0);
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL));
 
@@ -263,22 +259,18 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
 
             igraph_vector_int_t vectorlist_1;
-            IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_1, 1));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist_1);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_1, 0);
 
             igraph_vector_int_t edgelist_1;
-            IGRAPH_CHECK(igraph_vector_int_init(&edgelist_1, 1));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist_1);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist_1, 0);
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, E1, weights, IGRAPH_ALL));
 
             igraph_vector_int_t vectorlist_2;
-            IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_2, 1));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist_2);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_2, 0);
 
             igraph_vector_int_t edgelist_2;
-            IGRAPH_CHECK(igraph_vector_int_init(&edgelist_2, 1));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, &edgelist_2);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist_2, 0);
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_2, &edgelist_2, k, F1, weights, IGRAPH_ALL));
 
@@ -567,8 +559,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
 
     igraph_vector_int_t vectorlist_all;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&vectorlist_all, 1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &vectorlist_all);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_all, 0);
     IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree, subsetMap));
 
     // Default vector initiation add 0 and hence it's removed.
