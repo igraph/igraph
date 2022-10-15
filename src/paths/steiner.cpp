@@ -16,41 +16,35 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "igraph_types.h"
-#include "igraph_error.h"
-#include "igraph_vector.h"
-#include "igraph_matrix.h"
-#include "igraph_datatype.h"
-#include "igraph_error.h"
 #include "igraph_paths.h"
+
 #include "igraph_components.h"
 #include "igraph_interface.h"
+#include "igraph_matrix.h"
 #include "igraph_structural.h"
 
 #include "core/exceptions.h"
 #include "core/interruption.h"
 
-#include <cstring>
 #include <cmath>
-#include <map>
-#include <climits>
-#include <vector>
-#include <set>
 #include <algorithm>
 #include <iterator>
+#include <map>
+#include <set>
+#include <vector>
 
 
 typedef std::set<igraph_integer_t> int_set;
 typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
+
 /*
  *  Generates Subsets of length > 1 for list of integer values.
  *  As algorithm computes the minimum distance between set of variables ranging from
  *  length 2 to steiner_terminals - 1, we need these subsets.
- *   for e.g [2,3,4] --> [ [2,3], [2,4], [3,4], [2,3,4] ]
+ *  for e.g [2,3,4] --> [ [2,3], [2,4], [3,4], [2,3,4] ]
  *  Populates the subsetMap data structure as well.
  *
  */
-
 static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap) {
     igraph_integer_t count = ((igraph_integer_t)1 << n);
     std::set<int_set> allSubsets;
@@ -84,11 +78,9 @@ static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, i
 }
 
 /*
- *
  * Purpose: Fetching Index of a subset from subsetMap in order to store and look-up
  * the value of subset from DP table.
  */
-
 static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& subsetMap) {
 
     for (const auto & kv : subsetMap) {
@@ -101,9 +93,7 @@ static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& 
 
 /*
  * Purpose: Retriving the value of subset from given index.
- *
  */
-
 static int_set fetchSetsBasedonIndex(igraph_integer_t index, const  dictionary& subsetMap) {
     for (const auto &kv : subsetMap) {
         if (kv.second == index) {
@@ -114,11 +104,8 @@ static int_set fetchSetsBasedonIndex(igraph_integer_t index, const  dictionary& 
 }
 
 /*
- *
  * Calculating factorial of a number.
- *
  */
-
 static igraph_integer_t factorial(igraph_integer_t n) {
     igraph_integer_t answer = 1;
     for (igraph_integer_t i = 1; i <= n; i++) {
@@ -131,27 +118,21 @@ static igraph_integer_t factorial(igraph_integer_t n) {
  * Finding number of combinations nCr
  * Used to determine number of elements to be scanned in DP table
  * for a particular subset during generation of Steiner Tree.
- *
  */
-
 static igraph_integer_t Combination(igraph_integer_t n, igraph_integer_t r) {
     return factorial(n) / (factorial(n - r) * factorial(r));
 }
 
-/* \function  findMinimumK
+/**
+ * Iterates through a particular row of the DP table
+ * find the value of column where distance (q,k) + distance(Sk(D))
+ * where D is a subset. This signifies a vertex that is part
+ * of minimum path from vertex q to D
  *
- *
- *  Iterate through a particular row of the DP table
- *  find the value of column where distance (q,k) + distance(Sk(D))
- *  where D is a subset. This signifies a vertex that is part
- *  of minimum path from vertex q to D
- *  \param dp_cache The DP table.
- *
- *  \param indexD Index of the subset D.
- *
- *  \param q vertex from who minimum path needs tp be calculated
+ * \param dp_cache The DP table.
+ * \param indexD Index of the subset D.
+ * \param q vertex from who minimum path needs tp be calculated
  */
-
 static igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q) {
 
     igraph_integer_t min_col_num = -1;
@@ -174,38 +155,19 @@ static igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t
 }
 
 /**
- *  \function generate_steiner_tree_exact()
+ * \function generate_steiner_tree_exact
  *
- *   Generation of the Steiner Tree based on calculation of minimum distances in DP table.
+ * Generation of the Steiner Tree based on calculation of minimum distances in DP table.
  *
- *  \param graph The graph object.
- *  \param weights The edge weights. All edge weights must be
- *                 non-negative. Additionally, no edge weight may be NaN.
- *
- *  \param dp_cache The DP table.
- *
- *  \param indexD The index of subset D in DP table.
- *
- *  \param q The vertex that was remmoved from steiner terminals.
- *
- * \param mode How to determine the local neighborhood of each vertex
- *  in directed graphs. Ignored in undirected graphs.
- * \clist
- *         \cli IGRAPH_ALL
- *              take both in- and out-neighbours;
- *              this is a reasonable default for high-level interfaces.
- *         \cli IGRAPH_OUT
- *              take only out-neighbours
- *         \cli IGRAPH_IN
- *              take only in-neighbours
- *         \endclist
- *
- *  \param vectorlist_all The vector to capture vertices in resultant Steiner Tree.
- *
- *  \param edgelist_all The vector to capture edges in resultant Steiner Tree.
- *
+ * \param graph The graph object.
+ * \param weights The edge weights. All edge weights must be
+ *                non-negative. Additionally, no edge weight may be NaN.
+ * \param dp_cache The DP table.
+ * \param indexD The index of subset D in DP table.
+ * \param q The vertex that was remmoved from steiner terminals.
+ * \param vectorlist_all The vector to capture vertices in resultant Steiner Tree.
+ * \param edgelist_all The vector to capture edges in resultant Steiner Tree.
  */
-
 static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_vector_t *weights,
         igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_vector_int_t *vectorlist_all, igraph_vector_int_t *edgelist_all, const dictionary& subsetMap) {
 
@@ -351,15 +313,16 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
 /**
  * \function  igraph_steiner_dreyfus_wagner
- * \brief This function calculates Steiner Tree on undirected graph using Dreyfus-Wagner algorithm
+ * \brief Finds a Steiner tree on an undirected graph using the Dreyfus-Wagner algorithm.
  *
- * Steiner Tree is a tree with minimum length connecting steiner terminals which are subset of vertices
- * in a graph. If Steiner terminals equal to number of vertices in the graph then problem is reduced
- * to minimum spanning tree.
- * The Steiner Tree problem is NP-Hard but since it's FPT, Dreyfus-Wagner algorithm is able to calculate
- * Exact value of Steiner Tree on smaller graphs.
+ * A Steiner tree is a tree with minimum length connecting a set of terminal vertices
+ * in a graph. If every vertex is a terminal then problem is reduced to minimum spanning tree.
+ * The Steiner tree problem is NP-hard but since it's FPT, Dreyfus-Wagner algorithm is able to
+ * find an exact Steiner tree on small graphs.
  *
- * The algorithm uses Dynamic Programming approach and it assumes the graph is undirected.
+ * </para><para>
+ * The algorithm uses a dynamic programming approach and it treats the graph as undirected,
+ * i.e. edge directions are ignored.
  *
  * </para><para>
  * Reference:
@@ -371,25 +334,26 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
  * https://doi.org/10.1002/net.3230010302
  *
  * \param graph The graph object.
+ * \param weights The edge weights. All edge weights must be non-negative.
+ *    Additionally, no edge weight may be NaN.
+ * \param steiner_terminals Integer vector containing the IDs of the terminal vertices.
  * \param res Pointer to a real number, this will contain the result which is distance of Steiner Tree.
- * \param res_tree Pointer to a vector, this will contain the Edges that are part of Steiner Tree
- * \param steiner_terminals Pointer to a vector, this will contain vertices
- * \param weights The edge weights. All edge weights must be
- *        non-negative. Additionally, no edge weight may be NaN.
+ * \param res_tree Pointer to an initialized integer vector, this will contain the IDs of edges
+ *    that are part of Steiner tree.
  * \return Error code.
  *
  * Time complexity: O( 3^k ∗ V + 2^k ∗ V^2 + V∗(V+E) ∗ log(V) )
  * where V and E are the number of vertices and edges
  * and k is the number of Steiner terminals.
- * It's recommended that V &lt;= 50 and k &lt; 11
+ * It is recommended that V &lt;= 50 and k &lt; 11.
  *
  * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_spanner()
  */
 
 igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph_vector_int_t *steiner_terminals,
         const igraph_vector_t *weights, igraph_real_t *res, igraph_vector_int_t *res_tree) {
-    IGRAPH_HANDLE_EXCEPTIONS_BEGIN
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     igraph_integer_t no_of_vertices = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -443,10 +407,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
     }
 
-
-
-
-
     /*
      *  If the Steiner terminals is number of vertices in graph then problem
      *  is reduced to minimum spanning tree which is tractable.
@@ -482,9 +442,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     IGRAPH_FINALLY(igraph_matrix_destroy, &distance);
 
     /*
-     *  Johnson's algorithm calculates all pairs shortest path
-     *  and returns distance matrix. The Dreyfus - Wagner algorithm needs complete graph
-     *   hence this step is necessary.
+     * Johnson's algorithm calculates all pairs shortest path
+     * and returns distance matrix. The Dreyfus - Wagner algorithm needs complete graph
+     * hence this step is necessary.
      */
     IGRAPH_CHECK(igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights));
 
@@ -496,16 +456,16 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
     /*
-     *  DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy - 1)
-     *  2 ^ (number of steiner_terminals_copy - 1) is number of subsets.
+     * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy - 1)
+     * 2 ^ (number of steiner_terminals_copy - 1) is number of subsets.
      */
     IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_vertices + pow(2, igraph_vector_int_size(&steiner_terminals_copy) - 1), no_of_vertices));
     IGRAPH_FINALLY(igraph_matrix_destroy, &dp_cache);
 
     igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
     /*
-     *  for singleton value the distance in dp cahce is just the
-     *  distance between same vertices in distance matrix
+     * for singleton value the distance in dp cahce is just the
+     * distance between same vertices in distance matrix
      */
     for (igraph_integer_t i = 0; i < no_of_vertices; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
@@ -515,11 +475,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     }
 
     /*
-    *
-    * Usage: Data structure to store index value of subsets.
-    * The index would be used in DP table
-    *
-    */
+     * Usage: Data structure to store index value of subsets.
+     * The index would be used in DP table.
+     */
     dictionary subsetMap;
     allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_vertices, subsetMap);
 
@@ -538,7 +496,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
 
             for (igraph_integer_t j = 0; j < no_of_vertices; j++) {
                 igraph_real_t distance1 = IGRAPH_INFINITY;
-
 
                 for (auto E :  D) {
 
@@ -629,7 +586,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(const igraph_t *graph, const igraph
     igraph_vector_int_destroy(&vectorlist_all);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_HANDLE_EXCEPTIONS_END
+    IGRAPH_HANDLE_EXCEPTIONS_END;
     return IGRAPH_SUCCESS;
 }
-
