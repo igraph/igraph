@@ -165,6 +165,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         igraph_integer_t nlen, minnei = igraph_2wheap_max_index(&Q);
+        printf("minnei: %ld", minnei);
         //so there's the distance, the heuristic, and the sum of the distance and the heuristic, which is the estimate. The estimate should be on the heap, because the minimum estimate should always be handled next
         igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
         igraph_vector_int_t *neis;
