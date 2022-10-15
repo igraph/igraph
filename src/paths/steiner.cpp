@@ -558,12 +558,11 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_integer_t indexD = fetchIndexofMapofSets(newSet, subsetMap);
 
     igraph_vector_int_t vectorlist_all;
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_all, 0);
-    IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree, subsetMap));
 
-    // Default vector initiation add 0 and hence it's removed.
-    igraph_vector_int_remove(res_tree, 0);
+    igraph_vector_int_clear(res_tree);
+
+    IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree, subsetMap));
 
     igraph_matrix_destroy(&distance);
     igraph_vector_int_destroy(&steiner_terminals_copy);
