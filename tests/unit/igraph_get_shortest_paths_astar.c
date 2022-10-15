@@ -117,9 +117,15 @@ igraph_error_t heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t heuristic_2(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
-    (void) extra;
-    *result = abs(vertex_id - 59);
+igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
+    int *d = extra;
+    int x[4];
+    for (int i = 0; i < 4; i++) {
+        x[i] = vertex_id % *d;
+        vertex_id /= *d;
+    }
+    *result = abs(*d - 1 - x[0]) + x[1] + x[2] + x[3];
+    *result *=*result;
     return IGRAPH_SUCCESS;
 }
 
@@ -178,7 +184,7 @@ int main(void) {
     igraph_vs_destroy(&vs);
 
     igraph_vector_int_t dimvector;
-    igraph_integer_t d = 60;
+    igraph_integer_t d = 10;
     igraph_integer_t dims[] = {d, d, d, d};
     igraph_vector_int_view(&dimvector, dims, 4);
     igraph_vs_vector_small(&vs, d-1, -1);
@@ -186,12 +192,12 @@ int main(void) {
     igraph_square_lattice(&g, &dimvector, /*nei*/ 1, IGRAPH_UNDIRECTED, /*mutual*/ false, /*periodic*/NULL);
 
     //print_graph_canon(&g);
-    printf("starting astar\n");
+    printf("starting astar\n\n\n\n\n\n");
     igraph_get_shortest_paths_astar(&g, /*vertices=*/ &vecs,
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
                                        /*weights*/NULL, IGRAPH_OUT,
                                        &parents,
-                                       /*inbound_edges=*/ &inbound, heuristic_2, NULL);
+                                       /*inbound_edges=*/ &inbound, lattice_heuristic, &d);
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
 
     igraph_vector_int_list_destroy(&vecs);
