@@ -46,6 +46,8 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
         igraph_bool_t is_tree;
         igraph_is_tree(&tree, &is_tree, NULL, IGRAPH_ALL);
         IGRAPH_ASSERT(is_tree);
+
+        igraph_destroy(&tree);
     }
 
     igraph_vector_int_destroy(&tree_edges);
