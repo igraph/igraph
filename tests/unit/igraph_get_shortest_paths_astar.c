@@ -125,10 +125,25 @@ igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t vertex_
         vertex_id /= *d;
     }
     *result = abs(*d - 1 - x[0]) + x[1] + x[2] + x[3];
-    *result *=*result;
     return IGRAPH_SUCCESS;
 }
 
+struct xyv {
+    igraph_vector_t x;
+    igraph_vector_t y;
+    igraph_integer_t v;
+};
+
+igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
+    struct xyv *xyp = extra;
+    igraph_real_t xt, xf, yt, yf;
+    xt = VECTOR(xyp->x)[xyp->v];
+    yt = VECTOR(xyp->y)[xyp->v];
+    xf = VECTOR(xyp->x)[vertex_id];
+    yf = VECTOR(xyp->y)[vertex_id];
+    *result = sqrt((xt-xf)*(xt-xf) + (yt-yf)*(yt-yf));
+    return IGRAPH_SUCCESS;
+}
 int main(void) {
 
     igraph_t g;
@@ -200,10 +215,41 @@ int main(void) {
                                        /*inbound_edges=*/ &inbound, lattice_heuristic, &d);
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
 
+    igraph_destroy(&g);
+ 
+    struct xyv xy;
+    xy.v = d-1; //just because that was the end vertex last test
+    igraph_vector_init(&xy.x, 0);
+    igraph_vector_init(&xy.y, 0);
+
+    igraph_grg_game(&g, /*nodes*/100, /*radius*/0.2, /*torus*/ false, &xy.x, &xy.y); 
+    igraph_vector_init(&weights_vec, igraph_ecount(&g));
+
+    for (int i = 0; i < igraph_ecount(&g); i++) {
+        igraph_real_t xt, xf, yt, yf;
+        xt = VECTOR(xy.x)[IGRAPH_TO(&g, i)];
+        xf = VECTOR(xy.x)[IGRAPH_FROM(&g, i)];
+        yt = VECTOR(xy.y)[IGRAPH_TO(&g, i)];
+        yf = VECTOR(xy.y)[IGRAPH_FROM(&g, i)];
+        VECTOR(weights_vec)[i] = sqrt((xt-xf)*(xt-xf) + (yt-yf)*(yt-yf));
+    }
+
+
+    igraph_get_shortest_paths_astar(&g, /*vertices=*/ &vecs,
+                                       /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
+                                       /*weights*/NULL, IGRAPH_OUT,
+                                       &parents,
+                                       /*inbound_edges=*/ &inbound, euclidean_heuristic, &xy);
+
+    igraph_vector_int_print(&(VECTOR(vecs)[0]));
+
     igraph_vector_int_list_destroy(&vecs);
     igraph_vector_int_list_destroy(&evecs);
     igraph_vector_int_destroy(&parents);
     igraph_vector_int_destroy(&inbound);
+    igraph_vector_destroy(&weights_vec);
+    igraph_vector_destroy(&xy.x);
+    igraph_vector_destroy(&xy.y);
 
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
