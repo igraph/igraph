@@ -428,11 +428,10 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     IGRAPH_FINALLY(igraph_matrix_destroy, &distance);
 
     /*
-     * Johnson's algorithm calculates all pairs shortest path
-     * and returns distance matrix. The Dreyfus - Wagner algorithm needs complete graph
+     * Compute distances between all pairs of vertices. The Dreyfus - Wagner algorithm needs complete graph information
      * hence this step is necessary.
      */
-    IGRAPH_CHECK(igraph_distances_johnson(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights));
+    IGRAPH_CHECK(igraph_distances_dijkstra(graph, &distance, igraph_vss_all(), igraph_vss_all(), weights, IGRAPH_ALL));
 
     IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy, terminals));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &steiner_terminals_copy);
