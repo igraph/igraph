@@ -19,6 +19,38 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, const igraph_vector_t *weights) {
+    igraph_real_t value;
+    igraph_vector_int_t tree_edges;
+
+    igraph_vector_int_init(&tree_edges, 0);
+
+    igraph_steiner_dreyfus_wagner(graph, terminals, weights, &value, &tree_edges);
+
+    print_vector_int(&tree_edges);
+    printf("Total Steiner tree weight: %g\n", value);
+
+    /* Check total tree weight. */
+    igraph_real_t value2 = 0.0;
+    igraph_integer_t tree_size = igraph_vector_int_size(&tree_edges);
+    for (igraph_integer_t i=0; i < tree_size; i++) {
+        value2 += VECTOR(*weights)[ VECTOR(tree_edges)[i] ];
+    }
+    IGRAPH_ASSERT(value == value2);
+
+    /* Check that the result is indeed a tree. */
+    if (igraph_vector_int_size(terminals) > 0) {
+        igraph_t tree;
+        igraph_subgraph_edges(graph, &tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ true);
+
+        igraph_bool_t is_tree;
+        igraph_is_tree(&tree, &is_tree, NULL, IGRAPH_ALL);
+        IGRAPH_ASSERT(is_tree);
+    }
+
+    igraph_vector_int_destroy(&tree_edges);
+}
+
 int main(void) {
     igraph_t g_null, g_k7, g_k6_k1;
     igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1;
@@ -69,25 +101,21 @@ int main(void) {
     igraph_vector_int_init_int(&terminals_k6_k1, 4,
                                0, 1, 2, 6);
 
-    printf("No vertices, not directed:\n");
-    igraph_real_t val1, val2,val3;
-    igraph_vector_int_t res_tree, res_tree_1,res_tree_2;
 
-    igraph_vector_int_init(&res_tree, 0);
-    igraph_vector_int_init(&res_tree_1, 0);
-    igraph_vector_int_init(&res_tree_2, 0);
 
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_null, &terminals_null, &weights_null, &val1, &res_tree) == IGRAPH_SUCCESS);
-    printf("%.2f\n", val1);
-    IGRAPH_ASSERT(val1 == 0);
-    printf("Un-Directed graph with loops and multi-edges, select none:\n");
-    IGRAPH_ASSERT(igraph_steiner_dreyfus_wagner(&g_k7, &terminals_k7, &weights_k7, &val2, &res_tree_1) == IGRAPH_SUCCESS);
-    printf("%.2f\n", val2);
-    IGRAPH_ASSERT(val2 == 5);
+    printf("Null graph:\n");
+    check_graph(&g_null, &terminals_null, &weights_null);
 
-    print_vector_int(&res_tree_1);
+    printf("\nK_7 graph:\n");
+    check_graph(&g_k7, &terminals_k7, &weights_k7);
 
-    CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_k6_k1, &terminals_k6_k1, &weights_k6_k1, &val3, &res_tree_2), IGRAPH_EINVAL);
+    igraph_real_t value;
+    igraph_vector_int_t tree_edges;
+    igraph_vector_int_init(&tree_edges, 0);
+
+    CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_k6_k1, &terminals_k6_k1, &weights_k6_k1, &value, &tree_edges), IGRAPH_EINVAL);
+
+    igraph_vector_int_destroy(&tree_edges);
 
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
@@ -100,10 +128,6 @@ int main(void) {
     igraph_vector_int_destroy(&terminals_k7);
     igraph_vector_int_destroy(&terminals_null);
     igraph_vector_int_destroy(&terminals_k6_k1);
-
-    igraph_vector_int_destroy(&res_tree);
-    igraph_vector_int_destroy(&res_tree_1);
-    igraph_vector_int_destroy(&res_tree_2);
 
     VERIFY_FINALLY_STACK();
 

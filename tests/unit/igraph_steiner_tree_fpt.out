@@ -1,5 +1,7 @@
-No vertices, not directed:
-0.00
-Un-Directed graph with loops and multi-edges, select none:
-5.00
+Null graph:
+( )
+Total Steiner tree weight: 0
+
+K_7 graph:
 ( 4 9 20 14 17 )
+Total Steiner tree weight: 5
