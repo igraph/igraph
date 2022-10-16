@@ -155,6 +155,9 @@ int main(void) {
     igraph_vector_t weights_vec;
     igraph_vs_t vs;
 
+    //set seed for grg random graph generation
+    igraph_rng_seed(igraph_rng_default(), 42);
+
     /* Simple ring graph without weights */
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
@@ -166,6 +169,7 @@ int main(void) {
 
     igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
 
+    printf("Astar, unweighted, no heuristic:\n");
     igraph_get_shortest_paths_astar(&g, /*vertices=*/ &vecs,
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
                                        /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
@@ -181,6 +185,7 @@ int main(void) {
 
     /* Same ring, but with weights */
 
+    printf("Astar, weighted, no heuristic:\n");
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
     igraph_get_shortest_paths_astar(&g, /*vertices=*/ &vecs,
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
@@ -198,6 +203,7 @@ int main(void) {
     igraph_destroy(&g);
     igraph_vs_destroy(&vs);
 
+    printf("Astar, unweighted, lattice with manhattan distance heuristic:\n");
     igraph_vector_int_t dimvector;
     igraph_integer_t d = 10;
     igraph_integer_t dims[] = {d, d, d, d};
@@ -207,7 +213,6 @@ int main(void) {
     igraph_square_lattice(&g, &dimvector, /*nei*/ 1, IGRAPH_UNDIRECTED, /*mutual*/ false, /*periodic*/NULL);
 
     //print_graph_canon(&g);
-    printf("starting astar\n\n\n\n\n\n");
     igraph_get_shortest_paths_astar(&g, /*vertices=*/ &vecs,
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
                                        /*weights*/NULL, IGRAPH_OUT,
@@ -217,6 +222,7 @@ int main(void) {
 
     igraph_destroy(&g);
  
+    printf("Astar, unweighted, grg with euclidean distance heuristic:\n");
     struct xyv xy;
     xy.v = d-1; //just because that was the end vertex last test
     igraph_vector_init(&xy.x, 0);
@@ -234,12 +240,22 @@ int main(void) {
         VECTOR(weights_vec)[i] = sqrt((xt-xf)*(xt-xf) + (yt-yf)*(yt-yf));
     }
 
-
     igraph_get_shortest_paths_astar(&g, /*vertices=*/ &vecs,
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
-                                       /*weights*/NULL, IGRAPH_OUT,
+                                       /*weights*/&weights_vec, IGRAPH_OUT,
                                        &parents,
                                        /*inbound_edges=*/ &inbound, euclidean_heuristic, &xy);
+
+    igraph_vector_int_print(&(VECTOR(vecs)[0]));
+
+    printf("Check with dijkstra:\n");
+    igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs,
+                                       /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
+                                       /*weights*/&weights_vec, IGRAPH_OUT,
+                                       &parents,
+                                       /*inbound_edges=*/ &inbound);
+
+    igraph_vector_int_t *edges = &VECTOR(evecs)[0];
 
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
 
