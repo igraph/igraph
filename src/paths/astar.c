@@ -28,50 +28,83 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
-//#include <string.h>   /* memset */
 /**
- * \function igraph_get_shortest_path_dijkstra
- * \brief Weighted shortest path from one vertex to another one.
+ * \ingroup structural
+ * \function igraph_get_shortest_paths_astar
+ * \brief Shortest paths from a vertex with heuristic.
  *
- * Calculates a single (positively) weighted shortest path from
- * a single vertex to another one, using Dijkstra's algorithm.
+ * </para><para>
+ * Finds the shortest path between on starting vertex and one or several enpoints.
+ * Compared to Dijkstra's algorithm, A* uses a heuristic to decide the direction to move to.
  *
- * </para><para>This function is a special case (and a wrapper) to
- * \ref igraph_get_shortest_paths_dijkstra().
- *
- * \param graph The input graph, it can be directed or undirected.
- * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex IDs along
- *        the path are stored here, including the source and target
- *        vertices.
- * \param edges Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the edge IDs along the
- *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
- * \param weights The edge weights. All edge weights must be
+ * </para><para>
+ * If there is more than one path with the smallest weight between two vertices, this
+ * function gives only one of them.
+ * \param graph The graph object.
+ * \param vertices The result, the IDs of the vertices along the paths.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
+ * \param edges The result, the IDs of the edges along the paths.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
+ * \param from The id of the vertex from/to which the geodesics are
+ *        calculated.
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
+ *        shortest paths will be calculated. A vertex might be given multiple
+ *        times.
+* \param weights The edge weights. All edge weights must be
  *       non-negative for Dijkstra's algorithm to work. Additionally, no
  *       edge weight may be NaN. If either case does not hold, an error
  *       is returned. If this is a null pointer, then the unweighted
  *       version, \ref igraph_get_shortest_paths() is called.
- * \param mode A constant specifying how edge directions are
- *        considered in directed graphs. \c IGRAPH_OUT follows edge
- *        directions, \c IGRAPH_IN follows the opposite directions,
- *        and \c IGRAPH_ALL ignores edge directions. This argument is
- *        ignored for undirected graphs.
- * \return Error code.
+ * \param mode The type of shortest paths to be use for the
+ *        calculation in directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the outgoing paths are calculated.
+ *        \cli IGRAPH_IN
+ *          the incoming paths are calculated.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an
+ *          undirected one for the computation.
+ *        \endclist
+ * \param parents A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the parent of each vertex in
+ *        the single source shortest path tree is returned here. The
+ *        parent of vertex i in the tree is the vertex from which vertex i
+ *        was reached. The parent of the start vertex (in the \c from
+ *        argument) is -1. If the parent is -2, it means
+ *        that the given vertex was not reached from the source during the
+ *        search. Note that the search terminates if all the vertices in
+ *        \c to are reached.
+ * \param inbound_edges A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the inbound edge of each vertex in
+ *        the single source shortest path tree is returned here. The
+ *        inbound edge of vertex i in the tree is the edge via which vertex i
+ *        was reached. The start vertex and vertices that were not reached
+ *        during the search will have -1 in the corresponding entry of the
+ *        vector. Note that the search terminates if all the vertices in
+ *        \c to are reached.
+ * \param heuristic A function that returns an estimate of the distance as
+ *        igraph_real_t in its first argument. The second parameter is passed
+ *        the vertex id, and the third parameter is passed \p extra.
+ * \param extra This is passed on to the heuristic.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           \p from is invalid vertex ID
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
  *
- * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
- * |E| is the number of edges in the graph.
+ * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
+ * vertices and |E| is the number of edges
  *
- * \sa \ref igraph_get_shortest_paths_dijkstra() for the version with
- * more target vertices.
  */
-
-//this can hold any static information in extra, and vertex_id seems like all the dynamic information we need
-typedef igraph_error_t igraph_astar_heuristic_t(igraph_real_t *result, igraph_integer_t vertex_id, void *extra);
-
-
 igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph, 
                                        igraph_vector_int_list_t *vertices,
                                        igraph_vector_int_list_t *edges,
@@ -81,9 +114,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
                                        igraph_neimode_t mode,
                                        igraph_vector_int_t *parents,
                                        igraph_vector_int_t *inbound_edges,
-                                      igraph_astar_heuristic_t *heuristic,
-                                      //extra is needed so users can pass in information to the heuristic
-                                      //maybe the whole graph? and also the weights? or a location matrix?
+                                       igraph_astar_heuristic_t *heuristic,
                                       void *extra
                                       ) {
  
