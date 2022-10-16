@@ -81,7 +81,7 @@ static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, i
  * Purpose: Fetching Index of a subset from subsetMap in order to store and look-up
  * the value of subset from DP table.
  */
-static igraph_integer_t fetchIndexofMapofSets(int_set subset, const dictionary& subsetMap) {
+static igraph_integer_t fetchIndexofMapofSets(const int_set &subset, const dictionary& subsetMap) {
 
     for (const auto & kv : subsetMap) {
         if (kv.first == subset) {
