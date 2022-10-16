@@ -45,7 +45,7 @@ typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
  *  Populates the subsetMap data structure as well.
  *
  */
-static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap) {
+static std::set<int_set> generateSubsets(const igraph_vector_int_t *steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap) {
     igraph_integer_t count = ((igraph_integer_t)1 << n);
     std::set<int_set> allSubsets;
     igraph_integer_t subsetIndex = graphsize;
@@ -62,7 +62,7 @@ static std::set<int_set> generateSubsets(igraph_vector_int_t steinerTerminals, i
             // if the value of (i & (1 << j)) is greater than 0 , include arr[j] in the current subset
             // otherwise exclude arr[j]
             if ((i & ((igraph_integer_t)1 << j)) > 0) {
-                newSubset.insert(VECTOR(steinerTerminals)[j]);
+                newSubset.insert(VECTOR(*steinerTerminals)[j]);
             }
         }
 
@@ -464,7 +464,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
      * The index would be used in DP table.
      */
     dictionary subsetMap;
-    allSubsets = generateSubsets(steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_nodes, subsetMap);
+    allSubsets = generateSubsets(&steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_nodes, subsetMap);
 
     for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++) {
         for (igraph_integer_t i = 0; i < (igraph_integer_t)allSubsets.size(); i++) {
