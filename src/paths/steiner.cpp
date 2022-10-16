@@ -136,7 +136,7 @@ static igraph_integer_t Combination(igraph_integer_t n, igraph_integer_t r) {
 static igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q) {
 
     igraph_integer_t min_col_num = -1;
-    igraph_integer_t min_sum_for_col;
+    igraph_real_t min_sum_for_col;
 
     for (igraph_integer_t i = 0; i < dp_cache->ncol; i++) {
         if (q != i) {
@@ -485,7 +485,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                 for (auto E :  D) {
 
                     if (E != j) {
-                        igraph_integer_t distanceEJ = MATRIX(distance, E, j);
+                        igraph_real_t distanceEJ = MATRIX(distance, E, j);
 
                         int_set DMinusE = D;
 
@@ -526,7 +526,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         IGRAPH_ALLOW_INTERRUPTION();
         for (igraph_integer_t subset_C_iterator = 0; subset_C_iterator < no_of_terminals; subset_C_iterator++) {
             igraph_integer_t F = VECTOR(steiner_terminals_copy)[subset_C_iterator];
-            igraph_integer_t distanceFJ = MATRIX(distance, F, j);
+            igraph_real_t distanceFJ = MATRIX(distance, F, j);
 
             int_set CMinusF;
 
