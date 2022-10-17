@@ -25,11 +25,12 @@
  * \brief A triangle lattice with the given shape.
  *
  * Creates a triangle lattice whose vertices have the form (i, j) for non-negative integers i and j
- * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
+ * and (i, j) is connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1) provided a vertex
+ * exists. Thus, all vertices have degree at most 6.
  *
  * </para><para>
- * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
- *  more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1)
+ *  The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
+ *  more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1).
  *
  * \param graph An uninitialized graph object.
  * \param directed Boolean, whether to create a directed graph.
@@ -66,7 +67,6 @@ static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, 
             "row_start_vector (%" IGRAPH_PRId ").",
             IGRAPH_EINVAL,  igraph_vector_int_size(row_lengths_vector), igraph_vector_int_size(row_start_vector));
     }
-
     for (i = 0; i < row_count; i++)
     {
         if (VECTOR(*row_lengths_vector)[i] < 0)
@@ -77,12 +77,10 @@ static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, 
                 IGRAPH_EINVAL, VECTOR(*row_lengths_vector)[i], i);
         }
     }
-
+    
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&row_lengths_prefix_sum_vector, row_count + 1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_prefix_sum_vector);
-
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_prefix_sum_vector, row_count + 1);
     VECTOR(row_lengths_prefix_sum_vector)[0] = 0;
     for (i = 1; i < row_count + 1; i++)
     {
@@ -95,12 +93,12 @@ static igraph_error_t triangle_lattice(igraph_t *graph, igraph_bool_t directed, 
 #define ADD_EDGE_IJ_KL_IF_EXISTS(i, j, k, l)                                                                                                      \
     if (VECTOR(*row_start_vector)[l] <= k && k <= ROW_END(l) && 0 <= l && l <= row_count - 1)                                                     \
     {                                                                                                                                             \
-        igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                              \
-        igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                              \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));      /* reserved */                                                          \
+        igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));      /* reserved */                                                          \
         if (directed && mutual)                                                                                                                   \
         {                                                                                                                                         \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));                                                                          \
-            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));                                                                          \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((k), (l)));    /* reserved */                                                        \
+            igraph_vector_int_push_back(&edges, VERTEX_INDEX((i), (j)));    /* reserved */                                                        \
         }                                                                                                                                         \
     }
 
@@ -151,10 +149,8 @@ static igraph_error_t triangle_lattice_triangle_shape(igraph_t *graph, igraph_in
     igraph_vector_int_t row_start_vector;
     igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&row_lengths_vector, row_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_vector);
-    IGRAPH_CHECK(igraph_vector_int_init(&row_start_vector, row_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_start_vector);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
 
     for (i = 0; i < row_count; i++)
     {
@@ -165,9 +161,8 @@ static igraph_error_t triangle_lattice_triangle_shape(igraph_t *graph, igraph_in
     IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&row_start_vector);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -180,10 +175,8 @@ static igraph_error_t triangle_lattice_rectangle_shape(igraph_t *graph, igraph_i
     igraph_vector_int_t row_start_vector;
     igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&row_lengths_vector, row_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_vector);
-    IGRAPH_CHECK(igraph_vector_int_init(&row_start_vector, row_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_start_vector);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
 
     for (i = 0; i < row_count; i++)
     {
@@ -194,9 +187,8 @@ static igraph_error_t triangle_lattice_rectangle_shape(igraph_t *graph, igraph_i
     IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&row_start_vector);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -209,10 +201,8 @@ static igraph_error_t triangle_lattice_hex_shape(igraph_t *graph, igraph_integer
     igraph_vector_int_t row_start_vector;
     igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&row_lengths_vector, row_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_lengths_vector);
-    IGRAPH_CHECK(igraph_vector_int_init(&row_start_vector, row_count));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &row_start_vector);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_vector, row_count);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
 
     igraph_integer_t row_length = size_x;
     igraph_integer_t row_start = size_y - 1;
@@ -243,9 +233,8 @@ static igraph_error_t triangle_lattice_hex_shape(igraph_t *graph, igraph_integer
     IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&row_start_vector);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
