@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_transitivity_barrat()` did not correctly detect when a directed input graph had effective multi-edges due to ignoring edge directions. Such graphs are now rejected by this function.
+
 ### Other
 
  - Documentation improvements.
