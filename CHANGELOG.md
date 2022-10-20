@@ -5,6 +5,7 @@
 ### Fixed
 
  - `igraph_transitivity_barrat()` did not correctly detect when a directed input graph had effective multi-edges due to ignoring edge directions. Such graphs are now rejected by this function.
+ - Fixed a bug in `igraph_2dgrid_move()` that sometimes crashed the Large Graph Layout function when a grid cell became empty.
 
 ### Other
 
