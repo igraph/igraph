@@ -34,7 +34,7 @@
 
 __BEGIN_DECLS
 
-typedef igraph_error_t igraph_astar_heuristic_t(igraph_real_t *result, igraph_integer_t vertex_id, void *extra); //TODD where should this go?
+typedef igraph_error_t igraph_astar_heuristic_t(igraph_real_t *result, igraph_integer_t vertex_id, void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                                   igraph_integer_t *from, igraph_integer_t *to,

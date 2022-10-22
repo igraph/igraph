@@ -54,11 +54,10 @@
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
-* \param weights The edge weights. All edge weights must be
- *       non-negative for Dijkstra's algorithm to work. Additionally, no
- *       edge weight may be NaN. If either case does not hold, an error
- *       is returned. If this is a null pointer, then the unweighted
- *       version, \ref igraph_get_shortest_paths() is called.
+ * \param weights Optional edge weights. Supply \c NULL for unweighted graphs.
+ *        all edge weights must be non-negative. Additionally, no
+ *        edge weight may be NaN. If either case does not hold, an error
+ *        is returned.
  * \param mode The type of shortest paths to be use for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -88,8 +87,9 @@
  *        vector. Note that the search terminates if all the vertices in
  *        \c to are reached.
  * \param heuristic A function that returns an estimate of the distance as
- *        igraph_real_t in its first argument. The second parameter is passed
- *        the vertex id, and the third parameter is passed \p extra.
+ *        \c igraph_real_t in its first argument. The second parameter is
+ *        passed the vertex id as an \c igraph_integer_t, and the third
+ *         parameter is passed \p extra.
  * \param extra This is passed on to the heuristic.
  * \return Error code:
  *        \clist
@@ -115,12 +115,10 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
                                        igraph_vector_int_t *parents,
                                        igraph_vector_int_t *inbound_edges,
                                        igraph_astar_heuristic_t *heuristic,
-                                      void *extra
+                                       void *extra
                                       ) {
     igraph_real_t heur_res;
 
-    /*just copying stuff from get_shortest_paths that seems to be useful.
-      this needs to be fixed using #2221 */
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
@@ -131,7 +129,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
     igraph_bool_t *is_target;
     igraph_integer_t i, to_reach;
 
-    if (weights) { //for now if there are now weights, they are treated as 1
+    if (weights) { //If there are no weights, they are treated as 1.
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
         }
@@ -162,7 +160,6 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
-    //maybe we also want an estimates vector here? or we can calculate them when they're needed from the heuristic
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
     igraph_vector_fill(&dists, IGRAPH_INFINITY);
 
@@ -193,10 +190,11 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         igraph_integer_t nlen, minnei;
-        //The sum of the distance and the heuristic is the estimate.
-        //The estimates should be on the heap,
-        //because the minimum estimate should always be handled next.
-        //The value taken off the heap is ignored, we just want the index.
+        /*The sum of the distance and the heuristic is the estimate.
+         *The estimates should be on the heap,
+         *because the minimum estimate should always be handled next.
+         *The value taken off the heap is ignored, we just want the index.
+         */
         igraph_2wheap_delete_max_index(&Q, &minnei);
         igraph_vector_int_t *neis;
 
@@ -208,8 +206,6 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
         }
 
         /* Now check all neighbors of 'minnei' for a shorter path */
-        //distance updates should not use the heuristic, so the old code should be fine, except
-        // of course for the heap updates
         neis = igraph_lazy_inclist_get(&inclist, minnei);
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
         nlen = igraph_vector_int_size(neis);
