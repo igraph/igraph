@@ -117,9 +117,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
                                        igraph_astar_heuristic_t *heuristic,
                                       void *extra
                                       ) {
- 
     igraph_real_t heur_res;
-    igraph_bool_t found = false;
 
     /*just copying stuff from get_shortest_paths that seems to be useful.
       this needs to be fixed using #2221 */
@@ -166,7 +164,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
 
     //maybe we also want an estimates vector here? or we can calculate them when they're needed from the heuristic
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
-    igraph_vector_fill(&dists, -1.0);
+    igraph_vector_fill(&dists, IGRAPH_INFINITY);
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (parent_eids == 0) {
@@ -188,19 +186,18 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
             to_reach--;       /* this node was given multiple times */
         }
     }
-    
+
     VECTOR(dists)[from] = 0.0;  /* zero distance */
-    //igraph_2wheap_push_with_index(&Q, from, 0);
     IGRAPH_CHECK(heuristic(&heur_res, from, extra));
     igraph_2wheap_push_with_index(&Q, from, -heur_res);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
-        igraph_integer_t nlen, minnei = igraph_2wheap_max_index(&Q);
-        //so there's the distance, the heuristic, 
-        //and the sum of the distance and the heuristic, 
-        //which is the estimate. The estimate should be on the heap,
-        //because the minimum estimate should always be handled next
-        igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
+        igraph_integer_t nlen, minnei;
+        //The sum of the distance and the heuristic is the estimate.
+        //The estimates should be on the heap,
+        //because the minimum estimate should always be handled next.
+        //The value taken off the heap is ignored, we just want the index.
+        igraph_2wheap_delete_max_index(&Q, &minnei);
         igraph_vector_int_t *neis;
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -221,12 +218,14 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
             igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist;
             if (weights) {
-                altdist = VECTOR(dists)[minnei] + VECTOR(*weights)[edge];
+                igraph_real_t weight = VECTOR(*weights)[edge];
+                if (weight == IGRAPH_INFINITY) continue;
+                altdist = VECTOR(dists)[minnei] + weight;
             } else {
                 altdist = VECTOR(dists)[minnei] + 1;
             }
             igraph_real_t curdist = VECTOR(dists)[tto];
-            if (curdist < 0) {
+            if (curdist == IGRAPH_INFINITY) {
                 /* This is the first finite distance */
                 VECTOR(dists)[tto] = altdist;
                 parent_eids[tto] = edge + 1;

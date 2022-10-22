@@ -147,7 +147,6 @@ igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_integer_t verte
 int main(void) {
 
     igraph_t g;
-    igraph_t g_lat;
     igraph_vector_int_list_t vecs, evecs;
     igraph_vector_int_t parents, inbound;
     igraph_integer_t i;
@@ -254,8 +253,6 @@ int main(void) {
                                        /*weights*/&weights_vec, IGRAPH_OUT,
                                        &parents,
                                        /*inbound_edges=*/ &inbound);
-
-    igraph_vector_int_t *edges = &VECTOR(evecs)[0];
 
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
 
