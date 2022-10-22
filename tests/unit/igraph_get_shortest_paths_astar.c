@@ -110,7 +110,7 @@ int check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* pare
 }
 
 
-igraph_error_t heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
+igraph_error_t no_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
     (void) vertex_id;
     (void) extra;
     *result = 0;
@@ -128,17 +128,17 @@ igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t vertex_
     return IGRAPH_SUCCESS;
 }
 
-struct xyv {
+struct xyt {
     igraph_vector_t x;
     igraph_vector_t y;
-    igraph_integer_t v;
+    igraph_integer_t target;
 };
 
 igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
-    struct xyv *xyp = extra;
+    struct xyt *xyp = extra;
     igraph_real_t xt, xf, yt, yf;
-    xt = VECTOR(xyp->x)[xyp->v];
-    yt = VECTOR(xyp->y)[xyp->v];
+    xt = VECTOR(xyp->x)[xyp->target];
+    yt = VECTOR(xyp->y)[xyp->target];
     xf = VECTOR(xyp->x)[vertex_id];
     yf = VECTOR(xyp->y)[vertex_id];
     *result = sqrt((xt-xf)*(xt-xf) + (yt-yf)*(yt-yf));
@@ -153,6 +153,10 @@ int main(void) {
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_vector_t weights_vec;
     igraph_vs_t vs;
+    struct xyt xy;
+    igraph_vector_int_t dimvector;
+    igraph_integer_t d = 10;
+    igraph_integer_t dims[] = {d, d, d, d};
 
     //set seed for grg random graph generation
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -173,10 +177,10 @@ int main(void) {
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
                                        /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
                                        &parents,
-                                       /*inbound_edges=*/ &inbound, heuristic, NULL);
+                                       /*inbound_edges=*/ &inbound, no_heuristic, NULL);
 
-    check_evecs(&g, &vecs, &evecs, 10);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, 40);
+    check_evecs(&g, &vecs, &evecs, /*error code*/10);
+    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/40);
 
     for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&vecs, i));
@@ -190,10 +194,10 @@ int main(void) {
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
                                        &weights_vec, IGRAPH_OUT,
                                        &parents,
-                                       /*inbound_edges=*/ &inbound, heuristic, NULL);
+                                       /*inbound_edges=*/ &inbound, no_heuristic, NULL);
 
     check_evecs(&g, &vecs, &evecs, 20);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, 50);
+    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/50);
 
     for (i = 0; i < igraph_vector_int_list_size(&vecs); i++) {
         igraph_vector_int_print(igraph_vector_int_list_get_ptr(&vecs, i));
@@ -203,10 +207,7 @@ int main(void) {
     igraph_vs_destroy(&vs);
 
     printf("Astar, unweighted, lattice with manhattan distance heuristic:\n");
-    igraph_vector_int_t dimvector;
-    igraph_integer_t d = 10;
-    igraph_integer_t dims[] = {d, d, d, d};
-    igraph_vector_int_view(&dimvector, dims, 4);
+    igraph_vector_int_view(&dimvector, dims, sizeof(dims)/sizeof(dims[0]));
     igraph_vs_vector_small(&vs, d-1, -1);
 
     igraph_square_lattice(&g, &dimvector, /*nei*/ 1, IGRAPH_UNDIRECTED, /*mutual*/ false, /*periodic*/NULL);
@@ -218,12 +219,13 @@ int main(void) {
                                        &parents,
                                        /*inbound_edges=*/ &inbound, lattice_heuristic, &d);
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
+    check_evecs(&g, &vecs, &evecs, /*error code*/60);
+    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/70);
 
     igraph_destroy(&g);
  
     printf("Astar, unweighted, grg with euclidean distance heuristic:\n");
-    struct xyv xy;
-    xy.v = d-1; //just because that was the end vertex last test
+    xy.target = d-1; //just because that was the end vertex last test
     igraph_vector_init(&xy.x, 0);
     igraph_vector_init(&xy.y, 0);
 
@@ -246,6 +248,8 @@ int main(void) {
                                        /*inbound_edges=*/ &inbound, euclidean_heuristic, &xy);
 
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
+    check_evecs(&g, &vecs, &evecs, /*error code*/80);
+    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/90);
 
     printf("Check with dijkstra:\n");
     igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs,
