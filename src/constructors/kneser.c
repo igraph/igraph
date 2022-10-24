@@ -31,19 +31,34 @@ static igraph_integer_t igraph_i_number_of_subsets(igraph_integer_t n, igraph_in
     return igraph_i_number_of_subsets(n - 1, k) + igraph_i_number_of_subsets(n - 1, k - 1);
 }
 
-static igraph_error_t igraph_i_generate_subsets(igraph_integer_t n, igraph_integer_t k, igraph_integer_t vertex_id, igraph_integer_t size,
-                              igraph_integer_t *subset_index, igraph_vector_int_t *subset, igraph_vector_int_list_t *vertices) {
-    if (size == k) {
-        IGRAPH_CHECK(igraph_vector_list_insert_copy(vertices, *subset_index, subset));
-        (*subset_index)++;
-        return IGRAPH_SUCCESS;
-    }
-    if (vertex_id > n) {
-        return IGRAPH_SUCCESS;
+static igraph_error_t igraph_i_generate_subsets(igraph_integer_t n, igraph_integer_t k, 
+                              igraph_integer_t subsets, igraph_vector_int_list_t *vertices) {
+
+    igraph_vector_int_t *temp = igraph_vector_list_get_ptr(vertices, 0);
+    IGRAPH_CHECK(igraph_vector_init(temp, k));
+    for(int i = 0 ; i < k ; i++) {
+        VECTOR(*temp)[i] = i + 1;
     }
 
-    VECTOR(*subset)[size] = vertex_id;
-    IGRAPH_CHECK(igraph_i_generate_subsets(n, k, vertex_id + 1, size + 1, subset_index, subset, vertices));
-    IGRAPH_CHECK(igraph_i_generate_subsets(n, k, vertex_id + 1, size, subset_index, subset, vertices));
+    igraph_integer_t list_idx = 0, vector_idx = k - 1;
+    while(list_idx < subsets - 1) {
+        temp = igraph_vector_list_get_ptr(vertices, list_idx + 1);
+        IGRAPH_CHECK(igraph_vector_init(temp, k));
+
+        IGRAPH_CHECK(igraph_vector_update(temp, igraph_vector_list_get_ptr(vertices, list_idx)));
+
+        igraph_integer_t subset_pos = k - 1;
+        while(subset_pos >= 0 && VECTOR(*temp)[subset_pos] == n - (k - 1 - subset_pos)) {
+            subset_pos--;
+        }
+
+        VECTOR(*temp)[subset_pos]++;
+        while(++subset_pos < k) {
+            VECTOR(*temp)[subset_pos] = VECTOR(*temp)[subset_pos - 1] + 1;
+        }
+
+        list_idx++;
+    }
+
     return IGRAPH_SUCCESS;
 }
