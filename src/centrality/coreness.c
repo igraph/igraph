@@ -93,7 +93,8 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, pos);
 
     /* maximum degree + degree of vertices */
-    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode, /* loops= */ true));
+    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode,
+        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE));
 
     maxdeg = igraph_vector_int_max(cores);
 

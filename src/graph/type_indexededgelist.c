@@ -509,9 +509,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t e = IGRAPH_EIT_GET(eit);
-        if (! mark[e]) {
+        if (mark[e] == 0) {
             edges_to_remove++;
-            mark[e] = true;
+            mark[e]++;
         }
     }
     remaining_edges = no_of_edges - edges_to_remove;
@@ -525,7 +525,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     /* Actually remove the edges, move from pos i to pos j in newfrom/newto */
     for (i = 0, j = 0; j < remaining_edges; i++) {
-        if (! mark[i]) {
+        if (mark[i] == 0) {
             VECTOR(newfrom)[j] = VECTOR(graph->from)[i];
             VECTOR(newto)[j] = VECTOR(graph->to)[i];
             j++;
@@ -545,7 +545,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
         igraph_vector_int_t idx;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, remaining_edges);
         for (i = 0, j = 0; i < no_of_edges; i++) {
-            if (! mark[i]) {
+            if (mark[i] == 0) {
                 VECTOR(idx)[j++] = i;
             }
         }
