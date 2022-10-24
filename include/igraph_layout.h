@@ -143,16 +143,14 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                                 igraph_bool_t use_seed,
                                                 const igraph_vector_t *distances,
                                                 igraph_real_t min_dist,
-                                                igraph_integer_t epochs,
-                                                igraph_real_t sampling_prob);
+                                                igraph_integer_t epochs);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                                 igraph_matrix_t *res,
                                                 igraph_bool_t use_seed,
                                                 const igraph_vector_t *distances,
                                                 igraph_real_t min_dist,
-                                                igraph_integer_t epochs,
-                                                igraph_real_t sampling_prob);
+                                                igraph_integer_t epochs);
 
 /**
  * \struct igraph_layout_drl_options_t
