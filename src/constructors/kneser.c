@@ -20,15 +20,31 @@
 
 #include "igraph_vector_list.h"
 
-static igraph_integer_t igraph_i_number_of_subsets(igraph_integer_t n, igraph_integer_t k) {
-    if (n < k) {
-        return 0;
-    }
-    if (k == 0) {
-        return 1;
+static igraph_integer_t igraph_i_get_gcd(igraph_integer_t a, igraph_integer_t b){
+    while(b != 0) {
+        igraph_integer_t temp = a % b;
+        a = b;
+        b = temp;
     }
 
-    return igraph_i_number_of_subsets(n - 1, k) + igraph_i_number_of_subsets(n - 1, k - 1);
+    return a;
+}
+
+static igraph_integer_t igraph_i_number_of_subsets(igraph_integer_t n, igraph_integer_t k){
+    igraph_integer_t numerator = 1, denominator = 1;
+    igraph_integer_t r = (k < n - k ? k : n - k);
+
+    while(r > 0) {
+        numerator *= n;
+        denominator *= r;
+        igraph_integer_t gcd = igraph_i_get_gcd(numerator, denominator);
+        numerator /= gcd;
+        denominator /= gcd;
+        --r;
+        --n;
+    }
+
+    return numerator;
 }
 
 static igraph_error_t igraph_i_generate_subsets(igraph_integer_t n, igraph_integer_t k, 
