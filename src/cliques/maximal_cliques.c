@@ -308,7 +308,7 @@ static igraph_error_t igraph_i_maximal_cliques_up(
         VECTOR(*PX)[vvpos - 1] = tmp;
         VECTOR(*pos)[vv] = XS + 1;
         VECTOR(*pos)[tmp] = vvpos;
-        PE++; XS++;
+        XS++;
     }
 
     return IGRAPH_SUCCESS;
