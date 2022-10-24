@@ -20,6 +20,9 @@
 #include "core/interruption.h"
 #include "math/safe_intop.h"
 
+#define MIN(n, m) (n < m ? n : m)
+#define MAX(n, m) (n < m ? m : n)
+
 /**
  * \ingroup generators
  * \function igraph_triangle_lattice
@@ -110,9 +113,9 @@ static igraph_error_t triangle_lattice(
     igraph_integer_t multiplier = mutual && directed ? 4 : 2;
     for (j = 0; j < row_count - 1; j++) {
         IGRAPH_SAFE_ADD(no_of_edges2, VECTOR(*row_lengths_vector)[j], &no_of_edges2);
-        IGRAPH_SAFE_ADD(no_of_edges2, fmin(ROW_END(j), ROW_END((j + 1))) - fmax(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1]) + 1,
+        IGRAPH_SAFE_ADD(no_of_edges2, MIN(ROW_END(j), ROW_END((j + 1))) - MAX(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1]) + 1,
                         &no_of_edges2);
-        IGRAPH_SAFE_ADD(no_of_edges2, fmin(ROW_END(j), ROW_END((j + 1)) + 1) - fmax(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1] + 1) + 1,
+        IGRAPH_SAFE_ADD(no_of_edges2, MIN(ROW_END(j), ROW_END((j + 1)) + 1) - MAX(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1] + 1) + 1,
                         &no_of_edges2);
     }
     IGRAPH_SAFE_MULT(no_of_edges2, multiplier, &no_of_edges2);
@@ -204,8 +207,8 @@ static igraph_error_t triangle_lattice_hex_shape(
 
     igraph_integer_t row_length = size_x;
     igraph_integer_t row_start = size_y - 1;
-    igraph_integer_t first_threshold = fmin(size_y - 1, size_z - 1);
-    igraph_integer_t second_threshold = fmax(size_y - 1, size_z - 1);
+    igraph_integer_t first_threshold = MIN(size_y - 1, size_z - 1);
+    igraph_integer_t second_threshold = MAX(size_y - 1, size_z - 1);
     igraph_integer_t sgn_flag = size_y < size_z ? 0 : -1;
 
     for (i = 0; i < row_count; i++) {
@@ -252,8 +255,7 @@ static igraph_error_t triangle_lattice_hex_shape(
  *        \c "dims[1]" vertices, respectively.
  *        If \p dims is of length 3, the resulting lattice has a hexagonal shape
  *        where the sides of the hexagon contain \c "dims[0]", \c "dims[1]" and
- *        \c "dims[2]" vertices. See https://github.com/igraph/igraph/issues/1842 for
- *        lattice visualizations.
+ *        \c "dims[2]" vertices.
  * \param directed Boolean, whether to create a directed graph.
  *        If the \c mutual argument is not set to true,
  *        edges will be directed from lower-index vertices towards
