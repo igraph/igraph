@@ -947,8 +947,12 @@ static igraph_error_t igraph_i_layout_umap(
     /* Minimize cross-entropy between high-d and low-d probability
      * distributions */
     IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(
-                graph, &umap_weights, a, b,
-                res, epochs, negative_sampling_rate));
+                graph,
+                &umap_weights,
+                a, b,
+                res,
+                epochs,
+                negative_sampling_rate));
 
     igraph_vector_destroy(&umap_weights);
     IGRAPH_FINALLY_CLEAN(1);

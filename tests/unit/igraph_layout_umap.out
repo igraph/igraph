@@ -18,3 +18,5 @@ Same graph, 3D layout:
 UMAP layout seems fine.
 Same graph, custom initial layout:
 UMAP layout seems fine.
+Large disjoint union of 3 full graphs:
+UMAP layout of large graph seems fine.
