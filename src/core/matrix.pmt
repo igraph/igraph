@@ -447,6 +447,37 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
 
 /**
  * \ingroup matrix
+ * \function igraph_matrix_init_array
+ * \brief Initializes a matrix from an ordinary C array (constructor).
+ *
+ * \param v Pointer to an uninitialized matrix object.
+ * \param data A regular C array, storing the elements of the matrix in
+ *        column-major order, i.e. the elements of the first column are stored
+ *        first, followed by the second column and so on.
+ * \param nrow The number of rows in the matrix.
+ * \param ncol The number of columns in the matrix.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system specific, usually
+ * O(\p nrow \p ncol).
+ */
+
+igraph_error_t FUNCTION(igraph_matrix, init_array)(
+        TYPE(igraph_matrix) *m, const BASE *data, igraph_integer_t nrow, igraph_integer_t ncol) {
+    igraph_integer_t length;
+    TYPE(igraph_vector) v;
+
+    IGRAPH_SAFE_MULT(nrow, ncol, &length);
+    IGRAPH_CHECK(FUNCTION(igraph_matrix, init)(m, nrow, ncol));
+    FUNCTION(igraph_vector, view)(&v, data, length);
+    IGRAPH_CHECK(FUNCTION(igraph_vector, update)(&m->data, &v));
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup matrix
  * \function igraph_matrix_init_copy
  * \brief Copies a matrix.
  *
