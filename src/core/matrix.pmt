@@ -819,16 +819,19 @@ igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *
  */
 
 igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
-    igraph_integer_t nrow = m->nrow;
-    igraph_integer_t ncol = m->ncol;
+    size_t nrow = m->nrow;
+    size_t ncol = m->ncol;
     if (nrow > 1 && ncol > 1) {
         TYPE(igraph_vector) newdata;
         igraph_integer_t size = nrow * ncol;
         IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&newdata, size));
         IGRAPH_FINALLY(FUNCTION(igraph_vector, destroy), &newdata);
-        for (igraph_integer_t i=0; i < nrow; i++) {
-            for (igraph_integer_t j=0; j < ncol; j++) {
-                VECTOR(newdata)[j + i*ncol] = VECTOR(m->data)[i + j*nrow];
+        size_t blocksize = 4;
+        for (size_t i=0; i < nrow; i += blocksize) {
+            for (size_t j=0; j < ncol; j++) {
+                for (size_t k=0; k < blocksize && i+k < nrow; k++) {
+                    VECTOR(newdata)[j + (i+k)*ncol] = VECTOR(m->data)[i+k + j*nrow];
+                }
             }
         }
         FUNCTION(igraph_vector, destroy)(&m->data);
