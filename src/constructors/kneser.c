@@ -20,46 +20,31 @@
 
 #include "igraph_vector_list.h"
 
-static igraph_integer_t igraph_i_get_gcd(igraph_integer_t a, igraph_integer_t b){
-    while(b != 0) {
-        igraph_integer_t temp = a % b;
-        a = b;
-        b = temp;
-    }
-
-    return a;
-}
-
 static igraph_integer_t igraph_i_number_of_subsets(igraph_integer_t n, igraph_integer_t k){
-    igraph_integer_t numerator = 1, denominator = 1;
     igraph_integer_t r = (k < n - k ? k : n - k);
+    igraph_integer_t number_of_subsets = 1;
 
-    while(r > 0) {
-        numerator *= n;
-        denominator *= r;
-        igraph_integer_t gcd = igraph_i_get_gcd(numerator, denominator);
-        numerator /= gcd;
-        denominator /= gcd;
-        --r;
-        --n;
+    for(igraph_integer_t i = 1 ; i <= r ; i++) {
+        number_of_subsets *= n - i + 1;
+        number_of_subsets /= i;
     }
 
-    return numerator;
+    return number_of_subsets;
 }
 
-static igraph_error_t igraph_i_generate_subsets(igraph_integer_t n, igraph_integer_t k, 
+static igraph_error_t igraph_i_generate_subsets(igraph_integer_t n, igraph_integer_t k,
                               igraph_integer_t subsets, igraph_vector_int_list_t *vertices) {
 
     igraph_vector_int_t *temp = igraph_vector_list_get_ptr(vertices, 0);
-    IGRAPH_CHECK(igraph_vector_init(temp, k));
-    for(int i = 0 ; i < k ; i++) {
+    IGRAPH_CHECK(igraph_vector_resize(temp, k));
+    for(igraph_integer_t i = 0 ; i < k ; i++) {
         VECTOR(*temp)[i] = i + 1;
     }
 
     igraph_integer_t list_idx = 0, vector_idx = k - 1;
     while(list_idx < subsets - 1) {
         temp = igraph_vector_list_get_ptr(vertices, list_idx + 1);
-        IGRAPH_CHECK(igraph_vector_init(temp, k));
+        IGRAPH_CHECK(igraph_vector_resize(temp, k));
 
         IGRAPH_CHECK(igraph_vector_update(temp, igraph_vector_list_get_ptr(vertices, list_idx)));
 
