@@ -23,11 +23,18 @@
 
 /* Helper function, computes layout span of a subset of vertices */
 igraph_real_t get_layout_span(const igraph_matrix_t *layout, int i_start, int i_end) {
-    igraph_real_t xm, ym, zm, dx, dy, dz, dist, xmin, xmax, ymin, ymax, zmin, zmax, distmax;
+    igraph_real_t dx, dy, dz, dist, xmin, xmax, ymin, ymax, zmin, zmax, distmax;
     igraph_integer_t ndim = igraph_matrix_ncol(layout);
 
-    xmin = xmax = ymin = ymax = zmin = zmax = 0;
-    for (int i = i_start; i < i_end; i++) {
+    if (i_start >= i_end)
+        return -1;
+
+    xmin = xmax = MATRIX(*layout, i_start, 0);
+    ymin = ymax = MATRIX(*layout, i_start, 1);
+    if (ndim == 3) {
+        zmin = zmax = MATRIX(*layout, i_start, 2);
+    }
+    for (int i = i_start + 1; i < i_end; i++) {
         xmin = fmin(xmin, MATRIX(*layout, i, 0));
         xmax = fmax(xmax, MATRIX(*layout, i, 0));
         ymin = fmin(ymin, MATRIX(*layout, i, 1));
@@ -38,33 +45,43 @@ igraph_real_t get_layout_span(const igraph_matrix_t *layout, int i_start, int i_
         }
     }
     /* total span of the layout */
-    distmax = fmax((xmax - xmin), (ymax - ymin));
+    dx = xmax - xmin;
+    dy = ymax - ymin;
+    distmax = dx > dy ? dx : dy;
     if (ndim == 3) {
-        distmax = fmax((zmax - zmin), distmax);
+        dz = zmax - zmin;
+        distmax = dz > distmax ? dz : distmax;
     }
     return distmax;
 }
 
 
-void check_graph_largeunion(const igraph_matrix_t *layout) {
+void check_graph_largeunion(
+        const igraph_matrix_t *layout,
+        const igraph_vector_int_t *subgraph_sizes) {
 
     /* sizes of the full subgraphs are 50, 70, 90 */
-    igraph_real_t xm, ym, dx, dy, dist, xmin, xmax, ymin, ymax, dist, distlim;
+    igraph_real_t xm, ym, dx, dy, xmin, xmax, ymin, ymax, distlim;
     igraph_integer_t nrow = igraph_matrix_nrow(layout);
-
+    igraph_error_t err;
     int nerr = 0;
+    igraph_integer_t nvertices = 0;
 
     /* each cluster should occupy no more than say 50% of the layout */
-    distlim = 0.5 * get_layout_span(layout, 0, nrow);
-    nerr += (get_layout_span(layout, 0, 50) > distlim);
-    nerr += (get_layout_span(layout, 50, 50 + 70) > distlim);
-    nerr += (get_layout_span(layout, 50 + 70, 50 + 70 + 90) > distlim);
+    distlim = 0.2 * get_layout_span(layout, 0, nrow);
+    for (int i = 0; i < igraph_vector_int_size(subgraph_sizes); i++) {
+        err = get_layout_span(
+                layout, nvertices, nvertices + VECTOR(*subgraph_sizes)[i]) > distlim;
+        nvertices += VECTOR(*subgraph_sizes)[i];
+        if (err) {
+            nerr++;
+            printf("layout of subgraph #%d too wide\n", i);
+        }
+    }
     if (nerr == 0) {
         printf("UMAP layout of large graph seems fine.\n");
     }
-    return nerr;
 }
-
 
 
 void check_graph_twoclusters(const igraph_matrix_t *layout) {
@@ -146,7 +163,9 @@ int main(void) {
     igraph_t graph, empty_graph, singleton_graph;
     igraph_vector_t distances;
     igraph_matrix_t layout;
-    igtaph_vector_ptr_t graph_ptr;
+    igraph_t graph1, graph2, graph3;
+    igraph_vector_ptr_t graph_ptr;
+    igraph_vector_int_t subgraph_sizes;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -216,26 +235,34 @@ int main(void) {
     igraph_destroy(&graph);
 
     /* Check a larger graph with around 150 vertices, split in 3 main clusters */
+    printf("Large disjoint union of 3 full graphs:\n");
     igraph_matrix_init(&layout, 0, 0);
+    igraph_vector_int_init(&subgraph_sizes, 3);
+    VECTOR(subgraph_sizes)[0] = 10;
+    VECTOR(subgraph_sizes)[1] = 50;
+    VECTOR(subgraph_sizes)[2] = 30;
     // Make 3 full graphs
     igraph_vector_ptr_init(&graph_ptr, 3);
-    igraph_full(&(VECTOR(graph_ptr)[0]), 50, 0, 0);
-    igraph_full(&(VECTOR(graph_ptr)[1]), 70, 0, 0);
-    igraph_full(&(VECTOR(graph_ptr)[2]), 90, 0, 0);
+    igraph_full(&graph1, VECTOR(subgraph_sizes)[0], 0, 0);
+    VECTOR(graph_ptr)[0] = &graph1;
+    igraph_full(&graph2, VECTOR(subgraph_sizes)[1], 0, 0);
+    VECTOR(graph_ptr)[1] = &graph2;
+    igraph_full(&graph3, VECTOR(subgraph_sizes)[2], 0, 0);
+    VECTOR(graph_ptr)[2] = &graph3;
     // Get the disjoint union
-    igraph_disjoint_union_many(&graph, &graph_list);
+    igraph_disjoint_union_many(&graph, &graph_ptr);
     // Call UMAP
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, NULL, 0.0, 50) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(
+                &graph, &layout, 0, NULL, 0.0, 50) == IGRAPH_SUCCESS);
     // Check the layout, it should have three balls
-    printf("Large disjoint union of 3 full graphs:\n");
-    check_graph_largeunion(&layout);
+    check_graph_largeunion(&layout, &subgraph_sizes);
 
     // Destroy data structures
     igraph_matrix_destroy(&layout);
     igraph_destroy(&graph);
-    igraph_destroy(&(VECTOR(graph_ptr)[2]));
-    igraph_destroy(&(VECTOR(graph_ptr)[1]));
-    igraph_destroy(&(VECTOR(graph_ptr)[0]));
+    igraph_destroy(&graph3);
+    igraph_destroy(&graph2);
+    igraph_destroy(&graph1);
     igraph_vector_ptr_destroy(&graph_ptr);
 
     VERIFY_FINALLY_STACK();

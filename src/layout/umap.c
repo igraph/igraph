@@ -881,11 +881,11 @@ static igraph_error_t igraph_i_layout_umap(
     /* The smoothing parameters given min_dist */
     igraph_real_t a, b;
     /* How many repulsions for each attraction */
-    igraph_integer_t negative_sampling_rate = 4;
+    igraph_integer_t negative_sampling_rate = 5;
 
     /* Check input arguments */
-    if (min_dist <= 0) {
-        IGRAPH_ERRORF("Minimum distance must be positive, got %g.",
+    if (min_dist < 0) {
+        IGRAPH_ERRORF("Minimum distance must be nonnegative, got %g.",
                 IGRAPH_EINVAL, min_dist);
     }
 
@@ -1059,8 +1059,8 @@ static igraph_error_t igraph_i_layout_umap(
  *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
  *   That is fine here too. If this argument \c NULL, all lengths are assumed to be the same.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
- *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
- *   number.
+ *   embedding before feeling a repulsive force. It should be nonnegative. Typically, values between
+ *   0 and 1 are used.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
  *   (less than 50000 edges), 50 epochs are used for larger graphs.
@@ -1096,8 +1096,8 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
  *   That is fine here too. If this argument is \c NULL, all lengths are assumed to be the same.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
- *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
- *   number.
+ *   embedding before feeling a repulsive force. It should be nonnegative. Typically, values between
+ *   0 and 1 are used.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
  *   (less than 50000 edges), 50 epochs are used for larger graphs.
