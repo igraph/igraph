@@ -13,6 +13,7 @@
 
 ### Other
 
+ - Significantly improved performance for `igraph_matrix_transpose()`.
  - Documentation improvements.
 
 ## [0.10.2] - 2022-10-14
