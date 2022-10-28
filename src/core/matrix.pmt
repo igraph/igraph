@@ -457,12 +457,13 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
  * \param n The number of blocks. The is the number of rows when using column-major format,
  *   or the number of column when using row-major format.
  */
-void FUNCTION(igraph_i, transpose_copy)(TYPE(igraph_vector) *dst, const TYPE(igraph_vector) *src,
-                                        size_t m, size_t n) {
+static void FUNCTION(igraph_i, transpose_copy)(
+        TYPE(igraph_vector) *dst, const TYPE(igraph_vector) *src,
+        size_t m, size_t n) {
+
     IGRAPH_ASSERT(dst != src);
 
-    /* Block size for cache blocking. Size 4 was found to yield the best performance
-     * when benchmarking with:
+    /* Block size of 4 was found to yield the best performance when benchmarking with:
      *  - Intel Core i7-7920HQ on macOS.
      *  - AMD Ryzen Threadripper 3990X on Linux.
      */
@@ -855,31 +856,62 @@ igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *
 
 /**
  * \function igraph_matrix_transpose
- * \brief Transpose a matrix.
+ * \brief Transpose of a matrix.
  *
- * Calculate the transpose of a matrix. Note that the function
- * reallocates the memory used for the matrix.
+ * Calculates the transpose of a matrix. When the matrix is non-square,
+ * this function reallocates the storage used for the matrix.
+ *
  * \param m The input (and output) matrix.
  * \return Error code.
  *
  * Time complexity: O(mn), the number of elements in the matrix.
  */
 
+#define SWAP(TYPE,a,b) do { TYPE igraph_i_tmp = (a); (a) = (b); (b) = igraph_i_tmp; } while (0)
+
 igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
     if (m->nrow > 1 && m->ncol > 1) {
-        TYPE(igraph_vector) newdata;
-        IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&newdata, m->nrow * m->ncol));
-        FUNCTION(igraph_i, transpose_copy)(&newdata, &m->data, m->nrow, m->ncol);
-        FUNCTION(igraph_vector, destroy)(&m->data);
-        m->data = newdata;
+        if (m->nrow == m->ncol) {
+            /* In-place transpose for square matrices. */
+
+            /* Block size of 4 was found to yield the best performance during benchmarking,
+             * see igraph_i_transpose_copy() */
+            const size_t blocksize = 4;
+            const size_t n = m->nrow;
+            size_t k=0;
+            for (k=0; k + blocksize - 1 < n; k += blocksize) {
+                for (size_t i = k; i < k + blocksize; ++i) {
+                    for (size_t j = i + 1; j < k + blocksize; ++j) {
+                        SWAP(BASE, VECTOR(m->data)[j + i*n], VECTOR(m->data)[i + j*n]);
+                    }
+                }
+                for (size_t i = k + blocksize; i < n; ++i) {
+                    for (size_t j = k; j < k + blocksize; ++j) {
+                        SWAP(BASE, VECTOR(m->data)[j + i*n], VECTOR(m->data)[i + j*n]);
+                    }
+                }
+            }
+            for (size_t i = k; i < n; ++i) {
+                for (size_t j = i + 1; j < n; ++j) {
+                    SWAP(BASE, VECTOR(m->data)[j + i*n], VECTOR(m->data)[i + j*n]);
+                }
+            }
+        } else {
+            /* Allocate new storage for non-square matrices. */
+            TYPE(igraph_vector) newdata;
+            IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&newdata, m->nrow * m->ncol));
+            FUNCTION(igraph_i, transpose_copy)(&newdata, &m->data, m->nrow, m->ncol);
+            FUNCTION(igraph_vector, destroy)(&m->data);
+            m->data = newdata;
+        }
     }
 
-    igraph_integer_t tmp = m->nrow;
-    m->nrow = m->ncol;
-    m->ncol = tmp;
+    SWAP(igraph_integer_t, m->nrow, m->ncol);
 
     return IGRAPH_SUCCESS;
 }
+
+#undef SWAP
 
 /**
  * \function igraph_matrix_get

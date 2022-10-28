@@ -29,7 +29,10 @@ int main(void) {
     bench(30, 30, 100000);
     bench(100, 100, 10000);
     bench(1000, 1000, 100);
+    bench(1024, 1024, 100); /* naive implementation has bad cache behaviour with power of 2 sizes */
+    bench(1023, 1025, 100); /* non-symmetric */
     bench(3000, 3000, 10);
+    /* skinny non-symmetric: */
     bench(100, 10000, 100);
     bench(10000, 100, 100);
 
