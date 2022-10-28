@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_matrix_init_array()` to initialize an igraph matrix from a copy of an existing C array in column-major order.
+
 ### Fixed
 
  - `igraph_transitivity_barrat()` did not correctly detect when a directed input graph had effective multi-edges due to ignoring edge directions. Such graphs are now rejected by this function.
