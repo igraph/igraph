@@ -23,7 +23,7 @@
 
 /* Helper function, computes layout span of a subset of vertices */
 igraph_real_t get_layout_span(const igraph_matrix_t *layout, int i_start, int i_end) {
-    igraph_real_t dx, dy, dz, dist, xmin, xmax, ymin, ymax, zmin, zmax, distmax;
+    igraph_real_t dx, dy, dz, xmin, xmax, ymin, ymax, zmin, zmax, spanmax;
     igraph_integer_t ndim = igraph_matrix_ncol(layout);
 
     if (i_start >= i_end)
@@ -47,12 +47,12 @@ igraph_real_t get_layout_span(const igraph_matrix_t *layout, int i_start, int i_
     /* total span of the layout */
     dx = xmax - xmin;
     dy = ymax - ymin;
-    distmax = dx > dy ? dx : dy;
+    spanmax = dx > dy ? dx : dy;
     if (ndim == 3) {
         dz = zmax - zmin;
-        distmax = dz > distmax ? dz : distmax;
+        spanmax = dz > spanmax ? dz : spanmax;
     }
-    return distmax;
+    return spanmax;
 }
 
 
