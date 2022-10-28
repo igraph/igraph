@@ -451,6 +451,7 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
  *
  * \param dst Data will be copied into this vector. It must have length m-by-n. It will not be resized.
  * \param src Vector containing the data to be copied. It is assumed to have length m-by-n.
+ *   Must not be the same as \p dst .
  * \param m The size of contiguous blocks. This is the number of columns when using column-major
  *   storage format, or the number of rows when using row-major format.
  * \param n The number of blocks. The is the number of rows when using column-major format,
@@ -458,6 +459,8 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
  */
 void FUNCTION(igraph_i, transpose_copy)(TYPE(igraph_vector) *dst, const TYPE(igraph_vector) *src,
                                         size_t m, size_t n) {
+    IGRAPH_ASSERT(dst != src);
+
     /* Block size for cache blocking. Size 4 was found to yield the best performance
      * when benchmarking with:
      *  - Intel Core i7-7920HQ on macOS.
