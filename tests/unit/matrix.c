@@ -1,4 +1,4 @@
-/* -*- mode: C -*-  */
+    /* -*- mode: C -*-  */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -123,7 +123,15 @@ int main(void) {
     igraph_matrix_destroy(&m1);
 
     /* igraph_matrix_init_array */
-    igraph_matrix_init_array(&m, arr, 2, 3);
+    igraph_matrix_init_array(&m, arr, 2, 3, /* column_major */ true);
+    print_matrix(&m);
+    igraph_matrix_destroy(&m);
+
+    igraph_matrix_init_array(&m, arr, 2, 3, /* column_major */ false);
+    print_matrix(&m);
+    igraph_matrix_destroy(&m);
+
+    igraph_matrix_init_array(&m, arr, 3, 2, /* column_major */ false);
     print_matrix(&m);
     igraph_matrix_destroy(&m);
 

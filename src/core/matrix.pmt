@@ -446,9 +446,43 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
 }
 
 /**
+ * Copies matrix data stored contiguously while transposing. Applications include implementing
+ * matrix transposition as well as changing between row-major and column-major storage formats.
+ *
+ * \param dst Data will be copied into this vector. It must have length m-by-n. It will not be resized.
+ * \param src Vector containing the data to be copied. It is assumed to have length m-by-n.
+ * \param m The size of contiguous blocks. This is the number of columns when using column-major
+ *   storage format, or the number of rows when using row-major format.
+ * \param n The number of blocks. The is the number of rows when using column-major format,
+ *   or the number of column when using row-major format.
+ */
+void FUNCTION(igraph_i, transpose_copy)(TYPE(igraph_vector) *dst, const TYPE(igraph_vector) *src,
+                                        size_t m, size_t n) {
+    /* Block size for cache blocking. Size 4 was found to yield the best performance
+     * when benchmarking with:
+     *  - Intel Core i7-7920HQ on macOS.
+     *  - AMD Ryzen Threadripper 3990X on Linux.
+     */
+    const size_t blocksize = 4;
+    for (size_t i=0; i < m; i += blocksize) {
+        for (size_t j=0; j < n; j++) {
+            for (size_t k=0; k < blocksize && i+k < m; k++) {
+                VECTOR(*dst)[j + (i+k)*n] = VECTOR(*src)[i+k + j*m];
+            }
+        }
+    }
+}
+
+/**
  * \ingroup matrix
  * \function igraph_matrix_init_array
  * \brief Initializes a matrix from an ordinary C array (constructor).
+ *
+ * The array is assumed to store the matrix data contiguously, either in
+ * a column-major or row-major format. In other words, \p data may
+ * store concatenated matrix columns or concatenated matrix rows.
+ * Constructing a matrix from column-major data is faster, as this is
+ * igraph's native storage format.
  *
  * \param v Pointer to an uninitialized matrix object.
  * \param data A regular C array, storing the elements of the matrix in
@@ -456,6 +490,8 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
  *        first, followed by the second column and so on.
  * \param nrow The number of rows in the matrix.
  * \param ncol The number of columns in the matrix.
+ * \param column_major Boolean, set to \c true if \p data is in column-major
+ *   format, or to \c false if it is in row-major format.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory.
  *
@@ -464,14 +500,20 @@ igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(
  */
 
 igraph_error_t FUNCTION(igraph_matrix, init_array)(
-        TYPE(igraph_matrix) *m, const BASE *data, igraph_integer_t nrow, igraph_integer_t ncol) {
+        TYPE(igraph_matrix) *m, const BASE *data,
+        igraph_integer_t nrow, igraph_integer_t ncol,
+        igraph_bool_t column_major) {
     igraph_integer_t length;
     TYPE(igraph_vector) v;
 
     IGRAPH_SAFE_MULT(nrow, ncol, &length);
     IGRAPH_CHECK(FUNCTION(igraph_matrix, init)(m, nrow, ncol));
     FUNCTION(igraph_vector, view)(&v, data, length);
-    IGRAPH_CHECK(FUNCTION(igraph_vector, update)(&m->data, &v));
+    if (column_major) {
+        IGRAPH_CHECK(FUNCTION(igraph_vector, update)(&m->data, &v));
+    } else {
+        FUNCTION(igraph_i, transpose_copy)(&m->data, &v, ncol, nrow);
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -819,27 +861,17 @@ igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *
  */
 
 igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
-    size_t nrow = m->nrow;
-    size_t ncol = m->ncol;
-    if (nrow > 1 && ncol > 1) {
+    if (m->nrow > 1 && m->ncol > 1) {
         TYPE(igraph_vector) newdata;
-        igraph_integer_t size = nrow * ncol;
-        IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&newdata, size));
-        IGRAPH_FINALLY(FUNCTION(igraph_vector, destroy), &newdata);
-        size_t blocksize = 4;
-        for (size_t i=0; i < nrow; i += blocksize) {
-            for (size_t j=0; j < ncol; j++) {
-                for (size_t k=0; k < blocksize && i+k < nrow; k++) {
-                    VECTOR(newdata)[j + (i+k)*ncol] = VECTOR(m->data)[i+k + j*nrow];
-                }
-            }
-        }
+        IGRAPH_CHECK(FUNCTION(igraph_vector, init)(&newdata, m->nrow * m->ncol));
+        FUNCTION(igraph_i, transpose_copy)(&newdata, &m->data, m->nrow, m->ncol);
         FUNCTION(igraph_vector, destroy)(&m->data);
-        IGRAPH_FINALLY_CLEAN(1);
         m->data = newdata;
     }
-    m->nrow = ncol;
-    m->ncol = nrow;
+
+    igraph_integer_t tmp = m->nrow;
+    m->nrow = m->ncol;
+    m->ncol = tmp;
 
     return IGRAPH_SUCCESS;
 }

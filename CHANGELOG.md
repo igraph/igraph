@@ -4,7 +4,7 @@
 
 ### Added
 
- - `igraph_matrix_init_array()` to initialize an igraph matrix from a copy of an existing C array in column-major order.
+ - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
 
 ### Fixed
 
