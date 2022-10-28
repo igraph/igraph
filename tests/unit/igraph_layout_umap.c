@@ -263,6 +263,7 @@ int main(void) {
     igraph_destroy(&graph3);
     igraph_destroy(&graph2);
     igraph_destroy(&graph1);
+    igraph_vector_int_destroy(&subgraph_sizes);
     igraph_vector_ptr_destroy(&graph_ptr);
 
     VERIFY_FINALLY_STACK();
