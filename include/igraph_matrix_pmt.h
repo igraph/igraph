@@ -33,7 +33,7 @@ typedef struct TYPE(igraph_matrix) {
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init)(
     TYPE(igraph_matrix) *m, igraph_integer_t nrow, igraph_integer_t ncol);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init_array)(
-    TYPE(igraph_matrix)* m, const BASE* data, igraph_integer_t nrow, igraph_integer_t ncol, igraph_bool_t column_major);
+    TYPE(igraph_matrix)* m, const BASE* data, igraph_integer_t nrow, igraph_integer_t ncol, igraph_matrix_storage_t storage);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init_copy)(
     TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m);

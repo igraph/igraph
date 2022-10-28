@@ -123,15 +123,15 @@ int main(void) {
     igraph_matrix_destroy(&m1);
 
     /* igraph_matrix_init_array */
-    igraph_matrix_init_array(&m, arr, 2, 3, /* column_major */ true);
+    igraph_matrix_init_array(&m, arr, 2, 3, IGRAPH_COLUMN_MAJOR);
     print_matrix(&m);
     igraph_matrix_destroy(&m);
 
-    igraph_matrix_init_array(&m, arr, 2, 3, /* column_major */ false);
+    igraph_matrix_init_array(&m, arr, 2, 3, IGRAPH_ROW_MAJOR);
     print_matrix(&m);
     igraph_matrix_destroy(&m);
 
-    igraph_matrix_init_array(&m, arr, 3, 2, /* column_major */ false);
+    igraph_matrix_init_array(&m, arr, 3, 2, IGRAPH_ROW_MAJOR);
     print_matrix(&m);
     igraph_matrix_destroy(&m);
 

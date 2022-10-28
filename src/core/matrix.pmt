@@ -490,8 +490,8 @@ void FUNCTION(igraph_i, transpose_copy)(TYPE(igraph_vector) *dst, const TYPE(igr
  *        first, followed by the second column and so on.
  * \param nrow The number of rows in the matrix.
  * \param ncol The number of columns in the matrix.
- * \param column_major Boolean, set to \c true if \p data is in column-major
- *   format, or to \c false if it is in row-major format.
+ * \param storage \c IGRAPH_ROW_MAJOR if the array is in row-major format,
+          \c IGRAPH_COLUMN_MAJOR if the array is in column-major format.
  * \return Error code:
  *         \c IGRAPH_ENOMEM if there is not enough memory.
  *
@@ -502,17 +502,19 @@ void FUNCTION(igraph_i, transpose_copy)(TYPE(igraph_vector) *dst, const TYPE(igr
 igraph_error_t FUNCTION(igraph_matrix, init_array)(
         TYPE(igraph_matrix) *m, const BASE *data,
         igraph_integer_t nrow, igraph_integer_t ncol,
-        igraph_bool_t column_major) {
+        igraph_matrix_storage_t storage) {
     igraph_integer_t length;
     TYPE(igraph_vector) v;
 
     IGRAPH_SAFE_MULT(nrow, ncol, &length);
     IGRAPH_CHECK(FUNCTION(igraph_matrix, init)(m, nrow, ncol));
     FUNCTION(igraph_vector, view)(&v, data, length);
-    if (column_major) {
+    if (storage == IGRAPH_COLUMN_MAJOR) {
         IGRAPH_CHECK(FUNCTION(igraph_vector, update)(&m->data, &v));
-    } else {
+    } else if (storage == IGRAPH_ROW_MAJOR) {
         FUNCTION(igraph_i, transpose_copy)(&m->data, &v, ncol, nrow);
+    } else {
+        IGRAPH_ERROR("Invalid storage type argument", IGRAPH_EINVAL);
     }
 
     return IGRAPH_SUCCESS;
