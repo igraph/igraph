@@ -84,6 +84,11 @@ void check_graph_largeunion(
 }
 
 
+void check_graph_twoclusters_connectivities(const igraph_vector_t *connectivities) {
+    return;
+}
+
+
 void check_graph_twoclusters(const igraph_matrix_t *layout) {
     /* 4 vertices (0-3), 2 articulation points (4-5), 4 vertices (6-9) */
     igraph_real_t xm, ym, zm, dx, dy, dz, dist, distmax;
@@ -161,7 +166,7 @@ void check_graph_singleton(const igraph_matrix_t *layout) {
 
 int main(void) {
     igraph_t graph, empty_graph, singleton_graph;
-    igraph_vector_t distances;
+    igraph_vector_t distances, connectivities;
     igraph_matrix_t layout;
     igraph_t graph1, graph2, graph3;
     igraph_vector_ptr_t graph_ptr;
@@ -232,6 +237,17 @@ int main(void) {
     check_graph_twoclusters(&layout);
 
     igraph_matrix_destroy(&layout);
+
+    printf("Same graph, just compute connectivities from NULL distances:\n");
+    igraph_vector_init(&connectivities, igraph_ecount(&graph));
+    igraph_layout_umap_compute_connectivities(&graph, NULL, &connectivities);
+    igraph_vector_destroy(&connectivities);
+
+    printf("Same graph, just compute connectivities from distances:\n");
+    igraph_vector_init(&connectivities, igraph_ecount(&graph));
+    igraph_layout_umap_compute_connectivities(&graph, &distances, &connectivities);
+    check_graph_twoclusters_connectivities(&connectivities);
+    igraph_vector_destroy(&connectivities);
     igraph_destroy(&graph);
 
     /* Check a larger graph with around 150 vertices, split in 3 main clusters */

@@ -94,14 +94,68 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
     return IGRAPH_SUCCESS;
 }
 
+/* Check the distances argument, which should be NULL or a vector of nonnegative numbers */
+static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *distances, igraph_integer_t no_of_edges) {
 
-/* Convert the graph with distances into a probability graph with exponential decay.
- * The original UMAP implementation calls these probabilities "membership strengths"
- * and computes them in a separate function. Here, we have a single function computing
- * the sigmas (scale factors), rhos (minimal distance or connectivity correction)
- * and the probability graph in one go. */
-static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
-        const igraph_vector_t *distances, igraph_vector_t *umap_weights) {
+    if (distances == NULL) {
+        return IGRAPH_SUCCESS;
+    }
+
+    if (igraph_vector_size(distances) != no_of_edges) {
+        IGRAPH_ERROR("Distances must be the same number as the edges in the graph.", IGRAPH_EINVAL);
+    }
+
+    for (igraph_integer_t eid = 0; eid != no_of_edges; eid++) {
+        if (VECTOR(*distances)[eid] < 0) {
+            IGRAPH_ERROR("Distances cannot be negative.", IGRAPH_EINVAL);
+        } else if (isnan(VECTOR(*distances)[eid])) {
+            IGRAPH_ERROR("Distances cannot contain NaN values.", IGRAPH_EINVAL);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_layout_umap_compute_connectivities
+ * \brief Compute connectivities (edge weights) for a UMAP layout starting from distances.
+ *
+ * \experimental
+ *
+ * UMAP is mostly used to embed high-dimensional vectors in a low-dimensional space
+ * (most commonly by far, 2D). It uses a distance graph as an intermediate data structure,
+ * making it also a useful graph layout algorithm. See igraph_layout_umap for more information.
+ *
+ * </para><para>
+ *
+ * An early step in UMAP is to compute exponentially decaying "connectivities" from the
+ * distance (usually k-nearest neighbor) graph.  This function performs that step.
+ * Connectivities can also be viewed as edge weights that quantify similarity between two
+ * vertices.
+ *
+ * </para><para>
+ *
+ * Technical note: For each vertex, this function computes its scale factor (sigma), its
+ * connectivity correction (rho), and finally the connectivities themselves.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
+ *
+ * \param graph Pointer to the distance graph.
+ * \param distances Pointer to the vector with the vertex-to-vertex distance associated with
+ *   each edge.
+ * \param connectivities Pointer to an initialized vector where the result will be stored.
+ *
+ * \return Error code.
+ */
+igraph_error_t igraph_layout_umap_compute_connectivities(
+        const igraph_t *graph,
+        const igraph_vector_t *distances,
+        igraph_vector_t *connectivities) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -109,16 +163,22 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
     igraph_vector_int_t eids, weight_seen;
     igraph_real_t rho, dist_max, dist, sigma, weight, weight_inv, sigma_target;
 
+    /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */
+    IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
+
+    /* reserve memory for the connectivities */
+    IGRAPH_CHECK(igraph_vector_resize(connectivities, no_of_edges));
+
     /* if the original graph is unweighted, probabilities are 1 throughout */
     if (distances == NULL) {
         for (igraph_integer_t j = 0; j < no_of_edges; j++) {
-            VECTOR(*umap_weights)[j] = 1;
+            VECTOR(*connectivities)[j] = 1;
         }
         return IGRAPH_SUCCESS;
     }
-    /* alright, the graph is weighted */
+    /* alright, the graph has actual distances */
 
-    /* Initialize vectors and matrices */
+    /* Initialize auxiliary vectors */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&weight_seen, no_of_edges);
 
@@ -156,7 +216,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
                         sigma_target));
         }
 
-        /* Convert to umap_weight
+        /* Convert to connectivities
          * Each edge is seen twice, from each of its two vertices. Because this weight
          * is a probability and the probability of the two vertices to be close are set
          * as the probability of either "edge direction" being legit, the final weight
@@ -178,7 +238,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
 
             /* Compute the probability of either edge direction if you can */
             if (VECTOR(weight_seen)[eid] != 0) {
-                weight_inv = VECTOR(*umap_weights)[eid];
+                weight_inv = VECTOR(*connectivities)[eid];
                 weight = weight + weight_inv - weight * weight_inv;
             }
 
@@ -186,7 +246,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
             printf("distance: %g\n", VECTOR(*distances)[eid]);
             printf("weight: %g\n", weight);
 #endif
-            VECTOR(*umap_weights)[eid] = weight;
+            VECTOR(*connectivities)[eid] = weight;
             VECTOR(weight_seen)[eid] += 1;
         }
 
@@ -840,29 +900,6 @@ static igraph_error_t igraph_i_umap_center_layout(igraph_matrix_t *layout) {
 }
 
 
-/* Check the distances argument, which should be NULL or a vector of nonnegative numbers */
-static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *distances, igraph_integer_t no_of_edges) {
-
-    if (distances == NULL) {
-        return IGRAPH_SUCCESS;
-    }
-
-    if (igraph_vector_size(distances) != no_of_edges) {
-        IGRAPH_ERROR("Distances must be the same number as the edges in the graph.", IGRAPH_EINVAL);
-    }
-
-    for (igraph_integer_t eid = 0; eid != no_of_edges; eid++) {
-        if (VECTOR(*distances)[eid] < 0) {
-            IGRAPH_ERROR("Distances cannot be negative.", IGRAPH_EINVAL);
-        } else if (isnan(VECTOR(*distances)[eid])) {
-            IGRAPH_ERROR("Distances cannot contain NaN values.", IGRAPH_EINVAL);
-        }
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-
 /* This is the main function that works for any dimensionality of the embedding
  * (currently hard-constrained to 2 or 3 ONLY in the initialization). */
 static igraph_error_t igraph_i_layout_umap(
@@ -872,12 +909,14 @@ static igraph_error_t igraph_i_layout_umap(
         const igraph_vector_t *distances,
         igraph_real_t min_dist,
         igraph_integer_t epochs,
-        igraph_integer_t ndim) {
+        igraph_integer_t ndim,
+        igraph_bool_t connectivities_precomputed) {
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     /* probabilities of each edge being a real connection */
-    igraph_vector_t umap_weights;
+    igraph_vector_t connectivities;
+    igraph_vector_t *connectivitiesp;
     /* The smoothing parameters given min_dist */
     igraph_real_t a, b;
     /* How many repulsions for each attraction */
@@ -899,9 +938,6 @@ static igraph_error_t igraph_i_layout_umap(
                 IGRAPH_EINVAL, ndim);
 
     }
-
-    /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */
-    IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
 
     if (use_seed) {
         if ((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
@@ -931,14 +967,17 @@ static igraph_error_t igraph_i_layout_umap(
         }
     }
 
-    RNG_BEGIN();
-    IGRAPH_VECTOR_INIT_FINALLY(&umap_weights, no_of_edges);
-
-    /* Make combined graph with smoothed probabilities */
-    IGRAPH_CHECK(igraph_i_umap_find_prob_graph(graph, distances, &umap_weights));
-
     /* From now on everything lives in probability space, it does not matter whether
      * the original graph was weighted/distanced or unweighted */
+    RNG_BEGIN();
+    /* Make combined graph with smoothed probabilities */
+    if (connectivities_precomputed) {
+        connectivitiesp = (igraph_vector_t *) distances;
+    } else {
+        IGRAPH_VECTOR_INIT_FINALLY(&connectivities, no_of_edges);
+        IGRAPH_CHECK(igraph_layout_umap_compute_connectivities(graph, distances, &connectivities));
+        connectivitiesp = &connectivities;
+    }
 
     /* Fit a and b parameter to find smooth approximation to
      * probability distribution in embedding space */
@@ -948,14 +987,16 @@ static igraph_error_t igraph_i_layout_umap(
      * distributions */
     IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(
                 graph,
-                &umap_weights,
+                connectivitiesp,
                 a, b,
                 res,
                 epochs,
                 negative_sampling_rate));
 
-    igraph_vector_destroy(&umap_weights);
-    IGRAPH_FINALLY_CLEAN(1);
+    if (!connectivities_precomputed) {
+        igraph_vector_destroy(&connectivities);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
     RNG_END();
 
     /* Center layout */
@@ -1074,7 +1115,7 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   igraph_real_t min_dist,
                                   igraph_integer_t epochs) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, 2);
+            distances, min_dist, epochs, 2, 0);
 }
 
 
@@ -1111,5 +1152,5 @@ igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_real_t min_dist,
                                      igraph_integer_t epochs) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, 3);
+            distances, min_dist, epochs, 3, 0);
 }

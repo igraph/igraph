@@ -152,6 +152,11 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                                 igraph_real_t min_dist,
                                                 igraph_integer_t epochs);
 
+IGRAPH_EXPORT igraph_error_t igraph_layout_umap_compute_connectivities(const igraph_t *graph,
+                                                const igraph_vector_t *distances,
+                                                igraph_vector_t *connectivities);
+
+
 /**
  * \struct igraph_layout_drl_options_t
  * Parameters for the DrL layout generator
