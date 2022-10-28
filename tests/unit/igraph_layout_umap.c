@@ -61,7 +61,7 @@ void check_graph_largeunion(
         const igraph_vector_int_t *subgraph_sizes) {
 
     /* sizes of the full subgraphs are 50, 70, 90 */
-    igraph_real_t xm, ym, dx, dy, xmin, xmax, ymin, ymax, distlim;
+    igraph_real_t distlim;
     igraph_integer_t nrow = igraph_matrix_nrow(layout);
     igraph_error_t err;
     int nerr = 0;
