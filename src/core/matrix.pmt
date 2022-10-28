@@ -854,6 +854,8 @@ igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *
 
 #endif
 
+#define SWAP(TYPE,a,b) do { TYPE igraph_i_tmp = (a); (a) = (b); (b) = igraph_i_tmp; } while (0)
+
 /**
  * \function igraph_matrix_transpose
  * \brief Transpose of a matrix.
@@ -866,8 +868,6 @@ igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *
  *
  * Time complexity: O(mn), the number of elements in the matrix.
  */
-
-#define SWAP(TYPE,a,b) do { TYPE igraph_i_tmp = (a); (a) = (b); (b) = igraph_i_tmp; } while (0)
 
 igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
     if (m->nrow > 1 && m->ncol > 1) {
