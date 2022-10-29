@@ -3,7 +3,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t global, global2, global3;
@@ -80,7 +80,7 @@ int main() {
     printf("\n");
 
     printf("Simple: ");
-    igraph_simplify(&g, 1, 1, NULL);
+    igraph_simplify(&g, true, true, NULL);
     igraph_transitivity_undirected(&g, &global3, IGRAPH_TRANSITIVITY_NAN);
     print_real(stdout, global3, "%.10g");
     printf("\n");

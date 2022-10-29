@@ -6,7 +6,7 @@
 
 #define FILENAME "mybool.graphml.xml"
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_error_handler_t* oldhandler;

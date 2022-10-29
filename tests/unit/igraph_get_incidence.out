@@ -1,5 +1,6 @@
 No vertices:
 Incidence matrix:
+[ 0-by-0 ]
 Row ids:
 ( )
 Col ids:
@@ -7,6 +8,7 @@ Col ids:
 
 One vertex:
 Incidence matrix:
+[ 0-by-1 ]
 Row ids:
 ( )
 Col ids:

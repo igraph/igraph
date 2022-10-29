@@ -21,7 +21,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t result;
@@ -76,16 +76,17 @@ int main() {
     // test graph with zero nodes
     printf("\ngraph with zero nodes\n");
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
-    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, &result, &from, &to, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
+    printf("\nfrom = %" IGRAPH_PRId ", to = %" IGRAPH_PRId "\n", from, to);
     igraph_destroy(&g);
 
     //test graph with one node
-    printf("\ngraph with one node\n");
+    printf("graph with one node\n");
     igraph_empty(&g, 1, IGRAPH_DIRECTED);
-    igraph_diameter(&g, &result, NULL, NULL, NULL, NULL, IGRAPH_DIRECTED, 1);
+    igraph_diameter(&g, &result, &from, &to, NULL, NULL, IGRAPH_DIRECTED, 1);
     print_real(stdout, result, "%g");
-    printf("\n");
+    printf("\nfrom = %" IGRAPH_PRId ", to = %" IGRAPH_PRId "\n", from, to);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

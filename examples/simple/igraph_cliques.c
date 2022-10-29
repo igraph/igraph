@@ -48,16 +48,15 @@ int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2
 
 /* Takes a pointer vector of vectors. Sorts each vector, then sorts the pointer vector */
 void canonicalize_list(igraph_vector_int_list_t *list) {
-    igraph_integer_t i, len;
-    len = igraph_vector_int_list_size(list);
-    for (i = 0; i < len; ++i) {
+    igraph_integer_t len = igraph_vector_int_list_size(list);
+    for (igraph_integer_t i = 0; i < len; ++i) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(list, i));
     }
     igraph_vector_int_list_sort(list, &compare_vectors);
 }
 
 struct userdata {
-    int i;
+    igraph_integer_t i;
     igraph_vector_int_list_t *list;
 };
 
@@ -94,7 +93,7 @@ void test_callback(const igraph_t *graph) {
 }
 
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t result;

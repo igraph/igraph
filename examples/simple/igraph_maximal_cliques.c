@@ -70,7 +70,7 @@ void print_cliques(igraph_vector_int_list_t *cliques) {
     }
 }
 
-int main() {
+int main(void) {
 
     igraph_t g, g2, cli;
     igraph_vector_int_t perm;
@@ -85,8 +85,8 @@ int main() {
 
     igraph_vector_int_init_range(&perm, 0, NODES);
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, NODES, NODES,
-                            /*directed=*/ 0, /*loops=*/ 0);
-    igraph_full(&cli, CLIQUE_SIZE, /*directed=*/ 0, /*loops=*/ 0);
+                            IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_full(&cli, CLIQUE_SIZE, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     for (i = 0; i < NO_CLIQUES; i++) {
         /* Permute vertices of g */
@@ -96,11 +96,11 @@ int main() {
         g = g2;
 
         /* Add a clique */
-        igraph_union(&g2, &g, &cli, /*edge_map1=*/ 0, /*edge_map2=*/ 0);
+        igraph_union(&g2, &g, &cli, /*edge_map1=*/ NULL, /*edge_map2=*/ NULL);
         igraph_destroy(&g);
         g = g2;
     }
-    igraph_simplify(&g, /*multiple=*/ 1, /*loop=*/ 0, /*edge_comb=*/ 0);
+    igraph_simplify(&g, /*multiple=*/ true, /*loop=*/ false, /*edge_comb=*/ NULL);
 
     igraph_vector_int_destroy(&perm);
     igraph_destroy(&cli);

@@ -56,6 +56,11 @@
  * \param weights Optional edge weights. If it is a null-pointer, then
  *   the unweighted breadth-first search based \ref igraph_distances() will
  *   be called.
+ * \param mode For directed graphs; whether to follow paths along edge
+ *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
+ *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
+ *    for undirected graphs. \c IGRAPH_ALL should not be used with
+ *    negative weights.
  * \return Error code.
  *
  * Time complexity: O(s|V|log|V|+|V||E|), |V| and |E| are the number
@@ -70,7 +75,8 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
                                   igraph_matrix_t *res,
                                   const igraph_vs_t from,
                                   const igraph_vs_t to,
-                                  const igraph_vector_t *weights) {
+                                  const igraph_vector_t *weights,
+                                  igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -85,34 +91,34 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
 
     /* If no weights, then we can just run the unweighted version */
     if (!weights) {
-        return igraph_distances(graph, res, from, to, IGRAPH_OUT);
+        return igraph_distances(graph, res, from, to, mode);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
     /* If no edges, then we can just run the unweighted version */
     if (no_of_edges == 0) {
-        return igraph_distances(graph, res, from, to, IGRAPH_OUT);
+        return igraph_distances(graph, res, from, to, mode);
     }
 
     /* If no negative weights, then we can run Dijkstra's algorithm */
     {
         igraph_real_t min_weight = igraph_vector_min(weights);
-        if (igraph_is_nan(min_weight)) {
+        if (isnan(min_weight)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         if (min_weight >= 0) {
-            return igraph_distances_dijkstra(graph, res, from, to, weights, IGRAPH_OUT);
+            return igraph_distances_dijkstra(graph, res, from, to, weights, mode);
         }
     }
 
-    if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Johnson's shortest path: undirected graph and negative weight.",
-                     IGRAPH_EINVAL);
+    if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
+        IGRAPH_ERROR("Undirected graph with negative weight.",
+                     IGRAPH_ENEGLOOP);
     }
 
     /* ------------------------------------------------------------ */
@@ -131,9 +137,16 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_edges_reserved);
     igraph_get_edgelist(graph, &edges, /*bycol=*/ 0); /* reserved */
     igraph_vector_int_resize(&edges, no_edges_reserved); /* reserved */
-    for (i = 0, ptr = no_of_edges * 2; i < no_of_nodes; i++) {
-        VECTOR(edges)[ptr++] = no_of_nodes;
-        VECTOR(edges)[ptr++] = i;
+    if (mode == IGRAPH_OUT) {
+        for (i = 0, ptr = no_of_edges * 2; i < no_of_nodes; i++) {
+            VECTOR(edges)[ptr++] = no_of_nodes;
+            VECTOR(edges)[ptr++] = i;
+        }
+    } else {
+        for (i = 0, ptr = no_of_edges * 2; i < no_of_nodes; i++) {
+            VECTOR(edges)[ptr++] = i;
+            VECTOR(edges)[ptr++] = no_of_nodes;
+        }
     }
     IGRAPH_CHECK(igraph_add_edges(&newgraph, &edges, 0));
     igraph_vector_int_destroy(&edges);
@@ -151,7 +164,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_distances_bellman_ford(&newgraph, &bfres,
                  igraph_vss_1(no_of_nodes),
-                 igraph_vss_all(), &newweights, IGRAPH_OUT));
+                 igraph_vss_all(), &newweights, mode));
 
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
@@ -164,13 +177,21 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     for (i = 0; i < no_of_edges; i++) {
         igraph_integer_t ffrom = IGRAPH_FROM(graph, i);
         igraph_integer_t tto = IGRAPH_TO(graph, i);
-        VECTOR(newweights)[i] += MATRIX(bfres, 0, ffrom) - MATRIX(bfres, 0, tto);
+        if (mode == IGRAPH_OUT) {
+            VECTOR(newweights)[i] += MATRIX(bfres, 0, ffrom) - MATRIX(bfres, 0, tto);
+        } else {
+            VECTOR(newweights)[i] += MATRIX(bfres, 0, tto) - MATRIX(bfres, 0, ffrom);
+        }
+
+        /* If a weight becomes slightly negative due to roundoff errors,
+           snap it to exact zero. */
+        if (VECTOR(newweights)[i] < 0) VECTOR(newweights)[i] = 0;
     }
 
     /* Run Dijkstra's algorithm on the new weights */
     IGRAPH_CHECK(igraph_distances_dijkstra(graph, res, from,
                  to, &newweights,
-                 IGRAPH_OUT));
+                 mode));
 
     igraph_vector_destroy(&newweights);
     IGRAPH_FINALLY_CLEAN(1);
@@ -187,8 +208,14 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
         if (igraph_vs_is_all(&to)) {
             igraph_integer_t v2;
             for (v2 = 0; v2 < nc; v2++) {
-                igraph_real_t sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
-                MATRIX(*res, i, v2) -= sub;
+                igraph_real_t sub;
+                if (mode == IGRAPH_OUT) {
+                    sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
+                    MATRIX(*res, i, v2) -= sub;
+                } else {
+                    sub = MATRIX(bfres, 0, v2) - MATRIX(bfres, 0, v1);
+                    MATRIX(*res, v2, i) -= sub;
+                }
             }
         } else {
             igraph_integer_t j;
@@ -196,9 +223,15 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
             IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
             for (j = 0, IGRAPH_VIT_RESET(tovit); j < nc; j++, IGRAPH_VIT_NEXT(tovit)) {
+                igraph_real_t sub;
                 igraph_integer_t v2 = IGRAPH_VIT_GET(tovit);
-                igraph_real_t sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
-                MATRIX(*res, i, j) -= sub;
+                if (mode == IGRAPH_OUT) {
+                    sub = MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
+                    MATRIX(*res, i, j) -= sub;
+                } else {
+                    sub = MATRIX(bfres, 0, v2) - MATRIX(bfres, 0, v1);
+                    MATRIX(*res, j, i) -= sub;
+                }
             }
             igraph_vit_destroy(&tovit);
             IGRAPH_FINALLY_CLEAN(1);
@@ -223,5 +256,5 @@ igraph_error_t igraph_shortest_paths_johnson(const igraph_t *graph,
                                   const igraph_vs_t from,
                                   const igraph_vs_t to,
                                   const igraph_vector_t *weights) {
-    return igraph_distances_johnson(graph, res, from, to, weights);
+    return igraph_distances_johnson(graph, res, from, to, weights, IGRAPH_OUT);
 }

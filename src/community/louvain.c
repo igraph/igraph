@@ -24,6 +24,7 @@
 #include "igraph_community.h"
 
 #include "igraph_constructors.h"
+#include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_qsort.h"
@@ -104,16 +105,12 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
     IGRAPH_CHECK(igraph_vector_int_resize(eids, ecount));
 
     links = IGRAPH_CALLOC(ecount, igraph_i_multilevel_link);
-    if (links == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(links, "Multi-level community structure detection failed.");
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < ecount; i++) {
-        igraph_integer_t from, to;
-        igraph_edge(graph, i, &from, &to);
-        links[i].from = from;
-        links[i].to = to;
+        links[i].from = IGRAPH_FROM(graph, i);
+        links[i].to = IGRAPH_TO(graph, i);
         links[i].id = i;
     }
 
@@ -199,9 +196,7 @@ static igraph_error_t igraph_i_multilevel_community_links(
 
     n = igraph_vector_int_size(edges);
     links = IGRAPH_CALLOC(n, igraph_i_multilevel_community_link);
-    if (links == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(links, "Multi-level community structure detection failed.");
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < n; i++) {
@@ -236,8 +231,8 @@ static igraph_error_t igraph_i_multilevel_community_links(
     for (i = 0; i < n; i++) {
         to_community = links[i].community;
         if (to_community != last) {
-            igraph_vector_push_back(links_community, to_community);
-            igraph_vector_push_back(links_weight, links[i].weight);
+            IGRAPH_CHECK(igraph_vector_push_back(links_community, to_community));
+            IGRAPH_CHECK(igraph_vector_push_back(links_weight, links[i].weight));
             last = to_community;
             c++;
         } else {
@@ -273,9 +268,6 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
-    igraph_integer_t i;
-    igraph_eit_t eit;
-
     if (no_of_nodes == 0) {
         return IGRAPH_SUCCESS;
     }
@@ -285,23 +277,15 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*no_of_edges);
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
     /* Create the new edgelist */
-    igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
-    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-    i = 0;
-    while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t from, to;
-        IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(eit), &from, &to));
-        VECTOR(edges)[i++] = VECTOR(*membership)[from];
-        VECTOR(edges)[i++] = VECTOR(*membership)[to];
-        IGRAPH_EIT_NEXT(eit);
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));
+    for (igraph_integer_t i=0; i < 2*no_of_edges; i++) {
+        VECTOR(edges)[i] = VECTOR(*membership)[ VECTOR(edges)[i] ];
     }
-    igraph_eit_destroy(&eit);
-    IGRAPH_FINALLY_CLEAN(1);
 
     /* Create the new graph */
     igraph_destroy(graph);
@@ -317,7 +301,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
 /**
  * \ingroup communities
  * \function igraph_i_community_multilevel_step
- * \brief Performs a single step of the multi-level modularity optimization method
+ * \brief Performs a single step of the multi-level modularity optimization method.
  *
  * This function implements a single step of the multi-level modularity optimization
  * algorithm for finding community structure, see VD Blondel, J-L Guillaume,
@@ -352,8 +336,8 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_integer_t vcount = igraph_vcount(graph);
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
-    int pass;
-    igraph_bool_t changed = 0;
+    /* int pass; // used only for debugging */
+    igraph_bool_t changed = false;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
     igraph_vector_int_t edges;
@@ -394,9 +378,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     communities.weight_sum = 2 * igraph_vector_sum(weights);
     communities.membership = membership;
     communities.item = IGRAPH_CALLOC(vcount, igraph_i_multilevel_community);
-    if (communities.item == 0) {
-        IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(communities.item, "Multi-level community structure detection failed.");
     IGRAPH_FINALLY(igraph_free, communities.item);
 
     /* Still initializing the communities data structure */
@@ -409,9 +391,8 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
     /* Some more initialization :) */
     for (i = 0; i < ecount; i++) {
-        igraph_integer_t ffrom, fto;
+        igraph_integer_t ffrom = IGRAPH_FROM(graph, i), fto = IGRAPH_TO(graph, i);
         igraph_real_t weight = 1;
-        igraph_edge(graph, i, &ffrom, &fto);
 
         weight = VECTOR(*weights)[i];
         communities.item[ffrom].weight_all += weight;
@@ -422,7 +403,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     }
 
     q = igraph_i_multilevel_community_modularity(&communities, resolution);
-    pass = 1;
+    /* pass = 1; */
 
     do { /* Pass begin */
         igraph_integer_t temp_communities_no = communities.communities_no;
@@ -505,7 +486,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
         if (changed && (q > pass_q)) {
             /* debug("Pass %d (changed: %d) Communities: %ld Modularity from %lf to %lf\n",
               pass, changed, communities.communities_no, (double) pass_q, (double) q); */
-            pass++;
+            /* pass++; */
         } else {
             /* No changes or the modularity became worse, restore last membership */
             IGRAPH_CHECK(igraph_vector_int_update(communities.membership, &temp_membership));
@@ -625,7 +606,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     igraph_vector_int_t m;
     igraph_vector_int_t level_membership;
     igraph_real_t prev_q = -1, q = -1;
-    int i, level = 1;
+    igraph_integer_t i, level = 1;
     igraph_integer_t vcount = igraph_vcount(graph);
 
     /* Make a copy of the original graph, we will do the merges on the copy */

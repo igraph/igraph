@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int permute(const igraph_matrix_t *M,
+void permute(const igraph_matrix_t *M,
             const igraph_vector_int_t *p,
             const igraph_vector_int_t *q,
             igraph_matrix_t *res) {
@@ -41,11 +41,9 @@ int permute(const igraph_matrix_t *M,
             MATRIX(*res, i, j) = MATRIX(*M, ii, jj);
         }
     }
-
-    return 0;
 }
 
-int permute_rows(const igraph_matrix_t *M,
+void permute_rows(const igraph_matrix_t *M,
                  const igraph_vector_int_t *p,
                  igraph_matrix_t *res) {
 
@@ -61,11 +59,9 @@ int permute_rows(const igraph_matrix_t *M,
             MATRIX(*res, i, j) = MATRIX(*M, ii, j);
         }
     }
-
-    return 0;
 }
 
-int permute_cols(const igraph_matrix_t *M,
+void permute_cols(const igraph_matrix_t *M,
                  const igraph_vector_int_t *q,
                  igraph_matrix_t *res) {
 
@@ -81,11 +77,9 @@ int permute_cols(const igraph_matrix_t *M,
             MATRIX(*res, i, j) = MATRIX(*M, i, jj);
         }
     }
-
-    return 0;
 }
 
-igraph_error_t random_permutation(igraph_vector_int_t *vec) {
+void random_permutation(igraph_vector_int_t *vec) {
     /* We just do size(vec) * 2 swaps */
     igraph_integer_t one, two, i, n = igraph_vector_int_size(vec);
     igraph_integer_t tmp;
@@ -96,7 +90,6 @@ igraph_error_t random_permutation(igraph_vector_int_t *vec) {
         VECTOR(*vec)[one] = VECTOR(*vec)[two];
         VECTOR(*vec)[two] = tmp;
     }
-    return 0;
 }
 
 igraph_bool_t check_same(const igraph_sparsemat_t *A,
@@ -112,7 +105,7 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
     return result;
 }
 
-int main() {
+int main(void) {
 
     igraph_sparsemat_t A, B;
     igraph_matrix_t M, N;

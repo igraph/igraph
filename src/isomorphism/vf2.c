@@ -192,7 +192,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
     /* Check color distribution */
     if (vertex_color1) {
-        igraph_bool_t ret = 0;
+        igraph_bool_t ret = false;
         igraph_vector_int_t tmp1, tmp2;
         IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp1, vertex_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
@@ -211,7 +211,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
     /* Check edge color distribution */
     if (edge_color1) {
-        igraph_bool_t ret = 0;
+        igraph_bool_t ret = false;
         igraph_vector_int_t tmp1, tmp2;
         IGRAPH_CHECK(igraph_vector_int_init_copy(&tmp1, edge_color1));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &tmp1);
@@ -432,7 +432,7 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
             /**************************************************************/
             /* step forward if worth, check if worth first */
             igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
-            igraph_bool_t end = 0;
+            igraph_bool_t end = false;
 
             inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
             outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
@@ -445,13 +445,13 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
 
             if (VECTOR(indeg1)[cand1] != VECTOR(indeg2)[cand2] ||
                 VECTOR(outdeg1)[cand1] != VECTOR(outdeg2)[cand2]) {
-                end = 1;
+                end = true;
             }
             if (vertex_color1 && VECTOR(*vertex_color1)[cand1] != VECTOR(*vertex_color2)[cand2]) {
-                end = 1;
+                end = true;
             }
             if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, arg)) {
-                end = 1;
+                end = true;
             }
 
             vsize = igraph_vector_int_size(inneis_1);
@@ -461,20 +461,20 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                     igraph_integer_t node2 = VECTOR(*core_1)[node];
                     /* check if there is a node2->cand2 edge */
                     if (!igraph_vector_int_binsearch2(inneis_2, node2)) {
-                        end = 1;
+                        end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, node, cand1, /*directed=*/ 1,
-                                       /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, node2, cand2, /*directed=*/ 1,
-                                       /*error=*/ 1);
+                        igraph_get_eid(graph1, &eid1, node, cand1, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
+                        igraph_get_eid(graph2, &eid2, node2, cand2, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
-                            end = 1;
+                            end = true;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
                                                               eid1, eid2, arg)) {
-                            end = 1;
+                            end = true;
                         }
                     }
                 } else {
@@ -493,20 +493,20 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                     igraph_integer_t node2 = VECTOR(*core_1)[node];
                     /* check if there is a cand2->node2 edge */
                     if (!igraph_vector_int_binsearch2(outneis_2, node2)) {
-                        end = 1;
+                        end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, cand1, node, /*directed=*/ 1,
-                                       /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, cand2, node2, /*directed=*/ 1,
-                                       /*error=*/ 1);
+                        igraph_get_eid(graph1, &eid1, cand1, node, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
+                        igraph_get_eid(graph2, &eid2, cand2, node2, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
-                            end = 1;
+                            end = true;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
                                                               eid1, eid2, arg)) {
-                            end = 1;
+                            end = true;
                         }
                     }
                 } else {
@@ -525,20 +525,20 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a node2->cand1 edge */
                     if (!igraph_vector_int_binsearch2(inneis_1, node2)) {
-                        end = 1;
+                        end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1,
-                                       /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1,
-                                       /*error=*/ 1);
+                        igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
+                        igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
-                            end = 1;
+                            end = true;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
                                                               eid1, eid2, arg)) {
-                            end = 1;
+                            end = true;
                         }
                     }
                 } else {
@@ -557,20 +557,20 @@ igraph_error_t igraph_get_isomorphisms_vf2_callback(
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a cand1->node2 edge */
                     if (!igraph_vector_int_binsearch2(outneis_1, node2)) {
-                        end = 1;
+                        end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1,
-                                       /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1,
-                                       /*error=*/ 1);
+                        igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
+                        igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
-                            end = 1;
+                            end = true;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
                                                               eid1, eid2, arg)) {
-                            end = 1;
+                            end = true;
                         }
                     }
                 } else {
@@ -755,7 +755,7 @@ static igraph_error_t igraph_i_isomorphic_vf2_cb(
 
 /**
  * \function igraph_isomorphic_vf2
- * \brief Isomorphism via VF2
+ * \brief Isomorphism via VF2.
  *
  * </para><para>
  * This function performs the VF2 algorithm via calling \ref
@@ -853,7 +853,7 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
 
 /**
  * \function igraph_count_isomorphisms_vf2
- * \brief Number of isomorphisms via VF2
+ * \brief Number of isomorphisms via VF2.
  *
  * This function counts the number of isomorphic mappings between two
  * graphs. It uses the generic \ref igraph_get_isomorphisms_vf2_callback()
@@ -989,7 +989,7 @@ igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 
 /**
  * \function igraph_get_subisomorphisms_vf2_callback
- * \brief Generic VF2 function for subgraph isomorphism problems
+ * \brief Generic VF2 function for subgraph isomorphism problems.
  *
  * This function is the pair of \ref igraph_get_isomorphisms_vf2_callback(),
  * for subgraph isomorphism problems. It searches for subgraphs of \p
@@ -1306,7 +1306,7 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
             /**************************************************************/
             /* step forward if worth, check if worth first */
             igraph_integer_t xin1 = 0, xin2 = 0, xout1 = 0, xout2 = 0;
-            igraph_bool_t end = 0;
+            igraph_bool_t end = false;
 
             inneis_1 = igraph_lazy_adjlist_get(&inadj1, cand1);
             outneis_1 = igraph_lazy_adjlist_get(&outadj1, cand1);
@@ -1319,13 +1319,13 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
 
             if (VECTOR(indeg1)[cand1] < VECTOR(indeg2)[cand2] ||
                 VECTOR(outdeg1)[cand1] < VECTOR(outdeg2)[cand2]) {
-                end = 1;
+                end = true;
             }
             if (vertex_color1 && VECTOR(*vertex_color1)[cand1] != VECTOR(*vertex_color2)[cand2]) {
-                end = 1;
+                end = true;
             }
             if (node_compat_fn && !node_compat_fn(graph1, graph2, cand1, cand2, arg)) {
-                end = 1;
+                end = true;
             }
 
             vsize = igraph_vector_int_size(inneis_1);
@@ -1359,20 +1359,20 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a node2->cand1 edge */
                     if (!igraph_vector_int_binsearch2(inneis_1, node2)) {
-                        end = 1;
+                        end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, node2, cand1, /*directed=*/ 1,
-                                       /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, node, cand2, /*directed=*/ 1,
-                                       /*error=*/ 1);
+                        igraph_get_eid(graph1, &eid1, node2, cand1, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
+                        igraph_get_eid(graph2, &eid2, node, cand2, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
-                            end = 1;
+                            end = true;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
                                                               eid1, eid2, arg)) {
-                            end = 1;
+                            end = true;
                         }
                     }
                 } else {
@@ -1391,20 +1391,20 @@ igraph_error_t igraph_get_subisomorphisms_vf2_callback(
                     igraph_integer_t node2 = VECTOR(*core_2)[node];
                     /* check if there is a cand1->node2 edge */
                     if (!igraph_vector_int_binsearch2(outneis_1, node2)) {
-                        end = 1;
+                        end = true;
                     } else if (edge_color1 || edge_compat_fn) {
                         igraph_integer_t eid1, eid2;
-                        igraph_get_eid(graph1, &eid1, cand1, node2, /*directed=*/ 1,
-                                       /*error=*/ 1);
-                        igraph_get_eid(graph2, &eid2, cand2, node, /*directed=*/ 1,
-                                       /*error=*/ 1);
+                        igraph_get_eid(graph1, &eid1, cand1, node2, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
+                        igraph_get_eid(graph2, &eid2, cand2, node, IGRAPH_DIRECTED,
+                                       /*error=*/ true);
                         if (edge_color1 && VECTOR(*edge_color1)[eid1] !=
                             VECTOR(*edge_color2)[eid2]) {
-                            end = 1;
+                            end = true;
                         }
                         if (edge_compat_fn && !edge_compat_fn(graph1, graph2,
                                                               eid1, eid2, arg)) {
-                            end = 1;
+                            end = true;
                         }
                     }
                 } else {

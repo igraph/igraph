@@ -38,7 +38,7 @@
 /**
  * \ingroup conversion
  * \function igraph_get_adjacency
- * \brief Returns the adjacency matrix of a graph
+ * \brief The adjacency matrix of a graph.
  *
  * </para><para>
  * The result is an adjacency matrix. Entry i, j of the matrix
@@ -84,7 +84,7 @@
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
- * \sa igraph_get_adjacency_sparse() if you want a sparse matrix representation
+ * \sa \ref igraph_get_adjacency_sparse() if you want a sparse matrix representation
  *
  * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  */
@@ -182,7 +182,7 @@ igraph_error_t igraph_get_adjacency(
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
- * \sa igraph_get_adjacency(), the dense version of this function.
+ * \sa \ref igraph_get_adjacency(), the dense version of this function.
  *
  * Time complexity: TODO.
  */
@@ -313,9 +313,10 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
 /**
  * \ingroup conversion
  * \function igraph_get_edgelist
- * \brief Returns the list of edges in a graph
+ * \brief The list of edges in a graph.
  *
- * </para><para>The order of the edges is given by the edge IDs.
+ * The order of the edges is given by the edge IDs.
+ *
  * \param graph Pointer to the graph object
  * \param res Pointer to an initialized vector object, it will be
  *        resized.
@@ -327,8 +328,7 @@ igraph_error_t igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *r
  *
  * \sa \ref igraph_edges() to return the result only for some edge IDs.
  *
- * Time complexity: O(|E|), the
- * number of edges in the graph.
+ * Time complexity: O(|E|), the number of edges in the graph.
  */
 
 igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *res, igraph_bool_t bycol) {
@@ -367,7 +367,7 @@ igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_int_t *r
 
 /**
  * \function igraph_to_directed
- * \brief Convert an undirected graph to a directed one
+ * \brief Convert an undirected graph to a directed one.
  *
  * </para><para>
  * If the supplied graph is directed, this function does nothing.
@@ -571,10 +571,8 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
 
         while (!IGRAPH_EIT_END(eit)) {
             igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-            igraph_integer_t from, to;
-            igraph_edge(graph, edge, &from, &to);
-            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
-            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, IGRAPH_FROM(graph, edge)));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, IGRAPH_TO(graph, edge)));
             IGRAPH_EIT_NEXT(eit);
         }
 
@@ -822,7 +820,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
  *
  * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  *
- * \sa igraph_get_stochastic_sparse(), the sparse version of this
+ * \sa \ref igraph_get_stochastic_sparse(), the sparse version of this
  * function.
  */
 
@@ -879,7 +877,7 @@ igraph_error_t igraph_get_stochastic(
 
 /**
  * \function igraph_get_stochastic_sparse
- * \brief Stochastic adjacency matrix of a graph
+ * \brief The stochastic adjacency matrix of a graph.
  *
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise or column-wise, such that
@@ -894,7 +892,7 @@ igraph_error_t igraph_get_stochastic(
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  *
- * \sa igraph_get_stochastic(), the dense version of this function.
+ * \sa \ref igraph_get_stochastic(), the dense version of this function.
  */
 
 igraph_error_t igraph_get_stochastic_sparse(
@@ -947,7 +945,7 @@ igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
 /**
  * \ingroup conversion
  * \function igraph_to_prufer
- * \brief Converts a tree to its Pr&uuml;fer sequence
+ * \brief Converts a tree to its Pr&uuml;fer sequence.
  *
  * A Pr&uuml;fer sequence is a unique sequence of integers associated
  * with a labelled tree. A tree on n >= 2 vertices can be represented by a
@@ -981,7 +979,7 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
     igraph_vector_int_t neighbors;
     igraph_integer_t prufer_index = 0;
     igraph_integer_t n = igraph_vcount(graph);
-    igraph_bool_t is_tree = 0;
+    igraph_bool_t is_tree = false;
 
     IGRAPH_CHECK(igraph_is_tree(graph, &is_tree, NULL, IGRAPH_ALL));
 

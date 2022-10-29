@@ -42,7 +42,7 @@ void check_and_destroy(igraph_matrix_t *matrix, igraph_bool_t pivot) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t matrix;
 
     printf("Empty matrix:\n");

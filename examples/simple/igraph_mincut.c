@@ -54,7 +54,7 @@ int print_mincut(const igraph_t *graph, igraph_real_t value,
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_t partition, partition2, cut;

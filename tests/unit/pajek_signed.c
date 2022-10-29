@@ -25,20 +25,18 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
-    FILE *input;
+    FILE *ifile;
 
     /* turn on attribute handling */
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    input = fopen("pajek_signed.net", "r");
-    if (input == 0) {
-        return 1;
-    }
+    ifile = fopen("pajek_signed.net", "r");
+    IGRAPH_ASSERT(ifile != NULL);
 
-    igraph_read_graph_pajek(&graph, input);
-    fclose(input);
+    igraph_read_graph_pajek(&graph, ifile);
+    fclose(ifile);
 
     print_attributes(&graph);
 

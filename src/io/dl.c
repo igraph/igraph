@@ -26,16 +26,22 @@
 #include "igraph_interface.h"
 
 #include "io/dl-header.h"
+#include "io/parsers/dl-parser.h"
 
 int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
                                 void* scanner);
-void igraph_dl_yylex_destroy (void *scanner );
+int igraph_dl_yylex_destroy (void *scanner );
 int igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
 void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
 
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_dl_yylex_destroy(scanner);
+}
+
 /**
  * \function igraph_read_graph_dl
- * \brief Read a file in the DL format of UCINET
+ * \brief Reads a file in the DL format of UCINET.
  *
  * This is a simple textual file format used by UCINET. See
  * http://www.analytictech.com/networks/dataentry.htm for
@@ -84,7 +90,7 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     IGRAPH_TRIE_INIT_FINALLY(&context.trie, /*names=*/ 1);
 
     igraph_dl_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_dl_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_dl_yylex_destroy_wrapper, context.scanner);
 
     igraph_dl_yyset_in(instream, context.scanner);
 

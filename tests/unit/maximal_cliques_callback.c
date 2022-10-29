@@ -58,7 +58,7 @@ igraph_error_t handler_stop(const igraph_vector_int_t *clique, void *arg) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_list_t list;
     struct userdata ud;

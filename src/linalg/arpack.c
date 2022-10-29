@@ -23,9 +23,10 @@
 */
 
 #include "igraph_arpack.h"
-#include "igraph_memory.h"
-
 #include "linalg/arpack_internal.h"
+
+#include "igraph_memory.h"
+#include "igraph_random.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -208,7 +209,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
 
 /**
  * \function igraph_arpack_options_get_default
- * \brief Return a pointer to a "default" ARPACK options object
+ * \brief Returns a pointer to a "default" ARPACK options object.
  *
  * This function is used by other igraph functions taking an \ref igraph_arpack_options_t
  * object as an argument to get a reference to a pre-initialized "default"
@@ -221,7 +222,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
  *
  * Time complexity: O(1).
  */
-igraph_arpack_options_t* igraph_arpack_options_get_default() {
+igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
     igraph_i_arpack_options_default = igraph_i_arpack_options_pristine;
     return &igraph_i_arpack_options_default;
 }
@@ -407,8 +408,8 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
     igraph_real_t trace, det, tsq4_minus_d;
     igraph_complex_t eval1, eval2;
     igraph_complex_t evec1[2], evec2[2];
-    igraph_bool_t swap_evals = 0;
-    igraph_bool_t complex_evals = 0;
+    igraph_bool_t swap_evals = false;
+    igraph_bool_t complex_evals = false;
     int nev = options->nev;
 
     if (nev <= 0) {
@@ -464,7 +465,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
     if (options->which[0] == 'S') {
         if (options->which[1] == 'M') {
             /* eval1 must be the one with the smallest magnitude */
-            swap_evals = (igraph_complex_mod(eval1) > igraph_complex_mod(eval2));
+            swap_evals = (igraph_complex_abs(eval1) > igraph_complex_abs(eval2));
         } else if (options->which[1] == 'R') {
             /* eval1 must be the one with the smallest real part */
             swap_evals = (IGRAPH_REAL(eval1) > IGRAPH_REAL(eval2));
@@ -477,7 +478,7 @@ static igraph_error_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun,
     } else if (options->which[0] == 'L') {
         if (options->which[1] == 'M') {
             /* eval1 must be the one with the largest magnitude */
-            swap_evals = (igraph_complex_mod(eval1) < igraph_complex_mod(eval2));
+            swap_evals = (igraph_complex_abs(eval1) < igraph_complex_abs(eval2));
         } else if (options->which[1] == 'R') {
             /* eval1 must be the one with the largest real part */
             swap_evals = (IGRAPH_REAL(eval1) < IGRAPH_REAL(eval2));
@@ -891,7 +892,7 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
 
 /**
  * \function igraph_arpack_rssolve
- * \brief ARPACK solver for symmetric matrices
+ * \brief ARPACK solver for symmetric matrices.
  *
  * This is the ARPACK solver for symmetric matrices. Please use
  * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
@@ -911,7 +912,7 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
  * \param vectors If not a null pointer, then it must be a pointer to
  *     an initialized matrix. The eigenvectors will be stored in the
  *     columns of the matrix. The matrix will be resized as needed.
- *     Either this or the \p vectors argument must be non-null if the
+ *     Either this or the \p storage argument must be non-null if the
  *     ARPACK iteration is started from a given starting vector. If
  *     both are given \p vectors take precedence.
  * \return Error code.
@@ -929,7 +930,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_vector_t *values, igraph_matrix_t *vectors) {
 
     igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
-    igraph_bool_t free_them = 0;
+    igraph_bool_t free_them = false;
     int *select, i;
 
     int ido = 0;
@@ -1021,13 +1022,14 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     options->iparam[8] = 0;   // return value
     options->iparam[9] = 0;   // return value
     options->iparam[10] = 0;  // return value
-    options->info = options->start;
+    options->info = 1;  // always use a provided starting vector
     if (options->start) {
+        // user provided the starting vector so we just use that
         if (!storage && !vectors) {
             IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
         }
         if (vectors && (igraph_matrix_nrow(vectors) != options->n ||
-                        igraph_matrix_ncol(vectors) != 1)) {
+                        igraph_matrix_ncol(vectors) < 1)) {
             IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
         }
         if (vectors) {
@@ -1035,6 +1037,14 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                 resid[i] = MATRIX(*vectors, i, 0);
             }
         }
+    } else {
+        // we need to generate a random vector on our own; let's not rely on
+        // ARPACK to do so because we want to use our own RNG
+        RNG_BEGIN();
+        for (i = 0; i < options->n; i++) {
+            resid[i] = RNG_UNIF(-1, 1);
+        }
+        RNG_END();
     }
 
     /* Ok, we have everything */
@@ -1140,7 +1150,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
 /**
  * \function igraph_arpack_rnsolve
- * \brief ARPACK solver for non-symmetric matrices
+ * \brief ARPACK solver for non-symmetric matrices.
  *
  * Please always consider calling \ref igraph_arpack_rssolve() if your
  * matrix is symmetric, it is much faster.
@@ -1191,7 +1201,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_matrix_t *values, igraph_matrix_t *vectors) {
 
     igraph_real_t *v, *workl, *workd, *dr, *di, *resid, *workev;
-    igraph_bool_t free_them = 0;
+    igraph_bool_t free_them = false;
     int *select, i;
 
     int ido = 0;
@@ -1288,7 +1298,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     options->iparam[8] = 0;   // return value
     options->iparam[9] = 0;   // return value
     options->iparam[10] = 0;  // return value
-    options->info = options->start;
+    options->info = 1;  // always use a provided starting vector
     if (options->start) {
         if (!storage && !vectors) {
             IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
@@ -1302,6 +1312,14 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                 resid[i] = MATRIX(*vectors, i, 0);
             }
         }
+    } else {
+        // we need to generate a random vector on our own; let's not rely on
+        // ARPACK to do so because we want to use our own RNG
+        RNG_BEGIN();
+        for (i = 0; i < options->n; i++) {
+            resid[i] = RNG_UNIF(-1, 1);
+        }
+        RNG_END();
     }
 
     /* Ok, we have everything */
@@ -1416,7 +1434,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
 /**
  * \function igraph_arpack_unpack_complex
- * \brief Make the result of the non-symmetric ARPACK solver more readable
+ * \brief Makes the result of the non-symmetric ARPACK solver more readable.
  *
  * This function works on the output of \ref igraph_arpack_rnsolve and
  * brushes it up a bit: it only keeps \p nev eigenvalues/vectors and

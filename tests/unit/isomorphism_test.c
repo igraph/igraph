@@ -11,15 +11,15 @@ void random_permutation(igraph_vector_int_t *vec) {
     for (i = 0; i < 2 * n; i++) {
         one = RNG_INTEGER(0, n - 1);
         two = RNG_INTEGER(0, n - 1);
-        tmp = one;
-        one = two;
-        two = tmp;
+        tmp = VECTOR(*vec)[one];
+        VECTOR(*vec)[one] = VECTOR(*vec)[two];
+        VECTOR(*vec)[two] = tmp;
     }
 }
 
 
-void test3() {
-    int i, j;
+void test3(void) {
+    igraph_integer_t i, j;
     igraph_graph_list_t graphs3;
     igraph_t g;
 
@@ -41,7 +41,7 @@ void test3() {
                 NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL
             );
             if (iso) {
-                printf("Bliss failure, 3 vertex directed graphs of isoclass %d and %d are not isomorphic. Bliss reports otherwise.\n", i, j);
+                printf("Bliss failure, 3 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. Bliss reports otherwise.\n", i, j);
             }
         }
 
@@ -54,7 +54,7 @@ void test3() {
                 NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
             );
             if (iso) {
-                printf("VF2 failure, 3 vertex directed graphs of isoclass %d and %d are not isomorphic. VF2 reports otherwise.\n", i, j);
+                printf("VF2 failure, 3 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. VF2 reports otherwise.\n", i, j);
             }
         }
 
@@ -62,8 +62,8 @@ void test3() {
 }
 
 
-void test4() {
-    int i, j;
+void test4(void) {
+    igraph_integer_t i, j;
     igraph_graph_list_t graphs4;
     igraph_t g;
 
@@ -85,7 +85,7 @@ void test4() {
                 NULL, NULL, &iso, NULL, NULL, IGRAPH_BLISS_F, NULL, NULL
             );
             if (iso) {
-                printf("Bliss failure, 4 vertex directed graphs of isoclass %d and %d are not isomorphic. Bliss reports otherwise.\n", i, j);
+                printf("Bliss failure, 4 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. Bliss reports otherwise.\n", i, j);
             }
         }
 
@@ -98,7 +98,7 @@ void test4() {
                 NULL, NULL, NULL, NULL, &iso, NULL, NULL, NULL, NULL, NULL
             );
             if (iso) {
-                printf("VF2 failure, 4 vertex directed graphs of isoclass %d and %d are not isomorphic. VF2 reports otherwise.\n", i, j);
+                printf("VF2 failure, 4 vertex directed graphs of isoclass %" IGRAPH_PRId " and %" IGRAPH_PRId " are not isomorphic. VF2 reports otherwise.\n", i, j);
             }
         }
 
@@ -106,7 +106,7 @@ void test4() {
 }
 
 
-void test_bliss() {
+void test_bliss(void) {
     igraph_t ring1, ring2, directed_ring;
     igraph_vector_int_t perm;
     igraph_bool_t iso;
@@ -191,7 +191,7 @@ void test_bliss() {
     igraph_destroy(&directed_ring);
 }
 
-void test_bug_995() {
+void test_bug_995(void) {
     igraph_t g1, g2;
     igraph_bool_t result;
 
@@ -207,7 +207,7 @@ void test_bug_995() {
     igraph_destroy(&g2);
 }
 
-int main() {
+int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 293847); /* make tests deterministic */
 

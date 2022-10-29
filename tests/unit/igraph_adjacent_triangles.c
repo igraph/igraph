@@ -3,7 +3,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t res;
     igraph_vs_t vertices;
@@ -40,7 +40,7 @@ int main() {
     print_vector(&res);
 
     printf("\nSimple:\n");
-    igraph_simplify(&g, 1, 1, NULL);
+    igraph_simplify(&g, true, true, NULL);
     igraph_adjacent_triangles(&g, &res, igraph_vss_all());
     print_vector(&res);
     igraph_adjacent_triangles(&g, &res, vertices);

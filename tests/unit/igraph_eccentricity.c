@@ -21,7 +21,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t ecc;
@@ -72,7 +72,7 @@ int main() {
     print_vector(&ecc);
     igraph_destroy(&g);
 
-    printf("\nIn-star:\n");
+    printf("\nOut-star, IGRAPH_OUT:\n");
     igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
     igraph_eccentricity(&g, &ecc, igraph_vss_all(), IGRAPH_OUT);
     print_vector(&ecc);

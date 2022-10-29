@@ -21,13 +21,10 @@
 
 */
 
-#include <limits.h>
-
 #include "igraph_lapack.h"
-
-#include "igraph_memory.h"
-
 #include "linalg/lapack_internal.h"
+
+#include <limits.h>
 
 #define BASE_FORTRAN_INT
 #include "igraph_pmt.h"
@@ -178,8 +175,8 @@ igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipi
  *      factorization A = P*L*U. L is expected to be unitriangular,
  *      diagonal entries are those of U. If A is singular, no warning or
  *      error wil be given and random output will be returned.
- * \param ipiv An integer vector, the pivot indices from \ref
- *      igraph_lapack_dgetrf() must be given here. Row \c i of A was
+ * \param ipiv An integer vector, the pivot indices from
+ *      \ref igraph_lapack_dgetrf() must be given here. Row \c i of A was
  *      interchanged with row <code>ipiv[i]</code>.
  * \param b The right hand side matrix must be given here. The solution
             will also be placed here.
@@ -216,12 +213,8 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
-    if (igraph_vector_int_size(ipiv) > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(ipiv, &min, &max);
-        if (max > n || min < 1) {
+    if (! igraph_vector_int_isininterval(ipiv, 1, n)) {
             IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
-        }
     }
     if (igraph_vector_int_size(ipiv) != n) {
         IGRAPH_ERROR("Pivot vector length must match number of matrix rows.", IGRAPH_EINVAL);
@@ -632,6 +625,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
+    igraph_real_t dummy;   /* to prevent some Clang sanitizer warnings */
+
     if (igraph_matrix_nrow(A) > INT_MAX) {
         IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
     }
@@ -672,8 +667,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy, 0, 0), &lda,
                  VECTOR(*myreal), VECTOR(*myimag),
-                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                  VECTOR(work), &lwork, info);
 
     lwork = (int) VECTOR(work)[0];
@@ -681,8 +676,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy, 0, 0), &lda,
                  VECTOR(*myreal), VECTOR(*myimag),
-                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                  VECTOR(work), &lwork, info);
 
     if (*info < 0) {
@@ -747,7 +742,8 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Permuting rows and columns will not change the condition numbers
  * (in exact arithmetic) but diagonal scaling will.  For further
  * explanation of balancing, see section 4.10.2 of the LAPACK
- * Users' Guide.
+ * Users' Guide. Note that the eigenvectors obtained for the balanced
+ * matrix are backtransformed to those of \p A.
  *
  * \param balance Scalar that indicated, whether the input matrix
  *   should be balanced. Possible values:
@@ -778,12 +774,14 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   stored in a compressed form. If the j-th eigenvalue is real then
  *   column j contains the corresponding eigenvector. If the j-th and
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
- *   and (j+1)-th columns contain their corresponding eigenvectors.
+ *   and (j+1)-th columns contain the real and imaginary parts of the
+ *   corresponding eigenvectors.
  * \param vectorsright An initialized matrix or a NULL pointer. If not
  *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo
- * \param ihi \p ilo and \p ihi are integer values determined when A was
+ * \param ihi if not NULL, \p ilo and \p ihi point to integer values
+ *   determined when A was
  *   balanced.  The balanced A(i,j) = 0 if I>J and
  *   J=1,...,ilo-1 or I=ihi+1,...,N.
  * \param scale Pointer to an initialized vector or a NULL pointer. If
@@ -856,7 +854,16 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     int error = *info;
     igraph_vector_t *myreal = valuesreal, *myimag = valuesimag, vreal, vimag;
     igraph_vector_t *myscale = scale, vscale;
+    igraph_real_t dummy;   /* to prevent some Clang sanitizer warnings */
+    int ilo_dummy;
+    int ihi_dummy;
 
+    if (ilo == NULL) {
+        ilo = &ilo_dummy;
+    }
+    if (ihi == NULL) {
+        ihi = &ihi_dummy;
+    }
     if (igraph_matrix_ncol(A) != n) {
         IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx).", IGRAPH_NONSQUARE);
     }
@@ -923,11 +930,11 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 
     igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy, 0, 0),
                   &lda, VECTOR(*myreal), VECTOR(*myimag),
-                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                   ilo, ihi, VECTOR(*myscale), abnrm,
-                  rconde ? VECTOR(*rconde) : 0,
-                  rcondv ? VECTOR(*rcondv) : 0,
+                  rconde ? VECTOR(*rconde) : &dummy,
+                  rcondv ? VECTOR(*rcondv) : &dummy,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     lwork = (int) VECTOR(work)[0];
@@ -935,11 +942,11 @@ igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 
     igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy, 0, 0),
                   &lda, VECTOR(*myreal), VECTOR(*myimag),
-                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                   ilo, ihi, VECTOR(*myscale), abnrm,
-                  rconde ? VECTOR(*rconde) : 0,
-                  rcondv ? VECTOR(*rcondv) : 0,
+                  rconde ? VECTOR(*rconde) : &dummy,
+                  rcondv ? VECTOR(*rcondv) : &dummy,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     if (*info < 0) {

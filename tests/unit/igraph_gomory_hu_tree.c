@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int validate_tree(const igraph_t *graph, const igraph_t *tree,
+igraph_error_t validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {
     igraph_integer_t n = igraph_vcount(graph);
     igraph_integer_t no_of_clusters, min_weight_edge_index;
@@ -157,7 +157,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_t tree;

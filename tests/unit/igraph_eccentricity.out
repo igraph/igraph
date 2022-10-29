@@ -19,5 +19,5 @@ Undirected star:
 Out-star:
 ( 1 2 2 2 2 2 2 2 2 2 )
 
-In-star:
+Out-star, IGRAPH_OUT:
 ( 1 0 0 0 0 0 0 0 0 0 )

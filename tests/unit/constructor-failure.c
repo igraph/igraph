@@ -67,7 +67,7 @@ void verify_graph(const igraph_t *graph, igraph_integer_t vcount, igraph_integer
     IGRAPH_ASSERT(igraph_vector_int_size(&graph->is) == vcount + 1);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
 
     /* Enable attribute handler */

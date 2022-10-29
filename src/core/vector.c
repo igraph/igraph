@@ -21,10 +21,10 @@
 
 */
 
-#include "igraph_complex.h"
-#include "igraph_error.h"
-#include "igraph_types.h"
 #include "igraph_vector.h"
+
+#include "igraph_complex.h"
+#include "igraph_types.h"
 #include "igraph_nongraph.h"
 
 #include <float.h>
@@ -98,7 +98,6 @@ igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_in
 }
 
 igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
-
     igraph_indheap_t heap;
 
     IGRAPH_CHECK(igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v)));
@@ -118,8 +117,7 @@ igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 /**
  * \ingroup vector
  * \function igraph_vector_int_pair_order
- * \brief Calculate the order of the elements in a pair of integer vectors of
- * equal length.
+ * \brief Calculates the order of the elements in a pair of integer vectors of equal length.
  *
  * The smallest element will have order zero, the second smallest
  * order one, etc.
@@ -308,37 +306,6 @@ igraph_error_t igraph_vector_int_rank(
     return IGRAPH_SUCCESS;
 }
 
-#ifndef USING_R
-igraph_error_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
-    if (n != 0) {
-        igraph_complex_t z = VECTOR(*v)[0];
-        printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    for (i = 1; i < n; i++) {
-        igraph_complex_t z = VECTOR(*v)[i];
-        printf(" %g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    printf("\n");
-    return IGRAPH_SUCCESS;
-}
-#endif
-
-igraph_error_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
-                                 FILE *file) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
-    if (n != 0) {
-        igraph_complex_t z = VECTOR(*v)[0];
-        fprintf(file, "%g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    for (i = 1; i < n; i++) {
-        igraph_complex_t z = VECTOR(*v)[i];
-        fprintf(file, " %g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-    }
-    fprintf(file, "\n");
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \ingroup vector
  * \function igraph_vector_complex_real
@@ -494,19 +461,19 @@ igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vector_complex_t *
     igraph_integer_t n = igraph_vector_complex_size(lhs);
 
     if (lhs == rhs) {
-        return 1;
+        return true;
     }
 
     if (igraph_vector_complex_size(rhs) != n) {
-        return 0;
+        return false;
     }
 
     for (igraph_integer_t i=0; i < n; i++) {
         if (! igraph_complex_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
-            return 0;
+            return false;
     }
 
-    return 1;
+    return true;
 }
 
 /**
@@ -526,7 +493,7 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 
     s = igraph_vector_size(lhs);
     if (s != igraph_vector_size(rhs)) {
-        return 0;
+        return false;
     } else {
         if (tol == 0) {
             tol = DBL_EPSILON;
@@ -535,10 +502,10 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
             igraph_real_t l = VECTOR(*lhs)[i];
             igraph_real_t r = VECTOR(*rhs)[i];
             if (l < r - tol || l > r + tol) {
-                return 0;
+                return false;
             }
         }
-        return 1;
+        return true;
     }
 }
 
@@ -561,33 +528,99 @@ igraph_bool_t igraph_vector_all_almost_e(const igraph_vector_t *lhs,
     igraph_integer_t n = igraph_vector_size(lhs);
 
     if (lhs == rhs) {
-        return 1;
+        return true;
     }
 
     if (igraph_vector_size(rhs) != n) {
-        return 0;
+        return false;
     }
 
     for (igraph_integer_t i=0; i < n; i++) {
         if (! igraph_almost_equals(VECTOR(*lhs)[i], VECTOR(*rhs)[i], eps))
-            return 0;
+            return false;
     }
 
-    return 1;
+    return true;
 }
 
+/**
+ * \function igraph_vector_zapsmall
+ * \brief Replaces small elements of a vector by exact zeros.
+ *
+ * Vector elements which are smaller in magnitude than the given absolute
+ * tolerance will be replaced by exact zeros. The default tolerance
+ * corresponds to two-thirds of the representable digits of \type igraph_real_t,
+ * i.e. <code>DBL_EPSILON^(2/3)</code> which is approximately <code>10^-10</code>.
+ *
+ * \param v   The vector to process, it will be changed in-place.
+ * \param tol Tolerance value. Numbers smaller than this in magnitude will
+ *            be replaced by zeros. Pass in zero to use the default tolerance.
+ *            Must not be negative.
+ * \return Error code.
+ *
+ * \sa \ref igraph_vector_all_almost_e() and \ref igraph_almost_equals() to
+ * perform comparisons with relative tolerances.
+ */
 igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
     igraph_integer_t i, n = igraph_vector_size(v);
     if (tol < 0.0) {
-        IGRAPH_ERROR("`tol' tolerance must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Tolerance must be positive or zero.", IGRAPH_EINVAL);
     }
     if (tol == 0.0) {
-        tol = sqrt(DBL_EPSILON);
+        tol = pow(DBL_EPSILON, 2.0/3);
     }
     for (i = 0; i < n; i++) {
         igraph_real_t val = VECTOR(*v)[i];
         if (val < tol && val > -tol) {
             VECTOR(*v)[i] = 0.0;
+        }
+    }
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_vector_complex_zapsmall
+ * \brief Replaces small elements of a complex vector by exact zeros.
+ *
+ * Similarly to \ref igraph_vector_zapsmall(), small elements will be replaced
+ * by zeros. The operation is performed separately on the real and imaginary
+ * parts of the numbers. This way, complex numbers with a large real part and
+ * tiny imaginary part will effectively be transformed to real numbers.
+ * The default tolerance
+ * corresponds to two-thirds of the representable digits of \type igraph_real_t,
+ * i.e. <code>DBL_EPSILON^(2/3)</code> which is approximately <code>10^-10</code>.
+ *
+ * \param v   The vector to process, it will be changed in-place.
+ * \param tol Tolerance value. Real and imaginary parts smaller than this in
+ *            magnitude will be replaced by zeros. Pass in zero to use the default
+ *            tolerance. Must not be negative.
+ * \return Error code.
+ *
+ * \sa \ref igraph_vector_complex_all_almost_e() and
+ * \ref igraph_complex_almost_equals() to perform comparisons with relative
+ * tolerances.
+ */
+igraph_error_t igraph_vector_complex_zapsmall(igraph_vector_complex_t *v, igraph_real_t tol) {
+    igraph_integer_t i, n = igraph_vector_complex_size(v);
+    if (tol < 0.0) {
+        IGRAPH_ERROR("Tolerance must be positive or zero.", IGRAPH_EINVAL);
+    }
+    if (tol == 0.0) {
+        tol = pow(DBL_EPSILON, 2.0/3);
+    }
+    for (i = 0; i < n; i++) {
+        igraph_complex_t val = VECTOR(*v)[i];
+        igraph_bool_t zapped = false;
+        if (IGRAPH_REAL(val) < tol && IGRAPH_REAL(val) > -tol) {
+            IGRAPH_REAL(val) = 0.0;
+            zapped = true;
+        }
+        if (IGRAPH_IMAG(val) < tol && IGRAPH_IMAG(val) > -tol) {
+            IGRAPH_IMAG(val) = 0.0;
+            zapped = true;
+        }
+        if (zapped) {
+            VECTOR(*v)[i] = val;
         }
     }
     return IGRAPH_SUCCESS;
@@ -618,7 +651,7 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
     IGRAPH_ASSERT(is_nan->stor_begin != NULL);
     IGRAPH_CHECK(igraph_vector_bool_resize(is_nan, igraph_vector_size(v)));
     for (ptr = v->stor_begin, ptr_nan = is_nan->stor_begin; ptr < v->end; ptr++, ptr_nan++) {
-        *ptr_nan = igraph_is_nan(*ptr) ? 1 : 0;
+        *ptr_nan = isnan(*ptr);
     }
     return IGRAPH_SUCCESS;
 }
@@ -640,10 +673,10 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
     IGRAPH_ASSERT(v->stor_begin != NULL);
     ptr = v->stor_begin;
     while (ptr < v->end) {
-        if (igraph_is_nan(*ptr)) {
-            return 1;
+        if (isnan(*ptr)) {
+            return true;
         }
         ptr++;
     }
-    return 0;
+    return false;
 }

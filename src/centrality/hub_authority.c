@@ -27,8 +27,6 @@
 
 #include "centrality/centrality_internal.h"
 
-#include "config.h"
-
 #include <limits.h>
 
 /* struct for the unweighted variant of the HITS algorithm */

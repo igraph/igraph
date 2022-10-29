@@ -31,6 +31,7 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
+#include "core/math.h"
 
 /**
  * \ingroup generators
@@ -373,7 +374,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
     /* Calculate alpha_out */
     if (exponent_out < 2) {
         IGRAPH_ERRORF("Out-degree exponent must be >= 2, got %g.", IGRAPH_EINVAL, exponent_out);
-    } else if (igraph_finite(exponent_out)) {
+    } else if (isfinite(exponent_out)) {
         alpha_out = -1.0 / (exponent_out - 1);
     } else {
         alpha_out = 0.0;
@@ -385,7 +386,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
     if (finite_size_correction && alpha_out < -0.5) {
         /* See the Cho et al paper, first page first column + footnote 7 */
         j += pow(no_of_nodes, 1 + 0.5 / alpha_out) *
-             pow(10 * sqrt(2) * (1 + alpha_out), -1.0 / alpha_out) - 1;
+             pow(10 * M_SQRT2 * (1 + alpha_out), -1.0 / alpha_out) - 1;
     }
     if (j < no_of_nodes) {
         j = no_of_nodes;
@@ -398,7 +399,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         if (exponent_in < 2) {
             IGRAPH_ERRORF("For directed graphs the in-degree exponent must be >= 2, got %g.",
                           IGRAPH_EINVAL, exponent_in);
-        } else if (igraph_finite(exponent_in)) {
+        } else if (isfinite(exponent_in)) {
             alpha_in = -1.0 / (exponent_in - 1);
         } else {
             alpha_in = 0.0;
@@ -409,7 +410,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         if (finite_size_correction && alpha_in < -0.5) {
             /* See the Cho et al paper, first page first column + footnote 7 */
             j += pow(no_of_nodes, 1 + 0.5 / alpha_in) *
-                 pow(10 * sqrt(2) * (1 + alpha_in), -1.0 / alpha_in) - 1;
+                 pow(10 * M_SQRT2 * (1 + alpha_in), -1.0 / alpha_in) - 1;
         }
         if (j < no_of_nodes) {
             j = no_of_nodes;

@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     const igraph_integer_t edges[] = { 0, 1, 0, 2, 1, 6, 2, 6, 1, 3, 1, 4, 1, 5,
                                     3, 2, 4, 2, 5, 2
                                   };
@@ -33,7 +33,7 @@ int main() {
     igraph_vector_int_t edgev;
     igraph_vector_int_list_t resvertices, resedges;
     igraph_vector_int_t parents, inbound_edges;
-    int vcount, i;
+    igraph_integer_t vcount, i;
 
     igraph_vector_int_view(&edgev, edges, sizeof(edges) / sizeof(edges[0]));
     vcount = igraph_vector_int_max(&edgev) + 1;
@@ -51,9 +51,9 @@ int main() {
     for (i = 0; i < vcount; i++) {
         igraph_vector_int_t *v1 = igraph_vector_int_list_get_ptr(&resvertices, i);
         igraph_vector_int_t *v2 = igraph_vector_int_list_get_ptr(&resedges, i);
-        printf("%i V: ", i);
+        printf("%" IGRAPH_PRId " V: ", i);
         igraph_vector_int_print(v1);
-        printf("%i E: ", i);
+        printf("%" IGRAPH_PRId " E: ", i);
         igraph_vector_int_print(v2);
     }
     printf("pred: ");

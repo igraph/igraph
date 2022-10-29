@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_progress_handler_stderr("This is a message ", 10, NULL);
 
     VERIFY_FINALLY_STACK();

@@ -169,10 +169,9 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
         }
     } else if (size == 4) {
         if (directed) {
-            int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
-                                    28, 33, 34, 39, 62, 120
-                                  };
-            int i, n = sizeof(not_connected) / sizeof(not_connected[0]);
+            const int not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
+                                          28, 33, 34, 39, 62, 120 };
+            size_t i, n = sizeof(not_connected) / sizeof(not_connected[0]);
             for (i = 0; i < n; i++) {
                 VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
             }
@@ -182,17 +181,17 @@ igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *his
         }
     } else if (size == 5) {
         /* undirected only */
-        int not_connected[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 19 };
-        int i, n = sizeof(not_connected) / sizeof(int);
+        const int not_connected[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 19 };
+        size_t i, n = sizeof(not_connected) / sizeof(int);
         for (i = 0; i < n; i++) {
             VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
         }
     } else if (size == 6) {
         /* undirected only */
-        int not_connected[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-                               19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 38,
-                               44, 50, 51, 54, 74, 77, 89, 120};
-        int i, n = sizeof(not_connected) / sizeof(int);
+        const int not_connected[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                                     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                                     30, 31, 32, 33, 35, 38, 44, 50, 51, 54, 74, 77, 89, 120};
+        size_t i, n = sizeof(not_connected) / sizeof(int);
         for (i = 0; i < n; i++) {
             VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
         }
@@ -258,7 +257,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
     unsigned int code = 0;
     unsigned int mul, idx;
 
-    igraph_bool_t terminate = 0;
+    igraph_bool_t terminate = false;
 
     if (igraph_is_directed(graph)) {
         switch (size) {
@@ -402,7 +401,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
                     );
 
                     if (ret == IGRAPH_STOP) {
-                        terminate = 1;
+                        terminate = true;
                         break;
                     }
 
@@ -575,12 +574,8 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
-    if (parsample && igraph_vector_int_size(parsample) != 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(parsample, &min, &max);
-        if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Sample vertex ID out of range.", IGRAPH_EINVAL);
-        }
+    if (parsample && !igraph_vector_int_isininterval(parsample, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("Sample vertex ID out of range.", IGRAPH_EINVVID);
     }
 
     if (no_of_nodes == 0) {
@@ -925,9 +920,8 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
 
 /**
  * \function igraph_dyad_census
- * \brief Calculating the dyad census as defined by Holland and Leinhardt.
+ * \brief Dyad census, as defined by Holland and Leinhardt.
  *
- * </para><para>
  * Dyad census means classifying each pair of vertices of a directed
  * graph into three categories: mutual (there is at least one edge from
  * \c a to \c b and also from \c b to \c a); asymmetric (there is at least
@@ -941,13 +935,12 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
  *
  * \param graph The input graph. For an undirected graph, there are no
  *    asymmetric connections.
- * \param mut Pointer to an integer, the number of mutual dyads is
+ * \param mut Pointer to a real, the number of mutual dyads is
  *    stored here.
- * \param asym Pointer to an integer, the number of asymmetric dyads
+ * \param asym Pointer to a real, the number of asymmetric dyads
  *    is stored here.
- * \param null Pointer to an integer, the number of null dyads is
- *    stored here. In case of an integer overflow (i.e. too many
- *    null dyads), -1 will be returned.
+ * \param null Pointer to a real, the number of null dyads is
+ *    stored here.
  * \return Error code.
  *
  * \sa \ref igraph_reciprocity(), \ref igraph_triad_census().
@@ -955,10 +948,14 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
-                       igraph_integer_t *asym, igraph_integer_t *null) {
+igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_real_t *mut,
+                       igraph_real_t *asym, igraph_real_t *null) {
 
-    igraph_integer_t nonrec = 0, rec = 0;
+    /* This function operates with a floating point type instead of an
+     * integer type in order to avoid integer overflow, which is likely
+     * for 'null' in large graphs on 32-bit systems. */
+
+    igraph_real_t nonrec = 0, rec = 0;
     igraph_vector_int_t inneis, outneis;
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t i;
@@ -999,17 +996,8 @@ igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 
     *mut = rec / 2;
     *asym = nonrec / 2;
-    if (vc % 2) {
-        *null = vc * ((vc - 1) / 2);
-    } else {
-        *null = (vc / 2) * (vc - 1);
-    }
-    if (*null < vc && vc > 2) {
-        IGRAPH_WARNING("Integer overflow, returning -1.");
-        *null = -1;
-    } else {
-        *null = *null - (*mut) - (*asym);
-    }
+    *null = 0.5 * vc * (vc - 1.0) - (*mut + *asym);
+    if (*null == 0.0) *null = 0.0; /* avoid returning -0.0 */
 
     return IGRAPH_SUCCESS;
 }
@@ -1081,7 +1069,7 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
 
 /**
  * \function igraph_triad_census
- * \brief Triad census, as defined by Davis and Leinhardt
+ * \brief Triad census, as defined by Davis and Leinhardt.
  *
  * </para><para>
  * Calculating the triad census means classifying every triple of

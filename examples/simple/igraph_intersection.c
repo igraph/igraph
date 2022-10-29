@@ -31,7 +31,7 @@ void print_vector(igraph_vector_t *v) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
 
     igraph_t left, right, isec;
     igraph_vector_int_t v;

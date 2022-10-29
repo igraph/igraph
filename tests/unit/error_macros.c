@@ -19,17 +19,17 @@
 #include <igraph_error.h>
 #include "test_utilities.h"
 
-int cause_error() {
+int cause_error(void) {
     IGRAPH_ERRORF("%d %f %ld %c", IGRAPH_EINVAL, 1, 1.0, 1L, 'a');
     return IGRAPH_SUCCESS;
 }
 
-int cause_warning() {
+int cause_warning(void) {
     IGRAPH_WARNINGF("%d %f %ld %c", 1, 1.0, 1L, 'a');
     return IGRAPH_SUCCESS;
 }
 
-int cause_fatal() {
+int cause_fatal(void) {
     IGRAPH_FATALF("%d %f %ld %c", 1, 1.0, 1L, 'a');
 }
 
@@ -52,7 +52,7 @@ void fatal_handler(const char *reason, const char *file, int line) {
     exit(0);
 }
 
-int main() {
+int main(void) {
     igraph_set_error_handler(&error_handler);
     igraph_set_warning_handler(&warning_handler);
     igraph_set_fatal_handler(&fatal_handler);

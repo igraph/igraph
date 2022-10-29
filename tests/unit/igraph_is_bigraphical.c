@@ -12,7 +12,7 @@
     igraph_vector_int_destroy(&(deg1)); \
     igraph_vector_int_destroy(&(deg2));
 
-int main() {
+int main(void) {
     igraph_vector_int_t deg1, deg2;
     igraph_bool_t simple, multi;
 

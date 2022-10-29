@@ -26,13 +26,29 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_matrix_t coords;
     igraph_real_t vc;
 
     igraph_rng_seed(igraph_rng_default(), 33);
+
+    printf("Testing graph with no vertices\n");
+    igraph_small(&g, 0, 0, -1);
+    igraph_matrix_init(&coords, 0, 0);
+    vc = igraph_vcount(&g);
+    igraph_layout_lgl(&g, &coords,
+                      /* maxiter */    150,
+                      /* maxdelta */   vc,
+                      /* area */       vc * vc,
+                      /* coolexp */    1.5,
+                      /* repulserad */ vc * vc * vc,
+                      /* cellsize */   sqrt(sqrt(vc)),
+                      /* root */       0);
+
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
 
     printf("Testing k-ary tree\n");
     igraph_kary_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);

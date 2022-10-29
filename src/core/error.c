@@ -62,7 +62,7 @@
  * Note that some of the other #ifndef USING_R's in this file are still needed
  * to avoid references to fprintf and stderr.
  */
-static IGRAPH_FUNCATTR_NORETURN void igraph_abort() {
+static IGRAPH_FUNCATTR_NORETURN void igraph_abort(void) {
 #ifndef USING_R
 #ifdef IGRAPH_SANITIZER_AVAILABLE
     fprintf(stderr, "\nStack trace:\n");
@@ -143,7 +143,8 @@ static const char *igraph_i_error_strings[] = {
     /* 51 */ "Internal attribute handler error",
     /* 52 */ "Unimplemented attribute combination for this type",
     /* 53 */ "LAPACK call resulted in an error",
-    /* 54 */ "Internal DrL error",
+    /* 54 */ "Internal DrL error; this error should never be visible to the user, "
+    "please report this error along with the steps to reproduce it.",
     /* 55 */ "Integer or double overflow",
     /* 56 */ "Internal GPLK error",
     /* 57 */ "CPU time exceeded",
@@ -151,12 +152,13 @@ static const char *igraph_i_error_strings[] = {
     /* 59 */ "Random walk got stuck",
     /* 60 */ "Search stopped; this error should never be visible to the user, "
     "please report this error along with the steps to reproduce it.",
-    /* 61 */ "Result too large"
+    /* 61 */ "Result too large",
+    /* 62 */ "Input problem has no solution"
 };
 
 const char *igraph_strerror(const igraph_error_t igraph_errno) {
-    if (igraph_errno < 0 ||
-        ((size_t) igraph_errno) >= sizeof(igraph_i_error_strings) / sizeof(char *)) {
+    if ((int) igraph_errno < 0 ||
+        (int) igraph_errno >= sizeof(igraph_i_error_strings) / sizeof(igraph_i_error_strings[0])) {
         IGRAPH_FATALF("Invalid error code %d; no error string available.", (int) igraph_errno);
     }
     return igraph_i_error_strings[igraph_errno];
@@ -297,7 +299,7 @@ int IGRAPH_FINALLY_STACK_SIZE(void) {
  * will only unwind the current level of the finally stack, not any of the lower
  * levels. This mechanism is used to allow some functions to pause stack unwinding
  * until they can restore their data structures into a consistent state.
- * See igraph_add_edges() for an example usage.
+ * See \ref igraph_add_edges() for an example usage.
  */
 void IGRAPH_FINALLY_ENTER(void) {
     int no = igraph_i_finally_stack_size;

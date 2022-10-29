@@ -285,12 +285,13 @@ typedef struct igraph_arpack_storage_t {
     igraph_real_t *resid;
     igraph_real_t *ax;
     int *select;
-    igraph_real_t *di;        /* These two only for non-symmetric problems */
+    /* The following two are only used for non-symmetric problems: */
+    igraph_real_t *di;
     igraph_real_t *workev;
 } igraph_arpack_storage_t;
 
 IGRAPH_EXPORT void igraph_arpack_options_init(igraph_arpack_options_t *o);
-IGRAPH_EXPORT igraph_arpack_options_t* igraph_arpack_options_get_default();
+IGRAPH_EXPORT igraph_arpack_options_t* igraph_arpack_options_get_default(void);
 
 IGRAPH_EXPORT igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
                                              igraph_integer_t maxncv, igraph_integer_t maxldv, igraph_bool_t symm);

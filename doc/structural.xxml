@@ -19,9 +19,12 @@
 
 <section id="shortest-path-related-functions"><title>(Shortest)-path related functions</title>
 <!-- doxrox-include igraph_distances -->
+<!-- doxrox-include igraph_distances_cutoff -->
 <!-- doxrox-include igraph_distances_dijkstra -->
+<!-- doxrox-include igraph_distances_dijkstra_cutoff -->
 <!-- doxrox-include igraph_distances_bellman_ford -->
 <!-- doxrox-include igraph_distances_johnson -->
+<!-- doxrox-include igraph_distances_floyd_warshall -->
 <!-- doxrox-include igraph_get_shortest_paths -->
 <!-- doxrox-include igraph_get_shortest_path -->
 <!-- doxrox-include igraph_get_shortest_paths_dijkstra -->
@@ -39,9 +42,11 @@
 <!-- doxrox-include igraph_diameter_dijkstra -->
 <!-- doxrox-include igraph_girth -->
 <!-- doxrox-include igraph_eccentricity -->
+<!-- doxrox-include igraph_eccentricity_dijkstra -->
 <!-- doxrox-include igraph_graph_center -->
 <!-- doxrox-include igraph_radius -->
 <!-- doxrox-include igraph_pseudo_diameter -->
+<!-- doxrox-include igraph_voronoi -->
 <!-- doxrox-include igraph_vertex_path_from_edge_path -->
 </section>
 
@@ -76,8 +81,9 @@
 <!-- doxrox-include igraph_local_scan_1_ecount_them -->
 <!-- doxrox-include igraph_local_scan_k_ecount_them -->
 </section>
-<section id="pre-calculated-neighborhoods"><title>Pre-calculated neighborhoods</title>
+<section id="pre-calculated-subsets"><title>Pre-calculated subsets</title>
 <!-- doxrox-include igraph_local_scan_neighborhood_ecount -->
+<!-- doxrox-include igraph_local_scan_subset_ecount -->
 </section>
 </section>
 
@@ -167,6 +173,7 @@
 <!-- doxrox-include igraph_transitivity_local_undirected -->
 <!-- doxrox-include igraph_transitivity_avglocal_undirected -->
 <!-- doxrox-include igraph_transitivity_barrat -->
+<!-- doxrox-include igraph_ecc -->
 </section>
 
 <section id="directedness-conversion"><title>Directedness conversion</title>
@@ -186,6 +193,7 @@
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
+<!-- doxrox-include igraph_count_multiple_1 -->
 </section>
 
 <section id="mixing-patterns"><title>Mixing patterns</title>

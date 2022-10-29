@@ -4,7 +4,7 @@
 
 /*
  * This test tries to ensure that property caching works correctly in the most
- * "dangerous" scenarios (goijg from disconnected to connected graphs and
+ * "dangerous" scenarios (going from disconnected to connected graphs and
  * back). Feel free to extend the file later on with regression tests for any
  * issues that we might find related to caching.
  *
@@ -91,28 +91,31 @@ void test_basic_operations(igraph_t* graph) {
     validate_properties(graph);
 }
 
-int test_basic_operations_directed() {
+int test_basic_operations_directed(void) {
     igraph_t g;
 
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
     test_basic_operations(&g);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
 
-int test_basic_operations_undirected() {
+int test_basic_operations_undirected(void) {
     igraph_t g;
 
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     test_basic_operations(&g);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
 
-int main() {
-    int retval;
+int main(void) {
 
     RUN_TEST(test_basic_operations_directed);
     RUN_TEST(test_basic_operations_undirected);

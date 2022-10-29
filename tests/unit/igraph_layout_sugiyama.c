@@ -27,7 +27,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g, extd_g;
     igraph_matrix_t coords;
     igraph_vector_int_t edgelist, extd_edgelist, extd_to_orig_eids;

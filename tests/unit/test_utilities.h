@@ -135,7 +135,7 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);
  * empty. Needs an integer variable named 'retval' in the local context. */
 #define RUN_TEST(func) \
     { \
-        retval = func(); \
+        int retval = func(); \
         if (retval) { \
             return retval; \
         } \

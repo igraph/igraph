@@ -11,24 +11,43 @@
 
 <para>
 The following short example program demonstrates the basic usage of
-the <command>igraph</command> library.
+the <command>igraph</command> library. Save it into a file named
+<filename>igraph_test.c</filename>.
 <xi:include href="../examples/tutorial/tutorial1.c.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 </para>
 
 <para>
-This example illustrates a couple of points. First, programs
+This example illustrates a couple of points:
+</para>
+
+<itemizedlist>
+<listitem><para>
+First, programs
 using the <command>igraph</command> library should include the
 <filename>igraph.h</filename> header
-file. Second, <command>igraph</command> uses the
+file.
+</para></listitem>
+<listitem><para>
+Second, <command>igraph</command> uses the
+<type>igraph_integer_t</type> type for integers instead of
+<type>int</type> or <type>long int</type>, and it also uses the
 <type>igraph_real_t</type> type for real numbers instead of
-<type>double</type>. Third, <command>igraph</command> graph objects
-are represented by the <type>igraph_t</type> data
-type. Fourth, the <link
+<type>double</type>. Depending on how <command>igraph</command> was compiled, and whether you are
+using a 32-bit or 64-bit system, <type>igraph_integer_t</type> may be a 32-bit
+or 64-bit integer.
+</para></listitem>
+<listitem><para>
+Third, <command>igraph</command> graph objects are represented by the <type>igraph_t</type> data
+type.
+</para></listitem>
+<listitem><para>
+Fourth, the <link
 linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
 destroys it, i.e. deallocates the memory associated to it.
-</para>
+</para></listitem>
+</itemizedlist>
 
 <para>
 For compiling this program you need a C compiler. Optionally,
@@ -58,7 +77,7 @@ target_link_libraries(igraph_test PUBLIC igraph::igraph)
 
 <para>
 To compile the project, create a new directory called <filename>build</filename> in
-the root of the igraph source tree, and switch to it:
+the root of the <command>igraph</command> source tree, and switch to it:
 <programlisting>
 mkdir build
 cd build
@@ -73,7 +92,7 @@ cmake ..
 </para>
 
 <para>
-If igraph was installed at a non-standard location, specify its prefix
+If <command>igraph</command> was installed at a non-standard location, specify its prefix
 using the <option>-DCMAKE_PREFIX_PATH=...</option> option. The prefix must be
 the same directory that was specified as the <option>CMAKE_INSTALL_PREFIX</option>
 when compiling igraph.
@@ -87,15 +106,16 @@ cmake --build .
 </para>
 
 <note><title>C++ must be enabled in igraph projects</title>
-<para>Parts of igraph are implemented in C++; therefore, any CMake target that
-depends on igraph should use the C++ linker. Furthermore, OpenMP support in
+<para>Parts of <command>igraph</command> are implemented in C++; therefore, any CMake target that
+depends on <command>igraph</command> should use the C++ linker. Furthermore, OpenMP support in
 igraph works correctly only if C++ is enabled in the CMake project. The script
-that finds igraph on the host machine will throw an error if C++ support is
+that finds <command>igraph</command> on the host machine will throw an error if C++ support is
 not enabled in the CMake project.</para>
 
 <para>C++ support is enabled by default when no languages are explicitly
-specified in CMake's <code>project</code> command. If you do specify some
-languages explicitly, make sure to also include <code>CXX</code>.
+specified in CMake's <ulink url="https://cmake.org/cmake/help/latest/command/project.html"><code>project</code></ulink>
+command, e.g. <code>project(igraph_test)</code>. If you do specify some languages explicitly, 
+make sure to also include <code>CXX</code>, e.g. <code>project(igraph_test C CXX)</code>.
 </para>
 </note>
 
@@ -208,9 +228,8 @@ on them. A vector can be indexed by the
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). The elements of a vector are of type <type>igraph_real_t</type>
 for <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>,
-and of type <type>igraph_integer_t</type> for <type>igraph_vector_int_t</type>. Depending on
-how igraph was compiled, and whether you are using a 32-bit or 64-bit system, <type>igraph_integer_t</type>
-may be a 32- or 64-bit integer. As you might expect, <type>igraph_vector_bool_t</type> holds
+and of type <type>igraph_integer_t</type> for <type>igraph_vector_int_t</type>.
+As you might expect, <type>igraph_vector_bool_t</type> holds
 <type>igraph_bool_t</type> values. Vectors can be resized and most <command>igraph</command>
 functions returning the result in a vector automatically resize it to the size they need.
 </para>
@@ -226,7 +245,7 @@ the reference manual for the other arguments.
 
 <para>
 The vertices in a graph are identified by a <emphasis>vertex ID</emphasis>, an integer between
-0 and N-1, where N is the number of vertices in the graph. The vertex count can be
+<code>0</code> and <code>N-1</code>, where <code>N</code> is the number of vertices in the graph. The vertex count can be
 retrieved using <link linkend="igraph_vcount"><function>igraph_vcount()</function></link>,
 as in the example.
 </para>
@@ -243,7 +262,7 @@ two, etc. This way we add ten random edges to the lattice.
 Note that this example program may add <emphasis>loop edges</emphasis>, edges
 pointing a vertex to itself, or <emphasis>multiple edges</emphasis>, more than one edge
 between the same pair of vertices.
-<type>igraph_t</type> can of course represent loops and multiple edges, although some 
+<type>igraph_t</type> can of course represent loops and multiple edges, although some
 routines expect simple graphs, i.e. graphs which contain neither of these. This is because some
 structural properties are ill-defined for non-simple graphs. Loop and multi-edges can be removed by calling
 <link linkend="igraph_simplify"><function>igraph_simplify()</function></link>.

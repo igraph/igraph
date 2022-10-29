@@ -34,7 +34,7 @@ igraph_error_t cb2(igraph_real_t *to, const igraph_real_t *from, int n, void *ex
     cb2_data_t *data = (cb2_data_t*) extra;
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
                                            data->A, from, /*beta=*/ 0.0, to);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int check_eigenvector(
@@ -125,13 +125,15 @@ int check_eigenvectors(
 
 #define DIM 10
 
-int main() {
+int main(void) {
     igraph_matrix_t A;
     igraph_matrix_t values, vectors;
     igraph_arpack_options_t options;
     cb2_data_t data = { &A };
     int i, j;
 
+    /* Note: igraph_arpack_rnsolve() uses the RNG to generate a random
+     * starting vector for ARPACK. */
     igraph_rng_seed(igraph_rng_default(), 42 * 42);
 
     igraph_matrix_init(&A, DIM, DIM);

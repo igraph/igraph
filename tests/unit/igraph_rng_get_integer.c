@@ -24,7 +24,7 @@
 
 #include "test_utilities.h"
 
-void simple_tests() {
+void simple_tests(void) {
     int i;
 
     /* Seed the RNG, generate 10 random integers */
@@ -85,7 +85,7 @@ void check_consecutive_bits(const igraph_vector_int_t* numbers, uint8_t num_bits
     n = igraph_vector_int_size(numbers);
 
     for (j = 0; j < 4; j++) {
-        mask = (1 << (j + 1)) - 1;
+        mask = ((igraph_integer_t) 1 << (j + 1)) - 1;
         igraph_vector_bool_init(&seen, mask + 1);
         for (i = 0; i < num_bits - j; i++, mask <<= 1) {
             still_needed = (1 << (j + 1));
@@ -132,7 +132,7 @@ void check_consecutive_bits(const igraph_vector_int_t* numbers, uint8_t num_bits
     }
 }
 
-void stress_tests() {
+void stress_tests(void) {
     igraph_rng_t rng;
     const igraph_rng_type_t* rng_types[] = {
         &igraph_rngtype_mt19937,
@@ -202,7 +202,7 @@ void stress_tests() {
     igraph_vector_int_destroy(&numbers);
 }
 
-int main() {
+int main(void) {
     simple_tests();
     stress_tests();
 

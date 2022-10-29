@@ -44,8 +44,6 @@
 
 */
 
-#include "config.h"
-
 #include "internal/hacks.h"
 #include "io/dl-header.h"
 #include "io/parsers/dl-parser.h"

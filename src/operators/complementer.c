@@ -30,9 +30,9 @@
 
 /**
  * \function igraph_complementer
- * \brief Create the complementer of a graph
+ * \brief Creates the complementer of a graph.
  *
- * </para><para>The complementer graph means that all edges which are
+ * The complementer graph means that all edges which are
  * not part of the original graph will be included in the result.
  *
  * \param res Pointer to an uninitialized graph object.

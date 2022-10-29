@@ -54,47 +54,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
 
-#ifndef USING_R
-igraph_error_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
-
-    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
-    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
-    igraph_integer_t i, j;
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
-            igraph_complex_t z = MATRIX(*m, i, j);
-            if (j != 0) {
-                putchar(' ');
-            }
-            printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-        }
-        printf("\n");
-    }
-
-    return IGRAPH_SUCCESS;
-}
-#endif
-
-igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
-                                 FILE *file) {
-
-    igraph_integer_t nr = igraph_matrix_complex_nrow(m);
-    igraph_integer_t nc = igraph_matrix_complex_ncol(m);
-    igraph_integer_t i, j;
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
-            igraph_complex_t z = MATRIX(*m, i, j);
-            if (j != 0) {
-                fputc(' ', file);
-            }
-            fprintf(file, "%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
-        }
-        fprintf(file, "\n");
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \ingroup matrix
  * \function igraph_matrix_complex_real
@@ -255,7 +214,7 @@ igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *m,
  * \return True if the two matrices are almost equal, false if there is at least
  *     one differing element or if the matrices are not of the same dimensions.
  */
-igraph_error_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
+igraph_bool_t igraph_matrix_complex_all_almost_e(igraph_matrix_complex_t *lhs,
                                                   igraph_matrix_complex_t *rhs,
                                                   igraph_real_t eps) {
     return lhs->ncol == rhs->ncol && lhs->nrow == rhs->nrow &&
@@ -295,6 +254,51 @@ igraph_bool_t igraph_matrix_all_almost_e(const igraph_matrix_t *lhs,
             igraph_vector_all_almost_e(&lhs->data, &rhs->data, eps);
 }
 
+
+/**
+ * \function igraph_matrix_zapsmall
+ * \brief Replaces small elements of a matrix by exact zeros.
+ *
+ * Matrix elements which are smaller in magnitude than the given absolute
+ * tolerance will be replaced by exact zeros. The default tolerance
+ * corresponds to two-thirds of the representable digits of \type igraph_real_t,
+ * i.e. <code>DBL_EPSILON^(2/3)</code> which is approximately <code>10^-10</code>.
+ *
+ * \param m   The matrix to process, it will be changed in-place.
+ * \param tol Tolerance value. Numbers smaller than this in magnitude will
+ *            be replaced by zeros. Pass in zero to use the default tolerance.
+ *            Must not be negative.
+ * \return Error code.
+ *
+ * \sa \ref igraph_matrix_all_almost_e() and \ref igraph_almost_equals() to
+ * perform comparisons with relative tolerances.
+ */
 igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol) {
     return igraph_vector_zapsmall(&m->data, tol);
+}
+
+/**
+ * \function igraph_matrix_complex_zapsmall
+ * \brief Replaces small elements of a complex matrix by exact zeros.
+ *
+ * Similarly to \ref igraph_matrix_zapsmall(), small elements will be replaced
+ * by zeros. The operation is performed separately on the real and imaginary
+ * parts of the numbers. This way, complex numbers with a large real part and
+ * tiny imaginary part will effectively be transformed to real numbers.
+ * The default tolerance
+ * corresponds to two-thirds of the representable digits of \type igraph_real_t,
+ * i.e. <code>DBL_EPSILON^(2/3)</code> which is approximately <code>10^-10</code>.
+ *
+ * \param m   The matrix to process, it will be changed in-place.
+ * \param tol Tolerance value. Real and imaginary parts smaller than this in
+ *            magnitude will be replaced by zeros. Pass in zero to use the default
+ *            tolerance. Must not be negative.
+ * \return Error code.
+ *
+ * \sa \ref igraph_matrix_complex_all_almost_e() and
+ * \ref igraph_complex_almost_equals() to perform comparisons with relative
+ * tolerances.
+ */
+igraph_error_t igraph_matrix_complex_zapsmall(igraph_matrix_complex_t *m, igraph_real_t tol) {
+    return igraph_vector_complex_zapsmall(&m->data, tol);
 }

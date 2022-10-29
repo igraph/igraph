@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t weights;
     igraph_vector_int_t membership;
@@ -45,16 +45,16 @@ int main() {
     /* Null graph */
     igraph_vector_int_init(&membership, 0);
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
-    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, &modularity);
-    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
+    IGRAPH_ASSERT(isnan(modularity));
 
     igraph_destroy(&graph);
     igraph_small(&graph, 0, IGRAPH_DIRECTED, -1);
-    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, &modularity);
-    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
+    IGRAPH_ASSERT(isnan(modularity));
 
     /* Should not crash if we omit 'modularity' */
-    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, /* modularity = */ 0);
+    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, /* modularity = */ NULL);
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&membership);
 
@@ -77,7 +77,7 @@ int main() {
     for (resolution = 0.5; resolution <= 1.5; resolution += 0.5) {
         igraph_modularity(&graph, &membership, &weights,
                         /* resolution */ resolution,
-                        /* directed */ 1, &modularity);
+                        IGRAPH_DIRECTED, &modularity);
         printf("Modularity (resolution %.2f) is %g.\n", resolution, modularity);
     }
 
@@ -87,7 +87,7 @@ int main() {
     for (resolution = 0.5; resolution <= 1.5; resolution += 0.5) {
         igraph_modularity(&graph, &membership, &weights,
                         /* resolution */ resolution,
-                        /* directed */ 1, &modularity);
+                        IGRAPH_DIRECTED, &modularity);
         printf("Modularity (resolution %.2f) is %g on directed graph.\n", resolution, modularity);
     }
 
@@ -95,14 +95,14 @@ int main() {
     igraph_contract_vertices(&graph, &membership, NULL);
     igraph_vector_int_destroy(&membership);
 
-    igraph_simplify(&graph, /* multiple */ 1, /* loops */ 0, &comb);
+    igraph_simplify(&graph, /* multiple */ true, /* loops */ false, &comb);
 
     igraph_vector_int_init_range(&membership, 0, igraph_vcount(&graph));
     EANV(&graph, "weight", &weights);
     for (resolution = 0.5; resolution <= 1.5; resolution += 0.5) {
         igraph_modularity(&graph, &membership, &weights,
                         /* resolution */ resolution,
-                        /* directed */ 1, &modularity);
+                        IGRAPH_DIRECTED, &modularity);
         printf("Modularity (resolution %.2f) is %g after aggregation.\n", resolution, modularity);
     }
 

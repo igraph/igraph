@@ -35,10 +35,10 @@ igraph_error_t bfs_callback(const igraph_t *graph,
     IGRAPH_UNUSED(rank);
     IGRAPH_UNUSED(dist);
     printf(" %" IGRAPH_PRId "", vid);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_t graph, ring;
 
     /* Create a disjoint union of two rings */

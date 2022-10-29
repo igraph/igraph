@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g_in;
     igraph_t g_out;
     FILE *file;
@@ -42,7 +42,7 @@ int main() {
 
     char filename[] = "ncol.tmp";
     file = fopen(filename, "w");
-    IGRAPH_ASSERT(file); /* make sure that the file was created successfully */
+    IGRAPH_ASSERT(file != NULL); /* make sure that the file was created successfully */
 
     igraph_write_graph_ncol(&g_in, file, "vertex_attr", "edge_attr");
     fclose(file);

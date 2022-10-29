@@ -38,12 +38,13 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_bfshandler_t
- * Callback type for BFS function
+ * \brief Callback type for BFS function.
  *
  * \ref igraph_bfs() is able to call a callback function, whenever a
  * new vertex is found, while doing the breadth-first search. This
  * callback function must be of type \c igraph_bfshandler_t. It has
  * the following arguments:
+ *
  * \param graph The graph that that algorithm is working on. Of course
  *   this must not be modified.
  * \param vid The id of the vertex just found by the breadth-first
@@ -94,12 +95,13 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_int
 
 /**
  * \function igraph_dfshandler_t
- * Callback type for the DFS function
+ * \brief Callback type for the DFS function.
  *
  * \ref igraph_dfs() is able to call a callback function, whenever a
  * new vertex is discovered, and/or whenever a subtree is
  * completed. These callbacks must be of type \c
  * igraph_dfshandler_t. They have the following arguments:
+ *
  * \param graph The graph that that algorithm is working on. Of course
  *   this must not be modified.
  * \param vid The id of the vertex just found by the depth-first

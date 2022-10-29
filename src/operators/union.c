@@ -27,7 +27,6 @@
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_qsort.h"
 #include "igraph_vector_list.h"
 
@@ -37,7 +36,6 @@
  * \function igraph_union
  * \brief Calculates the union of two graphs.
  *
- * </para><para>
  * The number of vertices in the result is that of the larger graph
  * from the two arguments. The result graph contains edges which are
  * present in at least one of the operand graphs.
@@ -73,7 +71,6 @@ igraph_error_t igraph_union(igraph_t *res,
  * \function igraph_union_many
  * \brief Creates the union of many graphs.
  *
- * </para><para>
  * The result graph will contain as many vertices as the largest graph
  * among the arguments does, and an edge will be included in it if it
  * is part of at least one operand graph.
@@ -110,7 +107,7 @@ igraph_error_t igraph_union_many(
 
     igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_integer_t no_of_nodes = 0;
-    igraph_bool_t directed = 1;
+    igraph_bool_t directed = true;
     igraph_vector_int_t edges;
     igraph_vector_int_list_t edge_vects, order_vects;
     igraph_vector_int_t no_edges;

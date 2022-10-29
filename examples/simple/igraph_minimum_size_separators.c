@@ -35,7 +35,7 @@ int print_and_destroy(igraph_vector_int_list_t *list) {
     return 0;
 }
 
-int main() {
+int main(void) {
     igraph_t g, g2;
     igraph_vector_int_list_t sep;
     igraph_vs_t vs;

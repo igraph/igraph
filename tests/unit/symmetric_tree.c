@@ -9,7 +9,7 @@
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -24,7 +24,7 @@
     igraph_vector_int_destroy(&v); \
     printf("\n");
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_t v;
@@ -58,13 +58,13 @@ int main() {
     // 1 edge, 2 vertices (root and child)
     igraph_vector_int_init_int(&v, 1, 1);
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_IN) ==  IGRAPH_SUCCESS);
-    PRINT_DESTROY("Directed graph with 2 vertices and 1 edge");    
+    PRINT_DESTROY("Directed graph with 2 vertices and 1 edge");
 
     /**** Test directed symmetric path graph with 1 child in each level ****/
     igraph_vector_int_init_int(&v, 3, 1, 1, 1);
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_OUT) == IGRAPH_SUCCESS);
     PRINT_DESTROY("Directed path graph with 4 level and 1 child in each");
-    
+
     /**** Test undirected symmetric path graph with 1 child in each level ****/
     igraph_vector_int_init_int(&v, 3, 1, 1, 1);
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_UNDIRECTED) == IGRAPH_SUCCESS);
@@ -79,13 +79,13 @@ int main() {
     igraph_vector_int_init_int(&v, 1, 2);
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_UNDIRECTED) == IGRAPH_SUCCESS);
     PRINT_DESTROY("Undirected binery tree with 3 vertices");
-    
+
 
     /**** Test directed symmetric graph with 2 level, each 3 children  ****/
     igraph_vector_int_init_int(&v, 2, 3, 3);
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_OUT) == IGRAPH_SUCCESS);
     PRINT_DESTROY("Symmetric out-tree with 2 level, 3 children in each");
-    
+
     /**** Test undirected symmetric graph with 2 level, each 3 children  ****/
     igraph_vector_int_init_int(&v, 2, 3, 3);
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_UNDIRECTED) == IGRAPH_SUCCESS);
@@ -98,9 +98,9 @@ int main() {
 
     /**** Test undirected symmetric graph with 2 level, first with 4 and second with 3 children  ****/
     igraph_vector_int_init_int(&v, 2, 4, 3);
-    IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_UNDIRECTED) == IGRAPH_SUCCESS);    
+    IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_UNDIRECTED) == IGRAPH_SUCCESS);
     PRINT_DESTROY("Undirected symmetric tree with 2 level, 4 children in first, 3 in second");
-    
+
     /**** Test undirected symmetric graph with 3 level, first with 3, second with 4, third with 5 children  ****/
     igraph_vector_int_init_int(&v, 3, 3, 4, 5);
     IGRAPH_ASSERT(igraph_symmetric_tree(&g, &v, IGRAPH_TREE_UNDIRECTED) == IGRAPH_SUCCESS);

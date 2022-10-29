@@ -31,7 +31,7 @@ void print_sparse_matrix(const igraph_sparsemat_t* sm) {
 }
 
 
-void test_undirected() {
+void test_undirected(void) {
     igraph_t graph;
     igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
     igraph_vector_t weights;
@@ -138,7 +138,7 @@ void test_undirected() {
     VERIFY_FINALLY_STACK();
 }
 
-void test_directed() {
+void test_directed(void) {
     igraph_t graph;
     igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
     igraph_vector_t weights;
@@ -185,16 +185,14 @@ void test_directed() {
     VERIFY_FINALLY_STACK();
 }
 
-void test_errors() {
+void test_errors(void) {
     igraph_t graph;
     igraph_sparsemat_t m;
 
     igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 3, 2, 2, 0, 1, -1);
     igraph_sparsemat_init(&m, 2, 2, 0);
 
-    igraph_set_error_handler(&igraph_error_handler_ignore);
-    IGRAPH_ASSERT(igraph_get_adjacency_sparse(&graph, &m, 42, NULL, IGRAPH_LOOPS_ONCE) == IGRAPH_EINVAL);
-    igraph_set_error_handler(&igraph_error_handler_abort);
+    CHECK_ERROR(igraph_get_adjacency_sparse(&graph, &m, (igraph_get_adjacency_t) 42, NULL, IGRAPH_LOOPS_ONCE), IGRAPH_EINVAL);
 
     igraph_sparsemat_destroy(&m);
     igraph_destroy(&graph);
@@ -202,7 +200,7 @@ void test_errors() {
     VERIFY_FINALLY_STACK();
 }
 
-int main() {
+int main(void) {
 
     test_undirected();
     test_directed();

@@ -11,17 +11,17 @@
 /* Print an igraph_real_t value. Be consistent in printing NaN/Inf across platforms. */
 void print_real(FILE *f, igraph_real_t x, const char *format) {
     igraph_bool_t g8 = !strcmp(format, "%8g");
-    if (igraph_finite(x)) {
+    if (isfinite(x)) {
         if (x == 0 && signbit(x)) {
             /* print negative zeros as positive zeros for sake of consistency */
             x = +0.0;
         }
         fprintf(f, format, x);
-    } else if (igraph_is_nan(x)) {
+    } else if (isnan(x)) {
         fprintf(f, g8 ? "     NaN" : "NaN");
-    } else if (igraph_is_posinf(x)) {
+    } else if (isinf(x) && x > 0) {
         fprintf(f, g8 ? "     Inf" : "Inf");
-    } else if (igraph_is_neginf(x)) {
+    } else if (isinf(x) && x < 0) {
         fprintf(f, g8 ? "    -Inf" : "-Inf");
     }
 }
@@ -74,6 +74,11 @@ void print_vector_int_list(const igraph_vector_int_list_t *v) {
 /* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
 void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) {
     igraph_integer_t i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
+    if (nrow == 0 || ncol == 0) {
+        /* When the matrix is empty, output the dimensions */
+        fprintf(f, "[ %" IGRAPH_PRId "-by-%" IGRAPH_PRId" ]\n", nrow, ncol);
+        return;
+    }
     for (i = 0; i < nrow; i++) {
         fprintf(f, i == 0 ? "[" : " ");
         for (j = 0; j < ncol; j++) {
@@ -90,6 +95,11 @@ void print_matrix(const igraph_matrix_t *m) {
 
 void print_matrix_int(const igraph_matrix_int_t *m) {
     igraph_integer_t i, j, nrow = igraph_matrix_int_nrow(m), ncol = igraph_matrix_int_ncol(m);
+    if (nrow == 0 || ncol == 0) {
+        /* When the matrix is empty, output the dimensions */
+        printf("[ %" IGRAPH_PRId "-by-%" IGRAPH_PRId" ]\n", nrow, ncol);
+        return;
+    }
     for (i = 0; i < nrow; i++) {
         printf(i == 0 ? "[" : " ");
         for (j = 0; j < ncol; j++) {
@@ -572,6 +582,8 @@ void print_attributes(const igraph_t *g) {
 expect_warning_context_t expect_warning_ctx;
 
 void record_last_warning(const char *reason, const char *file, int line) {
+    IGRAPH_UNUSED(file); IGRAPH_UNUSED(line);
+
     if (expect_warning_ctx.observed) {
         igraph_free(expect_warning_ctx.observed);
     }

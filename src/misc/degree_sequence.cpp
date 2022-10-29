@@ -18,7 +18,6 @@
 */
 
 #include "igraph_constructors.h"
-#include "igraph_interface.h"
 
 #include "math/safe_intop.h"
 
@@ -709,8 +708,8 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *
  * </para><para>
  * Sz. Horvát and C. D. Modes,
- * Connectivity matters: Construction and exact random sampling of connected graphs (2020).
- * https://arxiv.org/abs/2009.03747
+ * Connectedness matters: construction and exact random sampling of connected networks (2021).
+ * https://doi.org/10.1088/2632-072X/abced5
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param outdeg The degree sequence of an undirected graph
@@ -737,7 +736,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *          The vertex with smallest remaining degree is selected first. The result is usually
  *          a graph with high negative degree assortativity. In the undirected case, this method
  *          is guaranteed to generate a connected graph, regardless of whether multi-edges are allowed,
- *          provided that a connected realization exists (see Horvát and Modes, 2020, as well as
+ *          provided that a connected realization exists (see Horvát and Modes, 2021, as well as
  *          http://szhorvat.net/pelican/hh-connected-graphs.html).
  *          In the directed case it tends to generate weakly connected graphs, but this is not
  *          guaranteed.

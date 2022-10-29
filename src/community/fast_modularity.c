@@ -118,7 +118,7 @@ static igraph_bool_t igraph_i_fastgreedy_community_rescan_max(igraph_i_fastgreed
     n = igraph_vector_ptr_size(&comm->neis);
     if (n == 0) {
         comm->maxdq = 0;
-        return 1;
+        return true;
     }
 
     best = (igraph_i_fastgreedy_commpair*)VECTOR(comm->neis)[0];
@@ -134,9 +134,9 @@ static igraph_bool_t igraph_i_fastgreedy_community_rescan_max(igraph_i_fastgreed
 
     if (best != comm->maxdq) {
         comm->maxdq = best;
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 
@@ -334,7 +334,7 @@ static void igraph_i_fastgreedy_community_list_remove2(
 static void igraph_i_fastgreedy_community_remove_nei(
         igraph_i_fastgreedy_community_list* list, igraph_integer_t c, igraph_integer_t k) {
     igraph_integer_t i, n;
-    igraph_bool_t rescan = 0;
+    igraph_bool_t rescan = false;
     igraph_i_fastgreedy_commpair *p;
     igraph_i_fastgreedy_community *comm;
     igraph_real_t olddq;
@@ -392,7 +392,7 @@ static void igraph_i_fastgreedy_community_sort_neighbors_of(
         igraph_i_fastgreedy_commpair* changed_pair) {
     igraph_vector_ptr_t* vec;
     igraph_integer_t i, n;
-    igraph_bool_t can_skip_sort = 0;
+    igraph_bool_t can_skip_sort = false;
     igraph_i_fastgreedy_commpair *other_pair;
 
     vec = &list->e[index].neis;
@@ -629,7 +629,6 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                 igraph_vector_int_t *membership) {
     igraph_integer_t no_of_edges, no_of_nodes, no_of_joins, total_joins;
     igraph_integer_t i, j, k, n, m, from, to, dummy, best_no_of_joins;
-    igraph_integer_t ffrom, fto;
     igraph_eit_t edgeit;
     igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
     igraph_i_fastgreedy_community_list communities;
@@ -660,7 +659,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
             if (minweight < 0) {
                 IGRAPH_ERROR("Weights must not be negative.", IGRAPH_EINVAL);
             }
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }
@@ -744,7 +743,7 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     }
     IGRAPH_FINALLY(igraph_free, dq);
     debug("Creating community pair list\n");
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &edgeit));
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
     pairs = IGRAPH_CALLOC(2 * no_of_edges, igraph_i_fastgreedy_commpair);
     if (pairs == 0) {
@@ -754,10 +753,9 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
     loop_weight_sum = 0;
     for (i = 0, j = 0; !IGRAPH_EIT_END(edgeit); i += 2, j++, IGRAPH_EIT_NEXT(edgeit)) {
         igraph_integer_t eidx = IGRAPH_EIT_GET(edgeit);
-        igraph_edge(graph, eidx, &ffrom, &fto);
 
         /* Create the pairs themselves */
-        from = ffrom; to = fto;
+        from = IGRAPH_FROM(graph, eidx); to = IGRAPH_TO(graph, eidx);
         if (from == to) {
             loop_weight_sum += weights ? 2 * VECTOR(*weights)[eidx] : 2;
             continue;
@@ -780,8 +778,8 @@ igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
         pairs[i + 1].dq = pairs[i].dq;
         pairs[i + 1].opposite = &pairs[i];
         /* Link the pair to the communities */
-        igraph_vector_ptr_push_back(&communities.e[from].neis, &pairs[i]);
-        igraph_vector_ptr_push_back(&communities.e[to].neis, &pairs[i + 1]);
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(&communities.e[from].neis, &pairs[i]));
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(&communities.e[to].neis, &pairs[i + 1]));
         /* Update maximums */
         if (communities.e[from].maxdq == 0 || *communities.e[from].maxdq->dq < *pairs[i].dq) {
             communities.e[from].maxdq = &pairs[i];

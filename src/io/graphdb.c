@@ -41,9 +41,12 @@ static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
  * \function igraph_read_graph_graphdb
  * \brief Read a graph in the binary graph database format.
  *
- * This is a binary format, used in the graph database
- * for isomorphism testing. From the (now defunct) graph database
- * homepage:
+ * This is a binary format, used in the ARG Graph Database
+ * for isomorphism testing. For more information, see
+ * https://mivia.unisa.it/datasets/graph-database/arg-database/
+ *
+ * </para><para>
+ * From the graph database homepage:
  * </para>
  *
  * \blockquote <para>
@@ -60,7 +63,8 @@ static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
  * first node of the graph has index 0.</para> \endblockquote
  *
  * <para>
- * Only unlabelled graphs are implemented.
+ * As of igraph 0.10, only unlabelled graphs are implemented.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream The stream to read from.
  * \param directed Logical scalar, whether to create a directed graph.
@@ -78,7 +82,7 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
     igraph_vector_int_t edges;
     igraph_integer_t nodes;
     igraph_integer_t i, j;
-    igraph_bool_t end = 0;
+    igraph_bool_t end = false;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 

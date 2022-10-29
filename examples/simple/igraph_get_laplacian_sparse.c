@@ -100,7 +100,7 @@ int test_laplacian(const igraph_vector_t *w, igraph_bool_t dir, igraph_laplacian
     return 0;
 }
 
-int main() {
+int main(void) {
     int res;
     int i;
     igraph_vector_t weights;

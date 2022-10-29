@@ -28,7 +28,7 @@ int igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
     return igraph_vector_all_le(lo, v) && igraph_vector_all_ge(hi, v);
 }
 
-void test_unweighted() {
+void test_unweighted(void) {
     igraph_t g;
     igraph_vector_int_t edges;
     igraph_vector_t eb;
@@ -92,7 +92,7 @@ void test_unweighted() {
 
 #define EPS 1e-4
 
-void test_weighted() {
+void test_weighted(void) {
     igraph_t g;
     igraph_vector_int_t edges;
     igraph_vector_t eb, weights;
@@ -160,7 +160,7 @@ void test_weighted() {
     igraph_destroy(&g);
 }
 
-void test_zero_edge_graph() {
+void test_zero_edge_graph(void) {
     igraph_t g;
     igraph_vector_t eb;
     igraph_vector_int_t res;
@@ -186,7 +186,7 @@ void test_zero_edge_graph() {
     igraph_destroy(&g);
 }
 
-int main() {
+int main(void) {
     test_unweighted();
     test_weighted();
     test_zero_edge_graph();

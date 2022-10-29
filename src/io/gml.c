@@ -29,14 +29,16 @@
 #include "core/trie.h"
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strdup, strncasecmp */
+
 #include "io/gml-header.h"
+#include "io/parsers/gml-parser.h"
 
 #include <ctype.h>
 #include <time.h>
 #include <string.h>
 
 int igraph_gml_yylex_init_extra(igraph_i_gml_parsedata_t *user_defined, void *scanner);
-void igraph_gml_yylex_destroy(void *scanner);
+int igraph_gml_yylex_destroy(void *scanner);
 int igraph_gml_yyparse(igraph_i_gml_parsedata_t *context);
 void igraph_gml_yyset_in(FILE *in_str, void *yyscanner);
 
@@ -52,11 +54,11 @@ void igraph_gml_yyset_in(FILE *in_str, void *yyscanner);
 static igraph_bool_t needs_coding(const char *str) {
     while (*str) {
         if (*str == '&' || *str == '"') {
-            return 1;
+            return true;
         }
         str++;
     }
-    return 0;
+    return false;
 }
 
 /* Encode & and " character in 'src' to &amp; and &quot;
@@ -146,7 +148,7 @@ static igraph_error_t entity_decode(const char *src, char **dest, igraph_bool_t 
                     } else {
                         IGRAPH_WARNINGF("One or more unknown entities will be returned verbatim (%.*s).", j+1, s);
                     }
-                    *warned = 1; /* warn only once */
+                    *warned = true; /* warn only once */
                 }
                 *d++ = *s++;
             }
@@ -254,7 +256,7 @@ void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t *context) {
     }
 
     if (context->scanner != 0) {
-        igraph_gml_yylex_destroy(context->scanner);
+        (void) igraph_gml_yylex_destroy(context->scanner);
         context->scanner = 0;
     }
 }
@@ -424,7 +426,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_trie_t trie;
     igraph_vector_int_t edges;
     igraph_bool_t directed = IGRAPH_UNDIRECTED;
-    igraph_bool_t has_directed = 0;
+    igraph_bool_t has_directed = false;
     igraph_gml_tree_t *gtree;
     igraph_integer_t gidx;
     igraph_trie_t vattrnames;
@@ -436,7 +438,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     igraph_vector_ptr_t *attrs[3];
     igraph_integer_t edgeptr = 0;
     igraph_i_gml_parsedata_t context;
-    igraph_bool_t entity_warned = 0; /* used to warn at most once about unsupported entities */
+    igraph_bool_t entity_warned = false; /* used to warn at most once about unsupported entities */
 
     attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
 
@@ -575,14 +577,13 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             }
         } else if (!strcmp(name, "edge")) {
             igraph_gml_tree_t *edge;
-            igraph_bool_t has_source = 0, has_target = 0;
+            igraph_bool_t has_source = false, has_target = false;
             no_of_edges++;
             if (igraph_gml_tree_type(gtree, i) != IGRAPH_I_GML_TREE_TREE) {
                 IGRAPH_ERRORF("'edge' is not a list in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                               igraph_gml_tree_line(gtree, i));
             }
             edge = igraph_gml_tree_get_tree(gtree, i);
-            has_source = has_target = 0;
             for (igraph_integer_t j = 0; j < igraph_gml_tree_length(edge); j++) {
                 const char *name = igraph_gml_tree_name(edge, j);
                 igraph_i_gml_tree_type_t type = igraph_gml_tree_type(edge, j);
@@ -596,7 +597,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                       IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(edge, j));
                     }
-                    has_source = 1;
+                    has_source = true;
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERRORF("Non-integer 'source' for an edge in GML file, line %" IGRAPH_PRId ".",
                                       IGRAPH_PARSEERROR,
@@ -609,7 +610,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                                       IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(edge, j));
                     }
-                    has_target = 1;
+                    has_target = true;
                     if (type != IGRAPH_I_GML_TREE_INTEGER) {
                         IGRAPH_ERRORF("Non-integer 'target' for an edge in GML file, line %" IGRAPH_PRId ".",
                                       IGRAPH_PARSEERROR,
@@ -645,7 +646,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 if (dir) {
                     directed = IGRAPH_DIRECTED;
                 }
-                has_directed = 1;
+                has_directed = true;
             } else {
                 IGRAPH_WARNINGF("Invalid type for 'directed' attribute on line %" IGRAPH_PRId ", assuming undirected.",
                                 igraph_gml_tree_line(gtree, i));
@@ -825,13 +826,11 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 }
 
 static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) {
-    int no = 1;
     char strno[50];
     size_t i, len = strlen(orig), newlen = 0, plen = 0;
 
     /* do we need a prefix? */
     if (len == 0 || !isalpha(orig[0])) {
-        no++;
         snprintf(strno, sizeof(strno) - 1, "igraph");
         plen = newlen = strlen(strno);
     }
@@ -862,7 +861,7 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
     igraph_integer_t n = igraph_vector_size(v);
 
     if (n < 2) {
-        *res = 1;
+        *res = true;
         return IGRAPH_SUCCESS;
     }
 
@@ -870,10 +869,10 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
     IGRAPH_FINALLY(igraph_vector_destroy, &u);
     igraph_vector_sort(&u);
 
-    *res = 1;
+    *res = true;
     for (igraph_integer_t i=1; i < n; i++) {
         if (VECTOR(u)[i-1] == VECTOR(u)[i]) {
-            *res = 0;
+            *res = false;
             break;
         }
     }
@@ -884,7 +883,7 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
     return IGRAPH_SUCCESS;
 }
 
-#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Writing GML format failed.", IGRAPH_EFILE); } while (0)
+#define CHECK(cmd) do { int ret=cmd; if (ret<0) IGRAPH_ERROR("Writing GML format failed.", IGRAPH_EFILE); } while (0)
 
 /**
  * \function igraph_write_graph_gml
@@ -969,7 +968,6 @@ static igraph_error_t igraph_i_vector_is_duplicate_free(const igraph_vector_t *v
 igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                                       igraph_write_gml_sw_t options,
                                       const igraph_vector_t *id, const char *creator) {
-    igraph_error_t ret;
     igraph_strvector_t gnames, vnames, enames; /* attribute names */
     igraph_vector_int_t gtypes, vtypes, etypes; /* attribute types */
     igraph_integer_t gattr_no, vattr_no, eattr_no; /* attribute counts */
@@ -1001,7 +999,7 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     } else {
         if (needs_coding(creator)) {
             char *d;
-            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW | options));
+            IGRAPH_CHECK(entity_encode(creator, &d, IGRAPH_WRITE_GML_ENCODE_ONLY_QUOT_SW & options));
             IGRAPH_FINALLY(igraph_free, d);
             CHECK(fprintf(outstream,
                           "Creator \"%s\"\n",
@@ -1041,11 +1039,11 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 
     /* Check whether there is an 'id' node attribute if the supplied is 0 */
     if (!id) {
-        igraph_bool_t found = 0;
+        igraph_bool_t found = false;
         for (i = 0; i < igraph_vector_int_size(&vtypes); i++) {
             const char *n = igraph_strvector_get(&vnames, i);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                found = 1; break;
+                found = true; break;
             }
         }
         if (found) {
@@ -1101,8 +1099,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
                 /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
-                if (! igraph_is_nan(VECTOR(numv)[0])) {
-                    if (! igraph_finite(VECTOR(numv)[0])) {
+                if (! isnan(VECTOR(numv)[0])) {
+                    if (! isfinite(VECTOR(numv)[0])) {
                         IGRAPH_WARNINGF("Infinite value in numeric graph attribute '%s'. "
                                         "Produced GML file will not be conformant.", name);
                     }
@@ -1178,8 +1176,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name,
                                  igraph_vss_1(i), &numv));
                     /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
-                    if (! igraph_is_nan(VECTOR(numv)[0])) {
-                        if (! igraph_finite(VECTOR(numv)[0])) {
+                    if (! isnan(VECTOR(numv)[0])) {
+                        if (! isfinite(VECTOR(numv)[0])) {
                             WARN_ONCE(j, 3,
                                       IGRAPH_WARNINGF("Infinite value in numeric vertex attribute '%s'. "
                                                       "Produced GML file will not be conformant.", name));
@@ -1250,8 +1248,8 @@ igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, name,
                                  igraph_ess_1(i), &numv));
                     /* Treat NaN as missing, skip writing it. GML does not officially support NaN. */
-                    if (! igraph_is_nan(VECTOR(numv)[0])) {
-                        if (! igraph_finite(VECTOR(numv)[0])) {
+                    if (! isnan(VECTOR(numv)[0])) {
+                        if (! isfinite(VECTOR(numv)[0])) {
                             WARN_ONCE(j, 3,
                                       IGRAPH_WARNINGF("Infinite value in numeric edge attribute '%s'. "
                                                       "Produced GML file will not be conformant.", name));

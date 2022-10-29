@@ -105,7 +105,7 @@ static igraph_error_t igraph_i_handle_plfit_error(int code) {
 /**
  * \ingroup nongraph
  * \function igraph_power_law_fit
- * \brief Fits a power-law distribution to a vector of numbers
+ * \brief Fits a power-law distribution to a vector of numbers.
  *
  * This function fits a power-law distribution to a vector containing samples
  * from a distribution (that is assumed to follow a power-law of course). In
@@ -128,8 +128,9 @@ static igraph_error_t igraph_i_handle_plfit_error(int code) {
  * details:
  *
  * </para><para>
- * Aaron Clauset, Cosma R .Shalizi and Mark E.J. Newman: Power-law
+ * Aaron Clauset, Cosma R. Shalizi and Mark E.J. Newman: Power-law
  * distributions in empirical data. SIAM Review 51(4):661-703, 2009.
+ * https://doi.org/10.1137/070710111
  *
  * \param data vector containing the samples for which a power-law distribution
  *             is to be fitted. Note that you have to provide the \em samples,
@@ -178,7 +179,7 @@ igraph_error_t igraph_power_law_fit(
     plfit_result_t plfit_result;
     plfit_continuous_options_t cont_options;
     plfit_discrete_options_t disc_options;
-    igraph_bool_t discrete = force_continuous ? 0 : 1;
+    igraph_bool_t discrete = force_continuous ? false : true;
     igraph_bool_t finite_size_correction;
 
     int retval;
@@ -190,8 +191,8 @@ igraph_error_t igraph_power_law_fit(
     if (discrete) {
         /* Does the vector contain discrete values only? */
         for (i = 0; i < n; i++) {
-            if ((igraph_integer_t)(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
-                discrete = 0;
+            if (trunc(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
+                discrete = false;
                 break;
             }
         }
@@ -238,7 +239,7 @@ igraph_error_t igraph_power_law_fit(
 /**
  * \ingroup nongraph
  * \function igraph_plfit_result_calculate_p_value
- * \brief Calculates the p-value of a fitter power-law model
+ * \brief Calculates the p-value of a fitted power-law model.
  *
  * </para><para>
  * The p-value is calculated by resampling the input data many times in a way
@@ -254,6 +255,18 @@ igraph_error_t igraph_power_law_fit(
  * resampling attempts. The number of resampling trials is determined by
  * 0.25 divided by the square of the required precision. For instance, a required
  * precision of 0.01 means that 2500 samples will be drawn.
+ *
+ * </para><para>
+ * If igraph is compiled with OpenMP support, this function will use parallel
+ * OpenMP threads for the resampling. Each OpenMP thread gets its own instance
+ * of a random number generator. However, since the scheduling of OpenMP threads
+ * is outside our control, we cannot guarantee how many resampling instances the
+ * threads are asked to execute, thus it may happen that the random number
+ * generators are used differently between runs. If you want to obtain
+ * reproducible results, seed igraph's master RNG appropriately, and force the
+ * number of OpenMP threads to 1 early in your program, either by calling
+ * <code>omp_set_num_threads(1)</code> or by setting the value of the \c OMP_NUM_THREADS
+ * environment variable to 1.
  *
  * \param model The fitted power-law model from the \ref igraph_power_law_fit()
  *        function

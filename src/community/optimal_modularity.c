@@ -71,6 +71,7 @@
  * \param weights Vector giving the weights of the edges. If it is
  *        \c NULL then each edge is supposed to have the same weight.
  * \return Error code.
+ *         When GLPK is not available, \c IGRAPH_UNIMPLEMENTED is returned.
  *
  * \sa \ref igraph_modularity(), \ref igraph_community_fastgreedy()
  * for an algorithm that finds a local optimum in a greedy way.
@@ -114,7 +115,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
             if (minweight < 0) {
                 IGRAPH_ERROR("Negative weights are not allowed in weight vector.", IGRAPH_EINVAL);
             }
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }

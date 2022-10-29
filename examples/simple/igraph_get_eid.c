@@ -23,12 +23,11 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_integer_t eid;
     igraph_vector_int_t hist;
     igraph_integer_t i;
-    igraph_error_t ret;
 
     /* DIRECTED */
 
@@ -37,7 +36,7 @@ int main() {
     igraph_vector_int_init(&hist, 9);
 
     for (i = 1; i < 10; i++) {
-        igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ 1);
+        igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ true);
         VECTOR(hist)[ eid ] = 1;
     }
 
@@ -53,9 +52,9 @@ int main() {
     igraph_vector_int_init(&hist, 9);
 
     for (i = 1; i < 10; i++) {
-        igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ 1);
+        igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ true);
         VECTOR(hist)[ eid ] += 1;
-        igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ 1);
+        igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ true);
         VECTOR(hist)[ eid ] += 1;
     }
     igraph_vector_int_print(&hist);
@@ -63,105 +62,6 @@ int main() {
     igraph_vector_int_destroy(&hist);
     igraph_destroy(&g);
 
-    /* NON-EXISTENT EDGE */
-
-    igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-
-    igraph_set_error_handler(igraph_error_handler_ignore);
-
-    ret = igraph_get_eid(&g, &eid, 5, 6, IGRAPH_UNDIRECTED, /*error=*/ 1);
-    if (ret != IGRAPH_EINVAL) {
-        return 1;
-    }
-
-    /* INVALID VERTEX ID */
-
-    ret = igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ 1);
-    if (ret != IGRAPH_EINVVID) {
-        return 1;
-    }
-
-    /* INVALID VERTEX ID even if error == 0 */
-
-    ret = igraph_get_eid(&g, &eid, 171, 6, IGRAPH_UNDIRECTED, /*error=*/ 0);
-    if (ret != IGRAPH_EINVVID) {
-        return 1;
-    }
-
-    igraph_destroy(&g);
-
     return 0;
 }
 
-/* Stress test */
-
-/* int main() { */
-
-/*   igraph_t g; */
-/*   igraph_integer_t i, n; */
-/*   igraph_integer_t from, to, eid; */
-
-/*   igraph_barabasi_game(&g, 10000, 100, 0, 0, 1); */
-/*   n=igraph_ecount(&g); */
-/*   for (i=0; i<n; i++) { */
-/*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 1, 1); */
-/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
-/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
-/*   } */
-/*   igraph_destroy(&g); */
-
-/*   igraph_barabasi_game(&g, 10000, 100, 0, 0, 0); */
-/*   n=igraph_ecount(&g); */
-/*   for (i=0; i<n; i++) { */
-/*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
-/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
-/*   } */
-/*   igraph_destroy(&g); */
-
-/*   igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, */
-/*            2000, 100.0/2000, 0, 0); */
-/*   n=igraph_ecount(&g); */
-/*   for (i=0; i<n; i++) { */
-/*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
-/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
-/*   } */
-/*   igraph_destroy(&g); */
-
-/*   igraph_full(&g, 500, 0, 0); */
-/*   n=igraph_ecount(&g); */
-/*   for (i=0; i<n; i++) { */
-/*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
-/*   } */
-/*   igraph_destroy(&g); */
-
-/*   igraph_star(&g, 20000, IGRAPH_STAR_OUT, 0); */
-/*   n=igraph_ecount(&g); */
-/*   for (i=0; i<n; i++) { */
-/*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
-/*   } */
-/*   igraph_destroy(&g); */
-
-/*   igraph_star(&g, 20000, IGRAPH_STAR_IN, 0); */
-/*   n=igraph_ecount(&g); */
-/*   for (i=0; i<n; i++) { */
-/*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
-/*   } */
-/*   igraph_destroy(&g); */
-
-/*   igraph_star(&g, 2000000, IGRAPH_STAR_UNDIRECTED, 1999999); */
-/*   n=igraph_ecount(&g); */
-/*   for (i=0; i<n; i++) { */
-/*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 0, 1); */
-/*     igraph_get_eid(&g, &eid, to, from, 0, 1); */
-/*   } */
-/*   igraph_destroy(&g); */
-
-/*   return 0; */
-/* } */

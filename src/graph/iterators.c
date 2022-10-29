@@ -562,11 +562,11 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
  * by \ref igraph_vs_all() or \ref igraph_vss_all(). Note that the
  * vertex selector might contain all vertices in a given graph but if
  * it wasn't created by the two constructors mentioned here the return
- * value will be \c FALSE.
+ * value will be \c false.
  *
  * \param vs Pointer to a vertex selector object.
- * \return \c TRUE (1) if the vertex selector contains all vertices and
- *         \c FALSE (0) otherwise.
+ * \return \c true if the vertex selector contains all vertices and
+ *         \c false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -604,8 +604,10 @@ igraph_error_t igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
     case IGRAPH_VS_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy vertex selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     default:
         break;
@@ -728,8 +730,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * \ref igraph_vs_nonadj(), |V| is the number of vertices in the graph.
  */
 
-igraph_error_t igraph_vit_create(const igraph_t *graph,
-                      igraph_vs_t vs, igraph_vit_t *vit) {
+igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_vit_t *vit) {
     igraph_vector_int_t vec;
     igraph_vector_int_t *vec_int;
     igraph_bool_t *seen;
@@ -828,11 +829,16 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         }
         break;
     case IGRAPH_VS_RANGE:
-        if (vs.data.range.start < 0 || vs.data.range.start >= igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create sequence iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
-        }
-        if (vs.data.range.end < 0 || vs.data.range.end > igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create sequece iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
+        {
+            igraph_integer_t no_of_nodes = igraph_vcount(graph);
+            if (vs.data.range.start < 0 ||
+                vs.data.range.start > no_of_nodes ||
+                (no_of_nodes > 0 && vs.data.range.start == no_of_nodes)) {
+                IGRAPH_ERROR("Cannot create range iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
+            }
+            if (vs.data.range.end < 0 || vs.data.range.end > no_of_nodes) {
+                IGRAPH_ERROR("Cannot create range iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
+            }
         }
         vit->type = IGRAPH_VIT_RANGE;
         vit->pos = vs.data.range.start;
@@ -944,7 +950,7 @@ igraph_error_t igraph_es_all(igraph_es_t *es,
 
 /**
  * \function igraph_ess_all
- * \brief Edge set, all edges (immediate version)
+ * \brief Edge set, all edges (immediate version).
  *
  * The immediate version of the all-edges selector.
  *
@@ -1142,29 +1148,6 @@ igraph_es_t igraph_ess_vector(const igraph_vector_int_t *v) {
 }
 
 /**
- * \function igraph_es_fromto
- * \brief Edge selector, all edges between two vertex sets.
- *
- * This function is not implemented yet.
- *
- * \param es Pointer to an uninitialized edge selector.
- * \param from Vertex selector, their outgoing edges will be
- *        selected.
- * \param to Vertex selector, their incoming edges will be selected
- *        from the previous selection.
- * \return Error code.
- * \sa \ref igraph_es_destroy()
- *
- * Time complexity: O(1).
- */
-
-igraph_error_t igraph_es_fromto(igraph_es_t *es, igraph_vs_t from, igraph_vs_t to) {
-    IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
-    IGRAPH_ERROR("igraph_es_fromto not implemented yet.", IGRAPH_UNIMPLEMENTED);
-    /* TODO */
-}
-
-/**
  * \function igraph_es_range
  * \brief Edge selector, a sequence of edge IDs.
  *
@@ -1305,38 +1288,44 @@ igraph_error_t igraph_es_pairs(igraph_es_t *es, const igraph_vector_int_t *v,
  *
  * \param es Pointer to an uninitialized edge selector object.
  * \param directed Whether the graph is directed or not.
+ * \param ... The additional arguments give the edges to be included in the
+ *        selector, as pairs of vertex IDs. The last argument must be -1.
+ *        The \p first parameter is present for technical reasons and represents
+ *        the first variadic argument.
  * \return Error code.
  * \sa \ref igraph_es_pairs(), \ref igraph_es_destroy()
  *
  * Time complexity: O(n), the number of edges being selected.
  */
 
-igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, int first, ...) {
     va_list ap;
     igraph_integer_t i, n = 0;
     igraph_vector_int_t *vec;
+    int num;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
-    va_start(ap, directed);
-    while (1) {
-        int num = va_arg(ap, int);
-        if (num == -1) {
-            break;
-        }
+    va_start(ap, first);
+    num = first;
+    while (num != -1) {
         n++;
+        num = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
-    va_start(ap, directed);
-    for (i = 0; i < n; i++) {
-        VECTOR(*vec)[i] = va_arg(ap, int);
+    if (n > 0) {
+        va_start(ap, first);
+        VECTOR(*vec)[0] = first;
+        for (i = 1; i < n; i++) {
+            VECTOR(*vec)[i] = va_arg(ap, int);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -1382,32 +1371,34 @@ igraph_error_t igraph_es_path(igraph_es_t *es, const igraph_vector_int_t *v,
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
+igraph_error_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, int first, ...) {
     va_list ap;
     igraph_integer_t i, n = 0;
     igraph_vector_int_t *vec;
+    int num;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec, "Cannot create edge selector.");
     IGRAPH_FINALLY(igraph_free, vec);
 
-    va_start(ap, directed);
-    while (1) {
-        int num = va_arg(ap, int);
-        if (num == -1) {
-            break;
-        }
+    va_start(ap, first);
+    num = first;
+    while (num != -1) {
         n++;
+        num = va_arg(ap, int);
     }
     va_end(ap);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, n);
 
-    va_start(ap, directed);
-    for (i = 0; i < n; i++) {
-        VECTOR(*vec)[i] = va_arg(ap, int);
+    if (n > 0) {
+        va_start(ap, first);
+        VECTOR(*vec)[0] = first;
+        for (i = 1; i < n; i++) {
+            VECTOR(*vec)[i] = va_arg(ap, int);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     IGRAPH_FINALLY_CLEAN(2);
 
@@ -1490,8 +1481,8 @@ void igraph_es_destroy(igraph_es_t *es) {
  * \brief Check whether an edge selector includes all edges.
  *
  * \param es Pointer to an edge selector object.
- * \return TRUE (1) if <code>es</code> was created with \ref
- * igraph_es_all() or \ref igraph_ess_all(), and FALSE (0) otherwise.
+ * \return \c true if \p es was created with \ref
+ * igraph_es_all() or \ref igraph_ess_all(), and \c false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -1515,15 +1506,19 @@ igraph_error_t igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
     case IGRAPH_ES_VECTOR:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.vecptr));
         dest->data.vecptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     case IGRAPH_ES_PATH:
     case IGRAPH_ES_PAIRS:
         vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(vec, "Cannot copy edge selector.");
+        IGRAPH_FINALLY(igraph_free, &vec);
         IGRAPH_CHECK(igraph_vector_int_init_copy(vec, src->data.path.ptr));
         dest->data.path.ptr = vec;
+        IGRAPH_FINALLY_CLEAN(1); /* ownership of vec taken by 'dest' */
         break;
     default:
         break;
@@ -1955,13 +1950,12 @@ static igraph_error_t igraph_i_eit_all_between(
  *
  * Time complexity: depends on the type of the edge selector. For edge
  * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
- * \ref igraph_es_1(), igraph_es_vector(), igraph_es_seq() it is
+ * \ref igraph_es_1(), \ref igraph_es_vector(), \ref igraph_es_seq() it is
  * O(1). For \ref igraph_es_incident() it is O(d) where d is the number of
  * incident edges of the vertex.
  */
 
-igraph_error_t igraph_eit_create(const igraph_t *graph,
-                      igraph_es_t es, igraph_eit_t *eit) {
+igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_eit_t *eit) {
     switch (es.type) {
     case IGRAPH_ES_ALL:
         eit->type = IGRAPH_EIT_RANGE;
@@ -2005,11 +1999,16 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
         }
         break;
     case IGRAPH_ES_RANGE:
-        if (es.data.range.start < 0 || es.data.range.start >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create sequence iterator, starting edge ID out of range.", IGRAPH_EINVAL);
-        }
-        if (es.data.range.end < 0 || es.data.range.end > igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create sequece iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+        {
+            igraph_integer_t no_of_edges = igraph_ecount(graph);
+            if (es.data.range.start < 0 ||
+                es.data.range.start > no_of_edges ||
+                (no_of_edges > 0 && es.data.range.start == no_of_edges)) {
+                IGRAPH_ERROR("Cannot create range iterator, starting edge ID out of range.", IGRAPH_EINVAL);
+            }
+            if (es.data.range.end < 0 || es.data.range.end > no_of_edges) {
+                IGRAPH_ERROR("Cannot create range iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+            }
         }
         eit->type = IGRAPH_EIT_RANGE;
         eit->pos = es.data.range.start;

@@ -52,10 +52,10 @@
  * \param res Pointer to a real number, the result will be stored
  *   here.
  * \param loops Logical constant, whether to include self-loops in the
- *   calculation. If this constant is TRUE then
+ *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
  *   necessarily mean that the graph really contains any loops). If
- *   this is FALSE then the result is only correct if the graph does not
+ *   this is \c false then the result is only correct if the graph does not
  *   contain loops.
  * \return Error code.
  *
@@ -94,7 +94,7 @@ igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
 
 /**
  * \function igraph_diversity
- * Structural diversity index of the vertices
+ * \brief Structural diversity index of the vertices.
  *
  * This measure was defined in Nathan Eagle, Michael Macy and Rob
  * Claxton: Network Diversity and Economic Development, Science 328,
@@ -157,7 +157,7 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight < 0) {
             IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
-        } else if (igraph_is_nan(minweight)) {
+        } else if (isnan(minweight)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -172,7 +172,7 @@ igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *we
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         igraph_real_t d;
-        long int v = IGRAPH_VIT_GET(vit);
+        igraph_integer_t v = IGRAPH_VIT_GET(vit);
 
         IGRAPH_CHECK(igraph_incident(graph, &incident, v, /*mode=*/ IGRAPH_ALL));
         k = igraph_vector_int_size(&incident); /* degree */
@@ -282,8 +282,8 @@ igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t ip, op;
-        igraph_neighbors(graph, &inneis, i, IGRAPH_IN);
-        igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
+        IGRAPH_CHECK(igraph_neighbors(graph, &inneis, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_neighbors(graph, &outneis, i, IGRAPH_OUT));
 
         ip = op = 0;
         while (ip < igraph_vector_int_size(&inneis) &&

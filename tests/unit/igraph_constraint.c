@@ -28,7 +28,7 @@ void call_and_print(igraph_t *graph, igraph_vs_t vids, igraph_vector_t *weights)
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_4_full, g_4_full_split, g_4_full_loop, g_4_line, g_hole;
     igraph_vector_t weights_full, weights_full_split, weights_line, result;
 
@@ -40,7 +40,7 @@ int main() {
     igraph_small(&g_1, 1, 0, -1);
     igraph_small(&g_4_full, 4, IGRAPH_UNDIRECTED, 0,1, 0,2, 0,3, 1,2, 1,3, 2,3, -1);
     igraph_small(&g_4_full_loop, 4, IGRAPH_UNDIRECTED, 0,0, 0,1, 0,2, 0,3, 1,2, 1,3, 2,3, -1);
-    igraph_small(&g_4_full_split, 4, IGRAPH_UNDIRECTED, 0,1, 0,1, 0,2, 0,3, 1,2, 
+    igraph_small(&g_4_full_split, 4, IGRAPH_UNDIRECTED, 0,1, 0,1, 0,2, 0,3, 1,2,
             1,3, 1,3, 1,3, 2,3, -1);
     igraph_small(&g_4_line, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, -1);
     igraph_small(&g_hole, 9, IGRAPH_UNDIRECTED, 0,1, 0,2, 0,3, 1,2, 1,3, 2,3, 3,4, 4,5,
@@ -71,10 +71,10 @@ int main() {
     call_and_print(&g_4_full_split, igraph_vss_all(), &weights_full_split);
 
     printf("Full graph, 4 vertices, no weights:\n");
-    call_and_print(&g_4_full, igraph_vss_all(), NULL); 
+    call_and_print(&g_4_full, igraph_vss_all(), NULL);
 
     printf("Full graph, 4 vertices, no weights, with loop:\n");
-    call_and_print(&g_4_full_loop, igraph_vss_all(), NULL); 
+    call_and_print(&g_4_full_loop, igraph_vss_all(), NULL);
 
     /*
        for node 0, each p_ij is again equal to 1/3, but p_ji equals 1/4 for j = 3,

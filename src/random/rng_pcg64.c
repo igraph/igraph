@@ -81,18 +81,22 @@ static void igraph_rng_pcg64_destroy(void *vstate) {
 /* Dummy implementation if the compiler does not support __uint128_t */
 
 static igraph_uint_t igraph_rng_pcg64_get(void *vstate) {
+    IGRAPH_UNUSED(vstate);
     return 0;
 }
 
 static igraph_error_t igraph_rng_pcg64_seed(void *vstate, igraph_uint_t seed) {
+    IGRAPH_UNUSED(vstate); IGRAPH_UNUSED(seed);
     IGRAPH_ERROR("64-bit PCG generator needs __uint128_t.", IGRAPH_UNIMPLEMENTED);
 }
 
 static igraph_error_t igraph_rng_pcg64_init(void **state) {
+    IGRAPH_UNUSED(state);
     IGRAPH_ERROR("64-bit PCG generator needs __uint128_t.", IGRAPH_UNIMPLEMENTED);
 }
 
 static void igraph_rng_pcg64_destroy(void *vstate) {
+    IGRAPH_UNUSED(vstate);
 }
 
 #endif
@@ -113,7 +117,7 @@ static void igraph_rng_pcg64_destroy(void *vstate) {
  *
  * </para><para>
  * The generator was ported from the original source code published by the
- * authors at https://github.com/imneme/pcg-c .
+ * authors at https://github.com/imneme/pcg-c.
  */
 
 const igraph_rng_type_t igraph_rngtype_pcg64 = {

@@ -89,7 +89,7 @@ void test_and_destroy_with_expected_values(
     igraph_rng_destroy(&rng);
 }
 
-void test_mandatory_rngtypes() {
+void test_mandatory_rngtypes(void) {
     int i;
     igraph_rng_type_t rng_types[] = {
         igraph_rngtype_glibc2,
@@ -110,7 +110,7 @@ void test_mandatory_rngtypes() {
     VERIFY_FINALLY_STACK();
 }
 
-void test_optional_rngtypes() {
+void test_optional_rngtypes(void) {
     igraph_rng_type_t rng_types[] = {
         igraph_rngtype_pcg64
     };
@@ -126,7 +126,7 @@ void test_optional_rngtypes() {
     }
 }
 
-int main() {
+int main(void) {
     test_mandatory_rngtypes();
     test_optional_rngtypes();
     return 0;

@@ -4,7 +4,7 @@
 #include "test_utilities.h"
 
 /* Check that isoclass() and isoclass_create() are consistent with each other. */
-void verify_classes() {
+void verify_classes(void) {
     igraph_integer_t class;
     igraph_integer_t size;
 
@@ -41,7 +41,7 @@ void verify_classes() {
 }
 
 /* Generate small random graphs and check that their isoclasses are identified correctly. */
-void random_test() {
+void random_test(void) {
     igraph_integer_t size, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
@@ -89,7 +89,7 @@ void random_test() {
 
 /* Generate a random graph, select random subgraphs, and check that their
  * isoclasses are identified correctly. */
-void random_subgraph_test() {
+void random_subgraph_test(void) {
     igraph_t graph;
     igraph_integer_t size, i;
     igraph_vector_int_t vids;
@@ -151,7 +151,7 @@ void random_subgraph_test() {
     igraph_vector_int_destroy(&vids);
 }
 
-int main() {
+int main(void) {
 
     verify_classes();
     random_test();

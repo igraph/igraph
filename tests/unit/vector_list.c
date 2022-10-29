@@ -25,7 +25,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_vector_int_list_t list, list2;
     igraph_vector_int_t v;
     igraph_vector_int_t* v_ptr;
@@ -221,8 +221,6 @@ int main() {
         igraph_vector_int_list_remove_fast(&list, -2, /* item = */ &v) == IGRAPH_EINVAL
     );
     igraph_vector_int_list_destroy(&list);
-
-    /* TODO(ntamas): test insert, insert_copy, insert_new, swap, swap_elements */
 
     VERIFY_FINALLY_STACK();
 

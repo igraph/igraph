@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <unistd.h>     /* unlink */
 
+#include "test_utilities.h"
+
 void custom_warning_handler (const char *reason, const char *file,
                              int line) {
     IGRAPH_UNUSED(file);
@@ -69,20 +71,18 @@ void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_error_handler_t* oldhandler;
     igraph_warning_handler_t* oldwarnhandler;
-    int result;
+    igraph_error_t result;
     FILE *ifile, *ofile;
 
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* GraphML */
     ifile = fopen("test.graphml", "r");
-    if (ifile == 0) {
-        return 10;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
 
     oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
     oldwarnhandler = igraph_set_warning_handler(custom_warning_handler);
@@ -101,7 +101,7 @@ int main() {
     ofile = fopen("test2.graphml", "w");
     /* If we can't create the test file, just skip the test */
     if (ofile) {
-        if ((result = igraph_write_graph_graphml(&g, ofile, /*prefixattr=*/ 1))) {
+        if ((result = igraph_write_graph_graphml(&g, ofile, /*prefixattr=*/ true))) {
             printf("Received unexpected return code: %d\n", result);
             return 1;
         }
@@ -109,20 +109,26 @@ int main() {
         unlink("test2.graphml");
     }
     dump_graph("Directed graph:\n", &g);
+    dump_vertex_attribute_bool("gender", &g);
+    dump_vertex_attribute_string("color", &g);
     igraph_destroy(&g);
 
     /* The same with undirected graph */
     ifile = fopen("test.graphml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         printf("Received unexpected return code: %d\n", result);
         return 1;
     }
     fclose(ifile);
     dump_graph("Undirected graph:\n", &g);
+    dump_vertex_attribute_bool("gender", &g);
+    dump_vertex_attribute_string("color", &g);
     igraph_destroy(&g);
 
     /* Test a GraphML file with default attributes */
     ifile = fopen("graphml-default-attrs.xml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         printf("Received unexpected return code: %d\n", result);
         return 1;
@@ -137,6 +143,7 @@ int main() {
 
     /* Test a GraphML file with namespaces */
     ifile = fopen("graphml-namespace.xml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         printf("Received unexpected return code: %d\n", result);
         return 1;
@@ -147,6 +154,7 @@ int main() {
 
     /* Test a not-really-valid GraphML file as it has no namespace information */
     ifile = fopen("graphml-lenient.xml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         printf("Received unexpected return code: %d\n", result);
         return 1;
@@ -158,6 +166,7 @@ int main() {
     /* Test a GraphML file with excess whitespace around attribute values
      * (which we attempt to handle gracefully) */
     ifile = fopen("graphml-whitespace.xml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         printf("Received unexpected return code: %d\n", result);
         return 1;
@@ -173,6 +182,7 @@ int main() {
      * edges */
     igraph_set_warning_handler(igraph_warning_handler_ignore);
     ifile = fopen("graphml-yed.xml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
     if ((result = igraph_read_graph_graphml(&g, ifile, 0))) {
         printf("Received unexpected return code: %d\n", result);
         return 1;
@@ -192,9 +202,12 @@ int main() {
        ten reads. Do testing here doesn't make much sense, but if we have the file
        then let's do it anyway. */
     ifile = fopen("graphml-hsa05010.xml", "r");
+    IGRAPH_ASSERT(ifile != NULL);
     igraph_read_graph_graphml(&g, ifile, 0);
     fclose(ifile);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

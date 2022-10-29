@@ -30,7 +30,7 @@ void call_and_print(igraph_t *graph) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_5_full, g_lm;
 
     igraph_small(&g_0, 0, 0, -1);

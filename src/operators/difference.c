@@ -31,9 +31,8 @@
 
 /**
  * \function igraph_difference
- * \brief Calculate the difference of two graphs
+ * \brief Calculates the difference of two graphs.
  *
- * </para><para>
  * The number of vertices in the result is the number of vertices in
  * the original graph, i.e. the left, first operand. In the results
  * graph only edges will be included from \p orig which are not

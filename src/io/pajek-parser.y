@@ -44,11 +44,10 @@
 
 */
 
-#include "igraph_types.h"
-#include "igraph_memory.h"
-#include "igraph_error.h"
 #include "igraph_attributes.h"
-#include "config.h"
+#include "igraph_error.h"
+#include "igraph_memory.h"
+#include "igraph_types.h"
 
 #include "io/pajek-header.h"
 #include "io/parsers/pajek-parser.h" /* it must come first because of YYSTYPE */

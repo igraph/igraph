@@ -1,6 +1,5 @@
 
 #include "igraph_error.h"
-#include "igraph_memory.h"
 
 #include "core/interruption.h"
 #include "cliques/cliquer_internal.h"
@@ -401,6 +400,7 @@ igraph_error_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
 /* Find weight of largest weight clique. */
 
 static igraph_error_t check_interruption_callback(set_t s, graph_t *g, clique_options *opt) {
+    IGRAPH_UNUSED(s); IGRAPH_UNUSED(g); IGRAPH_UNUSED(opt);
     IGRAPH_ALLOW_INTERRUPTION();
     return IGRAPH_SUCCESS;
 }

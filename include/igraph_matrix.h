@@ -93,6 +93,7 @@ IGRAPH_EXPORT igraph_bool_t igraph_matrix_all_almost_e(const igraph_matrix_t *lh
                                                            igraph_real_t eps);
 
 IGRAPH_EXPORT igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
+IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_zapsmall(igraph_matrix_complex_t *m, igraph_real_t tol);
 
 __END_DECLS
 

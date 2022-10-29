@@ -246,7 +246,7 @@ IGRAPH_EXPORT void FUNCTION(igraph_vector, remove_section)(
 IGRAPH_EXPORT void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, qsort_ind)(
-        TYPE(igraph_vector) *v, igraph_vector_int_t *inds, igraph_order_t order);
+        const TYPE(igraph_vector) *v, igraph_vector_int_t *inds, igraph_order_t order);
 
 #endif
 
@@ -255,9 +255,15 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, qsort_ind)(
 /*-----------*/
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
-                                                  const char *format);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FILE *file);
+
+#ifdef OUT_FORMAT
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v, const char *format);
+#endif /* OUT_FORMAT */
+
+/*----------------------------------------*/
+/* Operations specific to complex vectors */
+/*----------------------------------------*/
 
 #ifdef BASE_COMPLEX
 
@@ -279,7 +285,7 @@ IGRAPH_EXPORT igraph_bool_t igraph_vector_complex_all_almost_e(const igraph_vect
                                                                const igraph_vector_complex_t *rhs,
                                                                igraph_real_t eps);
 
-#endif
+#endif /* BASE_COMPLEX */
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector)*v, int no, ...);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector)*v, int no, ...);

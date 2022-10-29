@@ -38,10 +38,10 @@ igraph_error_t bfs_callback(const igraph_t *graph,
     IGRAPH_UNUSED(dist);
     IGRAPH_UNUSED(extra);
     printf(" %" IGRAPH_PRId, vid);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
 
     igraph_t graph, ring;
     igraph_vector_int_t restricted, order, rank, father, pred, succ, dist, roots;

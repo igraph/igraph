@@ -67,11 +67,11 @@ jobs:
 
     - name: "Linux arm64"
       os: linux
-      arch: arm64-graviton2 # faster than arm64
+      arch: arm64
 
     - name: "Linux arm64 external"
       os: linux
-      arch: arm64-graviton2 # faster than arm64
+      arch: arm64
       before_script:
         - mkdir build && cd build
         - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=OFF -DIGRAPH_USE_INTERNAL_LAPACK=OFF -DIGRAPH_USE_INTERNAL_ARPACK=OFF -DIGRAPH_USE_INTERNAL_GLPK=OFF -DIGRAPH_USE_INTERNAL_GMP=OFF -DIGRAPH_VERIFY_FINALLY_STACK=ON -DBLA_VENDOR=OpenBLAS -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON -DUSE_SANITIZER=Address\;Undefined

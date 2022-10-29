@@ -23,13 +23,13 @@
 #include <cstdio>
 #include <cmath>
 #include <limits>
+#include <stdexcept>
 
 #include "gengraph_qsort.h"
 #include "gengraph_degree_sequence.h"
 #include "gengraph_graph_molloy_optimized.h"
 
 #include "igraph_error.h"
-#include "igraph_statusbar.h"
 #include "igraph_progress.h"
 
 
@@ -129,7 +129,6 @@ graph_molloy_opt::graph_molloy_opt(igraph_integer_t *svg) {
     degree_sequence dd(n, svg);
     // Build neigh[] and alloc links[]
     alloc(dd);
-    dd.detach();
     // Read links[]
     restore(svg + n);
 }
@@ -365,12 +364,11 @@ bool graph_molloy_opt::havelhakimi() {
             /* Cannot use IGRAPH_ERRORF() as this function does not return
              * an error code. This situation should only occur when the degree
              * sequence is not graphical, but that is already checked at the top
-             * level. Therefore, we report EINTERNAL, as triggering this
+             * level. Therefore, we use IGRAPH_FATAL(), as triggering this
              * indicates a bug. */
-            igraph_errorf("Error in graph_molloy_opt::havelhakimi(): "
+            IGRAPH_FATALF("Error in graph_molloy_opt::havelhakimi(): "
                           "Couldn't bind vertex %" IGRAPH_PRId " entirely (%" IGRAPH_PRId " edges remaining)",
-                          IGRAPH_FILE_BASENAME, __LINE__,
-                          IGRAPH_EINTERNAL, v, dv);
+                          v, dv);
             return false;
         }
     }
@@ -443,11 +441,7 @@ bool graph_molloy_opt::make_connected() {
             if (deg[v0] == 0) {
                 delete[] dist;
                 delete[] buff;
-                /* Cannot use IGRAPH_ERROR() as this function does not return an error code. */
-                igraph_error("Cannot create connected graph from degree sequence: "
-                              "vertex with degree 0 found.",
-                              IGRAPH_FILE_BASENAME, __LINE__,
-                              IGRAPH_EINVAL);
+                // 0-degree vertex found, cannot create connected graph
                 return false;
             }
             dist[v0] = 0; // root
@@ -694,8 +688,7 @@ igraph_integer_t graph_molloy_opt::breadth_path_search(igraph_integer_t src, igr
                 }
             } else if (d == nd) {
                 if ((paths[w] += p) == numeric_limits<double>::infinity()) {
-                    IGRAPH_ERROR("Fatal error : too many (>MAX_DOUBLE) possible"
-                                 " paths in graph", IGRAPH_EOVERFLOW);
+                    throw std::runtime_error("Fatal error: too many (>MAX_DOUBLE) possible paths in graph.");
                 }
             }
         }

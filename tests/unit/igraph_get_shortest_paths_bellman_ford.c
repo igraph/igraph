@@ -94,7 +94,7 @@ void check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* par
     }
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;
     igraph_vector_int_t parents, inbound;

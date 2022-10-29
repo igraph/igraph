@@ -99,6 +99,11 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
  * adjacency list contains the state of the graph at the time of its
  * initialization.
  *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE or setting \p multiple to a
+ * different value from \c IGRAPH_MULTIPLE.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
  * \param mode Constant specifying whether outgoing
@@ -423,8 +428,8 @@ igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
     igraph_integer_t i;
     igraph_integer_t n = al->length;
     igraph_vector_int_t mark;
-    igraph_vector_int_init(&mark, n);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, n);
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_integer_t j, l = igraph_vector_int_size(v);
@@ -472,12 +477,12 @@ igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) 
 #define ADJLIST_CANON_EDGE(from, to, directed) \
     do {                     \
         igraph_integer_t temp;         \
-        if((!directed) && from < to) {     \
+        if ((!directed) && from < to) {     \
             temp = to;               \
             to = from;               \
             from = temp;             \
         }                      \
-    } while(0);
+    } while (0);
 
 igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed) {
     igraph_vector_int_t* fromvec;
@@ -639,6 +644,10 @@ igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) 
  * may potentially appear \em twice for the \em same vertex. Use the \p loops
  * argument to control whether this will be the case (\c IGRAPH_LOOPS_TWICE )
  * or not (\c IGRAPH_LOOPS_ONCE or \c IGRAPH_NO_LOOPS).
+ *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE.
  *
  * \param graph The input graph.
  * \param il Pointer to an uninitialized incidence list.
@@ -825,7 +834,6 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
         if (multiple == IGRAPH_NO_MULTIPLE) {
             /* We need to get rid of multiple edges completely (including
              * multiple loop edges), but keep one edge from each loop edge */
-            /* TODO(ntamas): think this through! */
             for (i = 0; i < n; i++) {
                 if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
@@ -852,7 +860,6 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     } else if (loops == IGRAPH_LOOPS_TWICE && multiple == IGRAPH_NO_MULTIPLE) {
         /* We need to get rid of multiple edges completely (including
          * multiple loop edges), but keep both edge from each loop edge */
-        /* TODO(ntamas): think this through! */
         for (i = 0; i < n; i++) {
             if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                 VECTOR(*v)[p] = VECTOR(*v)[i];
@@ -897,6 +904,12 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  * allocates some memory for storing the vectors of an adjacency list,
  * but the neighbor vertices are not queried, only at the \ref
  * igraph_lazy_adjlist_get() calls.
+ *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE or setting \p multiple to a
+ * different value from \c IGRAPH_MULTIPLE.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized adjacency list object.
  * \param mode Constant, it gives whether incoming edges
@@ -1037,6 +1050,10 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
  * will appear in the incidence list \em twice, once for the source vertex
  * and once for the target edge. It also means that the edge IDs of loop edges
  * will appear \em twice for the \em same vertex.
+ *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE.
  *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized incidence list.

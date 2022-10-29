@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         VECTOR(mymembership)[i] = i;
     }
     if (membership) {
-        igraph_vector_int_update(membership, &mymembership);
+        IGRAPH_CHECK(igraph_vector_int_update(membership, &mymembership));
     }
 
     IGRAPH_CHECK(igraph_modularity(graph, &mymembership, weights,
@@ -146,7 +146,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                 if (actmod > maxmod) {
                     maxmod = actmod;
                     if (membership) {
-                        igraph_vector_int_update(membership, &mymembership);
+                        IGRAPH_CHECK(igraph_vector_int_update(membership, &mymembership));
                     }
                 }
             }
@@ -192,8 +192,8 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *     the weighted modularity scores will be calculated. Ignored if both
  *     \p modularity and \p membership are \c NULL pointers.
  * \param res Pointer to an initialized matrix, if not \c NULL then the
- *    dendrogram will be stored here, in the same form as for the \ref
- *    igraph_community_walktrap() function: the matrix has two columns
+ *    dendrogram will be stored here, in the same form as for the
+ *    \ref igraph_community_walktrap() function: the matrix has two columns
  *    and each line is a merge given by the IDs of the merged
  *    components. The component IDs are numbered from zero and
  *    component IDs smaller than the number of vertices in the graph
@@ -236,17 +236,9 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     igraph_integer_t no_comps;
     igraph_integer_t no_removed_edges = igraph_vector_int_size(edges);
     igraph_integer_t max_merges;
-    igraph_integer_t min;
-    igraph_integer_t max;
 
-    if (no_removed_edges > 0) {
-        igraph_vector_int_minmax(edges, &min, &max);
-        if (min < 0) {
-            IGRAPH_ERRORF("Edge ids should not be negative, found %" IGRAPH_PRId ".", IGRAPH_EINVAL, min);
-        }
-        if (max > no_of_edges) {
-            IGRAPH_ERRORF("Edge id %" IGRAPH_PRId " is not in the graph.", IGRAPH_EINVAL, max);
-        }
+    if (! igraph_vector_int_isininterval(edges, 0, no_of_edges-1)) {
+        IGRAPH_ERROR("Invalid edge ID.", IGRAPH_EINVAL);
     }
     if (no_removed_edges < no_of_edges) {
             IGRAPH_ERRORF("Number of removed edges (%" IGRAPH_PRId ") should be equal to "
@@ -257,13 +249,13 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     /* catch null graph early */
     if (no_of_nodes == 0) {
         if (res) {
-            igraph_matrix_int_resize(res, 0, 2);
+            IGRAPH_CHECK(igraph_matrix_int_resize(res, 0, 2));
         }
         if (bridges) {
             igraph_vector_int_clear(bridges);
         }
         if (modularity) {
-            igraph_vector_resize(modularity, 1);
+            IGRAPH_CHECK(igraph_vector_resize(modularity, 1));
             VECTOR(*modularity)[0] = IGRAPH_NAN;
         }
         if (membership) {
@@ -357,7 +349,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * in the network. The algorithm was invented by M. Girvan and
  * M. Newman, see: M. Girvan and M. E. J. Newman: Community structure in
  * social and biological networks, Proc. Nat. Acad. Sci. USA 99, 7821-7826
- * (2002).
+ * (2002). https://doi.org/10.1073/pnas.122653799
  *
  * </para><para>
  * The idea is that the betweenness of the edges connecting two
@@ -365,10 +357,16 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  * between nodes in separate communities go through them. So we
  * gradually remove the edge with highest betweenness from the
  * network, and recalculate edge betweenness after every removal.
- * This way sooner or later the network falls off to two components,
- * then after a while one of these components falls off to two smaller
- * components, etc. until all edges are removed. This is a divisive
- * hierarchical approach, the result is a dendrogram.
+ * This way sooner or later the network splits into two components,
+ * then after a while one of these components splits again into two smaller
+ * components, and so on until all edges are removed. This is a divisive
+ * hierarchical approach, the result of which is a dendrogram.
+ *
+ * </para><para>
+ * In directed graphs, when \p directed is set to true, the directed version
+ * of betweenness and modularity are used, however, only splits into
+ * \em weakly connected components are detected.
+ *
  * \param graph The input graph.
  * \param result Pointer to an initialized vector, the result will be
  *     stored here, the IDs of the removed edges in the order of their
@@ -381,22 +379,22 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  *     then merges performed by the algorithm are stored here. Even if
  *     this is a divisive algorithm, we can replay it backwards and
  *     note which two clusters were merged. Clusters are numbered from
- *     zero, see the \p merges argument of \ref
- *     igraph_community_walktrap() for details. The matrix will be
- *     resized as needed.
+ *     zero, see the \p merges argument of \ref igraph_community_walktrap()
+ *     for details. The matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
- *     NULL then the indices into \p result of all edges which caused
- *     one of the \p merges will be put here. This is equal to all edge removals
- *      which separated the network into more components, in reverse order.
+ *     \c NULL then the indices into \p result of all edges which caused
+ *     one of the \p merges will be put here. This is equivalent to all edge removals
+ *     which separated the network into more components, in reverse order.
  * \param modularity If not a null pointer, then the modularity values
  *     of the different divisions are stored here, in the order
  *     corresponding to the merge matrix. The modularity values will
  *     take weights into account if \p weights is not null.
  * \param membership If not a null pointer, then the membership vector,
  *     corresponding to the highest modularity value, is stored here.
- * \param directed Logical constant, whether to calculate directed
- *    betweenness (i.e. directed paths) for directed graphs. It is
- *    ignored for undirected graphs.
+ * \param directed Logical constant. Controls whether to calculate directed
+ *    betweenness (i.e. directed paths) for directed graphs, and whether
+ *    to use the directed version of modularity. It is ignored for undirected
+ *    graphs.
  * \param weights An optional vector containing edge weights. If null,
  *     the unweighted edge betweenness scores will be calculated and
  *     used. If not null, the weighted edge betweenness scores will be
@@ -434,7 +432,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_vector_t eb;
     igraph_integer_t maxedge, pos;
     igraph_integer_t from, to;
-    igraph_bool_t result_owned = 0;
+    igraph_bool_t result_owned = false;
     igraph_stack_int_t stack = IGRAPH_STACK_NULL;
     igraph_real_t steps, steps_done;
 
@@ -500,7 +498,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 IGRAPH_ERROR("Weights must be strictly positive.", IGRAPH_EINVAL);
             }
 
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }
@@ -638,7 +636,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(double));
                 memset(tmpscore, 0, (size_t) no_of_nodes * sizeof(double));
 
-                igraph_2wheap_push_with_index(&heap, source, 0);
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&heap, source, 0));
                 distance[source] = 1.0;
                 nrgeo[source] = 1;
 
@@ -646,7 +644,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     igraph_integer_t minnei = igraph_2wheap_max_index(&heap);
                     igraph_real_t mindist = -igraph_2wheap_delete_max(&heap);
 
-                    igraph_stack_int_push(&stack, minnei);
+                    IGRAPH_CHECK(igraph_stack_int_push(&stack, minnei));
 
                     neip = igraph_inclist_get(elist_out_p, minnei);
                     neino = igraph_vector_int_size(neip);
@@ -673,11 +671,11 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
-                            IGRAPH_CHECK(igraph_2wheap_modify(&heap, to, -altdist));
+                            igraph_2wheap_modify(&heap, to, -altdist);
                         } else if (altdist == curdist - 1) {
                             /* Another path with the same length */
                             v = igraph_inclist_get(&fathers, to);
-                            igraph_vector_int_push_back(v, edge);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                             nrgeo[to] += nrgeo[minnei];
                         }
                     }

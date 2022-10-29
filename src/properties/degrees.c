@@ -29,7 +29,6 @@
  * \function igraph_maxdegree
  * \brief The maximum degree in a graph (or set of vertices).
  *
- * </para><para>
  * The largest in-, out- or total degree of the specified vertices is
  * calculated. If the graph has no vertices, or \p vids is empty,
  * 0 is returned, as this is the smallest possible value for degrees.
@@ -51,7 +50,7 @@
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
- * Time complexity: O(v) if loops is TRUE, and O(v*d) otherwise. v is the number
+ * Time complexity: O(v) if \p loops is \c true, and O(v*d) otherwise. v is the number
  * of vertices for which the degree will be calculated, and d is their
  * (average) degree.
  */
@@ -208,16 +207,21 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  * </para><para>
  * The weighted version computes a weighted average of the neighbor degrees as
  *
+ * </para><para>
  * <code>k_nn_u = 1/s_u sum_v w_uv k_v</code>,
  *
+ * </para><para>
  * where <code>s_u = sum_v w_uv</code> is the sum of the incident edge weights
  * of vertex \c u, i.e. its strength.
  * The sum runs over the neighbors \c v of vertex \c u
  * as indicated by \p mode. <code>w_uv</code> denotes the weighted adjacency matrix
  * and <code>k_v</code> is the neighbors' degree, specified by \p neighbor_degree_mode.
+ * This is equation (6) in the reference below.
  *
  * </para><para>
  * Reference:
+ *
+ * </para><para>
  * A. Barrat, M. Barthélemy, R. Pastor-Satorras, and A. Vespignani,
  * The architecture of complex weighted networks,
  * Proc. Natl. Acad. Sci. USA 101, 3747 (2004).
@@ -474,7 +478,7 @@ igraph_error_t igraph_strength(const igraph_t *graph, igraph_vector_t *res,
  * \param only_indices If true, then return a sorted list of indices
  *        into a vector corresponding to \c vids, rather than a list
  *        of vertex IDs. This parameter is ignored if \c vids is set
- *        to all vertices via igraph_vs_all() or igraph_vss_all(),
+ *        to all vertices via \ref igraph_vs_all() or \ref igraph_vss_all(),
  *        because in this case the indices and vertex IDs are the
  *        same.
  * \return Error code:

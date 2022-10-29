@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 
-int main() {
+int main(void) {
     igraph_vector_t from;
     igraph_vector_int_t to;
 

@@ -27,20 +27,25 @@
 
 #include "graph/attributes.h"
 
-#include "lgl-header.h"
+#include "io/lgl-header.h"
+#include "io/parsers/lgl-parser.h"
 
 int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
                                  void* scanner);
-void igraph_lgl_yylex_destroy (void *scanner );
+int igraph_lgl_yylex_destroy (void *scanner );
 int igraph_lgl_yyparse (igraph_i_lgl_parsedata_t* context);
 void igraph_lgl_yyset_in  (FILE * in_str, void* yyscanner );
+
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_lgl_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_lgl_yylex_destroy(scanner);
+}
 
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_lgl
- * \brief Reads a graph from an <code>.lgl</code> file
+ * \brief Reads a graph from an <code>.lgl</code> file.
  *
- * </para><para>
  * The <code>.lgl</code> format is used by the Large Graph
  * Layout visualization software
  * (http://lgl.sourceforge.net), it can
@@ -65,7 +70,7 @@ vertex3name [optionalWeight] \endverbatim
  * in \a igraph it is not an error to have multiple and loop edges.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.
- * \param names Logical value, if TRUE the symbolic names of the
+ * \param names Logical value, if \c true the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
  * \param weights Whether to add the weights of the edges to the
@@ -123,7 +128,7 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     context.igraph_errno = IGRAPH_SUCCESS;
 
     igraph_lgl_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_lgl_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_lgl_yylex_destroy_wrapper, context.scanner);
 
     igraph_lgl_yyset_in(instream, context.scanner);
 
@@ -204,9 +209,8 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_lgl
- * \brief Writes the graph to a file in <code>.lgl</code> format
+ * \brief Writes the graph to a file in <code>.lgl</code> format.
  *
- * </para><para>
  * <code>.lgl</code> is a format used by LGL, see \ref
  * igraph_read_graph_lgl() for details.
  *
@@ -224,17 +228,15 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
  * \param weights The name of a numerical edge attribute, which will be
  *        written as weights to the file. Supply \c NULL to skip writing
  *        edge weights.
- * \param isolates Logical, if TRUE isolated vertices are also written
- *        to the file. If FALSE they will be omitted.
+ * \param isolates Logical, if \c true isolated vertices are also written
+ *        to the file. If \c false they will be omitted.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error
  *         writing the file.
  *
- * Time complexity: O(|E|), the
- * number of edges if \p isolates is
- * FALSE, O(|V|+|E|) otherwise. All
- * file operations are expected to have time complexity
- * O(1).
+ * Time complexity: O(|E|), the number of edges if \p isolates is \c false,
+ * O(|V|+|E|) otherwise. All file operations are expected to have
+ * time complexity O(1).
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  *
@@ -280,7 +282,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         }
     }
 
-    if (names == 0 && weights == 0) {
+    if (names == NULL && weights == NULL) {
         /* No names, no weights */
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t from, to;
@@ -297,7 +299,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             }
             IGRAPH_EIT_NEXT(it);
         }
-    } else if (weights == 0) {
+    } else if (weights == NULL) {
         /* No weights but use names */
         igraph_strvector_t nvec;
         IGRAPH_CHECK(igraph_strvector_init(&nvec, igraph_vcount(graph)));
@@ -326,7 +328,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             IGRAPH_EIT_NEXT(it);
         }
         IGRAPH_FINALLY_CLEAN(1);
-    } else if (names == 0) {
+    } else if (names == NULL) {
         /* No names but weights */
         igraph_vector_t wvec;
         IGRAPH_VECTOR_INIT_FINALLY(&wvec, igraph_ecount(graph));
@@ -399,17 +401,16 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         igraph_integer_t nov = igraph_vcount(graph);
         igraph_integer_t i;
         int ret = 0;
-        igraph_vector_int_t deg;
+        igraph_integer_t deg;
         igraph_strvector_t nvec;
         const char *str;
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, 1);
         IGRAPH_CHECK(igraph_strvector_init(&nvec, 1));
         IGRAPH_FINALLY(igraph_strvector_destroy, &nvec);
         for (i = 0; i < nov; i++) {
-            IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_1(i), IGRAPH_ALL, IGRAPH_LOOPS));
-            if (VECTOR(deg)[0] == 0) {
-                if (names == 0) {
+            IGRAPH_CHECK(igraph_degree_1(graph, &deg, i, IGRAPH_ALL, IGRAPH_LOOPS));
+            if (deg == 0) {
+                if (names == NULL) {
                     ret = fprintf(outstream, "# %" IGRAPH_PRId "\n", i);
                 } else {
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, names,
@@ -423,8 +424,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
             }
         }
         igraph_strvector_destroy(&nvec);
-        igraph_vector_int_destroy(&deg);
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     igraph_eit_destroy(&it);

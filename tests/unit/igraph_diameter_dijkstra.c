@@ -44,7 +44,7 @@ void call_and_print(igraph_t *g, igraph_vector_t *weights, igraph_bool_t unconn,
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g_ring, g_0, g_1, g_2, g_lm;
     igraph_vector_t weights, weights_neg, weights_0;
 
@@ -61,8 +61,14 @@ int main() {
     printf("Graph with zero nodes:\n");
     call_and_print(&g_0, NULL, 1, 1);
 
+    printf("Graph with zero nodes, weighted:\n");
+    call_and_print(&g_0, &weights_0, 1, 1);
+
     printf("Graph with one node:\n");
     call_and_print(&g_1, NULL, 1, 1);
+
+    printf("Graph with one node, weighted:\n");
+    call_and_print(&g_1, &weights_0, 1, 1);
 
     printf("Graph with one node, returns inf for unconnected:\n");
     call_and_print(&g_1, NULL, 0, 1);

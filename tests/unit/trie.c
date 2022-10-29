@@ -28,7 +28,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_trie_t trie;
     igraph_integer_t id;

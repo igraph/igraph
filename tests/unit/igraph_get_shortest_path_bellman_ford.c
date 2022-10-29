@@ -20,7 +20,7 @@
 #include "test_utilities.h"
 
 
-int main() {
+int main(void) {
     /*most functionality is currently tested in
       igraph_get_shortest_paths_bellman_ford(), which is called by
       igraph_get_shortest_path_bellman_ford()*/
@@ -39,19 +39,18 @@ int main() {
     igraph_get_shortest_path_bellman_ford(&g, &vertices, &edges,
             0, 1, NULL, IGRAPH_OUT);
     printf("vertices: ");
-    igraph_vector_int_print(&vertices);
+    print_vector_int(&vertices);
     printf("edges: ");
-    igraph_vector_int_print(&edges);
+    print_vector_int(&edges);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
 
-    {
-        printf("Check error for Graph with no vertices.");
-        igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
-        CHECK_ERROR(igraph_get_shortest_path_bellman_ford(&g, NULL, NULL,
-                    0, 0, NULL, IGRAPH_OUT), IGRAPH_EINVVID);
-    }
+    printf("Check error when passing null graph.\n");
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    CHECK_ERROR(
+        igraph_get_shortest_path_bellman_ford(&g, NULL, NULL, 0, 0, NULL, IGRAPH_OUT),
+        IGRAPH_EINVVID);
 
     igraph_vector_int_destroy(&vertices);
     igraph_vector_int_destroy(&edges);

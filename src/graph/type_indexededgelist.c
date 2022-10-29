@@ -243,7 +243,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
  * Time complexity: O(|V|+|E|) where |V| is the number of vertices and
  * |E| is the number of edges in the \em new, extended graph.
  *
- * \example examples/simple/igraph_add_edges.c
+ * \example examples/simple/creation.c
  */
 igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
                      void *attr) {
@@ -376,7 +376,7 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
  * Time complexity: O(|V|) where |V| is the number of vertices in the \em new,
  * extended graph.
  *
- * \example examples/simple/igraph_add_vertices.c
+ * \example examples/simple/creation.c
  */
 igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     igraph_integer_t ec = igraph_ecount(graph);
@@ -500,7 +500,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
     igraph_bool_t *mark;
     igraph_integer_t i, j;
 
-    mark = IGRAPH_CALLOC(no_of_edges, int);
+    mark = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
     IGRAPH_CHECK_OOM(mark, "Cannot delete edges.");
     IGRAPH_FINALLY(igraph_free, mark);
 
@@ -606,7 +606,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 /**
  * \ingroup interface
  * \function igraph_delete_vertices_idx
- * \brief Removes some vertices (with all their edges) from the graph
+ * \brief Removes some vertices (with all their edges) from the graph.
  *
  * </para><para>
  * This function changes the IDs of the vertices (except in some very
@@ -1080,8 +1080,8 @@ static igraph_error_t igraph_i_create_start_vectors(
  * \brief Is this a directed graph?
  *
  * \param graph The graph.
- * \return Logical value, <code>TRUE</code> if the graph is directed,
- * <code>FALSE</code> otherwise.
+ * \return Logical value, \c true if the graph is directed,
+ * \c false otherwise.
  *
  * Time complexity: O(1)
  *
@@ -1090,6 +1090,67 @@ static igraph_error_t igraph_i_create_start_vectors(
 
 igraph_bool_t igraph_is_directed(const igraph_t *graph) {
     return graph->directed;
+}
+
+/**
+ * \ingroup interface
+ * \function igraph_degree_1
+ * \brief The degree of of a single vertex in the graph.
+ *
+ * This function calculates the in-, out- or total degree of a single vertex.
+ * For a single vertex, it is more efficient than calling \ref igraph_degree().
+ *
+ * \param graph The graph.
+ * \param deg Pointer to the integer where the computed degree will be stored.
+ * \param vid The vertex for which the degree will be calculated.
+ * \param mode Defines the type of the degree for directed graphs. Valid modes are:
+ *        \c IGRAPH_OUT, out-degree;
+ *        \c IGRAPH_IN, in-degree;
+ *        \c IGRAPH_ALL, total degree (sum of the in- and out-degree).
+ *        This parameter is ignored for undirected graphs.
+ * \param loops Boolean, gives whether the self-loops should be
+ *        counted.
+ * \return Error code.
+ *
+ * \sa \ref igraph_degree() to compute the degree of several vertices at once.
+ *
+ * Time complexity: O(1) if \p loops is \c true, and
+ * O(d) otherwise, where d is the degree.
+ */
+igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
+                               igraph_integer_t vid, igraph_neimode_t mode, igraph_bool_t loops) {
+
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    *deg = 0;
+    if (mode & IGRAPH_OUT) {
+        *deg += (VECTOR(graph->os)[vid + 1] - VECTOR(graph->os)[vid]);
+    }
+    if (mode & IGRAPH_IN) {
+        *deg += (VECTOR(graph->is)[vid + 1] - VECTOR(graph->is)[vid]);
+    }
+    if (! loops) {
+        /* When loops should not be counted, we remove their contribution from the
+         * previously computed degree. */
+        if (mode & IGRAPH_OUT) {
+            for (igraph_integer_t i = VECTOR(graph->os)[vid]; i < VECTOR(graph->os)[vid + 1]; i++) {
+                if (VECTOR(graph->to)[ VECTOR(graph->oi)[i] ] == vid) {
+                    *deg -= 1;
+                }
+            }
+        }
+        if (mode & IGRAPH_IN) {
+            for (igraph_integer_t i = VECTOR(graph->is)[vid]; i < VECTOR(graph->is)[vid + 1]; i++) {
+                if (VECTOR(graph->from)[ VECTOR(graph->ii)[i] ] == vid) {
+                    *deg -= 1;
+                }
+            }
+        }
+    }
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1123,16 +1184,14 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  *         \c IGRAPH_EINVVID: invalid vertex ID.
  *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
- * Time complexity: O(v) if
- * loops is
- * TRUE, and
- * O(v*d)
- * otherwise. v is the number of
+ * Time complexity: O(v) if \p loops is \c true, and
+ * O(v*d) otherwise. v is the number of
  * vertices for which the degree will be calculated, and
  * d is their (average) degree.
  *
  * \sa \ref igraph_strength() for the version that takes into account
- * edge weights.
+ * edge weights; \ref igraph_degree_1() to efficiently compute the
+ * degree of a single vertex.
  *
  * \example examples/simple/igraph_degree.c
  */
@@ -1251,7 +1310,8 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
                 *(result) = e; \
                 if (result_pos != 0) { *(result_pos) = start; } \
             } \
-        } } while(0)
+        } \
+    } while (0)
 
 #define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid) \
     do { \
@@ -1280,26 +1340,26 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  * \function igraph_get_eid
  * \brief Get the edge ID from the end points of an edge.
  *
- * For undirected graphs \c pfrom and \c pto are exchangeable.
+ * For undirected graphs \c from and \c to are exchangeable.
  *
  * \param graph The graph object.
  * \param eid Pointer to an integer, the edge ID will be stored here.
- * \param pfrom The starting point of the edge.
- * \param pto The end point of the edge.
+ * \param from The starting point of the edge.
+ * \param to The end point of the edge.
  * \param directed Logical constant, whether to search for directed
  *        edges in a directed graph. Ignored for undirected graphs.
  * \param error Logical scalar, whether to report an error if the edge
  *        was not found. If it is false, then -1 will be assigned to \p eid.
- *        Note that invalid vertex IDs in input arguments (\p pfrom or \p pto)
+ *        Note that invalid vertex IDs in input arguments (\p from or \p to)
  *        always return an error code.
  * \return Error code.
  * \sa \ref igraph_edge() for the opposite operation, \ref igraph_get_all_eids_between()
  *     to retrieve all edge IDs between a pair of vertices.
  *
  * Time complexity: O(log (d)), where d is smaller of the out-degree
- * of \c pfrom and in-degree of \c pto if \p directed is true. If \p directed
+ * of \c from and in-degree of \c to if \p directed is true. If \p directed
  * is false, then it is O(log(d)+log(d2)), where d is the same as before and
- * d2 is the minimum of the out-degree of \c pto and the in-degree of \c pfrom.
+ * d2 is the minimum of the out-degree of \c to and the in-degree of \c from.
  *
  * \example examples/simple/igraph_get_eid.c
  *
@@ -1307,14 +1367,13 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
  */
 
 igraph_error_t igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
-                   igraph_integer_t pfrom, igraph_integer_t pto,
+                   igraph_integer_t from, igraph_integer_t to,
                    igraph_bool_t directed, igraph_bool_t error) {
 
-    igraph_integer_t from = pfrom, to = pto;
-    igraph_integer_t nov = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    if (from < 0 || to < 0 || from > nov - 1 || to > nov - 1) {
-        IGRAPH_ERROR("cannot get edge ID", IGRAPH_EINVVID);
+    if (from < 0 || to < 0 || from >= no_of_nodes || to >= no_of_nodes) {
+        IGRAPH_ERROR("Cannot get edge ID.", IGRAPH_EINVVID);
     }
 
     *eid = -1;
@@ -1734,7 +1793,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
  *
  * Time complexity: O(E), the number of edges in the graphs.
  *
- * \sa igraph_isomorphic() to test if two graphs are isomorphic.
+ * \sa \ref igraph_isomorphic() to test if two graphs are isomorphic.
  */
 
 igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res) {

@@ -34,7 +34,7 @@ void print_and_destroy(igraph_matrix_t *vectors, igraph_matrix_t *values, igraph
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t vectors;
     igraph_matrix_t values;
 

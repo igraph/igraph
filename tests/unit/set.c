@@ -37,10 +37,10 @@ void print_set(igraph_set_t *set, FILE *f) {
     fprintf(f, "\n");
 }
 
-int main() {
+int main(void) {
 
     igraph_set_t set;
-    int i;
+    igraph_integer_t i;
 
     /* simple init */
     igraph_set_init(&set, 0);

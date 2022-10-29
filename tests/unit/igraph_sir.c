@@ -43,7 +43,7 @@ void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_i
     igraph_vector_ptr_t result;
     igraph_vector_ptr_init(&result, 0);
     IGRAPH_ASSERT(igraph_sir(g, beta, gamma, no_sim, &result) == IGRAPH_SUCCESS);
-    for (int i = 0; i < igraph_vector_ptr_size(&result); i++) {
+    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&result); i++) {
         print_sir(VECTOR(result)[i]);
         igraph_sir_destroy(VECTOR(result)[i]);
     }
@@ -51,7 +51,7 @@ void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_i
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g_empty, g_lm, g_line, g_1, g_2, g_full;
 
     igraph_rng_seed(igraph_rng_default(), 43);

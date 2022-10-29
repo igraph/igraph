@@ -25,7 +25,7 @@
 
 #include "../unit/test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_vector_t mod;
@@ -36,7 +36,7 @@ int main() {
                                 /*membership=*/ 0, /*memberships=*/ 0, &mod);
 
     if (igraph_vector_size(&mod) != 1 ||
-        !igraph_is_nan(VECTOR(mod)[0])) {
+        !isnan(VECTOR(mod)[0])) {
         return 1;
     }
 

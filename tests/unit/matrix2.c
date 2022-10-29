@@ -45,7 +45,7 @@ void byrow(igraph_matrix_t *m) {
     }
 
 
-int main() {
+int main(void) {
     igraph_matrix_t m, m2;
     igraph_vector_t v;
     igraph_vector_int_t index;
@@ -57,11 +57,11 @@ int main() {
 
     /* igraph_matrix_get */
     printf("igraph_matrix_get\n");
-    apply(m, printf("%i ", (int)igraph_matrix_get(&m, i, j)), printf("\n"));
+    apply(m, printf("%g ", igraph_matrix_get(&m, i, j)), printf("\n"));
 
     /* igraph_matrix_get_ptr */
     printf("igraph_matrix_get_ptr\n");
-    apply(m, printf("%i ", (int)igraph_matrix_get_ptr(&m, i, j)[0]), printf("\n"));
+    apply(m, printf("%g ", igraph_matrix_get_ptr(&m, i, j)[0]), printf("\n"));
 
     /* igraph_matrix_set */
     printf("igraph_matrix_set\n");

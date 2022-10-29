@@ -42,7 +42,7 @@ static void igraph_i_cohesive_blocks_free_graphs(igraph_vector_ptr_t *ptr) {
         igraph_t *g = VECTOR(*ptr)[i];
         if (g) {
             igraph_destroy(g);
-            igraph_free(g);
+            IGRAPH_FREE(VECTOR(*ptr)[i]); /* also sets it to NULL */
         }
     }
 }
@@ -122,14 +122,14 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
     igraph_integer_t np = 0, hp = 0;
 
     if (hlen < nlen) {
-        return 0;
+        return false;
     }
 
     while (np < nlen && hp < hlen) {
         if (VECTOR(*needle)[np] == VECTOR(*haystack)[hp]) {
             np++; hp++;
         } else if (VECTOR(*needle)[np] < VECTOR(*haystack)[hp]) {
-            return 0;
+            return false;
         } else {
             hp++;
         }
@@ -296,7 +296,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_integer_t no, kept = 0;
         igraph_integer_t cptr = 0;
         igraph_integer_t nsepv = 0;
-        igraph_bool_t addedsep = 0;
+        igraph_bool_t addedsep = false;
 
         IGRAPH_STATUSF(("Candidate %li: %li vertices,",
                         0, Qptr, mynodes));

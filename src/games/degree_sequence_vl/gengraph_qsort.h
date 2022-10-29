@@ -21,6 +21,8 @@
 #ifndef QSORT_H
 #define QSORT_H
 
+#include "igraph_types.h"
+
 #include <assert.h>
 #include <stdio.h>
 

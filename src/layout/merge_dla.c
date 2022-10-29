@@ -22,10 +22,10 @@
 */
 
 #include "igraph_layout.h"
+
 #include "igraph_progress.h"
 #include "igraph_random.h"
 
-#include "core/grid.h"
 #include "core/interruption.h"
 #include "core/math.h"
 #include "layout/merge_grid.h"
@@ -33,13 +33,15 @@
 
 /**
  * \function igraph_layout_merge_dla
- * \brief Merge multiple layouts by using a DLA algorithm
+ * \brief Merges multiple layouts by using a DLA algorithm.
  *
- * </para><para>
+ * \experimental
+ *
  * First each layout is covered by a circle. Then the layout of the
  * largest graph is placed at the origin. Then the other layouts are
  * placed by the DLA algorithm, larger ones first and smaller ones
  * last.
+ *
  * \param thegraphs Pointer vector containing the graph objects of
  *        which the layouts will be merged.
  * \param coords List of matrices with the 2D layouts of the graphs in \p thegraphs.
@@ -47,7 +49,7 @@
  *        be stored here. It will be resized if needed.
  * \return Error code.
  *
- * Added in version 0.2. This function is experimental.
+ * Added in version 0.2.
  *
  * </para><para>
  * Time complexity: TODO.
@@ -259,7 +261,6 @@ igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                               igraph_real_t killr) {
     igraph_integer_t sp = -1;
     igraph_real_t angle, len;
-    igraph_integer_t steps = 0;
 
     /* The graph is not used, only its coordinates */
     IGRAPH_UNUSED(actg);
@@ -267,7 +268,6 @@ igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
     while (sp < 0) {
         /* start particle */
         do {
-            steps++;
             angle = RNG_UNIF(0, 2 * M_PI);
             len = RNG_UNIF(.5 * startr, startr);
             *x = cx + len * cos(angle);
@@ -277,7 +277,6 @@ igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 
         while (sp < 0 && DIST(*x, *y) < killr) {
             igraph_real_t nx, ny;
-            steps++;
             angle = RNG_UNIF(0, 2 * M_PI);
             len = RNG_UNIF(0, startr / 100);
             nx = *x + len * cos(angle);
@@ -289,6 +288,5 @@ igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
         }
     }
 
-    /*   fprintf(stderr, "%li ", steps); */
     return IGRAPH_SUCCESS;
 }

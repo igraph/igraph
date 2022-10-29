@@ -27,7 +27,7 @@ void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob,
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_50_full, g_4_3_1;
     igraph_vector_t cut_prob_0_3;
     igraph_vector_t cut_prob_0_4;
@@ -81,7 +81,7 @@ int main() {
     IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 40, /*parsample*/ NULL) == IGRAPH_EINVAL);
 
     printf("Too many parsamples.\n");
-    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 4, /*parsample*/ &parsample) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 4, /*parsample*/ &parsample) == IGRAPH_EINVVID);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

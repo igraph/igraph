@@ -382,7 +382,7 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  *
  * \sa \ref igraph_assortativity() for the general function
  * calculating assortativity for any kind of numeric vertex values.
- * 
+ *
  * \example examples/simple/igraph_assortativity_degree.c
  */
 

@@ -71,10 +71,11 @@ void call_and_print(
 }
 
 
-int main() {
+int main(void) {
     /* Wiki example taken from https://en.wikipedia.org/wiki/Yen's_algorithm */
-    igraph_t g_0, g_1, g_2, g_2c, g_wiki, g_wiki_u, g_sz;
+    igraph_t g_0, g_1, g_2, g_2c, g_wiki, g_wiki_u, g_sz, g_lattice;
     igraph_vector_t weights, weights_wiki, weights_inf;
+    igraph_vector_int_t dims;
     igraph_vector_int_list_t paths;
 
     igraph_vector_int_list_init(&paths, 0);
@@ -86,6 +87,10 @@ int main() {
     igraph_small(&g_wiki, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
     igraph_small(&g_wiki_u, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,3, 2,1, 2,3, 2,4, 3,4, 3,5, 4,5, -1);
     igraph_small(&g_sz, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 2, 2, 0, 0, 3, 3, 4, 4, 2, 2, 2, 2, 4, 0, 4, -1);
+
+    igraph_vector_int_init_int(&dims, 2, 3, 3);
+    igraph_square_lattice(&g_lattice, &dims, 1, IGRAPH_UNDIRECTED, /* mutual = */ 0, /* periodic = */ NULL);
+    igraph_vector_int_destroy(&dims);
 
     igraph_vector_init(&weights, 0);
     igraph_vector_init_int(&weights_wiki, 9, 3, 2, 4, 1, 2, 3, 2, 1, 2);
@@ -124,16 +129,17 @@ int main() {
     printf("Directed unweighted graph:\n");
     call_and_print(&g_sz, NULL, 4, 0, 4, IGRAPH_OUT);
 
-    igraph_set_error_handler(igraph_error_handler_ignore);
+    printf("3x3 square lattice:\n");
+    call_and_print(&g_lattice, NULL, 6, 0, 8, IGRAPH_OUT);
 
     printf("Zero vertices, from and to don't exist:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_0, &weights, NULL, &paths, 4, 0, 0, IGRAPH_ALL) == IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_get_k_shortest_paths(&g_0, &weights, NULL, &paths, 4, 0, 0, IGRAPH_ALL), IGRAPH_EINVVID);
 
     printf("Wrong weights length:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_wiki, &weights, NULL, &paths, 4, 0, 5, IGRAPH_ALL) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_get_k_shortest_paths(&g_wiki, &weights, NULL, &paths, 4, 0, 5, IGRAPH_ALL), IGRAPH_EINVAL);
 
     printf("Non-existent mode:\n");
-    IGRAPH_ASSERT(igraph_get_k_shortest_paths(&g_1, &weights, NULL, &paths, 4, 0, 0, 100) == IGRAPH_EINVMODE);
+    CHECK_ERROR(igraph_get_k_shortest_paths(&g_1, &weights, NULL, &paths, 4, 0, 0, (igraph_neimode_t) 100), IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
@@ -142,6 +148,7 @@ int main() {
     igraph_destroy(&g_wiki);
     igraph_destroy(&g_wiki_u);
     igraph_destroy(&g_sz);
+    igraph_destroy(&g_lattice);
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&weights_wiki);
     igraph_vector_destroy(&weights_inf);

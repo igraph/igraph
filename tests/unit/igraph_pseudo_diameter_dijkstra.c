@@ -28,7 +28,7 @@ void print_result(igraph_t *g, igraph_vector_t *weights, igraph_integer_t start_
     printf(", from %" IGRAPH_PRId " to %" IGRAPH_PRId "\n\n", from, to);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_real_t result;
     int i;

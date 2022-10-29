@@ -3,7 +3,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     /* this is a directed graph with 10 vertices and 20 edges: */
     igraph_integer_t vc = 10, ec = 20;
     igraph_integer_t edge_data[] = {

@@ -14,4 +14,9 @@
 <!-- doxrox-include igraph_eulerian_path -->
 </section>
 
+<section><title>Cycle bases</title>
+<!-- doxrox-include igraph_fundamental_cycles -->
+<!-- doxrox-include igraph_minimum_cycle_basis -->
+</section>
+
 </chapter>

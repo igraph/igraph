@@ -22,7 +22,7 @@
 
 
 /* https://github.com/igraph/igraph/issues/950 */
-void test_bug950() {
+void test_bug950(void) {
     /* Testing the case of weighted graphs with multiple alternate
      * paths to the same node with slightly different weights due to
      * floating point inaccuracies. */
@@ -57,7 +57,7 @@ void test_bug950() {
 
 
 /* https://github.com/igraph/igraph/issues/1050 */
-void test_bug1050() {
+void test_bug1050(void) {
     /* compare cutoff = -1 with cutoff = 0 */
     igraph_t g;
     igraph_vector_t eb, eb2;
@@ -99,7 +99,7 @@ void test_bug1050() {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t eb, eb2;
     igraph_vector_t weights;

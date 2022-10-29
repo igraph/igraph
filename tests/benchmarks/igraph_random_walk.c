@@ -1,7 +1,7 @@
 #include <igraph.h>
 #include "bench.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t vertices;
     igraph_vector_int_t edges;
@@ -51,7 +51,7 @@ int main() {
     BENCH(" 6 Random vertex walk, directed,   weighted, small graph  ",
           igraph_random_walk(&graph, &weights, &vertices, NULL, 0, IGRAPH_OUT, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
-    
+
     BENCH(" 7 Random vertex walk, undirected, unweighted, small graph  ",
           igraph_random_walk(&graph, NULL, &vertices, NULL, 0, IGRAPH_ALL, 50000000, IGRAPH_RANDOM_WALK_STUCK_RETURN)
          );
@@ -154,11 +154,11 @@ int main() {
     BENCH(" 26 Short vertex walk,    directed,   weighted,   large graph, x 100",
           REPEAT(igraph_random_walk(&graph, &weights, &vertices, NULL, 0, IGRAPH_OUT, 10000, IGRAPH_RANDOM_WALK_STUCK_RETURN), 100)
          );
-    
+
     BENCH(" 27 Short vertex walk,    undirected, unweighted, large graph, x 100",
           REPEAT(igraph_random_walk(&graph, NULL, &vertices, NULL, 0, IGRAPH_ALL, 10000, IGRAPH_RANDOM_WALK_STUCK_RETURN), 100)
          );
-    
+
     BENCH(" 28 Short vertex walk,    undirected, weighted,   large graph, x 100",
           REPEAT(igraph_random_walk(&graph, &weights, &vertices, NULL, 0, IGRAPH_ALL, 10000, IGRAPH_RANDOM_WALK_STUCK_RETURN), 100)
          );
@@ -178,6 +178,6 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_vector_int_destroy(&vertices);
     igraph_vector_int_destroy(&edges);
-    
+
     return 0;
 }

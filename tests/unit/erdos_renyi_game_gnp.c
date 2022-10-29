@@ -3,7 +3,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_rng_seed(igraph_rng_default(), 137);
 
     for (igraph_integer_t size=2; size < 5; size++) {

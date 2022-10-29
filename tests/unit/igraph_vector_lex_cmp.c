@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_vector_t v1, v2, v3, v4, v5, v6, v7, v8;
 
     igraph_vector_init_real(&v1, 3, 1e30, 2e30, 9e30);

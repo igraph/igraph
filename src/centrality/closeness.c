@@ -160,7 +160,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
             IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
-        } else if (igraph_is_nan(minweight)) {
+        } else if (isnan(minweight)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -231,7 +231,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
                 } else if (curdist == 0 /* this means curdist is infinity */ || altdist < curdist) {
                     /* This is a shorter path */
                     VECTOR(dist)[to] = altdist;
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+                    igraph_2wheap_modify(&Q, to, -altdist);
                 }
             }
 
@@ -579,7 +579,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
             IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
-        } else if (igraph_is_nan(minweight)) {
+        } else if (isnan(minweight)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -643,7 +643,7 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
                 } else if (curdist == 0 /* this means curdist is infinity */ || altdist < curdist) {
                     /* This is a shorter path */
                     VECTOR(dist)[to] = altdist;
-                    IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+                    igraph_2wheap_modify(&Q, to, -altdist);
                 }
             }
 

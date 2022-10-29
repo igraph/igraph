@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g, residual, expected_residual;
     igraph_vector_t capacity, residual_capacity, flow, expected_residual_capacity;

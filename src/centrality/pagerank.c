@@ -26,6 +26,8 @@
 
 #include "centrality/prpack_internal.h"
 
+#include <limits.h>
+
 static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *graph,
                                                  igraph_vector_t *vector,
                                                  igraph_real_t *value, const igraph_vs_t vids,
@@ -468,6 +470,10 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
+    if (no_of_nodes > INT_MAX) {
+        IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
+    }
+
     if (reset && igraph_vector_size(reset) != no_of_nodes) {
         IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
     }
@@ -495,7 +501,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
     options->which[0] = 'L'; options->which[1] = 'R';
-    options->start = 1;       /* no random start vector */
+    options->start = 1; /* no random start vector */
 
     directed = directed && igraph_is_directed(graph);
 
@@ -508,7 +514,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
-        if (igraph_is_nan(min)) {
+        if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         if (min == 0 && max == 0) {
@@ -553,7 +559,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         if (reset_min < 0) {
             IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(reset_min)) {
+        if (isnan(reset_min)) {
             IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         reset_sum = igraph_vector_sum(reset);
@@ -584,13 +590,13 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                    directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS));
-        for (i = 0; i < options->n; i++) {
+        for (i = 0; i < no_of_nodes; i++) {
             VECTOR(outdegree)[i] = VECTOR(degree)[i];
         }
 
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                    directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS));
-        for (i = 0; i < options->n; i++) {
+        for (i = 0; i < no_of_nodes; i++) {
             VECTOR(indegree)[i] = VECTOR(degree)[i];
         }
 
@@ -599,7 +605,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
         /* Set up an appropriate starting vector. We start from the in-degrees
          * plus some small random noise to avoid convergence problems */
-        for (i = 0; i < options->n; i++) {
+        for (i = 0; i < no_of_nodes; i++) {
             if (VECTOR(indegree)[i]) {
                 MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
             } else {
@@ -621,7 +627,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     } else {
 
         igraph_inclist_t inclist;
-        igraph_bool_t negative_weight_warned = 0;
+        igraph_bool_t negative_weight_warned = false;
         igraph_i_pagerank_data2_t data;
 
         data.graph = graph;
@@ -654,7 +660,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         }
         /* Set up an appropriate starting vector. We start from the in-degrees
          * plus some small random noise to avoid convergence problems */
-        for (i = 0; i < options->n; i++) {
+        for (i = 0; i < no_of_nodes; i++) {
             if (VECTOR(indegree)[i]) {
                 MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
             } else {

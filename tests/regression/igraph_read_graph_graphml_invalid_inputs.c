@@ -62,7 +62,7 @@ int test_file(const char* fname, igraph_bool_t should_parse) {
     VERIFY_FINALLY_STACK();               \
 }
 
-int main(int argc, char* argv[]) {
+int main(void) {
     int index = 0;
 
     /* We do not care about errors; all we care about is that the library

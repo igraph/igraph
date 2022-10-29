@@ -1,6 +1,7 @@
 # Minimum CMake that we require is 3.18.
 # Some of the recent features we use:
 #  * --ignore-eol when comparing unit test results with expected outcomes (3.14)
+#  * CROSSCOMPILING_EMULATOR can be a semicolon-separated list to pass arguments (3.15)
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 cmake_minimum_required(VERSION 3.18...3.22)
@@ -101,10 +102,11 @@ endif()
 check_symbol_exists(_configthreadlocale locale.h HAVE__CONFIGTHREADLOCALE)
 cmake_pop_check_state()
 
-# Check for 128-bit integer multiplication support and floating-point
-# endianness
+# Check for 128-bit integer multiplication support, floating-point endianness
+# and support for built-in overflow detection.
 include(ieee754_endianness)
 include(uint128_support)
+include(safe_math_support)
 
 if(NOT HAVE_USELOCALE AND NOT HAVE__CONFIGTHREADLOCALE)
   message(WARNING "igraph cannot set per-thread locale on this platform. igraph_enter_safelocale() and igraph_exit_safelocale() will not be safe to use in multithreaded programs.")

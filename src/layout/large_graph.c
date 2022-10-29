@@ -112,6 +112,39 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     igraph_real_t frk = sqrt(area / no_of_nodes);
     igraph_real_t H_n = 0;
 
+    if (no_of_nodes == 0) {
+        /* We skip parameter checks for the null graph, as following the recommendations
+         * for parameter choices in the documentation would lead to zero values that are
+         * considered invalid in general, but don't cause problems for the null graph. */
+        IGRAPH_CHECK(igraph_matrix_resize(res, 0, 2));
+        return IGRAPH_SUCCESS;
+    }
+
+    /* TODO: is zero okay? */
+    if (maxit < 0) {
+        IGRAPH_ERRORF("Maximum number of iterations must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, maxit);
+    }
+
+    if (maxdelta <= 0) {
+        IGRAPH_ERRORF("Maximum delta must be positive, got %g.", IGRAPH_EINVAL, maxdelta);
+    }
+
+    if (area <= 0) {
+        IGRAPH_ERRORF("Placement area size must be positive, got %g.", IGRAPH_EINVAL, area);
+    }
+
+    if (coolexp <= 0) {
+        IGRAPH_ERRORF("Cooling exponent must be positive, got %g.", IGRAPH_EINVAL, coolexp);
+    }
+
+    if (repulserad <= 0) {
+        IGRAPH_ERRORF("Repusion cutoff radius must be positive, got %g.", IGRAPH_EINVAL, repulserad);
+    }
+
+    if (cellsize <= 0) {
+        IGRAPH_ERRORF("Cell size must be positive, got %g.", IGRAPH_EINVAL, cellsize);
+    }
+
     IGRAPH_CHECK(igraph_minimum_spanning_tree_unweighted(graph, &mst));
     IGRAPH_FINALLY(igraph_destroy, &mst);
 
@@ -128,7 +161,9 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&layers, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, 0);
-    IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
+    if (no_of_nodes > 0) {
+        IGRAPH_CHECK(igraph_bfs_simple(&mst, root, IGRAPH_ALL, &vids, &layers, &parents));
+    }
     no_of_layers = igraph_vector_int_size(&layers) - 1;
 
     /* Check whether we have reached all the nodes -- if not, the graph is
@@ -175,7 +210,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         igraph_integer_t it = 0;
         igraph_real_t epsilon = 10e-6;
         igraph_real_t maxchange = epsilon + 1;
-        igraph_integer_t pairs;
+        /* igraph_integer_t pairs; */
         igraph_real_t sconst = sqrt(area / M_PI) / H_n;
         igraph_2dgrid_iterator_t vidit;
 
@@ -241,8 +276,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             IGRAPH_CHECK(igraph_incident(graph, &eids, vid, IGRAPH_ALL));
             for (k = 0; k < igraph_vector_int_size(&eids); k++) {
                 igraph_integer_t eid = VECTOR(eids)[k];
-                igraph_integer_t from, to;
-                igraph_edge(graph, eid, &from, &to);
+                igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
                 if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
                     (to   != vid && igraph_2dgrid_in(&grid, to))) {
                     igraph_vector_int_push_back(&edges, eid);
@@ -257,11 +291,11 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
         maxchange = epsilon + 1;
         while (it < maxit && maxchange > epsilon) {
             igraph_integer_t jj;
-            igraph_real_t t = maxdelta * pow((maxit - it) / (double)maxit, coolexp);
+            igraph_real_t t = maxdelta * pow((maxit - it) / (igraph_real_t) maxit, coolexp);
             igraph_integer_t vid, nei;
 
             IGRAPH_PROGRESS("Large graph layout",
-                            100.0 * ((actlayer - 1.0) / (no_of_layers - 1.0) + ((float)it) / (maxit * (no_of_layers - 1.0))),
+                            100.0 * ((actlayer - 1.0) / (no_of_layers - 1.0) + (it) / (maxit * (no_of_layers - 1.0))),
                             0);
 
             /* init */
@@ -271,10 +305,10 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
             /* attractive "forces" along the edges */
             for (jj = 0; jj < igraph_vector_int_size(&edges); jj++) {
-                igraph_integer_t from, to;
+                igraph_integer_t from = IGRAPH_FROM(graph, VECTOR(edges)[jj]);
+                igraph_integer_t to = IGRAPH_TO(graph, VECTOR(edges)[jj]);
                 igraph_real_t xd, yd, dist, force;
                 IGRAPH_ALLOW_INTERRUPTION();
-                igraph_edge(graph, VECTOR(edges)[jj], &from, &to);
                 xd = MATRIX(*res, from, 0) - MATRIX(*res, to, 0);
                 yd = MATRIX(*res, from, 1) - MATRIX(*res, to, 1);
                 dist = sqrt(xd*xd + yd*yd);
@@ -290,7 +324,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
             }
 
             /* repulsive "forces" of the vertices nearby */
-            pairs = 0;
+            /* pairs = 0; */
             igraph_2dgrid_reset(&grid, &vidit);
             while ( (vid = igraph_2dgrid_next(&grid, &vidit) - 1) != -1) {
                 while ( (nei = igraph_2dgrid_next_nei(&grid, &vidit) - 1) != -1) {
@@ -299,7 +333,7 @@ igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                     igraph_real_t dist = sqrt(xd*xd + yd*yd);
                     igraph_real_t force;
                     if (dist < cellsize) {
-                        pairs++;
+                        /* pairs++; */
                         if (dist == 0) {
                             dist = epsilon;
                         };

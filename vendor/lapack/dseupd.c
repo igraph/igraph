@@ -243,7 +243,7 @@ static doublereal c_b119 = 1.;
 
     /* Builtin functions */
     integer s_cmp(char *, char *, ftnlen, ftnlen);
-    /* Subroutine */ int s_copy(char *, char *, ftnlen, ftnlen);
+    /* Subroutine */ void s_copy(char *, char *, ftnlen, ftnlen);
     double pow_dd(doublereal *, doublereal *);
 
     /* Local variables */

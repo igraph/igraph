@@ -29,7 +29,7 @@ void call_and_print(igraph_t *graph, igraph_es_t es, igraph_bool_t loops) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_lm, g_lmu;
     igraph_vector_bool_t result;
 
@@ -57,7 +57,7 @@ int main() {
     VERIFY_FINALLY_STACK();
 
     printf("Edge out of range.\n");
-    CHECK_ERROR(igraph_is_mutual(&g_lm, &result, igraph_ess_1(100), 1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_is_mutual(&g_lm, &result, igraph_ess_1(100), true), IGRAPH_EINVAL);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_lm);

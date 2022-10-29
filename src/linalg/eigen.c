@@ -936,7 +936,7 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
         igraph_matrix_complex_t *vectors) {
     igraph_vector_int_t idx;
     igraph_vector_t mag;
-    igraph_bool_t hasmag = 0;
+    igraph_bool_t hasmag = false;
     int nev;
     int howmany = 0, start = 0;
     igraph_integer_t i;
@@ -1092,63 +1092,6 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t 
 
 }
 
-static igraph_error_t igraph_i_eigen_matrix_lapack_lm(const igraph_matrix_t *A,
-                                    const igraph_eigen_which_t *which,
-                                    igraph_vector_complex_t *values,
-                                    igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
-static igraph_error_t igraph_i_eigen_matrix_lapack_sm(const igraph_matrix_t *A,
-                                    const igraph_eigen_which_t *which,
-                                    igraph_vector_complex_t *values,
-                                    igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
-static igraph_error_t igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
-                                    const igraph_eigen_which_t *which,
-                                    igraph_vector_complex_t *values,
-                                    igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
-
-static igraph_error_t igraph_i_eigen_matrix_lapack_sr(const igraph_matrix_t *A,
-                                    const igraph_eigen_which_t *which,
-                                    igraph_vector_complex_t *values,
-                                    igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
-static igraph_error_t igraph_i_eigen_matrix_lapack_li(const igraph_matrix_t *A,
-                                    const igraph_eigen_which_t *which,
-                                    igraph_vector_complex_t *values,
-                                    igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
-static igraph_error_t igraph_i_eigen_matrix_lapack_si(const igraph_matrix_t *A,
-                                    const igraph_eigen_which_t *which,
-                                    igraph_vector_complex_t *values,
-                                    igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
-static igraph_error_t igraph_i_eigen_matrix_lapack_select(const igraph_matrix_t *A,
-                                        const igraph_eigen_which_t *which,
-                                        igraph_vector_complex_t *values,
-                                        igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
-static igraph_error_t igraph_i_eigen_matrix_lapack_all(const igraph_matrix_t *A,
-                                     const igraph_eigen_which_t *which,
-                                     igraph_vector_complex_t *values,
-                                     igraph_matrix_complex_t *vectors) {
-    return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
-}
-
 static igraph_error_t igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
                                  const igraph_sparsemat_t *sA,
                                  igraph_arpack_function_t *fun,
@@ -1181,44 +1124,9 @@ static igraph_error_t igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
         IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
     }
 
-    switch (which->pos) {
-    case IGRAPH_EIGEN_LM:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_lm(myA, which,
-                     values, vectors));
-        break;
-    case IGRAPH_EIGEN_SM:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_sm(myA, which,
-                     values, vectors));
-        break;
-    case IGRAPH_EIGEN_LR:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_lr(myA, which,
-                     values, vectors));
-        break;
-    case IGRAPH_EIGEN_SR:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_sr(myA, which,
-                     values, vectors));
-        break;
-    case IGRAPH_EIGEN_LI:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_li(myA, which,
-                     values, vectors));
-        break;
-    case IGRAPH_EIGEN_SI:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_si(myA, which,
-                     values, vectors));
-        break;
-    case IGRAPH_EIGEN_SELECT:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_select(myA, which,
-                     values, vectors));
-        break;
-    case IGRAPH_EIGEN_ALL:
-        IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_all(myA, which,
-                     values,
-                     vectors));
-        break;
-    default:
-        /* This cannot happen */
-        break;
-    }
+    IGRAPH_CHECK(igraph_i_eigen_matrix_lapack_common(myA, which,
+                values,
+                vectors));
 
     if (!A) {
         igraph_matrix_destroy(&mA);

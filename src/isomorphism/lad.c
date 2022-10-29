@@ -57,15 +57,10 @@
 
 #include "core/interruption.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-
-/* define boolean type as char */
-#define true 1
-#define false 0
-#define bool char
 
 /* helper to allocate an array of given size and free it using IGRAPH_FINALLY
  * when needed */
@@ -1520,8 +1515,8 @@ cleanup:
  *    vertices in the \p pattern graph. For each vertex, the IDs of
  *    the compatible vertices in the target graph are listed.
  * \param iso Pointer to a boolean, or a null pointer. If not a null
- *    pointer, then the boolean is set to TRUE (1) if a subgraph
- *    isomorphism is found, and to FALSE (0) otherwise.
+ *    pointer, then the boolean is set to \c true if a subgraph
+ *    isomorphism is found, and to \c false otherwise.
  * \param map Pointer to a vector or a null pointer. If not a null
  *    pointer and a subgraph isomorphism is found, the matching
  *    vertices from the target graph are listed here, for each vertex

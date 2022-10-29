@@ -22,7 +22,7 @@
 
 /* Basic check: Are means within tol*sigma from the expected value?
  * This is meant to catch gross bugs while changing RNG/sampler code. */
-void stats() {
+void stats(void) {
     igraph_integer_t k;
     const igraph_integer_t n = 100000;
     igraph_real_t m, tm, tsd;
@@ -132,7 +132,7 @@ void stats() {
  * It does not verify the correctness of the result, except
  * for some special edge cases. */
 
-void sample() {
+void sample(void) {
     igraph_integer_t i;
     igraph_real_t x;
 
@@ -176,12 +176,12 @@ void sample() {
     IGRAPH_ASSERT(x == 5);
 
     x = RNG_BINOM((1LL << 31) - 1, 0.5);
-    IGRAPH_ASSERT(!igraph_is_nan(x));
+    IGRAPH_ASSERT(!isnan(x));
     IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
 
 #if IGRAPH_INTEGER_SIZE > 32
     x = RNG_BINOM((1LL << 31), 0.5);
-    IGRAPH_ASSERT(!igraph_is_nan(x));
+    IGRAPH_ASSERT(!isnan(x));
     IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
 #endif
 
@@ -193,18 +193,18 @@ void sample() {
     IGRAPH_ASSERT(x == 0);
 
     x = RNG_GEOM(0);
-    IGRAPH_ASSERT(igraph_is_nan(x));
+    IGRAPH_ASSERT(isnan(x));
 
     x = RNG_NORMAL(0, 1);
     printf("normal: %g\n", x);
-    IGRAPH_ASSERT(IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(isfinite(x));
 
     x = RNG_EXP(1);
     printf("exp: %g\n", x);
     IGRAPH_ASSERT(0 <= x);
 
     x = RNG_EXP(0);
-    IGRAPH_ASSERT(igraph_is_nan(x));
+    IGRAPH_ASSERT(isnan(x));
 
     x = RNG_GAMMA(1, 1);
     printf("gamma: %g\n", x);
@@ -219,23 +219,23 @@ void sample() {
 
     x = RNG_POIS(10);
     printf("poisson: %g\n", x);
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 
     x = RNG_POIS(0);
     IGRAPH_ASSERT(x == 0);
 
     x = RNG_POIS(-1);
-    IGRAPH_ASSERT(igraph_is_nan(x));
+    IGRAPH_ASSERT(isnan(x));
 
     x = RNG_POIS((1LL << 31) - 1);
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 
     x = RNG_POIS((1LL << 31));
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 
 #if IGRAPH_INTEGER_SIZE > 32
     x = RNG_POIS((1LL << 32));
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 #endif
 
 }
@@ -268,7 +268,7 @@ void test_and_destroy(igraph_rng_type_t *rng_type) {
     igraph_rng_destroy(&rng);
 }
 
-int main() {
+int main(void) {
     igraph_rng_type_t rng_types[] = {
         igraph_rngtype_glibc2,
         igraph_rngtype_mt19937,
@@ -285,6 +285,8 @@ int main() {
     for (size_t i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
         test_and_destroy(&rng_types[i]);
     }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

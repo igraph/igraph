@@ -35,7 +35,7 @@ void print_and_destroy(igraph_matrix_t *incidence, igraph_bool_t directed, igrap
     igraph_vector_bool_destroy(&types);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_bool_t types;
     igraph_vector_bool_init(&types, 0);

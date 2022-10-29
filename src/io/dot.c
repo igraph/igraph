@@ -34,19 +34,19 @@
 #include <ctype.h>
 #include <string.h>
 
-#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write DOT format failed.", IGRAPH_EFILE); } while (0)
+#define CHECK(cmd) do { int ret=cmd; if (ret<0) IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_EFILE); } while (0)
 
 static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
     /* do we have to escape the string at all? */
     igraph_integer_t i, j, len = strlen(orig), newlen = 0;
-    igraph_bool_t need_quote = 0, is_number = 1;
+    igraph_bool_t need_quote = false, is_number = true;
 
     /* first, check whether the string is equal to some reserved word, or empty */
     if (!strcasecmp(orig, "graph") || !strcasecmp(orig, "digraph") ||
         !strcasecmp(orig, "node") || !strcasecmp(orig, "edge") ||
         !strcasecmp(orig, "strict") || !strcasecmp(orig, "subgraph") || len == 0) {
-        need_quote = 1;
-        is_number = 0;
+        need_quote = true;
+        is_number = false;
     }
 
     /* next, check whether we need to escape the string for any other reason.
@@ -116,7 +116,7 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
 
 /**
  * \function igraph_write_graph_dot
- * \brief Write the graph to a stream in DOT format
+ * \brief Write the graph to a stream in DOT format.
  *
  * DOT is the format used by the widely known GraphViz software, see
  * http://www.graphviz.org for details. The grammar of the DOT format
@@ -136,7 +136,6 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
  * \example examples/simple/dot.c
  */
 igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
-    igraph_error_t ret;
     igraph_integer_t i, j;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);

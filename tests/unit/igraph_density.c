@@ -33,14 +33,14 @@ void test_density(const igraph_t *graph, igraph_bool_t loops) {
         return;
     }
 
-    if (igraph_is_nan(density)) {
+    if (isnan(density)) {
         printf("nan\n");
     } else {
         printf("%.4f\n", density);
     }
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_t v;

@@ -23,7 +23,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_matrix_t rm1, rm2;
     igraph_matrix_complex_t cm1, cm2;
     const igraph_integer_t nrow = 50, ncol = 60;
@@ -80,6 +80,8 @@ int main() {
 
     igraph_matrix_complex_destroy(&cm2);
     igraph_matrix_complex_destroy(&cm1);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -22,33 +22,15 @@
 */
 
 #include "igraph_community.h"
-#include "igraph_constructors.h"
 #include "igraph_memory.h"
-#include "igraph_random.h"
-#include "igraph_arpack.h"
-#include "igraph_adjlist.h"
-#include "igraph_interface.h"
-#include "igraph_components.h"
-#include "igraph_dqueue.h"
-#include "igraph_progress.h"
-#include "igraph_stack.h"
 #include "igraph_sparsemat.h"
-#include "igraph_statusbar.h"
-#include "igraph_conversion.h"
-#include "igraph_centrality.h"
-#include "igraph_structural.h"
-
-#include "core/indheap.h"
-#include "core/interruption.h"
-
-#include "config.h"
 
 #include <string.h>
 #include <math.h>
 
 /**
  * \function igraph_community_to_membership
- * \brief Create membership vector from community structure dendrogram
+ * \brief Creates a membership vector from a community structure dendrogram.
  *
  * This function creates a membership vector from a community
  * structure dendrogram. A membership vector contains for each vertex
@@ -105,7 +87,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
     igraph_vector_t tmp;
     igraph_vector_bool_t already_merged;
     igraph_vector_int_t own_membership;
-    igraph_bool_t using_own_membership = 0;
+    igraph_bool_t using_own_membership = false;
 
     if (steps > igraph_matrix_int_nrow(merges)) {
         IGRAPH_ERRORF("Number of steps is greater than number of rows in merges matrix: found %"
@@ -222,7 +204,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
 
 /**
  * \function igraph_reindex_membership
- * \brief Makes the IDs in a membership vector continuous
+ * \brief Makes the IDs in a membership vector contiguous.
  *
  * This function reindexes component IDs in a membership vector
  * in a way that the new IDs start from zero and go up to C-1,
@@ -234,11 +216,11 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
  *                     vertex, i.e. the component to which it belongs.
  *                     The vector will be altered in-place.
  * \param  new_to_old  Pointer to a vector which will contain the
- *                     old component ID for each new one, or NULL,
+ *                     old component ID for each new one, or \c NULL,
  *                     in which case it is not returned. The vector
  *                     will be resized as needed.
  * \param  nb_clusters Pointer to an integer for the number of
- *                     distinct clusters. If not NULL, this will be
+ *                     distinct clusters. If not \c NULL, this will be
  *                     updated to reflect the number of distinct
  *                     clusters found in membership.
  *
@@ -365,6 +347,28 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
  * the two clusterings, with <code>VI = 0</code> achieved precisely when they coincide.
  *
  * </para><para>
+ * The Rand index is defined as the probability that the two clusterings agree
+ * about the cluster memberships of a randomly chosen vertex \em pair. All vertex
+ * pairs are considered, and the two clusterings are considered to be in agreement
+ * about the memberships of a vertex pair if either the two vertices are in the
+ * same cluster in both clusterings, or they are in different clusters in both
+ * clusterings. The Rand index is then the number of vertex pairs in agreement,
+ * divided by the total number of vertex pairs. A Rand index of zero means that
+ * the two clusterings disagree about the membership of all vertex pairs, while
+ * 1 means that the two clusterings are identical.
+ *
+ * </para><para>
+ * The adjusted Rand index is similar to the Rand index, but it takes into
+ * account that agreement between the two clusterings may also occur by chance
+ * even if the two clusterings are chosen completely randomly. The adjusted
+ * Rand index therefore subtracts the expected fraction of agreements from the
+ * value of the Rand index, and divides the result by one minus the expected
+ * fraction of agreements. The maximum value of the adjusted Rand index is
+ * still 1 (similarly to the Rand index), indicating maximum agreement, but
+ * the value may be less than zero if there is \em less agreement between the
+ * two clusterings than what would be expected by chance.
+ *
+ * </para><para>
  * For an explanation of the split-join distance, see \ref igraph_split_join_distance().
  *
  * </para><para>
@@ -474,7 +478,7 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
 /**
  * \ingroup communities
  * \function igraph_split_join_distance
- * \brief Calculates the split-join distance of two community structures
+ * \brief Calculates the split-join distance of two community structures.
  *
  * The split-join distance between partitions A and B is the sum of the
  * projection distance of A from B and the projection distance of B from
@@ -625,9 +629,9 @@ static igraph_error_t igraph_i_entropy_and_mutual_information(const igraph_vecto
         ));
     }
 
-    igraph_sparsemat_compress(&mu, &m);
+    IGRAPH_CHECK(igraph_sparsemat_compress(&mu, &m));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
-    igraph_sparsemat_dupl(&m);
+    IGRAPH_CHECK(igraph_sparsemat_dupl(&m));
 
     IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
     while (!igraph_sparsemat_iterator_end(&mit)) {
@@ -770,7 +774,7 @@ static igraph_error_t igraph_i_split_join_distance(const igraph_vector_int_t *v1
     /* Find the row/columnwise maxima */
     igraph_sparsemat_compress(&mu, &m);
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
-    igraph_sparsemat_dupl(&m);
+    IGRAPH_CHECK(igraph_sparsemat_dupl(&m));
     IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
     while (!igraph_sparsemat_iterator_end(&mit)) {
         igraph_real_t value = igraph_sparsemat_iterator_get(&mit);
@@ -883,7 +887,7 @@ static igraph_error_t igraph_i_compare_communities_rand(
     rand = 0.0;
     igraph_sparsemat_compress(&mu, &m);
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &m);
-    igraph_sparsemat_dupl(&m);
+    IGRAPH_CHECK(igraph_sparsemat_dupl(&m));
 
     IGRAPH_CHECK(igraph_sparsemat_iterator_init(&mit, &m));
     while (!igraph_sparsemat_iterator_end(&mit)) {

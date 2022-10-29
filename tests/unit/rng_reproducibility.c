@@ -6,7 +6,7 @@
  * same seed on all platforms (different operating systems and 32- or 64-bit systems).
  */
 
-int main() {
+int main(void) {
     int i;
     igraph_rng_seed(igraph_rng_default(), 137);
 

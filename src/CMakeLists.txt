@@ -17,7 +17,7 @@ foreach(FORMAT dl gml lgl ncol pajek)
     if (BISON_VERSION VERSION_GREATER_EQUAL 3)
       set(bison_no_deprecated -Wno-deprecated)
     endif()
-	if (NOT FLEX_KEEP_LINE_NUMBERS)
+    if (NOT FLEX_KEEP_LINE_NUMBERS)
       set(bison_hide_line_numbers --no-lines)
       set(flex_hide_line_numbers --noline)
     endif()
@@ -67,7 +67,6 @@ add_library(
   core/vector_list.c
   core/vector_ptr.c
 
-  math/bfgs.c
   math/complex.c
   math/safe_intop.c
   math/utils.c
@@ -240,6 +239,7 @@ add_library(
   paths/dijkstra.c
   paths/distances.c
   paths/eulerian.c
+  paths/floyd_warshall.c
   paths/histogram.c
   paths/johnson.c
   paths/random_walk.c
@@ -247,6 +247,7 @@ add_library(
   paths/simple_paths.c
   paths/sparsifier.c
   paths/unweighted.c
+  paths/voronoi.c
   paths/widest_paths.c
 
   properties/basic_properties.c
@@ -254,6 +255,7 @@ add_library(
   properties/convergence_degree.c
   properties/dag.c
   properties/degrees.c
+  properties/ecc.c
   properties/girth.c
   properties/loops.c
   properties/multiplicity.c
@@ -310,6 +312,9 @@ add_library(
   $<IF:$<BOOL:${PLFIT_IS_VENDORED}>,$<TARGET_OBJECTS:plfit_vendored>,>
 )
 
+# Required by Xcode new build system
+add_dependencies(igraph parsersources)
+
 # Set soname for the library
 set_target_properties(igraph PROPERTIES VERSION "3.0.0")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
@@ -346,14 +351,14 @@ target_include_directories(
   ${PROJECT_SOURCE_DIR}/vendor
 
   # Vendored library include paths
-  $<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>
-  $<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>
+  "$<$<BOOL:${GLPK_IS_VENDORED}>:$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>>"
+  "$<$<BOOL:${PLFIT_IS_VENDORED}>:$<TARGET_PROPERTY:plfit_vendored,INCLUDE_DIRECTORIES>>"
 
   # Include paths for dependencies
-  $<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>
-  $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
-  $<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>
-  $<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>
+  "$<$<BOOL:${GLPK_INCLUDE_DIR}>:${GLPK_INCLUDE_DIR}>"
+  "$<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>"
+  "$<$<BOOL:${LIBXML2_INCLUDE_DIRS}>:${LIBXML2_INCLUDE_DIRS}>"
+  "$<$<BOOL:${PLFIT_INCLUDE_DIRS}>:${PLFIT_INCLUDE_DIRS}>"
 )
 
 if(MATH_LIBRARY)

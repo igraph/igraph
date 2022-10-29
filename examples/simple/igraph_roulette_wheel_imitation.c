@@ -36,85 +36,12 @@ typedef struct {
     igraph_error_t retval;
 } strategy_test_t;
 
-/* Error tests. That is, we expect error codes to be returned from such tests.
- */
-igraph_error_t error_tests() {
-    igraph_t g, gzero, h;
-    igraph_vector_t quant, quantzero;
-    igraph_vector_int_t strat, stratzero;
-    igraph_integer_t i, n, nvert;
-    igraph_error_t ret;
-    strategy_test_t *test;
-
-    /* nonempty graph */
-    igraph_small(&g, /*nvert=*/ 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
-    igraph_empty(&h, 0, 0);         /* empty graph */
-    igraph_vector_init(&quant, 1);  /* quantities vector */
-    igraph_vector_int_init(&strat, 2);  /* strategies vector */
-    igraph_small(&gzero, /*nvert=*/ 0, IGRAPH_UNDIRECTED,
-                 0, 3, 0, 4, 1, 2, 1, 4, 1, 5, 2, 3, 2, 4, 3, 4, -1);
-    nvert = igraph_vcount(&gzero);
-    igraph_vector_int_init_int(&stratzero, nvert, 1, 0, 1, 2, 0, 3);
-    igraph_vector_init(&quantzero, nvert);  /* vector of zeros */
-
-    /* test parameters */
-    /*graph--vert--islocal--quantities--strategies--known_strats--mode--retval*/
-    /* null pointer for graph */
-    strategy_test_t null_graph = {NULL, 0, 1, NULL, NULL, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* null pointer for quantities vector */
-    strategy_test_t null_quant = {&g, 0, 1, NULL, NULL, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* null pointer for strategies vector */
-    strategy_test_t null_strat = {&g, 0, 1, &quant, NULL, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* empty graph */
-    strategy_test_t empty_graph = {&h, 0, 1, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* length of quantities vector different from number of vertices */
-    strategy_test_t qdiff_length = {&g, 0, 1, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* length of strategies vector different from number of vertices */
-    strategy_test_t sdiff_length = {&g, 0, 1, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* quantities vector contains all zeros */
-    strategy_test_t zero_quant = {&gzero, 4, 1, &quantzero, &stratzero, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    strategy_test_t *all_checks[] = {/* 1 */ &null_graph,
-                                             /* 2 */ &null_quant,
-                                             /* 3 */ &null_strat,
-                                             /* 4 */ &empty_graph,
-                                             /* 5 */ &qdiff_length,
-                                             /* 6 */ &sdiff_length,
-                                             /* 7 */ &zero_quant
-                                    };
-
-    /* Run the error tests. We expect error to be raised for each test. */
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    n = 7;
-    i = 0;
-    while (i < n) {
-        test = all_checks[i];
-        ret = igraph_roulette_wheel_imitation(test->graph, test->vertex,
-                                              test->islocal, test->quantities,
-                                              test->strategies, test->mode);
-        if (ret != test->retval) {
-            printf("Error test no. %" IGRAPH_PRId " failed.\n", i + 1);
-            return IGRAPH_FAILURE;
-        }
-        i++;
-    }
-    /* clean up */
-    igraph_destroy(&g);
-    igraph_destroy(&gzero);
-    igraph_destroy(&h);
-    igraph_vector_destroy(&quant);
-    igraph_vector_destroy(&quantzero);
-    igraph_vector_int_destroy(&strat);
-    igraph_vector_int_destroy(&stratzero);
-
-    return IGRAPH_SUCCESS;
-}
-
 /* A game on a graph with 5 vertices and 7 edges. Use roulette wheel selection
  * to update strategies. This example also illustrates how a choice of
  * perspective (whether local or global) could affect the range of
  * possible strategies a vertex could adopt.
  */
-igraph_error_t roulette_test() {
+igraph_error_t roulette_test(void) {
     igraph_t g;
     igraph_bool_t success;
     igraph_vector_t quant;
@@ -205,7 +132,7 @@ igraph_error_t roulette_test() {
 /* It is possible for a vertex to retain its current strategy. This can
  * happen both in the local and global perspectives.
  */
-igraph_error_t retain_strategy_test() {
+igraph_error_t retain_strategy_test(void) {
     igraph_t g;
     igraph_integer_t max, min, v;
     igraph_vector_t quant;
@@ -268,15 +195,11 @@ igraph_error_t retain_strategy_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
-    int ret;
+int main(void) {
+    igraph_error_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 3241);
 
-    ret = error_tests();
-    if (ret) {
-        return IGRAPH_FAILURE;
-    }
     ret = roulette_test();
     if (ret) {
         return IGRAPH_FAILURE;

@@ -26,7 +26,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_integer_t k;
     igraph_vector_int_t membership;

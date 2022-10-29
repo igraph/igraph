@@ -41,7 +41,7 @@ void print_and_destroy(igraph_t *g, igraph_vector_t *weights)
     igraph_vector_destroy(&v);
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t weights;

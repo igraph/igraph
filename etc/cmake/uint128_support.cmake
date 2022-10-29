@@ -1,13 +1,13 @@
-include(CheckCXXSourceRuns)
+include(CheckCXXSourceCompiles)
 include(CheckTypeSize)
 
 cmake_push_check_state(RESET)
 
 # Check whether the compiler supports the _umul128() intrinsic
-check_cxx_source_runs("
+check_cxx_source_compiles("
     #include <intrin.h>
 
-    int main() {
+    int main(void) {
         unsigned long long a = 0, b = 0;
         unsigned long long c;
         volatile unsigned long long d;
@@ -16,6 +16,20 @@ check_cxx_source_runs("
     }
     "
     HAVE__UMUL128
+)
+
+# Check whether the compiler supports the __umulh() intrinsic
+check_cxx_source_compiles("
+    #include <intrin.h>
+
+    int main(void) {
+        unsigned long long a = 0, b = 0;
+        volatile unsigned long long c;
+        c = __umulh(a, b);
+        return 0;
+    }
+    "
+    HAVE___UMULH
 )
 
 # Check whether the compiler has __uint128_t

@@ -143,7 +143,7 @@ void check_error(igraph_matrix_t *adjmatrix, igraph_adjacency_t mode, igraph_loo
     igraph_vector_destroy(&weights);
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t mat;
     igraph_matrix_t mat_sym;
     int m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 4, 0 }, { 0, 1, 0, 0 } };
@@ -237,13 +237,13 @@ int main() {
         printf("Check handling of invalid adjacency mode.\n");
         igraph_real_t e[] = {0, 2, 0, 3, 0, 4, 0, 5, 6};
         igraph_matrix_view(&mat, e, 3, 3);
-        check_error(&mat, 42, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
+        check_error(&mat, (igraph_adjacency_t) 42, IGRAPH_LOOPS_TWICE, IGRAPH_EINVAL);
     }
 
     {
         printf("Check error for 0x1 matrix.\n");
         igraph_matrix_init(&mat, 0, 1);
-        check_error(&mat, IGRAPH_ADJ_DIRECTED, 1, IGRAPH_NONSQUARE);
+        check_error(&mat, IGRAPH_ADJ_DIRECTED, IGRAPH_LOOPS_TWICE, IGRAPH_NONSQUARE);
         igraph_matrix_destroy(&mat);
     }
 

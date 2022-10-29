@@ -17,7 +17,7 @@
 
 #include "plfit_mt.h"
 
-static uint16_t get_random_uint16() {
+static uint16_t get_random_uint16(void) {
     return RNG_INTEGER(0, 0xffff);
 }
 
@@ -56,7 +56,7 @@ uint32_t plfit_mt_random(plfit_mt_rng_t* rng) {
     int idx = rng->mt_index;
     uint32_t s;
     int i;
-	
+
     if (idx == PLFIT_MT_LEN * sizeof(uint32_t)) {
         idx = 0;
         i = 0;
@@ -68,7 +68,7 @@ uint32_t plfit_mt_random(plfit_mt_rng_t* rng) {
             s = TWIST(b, i, i+1);
             b[i] = b[i - MT_IB] ^ (s >> 1) ^ MAGIC(s);
         }
-        
+
         s = TWIST(b, PLFIT_MT_LEN-1, 0);
         b[PLFIT_MT_LEN-1] = b[MT_IA-1] ^ (s >> 1) ^ MAGIC(s);
     }
@@ -79,7 +79,7 @@ uint32_t plfit_mt_random(plfit_mt_rng_t* rng) {
     Matsumoto and Nishimura additionally confound the bits returned to the caller
     but this doesn't increase the randomness, and slows down the generator by
     as much as 25%.  So I omit these operations here.
-    
+
     r ^= (r >> 11);
     r ^= (r << 7) & 0x9D2C5680;
     r ^= (r << 15) & 0xEFC60000;

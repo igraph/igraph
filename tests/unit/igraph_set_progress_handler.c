@@ -24,7 +24,7 @@ igraph_error_t handler(const char* message, igraph_real_t percent, void*data) {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_set_progress_handler(handler);
     int data = 10;
 

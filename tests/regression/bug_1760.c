@@ -104,7 +104,7 @@ int test_weighted(
     return IGRAPH_SUCCESS;
 }
 
-int main(int argc, char* argv[]) {
+int main(void) {
     igraph_t g;
     igraph_vector_t weights;
     igraph_vs_t to;

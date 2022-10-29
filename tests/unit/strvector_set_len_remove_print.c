@@ -19,12 +19,10 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_strvector_t sv;
     char *test_string = "This is a string.";
     char *test_string2 = "A completely different one.";
-
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("Two strings in a vector.\n");
     igraph_strvector_init(&sv, 5);
@@ -47,6 +45,8 @@ int main() {
     IGRAPH_ASSERT(igraph_strvector_set_len(&sv, 2, test_string, strlen(test_string)) == IGRAPH_SUCCESS);
     igraph_strvector_print(&sv, stdout, " | ");
     igraph_strvector_destroy(&sv);
+
+    printf("\n");
 
     VERIFY_FINALLY_STACK();
     return 0;

@@ -179,6 +179,8 @@ igraph_i_fundamental_cycles_bfs(
  * \function igraph_fundamental_cycles
  * \brief Finds a fundamental cycle basis.
  *
+ * \experimental
+ *
  * This function computes a fundamental cycle basis associated with a breadth-first
  * search tree of the graph.
  *
@@ -199,8 +201,6 @@ igraph_i_fundamental_cycles_bfs(
  * \return Error code.
  *
  * Time complexity: O(|V| + |E|).
- *
- * \experimental
  */
 igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                          igraph_vector_int_list_t *result,
@@ -221,7 +221,7 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
         IGRAPH_ERROR("Vertex id out of range.", IGRAPH_EINVAL);
     }
 
-    igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&visited, no_of_nodes);
@@ -341,7 +341,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
         } else if ( VECTOR(*row)[0] == VECTOR(work)[0] ) {
             IGRAPH_CHECK(cycle_add(row, &work, &tmp));
             if (igraph_vector_int_empty(&tmp)) {
-                *independent = 0;
+                *independent = false;
                 igraph_vector_int_destroy(&work);
                 igraph_vector_int_destroy(&tmp);
                 IGRAPH_FINALLY_CLEAN(2);
@@ -354,7 +354,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
     }
 
     /* 'cycle' was linearly independent, insert new row into matrix */
-    *independent = 1;
+    *independent = true;
     IGRAPH_CHECK(igraph_vector_int_list_insert(reduced_matrix, i, &work)); /* transfers ownership */
 
     igraph_vector_int_destroy(&tmp);
@@ -370,6 +370,23 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
 /**
  * \function igraph_minimum_cycle_basis
  * \brief Computes a minimum weight cycle basis.
+ *
+ * \experimental
+ *
+ * This function computes a minimum weight cycle basis of a graph. Currently,
+ * a modified version of Horton's algorithm is used that allows for cutoffs.
+ *
+ * </para><para>
+ * Edge directions are ignored. Multi-edges and self-loops are supported.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Horton, J. D. (1987)
+ * A polynomial-time algorithm to find the shortest cycle basis of a graph,
+ * SIAM Journal on Computing, 16 (2): 358–366.
+ * https://doi.org/10.1137%2F0216026
  *
  * \param graph The graph object.
  * \param result An initialized integer vector list, the elements of the cycle
@@ -393,8 +410,6 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
  * \return Error code.
  *
  * Time complexity: TODO.
- *
- * \experimental
  */
 igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                           igraph_vector_int_list_t *result,
@@ -439,7 +454,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
         mark = 0;
         for (i=0; i < no_of_nodes; ++i) {
             igraph_integer_t degree = VECTOR(degrees)[i];
-            igraph_bool_t vis = VECTOR(visited)[i] % 3; /* was vertex i visited already? */
+            igraph_bool_t vis = VECTOR(visited)[i] % 3 != 0; /* was vertex i visited already? */
 
             /* Generally, we only need to run a BFS from vertices of degree 3 or greater.
              * The exception is a connected component which is itself a cycle, and therefore

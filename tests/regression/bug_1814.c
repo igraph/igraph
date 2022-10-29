@@ -33,7 +33,7 @@ void test_igraph_to_undirected(igraph_to_undirected_t mode) {
     VERIFY_FINALLY_STACK();
 }
 
-int main() {
+int main(void) {
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     printf("to_undirected(COLLAPSE)\n");

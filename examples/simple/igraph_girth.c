@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     igraph_t g;
-    igraph_integer_t girth;
+    igraph_real_t girth;
     igraph_vector_int_t v;
     igraph_vector_int_t circle;
     igraph_integer_t chord[] = { 0, 50 };
@@ -45,7 +45,7 @@ int main() {
     igraph_vector_int_init(&circle, 1);
     VECTOR(circle)[0] = 2;
     igraph_girth(&g, &girth, &circle);
-    if (girth != 0) {
+    if (girth != IGRAPH_INFINITY) {
         return 2;
     }
     if (igraph_vector_int_size(&circle) != 0) {

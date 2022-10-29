@@ -23,6 +23,7 @@
 */
 
 #include "igraph_cocitation.h"
+
 #include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
@@ -358,7 +359,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
             v1 = igraph_lazy_adjlist_get(&al, i);
             IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, i, &k)) {
-                igraph_vector_int_insert(v1, k, i);
+                IGRAPH_CHECK(igraph_vector_int_insert(v1, k, i));
             }
         }
     }
@@ -599,12 +600,11 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  * \function igraph_similarity_dice
  * \brief Dice similarity coefficient.
  *
- * </para><para>
  * The Dice similarity coefficient of two vertices is twice the number of common
  * neighbors divided by the sum of the degrees of the vertices. This function
  * calculates the pairwise Dice similarities for some (or all) of the vertices.
  *
- * \param graph The graph object to analyze
+ * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
  *        as the number of vertex IDs in \p vids.
@@ -634,8 +634,8 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  *        \endclist
  *
  * Time complexity: O(|V|^2 d),
- * |V| is the number of vertices in the vertex iterator given, d is the
- * (maximum) degree of the vertices in the graph.
+ * where |V| is the number of vertices in the vertex iterator given, and
+ * d is the (maximum) degree of the vertices in the graph.
  *
  * \sa \ref igraph_similarity_jaccard(), a measure very similar to the Dice
  *   coefficient
@@ -643,7 +643,8 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  * \example examples/simple/igraph_similarity.c
  */
 igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
-                           const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
+                                      const igraph_vs_t vids,
+                                      igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_integer_t i, j, nr, nc;
 
     IGRAPH_CHECK(igraph_similarity_jaccard(graph, res, vids, mode, loops));

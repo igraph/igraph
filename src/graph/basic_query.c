@@ -29,13 +29,13 @@
 /**
  * \ingroup structural
  * \function igraph_are_connected
- * \brief Decides whether two vertices are connected
+ * \brief Decides whether two vertices are connected.
  *
  * \param graph The graph object.
  * \param v1 The first vertex.
  * \param v2 The second vertex.
- * \param res Boolean, \c TRUE if there is an edge from
- *         \p v1 to \p v2, \c FALSE otherwise.
+ * \param res Boolean, \c true if there is an edge from
+ *         \p v1 to \p v2, \c false otherwise.
  * \return The error code \c IGRAPH_EINVVID is returned if an invalid
  *         vertex ID is given.
  *
@@ -56,7 +56,7 @@ igraph_error_t igraph_are_connected(const igraph_t *graph,
         IGRAPH_ERROR("are connected", IGRAPH_EINVVID);
     }
 
-    igraph_get_eid(graph, &eid, v1, v2, /*directed=*/1, /*error=*/ 0);
+    igraph_get_eid(graph, &eid, v1, v2, IGRAPH_DIRECTED, /*error=*/ false);
     *res = (eid >= 0);
 
     return IGRAPH_SUCCESS;

@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_matrix_t a, b, c, d, e;
 
     igraph_matrix_init(&c, 0, 0);
@@ -34,35 +34,35 @@ int main() {
 
     printf("matrix multiplication, A={{1,2},{3,4}} B ={{5,6},{7,8}}\n");
     igraph_blas_dgemm(0, 0, 1, &a, &b, 0, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("transpose a first\n");
     igraph_blas_dgemm(1, 0, 1, &a, &b, 0, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("transpose b first\n");
     igraph_blas_dgemm(0, 1, 1, &a, &b, 0, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("transpose both matrices first\n");
     igraph_blas_dgemm(1, 1, 1, &a, &b, 0, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("multiply by 0.5\n");
     igraph_blas_dgemm(0, 0, 0.5, &a, &b, 0, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("multiply by 1.5 by using previous result\n");
     igraph_blas_dgemm(0, 0, 1, &a, &b, 1, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("matrix multiplication, A={{1,2},{3,4}} B={{5,6,7},{8,9,10}}\n");
     igraph_blas_dgemm(0, 0, 1, &a, &d, 0, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("matrix multiplication, A={{5,8},{6,9},{7,10}} B={{1,2},{3,4}}\n");
     igraph_blas_dgemm(1, 0, 1, &d, &a, 0, &c);
-    igraph_matrix_printf(&c, "%g");
+    igraph_matrix_print(&c);
 
     printf("check error when matrix sizes don't match\n");
     CHECK_ERROR(igraph_blas_dgemm(0, 0, 1, &d, &a, 0, &c), IGRAPH_EINVAL);

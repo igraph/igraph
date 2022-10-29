@@ -105,7 +105,6 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     igraph_real_t last;
     igraph_integer_t p_e = 0, p_a = 0, p_d = 0;
     igraph_integer_t no_add, no_del;
-    igraph_real_t inf = IGRAPH_INFINITY;
     igraph_real_t next_e, next_a, next_d;
     igraph_integer_t i, newec;
     igraph_bool_t simple;
@@ -217,17 +216,17 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
        the code must be shifted by the edges in the original graph. */
 
 #define UPD_E() \
-    { if (p_e < no_of_edges) { next_e=CODEE(); } else { next_e = inf; } }
+    { if (p_e < no_of_edges) { next_e=CODEE(); } else { next_e = IGRAPH_INFINITY; } }
 #define UPD_A() \
     { if (p_a < no_add) { \
-            next_a = VECTOR(add)[p_a] + p_e; } else { next_a = inf; } }
+            next_a = VECTOR(add)[p_a] + p_e; } else { next_a = IGRAPH_INFINITY; } }
 #define UPD_D() \
     { if (p_d < no_del) { \
-            next_d = VECTOR(delete)[p_d]; } else { next_d = inf; } }
+            next_d = VECTOR(delete)[p_d]; } else { next_d = IGRAPH_INFINITY; } }
 
     UPD_E(); UPD_A(); UPD_D();
 
-    while (next_e != inf || next_a != inf || next_d != inf) {
+    while (next_e != IGRAPH_INFINITY || next_a != IGRAPH_INFINITY || next_d != IGRAPH_INFINITY) {
         IGRAPH_ALLOW_INTERRUPTION();
         if (next_e <= next_a && next_e < next_d) {
 
@@ -246,7 +245,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
 
             /* add an edge */
             igraph_integer_t to, from;
-            IGRAPH_ASSERT(igraph_finite(next_a));
+            IGRAPH_ASSERT(isfinite(next_a));
             if (directed) {
                 to = floor(next_a / no_of_nodes);
                 from = next_a - ((igraph_real_t)to) * no_of_nodes;

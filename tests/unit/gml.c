@@ -44,7 +44,7 @@ void test_input(const char *filename) {
     printf("======================\n\n");
 }
 
-int main() {
+int main(void) {
 
     /* Enable attribute handling */
     igraph_set_attribute_table(&igraph_cattribute_table);

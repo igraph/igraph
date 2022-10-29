@@ -24,7 +24,6 @@
 #include "igraph_structural.h"
 #include "igraph_topology.h"
 
-#include "igraph_adjlist.h"
 #include "igraph_constructors.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
@@ -64,7 +63,6 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_roots = igraph_vector_int_size(roots);
     igraph_integer_t tree_vertex_count = no_of_nodes;
-    igraph_integer_t root_min, root_max;
 
     igraph_vector_int_t edges;
     igraph_vector_bool_t seen_vertices;
@@ -75,11 +73,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     igraph_integer_t i, n, r, v_ptr = no_of_nodes;
 
-    if (no_of_roots > 0) {
-        igraph_vector_int_minmax(roots, &root_min, &root_max);
-        if (root_max >= no_of_nodes || root_min < 0)  {
-            IGRAPH_ERROR("All roots should be vertices of the graph.", IGRAPH_EINVAL);
-        }
+    if (! igraph_vector_int_isininterval(roots, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("All roots should be vertices of the graph.", IGRAPH_EINVVID);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -100,7 +95,7 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
         igraph_integer_t root = VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
-        igraph_dqueue_int_push(&Q, root);
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, root));
 
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
@@ -120,8 +115,8 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
                     if (! VECTOR(seen_vertices)[nei]) {
 
-                        igraph_vector_int_push_back(&edges, from);
-                        igraph_vector_int_push_back(&edges, to);
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
 
                         VECTOR(seen_vertices)[nei] = 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
@@ -134,11 +129,11 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                         }
 
                         if (from == nei) {
-                            igraph_vector_int_push_back(&edges, v_ptr++);
-                            igraph_vector_int_push_back(&edges, to);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v_ptr++));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
                         } else {
-                            igraph_vector_int_push_back(&edges, from);
-                            igraph_vector_int_push_back(&edges, v_ptr++);
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, v_ptr++));
                         }
                     }
                 }
@@ -220,14 +215,14 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * \brief Decides whether the graph is a tree.
  *
  * An undirected graph is a tree if it is connected and has no cycles.
- * </para><para>
  *
+ * </para><para>
  * In the directed case, a possible additional requirement is that all
  * edges are oriented away from a root (out-tree or arborescence) or all edges
  * are oriented towards a root (in-tree or anti-arborescence).
  * This test can be controlled using the \p mode parameter.
- * </para><para>
  *
+ * </para><para>
  * By convention, the null graph (i.e. the graph with no vertices) is considered not to be a tree.
  *
  * \param graph The graph object to analyze.
@@ -249,12 +244,12 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
  * Time complexity: At most O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa igraph_is_weakly_connected()
+ * \sa \ref igraph_is_connected()
  *
  * \example examples/simple/igraph_kary_tree.c
  */
 igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
-    igraph_bool_t is_tree = 0;
+    igraph_bool_t is_tree = false;
     igraph_bool_t treat_as_undirected = !igraph_is_directed(graph) || mode == IGRAPH_ALL;
     igraph_integer_t iroot = 0;
     igraph_integer_t visited_count;
@@ -274,7 +269,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
         igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST) &&
         igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)
     ) {
-        is_tree = 1;
+        is_tree = true;
         iroot = 0;
         goto success;
     }
@@ -282,13 +277,13 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
     /* A tree must have precisely vcount-1 edges. */
     /* By convention, the zero-vertex graph will not be considered a tree. */
     if (ecount != vcount - 1) {
-        is_tree = 0;
+        is_tree = false;
         goto success;
     }
 
     /* The single-vertex graph is a tree, provided it has no edges (checked in the previous if (..)) */
     if (vcount == 1) {
-        is_tree = 1;
+        is_tree = true;
         iroot = 0;
         goto success;
     }
@@ -311,7 +306,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
      * we choose 0.
      */
 
-    is_tree = 1; /* assume success */
+    is_tree = true; /* assume success */
 
     switch (mode) {
     case IGRAPH_ALL:
@@ -340,14 +335,14 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
                  * improve performance when the graph is indeed a tree, persumably
                  * the most common case. Thus we only check until finding the root.
                  */
-                is_tree = 0;
+                is_tree = false;
                 break;
             }
         }
 
         /* If no suitable root is found, the graph is not a tree. */
         if (is_tree && i == vcount) {
-            is_tree = 0;
+            is_tree = false;
         } else {
             iroot = i;
         }
@@ -558,7 +553,7 @@ static igraph_error_t igraph_i_is_forest(
     /* Any graph with 0 edges is a forest. */
     if (ecount == 0) {
         if (res) {
-            *res = 1;
+            *res = true;
         }
         if (roots) {
             for (v = 0; v < vcount; v++) {
@@ -571,7 +566,7 @@ static igraph_error_t igraph_i_is_forest(
     /* A forest can have at most vcount-1 edges. */
     if (ecount > vcount - 1) {
         if (res) {
-            *res = 0;
+            *res = false;
         }
         return IGRAPH_SUCCESS;
     }
@@ -581,7 +576,7 @@ static igraph_error_t igraph_i_is_forest(
         mode = IGRAPH_ALL;
     }
 
-    result = 1; /* assume success */
+    result = true; /* assume success */
 
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited, vcount);
 
@@ -636,7 +631,7 @@ static igraph_error_t igraph_i_is_forest(
                 /* In an out-tree, roots have in-degree 0,
                  * and all other vertices have in-degree 1. */
                 if (VECTOR(degree)[v] > 1 || !result) {
-                    result = 0;
+                    result = false;
                     break;
                 }
                 if (VECTOR(degree)[v] == 0) {

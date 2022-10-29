@@ -36,7 +36,7 @@
     igraph_lazy_inclist_destroy(&lazy_inclist); \
 }
 
-int test_loop_elimination_for_undirected_graph() {
+int test_loop_elimination_for_undirected_graph(void) {
     igraph_t g;
     igraph_inclist_t inclist;
     igraph_lazy_inclist_t lazy_inclist;
@@ -84,7 +84,7 @@ int test_loop_elimination_for_undirected_graph() {
     return 0;
 }
 
-int test_loop_elimination_for_directed_graph() {
+int test_loop_elimination_for_directed_graph(void) {
     igraph_t g;
     igraph_inclist_t inclist;
     igraph_lazy_inclist_t lazy_inclist;
@@ -148,7 +148,7 @@ int test_loop_elimination_for_directed_graph() {
     return 0;
 }
 
-int test_adjlist_from_inclist() {
+int test_adjlist_from_inclist(void) {
     igraph_t g;
     igraph_inclist_t inclist;
     igraph_adjlist_t adjlist;
@@ -195,8 +195,7 @@ int test_adjlist_from_inclist() {
     return 0;
 }
 
-int main() {
-    int retval;
+int main(void) {
 
     RUN_TEST(test_loop_elimination_for_undirected_graph);
     RUN_TEST(test_loop_elimination_for_directed_graph);

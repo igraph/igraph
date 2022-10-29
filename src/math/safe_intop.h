@@ -25,6 +25,8 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "config.h"
+
 #include <float.h>
 
 __BEGIN_DECLS
@@ -39,7 +41,7 @@ __BEGIN_DECLS
  * https://wiki.sei.cmu.edu/confluence/display/c/SEI+CERT+C+Coding+Standard
  */
 
-#if defined(__GNUC__)
+#ifdef HAVE_BUILTIN_OVERFLOW
 
 #define IGRAPH_SAFE_ADD(a, b, res) \
     do { \
@@ -108,7 +110,7 @@ __BEGIN_DECLS
         *(res) = _safe_prod; \
     } while (0)
 
-#endif
+#endif /* HAVE_BUILTIN_OVERFLOW */
 
 /* Overflow-safe calculation of "n choose 2" = n*(n-1) / 2, assuming that n >= 0. */
 #define IGRAPH_SAFE_N_CHOOSE_2(n, res) \

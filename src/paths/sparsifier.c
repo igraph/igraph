@@ -24,6 +24,8 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
+
 /*
  * This internal function gets the adjacency and incidence list representation
  * of the current residual graph, the weight vector, the current assignment of
@@ -41,7 +43,7 @@
  * filled with -1 and the lightest_weight vector to be filled with infinity.
  * This is _not_ checked within the function.
  *
- * Use the igraph_i_clean_lighest_edges_to_clusters() function to clear these vectors
+ * Use the igraph_i_clean_lightest_edges_to_clusters() function to clear these vectors
  * after you are done with them. Avoid using igraph_vector_fill() because that
  * one is O(|V|), while igraph_i_clean_lightest_edge_vector() is O(d) where d
  * is the degree of the vertex.
@@ -130,22 +132,22 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  * </para><para>
  * This function is based on the algorithm of Baswana and Sen: "A Simple and
  * Linear Time Randomized Algorithm for Computing Sparse Spanners in
- * Weighted Graphs"
+ * Weighted Graphs". https://doi.org/10.1002/rsa.20130
  *
  * \param graph An undirected connected graph object. If the graph
  *        is directed, the directions of the edges will be ignored.
- * \param spanenr An initialized vector, the IDs of the edges that constitute
+ * \param spanner An initialized vector, the IDs of the edges that constitute
  *        the calculated spanner will be returned here. Use
- *        \ref igraph_subgraph_edges() to extract the spanner as a separate
+ * \ref igraph_subgraph_edges() to extract the spanner as a separate
  *        graph object.
  * \param stretch The stretch factor of the spanner.
  * \param weights The edge weights or NULL.
  *
  * \return Error code:
- *        \clist
- *        \cli IGRAPH_ENOMEM
+ * \clist
+ * \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
- *        \endclist
+ * \endclist
  *
  * Time complexity: The algorithm is a randomized Las Vegas algorithm. The expected
  *                  running time is O(km) where k is the value mentioned above.
@@ -156,7 +158,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t i, j, v, nlen, neighbor, cluster;
-    double sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
+    igraph_real_t sample_prob, k = (stretch + 1) / 2, weight, lightest_sampled_weight;
     igraph_vector_int_t clustering, lightest_eid;
     igraph_vector_t lightest_weight;
     igraph_vector_bool_t is_cluster_sampled;
@@ -170,7 +172,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     igraph_integer_t edge;
     igraph_integer_t index;
 
-    if (spanner == 0) {
+    if (spanner == NULL) {
         return IGRAPH_SUCCESS;
     }
 
@@ -189,7 +191,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
             if (min < 0) {
                 IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
             }
-            else if (igraph_is_nan(min)) {
+            else if (isnan(min)) {
                 IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
             }
         }
@@ -198,7 +200,7 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     // Clear the vector that will contain the IDs of the edges in the spanner
     igraph_vector_int_clear(spanner);
 
-    // Create an incidence list reprsentation of the graph and also create the
+    // Create an incidence list representation of the graph and also create the
     // corresponding adjacency list. The residual graph will not be constructed
     // explicitly; it will only exist in terms of the incidence and the adjacency
     // lists, maintained in parallel as the edges are removed from the residual
@@ -235,30 +237,31 @@ igraph_error_t igraph_spanner(const igraph_t *graph, igraph_vector_int_t *spanne
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&is_cluster_sampled, no_of_nodes);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&is_edge_in_spanner, no_of_edges);
 
-    // Temporary vecetor used by igraph_i_collect_lightest_edges_to_clusters()
+    // Temporary vector used by igraph_i_collect_lightest_edges_to_clusters()
     // to keep track of the nodes that it has written to
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dirty_vids, 0);
 
     sample_prob = pow(no_of_nodes, -1 / k);
 
-#define ADD_EDGE_TO_SPANNER {                                   \
-    if (!VECTOR(is_edge_in_spanner)[edge]) {         \
-        VECTOR(is_edge_in_spanner)[edge] = 1;        \
-        IGRAPH_CHECK(igraph_vector_int_push_back(spanner, edge));   \
-    }                                                           \
-}
+#define ADD_EDGE_TO_SPANNER \
+    if (!VECTOR(is_edge_in_spanner)[edge]) { \
+        VECTOR(is_edge_in_spanner)[edge] = true; \
+        IGRAPH_CHECK(igraph_vector_int_push_back(spanner, edge)); \
+    }
 
-            igraph_vector_fill(&lightest_weight, INFINITY);
+    igraph_vector_fill(&lightest_weight, INFINITY);
 
     for (i = 0; i < k - 1; i++) {
+        IGRAPH_ALLOW_INTERRUPTION();
+
         igraph_vector_int_fill(&new_clustering, -1);
-        igraph_vector_bool_fill(&is_cluster_sampled, 0);
+        igraph_vector_bool_fill(&is_cluster_sampled, false);
 
         // Step 1: sample cluster centers
         RNG_BEGIN();
         for (j = 0; j < no_of_nodes; j++) {
             if (VECTOR(clustering)[j] == j && RNG_UNIF01() < sample_prob) {
-                VECTOR(is_cluster_sampled)[j] = 1;
+                VECTOR(is_cluster_sampled)[j] = true;
             }
         }
         RNG_END();

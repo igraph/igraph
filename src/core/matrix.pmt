@@ -21,8 +21,6 @@
 
 */
 
-#include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_error.h"
 
 #include "math/safe_intop.h"
@@ -1381,7 +1379,7 @@ void FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_which_minmax
- * \brief Indices of the minimum and maximum elements
+ * \brief Indices of the minimum and maximum elements.
  *
  * Handy if you need the indices of the smallest and largest
  * elements. The matrix is traversed only once. The matrix must be
@@ -1422,7 +1420,7 @@ void FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
  *
  * Checks whether all elements are zero.
  * \param m The input matrix.
- * \return Boolean, \c TRUE is \p m contains only zeros and \c FALSE
+ * \return Boolean, \c true is \p m contains only zeros and \c false
  *   otherwise.
  *
  * Time complexity: O(mn), the number of elements.
@@ -1439,8 +1437,8 @@ igraph_bool_t FUNCTION(igraph_matrix, isnull)(const TYPE(igraph_matrix) *m) {
  * It is possible to have a matrix with zero rows or zero columns, or
  * even both. This functions checks for these.
  * \param m The input matrix.
- * \return Boolean, \c TRUE if the matrix contains zero elements, and
- *    \c FALSE otherwise.
+ * \return Boolean, \c true if the matrix contains zero elements, and
+ *    \c false otherwise.
  *
  * Time complexity: O(1).
  */
@@ -1455,8 +1453,8 @@ igraph_bool_t FUNCTION(igraph_matrix, empty)(const TYPE(igraph_matrix) *m) {
  *
  * A non-square matrix is not symmetric by definition.
  * \param m The input matrix.
- * \return Boolean, \c TRUE if the matrix is square and symmetric, \c
- *    FALSE otherwise.
+ * \return Boolean, \c true if the matrix is square and symmetric, \c
+ *    false otherwise.
  *
  * Time complexity: O(mn), the number of elements. O(1) for non-square
  * matrices.
@@ -1467,7 +1465,7 @@ igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m
     igraph_integer_t n = m->nrow;
     igraph_integer_t r, c;
     if (m->ncol != n) {
-        return 0;
+        return false;
     }
     for (r = 1; r < n; r++) {
         for (c = 0; c < r; c++) {
@@ -1475,16 +1473,16 @@ igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m
             BASE a2 = MATRIX(*m, c, r);
 #ifdef EQ
             if (!EQ(a1, a2)) {
-                return 0;
+                return false;
             }
 #else
             if (a1 != a2) {
-                return 0;
+                return false;
             }
 #endif
         }
     }
-    return 1;
+    return true;
 }
 
 /**
@@ -1574,7 +1572,7 @@ igraph_error_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
  * Search for the given element in the matrix.
  * \param m The input matrix.
  * \param e The element to search for.
- * \return Boolean, \c TRUE if the matrix contains \p e, \c FALSE
+ * \return Boolean, \c true if the matrix contains \p e, \c false
  * otherwise.
  *
  * Time complexity: O(mn), the number of elements.
@@ -1601,7 +1599,7 @@ igraph_bool_t FUNCTION(igraph_matrix, contains)(const TYPE(igraph_matrix) *m,
  *    found, then this is set to its row index.
  * \param col Pointer to an <type>igraph_integer_t</type>. If the element is
  *    found, then this is set to its column index.
- * \return Boolean, \c TRUE if the element is found, \c FALSE
+ * \return Boolean, \c true if the element is found, \c false
  *    otherwise.
  *
  * Time complexity: O(mn), the number of elements.
@@ -1685,31 +1683,13 @@ igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m
 }
 
 #ifdef OUT_FORMAT
-
 #ifndef USING_R
-igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
-
-    igraph_integer_t nr = FUNCTION(igraph_matrix, nrow)(m);
-    igraph_integer_t nc = FUNCTION(igraph_matrix, ncol)(m);
-    igraph_integer_t i, j;
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
-            if (j != 0) {
-                putchar(' ');
-            }
-            printf(OUT_FORMAT, MATRIX(*m, i, j));
-        }
-        printf("\n");
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
                                     const char *format) {
     igraph_integer_t nr = FUNCTION(igraph_matrix, nrow)(m);
     igraph_integer_t nc = FUNCTION(igraph_matrix, ncol)(m);
     igraph_integer_t i, j;
+
     for (i = 0; i < nr; i++) {
         for (j = 0; j < nc; j++) {
             if (j != 0) {
@@ -1722,26 +1702,73 @@ igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
 
     return IGRAPH_SUCCESS;
 }
+#endif /* USING_R */
+#endif /* OUT_FORMAT */
 
-#endif
+#if defined(OUT_FORMAT) || defined(FPRINTFUNC)
 
-igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
-                                    FILE *file) {
+#ifndef USING_R
 
+igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
+    return FUNCTION(igraph_matrix, fprint)(m, stdout);
+}
+
+#endif /* USING_R */
+
+igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FILE *file) {
     igraph_integer_t nr = FUNCTION(igraph_matrix, nrow)(m);
     igraph_integer_t nc = FUNCTION(igraph_matrix, ncol)(m);
     igraph_integer_t i, j;
+    igraph_vector_int_t column_width;
+
+#ifdef OUT_FORMAT
+    /* Insert dynamic width specifier '*' in format string. */
+    char format[ sizeof(OUT_FORMAT) + 1 ] = "%*";
+    strcpy(format + 2, (const char *) OUT_FORMAT + 1);
+#endif
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&column_width, nc);
+
+    /* First we detect the width needed for each matrix column.
+     * snprintf() may be passed a NULL pointer with a buffer size of 0.
+     * It will then return the number of characters that would have been written,
+     * without writing anything. */
+    for (j = 0; j < nc; j++) {
+        for (i = 0; i < nr; i++) {
+            const int min_width = 1; /* minimum field width */
+            int width;
+#ifdef SNPRINTFUNC
+            width = SNPRINTFUNC(NULL, 0, MATRIX(*m, i, j));
+#else
+            width = snprintf(NULL, 0, OUT_FORMAT, MATRIX(*m, i, j));
+#endif
+            if (width < min_width) {
+                width = min_width;
+            }
+            if (width > VECTOR(column_width)[j]) {
+                VECTOR(column_width)[j] = width;
+            }
+        }
+    }
+
     for (i = 0; i < nr; i++) {
         for (j = 0; j < nc; j++) {
             if (j != 0) {
                 fputc(' ', file);
             }
-            fprintf(file, OUT_FORMAT, MATRIX(*m, i, j));
+#ifdef FPRINTFUNC_ALIGNED
+            FPRINTFUNC_ALIGNED(file, VECTOR(column_width)[j], MATRIX(*m, i, j));
+#else
+            fprintf(file, format, VECTOR(column_width)[j], MATRIX(*m, i, j));
+#endif
         }
         fprintf(file, "\n");
     }
 
+    igraph_vector_int_destroy(&column_width);
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
-#endif
+#endif /* defined(OUT_FORMAT) || defined(FPRINTFUNC) */

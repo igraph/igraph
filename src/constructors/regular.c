@@ -381,15 +381,13 @@ igraph_error_t igraph_square_lattice(
     /* init coords & weights */
 
     coords = IGRAPH_CALLOC(dims, igraph_integer_t);
-    if (coords == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(coords, "Lattice creation failed.");
     IGRAPH_FINALLY(igraph_free, coords);
+
     weights = IGRAPH_CALLOC(dims, igraph_integer_t);
-    if (weights == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(weights, "Lattice creation failed.");
     IGRAPH_FINALLY(igraph_free, weights);
+
     if (dims > 0) {
         weights[0] = 1;
         for (i = 1; i < dims; i++) {
@@ -825,7 +823,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t 
     parent = 0;
     for (k = 0; k < branching_counts_size; ++k) {
         level_end = child; /* points to one past the last vertex of the current level of parents */
-        while(parent < level_end) {
+        while (parent < level_end) {
             IGRAPH_ALLOW_INTERRUPTION();
             for (j = 0; j < VECTOR(*branches)[k]; j++) {
                 if (type == IGRAPH_TREE_IN) {

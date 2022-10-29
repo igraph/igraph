@@ -98,7 +98,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_int_list_t vids_by_type;
     igraph_real_t maxcum, maxedges;
 
-    if(nodes < 0){
+    if (nodes < 0) {
         IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
 
@@ -118,7 +118,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         if (lo < 0) {
             IGRAPH_ERROR("The vertex type distribution vector must not contain negative values.", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo)) {
+        if (isnan(lo)) {
             IGRAPH_ERROR("The vertex type distribution vector must not contain NaN.", IGRAPH_EINVAL);
         }
     }
@@ -134,7 +134,7 @@ igraph_error_t igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
         if (lo < 0 || hi > 1) {
             IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo) || igraph_is_nan(hi)) {
+        if (isnan(lo) || isnan(hi)) {
             IGRAPH_ERROR("The preference matrix must not contain NaN.", IGRAPH_EINVAL);
         }
     }
@@ -405,7 +405,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     igraph_vector_int_list_t vids_by_intype, vids_by_outtype;
     igraph_real_t maxcum, maxedges;
 
-    if(nodes < 0){
+    if (nodes < 0) {
         IGRAPH_ERROR("The number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
@@ -429,7 +429,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         if (lo < 0) {
             IGRAPH_ERROR("The type distribution matrix must not contain negative values.", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo)) {
+        if (isnan(lo)) {
             IGRAPH_ERROR("The type distribution matrix must not contain NaN.", IGRAPH_EINVAL);
         }
     }
@@ -446,7 +446,7 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         if (lo < 0 || hi > 1) {
             IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo) || igraph_is_nan(hi)) {
+        if (isnan(lo) || isnan(hi)) {
             IGRAPH_ERROR("The preference matrix must not contain NaN.", IGRAPH_EINVAL);
         }
     }
@@ -458,9 +458,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         IGRAPH_CHECK(igraph_vector_int_resize(nodetypes_in, nodes));
     } else {
         nodetypes_in = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (nodetypes_in == 0) {
-            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(nodetypes_in, "Insufficient memory for asymmetric preference game.");
+        IGRAPH_FINALLY(igraph_free, &nodetypes_in);
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes_in, nodes);
     }
 
@@ -469,9 +468,8 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
         IGRAPH_CHECK(igraph_vector_int_resize(nodetypes_out, nodes));
     } else {
         nodetypes_out = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (nodetypes_out == 0) {
-            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(nodetypes_out, "Insufficient memory for asymmetric preference game.");
+        IGRAPH_FINALLY(igraph_free, &nodetypes_out);
         IGRAPH_VECTOR_INT_INIT_FINALLY(nodetypes_out, nodes);
     }
 
@@ -608,13 +606,13 @@ igraph_error_t igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer
     if (node_type_out_vec == 0) {
         igraph_vector_int_destroy(nodetypes_out);
         IGRAPH_FREE(nodetypes_out);
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_FINALLY_CLEAN(2);
     }
 
     if (node_type_in_vec == 0) {
         igraph_vector_int_destroy(nodetypes_in);
         IGRAPH_FREE(nodetypes_in);
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_FINALLY_CLEAN(2);
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, 1));

@@ -97,8 +97,8 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0 && igraph_vector_is_any_nan(weights)) {
@@ -161,7 +161,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
 
             /* If we cannot get to j in finite time yet, there is no need to relax
              * its edges */
-            if (!IGRAPH_FINITE(VECTOR(dist)[j])) {
+            if (!isfinite(VECTOR(dist)[j])) {
                 continue;
             }
 
@@ -377,7 +377,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
         /* If we cannot get to j in finite time yet, there is no need to relax
             * its edges */
-        if (!IGRAPH_FINITE(VECTOR(dist)[j])) {
+        if (!isfinite(VECTOR(dist)[j])) {
             continue;
         }
 
@@ -512,7 +512,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
  *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
- * \param edges Pointer to an uninitialized vector or a null
+ * \param edges Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
  * \param from The id of the source vertex.

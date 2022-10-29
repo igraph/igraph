@@ -23,7 +23,7 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t bet, bet2, weights;
@@ -60,7 +60,7 @@ int main() {
                                          /* algo= */     IGRAPH_BARABASI_BAG,
                                          /* start_from= */ 0);
 
-    igraph_simplify(&g, /* multiple= */ 1, /* loops= */ 1, /*edge_comb=*/ 0);
+    igraph_simplify(&g, /* multiple= */ true, /* loops= */ true, /*edge_comb=*/ NULL);
 
     igraph_vector_init(&bet, 0);
 

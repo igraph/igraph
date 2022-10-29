@@ -70,7 +70,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;

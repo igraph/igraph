@@ -159,7 +159,9 @@ namespace prpack {
             prpack_solver(const prpack_csr* g);
             prpack_solver(const prpack_edge_list* g);
             prpack_solver(prpack_base_graph* g, bool owns_bg=true);
+#if 0
             prpack_solver(const char* filename, const char* format, const bool weighted);
+#endif
             // destructor
             ~prpack_solver();
             // methods

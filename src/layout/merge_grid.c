@@ -20,9 +20,10 @@
 
 */
 
+#include "layout/merge_grid.h"
+
 #include "igraph_memory.h"
 
-#include "layout/merge_grid.h"
 
 static igraph_error_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
                                     igraph_real_t xc, igraph_real_t yc,

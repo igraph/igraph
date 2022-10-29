@@ -23,7 +23,6 @@
 #include "igraph_constructors.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_sparsemat.h"
 
@@ -1039,7 +1038,10 @@ static igraph_error_t igraph_i_sparse_adjacency_undirected(
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_loops_t loops
 ) {
-    if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
+    igraph_bool_t sym;
+
+    IGRAPH_CHECK(igraph_sparsemat_is_symmetric(adjmatrix, &sym));
+    if (!sym) {
         IGRAPH_ERROR(
             "Adjacency matrix should be symmetric to produce an undirected graph.",
             IGRAPH_EINVAL
@@ -1166,8 +1168,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_max (
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1200,8 +1202,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_min (
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1234,8 +1236,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_plus (
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1264,8 +1266,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_upper(
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1294,8 +1296,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_lower(
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1304,7 +1306,10 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_undirected (
     igraph_sparsemat_t *adjmatrix, igraph_vector_int_t *edges,
     igraph_vector_t *weights, igraph_loops_t loops
 ) {
-    if (!igraph_sparsemat_is_symmetric(adjmatrix)) {
+    igraph_bool_t sym;
+
+    IGRAPH_CHECK(igraph_sparsemat_is_symmetric(adjmatrix, &sym));
+    if (!sym) {
         IGRAPH_ERROR(
             "Adjacency matrix should be symmetric to produce an undirected graph.",
             IGRAPH_EINVAL
@@ -1335,8 +1340,8 @@ static igraph_error_t igraph_i_sparse_weighted_adjacency_directed(
             VECTOR(*edges)[e++] = to;
         }
     }
-    igraph_vector_int_resize(edges, e);
-    igraph_vector_resize(weights, e/2);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, e/2); /* shrinks */
 
     return IGRAPH_SUCCESS;
 }
@@ -1363,15 +1368,14 @@ igraph_error_t igraph_sparse_weighted_adjacency(
     igraph_integer_t no_of_edges = igraph_sparsemat_count_nonzero(adjmatrix);
 
     if (!igraph_sparsemat_is_cc(adjmatrix)) {
-        IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed "
-               "form.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Sparse adjacency matrix should be in column-compressed form.", IGRAPH_EINVAL);
     }
     if (no_of_nodes != igraph_sparsemat_ncol(adjmatrix)) {
         IGRAPH_ERROR("Adjacency matrix is non-square.", IGRAPH_NONSQUARE);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
-    igraph_vector_resize(weights, no_of_edges);
+    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
 
     /* Collect the edges */
     switch (mode) {

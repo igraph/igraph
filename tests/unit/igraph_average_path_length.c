@@ -32,7 +32,7 @@ void print_and_destroy(igraph_t *graph, igraph_bool_t unconn) {
     igraph_destroy(graph);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
 
     printf("Null graph:\n");

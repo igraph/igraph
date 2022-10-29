@@ -18,11 +18,15 @@
    */
 
 #include "igraph_layout.h"
+
 #include "igraph_interface.h"
 #include "igraph_lapack.h"
 #include "igraph_matrix.h"
-#include "igraph_random.h"
 #include "igraph_nongraph.h"
+#include "igraph_random.h"
+
+#include "layout/layout_internal.h"
+#include "core/interruption.h"
 
 #include <math.h>
 
@@ -115,7 +119,7 @@ static igraph_error_t igraph_i_umap_find_prob_graph(const igraph_t *graph,
     /* Iterate over vertices x, like in the paper */
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         /* Edges into this vertex */
-        igraph_incident(graph, &eids, i, IGRAPH_ALL);
+        IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_ALL));
         no_of_neis = igraph_vector_int_size(&eids);
 
         /* Vertex has no neighbors */
@@ -268,17 +272,18 @@ static igraph_error_t igraph_i_umap_get_ab_residuals(igraph_vector_t *residuals,
  * For instance, if b = 1, a -> 0.01*a moves the fit a decade towards larger min_dist,
  * and a -> 100*a moves the fit a decade towards smaller min_dist.
  * */
-static igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, igraph_real_t *b_p)
+igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, igraph_real_t *b_p)
 {
     /* Grid points */
     igraph_vector_t x;
-     /* Make a lattice from 0 to this distance */
-    igraph_integer_t nr_points = 100;
-    igraph_real_t end_point = min_dist*30; /* Need to sample decently around the kink I guess? */
-    /* Initial values: a^-2b is the point where f(x) = 0.5, so around min_dist
-     * Therefore, initial a is 1/sqrt(min_dist) */
-    igraph_real_t b = 1.;
-    igraph_real_t a = 1. / sqrt(min_dist);
+     /* Make a lattice from 0 to 3 * sigma with 300 points. This is what
+      * umap.umap_.fit_ab_params does, but sigma is fixed to 1.0 here since
+      * that's the default value used in scanpy and by virtually everyone */
+    igraph_integer_t nr_points = 300;
+    igraph_real_t end_point = 3.0;
+    /* Initial values takes as reasonable assumptions from typical min_dist values */
+    igraph_real_t b = 0.8;
+    igraph_real_t a = 1.8;
     /* deltas */
     igraph_real_t da, db;
     /* Residuals */
@@ -309,6 +314,10 @@ static igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t
     for (igraph_integer_t i = 0; i < nr_points; i++) {
         VECTOR(x)[i] = (end_point / nr_points) * i + 0.001; /* added a 0.001 to prevent NaNs */
     }
+
+    /* Initialize squared_sum_res_old to a dummy value to prevent some compilers
+     * from complaining about uninitialized values */
+    squared_sum_res_old = IGRAPH_INFINITY;
 
 #ifdef UMAP_DEBUG
     printf("start fit_ab\n");
@@ -523,11 +532,8 @@ static igraph_error_t igraph_i_umap_compute_cross_entropy(const igraph_t *graph,
 
 
 /* clip forces to avoid too rapid shifts */
-static igraph_error_t igraph_i_umap_clip_force(igraph_real_t *force, igraph_real_t limit) {
-
-    *force  = fmax(fmin(*force, limit), -limit);
-
-    return IGRAPH_SUCCESS;
+static igraph_real_t igraph_i_umap_clip_force(igraph_real_t force, igraph_real_t limit) {
+    return fmax(fmin(force, limit), -limit);
 }
 
 /*xd is difference in x direction, mu is a weight */
@@ -551,7 +557,7 @@ static igraph_error_t igraph_i_umap_attract(
     for (igraph_integer_t d = 0; d != ndim; d++) {
         VECTOR(*forces)[d] = force * VECTOR(*delta)[d];
         /* clip force to avoid too rapid change */
-        igraph_i_umap_clip_force(&(VECTOR(*forces)[d]), 3);
+        VECTOR(*forces)[d] = igraph_i_umap_clip_force(VECTOR(*forces)[d], 3);
 
 #ifdef UMAP_DEBUG
         printf("force attractive: delta[%d] = %g, forces[%d] = %g\n", d, VECTOR(*delta)[d], d, VECTOR(*forces)[d]);
@@ -583,7 +589,7 @@ static igraph_error_t igraph_i_umap_repel(
         VECTOR(*forces)[d] = force * VECTOR(*delta)[d];
 
         /* clip force to avoid too rapid change */
-        igraph_i_umap_clip_force(&(VECTOR(*forces)[d]), 3);
+        VECTOR(*forces)[d] = igraph_i_umap_clip_force(VECTOR(*forces)[d], 3);
 
 #ifdef UMAP_DEBUG
         printf("force repulsive: delta[%d] = %g, forces[%d] = %g\n", d, VECTOR(*delta)[d], d, VECTOR(*forces)[d]);
@@ -658,6 +664,8 @@ static igraph_error_t igraph_i_umap_apply_forces(
         /* Random other nodes are repelled from one (the first) vertex */
         IGRAPH_CHECK(igraph_random_sample(&negative_vertices, 0, no_of_nodes - 2, n_random_vertices));
         for (igraph_integer_t j = 0; j < n_random_vertices; j++) {
+            IGRAPH_ALLOW_INTERRUPTION();
+
             /* Get random neighbor */
             to = VECTOR(negative_vertices)[j];
             /* obviously you cannot repel yourself */
@@ -669,8 +677,8 @@ static igraph_error_t igraph_i_umap_apply_forces(
             if (avoid_neighbor_repulsion) {
                 /* NOTE: the efficiency of this step could be improved but it
                  * should be only used for small graphs anyway, so it's fine */
-                igraph_bool_t skip = 0;
-                igraph_incident(graph, &neis, from, IGRAPH_ALL);
+                igraph_bool_t skip = false;
+                IGRAPH_CHECK(igraph_incident(graph, &neis, from, IGRAPH_ALL));
                 nneis = igraph_vector_int_size(&neis);
                 for (igraph_integer_t k = 0; k < nneis; k++) {
                     igraph_integer_t eid2 = VECTOR(neis)[k];
@@ -735,7 +743,7 @@ static igraph_error_t igraph_i_umap_optimize_layout_stochastic_gradient(const ig
      * relies on an approximation that only works if the graph is sparse, which is never
      * quite true for small graphs (i.e. |V| << |E| << |V|^2 is hard to judge if
      * |V| is small) */
-    igraph_bool_t avoid_neighbor_repulsion = 0;
+    igraph_bool_t avoid_neighbor_repulsion = false;
     if (igraph_vcount(graph) < 100) {
         avoid_neighbor_repulsion = 1;
     }
@@ -812,7 +820,7 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
     for (igraph_integer_t eid = 0; eid != no_of_edges; eid++) {
         if (VECTOR(*distances)[eid] < 0) {
             IGRAPH_ERROR("Distances cannot be negative.", IGRAPH_EINVAL);
-        } else if (igraph_is_nan(VECTOR(*distances)[eid])) {
+        } else if (isnan(VECTOR(*distances)[eid])) {
             IGRAPH_ERROR("Distances cannot contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -866,17 +874,17 @@ static igraph_error_t igraph_i_layout_umap(
     IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
 
     if (use_seed) {
-        if((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
-          IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
-                  IGRAPH_EINVAL, no_of_nodes, ndim,
-                  igraph_matrix_nrow(res),
-                  igraph_matrix_ncol(res));
+        if ((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
+            IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
+                          IGRAPH_EINVAL, no_of_nodes, ndim,
+                          igraph_matrix_nrow(res),
+                          igraph_matrix_ncol(res));
         }
 
         /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
-        if (no_of_nodes <= 1)
+        if (no_of_nodes <= 1) {
             return IGRAPH_SUCCESS;
-        
+        }
     } else {
          /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
          if (no_of_nodes <= 1) {
@@ -923,9 +931,11 @@ static igraph_error_t igraph_i_layout_umap(
 
 /**
  * \function igraph_layout_umap
- * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction
+ * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction.
  *
- * UMAP is a mostly used to embed high-dimensional vectors in a low-dimensional space
+ * \experimental
+ *
+ * UMAP is mostly used to embed high-dimensional vectors in a low-dimensional space
  * (most commonly by far, 2D). The algorithm is probabilistic and introduces
  * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
  * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
@@ -945,10 +955,11 @@ static igraph_error_t igraph_i_layout_umap(
  *
  * </para><para>
  *
- * <code>corr(v1, v2) = v1 x v2 / [ sqrt(v1 x v1) * sqrt(v2 x v2) ]</code>
+ * <code>corr(v1, v2) = v1 . v2 / [ sqrt(v1 . v1) * sqrt(v2 . v2) ]</code>,
  *
  * </para><para>
  *
+ * where <code>.</code> denotes the dot product.
  * In this case, the associated distance is usually defined as:
  *
  * </para><para>
@@ -977,7 +988,7 @@ static igraph_error_t igraph_i_layout_umap(
  * </para><para>
  *
  * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
- *    weighted or unweighted. If unsure, compute a knn.
+ *    weighted or unweighted. If unsure, compute a k-nearest neighbors graph.
  *
  * </para><para>
  *
@@ -1010,21 +1021,19 @@ static igraph_error_t igraph_i_layout_umap(
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
- *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
+ *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
+ *   That is fine here too. If this argument \c NULL, all lengths are assumed to be the same.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
  *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
  *   number.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
- *   (less than 50k edges), 50 epochs are used for larger graphs.
+ *   (less than 50000 edges), 50 epochs are used for larger graphs.
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
  *
  * \return Error code.
- *
- * \experimental
  */
 igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   igraph_matrix_t *res,
@@ -1042,8 +1051,10 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \function igraph_layout_umap_3d
  * \brief 3D layout using UMAP.
  *
- * This is the 3D version of the UMAP algorithm (see \ref
- * igraph_layout_umap() for the 2D version).
+ * \experimental
+ *
+ * This is the 3D version of the UMAP algorithm
+ * (see \ref igraph_layout_umap() for the 2D version).
  *
  * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
  * \param res Pointer to the n by 3 matrix where the layout coordinates will be stored.
@@ -1051,21 +1062,19 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of edge lengths. Similarity graphs for
  *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude dist := 1 - corr. That is
- *   fine here too. If this argument is a NULL pointer (NULL), all lengths are assumed equal.
+ *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
+ *   That is fine here too. If this argument is \c NULL, all lengths are assumed to be the same.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
  *   embedding before feeling a repulsive force. It should be positive. Typically, 0.01 is a good
  *   number.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
- *   (less than 50k edges), 50 epochs are used for larger graphs.
+ *   (less than 50000 edges), 50 epochs are used for larger graphs.
  * \param sampling_prob The fraction of vertices moved at each iteration of the stochastic gradient
  *   descent (epoch). At fixed number of epochs, a higher fraction makes the algorithm slower.
  *   Vice versa, a too low number will converge very slowly, possibly too slowly.
  *
  * \return Error code.
- *
- * \experimental
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_matrix_t *res,
@@ -1075,5 +1084,5 @@ igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_integer_t epochs,
                                      igraph_real_t sampling_prob) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, sampling_prob, 2);
+            distances, min_dist, epochs, sampling_prob, 3);
 }

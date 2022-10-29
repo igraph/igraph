@@ -23,7 +23,6 @@
 
 #include "gengraph_definitions.h"
 #include "gengraph_degree_sequence.h"
-#include "gengraph_qsort.h"
 
 #include <assert.h>
 #include "gengraph_random.h"

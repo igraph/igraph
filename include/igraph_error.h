@@ -25,6 +25,7 @@
 #define IGRAPH_ERROR_H
 
 #include "igraph_decls.h"
+#include "igraph_config.h"
 
 #include <stdarg.h>
 
@@ -291,12 +292,15 @@ __BEGIN_DECLS
  * \enumval IGRAPH_EATTRCOMBINE Unimplemented attribute combination
  *   method for the given attribute type.
  * \enumval IGRAPH_ELAPACK A LAPACK call resulted in an error.
- * \enumval IGRAPH_EDRL Internal error in the DrL layout generator.
+ * \enumval IGRAPH_EDRL Internal error in the DrL layout generator; not used
+ *   any more (replaced by IGRAPH_EINTERNAL).
  * \enumval IGRAPH_EOVERFLOW Integer or double overflow.
  * \enumval IGRAPH_EGLP Internal GLPK error.
  * \enumval IGRAPH_CPUTIME CPU time exceeded.
  * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
+ * \enumval IGRAPH_ERANGE Maximum vertex or edge count exceeded.
+ * \enumval IGRAPH_ENOSOL Input problem has no solution.
  */
 
 typedef enum {
@@ -353,14 +357,15 @@ typedef enum {
     IGRAPH_EATTRIBUTES       = 51,
     IGRAPH_EATTRCOMBINE      = 52,
     IGRAPH_ELAPACK           = 53,
-    IGRAPH_EDRL              = 54,
+    IGRAPH_EDRL IGRAPH_DEPRECATED_ENUMVAL = 54,
     IGRAPH_EOVERFLOW         = 55,
     IGRAPH_EGLP              = 56,
     IGRAPH_CPUTIME           = 57,
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
     IGRAPH_STOP              = 60,
-    IGRAPH_ERANGE            = 61
+    IGRAPH_ERANGE            = 61,
+    IGRAPH_ENOSOL            = 62
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in core/error.c
@@ -383,11 +388,11 @@ typedef enum {
 
 /**
  * \typedef igraph_error_t
- * \brief Type alias because igraph_error_t used to be an integer, and was used
- *          slightly differenly than igraph_error_type_t.
+ * \brief Return type for functions returning an error code.
  *
  * This type is used as the return type of igraph functions that return an
- * error code.
+ * error code. It is a type alias because \type igraph_error_t used to be
+ * an \c int, and was used slightly differenly than \type igraph_error_type_t.
  */
 typedef igraph_error_type_t igraph_error_t;
 
@@ -465,7 +470,7 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
 
 /**
  * \define IGRAPH_ERROR
- * \brief Trigger an error.
+ * \brief Triggers an error.
  *
  * \a igraph functions usually use this macro when they notice an error.
  * It calls
@@ -497,7 +502,7 @@ IGRAPH_EXPORT igraph_error_handler_t* igraph_set_error_handler(igraph_error_hand
 
 /**
  * \function igraph_error
- * \brief Triggers an error.
+ * \brief Reports an error.
  *
  * \a igraph functions usually call this function (most often via the
  * \ref IGRAPH_ERROR macro) if they notice an error.
@@ -550,7 +555,7 @@ IGRAPH_EXPORT igraph_error_t igraph_error(const char *reason, const char *file, 
 
 /**
  * \function igraph_errorf
- * \brief Triggers an error, printf-like version.
+ * \brief Reports an error, printf-like version.
  *
  * \param reason Textual description of the error, interpreted as
  *               a \c printf format string.
@@ -860,10 +865,11 @@ IGRAPH_EXPORT extern igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning
- * \brief Triggers a warning.
+ * \brief Reports a warning.
  *
  * Call this function if you want to trigger a warning from within
  * a function that uses \a igraph.
+ *
  * \param reason Textual description of the warning.
  * \param file The source file in which the warning was noticed.
  * \param line The number of line in the source file which triggered the
@@ -899,11 +905,12 @@ IGRAPH_EXPORT void igraph_warning(const char *reason, const char *file, int line
 
 /**
  * \function igraph_warningf
- * \brief Triggers a warning, printf-like version.
+ * \brief Reports a warning, printf-like version.
  *
  * This function is similar to \ref igraph_warning(), but
  * uses a printf-like syntax. It substitutes the additional arguments
  * into the \p reason template string and calls \ref igraph_warning().
+ *
  * \param reason Textual description of the warning, a template string
  *        with the same syntax as the standard printf C library function.
  * \param file The source file in which the warning was noticed.

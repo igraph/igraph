@@ -31,7 +31,7 @@ void print_and_destroy(igraph_t *g) {
     igraph_vector_int_destroy(&edges);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
 
     printf("No edges:\n");

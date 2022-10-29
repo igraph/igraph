@@ -25,6 +25,8 @@
 #include "gengraph_hash.h"
 #include "gengraph_degree_sequence.h"
 
+#include "igraph_datatype.h"
+
 #include <string.h>
 #include <assert.h>
 // This class handles graphs with a constant degree sequence.
@@ -150,7 +152,7 @@ public:
         return n;
     };
     // print graph in SUCC_LIST mode, in stdout
-    void print(FILE *f = stdout);
+    /* void print(FILE *f = stdout); */
     igraph_error_t print(igraph_t *graph);
     // Test if graph is connected
     bool is_connected();

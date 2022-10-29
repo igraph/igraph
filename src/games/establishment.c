@@ -70,7 +70,7 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes
     igraph_vector_int_t *nodetypes;
 
     /* Argument contracts */
-    if(nodes < 0){
+    if (nodes < 0) {
         IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
 
@@ -90,7 +90,7 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes
         if (lo < 0) {
             IGRAPH_ERROR("The vertex type distribution vector must not contain negative values.", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo)) {
+        if (isnan(lo)) {
             IGRAPH_ERROR("The vertex type distribution vector must not contain NaN.", IGRAPH_EINVAL);
         }
     }
@@ -106,7 +106,7 @@ igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes
         if (lo < 0 || hi > 1) {
             IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo) || igraph_is_nan(hi)) {
+        if (isnan(lo) || isnan(hi)) {
             IGRAPH_ERROR("The preference matrix must not contain NaN.", IGRAPH_EINVAL);
         }
     }

@@ -20,7 +20,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_heap_t h_max;
     igraph_heap_min_t h_min;
@@ -130,6 +130,14 @@ int main() {
 
     igraph_heap_destroy(&h_max);
     igraph_heap_min_destroy(&h_min);
+
+    /* Test initializing empty heap from array. */
+    igraph_heap_init_array(&h_max, list, 0);
+    IGRAPH_ASSERT(igraph_heap_empty(&h_max));
+    igraph_heap_push(&h_max, 3.0);
+    IGRAPH_ASSERT(! igraph_heap_empty(&h_max));
+    IGRAPH_ASSERT(igraph_heap_top(&h_max) == 3.0);
+    igraph_heap_destroy(&h_max);
 
     VERIFY_FINALLY_STACK();
 

@@ -27,7 +27,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_d_indheap_t h;
     igraph_integer_t idx1, idx2;

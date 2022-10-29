@@ -23,12 +23,12 @@
 /* This test verifies that trying to read an empty file does not cause
  * a crash or fatal error in any of the file format readers. */
 
-int main() {
+int main(void) {
     igraph_t graph;
     FILE *file;
 
     file = fopen("empty", "r");
-    IGRAPH_ASSERT(file);
+    IGRAPH_ASSERT(file != NULL);
 
     /* Formats for which an emtpy file is valid */
 

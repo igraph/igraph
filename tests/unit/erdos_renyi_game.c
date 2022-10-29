@@ -21,7 +21,7 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_bool_t simple;
 
@@ -168,7 +168,7 @@ int main() {
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 10 - 1);
     IGRAPH_ASSERT(igraph_is_directed(&g));
 
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /*multiple=*/ false, /*loops=*/ true, /*edge_comb=*/ NULL);
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 || igraph_ecount(&g) == 10 * 9 - 1);
 
     igraph_destroy(&g);
@@ -189,7 +189,7 @@ int main() {
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 11 / 2 - 1);
     IGRAPH_ASSERT(! igraph_is_directed(&g));
 
-    igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ NULL);
+    igraph_simplify(&g, /*multiple=*/ false, /*loops=*/ true, /*edge_comb=*/ NULL);
     IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 / 2 || igraph_ecount(&g) == 10 * 9 / 2 - 1);
 
     igraph_destroy(&g);

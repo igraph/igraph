@@ -76,7 +76,7 @@
  *    undirected.
  * \param membership The membership vector, the result is returned here.
  *    For each vertex it gives the ID of its community (label).
- * \param mode Whether to consider edge directions for the label proppagation,
+ * \param mode Whether to consider edge directions for the label propagation,
  *    and if so, which direction the labels should propagate. Ignored for
  *    undirected graphs. \c IGRAPH_ALL means to ignore edge directions (even
  *    in directed graphs). \c IGRAPH_OUT means to propagate labels along the
@@ -159,7 +159,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             if (minweight < 0) {
                 IGRAPH_ERROR("Weights must not be negative.", IGRAPH_EINVAL);
             }
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }

@@ -11,5 +11,7 @@ uconn = False
 Inf
 graph with zero nodes
 NaN
+from = -1, to = -1
 graph with one node
 0
+from = 0, to = 0

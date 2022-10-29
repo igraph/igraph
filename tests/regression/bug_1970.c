@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
     FILE *file;
     igraph_t graph;
     igraph_error_t err;
@@ -11,7 +11,7 @@ int main() {
     igraph_set_error_handler(igraph_error_handler_printignore);
 
     file = fopen("bug_1970.graphml", "r");
-    IGRAPH_ASSERT(file);
+    IGRAPH_ASSERT(file != NULL);
 
     err = igraph_read_graph_graphml(&graph, file, 0);
     fclose(file);

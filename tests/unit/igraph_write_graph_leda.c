@@ -25,12 +25,13 @@
 
 #include "test_utilities.h"
 
-int main() {
+int main(void) {
     int i;
     igraph_t g;
     igraph_vector_t values;
     igraph_strvector_t strvalues;
-    const char* strings[] = {"foo", "bar", "baz", "spam", "eggs", "bacon"};
+    igraph_vector_bool_t boolvalues;
+    const char *strings[] = {"foo", "bar", "baz", "spam", "eggs", "bacon"};
 
     /* Setting up attribute handler */
     igraph_set_attribute_table(&igraph_cattribute_table);
@@ -91,13 +92,17 @@ int main() {
     printf("===\n");
     igraph_destroy(&g);
 
-    /* Saving undirected graph with edge attributes and large weights */
+    /* Saving undirected graph with numerical edge attributes and boolean vertex attributes */
     igraph_ring(&g, 5, /* directed = */ 0,
                 /* mutual   = */ 0,
                 /* circular = */ 1);
     igraph_vector_init_range(&values, 123456789, 123456794);
     SETEANV(&g, "weight", &values);
-    igraph_write_graph_leda(&g, stdout, 0, "weight");
+    igraph_vector_bool_init(&boolvalues, igraph_vcount(&g));
+    VECTOR(boolvalues)[1] = true; VECTOR(boolvalues)[3] = true;
+    SETVABV(&g, "binary", &boolvalues);
+    igraph_write_graph_leda(&g, stdout, "binary", "weight");
+    igraph_vector_bool_destroy(&boolvalues);
     igraph_vector_destroy(&values);
     printf("===\n");
     igraph_destroy(&g);

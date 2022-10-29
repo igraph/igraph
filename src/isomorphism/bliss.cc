@@ -256,7 +256,7 @@ public:
  *    when no longer needed, see \ref igraph_bliss_info_t.
  * \return Error code.
  *
- * \sa igraph_is_same_graph()
+ * \sa \ref igraph_is_same_graph()
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
@@ -527,7 +527,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         VECTOR(perm2)[i] = VECTOR(*mymap12)[ VECTOR(perm1)[i] ];
     }
     /* Copy it to mymap12 */
-    igraph_vector_int_update(mymap12, &perm2);
+    IGRAPH_CHECK(igraph_vector_int_update(mymap12, &perm2));
 
     igraph_vector_int_destroy(&perm1);
     igraph_vector_int_destroy(&perm2);
@@ -547,7 +547,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
         VECTOR(from)[i] = VECTOR(*mymap12)[ IGRAPH_FROM(graph1, i) ];
         VECTOR(to)[i]   = VECTOR(*mymap12)[ IGRAPH_TO  (graph1, i) ];
         if (! directed && VECTOR(from)[i] < VECTOR(to)[i]) {
-            igraph_real_t tmp = VECTOR(from)[i];
+            igraph_integer_t tmp = VECTOR(from)[i];
             VECTOR(from)[i] = VECTOR(to)[i];
             VECTOR(to)[i] = tmp;
         }
@@ -558,7 +558,7 @@ igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *g
     for (i = 0, j = no_of_edges; i < no_of_edges; i++, j++) {
         VECTOR(to2)[i] = VECTOR(from2)[j];
         if (! directed && VECTOR(from2)[i] < VECTOR(to2)[i]) {
-            igraph_real_t tmp = VECTOR(from2)[i];
+            igraph_integer_t tmp = VECTOR(from2)[i];
             VECTOR(from2)[i] = VECTOR(to2)[i];
             VECTOR(to2)[i] = tmp;
         }

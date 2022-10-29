@@ -61,7 +61,7 @@ void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
     igraph_matrix_destroy(result);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t result;
     igraph_layout_drl_options_t options;
@@ -70,7 +70,7 @@ int main() {
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    set_options_fast(&options);
+    igraph_layout_drl_options_init(&options, IGRAPH_LAYOUT_DRL_DEFAULT);
 
     printf("The Zachary karate club.\n");
     igraph_famous(&g, "zachary");
@@ -82,6 +82,7 @@ int main() {
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
+    set_options_fast(&options);
     printf("Negative damping.\n");
     igraph_matrix_init(&result, 0, 0);
     for (i = 0; i < 6; i++) {

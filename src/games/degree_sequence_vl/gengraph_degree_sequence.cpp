@@ -19,11 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "gengraph_definitions.h"
-#include "gengraph_random.h"
 #include "gengraph_degree_sequence.h"
-#include "gengraph_hash.h"
-
-#include "igraph_statusbar.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -44,14 +40,7 @@ void random_permute(igraph_integer_t *a, igraph_integer_t n);
 void cumul_sort(igraph_integer_t *q, igraph_integer_t n);
 
 
-void degree_sequence::detach() {
-    deg = NULL;
-}
-
 degree_sequence::~degree_sequence() {
-    if (deg != NULL) {
-        delete[] deg;
-    }
     deg = NULL;
 }
 
@@ -72,10 +61,7 @@ degree_sequence(igraph_integer_t n0, igraph_integer_t *degs) {
 degree_sequence::
 degree_sequence(const igraph_vector_int_t *out_seq) {
     n = igraph_vector_int_size(out_seq);
-    deg = new igraph_integer_t[n];
-    for (igraph_integer_t i = 0; i < n; i++) {
-        deg[i] = VECTOR(*out_seq)[i];
-    }
+    deg = &VECTOR(*out_seq)[0];
     compute_total();
 }
 

@@ -97,7 +97,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         IGRAPH_CHECK(igraph_transitivity_local_undirected(graph, &vec, igraph_vss_all(), mode));
 
         for (i = 0, nans = 0; i < no_of_nodes; i++) {
-            if (!igraph_is_nan(VECTOR(vec)[i])) {
+            if (!isnan(VECTOR(vec)[i])) {
                 sum += VECTOR(vec)[i];
             } else {
                 nans++;
@@ -189,7 +189,7 @@ static igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *grap
             maxdegree = deg;
         }
     }
-    igraph_vector_int_order1(&degree, &order, maxdegree + 1);
+    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree + 1));
     igraph_vector_int_destroy(&degree);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_VECTOR_INIT_FINALLY(&rank, affected_nodes);
@@ -334,7 +334,7 @@ static igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *grap
 
 /**
  * \function igraph_transitivity_local_undirected
- * \brief Calculates the local transitivity (clustering coefficient) of a graph.
+ * \brief The local transitivity (clustering coefficient) of some vertices.
  *
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the local transitivity, this
@@ -811,17 +811,17 @@ static igraph_error_t igraph_i_transitivity_barrat4(
 
 /**
  * \function igraph_transitivity_barrat
- * Weighted transitivity, as defined by A. Barrat.
+ * \brief Weighted local transitivity of some vertices, as defined by A. Barrat.
  *
  * This is a local transitivity, i.e. a vertex-level index. For a
  * given vertex \c i, from all triangles in which it participates we
  * consider the weight of the edges incident on \c i. The transitivity
  * is the sum of these weights divided by twice the strength of the
  * vertex (see \ref igraph_strength()) and the degree of the vertex
- * minus one. See   Alain Barrat, Marc Barthelemy, Romualdo
+ * minus one. See equation (5) in Alain Barrat, Marc Barthelemy, Romualdo
  * Pastor-Satorras, Alessandro Vespignani: The architecture of complex
  * weighted networks, Proc. Natl. Acad. Sci. USA 101, 3747 (2004) at
- * http://arxiv.org/abs/cond-mat/0311416 for the exact formula.
+ * https://doi.org/10.1073/pnas.0400087101 for the exact formula.
  *
  * \param graph The input graph. Edge directions are ignored for
  *   directed graphs. Note that the function does \em not work for

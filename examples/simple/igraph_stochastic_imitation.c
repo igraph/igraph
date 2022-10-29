@@ -34,72 +34,10 @@ typedef struct {
     igraph_integer_t retval;
 } strategy_test_t;
 
-/* Error tests. That is, we expect error codes to be returned from such tests.
- */
-igraph_error_t error_tests() {
-    igraph_t g, h;
-    igraph_vector_t quant;
-    igraph_vector_int_t strat;
-    igraph_integer_t i, n, ret;
-    strategy_test_t *test;
-
-    /* nonempty graph */
-    igraph_small(&g, /*n vertices*/ 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
-    igraph_empty(&h, 0, 0);         /* empty graph */
-    igraph_vector_init(&quant, 1);  /* quantities vector */
-    igraph_vector_int_init(&strat, 2);  /* strategies vector */
-
-    /* test parameters */
-    /*graph--vertex--algo--quantities--strategies--known_strats--mode--retval*/
-    /* null pointer for graph */
-    strategy_test_t null_graph = {NULL, 0, IGRAPH_IMITATE_BLIND, NULL, NULL, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* null pointer for quantities vector */
-    strategy_test_t null_quant = {&g, 0, IGRAPH_IMITATE_BLIND, NULL, NULL, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* null pointer for strategies vector */
-    strategy_test_t null_strat = {&g, 0, IGRAPH_IMITATE_BLIND, &quant, NULL, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* empty graph */
-    strategy_test_t empty_graph = {&h, 0, IGRAPH_IMITATE_BLIND, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* length of quantities vector different from number of vertices */
-    strategy_test_t qdiff_length = {&g, 0, IGRAPH_IMITATE_BLIND, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    /* length of strategies vector different from number of vertices */
-    strategy_test_t sdiff_length = {&g, 0, IGRAPH_IMITATE_BLIND, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    strategy_test_t unknown_algo = {&g, 0, -1, &quant, &strat, NULL, IGRAPH_ALL, IGRAPH_EINVAL};
-    strategy_test_t *all_checks[] = {/* 1 */ &null_graph,
-                                             /* 2 */ &null_quant,
-                                             /* 3 */ &null_strat,
-                                             /* 4 */ &empty_graph,
-                                             /* 5 */ &qdiff_length,
-                                             /* 6 */ &sdiff_length,
-                                             /* 7 */ &unknown_algo
-                                    };
-    /* Run the error tests. We expect error to be raised for each test. */
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    n = 7;
-    i = 0;
-    while (i < n) {
-        test = all_checks[i];
-        ret = igraph_stochastic_imitation(test->graph, test->vertex, test->algo,
-                                          test->quantities, test->strategies,
-                                          test->mode);
-        if (ret != test->retval) {
-            printf("Error test no. %" IGRAPH_PRId " failed.\n", i + 1);
-            return IGRAPH_FAILURE;
-        }
-        i++;
-    }
-    /* clean up */
-    igraph_destroy(&g);
-    igraph_destroy(&h);
-    igraph_vector_destroy(&quant);
-    igraph_vector_int_destroy(&strat);
-
-    return IGRAPH_SUCCESS;
-}
-
 /* Updating the strategy of an isolated vertex. In this case, the strategies
  * vector should not change at all.
  */
-igraph_error_t isolated_vertex_test() {
+igraph_error_t isolated_vertex_test(void) {
     igraph_t g;
     igraph_vector_t quant;
     igraph_vector_int_t strat, v;
@@ -148,13 +86,14 @@ igraph_error_t isolated_vertex_test() {
  * default strategies vector. Some vertices are chosen for strategy revision,
  * each one via a different stochastic imitation rule.
  */
-igraph_error_t petersen_game_test() {
+igraph_error_t petersen_game_test(void) {
     igraph_t g;
     igraph_bool_t success;
     igraph_vector_t quant;
     igraph_vector_int_t strat, stratcopy, *knownstrats;
     igraph_vector_int_t known0, known2, known4;
-    igraph_integer_t i, k, n, ret;
+    igraph_integer_t i, k, n;
+    igraph_error_t ret;
     int nvert;
     strategy_test_t *test;
 
@@ -225,15 +164,11 @@ igraph_error_t petersen_game_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_error_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 547612);
 
-    ret = error_tests();
-    if (ret) {
-        return ret;
-    }
     ret = isolated_vertex_test();
     if (ret) {
         return ret;

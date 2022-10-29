@@ -44,7 +44,6 @@
 
 #include "igraph_error.h"
 #include "igraph_memory.h"
-#include "config.h"
 
 #include "io/gml-header.h"
 #include "io/gml-tree.h"

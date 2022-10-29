@@ -35,6 +35,7 @@
 
 #include "core/interruption.h"
 #include "core/set.h"
+#include "games/degree_sequence_vl/degree_sequence_vl.h"
 #include "math/safe_intop.h"
 
 static igraph_error_t igraph_i_degree_sequence_game_configuration(igraph_t *graph,
@@ -477,7 +478,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
     RNG_BEGIN();
 
     for (;;) {
-        igraph_bool_t success = 1;
+        igraph_bool_t success = true;
 
         /* Shuffle stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
         for (i = 0; i < ecount; ++i) {
@@ -494,13 +495,13 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
 
             /* self-loop, fail */
             if (from == to) {
-                success = 0;
+                success = false;
                 break;
             }
 
             /* multi-edge, fail */
             if (igraph_set_contains((igraph_set_t *) VECTOR(adjlist)[to], from)) {
-                success = 0;
+                success = false;
                 break;
             }
 
@@ -596,7 +597,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
     RNG_BEGIN();
 
     for (;;) {
-        igraph_bool_t success = 1;
+        igraph_bool_t success = true;
 
         /* Shuffle out-stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
         for (i = 0; i < ecount; ++i) {
@@ -611,14 +612,14 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
 
             /* self-loop, fail */
             if (to == from) {
-                success = 0;
+                success = false;
                 break;
             }
 
             /* multi-edge, fail */
             set = (igraph_set_t *) VECTOR(adjlist)[from];
             if (igraph_set_contains(set, to)) {
-                success = 0;
+                success = false;
                 break;
             }
 
@@ -670,12 +671,6 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
     return IGRAPH_SUCCESS;
 }
 
-
-/* This is in gengraph_mr-connected.cpp */
-
-igraph_error_t igraph_degree_sequence_game_vl(igraph_t *graph,
-                                   const igraph_vector_int_t *out_seq,
-                                   const igraph_vector_int_t *in_seq);
 
 /**
  * \ingroup generators

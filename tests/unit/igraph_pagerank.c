@@ -32,13 +32,13 @@ int is_almost_one(igraph_real_t x) {
     return 1;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t res, reset, weights;
     igraph_arpack_options_t arpack_options;
     igraph_real_t value;
-    int err;
+    igraph_error_t err;
 
     /* The ARPACK method uses a random perturbation to the in-degrees
        to set the starting vector for ARPACK. */

@@ -48,7 +48,7 @@ static igraph_error_t igraph_i_laplacian_validate_weights(
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight < 0) {
             IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
-        } else if (igraph_is_nan(minweight)) {
+        } else if (isnan(minweight)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -262,7 +262,7 @@ igraph_error_t igraph_get_laplacian_sparse(
     igraph_vector_t degree;
     igraph_integer_t i;
     igraph_integer_t nz;
-   
+
     if (directed) {
         IGRAPH_SAFE_ADD(no_of_edges, no_of_nodes, &nz);
     } else {
