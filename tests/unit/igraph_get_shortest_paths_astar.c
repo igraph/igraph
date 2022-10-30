@@ -18,6 +18,8 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+#define LENGTH 10
+
 int check_evecs(const igraph_t *graph, const igraph_vector_int_list_t *vecs,
                 const igraph_vector_int_list_t *evecs, int error_code) {
 
@@ -118,13 +120,12 @@ igraph_error_t no_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, v
 }
 
 igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
-    int *d = extra;
     int x[4];
     for (int i = 0; i < 4; i++) {
-        x[i] = vertex_id % *d;
-        vertex_id /= *d;
+        x[i] = vertex_id % LENGTH;
+        vertex_id /= LENGTH;
     }
-    *result = abs(*d - 1 - x[0]) + x[1] + x[2] + x[3];
+    *result = abs(LENGTH - 1 - x[0]) + x[1] + x[2] + x[3];
     return IGRAPH_SUCCESS;
 }
 
@@ -155,8 +156,7 @@ int main(void) {
     igraph_vs_t vs;
     struct xyt xy;
     igraph_vector_int_t dimvector;
-    igraph_integer_t d = 10;
-    igraph_integer_t dims[] = {d, d, d, d};
+    igraph_integer_t dims[] = {LENGTH, LENGTH, LENGTH, LENGTH};
 
     //set seed for grg random graph generation
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -208,7 +208,7 @@ int main(void) {
 
     printf("Astar, unweighted, lattice with manhattan distance heuristic:\n");
     igraph_vector_int_view(&dimvector, dims, sizeof(dims)/sizeof(dims[0]));
-    igraph_vs_vector_small(&vs, d-1, -1);
+    igraph_vs_vector_small(&vs, LENGTH-1, -1);
 
     igraph_square_lattice(&g, &dimvector, /*nei*/ 1, IGRAPH_UNDIRECTED, /*mutual*/ false, /*periodic*/NULL);
 
@@ -217,7 +217,7 @@ int main(void) {
                                        /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
                                        /*weights*/NULL, IGRAPH_OUT,
                                        &parents,
-                                       /*inbound_edges=*/ &inbound, lattice_heuristic, &d);
+                                       /*inbound_edges=*/ &inbound, lattice_heuristic, NULL);
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
     check_evecs(&g, &vecs, &evecs, /*error code*/60);
     check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/70);
@@ -225,7 +225,7 @@ int main(void) {
     igraph_destroy(&g);
  
     printf("Astar, unweighted, grg with euclidean distance heuristic:\n");
-    xy.target = d-1; //just because that was the end vertex last test
+    xy.target = LENGTH-1; //just because that was the end vertex last test
     igraph_vector_init(&xy.x, 0);
     igraph_vector_init(&xy.y, 0);
 
