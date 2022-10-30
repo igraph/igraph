@@ -359,6 +359,57 @@ igraph_error_t igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *re
     }
 }
 
+/**
+ * \ingroup structural
+ * \function igraph_induced_subgraph_map
+ * \brief Creates an induced subraph and returns the mapping from the original.
+ *
+ * </para><para>
+ * This function collects the specified vertices and all edges between
+ * them to a new graph.
+ * As the vertex IDs in a graph always start with zero, this function
+ * very likely needs to reassign IDs to the vertices.
+ * \param graph The graph object.
+ * \param res The subgraph, another graph object will be stored here,
+ *        do \em not initialize this object before calling this
+ *        function, and call \ref igraph_destroy() on it if you don't need
+ *        it any more.
+ * \param vids A vertex selector describing which vertices to keep.
+ * \param impl This parameter selects which implementation should we
+ *        use when constructing the new graph. Basically there are two
+ *        possibilities: \c IGRAPH_SUBGRAPH_COPY_AND_DELETE copies the
+ *        existing graph and deletes the vertices that are not needed
+ *        in the new graph, while \c IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
+ *        constructs the new graph from scratch without copying the old
+ *        one. The latter is more efficient if you are extracting a
+ *        relatively small subpart of a very large graph, while the
+ *        former is better if you want to extract a subgraph whose size
+ *        is comparable to the size of the whole graph. There is a third
+ *        possibility: \c IGRAPH_SUBGRAPH_AUTO will select one of the
+ *        two methods automatically based on the ratio of the number
+ *        of vertices in the new and the old graph.
+ * \param map Returns a map of the vertices in \p graph to the vertices
+ *        in \p res. A 0 indicates a vertex is not mapped. An \c i + 1 at
+ *        position \c j indicates the vertex \c j in \p graph is mapped
+ *        to vertex i in \p res.
+ * \param invmap Returns a map of the vertices in \p res to the vertices
+ *        in \p graph. An i at position \c j indicates the vertex \c i
+ *        in \p graph is mapped to vertex j in \p res.
+ *
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data.
+ *         \c IGRAPH_EINVVID, invalid vertex ID in
+ *         \p vids.
+ *
+ * Time complexity: O(|V|+|E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the original graph.
+ *
+ * \sa \ref igraph_delete_vertices() to delete the specified set of
+ * vertices from a graph, the opposite of this function.
+ */
 igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 const igraph_vs_t vids,
                                 igraph_subgraph_implementation_t impl,
