@@ -169,7 +169,7 @@ static igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t
  * \param edgelist_all The vector to capture edges in resultant Steiner Tree.
  */
 static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_vector_t *weights,
-        igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_vector_int_t *vectorlist_all, igraph_vector_int_t *edgelist_all, const dictionary& subsetMap) {
+        igraph_matrix_t *dp_cache, igraph_integer_t indexD, igraph_integer_t q, igraph_vector_int_t *edgelist_all, const dictionary& subsetMap) {
 
     int_set C = fetchSetsBasedonIndex(indexD, subsetMap);
     // Initially the value of m is the vertex that was removed from Steiner Terminals
@@ -193,7 +193,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
         IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist, &edgelist, m, k, weights, IGRAPH_ALL));
 
-        IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist));
+        //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist));
         IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist));
 
         igraph_integer_t min_E_value = IGRAPH_INTEGER_MAX;
@@ -241,7 +241,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL));
 
-            IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
+            //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
 
             igraph_vector_int_destroy(&vectorlist_1);
@@ -274,8 +274,8 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_2, &edgelist_2, k, F1, weights, IGRAPH_ALL));
 
-            IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
-            IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_2));
+            //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
+            //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_2));
 
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_2));
@@ -288,7 +288,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             IGRAPH_FINALLY_CLEAN(4);
 
-            int_set min_F;
+            //int_set min_F;
             min_F.insert(F1);
         }
 
@@ -556,18 +556,16 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     }
     igraph_integer_t indexD = fetchIndexofMapofSets(newSet, subsetMap);
 
-    igraph_vector_int_t vectorlist_all;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_all, 0);
 
     igraph_vector_int_clear(res_tree);
 
-    IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, &vectorlist_all, res_tree, subsetMap));
+    IGRAPH_CHECK(generate_steiner_tree_exact(graph, weights, &dp_cache, indexD, q, res_tree, subsetMap));
 
     igraph_matrix_destroy(&distance);
     igraph_vector_int_destroy(&steiner_terminals_copy);
     igraph_matrix_destroy(&dp_cache);
-    igraph_vector_int_destroy(&vectorlist_all);
-    IGRAPH_FINALLY_CLEAN(4);
+   
+    IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
     return IGRAPH_SUCCESS;
