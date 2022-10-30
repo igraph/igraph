@@ -165,7 +165,7 @@ static igraph_integer_t findMinimumK(igraph_matrix_t *dp_cache, igraph_integer_t
  * \param dp_cache The DP table.
  * \param indexD The index of subset D in DP table.
  * \param q The vertex that was remmoved from steiner terminals.
- * \param vectorlist_all The vector to capture vertices in resultant Steiner Tree.
+ * \param vertexlist_all The vector to capture vertices in resultant Steiner Tree.
  * \param edgelist_all The vector to capture edges in resultant Steiner Tree.
  */
 static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const igraph_vector_t *weights,
@@ -193,7 +193,6 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
         IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist, &edgelist, m, k, weights, IGRAPH_ALL));
 
-        //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist));
         IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist));
 
         igraph_integer_t min_E_value = IGRAPH_INTEGER_MAX;
@@ -241,7 +240,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL));
 
-            //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
+        
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
 
             igraph_vector_int_destroy(&vectorlist_1);
@@ -274,8 +273,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_2, &edgelist_2, k, F1, weights, IGRAPH_ALL));
 
-            //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_1));
-            //IGRAPH_CHECK(igraph_vector_int_append(vectorlist_all, &vectorlist_2));
+  
 
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_2));
@@ -466,7 +464,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     dictionary subsetMap;
     allSubsets = generateSubsets(&steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_nodes, subsetMap);
 
-    for (igraph_integer_t m = 2; m <= igraph_vector_int_size(&steiner_terminals_copy); m++) {
+    int steiner_terminals_copy_size = igraph_vector_int_size(&steiner_terminals_copy);
+    for (igraph_integer_t m = 2; m <= steiner_terminals_copy_size; m++) {
         for (igraph_integer_t i = 0; i < (igraph_integer_t)allSubsets.size(); i++) {
             auto it = allSubsets.begin();
             std::advance(it, i);
@@ -492,9 +491,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                         /*
                          *  A set with Singleton value E removed from subset D
                          */
-                        for (auto iter :  DMinusE) {
-                            if (iter == E) {
-                                iter = DMinusE.erase(iter);
+                        for (auto item :  DMinusE) {
+                            if (item == E) {
+                                DMinusE.erase(item);
                                 break;
                             }
                         }
@@ -551,7 +550,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     *res = distance2;
 
     int_set newSet;
-    for (igraph_integer_t i = 0; i < igraph_vector_int_size(&steiner_terminals_copy); i++) {
+
+    for (igraph_integer_t i = 0; i < steiner_terminals_copy_size; i++) {
         newSet.insert(VECTOR(steiner_terminals_copy)[i]);
     }
     igraph_integer_t indexD = fetchIndexofMapofSets(newSet, subsetMap);
