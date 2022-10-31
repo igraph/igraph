@@ -240,7 +240,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL));
 
-        
+
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
 
             igraph_vector_int_destroy(&vectorlist_1);
@@ -273,7 +273,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
             IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_2, &edgelist_2, k, F1, weights, IGRAPH_ALL));
 
-  
+
 
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_1));
             IGRAPH_CHECK(igraph_vector_int_append(edgelist_all, &edgelist_2));
@@ -341,8 +341,8 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
  */
 
 igraph_error_t igraph_steiner_dreyfus_wagner(
-        const igraph_t *graph, const igraph_vector_int_t *terminals, const igraph_vector_t *weights,
-        igraph_real_t *res, igraph_vector_int_t *res_tree) {
+    const igraph_t *graph, const igraph_vector_int_t *terminals, const igraph_vector_t *weights,
+    igraph_real_t *res, igraph_vector_int_t *res_tree) {
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
@@ -386,7 +386,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         if (no_comps > 1) {
             /* The case of zero terminals was already handled above. */
             igraph_integer_t component_id = VECTOR(membership)[ VECTOR(*terminals)[0] ];
-            for (igraph_integer_t i=1; i < no_of_terminals; i++) {
+            for (igraph_integer_t i = 1; i < no_of_terminals; i++) {
                 if (VECTOR(membership)[ VECTOR(*terminals)[i] ] != component_id) {
                     IGRAPH_ERROR("Not all Steiner terminals are in the same connected component.", IGRAPH_EINVAL);
                 }
@@ -564,7 +564,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_matrix_destroy(&distance);
     igraph_vector_int_destroy(&steiner_terminals_copy);
     igraph_matrix_destroy(&dp_cache);
-   
+
     IGRAPH_FINALLY_CLEAN(3);
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
