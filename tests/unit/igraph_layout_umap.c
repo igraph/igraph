@@ -233,6 +233,10 @@ int main(void) {
     printf("Singleton graph:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, &layout, 0, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
     check_graph_singleton(&layout);
+    
+    printf("Singleton graph, use seed:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, &layout, 1, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
+    check_graph_singleton(&layout);
 
     igraph_destroy(&singleton_graph);
     igraph_destroy(&empty_graph);

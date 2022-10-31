@@ -4,6 +4,8 @@ Check error for seed layout with wrong dimensions.
 Empty graph:
 Singleton graph:
 UMAP layout seems fine.
+Singleton graph, use seed:
+UMAP layout seems fine.
 layout of two clusters of vertices with 2 articulation points:
 UMAP layout seems fine.
 same graph, different epochs:
