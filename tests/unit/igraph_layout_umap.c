@@ -218,23 +218,24 @@ int main(void) {
     igraph_small(&singleton_graph, 1, IGRAPH_UNDIRECTED, -1);
 
     printf("Check error for negative min_dist.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, &layout, 0, NULL, -0.01, 500), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, &layout, 0, NULL, -0.01, 500, 0), IGRAPH_EINVAL);
 
     printf("Check error for negative epochs.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, &layout, 0, NULL, 0.01, -1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, &layout, 0, NULL, 0.01, -1, 0), IGRAPH_EINVAL);
 
     printf("Check error for seed layout with wrong dimensions.\n");
-    CHECK_ERROR(igraph_layout_umap(&empty_graph, &layout, 1, NULL, 0.01, 500), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_umap(&empty_graph, &layout, 1, NULL, 0.01, 500, 0), IGRAPH_EINVAL);
 
     printf("Empty graph:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, &layout, 0, NULL, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&empty_graph, &layout, 0, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
     igraph_matrix_print(&layout);
-    igraph_destroy(&empty_graph);
 
     printf("Singleton graph:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, &layout, 0, NULL, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&singleton_graph, &layout, 0, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
     check_graph_singleton(&layout);
+
     igraph_destroy(&singleton_graph);
+    igraph_destroy(&empty_graph);
 
     /* Check a small graph with two main groups of vertices */
     igraph_small(&graph, 12, IGRAPH_UNDIRECTED,
@@ -250,35 +251,33 @@ int main(void) {
             );
 
     printf("layout of two clusters of vertices with 2 articulation points:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, 500, 0) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("same graph, different epochs:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.0, 5000) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.0, 5000, 0) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("Same graph, no distances:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, NULL, 0.0, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, NULL, 0.0, 500, 0) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
     igraph_matrix_resize(&layout, 0, 0);
 
     printf("Same graph, 3D layout:\n");
-    IGRAPH_ASSERT(igraph_layout_umap_3d(&graph, &layout, 0, NULL, 0.0, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap_3d(&graph, &layout, 0, NULL, 0.0, 500, 0) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("Same graph, custom initial layout:\n");
     igraph_layout_random(&graph, &layout);
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 1, NULL, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 1, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("Same graph, just compute connectivities from NULL distances:\n");
     igraph_vector_init(&connectivities, 0);
     igraph_layout_umap_compute_connectivities(&graph, NULL, &connectivities);
     check_graph_twoclusters_connectivities(&connectivities, NULL);
-    igraph_vector_destroy(&connectivities);
 
     printf("Same graph, just compute connectivities from distances:\n");
-    igraph_vector_init(&connectivities, 0);
     igraph_layout_umap_compute_connectivities(&graph, &distances, &connectivities);
     check_graph_twoclusters_connectivities(&connectivities, &distances);
 
@@ -306,7 +305,7 @@ int main(void) {
     igraph_disjoint_union_many(&graph, &graph_ptr);
     // Call UMAP
     IGRAPH_ASSERT(igraph_layout_umap(
-                &graph, &layout, 0, NULL, 0.0, 50) == IGRAPH_SUCCESS);
+                &graph, &layout, 0, NULL, 0.0, 50, 0) == IGRAPH_SUCCESS);
     // Check the layout, it should have three balls
     check_graph_largeunion(&layout, &subgraph_sizes);
 

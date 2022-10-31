@@ -965,15 +965,23 @@ static igraph_error_t igraph_i_layout_umap(
 
         /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
         if (no_of_nodes <= 1) {
+            if (!distances_are_connectivities) {
+                igraph_vector_destroy(&connectivities);
+                IGRAPH_FINALLY_CLEAN(1);
+            }
             return IGRAPH_SUCCESS;
         }
     } else {
-         /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
-         if (no_of_nodes <= 1) {
-             IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, ndim));
-             igraph_matrix_null(res);
-             return IGRAPH_SUCCESS;
-         }
+        /* Trivial graphs (0 or 1 nodes) beget trivial - but valid - layouts */
+        if (no_of_nodes <= 1) {
+            IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, ndim));
+            igraph_matrix_null(res);
+            if (!distances_are_connectivities) {
+                igraph_vector_destroy(&connectivities);
+                IGRAPH_FINALLY_CLEAN(1);
+            }
+            return IGRAPH_SUCCESS;
+        }
 
         /* Skip spectral embedding for now (see #1971), initialize at random */
         if (ndim == 2) {

@@ -32,7 +32,7 @@ int main(void) {
 #define EPOCHS 5000
 #define REP 40
 
-    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS) , REP);
+    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0), REP);
     );
 
 #undef EPOCHS
@@ -40,7 +40,7 @@ int main(void) {
 #define EPOCHS 500
 #define REP 400
 
-    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS) , REP);
+    BENCH("Small graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0) , REP);
     );
 
 #undef EPOCHS
@@ -59,7 +59,7 @@ int main(void) {
     }
     RNG_END();
 
-    BENCH("Larger graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS) , REP);
+    BENCH("Larger graph, epochs: " TOSTR(EPOCHS) ", repetitions: " TOSTR(REP), REPEAT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, EPOCHS, 0) , REP);
     );
 
 
