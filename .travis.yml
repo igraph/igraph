@@ -44,9 +44,9 @@ addons:
       - libxml2-dev
       - git
       - colordiff
-#  snaps:
-#    - name: cmake
-#      confinement: classic
+  snaps:
+    - name: cmake
+      confinement: classic
 
 # configuration (running cmake) is in before_script
 # if this phase fails, the build stops immediately
