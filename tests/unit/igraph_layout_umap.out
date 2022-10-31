@@ -18,5 +18,7 @@ Same graph, just compute connectivities from NULL distances:
 Connectivities from NULL distances seem fine.
 Same graph, just compute connectivities from distances:
 Connectivities from distances seem fine.
+Same graph, precomputed (bogus) connectivities:
+Ran through without leaks.
 Large disjoint union of 3 full graphs:
 UMAP layout of large graph seems fine.
