@@ -14,5 +14,9 @@ Same graph, 3D layout:
 UMAP layout seems fine.
 Same graph, custom initial layout:
 UMAP layout seems fine.
+Same graph, just compute connectivities from NULL distances:
+Connectivities from NULL distances seem fine.
+Same graph, just compute connectivities from distances:
+Connectivities from distances seem fine.
 Large disjoint union of 3 full graphs:
 UMAP layout of large graph seems fine.

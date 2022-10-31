@@ -84,7 +84,44 @@ void check_graph_largeunion(
 }
 
 
-void check_graph_twoclusters_connectivities(const igraph_vector_t *connectivities) {
+void check_graph_twoclusters_connectivities(
+        const igraph_vector_t *connectivities,
+        const igraph_vector_t *distances) {
+    int nerr = 0;
+    igraph_integer_t i;
+    igraph_real_t connectivity;
+    igraph_integer_t nc = igraph_vector_size(connectivities);
+    igraph_integer_t nd;
+
+    if (distances == NULL) {     
+        for (i = 0; i < nc; i++) {
+            if (VECTOR(*connectivities)[i] != 1.0) {
+                printf("Connectivities with NULL distances should all be 1.0.");
+                return;
+            }
+        }
+
+        printf("Connectivities from NULL distances seem fine.\n");
+    } else {
+        nd = igraph_vector_size(distances);
+        if (nd != nc) {
+            nerr++;
+            printf("Length of distances and connectivities must be equal.\n");
+            return;
+        }
+
+        for (i = 0; i < nc; i++) {
+            connectivity = VECTOR(*connectivities)[i];
+            if (connectivity > 1.0) {
+                printf("Connectivities cannot be >1.0, found %f", connectivity);
+                return;
+            } else if (connectivity < 0.0) {
+                printf("Connectivities cannot be negative, found %f", connectivity);
+                return;
+            }
+        }
+        printf("Connectivities from distances seem fine.\n");
+    }
     return;
 }
 
@@ -212,23 +249,21 @@ int main(void) {
             0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.08, 0.05, 0.1, 0.08, 0.12, 0.09, 0.11
             );
 
-
     printf("layout of two clusters of vertices with 2 articulation points:\n");
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, 500) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("same graph, different epochs:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, 5000) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.0, 5000) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
-    igraph_vector_destroy(&distances);
 
     printf("Same graph, no distances:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, NULL, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, NULL, 0.0, 500) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
     igraph_matrix_resize(&layout, 0, 0);
 
     printf("Same graph, 3D layout:\n");
-    IGRAPH_ASSERT(igraph_layout_umap_3d(&graph, &layout, 0, NULL, 0.01, 500) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_layout_umap_3d(&graph, &layout, 0, NULL, 0.0, 500) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     printf("Same graph, custom initial layout:\n");
@@ -236,17 +271,19 @@ int main(void) {
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 1, NULL, 0.01, 500) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
-    igraph_matrix_destroy(&layout);
-
     printf("Same graph, just compute connectivities from NULL distances:\n");
-    igraph_vector_init(&connectivities, igraph_ecount(&graph));
+    igraph_vector_init(&connectivities, 0);
     igraph_layout_umap_compute_connectivities(&graph, NULL, &connectivities);
+    check_graph_twoclusters_connectivities(&connectivities, NULL);
     igraph_vector_destroy(&connectivities);
 
     printf("Same graph, just compute connectivities from distances:\n");
-    igraph_vector_init(&connectivities, igraph_ecount(&graph));
+    igraph_vector_init(&connectivities, 0);
     igraph_layout_umap_compute_connectivities(&graph, &distances, &connectivities);
-    check_graph_twoclusters_connectivities(&connectivities);
+    check_graph_twoclusters_connectivities(&connectivities, &distances);
+
+    igraph_matrix_destroy(&layout);
+    igraph_vector_destroy(&distances);
     igraph_vector_destroy(&connectivities);
     igraph_destroy(&graph);
 
