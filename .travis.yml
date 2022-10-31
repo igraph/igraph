@@ -2,6 +2,7 @@
 language: c
 cache: ccache
 os: linux
+dist: jammy
 
 # Ignore branches with names starting with certain keywords:
 branches:
@@ -22,29 +23,30 @@ addons:
   apt:
     update: true
     packages:
-    - ninja-build
-    - flex
-    - bison
-#    - docbook2x
-#    - xmlto
-#    - texinfo
-#    - source-highlight
-#    - libxml2-utils
-#    - xsltproc
-#    - fop
-    - libgmp-dev
-    - libglpk-dev
-    - libarpack2-dev
-#    - libblas-dev
-#    - liblapack-dev
-    - libopenblas-dev
-    - libsuitesparse-dev
-    - libxml2-dev
-    - git
-    - colordiff
-  snaps:
-    - name: cmake
-      confinement: classic
+      - cmake
+      - ninja-build
+      - flex
+      - bison
+#      - docbook2x
+#      - xmlto
+#      - texinfo
+#      - source-highlight
+#      - libxml2-utils
+#      - xsltproc
+#      - fop
+      - libgmp-dev
+      - libglpk-dev
+      - libarpack2-dev
+#      - libblas-dev
+#      - liblapack-dev
+      - libopenblas-dev
+      - libsuitesparse-dev
+      - libxml2-dev
+      - git
+      - colordiff
+#  snaps:
+#    - name: cmake
+#      confinement: classic
 
 # configuration (running cmake) is in before_script
 # if this phase fails, the build stops immediately
