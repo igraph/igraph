@@ -186,7 +186,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
-        } else if (igraph_is_nan(min)) {
+        } else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -321,7 +321,7 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
  *
  * To obtain a Voronoi partitioning of a graph, we start with a set of generator
  * vertices, which will define the partitions. Each vertex is assigned to the generator
- * point from (or to) which it is closest.
+ * vertex from (or to) which it is closest.
  *
  * </para><para>
  * This function uses a BFS search for unweighted graphs and Dijkstra's algorithm
@@ -330,24 +330,24 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
  * \param graph The graph to partition.
  * \param membership If not \c NULL, the Voronoi partition of each vertex
  *    will be stored here. <code>membership[v]</code> will be set to the index
- *    in \p generators of the generator point that \c v belongs to. For vertices
+ *    in \p generators of the generator vertex that \c v belongs to. For vertices
  *    that are not reachable from any generator, <code>-1</code> is returned.
  * \param distances If not \c NULL, the distance of each vertex to its respective
  *    generator will be stored here. For vertices which are not reachable from
  *    any generator, \c IGRAPH_INFINITY is returned.
- * \param generators Vertex IDs of the generator points.
+ * \param generators Vertex IDs of the generator vertices.
  * \param weights The edge weights, interpreted as lengths in the shortest
  *    path calculation. All weights must be non-negative.
  * \param mode In directed graphs, whether to compute distances \em from
- *    generator points to other vertices (\c IGRAPH_OUT), \em to generator
- *    points from other vertices (\c IGRAPH_IN), or ignore edge directions
+ *    generator vertices to other vertices (\c IGRAPH_OUT), \em to generator
+ *    vertices from other vertices (\c IGRAPH_IN), or ignore edge directions
  *    entirely (\c IGRAPH_ALL).
- * \param tiebreaker Controls which generator point to assign a vertex to
- *    when it is at equal distance from/to multiple generator points.
+ * \param tiebreaker Controls which generator vertex to assign a vertex to
+ *    when it is at equal distance from/to multiple generator vertices.
  *    \clist
- *    \cli IGRAPH_VORONOI_FIRST assign the vertex to the first generator point.
- *    \cli IGRAPH_VORONOI_LAST assign the vertex to the last generator point.
- *    \cli IGRAPH_VORONOI_RANDOM assign the vertex to a random generator point.
+ *    \cli IGRAPH_VORONOI_FIRST assign the vertex to the first generator vertex.
+ *    \cli IGRAPH_VORONOI_LAST assign the vertex to the last generator vertex.
+ *    \cli IGRAPH_VORONOI_RANDOM assign the vertex to a random generator vertex.
  *    \endclist
  *    Note that \c IGRAPH_VORONOI_RANDOM does not guarantee that all partitions
  *    will be contiguous. For example, if 1 and 2 are chosen as generators for the
@@ -355,6 +355,10 @@ static igraph_error_t igraph_i_voronoi_dijkstra(
  *    both generators. If 3 is assigned to 2 but 4 is assigned to 1, then the
  *    partition {1, 4} will not induce a connected subgraph.
  * \return Error code.
+ *
+ * Time complexity: In weighted graphs, O((log s) |E| log |V| + |V|), and in
+ * unweighted graphs O((log s) |E| + |V|), where s is the number of generator
+ * vertices and |V| and |E| are the number of vertices and edges in the graph.
  *
  * \sa \ref igraph_distances(), \ref igraph_distances_dijkstra().
  */

@@ -30,6 +30,7 @@
 #include "test_utilities.h"
 
 int main(void) {
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
     for (int k = 0; k < 20; k++) {
         igraph_t g;

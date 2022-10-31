@@ -206,6 +206,9 @@ typedef enum { IGRAPH_VORONOI_FIRST = 0,
                IGRAPH_VORONOI_RANDOM
              } igraph_voronoi_tiebreaker_t;
 
+typedef enum { IGRAPH_ROW_MAJOR = 0,
+               IGRAPH_COLUMN_MAJOR = 1
+             } igraph_matrix_storage_t;
 
 __END_DECLS
 

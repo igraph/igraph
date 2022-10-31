@@ -102,7 +102,7 @@ igraph_error_t igraph_distances_johnson(const igraph_t *graph,
     /* If no negative weights, then we can run Dijkstra's algorithm */
     {
         igraph_real_t min_weight = igraph_vector_min(weights);
-        if (igraph_is_nan(min_weight)) {
+        if (isnan(min_weight)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         if (min_weight >= 0) {

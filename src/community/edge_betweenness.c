@@ -498,7 +498,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 IGRAPH_ERROR("Weights must be strictly positive.", IGRAPH_EINVAL);
             }
 
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }

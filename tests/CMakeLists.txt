@@ -951,6 +951,7 @@ add_benchmarks(
   igraph_distances
   igraph_ecc
   igraph_layout_umap
+  igraph_matrix_transpose
   igraph_maximal_cliques
   igraph_neighborhood
   igraph_pagerank

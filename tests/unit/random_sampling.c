@@ -176,12 +176,12 @@ void sample(void) {
     IGRAPH_ASSERT(x == 5);
 
     x = RNG_BINOM((1LL << 31) - 1, 0.5);
-    IGRAPH_ASSERT(!igraph_is_nan(x));
+    IGRAPH_ASSERT(!isnan(x));
     IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
 
 #if IGRAPH_INTEGER_SIZE > 32
     x = RNG_BINOM((1LL << 31), 0.5);
-    IGRAPH_ASSERT(!igraph_is_nan(x));
+    IGRAPH_ASSERT(!isnan(x));
     IGRAPH_ASSERT(0 <= x && x <= (1LL << 31) - 1);
 #endif
 
@@ -193,18 +193,18 @@ void sample(void) {
     IGRAPH_ASSERT(x == 0);
 
     x = RNG_GEOM(0);
-    IGRAPH_ASSERT(igraph_is_nan(x));
+    IGRAPH_ASSERT(isnan(x));
 
     x = RNG_NORMAL(0, 1);
     printf("normal: %g\n", x);
-    IGRAPH_ASSERT(IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(isfinite(x));
 
     x = RNG_EXP(1);
     printf("exp: %g\n", x);
     IGRAPH_ASSERT(0 <= x);
 
     x = RNG_EXP(0);
-    IGRAPH_ASSERT(igraph_is_nan(x));
+    IGRAPH_ASSERT(isnan(x));
 
     x = RNG_GAMMA(1, 1);
     printf("gamma: %g\n", x);
@@ -219,23 +219,23 @@ void sample(void) {
 
     x = RNG_POIS(10);
     printf("poisson: %g\n", x);
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 
     x = RNG_POIS(0);
     IGRAPH_ASSERT(x == 0);
 
     x = RNG_POIS(-1);
-    IGRAPH_ASSERT(igraph_is_nan(x));
+    IGRAPH_ASSERT(isnan(x));
 
     x = RNG_POIS((1LL << 31) - 1);
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 
     x = RNG_POIS((1LL << 31));
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 
 #if IGRAPH_INTEGER_SIZE > 32
     x = RNG_POIS((1LL << 32));
-    IGRAPH_ASSERT(0 <= x && IGRAPH_FINITE(x));
+    IGRAPH_ASSERT(0 <= x && isfinite(x));
 #endif
 
 }
@@ -285,6 +285,8 @@ int main(void) {
     for (size_t i = 0; i < sizeof(rng_types) / sizeof(rng_types[0]); i++) {
         test_and_destroy(&rng_types[i]);
     }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

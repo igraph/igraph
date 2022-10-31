@@ -11,17 +11,17 @@
 /* Print an igraph_real_t value. Be consistent in printing NaN/Inf across platforms. */
 void print_real(FILE *f, igraph_real_t x, const char *format) {
     igraph_bool_t g8 = !strcmp(format, "%8g");
-    if (igraph_finite(x)) {
+    if (isfinite(x)) {
         if (x == 0 && signbit(x)) {
             /* print negative zeros as positive zeros for sake of consistency */
             x = +0.0;
         }
         fprintf(f, format, x);
-    } else if (igraph_is_nan(x)) {
+    } else if (isnan(x)) {
         fprintf(f, g8 ? "     NaN" : "NaN");
-    } else if (igraph_is_posinf(x)) {
+    } else if (isinf(x) && x > 0) {
         fprintf(f, g8 ? "     Inf" : "Inf");
-    } else if (igraph_is_neginf(x)) {
+    } else if (isinf(x) && x < 0) {
         fprintf(f, g8 ? "    -Inf" : "-Inf");
     }
 }
