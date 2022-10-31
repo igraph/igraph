@@ -23,7 +23,6 @@ addons:
   apt:
     update: true
     packages:
-      - cmake
       - ninja-build
       - flex
       - bison
