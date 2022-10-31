@@ -1460,6 +1460,10 @@ igraph_layout_umap_3d:
         OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
         BOOLEAN distances_are_connectivities=False
 
+igraph_layout_umap_compute_connectivities:
+    PARAMS: |-
+        GRAPH graph, VECTOR distances, INOUT VECTOR connectivities
+
 #######################################
 # Cocitation and other similarity measures
 #######################################
