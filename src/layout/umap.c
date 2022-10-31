@@ -30,13 +30,68 @@
 
 #include <math.h>
 
+/* This file contains the implementation of the UMAP algorithm.
+ *
+ * UMAP is typically used as a to reduce dimensionality of vectors, embedding them in
+ * 2D (or, less commonly, in 3D). Despite this geometric flair, UMAP heavily relies on
+ * graphs as intermediate data structures and is therefore a useful graph layout
+ * algorithm in its own right. Conceptually, there are three steps:
+ * 
+ * 1. Compute a sparse graph with edges connecting similar vectors, e.g. a k-nearest
+ *    neighbor graph. A vector of distances is associated with the graph edges. This
+ *    file does *not* perform this part of the computation since there are many
+ *    libraries out there that can compute knn or other sparse graphs efficiently
+ *    starting from vector spaces (e.g. faiss).
+ * 2. Convert the distances into connectivities, which are weights between 0 and 1
+ *    that are larger for short-distance edges. This step is exposed via
+ *    igraph_layout_umap_compute_connectivities.
+ * 3. Compute a layout for the graph, using its associated connectivities as edge
+ *    weights. This step is exposed via igraph_layout_umap and its 3D counterpart.
+ *    These two fuctions can also compute steps 2 and 3 in one go, since that's the
+ *    most common use case: the argument "distances_are_connectivities" should be
+ *    set to false.
+ *
+ * A few more details w/r/t steps 2 and 3, since they are computed in detail below.
+ *
+ * STEP 2
+ * For each vertex, the distance to its closest neighbor, called rho, is "forfeited":
+ * that edge begets connectivity 1 (in principle, at least). Farther neighbors beget
+ * lower connectivities according to an exponential decay. The scale factor of this
+ * decay is called sigma and is computed from the graph itself.
+ *
+ * STEP 3
+ * The layout is computed via stochastic gradient descent, i.e. applying stochastic
+ * forces along high-connectivity edges and, more rarely, low-connectivity edges.
+ * To compute the stochastic forces, one needs a smooth function that approximates
+ * connectivities but in the embedded space:
+ *                        Q(d) = ( 1 + a*d^2b )^-1
+ * where d is the 2D/3D distance between the vertices and a and b are constants that
+ * are computed globally based on a user-chosen fudge parameter called min_dist.
+ * Smaller min_dist will give rise to slightly more compact embeddings. We find a
+ * and b via gradient descent, which is implemented de novo below.
+ *
+ * Repulsion is computed via negative sampling, typically a few nodes are picked
+ * at random as repulsive sources each time an attractive force is computed.
+ *
+ * During the stochastic gradient descent, the learning rate - a multiplicative factor
+ * on top of the stochastic forces themselves - is reduced linearly from 1 to 0. At
+ * the end, the stochastic forces can be strong but their effect is reduced to almost
+ * nothing by the small learning rate. Notice that UMAP does not formally converge:
+ * instead, we reduce the forces' impact steadily to a trickle and finally quench it
+ * altogether.
+ *
+ * FINAL COMMENTS
+ * This implementation uses a few more tricks to improve the result:
+ * - a few constants are defined to limit the force applied to vertices at each step
+ *   and other geometric corrections
+ * - the layout is centered at the end of the computation.
+ * - a seed layout can be used. Notice that since UMAP runs for an essentially fixed
+ *   time rather than until convergence, using a good/bad seed does not affect
+ *   runtimes significantly.
+ * */
 #define UMAP_FORCE_LIMIT 4
 #define UMAP_MIN_DISTANCE_ATTRACTION 0.0001
 #define UMAP_CORRECT_DISTANCE_REPULSION 0.01
-
-/* rho is just the size of the distance from each vertex and its closest neighbor */
-/* sigma is the the decay from each vertex, depends on its rho and the rest of its
- * neighbor distances */
 
 /* Find sigma for this vertex by binary search */
 static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
@@ -123,21 +178,22 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  *
  * \experimental
  *
- * UMAP is mostly used to embed high-dimensional vectors in a low-dimensional space
- * (most commonly by far, 2D). It uses a distance graph as an intermediate data structure,
+ * UMAP is used to embed high-dimensional vectors in a low-dimensional space
+ * (most commonly 2D). It uses a distance graph as an intermediate data structure,
  * making it also a useful graph layout algorithm. See igraph_layout_umap for more information.
  *
  * </para><para>
  *
  * An early step in UMAP is to compute exponentially decaying "connectivities" from the
- * distance (usually k-nearest neighbor) graph.  This function performs that step.
- * Connectivities can also be viewed as edge weights that quantify similarity between two
- * vertices.
+ * distance graph. Connectivities can also be viewed as edge weights that quantify
+ * similarity between two vertices. This function computes connectivities from the
+ * distance graph. To compute the layout from precomputed connectivities, call
+ * igraph_layout_umap with the "distances_are_connectivities" argument set to true.
  *
  * </para><para>
  *
- * Technical note: For each vertex, this function computes its scale factor (sigma), its
- * connectivity correction (rho), and finally the connectivities themselves.
+ * Technical note: For each vertex, this function computes its scale factor (sigma),
+ * its connectivity correction (rho), and finally the connectivities themselves.
  *
  * </para><para>
  * References:
@@ -618,8 +674,6 @@ static igraph_real_t igraph_i_umap_repel(
 {
     igraph_real_t dsq_min = UMAP_CORRECT_DISTANCE_REPULSION * UMAP_CORRECT_DISTANCE_REPULSION;
 
-    /* NOTE: in practice, in negative sampling mu is always zero because we
-     * *assume* the sample to be negative i.e. never a true edge */
     return (2 * b) / (dsq_min + dsq) / (1. + a * pow(dsq, b));
 }
 
@@ -1021,108 +1075,61 @@ static igraph_error_t igraph_i_layout_umap(
 
 /**
  * \function igraph_layout_umap
- * \brief Layout using Uniform Manifold Approximation and Projection for Dimension Reduction.
+ * \brief Layout using Uniform Manifold Approximation and Projection (UMAP).
  *
  * \experimental
  *
  * UMAP is mostly used to embed high-dimensional vectors in a low-dimensional space
- * (most commonly by far, 2D). The algorithm is probabilistic and introduces
- * nonlinearities, unlike e.g. PCA and similar to T-distributed Stochastic Neighbor
- * Embedding (t-SNE). Nonlinearity helps "cluster" very similar vectors together without
- * imposing a global geometry on the embedded space (e.g. a rigid rotation + compression
- * in PCA).
+ * (most commonly 2D). The algorithm is probabilistic and introduces nonlinearities,
+ * unlike e.g. PCA and similar to T-distributed Stochastic Neighbor Embedding (t-SNE).
+ * Nonlinearity helps "cluster" very similar vectors together without imposing a
+ * global geometry on the embedded space (e.g. a rigid rotation + compression in PCA).
+ * UMAP uses graphs as intermediate data structures, hence it can be used as a
+ * graph layout algorithm as well. 
  *
  * </para><para>
  *
- * However, UMAP uses a graph with distances associated to the edges as a key
- * intermediate representation of the high-dimensional space, so it is also useful as
- * a general graph layouting algorithm, hence its inclusion in igraph.
+ * The general UMAP workflow is to start from vectors, compute a sparse distance
+ * graph that only contains edges between simiar points (e.g. a k-nearest neighbors
+ * graph), and then convert these distances into "connectivities", i.e. exponentially
+ * decaying weights between 0 and 1 that are larger for points that are closest
+ * neighbors in the distance graph. If a graph without any distances associated to
+ * the edges is used, all connectivities will be set to 1.
  *
  * </para><para>
  *
- * Importantly, the edge-associated distances are derived from a similarity metric
- * between the high-dimensional vectors, often Pearson correlation:
- *
- * </para><para>
- *
- * <code>corr(v1, v2) = v1 . v2 / [ sqrt(v1 . v1) * sqrt(v2 . v2) ]</code>,
- *
- * </para><para>
- *
- * where <code>.</code> denotes the dot product.
- * In this case, the associated distance is usually defined as:
- *
- * </para><para>
- *
- * <code>d(v1, v2) = 1 - corr(v1, v2)</code>
- *
- * </para><para>
- *
- * This implementation can also work with unweighted similarity graphs, in which case
- * the distance parameter should be a null pointer and all edges beget a similarity
- * score of 1 (a distance of 0).
- *
- * </para><para>
- *
- * While all similarity graphs are theoretically embeddable, UMAP's stochastic gradient
- * descent approach really shines when the graph is sparse. In practice, most people
- * feed a k-nearest neighbor (either computed exactly or approximated) similarity graph
- * with some additional cutoff to exclude "quasi-neighbors" that lie beyond a certain
- * distance (e.g. correlation less than 0.2).
- *
- * </para><para>
- *
- * Therefore, if you are trying to use this function to embed high-dimensional vectors,
- * the steps are:
- *
- * </para><para>
- *
- * 1. Compute a sparse similarity graph (either exact or approximate) from your vectors,
- *    weighted or unweighted. If unsure, compute a k-nearest neighbors graph.
- *
- * </para><para>
- *
- * 2. If you keep the weights, convert them into distances or store them as a "weight"
- *    edge attribute and use a null pointer for the distances. If using similarity
- *    weights instead of distances, make sure they do not exceed 1.
- *
- * </para><para>
- *
- * 3. Feed the graph (and distances, if you have them) into this function.
- *
- * </para><para>
- *
- * Note: Step 1 above involves deciding if two high-dimensional vectors "look similar"
- *       which, because of the curse of dimensionality, is in many cases a highly
- *       subjective and potentially controversial operation: thread with care and at
- *       your own risk. Two high-dimensional vectors might look similar or extremely
- *       different depending on the point of view/angle, and there are a lot of
- *       viewpoints when the dimensionality ramps up.
+ * If you are trying to use this function to embed high-dimensional vectors, you should
+ * first compute a k-nearest neighbors graph between your vectors and compute the
+ * associated distances, and then call this function on that graph. If you already
+ * have a distance graph, or you have a graph with no distances, you can call this
+ * function directly. If you already have a graph with meaningful connectivities
+ * associated to each edge, you can also call this function, but set the argument
+ * distances_are_connectivities to true. To compute connectivities from distances
+ * without computing the layout, see \ref igraph_layout_umap_compute_connectivities().
  *
  * </para><para>
  * References:
  *
  * </para><para>
  * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
- *
- * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
+ 
+ * \param graph Pointer to the graph to find a layout for (i.e. to embed). This is
+ *   typically a sparse graph with only edges for the shortest distances stored, e.g.
+ *   a k-nearest neighbors graph.
  * \param res Pointer to the n by 2 matrix where the layout coordinates will be stored.
  * \param use_seed Logical, if true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
- * \param distances Pointer to a vector of edge lengths. Similarity graphs for
- *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
- *   That is fine here too. If this argument \c NULL, all lengths are assumed to be the same.
- * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
- *   embedding before feeling a repulsive force. It should be nonnegative. Typically, values between
- *   0 and 1 are used.
- * \param epochs Number of iterations of the main stochastic gradient descent loop on the
- *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
- *   (less than 50000 edges), 50 epochs are used for larger graphs.
- * \param distances_are_connectivities If true, the "distances" vector contains precomputed
- *   connectivities. If false (the typical use case), this function will compute connectivities
- *   from distances first, and then use them to compute the layout.
- *
+ * \param distances Pointer to a vector of distances associated with the graph edges.
+ *   If this argument is \c NULL, all connectivities will be set to 1.
+ * \param min_dist A fudge parameter that decides how close two unconnected vertices
+ *   can be in the embedding before feeling a repulsive force. It should be
+ *   nonnegative. Typical values are between 0 and 1.
+ * \param epochs Number of iterations of the main stochastic gradient descent loop on
+ *   the cross-entropy. Typical values are between 30 and 500.
+ * \param distances_are_connectivities Whether to use precomputed connectivities. If
+ *   true, the "distances" vector contains precomputed connectivities. If false (the
+ *   typical use case), this function will compute connectivities from distances and
+ *   then use them to compute the layout.
  * \return Error code.
  */
 igraph_error_t igraph_layout_umap(const igraph_t *graph,
@@ -1143,27 +1150,28 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *
  * \experimental
  *
+ * </para><para>
+ *
  * This is the 3D version of the UMAP algorithm
  * (see \ref igraph_layout_umap() for the 2D version).
  *
- * \param graph Pointer to the similarity graph to find a layout for (i.e. to embed).
+ * \param graph Pointer to the graph to find a layout for (i.e. to embed). This is
+ *   typically a sparse graph with only edges for the shortest distances stored, e.g.
+ *   a k-nearest neighbors graph.
  * \param res Pointer to the n by 3 matrix where the layout coordinates will be stored.
  * \param use_seed Logical, if true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
- * \param distances Pointer to a vector of edge lengths. Similarity graphs for
- *   UMAP are often originally meant in terms of similarity weights (e.g. correlation between
- *   high-dimensional vectors) and converted into distances by crude <code>dist = 1 - corr</code>.
- *   That is fine here too. If this argument is \c NULL, all lengths are assumed to be the same.
- * \param min_dist A fudge parameter that decides how close two unconnected vertices can be in the
- *   embedding before feeling a repulsive force. It should be nonnegative. Typically, values between
- *   0 and 1 are used.
- * \param epochs Number of iterations of the main stochastic gradient descent loop on the
- *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
- *   (less than 50000 edges), 50 epochs are used for larger graphs.
- *
- * \param distances_are_connectivities If true, the "distances" vector contains precomputed
- *   connectivities. If false (the typical use case), this function will compute connectivities
- *   from distances first, and then use them to compute the layout.
+ * \param distances Pointer to a vector of distances associated with the graph edges.
+ *   If this argument is \c NULL, all connectivities will be set to 1.
+ * \param min_dist A fudge parameter that decides how close two unconnected vertices
+ *   can be in the embedding before feeling a repulsive force. It should be
+ *   nonnegative. Typical values are between 0 and 1.
+ * \param epochs Number of iterations of the main stochastic gradient descent loop on
+ *   the cross-entropy. Typical values are between 30 and 500.
+ * \param distances_are_connectivities Whether to use precomputed connectivities. If
+ *   true, the "distances" vector contains precomputed connectivities. If false (the
+ *   typical use case), this function will compute connectivities from distances and
+ *   then use them to compute the layout.
  * \return Error code.
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
