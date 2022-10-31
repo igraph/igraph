@@ -281,9 +281,9 @@ int main(void) {
     igraph_layout_umap_compute_connectivities(&graph, &distances, &connectivities);
     check_graph_twoclusters_connectivities(&connectivities, &distances);
 
-    printf("Same graph, precomputed (bogus) connectivities:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &distances, 0.01, 500, 1) == IGRAPH_SUCCESS);
-    printf("Ran through without leaks\n");
+    printf("Same graph, precomputed connectivities:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &connectivities, 0.01, 500, 1) == IGRAPH_SUCCESS);
+    check_graph_twoclusters(&layout);
 
     igraph_matrix_destroy(&layout);
     igraph_vector_destroy(&distances);
