@@ -1451,12 +1451,14 @@ igraph_layout_davidson_harel:
 igraph_layout_umap:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_connectivities=False
 
 igraph_layout_umap_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_connectivities=False
 
 #######################################
 # Cocitation and other similarity measures
