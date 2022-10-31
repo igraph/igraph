@@ -910,7 +910,7 @@ static igraph_error_t igraph_i_layout_umap(
         igraph_real_t min_dist,
         igraph_integer_t epochs,
         igraph_integer_t ndim,
-        igraph_bool_t connectivities_precomputed) {
+        igraph_bool_t distances_are_connectivities) {
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -939,6 +939,22 @@ static igraph_error_t igraph_i_layout_umap(
 
     }
 
+    /* Compute connectivities (exponential weights) from distances if required.
+     * If the connectivities have already been computed, they are stored in
+     * the "distances" vector and we can recycle the pointer. */
+    if (distances_are_connectivities) {
+        connectivitiesp = (igraph_vector_t *) distances;
+    } else {
+        IGRAPH_VECTOR_INIT_FINALLY(&connectivities, no_of_edges);
+        IGRAPH_CHECK(igraph_layout_umap_compute_connectivities(
+                    graph, distances, &connectivities));
+        connectivitiesp = &connectivities;
+    }
+    /* From now on everything lives in probability space, it does not matter whether
+     * the original graph was weighted/distanced or unweighted */
+
+    /* Compute initial layout if required. If a seed layout is used, then just
+     * check that the dimensions of the layout make sense. */
     if (use_seed) {
         if ((igraph_matrix_nrow(res) != no_of_nodes) || (igraph_matrix_ncol(res) != ndim)) {
             IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
@@ -967,17 +983,7 @@ static igraph_error_t igraph_i_layout_umap(
         }
     }
 
-    /* From now on everything lives in probability space, it does not matter whether
-     * the original graph was weighted/distanced or unweighted */
     RNG_BEGIN();
-    /* Make combined graph with smoothed probabilities */
-    if (connectivities_precomputed) {
-        connectivitiesp = (igraph_vector_t *) distances;
-    } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&connectivities, no_of_edges);
-        IGRAPH_CHECK(igraph_layout_umap_compute_connectivities(graph, distances, &connectivities));
-        connectivitiesp = &connectivities;
-    }
 
     /* Fit a and b parameter to find smooth approximation to
      * probability distribution in embedding space */
@@ -993,7 +999,7 @@ static igraph_error_t igraph_i_layout_umap(
                 epochs,
                 negative_sampling_rate));
 
-    if (!connectivities_precomputed) {
+    if (!distances_are_connectivities) {
         igraph_vector_destroy(&connectivities);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -1105,6 +1111,9 @@ static igraph_error_t igraph_i_layout_umap(
  * \param epochs Number of iterations of the main stochastic gradient descent loop on the
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
  *   (less than 50000 edges), 50 epochs are used for larger graphs.
+ * \param distances_are_connectivities If true, the "distances" vector contains precomputed
+ *   connectivities. If false (the typical use case), this function will compute connectivities
+ *   from distances first, and then use them to compute the layout.
  *
  * \return Error code.
  */
@@ -1113,9 +1122,10 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   igraph_bool_t use_seed,
                                   const igraph_vector_t *distances,
                                   igraph_real_t min_dist,
-                                  igraph_integer_t epochs) {
+                                  igraph_integer_t epochs,
+                                  igraph_bool_t distances_are_connectivities) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, 2, 0);
+            distances, min_dist, epochs, 2, distances_are_connectivities);
 }
 
 
@@ -1143,6 +1153,9 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  *   cross-entropy. Usually, 500 epochs can be used if the graph is the graph is small
  *   (less than 50000 edges), 50 epochs are used for larger graphs.
  *
+ * \param distances_are_connectivities If true, the "distances" vector contains precomputed
+ *   connectivities. If false (the typical use case), this function will compute connectivities
+ *   from distances first, and then use them to compute the layout.
  * \return Error code.
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
@@ -1150,7 +1163,8 @@ igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      igraph_bool_t use_seed,
                                      const igraph_vector_t *distances,
                                      igraph_real_t min_dist,
-                                     igraph_integer_t epochs) {
+                                     igraph_integer_t epochs,
+                                     igraph_bool_t distances_are_connectivities) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, 3, 0);
+            distances, min_dist, epochs, 3, distances_are_connectivities);
 }
