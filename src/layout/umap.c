@@ -180,7 +180,7 @@ static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *dista
  *
  * UMAP is used to embed high-dimensional vectors in a low-dimensional space
  * (most commonly 2D). It uses a distance graph as an intermediate data structure,
- * making it also a useful graph layout algorithm. See igraph_layout_umap for more information.
+ * making it also a useful graph layout algorithm. See \ref igraph_layout_umap() for more information.
  *
  * </para><para>
  *
