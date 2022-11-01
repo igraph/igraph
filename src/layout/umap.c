@@ -149,28 +149,6 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
     return IGRAPH_SUCCESS;
 }
 
-/* Check the distances argument, which should be NULL or a vector of nonnegative numbers */
-static igraph_error_t igraph_i_umap_check_distances(const igraph_vector_t *distances, igraph_integer_t no_of_edges) {
-
-    if (distances == NULL) {
-        return IGRAPH_SUCCESS;
-    }
-
-    if (igraph_vector_size(distances) != no_of_edges) {
-        IGRAPH_ERROR("Distances must be the same number as the edges in the graph.", IGRAPH_EINVAL);
-    }
-
-    for (igraph_integer_t eid = 0; eid != no_of_edges; eid++) {
-        if (VECTOR(*distances)[eid] < 0) {
-            IGRAPH_ERROR("Distances cannot be negative.", IGRAPH_EINVAL);
-        } else if (isnan(VECTOR(*distances)[eid])) {
-            IGRAPH_ERROR("Distances cannot contain NaN values.", IGRAPH_EINVAL);
-        }
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 
 /**
  * \function igraph_layout_umap_compute_connectivities
@@ -219,8 +197,21 @@ igraph_error_t igraph_layout_umap_compute_connectivities(
     igraph_vector_int_t eids, weight_seen;
     igraph_real_t rho, dist_max, dist, sigma, weight, weight_inv, sigma_target;
 
-    /* UMAP is sometimes used on unweighted graphs, that means distances are always zero */
-    IGRAPH_CHECK(igraph_i_umap_check_distances(distances, no_of_edges));
+    /* UMAP is sometimes used on unweighted graphs. Otherwise, check distance vector */
+    if (distances != NULL) {
+        if (igraph_vector_size(distances) != no_of_edges) {
+            IGRAPH_ERROR("Distances must be the same number as the edges in the graph.", IGRAPH_EINVAL);
+        }
+
+        if (no_of_edges > 0) {
+            igraph_real_t distance_min = igraph_vector_min(distances);
+            if (distance_min <= 0) {
+                IGRAPH_ERROR("Distance vector must be positive.", IGRAPH_EINVAL);
+            } else if (isnan(distance_min)) {
+                IGRAPH_ERROR("Distance vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
+        }
+    }
 
     /* reserve memory for the connectivities */
     IGRAPH_CHECK(igraph_vector_resize(connectivities, no_of_edges));
