@@ -971,5 +971,5 @@ add_legacy_tests(
 # lattices
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_triangle_lattice
+  igraph_triangular_lattice
 )

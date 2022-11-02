@@ -24,11 +24,7 @@
 #define MAX(n, m) (n < m ? m : n)
 
 /**
- * \ingroup generators
- * \function igraph_triangle_lattice
- * \brief A triangle lattice with the given shape.
- *
- * Creates a triangle lattice whose vertices have the form (i, j) for non-negative integers i and j
+ * Creates a triangular lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1) provided a vertex
  * exists. Thus, all vertices have degree at most 6.
  *
@@ -235,11 +231,10 @@ static igraph_error_t triangle_lattice_hex_shape(
 }
 
 /**
- * \ingroup generators
- * \function igraph_triangle_lattice
- * \brief A triangle lattice with the given shape.
+ * \function igraph_triangulafr_lattice
+ * \brief A triangular lattice with the given shape.
  *
- * Creates a triangle lattice whose vertices have the form (i, j) for non-negative integers i and j
+ * Creates a triangular lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
  *
  * </para><para>
@@ -269,7 +264,7 @@ static igraph_error_t triangle_lattice_hex_shape(
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  *
  */
-igraph_error_t igraph_triangle_lattice(
+igraph_error_t igraph_triangular_lattice(
     igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed,
     igraph_bool_t mutual
 ) {

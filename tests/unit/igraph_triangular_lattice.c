@@ -27,7 +27,7 @@ int main(void) {
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 1));
     VECTOR(dimvector)[0] = 1;
 
-    IGRAPH_CHECK(igraph_triangle_lattice(&graph, &dimvector, true, false));
+    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
     igraph_integer_t number_of_edges = igraph_vector_int_size(&graph.from);
     IGRAPH_ASSERT(number_of_edges == 0);
 
@@ -38,7 +38,7 @@ int main(void) {
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 1));
     VECTOR(dimvector)[0] = 5;
 
-    IGRAPH_CHECK(igraph_triangle_lattice(&graph, &dimvector, true, false));
+    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
     number_of_edges = igraph_vector_int_size(&graph.from);
     IGRAPH_ASSERT(number_of_edges == 30);
 
@@ -50,7 +50,7 @@ int main(void) {
     VECTOR(dimvector)[0] = 4;
     VECTOR(dimvector)[1] = 5;
 
-    IGRAPH_CHECK(igraph_triangle_lattice(&graph, &dimvector, true, true));
+    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, true));
     number_of_edges = igraph_vector_int_size(&graph.from);
     IGRAPH_ASSERT(number_of_edges == 86);
 
@@ -63,13 +63,13 @@ int main(void) {
     VECTOR(dimvector)[1] = 4;
     VECTOR(dimvector)[2] = 5;
 
-    IGRAPH_CHECK(igraph_triangle_lattice(&graph, &dimvector, false, true));
+    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, false, true));
     number_of_edges = igraph_vector_int_size(&graph.from);
     IGRAPH_ASSERT(number_of_edges == 87);
 
     /*An erroneous call*/
     VECTOR(dimvector)[0] = -3;
-    CHECK_ERROR(igraph_triangle_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_triangular_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
