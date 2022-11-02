@@ -205,8 +205,8 @@ igraph_error_t igraph_layout_umap_compute_connectivities(
 
         if (no_of_edges > 0) {
             igraph_real_t distance_min = igraph_vector_min(distances);
-            if (distance_min <= 0) {
-                IGRAPH_ERROR("Distance vector must be positive.", IGRAPH_EINVAL);
+            if (distance_min < 0) {
+                IGRAPH_ERROR("Distance vector must be nonnegative.", IGRAPH_EINVAL);
             } else if (isnan(distance_min)) {
                 IGRAPH_ERROR("Distance vector must not contain NaN values.", IGRAPH_EINVAL);
             }
