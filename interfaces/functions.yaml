@@ -131,6 +131,10 @@ igraph_square_lattice:
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
         BOOLEAN directed=False, BOOLEAN mutual=False, OPTIONAL VECTOR_BOOL periodic
 
+igraph_triangular_lattice:
+    PARAMS: |-
+        OUT GRAPH graph, VECTOR_INT dimvector, BOOLEAN directed=False, BOOLEAN mutual=False
+
 igraph_ring:
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False,
@@ -1630,7 +1634,7 @@ igraph_community_leiden:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL VERTEXWEIGHTS vertex_weights,
-        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2, 
+        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_weights ON graph
