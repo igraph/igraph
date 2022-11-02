@@ -278,7 +278,7 @@ igraph_error_t igraph_layout_umap_compute_connectivities(
          * it with the final result.
          *
          * */
-        for (igraph_integer_t j = 1; j < no_of_neis; j++) {
+        for (igraph_integer_t j = 0; j < no_of_neis; j++) {
             eid = VECTOR(eids)[j];
             /* Basically, nodes closer than rho have probability 1, but nothing disappears */
             weight = sigma < 0 ? 1: exp(-(VECTOR(*distances)[eid] - rho) / sigma);
