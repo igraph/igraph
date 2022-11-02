@@ -84,18 +84,18 @@ void check_graph_largeunion(
 }
 
 
-void check_graph_twoclusters_connectivities(
-        const igraph_vector_t *connectivities,
+void check_graph_twoclusters_weights(
+        const igraph_vector_t *weights,
         const igraph_vector_t *distances) {
     int nerr = 0;
     igraph_integer_t i;
-    igraph_real_t connectivity;
-    igraph_integer_t nc = igraph_vector_size(connectivities);
+    igraph_real_t weight;
+    igraph_integer_t nc = igraph_vector_size(weights);
     igraph_integer_t nd;
 
     if (distances == NULL) {     
         for (i = 0; i < nc; i++) {
-            if (VECTOR(*connectivities)[i] != 1.0) {
+            if (VECTOR(*weights)[i] != 1.0) {
                 printf("Connectivities with NULL distances should all be 1.0.");
                 return;
             }
@@ -106,17 +106,17 @@ void check_graph_twoclusters_connectivities(
         nd = igraph_vector_size(distances);
         if (nd != nc) {
             nerr++;
-            printf("Length of distances and connectivities must be equal.\n");
+            printf("Length of distances and weights must be equal.\n");
             return;
         }
 
         for (i = 0; i < nc; i++) {
-            connectivity = VECTOR(*connectivities)[i];
-            if (connectivity > 1.0) {
-                printf("Connectivities cannot be >1.0, found %f", connectivity);
+            weight = VECTOR(*weights)[i];
+            if (weight > 1.0) {
+                printf("Weights cannot be >1.0, found %f", weight);
                 return;
-            } else if (connectivity < 0.0) {
-                printf("Connectivities cannot be negative, found %f", connectivity);
+            } else if (weight < 0.0) {
+                printf("Weights cannot be negative, found %f", weight);
                 return;
             }
         }
@@ -203,7 +203,7 @@ void check_graph_singleton(const igraph_matrix_t *layout) {
 
 int main(void) {
     igraph_t graph, empty_graph, singleton_graph;
-    igraph_vector_t distances, connectivities;
+    igraph_vector_t distances, weights;
     igraph_matrix_t layout;
     igraph_t graph1, graph2, graph3;
     igraph_vector_ptr_t graph_ptr;
@@ -276,22 +276,22 @@ int main(void) {
     IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 1, NULL, 0.01, 500, 0) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
-    printf("Same graph, just compute connectivities from NULL distances:\n");
-    igraph_vector_init(&connectivities, 0);
-    igraph_layout_umap_compute_connectivities(&graph, NULL, &connectivities);
-    check_graph_twoclusters_connectivities(&connectivities, NULL);
+    printf("Same graph, just compute weights from NULL distances:\n");
+    igraph_vector_init(&weights, 0);
+    igraph_layout_umap_compute_weights(&graph, NULL, &weights);
+    check_graph_twoclusters_weights(&weights, NULL);
 
-    printf("Same graph, just compute connectivities from distances:\n");
-    igraph_layout_umap_compute_connectivities(&graph, &distances, &connectivities);
-    check_graph_twoclusters_connectivities(&connectivities, &distances);
+    printf("Same graph, just compute weights from distances:\n");
+    igraph_layout_umap_compute_weights(&graph, &distances, &weights);
+    check_graph_twoclusters_weights(&weights, &distances);
 
-    printf("Same graph, precomputed connectivities:\n");
-    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &connectivities, 0.01, 500, 1) == IGRAPH_SUCCESS);
+    printf("Same graph, precomputed weights:\n");
+    IGRAPH_ASSERT(igraph_layout_umap(&graph, &layout, 0, &weights, 0.01, 500, 1) == IGRAPH_SUCCESS);
     check_graph_twoclusters(&layout);
 
     igraph_matrix_destroy(&layout);
     igraph_vector_destroy(&distances);
-    igraph_vector_destroy(&connectivities);
+    igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 
     /* Check a larger graph with around 150 vertices, split in 3 main clusters */

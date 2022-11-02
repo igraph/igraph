@@ -181,7 +181,7 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  *
  * \param graph Pointer to the distance graph.
  * \param distances Pointer to the vector with the vertex-to-vertex distance associated with
- *   each edge.
+ *   each edge. This argument can be NULL, in which case all weights will be set to 1.0.
  * \param weights Pointer to an initialized vector where the result will be stored.
  *
  * \return Error code.
@@ -193,44 +193,43 @@ igraph_error_t igraph_layout_umap_compute_weights(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_neis, eid;
-    igraph_vector_int_t eids, weight_seen;
-    igraph_real_t rho, dist_max, dist, sigma, weight, weight_inv, sigma_target;
+    igraph_integer_t no_of_neis, eid, i, j;
+    igraph_vector_int_t eids;
+    igraph_vector_bool_t weight_seen;
+    igraph_real_t rho, dist_max, dist, sigma, weight, weight_inv, sigma_target, dist_min;
 
-    /* UMAP is sometimes used on unweighted graphs. Otherwise, check distance vector */
-    if (distances != NULL) {
+    /* reserve memory for the weights */
+    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
+
+    /* UMAP is sometimes used on unweighted graphs, then weights are all 1. */
+    if (distances == NULL) {
+        for (j = 0; j < no_of_edges; j++) {
+            VECTOR(*weights)[j] = 1;
+        }
+        return IGRAPH_SUCCESS;
+    } else {
+        /* Otherwise, check distance vector */
         if (igraph_vector_size(distances) != no_of_edges) {
             IGRAPH_ERROR("Distances must be the same number as the edges in the graph.", IGRAPH_EINVAL);
         }
 
         if (no_of_edges > 0) {
-            igraph_real_t distance_min = igraph_vector_min(distances);
-            if (distance_min < 0) {
+            dist_min = igraph_vector_min(distances);
+            if (dist_min < 0) {
                 IGRAPH_ERROR("Distance vector must be nonnegative.", IGRAPH_EINVAL);
-            } else if (isnan(distance_min)) {
+            } else if (isnan(dist_min)) {
                 IGRAPH_ERROR("Distance vector must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
-    }
-
-    /* reserve memory for the weights */
-    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
-
-    /* if the original graph is unweighted, probabilities are 1 throughout */
-    if (distances == NULL) {
-        for (igraph_integer_t j = 0; j < no_of_edges; j++) {
-            VECTOR(*weights)[j] = 1;
-        }
-        return IGRAPH_SUCCESS;
     }
     /* alright, the graph has actual distances */
 
     /* Initialize auxiliary vectors */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&weight_seen, no_of_edges);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&weight_seen, no_of_edges);
 
     /* Iterate over vertices x, like in the paper */
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+    for (i = 0; i < no_of_nodes; i++) {
         /* Edges into this vertex */
         IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_ALL));
         no_of_neis = igraph_vector_int_size(&eids);
@@ -243,7 +242,7 @@ igraph_error_t igraph_layout_umap_compute_weights(
         /* Find rho for this vertex, i.e. the minimal non-self distance */
         rho = VECTOR(*distances)[VECTOR(eids)[0]];
         dist_max = rho;
-        for (igraph_integer_t j = 1; j < no_of_neis; j++) {
+        for (j = 1; j < no_of_neis; j++) {
             dist = VECTOR(*distances)[VECTOR(eids)[j]];
             rho = fmin(rho, dist);
             dist_max = fmax(dist_max, dist);
@@ -278,15 +277,17 @@ igraph_error_t igraph_layout_umap_compute_weights(
          * it with the final result.
          *
          * */
-        for (igraph_integer_t j = 0; j < no_of_neis; j++) {
+        for (j = 0; j < no_of_neis; j++) {
             eid = VECTOR(eids)[j];
             /* Basically, nodes closer than rho have probability 1, but nothing disappears */
             weight = sigma < 0 ? 1 : exp(-(VECTOR(*distances)[eid] - rho) / sigma);
 
             /* Compute the probability of either edge direction if you can */
-            if (VECTOR(weight_seen)[eid] != 0) {
+            if (VECTOR(weight_seen)[eid]) {
                 weight_inv = VECTOR(*weights)[eid];
                 weight = weight + weight_inv - weight * weight_inv;
+            } else {
+                VECTOR(weight_seen)[eid] = true;
             }
 
 #ifdef UMAP_DEBUG
@@ -294,12 +295,11 @@ igraph_error_t igraph_layout_umap_compute_weights(
             printf("weight: %g\n", weight);
 #endif
             VECTOR(*weights)[eid] = weight;
-            VECTOR(weight_seen)[eid] += 1;
         }
 
     }
 
-    igraph_vector_int_destroy(&weight_seen);
+    igraph_vector_bool_destroy(&weight_seen);
     igraph_vector_int_destroy(&eids);
     IGRAPH_FINALLY_CLEAN(2);
 
