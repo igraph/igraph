@@ -136,7 +136,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
         if (no_of_edges > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
             }
             else if (isnan(min)) {
                 IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
