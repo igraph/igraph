@@ -16,11 +16,11 @@ Same graph, 3D layout:
 UMAP layout seems fine.
 Same graph, custom initial layout:
 UMAP layout seems fine.
-Same graph, just compute connectivities from NULL distances:
+Same graph, just compute weights from NULL distances:
 Connectivities from NULL distances seem fine.
-Same graph, just compute connectivities from distances:
+Same graph, just compute weights from distances:
 Connectivities from distances seem fine.
-Same graph, precomputed connectivities:
+Same graph, precomputed weights:
 UMAP layout seems fine.
 Large disjoint union of 3 full graphs:
 UMAP layout of large graph seems fine.
