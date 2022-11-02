@@ -42,28 +42,28 @@
  *    file does *not* perform this part of the computation since there are many
  *    libraries out there that can compute knn or other sparse graphs efficiently
  *    starting from vector spaces (e.g. faiss).
- * 2. Convert the distances into connectivities, which are weights between 0 and 1
+ * 2. Convert the distances into weights, which are weights between 0 and 1
  *    that are larger for short-distance edges. This step is exposed via
- *    igraph_layout_umap_compute_connectivities.
- * 3. Compute a layout for the graph, using its associated connectivities as edge
+ *    igraph_layout_umap_compute_weights.
+ * 3. Compute a layout for the graph, using its associated weights as edge
  *    weights. This step is exposed via igraph_layout_umap and its 3D counterpart.
  *    These two fuctions can also compute steps 2 and 3 in one go, since that's the
- *    most common use case: the argument "distances_are_connectivities" should be
+ *    most common use case: the argument "distances_are_weights" should be
  *    set to false.
  *
  * A few more details w/r/t steps 2 and 3, since they are computed in detail below.
  *
  * STEP 2
  * For each vertex, the distance to its closest neighbor, called rho, is "forfeited":
- * that edge begets connectivity 1 (in principle, at least). Farther neighbors beget
- * lower connectivities according to an exponential decay. The scale factor of this
+ * that edge begets weight 1 (in principle, at least). Farther neighbors beget
+ * lower weights according to an exponential decay. The scale factor of this
  * decay is called sigma and is computed from the graph itself.
  *
  * STEP 3
  * The layout is computed via stochastic gradient descent, i.e. applying stochastic
- * forces along high-connectivity edges and, more rarely, low-connectivity edges.
+ * forces along high-weight edges and, more rarely, low-weight edges.
  * To compute the stochastic forces, one needs a smooth function that approximates
- * connectivities but in the embedded space:
+ * weights but in the embedded space:
  *                        Q(d) = ( 1 + a*d^2b )^-1
  * where d is the 2D/3D distance between the vertices and a and b are constants that
  * are computed globally based on a user-chosen fudge parameter called min_dist.
@@ -151,8 +151,8 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
 
 
 /**
- * \function igraph_layout_umap_compute_connectivities
- * \brief Compute connectivities (edge weights) for a UMAP layout starting from distances.
+ * \function igraph_layout_umap_compute_weights
+ * \brief Compute weights for a UMAP layout starting from distances.
  *
  * \experimental
  *
@@ -162,16 +162,16 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  *
  * </para><para>
  *
- * An early step in UMAP is to compute exponentially decaying "connectivities" from the
+ * An early step in UMAP is to compute exponentially decaying "weights" from the
  * distance graph. Connectivities can also be viewed as edge weights that quantify
- * similarity between two vertices. This function computes connectivities from the
- * distance graph. To compute the layout from precomputed connectivities, call
- * igraph_layout_umap with the "distances_are_connectivities" argument set to true.
+ * similarity between two vertices. This function computes weights from the
+ * distance graph. To compute the layout from precomputed weights, call
+ * igraph_layout_umap with the "distances_are_weights" argument set to true.
  *
  * </para><para>
  *
  * Technical note: For each vertex, this function computes its scale factor (sigma),
- * its connectivity correction (rho), and finally the connectivities themselves.
+ * its connectivity correction (rho), and finally the weights themselves.
  *
  * </para><para>
  * References:
@@ -182,14 +182,14 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * \param graph Pointer to the distance graph.
  * \param distances Pointer to the vector with the vertex-to-vertex distance associated with
  *   each edge.
- * \param connectivities Pointer to an initialized vector where the result will be stored.
+ * \param weights Pointer to an initialized vector where the result will be stored.
  *
  * \return Error code.
  */
-igraph_error_t igraph_layout_umap_compute_connectivities(
+igraph_error_t igraph_layout_umap_compute_weights(
         const igraph_t *graph,
         const igraph_vector_t *distances,
-        igraph_vector_t *connectivities) {
+        igraph_vector_t *weights) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -213,13 +213,13 @@ igraph_error_t igraph_layout_umap_compute_connectivities(
         }
     }
 
-    /* reserve memory for the connectivities */
-    IGRAPH_CHECK(igraph_vector_resize(connectivities, no_of_edges));
+    /* reserve memory for the weights */
+    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
 
     /* if the original graph is unweighted, probabilities are 1 throughout */
     if (distances == NULL) {
         for (igraph_integer_t j = 0; j < no_of_edges; j++) {
-            VECTOR(*connectivities)[j] = 1;
+            VECTOR(*weights)[j] = 1;
         }
         return IGRAPH_SUCCESS;
     }
@@ -263,7 +263,7 @@ igraph_error_t igraph_layout_umap_compute_connectivities(
                         sigma_target));
         }
 
-        /* Convert to connectivities
+        /* Convert to weights
          * Each edge is seen twice, from each of its two vertices. Because this weight
          * is a probability and the probability of the two vertices to be close are set
          * as the probability of either "edge direction" being legit, the final weight
@@ -285,7 +285,7 @@ igraph_error_t igraph_layout_umap_compute_connectivities(
 
             /* Compute the probability of either edge direction if you can */
             if (VECTOR(weight_seen)[eid] != 0) {
-                weight_inv = VECTOR(*connectivities)[eid];
+                weight_inv = VECTOR(*weights)[eid];
                 weight = weight + weight_inv - weight * weight_inv;
             }
 
@@ -293,7 +293,7 @@ igraph_error_t igraph_layout_umap_compute_connectivities(
             printf("distance: %g\n", VECTOR(*distances)[eid]);
             printf("weight: %g\n", weight);
 #endif
-            VECTOR(*connectivities)[eid] = weight;
+            VECTOR(*weights)[eid] = weight;
             VECTOR(weight_seen)[eid] += 1;
         }
 
@@ -955,13 +955,13 @@ static igraph_error_t igraph_i_layout_umap(
         igraph_real_t min_dist,
         igraph_integer_t epochs,
         igraph_integer_t ndim,
-        igraph_bool_t distances_are_connectivities) {
+        igraph_bool_t distances_are_weights) {
 
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     /* probabilities of each edge being a real connection */
-    igraph_vector_t connectivities;
-    igraph_vector_t *connectivitiesp;
+    igraph_vector_t weights;
+    igraph_vector_t *weightsp;
     /* The smoothing parameters given min_dist */
     igraph_real_t a, b;
     /* How many repulsions for each attraction */
@@ -984,16 +984,16 @@ static igraph_error_t igraph_i_layout_umap(
 
     }
 
-    /* Compute connectivities (exponential weights) from distances if required.
-     * If the connectivities have already been computed, they are stored in
+    /* Compute weights (exponential weights) from distances if required.
+     * If the weights have already been computed, they are stored in
      * the "distances" vector and we can recycle the pointer. */
-    if (distances_are_connectivities) {
-        connectivitiesp = (igraph_vector_t *) distances;
+    if (distances_are_weights) {
+        weightsp = (igraph_vector_t *) distances;
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&connectivities, no_of_edges);
-        IGRAPH_CHECK(igraph_layout_umap_compute_connectivities(
-                    graph, distances, &connectivities));
-        connectivitiesp = &connectivities;
+        IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_edges);
+        IGRAPH_CHECK(igraph_layout_umap_compute_weights(
+                    graph, distances, &weights));
+        weightsp = &weights;
     }
     /* From now on everything lives in probability space, it does not matter whether
      * the original graph was weighted/distanced or unweighted */
@@ -1010,8 +1010,8 @@ static igraph_error_t igraph_i_layout_umap(
 
         /* Trivial graphs (0 or 1 nodes) with seed - do nothing */
         if (no_of_nodes <= 1) {
-            if (!distances_are_connectivities) {
-                igraph_vector_destroy(&connectivities);
+            if (!distances_are_weights) {
+                igraph_vector_destroy(&weights);
                 IGRAPH_FINALLY_CLEAN(1);
             }
             return IGRAPH_SUCCESS;
@@ -1021,8 +1021,8 @@ static igraph_error_t igraph_i_layout_umap(
         if (no_of_nodes <= 1) {
             IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, ndim));
             igraph_matrix_null(res);
-            if (!distances_are_connectivities) {
-                igraph_vector_destroy(&connectivities);
+            if (!distances_are_weights) {
+                igraph_vector_destroy(&weights);
                 IGRAPH_FINALLY_CLEAN(1);
             }
             return IGRAPH_SUCCESS;
@@ -1046,14 +1046,14 @@ static igraph_error_t igraph_i_layout_umap(
      * distributions */
     IGRAPH_CHECK(igraph_i_umap_optimize_layout_stochastic_gradient(
                 graph,
-                connectivitiesp,
+                weightsp,
                 a, b,
                 res,
                 epochs,
                 negative_sampling_rate));
 
-    if (!distances_are_connectivities) {
-        igraph_vector_destroy(&connectivities);
+    if (!distances_are_weights) {
+        igraph_vector_destroy(&weights);
         IGRAPH_FINALLY_CLEAN(1);
     }
     RNG_END();
@@ -1082,10 +1082,10 @@ static igraph_error_t igraph_i_layout_umap(
  *
  * The general UMAP workflow is to start from vectors, compute a sparse distance
  * graph that only contains edges between simiar points (e.g. a k-nearest neighbors
- * graph), and then convert these distances into "connectivities", i.e. exponentially
- * decaying weights between 0 and 1 that are larger for points that are closest
- * neighbors in the distance graph. If a graph without any distances associated to
- * the edges is used, all connectivities will be set to 1.
+ * graph), and then convert these distances into exponentially decaying weights
+ * between 0 and 1 that are larger for points that are closest neighbors in the
+ * distance graph. If a graph without any distances associated to the edges is used,
+ * all weights will be set to 1.
  *
  * </para><para>
  *
@@ -1093,10 +1093,10 @@ static igraph_error_t igraph_i_layout_umap(
  * first compute a k-nearest neighbors graph between your vectors and compute the
  * associated distances, and then call this function on that graph. If you already
  * have a distance graph, or you have a graph with no distances, you can call this
- * function directly. If you already have a graph with meaningful connectivities
+ * function directly. If you already have a graph with meaningful weights
  * associated to each edge, you can also call this function, but set the argument
- * distances_are_connectivities to true. To compute connectivities from distances
- * without computing the layout, see \ref igraph_layout_umap_compute_connectivities().
+ * distances_are_weights to true. To compute weights from distances
+ * without computing the layout, see \ref igraph_layout_umap_compute_weights().
  *
  * </para><para>
  * References:
@@ -1111,15 +1111,15 @@ static igraph_error_t igraph_i_layout_umap(
  * \param use_seed Logical, if true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
- *   If this argument is \c NULL, all connectivities will be set to 1.
+ *   If this argument is \c NULL, all weights will be set to 1.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices
  *   can be in the embedding before feeling a repulsive force. It should be
  *   nonnegative. Typical values are between 0 and 1.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on
  *   the cross-entropy. Typical values are between 30 and 500.
- * \param distances_are_connectivities Whether to use precomputed connectivities. If
- *   true, the "distances" vector contains precomputed connectivities. If false (the
- *   typical use case), this function will compute connectivities from distances and
+ * \param distances_are_weights Whether to use precomputed weights. If
+ *   true, the "distances" vector contains precomputed weights. If false (the
+ *   typical use case), this function will compute weights from distances and
  *   then use them to compute the layout.
  * \return Error code.
  */
@@ -1129,9 +1129,9 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                   const igraph_vector_t *distances,
                                   igraph_real_t min_dist,
                                   igraph_integer_t epochs,
-                                  igraph_bool_t distances_are_connectivities) {
+                                  igraph_bool_t distances_are_weights) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, 2, distances_are_connectivities);
+            distances, min_dist, epochs, 2, distances_are_weights);
 }
 
 
@@ -1153,15 +1153,15 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \param use_seed Logical, if true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
- *   If this argument is \c NULL, all connectivities will be set to 1.
+ *   If this argument is \c NULL, all weights will be set to 1.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices
  *   can be in the embedding before feeling a repulsive force. It should be
  *   nonnegative. Typical values are between 0 and 1.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on
  *   the cross-entropy. Typical values are between 30 and 500.
- * \param distances_are_connectivities Whether to use precomputed connectivities. If
- *   true, the "distances" vector contains precomputed connectivities. If false (the
- *   typical use case), this function will compute connectivities from distances and
+ * \param distances_are_weights Whether to use precomputed weights. If
+ *   true, the "distances" vector contains precomputed weights. If false (the
+ *   typical use case), this function will compute weights from distances and
  *   then use them to compute the layout.
  * \return Error code.
  */
@@ -1171,7 +1171,7 @@ igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                      const igraph_vector_t *distances,
                                      igraph_real_t min_dist,
                                      igraph_integer_t epochs,
-                                     igraph_bool_t distances_are_connectivities) {
+                                     igraph_bool_t distances_are_weights) {
     return igraph_i_layout_umap(graph, res, use_seed,
-            distances, min_dist, epochs, 3, distances_are_connectivities);
+            distances, min_dist, epochs, 3, distances_are_weights);
 }

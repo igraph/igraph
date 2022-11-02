@@ -144,7 +144,7 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap(const igraph_t *graph,
                                                 const igraph_vector_t *distances,
                                                 igraph_real_t min_dist,
                                                 igraph_integer_t epochs,
-                                                igraph_bool_t distances_are_connectivities);
+                                                igraph_bool_t distances_are_weights);
 
 IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                                 igraph_matrix_t *res,
@@ -152,11 +152,11 @@ IGRAPH_EXPORT igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
                                                 const igraph_vector_t *distances,
                                                 igraph_real_t min_dist,
                                                 igraph_integer_t epochs,
-                                                igraph_bool_t distances_are_connectivities);
+                                                igraph_bool_t distances_are_weights);
 
-IGRAPH_EXPORT igraph_error_t igraph_layout_umap_compute_connectivities(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_layout_umap_compute_weights(const igraph_t *graph,
                                                 const igraph_vector_t *distances,
-                                                igraph_vector_t *connectivities);
+                                                igraph_vector_t *weights);
 
 
 /**
