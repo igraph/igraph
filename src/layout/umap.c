@@ -166,7 +166,7 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * distance graph. Connectivities can also be viewed as edge weights that quantify
  * similarity between two vertices. This function computes weights from the
  * distance graph. To compute the layout from precomputed weights, call
- * igraph_layout_umap with the "distances_are_weights" argument set to true.
+ * \ref igraph_layout_umap() with the \p distances_are_weights argument set to \c true.
  *
  * </para><para>
  *
