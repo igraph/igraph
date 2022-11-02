@@ -281,7 +281,7 @@ igraph_error_t igraph_layout_umap_compute_weights(
         for (igraph_integer_t j = 0; j < no_of_neis; j++) {
             eid = VECTOR(eids)[j];
             /* Basically, nodes closer than rho have probability 1, but nothing disappears */
-            weight = sigma < 0 ? 1: exp(-(VECTOR(*distances)[eid] - rho) / sigma);
+            weight = sigma < 0 ? 1 : exp(-(VECTOR(*distances)[eid] - rho) / sigma);
 
             /* Compute the probability of either edge direction if you can */
             if (VECTOR(weight_seen)[eid] != 0) {
