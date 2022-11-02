@@ -160,3 +160,63 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
         IGRAPH_ERROR("Invalid heuristic for greedy vertex coloring.", IGRAPH_EINVAL);
     }
 }
+
+/**
+ * \function igraph_vertex_coloring_antColony
+ * \brief Computes a vertex coloring using ant colony optimisation metaheuristic.
+ *
+ * </para><para>
+ * This function assigns a "color"—represented as a non-negative integer—to
+ * each vertex of the graph in such a way that neighboring vertices never have
+ * the same color. The obtained coloring is not necessarily minimal.
+ *
+ * </para><para>
+ * The coloring is performed using the ant-colony optimisation metaheuristic as described in the paper with slight variations
+ * A New Ant Algorithm for Graph Coloring - Alain Hertz, Nicolas Zufferey
+ * </para><para>
+ * The variations are
+ * 1) The sorting of the move is first done by how much it would reduce conflicts, and then inplace by the fitness formula given in the paper
+ * 2) The selection of moves is not deterministic its probabalistic with the probability distribution being a normal distribution
+ * Both of these can be turned off (see parameters) to use the original algorithm
+ * \param graph The input graph.
+ * \param colors Pointer to an initialized integer vector. The vertex colors will be stored here.
+ * \param alpha real number which describes the greedy force when calculating move fitness. Paper suggests keeping this 1.0
+ * \param beta  real number which describes the trail force when calculating move fitness. Paper suggests keeping this 5.0
+ * \param rho evaporation constant which describes the trail being forgotten per iteration. Paper suggests keeping this at or close to 0.9
+ * \param maxIters number of iterations the ant colony loop will run for each color. Paper suggest to keep that at 1000. Setting this to 0 will
+ * will jus return the graph colored using the D-Satur algorithm
+ * \param tabuRangeUp the lower bound on the maximum tabu tenure. Paper suggests keeping this 9
+ * \param tabuFactor the formula for tabu tenure of a move is given by random_int(0, tabuRange) + tabuFactor * NCV(s) where s is the current coloring
+ * and NVC is the number of conflicting vertices.
+ * \param k_end the number of colors which once achieved will make the algorithm return. Setting this to 0 will allow the algorithm to try and find the optimal coloring
+ * \param firstVariationFlag setting this to true will enable the first variatio, which has been observed to improve results
+ * \param secondVariationFlag setting this to true will enable second variation, which works well with the first variation.
+ * \return Error code.
+ *
+ * \example examples/simple/igraph_coloring.c
+ */
+igraph_error_t igraph_vertex_coloring_AntColony(const igraph_t *graph, igraph_vector_int_t *colors,igraph_real_t alpha, igraph_real_t beta,
+    igraph_real_t rho, igraph_integer_t maxIters, igraph_integer_t tabuRangeUp, igraph_real_t tabuFactor, igraph_integer_t k_end , igraph_bool_t firstVariationFlag,
+    igraph_bool_t secondVariationFlag ) {
+
+    igraph_integer_t vc = igraph_vcount(graph);
+    IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
+    igraph_vector_int_fill(colors, 0);
+    if (vc <= 1) {
+        return IGRAPH_SUCCESS;
+    }
+
+    if( rho < 0 || rho > 1 ){
+        IGRAPH_ERROR("Evaporation constant should be b/w 0 and 1", IGRAPH_EINVAL);
+    }
+    if( maxIters < 0 ){
+        IGRAPH_ERROR("maxIters should be greater than or equal to 0", IGRAPH_EINVAL);
+    }
+    if( tabuRangeUp < 0 ){
+        IGRAPH_ERROR("tabuRangeUp should be greater than or equal to 0", IGRAPH_EINVAL);
+    }
+    if( tabuFactor < 0.0 ){
+        IGRAPH_ERROR("tabuFactor should be greater than or equal to 0", IGRAPH_EINVAL);
+    }
+    return IGRAPH_SUCCESS;
+}
