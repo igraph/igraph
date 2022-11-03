@@ -16,6 +16,7 @@
 */
 
 #include "igraph_constructors.h"
+#include "igraph_interface.h"
 
 #include "core/interruption.h"
 #include "math/safe_intop.h"
@@ -30,7 +31,7 @@
  *
  * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
- * more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1).
+ * more significant, e.g., (i, j) &lt; (i + 1, j) and (i + 1, j) &lt; (i, j + 1).
  *
  * \param graph An uninitialized graph object.
  * \param directed Boolean, whether to create a directed graph.
@@ -84,8 +85,7 @@ static igraph_error_t triangle_lattice(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_prefix_sum_vector, row_count + 1);
     VECTOR(row_lengths_prefix_sum_vector)[0] = 0;
-    for (i = 1; i < row_count + 1; i++)
-    {
+    for (i = 1; i < row_count + 1; i++) {
         IGRAPH_SAFE_ADD(VECTOR(row_lengths_prefix_sum_vector)[i - 1], VECTOR(*row_lengths_vector)[i - 1], &(VECTOR(row_lengths_prefix_sum_vector)[i]));
     }
     no_of_nodes = VECTOR(row_lengths_prefix_sum_vector)[row_count];
@@ -104,7 +104,7 @@ static igraph_error_t triangle_lattice(
         }                                                                                                                                         \
     }
 
-     /* computing the number of edges in the constructed triangle lattice */
+    /* computing the number of edges in the constructed triangle lattice */
     igraph_integer_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
     igraph_integer_t multiplier = mutual && directed ? 4 : 2;
     for (j = 0; j < row_count - 1; j++) {
@@ -167,7 +167,7 @@ static igraph_error_t triangle_lattice_rectangle_shape(
     igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
     igraph_bool_t directed, igraph_bool_t mutual
 ) {
-    igraph_integer_t row_count = size_y;
+    igraph_integer_t row_count = size_x;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
     igraph_integer_t i;
@@ -176,7 +176,7 @@ static igraph_error_t triangle_lattice_rectangle_shape(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&row_start_vector, row_count);
 
     for (i = 0; i < row_count; i++) {
-        VECTOR(row_lengths_vector)[i] = size_x;
+        VECTOR(row_lengths_vector)[i] = size_y;
         VECTOR(row_start_vector)[i] = (row_count - i) / 2;
     }
 
@@ -231,26 +231,29 @@ static igraph_error_t triangle_lattice_hex_shape(
 }
 
 /**
- * \function igraph_triangulafr_lattice
+ * \function igraph_triangular_lattice
  * \brief A triangular lattice with the given shape.
+ *
+ * \experimental
  *
  * Creates a triangular lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
  *
  * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
- * more significant, e.g., (i, j) < (i + 1, j) and (i + 1, j) < (i, j + 1)
+ * more significant, e.g., (i, j) &lt; (i + 1, j) and (i + 1, j) &lt; (i, j + 1)
  *
  * \param graph An uninitialized graph object.
  * \param dims Integer vector, defines the shape of the lattice. (Below the "edge length"s are in terms of graph theoretical path lengths.)
  *        If \p dims is of length 1, the resulting lattice has a triangular shape
- *        where each side of the triangle contains \c "dims[0]" vertices.
+ *        where each side of the triangle contains <code>dims[0]</code> vertices.
  *        If \p dims is of length 2, the resulting lattice has a
- *        "quasi rectangular" shape with the sides containing \c "dims[0]" and
- *        \c "dims[1]" vertices, respectively.
+ *        "quasi rectangular" shape with the sides containing <code>dims[0]</code> and
+ *        <code>dims[1]</code> vertices, respectively.
  *        If \p dims is of length 3, the resulting lattice has a hexagonal shape
- *        where the sides of the hexagon contain \c "dims[0]", \c "dims[1]" and
- *        \c "dims[2]" vertices.
+ *        where the sides of the hexagon contain <code>dims[0]</code>, <code>dims[1]</code> and
+ *        <code>dims[2]</code> vertices.
+ *        All coordinates must be non-negative.
  * \param directed Boolean, whether to create a directed graph.
  *        If the \c mutual argument is not set to true,
  *        edges will be directed from lower-index vertices towards
@@ -269,8 +272,12 @@ igraph_error_t igraph_triangular_lattice(
     igraph_bool_t mutual
 ) {
     igraph_integer_t num_dims = igraph_vector_int_size(dims);
-    if (igraph_vector_int_any_smaller(dims, 1)) {
+    if (igraph_vector_int_any_smaller(dims, 0)) {
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
+    }
+    /* If a coordinate of dims is 0 the result is an empty graph. */
+    if (igraph_vector_int_contains(dims, 0)) {
+        return igraph_empty(graph, 0, directed);
     }
 
     switch (num_dims) {
