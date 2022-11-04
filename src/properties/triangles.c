@@ -97,7 +97,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         IGRAPH_CHECK(igraph_transitivity_local_undirected(graph, &vec, igraph_vss_all(), mode));
 
         for (i = 0, nans = 0; i < no_of_nodes; i++) {
-            if (!igraph_is_nan(VECTOR(vec)[i])) {
+            if (!isnan(VECTOR(vec)[i])) {
                 sum += VECTOR(vec)[i];
             } else {
                 nans++;
@@ -877,10 +877,19 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_has_multiple(graph, &has_multiple));
     if (has_multiple) {
-        IGRAPH_ERROR(
-            "Barrat's weighted transitivity measure works only if the graph "
-            "has no multiple edges.", IGRAPH_EINVAL
-        );
+        IGRAPH_ERROR("Barrat's weighted transitivity measure works only if the graph has no multiple edges.",
+                     IGRAPH_EINVAL);
+    }
+
+    if (igraph_is_directed(graph)) {
+        /* When the graph is directed, mutual edges are effectively multi-edges as we
+         * are ignoring edge directions. */
+        igraph_bool_t has_mutual;
+        IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
+        if (has_mutual) {
+            IGRAPH_ERROR("Barrat's weighted transitivity measure works only if the graph has no multiple edges.",
+                         IGRAPH_EINVAL);
+        }
     }
 
     /* Preconditions validated, now we can call the real implementation */

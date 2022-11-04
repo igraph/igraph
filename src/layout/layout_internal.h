@@ -45,14 +45,14 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *
                                                     igraph_real_t *y, igraph_real_t *z,
                                                     igraph_real_t *r);
 
-IGRAPH_PRIVATE_EXPORT float igraph_i_layout_point_segment_dist2(float v_x, float v_y,
-                                                                float u1_x, float u1_y,
-                                                                float u2_x, float u2_y);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_i_layout_point_segment_dist2(igraph_real_t v_x, igraph_real_t v_y,
+                                                                igraph_real_t u1_x, igraph_real_t u1_y,
+                                                                igraph_real_t u2_x, igraph_real_t u2_y);
 
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_i_layout_segments_intersect(float p0_x, float p0_y,
-                                                                       float p1_x, float p1_y,
-                                                                       float p2_x, float p2_y,
-                                                                       float p3_x, float p3_y);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_i_layout_segments_intersect(igraph_real_t p0_x, igraph_real_t p0_y,
+                                                                       igraph_real_t p1_x, igraph_real_t p1_y,
+                                                                       igraph_real_t p2_x, igraph_real_t p2_y,
+                                                                       igraph_real_t p3_x, igraph_real_t p3_y);
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist,
                                                           igraph_real_t *a_p,

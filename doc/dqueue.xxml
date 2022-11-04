@@ -16,6 +16,7 @@
 <!-- doxrox-include igraph_dqueue_size -->
 <!-- doxrox-include igraph_dqueue_head -->
 <!-- doxrox-include igraph_dqueue_back -->
+<!-- doxrox-include igraph_dqueue_get -->
 <!-- doxrox-include igraph_dqueue_pop -->
 <!-- doxrox-include igraph_dqueue_pop_back -->
 <!-- doxrox-include igraph_dqueue_push -->

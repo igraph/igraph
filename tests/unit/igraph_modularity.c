@@ -46,12 +46,12 @@ int main(void) {
     igraph_vector_int_init(&membership, 0);
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
-    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    IGRAPH_ASSERT(isnan(modularity));
 
     igraph_destroy(&graph);
     igraph_small(&graph, 0, IGRAPH_DIRECTED, -1);
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, &modularity);
-    IGRAPH_ASSERT(igraph_is_nan(modularity));
+    IGRAPH_ASSERT(isnan(modularity));
 
     /* Should not crash if we omit 'modularity' */
     igraph_modularity(&graph, &membership, 0, /* resolution */ 1, IGRAPH_UNDIRECTED, /* modularity = */ NULL);

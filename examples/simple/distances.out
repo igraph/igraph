@@ -1,0 +1,51 @@
+Unweighted distances:
+
+  0   1   1   1   2   2   2   3   3   3
+Inf   0   1   2   1   1   2   2   2   2
+Inf   1   0   1   2   2   1   3   3   3
+Inf   2   1   0   3   3   1   4   4   4
+Inf   3   2   3   0   1   2   1   2   2
+Inf   2   1   2   3   0   1   4   1   1
+Inf Inf Inf Inf Inf Inf   0 Inf Inf Inf
+Inf   3   2   3   4   1   2   0   1   2
+Inf Inf Inf Inf Inf Inf Inf Inf   0   1
+Inf Inf Inf Inf Inf Inf Inf Inf Inf   0
+
+Unweighted distances with a cutoff of 3:
+
+  0   1   1   1   2   2   2   3   3   3
+Inf   0   1   2   1   1   2   2   2   2
+Inf   1   0   1   2   2   1   3   3   3
+Inf   2   1   0   3   3   1 Inf Inf Inf
+Inf   3   2   3   0   1   2   1   2   2
+Inf   2   1   2   3   0   1 Inf   1   1
+Inf Inf Inf Inf Inf Inf   0 Inf Inf Inf
+Inf   3   2   3 Inf   1   2   0   1   2
+Inf Inf Inf Inf Inf Inf Inf Inf   0   1
+Inf Inf Inf Inf Inf Inf Inf Inf Inf   0
+
+Weighted distances:
+
+  0   0   0   1   5   2   1  13   3   5
+Inf   0   0   1   5   2   1  13   3   5
+Inf   1   0   1   6   3   1  14   4   6
+Inf   1   0   0   6   3   1  14   4   6
+Inf   5   4   5   0   2   3   8   3   5
+Inf   3   2   3   8   0   1  16   1   3
+Inf Inf Inf Inf Inf Inf   0 Inf Inf Inf
+Inf   4   3   4   9   1   2   0   1   4
+Inf Inf Inf Inf Inf Inf Inf Inf   0   4
+Inf Inf Inf Inf Inf Inf Inf Inf Inf   0
+
+Weighted distances with a cutoff of 8:
+
+  0   0   0   1   5   2   1 Inf   3   5
+Inf   0   0   1   5   2   1 Inf   3   5
+Inf   1   0   1   6   3   1 Inf   4   6
+Inf   1   0   0   6   3   1 Inf   4   6
+Inf   5   4   5   0   2   3   8   3   5
+Inf   3   2   3   8   0   1 Inf   1   3
+Inf Inf Inf Inf Inf Inf   0 Inf Inf Inf
+Inf   4   3   4 Inf   1   2   0   1   4
+Inf Inf Inf Inf Inf Inf Inf Inf   0   4
+Inf Inf Inf Inf Inf Inf Inf Inf Inf   0

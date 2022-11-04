@@ -447,6 +447,12 @@ igraph_distances:
         VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph
 
+igraph_distances_cutoff:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, NEIMODE mode=OUT, REAL cutoff=-1
+    DEPS: from ON graph, to ON graph
+
 igraph_get_shortest_path:
     PARAMS: |-
         GRAPH graph,
@@ -488,6 +494,12 @@ igraph_distances_dijkstra:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
         VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+    DEPS: from ON graph, to ON graph, weights ON graph
+
+igraph_distances_dijkstra_cutoff:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT, REAL cutoff=-1
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_get_shortest_paths_dijkstra:
@@ -537,6 +549,12 @@ igraph_distances_floyd_warshall:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
     DEPS: weights ON graph
+
+igraph_voronoi:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR_INT membership, OUT VECTOR distances,
+        VERTEX_INDICES generators, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, VORONOI_TIEBREAKER tiebreaker=RANDOM
+    DEPS: weights ON graph, generators ON graph
 
 igraph_get_all_simple_paths:
     PARAMS: |-
@@ -732,6 +750,12 @@ igraph_transitivity_barrat:
         GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL,
         EDGEWEIGHTS weights=NULL, TRANSITIVITY_MODE mode=NAN
     DEPS: res ON graph, vids ON graph, weights ON graph
+
+igraph_ecc:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR res, EDGE_SELECTOR eids=ALL,
+        INTEGER k=3, BOOLEAN offset=False, BOOLEAN normalize=True
+    DEPS: res ON graph, eids ON graph
 
 igraph_reciprocity:
     PARAMS: |-
@@ -1427,13 +1451,13 @@ igraph_layout_davidson_harel:
 igraph_layout_umap:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
         REAL sampling_prob
 
 igraph_layout_umap_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
         REAL sampling_prob
 
 #######################################
@@ -1606,7 +1630,7 @@ igraph_community_leiden:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL VERTEXWEIGHTS vertex_weights,
-        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2, 
+        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_weights ON graph

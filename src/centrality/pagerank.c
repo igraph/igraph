@@ -514,7 +514,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
-        if (igraph_is_nan(min)) {
+        if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         if (min == 0 && max == 0) {
@@ -559,7 +559,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         if (reset_min < 0) {
             IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(reset_min)) {
+        if (isnan(reset_min)) {
             IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
         }
         reset_sum = igraph_vector_sum(reset);

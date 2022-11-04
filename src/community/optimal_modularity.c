@@ -115,7 +115,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
             if (minweight < 0) {
                 IGRAPH_ERROR("Negative weights are not allowed in weight vector.", IGRAPH_EINVAL);
             }
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }

@@ -322,9 +322,9 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
  *
  * </para><para>
  * The vertices of the resulting graph are ordered such that the
- * index of the vertex at position <code>(i_0, i_1, i_2, ..., i_d)</code>
- * in a lattice of size <code>(n_0, n_1, ..., n_d)</code> will be
- * <code>i_0 + n_0 * i_1 + n_0 * n_1 * i_2 + ...</code>.
+ * index of the vertex at position <code>(i_1, i_2, i_3, ..., i_d)</code>
+ * in a lattice of size <code>(n_1, n_2, ..., n_d)</code> will be
+ * <code>i_1 + n_1 * i_2 + n_1 * n_2 * i_3 + ...</code>.
  *
  * \param graph An uninitialized graph object.
  * \param dimvector Vector giving the sizes of the lattice in each of

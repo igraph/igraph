@@ -249,6 +249,7 @@ add_library(
   paths/simple_paths.c
   paths/sparsifier.c
   paths/unweighted.c
+  paths/voronoi.c
   paths/widest_paths.c
 
   properties/basic_properties.c
@@ -256,6 +257,7 @@ add_library(
   properties/convergence_degree.c
   properties/dag.c
   properties/degrees.c
+  properties/ecc.c
   properties/girth.c
   properties/loops.c
   properties/multiplicity.c

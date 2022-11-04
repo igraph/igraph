@@ -14,6 +14,7 @@
 <section id="matrix-constructor-and-destructor">
 <!-- doxrox-include igraph_matrix_constructor_and_destructor -->
 <!-- doxrox-include igraph_matrix_init -->
+<!-- doxrox-include igraph_matrix_init_array -->
 <!-- doxrox-include igraph_matrix_init_copy -->
 <!-- doxrox-include igraph_matrix_destroy -->
 </section>

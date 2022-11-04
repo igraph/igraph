@@ -37,18 +37,18 @@
  * The algorithm is based on the simple idea of
  * several fluids interacting in a non-homogeneous environment
  * (the graph topology), expanding and contracting based on their
- * interaction and density.
+ * interaction and density. Weighted graphs are not supported.
  *
+ * </para><para>
  * This function implements the community detection method described in:
  * Parés F, Gasulla DG, et. al. (2018) Fluid Communities: A Competitive,
  * Scalable and Diverse Community Detection Algorithm. In: Complex Networks
  * &amp; Their Applications VI: Proceedings of Complex Networks 2017 (The Sixth
  * International Conference on Complex Networks and Their Applications),
- * Springer, vol 689, p 229.
+ * Springer, vol 689, p 229. https://doi.org/10.1007/978-3-319-72150-7_19
  *
  * \param graph The input graph. The graph must be simple and connected.
- *   Empty graphs are not supported as well as single vertex graphs.
- *   Edge directions are ignored. Weights are not considered.
+ *   Edge directions will be ignored.
  * \param no_of_communities The number of communities to be found. Must be
  *   greater than 0 and fewer than number of vertices in the graph.
  * \param membership The result vector mapping vertices to the communities

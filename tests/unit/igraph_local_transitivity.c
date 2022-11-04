@@ -37,7 +37,7 @@ igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2)
 
     for (i=0; i < n1; ++i) {
         /* Since NaN == NaN compares false, we must handle NaN values early. */
-        if (igraph_is_nan(VECTOR(*v1)[i]) && igraph_is_nan(VECTOR(*v2)[i])) {
+        if (isnan(VECTOR(*v1)[i]) && isnan(VECTOR(*v2)[i])) {
             continue;
         }
         if (VECTOR(*v1)[i]  != VECTOR(*v2)[i]) {
@@ -56,7 +56,7 @@ igraph_real_t vector_avg(const igraph_vector_t *v) {
 
     count = 0;
     for (i=0; i < n; ++i) {
-        if (igraph_is_nan(VECTOR(*v)[i])) {
+        if (isnan(VECTOR(*v)[i])) {
             continue;
         }
         sum += VECTOR(*v)[i];
@@ -143,7 +143,7 @@ int main(void) {
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_NAN);
-    IGRAPH_ASSERT(igraph_is_nan(avg_local));
+    IGRAPH_ASSERT(isnan(avg_local));
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_ZERO);
     IGRAPH_ASSERT(avg_local == 0);
     igraph_destroy(&g);
@@ -153,7 +153,7 @@ int main(void) {
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_NAN);
-    IGRAPH_ASSERT(igraph_is_nan(avg_local));
+    IGRAPH_ASSERT(isnan(avg_local));
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_ZERO);
     IGRAPH_ASSERT(avg_local == 0);
     igraph_destroy(&g);
