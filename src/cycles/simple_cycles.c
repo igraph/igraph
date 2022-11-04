@@ -24,11 +24,21 @@
 #include "igraph_dqueue.h"
 #include "igraph_error.h"
 #include "igraph_interface.h"
+#include "igraph_stack.h"
 #include "igraph_structural.h"
 #include "core/interruption.h"
 
 #define IGRAPH_CYCLE_FOUND 0
 #define IGRAPH_ERROR_NO_CYCLE_FOUND 3
+
+typedef struct igraph_simple_cycle_search_state_t {
+    igraph_integer_t N;
+    igraph_adjlist_t AK;
+    igraph_adjlist_t B;
+    igraph_stack_int_t stack;
+    igraph_vector_bool_t blocked;
+    igraph_bool_t directed;
+} igraph_simple_cycle_search_state_t;
 
 // Johnson's cycle detection algorithm
 

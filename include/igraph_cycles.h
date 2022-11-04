@@ -7,8 +7,6 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector_list.h"
-#include "igraph_adjlist.h"
-#include "igraph_stack.h"
 
 __BEGIN_DECLS
 
@@ -22,24 +20,16 @@ IGRAPH_EXPORT igraph_error_t igraph_minimum_cycle_basis(
     igraph_integer_t bfs_cutoff, igraph_bool_t complete,
     igraph_bool_t use_cycle_order, const igraph_vector_t *weights);
 
-// simple cycle search, johnson
-typedef struct igraph_simple_cycle_search_state_t {
-    igraph_integer_t N;
-    igraph_adjlist_t AK;
-    igraph_adjlist_t B;
-    igraph_stack_int_t stack;
-    igraph_vector_bool_t blocked;
-    igraph_bool_t directed;
-} igraph_simple_cycle_search_state_t;
+struct igraph_simple_cycle_search_state_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_init(
-    igraph_simple_cycle_search_state_t *state, const igraph_t *graph);
+    struct igraph_simple_cycle_search_state_t *state, const igraph_t *graph);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_destroy(
-    igraph_simple_cycle_search_state_t *state);
+    struct igraph_simple_cycle_search_state_t *state);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_from_one_vertex(
-    igraph_simple_cycle_search_state_t *state, igraph_integer_t start,
+    struct igraph_simple_cycle_search_state_t *state, igraph_integer_t start,
     igraph_vector_int_list_t *result,
     igraph_simple_cycle_search_mode_t search_mode);
 
