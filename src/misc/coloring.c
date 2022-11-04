@@ -161,6 +161,77 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
     }
 }
 
+static igraph_integer_t DSatur_node_selection(const igraph_t *graph,igraph_vector_int_t *colors, igraph_vector_int_t * saturation_degree, igraph_integer_t vc){
+    igraph_integer_t mst_saurated_node = -1, max_saturation = -1, max_degree = -1;
+    for( igraph_integer_t node = 0 ; node < vc ; node++ ){
+        //finding an uncolored node with max (saturation degree ,  degree)
+        if( VECTOR(*colors)[node] == -1 ){
+            if( VECTOR(*saturation_degree)[node] > max_saturation ){
+                max_saturation = VECTOR(*saturation_degree)[node];
+                mst_saurated_node = node;
+            }
+            else if( VECTOR(*saturation_degree)[node] == max_saturation ){
+                igraph_integer_t degree;
+                igraph_degree_1(graph, &degree, node, IGRAPH_ALL, true);
+                if( degree > max_degree ){
+                    mst_saurated_node = node;
+                    max_degree = degree;
+                }
+            }
+        }
+    }
+    return mst_saurated_node;
+}
+
+static void update_saturation_degree(const igraph_t *graph, igraph_vector_int_t * saturation_degree,igraph_vector_int_t *neighbours){
+    igraph_integer_t nbr_cnt = igraph_vector_int_size(neighbours);
+    for( igraph_integer_t nmbr_indx = 0 ; nmbr_indx < nbr_cnt ; nmbr_indx++ ){
+        igraph_integer_t nbr = VECTOR(*neighbours)[nmbr_indx];
+        VECTOR(*saturation_degree)[ nbr ] += 1;
+    }
+}
+
+static igraph_error_t DSatur(const igraph_t *graph,igraph_vector_int_t *colors, igraph_vector_int_t * saturation_degree){
+    igraph_vector_int_fill(colors, -1); //-1 as a color means uncolored
+    igraph_vector_int_fill(saturation_degree, 0);
+
+    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_integer_t vertices_colored = 0;
+    igraph_vector_int_t neighbours;
+    igraph_vector_int_init(&neighbours, 0);
+    while( vertices_colored < vc ){
+        igraph_integer_t node_to_color = DSatur_node_selection(graph, colors, saturation_degree, vc);
+
+        IGRAPH_CHECK(igraph_neighbors(graph, &neighbours, node_to_color, IGRAPH_ALL ));
+        igraph_integer_t nbr_cnt = igraph_vector_int_size(&neighbours);
+        for( igraph_integer_t color = 0 ; color < vc ; color++ ){
+            igraph_bool_t viable_color = true;
+            for( igraph_integer_t nmbr_indx = 0 ; nmbr_indx < nbr_cnt ; nmbr_indx++ ){
+                igraph_integer_t nbr = VECTOR(neighbours)[nmbr_indx];
+                if( color == VECTOR(*colors)[nbr] ){
+                    viable_color = false;
+                    break;
+                }
+            }
+            if( viable_color ){
+                VECTOR(*colors)[ node_to_color ] = color;
+                break;
+            }
+        }
+        update_saturation_degree(graph, saturation_degree, &neighbours);
+
+        vertices_colored++;
+
+    }
+    return IGRAPH_SUCCESS;
+}
+
+// static igraph_error_t Color(const igraph_t *graph,igraph_vector_int_t *colors, igraph_vector_int_t * saturation_degree, igraph_matrix_int_t* ants,
+//     igraph_integer_t nmbr_colors){
+
+//         return IGRAPH_SUCCESS;
+// }
+
 /**
  * \function igraph_vertex_coloring_antColony
  * \brief Computes a vertex coloring using ant colony optimisation metaheuristic.
@@ -184,7 +255,7 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
  * \param beta  real number which describes the trail force when calculating move fitness. Paper suggests keeping this 5.0
  * \param rho evaporation constant which describes the trail being forgotten per iteration. Paper suggests keeping this at or close to 0.9
  * \param maxIters number of iterations the ant colony loop will run for each color. Paper suggest to keep that at 1000. Setting this to 0 will
- * will jus return the graph colored using the D-Satur algorithm
+ * will jus return the graph colored using the D-Satur algorithm and all checks for other parameters being valid will not run
  * \param tabuRangeUp the lower bound on the maximum tabu tenure. Paper suggests keeping this 9
  * \param tabuFactor the formula for tabu tenure of a move is given by random_int(0, tabuRange) + tabuFactor * NCV(s) where s is the current coloring
  * and NVC is the number of conflicting vertices.
@@ -201,8 +272,15 @@ igraph_error_t igraph_vertex_coloring_AntColony(const igraph_t *graph, igraph_ve
 
     igraph_integer_t vc = igraph_vcount(graph);
     IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
-    igraph_vector_int_fill(colors, 0);
     if (vc <= 1) {
+        igraph_vector_int_fill(colors, 0);
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_t saturation_degree;
+    IGRAPH_CHECK(igraph_vector_int_init(&saturation_degree, vc));
+    if( maxIters == 0 ){
+        IGRAPH_CHECK(DSatur(graph, colors, &saturation_degree));
         return IGRAPH_SUCCESS;
     }
 
@@ -218,5 +296,6 @@ igraph_error_t igraph_vertex_coloring_AntColony(const igraph_t *graph, igraph_ve
     if( tabuFactor < 0.0 ){
         IGRAPH_ERROR("tabuFactor should be greater than or equal to 0", IGRAPH_EINVAL);
     }
+    IGRAPH_CHECK(DSatur(graph, colors, &saturation_degree));
     return IGRAPH_SUCCESS;
 }
