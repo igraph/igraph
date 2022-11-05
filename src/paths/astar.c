@@ -332,7 +332,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
 
 /**
  * \function igraph_get_shortest_path_astar
- * \brief Weighted shortest path from one vertex to another one.
+ * \brief Shortest path from one vertex to another, with heuristic.
  *
  * Calculates a single (positively) weighted shortest path from
  * a single vertex to another one, using the A* algorithm.
@@ -348,13 +348,12 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
  * \param edges Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
- * \param from The id of the sour igraph_delete_vertices_idx(ce vertex.
+ * \param from The id of the source vertex.
  * \param to The id of the target vertex.
- * \param weights The edge weights. All edge weights must be
- *       non-negative for Dijkstra's algorithm to work. Additionally, no
- *       edge weight may be NaN. If either case does not hold, an error
- *       is returned. If this is a null pointer, then the unweighted
- *       version, \ref igraph_get_shortest_paths() is called.
+ * \param weights Optional edge weights. Supply \c NULL for unweighted graphs.
+ *        all edge weights must be non-negative. Additionally, no
+ *        edge weight may be NaN. If either case does not hold, an error
+ *        is returned.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. \c IGRAPH_OUT follows edge
  *        directions, \c IGRAPH_IN follows the opposite directions,
@@ -370,7 +369,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
  * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
  * |E| is the number of edges in the graph.
  *
- * \sa \ref igraph_get_shortest_paths_dijkstra() for the version with
+ * \sa \ref igraph_get_shortest_paths_astar() for the version with
  * more target vertices.
  */
 
