@@ -89,7 +89,7 @@
  * \param heuristic A function that returns an estimate of the distance as
  *        \c igraph_real_t in its first argument. The second parameter is
  *        passed the vertex id as an \c igraph_integer_t, and the third
- *         parameter is passed \p extra.
+ *        parameter is passed \p extra.
  * \param extra This is passed on to the heuristic.
  * \return Error code:
  *        \clist
@@ -327,5 +327,93 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
     IGRAPH_FREE(parent_eids);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(6);
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_get_shortest_path_astar
+ * \brief Weighted shortest path from one vertex to another one.
+ *
+ * Calculates a single (positively) weighted shortest path from
+ * a single vertex to another one, using the A* algorithm.
+ *
+ * </para><para>This function is a special case (and a wrapper) to
+ * \ref igraph_get_shortest_paths_astar().
+ *
+ * \param graph The input graph, it can be directed or undirected.
+ * \param vertices Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the vertex IDs along
+ *        the path are stored here, including the source and target
+ *        vertices.
+ * \param edges Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the edge IDs along the
+ *        path are stored here.
+ * \param from The id of the sour igraph_delete_vertices_idx(ce vertex.
+ * \param to The id of the target vertex.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_get_shortest_paths() is called.
+ * \param mode A constant specifying how edge directions are
+ *        considered in directed graphs. \c IGRAPH_OUT follows edge
+ *        directions, \c IGRAPH_IN follows the opposite directions,
+ *        and \c IGRAPH_ALL ignores edge directions. This argument is
+ *        ignored for undirected graphs.
+ * \param heuristic A function that returns an estimate of the distance as
+ *        \c igraph_real_t in its first argument. The second parameter is
+ *        passed the vertex id as an \c igraph_integer_t, and the third
+ *        parameter is passed \p extra.
+ * \param extra This is passed on to the heuristic.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
+ * |E| is the number of edges in the graph.
+ *
+ * \sa \ref igraph_get_shortest_paths_dijkstra() for the version with
+ * more target vertices.
+ */
+
+igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
+                                      igraph_vector_int_t *vertices,
+                                      igraph_vector_int_t *edges,
+                                      igraph_integer_t from,
+                                      igraph_integer_t to,
+                                      const igraph_vector_t *weights,
+                                      igraph_neimode_t mode,
+                                      igraph_astar_heuristic_t *heuristic,
+                                      void *extra)
+{
+    igraph_vector_int_list_t vertices2, *vp = &vertices2;
+    igraph_vector_int_list_t edges2, *ep = &edges2;
+
+    if (vertices) {
+        IGRAPH_CHECK(igraph_vector_int_list_init(&vertices2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &vertices2);
+    } else {
+        vp = NULL;
+    }
+    if (edges) {
+        IGRAPH_CHECK(igraph_vector_int_list_init(&edges2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &edges2);
+    } else {
+        ep = NULL;
+    }
+
+    IGRAPH_CHECK(igraph_get_shortest_paths_astar(graph, vp, ep,
+                 from, igraph_vss_1(to),
+                 weights, mode, NULL, NULL, heuristic, extra));
+
+    if (edges) {
+        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        igraph_vector_int_list_destroy(&edges2);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+    if (vertices) {
+        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        igraph_vector_int_list_destroy(&vertices2);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
     return IGRAPH_SUCCESS;
 }

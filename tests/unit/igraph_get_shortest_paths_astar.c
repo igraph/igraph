@@ -149,7 +149,7 @@ int main(void) {
 
     igraph_t g;
     igraph_vector_int_list_t vecs, evecs;
-    igraph_vector_int_t parents, inbound;
+    igraph_vector_int_t parents, inbound, vertices, edges;
     igraph_integer_t i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_vector_t weights_vec;
@@ -169,6 +169,8 @@ int main(void) {
     igraph_vector_int_list_init(&evecs, 0);
     igraph_vector_int_init(&parents, 0);
     igraph_vector_int_init(&inbound, 0);
+    igraph_vector_int_init(&vertices, 0);
+    igraph_vector_int_init(&edges, 0);
 
     igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
 
@@ -260,10 +262,20 @@ int main(void) {
 
     igraph_vector_int_print(&(VECTOR(vecs)[0]));
 
+    printf("Same situation but through shortest_path_astar interface:\n");
+    igraph_get_shortest_path_astar(&g, &vertices,
+                                       &edges, /*from=*/ 0, /*to=*/ LENGTH - 1,
+                                       /*weights*/&weights_vec, IGRAPH_OUT,
+                                       euclidean_heuristic, &xy);
+
+    igraph_vector_int_print(&(VECTOR(vecs)[0]));
+
     igraph_vector_int_list_destroy(&vecs);
     igraph_vector_int_list_destroy(&evecs);
     igraph_vector_int_destroy(&parents);
     igraph_vector_int_destroy(&inbound);
+    igraph_vector_int_destroy(&vertices);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&weights_vec);
     igraph_vector_destroy(&xy.x);
     igraph_vector_destroy(&xy.y);
