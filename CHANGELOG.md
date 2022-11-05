@@ -5,6 +5,7 @@
 ### Added
 
  - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
+ - `igraph_get_shortest_path_astar()` and `igraph_get_shortest_paths_astar()` find shortest paths with the A* algorithm.
 
 ### Fixed
 
