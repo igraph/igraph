@@ -186,7 +186,7 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
 
     VECTOR(dists)[from] = 0.0;  /* zero distance */
     IGRAPH_CHECK(heuristic(&heur_res, from, extra));
-    igraph_2wheap_push_with_index(&Q, from, -heur_res);
+    IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, from, -heur_res));
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
         igraph_integer_t nlen, minnei;
