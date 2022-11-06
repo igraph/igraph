@@ -48,22 +48,21 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
+
     remain = IGRAPH_CALLOC(no_of_nodes, char);
-    if (remain == 0) {
-        IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(remain, "Insufficient memory for taking subgraph.");
     IGRAPH_FINALLY(igraph_free, remain);
+
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_nodes - IGRAPH_VIT_SIZE(vit)));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        remain[ IGRAPH_VIT_GET(vit) ] = 1;
+        remain[ IGRAPH_VIT_GET(vit) ] = true;
     }
 
     for (i = 0; i < no_of_nodes; i++) {
-
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (remain[i] == 0) {
+        if (! remain[i]) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
         }
     }
@@ -81,6 +80,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     igraph_vector_int_destroy(&delete);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -364,7 +364,7 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 igraph_subgraph_implementation_t impl,
                                 igraph_vector_int_t *map,
                                 igraph_vector_int_t *invmap) {
-    return igraph_i_induced_subgraph_map(graph, res,vids, impl, map, invmap, /* map_is_prepared = */ 0);
+    return igraph_i_induced_subgraph_map(graph, res,vids, impl, map, invmap, /* map_is_prepared = */ false);
 }
 
 /**
