@@ -364,19 +364,19 @@ igraph_error_t igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *re
  * \function igraph_induced_subgraph_map
  * \brief Creates an induced subraph and returns the mapping from the original.
  *
- * </para><para>
  * This function collects the specified vertices and all edges between
  * them to a new graph.
  * As the vertex IDs in a graph always start with zero, this function
  * very likely needs to reassign IDs to the vertices.
+ *
  * \param graph The graph object.
  * \param res The subgraph, another graph object will be stored here,
  *        do \em not initialize this object before calling this
  *        function, and call \ref igraph_destroy() on it if you don't need
  *        it any more.
  * \param vids A vertex selector describing which vertices to keep.
- * \param impl This parameter selects which implementation should we
- *        use when constructing the new graph. Basically there are two
+ * \param impl This parameter selects which implementation should be
+ *        used when constructing the new graph. Basically there are two
  *        possibilities: \c IGRAPH_SUBGRAPH_COPY_AND_DELETE copies the
  *        existing graph and deletes the vertices that are not needed
  *        in the new graph, while \c IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
