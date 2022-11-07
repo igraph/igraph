@@ -280,8 +280,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     IGRAPH_CHECK(igraph_is_dag(graph, &dag));
     if (dag) {
         /* special case: graph is a DAG */
-        IGRAPH_WARNING("graph is directed and acyclic; eigenvector centralities "
-                       "will be zeros");
+        IGRAPH_WARNING("Graph is directed and acyclic; eigenvector centralities will be zeros.");
         if (value) {
             *value = 0;
         }
@@ -310,7 +309,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         if (min < 0.0) {
             /* When there are negative weights, the eigenvalue and the eigenvector are no
              * longer guaranteed to be non-negative, or even real-valued. */
-            negative_weights = 1;
+            negative_weights = true;
             IGRAPH_WARNING("Negative weights in directed graph, eigenpair may be complex.");
         }
         if (min == 0.0 && max == 0.0) {
