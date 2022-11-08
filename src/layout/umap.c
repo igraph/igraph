@@ -175,7 +175,7 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * clear *who* you are a neighbor of), the weights are usually undirected. Whenever two
  * vertices are doubly connected in the distance graph, the resulting weight W is set as:
  *
- *     W = P_{-> | <-} = P_{->} + P_{<-} - P_{->} * P_{<-} = W1 + W2 - W1 * W2
+ * W = W1 + W2 - W1 * W2
  *
  *
  * Because UMAP weights are interpreted as probabilities, this is just the probability
