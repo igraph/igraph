@@ -64,11 +64,6 @@ static igraph_error_t igraph_i_gml_make_numeric(const char *name,
                                                 int line,
                                                 igraph_real_t value,
                                                 igraph_gml_tree_t **tree);
-static igraph_error_t igraph_i_gml_make_numeric2(char *name,
-                                                 int line,
-                                                 char *value,
-                                                 igraph_real_t sign,
-                                                 igraph_gml_tree_t **tree);
 static igraph_error_t igraph_i_gml_make_string(const char *name,
                                                int line,
                                                char *value,
