@@ -77,14 +77,6 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_CHECK(igraph_delete_vertices_idx(res, igraph_vss_vector(&delete),
                                             map, invmap));
 
-    /* temporarily update 'map' as the caller requires 'map' to mark unmapped
-     * vertices with zero */
-    if (map) {
-        for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(*map)[i]++;
-        }
-    }
-
     igraph_vector_int_destroy(&delete);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
@@ -137,10 +129,11 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
         my_vids_old2new = map;
         if (!map_is_prepared) {
             IGRAPH_CHECK(igraph_vector_int_resize(map, no_of_nodes));
-            igraph_vector_int_null(map);
+            igraph_vector_int_fill(map, -1);
         }
     } else {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
+        igraph_vector_int_fill(&vids_old2new, -1);
     }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_vec, 0);
 
@@ -163,10 +156,10 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
     n = igraph_vector_int_size(&vids_vec);
     for (i = 0; i < n; i++) {
         igraph_integer_t vid = VECTOR(vids_vec)[i];
-        if (VECTOR(*my_vids_old2new)[vid] == 0) {
+        if (VECTOR(*my_vids_old2new)[vid] < 0) {
             IGRAPH_CHECK(igraph_vector_int_push_back(my_vids_new2old, vid));
-            no_of_new_nodes++;
             VECTOR(*my_vids_old2new)[vid] = no_of_new_nodes;
+            no_of_new_nodes++;
         }
     }
     igraph_vector_int_destroy(&vids_vec);
@@ -187,12 +180,12 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
                 eid = VECTOR(nei_edges)[j];
 
                 to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
-                if (!to) {
+                if (to < 0) {
                     continue;
                 }
 
                 IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to - 1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
             }
         } else {
@@ -209,10 +202,9 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
                 }
 
                 to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
-                if (!to) {
+                if (to < 0) {
                     continue;
                 }
-                to -= 1;
 
                 if (new_vid == to) {
                     /* this is a loop edge; check whether we need to skip it */
@@ -397,12 +389,12 @@ igraph_error_t igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *re
  *        two methods automatically based on the ratio of the number
  *        of vertices in the new and the old graph.
  * \param map Returns a map of the vertices in \p graph to the vertices
- *        in \p res. A 0 indicates a vertex is not mapped. An \c i + 1 at
+ *        in \p res. -1 indicates a vertex is not mapped. A value of \c i at
  *        position \c j indicates the vertex \c j in \p graph is mapped
  *        to vertex i in \p res.
  * \param invmap Returns a map of the vertices in \p res to the vertices
- *        in \p graph. An i at position \c j indicates the vertex \c i
- *        in \p graph is mapped to vertex j in \p res.
+ *        in \p graph. A value of \c i at position \c j indicates that
+ *        vertex \c i in \p graph is mapped to vertex \c j in \p res.
  *
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
