@@ -246,7 +246,7 @@ igraph_error_t igraph_layout_umap_compute_weights(
     /* Iterate over vertices x, like in the paper */
     for (i = 0; i < no_of_vertices; i++) {
         /* Edges into this vertex */
-        IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_OUT));
         no_of_neis = igraph_vector_int_size(&eids);
 
         /* Vertex has no neighbors */
