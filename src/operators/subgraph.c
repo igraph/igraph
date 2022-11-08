@@ -77,6 +77,14 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_CHECK(igraph_delete_vertices_idx(res, igraph_vss_vector(&delete),
                                             map, invmap));
 
+    /* temporarily update 'map' as the caller requires 'map' to mark unmapped
+     * vertices with zero */
+    if (map) {
+        for (i = 0; i < no_of_nodes; i++) {
+            VECTOR(*map)[i]++;
+        }
+    }
+
     igraph_vector_int_destroy(&delete);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
