@@ -96,7 +96,7 @@ void check_graph_twoclusters_weights(
     if (distances == NULL) {     
         for (i = 0; i < nc; i++) {
             if (VECTOR(*weights)[i] != 1.0) {
-                printf("Connectivities with NULL distances should all be 1.0.");
+                printf("Connectivities with NULL distances should all be 1 or -1.\n");
                 return;
             }
         }
