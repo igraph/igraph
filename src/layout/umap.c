@@ -159,7 +159,8 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  *
  * UMAP is used to embed high-dimensional vectors in a low-dimensional space
  * (most commonly 2D). It uses a distance graph as an intermediate data structure,
- * making it also a useful graph layout algorithm. See \ref igraph_layout_umap() for more information.
+ * making it also a useful graph layout algorithm. See \ref igraph_layout_umap()
+ * for more information.
  *
  * </para><para>
  *
@@ -176,7 +177,6 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * vertices are doubly connected in the distance graph, the resulting weight W is set as:
  *
  * W = W1 + W2 - W1 * W2
- *
  *
  * Because UMAP weights are interpreted as probabilities, this is just the probability
  * that either edge is present, without double counting. It is called "fuzzy union" in
@@ -198,10 +198,19 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * </para><para>
  * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
  *
- * \param graph Pointer to the distance graph.
+ * \param graph Pointer to the distance graph. This can be directed (e.g. connecting
+ *   each vertex to its neighbors in a k-nearest neighbor) or undirected, but must
+ *   have no loops nor parallel edges. The only exception is: if the graph is directed,
+ *   having pairs of edges with opposite direction is accepted.
  * \param distances Pointer to the vector with the vertex-to-vertex distance associated with
- *   each edge. This argument can be NULL, in which case all weights will be set to 1.0.
- * \param weights Pointer to an initialized vector where the result will be stored.
+ *   each edge. This argument can be NULL, in which case all edges are assumed to have the
+ *   same distance.
+ * \param weights Pointer to an initialized vector where the result will be stored. If the
+ *   input graph is directed, the weights represent a symmetrized version which contains
+ *   less information. Therefore, whenever two edges between the same vertices and opposite
+ *   direction are present in the input graph, only one of the weights is set and the other
+ *   is fixed to zero. That format is accepted by \ref igraph_layout_umap(), which skips
+ *   all zero-weight edges from the layout optimization.
  *
  * \return Error code.
  */
@@ -221,13 +230,11 @@ igraph_error_t igraph_layout_umap_compute_weights(
     /* reserve memory for the weights */
     IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
 
-    /* UMAP is sometimes used on unweighted graphs, then weights are all 1. */
+    /* UMAP is sometimes used on unweighted graphs, otherwise check distance vector. */
     if (distances != NULL) {
-        /* Otherwise, check distance vector */
         if (igraph_vector_size(distances) != no_of_edges) {
             IGRAPH_ERROR("Distances must be the same number as the edges in the graph.", IGRAPH_EINVAL);
         }
-
         if (no_of_edges > 0) {
             dist_min = igraph_vector_min(distances);
             if (dist_min < 0) {
@@ -245,7 +252,7 @@ igraph_error_t igraph_layout_umap_compute_weights(
 
     /* Iterate over vertices x, like in the paper */
     for (i = 0; i < no_of_vertices; i++) {
-        /* Edges into this vertex */
+        /* Edges out of this vertex, e.g. to its k-nearest neighbors */
         IGRAPH_CHECK(igraph_incident(graph, &eids, i, IGRAPH_OUT));
         no_of_neis = igraph_vector_int_size(&eids);
 
@@ -298,6 +305,13 @@ igraph_error_t igraph_layout_umap_compute_weights(
 
             /* Store in vector lists for later symmetrization */
             k = IGRAPH_OTHER(graph, eid, i);
+            if (k == i) {
+                igraph_vector_list_destroy(&weights_seen);
+                igraph_vector_int_list_destroy(&neighbors_seen);
+                igraph_vector_int_destroy(&eids);
+                IGRAPH_FINALLY_CLEAN(3);
+                IGRAPH_ERROR("Input graph must contain no loops.", IGRAPH_EINVAL);
+            }
             igraph_vector_int_push_back(&(VECTOR(neighbors_seen)[i]), k);
             igraph_vector_push_back(&(VECTOR(weights_seen)[i]), weight);
         }
@@ -1065,6 +1079,10 @@ static igraph_error_t igraph_i_layout_umap(
      * check that the dimensions of the layout make sense. */
     if (use_seed) {
         if ((igraph_matrix_nrow(res) != no_of_vertices) || (igraph_matrix_ncol(res) != ndim)) {
+            if (!distances_are_weights) {
+                igraph_vector_destroy(&weights);
+                IGRAPH_FINALLY_CLEAN(1);
+            }
             IGRAPH_ERRORF("Seed layout should have %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions, got %" IGRAPH_PRId " points in %" IGRAPH_PRId " dimensions.",
                           IGRAPH_EINVAL, no_of_vertices, ndim,
                           igraph_matrix_nrow(res),
@@ -1210,22 +1228,25 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * (see \ref igraph_layout_umap() for the 2D version).
  *
  * \param graph Pointer to the graph to find a layout for (i.e. to embed). This is
- *   typically a sparse graph with only edges for the shortest distances stored, e.g.
- *   a k-nearest neighbors graph.
+ *   typically a directed, sparse graph with only edges for the shortest distances
+ *   stored, e.g. a k-nearest neighbors graph with the edges going from each focal
+ *   vertex to its neighbors. However, it can also be an undirected graph. If the
+ *   \p distances_are_weights is \c true, this is treated as an undirected graph.
  * \param res Pointer to the n by 3 matrix where the layout coordinates will be stored.
  * \param use_seed Logical, if true the supplied values in the \p res argument are used
  *   as an initial layout, if false a random initial layout is used.
  * \param distances Pointer to a vector of distances associated with the graph edges.
- *   If this argument is \c NULL, all weights will be set to 1.
+ *   If this argument is \c NULL, all edges are assumed to have the same distance.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices
  *   can be in the embedding before feeling a repulsive force. It should be
  *   nonnegative. Typical values are between 0 and 1.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on
  *   the cross-entropy. Typical values are between 30 and 500.
- * \param distances_are_weights Whether to use precomputed weights. If
- *   true, the "distances" vector contains precomputed weights. If false (the
+ * \param distances_are_weights Whether to use precomputed weights. If \c false (the
  *   typical use case), this function will compute weights from distances and
- *   then use them to compute the layout.
+ *   then use them to compute the layout.  If \c true, the "distances" vector contains
+ *   precomputed weights, including possibly some weights equal to zero that are
+ *   inconsequential for the layout optimization.
  * \return Error code.
  */
 igraph_error_t igraph_layout_umap_3d(const igraph_t *graph,
