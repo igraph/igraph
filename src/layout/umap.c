@@ -37,7 +37,7 @@
  * 2D (or, less commonly, in 3D). Despite this geometric flair, UMAP heavily relies on
  * graphs as intermediate data structures and is therefore a useful graph layout
  * algorithm in its own right. Conceptually, there are three steps:
- * 
+ *
  * 1. Compute a sparse graph with edges connecting similar vectors, e.g. a k-nearest
  *    neighbor graph. A vector of distances is associated with the graph edges. This
  *    file does *not* perform this part of the computation since there are many
@@ -186,7 +186,7 @@ static igraph_error_t igraph_i_umap_find_sigma(const igraph_vector_t *distances,
  * i.e. one needs fewer weights than one had distances. To keep things efficient, here
  * we set the weight for one of the two edges as above and the weight for its opposite edge
  * as 0, so that it will be skipped in the UMAP gradient descent later on.
- * 
+ *
  * </para><para>
  *
  * Technical note: For each vertex, this function computes its scale factor (sigma),
@@ -225,6 +225,8 @@ igraph_error_t igraph_layout_umap_compute_weights(
     igraph_vector_int_t eids;
     igraph_vector_int_list_t neighbors_seen;
     igraph_vector_list_t weights_seen;
+    igraph_vector_int_t* neighbors_seen_elt;
+    igraph_vector_t* weights_seen_elt;
     igraph_real_t rho, dist_max, dist, sigma, weight, weight_inv, sigma_target, dist_min;
 
     /* reserve memory for the weights */
@@ -306,19 +308,19 @@ igraph_error_t igraph_layout_umap_compute_weights(
             /* Store in vector lists for later symmetrization */
             k = IGRAPH_OTHER(graph, eid, i);
             if (k == i) {
-                igraph_vector_list_destroy(&weights_seen);
-                igraph_vector_int_list_destroy(&neighbors_seen);
-                igraph_vector_int_destroy(&eids);
-                IGRAPH_FINALLY_CLEAN(3);
                 IGRAPH_ERROR("Input graph must contain no loops.", IGRAPH_EINVAL);
             }
-            igraph_vector_int_push_back(&(VECTOR(neighbors_seen)[i]), k);
-            igraph_vector_push_back(&(VECTOR(weights_seen)[i]), weight);
+
+            neighbors_seen_elt = igraph_vector_int_list_get_ptr(&neighbors_seen, i);
+            IGRAPH_CHECK(igraph_vector_int_push_back(neighbors_seen_elt, k));
+
+            weights_seen_elt = igraph_vector_list_get_ptr(&weights_seen, i);
+            IGRAPH_CHECK(igraph_vector_push_back(weights_seen_elt, weight));
         }
 
     }
 
-    /* Symmetrize the weights. UMAP weights are probabilities of that edge being a 
+    /* Symmetrize the weights. UMAP weights are probabilities of that edge being a
      * "real" connection. Unlike the distances, which can represent a directed graph,
      * weights are usually symmetric. We symmetrize via fuzzy union. */
     for (eid=0; eid < no_of_edges; eid++) {
@@ -329,13 +331,15 @@ igraph_error_t igraph_layout_umap_compute_weights(
         /* NOTE: this and the subsequent loop could be faster if we sorted the vectors
          * beforehand. Probably not such a big deal. */
         weight = 0;
-        no_of_neis = igraph_vector_int_size(&(VECTOR(neighbors_seen)[i]));
+        neighbors_seen_elt = igraph_vector_int_list_get_ptr(&neighbors_seen, i);
+        weights_seen_elt = igraph_vector_list_get_ptr(&weights_seen, i);
+        no_of_neis = igraph_vector_int_size(neighbors_seen_elt);
         for (l=0; l < no_of_neis; l++) {
-            if (VECTOR(VECTOR(neighbors_seen)[i])[l] == k) {
-                weight = VECTOR(VECTOR(weights_seen)[i])[l];
+            if (VECTOR(*neighbors_seen_elt)[l] == k) {
+                weight = VECTOR(*weights_seen_elt)[l];
                 /* Tag this weight so we can ignore it later on if the opposite
                  * directed edge is found. It's ok to retag */
-                VECTOR(VECTOR(weights_seen)[i])[l] = -1;
+                VECTOR(*weights_seen_elt)[l] = -1;
                 break;
             }
         }
@@ -348,13 +352,15 @@ igraph_error_t igraph_layout_umap_compute_weights(
 
         /* Weight of the opposite edge, if found */
         weight_inv = 0;
-        no_of_neis = igraph_vector_int_size(&(VECTOR(neighbors_seen)[k]));
+        neighbors_seen_elt = igraph_vector_int_list_get_ptr(&neighbors_seen, k);
+        weights_seen_elt = igraph_vector_list_get_ptr(&weights_seen, k);
+        no_of_neis = igraph_vector_int_size(neighbors_seen_elt);
         for (l=0; l < no_of_neis; l++) {
-            if (VECTOR(VECTOR(neighbors_seen)[k])[l] == i) {
-                weight_inv = VECTOR(VECTOR(weights_seen)[k])[l];
+            if (VECTOR(*neighbors_seen_elt)[l] == i) {
+                weight_inv = VECTOR(*weights_seen_elt)[l];
                 /* Tag this weight so we can ignore it later on if the opposite
                  * directed edge is found. It's ok to retag */
-                VECTOR(VECTOR(weights_seen)[k])[l] = -1;
+                VECTOR(*weights_seen_elt)[l] = -1;
                 break;
             }
         }
@@ -569,13 +575,6 @@ igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist, igraph_real_t *a_p, 
 
         /* This might go wrong, in which case we should fail graciously */
         if (lapack_info != 0) {
-            igraph_vector_destroy(&x);
-            igraph_vector_destroy(&residuals);
-            igraph_matrix_destroy(&jacobian);
-            igraph_matrix_destroy(&jTj);
-            igraph_matrix_destroy(&jTr);
-            igraph_vector_destroy(&powb);
-            IGRAPH_FINALLY_CLEAN(6);
             IGRAPH_ERROR("Singular matrix in the estimation of a and b for UMAP",  IGRAPH_EINVAL);
         }
 
@@ -841,7 +840,7 @@ static igraph_error_t igraph_i_umap_apply_forces(
             for (igraph_integer_t j = 0; j < n_negative_vertices; j++) {
 
                 IGRAPH_ALLOW_INTERRUPTION();
-                
+
                 /* Get random neighbor */
                 to = VECTOR(negative_vertices)[j];
                 /* obviously you cannot repel yourself */
@@ -1157,7 +1156,7 @@ static igraph_error_t igraph_i_layout_umap(
  * Nonlinearity helps "cluster" very similar vectors together without imposing a
  * global geometry on the embedded space (e.g. a rigid rotation + compression in PCA).
  * UMAP uses graphs as intermediate data structures, hence it can be used as a
- * graph layout algorithm as well. 
+ * graph layout algorithm as well.
  *
  * </para><para>
  *
@@ -1184,7 +1183,7 @@ static igraph_error_t igraph_i_layout_umap(
  *
  * </para><para>
  * Leland McInnes, John Healy, and James Melville. https://arxiv.org/abs/1802.03426
- 
+
  * \param graph Pointer to the graph to find a layout for (i.e. to embed). This is
  *   typically a sparse graph with only edges for the shortest distances stored, e.g.
  *   a k-nearest neighbors graph.
