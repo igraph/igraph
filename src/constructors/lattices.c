@@ -52,7 +52,7 @@
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  */
-static igraph_error_t triangle_lattice(
+static igraph_error_t triangular_lattice(
     igraph_t *graph, igraph_bool_t directed, igraph_bool_t mutual,
     const igraph_vector_int_t *row_lengths_vector, const igraph_vector_int_t *row_start_vector
 ) {
@@ -104,11 +104,11 @@ static igraph_error_t triangle_lattice(
         }                                                                                                                                         \
     }
 
-    /* computing the number of edges in the constructed triangle lattice */
+    /* computing the number of edges in the constructed triangular lattice */
     igraph_integer_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
     igraph_integer_t multiplier = mutual && directed ? 4 : 2;
     for (j = 0; j < row_count - 1; j++) {
-        IGRAPH_SAFE_ADD(no_of_edges2, VECTOR(*row_lengths_vector)[j], &no_of_edges2);
+        IGRAPH_SAFE_ADD(no_of_edges2, VECTOR(*row_lengths_vector)[j] - 1, &no_of_edges2);
         IGRAPH_SAFE_ADD(no_of_edges2, MIN(ROW_END(j), ROW_END((j + 1))) - MAX(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1]) + 1,
                         &no_of_edges2);
         IGRAPH_SAFE_ADD(no_of_edges2, MIN(ROW_END(j), ROW_END((j + 1)) + 1) - MAX(VECTOR(*row_start_vector)[j], VECTOR(*row_start_vector)[j + 1] + 1) + 1,
@@ -140,7 +140,7 @@ static igraph_error_t triangle_lattice(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t triangle_lattice_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual) {
+static igraph_error_t triangular_lattice_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual) {
     igraph_integer_t row_count = size;
     igraph_vector_int_t row_lengths_vector;
     igraph_vector_int_t row_start_vector;
@@ -154,7 +154,7 @@ static igraph_error_t triangle_lattice_triangle_shape(igraph_t *graph, igraph_in
         VECTOR(row_start_vector)[i] = 0;
     }
 
-    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
+    IGRAPH_CHECK(triangular_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
@@ -163,7 +163,7 @@ static igraph_error_t triangle_lattice_triangle_shape(igraph_t *graph, igraph_in
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t triangle_lattice_rectangle_shape(
+static igraph_error_t triangular_lattice_rectangle_shape(
     igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
     igraph_bool_t directed, igraph_bool_t mutual
 ) {
@@ -180,7 +180,7 @@ static igraph_error_t triangle_lattice_rectangle_shape(
         VECTOR(row_start_vector)[i] = (row_count - i) / 2;
     }
 
-    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
+    IGRAPH_CHECK(triangular_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
@@ -189,7 +189,7 @@ static igraph_error_t triangle_lattice_rectangle_shape(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t triangle_lattice_hex_shape(
+static igraph_error_t triangular_lattice_hex_shape(
     igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
     igraph_integer_t size_z, igraph_bool_t directed, igraph_bool_t mutual
 ) {
@@ -221,7 +221,7 @@ static igraph_error_t triangle_lattice_hex_shape(
         }
     }
 
-    IGRAPH_CHECK(triangle_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
+    IGRAPH_CHECK(triangular_lattice(graph, directed, mutual, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
@@ -282,13 +282,13 @@ igraph_error_t igraph_triangular_lattice(
 
     switch (num_dims) {
     case 1:
-        IGRAPH_CHECK(triangle_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
+        IGRAPH_CHECK(triangular_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
         break;
     case 2:
-        IGRAPH_CHECK(triangle_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
+        IGRAPH_CHECK(triangular_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
         break;
     case 3:
-        IGRAPH_CHECK(triangle_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
+        IGRAPH_CHECK(triangular_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
         break;
     default:
         IGRAPH_ERRORF(
