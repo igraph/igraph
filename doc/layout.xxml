@@ -37,6 +37,7 @@
 <!-- doxrox-include igraph_roots_for_tree_layout -->
 <!-- doxrox-include igraph_layout_sugiyama -->
 <!-- doxrox-include igraph_layout_umap -->
+<!-- doxrox-include igraph_layout_umap_compute_weights -->
 </section>
 
 <section id="three-d-layout-generators"><title>3D layout generators</title>
