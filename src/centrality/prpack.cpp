@@ -114,7 +114,8 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    // TODO: can we get the eigenvalue? We'll just fake it until we can.
+    // PRPACK calculates PageRank scores by solving a linear system,
+    // so there is no eigenvalue. We return an exact 1.0 in all cases.
     if (value) {
         *value = 1.0;
     }

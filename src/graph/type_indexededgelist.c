@@ -622,7 +622,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  *     may contain the same ID more than once.
  * \param idx An optional pointer to a vector that provides the mapping from
  *     the vertex IDs \em before the removal to the vertex IDs \em after
- *     the removal. You can supply \c NULL here if you are not interested.
+ *     the removal, \em plus one. Zero is used to represent vertices that were
+ *     removed during the operation. You can supply \c NULL here if you are not
+ *     interested.
  * \param invidx An optional pointer to a vector that provides the mapping from
  *     the vertex IDs \em after the removal to the vertex IDs \em before
  *     the removal. You can supply \c NULL here if you are not interested.
