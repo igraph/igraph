@@ -12,6 +12,11 @@
 ### Added
 
  - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
+ - `igraph_layout_umap_compute_weights()` computes weights for the UMAP layout algorithm from distances. This used to be part of `igraph_layout_umap()`, but it is now in a separate function to allow the user to experiment with different weighting schemes.
+
+### Changed
+
+ - The signature of the experimental `igraph_layout_umap()` function changed; the last argument is now a Boolean that specifies whether distances should already be treated as weights, and the sampling probability argument was removed.
 
 ### Fixed
 

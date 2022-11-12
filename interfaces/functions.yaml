@@ -1451,14 +1451,18 @@ igraph_layout_davidson_harel:
 igraph_layout_umap:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
-        REAL sampling_prob
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_weights=False
 
 igraph_layout_umap_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
-        REAL sampling_prob
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_weights=False
+
+igraph_layout_umap_compute_weights:
+    PARAMS: |-
+        GRAPH graph, VECTOR distances, INOUT VECTOR weights
 
 #######################################
 # Cocitation and other similarity measures
