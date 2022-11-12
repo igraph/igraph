@@ -200,7 +200,7 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
         degree_i  = igraph_vector_int_size(neis);
 
         if (dist > *ecc) {
-            if (!IGRAPH_FINITE(dist)) {
+            if (!isfinite(dist)) {
                 if (!unconn) {
                     *ecc = IGRAPH_INFINITY;
                     *vid_ecc = -1;
@@ -328,7 +328,7 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
-        } else if (igraph_is_nan(min)) {
+        } else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -705,7 +705,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
-        else if (igraph_is_nan(min)) {
+        else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -739,7 +739,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_u, vid_start, &vid_ecc, unconn, &inclist));
 
-        inf = !IGRAPH_FINITE(ecc_u);
+        inf = !isfinite(ecc_u);
 
         if (!inf) {
             while (1) {

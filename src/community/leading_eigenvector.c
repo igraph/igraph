@@ -155,73 +155,6 @@ static igraph_error_t igraph_i_community_leading_eigenvector(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_community_leading_eigenvector2(
-        igraph_real_t *to,
-        const igraph_real_t *from,
-        int n, void *extra) {
-
-    igraph_i_community_leading_eigenvector_data_t *data = extra;
-    igraph_integer_t j, k, nlen, size = n;
-    igraph_vector_int_t *idx = data->idx;
-    igraph_vector_int_t *idx2 = data->idx2;
-    igraph_vector_t *tmp = data->tmp;
-    igraph_adjlist_t *adjlist = data->adjlist;
-    igraph_real_t ktx, ktx2;
-    igraph_integer_t no_of_edges = data->no_of_edges;
-    igraph_vector_int_t *mymembership = data->mymembership;
-    igraph_integer_t comm = data->comm;
-
-    /* Ax */
-    for (j = 0; j < size; j++) {
-        igraph_integer_t oldid = VECTOR(*idx)[j];
-        igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
-        nlen = igraph_vector_int_size(neis);
-        to[j] = 0.0;
-        VECTOR(*tmp)[j] = 0.0;
-        for (k = 0; k < nlen; k++) {
-            igraph_integer_t nei = VECTOR(*neis)[k];
-            igraph_integer_t neimemb = VECTOR(*mymembership)[nei];
-            if (neimemb == comm) {
-                igraph_integer_t fi = VECTOR(*idx2)[nei];
-                if (fi < size) {
-                    to[j] += from[fi];
-                }
-                VECTOR(*tmp)[j] += 1;
-            }
-        }
-    }
-
-    /* Now calculate k^Tx/2m */
-    ktx = 0.0; ktx2 = 0.0;
-    for (j = 0; j < size + 1; j++) {
-        igraph_integer_t oldid = VECTOR(*idx)[j];
-        igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
-        igraph_integer_t degree = igraph_vector_int_size(neis);
-        if (j < size) {
-            ktx += from[j] * degree;
-        }
-        ktx2 += degree;
-    }
-    ktx = ktx / no_of_edges / 2.0;
-    ktx2 = ktx2 / no_of_edges / 2.0;
-
-    /* Now calculate Bx */
-    for (j = 0; j < size; j++) {
-        igraph_integer_t oldid = VECTOR(*idx)[j];
-        igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
-        igraph_real_t degree = igraph_vector_int_size(neis);
-        to[j] = to[j] - ktx * degree;
-        VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2 * degree;
-    }
-
-    /* -d_ij summa l in G B_il */
-    for (j = 0; j < size; j++) {
-        to[j] -= VECTOR(*tmp)[j] * from[j];
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
 static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
         igraph_real_t *to,
         const igraph_real_t *from,
@@ -266,76 +199,6 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
         igraph_integer_t oldid = VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
         ktx += from[j] * str;
-        ktx2 += str;
-    }
-    ktx = ktx / sw / 2.0;
-    ktx2 = ktx2 / sw / 2.0;
-
-    /* Bx */
-    for (j = 0; j < size; j++) {
-        igraph_integer_t oldid = VECTOR(*idx)[j];
-        igraph_real_t str = VECTOR(*strength)[oldid];
-        to[j] = to[j] - ktx * str;
-        VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2 * str;
-    }
-
-    /* -d_ij summa l in G B_il */
-    for (j = 0; j < size; j++) {
-        to[j] -= VECTOR(*tmp)[j] * from[j];
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-static igraph_error_t igraph_i_community_leading_eigenvector2_weighted(
-        igraph_real_t *to,
-        const igraph_real_t *from,
-        int n, void *extra) {
-
-    igraph_i_community_leading_eigenvector_data_t *data = extra;
-    igraph_integer_t j, k, nlen, size = n;
-    igraph_vector_int_t *idx = data->idx;
-    igraph_vector_int_t *idx2 = data->idx2;
-    igraph_vector_t *tmp = data->tmp;
-    igraph_inclist_t *inclist = data->inclist;
-    igraph_real_t ktx, ktx2;
-    igraph_vector_int_t *mymembership = data->mymembership;
-    igraph_integer_t comm = data->comm;
-    const igraph_vector_t *weights = data->weights;
-    const igraph_t *graph = data->graph;
-    igraph_vector_t *strength = data->strength;
-    igraph_real_t sw = data->sumweights;
-
-    /* Ax */
-    for (j = 0; j < size; j++) {
-        igraph_integer_t oldid = VECTOR(*idx)[j];
-        igraph_vector_int_t *inc = igraph_inclist_get(inclist, oldid);
-        nlen = igraph_vector_int_size(inc);
-        to[j] = 0.0;
-        VECTOR(*tmp)[j] = 0.0;
-        for (k = 0; k < nlen; k++) {
-            igraph_integer_t edge = VECTOR(*inc)[k];
-            igraph_real_t w = VECTOR(*weights)[edge];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, oldid);
-            igraph_integer_t neimemb = VECTOR(*mymembership)[nei];
-            if (neimemb == comm) {
-                igraph_integer_t fi = VECTOR(*idx2)[nei];
-                if (fi < size) {
-                    to[j] += from[fi] * w;
-                }
-                VECTOR(*tmp)[j] += w;
-            }
-        }
-    }
-
-    /* k^Tx/2m */
-    ktx = 0.0; ktx2 = 0.0;
-    for (j = 0; j < size + 1; j++) {
-        igraph_integer_t oldid = VECTOR(*idx)[j];
-        igraph_real_t str = VECTOR(*strength)[oldid];
-        if (j < size) {
-            ktx += from[j] * str;
-        }
         ktx2 += str;
     }
     ktx = ktx / sw / 2.0;
@@ -499,9 +362,6 @@ igraph_error_t igraph_community_leading_eigenvector(
     igraph_arpack_function_t *arpcb1 =
             weights ? igraph_i_community_leading_eigenvector_weighted :
                       igraph_i_community_leading_eigenvector;
-    igraph_arpack_function_t *arpcb2 =
-            weights ? igraph_i_community_leading_eigenvector2_weighted :
-                      igraph_i_community_leading_eigenvector2;
     igraph_real_t sumweights = 0.0;
 
     if (no_of_nodes > INT_MAX) {
@@ -651,7 +511,6 @@ igraph_error_t igraph_community_leading_eigenvector(
         igraph_integer_t comm = igraph_dqueue_int_pop_back(&tosplit);
         /* depth first search */
         igraph_integer_t size = 0;
-        igraph_real_t tmpev;
 
         IGRAPH_STATUSF(("Trying to split community %" IGRAPH_PRId "... ", 0, comm));
         IGRAPH_ALLOW_INTERRUPTION();
@@ -668,16 +527,7 @@ igraph_error_t igraph_community_leading_eigenvector(
             continue;
         }
 
-        /* We solve two eigenproblems, one for the original modularity
-           matrix, and one for the modularity matrix after deleting the
-           last row and last column from it. This is a trick to find
-           multiple leading eigenvalues, because ARPACK is sometimes
-           unstable when the first two eigenvalues are requested, but it
-           does much better for the single principal eigenvalue. */
-
-        /* We start with the smaller eigenproblem. */
-
-        options->n = (int) size - 1;
+        options->n = (int) size;
         options->info = 0;
         options->nev = 1;
         options->ldv = 0;
@@ -691,53 +541,17 @@ igraph_error_t igraph_community_leading_eigenvector(
          * values close to +1 and -1 as this is what the eigenvector should
          * look like if there _is_ some kind of a community structure at this
          * step to discover. Experiments showed that shuffling a vector
-         * containing equal number of +/-1 values yields convergence in most
-         * cases */
+         * containing equal number of slightly perturbed +/-1 values yields
+         * convergence in most cases. */
         options->start = 1;
+        options->mxiter = options->mxiter > 10000 ? options->mxiter : 10000;  /* use more iterations, we've had convergence problems with 3000 */
+        RNG_BEGIN();
         for (i = 0; i < options->n; i++) {
-            storage.resid[i] = i % 2 ? 1 : -1;
+            storage.resid[i] = (i % 2 ? 1 : -1) + RNG_UNIF(-0.1, 0.1);
         }
-        igraph_vector_view(&start_vec, storage.resid, options->n);
-        RNG_BEGIN();
-        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
         RNG_END();
-
-        {
-            igraph_error_t retval;
-            igraph_error_handler_t *errh =
-                    igraph_set_error_handler(igraph_i_error_handler_none);
-            igraph_warning_handler_t *warnh =
-                    igraph_set_warning_handler(igraph_warning_handler_ignore);
-            retval = igraph_arpack_rssolve(arpcb2, &extra, options, &storage, /*values=*/ 0, /*vectors=*/ 0);
-            igraph_set_error_handler(errh);
-            igraph_set_warning_handler(warnh);
-            if (retval != IGRAPH_SUCCESS && retval != IGRAPH_ARPACK_MAXIT && retval != IGRAPH_ARPACK_NOSHIFT) {
-                IGRAPH_ERROR("ARPACK call failed", retval);
-            }
-        }
-
-        if (options->nconv < 1) {
-            IGRAPH_ERROR("ARPACK did not converge", IGRAPH_ARPACK_FAILED);
-        }
-
-        tmpev = storage.d[0];
-
-        /* Now we do the original eigenproblem, again, twice if needed */
-
-        options->n = (int) size;
-        options->info = 0;
-        options->nev = 1;
-        options->ldv = 0;
-        options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-        options->nconv = 0;
-        options->lworkl = 0;    /* we surely have enough space */
-
-        /* Use a random start vector; see comments above */
-        options->start = 1;
         igraph_vector_view(&start_vec, storage.resid, options->n);
-        RNG_BEGIN();
         IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
-        RNG_END();
 
         {
             igraph_error_t retval;
@@ -818,18 +632,6 @@ igraph_error_t igraph_community_leading_eigenvector(
 
         if (storage.d[0] <= 0) {
             IGRAPH_STATUS("no split.\n", 0);
-            if (history) {
-                IGRAPH_CHECK(igraph_vector_push_back(history,
-                                                     IGRAPH_LEVC_HIST_FAILED));
-                IGRAPH_CHECK(igraph_vector_push_back(history, comm));
-            }
-            continue;
-        }
-
-        /* Check for multiple leading eigenvalues */
-
-        if (fabs(storage.d[0] - tmpev) < 1e-8) {
-            IGRAPH_STATUS("multiple principal eigenvalue, no split.\n", 0);
             if (history) {
                 IGRAPH_CHECK(igraph_vector_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));

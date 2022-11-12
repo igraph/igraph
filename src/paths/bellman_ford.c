@@ -161,7 +161,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
 
             /* If we cannot get to j in finite time yet, there is no need to relax
              * its edges */
-            if (!IGRAPH_FINITE(VECTOR(dist)[j])) {
+            if (!isfinite(VECTOR(dist)[j])) {
                 continue;
             }
 
@@ -377,7 +377,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
         /* If we cannot get to j in finite time yet, there is no need to relax
             * its edges */
-        if (!IGRAPH_FINITE(VECTOR(dist)[j])) {
+        if (!isfinite(VECTOR(dist)[j])) {
             continue;
         }
 

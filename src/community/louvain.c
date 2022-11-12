@@ -337,7 +337,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
     /* int pass; // used only for debugging */
-    igraph_bool_t changed = false;
+    igraph_bool_t changed;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
     igraph_vector_int_t edges;
@@ -409,7 +409,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
         igraph_integer_t temp_communities_no = communities.communities_no;
 
         pass_q = q;
-        changed = 0;
+        changed = false;
 
         /* Save the current membership, it will be restored in case of worse result */
         IGRAPH_CHECK(igraph_vector_int_update(&temp_membership, communities.membership));
@@ -477,7 +477,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
             communities.item[new_id].weight_inside += 2 * max_weight + weight_loop;
 
             if (new_id != old_id) {
-                changed++;
+                changed = true;
             }
         }
 

@@ -75,9 +75,8 @@
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(n(|V|+|E|)),
- * n is the number of vertices to calculate,
- * |V| and |E| are the number of vertices and edges in the graph.
+ * Time complexity: O(s |E| + |V|), where s is the number of source vertices to use,
+ * and |V| and |E| are the number of vertices and edges in the graph.
  *
  * \sa  \ref igraph_distances_dijkstra_cutoff() for the weighted version with non-negative
  * weights.

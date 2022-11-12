@@ -651,7 +651,7 @@ igraph_error_t igraph_vector_is_nan(const igraph_vector_t *v, igraph_vector_bool
     IGRAPH_ASSERT(is_nan->stor_begin != NULL);
     IGRAPH_CHECK(igraph_vector_bool_resize(is_nan, igraph_vector_size(v)));
     for (ptr = v->stor_begin, ptr_nan = is_nan->stor_begin; ptr < v->end; ptr++, ptr_nan++) {
-        *ptr_nan = igraph_is_nan(*ptr);
+        *ptr_nan = isnan(*ptr);
     }
     return IGRAPH_SUCCESS;
 }
@@ -673,7 +673,7 @@ igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
     IGRAPH_ASSERT(v->stor_begin != NULL);
     ptr = v->stor_begin;
     while (ptr < v->end) {
-        if (igraph_is_nan(*ptr)) {
+        if (isnan(*ptr)) {
             return true;
         }
         ptr++;

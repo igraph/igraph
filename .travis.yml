@@ -1,8 +1,8 @@
 
 language: c
 cache: ccache
-# dist: xenial
 os: linux
+dist: focal
 
 # Ignore branches with names starting with certain keywords:
 branches:
@@ -21,27 +21,28 @@ git:
 
 addons:
   apt:
+    update: true
     packages:
-    - ninja-build
-    - flex
-    - bison
-#    - docbook2x
-#    - xmlto
-#    - texinfo
-#    - source-highlight
-#    - libxml2-utils
-#    - xsltproc
-#    - fop
-    - libgmp-dev
-    - libglpk-dev
-    - libarpack2-dev
-#    - libblas-dev
-#    - liblapack-dev
-    - libopenblas-dev
-    - libsuitesparse-dev
-    - libxml2-dev
-    - git
-    - colordiff
+      - ninja-build
+      - flex
+      - bison
+#      - docbook2x
+#      - xmlto
+#      - texinfo
+#      - source-highlight
+#      - libxml2-utils
+#      - xsltproc
+#      - fop
+      - libgmp-dev
+      - libglpk-dev
+      - libarpack2-dev
+#      - libblas-dev
+#      - liblapack-dev
+      - libopenblas-dev
+      - libsuitesparse-dev
+      - libxml2-dev
+      - git
+      - colordiff
   snaps:
     - name: cmake
       confinement: classic
@@ -50,7 +51,7 @@ addons:
 # if this phase fails, the build stops immediately
 before_script:
   - mkdir build && cd build
-  - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=ON -DIGRAPH_USE_INTERNAL_LAPACK=ON -DIGRAPH_USE_INTERNAL_ARPACK=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DIGRAPH_USE_INTERNAL_GMP=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON -DUSE_SANITIZER=Address\;Undefined
+  - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=ON -DIGRAPH_USE_INTERNAL_LAPACK=ON -DIGRAPH_USE_INTERNAL_ARPACK=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DIGRAPH_USE_INTERNAL_GMP=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON -DUSE_SANITIZER=Address
 
 # building and testing is in script
 # use && to ensure that ctest is not run if the build failed
@@ -74,24 +75,21 @@ jobs:
       arch: arm64
       before_script:
         - mkdir build && cd build
-        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=OFF -DIGRAPH_USE_INTERNAL_LAPACK=OFF -DIGRAPH_USE_INTERNAL_ARPACK=OFF -DIGRAPH_USE_INTERNAL_GLPK=OFF -DIGRAPH_USE_INTERNAL_GMP=OFF -DIGRAPH_VERIFY_FINALLY_STACK=ON -DBLA_VENDOR=OpenBLAS -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON -DUSE_SANITIZER=Address\;Undefined
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=OFF -DIGRAPH_USE_INTERNAL_LAPACK=OFF -DIGRAPH_USE_INTERNAL_ARPACK=OFF -DIGRAPH_USE_INTERNAL_GLPK=OFF -DIGRAPH_USE_INTERNAL_GMP=OFF -DIGRAPH_VERIFY_FINALLY_STACK=OFF -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON -DUSE_SANITIZER=Address
 
     - name: "Linux ppc64"
       os: linux
-      dist: focal # Snap fails with ppc64 on earlier Ubuntu.
       arch: ppc64le
 
     - name: "Linux s390x"
       os: linux
-      dist: focal # Some packages are missing in earlier Ubuntu on this platform.
       arch: s390x
       # Do not enable ASan, as it leads to linking errors.
-      # This is possibly a conflict with LTO.
       before_script:
         - mkdir build && cd build
-        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=ON -DIGRAPH_USE_INTERNAL_LAPACK=ON -DIGRAPH_USE_INTERNAL_ARPACK=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DIGRAPH_USE_INTERNAL_GMP=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_ENABLE_LTO=AUTO -DIGRAPH_PRINT_ARITH_HEADER=ON
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=ON -DIGRAPH_USE_INTERNAL_LAPACK=ON -DIGRAPH_USE_INTERNAL_ARPACK=ON -DIGRAPH_USE_INTERNAL_GLPK=ON -DIGRAPH_USE_INTERNAL_GMP=ON -DIGRAPH_VERIFY_FINALLY_STACK=ON -DCMAKE_BUILD_TYPE=Debug -DIGRAPH_PRINT_ARITH_HEADER=ON
 
-notifications:
-  email:
-    on_success: change
-    on_failure: always
+#notifications:
+#  email:
+#    on_success: change
+#    on_failure: always

@@ -125,6 +125,10 @@ int main(void) {
     igraph_real_t min, max;
     igraph_t g1, g2, g3;
 
+    /* igraph_arpack_rssolve()/rnsolve() use the RNG to generate
+     * a random starting vector for ARPACK. */
+    igraph_rng_seed(igraph_rng_default(), 123);
+
     /***********************************************************************/
 
     /* Identity matrix */

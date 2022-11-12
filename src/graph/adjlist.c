@@ -147,8 +147,8 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
-    /* igraph_degrees() is fast when loops=true */
-    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, /* loops= */ 1));
+    /* igraph_degree() is fast when loops=true */
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, /* loops= */ true));
 
     al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);

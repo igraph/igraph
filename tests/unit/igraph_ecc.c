@@ -29,8 +29,8 @@ igraph_bool_t vec_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {
     for (igraph_integer_t i=0; i < n; i++) {
         igraph_real_t x1 = VECTOR(*v1)[i], x2 = VECTOR(*v2)[i];
 
-        if (igraph_is_nan(x1)) {
-            if (! igraph_is_nan(x2)) {
+        if (isnan(x1)) {
+            if (! isnan(x2)) {
                 return false;
             }
         } else if (x1 != x2) {
