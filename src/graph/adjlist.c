@@ -30,13 +30,30 @@
 #include <string.h>   /* memset */
 #include <stdio.h>
 
-/**
+/*
  * Helper function that simplifies a sorted adjacency vector by removing
  * duplicate elements and optionally self-loops.
+ *
+ * has_loops and has_multiple are pointers to booleans that will be updated
+ * to 1 if the function \em finds a loop or a multiple edge. These values will
+ * \em never be set back to zero by this function. The usage pattern for these
+ * arguments is that the caller should set them to zero, followed by one or
+ * multiple calls to this function; at the end of such a sequence the booleans
+ * will contain whether the function found at least one loop or multiple edge
+ * in the set of vertices that were investigated.
+ *
+ * Note the usage of the word "found" -- it might be the case that the
+ * function is not interested in loop or multiple edges due to how it is
+ * parameterized; in this case, we don't spend extra time in investigating the
+ * existence of loop or multiple edges, so the values of the has_loops and
+ * has_multiple arguments will stay as is. Therefore, upon exiting the
+ * function, finding \c false in one of these variables does \em not mean that
+ * there is no loop or multiple edge, only that the function hasn't found one.
  */
 static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
-    igraph_loops_t loops, igraph_multiple_t multiple
+    igraph_loops_t loops, igraph_multiple_t multiple, igraph_bool_t *has_loops,
+    igraph_bool_t *has_multiple
 );
 
 /**
@@ -134,6 +151,8 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_multiple_t multiple) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
+    igraph_bool_t has_loops = 0;
+    igraph_bool_t has_multiple = 0;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_EINVMODE);
@@ -155,6 +174,22 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
+    /* if we already know there are no multi-edges, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        multiple = IGRAPH_MULTIPLE;
+    }
+
+    /* if we already know there are no loops, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        if (mode == IGRAPH_ALL) {
+            loops = IGRAPH_LOOPS_TWICE;
+        } else {
+            loops = IGRAPH_LOOPS_ONCE;
+        }
+    }
+
     for (igraph_integer_t i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -162,8 +197,28 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
 
         IGRAPH_CHECK(igraph_i_simplify_sorted_int_adjacency_vector_in_place(
-            &al->adjs[i], i, mode, loops, multiple
+            &al->adjs[i], i, mode, loops, multiple, &has_loops, &has_multiple
         ));
+    }
+    if (has_loops) {
+        /* If we have found at least one loop above, set the cache to true */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, true);
+    } else if (loops == IGRAPH_NO_LOOPS) {
+        /* If we explicitly _checked_ for loops (to remove them) and haven't
+         * found one, set the cache to false. This is the only case when a
+         * definite "no" from has_loops really means that there are no loops at
+         * all */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+    }
+    if (has_multiple) {
+        /* If we have found at least one multiedge above, set the cache to true */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, true);
+    } else if (multiple == IGRAPH_NO_MULTIPLE) {
+        /* If we explicitly _checked_ for multi-edges (to remove them) and
+         * haven't found one, set the cache to false. This is the only case
+         * when a definite "no" from has_multiple really means that there are
+         * no multi-edges at all all */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
     }
 
     igraph_vector_int_destroy(&degrees);
@@ -795,8 +850,17 @@ igraph_integer_t igraph_inclist_size(const igraph_inclist_t *il) {
 
 static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
-    igraph_loops_t loops, igraph_multiple_t multiple
+    igraph_loops_t loops, igraph_multiple_t multiple, igraph_bool_t *has_loops,
+    igraph_bool_t *has_multiple
+
 ) {
+    igraph_bool_t dummy1, dummy2;
+    if (has_loops == NULL) {
+        has_loops = &dummy1;
+    }
+    if (has_multiple == NULL) {
+        has_multiple = &dummy2;
+    }
     igraph_integer_t i, p = 0;
     igraph_integer_t n = igraph_vector_int_size(v);
 
@@ -819,6 +883,12 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                     (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i])) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
+                } else {
+                    if (VECTOR(*v)[i] == index) {
+                        *has_loops = 1;
+                    } else if (i != n - 1 && VECTOR(*v)[i + 1] == VECTOR(*v)[i]) {
+                        *has_multiple = 1;
+                    }
                 }
             }
         } else {
@@ -827,6 +897,8 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 if (VECTOR(*v)[i] != index) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
+                } else {
+                    *has_loops = 1;
                 }
             }
         }
@@ -838,6 +910,21 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
+                } else if (
+                        /* If this is not a loop then we have a multigraph.
+                           Else we have at least two loops.
+                           The v vector comes from a call to igraph_neighbors.
+                           This will count loops twice if mode == IGRAPH_ALL.
+                           So if mode != IGRAPH_ALL,
+                           then we have a multigraph.
+                           If mode == IGRAPH_ALL and we have three loops
+                           then we also have a multigraph
+                           */
+                        (VECTOR(*v)[i] != index) ||
+                       (mode != IGRAPH_ALL)  ||
+                       (mode == IGRAPH_ALL && i < n - 2 && VECTOR(*v)[i + 2] == VECTOR(*v)[i])
+                       ){
+                    *has_multiple = 1;
                 }
             }
         } else {
@@ -848,6 +935,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
             for (i = 0; i < n; i++) {
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 if (VECTOR(*v)[i] == index) {
+                    *has_loops = 1;
                     /* this was a loop edge so if the next element is the same, we
                     * need to skip that */
                     if (i < n-1 && VECTOR(*v)[i + 1] == index) {
@@ -865,6 +953,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 p++;
             } else {
+                *has_multiple = 1;
                 /* Current item is the same as the next one, but if it is a
                  * loop edge, then the first one or two items are okay. We need
                  * to keep one if mode == IGRAPH_IN or mode == IGRAPH_OUT,
@@ -937,6 +1026,22 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
+    }
+
+    /* if we already know there are no multi-edges, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        multiple = IGRAPH_MULTIPLE;
+    }
+
+    /* if we already know there are no loops, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        if (mode == IGRAPH_ALL) {
+            loops = IGRAPH_LOOPS_TWICE;
+        } else {
+            loops = IGRAPH_LOOPS_ONCE;
+        }
     }
 
     al->mode = mode;
@@ -1023,7 +1128,8 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, i
         }
 
         ret = igraph_i_simplify_sorted_int_adjacency_vector_in_place(
-            al->adjs[no], no, al->mode, al->loops, al->multiple
+            al->adjs[no], no, al->mode, al->loops, al->multiple, NULL,
+            NULL
         );
         if (ret != IGRAPH_SUCCESS) {
             igraph_vector_int_destroy(al->adjs[no]);

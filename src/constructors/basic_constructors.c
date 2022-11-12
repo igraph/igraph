@@ -100,16 +100,16 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  * </para><para>
  * This function is handy when a relatively small graph needs to be created.
  * Instead of giving the edges as a vector, they are given simply as
- * arguments and a '-1' needs to be given after the last meaningful
+ * arguments and a <code>-1</code> needs to be given after the last meaningful
  * edge argument.
  *
- * </para><para>Note that only graphs which have vertices less than
- * the highest value of the 'int' type can be created this way. If you
- * give larger values then the result is undefined.
+ * </para><para>Note that only graphs which have vertex IDs smaller than
+ * the largest value representable by the <type>int</type> type can be created this way.
+ * If you give larger values then the result is undefined.
  *
  * \param graph Pointer to an uninitialized graph object. The result
  *        will be stored here.
- * \param n The number of vertices in the graph; a nonnegative integer.
+ * \param n The number of vertices in the graph; a non-negative integer.
  * \param directed Logical constant; gives whether the graph should be
  *        directed. Supported values are:
  *        \clist
@@ -119,7 +119,7 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  *          The graph to be created will be \em undirected.
  *        \endclist
  * \param ... The additional arguments giving the edges of the
- *        graph. Don't forget to supply an additional '-1' after the last
+ *        graph. Don't forget to supply an additional <code>-1</code> after the last
  *        (meaningful) argument. The \p first parameter is present for
  *        technical reasons and represents the first variadic argument.
  * \return Error code.
