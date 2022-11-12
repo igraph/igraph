@@ -296,7 +296,7 @@ igraph_error_t igraph_layout_umap_compute_weights(
             eid = VECTOR(eids)[j];
 
             /* Basically, nodes closer than rho have probability 1, the rest is
-             * exponentionally penalized keeping rough cardinality */
+             * exponentially penalized keeping rough cardinality */
             weight = sigma < 0 ? 1 : exp(-(VECTOR(*distances)[eid] - rho) / sigma);
 
             #ifdef UMAP_DEBUG
@@ -308,7 +308,7 @@ igraph_error_t igraph_layout_umap_compute_weights(
             /* Store in vector lists for later symmetrization */
             k = IGRAPH_OTHER(graph, eid, i);
             if (k == i) {
-                IGRAPH_ERROR("Input graph must contain no loops.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Input graph must contain no self-loops.", IGRAPH_EINVAL);
             }
 
             neighbors_seen_elt = igraph_vector_int_list_get_ptr(&neighbors_seen, i);
