@@ -49,7 +49,7 @@ int igraph_i_glpk_terminal_hook(void *info, const char *s) {
 
     if (igraph_i_interruption_handler &&
         !igraph_i_glpk_error_info.is_interrupted &&
-        igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+        igraph_allow_interruption() != IGRAPH_SUCCESS) {
         /* If an interruption has already occurred, do not set another error,
            to avoid an infinite loop between the term_hook (this function)
            and the error_hook. */
@@ -90,7 +90,7 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
        with the code GLP_ESTOP.
     */
     if (igraph_i_interruption_handler) {
-        if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+        if (igraph_allow_interruption() != IGRAPH_SUCCESS) {
             glp_ios_terminate(tree);
         }
     }
