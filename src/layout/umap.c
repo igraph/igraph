@@ -240,9 +240,9 @@ igraph_error_t igraph_layout_umap_compute_weights(
         if (no_of_edges > 0) {
             dist_min = igraph_vector_min(distances);
             if (dist_min < 0) {
-                IGRAPH_ERROR("Distance vector must be nonnegative.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Distance values must not be negative.", IGRAPH_EINVAL);
             } else if (isnan(dist_min)) {
-                IGRAPH_ERROR("Distance vector must not contain NaN values.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Distance values must not be NaN.", IGRAPH_EINVAL);
             }
         }
     }
@@ -1045,7 +1045,7 @@ static igraph_error_t igraph_i_layout_umap(
 
     /* Check input arguments */
     if (min_dist < 0) {
-        IGRAPH_ERRORF("Minimum distance must be nonnegative, got %g.",
+        IGRAPH_ERRORF("Minimum distance must not be negative, got %g.",
                 IGRAPH_EINVAL, min_dist);
     }
 
@@ -1193,8 +1193,8 @@ static igraph_error_t igraph_i_layout_umap(
  * \param distances Pointer to a vector of distances associated with the graph edges.
  *   If this argument is \c NULL, all weights will be set to 1.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices
- *   can be in the embedding before feeling a repulsive force. It should be
- *   nonnegative. Typical values are between 0 and 1.
+ *   can be in the embedding before feeling a repulsive force. It must not be
+ *   negative. Typical values are between 0 and 1.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on
  *   the cross-entropy. Typical values are between 30 and 500.
  * \param distances_are_weights Whether to use precomputed weights. If
@@ -1237,8 +1237,8 @@ igraph_error_t igraph_layout_umap(const igraph_t *graph,
  * \param distances Pointer to a vector of distances associated with the graph edges.
  *   If this argument is \c NULL, all edges are assumed to have the same distance.
  * \param min_dist A fudge parameter that decides how close two unconnected vertices
- *   can be in the embedding before feeling a repulsive force. It should be
- *   nonnegative. Typical values are between 0 and 1.
+ *   can be in the embedding before feeling a repulsive force. It must not be
+ *   negative. Typical values are between 0 and 1.
  * \param epochs Number of iterations of the main stochastic gradient descent loop on
  *   the cross-entropy. Typical values are between 30 and 500.
  * \param distances_are_weights Whether to use precomputed weights. If \c false (the
