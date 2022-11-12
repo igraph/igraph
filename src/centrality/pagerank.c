@@ -199,10 +199,13 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  * </para><para>
  * Starting from version 0.9, igraph has two PageRank implementations,
  * and the user can choose between them. The first implementation is
- * \c IGRAPH_PAGERANK_ALGO_ARPACK, based on the ARPACK library. This
- * was the default before igraph version 0.7. The second and recommended
+ * \c IGRAPH_PAGERANK_ALGO_ARPACK, which phrases the PageRank calculation
+ * as an eigenvalue problem, which is then solved using the ARPACK library.
+ * This was the default before igraph version 0.7. The second and recommended
  * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This is using the
- * PRPACK package, see https://github.com/dgleich/prpack .
+ * PRPACK package, see https://github.com/dgleich/prpack. PRPACK uses an
+ * algebraic method, i.e. solves a linear system to obtain the PageRank
+ * scores.
  *
  * </para><para>
  * Note that the PageRank of a given vertex depends on the PageRank
@@ -218,15 +221,18 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
  * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
  * Brisbane, Australia, April 1998.
+ * https://doi.org/10.1016/S0169-7552(98)00110-X
  *
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable, the eigenvalue
- *    corresponding to the PageRank vector is stored here. It should
- *    be always exactly one.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the eigenvalue corresponding to the PageRank vector is stored here. It is
+ *    expected to be exactly one. Checking this value can be used to diagnose cases
+ *    when ARPACK failed to converge to the leading eigenvector.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
  * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
@@ -290,17 +296,17 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
  * does not result in any performance increase at all.
- * </para>
  *
- * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable, the eigenvalue
- *    corresponding to the PageRank vector is stored here. It should
- *    be always exactly one.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the eigenvalue corresponding to the PageRank vector is stored here. It is
+ *    expected to be exactly one. Checking this value can be used to diagnose cases
+ *    when ARPACK failed to converge to the leading eigenvector.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
  * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
@@ -379,17 +385,17 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
  * does not result in any performance increase at all.
- * </para>
  *
- * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable, the eigenvalue
- *    corresponding to the PageRank vector is stored here. It should
- *    be always exactly one.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the eigenvalue corresponding to the PageRank vector is stored here. It is
+ *    expected to be exactly one. Checking this value can be used to diagnose cases
+ *    when ARPACK failed to converge to the leading eigenvector.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
  * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
