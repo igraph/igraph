@@ -8,12 +8,12 @@
 static clock_t start;
 
 /* Wait for at least a second before attempting interruption */
-igraph_error_t interruption_handler(void) {
+igraph_bool_t interruption_handler(void) {
     if ( ((double) (clock() - start)) / CLOCKS_PER_SEC > 1.0 ) {
         IGRAPH_FINALLY_FREE();
-        return IGRAPH_INTERRUPTED;
+        return true;
     } else {
-        return IGRAPH_SUCCESS;
+        return false;
     }
 }
 
