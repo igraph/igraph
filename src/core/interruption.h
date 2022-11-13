@@ -45,7 +45,7 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_
 #define IGRAPH_ALLOW_INTERRUPTION() \
     do { \
         if (igraph_i_interruption_handler) { \
-            if (igraph_allow_interruption() != IGRAPH_SUCCESS) { \
+            if (igraph_allow_interruption()) { \
                 return IGRAPH_INTERRUPTED; \
             } \
         } \

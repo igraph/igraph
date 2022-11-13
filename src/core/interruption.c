@@ -24,7 +24,7 @@
 #include "igraph_interrupt.h"
 #include "config.h"
 
-IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_handler = 0;
+IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_handler = NULL;
 
 igraph_bool_t igraph_allow_interruption() {
     if (igraph_i_interruption_handler) {
