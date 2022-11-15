@@ -109,7 +109,8 @@ igraph_error_t igraph_intersection_many(
     igraph_vector_int_list_t edge_vects, order_vects;
     igraph_integer_t i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
     igraph_vector_int_t no_edges;
-    igraph_bool_t allne = no_of_graphs == 0 ? false : true, allsame = false;
+    igraph_bool_t allne = no_of_graphs > 0;
+    igraph_bool_t allsame = false;
     igraph_integer_t idx = 0;
 
     /* Check directedness */
@@ -118,7 +119,7 @@ igraph_error_t igraph_intersection_many(
     }
     for (i = 1; i < no_of_graphs; i++) {
         if (directed != igraph_is_directed(VECTOR(*graphs)[i])) {
-            IGRAPH_ERROR("Cannot intersect directed and undirected graphs",
+            IGRAPH_ERROR("Cannot create intersecttion of directed and undirected graphs.",
                          IGRAPH_EINVAL);
         }
     }
@@ -155,7 +156,7 @@ igraph_error_t igraph_intersection_many(
         igraph_integer_t k, j, n = VECTOR(no_edges)[i];
         igraph_vector_int_t *ev = igraph_vector_int_list_get_ptr(&edge_vects, i);
         igraph_vector_int_t *order = igraph_vector_int_list_get_ptr(&order_vects, i);
-        IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], ev, /*bycol=*/0));
+        IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], ev, /*bycol=*/ false));
         if (!directed) {
             for (k = 0, j = 0; k < n; k++, j += 2) {
                 if (VECTOR(*ev)[j] > VECTOR(*ev)[j + 1]) {
@@ -206,7 +207,7 @@ igraph_error_t igraph_intersection_many(
                 if (from > tailfrom || (from == tailfrom && to > tailto)) {
                     igraph_vector_int_pop_back(order);
                     if (igraph_vector_int_empty(order)) {
-                        allne = 0;
+                        allne = false;
                         break;
                     }
                 } else {
@@ -237,7 +238,7 @@ igraph_error_t igraph_intersection_many(
                 if (from == tailfrom && to == tailto) {
                     igraph_vector_int_pop_back(order);
                     if (igraph_vector_int_empty(order)) {
-                        allne = 0;
+                        allne = false;
                     }
                     if (edgemaps && allsame) {
                         igraph_vector_int_t *map = igraph_vector_int_list_get_ptr(edgemaps, j);

@@ -121,7 +121,7 @@ igraph_error_t igraph_union_many(
     }
     for (i = 1; i < no_of_graphs; i++) {
         if (directed != igraph_is_directed(VECTOR(*graphs)[i])) {
-            IGRAPH_ERROR("Cannot union directed and undirected graphs",
+            IGRAPH_ERROR("Cannot create union of directed and undirected graphs.",
                          IGRAPH_EINVAL);
         }
     }
@@ -156,7 +156,7 @@ igraph_error_t igraph_union_many(
         igraph_integer_t k, j, n = VECTOR(no_edges)[i];
         igraph_vector_int_t *ev = igraph_vector_int_list_get_ptr(&edge_vects, i);
         igraph_vector_int_t *order = igraph_vector_int_list_get_ptr(&order_vects, i);
-        IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], ev, /*bycol=*/0));
+        IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], ev, /*bycol=*/ false));
         if (!directed) {
             for (k = 0, j = 0; k < n; k++, j += 2) {
                 if (VECTOR(*ev)[j] > VECTOR(*ev)[j + 1]) {

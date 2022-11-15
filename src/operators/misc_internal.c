@@ -68,8 +68,7 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
     igraph_bool_t l;
 
     if (directed != igraph_is_directed(right)) {
-        IGRAPH_ERROR("Cannot make union or intersection of directed "
-                     "and undirected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot create union or intersection of directed and undirected graph.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -109,8 +108,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
        for every edge, that larger (non-smaller) vertex ID is in the
        second column. */
 
-    IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ 0));
-    IGRAPH_CHECK(igraph_get_edgelist(right, &edges2, /*bycol=*/ 0));
+    IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ false));
+    IGRAPH_CHECK(igraph_get_edgelist(right, &edges2, /*bycol=*/ false));
     if (!directed) {
         for (i = 0, j = 0; i < no_edges_left; i++, j += 2) {
             if (VECTOR(edges1)[j] > VECTOR(edges1)[j + 1]) {
