@@ -510,3 +510,183 @@ In- and out-edges, loops listed twice: {
 
 ============================================================
 
+graph: simple, loop: 0 multi: 0, mode: 0
+loop cached: 0
+multi cached: 0
+graph: simple, loop: 0 multi: 0, mode: 1
+loop cached: 0
+multi cached: 0
+graph: simple, loop: 0 multi: 1, mode: 0
+loop cached: 0
+multi not cached
+graph: simple, loop: 0 multi: 1, mode: 1
+loop cached: 0
+multi not cached
+graph: simple, loop: 1 multi: 0, mode: 0
+loop not cached
+multi cached: 0
+graph: simple, loop: 1 multi: 0, mode: 1
+loop not cached
+multi cached: 0
+graph: simple, loop: 1 multi: 1, mode: 0
+loop not cached
+multi not cached
+graph: simple, loop: 1 multi: 1, mode: 1
+loop not cached
+multi not cached
+graph: simple, loop: 2 multi: 0, mode: 0
+loop not cached
+multi cached: 0
+graph: simple, loop: 2 multi: 0, mode: 1
+loop not cached
+multi cached: 0
+graph: simple, loop: 2 multi: 1, mode: 0
+loop not cached
+multi not cached
+graph: simple, loop: 2 multi: 1, mode: 1
+loop not cached
+multi not cached
+graph: loop, loop: 0 multi: 0, mode: 0
+loop cached: 1
+multi cached: 0
+graph: loop, loop: 0 multi: 0, mode: 1
+loop cached: 1
+multi cached: 0
+graph: loop, loop: 0 multi: 1, mode: 0
+loop cached: 1
+multi not cached
+graph: loop, loop: 0 multi: 1, mode: 1
+loop cached: 1
+multi not cached
+graph: loop, loop: 1 multi: 0, mode: 0
+loop not cached
+multi cached: 0
+graph: loop, loop: 1 multi: 0, mode: 1
+loop not cached
+multi cached: 0
+graph: loop, loop: 1 multi: 1, mode: 0
+loop cached: 1
+multi not cached
+graph: loop, loop: 1 multi: 1, mode: 1
+loop cached: 1
+multi not cached
+graph: loop, loop: 2 multi: 0, mode: 0
+loop not cached
+multi cached: 1
+graph: loop, loop: 2 multi: 0, mode: 1
+loop not cached
+multi cached: 1
+graph: loop, loop: 2 multi: 1, mode: 0
+loop not cached
+multi not cached
+graph: loop, loop: 2 multi: 1, mode: 1
+loop not cached
+multi not cached
+graph: multiloop, loop: 0 multi: 0, mode: 0
+loop cached: 1
+multi cached: 0
+graph: multiloop, loop: 0 multi: 0, mode: 1
+loop cached: 1
+multi cached: 0
+graph: multiloop, loop: 0 multi: 1, mode: 0
+loop cached: 1
+multi not cached
+graph: multiloop, loop: 0 multi: 1, mode: 1
+loop cached: 1
+multi not cached
+graph: multiloop, loop: 1 multi: 0, mode: 0
+loop not cached
+multi cached: 1
+graph: multiloop, loop: 1 multi: 0, mode: 1
+loop not cached
+multi cached: 1
+graph: multiloop, loop: 1 multi: 1, mode: 0
+loop cached: 1
+multi not cached
+graph: multiloop, loop: 1 multi: 1, mode: 1
+loop cached: 1
+multi not cached
+graph: multiloop, loop: 2 multi: 0, mode: 0
+loop not cached
+multi cached: 1
+graph: multiloop, loop: 2 multi: 0, mode: 1
+loop not cached
+multi cached: 1
+graph: multiloop, loop: 2 multi: 1, mode: 0
+loop not cached
+multi not cached
+graph: multiloop, loop: 2 multi: 1, mode: 1
+loop not cached
+multi not cached
+graph: multi, loop: 0 multi: 0, mode: 0
+loop cached: 0
+multi cached: 1
+graph: multi, loop: 0 multi: 0, mode: 1
+loop cached: 0
+multi cached: 1
+graph: multi, loop: 0 multi: 1, mode: 0
+loop cached: 0
+multi not cached
+graph: multi, loop: 0 multi: 1, mode: 1
+loop cached: 0
+multi not cached
+graph: multi, loop: 1 multi: 0, mode: 0
+loop not cached
+multi cached: 1
+graph: multi, loop: 1 multi: 0, mode: 1
+loop not cached
+multi cached: 1
+graph: multi, loop: 1 multi: 1, mode: 0
+loop not cached
+multi not cached
+graph: multi, loop: 1 multi: 1, mode: 1
+loop not cached
+multi not cached
+graph: multi, loop: 2 multi: 0, mode: 0
+loop not cached
+multi cached: 1
+graph: multi, loop: 2 multi: 0, mode: 1
+loop not cached
+multi cached: 1
+graph: multi, loop: 2 multi: 1, mode: 0
+loop not cached
+multi not cached
+graph: multi, loop: 2 multi: 1, mode: 1
+loop not cached
+multi not cached
+graph: multi and loop, loop: 0 multi: 0, mode: 0
+loop cached: 1
+multi cached: 1
+graph: multi and loop, loop: 0 multi: 0, mode: 1
+loop cached: 1
+multi cached: 1
+graph: multi and loop, loop: 0 multi: 1, mode: 0
+loop cached: 1
+multi not cached
+graph: multi and loop, loop: 0 multi: 1, mode: 1
+loop cached: 1
+multi not cached
+graph: multi and loop, loop: 1 multi: 0, mode: 0
+loop not cached
+multi cached: 1
+graph: multi and loop, loop: 1 multi: 0, mode: 1
+loop not cached
+multi cached: 1
+graph: multi and loop, loop: 1 multi: 1, mode: 0
+loop cached: 1
+multi not cached
+graph: multi and loop, loop: 1 multi: 1, mode: 1
+loop cached: 1
+multi not cached
+graph: multi and loop, loop: 2 multi: 0, mode: 0
+loop not cached
+multi cached: 1
+graph: multi and loop, loop: 2 multi: 0, mode: 1
+loop not cached
+multi cached: 1
+graph: multi and loop, loop: 2 multi: 1, mode: 0
+loop not cached
+multi not cached
+graph: multi and loop, loop: 2 multi: 1, mode: 1
+loop not cached
+multi not cached
