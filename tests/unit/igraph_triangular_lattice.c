@@ -26,13 +26,10 @@ int main(void) {
     /* empty graph */
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 2));
     VECTOR(dimvector)[0] = 3;
-    VECTOR(dimvector)[0] = 0;
 
     IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
-    igraph_integer_t number_of_edges = igraph_vector_int_size(&graph.from);
-    IGRAPH_ASSERT(number_of_edges == 0);
-    igraph_integer_t number_of_vertices = igraph_vcount(&graph);
-    IGRAPH_ASSERT(number_of_vertices == 0);
+    printf("Empty graph:\n");
+    print_graph_canon(&graph);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
@@ -42,10 +39,8 @@ int main(void) {
     VECTOR(dimvector)[0] = 1;
 
     IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
-    number_of_edges = igraph_vector_int_size(&graph.from);
-    IGRAPH_ASSERT(number_of_edges == 0);
-    number_of_vertices = igraph_vcount(&graph);
-    IGRAPH_ASSERT(number_of_vertices == 1);
+    printf("Triangular triangular lattice, single vertex:\n");
+    print_graph_canon(&graph);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
@@ -55,10 +50,8 @@ int main(void) {
     VECTOR(dimvector)[0] = 5;
 
     IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
-    number_of_edges = igraph_vector_int_size(&graph.from);
-    IGRAPH_ASSERT(number_of_edges == 30);
-    number_of_vertices = igraph_vcount(&graph);
-    IGRAPH_ASSERT(number_of_vertices == 15);
+    printf("Triangular triangular lattice:\n");
+    print_graph_canon(&graph);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
@@ -69,10 +62,8 @@ int main(void) {
     VECTOR(dimvector)[1] = 5;
 
     IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, true));
-    number_of_edges = igraph_vector_int_size(&graph.from);
-    IGRAPH_ASSERT(number_of_edges == 86);
-    number_of_vertices = igraph_vcount(&graph);
-    IGRAPH_ASSERT(number_of_vertices == 20);
+    printf("Rectangular triangular lattice:\n");
+    print_graph_canon(&graph);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
@@ -84,12 +75,12 @@ int main(void) {
     VECTOR(dimvector)[2] = 5;
 
     IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, false, true));
-    number_of_edges = igraph_vector_int_size(&graph.from);
-    IGRAPH_ASSERT(number_of_edges == 87);
-    number_of_vertices = igraph_vcount(&graph);
-    IGRAPH_ASSERT(number_of_vertices == 36);
+    printf("Hexagonal triangular lattice:\n");
+    print_graph_canon(&graph);
 
-    /*An erroneous call*/
+    igraph_destroy(&graph);
+
+    /* An erroneous call */
     VECTOR(dimvector)[0] = -3;
     CHECK_ERROR(igraph_triangular_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
 
