@@ -189,7 +189,7 @@ static igraph_error_t triangular_lattice_rectangle_shape(
         VECTOR(row_start_vector)[i] = (row_count - i) / 2;
     }
 
-    IGRAPH_CHECK(triangular_lattice(graph, directed, mutual, true, &row_lengths_vector, &row_start_vector));
+    IGRAPH_CHECK(triangular_lattice(graph, directed, mutual, false, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
