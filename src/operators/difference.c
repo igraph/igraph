@@ -72,7 +72,7 @@ igraph_error_t igraph_difference(igraph_t *res,
     igraph_integer_t v1, v2;
 
     if (directed != igraph_is_directed(sub)) {
-        IGRAPH_ERROR("Cannot subtract directed and undirected graphs",
+        IGRAPH_ERROR("Cannot subtract directed and undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
@@ -163,14 +163,16 @@ igraph_error_t igraph_difference(igraph_t *res,
     igraph_inclist_destroy(&inc_sub);
     igraph_inclist_destroy(&inc_orig);
     IGRAPH_FINALLY_CLEAN(2);
+
     IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Attributes */
     if (orig->attr) {
         IGRAPH_I_ATTRIBUTE_DESTROY(res);
-        IGRAPH_I_ATTRIBUTE_COPY(res, orig, /*graph=*/1, /*vertex=*/1, /*edge=*/0);
+        IGRAPH_I_ATTRIBUTE_COPY(res, orig, /*graph=*/ true, /*vertex=*/ true, /*edge=*/ false);
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(orig, res, &edge_ids));
     }
 

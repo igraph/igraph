@@ -106,6 +106,7 @@ add_library(
   constructors/linegraph.c
   constructors/prufer.c
   constructors/regular.c
+  constructors/lattices.c
 
   games/barabasi.c
   games/callaway_traits.c

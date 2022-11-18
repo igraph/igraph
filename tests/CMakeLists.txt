@@ -969,3 +969,9 @@ add_legacy_tests(
   igraph_sample_dirichlet
   igraph_sample_sphere
 )
+
+# lattices
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_triangular_lattice
+)
