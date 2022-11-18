@@ -38,15 +38,26 @@
  * the second graph. The number of vertices in the result graph is the
  * same as the larger from the two arguments.
  *
+ * </para><para>
+ * The directedness of the operand graphs must be the same.
+ *
+ * </para><para>
+ * Edge multiplicities are handled by taking the \em smaller of the two
+ * multiplicities in the input graphs. In other words, if the first graph
+ * has N edges between a vertex pair (u, v) and the second graph has M edges,
+ * the result graph will have min(N, M) edges between them.
+ *
  * \param res Pointer to an uninitialized graph object. This will
  * contain the result of the operation.
  * \param left The first operand, a graph object.
  * \param right The second operand, a graph object.
  * \param edge_map1 Null pointer, or an initialized vector.
  *    If the latter, then a mapping from the edges of the result graph, to
- *    the edges of the \p left input graph is stored here.
+ *    the edges of the \p left input graph is stored here. For the edges that
+ *    are not in the intersection, -1 is stored.
  * \param edge_map2 Null pointer, or an initialized vector. The same
- *    as \p edge_map1, but for the \p right input graph.
+ *    as \p edge_map1, but for the \p right input graph. For the edges that
+ *    are not in the intersection, -1 is stored.
  * \return Error code.
  * \sa \ref igraph_intersection_many() to calculate the intersection
  * of many graphs at once, \ref igraph_union(), \ref
@@ -77,6 +88,16 @@ igraph_error_t igraph_intersection(igraph_t *res,
  * </para><para>
  * The number of vertices in the result graph will be the maximum
  * number of vertices in the argument graphs.
+ *
+ * </para><para>
+ * The directedness of the argument graphs must be the same.
+ * If the graph list has length zero, the result will be a \em directed
+ * graph with no vertices.
+ *
+ * </para><para>
+ * Edge multiplicities are handled by taking the \em minimum multiplicity of the
+ * all multiplicities for the same vertex pair (u, v) in the input graphs; this
+ * will be the multiplicity of (u, v) in the result graph.
  *
  * \param res Pointer to an uninitialized graph object, the result of
  *        the operation will be stored here.
@@ -119,7 +140,7 @@ igraph_error_t igraph_intersection_many(
     }
     for (i = 1; i < no_of_graphs; i++) {
         if (directed != igraph_is_directed(VECTOR(*graphs)[i])) {
-            IGRAPH_ERROR("Cannot create intersecttion of directed and undirected graphs.",
+            IGRAPH_ERROR("Cannot create intersection of directed and undirected graphs.",
                          IGRAPH_EINVAL);
         }
     }

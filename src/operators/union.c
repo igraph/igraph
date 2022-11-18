@@ -40,6 +40,15 @@
  * from the two arguments. The result graph contains edges which are
  * present in at least one of the operand graphs.
  *
+ * </para><para>
+ * The directedness of the operand graphs must be the same.
+ *
+ * </para><para>
+ * Edge multiplicities are handled by taking the \em larger of the two
+ * multiplicities in the input graphs. In other words, if the first graph
+ * has N edges between a vertex pair (u, v) and the second graph has M edges,
+ * the result graph will have max(N, M) edges between them.
+ *
  * \param res Pointer to an uninitialized graph object, the result
  *        will be stored here.
  * \param left The first graph.
@@ -76,9 +85,18 @@ igraph_error_t igraph_union(igraph_t *res,
  * is part of at least one operand graph.
  *
  * </para><para>
- * The directedness of the operand graphs must be the same.
+ * The number of vertices in the result graph will be the maximum
+ * number of vertices in the argument graphs.
+ *
+ * </para><para>
+ * The directedness of the argument graphs must be the same.
  * If the graph list has length zero, the result will be a \em directed
  * graph with no vertices.
+ *
+ * </para><para>
+ * Edge multiplicities are handled by taking the \em maximum multiplicity of the
+ * all multiplicities for the same vertex pair (u, v) in the input graphs; this
+ * will be the multiplicity of (u, v) in the result graph.
  *
  * \param res Pointer to an uninitialized graph object, this will
  *        contain the result.
