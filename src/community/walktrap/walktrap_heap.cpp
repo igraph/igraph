@@ -127,10 +127,6 @@ void Neighbor_heap::update(Neighbor* N) {
     move_down(N->heap_index);
 }
 
-long Neighbor_heap::memory() {
-    return (sizeof(Neighbor_heap) + long(max_size) * sizeof(Neighbor*));
-}
-
 Neighbor_heap::Neighbor_heap(int max_s) {
     max_size = max_s;
     size = 0;
@@ -212,10 +208,6 @@ void Min_delta_sigma_heap::update(int community) {
     }
     move_up(I[community]);
     move_down(I[community]);
-}
-
-long Min_delta_sigma_heap::memory() {
-    return (sizeof(Min_delta_sigma_heap) + long(max_size) * (2 * sizeof(int) + sizeof(double)));
 }
 
 Min_delta_sigma_heap::Min_delta_sigma_heap(int max_s) {

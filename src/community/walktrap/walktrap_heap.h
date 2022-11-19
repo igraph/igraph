@@ -95,7 +95,6 @@ public:
     void update(Neighbor* N);     // update a distance
     void remove(Neighbor* N);     // remove a distance
     Neighbor* get_first();        // get the first item
-    long memory();
     bool is_empty();
 
     Neighbor_heap(int max_size);
@@ -118,7 +117,6 @@ public:
     int get_max_community();              // return the community with the maximal delta_sigma
     void remove_community(int community);         // remove a community;
     void update(int community);               // update (or insert if necessary) the community
-    long memory();                    // the memory used in Bytes.
     bool is_empty();
 
     double* delta_sigma;                    // the delta_sigma of the stored communities

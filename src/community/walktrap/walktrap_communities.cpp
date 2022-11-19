@@ -83,7 +83,6 @@ Neighbor::Neighbor() {
 }
 
 Probabilities::~Probabilities() {
-    C->memory_used -= memory();
     if (P) {
         delete[] P;
     }
@@ -184,7 +183,6 @@ Probabilities::Probabilities(int community) {
             }
         }
     }
-    C->memory_used += memory();
 }
 
 Probabilities::Probabilities(int community1, int community2) {
@@ -291,8 +289,6 @@ Probabilities::Probabilities(int community1, int community2) {
             }
         }
     }
-
-    C->memory_used += memory();
 }
 
 double Probabilities::compute_distance(const Probabilities* P2) const {
@@ -361,14 +357,6 @@ double Probabilities::compute_distance(const Probabilities* P2) const {
     return r;
 }
 
-long Probabilities::memory() {
-    if (vertices) {
-        return (sizeof(Probabilities) + long(size) * (sizeof(double) + sizeof(int)));
-    } else {
-        return (sizeof(Probabilities) + long(size) * sizeof(double));
-    }
-}
-
 Community::Community() {
     P = 0;
     first_neighbor = 0;
@@ -389,10 +377,8 @@ Community::~Community() {
 
 
 Communities::Communities(Graph* graph, int random_walks_length,
-                         long m, igraph_matrix_int_t *pmerges,
+                         igraph_matrix_int_t *pmerges,
                          igraph_vector_t *pmodularity) {
-    max_memory = m;
-    memory_used = 0;
     G = graph;
     merges = pmerges;
     mergeidx = 0;
@@ -421,11 +407,7 @@ Communities::Communities(Graph* graph, int random_walks_length,
 
 // init the n single vertex communities
 
-    if (max_memory != -1) {
-        min_delta_sigma = new Min_delta_sigma_heap(G->nb_vertices * 2);
-    } else {
-        min_delta_sigma = 0;
-    }
+    min_delta_sigma = 0;
 
     for (int i = 0; i < G->nb_vertices; i++) {
         communities[i].this_community = i;
@@ -452,14 +434,6 @@ Communities::Communities(Graph* graph, int random_walks_length,
                 add_neighbor(N);
             }
 
-    if (max_memory != -1) {
-        memory_used += min_delta_sigma->memory();
-        memory_used += 2 * long(G->nb_vertices) * sizeof(Community);
-        memory_used += long(G->nb_vertices) * (2 * sizeof(double) + 3 * sizeof(int)); // the static data of Probabilities class
-        memory_used += H->memory() + long(G->nb_edges) * sizeof(Neighbor);
-        memory_used += G->memory();
-    }
-
     /*   int c = 0; */
     Neighbor* N = H->get_first();
     if (N == 0) {
@@ -469,9 +443,6 @@ Communities::Communities(Graph* graph, int random_walks_length,
         update_neighbor(N, compute_delta_sigma(N->community1, N->community2));
         N->exact = true;
         N = H->get_first();
-        if (max_memory != -1) {
-            manage_memory();
-        }
         /* TODO: this could use igraph_progress */
         /*     if(!silent) { */
         /*       c++; */
@@ -593,95 +564,18 @@ void Communities::remove_neighbor(Neighbor* N) {
     communities[N->community1].remove_neighbor(N);
     communities[N->community2].remove_neighbor(N);
     H->remove(N);
-
-    if (max_memory != -1) {
-        if (N->delta_sigma == min_delta_sigma->delta_sigma[N->community1]) {
-            min_delta_sigma->delta_sigma[N->community1] = communities[N->community1].min_delta_sigma();
-            if (communities[N->community1].P) {
-                min_delta_sigma->update(N->community1);
-            }
-        }
-
-        if (N->delta_sigma == min_delta_sigma->delta_sigma[N->community2]) {
-            min_delta_sigma->delta_sigma[N->community2] = communities[N->community2].min_delta_sigma();
-            if (communities[N->community2].P) {
-                min_delta_sigma->update(N->community2);
-            }
-        }
-    }
 }
 
 void Communities::add_neighbor(Neighbor* N) {
     communities[N->community1].add_neighbor(N);
     communities[N->community2].add_neighbor(N);
     H->add(N);
-
-    if (max_memory != -1) {
-        if (N->delta_sigma < min_delta_sigma->delta_sigma[N->community1]) {
-            min_delta_sigma->delta_sigma[N->community1] = N->delta_sigma;
-            if (communities[N->community1].P) {
-                min_delta_sigma->update(N->community1);
-            }
-        }
-
-        if (N->delta_sigma < min_delta_sigma->delta_sigma[N->community2]) {
-            min_delta_sigma->delta_sigma[N->community2] = N->delta_sigma;
-            if (communities[N->community2].P) {
-                min_delta_sigma->update(N->community2);
-            }
-        }
-    }
 }
 
 void Communities::update_neighbor(Neighbor* N, double new_delta_sigma) {
-    if (max_memory != -1) {
-        if (new_delta_sigma < min_delta_sigma->delta_sigma[N->community1]) {
-            min_delta_sigma->delta_sigma[N->community1] = new_delta_sigma;
-            if (communities[N->community1].P) {
-                min_delta_sigma->update(N->community1);
-            }
-        }
-
-        if (new_delta_sigma < min_delta_sigma->delta_sigma[N->community2]) {
-            min_delta_sigma->delta_sigma[N->community2] = new_delta_sigma;
-            if (communities[N->community2].P) {
-                min_delta_sigma->update(N->community2);
-            }
-        }
-
-        double old_delta_sigma = N->delta_sigma;
-        N->delta_sigma = new_delta_sigma;
-        H->update(N);
-
-        if (old_delta_sigma == min_delta_sigma->delta_sigma[N->community1]) {
-            min_delta_sigma->delta_sigma[N->community1] = communities[N->community1].min_delta_sigma();
-            if (communities[N->community1].P) {
-                min_delta_sigma->update(N->community1);
-            }
-        }
-
-        if (old_delta_sigma == min_delta_sigma->delta_sigma[N->community2]) {
-            min_delta_sigma->delta_sigma[N->community2] = communities[N->community2].min_delta_sigma();
-            if (communities[N->community2].P) {
-                min_delta_sigma->update(N->community2);
-            }
-        }
-    } else {
-        N->delta_sigma = new_delta_sigma;
-        H->update(N);
-    }
+    N->delta_sigma = new_delta_sigma;
+    H->update(N);
 }
-
-void Communities::manage_memory() {
-    while ((memory_used > max_memory) && !min_delta_sigma->is_empty()) {
-        int c = min_delta_sigma->get_max_community();
-        delete communities[c].P;
-        communities[c].P = 0;
-        min_delta_sigma->remove_community(c);
-    }
-}
-
-
 
 void Communities::merge_communities(Neighbor* merge_N) {
     int c1 = merge_N->community1;
@@ -712,22 +606,10 @@ void Communities::merge_communities(Neighbor* merge_N) {
     if (communities[c1].P) {
         delete communities[c1].P;
         communities[c1].P = 0;
-        if (max_memory != -1) {
-            min_delta_sigma->remove_community(c1);
-        }
     }
     if (communities[c2].P) {
         delete communities[c2].P;
         communities[c2].P = 0;
-        if (max_memory != -1) {
-            min_delta_sigma->remove_community(c2);
-        }
-    }
-
-    if (max_memory != -1) {
-        min_delta_sigma->delta_sigma[c1] = -1.;         // to avoid to update the min_delta_sigma for these communities
-        min_delta_sigma->delta_sigma[c2] = -1.;         //
-        min_delta_sigma->delta_sigma[nb_communities] = -1.;
     }
 
 // update the new neighbors
@@ -869,11 +751,6 @@ void Communities::merge_communities(Neighbor* merge_N) {
         }
     }
 
-    if (max_memory != -1) {
-        min_delta_sigma->delta_sigma[nb_communities] = communities[nb_communities].min_delta_sigma();
-        min_delta_sigma->update(nb_communities);
-    }
-
     nb_communities++;
     nb_active_communities--;
 }
@@ -884,18 +761,12 @@ double Communities::merge_nearest_communities() {
         update_neighbor(N, compute_delta_sigma(N->community1, N->community2));
         N->exact = true;
         N = H->get_first();
-        if (max_memory != -1) {
-            manage_memory();
-        }
     }
 
     double d = N->delta_sigma;
     remove_neighbor(N);
 
     merge_communities(N);
-    if (max_memory != -1) {
-        manage_memory();
-    }
 
     if (merges) {
         MATRIX(*merges, mergeidx, 0) = N->community1;
@@ -930,15 +801,9 @@ double Communities::merge_nearest_communities() {
 double Communities::compute_delta_sigma(int community1, int community2) {
     if (!communities[community1].P) {
         communities[community1].P = new Probabilities(community1);
-        if (max_memory != -1) {
-            min_delta_sigma->update(community1);
-        }
     }
     if (!communities[community2].P) {
         communities[community2].P = new Probabilities(community2);
-        if (max_memory != -1) {
-            min_delta_sigma->update(community2);
-        }
     }
 
     return communities[community1].P->compute_distance(communities[community2].P) * double(communities[community1].size) * double(communities[community2].size) / double(communities[community1].size + communities[community2].size);

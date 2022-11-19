@@ -89,7 +89,6 @@ Graph::Graph() {
     nb_vertices = 0;
     nb_edges = 0;
     vertices = 0;
-    index = 0;
     total_weight = 0.;
 }
 
@@ -230,20 +229,6 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     return IGRAPH_SUCCESS;
-}
-
-long Graph::memory() {
-    size_t m = 0;
-    m += size_t(nb_vertices) * sizeof(Vertex);
-    m += 2 * size_t(nb_edges) * sizeof(Edge);
-    m += sizeof(Graph);
-    if (index != 0) {
-        m += size_t(nb_vertices) * sizeof(char*);
-        for (int i = 0; i < nb_vertices; i++) {
-            m += strlen(index[i]) + 1;
-        }
-    }
-    return m;
 }
 
 }

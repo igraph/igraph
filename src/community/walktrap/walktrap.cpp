@@ -144,7 +144,6 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
         }
 
         int length = steps;
-        long max_memory = -1;
 
         if (weights) {
             if (igraph_vector_size(weights) != no_of_edges) {
@@ -180,7 +179,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes - comp_count + 1));
             igraph_vector_null(modularity);
         }
-        Communities C(&G, length, max_memory, merges, modularity);
+        Communities C(&G, length, merges, modularity);
 
         while (!C.H->is_empty()) {
             IGRAPH_ALLOW_INTERRUPTION();

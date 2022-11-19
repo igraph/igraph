@@ -83,7 +83,6 @@ public:
     int* vertices;                        // the vertices corresponding to the stored probabilities, 0 if all the probabilities are stored
     double* P;                         // the probabilities
 
-    long memory();                        // the memory (in Bytes) used by the object
     double compute_distance(const Probabilities* P2) const;   // compute the squared distance r^2 between this probability vector and P2
     Probabilities(int community);                 // compute the probability vector of a community
     Probabilities(int community1, int community2);        // merge the probability vectors of two communities in a new one
@@ -126,14 +125,12 @@ public:
 
 class Communities {
 private:
-    long max_memory;  // size in Byte of maximal memory usage, -1 for no limit
     igraph_matrix_int_t *merges;
     igraph_integer_t mergeidx;
     igraph_vector_t *modularity;
 
 public:
 
-    long memory_used;                 // in bytes
     Min_delta_sigma_heap* min_delta_sigma;            // the min delta_sigma of the community with a saved probability vector (for memory management)
 
     Graph* G;         // the graph
@@ -149,7 +146,7 @@ public:
     int nb_active_communities;    // number of active communities
 
     Communities(Graph* G, int random_walks_length = 3,
-                long max_memory = -1, igraph_matrix_int_t *merges = 0,
+                igraph_matrix_int_t *merges = 0,
                 igraph_vector_t *modularity = 0);  // Constructor
     ~Communities();                   // Destructor
 
@@ -163,9 +160,6 @@ public:
     void remove_neighbor(Neighbor* N);
     void add_neighbor(Neighbor* N);
     void update_neighbor(Neighbor* N, double new_delta_sigma);
-
-    void manage_memory();
-
 };
 
 }
