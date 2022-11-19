@@ -60,7 +60,6 @@
 #include <algorithm>
 #include <stdexcept>
 #include <climits>
-#include <cstring>      // strlen
 
 using namespace std;
 
@@ -75,27 +74,23 @@ bool operator<(const Edge& E1, const Edge& E2) {
 
 Vertex::Vertex() {
     degree = 0;
-    edges = 0;
+    edges = nullptr;
     total_weight = 0.;
 }
 
 Vertex::~Vertex() {
-    if (edges) {
-        delete[] edges;
-    }
+    delete[] edges;
 }
 
 Graph::Graph() {
     nb_vertices = 0;
     nb_edges = 0;
-    vertices = 0;
+    vertices = nullptr;
     total_weight = 0.;
 }
 
 Graph::~Graph () {
-    if (vertices) {
-        delete[] vertices;
-    }
+    delete[] vertices;
 }
 
 class Edge_list {
@@ -115,16 +110,11 @@ public:
         V2 = new int[1024];
         W = new double[1024];
     }
+
     ~Edge_list() {
-        if (V1) {
-            delete[] V1;
-        }
-        if (V2) {
-            delete[] V2;
-        }
-        if (W) {
-            delete[] W;
-        }
+        delete[] V1;
+        delete[] V2;
+        delete[] W;
     }
 };
 

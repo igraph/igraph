@@ -92,7 +92,7 @@ void Neighbor_heap::move_down(int index) {
 
 Neighbor* Neighbor_heap::get_first() {
     if (size == 0) {
-        return 0;
+        return nullptr;
     } else {
         return H[0];
     }
@@ -137,6 +137,6 @@ Neighbor_heap::~Neighbor_heap() {
     delete[] H;
 }
 
-bool Neighbor_heap::is_empty() {
+bool Neighbor_heap::is_empty() const {
     return (size == 0);
 }

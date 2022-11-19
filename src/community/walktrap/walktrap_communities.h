@@ -84,7 +84,7 @@ public:
     double* P;                         // the probabilities
 
     double compute_distance(const Probabilities* P2) const;   // compute the squared distance r^2 between this probability vector and P2
-    Probabilities(int community);                 // compute the probability vector of a community
+    explicit Probabilities(int community);                 // compute the probability vector of a community
     Probabilities(int community1, int community2);        // merge the probability vectors of two communities in a new one
     // the two communities must have their probability vectors stored
 
@@ -109,12 +109,11 @@ public:
     double internal_weight;    // sum of the weight of the internal edges
     double total_weight;       // sum of the weight of all the edges of the community (an edge between two communities is a half-edge for each community)
 
-    int sub_communities[2];   // the two sub sommunities, -1 if no sub communities;
+    int sub_communities[2];   // the two sub communities, -1 if no sub communities;
     int sub_community_of;     // number of the community in which this community has been merged
     // 0 if the community is active
     // -1 if the community is not used
 
-    void merge(Community &C1, Community &C2); // create a new community by merging C1 an C2
     void add_neighbor(Neighbor* N);
     void remove_neighbor(Neighbor* N);
 
@@ -142,16 +141,14 @@ public:
     int nb_active_communities;    // number of active communities
 
     Communities(Graph* G, int random_walks_length = 3,
-                igraph_matrix_int_t *merges = 0,
-                igraph_vector_t *modularity = 0);  // Constructor
+                igraph_matrix_int_t *merges = nullptr,
+                igraph_vector_t *modularity = nullptr);  // Constructor
     ~Communities();                   // Destructor
-
 
     void merge_communities(Neighbor* N);          // create a community by merging two existing communities
     double merge_nearest_communities();
 
-
-    double compute_delta_sigma(int c1, int c2);       // compute delta_sigma(c1,c2)
+    double compute_delta_sigma(int c1, int c2) const;       // compute delta_sigma(c1,c2)
 
     void remove_neighbor(Neighbor* N);
     void add_neighbor(Neighbor* N);

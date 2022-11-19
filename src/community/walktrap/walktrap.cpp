@@ -169,7 +169,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
         IGRAPH_CHECK(G.convert_from_igraph(graph, weights));
 
         if (merges || modularity) {
-            IGRAPH_CHECK(igraph_connected_components(graph, /*membership=*/ 0, /*csize=*/ 0,
+            IGRAPH_CHECK(igraph_connected_components(graph, /*membership=*/ NULL, /*csize=*/ NULL,
                                                      &comp_count, IGRAPH_WEAK));
         }
         if (merges) {

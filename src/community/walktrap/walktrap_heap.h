@@ -95,9 +95,9 @@ public:
     void update(Neighbor* N);     // update a distance
     void remove(Neighbor* N);     // remove a distance
     Neighbor* get_first();        // get the first item
-    bool is_empty();
+    bool is_empty() const;
 
-    Neighbor_heap(int max_size);
+    explicit Neighbor_heap(int max_size);
     ~Neighbor_heap();
 };
 
