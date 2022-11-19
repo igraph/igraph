@@ -407,8 +407,6 @@ Communities::Communities(Graph* graph, int random_walks_length,
 
 // init the n single vertex communities
 
-    min_delta_sigma = 0;
-
     for (int i = 0; i < G->nb_vertices; i++) {
         communities[i].this_community = i;
         communities[i].first_member = i;
@@ -469,9 +467,6 @@ Communities::~Communities() {
     delete[] members;
     delete[] communities;
     delete H;
-    if (min_delta_sigma) {
-        delete min_delta_sigma;
-    }
 
     delete[] Probabilities::tmp_vector1;
     delete[] Probabilities::tmp_vector2;
@@ -479,22 +474,6 @@ Communities::~Communities() {
     delete[] Probabilities::vertices1;
     delete[] Probabilities::vertices2;
 }
-
-double Community::min_delta_sigma() {
-    double r = 1.0;
-    for (Neighbor* N = first_neighbor; N != 0;) {
-        if (N->delta_sigma < r) {
-            r = N->delta_sigma;
-        }
-        if (N->community1 == this_community) {
-            N = N->next_community1;
-        } else {
-            N = N->next_community2;
-        }
-    }
-    return r;
-}
-
 
 void Community::add_neighbor(Neighbor* N) { // add a new neighbor at the end of the list
     if (last_neighbor) {

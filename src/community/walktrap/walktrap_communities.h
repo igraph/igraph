@@ -117,7 +117,6 @@ public:
     void merge(Community &C1, Community &C2); // create a new community by merging C1 an C2
     void add_neighbor(Neighbor* N);
     void remove_neighbor(Neighbor* N);
-    double min_delta_sigma();          // compute the minimal delta sigma among all the neighbors of this community
 
     Community();          // create an empty community
     ~Community();         // destructor
@@ -130,9 +129,6 @@ private:
     igraph_vector_t *modularity;
 
 public:
-
-    Min_delta_sigma_heap* min_delta_sigma;            // the min delta_sigma of the community with a saved probability vector (for memory management)
-
     Graph* G;         // the graph
     int* members;         // the members of each community represented as a chained list.
     // a community points to the first_member the array which contains
