@@ -149,8 +149,10 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
+    // Refactoring the walktrap code to support larger graphs is pointless
+    // as running the algorithm on them would take an impractically long time.
     if (no_of_nodes > INT_MAX || no_of_edges > INT_MAX) {
-        throw std::domain_error("Graph too large for walktrap community detection.");
+        IGRAPH_ERROR("Graph too large for walktrap community detection.", IGRAPH_EINVAL);
     }
 
     int max_vertex = no_of_nodes - 1;
@@ -196,7 +198,7 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     for (int i = 0; i < G.nb_vertices; i++) {
-        /* Check for zero strength, as it may lead to crashed in walktrap algorithm.
+        /* Check for zero strength, as it may lead to crashes the in walktrap algorithm.
          * See https://github.com/igraph/igraph/pull/2043 */
         if (G.vertices[i].total_weight == 0) {
             /* G.vertices will be destroyed by Graph::~Graph() */
