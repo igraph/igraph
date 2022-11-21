@@ -16,11 +16,8 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         const igraph_t *g, const igraph_vector_t *weights, bool directed) {
 
     const bool treat_as_directed = igraph_is_directed(g) && directed;
-    igraph_eit_t eit;
-    igraph_vector_int_t neis;
     igraph_integer_t vcount = igraph_vcount(g), ecount = igraph_ecount(g);
-    int *p_head, *p_head_copy;
-    double *p_weight = 0;
+    double *p_weight = nullptr;
 
     if (vcount > INT_MAX) {
         IGRAPH_ERROR("Too many vertices for PRPACK.", IGRAPH_EINVAL);
@@ -43,7 +40,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
     }
 
     // Allocate memory for heads and tails
-    p_head = heads = new int[num_es];
+    int *p_head = heads = new int[num_es];
     tails = new int[num_vs];
     memset(tails, 0, num_vs * sizeof(tails[0]));
 
@@ -56,8 +53,12 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
     int num_ignored_es = 0;
 
     if (treat_as_directed) {
+        // Use of igraph "finally" stack is safe in this block
+        // since no exceptions can be thrown from here.
+
         // Select all the edges and iterate over them by the source vertices
         // Add the edges
+        igraph_eit_t eit;
         IGRAPH_CHECK(igraph_eit_create(g, igraph_ess_all(IGRAPH_EDGEORDER_TO), &eit));
         IGRAPH_FINALLY(igraph_eit_destroy, &eit);
         while (!IGRAPH_EIT_END(eit)) {
@@ -93,7 +94,11 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
         igraph_eit_destroy(&eit);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
+        // Use of igraph "finally" stack is safe in this block
+        // since no exceptions can be thrown from here.
+
         // Select all the edges and iterate over them by the target vertices
+        igraph_vector_int_t neis;
         IGRAPH_CHECK(igraph_vector_int_init(&neis, 0));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
 
@@ -103,7 +108,7 @@ igraph_error_t prpack_igraph_graph::convert_from_igraph(
             int temp = igraph_vector_int_size(&neis);
 
             // TODO: should loop edges be added in both directions?
-            p_head_copy = p_head;
+            int *p_head_copy = p_head;
             for (int j = 0; j < temp; j++) {
                 if (weights != 0) {
                     if (VECTOR(*weights)[VECTOR(neis)[j]] <= 0) {
