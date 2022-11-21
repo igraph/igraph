@@ -140,8 +140,17 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
     */
 
     for (i = 0; i < n; i++) {
-        sumfrom += VECTOR(*outdegree)[i] != 0 ? from[i] * fact : from[i];
-        VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
+        if (VECTOR(*outdegree)[i] > 0) {
+            sumfrom += from[i] * fact;
+            VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
+        } else {
+            sumfrom += from[i];
+            /* The following value is used only when all outgoing edges have
+             * weight zero (as opposed to there being no outgoing edges at all).
+             * We set it to zero to avoid a 0.0*inf situation when computing
+             * to[i] below. */
+            VECTOR(*tmp)[i] = 0;
+        }
     }
 
     for (i = 0; i < n; i++) {
