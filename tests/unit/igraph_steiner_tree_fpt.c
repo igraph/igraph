@@ -54,7 +54,7 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1;
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_unit;
     igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1;
     igraph_vector_t weights_null, weights_k7, weights_k6_k1;
 
@@ -119,9 +119,24 @@ int main(void) {
 
     igraph_vector_int_destroy(&tree_edges);
 
+
+    igraph_real_t value_unit;
+    igraph_vector_int_t tree_edges_unit;
+    igraph_vector_int_init(&tree_edges_unit, 0);
+
+    printf("\nK_7_Unit graph:\n");
+    igraph_steiner_dreyfus_wagner(&g_k7, &terminals_k7, NULL, &value_unit, &tree_edges_unit);
+    print_vector_int(&tree_edges_unit);
+    printf("Total Steiner tree weight: %g\n", value_unit);
+
+    //check_graph(&g_k7, &terminals_k7, NULL);
+
+
+
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
+   
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
