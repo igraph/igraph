@@ -13,7 +13,7 @@ void prpack_solver::initialize() {
     gsg = NULL;
     sg = NULL;
     sccg = NULL;
-	owns_bg = true;
+    owns_bg = true;
 }
 
 prpack_solver::prpack_solver(const prpack_csc* g) {
