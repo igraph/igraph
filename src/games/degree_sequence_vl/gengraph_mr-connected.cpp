@@ -34,7 +34,7 @@
 namespace gengraph {
 
 // return negative number if program should exit
-int parse_options(int &argc, char** &argv);
+// int parse_options(int &argc, char** &argv);
 
 // options
 // static const bool MONITOR_TIME = false;
