@@ -86,7 +86,8 @@ igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igra
         }
 
         // Construct and run the solver
-        prpack_igraph_graph prpack_graph(graph, weights, directed);
+        prpack_igraph_graph prpack_graph;
+        IGRAPH_CHECK(prpack_graph.convert_from_igraph(graph, weights, directed));
         prpack_solver solver(&prpack_graph, false);
         res = solver.solve(damping, 1e-10, u, v, "");
 
