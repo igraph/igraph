@@ -588,6 +588,16 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
                                  directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS, weights));
 
+    /* Set up an appropriate starting vector. We start from the (possibly weight) in-degrees
+     * plus some small random noise to avoid convergence problems. */
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(indegree)[i] > 0) {
+            MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+        } else {
+            MATRIX(vectors, i, 0) = 1;
+        }
+    }
+
     if (!weights) {
 
         igraph_adjlist_t adjlist;
@@ -600,21 +610,11 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         data.tmp = &tmp;
         data.reset = reset ? &normalized_reset : NULL;
 
-        /* Set up an appropriate starting vector. We start from the in-degrees
-         * plus some small random noise to avoid convergence problems */
-        for (i = 0; i < no_of_nodes; i++) {
-            if (VECTOR(indegree)[i]) {
-                MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
-            } else {
-                MATRIX(vectors, i, 0) = 1;
-            }
-        }
-
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
-                                           &data, options, 0, &values, &vectors));
+                                           &data, options, NULL, &values, &vectors));
 
         igraph_adjlist_destroy(&adjlist);
         IGRAPH_FINALLY_CLEAN(1);
@@ -635,18 +635,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        /* Set up an appropriate starting vector. We start from the in-degrees
-         * plus some small random noise to avoid convergence problems */
-        for (i = 0; i < no_of_nodes; i++) {
-            if (VECTOR(indegree)[i]) {
-                MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
-            } else {
-                MATRIX(vectors, i, 0) = 1;
-            }
-        }
-
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
-                                           &data, options, 0, &values, &vectors));
+                                           &data, options, NULL, &values, &vectors));
 
         igraph_inclist_destroy(&inclist);
         IGRAPH_FINALLY_CLEAN(1);
