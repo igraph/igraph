@@ -60,7 +60,7 @@ prpack_igraph_graph::prpack_igraph_graph(
     memset(tails, 0, num_vs * sizeof(tails[0]));
 
     // Allocate memory for weights if needed
-    if (weights != 0) {
+    if (weights) {
         p_weight = vals = new double[num_es];
     }
 

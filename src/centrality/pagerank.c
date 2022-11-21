@@ -655,7 +655,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
             if (weight < 0 && !negative_weight_warned) {
                 IGRAPH_WARNING("Replacing negative weights with zeros during PageRank calculation.");
                 weight = 0;
-                negative_weight_warned = 1;
+                negative_weight_warned = true;
             }
             VECTOR(outdegree)[from] += weight;
             VECTOR(indegree) [to]   += weight;
