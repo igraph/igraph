@@ -23,6 +23,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
+#include "igraph_structural.h"
 
 #include "centrality/prpack_internal.h"
 
@@ -520,6 +521,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
+        if (min < 0) {
+            IGRAPH_ERROR("Edge weights must not be negative.", IGRAPH_EINVAL);
+        }
         if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
@@ -579,11 +583,15 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         igraph_vector_scale(&normalized_reset, 1.0 / reset_sum);
     }
 
+    IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(),
+                                 directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
+                                 directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS, weights));
+
     if (!weights) {
 
         igraph_adjlist_t adjlist;
         igraph_i_pagerank_data_t data;
-        igraph_vector_int_t degree;
 
         data.graph = graph;
         data.adjlist = &adjlist;
@@ -591,23 +599,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         data.outdegree = &outdegree;
         data.tmp = &tmp;
         data.reset = reset ? &normalized_reset : NULL;
-
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
-
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                                   directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS));
-        for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(outdegree)[i] = VECTOR(degree)[i];
-        }
-
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                                   directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS));
-        for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(indegree)[i] = VECTOR(degree)[i];
-        }
-
-        igraph_vector_int_destroy(&degree);
-        IGRAPH_FINALLY_CLEAN(1);
 
         /* Set up an appropriate starting vector. We start from the in-degrees
          * plus some small random noise to avoid convergence problems */
@@ -619,9 +610,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
             }
         }
 
-        IGRAPH_CHECK(igraph_adjlist_init(
-            graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
-        ));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
@@ -633,7 +622,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     } else {
 
         igraph_inclist_t inclist;
-        igraph_bool_t negative_weight_warned = false;
         igraph_i_pagerank_data2_t data;
 
         data.graph = graph;
@@ -647,23 +635,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        /* Weighted degree */
-        for (i = 0; i < no_of_edges; i++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, i);
-            igraph_integer_t to = IGRAPH_TO(graph, i);
-            igraph_real_t weight = VECTOR(*weights)[i];
-            if (weight < 0 && !negative_weight_warned) {
-                IGRAPH_WARNING("Replacing negative weights with zeros during PageRank calculation.");
-                weight = 0;
-                negative_weight_warned = true;
-            }
-            VECTOR(outdegree)[from] += weight;
-            VECTOR(indegree) [to]   += weight;
-            if (!directed) {
-                VECTOR(outdegree)[to]   += weight;
-                VECTOR(indegree) [from] += weight;
-            }
-        }
         /* Set up an appropriate starting vector. We start from the in-degrees
          * plus some small random noise to avoid convergence problems */
         for (i = 0; i < no_of_nodes; i++) {
