@@ -54,7 +54,7 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_unit;
+    igraph_t g_null, g_k7, g_k6_k1;
     igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1;
     igraph_vector_t weights_null, weights_k7, weights_k6_k1;
 
