@@ -92,7 +92,7 @@ void Neighbor_heap::move_down(int index) {
 
 Neighbor* Neighbor_heap::get_first() {
     if (size == 0) {
-        return 0;
+        return nullptr;
     } else {
         return H[0];
     }
@@ -127,10 +127,6 @@ void Neighbor_heap::update(Neighbor* N) {
     move_down(N->heap_index);
 }
 
-long Neighbor_heap::memory() {
-    return (sizeof(Neighbor_heap) + long(max_size) * sizeof(Neighbor*));
-}
-
 Neighbor_heap::Neighbor_heap(int max_s) {
     max_size = max_s;
     size = 0;
@@ -141,101 +137,6 @@ Neighbor_heap::~Neighbor_heap() {
     delete[] H;
 }
 
-bool Neighbor_heap::is_empty() {
-    return (size == 0);
-}
-
-
-
-//#################################################################
-
-void Min_delta_sigma_heap::move_up(int index) {
-    while (delta_sigma[H[index / 2]] < delta_sigma[H[index]]) {
-        int tmp = H[index / 2];
-        I[H[index]] = index / 2;
-        H[index / 2] = H[index];
-        I[tmp] = index;
-        H[index] = tmp;
-        index = index / 2;
-    }
-}
-
-void Min_delta_sigma_heap::move_down(int index) {
-    while (true) {
-        int max = index;
-        if (2 * index < size && delta_sigma[H[2 * index]] > delta_sigma[H[max]]) {
-            max = 2 * index;
-        }
-        if (2 * index + 1 < size && delta_sigma[H[2 * index + 1]] > delta_sigma[H[max]]) {
-            max = 2 * index + 1;
-        }
-        if (max != index) {
-            int tmp = H[max];
-            I[H[index]] = max;
-            H[max] = H[index];
-            I[tmp] = index;
-            H[index] = tmp;
-            index = max;
-        } else {
-            break;
-        }
-    }
-}
-
-int Min_delta_sigma_heap::get_max_community() {
-    if (size == 0) {
-        return -1;
-    } else {
-        return H[0];
-    }
-}
-
-void Min_delta_sigma_heap::remove_community(int community) {
-    if (I[community] == -1 || size == 0) {
-        return;
-    }
-    int last_community = H[--size];
-    H[I[community]] = last_community;
-    I[last_community] = I[community];
-    move_up(I[last_community]);
-    move_down(I[last_community]);
-    I[community] = -1;
-}
-
-void Min_delta_sigma_heap::update(int community) {
-    if (community < 0 || community >= max_size) {
-        return;
-    }
-    if (I[community] == -1) {
-        I[community] = size++;
-        H[I[community]] = community;
-    }
-    move_up(I[community]);
-    move_down(I[community]);
-}
-
-long Min_delta_sigma_heap::memory() {
-    return (sizeof(Min_delta_sigma_heap) + long(max_size) * (2 * sizeof(int) + sizeof(double)));
-}
-
-Min_delta_sigma_heap::Min_delta_sigma_heap(int max_s) {
-    max_size = max_s;
-    size = 0;
-    H = new int[max_s];
-    I = new int[max_s];
-    delta_sigma = new double[max_s];
-    for (int i = 0; i < max_size; i++) {
-        I[i] = -1;
-        delta_sigma[i] = 1.;
-    }
-}
-
-Min_delta_sigma_heap::~Min_delta_sigma_heap() {
-    delete[] H;
-    delete[] I;
-    delete[] delta_sigma;
-}
-
-bool Min_delta_sigma_heap::is_empty() {
+bool Neighbor_heap::is_empty() const {
     return (size == 0);
 }

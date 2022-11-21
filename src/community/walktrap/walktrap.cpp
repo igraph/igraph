@@ -69,6 +69,7 @@ using namespace igraph::walktrap;
 
 /**
  * \function igraph_community_walktrap
+ * \brief Community finding using a random walk based similarity measure.
  *
  * This function is the implementation of the Walktrap community
  * finding algorithm, see Pascal Pons, Matthieu Latapy: Computing
@@ -94,7 +95,7 @@ using namespace igraph::walktrap;
  *     Typically, good results are obtained with values between
  *     3-8 with 4-5 being a reasonable default.
  * \param merges Pointer to a matrix, the merges performed by the
- *     algorithm will be stored here (if not NULL). Each merge is a
+ *     algorithm will be stored here (if not \c NULL). Each merge is a
  *     row in a two-column matrix and contains the IDs of the merged
  *     clusters. Clusters are numbered from zero and cluster numbers
  *     smaller than the number of nodes in the network belong to the
@@ -104,13 +105,13 @@ using namespace igraph::walktrap;
  *     before the first merge we have \c n clusters (the number of
  *     vertices in the graph) numbered from zero to \c n-1. The first
  *     merge creates cluster \c n, the second cluster \c n+1, etc.
- * \param modularity Pointer to a vector. If not NULL then the
+ * \param modularity Pointer to a vector. If not \c NULL then the
  *     modularity score of the current clustering is stored here after
  *     each merge operation.
- * \param membership Pointer to a vector. If not a NULL pointer, then
+ * \param membership Pointer to a vector. If not a \c NULL pointer, then
  *     the membership vector corresponding to the maximal modularity
- *     score is stored here. If it is not a NULL pointer, then neither
- *     \p modularity nor \p merges may be NULL.
+ *     score is stored here. If it is not a \c NULL pointer, then neither
+ *     \p modularity nor \p merges may be \c NULL.
  * \return Error code.
  *
  * \sa \ref igraph_community_spinglass(), \ref
@@ -143,7 +144,6 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
         }
 
         int length = steps;
-        long max_memory = -1;
 
         if (weights) {
             if (igraph_vector_size(weights) != no_of_edges) {
@@ -169,7 +169,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
         IGRAPH_CHECK(G.convert_from_igraph(graph, weights));
 
         if (merges || modularity) {
-            IGRAPH_CHECK(igraph_connected_components(graph, /*membership=*/ 0, /*csize=*/ 0,
+            IGRAPH_CHECK(igraph_connected_components(graph, /*membership=*/ NULL, /*csize=*/ NULL,
                                                      &comp_count, IGRAPH_WEAK));
         }
         if (merges) {
@@ -179,7 +179,7 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes - comp_count + 1));
             igraph_vector_null(modularity);
         }
-        Communities C(&G, length, max_memory, merges, modularity);
+        Communities C(&G, length, merges, modularity);
 
         while (!C.H->is_empty()) {
             IGRAPH_ALLOW_INTERRUPTION();
