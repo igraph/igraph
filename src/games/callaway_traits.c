@@ -31,9 +31,8 @@
  * \function igraph_callaway_traits_game
  * \brief Simulates a growing network with vertex types.
  *
- * </para><para>
  * The different types of vertices prefer to connect other types of
- * vertices with a given probability.</para><para>
+ * vertices with a given probability.
  *
  * </para><para>
  * The simulation goes like this: in each discrete time step a new

@@ -79,12 +79,14 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * \oli The same procedure is applied to all the newly cited
  *   vertices.
  * \endolist
+ *
  * </para><para>
  * See also:
  * Jure Leskovec, Jon Kleinberg and Christos Faloutsos. Graphs over time:
  * densification laws, shrinking diameters and possible explanations.
  * \emb KDD '05: Proceeding of the eleventh ACM SIGKDD international
  * conference on Knowledge discovery in data mining \eme, 177--187, 2005.
+ *
  * </para><para>
  * Note however, that the version of the model in the published paper is incorrect
  * in the sense that it cannot generate the kind of graphs the authors
