@@ -413,13 +413,15 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * \function igraph_maxflow
  * \brief Maximum network flow between a pair of vertices.
  *
- * </para><para>This function implements the Goldberg-Tarjan algorithm for
+ * This function implements the Goldberg-Tarjan algorithm for
  * calculating value of the maximum flow in a directed or undirected
  * graph. The algorithm was given in Andrew V. Goldberg, Robert
  * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
- * the ACM, 35(4), 921-940, 1988. </para>
+ * the ACM, 35(4), 921-940, 1988
+ * https://doi.org/10.1145/48014.61051.
  *
- * <para> The input of the function is a graph, a vector
+ * </para><para>
+ * The input of the function is a graph, a vector
  * of real numbers giving the capacity of the edges and two vertices
  * of the graph, the source and the target. A flow is a function
  * assigning positive real numbers to the edges and satisfying two
@@ -1030,13 +1032,15 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * \function igraph_maxflow_value
  * \brief Maximum flow in a network with the push/relabel algorithm.
  *
- * </para><para>This function implements the Goldberg-Tarjan algorithm for
+ * This function implements the Goldberg-Tarjan algorithm for
  * calculating value of the maximum flow in a directed or undirected
  * graph. The algorithm was given in Andrew V. Goldberg, Robert
  * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
- * the ACM, 35(4), 921-940, 1988. </para>
+ * the ACM, 35(4), 921-940, 1988
+ * https://doi.org/10.1145/48014.61051.
  *
- * <para> The input of the function is a graph, a vector
+ * </para><para>
+ * The input of the function is a graph, a vector
  * of real numbers giving the capacity of the edges and two vertices
  * of the graph, the source and the target. A flow is a function
  * assigning positive real numbers to the edges and satisfying two
@@ -1046,18 +1050,21 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * the same as the outgoing flow (i.e. the sum of the flow on the
  * outgoing edges). The value of the flow is the incoming flow at the
  * target vertex. The maximum flow is the flow with the maximum
- * value. </para>
+ * value.
  *
- * <para> According to a theorem by Ford and Fulkerson
+ * </para><para>
+ * According to a theorem by Ford and Fulkerson
  * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
  * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
  * between two vertices is the same as the
  * minimum cut between them (also called the minimum s-t cut). So \ref
- * igraph_st_mincut_value() gives the same result in all cases as \c
- * igraph_maxflow_value().</para>
+ * igraph_st_mincut_value() gives the same result in all cases as \ref
+ * igraph_maxflow_value().
  *
- * <para> Note that the value of the maximum flow is the same as the
+ * </para><para>
+ * Note that the value of the maximum flow is the same as the
  * minimum cut in the graph.
+ *
  * \param graph The input graph, either directed or undirected.
  * \param value Pointer to a real number, the result will be placed here.
  * \param source The id of the source vertex.
@@ -2029,10 +2036,12 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
  * </para><para> The vertex connectivity of a graph is the minimum
  * vertex connectivity along each pairs of vertices in the graph.
  * </para>
+ *
  * <para> The vertex connectivity of a graph is the same as group
  * cohesion as defined in Douglas R. White and Frank Harary: The
  * cohesiveness of blocks in social networks: node connectivity and
- * conditional density, Sociological Methodology 31:305--359, 2001.
+ * conditional density, Sociological Methodology 31:305--359, 2001
+ * https://doi.org/10.1111/0081-1750.00098.
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2124,7 +2133,8 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
  * The edge connectivity of a graph is the same as group adhesion as
  * defined in Douglas R. White and Frank Harary: The cohesiveness of
  * blocks in social networks: node connectivity and conditional
- * density, Sociological Methodology 31:305--359, 2001.
+ * density, Sociological Methodology 31:305--359, 2001
+ * https://doi.org/10.1111/0081-1750.00098.
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2389,8 +2399,12 @@ igraph_error_t igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
  * Gomory-Hu tree. See the following paper for more details:
  *
  * </para><para>
+ * Reference:
+ *
+ * </para><para>
  * Gusfield D: Very simple methods for all pairs network flow analysis. SIAM J
- * Comput 19(1):143-155, 1990.
+ * Comput 19(1):143-155, 1990
+ * https://doi.org/10.1137/0219009.
  *
  * \param graph The input graph.
  * \param tree  Pointer to an uninitialized graph; the result will be

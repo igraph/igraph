@@ -66,6 +66,7 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
  * </para><para>The original paper where this reduction was conceived is
  * Shimon Even and R. Endre Tarjan: Network Flow and Testing Graph
  * Connectivity, SIAM J. Comput., 4(4), 507–518.
+ * https://doi.org/10.1137/0204043
  *
  * \param graph A graph. Although directness is not checked, this function
  *        is commonly used only on directed graphs.
@@ -376,7 +377,7 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
 
 /**
  * \function igraph_dominator_tree
- * Calculates the dominator tree of a flowgraph
+ * \brief Calculates the dominator tree of a flowgraph.
  *
  * A flowgraph is a directed graph with a distinguished start (or
  * root) vertex r, such that for any vertex v, there is a path from r
@@ -393,6 +394,7 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
  * please see Thomas Lengauer, Robert Endre Tarjan: A fast algorithm
  * for finding dominators in a flowgraph, ACM Transactions on
  * Programming Languages and Systems (TOPLAS) I/1, 121--141, 1979.
+ * https://doi.org/10.1145/357062.357071
  *
  * \param graph A directed graph. If it is not a flowgraph, and it
  *        contains some vertices not reachable from the root vertex,
@@ -1293,7 +1295,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
 /**
  * \function igraph_all_st_mincuts
- * All minimum s-t cuts of a directed graph
+ * \brief All minimum s-t cuts of a directed graph.
  *
  * This function lists all edge cuts between two vertices, in a directed graph,
  * with minimum total capacity. Possibly, multiple cuts may have the same total
