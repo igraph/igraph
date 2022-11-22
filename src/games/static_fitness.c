@@ -108,9 +108,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     igraph_integer_t step_counter = 0;
     igraph_integer_t i, from, to, pos;
 
-    if (fitness_out == 0) {
-        IGRAPH_ERROR("fitness_out must not be null.", IGRAPH_EINVAL);
-    }
+    IGRAPH_ASSERT(fitness_out != NULL);
 
     if (no_of_edges < 0) {
         IGRAPH_ERRORF("Number of edges cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_edges);
