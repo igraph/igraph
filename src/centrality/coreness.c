@@ -40,6 +40,8 @@
  * This function implements the algorithm presented in Vladimir
  * Batagelj, Matjaz Zaversnik: An O(m) Algorithm for Cores
  * Decomposition of Networks.
+ * https://arxiv.org/abs/cs/0310049
+ *
  * \param graph The input graph.
  * \param cores Pointer to an initialized vector, the result of the
  *        computation will be stored here. It will be resized as
