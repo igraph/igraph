@@ -155,7 +155,8 @@ int igraph_i_glpk_check(int retval, const char* message) {
 #undef HANDLE_CODE2
 #undef HANDLE_CODE3
 
-    sprintf(message_and_code, "%s (%s)", message, code);
+    snprintf(message_and_code, sizeof(message_and_code) / sizeof(message_and_code[0]),
+            "%s (%s)", message, code);
     IGRAPH_ERROR(message_and_code, retval);
 }
 
