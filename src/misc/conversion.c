@@ -806,7 +806,7 @@ igraph_error_t igraph_to_undirected(igraph_t *graph,
 
 /**
  * \function igraph_get_stochastic
- * Stochastic adjacency matrix of a graph
+ * \brief Stochastic adjacency matrix of a graph.
  *
  * Stochastic matrix of a graph. The stochastic matrix of a graph is
  * its adjacency matrix, normalized row-wise or column-wise, such that
