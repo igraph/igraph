@@ -25,7 +25,7 @@ struct igraph_simple_cycle_search_state_t;
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_init(
     struct igraph_simple_cycle_search_state_t *state, const igraph_t *graph);
 
-IGRAPH_EXPORT igraph_error_t igraph_simple_cycle_search_state_destroy(
+IGRAPH_EXPORT void igraph_simple_cycle_search_state_destroy(
     struct igraph_simple_cycle_search_state_t *state);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_from_one_vertex(
