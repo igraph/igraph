@@ -6,6 +6,14 @@ K_7 graph:
 ( 4 9 20 14 17 )
 Total Steiner tree weight: 5
 
+K_7 Non Complete graph-1:
+( 0 4 9 )
+Total Steiner tree weight: 6
+
+K_7 Non Complete graph-2:
+( 0 5 10 )
+Total Steiner tree weight: 6
+
 K_7_Unit graph:
 ( 0 6 11 )
 Total Steiner tree weight: 3
