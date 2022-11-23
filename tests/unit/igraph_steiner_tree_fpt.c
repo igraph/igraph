@@ -33,7 +33,7 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     /* Check total tree weight. */
     igraph_real_t value2 = 0.0;
     igraph_integer_t tree_size = igraph_vector_int_size(&tree_edges);
-    for (igraph_integer_t i=0; i < tree_size; i++) {
+    for (igraph_integer_t i = 0; i < tree_size; i++) {
         value2 += VECTOR(*weights)[ VECTOR(tree_edges)[i] ];
     }
     IGRAPH_ASSERT(value == value2);
@@ -138,7 +138,7 @@ int main(void) {
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
-   
+
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
