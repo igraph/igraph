@@ -1552,8 +1552,7 @@ igraph_error_t FUNCTION(igraph_vector, init_copy)(
     from_size = FUNCTION(igraph_vector, size)(from);
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(to, from_size));
 
-    memcpy(to->stor_begin, from->stor_begin,
-           FUNCTION(igraph_vector, size)(from) * sizeof(BASE));
+    memcpy(to->stor_begin, from->stor_begin, from_size * sizeof(BASE));
 
     return IGRAPH_SUCCESS;
 }

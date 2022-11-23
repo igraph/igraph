@@ -143,6 +143,12 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * eigenvectors of <code>A*A^T</code> and <code>A^T*A</code>, respectively,
  * where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
+ *
+ * </para><para>
+ * When both the hub and authority scores are needed (the typical use case),
+ * using this function is more efficient than separate calculations
+ * with \ref igraph_hub_score() and \ref igraph_authority_score().
+ *
  * </para><para>
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
@@ -150,6 +156,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * Algorithms, \eme 1998. Extended version in \emb Journal of the
  * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
  * 1997.
+ *
  * \param graph The input graph. Can be directed and undirected.
  * \param hub_vector Pointer to an initialized vector, the hub scores are
  *    stored here. If a null pointer then it is ignored.
@@ -381,6 +388,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
  * The hub scores of the vertices are defined as the principal
  * eigenvector of <code>A*A^T</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
+ *
  * </para><para>
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
@@ -388,6 +396,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
  * Algorithms, \eme 1998. Extended version in \emb Journal of the
  * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
  * 1997.
+ *
  * \param graph The input graph. Can be directed and undirected.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. If a null pointer then it is ignored.
@@ -407,7 +416,9 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
  * Time complexity: depends on the input graph, usually it is O(|V|),
  * the number of vertices.
  *
- * \sa \ref igraph_authority_score() for the companion measure,
+ * \sa \ref igraph_hub_and_authority_scores() to compute
+ * hub and authrotity scores efficiently at the same time,
+ * \ref igraph_authority_score() for the companion measure,
  * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
  * \ref igraph_eigenvector_centrality() for similar measures.
  */
@@ -426,6 +437,7 @@ igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  * The authority scores of the vertices are defined as the principal
  * eigenvector of <code>A^T*A</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
+ *
  * </para><para>
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
@@ -433,6 +445,7 @@ igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  * Algorithms, \eme 1998. Extended version in \emb Journal of the
  * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
  * 1997.
+ *
  * \param graph The input graph. Can be directed and undirected.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. If a null pointer then it is ignored.
@@ -452,7 +465,9 @@ igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  * Time complexity: depends on the input graph, usually it is O(|V|),
  * the number of vertices.
  *
- * \sa \ref igraph_hub_score() for the companion measure,
+ * \sa \ref igraph_hub_and_authority_scores() to compute
+ * hub and authrotity scores efficiently at the same time,
+ * \ref igraph_hub_score() for the companion measure,
  * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
  * \ref igraph_eigenvector_centrality() for similar measures.
  */
