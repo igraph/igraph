@@ -54,9 +54,9 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1;
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1;
     igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1;
-    igraph_vector_t weights_null, weights_k7, weights_k6_k1;
+    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1;
 
     /* Null graph */
     igraph_empty(&g_null, 0, 0);
@@ -72,7 +72,7 @@ int main(void) {
                  4, 5, 4, 6,
                  5, 6,
                  -1);
-
+    // 1 , 1
     igraph_vector_init_int(&weights_k7, 21,
                            2, 2, 2, 1, 1, 2,
                            2, 2, 2, 1, 2,
@@ -83,6 +83,53 @@ int main(void) {
 
     igraph_vector_int_init_int(&terminals_k7, 4,
                                0, 1, 2, 3);
+
+
+/* K_7 non-complete graph with edges 0-4,0-5 removed */
+    igraph_small(&g_k7_n, 7, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 0, 6,
+                 1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
+                 2, 3, 2, 4, 2, 5, 2, 6,
+                 3, 4, 3, 5, 3, 6,
+                 4, 5, 4, 6,
+                 5, 6,
+                 -1);
+
+    igraph_vector_init_int(&weights_k7_n, 19,
+                           2, 2, 2, 2,
+                           2, 2, 2, 1, 2,
+                           2, 2, 2, 1,
+                           1, 2, 1,
+                           2, 1,
+                           1);
+
+    igraph_vector_int_init_int(&terminals_k7, 4,
+                               0, 1, 2, 3);
+
+
+/* K_7 non-complete graph with edges 0-4 removed */
+    igraph_small(&g_k7_n1, 7, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 0, 4, 0, 6,
+                 1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
+                 2, 3, 2, 4, 2, 5, 2, 6,
+                 3, 4, 3, 5, 3, 6,
+                 4, 5, 4, 6,
+                 5, 6,
+                 -1);
+
+    igraph_vector_init_int(&weights_k7_n1, 20,
+                           2, 2, 2, 1, 2,
+                           2, 2, 2, 1, 2,
+                           2, 2, 2, 1,
+                           1, 2, 1,
+                           2, 1,
+                           1);
+
+    igraph_vector_int_init_int(&terminals_k7, 4,
+                               0, 1, 2, 3);
+
+
+
 
     /* Disconnected graph: K_6 with a specific edge order and an additional isolated vertex. */
     igraph_small(&g_k6_k1, 7, IGRAPH_UNDIRECTED,
@@ -110,6 +157,12 @@ int main(void) {
 
     printf("\nK_7 graph:\n");
     check_graph(&g_k7, &terminals_k7, &weights_k7);
+
+    printf("\nK_7 Non Complete graph-1:\n");
+    check_graph(&g_k7_n, &terminals_k7, &weights_k7_n);
+
+    printf("\nK_7 Non Complete graph-2:\n");
+    check_graph(&g_k7_n1, &terminals_k7, &weights_k7_n1);
 
     igraph_real_t value;
     igraph_vector_int_t tree_edges;
