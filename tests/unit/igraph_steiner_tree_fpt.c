@@ -103,9 +103,6 @@ int main(void) {
                            2, 1,
                            1);
 
-    igraph_vector_int_init_int(&terminals_k7, 4,
-                               0, 1, 2, 3);
-
 
     /* K_7 non-complete graph with edges 0-4 removed */
     igraph_small(&g_k7_n1, 7, IGRAPH_UNDIRECTED,
@@ -124,11 +121,6 @@ int main(void) {
                            1, 2, 1,
                            2, 1,
                            1);
-
-    igraph_vector_int_init_int(&terminals_k7, 4,
-                               0, 1, 2, 3);
-
-
 
 
     /* Disconnected graph: K_6 with a specific edge order and an additional isolated vertex. */
@@ -192,10 +184,14 @@ int main(void) {
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
 
+    igraph_destroy(&g_k7_n1);
+    igraph_destroy(&g_k7_n);
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
     igraph_vector_destroy(&weights_k6_k1);
+    igraph_vector_destroy(&weights_k7_n);
+    igraph_vector_destroy(&weights_k7_n1);
 
     igraph_vector_int_destroy(&terminals_k7);
     igraph_vector_int_destroy(&terminals_null);
