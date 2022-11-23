@@ -85,7 +85,7 @@ int main(void) {
                                0, 1, 2, 3);
 
 
-/* K_7 non-complete graph with edges 0-4,0-5 removed */
+    /* K_7 non-complete graph with edges 0-4,0-5 removed */
     igraph_small(&g_k7_n, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 6,
                  1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
@@ -107,7 +107,7 @@ int main(void) {
                                0, 1, 2, 3);
 
 
-/* K_7 non-complete graph with edges 0-4 removed */
+    /* K_7 non-complete graph with edges 0-4 removed */
     igraph_small(&g_k7_n1, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 0, 6,
                  1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
