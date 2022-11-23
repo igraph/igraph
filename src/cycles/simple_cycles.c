@@ -52,7 +52,7 @@ typedef struct igraph_simple_cycle_search_state_t {
     igraph_adjlist_t B;
 
     /* Stack in which the vertices of the current cycle are pushed */
-    igraph_stack_int_t stack;
+    igraph_vector_int_t stack;
 
     /* Boolean vector indicating which vertices are blocked */
     igraph_vector_bool_t blocked;
@@ -94,8 +94,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
     igraph_integer_t num_neighbors;
 
     // stack v
-    IGRAPH_CHECK(igraph_stack_int_push(&state->stack, V));
-    // printf("Pushing %lld to stack, stack size is %lld, result size is %lld\n", V, igraph_stack_int_size(&state->stack), igraph_vector_int_list_size(results));
+    IGRAPH_CHECK(igraph_vector_int_push_back(&state->stack, V));
+    // printf("Pushing %lld to stack, stack size is %lld, result size is %lld\n", V, igraph_vector_int_size(&state->stack), igraph_vector_int_list_size(results));
     VECTOR(state->blocked)[V] = true;
 
     // L1
@@ -106,24 +106,16 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
         // NOTE: possibly dangerous fix for undirected graphs,
         // disabling finding any two-vertex-loops
         if (W == S) {
-            if ((state->directed || igraph_stack_int_size(&state->stack) > 2)) {
+            if ((state->directed || igraph_vector_int_size(&state->stack) > 2)) {
                 local_found = true;
                 // output circuit composed of stack
-                // printf("Found cycle with size %lld\n", igraph_stack_int_size(&state->stack));
+                // printf("Found cycle with size %" IGRAPH_PRId "\n", igraph_vector_int_size(&state->stack));
 
                 // copy output: from stack to vector
-                igraph_integer_t res_idx = 0;
                 igraph_vector_int_t res;
-                IGRAPH_CHECK(igraph_vector_int_init(&res, igraph_stack_int_size(&state->stack)));
+                IGRAPH_CHECK(igraph_vector_int_init_copy(&res, &state->stack));
                 IGRAPH_FINALLY(igraph_vector_int_destroy, &res);
-                while (!igraph_stack_int_empty(&state->stack)) {
-                    VECTOR(res)[res_idx] = igraph_stack_int_pop(&state->stack); // igraph_stack_int_get(&state->stack, i);
-                    res_idx += 1;
-                }
-                // we actually want to keep the stack; maybe a different data structure would be better after all?
-                for (igraph_integer_t stack_idx = igraph_vector_int_size(&res) - 1; stack_idx >= 0; --stack_idx) {
-                    IGRAPH_CHECK(igraph_stack_int_push(&state->stack, igraph_vector_int_get(&res, stack_idx)));
-                }
+                IGRAPH_CHECK(igraph_vector_int_reverse(&res));
                 // undirected graphs lead to every cycle being found twice.
                 // this is our naïve filter for now
                 igraph_bool_t persist_result = true;
@@ -177,11 +169,11 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
         }
     }
 
-    IGRAPH_ASSERT(!igraph_stack_int_empty(&state->stack));
+    IGRAPH_ASSERT(!igraph_vector_int_empty(&state->stack));
 
     // unstack v
     // printf("Unstacking %lld\n", V);
-    igraph_stack_int_pop(&state->stack);
+    igraph_vector_int_pop_back(&state->stack);
 
     return IGRAPH_SUCCESS;
 }
@@ -203,8 +195,9 @@ igraph_error_t igraph_simple_cycle_search_state_init(
 ) {
     state->N = igraph_vcount(graph);
 
-    IGRAPH_CHECK(igraph_stack_int_init(&state->stack, 8));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &state->stack);
+    IGRAPH_CHECK(igraph_vector_int_init(&state->stack, 0));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&state->stack, 8));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &state->stack);
     IGRAPH_CHECK(igraph_vector_bool_init(&state->blocked, state->N));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &state->blocked);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &state->AK, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE)); // TODO: understand what we actually want to include
@@ -231,7 +224,7 @@ igraph_error_t igraph_simple_cycle_search_state_init(
  * \ref igraph_simple_cycle_search_state_init
  */
 void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state) {
-    igraph_stack_int_destroy(&state->stack);
+    igraph_vector_int_destroy(&state->stack);
     igraph_vector_bool_destroy(&state->blocked);
     igraph_adjlist_destroy(&state->AK);
     igraph_adjlist_destroy(&state->B);
