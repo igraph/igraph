@@ -295,6 +295,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
         igraph_vector_int_destroy(&vectorlist);
         igraph_vector_int_destroy(&edgelist);
+        
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -368,6 +369,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         pweights = weights;
     }
     
+
     if (igraph_vector_size(pweights) != no_of_edges) {
         
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
@@ -579,6 +581,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_matrix_destroy(&distance);
     igraph_vector_int_destroy(&steiner_terminals_copy);
     igraph_matrix_destroy(&dp_cache);
+    
 
     IGRAPH_FINALLY_CLEAN(3);
 

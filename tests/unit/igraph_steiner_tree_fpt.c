@@ -129,6 +129,8 @@ int main(void) {
     print_vector_int(&tree_edges_unit);
     printf("Total Steiner tree weight: %g\n", value_unit);
 
+    igraph_vector_int_destroy(&tree_edges_unit);
+
     //check_graph(&g_k7, &terminals_k7, NULL);
 
 
