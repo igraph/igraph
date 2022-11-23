@@ -191,11 +191,14 @@ int main(void) {
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
-   
+    igraph_destroy(&g_k7_n1);
+    igraph_destroy(&g_k7_n);
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
     igraph_vector_destroy(&weights_k6_k1);
+    igraph_vector_destroy(&weights_k7_n);
+    igraph_vector_destroy(&weights_k7_n1);
 
     igraph_vector_int_destroy(&terminals_k7);
     igraph_vector_int_destroy(&terminals_null);
