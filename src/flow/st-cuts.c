@@ -1368,20 +1368,21 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* -------------------------------------------------------------------- */
     /* Error checks */
     if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("S-t cuts can only be listed in directed graphs",
-                     IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("s-t cuts can only be listed in directed graphs.", IGRAPH_UNIMPLEMENTED);
     }
     if (source < 0 || source >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid `source' vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid source vertex.", IGRAPH_EINVVID);
     }
     if (target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid `target' vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid target vertex.", IGRAPH_EINVVID);
     }
     if (source == target) {
-        IGRAPH_ERROR("`source' and 'target' are the same vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
     }
-    if (capacity != NULL && igraph_vector_min(capacity) <= 0)
-    {
+    if (capacity && igraph_vector_size(capacity) != no_of_edges) {
+        IGRAPH_ERROR("Capacity vector length must agree with number of edges.", IGRAPH_EINVAL);
+    }
+    if (capacity && no_of_edges > 0 && igraph_vector_min(capacity) <= 0) {
         IGRAPH_ERROR("Not all capacities are strictly positive.", IGRAPH_EINVAL);
     }
 
@@ -1401,8 +1402,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     /* -------------------------------------------------------------------- */
     /* Then we need the reverse residual graph */
-    IGRAPH_CHECK(igraph_reverse_residual_graph(graph, capacity, &residual,
-                 &flow));
+    IGRAPH_CHECK(igraph_reverse_residual_graph(graph, capacity, &residual, &flow));
     IGRAPH_FINALLY(igraph_destroy, &residual);
 
     /* -------------------------------------------------------------------- */
