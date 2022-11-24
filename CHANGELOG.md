@@ -18,6 +18,7 @@
  - Fixed a bug in `igraph_2dgrid_move()` that sometimes crashed the Large Graph Layout function when a grid cell became empty.
  - `igraph_pagerank()` and `igraph_personalized_pagerank()` would fail to converge when the ARPACK implementation was used and a vertex had more than one outgoing edge but all these edges had zero weights.
  - `igraph_pagerank()` and `igraph_personalized_pagerank()` no longer allow negative weights. Previously, edges with negative weights were silently ignored when using the PRPACK implementation. The ARPACK implementation would issue a warning saying that they are ignored, but in fact it computed an incorrect result.
+ - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs.
  - Fixed new warnings issued by the Xcode 14.1 toolchain.
 
 ### Other
