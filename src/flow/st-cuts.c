@@ -491,11 +491,11 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* DFS first, to set semi, vertex and parent, step 1 */
 
-    IGRAPH_CHECK(igraph_dfs(graph, root, mode, /*unreachable=*/ 0,
+    IGRAPH_CHECK(igraph_dfs(graph, root, mode, /*unreachable=*/ false,
                             /*order=*/ &vertex,
-                            /*order_out=*/ 0, /*father=*/ &parent,
-                            /*dist=*/ 0, /*in_callback=*/ 0,
-                            /*out_callback=*/ 0, /*extra=*/ 0));
+                            /*order_out=*/ NULL, /*parents=*/ &parent,
+                            /*dist=*/ NULL, /*in_callback=*/ NULL,
+                            /*out_callback=*/ NULL, /*extra=*/ NULL));
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(vertex)[i] >= 0) {
@@ -700,12 +700,11 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
        one as non-minimal. */
 
     IGRAPH_CHECK(igraph_dfs(domtree, root, IGRAPH_IN,
-                            /*unreachable=*/ 0, /*order=*/ 0,
-                            /*order_out=*/ 0, /*father=*/ 0,
-                            /*dist=*/ 0, /*in_callback=*/
-                            igraph_i_all_st_cuts_minimal_dfs_incb,
-                            /*out_callback=*/
-                            igraph_i_all_st_cuts_minimal_dfs_outcb,
+                            /*unreachable=*/ false, /*order=*/ NULL,
+                            /*order_out=*/ NULL, /*parents=*/ NULL,
+                            /*dist=*/ NULL,
+                            /*in_callback=*/ igraph_i_all_st_cuts_minimal_dfs_incb,
+                            /*out_callback=*/ igraph_i_all_st_cuts_minimal_dfs_outcb,
                             /*extra=*/ &data));
 
     igraph_vector_int_clear(minimal);
@@ -845,10 +844,10 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
         igraph_integer_t min = VECTOR(Sbar_map)[ VECTOR(M)[i] ] - 1;
         igraph_integer_t nuvsize, isvlen, j;
         IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN,
-                                /*unreachable=*/ 0, /*order=*/ &Nuv,
-                                /*order_out=*/ 0, /*father=*/ 0, /*dist=*/ 0,
-                                /*in_callback=*/ 0, /*out_callback=*/ 0,
-                                /*extra=*/ 0));
+                                /*unreachable=*/ NULL, /*order=*/ &Nuv,
+                                /*order_out=*/ NULL, /*parents=*/ NULL, /*dist=*/ NULL,
+                                /*in_callback=*/ NULL, /*out_callback=*/ NULL,
+                                /*extra=*/ NULL));
         /* Remove the negative values from the end of the vector */
         for (nuvsize = 0; nuvsize < Sbar_size; nuvsize++) {
             igraph_integer_t t = VECTOR(Nuv)[nuvsize];
@@ -865,11 +864,11 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
            I(S,v) contains all vertices that are in Nu(v) and that are
            reachable from Gamma(S) via a path in Nu(v). */
         IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ -1, /*roots=*/ &GammaS_vec,
-                                /*mode=*/ IGRAPH_OUT, /*unreachable=*/ 0,
+                                /*mode=*/ IGRAPH_OUT, /*unreachable=*/ false,
                                 /*restricted=*/ &Nuv,
-                                /*order=*/ &Isv_min, /*rank=*/ 0,
-                                /*father=*/ 0, /*pred=*/ 0, /*succ=*/ 0,
-                                /*dist=*/ 0, /*callback=*/ 0, /*extra=*/ 0));
+                                /*order=*/ &Isv_min, /*rank=*/ NULL,
+                                /*parents=*/ NULL, /*pred=*/ NULL, /*succ=*/ NULL,
+                                /*dist=*/ NULL, /*callback=*/ NULL, /*extra=*/ NULL));
         for (isvlen = 0; isvlen < no_of_nodes; isvlen++) {
             if (VECTOR(Isv_min)[isvlen] < 0) {
                 break;
@@ -893,11 +892,11 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
             /* Calculate real Isv */
             IGRAPH_CHECK(igraph_vector_int_append(&Nuv, &leftout));
             IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,
-                                    /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
-                                    /*unreachable=*/ 0, /*restricted=*/ &Nuv,
-                                    /*order=*/ &Isv_min, /*rank=*/ 0,
-                                    /*father=*/ 0, /*pred=*/ 0, /*succ=*/ 0,
-                                    /*dist=*/ 0, /*callback=*/ 0, /*extra=*/ 0));
+                                    /*roots=*/ NULL, /*mode=*/ IGRAPH_OUT,
+                                    /*unreachable=*/ false, /*restricted=*/ &Nuv,
+                                    /*order=*/ &Isv_min, /*rank=*/ NULL,
+                                    /*parents=*/ NULL, /*pred=*/ NULL, /*succ=*/ NULL,
+                                    /*dist=*/ NULL, /*callback=*/ NULL, /*extra=*/ NULL));
             for (isvlen = 0; isvlen < no_of_nodes; isvlen++) {
                 if (VECTOR(Isv_min)[isvlen] < 0) {
                     break;
@@ -929,7 +928,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
 
 /* TODO: This is a temporary recursive version */
 
-igraph_error_t igraph_provan_shier_list(
+static igraph_error_t igraph_provan_shier_list(
     const igraph_t *graph, igraph_marked_queue_int_t *S,
     igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
     igraph_vector_int_list_t *result, igraph_provan_shier_pivot_t *pivot,
@@ -1267,12 +1266,12 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv_min, 0);
         *v = VECTOR(Sbar_invmap)[ VECTOR(M)[i] ];
         /* TODO: restricted == keep ? */
-        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ 0,
-                                /*mode=*/ IGRAPH_IN, /*unreachable=*/ 0,
+        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ NULL,
+                                /*mode=*/ IGRAPH_IN, /*unreachable=*/ false,
                                 /*restricted=*/ &keep, /*order=*/ &Isv_min,
-                                /*rank=*/ 0, /*father=*/ 0, /*pred=*/ 0,
-                                /*succ=*/ 0, /*dist=*/ 0, /*callback=*/ 0,
-                                /*extra=*/ 0));
+                                /*rank=*/ NULL, /*parents=*/ NULL, /*pred=*/ NULL,
+                                /*succ=*/ NULL, /*dist=*/ NULL, /*callback=*/ NULL,
+                                /*extra=*/ NULL));
         for (j = 0; j < no_of_nodes; j++) {
             igraph_integer_t u = VECTOR(Isv_min)[j];
             if (u < 0) {
@@ -1397,8 +1396,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* -------------------------------------------------------------------- */
     /* We need to calculate the maximum flow first */
     IGRAPH_VECTOR_INIT_FINALLY(&flow, 0);
-    IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ 0,
-                                /*partition1=*/ 0, /*partition2=*/ 0,
+    IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ NULL,
+                                /*partition1=*/ NULL, /*partition2=*/ NULL,
                                 /*source=*/ source, /*target=*/ target,
                                 capacity, &stats));
 
@@ -1412,13 +1411,11 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* We shrink it to its strongly connected components */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&NtoL, 0);
     IGRAPH_CHECK(igraph_connected_components(
-        &residual, /*membership=*/ &NtoL, /*csize=*/ 0,
+        &residual, /*membership=*/ &NtoL, /*csize=*/ NULL,
         /*no=*/ &proj_nodes, IGRAPH_STRONG
     ));
-    IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL,
-                                          /*vertex_comb=*/ 0));
-    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true,
-                                 /*edge_comb=*/ NULL));
+    IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL, /*vertex_comb=*/ NULL));
+    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true, /*edge_comb=*/ NULL));
 
     newsource = VECTOR(NtoL)[source];
     newtarget = VECTOR(NtoL)[target];
@@ -1437,11 +1434,11 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
             igraph_integer_t pfrom = VECTOR(NtoL)[from];
             igraph_integer_t pto = VECTOR(NtoL)[to];
             if (!VECTOR(VE1bool)[pfrom]) {
-                VECTOR(VE1bool)[pfrom] = 1;
+                VECTOR(VE1bool)[pfrom] = true;
                 VE1size++;
             }
             if (!VECTOR(VE1bool)[pto]) {
-                VECTOR(VE1bool)[pto] = 1;
+                VECTOR(VE1bool)[pto] = true;
                 VE1size++;
             }
         }

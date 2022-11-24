@@ -170,7 +170,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
     igraph_vector_int_t edges;
     igraph_vector_t newcapacity;
     igraph_t newgraph;
-    igraph_integer_t i, size;
+    igraph_integer_t size;
 
     /* We need to convert this to directed by hand, since we need to be
        sure that the edge IDs will be handled properly to build the new
@@ -182,7 +182,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, size));
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, size));
-    for (i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         VECTOR(edges)[no_of_edges * 2 + i * 2] = VECTOR(edges)[i * 2 + 1];
         VECTOR(edges)[no_of_edges * 2 + i * 2 + 1] = VECTOR(edges)[i * 2];
         VECTOR(newcapacity)[i] = VECTOR(newcapacity)[no_of_edges + i] =
@@ -196,8 +196,8 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
                                 partition2, source, target, &newcapacity, stats));
 
     if (cut) {
-        igraph_integer_t i, cs = igraph_vector_int_size(cut);
-        for (i = 0; i < cs; i++) {
+        igraph_integer_t cs = igraph_vector_int_size(cut);
+        for (igraph_integer_t i = 0; i < cs; i++) {
             if (VECTOR(*cut)[i] >= no_of_edges) {
                 VECTOR(*cut)[i] -= no_of_edges;
             }
@@ -210,8 +210,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
        from the bigger vertex ID to the smaller one. For positive
        values the direction is the opposite. */
     if (flow) {
-        igraph_integer_t i;
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             VECTOR(*flow)[i] -= VECTOR(*flow)[i + no_of_edges];
         }
         IGRAPH_CHECK(igraph_vector_resize(flow, no_of_edges));
@@ -521,10 +520,10 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     }
 
     if (capacity && igraph_vector_size(capacity) != no_of_orig_edges) {
-        IGRAPH_ERROR("Invalid capacity vector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Capacity vector must match number of edges in length.", IGRAPH_EINVAL);
     }
     if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVVID);
     }
 
     stats->nopush = stats->norelabel = stats->nogap = stats->nogapnodes =
@@ -825,7 +824,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                 if (i == j) {
 
                     /* RELABEL(vertex) comes here */
-                    igraph_real_t min;
+                    igraph_integer_t min;
                     igraph_integer_t min_edge = 0;
                     DIST(vertex) = min = no_of_nodes;
                     for (k = FIRST(vertex), l = LAST(vertex); k < l; k++) {
@@ -854,7 +853,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
                 break;
 
-            } while (1);
+            } while (true);
         }
 
         /* We need to eliminate flow cycles now. Before that we check that
@@ -1088,8 +1087,8 @@ igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
                          const igraph_vector_t *capacity,
                          igraph_maxflow_stats_t *stats) {
 
-    return igraph_maxflow(graph, value, /*flow=*/ 0, /*cut=*/ 0,
-                          /*partition=*/ 0, /*partition1=*/ 0,
+    return igraph_maxflow(graph, value, /*flow=*/ NULL, /*cut=*/ NULL,
+                          /*partition=*/ NULL, /*partition1=*/ NULL,
                           source, target, capacity, stats);
 }
 
@@ -1392,10 +1391,9 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         igraph_integer_t i, idx;
         igraph_integer_t size = 1;
         char *mark;
+
         mark = IGRAPH_CALLOC(no_of_nodes, char);
-        if (!mark) {
-            IGRAPH_ERROR("Not enough memory for minimum cut", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(mark, "Not enough memory for minimum cut.");
         IGRAPH_FINALLY(igraph_free, mark);
 
         /* first count the vertices in the partition */
