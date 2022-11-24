@@ -1358,8 +1358,6 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_estack_t T;
     igraph_i_all_st_mincuts_data_t pivot_data;
     igraph_vector_bool_t VE1bool;
-    igraph_vector_t VE1;
-    igraph_integer_t VE1size = 0;
     igraph_integer_t i, nocuts;
     igraph_integer_t proj_nodes;
     igraph_vector_t revmap_ptr, revmap_next;
@@ -1424,7 +1422,6 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     /* -------------------------------------------------------------------- */
     /* Determine the active vertices in the projection */
-    IGRAPH_VECTOR_INIT_FINALLY(&VE1, 0);
     IGRAPH_CHECK(igraph_vector_bool_init(&VE1bool, proj_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &VE1bool);
     for (i = 0; i < no_of_edges; i++) {
@@ -1435,18 +1432,10 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
             igraph_integer_t pto = VECTOR(NtoL)[to];
             if (!VECTOR(VE1bool)[pfrom]) {
                 VECTOR(VE1bool)[pfrom] = true;
-                VE1size++;
             }
             if (!VECTOR(VE1bool)[pto]) {
                 VECTOR(VE1bool)[pto] = true;
-                VE1size++;
             }
-        }
-    }
-    IGRAPH_CHECK(igraph_vector_reserve(&VE1, VE1size));
-    for (i = 0; i < proj_nodes; i++) {
-        if (VECTOR(VE1bool)[i]) {
-            igraph_vector_push_back(&VE1, i);
         }
     }
 
@@ -1550,11 +1539,10 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_vector_bool_destroy(&VE1bool);
-    igraph_vector_destroy(&VE1);
     igraph_vector_int_destroy(&NtoL);
     igraph_destroy(&residual);
     igraph_vector_destroy(&flow);
-    IGRAPH_FINALLY_CLEAN(8);
+    IGRAPH_FINALLY_CLEAN(7);
 
     if (!partition1s) {
         igraph_vector_int_list_destroy(mypartition1s);
