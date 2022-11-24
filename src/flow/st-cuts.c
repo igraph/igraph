@@ -945,7 +945,7 @@ igraph_error_t igraph_provan_shier_list(
      * this function as it can fill up the finally stack.
      * See https://github.com/igraph/igraph/issues/2261 */
     /* IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv, 0); */
-    igraph_vector_int_init(&Isv, 0);
+    IGRAPH_CHECK(igraph_vector_int_init(&Isv, 0));
 
     pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
 
