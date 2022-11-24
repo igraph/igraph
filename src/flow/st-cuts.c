@@ -941,7 +941,11 @@ igraph_error_t igraph_provan_shier_list(
     igraph_integer_t v = 0;
     igraph_integer_t i, n;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv, 0);
+    /* TODO: use of IGRAPH_FINALLY is temporarily removed from
+     * this function as it can fill up the finally stack.
+     * See https://github.com/igraph/igraph/issues/2261 */
+    /* IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv, 0); */
+    igraph_vector_int_init(&Isv, 0);
 
     pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
 
@@ -981,7 +985,8 @@ igraph_error_t igraph_provan_shier_list(
     }
 
     igraph_vector_int_destroy(&Isv);
-    IGRAPH_FINALLY_CLEAN(1);
+    /* TODO: see todo item at beginning of function. */
+    /* IGRAPH_FINALLY_CLEAN(1); */
 
     return IGRAPH_SUCCESS;
 }
