@@ -938,19 +938,18 @@ igraph_error_t igraph_provan_shier_list(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t Isv;
-    igraph_vector_int_t vec;
     igraph_integer_t v = 0;
     igraph_integer_t i, n;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
 
     pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
 
     if (igraph_vector_int_empty(&Isv)) {
         if (igraph_marked_queue_int_size(S) != 0 && igraph_marked_queue_int_size(S) != no_of_nodes) {
-            IGRAPH_CHECK(igraph_marked_queue_int_as_vector(S, &vec));
-            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(result, &vec));
+            igraph_vector_int_t *vec;
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_new(result, &vec));
+            IGRAPH_CHECK(igraph_marked_queue_int_as_vector(S, vec));
         }
     } else {
         /* Put v into T */
@@ -981,9 +980,8 @@ igraph_error_t igraph_provan_shier_list(
         igraph_marked_queue_int_pop_back_batch(S);
     }
 
-    igraph_vector_int_destroy(&vec);
     igraph_vector_int_destroy(&Isv);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
