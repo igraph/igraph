@@ -560,6 +560,15 @@ igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
     if (!simple) {
         IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
     }
+    if (igraph_is_directed(graph)) {
+        /* When the graph is directed, mutual edges are effectively multi-edges as we
+         * are ignoring edge directions. */
+        igraph_bool_t has_mutual;
+        IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
+        if (has_mutual) {
+            IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
+        }
+    }
 
     /* Internally, we will still use igraph_vector_ptr_t instead of
      * igraph_vector_int_list_t to manage the list of cliques; this is because
@@ -633,6 +642,15 @@ igraph_error_t igraph_i_graphlets_project(
     IGRAPH_CHECK(igraph_is_simple(graph, &simple));
     if (!simple) {
         IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
+    }
+    if (igraph_is_directed(graph)) {
+        /* When the graph is directed, mutual edges are effectively multi-edges as we
+         * are ignoring edge directions. */
+        igraph_bool_t has_mutual;
+        IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
+        if (has_mutual) {
+            IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
+        }
     }
 
     if (!startMu) {
