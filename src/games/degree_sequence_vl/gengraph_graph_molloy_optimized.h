@@ -113,7 +113,7 @@ public:
     // Destroy deg and links
     ~graph_molloy_opt();
     // Create graph from file (stdin not supported unless rewind() possible)
-    graph_molloy_opt(FILE *f);
+    //graph_molloy_opt(FILE *f);
     // Allocate memory for the graph. Create deg and links. No edge is created.
     graph_molloy_opt(degree_sequence &);
     // Create graph from hard copy
@@ -181,9 +181,9 @@ public:
     // sort adjacency lists
     void sort();
     // count cycles passing through vertex v
-    int cycles(int v);
+    //int cycles(int v);
     // remove vertex (i.e. remove all edges adjacent to vertex)
-    void remove_vertex(int v);
+    //void remove_vertex(int v);
 
     // For debug purposes : verify validity of the graph (symetry, simplicity)
 #define VERIFY_NORMAL  0

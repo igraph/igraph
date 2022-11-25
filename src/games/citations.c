@@ -66,6 +66,7 @@ static void igraph_i_citing_cited_type_game_free (
  * Note that this function generates networks with multiple edges if
  * \p edges_per_step is bigger than one, call \ref igraph_simplify()
  * on the result to get rid of these edges.
+ *
  * \param graph Pointer to an uninitialized graph object, the result
  *     will be stored here.
  * \param node The number of vertices in the network.

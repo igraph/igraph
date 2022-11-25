@@ -31,7 +31,7 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
-#include "core/math.h"
+#include "core/math.h" /* M_SQRT2 */
 
 /**
  * \ingroup generators
@@ -68,8 +68,12 @@
  * which generates the fitnesses for you with a given exponent.
  *
  * </para><para>
- * Reference: Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
- * in scale-free networks. Phys Rev Lett 87(27):278701, 2001.
+ * Reference:
+ *
+ * </para><para>
+ * Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
+ * in scale-free networks. Phys Rev Lett 87(27):278701, 2001
+ * https://doi.org/10.1103/PhysRevLett.87.278701.
  *
  * \param graph        Pointer to an uninitialized graph object.
  * \param fitness_out  A numeric vector containing the fitness of each vertex.
@@ -104,9 +108,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
     igraph_integer_t step_counter = 0;
     igraph_integer_t i, from, to, pos;
 
-    if (fitness_out == 0) {
-        IGRAPH_ERROR("fitness_out must not be null.", IGRAPH_EINVAL);
-    }
+    IGRAPH_ASSERT(fitness_out != NULL);
 
     if (no_of_edges < 0) {
         IGRAPH_ERRORF("Number of edges cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_edges);
@@ -338,7 +340,7 @@ igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_o
  *                     For directed graphs, this specifies the exponent of the
  *                     out-degree distribution. It must be greater than or
  *                     equal to 2. If you pass \c IGRAPH_INFINITY here, you
- *                     will get back an Erdos-Renyi random network.
+ *                     will get back an Erdős-Rényi random network.
  * \param exponent_in  If negative, the generated graph will be undirected.
  *                     If greater than or equal to 2, this argument specifies
  *                     the exponent of the in-degree distribution. If
