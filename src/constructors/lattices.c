@@ -193,7 +193,7 @@ static igraph_error_t triangular_lattice_rectangle_shape(
         VECTOR(row_start_vector)[i] = (row_count - i) / 2;
     }
 
-    IGRAPH_CHECK(triangular_lattice(graph, directed, mutual, true, &row_lengths_vector, &row_start_vector));
+    IGRAPH_CHECK(triangular_lattice(graph, directed, mutual, false, &row_lengths_vector, &row_start_vector));
 
     igraph_vector_int_destroy(&row_lengths_vector);
     igraph_vector_int_destroy(&row_start_vector);
@@ -250,6 +250,10 @@ static igraph_error_t triangular_lattice_hex_shape(
  *
  * Creates a triangular lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
+ * The function constructs a planar dual of the graph constructed by <code>igraph_hexagonal_lattice</code>.
+ * In particular, there a one-to-one correspondence between the vertices in the constructed graph
+ * and the cycles of length 6 in the graph constructed by <code>igraph_hexagonal_lattice</code>
+ * with the same \p dims parameter.
  *
  * </para><para>
  * The vertices of the resulting graph are ordered lexicographically with the 2nd coordinate being
@@ -590,6 +594,5 @@ igraph_error_t igraph_hexagonal_lattice(
                 IGRAPH_EINVAL, num_dims
             );
     }
-
     return IGRAPH_SUCCESS;
 }
