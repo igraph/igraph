@@ -113,6 +113,56 @@ int main(void)
     // clean up
     igraph_destroy(&g_wheel_undirected);
 
+    ////////////////////////////////
+    // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-1326064152
+    igraph_t directed_multiedge;
+    igraph_vector_int_t directed_multiedge_edges;
+    /**
+     * This graph looks like:
+     * 
+     *  /\
+     * 1--2
+     * |  |
+     * 3--4
+     * 
+     */
+    igraph_vector_int_init(&directed_multiedge_edges, 10);
+    igraph_vector_int_set(&directed_multiedge_edges, 0, 1);
+    igraph_vector_int_set(&directed_multiedge_edges, 1, 2);
+    igraph_vector_int_set(&directed_multiedge_edges, 2, 2);
+    igraph_vector_int_set(&directed_multiedge_edges, 3, 3);
+    igraph_vector_int_set(&directed_multiedge_edges, 4, 2);
+    igraph_vector_int_set(&directed_multiedge_edges, 5, 3);
+    igraph_vector_int_set(&directed_multiedge_edges, 6, 3);
+    igraph_vector_int_set(&directed_multiedge_edges, 7, 4);
+    igraph_vector_int_set(&directed_multiedge_edges, 8, 4);
+    igraph_vector_int_set(&directed_multiedge_edges, 9, 1);
+    igraph_create(&directed_multiedge, &directed_multiedge_edges, 5, true);
+    checkGraphForNrOfCycles(&directed_multiedge, 2, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
+    igraph_destroy(&directed_multiedge);
+
+    // same, but undirected
+    igraph_t undirected_multiedge;
+    igraph_create(&undirected_multiedge, &directed_multiedge_edges, 5, false);
+    // NOTE: here, if we use IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE,
+    // it currently only looks at the vertices -> would not find the duplicate with different edges
+    checkGraphForNrOfCycles(&undirected_multiedge, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
+    igraph_destroy(&undirected_multiedge);
+    igraph_vector_int_destroy(&directed_multiedge_edges);
+
+    // check that self-loops are handled
+    igraph_t self_loop;
+    igraph_vector_int_t self_loop_edges;
+    igraph_vector_int_init(&self_loop_edges, 2);
+    igraph_vector_int_set(&self_loop_edges, 0, 0);
+    igraph_vector_int_set(&self_loop_edges, 1, 0);
+    igraph_create(&self_loop, &self_loop_edges, 1, true);
+    checkGraphForNrOfCycles(&self_loop, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH);
+    igraph_destroy(&self_loop);
+    igraph_vector_int_destroy(&self_loop_edges);
+
+    ////////////////////////////////
+
     // clean up test
     VERIFY_FINALLY_STACK();
     return 0;
