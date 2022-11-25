@@ -166,13 +166,13 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     RNG_BEGIN();
 
 #define ADD_EDGE_TO(nei) \
-    if (VECTOR(visited)[(nei)] != actnode+1) {                           \
-        VECTOR(visited)[(nei)] = actnode+1;                              \
-        IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, nei));                \
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, actnode));      \
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));          \
-        IGRAPH_CHECK(igraph_vector_int_push_back(outneis+actnode, nei)); \
-        IGRAPH_CHECK(igraph_vector_int_push_back(inneis+nei, actnode));  \
+    if (VECTOR(visited)[(nei)] != actnode+1) { \
+        VECTOR(visited)[(nei)] = actnode+1; \
+        IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, (nei))); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, actnode)); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, (nei))); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(outneis+actnode, (nei))); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(inneis+(nei), actnode)); \
     }
 
     IGRAPH_PROGRESS("Forest fire: ", 0.0, NULL);
