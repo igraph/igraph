@@ -305,7 +305,7 @@ public:
     // sample dendrogram's splits and update the split histogram
     bool sampleSplitLikelihoods(igraph_integer_t&);
     // reset splits histogram
-    void resetAllSplits();
+    //void resetAllSplits();
 };
 
 } // namespace fitHRG
