@@ -295,7 +295,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
         igraph_vector_int_destroy(&vectorlist);
         igraph_vector_int_destroy(&edgelist);
-        
+
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -347,7 +347,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
-    const igraph_vector_t *pweights; 
+    const igraph_vector_t *pweights;
     igraph_vector_t iweights; // Will be used when weights are NULL.
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -358,20 +358,19 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         IGRAPH_ERROR("Invalid vertex ID given as Steiner terminal.", IGRAPH_EINVVID);
     }
 
-    if (!weights){
-        
-        IGRAPH_CHECK(igraph_vector_init(&iweights,no_of_edges));
-        igraph_vector_fill(&iweights,1);
-        pweights = &iweights;       
-        IGRAPH_FINALLY(igraph_vector_destroy,&iweights);
-    }
-    else{
+    if (!weights) {
+
+        IGRAPH_CHECK(igraph_vector_init(&iweights, no_of_edges));
+        igraph_vector_fill(&iweights, 1);
+        pweights = &iweights;
+        IGRAPH_FINALLY(igraph_vector_destroy, &iweights);
+    } else {
         pweights = weights;
     }
-    
+
 
     if (igraph_vector_size(pweights) != no_of_edges) {
-        
+
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
@@ -581,7 +580,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_matrix_destroy(&distance);
     igraph_vector_int_destroy(&steiner_terminals_copy);
     igraph_matrix_destroy(&dp_cache);
-    
+
 
     IGRAPH_FINALLY_CLEAN(3);
 

@@ -33,7 +33,7 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     /* Check total tree weight. */
     igraph_real_t value2 = 0.0;
     igraph_integer_t tree_size = igraph_vector_int_size(&tree_edges);
-    for (igraph_integer_t i=0; i < tree_size; i++) {
+    for (igraph_integer_t i = 0; i < tree_size; i++) {
         value2 += VECTOR(*weights)[ VECTOR(tree_edges)[i] ];
     }
     IGRAPH_ASSERT(value == value2);
@@ -85,7 +85,7 @@ int main(void) {
                                0, 1, 2, 3);
 
 
-/* K_7 non-complete graph with edges 0-4,0-5 removed */
+    /* K_7 non-complete graph with edges 0-4,0-5 removed */
     igraph_small(&g_k7_n, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 6,
                  1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
@@ -104,7 +104,7 @@ int main(void) {
                            1);
 
 
-/* K_7 non-complete graph with edges 0-4 removed */
+    /* K_7 non-complete graph with edges 0-4 removed */
     igraph_small(&g_k7_n1, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 0, 6,
                  1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
@@ -183,6 +183,7 @@ int main(void) {
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
+
     igraph_destroy(&g_k7_n1);
     igraph_destroy(&g_k7_n);
 
