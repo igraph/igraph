@@ -144,15 +144,15 @@ static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(n);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
     }
 
-    for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
+    for (auto pt : pointers) {
         vertices.sort(degree_greater<vd_pair>);
 
-        vd_pair vd = **pt;
-        vertices.erase(*pt);
+        vd_pair vd = *pt;
+        vertices.erase(pt);
 
         if (vd.degree == 0) {
             continue;
@@ -302,7 +302,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(vcount);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
     }
 
@@ -310,12 +310,12 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
     vertices.sort(degree_greater<vd_pair>);
 
     igraph_integer_t ec = 0;
-    for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
-        vd_pair vd = **pt;
-        vertices.erase(*pt);
+    for (auto pt : pointers) {
+        vd_pair vd = *pt;
+        vertices.erase(pt);
 
         while (vd.degree > 0) {
-            vlist::iterator uit = vertices.begin();
+            auto uit = vertices.begin();
 
             if (vertices.empty() || uit->degree == 0) {
                 // We are out of non-zero degree vertices to connect to.
@@ -342,7 +342,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
             // re-sort the list. A possible optimization would be a version of
             // bubble_up() that can exchange list nodes instead of swapping their values.
             if (vertices.size() > 1) {
-                vlist::iterator wit = uit;
+                auto wit = uit;
                 ++wit;
 
                 if (wit->degree > uit->degree) {
@@ -413,7 +413,7 @@ static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, 
 
         // create the connections
         igraph_integer_t k = 0;
-        for (std::vector<vbd_pair>::iterator it = vertices.begin();
+        for (auto it = vertices.begin();
              k < vdp->degree.second;
              ++it) {
             if (it->vertex == vdp->vertex) {
@@ -454,17 +454,17 @@ static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *ou
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(n);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
     }
 
-    for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
+    for (auto pt : pointers) {
         // sort vertices by (in, out) degree pairs in decreasing order
         // note: std::list::sort does a stable sort
         vertices.sort(degree_greater<vbd_pair>);
 
         // choose a vertex the out-stubs of which will be connected
-        vbd_pair &vd = **pt;
+        vbd_pair &vd = *pt;
 
         if (vd.degree.second == 0) {
             continue;
@@ -775,7 +775,7 @@ igraph_error_t igraph_realize_degree_sequence(
         igraph_edge_type_sw_t allowed_edge_types,
         igraph_realize_degseq_t method)
 {
-    bool directed = indeg != 0;
+    bool directed = indeg != NULL;
 
     try {
         if (directed) {
