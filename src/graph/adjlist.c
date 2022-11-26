@@ -168,10 +168,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
     al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating adjacency list view.");
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
     /* if we already know there are no multi-edges, they don't need to be removed */
@@ -1030,7 +1027,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                              igraph_loops_t loops,
                              igraph_multiple_t multiple) {
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannor create lazy adjacency list view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Cannot create lazy adjacency list view.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -1060,10 +1057,7 @@ igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
 
     al->length = igraph_vcount(graph);
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t*);
-
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create lazy adjacency list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating lazy adjacency list view.");
 
     return IGRAPH_SUCCESS;
 }
