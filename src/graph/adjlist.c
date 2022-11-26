@@ -123,20 +123,20 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
  *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
- * \param mode Constant specifying whether outgoing
- *   (<code>IGRAPH_OUT</code>), incoming (<code>IGRAPH_IN</code>),
- *   or both (<code>IGRAPH_ALL</code>) types of neighbors to include
- *   in the adjacency list. It is ignored for undirected networks.
- * \param loops Specifies how to treat loop edges. <code>IGRAPH_NO_LOOPS</code>
- *   removes loop edges from the adjacency list. <code>IGRAPH_LOOPS_ONCE</code>
+ * \param mode Constant specifying whether to include only outgoing
+ *   (\c IGRAPH_OUT), only incoming (\c IGRAPH_IN),
+ *   or both (\c IGRAPH_ALL) types of neighbors
+ *   in the adjacency list. It is ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *   removes loop edges from the adjacency list. \c IGRAPH_LOOPS_ONCE
  *   makes each loop edge appear only once in the adjacency list of the
- *   corresponding vertex. <code>IGRAPH_LOOPS_TWICE</code> makes loop edges
+ *   corresponding vertex. \c IGRAPH_LOOPS_TWICE makes loop edges
  *   appear \em twice in the adjacency list of the corresponding vertex,
- *   but only if the graph is undirected or <code>mode</code> is set to
- *   <code>IGRAPH_ALL</code>.
+ *   but only if the graph is undirected or \p mode is set to
+ *   \c IGRAPH_ALL.
  * \param multiple Specifies how to treat multiple (parallel) edges.
- *   <code>IGRAPH_NO_MULTIPLE</code> collapses parallel edges into a single one;
- *   <code>IGRAPH_MULTIPLE</code> keeps the multiplicities of parallel edges
+ *   \c IGRAPH_NO_MULTIPLE collapses parallel edges into a single one;
+ *   \c IGRAPH_MULTIPLE keeps the multiplicities of parallel edges
  *   so the same vertex will appear as many times in the adjacency list of
  *   another vertex as the number of parallel edges going between the two
  *   vertices.
@@ -987,12 +987,12 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
 
 /**
  * \function igraph_lazy_adjlist_init
- * \brief Initialized a lazy adjacency list.
+ * \brief Initializes a lazy adjacency list.
  *
  * Create a lazy adjacency list for vertices. This function only
  * allocates some memory for storing the vectors of an adjacency list,
- * but the neighbor vertices are not queried, only at the \ref
- * igraph_lazy_adjlist_get() calls.
+ * but the neighbor vertices are not queried, only at the
+ * \ref igraph_lazy_adjlist_get() calls.
  *
  * </para><para>
  * As of igraph 0.10, there is a small performance cost to setting \p loops
@@ -1001,14 +1001,23 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized adjacency list object.
- * \param mode Constant, it gives whether incoming edges
- *   (<code>IGRAPH_IN</code>), outgoing edges
- *   (<code>IGRPAH_OUT</code>) or both types of edges
- *   (<code>IGRAPH_ALL</code>) are considered. It is ignored for
- *   undirected graphs.
- * \param simplify Constant, it gives whether to simplify the vectors
- *   in the adjacency list (<code>IGRAPH_SIMPLIFY</code>) or not
- *   (<code>IGRAPH_DONT_SIMPLIFY</code>).
+ * \param mode Constant specifying whether to include only outgoing
+ *   (\c IGRAPH_OUT), only incoming (\c IGRAPH_IN),
+ *   or both (\c IGRAPH_ALL) types of neighbors
+ *   in the adjacency list. It is ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *   removes loop edges from the adjacency list. \c IGRAPH_LOOPS_ONCE
+ *   makes each loop edge appear only once in the adjacency list of the
+ *   corresponding vertex. \c IGRAPH_LOOPS_TWICE makes loop edges
+ *   appear \em twice in the adjacency list of the corresponding vertex,
+ *   but only if the graph is undirected or \p mode is set to
+ *   \c IGRAPH_ALL.
+ * \param multiple Specifies how to treat multiple (parallel) edges.
+ *   \c IGRAPH_NO_MULTIPLE collapses parallel edges into a single one;
+ *   \c IGRAPH_MULTIPLE keeps the multiplicities of parallel edges
+ *   so the same vertex will appear as many times in the adjacency list of
+ *   another vertex as the number of parallel edges going between the two
+ *   vertices.
  * \return Error code.
  *
  * Time complexity: O(|V|), the number of vertices, possibly, but
