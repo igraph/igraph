@@ -454,9 +454,8 @@ static igraph_error_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
         igraph_vector_int_t *needle = VECTOR(*cliques)[ri];
         igraph_real_t thr_i = VECTOR(*thresholds)[ri];
         igraph_integer_t n_i = igraph_vector_int_size(needle);
-        igraph_integer_t j = i + 1;
 
-        for (j = i + 1; j < nocliques; j++) {
+        for (igraph_integer_t j = i + 1; j < nocliques; j++) {
             igraph_integer_t rj = VECTOR(order)[j];
             igraph_real_t thr_j = VECTOR(*thresholds)[rj];
             igraph_vector_int_t *hay;
