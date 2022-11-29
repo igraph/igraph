@@ -270,15 +270,21 @@ igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t 
  * of the input graph. In the complementer graph all edges are present
  * which are not present in the original graph. Multiple edges in the
  * input graph are ignored.
+ *
+ * </para><para>
+ * This function returns each neighbor list in sorted order.
+ *
  * \param graph The input graph.
  * \param al Pointer to a not yet initialized adjacency list.
  * \param mode Constant specifying whether outgoing
- *   (<code>IGRAPH_OUT</code>), incoming (<code>IGRAPH_IN</code>),
- *   or both (<code>IGRAPH_ALL</code>) types of neighbors (in the
+ *   (\c IGRAPH_OUT), incoming (\c IGRAPH_IN),
+ *   or both (\c IGRAPH_ALL) types of neighbors (in the
  *   complementer graph) to include in the adjacency list. It is
  *   ignored for undirected networks.
  * \param loops Whether to consider loop edges.
  * \return Error code.
+ *
+ * \sa \ref igraph_adjlist_init(), \ref igraph_complementer()
  *
  * Time complexity: O(|V|^2+|E|), quadratic in the number of vertices.
  */
@@ -286,12 +292,12 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                      igraph_adjlist_t *al,
                                      igraph_neimode_t mode,
                                      igraph_bool_t loops) {
-    igraph_integer_t i, j, k, n;
-    igraph_bool_t* seen;
-    igraph_vector_int_t vec;
+
+    igraph_vector_bool_t seen;
+    igraph_vector_int_t neis;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid neighbor mode specified for complementer adjlist view.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -300,48 +306,51 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 
     al->length = igraph_vcount(graph);
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating complementer adjlist view.");
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
-    n = al->length;
-    seen = IGRAPH_CALLOC(n, igraph_bool_t);
-    if (seen == 0) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_free, seen);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, al->length);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
+    for (igraph_integer_t i = 0; i < al->length; i++) {
+        /* For each vertex, we mark neighbors within the 'seen' bool vector.
+         * Then we iterate over 'seen' and record non-marked vertices in
+         * the adjacency list. */
 
-    for (i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_neighbors(graph, &vec, i, mode));
-        memset(seen, 0, sizeof(igraph_bool_t) * (unsigned) al->length);
-        n = al->length;
+
+        /* Reset neighbor counter and 'seen' vector. */
+        igraph_vector_bool_null(&seen);
+        igraph_integer_t n = al->length;
+
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, mode));
+
         if (!loops) {
-            seen[i] = 1;
+            VECTOR(seen)[i] = true;
             n--;
         }
-        igraph_integer_t vec_size = igraph_vector_int_size(&vec);
-        for (j = 0; j < vec_size; j++) {
-            if (! seen [ VECTOR(vec)[j] ] ) {
+
+        igraph_integer_t neis_size = igraph_vector_int_size(&neis);
+        for (igraph_integer_t j = 0; j < neis_size; j++) {
+            if (! VECTOR(seen)[ VECTOR(neis)[j] ] ) {
                 n--;
-                seen[ VECTOR(vec)[j] ] = 1;
+                VECTOR(seen)[ VECTOR(neis)[j] ] = true;
             }
         }
+
+        /* Produce "non-neighbor" list in sorted order. */
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
-        for (j = 0, k = 0; k < n; j++) {
-            if (!seen[j]) {
+        for (igraph_integer_t j = 0, k = 0; k < n; j++) {
+            if (!VECTOR(seen)[j]) {
                 VECTOR(al->adjs[i])[k++] = j;
             }
         }
     }
 
-    IGRAPH_FREE(seen);
-    igraph_vector_int_destroy(&vec);
-    IGRAPH_FINALLY_CLEAN(3);
+    igraph_vector_bool_destroy(&seen);
+    igraph_vector_int_destroy(&neis);
+    IGRAPH_FINALLY_CLEAN(3); /* +1 for the adjlist itself */
+
     return IGRAPH_SUCCESS;
 }
 
