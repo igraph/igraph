@@ -77,7 +77,7 @@
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid (negative) length of row_lengths_vector does not match the length of the
-            row_start_vector.
+ *         row_start_vector.
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  */
@@ -250,9 +250,9 @@ static igraph_error_t triangular_lattice_hex_shape(
  *
  * Creates a triangular lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), (i, j + 1), and (i - 1, j + 1).
- * The function constructs a planar dual of the graph constructed by <code>igraph_hexagonal_lattice</code>.
+ * The function constructs a planar dual of the graph constructed by \ref igraph_hexagonal_lattice().
  * In particular, there a one-to-one correspondence between the vertices in the constructed graph
- * and the cycles of length 6 in the graph constructed by <code>igraph_hexagonal_lattice</code>
+ * and the cycles of length 6 in the graph constructed by \ref igraph_hexagonal_lattice()
  * with the same \p dims parameter.
  *
  * </para><para>
@@ -279,6 +279,7 @@ static igraph_error_t triangular_lattice_hex_shape(
  * \return Error code:
  *         \c IGRAPH_EINVAL: The size of \p dims must be either 1, 2, or 3 with all the components
  *         at least 1.
+ * \sa \ref igraph_hexagonal_lattice() for creating a triangular lattice.
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  *
@@ -296,19 +297,19 @@ igraph_error_t igraph_triangular_lattice(
     }
 
     switch (num_dims) {
-        case 1:
-            IGRAPH_CHECK(triangular_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
-            break;
-        case 2:
-            IGRAPH_CHECK(triangular_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
-            break;
-        case 3:
-            IGRAPH_CHECK(triangular_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
-            break;
-        default:
-            IGRAPH_ERRORF(
-                "The size of the dimension vector must be 1, 2 or 3, got %" IGRAPH_PRId ".",
-                IGRAPH_EINVAL, num_dims);
+    case 1:
+        IGRAPH_CHECK(triangular_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
+        break;
+    case 2:
+        IGRAPH_CHECK(triangular_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
+        break;
+    case 3:
+        IGRAPH_CHECK(triangular_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
+        break;
+    default:
+        IGRAPH_ERRORF(
+            "The size of the dimension vector must be 1, 2 or 3, got %" IGRAPH_PRId ".",
+            IGRAPH_EINVAL, num_dims);
     }
 
     return IGRAPH_SUCCESS;
@@ -339,7 +340,7 @@ igraph_error_t igraph_triangular_lattice(
  *
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid (negative) length of row_lengths_vector does not match the length of the
-            row_start_vector.
+ *         row_start_vector.
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  */
@@ -532,9 +533,9 @@ static igraph_error_t hex_lattice_hex_shape(
  *
  * Creates a hexagonal lattice whose vertices have the form (i, j) for non-negative integers i and j
  * and (i, j) is generally connected with (i + 1, j), and if i is odd also with (i - 1, j + 1).
- * The function constructs a planar dual of the graph constructed by <code>igraph_triangular_lattice</code>.
+ * The function constructs a planar dual of the graph constructed by \ref igraph_triangular_lattice().
  * In particular, there a one-to-one correspondence between the cycles of length 6 in the constructed graph
- * and the vertices of the graph constructed by <code>igraph_triangular_lattice</code> function
+ * and the vertices of the graph constructed by \ref igraph_triangular_lattice() function
  * with the same \p dims parameter.
  *
  * </para><para>
@@ -561,6 +562,8 @@ static igraph_error_t hex_lattice_hex_shape(
  * \return Error code:
  *         \c IGRAPH_EINVAL: The size of \p dims must be either 1, 2, or 3 with all the components
  *         at least 1.
+ * \sa \ref igraph_triangular_lattice() for creating a triangular lattice.
+ *
  *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  *
@@ -579,20 +582,20 @@ igraph_error_t igraph_hexagonal_lattice(
     }
 
     switch (num_dims) {
-        case 1:
-            IGRAPH_CHECK(hex_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
-            break;
-        case 2:
-            IGRAPH_CHECK(hex_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
-            break;
-        case 3:
-            IGRAPH_CHECK(hex_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
-            break;
-        default:
-            IGRAPH_ERRORF(
-                "The size of the dimension vector must be 1, 2 or 3, got %" IGRAPH_PRId ".",
-                IGRAPH_EINVAL, num_dims
-            );
-    }
+    case 1:
+        IGRAPH_CHECK(hex_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
+        break;
+    case 2:
+        IGRAPH_CHECK(hex_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
+        break;
+    case 3:
+        IGRAPH_CHECK(hex_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
+        break;
+    default:
+        IGRAPH_ERRORF(
+            "The size of the dimension vector must be 1, 2 or 3, got %" IGRAPH_PRId ".",
+            IGRAPH_EINVAL, num_dims
+        );
+}
     return IGRAPH_SUCCESS;
 }
