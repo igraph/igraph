@@ -80,8 +80,18 @@ int main(void) {
 
     igraph_destroy(&graph);
 
-    /* An erroneous call */
+    /* Erroneous calls */
     VECTOR(dimvector)[0] = -3;
+    CHECK_ERROR(igraph_hexagonal_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
+    
+    igraph_destroy(&graph);
+    igraph_vector_int_destroy(&dimvector);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 4));
+    VECTOR(dimvector)[0] = 3;
+    VECTOR(dimvector)[1] = 4;
+    VECTOR(dimvector)[2] = 5;
+    VECTOR(dimvector)[3] = 5;
     CHECK_ERROR(igraph_hexagonal_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
 
     igraph_destroy(&graph);

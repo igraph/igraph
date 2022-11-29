@@ -414,7 +414,7 @@ static igraph_error_t hexagonal_lattice(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t hex_lattice_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual) {
+static igraph_error_t hexagonal_lattice_triangle_shape(igraph_t *graph, igraph_integer_t size, igraph_bool_t directed, igraph_bool_t mutual) {
     igraph_integer_t row_count;
     IGRAPH_SAFE_ADD(size, 2, &row_count);
     igraph_vector_int_t row_lengths_vector;
@@ -438,7 +438,7 @@ static igraph_error_t hex_lattice_triangle_shape(igraph_t *graph, igraph_integer
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t hex_lattice_rectangle_shape(
+static igraph_error_t hexagonal_lattice_rectangle_shape(
     igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
     igraph_bool_t directed, igraph_bool_t mutual
 ) {
@@ -473,7 +473,7 @@ static igraph_error_t hex_lattice_rectangle_shape(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t hex_lattice_hex_shape(
+static igraph_error_t hexagonal_lattice_hex_shape(
     igraph_t *graph, igraph_integer_t size_x, igraph_integer_t size_y,
     igraph_integer_t size_z, igraph_bool_t directed, igraph_bool_t mutual
 ) {
@@ -564,7 +564,6 @@ static igraph_error_t hex_lattice_hex_shape(
  *         at least 1.
  * \sa \ref igraph_triangular_lattice() for creating a triangular lattice.
  *
- *
  * Time complexity:  O(|V|), where |V| is the number of vertices in the generated graph.
  *
  */
@@ -583,19 +582,19 @@ igraph_error_t igraph_hexagonal_lattice(
 
     switch (num_dims) {
     case 1:
-        IGRAPH_CHECK(hex_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
+        IGRAPH_CHECK(hexagonal_lattice_triangle_shape(graph, VECTOR(*dims)[0], directed, mutual));
         break;
     case 2:
-        IGRAPH_CHECK(hex_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
+        IGRAPH_CHECK(hexagonal_lattice_rectangle_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], directed, mutual));
         break;
     case 3:
-        IGRAPH_CHECK(hex_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
+        IGRAPH_CHECK(hexagonal_lattice_hex_shape(graph, VECTOR(*dims)[0], VECTOR(*dims)[1], VECTOR(*dims)[2], directed, mutual));
         break;
     default:
         IGRAPH_ERRORF(
             "The size of the dimension vector must be 1, 2 or 3, got %" IGRAPH_PRId ".",
             IGRAPH_EINVAL, num_dims
         );
-}
+    }
     return IGRAPH_SUCCESS;
 }
