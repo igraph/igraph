@@ -117,6 +117,10 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
  * initialization.
  *
  * </para><para>
+ * This function returns each neighbor list in sorted order, just
+ * like \ref igraph_neighbors().
+ *
+ * </para><para>
  * As of igraph 0.10, there is a small performance cost to setting \p loops
  * to a different value than \c IGRAPH_LOOPS_TWICE or setting \p multiple to a
  * different value from \c IGRAPH_MULTIPLE.
@@ -141,6 +145,9 @@ static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
  *   another vertex as the number of parallel edges going between the two
  *   vertices.
  * \return Error code.
+ *
+ * \sa \ref igraph_neighbors() for getting the neighbor lists of individual
+ * vertices.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
@@ -989,7 +996,8 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  * Create a lazy adjacency list for vertices. This function only
  * allocates some memory for storing the vectors of an adjacency list,
  * but the neighbor vertices are not queried, only at the
- * \ref igraph_lazy_adjlist_get() calls.
+ * \ref igraph_lazy_adjlist_get() calls. Neighbor lists will be returned
+ * in sorted order.
  *
  * </para><para>
  * As of igraph 0.10, there is a small performance cost to setting \p loops
@@ -1016,6 +1024,9 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
  *   another vertex as the number of parallel edges going between the two
  *   vertices.
  * \return Error code.
+ *
+ * \sa \ref igraph_neighbors() for getting the neighbor lists of individual
+ * vertices.
  *
  * Time complexity: O(|V|), the number of vertices, possibly, but
  * depends on the underlying memory management too.
