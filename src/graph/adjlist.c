@@ -238,6 +238,7 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * Creates a list of vectors, one for each vertex. This is useful when you
  * are \em constructing a graph using an adjacency list representation as
  * it does not require your graph to exist yet.
+ *
  * \param no_of_nodes The number of vertices
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
  * \return Error code.
@@ -245,18 +246,16 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * Time complexity: O(|V|), linear in the number of vertices.
  */
 igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
-    igraph_integer_t i;
 
     al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating adjlist.");
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
-    for (i = 0; i < al->length; i++) {
+
+    for (igraph_integer_t i = 0; i < al->length; i++) {
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], 0));
     }
+
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
