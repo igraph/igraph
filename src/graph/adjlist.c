@@ -355,7 +355,7 @@ igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
 
 
 /**
- * \function igraph_adjlist_init
+ * \function igraph_adjlist_init_from_inclist
  * \brief Constructs an adjacency list of vertices from an incidence list.
  *
  * In some algorithms it is useful to have an adjacency list \em and an incidence
