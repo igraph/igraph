@@ -74,7 +74,7 @@ static void igraph_i_citing_cited_type_game_free (
  *     step.
  * \param agebins The number of age bins to use.
  * \param preference Pointer to an initialized vector of length
- *     \c agebins+1. This contains the `attractivity' of the various
+ *     \c agebins+1. This contains the "attractivity" of the various
  *     age bins, the last element is the attractivity of the vertices
  *     which were never cited, and it should be greater than zero.
  *     It is a good idea to have all positive values in this vector.

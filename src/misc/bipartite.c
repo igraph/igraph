@@ -1130,7 +1130,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
  *          probability p.
  *        \endclist
  * \param n1 The number of bottom vertices.
- * \param n2 The number of top verices.
+ * \param n2 The number of top vertices.
  * \param p The connection probability for G(n,p) graphs. It is
  *     ignored for G(n,m) graphs.
  * \param m The number of edges for G(n,m) graphs. It is ignored for

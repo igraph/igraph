@@ -876,20 +876,14 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_has_multiple(graph, &has_multiple));
-    if (has_multiple) {
-        IGRAPH_ERROR("Barrat's weighted transitivity measure works only if the graph has no multiple edges.",
-                     IGRAPH_EINVAL);
-    }
-
-    if (igraph_is_directed(graph)) {
+    if (! has_multiple && igraph_is_directed(graph)) {
         /* When the graph is directed, mutual edges are effectively multi-edges as we
          * are ignoring edge directions. */
-        igraph_bool_t has_mutual;
-        IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
-        if (has_mutual) {
-            IGRAPH_ERROR("Barrat's weighted transitivity measure works only if the graph has no multiple edges.",
-                         IGRAPH_EINVAL);
-        }
+        IGRAPH_CHECK(igraph_has_mutual(graph, &has_multiple, false));
+    }
+    if (has_multiple) {
+        IGRAPH_ERROR("Barrat's weighted transitivity measure works only if the graph has no multi-edges.",
+                     IGRAPH_EINVAL);
     }
 
     /* Preconditions validated, now we can call the real implementation */
