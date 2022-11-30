@@ -274,7 +274,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm_multi(
     igraph_integer_t i;
     igraph_real_t maxedges;
     if(multi) {
-        maxedges = IGRAPH_ECOUNT_MAX;
+        maxedges = (igraph_real_t) IGRAPH_ECOUNT_MAX;
     } else {
         maxedges = n;
         if(directed && loops) {
