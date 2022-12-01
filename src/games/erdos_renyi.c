@@ -249,8 +249,6 @@ igraph_error_t igraph_erdos_renyi_game_gnm_multi(
     igraph_bool_t directed, igraph_bool_t loops
 ) {
 
-    igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_edges = m;
     igraph_vector_int_t edges;
 
     if (n < 0) {
@@ -261,18 +259,18 @@ igraph_error_t igraph_erdos_renyi_game_gnm_multi(
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges * 2));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
 
     RNG_BEGIN();
-    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < m; i++) {
         igraph_integer_t from, to;
-        from = RNG_INTEGER(0, no_of_nodes - 1);
+        from = RNG_INTEGER(0, n - 1);
         if (loops) {
-            to = RNG_INTEGER(0, no_of_nodes - 1);
+            to = RNG_INTEGER(0, n - 1);
         } else {
-            to = RNG_INTEGER(0, no_of_nodes - 2);
-            if(from == to) {
-                to = no_of_nodes - 1;
+            to = RNG_INTEGER(0, n - 2);
+            if (from == to) {
+                to = n - 1;
             }
         }
         igraph_vector_int_push_back(&edges, from); /* reserved */
@@ -283,6 +281,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm_multi(
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 
 }
