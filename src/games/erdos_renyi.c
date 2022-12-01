@@ -283,8 +283,8 @@ igraph_error_t igraph_erdos_renyi_game_gnm_multi(
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
 
+    return IGRAPH_SUCCESS;
 }
 
 /**
