@@ -93,39 +93,28 @@ int main(void) {
     IGRAPH_ASSERT(igraph_vcount(&graph1) == 10);
     IGRAPH_ASSERT(igraph_ecount(&graph1) == 440);
     IGRAPH_ASSERT(!igraph_is_directed(&graph1));
-    igraph_simplify(&graph1, true, false, NULL);
-    IGRAPH_ASSERT(igraph_ecount(&graph1) <= 45);
-    igraph_destroy(&graph1);
-
-    // large graphs
-
-    igraph_erdos_renyi_game_gnm_multi(&graph1, 100000, 2.0 * 100000, 1, 1, 1);
-    IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
-    IGRAPH_ASSERT(igraph_ecount(&graph1) == 2.0 * 100000);
-    IGRAPH_ASSERT(igraph_is_directed(&graph1));
-    igraph_destroy(&graph1);
-
-    igraph_erdos_renyi_game_gnm_multi(&graph1, 100000, 2.0 * 100000, 1, 0, 1);
-    IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
-    IGRAPH_ASSERT(igraph_ecount(&graph1) == 2.0 * 100000);
-    igraph_destroy(&graph1);
-
-    igraph_erdos_renyi_game_gnm_multi(&graph1, 100000, 2.0 * 100000, 0, 1, 1);
-    IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
-    IGRAPH_ASSERT(igraph_ecount(&graph1) == 2.0 * 100000);
-    igraph_simplify(&graph1, 0, 1, /*edge_comb=*/ 0);  /* only remove loops */
-    igraph_destroy(&graph1);
-
-    igraph_erdos_renyi_game_gnm_multi(&graph1, 100000, 2.0 * 100000, 0, 0, 1);
     igraph_copy(&graph2, &graph1);
-    IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
-    IGRAPH_ASSERT(igraph_ecount(&graph1) == 2.0 * 100000);
     igraph_simplify(&graph1, true, true, NULL);
     igraph_simplify(&graph2, true, false, NULL);
     igraph_isomorphic(&graph1, &graph2, &same);
     IGRAPH_ASSERT(same);
     igraph_destroy(&graph1);
     igraph_destroy(&graph2);
+
+    // large graphs
+
+    igraph_erdos_renyi_game_gnm_multi(&graph1, 100000, 2.0 * 100000, 1, 0, 1);
+    IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
+    IGRAPH_ASSERT(igraph_ecount(&graph1) == 2.0 * 100000);
+    IGRAPH_ASSERT(igraph_is_directed(&graph1));
+    igraph_destroy(&graph1);
+
+
+    igraph_erdos_renyi_game_gnm_multi(&graph1, 100000, 2.0 * 100000, 0, 0, 1);
+    IGRAPH_ASSERT(igraph_vcount(&graph1) == 100000);
+    IGRAPH_ASSERT(igraph_ecount(&graph1) == 2.0 * 100000);
+    IGRAPH_ASSERT(!igraph_is_directed(&graph1));
+    igraph_destroy(&graph1);
 
     
     VERIFY_FINALLY_STACK();
