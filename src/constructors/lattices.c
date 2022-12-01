@@ -40,14 +40,17 @@
         }                                                                                     \
     }
 
-#define COMPUTE_NUMBER_OF_VERTICES                                                                                                                       \
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_prefix_sum_vector, row_count + 1);                                                                      \
-    VECTOR(row_lengths_prefix_sum_vector)[0] = 0;                                                                                                       \
-    for (i = 1; i < row_count + 1; i++)                                                                                                                 \
-    {                                                                                                                                                   \
-        IGRAPH_SAFE_ADD(VECTOR(row_lengths_prefix_sum_vector)[i - 1], VECTOR(*row_lengths_vector)[i - 1], &(VECTOR(row_lengths_prefix_sum_vector)[i])); \
-    }                                                                                                                                                   \
-    no_of_nodes = VECTOR(row_lengths_prefix_sum_vector)[row_count];
+#define COMPUTE_NUMBER_OF_VERTICES()                                                                                                                        \
+    do                                                                                                                                                      \
+    {                                                                                                                                                       \
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&row_lengths_prefix_sum_vector, row_count + 1);                                                                      \
+        VECTOR(row_lengths_prefix_sum_vector)[0] = 0;                                                                                                       \
+        for (i = 1; i < row_count + 1; i++)                                                                                                                 \
+        {                                                                                                                                                   \
+            IGRAPH_SAFE_ADD(VECTOR(row_lengths_prefix_sum_vector)[i - 1], VECTOR(*row_lengths_vector)[i - 1], &(VECTOR(row_lengths_prefix_sum_vector)[i])); \
+        }                                                                                                                                                   \
+        no_of_nodes = VECTOR(row_lengths_prefix_sum_vector)[row_count];                                                                                     \
+    } while (0)
 
 /**
  * Creates a triangular lattice whose vertices have the form (i, j) for non-negative integers i and j
@@ -116,7 +119,7 @@ static igraph_error_t triangular_lattice(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    COMPUTE_NUMBER_OF_VERTICES
+    COMPUTE_NUMBER_OF_VERTICES();
 
     /* computing the number of edges in the constructed triangular lattice */
     igraph_integer_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
@@ -376,7 +379,7 @@ static igraph_error_t hexagonal_lattice(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    COMPUTE_NUMBER_OF_VERTICES
+    COMPUTE_NUMBER_OF_VERTICES();
 
     /* computing the number of edges in the constructed hex lattice */
     igraph_integer_t no_of_edges2 = VECTOR(*row_lengths_vector)[row_count - 1] - 1;
