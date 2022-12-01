@@ -27,7 +27,7 @@ int main(void) {
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 2));
     VECTOR(dimvector)[0] = 3;
 
-    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
+    IGRAPH_CHECK(igraph_hexagonal_lattice(&graph, &dimvector, true, false));
     printf("Empty graph:\n");
     print_graph_canon(&graph);
 
@@ -38,52 +38,52 @@ int main(void) {
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 1));
     VECTOR(dimvector)[0] = 1;
 
-    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
-    printf("Triangular triangular lattice, single vertex:\n");
+    IGRAPH_CHECK(igraph_hexagonal_lattice(&graph, &dimvector, true, false));
+    printf("Triangular hexagonal lattice, single hexagon:\n");
     print_graph_canon(&graph);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
 
-    /* triangular triangular lattice */
+    /* triangular hexagonal lattice */
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 1));
     VECTOR(dimvector)[0] = 5;
 
-    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, false));
-    printf("Triangular triangular lattice:\n");
+    IGRAPH_CHECK(igraph_hexagonal_lattice(&graph, &dimvector, true, false));
+    printf("Triangular hexagonal lattice:\n");
     print_graph_canon(&graph);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
 
-    /* rectangular triangular lattice */
+    /* rectangular hexagonal lattice */
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 2));
     VECTOR(dimvector)[0] = 4;
     VECTOR(dimvector)[1] = 5;
 
-    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, true, true));
-    printf("Rectangular triangular lattice:\n");
+    IGRAPH_CHECK(igraph_hexagonal_lattice(&graph, &dimvector, true, true));
+    printf("Rectangular hexagonal lattice:\n");
     print_graph_canon(&graph);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
 
-    /* hexagonal triangular lattice */
+    /* hexagonal hexagonal lattice */
     IGRAPH_CHECK(igraph_vector_int_init(&dimvector, 3));
     VECTOR(dimvector)[0] = 3;
     VECTOR(dimvector)[1] = 4;
     VECTOR(dimvector)[2] = 5;
 
-    IGRAPH_CHECK(igraph_triangular_lattice(&graph, &dimvector, false, true));
-    printf("Hexagonal triangular lattice:\n");
+    IGRAPH_CHECK(igraph_hexagonal_lattice(&graph, &dimvector, false, true));
+    printf("Hexagonal hexagonal lattice:\n");
     print_graph_canon(&graph);
 
     igraph_destroy(&graph);
 
     /* Erroneous calls */
     VECTOR(dimvector)[0] = -3;
-    CHECK_ERROR(igraph_triangular_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
-
+    CHECK_ERROR(igraph_hexagonal_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
+    
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
 
@@ -92,7 +92,7 @@ int main(void) {
     VECTOR(dimvector)[1] = 4;
     VECTOR(dimvector)[2] = 5;
     VECTOR(dimvector)[3] = 5;
-    CHECK_ERROR(igraph_triangular_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_hexagonal_lattice(&graph, &dimvector, true, true), IGRAPH_EINVAL);
 
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&dimvector);
