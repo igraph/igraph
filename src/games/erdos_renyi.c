@@ -271,7 +271,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm_multi(
             to = RNG_INTEGER(0, no_of_nodes - 1);
         } else {
             to = RNG_INTEGER(0, no_of_nodes - 2);
-            if(from == to) {
+            if (from == to) {
                 to = no_of_nodes - 1;
             }
         }
