@@ -283,7 +283,6 @@ igraph_error_t igraph_erdos_renyi_game_gnm_multi(
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
-
 }
 
 /**
