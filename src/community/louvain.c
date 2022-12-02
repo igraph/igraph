@@ -44,15 +44,15 @@ typedef struct {
     igraph_integer_t communities_no, vertices_no;  /* Number of communities, number of vertices */
     igraph_real_t weight_sum;              /* Sum of edges weight in the whole graph */
     igraph_i_multilevel_community *item;   /* List of communities */
-    igraph_vector_int_t *membership;           /* Community IDs */
-    igraph_vector_t *weights;        /* Graph edge weights */
+    igraph_vector_int_t *membership;       /* Community IDs */
+    igraph_vector_t *weights;              /* Graph edge weights */
 } igraph_i_multilevel_community_list;
 
 /* Computes the modularity of a community partitioning */
 static igraph_real_t igraph_i_multilevel_community_modularity(
-                                                              const igraph_i_multilevel_community_list *communities,
-                                                              const igraph_real_t resolution) {
-    igraph_real_t result = 0;
+        const igraph_i_multilevel_community_list *communities,
+        const igraph_real_t resolution) {
+    igraph_real_t result = 0.0;
     igraph_integer_t i;
     igraph_real_t m = communities->weight_sum;
 
@@ -114,7 +114,7 @@ static igraph_error_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igr
         links[i].id = i;
     }
 
-    igraph_qsort((void*)links, (size_t) ecount, sizeof(igraph_i_multilevel_link),
+    igraph_qsort(links, (size_t) ecount, sizeof(igraph_i_multilevel_link),
                  igraph_i_multilevel_link_cmp);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -345,21 +345,6 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_i_multilevel_community_list communities;
     igraph_vector_t node_order;
 
-    /* Initial sanity checks on the input parameters */
-    if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("multi-level community detection works for undirected graphs only",
-                     IGRAPH_UNIMPLEMENTED);
-    }
-    if (igraph_vector_size(weights) < igraph_ecount(graph)) {
-        IGRAPH_ERROR("multi-level community detection: weight vector too short", IGRAPH_EINVAL);
-    }
-    if (igraph_vector_any_smaller(weights, 0)) {
-        IGRAPH_ERROR("weights must be positive", IGRAPH_EINVAL);
-    }
-    if (resolution < 0.0) {
-      IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
-    }
-
     IGRAPH_CHECK(igraph_vector_init_range(&node_order, 0, vcount));
     IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
     IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
@@ -375,7 +360,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     communities.vertices_no = vcount;
     communities.communities_no = vcount;
     communities.weights = weights;
-    communities.weight_sum = 2 * igraph_vector_sum(weights);
+    communities.weight_sum = 2.0 * igraph_vector_sum(weights);
     communities.membership = membership;
     communities.item = IGRAPH_CALLOC(vcount, igraph_i_multilevel_community);
     IGRAPH_CHECK_OOM(communities.item, "Multi-level community structure detection failed.");
@@ -504,7 +489,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     /* debug("Result Communities: %ld Modularity: %lf\n",
       communities.communities_no, (double) q); */
 
-    IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
     /* Shrink the nodes of the graph according to the present community structure
      * and simplify the resulting graph */
@@ -570,7 +555,8 @@ static igraph_error_t igraph_i_community_multilevel_step(
  * <code>gamma=1</code>. Note that the returned modularity value is calculated using
  * the indicated resolution parameter. See \ref igraph_modularity() for more details.
  *
- * This function was contributed by Tom Gregorovic.
+ * </para><para>
+ * The original version of this function was contributed by Tom Gregorovic.
  *
  * \param graph       The input graph. It must be an undirected graph.
  * \param weights     Numeric vector containing edge weights. If \c NULL, every edge
@@ -596,10 +582,11 @@ static igraph_error_t igraph_i_community_multilevel_step(
  */
 
 igraph_error_t igraph_community_multilevel(const igraph_t *graph,
-                                const igraph_vector_t *weights,
-                                const igraph_real_t resolution,
-                                igraph_vector_int_t *membership,
-                                igraph_matrix_int_t *memberships, igraph_vector_t *modularity) {
+                                           const igraph_vector_t *weights,
+                                           const igraph_real_t resolution,
+                                           igraph_vector_int_t *membership,
+                                           igraph_matrix_int_t *memberships,
+                                           igraph_vector_t *modularity) {
 
     igraph_t g;
     igraph_vector_t w;
@@ -608,6 +595,29 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
     igraph_real_t prev_q = -1, q = -1;
     igraph_integer_t i, level = 1;
     igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
+
+    /* Initial sanity checks on the input parameters */
+    if (igraph_is_directed(graph)) {
+        IGRAPH_ERROR("Multi-level community detection works for undirected graphs only.",
+                     IGRAPH_UNIMPLEMENTED);
+    }
+    if (weights) {
+        if (igraph_vector_size(weights) != ecount) {
+            IGRAPH_ERROR("Weight vector length must agree with number of edges.", IGRAPH_EINVAL);
+        }
+        if (ecount > 0) {
+            igraph_real_t minweight = igraph_vector_min(weights);
+            if (minweight < 0) {
+                IGRAPH_ERROR("Weight vector must not be negative.", IGRAPH_EINVAL);
+            } else if (isnan(minweight)) {
+                IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
+        }
+    }
+    if (resolution < 0.0) {
+      IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
+    }
 
     /* Make a copy of the original graph, we will do the merges on the copy */
     IGRAPH_CHECK(igraph_copy(&g, graph));
@@ -639,7 +649,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
         igraph_vector_clear(modularity);
     }
 
-    while (1) {
+    while (true) {
         /* Remember the previous modularity and vertex count, do a single step */
         igraph_integer_t step_vcount = igraph_vcount(&g);
 
@@ -687,7 +697,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
             VECTOR(tmp)[i] = i;
         }
         IGRAPH_CHECK(igraph_modularity(graph, &tmp, weights, resolution,
-                                       /* only undirected */ 0, &mod));
+                                       /* only undirected */ false, &mod));
         igraph_vector_int_destroy(&tmp);
         IGRAPH_FINALLY_CLEAN(1);
         IGRAPH_CHECK(igraph_vector_resize(modularity, 1));

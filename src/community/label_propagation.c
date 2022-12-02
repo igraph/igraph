@@ -101,7 +101,7 @@
  * \param fixed Boolean vector denoting which labels are fixed. Of course
  *   this makes sense only if you provided an initial state, otherwise
  *   this element will be ignored. Note that vertices without labels
- *   cannot be fixed. The fixed status will be ignord for these with a
+ *   cannot be fixed. The fixed status will be ignored for these with a
  *   warning. Also note that label numbers by themselves have no meaning,
  *   and igraph may renumber labels. However, co-membership constraints
  *   will be respected: two vertices can be fixed to be in the same or in
@@ -133,7 +133,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_bool_t unlabelled_left;
     igraph_neimode_t reversed_mode;
 
-    igraph_vector_int_t label_counters, dominant_labels, nonzero_labels, node_order;
+    igraph_vector_t label_counters;
+    igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
 
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
      * away the constness, and promise ourselves that we will make a proper
@@ -179,7 +180,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             if (VECTOR(*initial)[i] < 0) {
                 VECTOR(*membership)[i] = 0;
             } else {
-                VECTOR(*membership)[i] = floor(VECTOR(*initial)[i]) + 1;
+                VECTOR(*membership)[i] = VECTOR(*initial)[i] + 1;
             }
         }
         if (fixed) {
@@ -235,7 +236,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     }
 
     /* Create storage space for counting distinct labels and dominant ones */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&label_counters, no_of_nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes + 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dominant_labels, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nonzero_labels, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&dominant_labels, 2));
@@ -258,20 +259,20 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     the other one for checking the end condition - every vertex in the graph has
     a label to which the maximum number of its neighbors belongs. If control_iteration
     is true, we are just checking the end condition and not relabeling nodes. */
-    control_iteration = 1;
-    running = 1;
+    control_iteration = true;
+    running = true;
     while (running) {
         igraph_integer_t v1, num_neis;
-        igraph_integer_t max_count;
+        igraph_real_t max_count;
         igraph_vector_int_t *neis;
         igraph_vector_int_t *ineis;
         igraph_bool_t was_zero;
 
         if (control_iteration) {
-            /* If we are in the control iteration, we expect in the begining of
-            the iterationthat all vertices meet the end condition, so 'running' is false.
+            /* If we are in the control iteration, we expect in the beginning of
+            the iteration that all vertices meet the end condition, so 'running' is false.
             If some of them does not, 'running' is set to true later in the code. */
-            running = 0;
+            running = false;
         } else {
             /* Shuffle the node ordering vector if we are in the label updating iteration */
             IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
@@ -285,7 +286,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             /* Count the weights corresponding to different labels */
             igraph_vector_int_clear(&dominant_labels);
             igraph_vector_int_clear(&nonzero_labels);
-            max_count = 0;
+            max_count = 0.0;
             if (weights) {
                 ineis = igraph_inclist_get(&il, v1);
                 num_neis = igraph_vector_int_size(ineis);
@@ -336,7 +337,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                     /* Check if the _current_ label of the node is also dominant */
                     if (VECTOR(label_counters)[VECTOR(*membership)[v1]] != max_count) {
                         /* Nope, we need at least one more iteration */
-                        running = 1;
+                        running = true;
                     }
                 }
                 else {
@@ -366,10 +367,10 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Shift back the membership vector, permute labels in increasing order */
-    /* We recycle label_counters here :) */
-    igraph_vector_int_fill(&label_counters, -1);
+    /* We recycle label_counters here :) and use it as an integer vector from now on */
+    igraph_vector_fill(&label_counters, -1);
     j = 0;
-    unlabelled_left = 0;
+    unlabelled_left = false;
     for (i = 0; i < no_of_nodes; i++) {
         k = VECTOR(*membership)[i] - 1;
         if (k >= 0) {
@@ -379,11 +380,11 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                 k = j;
                 j++;
             } else {
-                k = VECTOR(label_counters)[k];
+                k = (igraph_integer_t) VECTOR(label_counters)[k];
             }
         } else {
             /* This is an unlabeled vertex */
-            unlabelled_left = 1;
+            unlabelled_left = true;
         }
         VECTOR(*membership)[i] = k;
     }
@@ -446,7 +447,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     }
 
     igraph_vector_int_destroy(&node_order);
-    igraph_vector_int_destroy(&label_counters);
+    igraph_vector_destroy(&label_counters);
     igraph_vector_int_destroy(&dominant_labels);
     igraph_vector_int_destroy(&nonzero_labels);
     IGRAPH_FINALLY_CLEAN(4);

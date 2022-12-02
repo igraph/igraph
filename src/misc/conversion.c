@@ -968,7 +968,7 @@ igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pruf
        We keep track of the degrees of all vertices, treating vertices
        of degree 0 as removed. We maintain the invariant that all leafs
        that are still contained in the tree are >= u.
-       If u is a leaf, we remove it and add its unique neighbor to the prüfer
+       If u is a leaf, we remove it and add its unique neighbor to the Prüfer
        sequence. If the removal of u turns the neighbor into a leaf which is < u,
        we repeat the procedure for the new leaf and so on. */
     igraph_integer_t u;

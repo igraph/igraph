@@ -148,7 +148,7 @@ static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg
         pointers.push_back(it);
     }
 
-    for (auto pt : pointers) {
+    for (const auto &pt : pointers) {
         vertices.sort(degree_greater<vd_pair>);
 
         vd_pair vd = *pt;
@@ -310,7 +310,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
     vertices.sort(degree_greater<vd_pair>);
 
     igraph_integer_t ec = 0;
-    for (auto pt : pointers) {
+    for (const auto &pt : pointers) {
         vd_pair vd = *pt;
         vertices.erase(pt);
 
@@ -458,7 +458,7 @@ static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *ou
         pointers.push_back(it);
     }
 
-    for (auto pt : pointers) {
+    for (const auto &pt : pointers) {
         // sort vertices by (in, out) degree pairs in decreasing order
         // note: std::list::sort does a stable sort
         vertices.sort(degree_greater<vbd_pair>);

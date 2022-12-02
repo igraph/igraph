@@ -77,8 +77,6 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
     igraph_integer_t max_merges;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&mymembership, no_of_nodes);
-
     if (membership) {
         IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
     }
@@ -99,9 +97,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         }
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(mymembership)[i] = i;
-    }
+    IGRAPH_CHECK(igraph_vector_int_init_range(&mymembership, 0, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &mymembership);
+
     if (membership) {
         IGRAPH_CHECK(igraph_vector_int_update(membership, &mymembership));
     }
