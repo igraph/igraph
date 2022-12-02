@@ -157,9 +157,14 @@ add_library(
   community/edge_betweenness.c
   community/fast_modularity.c
   community/fluid.c
-  community/infomap/infomap_FlowGraph.cc
-  community/infomap/infomap_Greedy.cc
-  community/infomap/infomap.cc
+  community/infomap.cc
+  community/infomap/src/core/BiasedMapEquation.cpp
+  community/infomap/src/core/InfoEdge.cpp
+  community/infomap/src/core/InfomapBase.cpp
+  community/infomap/src/core/InfoNode.cpp
+  community/infomap/src/core/MemMapEquation.cpp
+  community/infomap/src/core/MetaMapEquation.cpp
+  community/infomap/src/core/StateNetwork.cpp  
   community/label_propagation.c
   community/leading_eigenvector.c
   community/leiden.c
