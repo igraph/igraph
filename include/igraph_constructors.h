@@ -69,6 +69,8 @@ IGRAPH_EXPORT igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph
                                                    igraph_tree_mode_t type);
 IGRAPH_EXPORT igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_integer_t k,
                                                  igraph_tree_mode_t type);
+IGRAPH_EXPORT igraph_error_t igraph_tree_from_parent_vector(igraph_t *graph, const igraph_vector_int_t *parents,
+                                                            igraph_tree_mode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer);
 IGRAPH_EXPORT igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_full_multipartite(igraph_t *graph, igraph_vector_int_t *types, const igraph_vector_int_t *n,
