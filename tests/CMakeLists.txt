@@ -232,6 +232,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_square_lattice
   igraph_static_power_law_game
+  igraph_tree_from_parent_vector
   igraph_trussness
   igraph_turan
   igraph_wheel
