@@ -998,8 +998,8 @@ void FUNCTION(remove_consecutive_duplicates)(
 }
 
 /**
- * \function igraph_vector_reverse
- * \brief Reverse the elements of a vector list.
+ * \function igraph_vector_list_reverse
+ * \brief Reverses the elements of a vector list.
  *
  * The first element will be last, the last element will be
  * first, etc.
