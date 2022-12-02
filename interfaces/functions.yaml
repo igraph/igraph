@@ -2443,7 +2443,7 @@ igraph_to_prufer:
     PARAMS: GRAPH graph, OUT INDEX_VECTOR prufer
 
 igraph_tree_from_parent_vector:
-    PARAMS: OUT GRAPH graph, INDEX_VECTOR prufer, TREE_MODE type=OUT
+    PARAMS: OUT GRAPH graph, INDEX_VECTOR parents, TREE_MODE type=OUT
 
 igraph_minimum_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGEWEIGHTS weights=NULL
