@@ -40,8 +40,14 @@ int main(void) {
     BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall, " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, NULL, IGRAPH_OUT), REP)
     );
+    BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, NULL, IGRAPH_OUT), REP)
+    );
     BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    );
+    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, &weights, IGRAPH_OUT), REP)
     );
 
     RNG_BEGIN();
@@ -61,6 +67,9 @@ int main(void) {
     );
     BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    );
+    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, &weights, IGRAPH_OUT), REP)
     );
 
     igraph_destroy(&g);
@@ -94,8 +103,14 @@ int main(void) {
     BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall, " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, NULL, IGRAPH_OUT), REP)
     );
+    BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, NULL, IGRAPH_OUT), REP)
+    );
     BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    );
+    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, &weights, IGRAPH_OUT), REP)
     );
 
     RNG_BEGIN();
@@ -115,6 +130,9 @@ int main(void) {
     );
     BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    );
+    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, &weights, IGRAPH_OUT), REP)
     );
 
     igraph_destroy(&g);
@@ -148,8 +166,14 @@ int main(void) {
     BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall, " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, NULL, IGRAPH_OUT), REP)
     );
+    BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, NULL, IGRAPH_OUT), REP)
+    );
     BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    );
+    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, &weights, IGRAPH_OUT), REP)
     );
 
     RNG_BEGIN();
@@ -169,6 +193,9 @@ int main(void) {
     );
     BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    );
+    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall_tree_speedup(&g, &res, &weights, IGRAPH_OUT), REP)
     );
 
     igraph_destroy(&g);
