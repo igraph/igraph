@@ -222,6 +222,7 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, no_of_nodes);
 
     for (igraph_integer_t k=0; k < no_of_nodes; k++) {
+        /* constructing the shortest path tree rooted at vertex k as out_k */
         IGRAPH_CHECK(igraph_empty(&out_k, 0, IGRAPH_DIRECTED));
         for (igraph_integer_t v=0; v < no_of_nodes; v++) {
             VECTOR(parents)[v] = v == k ? -1 : MATRIX(predecessors, k, v);
@@ -249,6 +250,7 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
                     if (di < dd) {
                         MATRIX(*res, i, j) = di;
                         MATRIX(predecessors, i, j) = MATRIX(predecessors, k, j);
+                        /* the subtree rooted at i will be explored */
                         // print_matrix_int(&predecessors);
                         IGRAPH_CHECK(igraph_stack_int_push(&stack, i));
                     }
