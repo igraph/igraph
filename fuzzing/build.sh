@@ -3,7 +3,10 @@
 export DEPS_PATH=/src/deps
 mkdir $DEPS_PATH
 
-# Build libxml2 without ICU support, https://github.com/igraph/igraph/issues/1992 
+# Build libxml2 without ICU support, https://github.com/igraph/igraph/issues/1992
+# Building libxml2 from scratch is also required for MemorySanitizer.
+# It may be necessary to leave CMAKE_BUILD_TYPE empty and specify LIBXML2_WITH_MODULES=OFF
+# in order for fuzz introspector builds to succceed (details unverified).
 cd $SRC
 wget https://download.gnome.org/sources/libxml2/2.10/libxml2-2.10.3.tar.xz
 tar xf libxml2-2.10.3.tar.xz

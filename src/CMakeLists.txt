@@ -102,11 +102,13 @@ add_library(
   constructors/full.c
   constructors/generalized_petersen.c
   constructors/kautz.c
+  constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
   constructors/prufer.c
   constructors/regular.c
-  constructors/lattices.c
+  constructors/trees.c
+
 
   games/barabasi.c
   games/callaway_traits.c
