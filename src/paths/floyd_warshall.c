@@ -18,10 +18,8 @@
 
 #include "igraph_paths.h"
 #include "igraph_constructors.h"
-#include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"
-// #include "igraph_test_utilities.h"
 
 /**
  * \function igraph_distances_floyd_warshall
@@ -211,8 +209,12 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
     igraph_vector_int_t parents;
     igraph_matrix_int_t predecessors;
     igraph_stack_int_t stack;
-    IGRAPH_CHECK(igraph_stack_int_init(&stack, no_of_nodes));
+
+    IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
+
     IGRAPH_CHECK(igraph_matrix_int_init(&predecessors, no_of_nodes, no_of_nodes));
+    IGRAPH_FINALLY(igraph_matrix_int_destroy, &predecessors);
+
     for (igraph_integer_t v=0; v < no_of_nodes; v++) {
         for (igraph_integer_t u=0; u < no_of_nodes; u++) {
             /* the penultimate vertex on the shortest path from u to v */
@@ -221,14 +223,18 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
     }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, no_of_nodes);
 
+    igraph_vector_int_t children;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&children, 0);
+
     for (igraph_integer_t k=0; k < no_of_nodes; k++) {
         /* constructing the shortest path tree rooted at vertex k as out_k */
-        IGRAPH_CHECK(igraph_empty(&out_k, 0, IGRAPH_DIRECTED));
         for (igraph_integer_t v=0; v < no_of_nodes; v++) {
             VECTOR(parents)[v] = v == k ? -1 : MATRIX(predecessors, k, v);
         }
         //print_vector_int2(&parents);
         igraph_tree_from_parent_vector(&out_k, &parents, IGRAPH_TREE_OUT);
+        IGRAPH_FINALLY(igraph_destroy, &out_k);
+
         //print_graph_canon(&out_k);
          /* Iteration order matters for performance!
          * First j, then i, because matrices are stored as column-major. */
@@ -239,8 +245,6 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
             while (!igraph_stack_int_empty(&stack)) {
                 // printf("%d,,,\n", igraph_stack_int_size(&stack));
                 igraph_integer_t v = igraph_stack_int_pop(&stack);
-                igraph_vector_int_t children;
-                IGRAPH_VECTOR_INT_INIT_FINALLY(&children, 0);
                 igraph_neighbors(&out_k, &children, v, IGRAPH_OUT);
                 // print_vector_int2(&children);
                 igraph_integer_t no_of_children = igraph_vector_int_size(&children);
@@ -259,16 +263,16 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
                                     IGRAPH_ENEGLOOP);
                     }
                 }
-                igraph_vector_int_destroy(&children);
-                IGRAPH_FINALLY_CLEAN(1);
             }
         }
         igraph_destroy(&out_k);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     igraph_vector_int_destroy(&parents);
-    IGRAPH_FINALLY_CLEAN(1);
     igraph_matrix_int_destroy(&predecessors);
     igraph_stack_int_destroy(&stack);
+    igraph_vector_int_destroy(&children);
+    IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
 }
