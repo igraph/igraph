@@ -205,8 +205,6 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
         if (in  && MATRIX(*res, to, from) > w) MATRIX(*res, to, from) = w;
     }
 
-    igraph_t out_k;
-    igraph_vector_int_t parents;
     igraph_matrix_int_t predecessors;
     igraph_stack_int_t stack;
 
@@ -221,33 +219,28 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
             MATRIX(predecessors, u, v) = u;
         }
     }
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&parents, no_of_nodes);
 
-    igraph_vector_int_t children;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&children, 0);
+    igraph_vector_int_t tree_out_deg;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tree_out_deg, no_of_nodes);
 
     for (igraph_integer_t k=0; k < no_of_nodes; k++) {
-        /* constructing the shortest path tree rooted at vertex k as out_k */
+        /* We compute the out-degrees of the shortest path tree rooted at vertex k */
+        igraph_vector_int_null(&tree_out_deg);
         for (igraph_integer_t v=0; v < no_of_nodes; v++) {
-            VECTOR(parents)[v] = v == k ? -1 : MATRIX(predecessors, k, v);
+            if (v != k) {
+                VECTOR(tree_out_deg)[ MATRIX(predecessors, k, v) ] += 1;
+            }
         }
-        //print_vector_int2(&parents);
-        igraph_tree_from_parent_vector(&out_k, &parents, IGRAPH_TREE_OUT);
-        IGRAPH_FINALLY(igraph_destroy, &out_k);
 
-        //print_graph_canon(&out_k);
          /* Iteration order matters for performance!
-         * First j, then i, because matrices are stored as column-major. */
+          * First j, then i, because matrices are stored as column-major. */
         for (igraph_integer_t j=0; j < no_of_nodes; j++) {
             igraph_real_t dkj = MATRIX(*res, k, j);
             if (dkj == IGRAPH_INFINITY) continue;
             IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
             while (!igraph_stack_int_empty(&stack)) {
-                // printf("%d,,,\n", igraph_stack_int_size(&stack));
                 igraph_integer_t v = igraph_stack_int_pop(&stack);
-                igraph_integer_t no_of_children;
-                IGRAPH_CHECK(igraph_degree_1(&out_k, &no_of_children, v, IGRAPH_OUT, true));
-                // print_vector_int2(&children);
+                igraph_integer_t no_of_children = VECTOR(tree_out_deg)[v];
                 for (igraph_integer_t i=0; i < no_of_children; i++) {
                     igraph_real_t di = MATRIX(*res, i, k) + dkj;
                     igraph_real_t dd = MATRIX(*res, i, j);
@@ -255,7 +248,6 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
                         MATRIX(*res, i, j) = di;
                         MATRIX(predecessors, i, j) = MATRIX(predecessors, k, j);
                         /* the subtree rooted at i will be explored */
-                        // print_matrix_int(&predecessors);
                         IGRAPH_CHECK(igraph_stack_int_push(&stack, i));
                     }
                     if (i == j && MATRIX(*res, i, i) < 0) {
@@ -265,14 +257,12 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
                 }
             }
         }
-        igraph_destroy(&out_k);
-        IGRAPH_FINALLY_CLEAN(1);
+
     }
-    igraph_vector_int_destroy(&parents);
     igraph_matrix_int_destroy(&predecessors);
     igraph_stack_int_destroy(&stack);
-    igraph_vector_int_destroy(&children);
-    IGRAPH_FINALLY_CLEAN(4);
+    igraph_vector_int_destroy(&tree_out_deg);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
