@@ -245,9 +245,9 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
             while (!igraph_stack_int_empty(&stack)) {
                 // printf("%d,,,\n", igraph_stack_int_size(&stack));
                 igraph_integer_t v = igraph_stack_int_pop(&stack);
-                igraph_neighbors(&out_k, &children, v, IGRAPH_OUT);
+                igraph_integer_t no_of_children;
+                IGRAPH_CHECK(igraph_degree_1(&out_k, &no_of_children, v, IGRAPH_OUT, true));
                 // print_vector_int2(&children);
-                igraph_integer_t no_of_children = igraph_vector_int_size(&children);
                 for (igraph_integer_t i=0; i < no_of_children; i++) {
                     igraph_real_t di = MATRIX(*res, i, k) + dkj;
                     igraph_real_t dd = MATRIX(*res, i, j);
