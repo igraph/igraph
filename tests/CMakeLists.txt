@@ -397,6 +397,7 @@ add_legacy_tests(
   igraph_layout_random_3d
   igraph_layout_reingold_tilford_circular
   igraph_layout_reingold_tilford_extended
+  igraph_layout_sphere
   igraph_layout_star
   igraph_layout_sugiyama
   igraph_layout_umap
