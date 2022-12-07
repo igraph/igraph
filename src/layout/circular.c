@@ -157,9 +157,9 @@ igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res)
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
 
-    igraph_real_t z = -1.0;
     igraph_real_t phi = 0;
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        igraph_real_t z = no_of_nodes > 1 ? -1.0 + 2.0 * i / (no_of_nodes - 1) : -1.0;
         igraph_real_t r = sqrt(1 - z*z);
 
         /* avoids division by zero for the first and last point where r==0 */
@@ -173,8 +173,6 @@ igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res)
         MATRIX(*res, i, 0) = x;
         MATRIX(*res, i, 1) = y;
         MATRIX(*res, i, 2) = z;
-
-        z += 2.0 / (no_of_nodes - 1);
 
         IGRAPH_ALLOW_INTERRUPTION();
     }
