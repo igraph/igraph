@@ -159,11 +159,18 @@ igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res)
 
     igraph_real_t phi = 0;
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        igraph_real_t z = no_of_nodes > 1 ? -1.0 + 2.0 * i / (no_of_nodes - 1) : -1.0;
-        igraph_real_t r = sqrt(1 - z*z);
+        igraph_real_t r, z;
 
-        /* avoids division by zero for the first and last point where r==0 */
-        if (i != 0 && i != no_of_nodes-1) {
+        /* The first and last point are handled separately to avoid
+         * division by zero or 1-z*z becoming slightly negative due
+         * to roundoff errors. */
+        if (i == 0) {
+            z = -1; r = 0;
+        } else if (i == no_of_nodes-1) {
+            z = 1; r = 0;
+        } else {
+            z = -1.0 + 2.0 * i / (no_of_nodes - 1);
+            r = sqrt(1 - z*z);
             phi += 3.6 / (sqrt_no_of_nodes*r);
         }
 
