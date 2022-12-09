@@ -23,6 +23,7 @@
 #include "igraph_foreign.h"
 
 #include "igraph_constructors.h"
+#include "core/interruption.h"
 
 /* Read a little-endian encoded 16-bit unsigned word.
  * Returns negative value on failure. */
@@ -113,6 +114,7 @@ igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
             }
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
+            IGRAPH_ALLOW_INTERRUPTION();
         }
     }
     if (fgetc(instream) != EOF) {
