@@ -270,8 +270,9 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
         return IGRAPH_SUCCESS;
     }
 
+    /* TODO: should this be an assertion instead? */
     if (igraph_vector_int_size(membership) < no_of_nodes) {
-        IGRAPH_ERROR("cannot shrink graph, membership vector too short",
+        IGRAPH_ERROR("Cannot shrink graph, membership vector too short.",
                      IGRAPH_EINVAL);
     }
 
@@ -613,7 +614,7 @@ igraph_error_t igraph_community_multilevel(const igraph_t *graph,
         }
     }
     if (resolution < 0.0) {
-      IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
     }
 
     /* Make a copy of the original graph, we will do the merges on the copy */
