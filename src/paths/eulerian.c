@@ -321,7 +321,9 @@ static igraph_error_t igraph_i_is_eulerian_directed(
  *
  * \param graph The graph object.
  * \param has_path Pointer to a Boolean, will be set to true if an Eulerian path exists.
+ *    Must not be \c NULL.
  * \param has_cycle Pointer to a Boolean, will be set to true if an Eulerian cycle exists.
+ *    Must not be \c NULL.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *

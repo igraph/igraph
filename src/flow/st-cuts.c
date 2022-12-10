@@ -928,64 +928,77 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
 
 /* TODO: This is a temporary recursive version */
 
-static igraph_error_t igraph_provan_shier_list(
+static igraph_error_t igraph_i_provan_shier_list_recursive(
     const igraph_t *graph, igraph_marked_queue_int_t *S,
     igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
     igraph_vector_int_list_t *result, igraph_provan_shier_pivot_t *pivot,
-    void *pivot_arg
+    igraph_vector_int_t *Isv, void *pivot_arg
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_int_t Isv;
     igraph_integer_t v = 0;
     igraph_integer_t i, n;
 
-    /* TODO: use of IGRAPH_FINALLY is temporarily removed from
-     * this function as it can fill up the finally stack.
-     * See https://github.com/igraph/igraph/issues/2261 */
-    /* IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv, 0); */
-    IGRAPH_CHECK(igraph_vector_int_init(&Isv, 0));
+    pivot(graph, S, T, source, target, &v, Isv, pivot_arg);
 
-    pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
-
-    if (igraph_vector_int_empty(&Isv)) {
+    if (igraph_vector_int_empty(Isv)) {
         if (igraph_marked_queue_int_size(S) != 0 && igraph_marked_queue_int_size(S) != no_of_nodes) {
             igraph_vector_int_t *vec;
             IGRAPH_CHECK(igraph_vector_int_list_push_back_new(result, &vec));
             IGRAPH_CHECK(igraph_marked_queue_int_as_vector(S, vec));
         }
     } else {
+        /* Add Isv to S */
+        IGRAPH_CHECK(igraph_marked_queue_int_start_batch(S));
+        n = igraph_vector_int_size(Isv);
+        for (i = 0; i < n; i++) {
+            if (!igraph_marked_queue_int_iselement(S, VECTOR(*Isv)[i])) {
+                IGRAPH_CHECK(igraph_marked_queue_int_push(S, VECTOR(*Isv)[i]));
+            }
+        }
+        igraph_vector_int_clear(Isv);
+
+        /* Go down right in the search tree */
+        IGRAPH_CHECK(igraph_i_provan_shier_list_recursive(
+            graph, S, T, source, target, result, pivot, Isv, pivot_arg));
+
+        /* Take out Isv from S */
+        igraph_marked_queue_int_pop_back_batch(S);
+
         /* Put v into T */
         IGRAPH_CHECK(igraph_estack_push(T, v));
 
         /* Go down left in the search tree */
-        IGRAPH_CHECK(igraph_provan_shier_list(
-            graph, S, T, source, target, result, pivot, pivot_arg));
+        IGRAPH_CHECK(igraph_i_provan_shier_list_recursive(
+            graph, S, T, source, target, result, pivot, Isv, pivot_arg));
 
         /* Take out v from T */
         igraph_estack_pop(T);
 
-        /* Add Isv to S */
-        IGRAPH_CHECK(igraph_marked_queue_int_start_batch(S));
-        n = igraph_vector_int_size(&Isv);
-        for (i = 0; i < n; i++) {
-            if (!igraph_marked_queue_int_iselement(S, VECTOR(Isv)[i])) {
-                IGRAPH_CHECK(igraph_marked_queue_int_push(S, VECTOR(Isv)[i]));
-            }
-        }
-
-        /* Go down right in the search tree */
-
-        IGRAPH_CHECK(igraph_provan_shier_list(
-            graph, S, T, source, target, result, pivot, pivot_arg));
-
-        /* Take out Isv from S */
-        igraph_marked_queue_int_pop_back_batch(S);
     }
 
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_provan_shier_list(
+    const igraph_t *graph, igraph_marked_queue_int_t *S,
+    igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
+    igraph_vector_int_list_t *result, igraph_provan_shier_pivot_t *pivot,
+    void *pivot_arg
+) {
+    igraph_vector_int_t Isv;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv, 0);
+
+    IGRAPH_CHECK(igraph_i_provan_shier_list_recursive(
+        graph, S, T, source, target, result, pivot, &Isv, pivot_arg
+    ));
+
+    /* Reverse the result to stay compatible with versions before 0.10.3 */
+    IGRAPH_CHECK(igraph_vector_int_list_reverse(result));
+
     igraph_vector_int_destroy(&Isv);
-    /* TODO: see todo item at beginning of function. */
-    /* IGRAPH_FINALLY_CLEAN(1); */
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

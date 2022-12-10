@@ -68,6 +68,9 @@ __BEGIN_DECLS
 #define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
     do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \
         IGRAPH_FINALLY(igraph_matrix_destroy, m); } while (0)
+#define IGRAPH_MATRIX_INT_INIT_FINALLY(m, nr, nc) \
+    do { IGRAPH_CHECK(igraph_matrix_int_init(m, nr, nc)); \
+        IGRAPH_FINALLY(igraph_matrix_int_destroy, m); } while (0)
 
 /**
  * \ingroup matrix
