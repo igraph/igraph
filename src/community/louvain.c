@@ -343,11 +343,11 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_vector_int_t edges;
     igraph_vector_int_t temp_membership;
     igraph_i_multilevel_community_list communities;
-    igraph_vector_t node_order;
+    igraph_vector_int_t node_order;
 
-    IGRAPH_CHECK(igraph_vector_init_range(&node_order, 0, vcount));
-    IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
-    igraph_vector_shuffle(&node_order);
+    IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, vcount));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
+    igraph_vector_int_shuffle(&node_order);
 
     /* Initialize data structures */
     IGRAPH_VECTOR_INIT_FINALLY(&links_community, 0);
@@ -517,7 +517,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
     igraph_vector_destroy(&links_community);
     igraph_vector_destroy(&links_weight);
     igraph_vector_int_destroy(&edges);
-    igraph_vector_destroy(&node_order);
+    igraph_vector_int_destroy(&node_order);
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
