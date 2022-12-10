@@ -25,10 +25,9 @@ int main(void) {
     igraph_matrix_int_t merges;
     igraph_vector_int_t bridges;
 
-    /* Small graph as follows: A--B--C--A, A--D--E--A, B--D, C--E */
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED,
-                 0,1, 0,2, 0,3, 0,4, 1,2, 1,3, 2,4, 3,4, -1);
-    igraph_vector_init_int(&weights, 8, 4, 1, 3, 2, 5, 8, 6, 7);
+                 0,1, 0,1, 0,1, -1);
+    igraph_vector_init_int(&weights, 3, 1, 2, 3);
     igraph_vector_init(&eb, 0);
     igraph_vector_int_init(&edges, 0);
     igraph_matrix_int_init(&merges, 0, 0);
