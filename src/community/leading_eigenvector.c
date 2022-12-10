@@ -551,7 +551,7 @@ igraph_error_t igraph_community_leading_eigenvector(
         }
         RNG_END();
         igraph_vector_view(&start_vec, storage.resid, options->n);
-        IGRAPH_CHECK(igraph_vector_shuffle(&start_vec));
+        igraph_vector_shuffle(&start_vec);
 
         {
             igraph_error_t retval;

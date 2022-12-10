@@ -347,7 +347,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
 
     IGRAPH_CHECK(igraph_vector_init_range(&node_order, 0, vcount));
     IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
-    IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+    igraph_vector_shuffle(&node_order);
 
     /* Initialize data structures */
     IGRAPH_VECTOR_INIT_FINALLY(&links_community, 0);

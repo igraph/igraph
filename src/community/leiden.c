@@ -80,7 +80,7 @@ static igraph_error_t igraph_i_community_leiden_fastmovenodes(
     /* Shuffle nodes */
     IGRAPH_CHECK(igraph_vector_int_init_range(&node_order, 0, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
-    IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+    igraph_vector_int_shuffle(&node_order);
 
     /* Add to the queue */
     for (i = 0; i < n; i++) {
@@ -339,7 +339,7 @@ static igraph_error_t igraph_i_community_leiden_mergenodes(
     /* Shuffle nodes */
     IGRAPH_CHECK(igraph_vector_int_init_copy(&node_order, node_subset));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
-    IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+    igraph_vector_int_shuffle(&node_order);
 
     /* Initialize non singleton clusters */
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&non_singleton_cluster, n);

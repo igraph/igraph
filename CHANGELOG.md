@@ -2,12 +2,13 @@
 
 ## [develop]
 
-### Changed
+### Breaking changes
 
  - Interruption handlers do not take a `void*` argument any more; this is relevant to maintainers of higher-level interfaces only.
  - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.
  - `igraph_delete_vertices_idx()` and `igraph_induced_subgraph_map()` now use -1 to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. (Note that the inverse map always behaved this way, this change makes the two mappings consistent).
  - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
+ - `igraph_vector_shuffle()` no longer returns an error code.
 
 ## [master]
 
