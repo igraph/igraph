@@ -71,7 +71,7 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
 
         nn = igraph_vector_int_size(neis);
         if (IGRAPH_UNLIKELY(nn == 0)) {
-            igraph_vector_int_resize(vertices, i);
+            igraph_vector_int_resize(vertices, i); /* shrinks */
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {

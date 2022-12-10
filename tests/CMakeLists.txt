@@ -398,6 +398,7 @@ add_legacy_tests(
   igraph_layout_random_3d
   igraph_layout_reingold_tilford_circular
   igraph_layout_reingold_tilford_extended
+  igraph_layout_sphere
   igraph_layout_star
   igraph_layout_sugiyama
   igraph_layout_umap
@@ -491,8 +492,9 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   foreign_empty
-  igraph_read_graph_graphml
   gml
+  igraph_read_graph_graphdb
+  igraph_read_graph_graphml
   igraph_write_graph_leda
   igraph_write_graph_dimacs_flow
   igraph_write_graph_dot
