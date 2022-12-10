@@ -22,6 +22,7 @@
  - `igraph_pagerank()` and `igraph_personalized_pagerank()` no longer allow negative weights. Previously, edges with negative weights were silently ignored when using the PRPACK implementation. The ARPACK implementation would issue a warning saying that they are ignored, but in fact it computed an incorrect result.
  - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs. This was a regression in igraph 0.10.
  - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
+ - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
  - Fixed new warnings issued by the Xcode 14.1 toolchain.
 
 ### Other
