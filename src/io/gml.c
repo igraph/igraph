@@ -389,7 +389,7 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
  * \oli Only attributes with a simple type are used: integer, real or
  *      string. If an attribute is composite, i.e. an array or a record,
  *      then it is ignored. When some values of the attribute are simple and
- *      some compound, the compositve ones are replaced with a default value
+ *      some compound, the composite ones are replaced with a default value
  *      (NaN for numeric, <code>""</code> for string).
  * \oli <code>comment</code> fields are not ignored. They are treated as any
  *      other field and converted to attributes.

@@ -6,11 +6,25 @@
 
  - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
  - `igraph_get_shortest_path_astar()` and `igraph_get_shortest_paths_astar()` find shortest paths with the A* algorithm.
+ - `igraph_layout_umap_compute_weights()` computes weights for the UMAP layout algorithm from distances. This used to be part of `igraph_layout_umap()`, but it is now in a separate function to allow the user to experiment with different weighting schemes.
+ - `igraph_triangular_lattice()` to generate triangular lattices of various kinds (#2235, thanks to @rfulekjames).
+ - `igraph_hexagonal_lattice()` to generate hexagonal lattices of various kinds (#2262, thanks to @rfulekjames).
+ - `igraph_tree_from_parent_vector()` to create a tree or a forest from a parent vector (i.e. a vector that encodes the parent vertex of each vertex).
+
+### Changed
+
+ - The signature of the experimental `igraph_layout_umap()` function changed; the last argument is now a Boolean that specifies whether distances should already be treated as weights, and the sampling probability argument was removed.
 
 ### Fixed
 
- - `igraph_transitivity_barrat()` did not correctly detect when a directed input graph had effective multi-edges due to ignoring edge directions. Such graphs are now rejected by this function.
+ - `igraph_transitivity_barrat()`, `igraph_community_fluid_communities()`, `igraph_sir()`, `igraph_trussness()` and graphlet functions did not correctly detect when a directed input graph had effective multi-edges due to ignoring edge directions. Such graphs are now rejected by these functions.
  - Fixed a bug in `igraph_2dgrid_move()` that sometimes crashed the Large Graph Layout function when a grid cell became empty.
+ - `igraph_pagerank()` and `igraph_personalized_pagerank()` would fail to converge when the ARPACK implementation was used and a vertex had more than one outgoing edge but all these edges had zero weights.
+ - `igraph_pagerank()` and `igraph_personalized_pagerank()` no longer allow negative weights. Previously, edges with negative weights were silently ignored when using the PRPACK implementation. The ARPACK implementation would issue a warning saying that they are ignored, but in fact it computed an incorrect result.
+ - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs. This was a regression in igraph 0.10.
+ - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
+ - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
+ - Fixed new warnings issued by the Xcode 14.1 toolchain.
 
 ### Other
 

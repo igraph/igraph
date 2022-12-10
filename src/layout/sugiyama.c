@@ -1220,16 +1220,15 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igrap
 
     /* Initialization */
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&sinks, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_int_init_range(&sinks, 0, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &sinks);
+
     IGRAPH_VECTOR_INIT_FINALLY(&shifts, no_of_nodes);
+    igraph_vector_fill(&shifts, IGRAPH_INFINITY);
+
     IGRAPH_VECTOR_INIT_FINALLY(&old_xs, no_of_nodes);
 
     IGRAPH_CHECK(igraph_vector_resize(xs, no_of_nodes));
-
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(sinks)[i] = i;
-    }
-    igraph_vector_fill(&shifts, IGRAPH_INFINITY);
     igraph_vector_fill(xs, -1);
 
     /* Calculate the coordinates of the vertices relative to their sinks

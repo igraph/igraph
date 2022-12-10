@@ -79,12 +79,14 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * \oli The same procedure is applied to all the newly cited
  *   vertices.
  * \endolist
+ *
  * </para><para>
  * See also:
  * Jure Leskovec, Jon Kleinberg and Christos Faloutsos. Graphs over time:
  * densification laws, shrinking diameters and possible explanations.
  * \emb KDD '05: Proceeding of the eleventh ACM SIGKDD international
  * conference on Knowledge discovery in data mining \eme, 177--187, 2005.
+ *
  * </para><para>
  * Note however, that the version of the model in the published paper is incorrect
  * in the sense that it cannot generate the kind of graphs the authors
@@ -164,13 +166,13 @@ igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     RNG_BEGIN();
 
 #define ADD_EDGE_TO(nei) \
-    if (VECTOR(visited)[(nei)] != actnode+1) {                           \
-        VECTOR(visited)[(nei)] = actnode+1;                              \
-        IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, nei));                \
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, actnode));      \
-        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));          \
-        IGRAPH_CHECK(igraph_vector_int_push_back(outneis+actnode, nei)); \
-        IGRAPH_CHECK(igraph_vector_int_push_back(inneis+nei, actnode));  \
+    if (VECTOR(visited)[(nei)] != actnode+1) { \
+        VECTOR(visited)[(nei)] = actnode+1; \
+        IGRAPH_CHECK(igraph_dqueue_int_push(&neiq, (nei))); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, actnode)); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, (nei))); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(outneis+actnode, (nei))); \
+        IGRAPH_CHECK(igraph_vector_int_push_back(inneis+(nei), actnode)); \
     }
 
     IGRAPH_PROGRESS("Forest fire: ", 0.0, NULL);

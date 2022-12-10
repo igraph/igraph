@@ -56,6 +56,7 @@
  * If \p merges is not a complete dendrogram, it is possible to
  * take \p steps steps if \p steps is not bigger than the number
  * lines in \p merges.
+ *
  * \param merges The two-column matrix containing the merge
  *    operations. See \ref igraph_community_walktrap() for the
  *    detailed syntax.

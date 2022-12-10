@@ -97,7 +97,7 @@ __BEGIN_DECLS
 
 /**
  * \struct igraph_arpack_options_t
- * \brief Options for ARPACK
+ * \brief Options for ARPACK.
  *
  * This data structure contains the options of the ARPACK eigenvalue
  * solver routines. It must be initialized by calling \ref
@@ -105,6 +105,7 @@ __BEGIN_DECLS
  * multiple ARPACK calls, as the ARPACK solvers do not modify it.
  *
  * Input options:
+ *
  * \member bmat Character. Whether to solve a standard ('I') ot a
  *    generalized problem ('B').
  * \member n Dimension of the eigenproblem.
@@ -187,6 +188,7 @@ __BEGIN_DECLS
  *    \ref igraph_arpack_rssolve() of \ref igraph_arpack_rnsolve() call.
  *
  * Output options:
+ *
  * \member info Error flag of ARPACK. Possible values:
  *    \clist \cli 0
  *                Normal exit.
@@ -257,7 +259,7 @@ typedef struct igraph_arpack_options_t {
 
 /**
  * \struct igraph_arpack_storage_t
- * \brief Storage for ARPACK
+ * \brief Storage for ARPACK.
  *
  * Public members, do not modify them directly, these are considered
  * to be read-only.
@@ -299,7 +301,7 @@ IGRAPH_EXPORT void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
 
 /**
  * \typedef igraph_arpack_function_t
- * Type of the ARPACK callback function
+ * \brief Type of the ARPACK callback function.
  *
  * \param to Pointer to an \c igraph_real_t, the result of the
  *    matrix-vector product is expected to be stored here.
@@ -310,7 +312,7 @@ IGRAPH_EXPORT void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
  * \param extra Extra argument to the matrix-vector calculation
  *    function. This is coming from the \ref igraph_arpack_rssolve()
  *    or \ref igraph_arpack_rnsolve() function.
- * \return Error code, if not zero, then the ARPACK solver considers
+ * \return Error code. If not \c IGRAPH_SUCCESS, then the ARPACK solver considers
  *    this as an error, stops and calls the igraph error handler.
  */
 
