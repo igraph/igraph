@@ -66,6 +66,8 @@ IGRAPH_EXPORT igraph_error_t igraph_read_graph_dimacs_flow(igraph_t *graph, FILE
                                            igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
                                             igraph_bool_t directed);
+IGRAPH_EXPORT igraph_error_t igraph_read_graph_graphdb_labeled(igraph_t *graph, FILE *instream,
+                                            igraph_bool_t directed);
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream);
 IGRAPH_EXPORT igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                                        igraph_bool_t directed);
