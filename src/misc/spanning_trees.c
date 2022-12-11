@@ -210,36 +210,32 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    char *already_added;
-    char *added_edges;
+    bool *already_added, *added_edges;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t eids = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j;
 
     igraph_vector_int_clear(res);
 
-    added_edges = IGRAPH_CALLOC(no_of_edges, char);
-    if (added_edges == 0) {
-        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    added_edges = IGRAPH_CALLOC(no_of_edges, bool);
+    IGRAPH_CHECK_OOM(added_edges, "Insufficient memory for unweighted spanning tree.");
     IGRAPH_FINALLY(igraph_free, added_edges);
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for unweighted spanning tree.");
     IGRAPH_FINALLY(igraph_free, already_added);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        if (already_added[i] > 0) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        if (already_added[i]) {
             continue;
         }
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[i] = 1;
+        already_added[i] = true;
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
         while (! igraph_dqueue_int_empty(&q)) {
             igraph_integer_t eids_size;
@@ -247,13 +243,13 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
             IGRAPH_CHECK(igraph_incident(graph, &eids, act_node,
                                          IGRAPH_ALL));
             eids_size = igraph_vector_int_size(&eids);
-            for (j = 0; j < eids_size; j++) {
+            for (igraph_integer_t j = 0; j < eids_size; j++) {
                 igraph_integer_t edge = VECTOR(eids)[j];
-                if (added_edges[edge] == 0) {
+                if (! added_edges[edge]) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
-                    if (already_added[to] == 0) {
-                        already_added[to] = 1;
-                        added_edges[edge] = 1;
+                    if (! already_added[to]) {
+                        already_added[to] = true;
+                        added_edges[edge] = true;
                         IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, to));
                     }

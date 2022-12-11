@@ -33,6 +33,7 @@ int main(void) {
     igraph_read_graph_graphdb(&g, ifile, IGRAPH_DIRECTED);
     fclose(ifile);
     IGRAPH_ASSERT(igraph_is_directed(&g));
+    print_graph(&g);
     igraph_destroy(&g);
 
     igraph_error_handler_t *handler = igraph_set_error_handler(&igraph_error_handler_printignore);
