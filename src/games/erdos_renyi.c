@@ -246,7 +246,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
 
 /**
  * \ingroup generators
- * \function igraph_erdos_renyi_game
+ * \function igraph_erdos_renyi_game_gnm_multi
  * \brief Generates a random (Erdős-Rényi) graph with multi-edges.
  *
  * \param graph Pointer to an uninitialized graph object.
