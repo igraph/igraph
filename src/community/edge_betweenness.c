@@ -28,6 +28,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_nongraph.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 
@@ -541,7 +542,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
         igraph_vector_null(&eb);
 
-        if (weights == 0) {
+        if (weights == NULL) {
             /* Unweighted variant follows */
 
             /* The following for loop is copied almost intact from
@@ -612,6 +613,9 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
         } else {
             /* Weighted variant follows */
 
+            const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
+            int cmp_result;
+
             /* The following for loop is copied almost intact from
              * igraph_i_edge_betweenness_cutoff_weighted */
             for (igraph_integer_t source = 0; source < no_of_nodes; source++) {
@@ -642,6 +646,8 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                         igraph_real_t curdist = distance[to];
                         igraph_vector_int_t *v;
 
+                        cmp_result = igraph_cmp_epsilon(altdist, curdist - 1, eps);
+
                         if (curdist == 0) {
                             /* This is the first finite distance to 'to' */
                             v = igraph_inclist_get(&parents, to);
@@ -650,7 +656,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
                             IGRAPH_CHECK(igraph_2wheap_push_with_index(&heap, to, -altdist));
-                        } else if (altdist < curdist - 1) {
+                        } else if (cmp_result < 0) {
                             /* This is a shorter path */
                             v = igraph_inclist_get(&parents, to);
                             igraph_vector_int_resize(v, 1);
@@ -658,7 +664,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
                             igraph_2wheap_modify(&heap, to, -altdist);
-                        } else if (altdist == curdist - 1) {
+                        } else if (cmp_result == 0) {
                             /* Another path with the same length */
                             v = igraph_inclist_get(&parents, to);
                             IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
