@@ -646,6 +646,9 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                         igraph_real_t curdist = distance[to];
                         igraph_vector_int_t *v;
 
+                        /* Note: curdist == 0 means infinity, and for this case
+                         * cmp_result should be -1. However, this case is handled
+                         * specially below, without referring to cmp_result. */
                         cmp_result = igraph_cmp_epsilon(altdist, curdist - 1, eps);
 
                         if (curdist == 0) {
