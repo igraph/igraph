@@ -1390,18 +1390,18 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         igraph_integer_t bignode = VECTOR(mergehist)[2 * mincut_step + 1];
         igraph_integer_t i, idx;
         igraph_integer_t size = 1;
-        char *mark;
+        bool *mark;
 
-        mark = IGRAPH_CALLOC(no_of_nodes, char);
+        mark = IGRAPH_CALLOC(no_of_nodes, bool);
         IGRAPH_CHECK_OOM(mark, "Not enough memory for minimum cut.");
         IGRAPH_FINALLY(igraph_free, mark);
 
         /* first count the vertices in the partition */
-        mark[bignode] = 1;
+        mark[bignode] = true;
         for (i = mincut_step - 1; i >= 0; i--) {
             if ( mark[ VECTOR(mergehist)[2 * i] ] ) {
                 size++;
-                mark [ VECTOR(mergehist)[2 * i + 1] ] = 1;
+                mark [ VECTOR(mergehist)[2 * i + 1] ] = true;
             }
         }
 
@@ -1446,7 +1446,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_int_append(cut, &mergehist));
         }
 
-        igraph_free(mark);
+        IGRAPH_FREE(mark);
         igraph_vector_int_destroy(&mergehist);
         IGRAPH_FINALLY_CLEAN(2);
     }

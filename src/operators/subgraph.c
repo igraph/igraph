@@ -40,7 +40,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t delete;
-    char *remain;
+    bool *remain;
     igraph_integer_t i;
     igraph_vit_t vit;
 
@@ -49,7 +49,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
 
-    remain = IGRAPH_CALLOC(no_of_nodes, char);
+    remain = IGRAPH_CALLOC(no_of_nodes, bool);
     IGRAPH_CHECK_OOM(remain, "Insufficient memory for taking subgraph.");
     IGRAPH_FINALLY(igraph_free, remain);
 
@@ -459,7 +459,7 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t delete = IGRAPH_VECTOR_NULL;
-    char *vremain, *eremain;
+    bool *vremain, *eremain;
     igraph_integer_t i;
     igraph_eit_t eit;
 
@@ -467,29 +467,27 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
-    vremain = IGRAPH_CALLOC(no_of_nodes, char);
-    if (vremain == 0) {
-        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    vremain = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(vremain, "Insufficient memory for taking subgraph based on edges.");
     IGRAPH_FINALLY(igraph_free, vremain);
-    eremain = IGRAPH_CALLOC(no_of_edges, char);
-    if (eremain == 0) {
-        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+
+    eremain = IGRAPH_CALLOC(no_of_edges, bool);
+    IGRAPH_CHECK_OOM(eremain, "Insufficient memory for taking subgraph based on edges.");
     IGRAPH_FINALLY(igraph_free, eremain);
+
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_edges - IGRAPH_EIT_SIZE(eit)));
 
     /* Collect the vertex and edge IDs that will remain */
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
-        eremain[eid] = vremain[from] = vremain[to] = 1;
+        eremain[eid] = vremain[from] = vremain[to] = true;
     }
 
     /* Collect the edge IDs to be deleted */
     for (i = 0; i < no_of_edges; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        if (eremain[i] == 0) {
+        if (! eremain[i]) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
         }
     }
@@ -509,7 +507,7 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
         igraph_vector_int_clear(&delete);
         for (i = 0; i < no_of_nodes; i++) {
             IGRAPH_ALLOW_INTERRUPTION();
-            if (vremain[i] == 0) {
+            if (! vremain[i]) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
             }
         }

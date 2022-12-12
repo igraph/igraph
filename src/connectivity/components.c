@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    char *already_added;
+    bool *already_added;
     igraph_integer_t first_node, act_cluster_size = 0, no_of_clusters = 0;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
@@ -116,10 +116,8 @@ static igraph_error_t igraph_i_connected_components_weak(
     igraph_integer_t i;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("Cannot calculate weakly connected components.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for calculating weakly connected components.");
     IGRAPH_FINALLY(igraph_free, already_added);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes / 10);
@@ -136,12 +134,12 @@ static igraph_error_t igraph_i_connected_components_weak(
     /* The algorithm */
 
     for (first_node = 0; first_node < no_of_nodes; ++first_node) {
-        if (already_added[first_node] == 1) {
+        if (already_added[first_node]) {
             continue;
         }
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[first_node] = 1;
+        already_added[first_node] = true;
         act_cluster_size = 1;
         if (membership) {
             VECTOR(*membership)[first_node] = no_of_clusters;
@@ -154,11 +152,11 @@ static igraph_error_t igraph_i_connected_components_weak(
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             for (i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
-                if (already_added[neighbor] == 1) {
+                if (already_added[neighbor]) {
                     continue;
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
-                already_added[neighbor] = 1;
+                already_added[neighbor] = true;
                 act_cluster_size++;
                 if (membership) {
                     VECTOR(*membership)[neighbor] = no_of_clusters;
