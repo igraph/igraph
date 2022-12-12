@@ -255,10 +255,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
  * \param directed Logical, whether to generate a directed graph.
  * \param loops Logical, whether to generate loops (self) edges.
  * \return Error code:
- *         \c IGRAPH_EINVAL: invalid
- *         \p type, \p n,
- *         \p p or \p m
- *          parameter.
+ *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough
  *         memory for the operation.
  *
