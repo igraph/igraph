@@ -145,7 +145,7 @@
  * igraph_rng_set_default() function.
  */
 
-extern IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default; /* defined in rng_mt19937.c */
+extern IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default; /* defined in rng_pcg32.c */
 
 /**
  * \function igraph_rng_set_default
