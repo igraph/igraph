@@ -302,17 +302,17 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
 
         /* do we need the paths leading to vertex i? */
         if (geodist[i] > 0) {
-            /* yes, copy them to the result vector */
+            /* yes, transfer them to the result vector */
             while (parentptr != 0) {
                 if (vertices) {
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(
-                        vertices, igraph_vector_int_list_get_ptr(&paths, parentptr - 1)
-                    ));
+                    igraph_vector_int_t *p;
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(vertices, &p));
+                    igraph_vector_int_swap(p, igraph_vector_int_list_get_ptr(&paths, parentptr - 1));
                 }
                 if (edges) {
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(
-                        edges, igraph_vector_int_list_get_ptr(&path_edge, parentptr - 1)
-                    ));
+                    igraph_vector_int_t *p;
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(edges, &p));
+                    igraph_vector_int_swap(p, igraph_vector_int_list_get_ptr(&path_edge, parentptr - 1));
                 }
                 parentptr = VECTOR(ptrlist)[parentptr - 1];
             }
