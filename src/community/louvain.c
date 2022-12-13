@@ -278,7 +278,7 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*no_of_edges);
 
-    IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
     /* Create the new edgelist */
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));

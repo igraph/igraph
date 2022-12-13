@@ -282,7 +282,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 
         *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
 
-        IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+        IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
         return IGRAPH_SUCCESS;
     );
