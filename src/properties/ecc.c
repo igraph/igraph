@@ -27,8 +27,8 @@
 /* Computes the size of the intersection of two sorted vectors, treated as sets.
  * It is assumed that the vectors contain no duplicates.
  *
- * We rely on lazy_adjlist_get() producing sorted neighbor lists and
- * lazy_adjlist_init() being called with IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
+ * We rely on (lazy_)adjlist_get() producing sorted neighbor lists and
+ * (lazy_)adjlist_init() being called with IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
  * to prevent duplicate entries.
  */
 static igraph_integer_t vector_int_intersection_size_sorted(
@@ -66,10 +66,6 @@ static igraph_error_t igraph_i_ecc3_1(
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-
-    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        igraph_vector_int_sort(igraph_adjlist_get(&al, i));
-    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
@@ -186,10 +182,6 @@ static igraph_error_t igraph_i_ecc4_1(
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-
-    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        igraph_vector_int_sort(igraph_adjlist_get(&al, i));
-    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
