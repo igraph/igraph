@@ -304,6 +304,10 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
         if (geodist[i] > 0) {
             /* yes, transfer them to the result vector */
             while (parentptr != 0) {
+                /* Given two vector lists, list1 and list2, an efficient way to transfer
+                 * a vector from list1 to the end of list2 is to extend list2 with an
+                 * empty vector, then swap that empty vector with the given element of
+                 * list1. This approach avoids creating a full copy of the vector. */
                 if (vertices) {
                     igraph_vector_int_t *p;
                     IGRAPH_CHECK(igraph_vector_int_list_push_back_new(vertices, &p));
