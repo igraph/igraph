@@ -210,7 +210,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     IGRAPH_CHECK(igraph_i_property_cache_copy(to->cache, from->cache));
     IGRAPH_FINALLY(igraph_i_property_cache_destroy, to->cache);
 
-    IGRAPH_I_ATTRIBUTE_COPY(to, from, 1, 1, 1); /* does IGRAPH_CHECK */
+    IGRAPH_I_ATTRIBUTE_COPY(to, from, true, true, true); /* does IGRAPH_CHECK */
 
     IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;

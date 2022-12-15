@@ -109,7 +109,6 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
     igraph_real_t no_of_edges_real = no_of_edges;   /* for divisions */
     igraph_integer_t no_of_types;
     igraph_vector_int_t ai, bi, eii;
-    igraph_integer_t e, i;
     igraph_real_t sumaibi = 0.0, sumeii = 0.0;
 
     if (igraph_vector_int_size(types) != no_of_nodes) {
@@ -133,7 +132,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&bi, no_of_types);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eii, no_of_types);
 
-    for (e = 0; e < no_of_edges; e++) {
+    for (igraph_integer_t e = 0; e < no_of_edges; e++) {
         igraph_integer_t from = IGRAPH_FROM(graph, e);
         igraph_integer_t to = IGRAPH_TO(graph, e);
         igraph_integer_t from_type = VECTOR(*types)[from];
@@ -153,7 +152,7 @@ igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
         }
     }
 
-    for (i = 0; i < no_of_types; i++) {
+    for (igraph_integer_t i = 0; i < no_of_types; i++) {
         sumaibi += (VECTOR(ai)[i] / no_of_edges_real) * (VECTOR(bi)[i] / no_of_edges_real);
         sumeii  += (VECTOR(eii)[i] / no_of_edges_real);
     }
@@ -267,9 +266,8 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
                          igraph_bool_t directed,
                          igraph_bool_t normalized) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t e;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
 
     directed = directed && igraph_is_directed(graph);
 
@@ -288,7 +286,7 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
     if (!directed) {
         igraph_real_t num1 = 0.0, num2 = 0.0, den1 = 0.0;
 
-        for (e = 0; e < no_of_edges; e++) {
+        for (igraph_integer_t e = 0; e < no_of_edges; e++) {
             igraph_integer_t from = IGRAPH_FROM(graph, e);
             igraph_integer_t to = IGRAPH_TO(graph, e);
             igraph_real_t from_value = VECTOR(*values)[from];
@@ -323,7 +321,7 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
             values_in = values;
         }
 
-        for (e = 0; e < no_of_edges; e++) {
+        for (igraph_integer_t e = 0; e < no_of_edges; e++) {
             igraph_integer_t from = IGRAPH_FROM(graph, e);
             igraph_integer_t to = IGRAPH_TO(graph, e);
             igraph_real_t from_value = VECTOR(*values)[from];
@@ -401,7 +399,7 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
         IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS, NULL));
         IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS, NULL));
-        IGRAPH_CHECK(igraph_assortativity(graph, &outdegree, &indegree, res, /* directed */ 1, /* normalized */ 1));
+        IGRAPH_CHECK(igraph_assortativity(graph, &outdegree, &indegree, res, /* directed */ true, /* normalized */ true));
         igraph_vector_destroy(&indegree);
         igraph_vector_destroy(&outdegree);
         IGRAPH_FINALLY_CLEAN(2);
@@ -409,7 +407,7 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
         igraph_vector_t degree;
         IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
         IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, NULL));
-        IGRAPH_CHECK(igraph_assortativity(graph, &degree, 0, res, /* directed */ 0, /* normalized */ 1));
+        IGRAPH_CHECK(igraph_assortativity(graph, &degree, 0, res, /* directed */ false, /* normalized */ true));
         igraph_vector_destroy(&degree);
         IGRAPH_FINALLY_CLEAN(1);
     }

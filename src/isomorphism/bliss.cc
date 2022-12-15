@@ -209,22 +209,20 @@ public:
     AutCollector(igraph_vector_int_list_t *generators_) : generators(generators_) { }
 
     void operator ()(unsigned int n, const unsigned int *aut) {
-        igraph_vector_int_t *newvector;
+        igraph_vector_int_t newvector;
         igraph_error_t err;
 
-        // TODO: this could be faster if we had push_back_new_with_size_hint()
-        // as we would need one allocation only
-        err = igraph_vector_int_list_push_back_new(generators, &newvector);
-        if (err) {
+        err = igraph_vector_int_init(&newvector, n);
+        if (err != IGRAPH_SUCCESS) {
             throw bad_alloc();
         }
 
-        err = igraph_vector_int_resize(newvector, n);
-        if (err) {
+        copy(aut, aut + n, VECTOR(newvector)); // takes care of unsigned int -> igraph_integer_t conversion
+
+        err = igraph_vector_int_list_push_back(generators, &newvector);
+        if (err != IGRAPH_SUCCESS) {
             throw bad_alloc();
         }
-
-        copy(aut, aut + n, VECTOR(*newvector)); // takes care of unsigned int -> igraph_integer_t conversion
     }
 };
 

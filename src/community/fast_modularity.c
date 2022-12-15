@@ -408,45 +408,40 @@ static void igraph_i_fastgreedy_community_sort_neighbors_of(
         }
 
         /* Did we find it? We should have -- otherwise it's a bug */
-        if (i >= n) {
-            IGRAPH_WARNING("changed_pair not found in neighbor vector while re-sorting "
-                           "the neighbors of a community; this is probably a bug. Falling back to "
-                           "full sort instead."
-                          );
-        } else {
-            /* Okay, the pair that changed is at index i. We need to figure out where
-             * its new place should be. We can simply try moving the item all the way
-             * to the left as long as the comparison function tells so (since the
-             * rest of the vector is sorted), and then move all the way to the right
-             * as long as the comparison function tells so, and we will be okay. */
+        IGRAPH_ASSERT(i < n);
 
-            /* Shifting to the left */
-            while (i > 0) {
-                other_pair = VECTOR(*vec)[i - 1];
-                if (other_pair->second > changed_pair->second) {
-                    VECTOR(*vec)[i] = other_pair;
-                    i--;
-                } else {
-                    break;
-                }
+        /* Okay, the pair that changed is at index i. We need to figure out where
+         * its new place should be. We can simply try moving the item all the way
+         * to the left as long as the comparison function tells so (since the
+         * rest of the vector is sorted), and then move all the way to the right
+         * as long as the comparison function tells so, and we will be okay. */
+
+        /* Shifting to the left */
+        while (i > 0) {
+            other_pair = VECTOR(*vec)[i - 1];
+            if (other_pair->second > changed_pair->second) {
+                VECTOR(*vec)[i] = other_pair;
+                i--;
+            } else {
+                break;
             }
-            VECTOR(*vec)[i] = changed_pair;
-
-            /* Shifting to the right */
-            while (i < n - 1) {
-                other_pair = VECTOR(*vec)[i + 1];
-                if (other_pair->second < changed_pair->second) {
-                    VECTOR(*vec)[i] = other_pair;
-                    i++;
-                } else {
-                    break;
-                }
-            }
-            VECTOR(*vec)[i] = changed_pair;
-
-            /* Mark that we don't need a full sort */
-            can_skip_sort = true;
         }
+        VECTOR(*vec)[i] = changed_pair;
+
+        /* Shifting to the right */
+        while (i < n - 1) {
+            other_pair = VECTOR(*vec)[i + 1];
+            if (other_pair->second < changed_pair->second) {
+                VECTOR(*vec)[i] = other_pair;
+                i++;
+            } else {
+                break;
+            }
+        }
+        VECTOR(*vec)[i] = changed_pair;
+
+        /* Mark that we don't need a full sort */
+        can_skip_sort = true;
     }
 
     if (!can_skip_sort) {
