@@ -110,10 +110,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
 
     // L1
     neighbors = igraph_adjlist_get(&state->AK, V);
-    neighbors_e = igraph_inclist_get(&state->IK, E);
+    neighbors_e = igraph_inclist_get(&state->IK, V);
     num_neighbors = igraph_vector_int_size(neighbors);
-    // TODO: this does not seem to work. What do I misunderstand about 
-    // the adjacency and incidence lists?
     IGRAPH_ASSERT(igraph_vector_int_size(neighbors_e) == num_neighbors);
     for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
         igraph_integer_t W = VECTOR(*neighbors)[i];
