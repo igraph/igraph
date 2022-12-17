@@ -29,46 +29,34 @@
 #include "core/interruption.h"
 
 /**
- * \ingroup structural
- * \function igraph_get_shortest_paths_astar
- * \brief Shortest paths from a vertex with heuristic.
+ * \function igraph_get_shortest_path_astar
+ * \brief Shortest path from one vertex to another, with heuristic.
  *
- * </para><para>
- * Finds the shortest path between on starting vertex and one or several enpoints.
- * Compared to Dijkstra's algorithm, A* uses a heuristic to decide the direction to move to.
+ * Calculates a single (positively) weighted shortest path from
+ * a single vertex to another one, using the A* algorithm.
  *
- * </para><para>
- * If there is more than one path with the smallest weight between two vertices, this
- * function gives only one of them.
- * \param graph The graph object.
- * \param vertices The result, the IDs of the vertices along the paths.
- *        This is a list of integer vectors where each element is an
- *        \ref igraph_vector_int_t object. The list will be resized as needed.
- *        Supply a null pointer here if you don't need these vectors.
- * \param edges The result, the IDs of the edges along the paths.
- *        This is a list of integer vectors where each element is an
- *        \ref igraph_vector_int_t object. The list will be resized as needed.
- *        Supply a null pointer here if you don't need these vectors.
- * \param from The id of the vertex from/to which the geodesics are
- *        calculated.
- * \param to Vertex sequence with the IDs of the vertices to/from which the
- *        shortest paths will be calculated. A vertex might be given multiple
- *        times.
+ * </para><para>This function is a special case (and a wrapper) to
+ * \ref igraph_get_shortest_paths_astar().
+ *
+ * \param graph The input graph, it can be directed or undirected.
+ * \param vertices Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the vertex IDs along
+ *        the path are stored here, including the source and target
+ *        vertices.
+ * \param edges Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the edge IDs along the
+ *        path are stored here.
+ * \param from The id of the source vertex.
+ * \param to The id of the target vertex.
  * \param weights Optional edge weights. Supply \c NULL for unweighted graphs.
  *        all edge weights must be non-negative. Additionally, no
  *        edge weight may be NaN. If either case does not hold, an error
  *        is returned.
- * \param mode The type of shortest paths to be use for the
- *        calculation in directed graphs. Possible values:
- *        \clist
- *        \cli IGRAPH_OUT
- *          the outgoing paths are calculated.
- *        \cli IGRAPH_IN
- *          the incoming paths are calculated.
- *        \cli IGRAPH_ALL
- *          the directed graph is considered as an
- *          undirected one for the computation.
- *        \endclist
+ * \param mode A constant specifying how edge directions are
+ *        considered in directed graphs. \c IGRAPH_OUT follows edge
+ *        directions, \c IGRAPH_IN follows the opposite directions,
+ *        and \c IGRAPH_ALL ignores edge directions. This argument is
+ *        ignored for undirected graphs.
  * \param parents A pointer to an initialized igraph vector or null.
  *        If not null, a vector containing the parent of each vertex in
  *        the single source shortest path tree is returned here. The
@@ -91,32 +79,27 @@
  *        passed the vertex id as an \c igraph_integer_t, and the third
  *        parameter is passed \p extra.
  * \param extra This is passed on to the heuristic.
- * \return Error code:
- *        \clist
- *        \cli IGRAPH_ENOMEM
- *           not enough memory for temporary data.
- *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex ID
- *        \cli IGRAPH_EINVMODE
- *           invalid mode argument.
- *        \endclist
+ * \return Error code.
  *
- * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
- * vertices and |E| is the number of edges
+ * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
+ * |E| is the number of edges in the graph.
  *
+ * \sa \ref igraph_get_shortest_paths_astar() for the version with
+ * more target vertices.
  */
-igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph, 
-                                       igraph_vector_int_list_t *vertices,
-                                       igraph_vector_int_list_t *edges,
-                                       igraph_integer_t from,
-                                       igraph_vs_t to,
-                                       const igraph_vector_t *weights,
-                                       igraph_neimode_t mode,
-                                       igraph_vector_int_t *parents,
-                                       igraph_vector_int_t *inbound_edges,
-                                       igraph_astar_heuristic_t *heuristic,
-                                       void *extra
-                                      ) {
+
+igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
+                                      igraph_vector_int_t *vertices,
+                                      igraph_vector_int_t *edges,
+                                      igraph_integer_t from,
+                                      igraph_integer_t to,
+                                      const igraph_vector_t *weights,
+                                      igraph_neimode_t mode,
+                                      igraph_vector_int_t *parents,
+                                      igraph_vector_int_t *inbound_edges,
+                                      igraph_astar_heuristic_func_t *heuristic,
+                                      void *extra)
+{
     igraph_real_t heur_res;
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -126,8 +109,8 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists;
     igraph_integer_t *parent_eids;
-    igraph_bool_t *is_target;
-    igraph_integer_t i, to_reach;
+    igraph_integer_t i;
+    igraph_bool_t found = false;
 
     if (weights) { //If there are no weights, they are treated as 1.
         if (igraph_vector_size(weights) != no_of_edges) {
@@ -144,17 +127,6 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-
-    if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_list_resize(vertices, IGRAPH_VIT_SIZE(vit)));
-    }
-    if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_list_resize(edges, IGRAPH_VIT_SIZE(vit)));
-    }
-
-
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
@@ -168,27 +140,12 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
         IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, parent_eids);
-    is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
-    if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_free, is_target);
-
-    /* Mark the vertices we need to reach */
-    to_reach = IGRAPH_VIT_SIZE(vit);
-    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (!is_target[ IGRAPH_VIT_GET(vit) ]) {
-            is_target[ IGRAPH_VIT_GET(vit) ] = 1;
-        } else {
-            to_reach--;       /* this node was given multiple times */
-        }
-    }
 
     VECTOR(dists)[from] = 0.0;  /* zero distance */
     IGRAPH_CHECK(heuristic(&heur_res, from, extra));
     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, from, -heur_res));
 
-    while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
+    while (!igraph_2wheap_empty(&Q) && !found) {
         igraph_integer_t nlen, minnei;
         /*The sum of the distance and the heuristic is the estimate.
          *The estimates should be on the heap,
@@ -200,9 +157,8 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (is_target[minnei]) {
-            is_target[minnei] = 0;
-            to_reach--;
+        if (minnei == to) {
+            found = true;
         }
 
         /* Now check all neighbors of 'minnei' for a shorter path */
@@ -237,8 +193,8 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
         }
     } /* !igraph_2wheap_empty(&Q) */
 
-    if (to_reach > 0) {
-        IGRAPH_WARNING("Couldn't reach some vertices");
+    if (!found) {
+        IGRAPH_WARNING("Couldn't reach the vertex");
     }
 
     /* Create `parents' if needed */
@@ -276,46 +232,44 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
 
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
-        for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-            igraph_integer_t node = IGRAPH_VIT_GET(vit);
-            igraph_integer_t size, act, edge;
-            igraph_vector_int_t *vvec = 0, *evec = 0;
-            if (vertices) {
-                vvec = igraph_vector_int_list_get_ptr(vertices, i);
-                igraph_vector_int_clear(vvec);
-            }
-            if (edges) {
-                evec = igraph_vector_int_list_get_ptr(edges, i);
-                igraph_vector_int_clear(evec);
-            }
+        igraph_integer_t node = to;
+        igraph_integer_t size, act, edge;
+        igraph_vector_int_t *vvec = 0, *evec = 0;
+        if (vertices) {
+            vvec = vertices;
+            igraph_vector_int_clear(vvec);
+        }
+        if (edges) {
+            evec = edges;
+            igraph_vector_int_clear(evec);
+        }
 
-            IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION();
 
-            size = 0;
-            act = node;
-            while (parent_eids[act]) {
-                size++;
-                edge = parent_eids[act] - 1;
-                act = IGRAPH_OTHER(graph, edge, act);
-            }
-            if (vvec && (size > 0 || node == from)) {
-                IGRAPH_CHECK(igraph_vector_int_resize(vvec, size + 1));
-                VECTOR(*vvec)[size] = node;
+        size = 0;
+        act = node;
+        while (parent_eids[act]) {
+            size++;
+            edge = parent_eids[act] - 1;
+            act = IGRAPH_OTHER(graph, edge, act);
+        }
+        if (vvec && (size > 0 || node == from)) {
+            IGRAPH_CHECK(igraph_vector_int_resize(vvec, size + 1));
+            VECTOR(*vvec)[size] = node;
+        }
+        if (evec) {
+            IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
+        }
+        act = node;
+        while (parent_eids[act]) {
+            edge = parent_eids[act] - 1;
+            act = IGRAPH_OTHER(graph, edge, act);
+            size--;
+            if (vvec) {
+                VECTOR(*vvec)[size] = act;
             }
             if (evec) {
-                IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
-            }
-            act = node;
-            while (parent_eids[act]) {
-                edge = parent_eids[act] - 1;
-                act = IGRAPH_OTHER(graph, edge, act);
-                size--;
-                if (vvec) {
-                    VECTOR(*vvec)[size] = act;
-                }
-                if (evec) {
-                    VECTOR(*evec)[size] = edge;
-                }
+                VECTOR(*evec)[size] = edge;
             }
         }
     }
@@ -323,96 +277,8 @@ igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
     igraph_lazy_inclist_destroy(&inclist);
     igraph_2wheap_destroy(&Q);
     igraph_vector_destroy(&dists);
-    IGRAPH_FREE(is_target);
     IGRAPH_FREE(parent_eids);
     igraph_vit_destroy(&vit);
-    IGRAPH_FINALLY_CLEAN(6);
-    return IGRAPH_SUCCESS;
-}
-
-/**
- * \function igraph_get_shortest_path_astar
- * \brief Shortest path from one vertex to another, with heuristic.
- *
- * Calculates a single (positively) weighted shortest path from
- * a single vertex to another one, using the A* algorithm.
- *
- * </para><para>This function is a special case (and a wrapper) to
- * \ref igraph_get_shortest_paths_astar().
- *
- * \param graph The input graph, it can be directed or undirected.
- * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex IDs along
- *        the path are stored here, including the source and target
- *        vertices.
- * \param edges Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the edge IDs along the
- *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
- * \param weights Optional edge weights. Supply \c NULL for unweighted graphs.
- *        all edge weights must be non-negative. Additionally, no
- *        edge weight may be NaN. If either case does not hold, an error
- *        is returned.
- * \param mode A constant specifying how edge directions are
- *        considered in directed graphs. \c IGRAPH_OUT follows edge
- *        directions, \c IGRAPH_IN follows the opposite directions,
- *        and \c IGRAPH_ALL ignores edge directions. This argument is
- *        ignored for undirected graphs.
- * \param heuristic A function that returns an estimate of the distance as
- *        \c igraph_real_t in its first argument. The second parameter is
- *        passed the vertex id as an \c igraph_integer_t, and the third
- *        parameter is passed \p extra.
- * \param extra This is passed on to the heuristic.
- * \return Error code.
- *
- * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
- * |E| is the number of edges in the graph.
- *
- * \sa \ref igraph_get_shortest_paths_astar() for the version with
- * more target vertices.
- */
-
-igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
-                                      igraph_vector_int_t *vertices,
-                                      igraph_vector_int_t *edges,
-                                      igraph_integer_t from,
-                                      igraph_integer_t to,
-                                      const igraph_vector_t *weights,
-                                      igraph_neimode_t mode,
-                                      igraph_astar_heuristic_t *heuristic,
-                                      void *extra)
-{
-    igraph_vector_int_list_t vertices2, *vp = &vertices2;
-    igraph_vector_int_list_t edges2, *ep = &edges2;
-
-    if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_list_init(&vertices2, 1));
-        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &vertices2);
-    } else {
-        vp = NULL;
-    }
-    if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_list_init(&edges2, 1));
-        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &edges2);
-    } else {
-        ep = NULL;
-    }
-
-    IGRAPH_CHECK(igraph_get_shortest_paths_astar(graph, vp, ep,
-                 from, igraph_vss_1(to),
-                 weights, mode, NULL, NULL, heuristic, extra));
-
-    if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
-        igraph_vector_int_list_destroy(&edges2);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
-    if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
-        igraph_vector_int_list_destroy(&vertices2);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
-
+    IGRAPH_FINALLY_CLEAN(4);
     return IGRAPH_SUCCESS;
 }

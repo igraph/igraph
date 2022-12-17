@@ -34,7 +34,7 @@
 
 __BEGIN_DECLS
 
-typedef igraph_error_t igraph_astar_heuristic_t(igraph_real_t *result, igraph_integer_t vertex_id, void *extra);
+typedef igraph_error_t igraph_astar_heuristic_func_t(igraph_real_t *result, igraph_integer_t vertex_id, void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                                   igraph_integer_t *from, igraph_integer_t *to,
@@ -152,17 +152,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *g
                                                     igraph_integer_t to,
                                                     const igraph_vector_t *weights,
                                                     igraph_neimode_t mode);
-IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_astar(const igraph_t *graph,
-                                                    igraph_vector_int_list_t *vertices,
-                                                    igraph_vector_int_list_t *edges,
-                                                    igraph_integer_t from,
-                                                    igraph_vs_t to,
-                                                    const igraph_vector_t *weights,
-                                                    igraph_neimode_t mode,
-                                                    igraph_vector_int_t *parents,
-                                                    igraph_vector_int_t *inbound_edges,
-                                                    igraph_astar_heuristic_t *heuristic,
-                                                    void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
                                       igraph_vector_int_t *vertices,
@@ -171,7 +160,9 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_path_astar(const igraph_t *grap
                                       igraph_integer_t to,
                                       const igraph_vector_t *weights,
                                       igraph_neimode_t mode,
-                                      igraph_astar_heuristic_t *heuristic,
+                                      igraph_vector_int_t *parents,
+                                      igraph_vector_int_t *inbound_edges,
+                                      igraph_astar_heuristic_func_t *heuristic,
                                       void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
