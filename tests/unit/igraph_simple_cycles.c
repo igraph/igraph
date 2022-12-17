@@ -23,21 +23,25 @@
 
 void checkGraphForNrOfCycles(igraph_t *graph, const igraph_integer_t expectedNrOfCycles, igraph_simple_cycle_search_mode_t search_mode)
 {
-    igraph_vector_int_list_t resultsT1;
-    igraph_vector_int_list_init(&resultsT1, 0);
-    igraph_simple_cycles_search_all(graph, &resultsT1, search_mode);
-    printf("Finished search, found %" IGRAPH_PRId " cycles.\n\n", igraph_vector_int_list_size(&resultsT1));
-    if (igraph_vector_int_list_size(&resultsT1) != expectedNrOfCycles)
+    igraph_vector_int_list_t results_v;
+    igraph_vector_int_list_t results_e;
+    igraph_vector_int_list_init(&results_v, 0);
+    igraph_vector_int_list_init(&results_e, 0);
+    igraph_simple_cycles_search_all(graph, &results_v, &results_e, search_mode);
+    printf("Finished search, found %" IGRAPH_PRId " cycles.\n\n", igraph_vector_int_list_size(&results_v));
+    if (igraph_vector_int_list_size(&results_v) != expectedNrOfCycles)
     {
-        printf("Unexpectedly found %" IGRAPH_PRId " cycles instead of %" IGRAPH_PRId ": ", igraph_vector_int_list_size(&resultsT1), expectedNrOfCycles);
-        for (int i = 0; i < igraph_vector_int_list_size(&resultsT1); i++)
+        printf("Unexpectedly found %" IGRAPH_PRId " cycles instead of %" IGRAPH_PRId ": ", igraph_vector_int_list_size(&results_v), expectedNrOfCycles);
+        for (int i = 0; i < igraph_vector_int_list_size(&results_v); i++)
         {
-            print_vector_int(igraph_vector_int_list_get_ptr(&resultsT1, i));
+            print_vector_int(igraph_vector_int_list_get_ptr(&results_v, i));
         }
     }
 
-    IGRAPH_ASSERT(igraph_vector_int_list_size(&resultsT1) == expectedNrOfCycles);
-    igraph_vector_int_list_destroy(&resultsT1);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_v) == expectedNrOfCycles);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&results_e) == igraph_vector_int_list_size(&results_v));
+    igraph_vector_int_list_destroy(&results_v);
+    igraph_vector_int_list_destroy(&results_e);
 }
 
 int main(void)
@@ -119,12 +123,12 @@ int main(void)
     igraph_vector_int_t directed_multiedge_edges;
     /**
      * This graph looks like:
-     * 
+     *
      *  /\
      * 1--2
      * |  |
      * 3--4
-     * 
+     *
      */
     igraph_vector_int_init(&directed_multiedge_edges, 10);
     igraph_vector_int_set(&directed_multiedge_edges, 0, 1);
