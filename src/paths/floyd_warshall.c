@@ -214,8 +214,14 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
        rooted at k in the main loop below */
     igraph_vector_int_t no_of_children;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children, no_of_nodes);
-    igraph_stack_int_t stack;
 
+    igraph_vector_int_t dfs_traversal;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dfs_traversal, no_of_nodes);
+
+    igraph_vector_int_t dfs_skip;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dfs_skip, no_of_nodes);
+
+    igraph_stack_int_t stack;
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
     IGRAPH_CHECK(igraph_matrix_int_init(&predecessors, no_of_nodes, no_of_nodes));
@@ -236,32 +242,51 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
             VECTOR(no_of_children)[parent] = 0;
         /* constructing the tree out_k (as in the paper) but
            representing it as the children matrix */
-        for (igraph_integer_t v=0; v < no_of_nodes; v++) {  
+        for (igraph_integer_t v=0; v < no_of_nodes; v++) {
             if (k == v) continue;
             igraph_integer_t parent = MATRIX(predecessors, k, v);
             MATRIX(children, parent, VECTOR(no_of_children)[parent]) = v;
             VECTOR(no_of_children)[parent]++;
         }
+        /* constructing dfs-traversal and dfs-skip arrays
+            for the out_k tree
+        */
+        IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
+        igraph_integer_t counter = 0;
+        while (!igraph_stack_int_empty(&stack)) {
+            igraph_integer_t parent = igraph_stack_int_pop(&stack);
+            if (parent > -1) {
+                VECTOR(dfs_traversal)[counter] = parent;
+                counter++;
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, -parent - 1));
+                for (igraph_integer_t l=0; l < VECTOR(no_of_children)[parent]; l++) {
+                    IGRAPH_CHECK(igraph_stack_int_push(&stack, MATRIX(children, parent, l)));
+                }
+            } else {
+                VECTOR(dfs_skip)[-(parent + 1)] = counter;
+            }
+        }
+        /* main inner loop */
         for (igraph_integer_t i=0; i < no_of_nodes; i++) {
             igraph_real_t dki = MATRIX(*res, k, i);
             if (dki == IGRAPH_INFINITY || i == k) continue;
-            IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
-            while (!igraph_stack_int_empty(&stack)) {
-                igraph_integer_t parent = igraph_stack_int_pop(&stack);
-                for (igraph_integer_t l=0; l < VECTOR(no_of_children)[parent]; l++) {
-                    igraph_integer_t j = MATRIX(children, parent, l);
-                    igraph_real_t di = MATRIX(*res, j, k) + dki;
-                    igraph_real_t dd = MATRIX(*res, j, i);
-                    if (di < dd) {
-                        MATRIX(*res, j, i) = di;
-                        MATRIX(predecessors, i, j) = MATRIX(predecessors, k, j);
-                        IGRAPH_CHECK(igraph_stack_int_push(&stack, j));
-                    }
-                    if (i == j && MATRIX(*res, i, i) < 0) {
-                        IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
-                                    IGRAPH_ENEGLOOP);
-                    }
+            igraph_integer_t counter = 1;
+            while (counter < no_of_nodes) {
+                igraph_integer_t j = VECTOR(dfs_traversal)[counter];
+                igraph_real_t di = MATRIX(*res, j, k) + dki;
+                igraph_real_t dd = MATRIX(*res, j, i);
+                if (di < dd) {
+                    MATRIX(*res, j, i) = di;
+                    MATRIX(predecessors, i, j) = MATRIX(predecessors, k, j);
+                    counter++;
+                } else {
+                    counter = VECTOR(dfs_skip)[j];
                 }
+                if (i == j && MATRIX(*res, i, i) < 0) {
+                    IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
+                                IGRAPH_ENEGLOOP);
+                }
+
             }
         }
     }
@@ -270,7 +295,9 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
     igraph_matrix_int_destroy(&children);
     igraph_stack_int_destroy(&stack);
     igraph_vector_int_destroy(&no_of_children);
-    IGRAPH_FINALLY_CLEAN(4);
+    igraph_vector_int_destroy(&dfs_skip);
+    igraph_vector_int_destroy(&dfs_traversal);
+    IGRAPH_FINALLY_CLEAN(6);
 
     return IGRAPH_SUCCESS;
 }
