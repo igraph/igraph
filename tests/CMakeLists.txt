@@ -299,6 +299,7 @@ add_legacy_tests(
   igraph_diameter_dijkstra
   igraph_diversity
   igraph_distances_floyd_warshall
+  igraph_distances_floyd_warshall_speedup
   igraph_distances_johnson
   igraph_ecc
   igraph_eccentricity
