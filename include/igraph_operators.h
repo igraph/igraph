@@ -80,6 +80,8 @@ IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, 
                                               igraph_vector_int_t *invmap);
 IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                           const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
+IGRAPH_EXPORT igraph_error_t igraph_induced_subgraph_edges(
+        const igraph_t *graph, igraph_vs_t vids, igraph_vector_int_t *edges);
 IGRAPH_EXPORT igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                                         const igraph_es_t eids, igraph_bool_t delete_vertices);
 IGRAPH_EXPORT igraph_error_t igraph_reverse_edges(igraph_t *graph, const igraph_es_t eids);
