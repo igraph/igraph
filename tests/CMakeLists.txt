@@ -545,6 +545,7 @@ add_legacy_tests(
   igraph_connect_neighborhood
   igraph_induced_subgraph
   igraph_induced_subgraph_map
+  igraph_induced_subgraph_edges
   igraph_intersection2
   igraph_permute_vertices
   igraph_reverse_edges
