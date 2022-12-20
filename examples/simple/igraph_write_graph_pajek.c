@@ -46,7 +46,7 @@ int main(void) {
     igraph_strvector_push_back(&names, "H");
     igraph_strvector_push_back(&names, "I");
     igraph_strvector_push_back(&names, "J");
-    SETVASV(&g, "id", &names);
+    SETVASV(&g, "name", &names);
     igraph_strvector_destroy(&names);
 
     /* save the graph with vertex names */

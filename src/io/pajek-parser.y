@@ -238,7 +238,6 @@ vertexline: NEWLINE |
 vertex: longint { $$=$1; context->mode=1; };
 
 vertexid: word {
-  IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("id", $1.str, $1.len, context));
   IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("name", $1.str, $1.len, context));
 };
 
