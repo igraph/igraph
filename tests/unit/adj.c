@@ -252,8 +252,8 @@ int main(void) {
     print_inc2(&dg, IGRAPH_OUT, IGRAPH_NO_LOOPS);
     print_inc2(&dg, IGRAPH_OUT, IGRAPH_LOOPS_ONCE);
 
-    /* Verify that nehgbour lists (adjlist) and inceident edge lists (inclist)
-     * have the same ordering with all paraemter combinations. */
+    /* Verify that neighbour lists (adjlist) and incident edge lists (inclist)
+     * have the same ordering with all parameter combinations. */
 
     verify_ordering1(&ug, IGRAPH_ALL, IGRAPH_NO_LOOPS);
     verify_ordering1(&ug, IGRAPH_ALL, IGRAPH_LOOPS_ONCE);
