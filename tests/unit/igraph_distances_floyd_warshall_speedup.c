@@ -20,7 +20,6 @@
 #include "test_utilities.h"
 
 int main(void) {
-
     igraph_t g;
     igraph_matrix_t d, d2;
     igraph_vector_t weights;
@@ -107,6 +106,12 @@ int main(void) {
     /* NaN weight */
     VECTOR(weights)[1] = IGRAPH_NAN;
     CHECK_ERROR(igraph_distances_floyd_warshall_tree_speedup(&g, &d, &weights, IGRAPH_OUT), IGRAPH_EINVAL);
+
+    /* Unweighted directed - larger graph */
+    igraph_erdos_renyi_game_gnp(&g, 100, 0.1, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_distances_floyd_warshall_tree_speedup(&g, &d, NULL, IGRAPH_OUT);
+    igraph_distances_dijkstra(&g, &d2, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT);
+    IGRAPH_ASSERT(igraph_matrix_all_e(&d, &d2));
 
     igraph_vector_destroy(&weights);
 

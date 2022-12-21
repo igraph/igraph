@@ -286,7 +286,6 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
                     IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
                                 IGRAPH_ENEGLOOP);
                 }
-
             }
         }
     }
