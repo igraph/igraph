@@ -106,6 +106,7 @@ int main(void) {
     /* NaN weight */
     VECTOR(weights)[1] = IGRAPH_NAN;
     CHECK_ERROR(igraph_distances_floyd_warshall_tree_speedup(&g, &d, &weights, IGRAPH_OUT), IGRAPH_EINVAL);
+    igraph_destroy(&g);
 
     /* Unweighted directed - larger graph */
     igraph_erdos_renyi_game_gnp(&g, 100, 0.1, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
