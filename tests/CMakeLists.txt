@@ -134,6 +134,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  adj
   igraph_add_edges
   igraph_add_vertices
   igraph_degree
