@@ -1618,19 +1618,20 @@ igraph_error_t igraph_get_all_eids_between(
 igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
         igraph_neimode_t mode) {
     if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE);
     } else {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_ONCE);
     }
 }
 
 igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-        igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
+        igraph_neimode_t mode, igraph_loops_t loops) {
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
     if (should_filter_duplicates) {                                                        \
-        if ((loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
-                (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode) ||  \
-                (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added)) {                \
+        if (                                                                               \
+            (loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
+            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode)         \
+        ) {                                                                                \
             length -= n;                                                                   \
             continue;                                                                      \
         } else {                                                                           \
@@ -1684,9 +1685,10 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
     if (!igraph_is_directed(graph) || mode != IGRAPH_ALL) {
         /* We did not ask for both directions; this is the easy case */
 
-        should_filter_duplicates = !(multiple == IGRAPH_MULTIPLE &&
-                ((!igraph_is_directed(graph) && loops == IGRAPH_LOOPS_TWICE) ||
-                 (igraph_is_directed(graph) && loops != IGRAPH_NO_LOOPS)));
+        should_filter_duplicates = !(
+            (!igraph_is_directed(graph) && loops == IGRAPH_LOOPS_TWICE) ||
+            (igraph_is_directed(graph) && loops != IGRAPH_NO_LOOPS)
+        );
 
         if (mode & IGRAPH_OUT) {
             j = VECTOR(graph->os)[node + 1];
@@ -1716,8 +1718,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
         igraph_integer_t eid1, eid2;
         igraph_integer_t n1, n2;
 
-        should_filter_duplicates = !(multiple == IGRAPH_MULTIPLE &&
-                loops == IGRAPH_LOOPS_TWICE);
+        should_filter_duplicates = loops != IGRAPH_LOOPS_TWICE;
 
         while (i1 < j1 && i2 < j2) {
             eid1 = VECTOR(graph->oi)[i1];
@@ -1737,8 +1738,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
                 i2++;
                 DEDUPLICATE_IF_NEEDED(n2, 2);
                 VECTOR(*eids)[idx++] = eid1;
-                if (should_filter_duplicates && ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE))) {
+                if (should_filter_duplicates && loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) {
                     length--;
                     continue;
                 }

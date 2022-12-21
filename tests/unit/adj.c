@@ -71,7 +71,7 @@ void print_inc1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops_t loo
     igraph_vector_int_init(&incs, 0);
     for (igraph_integer_t v=0; v < vcount; v++) {
         printf("%3" IGRAPH_PRId ": ", v);
-        igraph_i_incident(graph, &incs, v, mode, loops, IGRAPH_MULTIPLE);
+        igraph_i_incident(graph, &incs, v, mode, loops);
         print_vector_int(&incs);
     }
     igraph_vector_int_destroy(&incs);
@@ -107,7 +107,7 @@ void verify_ordering1(const igraph_t *graph, igraph_neimode_t mode, igraph_loops
 
     for (igraph_integer_t v=0; v < vcount; v++) {
         igraph_i_neighbors(graph, &neis, v, mode, loops, IGRAPH_MULTIPLE);
-        igraph_i_incident(graph, &incs, v, mode, loops, IGRAPH_MULTIPLE);
+        igraph_i_incident(graph, &incs, v, mode, loops);
 
         igraph_integer_t n = igraph_vector_int_size(&neis);
         IGRAPH_ASSERT(igraph_vector_int_size(&incs) == n);
