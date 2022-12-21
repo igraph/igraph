@@ -2369,7 +2369,7 @@ igraph_random_sample:
     PARAMS: OUT VECTOR_INT res, INTEGER l, INTEGER h, INTEGER length
 
 igraph_convex_hull:
-    PARAMS: MATRIX data, OUT VECTOR_INT resverts, OUT MATRIX rescoords
+    PARAMS: MATRIX data, OUT INDEX_VECTOR resverts, OUT MATRIX rescoords
 
 igraph_dim_select:
     PARAMS: VECTOR sv, OUT INTEGER dim
