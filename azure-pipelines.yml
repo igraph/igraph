@@ -119,7 +119,6 @@ jobs:
       vmImage: macos-latest
     steps:
       - script: |
-#          brew update
           brew install ninja ccache
         displayName: Install dependencies
 
