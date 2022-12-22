@@ -15,7 +15,6 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#include <iostream>
 #include "igraph_paths.h"
 
 #include "igraph_components.h"
@@ -375,7 +374,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         igraph_real_t minweight = igraph_vector_min(pweights);
         if (minweight < 0) {
             IGRAPH_ERRORF("Edge weights must be non-negative, got %g.", IGRAPH_EINVAL, minweight);
-            
+
         } else if (minweight == 0) {
             /* TODO: can we support zero edge weights? */
             IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
