@@ -15,7 +15,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
+#include <iostream>
 #include "igraph_paths.h"
 
 #include "igraph_components.h"
@@ -344,7 +344,6 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 igraph_error_t igraph_steiner_dreyfus_wagner(
     const igraph_t *graph, const igraph_vector_int_t *terminals, const igraph_vector_t *weights,
     igraph_real_t *res, igraph_vector_int_t *res_tree) {
-
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     const igraph_vector_t *pweights;
@@ -357,7 +356,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     if (! igraph_vector_int_isininterval(terminals, 0, no_of_nodes)) {
         IGRAPH_ERROR("Invalid vertex ID given as Steiner terminal.", IGRAPH_EINVVID);
     }
-
     if (!weights) {
 
         IGRAPH_CHECK(igraph_vector_init(&iweights, no_of_edges));
@@ -373,24 +371,22 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
 
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
-
     if (no_of_edges > 0) {
         igraph_real_t minweight = igraph_vector_min(pweights);
         if (minweight < 0) {
             IGRAPH_ERRORF("Edge weights must be non-negative, got %g.", IGRAPH_EINVAL, minweight);
+            
         } else if (minweight == 0) {
             /* TODO: can we support zero edge weights? */
             IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
         }
     }
-
     /* Handle the cases of the null graph and no terminals. */
     if (no_of_nodes == 0 || no_of_terminals == 0) {
         igraph_vector_int_clear(res_tree);
         *res = 0.0;
         return IGRAPH_SUCCESS;
     }
-
     /* Check whether all terminals are within the same connected component. */
     {
         igraph_vector_int_t membership;
@@ -412,7 +408,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         igraph_vector_int_destroy(&membership);
         IGRAPH_FINALLY_CLEAN(1);
     }
-
     /* When every vertex is a Steiner terminal, the probably reduces to
      * finding a minimum spanning tree.
      */
@@ -427,7 +422,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         *res = tree_weight;
         return IGRAPH_SUCCESS;
     }
-
 
     igraph_vector_int_t steiner_terminals_copy;
     igraph_matrix_t dp_cache; // dynamic programming table
@@ -574,9 +568,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
 
 
     igraph_vector_int_clear(res_tree);
-
     IGRAPH_CHECK(generate_steiner_tree_exact(graph, pweights, &dp_cache, indexD, q, res_tree, subsetMap));
-
     igraph_matrix_destroy(&distance);
     igraph_vector_int_destroy(&steiner_terminals_copy);
     igraph_matrix_destroy(&dp_cache);
