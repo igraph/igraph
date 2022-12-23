@@ -2,7 +2,7 @@
 language: c
 cache: ccache
 os: linux
-dist: bionic
+# dist: bionic
 
 # Ignore branches with names starting with certain keywords:
 branches:
