@@ -103,19 +103,19 @@ int check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* pare
     return 0;
 }
 
-
-igraph_error_t no_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
-    (void) vertex_id;
+igraph_error_t no_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
+    (void) source_id;
+    (void) target_id;
     (void) extra;
     *result = 0;
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
+igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
     int x[4];
     for (int i = 0; i < 4; i++) {
-        x[i] = vertex_id % LENGTH;
-        vertex_id /= LENGTH;
+        x[i] = source_id % LENGTH;
+        source_id /= LENGTH;
     }
     *result = abs(LENGTH - 1 - x[0]) + x[1] + x[2] + x[3];
     return IGRAPH_SUCCESS;
@@ -124,24 +124,23 @@ igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t vertex_
 struct xyt {
     igraph_vector_t x;
     igraph_vector_t y;
-    igraph_integer_t target;
 };
 
-igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_integer_t vertex_id, void *extra) {
+igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
     struct xyt *xyp = extra;
     igraph_real_t xt, xf, yt, yf;
-    xt = VECTOR(xyp->x)[xyp->target];
-    yt = VECTOR(xyp->y)[xyp->target];
-    xf = VECTOR(xyp->x)[vertex_id];
-    yf = VECTOR(xyp->y)[vertex_id];
+    xt = VECTOR(xyp->x)[target_id];
+    yt = VECTOR(xyp->y)[target_id];
+    xf = VECTOR(xyp->x)[source_id];
+    yf = VECTOR(xyp->y)[source_id];
     *result = sqrt((xt-xf)*(xt-xf) + (yt-yf)*(yt-yf));
     return IGRAPH_SUCCESS;
 }
+
 int main(void) {
 
     igraph_t g;
     igraph_vector_int_t parents, inbound, vertices, edges;
-    igraph_integer_t i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_vector_t weights_vec;
     struct xyt xy;
@@ -207,7 +206,6 @@ int main(void) {
     igraph_destroy(&g);
  
     printf("Astar, unweighted, grg with euclidean distance heuristic:\n");
-    xy.target = LENGTH-1; //just because that was the end vertex last test
     igraph_vector_init(&xy.x, 0);
     igraph_vector_init(&xy.y, 0);
 

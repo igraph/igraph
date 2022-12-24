@@ -141,7 +141,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, parent_eids);
 
     VECTOR(dists)[from] = 0.0;  /* zero distance */
-    IGRAPH_CHECK(heuristic(&heur_res, from, extra));
+    IGRAPH_CHECK(heuristic(&heur_res, from, to, extra));
     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, from, -heur_res));
 
     while (!igraph_2wheap_empty(&Q) && !found) {
@@ -180,13 +180,13 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
                 /* This is the first finite distance */
                 VECTOR(dists)[tto] = altdist;
                 parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(heuristic(&heur_res, tto, extra));
+                IGRAPH_CHECK(heuristic(&heur_res, tto, to, extra));
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist -heur_res));
             } else if (altdist < curdist) {
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
                 parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(heuristic(&heur_res, tto, extra));
+                IGRAPH_CHECK(heuristic(&heur_res, tto, to, extra));
                 igraph_2wheap_modify(&Q, tto, -altdist -heur_res);
             }
         }
