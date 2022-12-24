@@ -34,7 +34,27 @@
 
 __BEGIN_DECLS
 
-typedef igraph_error_t igraph_astar_heuristic_func_t(igraph_real_t *result, igraph_integer_t sourceid, igraph_integer_t target_id, void *extra);
+/**
+ * \typedef igraph_astar_heuristic_func_t
+ * \brief Heuristic for A* algorithm.
+ *
+ * \ref igraph_get_shortest_path_astar() uses a heuristic to determine
+ *      which vertex to try next. For example this heuristic can be the
+ *      Euclidean distance between two points.
+ *
+ * \param result The result of the heuristic, a lower value will mean this
+        vertex will be a better candidate for exploration.
+ * \param source_id The vertex id of the candidate vertex will be passed here.
+ * \param target_id The vertex id of the end point will be passed here.
+ * \param extra The extra argument that was passed to \ref
+ *   igraph_get_shortest_path_astar().
+ * \return \c IGRAPH_SUCCESS if there were no errors. This can be used to break
+        off the algorithm if something unexpected happens, like a failed memory
+        allocation (IGRAPH_ENOMEM).
+ *
+ * \sa \ref igraph_get_shortest_path_astar()
+ */
+typedef igraph_error_t igraph_astar_heuristic_func_t(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra);
 
 IGRAPH_EXPORT igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                                   igraph_integer_t *from, igraph_integer_t *to,
