@@ -30,7 +30,7 @@
 
 /**
  * \function igraph_get_shortest_path_astar
- * \brief Shortest path from one vertex to another, with heuristic.
+ * \brief A* gives the shortest path from one vertex to another, with heuristic.
  *
  * Calculates a single (positively) weighted shortest path from
  * a single vertex to another one, using the A* algorithm.
