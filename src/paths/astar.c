@@ -37,9 +37,6 @@
  * Calculates a single (positively) weighted shortest path from
  * a single vertex to another one, using the A* algorithm.
  *
- * </para><para>This function is a special case (and a wrapper) to
- * \ref igraph_get_shortest_paths_astar().
- *
  * \param graph The input graph, it can be directed or undirected.
  * \param vertices Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the vertex IDs along
@@ -86,8 +83,6 @@
  * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
  * |E| is the number of edges in the graph.
  *
- * \sa \ref igraph_get_shortest_paths_astar() for the version with
- * more target vertices.
  */
 
 igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
