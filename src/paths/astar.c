@@ -104,7 +104,6 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vit_t vit;
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists;
@@ -232,7 +231,6 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
-        igraph_integer_t node = to;
         igraph_integer_t size, act, edge;
         igraph_vector_int_t *vvec = 0, *evec = 0;
         if (vertices) {
@@ -247,20 +245,20 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         size = 0;
-        act = node;
+        act = to;
         while (parent_eids[act]) {
             size++;
             edge = parent_eids[act] - 1;
             act = IGRAPH_OTHER(graph, edge, act);
         }
-        if (vvec && (size > 0 || node == from)) {
+        if (vvec && (size > 0 || to == from)) {
             IGRAPH_CHECK(igraph_vector_int_resize(vvec, size + 1));
-            VECTOR(*vvec)[size] = node;
+            VECTOR(*vvec)[size] = to;
         }
         if (evec) {
             IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
         }
-        act = node;
+        act = to;
         while (parent_eids[act]) {
             edge = parent_eids[act] - 1;
             act = IGRAPH_OTHER(graph, edge, act);
@@ -278,7 +276,6 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     igraph_2wheap_destroy(&Q);
     igraph_vector_destroy(&dists);
     IGRAPH_FREE(parent_eids);
-    igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
     return IGRAPH_SUCCESS;
 }
