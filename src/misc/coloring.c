@@ -180,7 +180,6 @@ static void DSatur(const igraph_t *graph,igraph_vector_int_t *colors, igraph_vec
     while( vertices_colored < vc ){
         igraph_integer_t node_to_color = DSatur_node_selection(graph, colors, saturation_degree, vc);
         igraph_vector_int_t *neighbours = igraph_adjlist_get(adjlist, node_to_color);
-        igraph_integer_t nbr_cnt = igraph_vector_int_size(neighbours);
         for( igraph_integer_t color = 0 ; color < vc ; color++ ){
             igraph_bool_t viable_color = ! is_color_used_by_neighbour( colors , color , neighbours );
             if( viable_color ){
@@ -207,6 +206,9 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur_cn(const igraph_t *graph, 
 
     DSatur(graph, colors, &saturation_degree, &adjlist);
 
+
+    igraph_vector_int_destroy(&saturation_degree);
+    igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(2);
     return IGRAPH_SUCCESS;
 }
