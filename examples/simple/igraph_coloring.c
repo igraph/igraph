@@ -30,9 +30,8 @@ int main(void) {
             }
         }
     }
-    igraph_vector_int_fill(&colors, 0);
+
     igraph_vertex_coloring_greedy(&graph, &colors, IGRAPH_COLORING_DSATUR_COLORED_NEIGHBORS);
-    // igraph_vertex_coloring_AntColony(&graph, &colors, 1.0, 5.0, 0.9, 100, 9, 0.6, 0 , true,true );
 
     /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
     {

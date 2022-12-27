@@ -34,8 +34,7 @@ __BEGIN_DECLS
  * Ordering heuristics for \ref igraph_vertex_coloring_greedy().
  *
  * \enumval IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS  Choose vertex with largest number of already colored neighbors.
- *
- * \enumval IGRAPH_COLORING_DSATUR_COLORED_NEIGHBORS  Choose vertex with largest number of distinct colored neighbors.(DSatur Algorithm)
+ * \enumval IGRAPH_COLORING_DSATUR_COLORED_NEIGHBORS  Choose vertex with largest number of unique colors in its neighborhood (also known as the DSatur algorithm).
  *
  */
 typedef enum {
@@ -43,9 +42,7 @@ typedef enum {
     IGRAPH_COLORING_DSATUR_COLORED_NEIGHBORS = 1
 } igraph_coloring_greedy_t;
 
-
 IGRAPH_EXPORT igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic);
-
 
 __END_DECLS
 
