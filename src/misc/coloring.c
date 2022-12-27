@@ -135,25 +135,24 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
 
 static igraph_integer_t igraph_i_dsatur_select_node(
     const igraph_t *graph, const igraph_vector_int_t *colors,
-    const igraph_vector_int_t *saturation_degree, igraph_integer_t vc
+    const igraph_vector_int_t *saturation_degree, const igraph_vector_int_t *edge_degree,
+    igraph_integer_t vc
 ) {
     igraph_integer_t most_saturated_node = -1, max_saturation = -1, max_degree = -1;
 
     for (igraph_integer_t node = 0; node < vc; node++) {
         //finding an uncolored node with max (saturation degree ,  degree)
-        if (VECTOR(*colors)[node] == -1) {
-            if (VECTOR(*saturation_degree)[node] > max_saturation) {
-                max_saturation = VECTOR(*saturation_degree)[node];
-                most_saturated_node = node;
-            } else if (VECTOR(*saturation_degree)[node] == max_saturation) {
-                igraph_integer_t degree;
-                igraph_degree_1(graph, &degree, node, IGRAPH_ALL, true);
-                if (degree > max_degree) {
-                    most_saturated_node = node;
-                    max_degree = degree;
-                }
-            }
+        if (VECTOR(*colors)[node] != -1){
+            continue;
         }
+        igraph_integer_t saturation = VECTOR(*saturation_degree)[node];
+        igraph_integer_t degree = VECTOR(*edge_degree)[node] ;
+        if (( saturation < max_saturation) || (saturation == max_saturation && degree <= max_degree)) {
+            continue;
+        }
+        max_saturation = saturation;
+        max_degree = degree;
+        most_saturated_node = node;
     }
 
     return most_saturated_node;
@@ -200,12 +199,17 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur_cn(
     IGRAPH_CHECK(igraph_vector_int_init(&saturation_degree, igraph_vcount(graph) ) );
     IGRAPH_FINALLY(igraph_vector_int_destroy, &saturation_degree);
 
+    igraph_vector_int_t edge_degree;
+    IGRAPH_CHECK(igraph_vector_int_init(&edge_degree, igraph_vcount(graph) ) );
+    IGRAPH_CHECK(igraph_degree(graph, &edge_degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS ) );
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &edge_degree);
+
     igraph_vector_int_fill(colors, -1);   // -1 as a color means uncolored
 
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t vertices_colored = 0;
     while (vertices_colored < vc) {
-        igraph_integer_t node_to_color = igraph_i_dsatur_select_node(graph, colors, &saturation_degree, vc);
+        igraph_integer_t node_to_color = igraph_i_dsatur_select_node(graph, colors, &saturation_degree, &edge_degree, vc);
         igraph_vector_int_t *neighbours = igraph_adjlist_get(&adjlist, node_to_color);
         for (igraph_integer_t color = 0; color < vc; color++) {
             igraph_bool_t viable_color = !is_color_used_by_neighbour(colors, color, neighbours);
@@ -220,8 +224,9 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur_cn(
     }
 
     igraph_vector_int_destroy(&saturation_degree);
+    igraph_vector_int_destroy(&edge_degree);
     igraph_adjlist_destroy(&adjlist);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
