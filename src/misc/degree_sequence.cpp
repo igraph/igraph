@@ -19,6 +19,7 @@
 
 #include "igraph_constructors.h"
 
+#include "core/exceptions.h"
 #include "math/safe_intop.h"
 
 #include <vector>
@@ -527,9 +528,9 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
     }
 
     igraph_vector_int_t edges;
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, deg_sum));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, deg_sum);
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
     if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) && (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW ) )
     {
         switch (method) {
@@ -591,8 +592,9 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
          * so no explanatory error message for now. */
         return IGRAPH_UNIMPLEMENTED;
     }
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_integer_t(node_count), false));
+    IGRAPH_CHECK(igraph_create(graph, &edges, node_count, false));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -633,9 +635,9 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
 
     igraph_vector_int_t edges;
     IGRAPH_SAFE_MULT(edge_count, 2, &edge_count2);
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, edge_count2));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, edge_count2);
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
     switch (method) {
     case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
         IGRAPH_CHECK(igraph_i_kleitman_wang(outdeg, indeg, &edges, true));
@@ -649,8 +651,9 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
     default:
         IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
     }
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_integer_t(node_count), true));
+    IGRAPH_CHECK(igraph_create(graph, &edges, node_count, true));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -777,13 +780,9 @@ igraph_error_t igraph_realize_degree_sequence(
 {
     bool directed = indeg != NULL;
 
-    try {
-        if (directed) {
-            return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, allowed_edge_types, method);
-        } else {
-            return igraph_i_realize_undirected_degree_sequence(graph, outdeg, allowed_edge_types, method);
-        }
-    } catch (const std::bad_alloc &) {
-        IGRAPH_ERROR("Cannot realize degree sequence due to insufficient memory.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    if (directed) {
+        return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, allowed_edge_types, method);
+    } else {
+        return igraph_i_realize_undirected_degree_sequence(graph, outdeg, allowed_edge_types, method);
     }
 }
