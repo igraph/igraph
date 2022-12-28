@@ -2491,9 +2491,9 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         VECTOR(partition)[mid + 1] = VECTOR(neighbors)[i];
     }
 
-    /* Create the tree graph; we use igraph_subgraph_edges here to keep the
+    /* Create the tree graph; we use igraph_subgraph_from_edges here to keep the
      * graph and vertex attributes */
-    IGRAPH_CHECK(igraph_subgraph_edges(graph, tree, igraph_ess_none(), 0));
+    IGRAPH_CHECK(igraph_subgraph_from_edges(graph, tree, igraph_ess_none(), 0));
     IGRAPH_CHECK(igraph_add_edges(tree, &partition, 0));
 
     /* Free the allocated memory */
