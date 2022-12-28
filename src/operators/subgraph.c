@@ -492,6 +492,20 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
  * \function igraph_subgraph_edges
  * \brief Creates a subgraph with the specified edges and their endpoints.
  *
+ * \deprecated-by igraph_subgraph_from_edges 0.10.3
+ */
+igraph_error_t igraph_subgraph_edges(
+    const igraph_t *graph, igraph_t *res, const igraph_es_t eids,
+    igraph_bool_t delete_vertices
+) {
+    return igraph_subgraph_from_edges(graph, res, eids, delete_vertices);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_subgraph_from_edges
+ * \brief Creates a subgraph with the specified edges and their endpoints.
+ *
  * </para><para>
  * This function collects the specified edges and their endpoints to a new
  * graph.
@@ -522,8 +536,10 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
  * edges from a graph, the opposite of this function.
  */
 
-igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
-                          const igraph_es_t eids, igraph_bool_t delete_vertices) {
+igraph_error_t igraph_subgraph_from_edges(
+    const igraph_t *graph, igraph_t *res, const igraph_es_t eids,
+    igraph_bool_t delete_vertices
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);

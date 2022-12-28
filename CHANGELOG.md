@@ -26,6 +26,10 @@
  - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
  - Fixed new warnings issued by the Xcode 14.1 toolchain.
 
+### Deprecated
+
+- `igraph_subgraph_edges()` is now deprecated to avoid confusion with `igraph_induced_subgraph_edges()`; its new name is `igraph_subgraph_from_edges()`. The old name is kept available until at least igraph 0.11.
+
 ### Other
 
  - Significantly improved performance for `igraph_matrix_transpose()`.
