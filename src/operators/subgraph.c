@@ -27,7 +27,9 @@
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+#include "core/set.h"
 #include "graph/attributes.h"
+#include "graph/internal.h"
 #include "operators/subgraph.h"
 
 /**
@@ -416,6 +418,73 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 igraph_vector_int_t *map,
                                 igraph_vector_int_t *invmap) {
     return igraph_i_induced_subgraph_map(graph, res,vids, impl, map, invmap, /* map_is_prepared = */ false);
+}
+
+/**
+ * \function igraph_induced_subgraph_edges
+ * \brief The edges contained within an induced sugraph.
+ *
+ * This function finds the IDs of those edges which connect vertices from
+ * a given list, passed in the \p vids parameter.
+ *
+ * \param graph The graph.
+ * \param vids A vertex selector specifying the vertices that make up the subgraph.
+ * \param edges Integer vector. The IDs of edges within the subgraph induces by
+ *    \p vids will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(mv log(nv)) where nv is the number of vertices in \p vids
+ * and mv is the sum of degrees of vertices in \p vids.
+ */
+igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t vids, igraph_vector_int_t *edges) {
+    /* TODO: When the size of \p vids is large, is it faster to use a boolean vector instead of a set
+     * to test membership within \p vids? Benchmark to find out at what size it is worth switching
+     * to the alternative implementation.
+     */
+    igraph_vit_t vit;
+    igraph_set_t vids_set;
+    igraph_vector_int_t incedges;
+
+    if (igraph_vs_is_all(&vids)) {
+        IGRAPH_CHECK(igraph_vector_int_range(edges, 0, igraph_ecount(graph)));
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_clear(edges);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    IGRAPH_SET_INIT_FINALLY(&vids_set, IGRAPH_VIT_SIZE(vit));
+    for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        IGRAPH_CHECK(igraph_set_add(&vids_set, IGRAPH_VIT_GET(vit)));
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incedges, 0);
+
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        igraph_integer_t v = IGRAPH_VIT_GET(vit);
+        IGRAPH_CHECK(igraph_i_incident(graph, &incedges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
+
+        igraph_integer_t d = igraph_vector_int_size(&incedges);
+        for (igraph_integer_t i=0; i < d; i++) {
+            igraph_integer_t e = VECTOR(incedges)[i];
+            igraph_integer_t u = IGRAPH_OTHER(graph, e, v);
+            /* The v <= u check avoids adding non-loop edges twice.
+             * Loop edges only appear once due to the use of
+             * IGRAPH_LOOPS_ONCE in igraph_i_incident() */
+            if (v <= u && igraph_set_contains(&vids_set, u)) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, e));
+            }
+        }
+    }
+
+    IGRAPH_FINALLY_CLEAN(3);
+    igraph_vector_int_destroy(&incedges);
+    igraph_set_destroy(&vids_set);
+    igraph_vit_destroy(&vit);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
