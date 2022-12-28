@@ -20,6 +20,7 @@
  - `igraph_triangular_lattice()` to generate triangular lattices of various kinds (#2235, thanks to @rfulekjames).
  - `igraph_hexagonal_lattice()` to generate hexagonal lattices of various kinds (#2262, thanks to @rfulekjames).
  - `igraph_tree_from_parent_vector()` to create a tree or a forest from a parent vector (i.e. a vector that encodes the parent vertex of each vertex).
+ - `igraph_induced_subgraph_edges()` produces the IDs of edges contained within a subgraph induced by the given vertices.
 
 ### Changed
 
@@ -35,6 +36,10 @@
  - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
  - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
  - Fixed new warnings issued by the Xcode 14.1 toolchain.
+
+### Deprecated
+
+- `igraph_subgraph_edges()` is now deprecated to avoid confusion with `igraph_induced_subgraph_edges()`; its new name is `igraph_subgraph_from_edges()`. The old name is kept available until at least igraph 0.11.
 
 ### Other
 

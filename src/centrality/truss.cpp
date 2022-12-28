@@ -74,34 +74,35 @@ static void igraph_truss_i_compute_support(const igraph_vector_int_t *eid, igrap
 /* internal function doing the computations once the support is defined */
 static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_int_t *support,
                                          igraph_vector_int_t *trussness) {
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
     igraph_adjlist_t adjlist;
     igraph_vector_int_t commonNeighbors;
+    igraph_vector_bool_t completed;
 
     // C++ data structures
-    vector<bool> completed;
     vector< unordered_set<igraph_integer_t> > vec;
 
     // Allocate memory for result
-    igraph_integer_t nedges = igraph_vector_int_size(support);
-    IGRAPH_CHECK(igraph_vector_int_resize(trussness, nedges));
-    if (nedges == 0) {
+    igraph_integer_t no_of_edges = igraph_vector_int_size(support);
+    IGRAPH_CHECK(igraph_vector_int_resize(trussness, no_of_edges));
+    if (no_of_edges == 0) {
         return IGRAPH_SUCCESS;
     }
 
     // Get max possible value = max entry in support.
-    // This cannot be computed if there are no edges, hence the above if
+    // This cannot be computed if there are no edges, hence the above check
     igraph_integer_t max = igraph_vector_int_max(support);
 
     // Initialize completed edges.
-    completed.resize(nedges);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&completed, no_of_edges);
 
     // The vector of levels. Each level of the vector is a set of edges initially
     // at that level of support, where support is # of triangles the edge is in.
     vec.resize(max + 1);
 
     // Add each edge to its appropriate level of support.
-    for (igraph_integer_t i = 0; i < nedges; ++i) {
+    for (igraph_integer_t i = 0; i < no_of_edges; ++i) {
         vec[VECTOR(*support)[i]].insert(i);  // insert edge i into its support level
     }
 
@@ -109,7 +110,7 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     // of any triangles, so there's not much to do and we "complete" them
     for (auto edge : vec[0]) {
         VECTOR(*trussness)[edge] = 2;
-        completed[edge] = true;
+        VECTOR(completed)[edge] = true;
     }
 
     // Initialize variables needed below.
@@ -160,8 +161,8 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
                 IGRAPH_CHECK(igraph_get_eid(graph, &e1, fromVertex, n, IGRAPH_UNDIRECTED, /* error= */ true));
                 IGRAPH_CHECK(igraph_get_eid(graph, &e2, toVertex, n, IGRAPH_UNDIRECTED, /* error= */ true));
 
-                bool e1_complete = completed[e1] == 1;
-                bool e2_complete = completed[e2] == 1;
+                bool e1_complete = VECTOR(completed)[e1];
+                bool e2_complete = VECTOR(completed)[e2];
 
                 if (!e1_complete && !e2_complete) {
                     igraph_integer_t newLevel;
@@ -184,7 +185,7 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
             }
             // Record this edge; its level is its trussness.
             VECTOR(*trussness)[seed] = level + 2;
-            completed[seed] = true; // mark as complete
+            VECTOR(completed)[seed] = true; // mark as complete
             igraph_vector_int_clear(&commonNeighbors);
         }  // end while
     }  // end for-loop over levels
@@ -192,9 +193,12 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     // Clean up.
     igraph_vector_int_destroy(&commonNeighbors);
     igraph_adjlist_destroy(&adjlist);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vector_bool_destroy(&completed);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 }
 
 
@@ -278,7 +282,7 @@ igraph_error_t igraph_trussness(const igraph_t* graph, igraph_vector_int_t* trus
     IGRAPH_FINALLY_CLEAN(1);
 
     // Compute the trussness of the edges.
-    IGRAPH_HANDLE_EXCEPTIONS(IGRAPH_CHECK(igraph_i_trussness(graph, &support, trussness)));
+    IGRAPH_CHECK(igraph_i_trussness(graph, &support, trussness));
     igraph_vector_int_destroy(&support);
     IGRAPH_FINALLY_CLEAN(1);
 

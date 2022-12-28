@@ -60,7 +60,7 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
  * \param graph The graph object.
  * \param res An initialized vector, the IDs of the edges that constitute
  *        a spanning tree will be returned here. Use
- *        \ref igraph_subgraph_edges() to extract the spanning tree as
+ *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
  *        a separate graph object.
  * \param weights A vector containing the weights of the edges
  *        in the same order as the simple edge iterator visits them
@@ -133,8 +133,8 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_nodes > 0 ? no_of_nodes - 1 : 0);
     IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, &edges));
-    IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
-                                       igraph_ess_vector(&edges), /* delete_vertices = */ 0));
+    IGRAPH_CHECK(igraph_subgraph_from_edges(
+        graph, mst, igraph_ess_vector(&edges), /* delete_vertices = */ 0));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -197,8 +197,8 @@ igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, igraph_vcount(graph) - 1);
     IGRAPH_CHECK(igraph_i_minimum_spanning_tree_prim(graph, &edges, weights));
-    IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
-                                       igraph_ess_vector(&edges), /* delete_vertices = */ 0));
+    IGRAPH_CHECK(igraph_subgraph_from_edges(
+        graph, mst, igraph_ess_vector(&edges), /* delete_vertices = */ 0));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -434,7 +434,7 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
  * \param graph The input graph. Edge directions are ignored.
  * \param res An initialized vector, the IDs of the edges that constitute
  *        a spanning tree will be returned here. Use
- *        \ref igraph_subgraph_edges() to extract the spanning tree as
+ *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
  *        a separate graph object.
  * \param vid This parameter is relevant if the graph is not connected.
  *        If negative, a random spanning forest of all components will be

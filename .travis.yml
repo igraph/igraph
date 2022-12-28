@@ -39,7 +39,6 @@ addons:
 #      - libblas-dev
 #      - liblapack-dev
       - libopenblas-dev
-      - libsuitesparse-dev
       - libxml2-dev
       - git
       - colordiff
