@@ -174,10 +174,10 @@ static igraph_bool_t is_color_used_by_neighbour(
     return false;
 }
 
-static void igraph_i_dsatur_update_saturation_degree(
+static void igraph_i_dsatur_update_saturation_degree_and_edge_degree(
     const igraph_adjlist_t *adjlist, igraph_vector_int_t *saturation_degree,
-    igraph_vector_int_t *neighbours, igraph_vector_int_t *colors,
-    igraph_integer_t color
+    igraph_vector_int_t *edge_degree, igraph_vector_int_t *neighbours, 
+    igraph_vector_int_t *colors, igraph_integer_t color
 ) {
     igraph_integer_t nbr_cnt = igraph_vector_int_size(neighbours);
     for (igraph_integer_t nbr_indx = 0; nbr_indx < nbr_cnt; nbr_indx++){
@@ -185,43 +185,66 @@ static void igraph_i_dsatur_update_saturation_degree(
         if (!is_color_used_by_neighbour(colors, color, igraph_adjlist_get(adjlist, nbr))) {
             VECTOR(*saturation_degree)[nbr]++;
         }
+        VECTOR(*edge_degree)[nbr]--;
     }
 }
 
-static igraph_error_t igraph_i_vertex_coloring_dsatur_cn(
+static igraph_integer_t igraph_i_vector_bool_first_true(igraph_vector_bool_t *bool_vector){
+    for(igraph_integer_t index = 0 ; index<igraph_vector_bool_size(bool_vector) ; index++){
+        if(VECTOR(*bool_vector)[index]){
+            return index;
+        }
+    } 
+    return -1;
+}
+static igraph_error_t igraph_i_dsatur_main_loop(
+    const igraph_t *graph, igraph_vector_int_t *colors,
+    igraph_vector_int_t *saturation_degree, igraph_vector_int_t *edge_degree,
+    igraph_adjlist_t *adjlist, igraph_integer_t vc
+) {
+    igraph_integer_t vertices_colored = 0;
+    igraph_vector_bool_t viable_colors;
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&viable_colors, vc);
+    while (vertices_colored < vc) {
+        igraph_integer_t node_to_color = igraph_i_dsatur_select_node(graph, colors, saturation_degree, edge_degree, vc);
+        igraph_vector_int_t *neighbours = igraph_adjlist_get(adjlist, node_to_color);
+        igraph_integer_t neighbours_count = igraph_vector_int_size(neighbours);
+        igraph_vector_bool_fill(&viable_colors, true);
+        for(igraph_integer_t neighbor_index = 0 ; neighbor_index<neighbours_count ; neighbor_index++){
+            igraph_integer_t neighbour = VECTOR(*neighbours)[neighbor_index]; 
+            if(VECTOR(*colors)[neighbour] != -1){
+                VECTOR(viable_colors)[VECTOR(*colors)[neighbour]] = false;
+            }
+        }
+        igraph_integer_t color = igraph_i_vector_bool_first_true(&viable_colors);
+        igraph_i_dsatur_update_saturation_degree_and_edge_degree(adjlist, saturation_degree, edge_degree, neighbours, colors, color);
+        VECTOR(*colors)[node_to_color] = color;
+
+        vertices_colored++;
+    }
+    igraph_vector_bool_destroy(&viable_colors);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
+static igraph_error_t igraph_i_vertex_coloring_dsatur(
     const igraph_t *graph, igraph_vector_int_t *colors
 ) {
+    igraph_vector_int_fill(colors, -1);   // -1 as a color means uncolored
+    igraph_integer_t vc = igraph_vcount(graph);
+
     igraph_adjlist_t adjlist;
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     igraph_vector_int_t saturation_degree;
-    IGRAPH_CHECK(igraph_vector_int_init(&saturation_degree, igraph_vcount(graph) ) );
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &saturation_degree);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&saturation_degree, vc );
+
 
     igraph_vector_int_t edge_degree;
-    IGRAPH_CHECK(igraph_vector_int_init(&edge_degree, igraph_vcount(graph) ) );
-    IGRAPH_CHECK(igraph_degree(graph, &edge_degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS ) );
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edge_degree);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edge_degree, vc );
+    IGRAPH_CHECK(igraph_degree(graph, &edge_degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS ) );
 
-    igraph_vector_int_fill(colors, -1);   // -1 as a color means uncolored
-
-    igraph_integer_t vc = igraph_vcount(graph);
-    igraph_integer_t vertices_colored = 0;
-    while (vertices_colored < vc) {
-        igraph_integer_t node_to_color = igraph_i_dsatur_select_node(graph, colors, &saturation_degree, &edge_degree, vc);
-        igraph_vector_int_t *neighbours = igraph_adjlist_get(&adjlist, node_to_color);
-        for (igraph_integer_t color = 0; color < vc; color++) {
-            igraph_bool_t viable_color = !is_color_used_by_neighbour(colors, color, neighbours);
-            if (viable_color) {
-                igraph_i_dsatur_update_saturation_degree(&adjlist, &saturation_degree, neighbours, colors, color);
-                VECTOR(*colors)[node_to_color] = color;
-                break;
-            }
-        }
-
-        vertices_colored++;
-    }
+    IGRAPH_CHECK(igraph_i_dsatur_main_loop(graph, colors, &saturation_degree, &edge_degree, &adjlist, vc));
 
     igraph_vector_int_destroy(&saturation_degree);
     igraph_vector_int_destroy(&edge_degree);
@@ -257,8 +280,8 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
     switch (heuristic) {
     case IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS:
         return igraph_i_vertex_coloring_greedy_cn(graph, colors);
-    case IGRAPH_COLORING_DSATUR_COLORED_NEIGHBORS:
-        return igraph_i_vertex_coloring_dsatur_cn(graph, colors);
+    case IGRAPH_COLORING_GREEDY_DSATUR:
+        return igraph_i_vertex_coloring_dsatur(graph, colors);
     default:
         IGRAPH_ERROR("Invalid heuristic for greedy vertex coloring.", IGRAPH_EINVAL);
     }

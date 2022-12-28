@@ -31,7 +31,7 @@ int main(void) {
         }
     }
 
-    igraph_vertex_coloring_greedy(&graph, &colors, IGRAPH_COLORING_DSATUR_COLORED_NEIGHBORS);
+    igraph_vertex_coloring_greedy(&graph, &colors, IGRAPH_COLORING_GREEDY_DSATUR);
 
     /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
     {
