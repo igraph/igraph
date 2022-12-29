@@ -24,6 +24,7 @@
  - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs. This was a regression in igraph 0.10.
  - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
  - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
+ - `igraph_calloc()` did not zero-initialize the allocated memory. This is now corrected. Note that the macro `IGRAPH_CALLOC()` was _not_ affected.
  - Fixed new warnings issued by the Xcode 14.1 toolchain.
 
 ### Deprecated
