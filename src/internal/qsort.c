@@ -45,6 +45,11 @@
     #define __unused
 #endif
 
+#if defined(_MSC_VER) && _MSC_VER < 1927
+    /* MSVC does not understand restrict before version 19.27 */
+    #define restrict __restrict
+#endif
+
 #ifndef __unused
   #define __unused    __attribute__ ((unused))
 #endif
