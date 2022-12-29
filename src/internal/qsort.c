@@ -71,7 +71,7 @@ static inline char	*med3(char *, char *, char *, cmp_t *, void *);
  */
 
 static inline void
-swapfunc(char *a, char *b, size_t es)
+swapfunc(char * restrict a, char * restrict b, size_t es)
 {
 	char t;
 
