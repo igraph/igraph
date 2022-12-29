@@ -114,6 +114,7 @@ add_legacy_tests(
   cutheap
   d_indheap
   marked_queue
+  gen2wheap
   set
   trie
 )
