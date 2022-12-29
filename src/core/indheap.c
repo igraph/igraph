@@ -970,7 +970,7 @@ igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h) {
 }
 
 /**
- * Deletess the largest element from the heap and returns it along with its
+ * Deletes the largest element from the heap and returns it along with its
  * associated index (the latter being returned in an output argument).
  *
  * This function does \em not change the indices associated to the elements
