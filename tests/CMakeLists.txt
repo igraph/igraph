@@ -964,6 +964,7 @@ add_benchmarks(
   igraph_pagerank
   igraph_pagerank_weighted
   igraph_power_law_fit
+  igraph_qsort
   igraph_random_walk
   igraph_transitivity
   igraph_voronoi
