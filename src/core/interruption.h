@@ -37,16 +37,15 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_
  * \brief
  *
  * This macro should be called when interruption is allowed.  It calls
- * \ref igraph_allow_interruption() with the proper parameters and if that returns
- * anything but \c IGRAPH_SUCCESS then
- * the macro returns the "calling" function as well, with the proper
- * error code (\c IGRAPH_INTERRUPTED).
+ * \ref igraph_allow_interruption() and if that returns anything but
+ * \c IGRAPH_SUCCESS then the macro returns the "calling" function as well,
+ * with the proper error code (\c IGRAPH_INTERRUPTED).
  */
 
 #define IGRAPH_ALLOW_INTERRUPTION() \
     do { \
         if (igraph_i_interruption_handler) { \
-            if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) { \
+            if (igraph_allow_interruption()) { \
                 return IGRAPH_INTERRUPTED; \
             } \
         } \

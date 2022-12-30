@@ -23,6 +23,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
+#include "igraph_structural.h"
 
 #include "centrality/prpack_internal.h"
 
@@ -139,8 +140,17 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
     */
 
     for (i = 0; i < n; i++) {
-        sumfrom += VECTOR(*outdegree)[i] != 0 ? from[i] * fact : from[i];
-        VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
+        if (VECTOR(*outdegree)[i] > 0) {
+            sumfrom += from[i] * fact;
+            VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
+        } else {
+            sumfrom += from[i];
+            /* The following value is used only when all outgoing edges have
+             * weight zero (as opposed to there being no outgoing edges at all).
+             * We set it to zero to avoid a 0.0*inf situation when computing
+             * to[i] below. */
+            VECTOR(*tmp)[i] = 0;
+        }
     }
 
     for (i = 0; i < n; i++) {
@@ -199,10 +209,13 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  * </para><para>
  * Starting from version 0.9, igraph has two PageRank implementations,
  * and the user can choose between them. The first implementation is
- * \c IGRAPH_PAGERANK_ALGO_ARPACK, based on the ARPACK library. This
- * was the default before igraph version 0.7. The second and recommended
+ * \c IGRAPH_PAGERANK_ALGO_ARPACK, which phrases the PageRank calculation
+ * as an eigenvalue problem, which is then solved using the ARPACK library.
+ * This was the default before igraph version 0.7. The second and recommended
  * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This is using the
- * PRPACK package, see https://github.com/dgleich/prpack .
+ * PRPACK package, see https://github.com/dgleich/prpack. PRPACK uses an
+ * algebraic method, i.e. solves a linear system to obtain the PageRank
+ * scores.
  *
  * </para><para>
  * Note that the PageRank of a given vertex depends on the PageRank
@@ -218,15 +231,18 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
  * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
  * Brisbane, Australia, April 1998.
+ * https://doi.org/10.1016/S0169-7552(98)00110-X
  *
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable, the eigenvalue
- *    corresponding to the PageRank vector is stored here. It should
- *    be always exactly one.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the eigenvalue corresponding to the PageRank vector is stored here. It is
+ *    expected to be exactly one. Checking this value can be used to diagnose cases
+ *    when ARPACK failed to converge to the leading eigenvector.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
  * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
@@ -290,17 +306,17 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
  * does not result in any performance increase at all.
- * </para>
  *
- * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable, the eigenvalue
- *    corresponding to the PageRank vector is stored here. It should
- *    be always exactly one.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the eigenvalue corresponding to the PageRank vector is stored here. It is
+ *    expected to be exactly one. Checking this value can be used to diagnose cases
+ *    when ARPACK failed to converge to the leading eigenvector.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
  * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
@@ -379,17 +395,17 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  * the personalized PageRank for only some of the vertices, all of them must be
  * calculated. Requesting the personalized PageRank for only some of the vertices
  * does not result in any performance increase at all.
- * </para>
  *
- * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
  *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
- * \param value Pointer to a real variable, the eigenvalue
- *    corresponding to the PageRank vector is stored here. It should
- *    be always exactly one.
+ * \param value Pointer to a real variable. When using \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    the eigenvalue corresponding to the PageRank vector is stored here. It is
+ *    expected to be exactly one. Checking this value can be used to diagnose cases
+ *    when ARPACK failed to converge to the leading eigenvector.
+ *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
  * \param vids The vertex IDs for which the PageRank is returned.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
@@ -514,6 +530,9 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
+        if (min < 0) {
+            IGRAPH_ERROR("Edge weights must not be negative.", IGRAPH_EINVAL);
+        }
         if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
@@ -573,11 +592,25 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         igraph_vector_scale(&normalized_reset, 1.0 / reset_sum);
     }
 
+    IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(),
+                                 directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS, weights));
+    IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
+                                 directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS, weights));
+
+    /* Set up an appropriate starting vector. We start from the (possibly weight) in-degrees
+     * plus some small random noise to avoid convergence problems. */
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(indegree)[i] > 0) {
+            MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
+        } else {
+            MATRIX(vectors, i, 0) = 1;
+        }
+    }
+
     if (!weights) {
 
         igraph_adjlist_t adjlist;
         igraph_i_pagerank_data_t data;
-        igraph_vector_int_t degree;
 
         data.graph = graph;
         data.adjlist = &adjlist;
@@ -586,40 +619,11 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         data.tmp = &tmp;
         data.reset = reset ? &normalized_reset : NULL;
 
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
-
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                                   directed ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_LOOPS));
-        for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(outdegree)[i] = VECTOR(degree)[i];
-        }
-
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                                   directed ? IGRAPH_IN : IGRAPH_ALL, IGRAPH_LOOPS));
-        for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(indegree)[i] = VECTOR(degree)[i];
-        }
-
-        igraph_vector_int_destroy(&degree);
-        IGRAPH_FINALLY_CLEAN(1);
-
-        /* Set up an appropriate starting vector. We start from the in-degrees
-         * plus some small random noise to avoid convergence problems */
-        for (i = 0; i < no_of_nodes; i++) {
-            if (VECTOR(indegree)[i]) {
-                MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
-            } else {
-                MATRIX(vectors, i, 0) = 1;
-            }
-        }
-
-        IGRAPH_CHECK(igraph_adjlist_init(
-            graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE
-        ));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
-                                           &data, options, 0, &values, &vectors));
+                                           &data, options, NULL, &values, &vectors));
 
         igraph_adjlist_destroy(&adjlist);
         IGRAPH_FINALLY_CLEAN(1);
@@ -627,7 +631,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     } else {
 
         igraph_inclist_t inclist;
-        igraph_bool_t negative_weight_warned = false;
         igraph_i_pagerank_data2_t data;
 
         data.graph = graph;
@@ -641,35 +644,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        /* Weighted degree */
-        for (i = 0; i < no_of_edges; i++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, i);
-            igraph_integer_t to = IGRAPH_TO(graph, i);
-            igraph_real_t weight = VECTOR(*weights)[i];
-            if (weight < 0 && !negative_weight_warned) {
-                IGRAPH_WARNING("Replacing negative weights with zeros during PageRank calculation.");
-                weight = 0;
-                negative_weight_warned = 1;
-            }
-            VECTOR(outdegree)[from] += weight;
-            VECTOR(indegree) [to]   += weight;
-            if (!directed) {
-                VECTOR(outdegree)[to]   += weight;
-                VECTOR(indegree) [from] += weight;
-            }
-        }
-        /* Set up an appropriate starting vector. We start from the in-degrees
-         * plus some small random noise to avoid convergence problems */
-        for (i = 0; i < no_of_nodes; i++) {
-            if (VECTOR(indegree)[i]) {
-                MATRIX(vectors, i, 0) = VECTOR(indegree)[i] + RNG_UNIF(-1e-4, 1e-4);
-            } else {
-                MATRIX(vectors, i, 0) = 1;
-            }
-        }
-
         IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
-                                           &data, options, 0, &values, &vectors));
+                                           &data, options, NULL, &values, &vectors));
 
         igraph_inclist_destroy(&inclist);
         IGRAPH_FINALLY_CLEAN(1);

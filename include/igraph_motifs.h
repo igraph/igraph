@@ -38,7 +38,7 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_motifs_handler_t
- * Callback type for \c igraph_motifs_randesu_callback
+ * \brief Callback type for \c igraph_motifs_randesu_callback.
  *
  * \ref igraph_motifs_randesu_callback() calls a specified callback
  * function whenever a new motif is found during a motif search. This

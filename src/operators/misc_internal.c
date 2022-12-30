@@ -50,7 +50,7 @@ int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
     }
 }
 
-igraph_error_t igraph_i_merge(igraph_t *res, int mode,
+igraph_error_t igraph_i_merge(igraph_t *res, igraph_i_merge_mode_t mode,
                    const igraph_t *left, const igraph_t *right,
                    igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2) {
 
@@ -68,8 +68,7 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
     igraph_bool_t l;
 
     if (directed != igraph_is_directed(right)) {
-        IGRAPH_ERROR("Cannot make union or intersection of directed "
-                     "and undirected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot create union or intersection of directed and undirected graph.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -88,6 +87,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
         case IGRAPH_MERGE_MODE_INTERSECTION:
             igraph_vector_int_clear(edge_map1);
             break;
+        default:
+            IGRAPH_FATAL("Invalid merge mode.");
         }
     }
     if (edge_map2) {
@@ -98,6 +99,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
         case IGRAPH_MERGE_MODE_INTERSECTION:
             igraph_vector_int_clear(edge_map2);
             break;
+        default:
+            IGRAPH_FATAL("Invalid merge mode.");
         }
     }
 
@@ -106,11 +109,11 @@ igraph_error_t igraph_i_merge(igraph_t *res, int mode,
 
     /* We merge the two edge lists. We need to sort them first.
        For undirected graphs, we also need to make sure that
-       for every edge, that larger (non-smaller) vertex ID is in the
+       for every edge, the larger (non-smaller) vertex ID is in the
        second column. */
 
-    IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ 0));
-    IGRAPH_CHECK(igraph_get_edgelist(right, &edges2, /*bycol=*/ 0));
+    IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ false));
+    IGRAPH_CHECK(igraph_get_edgelist(right, &edges2, /*bycol=*/ false));
     if (!directed) {
         for (i = 0, j = 0; i < no_edges_left; i++, j += 2) {
             if (VECTOR(edges1)[j] > VECTOR(edges1)[j + 1]) {

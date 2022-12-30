@@ -82,7 +82,7 @@ IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness_subset(const igraph_t *grap
 
 /**
  * \typedef igraph_pagerank_algo_t
- * \brief PageRank algorithm implementation
+ * \brief PageRank algorithm implementation.
  *
  * Algorithms to calculate PageRank.
  * \enumval IGRAPH_PAGERANK_ALGO_ARPACK Use the ARPACK library, this

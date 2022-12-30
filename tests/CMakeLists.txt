@@ -134,6 +134,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  adj
   igraph_add_edges
   igraph_add_vertices
   igraph_degree
@@ -232,6 +233,7 @@ add_legacy_tests(
   igraph_simple_interconnected_islands_game
   igraph_square_lattice
   igraph_static_power_law_game
+  igraph_tree_from_parent_vector
   igraph_trussness
   igraph_turan
   igraph_wheel
@@ -317,6 +319,7 @@ add_legacy_tests(
   igraph_is_bipartite
   igraph_is_connected
   igraph_is_chordal
+  igraph_is_dag
   igraph_is_mutual
   igraph_is_tree
   igraph_is_forest
@@ -397,6 +400,7 @@ add_legacy_tests(
   igraph_layout_random_3d
   igraph_layout_reingold_tilford_circular
   igraph_layout_reingold_tilford_extended
+  igraph_layout_sphere
   igraph_layout_star
   igraph_layout_sugiyama
   igraph_layout_umap
@@ -490,8 +494,9 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   foreign_empty
-  igraph_read_graph_graphml
   gml
+  igraph_read_graph_graphdb
+  igraph_read_graph_graphml
   igraph_write_graph_leda
   igraph_write_graph_dimacs_flow
   igraph_write_graph_dot
@@ -542,6 +547,7 @@ add_legacy_tests(
   igraph_connect_neighborhood
   igraph_induced_subgraph
   igraph_induced_subgraph_map
+  igraph_induced_subgraph_edges
   igraph_intersection2
   igraph_permute_vertices
   igraph_reverse_edges
@@ -631,6 +637,8 @@ add_legacy_tests(
   community_walktrap
   graphlets
   igraph_community_eb_get_merges
+  igraph_community_edge_betweenness
+  igraph_community_fastgreedy
   igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
@@ -951,11 +959,13 @@ add_benchmarks(
   igraph_distances
   igraph_ecc
   igraph_layout_umap
+  igraph_matrix_transpose
   igraph_maximal_cliques
   igraph_neighborhood
   igraph_pagerank
   igraph_pagerank_weighted
   igraph_power_law_fit
+  igraph_qsort
   igraph_random_walk
   igraph_transitivity
   igraph_voronoi
@@ -967,4 +977,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_sample_dirichlet
   igraph_sample_sphere
+)
+
+# lattices
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_triangular_lattice
+  igraph_hexagonal_lattice
 )

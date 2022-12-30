@@ -1,9 +1,52 @@
 # igraph C library changelog
 
+## [develop]
+
+### Breaking changes
+
+ - Interruption handlers do not take a `void*` argument any more; this is relevant to maintainers of higher-level interfaces only.
+ - Interruption handlers now return an `igraph_bool_t` instead of an `igraph_error_t`; the returned value must be true if the calculation has to be interrupted and false otherwise.
+ - `igraph_delete_vertices_idx()` and `igraph_induced_subgraph_map()` now use -1 to represent unmapped vertices in the returned forward mapping vector and they do not offset vertex indices by 1 any more. (Note that the inverse map always behaved this way, this change makes the two mappings consistent).
+ - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
+ - `igraph_vector_shuffle()` no longer returns an error code.
+ - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
+
 ## [master]
+
+## [0.10.3] - 2022-12-30
+
+### Added
+
+ - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
+ - `igraph_layout_umap_compute_weights()` computes weights for the UMAP layout algorithm from distances. This used to be part of `igraph_layout_umap()`, but it is now in a separate function to allow the user to experiment with different weighting schemes.
+ - `igraph_triangular_lattice()` to generate triangular lattices of various kinds (#2235, thanks to @rfulekjames).
+ - `igraph_hexagonal_lattice()` to generate hexagonal lattices of various kinds (#2262, thanks to @rfulekjames).
+ - `igraph_tree_from_parent_vector()` to create a tree or a forest from a parent vector (i.e. a vector that encodes the parent vertex of each vertex).
+ - `igraph_induced_subgraph_edges()` produces the IDs of edges contained within a subgraph induced by the given vertices.
+
+### Changed
+
+ - The signature of the experimental `igraph_layout_umap()` function changed; the last argument is now a Boolean that specifies whether distances should already be treated as weights, and the sampling probability argument was removed.
+
+### Fixed
+
+ - `igraph_transitivity_barrat()`, `igraph_community_fluid_communities()`, `igraph_sir()`, `igraph_trussness()` and graphlet functions did not correctly detect when a directed input graph had effective multi-edges due to ignoring edge directions. Such graphs are now rejected by these functions.
+ - Fixed a bug in `igraph_2dgrid_move()` that sometimes crashed the Large Graph Layout function when a grid cell became empty.
+ - `igraph_pagerank()` and `igraph_personalized_pagerank()` would fail to converge when the ARPACK implementation was used and a vertex had more than one outgoing edge but all these edges had zero weights.
+ - `igraph_pagerank()` and `igraph_personalized_pagerank()` no longer allow negative weights. Previously, edges with negative weights were silently ignored when using the PRPACK implementation. The ARPACK implementation would issue a warning saying that they are ignored, but in fact it computed an incorrect result.
+ - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs. This was a regression in igraph 0.10.
+ - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
+ - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
+ - `igraph_calloc()` did not zero-initialize the allocated memory. This is now corrected. Note that the macro `IGRAPH_CALLOC()` was _not_ affected.
+ - Fixed new warnings issued by the Xcode 14.1 toolchain.
+
+### Deprecated
+
+- `igraph_subgraph_edges()` is now deprecated to avoid confusion with `igraph_induced_subgraph_edges()`; its new name is `igraph_subgraph_from_edges()`. The old name is kept available until at least igraph 0.11.
 
 ### Other
 
+ - Significantly improved performance for `igraph_matrix_transpose()`.
  - Documentation improvements.
 
 ## [0.10.2] - 2022-10-14
@@ -1080,7 +1123,9 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.2..master
+[develop]: https://github.com/igraph/igraph/compare/master..develop
+[master]: https://github.com/igraph/igraph/compare/0.10.3..master
+[0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0

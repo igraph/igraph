@@ -1552,8 +1552,7 @@ igraph_error_t FUNCTION(igraph_vector, init_copy)(
     from_size = FUNCTION(igraph_vector, size)(from);
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(to, from_size));
 
-    memcpy(to->stor_begin, from->stor_begin,
-           FUNCTION(igraph_vector, size)(from) * sizeof(BASE));
+    memcpy(to->stor_begin, from->stor_begin, from_size * sizeof(BASE));
 
     return IGRAPH_SUCCESS;
 }
@@ -2635,7 +2634,6 @@ igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
  * these generators is less than the number of possible permutations
  * of the vector if the vector is long enough.
  * \param v The vector object.
- * \return Error code, currently always \c IGRAPH_SUCCESS.
  *
  * Time complexity: O(n),
  * n is the number of elements in the
@@ -2656,7 +2654,7 @@ igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
  * \example examples/simple/igraph_fisher_yates_shuffle.c
  */
 
-igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
+void FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
     igraph_integer_t n = FUNCTION(igraph_vector, size)(v);
     igraph_integer_t k;
     BASE dummy;
@@ -2670,8 +2668,6 @@ igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
         VECTOR(*v)[k] = dummy;
     }
     RNG_END();
-
-    return IGRAPH_SUCCESS;
 }
 
 /**

@@ -210,7 +210,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     IGRAPH_CHECK(igraph_i_property_cache_copy(to->cache, from->cache));
     IGRAPH_FINALLY(igraph_i_property_cache_destroy, to->cache);
 
-    IGRAPH_I_ATTRIBUTE_COPY(to, from, 1, 1, 1); /* does IGRAPH_CHECK */
+    IGRAPH_I_ATTRIBUTE_COPY(to, from, true, true, true); /* does IGRAPH_CHECK */
 
     IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
@@ -509,9 +509,9 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t e = IGRAPH_EIT_GET(eit);
-        if (mark[e] == 0) {
+        if (! mark[e]) {
             edges_to_remove++;
-            mark[e]++;
+            mark[e] = true;
         }
     }
     remaining_edges = no_of_edges - edges_to_remove;
@@ -525,7 +525,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
     /* Actually remove the edges, move from pos i to pos j in newfrom/newto */
     for (i = 0, j = 0; j < remaining_edges; i++) {
-        if (mark[i] == 0) {
+        if (! mark[i]) {
             VECTOR(newfrom)[j] = VECTOR(graph->from)[i];
             VECTOR(newto)[j] = VECTOR(graph->to)[i];
             j++;
@@ -545,7 +545,7 @@ igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
         igraph_vector_int_t idx;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, remaining_edges);
         for (i = 0, j = 0; i < no_of_edges; i++) {
-            if (mark[i] == 0) {
+            if (! mark[i]) {
                 VECTOR(idx)[j++] = i;
             }
         }
@@ -671,18 +671,18 @@ igraph_error_t igraph_delete_vertices_idx(
     /* create vertex recoding vector */
     for (remaining_vertices = 0, i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*my_vertex_recoding)[i] == 0) {
-            VECTOR(*my_vertex_recoding)[i] = remaining_vertices + 1;
+            VECTOR(*my_vertex_recoding)[i] = remaining_vertices;
             remaining_vertices++;
         } else {
-            VECTOR(*my_vertex_recoding)[i] = 0;
+            VECTOR(*my_vertex_recoding)[i] = -1;
         }
     }
     /* create edge recoding vector */
     for (remaining_edges = 0, i = 0; i < no_of_edges; i++) {
         igraph_integer_t from = VECTOR(graph->from)[i];
         igraph_integer_t to = VECTOR(graph->to)[i];
-        if (VECTOR(*my_vertex_recoding)[from] != 0 &&
-            VECTOR(*my_vertex_recoding)[to  ] != 0) {
+        if (VECTOR(*my_vertex_recoding)[from] >= 0 &&
+            VECTOR(*my_vertex_recoding)[to  ] >= 0) {
             VECTOR(edge_recoding)[i] = remaining_edges + 1;
             remaining_edges++;
         }
@@ -705,8 +705,8 @@ igraph_error_t igraph_delete_vertices_idx(
         if (VECTOR(edge_recoding)[i] > 0) {
             igraph_integer_t from = VECTOR(graph->from)[i];
             igraph_integer_t to = VECTOR(graph->to  )[i];
-            VECTOR(newgraph.from)[j] = VECTOR(*my_vertex_recoding)[from] - 1;
-            VECTOR(newgraph.to  )[j] = VECTOR(*my_vertex_recoding)[to] - 1;
+            VECTOR(newgraph.from)[j] = VECTOR(*my_vertex_recoding)[from];
+            VECTOR(newgraph.to  )[j] = VECTOR(*my_vertex_recoding)[to];
             j++;
         }
     }
@@ -742,8 +742,8 @@ igraph_error_t igraph_delete_vertices_idx(
         IGRAPH_VECTOR_INT_INIT_FINALLY(&iidx, remaining_vertices);
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t jj = VECTOR(*my_vertex_recoding)[i];
-            if (jj != 0) {
-                VECTOR(iidx)[ jj - 1 ] = i;
+            if (jj >= 0) {
+                VECTOR(iidx)[ jj ] = i;
             }
         }
         IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph,
@@ -768,13 +768,12 @@ igraph_error_t igraph_delete_vertices_idx(
 
     IGRAPH_FINALLY_CLEAN(3);
 
-    /* TODO: this is duplicate */
     if (invidx) {
         IGRAPH_CHECK(igraph_vector_int_resize(invidx, remaining_vertices));
         for (i = 0; i < no_of_nodes; i++) {
             igraph_integer_t newid = VECTOR(*my_vertex_recoding)[i];
-            if (newid != 0) {
-                VECTOR(*invidx)[newid - 1] = i;
+            if (newid >= 0) {
+                VECTOR(*invidx)[newid] = i;
             }
         }
     }
@@ -883,9 +882,16 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
         igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
 #define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
     if (should_filter_duplicates) {                                                        \
-        if ((loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
-                (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode) ||  \
-                (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added)) {                \
+        if (                                                                               \
+            (loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
+            (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode)         \
+        ) {                                                                                \
+            length -= n;                                                                   \
+            if (loops == IGRAPH_LOOPS_ONCE) {                                              \
+                last_added = -1;                                                           \
+            }                                                                              \
+            continue;                                                                      \
+        } else if (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added) {               \
             length -= n;                                                                   \
             continue;                                                                      \
         } else {                                                                           \
@@ -955,6 +961,7 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
                 VECTOR(*neis)[idx++] = to;
             }
         }
+
         if (mode & IGRAPH_IN) {
             j = VECTOR(graph->is)[node + 1];
             for (i = VECTOR(graph->is)[node]; i < j; i++) {
@@ -998,6 +1005,9 @@ igraph_error_t igraph_i_neighbors(const igraph_t *graph, igraph_vector_int_t *ne
                 if (should_filter_duplicates && ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
                         (multiple == IGRAPH_NO_MULTIPLE))) {
                     length--;
+                    if (loops == IGRAPH_LOOPS_ONCE) {
+                        last_added = -1;
+                    }
                     continue;
                 }
                 VECTOR(*neis)[idx++] = n2;
@@ -1616,32 +1626,18 @@ igraph_error_t igraph_get_all_eids_between(
 igraph_error_t igraph_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
         igraph_neimode_t mode) {
     if (!igraph_is_directed(graph) || mode == IGRAPH_ALL) {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE);
+        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_TWICE);
     } else {
-        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE);
+        return igraph_i_incident(graph, eids, pnode, mode, IGRAPH_LOOPS_ONCE);
     }
 }
 
 igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-        igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple) {
-#define DEDUPLICATE_IF_NEEDED(vertex, n)                                                 \
-    if (should_filter_duplicates) {                                                        \
-        if ((loops == IGRAPH_NO_LOOPS && vertex == pnode) ||                               \
-                (loops == IGRAPH_LOOPS_ONCE && vertex == pnode && last_added == pnode) ||  \
-                (multiple == IGRAPH_NO_MULTIPLE && vertex == last_added)) {                \
-            length -= n;                                                                   \
-            continue;                                                                      \
-        } else {                                                                           \
-            last_added = vertex;                                                           \
-        }                                                                                  \
-    }
+        igraph_neimode_t mode, igraph_loops_t loops) {
     igraph_integer_t length = 0, idx = 0;
     igraph_integer_t i, j;
-
     igraph_integer_t node = pnode;
-    igraph_integer_t last_added = -1;
-
-    igraph_bool_t should_filter_duplicates;
+    igraph_bool_t directed = igraph_is_directed(graph);
 
     if (node < 0 || node > igraph_vcount(graph) - 1) {
         IGRAPH_ERROR("Given vertex is not in the graph.", IGRAPH_EINVVID);
@@ -1651,7 +1647,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
         IGRAPH_ERROR("Mode should be either IGRAPH_OUT, IGRAPH_IN or IGRAPH_ALL.", IGRAPH_EINVMODE);
     }
 
-    if (!igraph_is_directed(graph)) {
+    if (!directed) {
         mode = IGRAPH_ALL;
     }
 
@@ -1679,29 +1675,32 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
      * an easy job. If we have requested both, we need to merge the two lists
      * to ensure that the output is sorted by the vertex IDs of the "other"
      * endpoint of the affected edges */
-    if (!igraph_is_directed(graph) || mode != IGRAPH_ALL) {
+    if (!directed || mode != IGRAPH_ALL) {
         /* We did not ask for both directions; this is the easy case */
-
-        should_filter_duplicates = !(multiple == IGRAPH_MULTIPLE &&
-                ((!igraph_is_directed(graph) && loops == IGRAPH_LOOPS_TWICE) ||
-                 (igraph_is_directed(graph) && loops != IGRAPH_NO_LOOPS)));
 
         if (mode & IGRAPH_OUT) {
             j = VECTOR(graph->os)[node + 1];
             for (i = VECTOR(graph->os)[node]; i < j; i++) {
                 igraph_integer_t edge = VECTOR(graph->oi)[i];
                 igraph_integer_t other = VECTOR(graph->to)[edge];
-                DEDUPLICATE_IF_NEEDED(other, 1);
-                VECTOR(*eids)[idx++] = edge;
+                if (loops == IGRAPH_NO_LOOPS && other == pnode) {
+                    length--;
+                } else {
+                    VECTOR(*eids)[idx++] = edge;
+                }
             }
         }
+
         if (mode & IGRAPH_IN) {
             j = VECTOR(graph->is)[node + 1];
             for (i = VECTOR(graph->is)[node]; i < j; i++) {
                 igraph_integer_t edge = VECTOR(graph->ii)[i];
                 igraph_integer_t other = VECTOR(graph->from)[edge];
-                DEDUPLICATE_IF_NEEDED(other, 1);
-                VECTOR(*eids)[idx++] = edge;
+                if ((loops == IGRAPH_NO_LOOPS || (loops == IGRAPH_LOOPS_ONCE && !directed)) && other == pnode) {
+                    length--;
+                } else {
+                    VECTOR(*eids)[idx++] = edge;
+                }
             }
         }
     } else {
@@ -1713,9 +1712,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
         igraph_integer_t i2 = VECTOR(graph->is)[node];
         igraph_integer_t eid1, eid2;
         igraph_integer_t n1, n2;
-
-        should_filter_duplicates = !(multiple == IGRAPH_MULTIPLE &&
-                loops == IGRAPH_LOOPS_TWICE);
+        igraph_bool_t seen_loop_edge = 0;
 
         while (i1 < j1 && i2 < j2) {
             eid1 = VECTOR(graph->oi)[i1];
@@ -1724,37 +1721,44 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
             n2 = VECTOR(graph->from)[eid2];
             if (n1 < n2) {
                 i1++;
-                DEDUPLICATE_IF_NEEDED(n1, 1);
                 VECTOR(*eids)[idx++] = eid1;
             } else if (n1 > n2) {
                 i2++;
-                DEDUPLICATE_IF_NEEDED(n2, 1);
                 VECTOR(*eids)[idx++] = eid2;
-            } else {
+            } else if (n1 != pnode) {
+                /* multiple edge */
                 i1++;
                 i2++;
-                DEDUPLICATE_IF_NEEDED(n2, 2);
                 VECTOR(*eids)[idx++] = eid1;
-                if (should_filter_duplicates && ((loops == IGRAPH_LOOPS_ONCE && n1 == pnode && last_added == pnode) ||
-                        (multiple == IGRAPH_NO_MULTIPLE))) {
-                    length--;
-                    continue;
-                }
                 VECTOR(*eids)[idx++] = eid2;
+            } else {
+                /* loop edge */
+                i1++;
+                i2++;
+                if (loops == IGRAPH_NO_LOOPS) {
+                    length -= 2;
+                } else if (loops == IGRAPH_LOOPS_ONCE) {
+                    length--;
+                    if (!seen_loop_edge) {
+                        VECTOR(*eids)[idx++] = eid1;
+                    } else {
+                        VECTOR(*eids)[idx++] = eid2;
+                    }
+                    seen_loop_edge = !seen_loop_edge;
+                } else {
+                    VECTOR(*eids)[idx++] = eid1;
+                    VECTOR(*eids)[idx++] = eid2;
+                }
             }
         }
 
         while (i1 < j1) {
             eid1 = VECTOR(graph->oi)[i1++];
-            igraph_integer_t to = VECTOR(graph->to)[eid1];
-            DEDUPLICATE_IF_NEEDED(to, 1);
             VECTOR(*eids)[idx++] = eid1;
         }
 
         while (i2 < j2) {
             eid2 = VECTOR(graph->ii)[i2++];
-            igraph_integer_t from = VECTOR(graph->from)[eid2];
-            DEDUPLICATE_IF_NEEDED(from, 1);
             VECTOR(*eids)[idx++] = eid2;
         }
     }

@@ -31,6 +31,8 @@
  * \function igraph_are_connected
  * \brief Decides whether two vertices are connected.
  *
+ * This function is of course symmetric for undirected graphs.
+ *
  * \param graph The graph object.
  * \param v1 The first vertex.
  * \param v2 The second vertex.
@@ -39,9 +41,6 @@
  * \return The error code \c IGRAPH_EINVVID is returned if an invalid
  *         vertex ID is given.
  *
- * The function is of course symmetric for undirected graphs.
- *
- * </para><para>
  * Time complexity: O( min(log(d1), log(d2)) ),
  * d1 is the (out-)degree of \p v1 and d2 is the (in-)degree of \p v2.
  */
@@ -53,7 +52,7 @@ igraph_error_t igraph_are_connected(const igraph_t *graph,
     igraph_integer_t eid = -1;
 
     if (v1 < 0 || v2 < 0 || v1 > nov - 1 || v2 > nov - 1) {
-        IGRAPH_ERROR("are connected", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid vertex ID when checking if two vertices are connected.", IGRAPH_EINVVID);
     }
 
     igraph_get_eid(graph, &eid, v1, v2, IGRAPH_DIRECTED, /*error=*/ false);

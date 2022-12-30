@@ -152,7 +152,7 @@ IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_pcg32;
 IGRAPH_EXPORT extern const igraph_rng_type_t igraph_rngtype_pcg64;
 
 IGRAPH_EXPORT igraph_rng_t *igraph_rng_default(void);
-IGRAPH_EXPORT void igraph_rng_set_default(igraph_rng_t *rng);
+IGRAPH_EXPORT igraph_rng_t *igraph_rng_set_default(igraph_rng_t *rng);
 
 /* --------------------------------- */
 
@@ -166,12 +166,12 @@ void PutRNGstate(void);
 #else
 
 #define RNG_BEGIN() \
-    if (!igraph_rng_default()->is_seeded) { \
+    do { if (!igraph_rng_default()->is_seeded) { \
         igraph_rng_seed(igraph_rng_default(), time(0)); \
         igraph_rng_default()->is_seeded = 1; \
-    }
-#define RNG_END()       /* do nothing */
-
+    } } while (0)
+#define RNG_END() \
+    do { /* nothing */ } while (0)
 #endif
 
 #define RNG_INTEGER(l,h) (igraph_rng_get_integer(igraph_rng_default(),(l),(h)))

@@ -115,7 +115,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, swap_elements)(
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, permute)(TYPE(igraph_vector) *v,
                                                          const igraph_vector_int_t *ind);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v);
 
 /*-----------------------*/
 /* Vector operations     */

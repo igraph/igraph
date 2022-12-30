@@ -131,6 +131,10 @@ igraph_square_lattice:
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
         BOOLEAN directed=False, BOOLEAN mutual=False, OPTIONAL VECTOR_BOOL periodic
 
+igraph_triangular_lattice:
+    PARAMS: |-
+        OUT GRAPH graph, VECTOR_INT dimvector, BOOLEAN directed=False, BOOLEAN mutual=False
+
 igraph_ring:
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False,
@@ -549,7 +553,7 @@ igraph_distances_bellman_ford:
 igraph_distances_johnson:
     PARAMS: |-
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
-        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_distances_floyd_warshall:
@@ -715,7 +719,7 @@ igraph_induced_subgraph:
     PARAMS: GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl=AUTO
     DEPS: vids ON graph
 
-igraph_subgraph_edges:
+igraph_subgraph_from_edges:
     PARAMS: GRAPH graph, OUT GRAPH res, EDGE_SELECTOR eids, BOOLEAN delete_vertices=True
     DEPS: eids ON graph
 
@@ -1458,14 +1462,18 @@ igraph_layout_davidson_harel:
 igraph_layout_umap:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
-        REAL sampling_prob
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_weights=False
 
 igraph_layout_umap_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
-        REAL sampling_prob
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_weights=False
+
+igraph_layout_umap_compute_weights:
+    PARAMS: |-
+        GRAPH graph, VECTOR distances, INOUT VECTOR weights
 
 #######################################
 # Cocitation and other similarity measures
@@ -1637,7 +1645,7 @@ igraph_community_leiden:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGEWEIGHTS weights,
         OPTIONAL VERTEXWEIGHTS vertex_weights,
-        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2, 
+        REAL resolution, REAL beta=0.01, BOOLEAN start, INTEGER n_iterations=2,
         OPTIONAL INOUT VECTOR_INT membership,
         OUT INTEGER nb_clusters, OUT REAL quality
     DEPS: weights ON graph, vertex_weights ON graph
@@ -2368,7 +2376,7 @@ igraph_random_sample:
     PARAMS: OUT VECTOR_INT res, INTEGER l, INTEGER h, INTEGER length
 
 igraph_convex_hull:
-    PARAMS: MATRIX data, OUT VECTOR_INT resverts, OUT MATRIX rescoords
+    PARAMS: MATRIX data, OUT INDEX_VECTOR resverts, OUT MATRIX rescoords
 
 igraph_dim_select:
     PARAMS: VECTOR sv, OUT INTEGER dim
@@ -2440,6 +2448,9 @@ igraph_from_prufer:
 
 igraph_to_prufer:
     PARAMS: GRAPH graph, OUT INDEX_VECTOR prufer
+
+igraph_tree_from_parent_vector:
+    PARAMS: OUT GRAPH graph, INDEX_VECTOR parents, TREE_MODE type=OUT
 
 igraph_minimum_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGEWEIGHTS weights=NULL

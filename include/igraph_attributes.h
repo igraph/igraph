@@ -205,10 +205,11 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
 
 /**
  * \struct igraph_attribute_table_t
- * \brief Table of functions to perform operations on attributes
+ * \brief Table of functions to perform operations on attributes.
  *
  * This type collects the functions defining an attribute handler.
  * It has the following members:
+ *
  * \member init This function is called whenever a new graph object is
  *    created, right after it is created but before any vertices or
  *    edges are added. It is supposed to set the \c attr member of the \c

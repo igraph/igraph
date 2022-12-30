@@ -35,13 +35,13 @@ __BEGIN_DECLS
  */
 
 typedef struct igraph_2dgrid_t {
-    igraph_matrix_t *coords;
-    igraph_real_t minx, maxx, deltax;
-    igraph_real_t miny, maxy, deltay;
-    igraph_integer_t stepsx, stepsy;
-    igraph_matrix_int_t startidx;
-    igraph_vector_int_t next;
-    igraph_vector_int_t prev;
+    igraph_matrix_t *coords;          /* The current coordinates in the grid */
+    igraph_real_t minx, maxx, deltax; /* Minimum and maximum X coordinates and X spacing */
+    igraph_real_t miny, maxy, deltay; /* Minimum and maximum Y coordinates and Y spacing */
+    igraph_integer_t stepsx, stepsy;  /* Number of cells in the X and Y directions */
+    igraph_matrix_int_t startidx;     /* startidx[i, j] is the index of an arbitrary point in that grid cell, plus one; zero means "empty cell" */
+    igraph_vector_int_t next;         /* next[i] is the index of the point following point i in the same cell, plus one; zero means "last point" */
+    igraph_vector_int_t prev;         /* prev[i] is the index of the point preceding point i in the same cell, plus one; zero means "first point" */
     igraph_real_t massx, massy;       /* The sum of the coordinates */
     igraph_integer_t vertices;        /* Number of active vertices  */
 } igraph_2dgrid_t;

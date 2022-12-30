@@ -27,7 +27,9 @@
 #include "igraph_memory.h"
 
 #include "core/interruption.h"
+#include "core/set.h"
 #include "graph/attributes.h"
+#include "graph/internal.h"
 #include "operators/subgraph.h"
 
 /**
@@ -40,7 +42,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t delete;
-    char *remain;
+    bool *remain;
     igraph_integer_t i;
     igraph_vit_t vit;
 
@@ -48,22 +50,21 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
-    remain = IGRAPH_CALLOC(no_of_nodes, char);
-    if (remain == 0) {
-        IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+
+    remain = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(remain, "Insufficient memory for taking subgraph.");
     IGRAPH_FINALLY(igraph_free, remain);
+
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_nodes - IGRAPH_VIT_SIZE(vit)));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        remain[ IGRAPH_VIT_GET(vit) ] = 1;
+        remain[ IGRAPH_VIT_GET(vit) ] = true;
     }
 
     for (i = 0; i < no_of_nodes; i++) {
-
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (remain[i] == 0) {
+        if (! remain[i]) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
         }
     }
@@ -81,6 +82,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     igraph_vector_int_destroy(&delete);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -129,10 +131,11 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
         my_vids_old2new = map;
         if (!map_is_prepared) {
             IGRAPH_CHECK(igraph_vector_int_resize(map, no_of_nodes));
-            igraph_vector_int_null(map);
+            igraph_vector_int_fill(map, -1);
         }
     } else {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
+        igraph_vector_int_fill(&vids_old2new, -1);
     }
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_vec, 0);
 
@@ -155,10 +158,10 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
     n = igraph_vector_int_size(&vids_vec);
     for (i = 0; i < n; i++) {
         igraph_integer_t vid = VECTOR(vids_vec)[i];
-        if (VECTOR(*my_vids_old2new)[vid] == 0) {
+        if (VECTOR(*my_vids_old2new)[vid] < 0) {
             IGRAPH_CHECK(igraph_vector_int_push_back(my_vids_new2old, vid));
-            no_of_new_nodes++;
             VECTOR(*my_vids_old2new)[vid] = no_of_new_nodes;
+            no_of_new_nodes++;
         }
     }
     igraph_vector_int_destroy(&vids_vec);
@@ -179,12 +182,12 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
                 eid = VECTOR(nei_edges)[j];
 
                 to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
-                if (!to) {
+                if (to < 0) {
                     continue;
                 }
 
                 IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to - 1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&new_edges, to));
                 IGRAPH_CHECK(igraph_vector_int_push_back(&eids_new2old, eid));
             }
         } else {
@@ -201,10 +204,9 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
                 }
 
                 to = VECTOR(*my_vids_old2new)[ IGRAPH_TO(graph, eid) ];
-                if (!to) {
+                if (to < 0) {
                     continue;
                 }
-                to -= 1;
 
                 if (new_vid == to) {
                     /* this is a loop edge; check whether we need to skip it */
@@ -359,17 +361,149 @@ igraph_error_t igraph_i_induced_subgraph_map(const igraph_t *graph, igraph_t *re
     }
 }
 
+/**
+ * \ingroup structural
+ * \function igraph_induced_subgraph_map
+ * \brief Creates an induced subraph and returns the mapping from the original.
+ *
+ * This function collects the specified vertices and all edges between
+ * them to a new graph.
+ * As the vertex IDs in a graph always start with zero, this function
+ * very likely needs to reassign IDs to the vertices.
+ *
+ * \param graph The graph object.
+ * \param res The subgraph, another graph object will be stored here,
+ *        do \em not initialize this object before calling this
+ *        function, and call \ref igraph_destroy() on it if you don't need
+ *        it any more.
+ * \param vids A vertex selector describing which vertices to keep.
+ * \param impl This parameter selects which implementation should be
+ *        used when constructing the new graph. Basically there are two
+ *        possibilities: \c IGRAPH_SUBGRAPH_COPY_AND_DELETE copies the
+ *        existing graph and deletes the vertices that are not needed
+ *        in the new graph, while \c IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH
+ *        constructs the new graph from scratch without copying the old
+ *        one. The latter is more efficient if you are extracting a
+ *        relatively small subpart of a very large graph, while the
+ *        former is better if you want to extract a subgraph whose size
+ *        is comparable to the size of the whole graph. There is a third
+ *        possibility: \c IGRAPH_SUBGRAPH_AUTO will select one of the
+ *        two methods automatically based on the ratio of the number
+ *        of vertices in the new and the old graph.
+ * \param map Returns a map of the vertices in \p graph to the vertices
+ *        in \p res. -1 indicates a vertex is not mapped. A value of \c i at
+ *        position \c j indicates the vertex \c j in \p graph is mapped
+ *        to vertex i in \p res.
+ * \param invmap Returns a map of the vertices in \p res to the vertices
+ *        in \p graph. A value of \c i at position \c j indicates that
+ *        vertex \c i in \p graph is mapped to vertex \c j in \p res.
+ *
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data.
+ *         \c IGRAPH_EINVVID, invalid vertex ID in
+ *         \p vids.
+ *
+ * Time complexity: O(|V|+|E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the original graph.
+ *
+ * \sa \ref igraph_delete_vertices() to delete the specified set of
+ * vertices from a graph, the opposite of this function.
+ */
 igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 const igraph_vs_t vids,
                                 igraph_subgraph_implementation_t impl,
                                 igraph_vector_int_t *map,
                                 igraph_vector_int_t *invmap) {
-    return igraph_i_induced_subgraph_map(graph, res,vids, impl, map, invmap, /* map_is_prepared = */ 0);
+    return igraph_i_induced_subgraph_map(graph, res,vids, impl, map, invmap, /* map_is_prepared = */ false);
+}
+
+/**
+ * \function igraph_induced_subgraph_edges
+ * \brief The edges contained within an induced sugraph.
+ *
+ * This function finds the IDs of those edges which connect vertices from
+ * a given list, passed in the \p vids parameter.
+ *
+ * \param graph The graph.
+ * \param vids A vertex selector specifying the vertices that make up the subgraph.
+ * \param edges Integer vector. The IDs of edges within the subgraph induces by
+ *    \p vids will be stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(mv log(nv)) where nv is the number of vertices in \p vids
+ * and mv is the sum of degrees of vertices in \p vids.
+ */
+igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t vids, igraph_vector_int_t *edges) {
+    /* TODO: When the size of \p vids is large, is it faster to use a boolean vector instead of a set
+     * to test membership within \p vids? Benchmark to find out at what size it is worth switching
+     * to the alternative implementation.
+     */
+    igraph_vit_t vit;
+    igraph_set_t vids_set;
+    igraph_vector_int_t incedges;
+
+    if (igraph_vs_is_all(&vids)) {
+        IGRAPH_CHECK(igraph_vector_int_range(edges, 0, igraph_ecount(graph)));
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_clear(edges);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    IGRAPH_SET_INIT_FINALLY(&vids_set, IGRAPH_VIT_SIZE(vit));
+    for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        IGRAPH_CHECK(igraph_set_add(&vids_set, IGRAPH_VIT_GET(vit)));
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incedges, 0);
+
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+        igraph_integer_t v = IGRAPH_VIT_GET(vit);
+        IGRAPH_CHECK(igraph_i_incident(graph, &incedges, v, IGRAPH_ALL, IGRAPH_LOOPS_ONCE));
+
+        igraph_integer_t d = igraph_vector_int_size(&incedges);
+        for (igraph_integer_t i=0; i < d; i++) {
+            igraph_integer_t e = VECTOR(incedges)[i];
+            igraph_integer_t u = IGRAPH_OTHER(graph, e, v);
+            /* The v <= u check avoids adding non-loop edges twice.
+             * Loop edges only appear once due to the use of
+             * IGRAPH_LOOPS_ONCE in igraph_i_incident() */
+            if (v <= u && igraph_set_contains(&vids_set, u)) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(edges, e));
+            }
+        }
+    }
+
+    IGRAPH_FINALLY_CLEAN(3);
+    igraph_vector_int_destroy(&incedges);
+    igraph_set_destroy(&vids_set);
+    igraph_vit_destroy(&vit);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \ingroup structural
  * \function igraph_subgraph_edges
+ * \brief Creates a subgraph with the specified edges and their endpoints.
+ *
+ * \deprecated-by igraph_subgraph_from_edges 0.10.3
+ */
+igraph_error_t igraph_subgraph_edges(
+    const igraph_t *graph, igraph_t *res, const igraph_es_t eids,
+    igraph_bool_t delete_vertices
+) {
+    return igraph_subgraph_from_edges(graph, res, eids, delete_vertices);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_subgraph_from_edges
  * \brief Creates a subgraph with the specified edges and their endpoints.
  *
  * </para><para>
@@ -402,13 +536,15 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
  * edges from a graph, the opposite of this function.
  */
 
-igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
-                          const igraph_es_t eids, igraph_bool_t delete_vertices) {
+igraph_error_t igraph_subgraph_from_edges(
+    const igraph_t *graph, igraph_t *res, const igraph_es_t eids,
+    igraph_bool_t delete_vertices
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t delete = IGRAPH_VECTOR_NULL;
-    char *vremain, *eremain;
+    bool *vremain, *eremain;
     igraph_integer_t i;
     igraph_eit_t eit;
 
@@ -416,29 +552,27 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&delete, 0);
-    vremain = IGRAPH_CALLOC(no_of_nodes, char);
-    if (vremain == 0) {
-        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    vremain = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(vremain, "Insufficient memory for taking subgraph based on edges.");
     IGRAPH_FINALLY(igraph_free, vremain);
-    eremain = IGRAPH_CALLOC(no_of_edges, char);
-    if (eremain == 0) {
-        IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+
+    eremain = IGRAPH_CALLOC(no_of_edges, bool);
+    IGRAPH_CHECK_OOM(eremain, "Insufficient memory for taking subgraph based on edges.");
     IGRAPH_FINALLY(igraph_free, eremain);
+
     IGRAPH_CHECK(igraph_vector_int_reserve(&delete, no_of_edges - IGRAPH_EIT_SIZE(eit)));
 
     /* Collect the vertex and edge IDs that will remain */
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
         igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         igraph_integer_t from = IGRAPH_FROM(graph, eid), to = IGRAPH_TO(graph, eid);
-        eremain[eid] = vremain[from] = vremain[to] = 1;
+        eremain[eid] = vremain[from] = vremain[to] = true;
     }
 
     /* Collect the edge IDs to be deleted */
     for (i = 0; i < no_of_edges; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        if (eremain[i] == 0) {
+        if (! eremain[i]) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
         }
     }
@@ -458,7 +592,7 @@ igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
         igraph_vector_int_clear(&delete);
         for (i = 0; i < no_of_nodes; i++) {
             IGRAPH_ALLOW_INTERRUPTION();
-            if (vremain[i] == 0) {
+            if (! vremain[i]) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&delete, i));
             }
         }

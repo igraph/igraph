@@ -170,7 +170,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
     igraph_vector_int_t edges;
     igraph_vector_t newcapacity;
     igraph_t newgraph;
-    igraph_integer_t i, size;
+    igraph_integer_t size;
 
     /* We need to convert this to directed by hand, since we need to be
        sure that the edge IDs will be handled properly to build the new
@@ -182,7 +182,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, size));
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
     IGRAPH_CHECK(igraph_vector_int_resize(&edges, size));
-    for (i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         VECTOR(edges)[no_of_edges * 2 + i * 2] = VECTOR(edges)[i * 2 + 1];
         VECTOR(edges)[no_of_edges * 2 + i * 2 + 1] = VECTOR(edges)[i * 2];
         VECTOR(newcapacity)[i] = VECTOR(newcapacity)[no_of_edges + i] =
@@ -196,8 +196,8 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
                                 partition2, source, target, &newcapacity, stats));
 
     if (cut) {
-        igraph_integer_t i, cs = igraph_vector_int_size(cut);
-        for (i = 0; i < cs; i++) {
+        igraph_integer_t cs = igraph_vector_int_size(cut);
+        for (igraph_integer_t i = 0; i < cs; i++) {
             if (VECTOR(*cut)[i] >= no_of_edges) {
                 VECTOR(*cut)[i] -= no_of_edges;
             }
@@ -210,8 +210,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
        from the bigger vertex ID to the smaller one. For positive
        values the direction is the opposite. */
     if (flow) {
-        igraph_integer_t i;
-        for (i = 0; i < no_of_edges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_edges; i++) {
             VECTOR(*flow)[i] -= VECTOR(*flow)[i + no_of_edges];
         }
         IGRAPH_CHECK(igraph_vector_resize(flow, no_of_edges));
@@ -413,13 +412,15 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * \function igraph_maxflow
  * \brief Maximum network flow between a pair of vertices.
  *
- * </para><para>This function implements the Goldberg-Tarjan algorithm for
+ * This function implements the Goldberg-Tarjan algorithm for
  * calculating value of the maximum flow in a directed or undirected
  * graph. The algorithm was given in Andrew V. Goldberg, Robert
  * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
- * the ACM, 35(4), 921-940, 1988. </para>
+ * the ACM, 35(4), 921-940, 1988
+ * https://doi.org/10.1145/48014.61051.
  *
- * <para> The input of the function is a graph, a vector
+ * </para><para>
+ * The input of the function is a graph, a vector
  * of real numbers giving the capacity of the edges and two vertices
  * of the graph, the source and the target. A flow is a function
  * assigning positive real numbers to the edges and satisfying two
@@ -519,10 +520,10 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     }
 
     if (capacity && igraph_vector_size(capacity) != no_of_orig_edges) {
-        IGRAPH_ERROR("Invalid capacity vector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Capacity vector must match number of edges in length.", IGRAPH_EINVAL);
     }
     if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVVID);
     }
 
     stats->nopush = stats->norelabel = stats->nogap = stats->nogapnodes =
@@ -823,7 +824,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                 if (i == j) {
 
                     /* RELABEL(vertex) comes here */
-                    igraph_real_t min;
+                    igraph_integer_t min;
                     igraph_integer_t min_edge = 0;
                     DIST(vertex) = min = no_of_nodes;
                     for (k = FIRST(vertex), l = LAST(vertex); k < l; k++) {
@@ -852,7 +853,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
                 break;
 
-            } while (1);
+            } while (true);
         }
 
         /* We need to eliminate flow cycles now. Before that we check that
@@ -1030,13 +1031,15 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * \function igraph_maxflow_value
  * \brief Maximum flow in a network with the push/relabel algorithm.
  *
- * </para><para>This function implements the Goldberg-Tarjan algorithm for
+ * This function implements the Goldberg-Tarjan algorithm for
  * calculating value of the maximum flow in a directed or undirected
  * graph. The algorithm was given in Andrew V. Goldberg, Robert
  * E. Tarjan: A New Approach to the Maximum-Flow Problem, Journal of
- * the ACM, 35(4), 921-940, 1988. </para>
+ * the ACM, 35(4), 921-940, 1988
+ * https://doi.org/10.1145/48014.61051.
  *
- * <para> The input of the function is a graph, a vector
+ * </para><para>
+ * The input of the function is a graph, a vector
  * of real numbers giving the capacity of the edges and two vertices
  * of the graph, the source and the target. A flow is a function
  * assigning positive real numbers to the edges and satisfying two
@@ -1046,18 +1049,21 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * the same as the outgoing flow (i.e. the sum of the flow on the
  * outgoing edges). The value of the flow is the incoming flow at the
  * target vertex. The maximum flow is the flow with the maximum
- * value. </para>
+ * value.
  *
- * <para> According to a theorem by Ford and Fulkerson
+ * </para><para>
+ * According to a theorem by Ford and Fulkerson
  * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
  * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
  * between two vertices is the same as the
  * minimum cut between them (also called the minimum s-t cut). So \ref
- * igraph_st_mincut_value() gives the same result in all cases as \c
- * igraph_maxflow_value().</para>
+ * igraph_st_mincut_value() gives the same result in all cases as \ref
+ * igraph_maxflow_value().
  *
- * <para> Note that the value of the maximum flow is the same as the
+ * </para><para>
+ * Note that the value of the maximum flow is the same as the
  * minimum cut in the graph.
+ *
  * \param graph The input graph, either directed or undirected.
  * \param value Pointer to a real number, the result will be placed here.
  * \param source The id of the source vertex.
@@ -1081,8 +1087,8 @@ igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
                          const igraph_vector_t *capacity,
                          igraph_maxflow_stats_t *stats) {
 
-    return igraph_maxflow(graph, value, /*flow=*/ 0, /*cut=*/ 0,
-                          /*partition=*/ 0, /*partition1=*/ 0,
+    return igraph_maxflow(graph, value, /*flow=*/ NULL, /*cut=*/ NULL,
+                          /*partition=*/ NULL, /*partition1=*/ NULL,
                           source, target, capacity, stats);
 }
 
@@ -1384,19 +1390,18 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         igraph_integer_t bignode = VECTOR(mergehist)[2 * mincut_step + 1];
         igraph_integer_t i, idx;
         igraph_integer_t size = 1;
-        char *mark;
-        mark = IGRAPH_CALLOC(no_of_nodes, char);
-        if (!mark) {
-            IGRAPH_ERROR("Not enough memory for minimum cut", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        bool *mark;
+
+        mark = IGRAPH_CALLOC(no_of_nodes, bool);
+        IGRAPH_CHECK_OOM(mark, "Not enough memory for minimum cut.");
         IGRAPH_FINALLY(igraph_free, mark);
 
         /* first count the vertices in the partition */
-        mark[bignode] = 1;
+        mark[bignode] = true;
         for (i = mincut_step - 1; i >= 0; i--) {
             if ( mark[ VECTOR(mergehist)[2 * i] ] ) {
                 size++;
-                mark [ VECTOR(mergehist)[2 * i + 1] ] = 1;
+                mark [ VECTOR(mergehist)[2 * i + 1] ] = true;
             }
         }
 
@@ -1441,7 +1446,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_int_append(cut, &mergehist));
         }
 
-        igraph_free(mark);
+        IGRAPH_FREE(mark);
         igraph_vector_int_destroy(&mergehist);
         IGRAPH_FINALLY_CLEAN(2);
     }
@@ -2029,10 +2034,12 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
  * </para><para> The vertex connectivity of a graph is the minimum
  * vertex connectivity along each pairs of vertices in the graph.
  * </para>
+ *
  * <para> The vertex connectivity of a graph is the same as group
  * cohesion as defined in Douglas R. White and Frank Harary: The
  * cohesiveness of blocks in social networks: node connectivity and
- * conditional density, Sociological Methodology 31:305--359, 2001.
+ * conditional density, Sociological Methodology 31:305--359, 2001
+ * https://doi.org/10.1111/0081-1750.00098.
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2124,7 +2131,8 @@ igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer
  * The edge connectivity of a graph is the same as group adhesion as
  * defined in Douglas R. White and Frank Harary: The cohesiveness of
  * blocks in social networks: node connectivity and conditional
- * density, Sociological Methodology 31:305--359, 2001.
+ * density, Sociological Methodology 31:305--359, 2001
+ * https://doi.org/10.1111/0081-1750.00098.
  *
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
@@ -2389,8 +2397,12 @@ igraph_error_t igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
  * Gomory-Hu tree. See the following paper for more details:
  *
  * </para><para>
+ * Reference:
+ *
+ * </para><para>
  * Gusfield D: Very simple methods for all pairs network flow analysis. SIAM J
- * Comput 19(1):143-155, 1990.
+ * Comput 19(1):143-155, 1990
+ * https://doi.org/10.1137/0219009.
  *
  * \param graph The input graph.
  * \param tree  Pointer to an uninitialized graph; the result will be
@@ -2479,9 +2491,9 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         VECTOR(partition)[mid + 1] = VECTOR(neighbors)[i];
     }
 
-    /* Create the tree graph; we use igraph_subgraph_edges here to keep the
+    /* Create the tree graph; we use igraph_subgraph_from_edges here to keep the
      * graph and vertex attributes */
-    IGRAPH_CHECK(igraph_subgraph_edges(graph, tree, igraph_ess_none(), 0));
+    IGRAPH_CHECK(igraph_subgraph_from_edges(graph, tree, igraph_ess_none(), 0));
     IGRAPH_CHECK(igraph_add_edges(tree, &partition, 0));
 
     /* Free the allocated memory */

@@ -78,7 +78,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     igraph_integer_t i, j, k;
     igraph_integer_t no_of_from, no_of_to;
     igraph_dqueue_int_t Q;
-    igraph_vector_int_t clean_vertices;
+    igraph_vector_bool_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t fromvit, tovit;
     igraph_bool_t all_to;
@@ -110,7 +110,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     no_of_from = IGRAPH_VIT_SIZE(fromvit);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, no_of_nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&clean_vertices, no_of_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&clean_vertices, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num_queued, no_of_nodes);
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
@@ -139,7 +139,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
 
         igraph_vector_fill(&dist, IGRAPH_INFINITY);
         VECTOR(dist)[source] = 0;
-        igraph_vector_int_null(&clean_vertices);
+        igraph_vector_bool_null(&clean_vertices);
         igraph_vector_int_null(&num_queued);
 
         /* Fill the queue with vertices to be checked */
@@ -152,7 +152,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
             igraph_integer_t nlen;
 
             j = igraph_dqueue_int_pop(&Q);
-            VECTOR(clean_vertices)[j] = 1;
+            VECTOR(clean_vertices)[j] = true;
             VECTOR(num_queued)[j] += 1;
             if (VECTOR(num_queued)[j] > no_of_nodes) {
                 IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
@@ -177,7 +177,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
                     /* relax the edge */
                     VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
                     if (VECTOR(clean_vertices)[target]) {
-                        VECTOR(clean_vertices)[target] = 0;
+                        VECTOR(clean_vertices)[target] = false;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
                     }
                 }
@@ -206,7 +206,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
 
     igraph_vit_destroy(&fromvit);
     igraph_dqueue_int_destroy(&Q);
-    igraph_vector_int_destroy(&clean_vertices);
+    igraph_vector_bool_destroy(&clean_vertices);
     igraph_vector_int_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);
@@ -316,7 +316,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j, k;
     igraph_dqueue_int_t Q;
-    igraph_vector_int_t clean_vertices;
+    igraph_vector_bool_t clean_vertices;
     igraph_vector_int_t num_queued;
     igraph_vit_t tovit;
     igraph_vector_t dist;
@@ -331,7 +331,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     }
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, no_of_nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&clean_vertices, no_of_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&clean_vertices, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num_queued, no_of_nodes);
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
@@ -355,7 +355,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     igraph_vector_fill(&dist, IGRAPH_INFINITY);
     VECTOR(dist)[from] = 0;
-    igraph_vector_int_null(&clean_vertices);
+    igraph_vector_bool_null(&clean_vertices);
     igraph_vector_int_null(&num_queued);
 
     /* Fill the queue with vertices to be checked */
@@ -368,7 +368,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
         igraph_integer_t nlen;
 
         j = igraph_dqueue_int_pop(&Q);
-        VECTOR(clean_vertices)[j] = 1;
+        VECTOR(clean_vertices)[j] = true;
         VECTOR(num_queued)[j] += 1;
         if (VECTOR(num_queued)[j] > no_of_nodes) {
             IGRAPH_ERROR("Negative loop in graph while calculating distances with Bellman-Ford algorithm.",
@@ -394,7 +394,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                 VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
                 parent_eids[target] = nei + 1;
                 if (VECTOR(clean_vertices)[target]) {
-                    VECTOR(clean_vertices)[target] = 0;
+                    VECTOR(clean_vertices)[target] = false;
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, target));
                 }
             }
@@ -488,7 +488,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
 
     IGRAPH_FREE(parent_eids);
     igraph_dqueue_int_destroy(&Q);
-    igraph_vector_int_destroy(&clean_vertices);
+    igraph_vector_bool_destroy(&clean_vertices);
     igraph_vector_int_destroy(&num_queued);
     igraph_lazy_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(5);
