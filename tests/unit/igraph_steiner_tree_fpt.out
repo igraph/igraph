@@ -21,3 +21,7 @@ Total Steiner tree weight: 3
 K_7_Real graph:
 ( 4 9 20 14 17 )
 Total Steiner tree weight: 2.5
+
+K_7 graph with parallel edges:
+( 4 10 21 15 18 )
+Total Steiner tree weight: 5
