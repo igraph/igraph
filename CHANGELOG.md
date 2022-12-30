@@ -13,6 +13,8 @@
 
 ## [master]
 
+## [0.10.3] - 2022-12-30
+
 ### Added
 
  - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
@@ -35,6 +37,7 @@
  - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs. This was a regression in igraph 0.10.
  - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
  - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
+ - `igraph_calloc()` did not zero-initialize the allocated memory. This is now corrected. Note that the macro `IGRAPH_CALLOC()` was _not_ affected.
  - Fixed new warnings issued by the Xcode 14.1 toolchain.
 
 ### Deprecated
@@ -1121,7 +1124,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.2..master
+[master]: https://github.com/igraph/igraph/compare/0.10.3..master
+[0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0
