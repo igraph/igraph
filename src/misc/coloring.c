@@ -230,8 +230,11 @@ static igraph_error_t igraph_i_dsatur_main_loop(
 static igraph_error_t igraph_i_vertex_coloring_dsatur(
     const igraph_t *graph, igraph_vector_int_t *colors
 ) {
-    igraph_vector_int_fill(colors, -1);   // -1 as a color means uncolored
     igraph_integer_t vc = igraph_vcount(graph);
+
+    IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
+    igraph_vector_int_fill(colors, -1);   // -1 as a color means uncolored
+
 
     igraph_adjlist_t adjlist;
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
