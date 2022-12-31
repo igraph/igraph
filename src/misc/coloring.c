@@ -172,18 +172,18 @@ static void igraph_i_dsatur_update_heap(
     igraph_vector_int_t *neighbours, igraph_vector_int_t *colors, 
     igraph_integer_t color
 ) {
-    igraph_gen2wheap_deactivate_max(node_degrees_heap);
-    igraph_color_metadata_t *color_metadata; 
+    igraph_gen2wheap_delete_max(node_degrees_heap);
+    igraph_color_metadata_t color_metadata; 
     igraph_integer_t nbr_cnt = igraph_vector_int_size(neighbours);
     for (igraph_integer_t nbr_indx = 0; nbr_indx < nbr_cnt; nbr_indx++){
         igraph_integer_t nbr = VECTOR(*neighbours)[nbr_indx];
-        color_metadata = igraph_gen2wheap_get(node_degrees_heap, nbr);
+        color_metadata = *((igraph_color_metadata_t*)igraph_gen2wheap_get(node_degrees_heap, nbr));
         if (!is_color_used_by_neighbour(colors, color, igraph_adjlist_get(adjlist, nbr))) {
-            color_metadata->saturation_degree++;
+            color_metadata.saturation_degree++;
         }
-        color_metadata->edge_degree--;
-        if(igraph_gen2wheap_has_active(node_degrees_heap, nbr)){
-            igraph_gen2wheap_modify(node_degrees_heap, nbr, color_metadata);
+        color_metadata.edge_degree--;
+        if(igraph_gen2wheap_has_elem(node_degrees_heap, nbr)){
+            igraph_gen2wheap_modify(node_degrees_heap, nbr, &color_metadata);
         }
 
     }
@@ -254,8 +254,8 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
     IGRAPH_CHECK(igraph_i_dsatur_main_loop(graph, colors, &node_degrees_heap, &adjlist, vc));
 
     igraph_free(igraph_color_metadata);
-    // igraph_gen2wheap_destroy(&node_degrees_heap);
-    // igraph_adjlist_destroy(&adjlist);
+    igraph_gen2wheap_destroy(&node_degrees_heap);
+    igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(3);
     return IGRAPH_SUCCESS;
 }
