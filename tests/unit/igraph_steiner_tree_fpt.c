@@ -42,7 +42,7 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     /* Check that the result is indeed a tree. */
     if (igraph_vector_int_size(terminals) > 0) {
         igraph_t tree;
-        igraph_subgraph_edges(graph, &tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ true);
+        igraph_subgraph_from_edges(graph, &tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ true);
 
         igraph_bool_t is_tree;
         igraph_is_tree(&tree, &is_tree, NULL, IGRAPH_ALL);
@@ -55,9 +55,9 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real,g_k7_non_simple;
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple;
     igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real;
-    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real,weights_k7_non_simple;
+    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple;
 
     /* Null graph */
     igraph_empty(&g_null, 0, 0);
