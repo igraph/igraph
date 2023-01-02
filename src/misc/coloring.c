@@ -242,13 +242,13 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
 ) {
     igraph_integer_t vc = igraph_vcount(graph);
 
-    if(vc == 0){
+    if (vc == 0) {
         return IGRAPH_SUCCESS ;
     }
 
     IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
 
-    if(vc == 1){
+    if (vc == 1) {
         VECTOR(*colors)[0] = 0; //igraph vectors always have size 1
         return IGRAPH_SUCCESS ;
     }
