@@ -26,7 +26,7 @@ igraph_error_t verify_coloring(igraph_t *graph, igraph_vector_int_t *colors){
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_int_t colors;
 
