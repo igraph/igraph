@@ -468,7 +468,12 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
  * \function igraph_adjlist_sort
  * \brief Sorts each vector in an adjacency list.
  *
- * Sorts every vector of the adjacency list.
+ * Sorts every vector of the adjacency list. Note that
+ * \ref igraph_adjlist_init() already produces sorted neighbor lists.
+ * This function is useful when the adjacency list is produced in
+ * a different manner, or is modified in a way that does not preserve
+ * the sorted order.
+ *
  * \param al The adjacency list.
  *
  * Time complexity: O(n log n), n is the total number of elements in

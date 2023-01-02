@@ -114,6 +114,7 @@ add_legacy_tests(
   cutheap
   d_indheap
   marked_queue
+  gen2wheap
   set
   trie
 )
@@ -134,6 +135,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  adj
   igraph_add_edges
   igraph_add_vertices
   igraph_degree
@@ -546,6 +548,7 @@ add_legacy_tests(
   igraph_connect_neighborhood
   igraph_induced_subgraph
   igraph_induced_subgraph_map
+  igraph_induced_subgraph_edges
   igraph_intersection2
   igraph_permute_vertices
   igraph_reverse_edges
@@ -963,6 +966,7 @@ add_benchmarks(
   igraph_pagerank
   igraph_pagerank_weighted
   igraph_power_law_fit
+  igraph_qsort
   igraph_random_walk
   igraph_transitivity
   igraph_voronoi
