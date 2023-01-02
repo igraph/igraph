@@ -35,7 +35,7 @@ void run_tests(igraph_t *graph, igraph_vector_int_t *colors) {
     verify_coloring(graph, colors);
 }
 
-void test_empty_graph() {
+void test_empty_graph(void) {
     igraph_t graph;
     igraph_vector_int_t colors;
     igraph_vector_int_init(&colors, 0);
@@ -48,7 +48,7 @@ void test_empty_graph() {
     igraph_vector_int_destroy(&colors);
 }
 
-void test_graph_1_vertex() {
+void test_graph_1_vertex(void) {
     igraph_t graph;
     igraph_vector_int_t colors;
     igraph_vector_int_init(&colors, 0);
@@ -61,7 +61,7 @@ void test_graph_1_vertex() {
     igraph_vector_int_destroy(&colors);
 }
 
-void test_graph_large() {
+void test_graph_large(void) {
     igraph_t graph;
     igraph_vector_int_t colors;
     igraph_vector_int_init(&colors, 0);
