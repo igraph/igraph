@@ -17,7 +17,6 @@
 */
 
 #include "igraph_paths.h"
-#include "igraph_constructors.h"
 #include "igraph_interface.h"
 #include "igraph_stack.h"
 
@@ -207,9 +206,13 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
 
     /* predecessors[u][v] is the second but last vertex on the shortest path from u to v */
     igraph_matrix_int_t predecessors;
+    IGRAPH_MATRIX_INT_INIT_FINALLY(&predecessors, no_of_nodes, no_of_nodes);
+
     /* children[u][i] is the i-th children of u in a tree of shortest distances
        rooted at k in the main loop below */
     igraph_matrix_int_t children;
+    IGRAPH_MATRIX_INT_INIT_FINALLY(&children, no_of_nodes, no_of_nodes);
+
     /* no_of_children[u] is the number of children of u
        rooted at k in the main loop below */
     igraph_vector_int_t no_of_children;
@@ -224,12 +227,6 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
     igraph_stack_int_t stack;
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_matrix_int_init(&predecessors, no_of_nodes, no_of_nodes));
-    IGRAPH_FINALLY(igraph_matrix_int_destroy, &predecessors);
-
-    IGRAPH_CHECK(igraph_matrix_int_init(&children, no_of_nodes, no_of_nodes));
-    IGRAPH_FINALLY(igraph_matrix_int_destroy, &children);
-
     for (igraph_integer_t v=0; v < no_of_nodes; v++) {
         for (igraph_integer_t u=0; u < no_of_nodes; u++) {
             MATRIX(predecessors, u, v) = u;
@@ -238,8 +235,9 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
 
     for (igraph_integer_t k=0; k < no_of_nodes; k++) {
         /* resetting no_of_children vector */
-        for (igraph_integer_t parent=0; parent < no_of_nodes; parent++)
+        for (igraph_integer_t parent=0; parent < no_of_nodes; parent++) {
             VECTOR(no_of_children)[parent] = 0;
+        }
         /* constructing the tree out_k (as in the paper) but
            representing it as the children matrix */
         for (igraph_integer_t v=0; v < no_of_nodes; v++) {
@@ -284,7 +282,7 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
                 }
                 if (i == j && MATRIX(*res, i, i) < 0) {
                     IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
-                                IGRAPH_ENEGLOOP);
+                                 IGRAPH_ENEGLOOP);
                 }
             }
         }
