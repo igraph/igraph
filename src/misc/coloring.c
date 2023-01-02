@@ -177,14 +177,15 @@ static void igraph_i_dsatur_update_heap(
     igraph_integer_t nbr_cnt = igraph_vector_int_size(neighbours);
     for (igraph_integer_t nbr_indx = 0; nbr_indx < nbr_cnt; nbr_indx++){
         igraph_integer_t nbr = VECTOR(*neighbours)[nbr_indx];
+        if(!igraph_gen2wheap_has_elem(node_degrees_heap, nbr)){
+            continue;
+        }
         color_metadata = *((igraph_color_metadata_t*)igraph_gen2wheap_get(node_degrees_heap, nbr));
         if (!is_color_used_by_neighbour(colors, color, igraph_adjlist_get(adjlist, nbr))) {
             color_metadata.saturation_degree++;
         }
         color_metadata.edge_degree--;
-        if(igraph_gen2wheap_has_elem(node_degrees_heap, nbr)){
-            igraph_gen2wheap_modify(node_degrees_heap, nbr, &color_metadata);
-        }
+        igraph_gen2wheap_modify(node_degrees_heap, nbr, &color_metadata);
 
     }
 }
