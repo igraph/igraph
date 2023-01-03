@@ -218,9 +218,9 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
     igraph_vector_int_t no_of_children;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children, no_of_nodes);
 
+    /* dfs_traversal and dfs_skip arrays for running time optimization */
     igraph_vector_int_t dfs_traversal;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dfs_traversal, no_of_nodes);
-
     igraph_vector_int_t dfs_skip;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dfs_skip, no_of_nodes);
 
@@ -256,6 +256,8 @@ igraph_error_t igraph_distances_floyd_warshall_tree_speedup(
             if (parent > -1) {
                 VECTOR(dfs_traversal)[counter] = parent;
                 counter++;
+                // a negative marker -parent - 1 that is popped right after
+                // all the descendants of the parent were processed
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, -parent - 1));
                 for (igraph_integer_t l=0; l < VECTOR(no_of_children)[parent]; l++) {
                     IGRAPH_CHECK(igraph_stack_int_push(&stack, MATRIX(children, parent, l)));
