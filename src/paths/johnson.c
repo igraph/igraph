@@ -32,9 +32,15 @@
  * \brief Weighted shortest path lengths between vertices, using Johnson's algorithm.
  *
  * See Wikipedia at http://en.wikipedia.org/wiki/Johnson's_algorithm
- * for Johnson's algorithm. This algorithm works even if the graph
- * contains negative edge weights, and it is worth using it if we
- * calculate the shortest paths from many sources.
+ * for Johnson's algorithm. This algorithm supports negative edge weights,
+ * and performs better than the Bellman-Ford method when distances are calculated
+ * from many different sources, the typical use case being all-pairs distance
+ * calculations.
+ *
+ * </para><para>
+ * It works by using a single-source Bellman-Ford run to transform all edge
+ * weights to non-negative ones, then invoking Dijkstra's algorithm with the new
+ * weights.
  *
  * </para><para>
  * If no edge weights are supplied, then the unweighted
