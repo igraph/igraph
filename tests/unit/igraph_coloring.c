@@ -27,12 +27,18 @@ void verify_coloring(igraph_t *graph, igraph_vector_int_t *colors) {
 }
 
 void run_tests(igraph_t *graph, igraph_vector_int_t *colors) {
+    igraph_vector_int_fill(colors, 0);
+    printf("testing greedy coloring with COLORED_NEIGHBORS heuristic\n");
     igraph_vertex_coloring_greedy(graph, colors, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS);
     verify_coloring(graph, colors);
+    print_vector_int(colors);
 
     igraph_vector_int_fill(colors, 0);
+    printf("testing greedy coloring with COLORED_NEIGHBORS heuristic\n");
     igraph_vertex_coloring_greedy(graph, colors, IGRAPH_COLORING_GREEDY_DSATUR);
     verify_coloring(graph, colors);
+    print_vector_int(colors);
+
 }
 
 void test_empty_graph(void) {
@@ -42,6 +48,7 @@ void test_empty_graph(void) {
 
     //run it on empty graph
     igraph_empty(&graph, 0, IGRAPH_DIRECTED);
+    printf("Testing empty graph\n");
     run_tests(&graph, &colors);
 
     igraph_destroy(&graph);
@@ -54,7 +61,8 @@ void test_graph_1_vertex(void) {
     igraph_vector_int_init(&colors, 0);
 
     //run it on empty graph
-    igraph_empty(&graph, 0, IGRAPH_DIRECTED);
+    igraph_empty(&graph, 1, IGRAPH_DIRECTED);
+    printf("testing 1 vertice graph\n");
     run_tests(&graph, &colors);
 
     igraph_destroy(&graph);
@@ -68,10 +76,12 @@ void test_graph_large(void) {
 
     //simple large undirected graphx
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    printf("testing large simple graph\n");
     run_tests(&graph, &colors);
 
     //graph with loops and parallel edges
     igraph_rewire_edges(&graph, 1.0, true, true);
+    printf("testing large multiedge looped graph\n");
     run_tests(&graph, &colors);
 
     igraph_destroy(&graph);
