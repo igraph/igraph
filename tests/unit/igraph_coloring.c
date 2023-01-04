@@ -34,7 +34,7 @@ void run_tests(igraph_t *graph, igraph_vector_int_t *colors) {
     print_vector_int(colors);
 
     igraph_vector_int_fill(colors, 0);
-    printf("testing greedy coloring with COLORED_NEIGHBORS heuristic\n");
+    printf("testing greedy coloring with DSATUR heuristic\n");
     igraph_vertex_coloring_greedy(graph, colors, IGRAPH_COLORING_GREEDY_DSATUR);
     verify_coloring(graph, colors);
     print_vector_int(colors);
