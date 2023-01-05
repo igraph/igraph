@@ -248,7 +248,7 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
 
 
     if (vc == 1) {
-        VECTOR(*colors)[0] = 0; 
+        VECTOR(*colors)[0] = 0;
         return IGRAPH_SUCCESS ;
     }
 
