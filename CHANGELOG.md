@@ -2,6 +2,14 @@
 
 ## [master]
 
+### Fixed
+
+ - The Bellman-Ford shortest path finder is now interruptible.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.3] - 2022-12-30
 
 ### Added
