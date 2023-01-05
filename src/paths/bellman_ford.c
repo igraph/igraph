@@ -83,6 +83,7 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
     igraph_vit_t fromvit, tovit;
     igraph_bool_t all_to;
     igraph_vector_t dist;
+    int counter = 0;
 
     /*
        - speedup: a vertex is marked clean if its distance from the source
@@ -148,7 +149,10 @@ igraph_error_t igraph_distances_bellman_ford(const igraph_t *graph,
         }
 
         while (!igraph_dqueue_int_empty(&Q)) {
-            IGRAPH_ALLOW_INTERRUPTION();
+            if (++counter >= 10000) {
+                counter = 0;
+                IGRAPH_ALLOW_INTERRUPTION();
+            }
 
             igraph_integer_t j = igraph_dqueue_int_pop(&Q);
             VECTOR(clean_vertices)[j] = true;
@@ -320,6 +324,7 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     igraph_vector_int_t num_queued;
     igraph_vit_t tovit;
     igraph_vector_t dist;
+    int counter = 0;
 
     if (!weights) {
         return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
@@ -361,7 +366,10 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     }
 
     while (!igraph_dqueue_int_empty(&Q)) {
-        IGRAPH_ALLOW_INTERRUPTION();
+        if (++counter >= 10000) {
+            counter = 0;
+            IGRAPH_ALLOW_INTERRUPTION();
+        }
 
         j = igraph_dqueue_int_pop(&Q);
         VECTOR(clean_vertices)[j] = true;
