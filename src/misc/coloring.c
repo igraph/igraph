@@ -20,14 +20,12 @@
 
 #include "igraph_coloring.h"
 
-#include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_adjlist.h"
+#include "igraph_interface.h"
 
+#include "core/genheap.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "core/genheap.h"
-#include "core/set.h"
 
 /* COLORED_NEIGHBORS: Choose vertices based on the number of already coloured neighbours. */
 

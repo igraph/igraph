@@ -5,8 +5,9 @@
 void verify_coloring(igraph_t *graph, igraph_vector_int_t *colors) {
     /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
     igraph_integer_t i;
-    /* Store the edge count to avoid the overhead from igraph_ecount in the for loop. */
     igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t vertex_count = igraph_vcount(graph);
+
     for (i = 0; i < no_of_edges; ++i) {
         if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
             continue;
@@ -16,9 +17,8 @@ void verify_coloring(igraph_t *graph, igraph_vector_int_t *colors) {
                           IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
         }
     }
-    igraph_integer_t vertex_count = igraph_vcount(graph);
-    /*verify all assigned colors are valid*/
-    for (i = 0 ; i < vertex_count ; i++) {
+
+    for (i = 0; i < vertex_count; i++) {
         igraph_integer_t color = VECTOR(*colors)[i];
         if (color < 0 || color >= vertex_count) {
             IGRAPH_FATALF("The vertex %" IGRAPH_PRId " has invalid color %" IGRAPH_PRId "\n", i, color);
@@ -46,7 +46,7 @@ void test_empty_graph(void) {
     igraph_vector_int_t colors;
     igraph_vector_int_init(&colors, 0);
 
-    //run it on empty graph
+    /* run it on empty graph */
     igraph_empty(&graph, 0, IGRAPH_DIRECTED);
     printf("Testing empty graph\n");
     run_tests(&graph, &colors);
@@ -60,7 +60,7 @@ void test_graph_1_vertex(void) {
     igraph_vector_int_t colors;
     igraph_vector_int_init(&colors, 0);
 
-    //run it on empty graph
+    /* run it on empty graph */
     igraph_empty(&graph, 1, IGRAPH_DIRECTED);
     printf("testing 1 vertice graph\n");
     run_tests(&graph, &colors);
@@ -74,12 +74,12 @@ void test_graph_large(void) {
     igraph_vector_int_t colors;
     igraph_vector_int_init(&colors, 0);
 
-    //simple large undirected graphx
+    /* simple large undirected graph */
     igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     printf("testing large simple graph\n");
     run_tests(&graph, &colors);
 
-    //graph with loops and parallel edges
+    /* graph with loops and parallel edges */
     igraph_rewire_edges(&graph, 1.0, true, true);
     printf("testing large multiedge looped graph\n");
     run_tests(&graph, &colors);
@@ -99,4 +99,3 @@ int main(void) {
 
     return 0;
 }
-

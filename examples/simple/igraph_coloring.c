@@ -15,8 +15,8 @@ int main(void) {
     /* As with all igraph functions, the vector in which the result is returned must
        be initialized in advance. */
     igraph_vector_int_init(&colors, 0);
-
     igraph_vertex_coloring_greedy(&graph, &colors, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS);
+
     /* Verify that the colouring is valid, i.e. no two adjacent vertices have the same colour. */
     {
         igraph_integer_t i;
@@ -30,6 +30,7 @@ int main(void) {
             }
         }
     }
+
     /* Destroy data structure when we are done. */
     igraph_vector_int_destroy(&colors);
     igraph_destroy(&graph);
