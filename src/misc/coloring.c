@@ -26,6 +26,7 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
+/* Heuristic: The next vertex to color will be the one with the most already-colored neighbors. */
 static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
     igraph_integer_t i, vertex, maxdeg;
     igraph_integer_t vc = igraph_vcount(graph);
@@ -51,8 +52,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
     {
         igraph_vector_int_t degree;
 
-        IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 0));
 
         vertex = igraph_vector_int_which_max(&degree);
@@ -62,22 +62,29 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&neigh_colors, 0));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neigh_colors, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&neigh_colors, maxdeg));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &neigh_colors);
 
+    /* two-way indexed heap holding number of already colored neighbors of yet-uncolored vertices */
     IGRAPH_CHECK(igraph_2wheap_init(&cn, vc));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &cn);
-    for (i = 0; i < vc; ++i)
+    for (i = 0; i < vc; ++i) {
         if (i != vertex) {
             igraph_2wheap_push_with_index(&cn, i, 0); /* should not fail since memory was already reserved */
         }
+    }
 
-    while (1) {
+    /* Within this loop, a color of 0 means "uncolored", and valid color indices start at 1.
+     * At the beginning, all vertices are set as "uncolored", see the vector_int_fill() call above.
+     * Colors will be decremented to start at 0 later. */
+    while (true) {
         igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, vertex);
         igraph_integer_t neigh_count = igraph_vector_int_size(neighbors);
 
-        /* colour current vertex */
+        /* Colour current vertex by finding smallest available non-0 color.
+         * Note that self-loops are effectively skipped as they merely prevent
+         * the current vertex from being colored with the color value it presently
+         * has, which is 0 (meaning uncolored). */
         {
             igraph_integer_t col;
 
