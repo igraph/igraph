@@ -140,8 +140,8 @@ typedef struct {
 } dsatur_t;
 
 static int dsatur_t_compare(const void* left, const void* right) {
-    const dsatur_t *left_d  = (dsatur_t*)left;
-    const dsatur_t *right_d = (dsatur_t*)right;
+    const dsatur_t *left_d  = (const dsatur_t*)left;
+    const dsatur_t *right_d = (const dsatur_t*)right;
     if (left_d->saturation_degree == right_d->saturation_degree) {
         return left_d->edge_degree - right_d->edge_degree;
     }
@@ -186,18 +186,25 @@ static void igraph_i_dsatur_update_heap(
     }
 }
 
-static igraph_integer_t igraph_i_first_color(igraph_vector_int_t *viable_colors, igraph_integer_t color_count) {
+static igraph_error_t igraph_i_get_first_viable_color(
+    igraph_vector_int_t *viable_colors, igraph_integer_t color_count,
+    igraph_integer_t *result
+) {
     IGRAPH_CHECK(igraph_vector_int_resize(viable_colors, color_count));
     igraph_vector_int_sort(viable_colors);
     igraph_integer_t i = 0;
     igraph_integer_t col = 0;
+
     do {
         while (i < color_count && VECTOR(*viable_colors)[i] == col) {
             i++;
         }
         col++;
     } while (i < color_count && VECTOR(*viable_colors)[i] == col);
-    return col;
+
+    *result = col;
+
+    return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t igraph_i_dsatur_main_loop(
@@ -207,6 +214,8 @@ static igraph_error_t igraph_i_dsatur_main_loop(
 ) {
     igraph_integer_t vertices_colored = 0;
     igraph_vector_int_t viable_colors;
+    igraph_integer_t color;
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&viable_colors, 0);
 
     while (vertices_colored < vc) {
@@ -215,22 +224,24 @@ static igraph_error_t igraph_i_dsatur_main_loop(
         igraph_integer_t neighbours_count = igraph_vector_int_size(neighbours);
         igraph_integer_t color_count = 0;
         IGRAPH_CHECK(igraph_vector_int_resize(&viable_colors, neighbours_count));
-        for (igraph_integer_t neighbor_index = 0 ; neighbor_index < neighbours_count ; neighbor_index++) {
+        for (igraph_integer_t neighbor_index = 0; neighbor_index < neighbours_count; neighbor_index++) {
             igraph_integer_t neighbour = VECTOR(*neighbours)[neighbor_index];
             if (VECTOR(*colors)[neighbour] != -1) {
                 VECTOR(viable_colors)[color_count] = VECTOR(*colors)[neighbour];
                 color_count++;
             }
         }
-        igraph_integer_t color = igraph_i_first_color(&viable_colors, color_count);
+        IGRAPH_CHECK(igraph_i_get_first_viable_color(&viable_colors, color_count, &color));
         igraph_i_dsatur_update_heap(adjlist, node_degrees_heap, neighbours, colors, color);
         VECTOR(*colors)[node_to_color] = color;
 
         vertices_colored++;
         IGRAPH_ALLOW_INTERRUPTION();
     }
+
     igraph_vector_int_destroy(&viable_colors);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -241,13 +252,13 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
     IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
 
     if (vc == 0) {
-        return IGRAPH_SUCCESS ;
+        return IGRAPH_SUCCESS;
     }
 
 
     if (vc == 1) {
         VECTOR(*colors)[0] = 0;
-        return IGRAPH_SUCCESS ;
+        return IGRAPH_SUCCESS;
     }
 
     igraph_vector_int_fill(colors, -1);   // -1 as a color means uncolored
@@ -257,14 +268,14 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     igraph_gen2wheap_t node_degrees_heap;
-    igraph_gen2wheap_init(&node_degrees_heap, dsatur_t_compare, sizeof(dsatur_t), vc);
+    IGRAPH_CHECK(igraph_gen2wheap_init(&node_degrees_heap, dsatur_t_compare, sizeof(dsatur_t), vc));
     IGRAPH_FINALLY(igraph_gen2wheap_destroy, &node_degrees_heap);
 
     dsatur_t igraph_color_metadata;
-    for (igraph_integer_t vertex = 0 ; vertex < vc ; vertex++) {
+    for (igraph_integer_t vertex = 0; vertex < vc; vertex++) {
         igraph_color_metadata.saturation_degree = 0;
         igraph_color_metadata.edge_degree = igraph_vector_int_size(igraph_adjlist_get(&adjlist, vertex));
-        igraph_gen2wheap_push_with_index(&node_degrees_heap, vertex, &igraph_color_metadata);
+        IGRAPH_CHECK(igraph_gen2wheap_push_with_index(&node_degrees_heap, vertex, &igraph_color_metadata));
     }
 
     IGRAPH_CHECK(igraph_i_dsatur_main_loop(graph, colors, &node_degrees_heap, &adjlist, vc));
@@ -272,6 +283,7 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
     igraph_gen2wheap_destroy(&node_degrees_heap);
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(2);
+
     return IGRAPH_SUCCESS;
 }
 
