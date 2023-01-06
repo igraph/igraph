@@ -551,7 +551,7 @@ igraph_distances_johnson:
 
 igraph_distances_floyd_warshall:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
+        GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, FWALGORITHM method
     DEPS: weights ON graph
 
 igraph_voronoi:
