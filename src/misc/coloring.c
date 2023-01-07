@@ -187,24 +187,25 @@ static void igraph_i_dsatur_update_heap(
 }
 
 static igraph_error_t igraph_i_get_first_viable_color(
-    igraph_vector_int_t *viable_colors, igraph_integer_t color_count,
-    igraph_integer_t *result
+    igraph_vector_int_t *used_colors
 ) {
-    IGRAPH_CHECK(igraph_vector_int_resize(viable_colors, color_count));
-    igraph_vector_int_sort(viable_colors);
+    igraph_integer_t color_count = igraph_vector_int_size(used_colors);
+    igraph_vector_int_sort(used_colors);
     igraph_integer_t i = 0;
     igraph_integer_t col = 0;
-
-    do {
-        while (i < color_count && VECTOR(*viable_colors)[i] == col) {
+    while (i < color_count && VECTOR(*used_colors)[i] == col) {
+        while (i < color_count && VECTOR(*used_colors)[i] == col) {
             i++;
+            if (i == color_count) {
+                break; /*loop second condition could read outside bounds without this*/
+            }
         }
         col++;
-    } while (i < color_count && VECTOR(*viable_colors)[i] == col);
-
-    *result = col;
-
-    return IGRAPH_SUCCESS;
+        if (i == color_count) {
+            break;
+        }
+    }
+    return  col;
 }
 
 static igraph_error_t igraph_i_dsatur_main_loop(
@@ -213,25 +214,23 @@ static igraph_error_t igraph_i_dsatur_main_loop(
     igraph_integer_t vc
 ) {
     igraph_integer_t vertices_colored = 0;
-    igraph_vector_int_t viable_colors;
+    igraph_vector_int_t used_colors;
     igraph_integer_t color;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&viable_colors, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&used_colors, 0);
 
     while (vertices_colored < vc) {
         igraph_integer_t node_to_color = igraph_gen2wheap_max_index(node_degrees_heap);
         igraph_vector_int_t *neighbours = igraph_adjlist_get(adjlist, node_to_color);
         igraph_integer_t neighbours_count = igraph_vector_int_size(neighbours);
-        igraph_integer_t color_count = 0;
-        IGRAPH_CHECK(igraph_vector_int_resize(&viable_colors, neighbours_count));
+        igraph_vector_int_clear(&used_colors);
         for (igraph_integer_t neighbor_index = 0; neighbor_index < neighbours_count; neighbor_index++) {
             igraph_integer_t neighbour = VECTOR(*neighbours)[neighbor_index];
             if (VECTOR(*colors)[neighbour] != -1) {
-                VECTOR(viable_colors)[color_count] = VECTOR(*colors)[neighbour];
-                color_count++;
+                IGRAPH_CHECK(igraph_vector_int_push_back(&used_colors, VECTOR(*colors)[neighbour]));
             }
         }
-        IGRAPH_CHECK(igraph_i_get_first_viable_color(&viable_colors, color_count, &color));
+        color = igraph_i_get_first_viable_color(&used_colors);
         igraph_i_dsatur_update_heap(adjlist, node_degrees_heap, neighbours, colors, color);
         VECTOR(*colors)[node_to_color] = color;
 
@@ -239,7 +238,7 @@ static igraph_error_t igraph_i_dsatur_main_loop(
         IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    igraph_vector_int_destroy(&viable_colors);
+    igraph_vector_int_destroy(&used_colors);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
