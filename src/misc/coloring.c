@@ -190,15 +190,12 @@ static void dsatur_update_heap(
     }
 }
 
-static igraph_error_t dsatur_get_first_viable_color(
-    igraph_vector_int_t *used_colors
-) {
-    igraph_integer_t color_count = igraph_vector_int_size(used_colors);
-    igraph_vector_int_sort(used_colors);
+static igraph_error_t dsatur_get_first_viable_color(const igraph_vector_int_t *used_colors_sorted) {
+    igraph_integer_t color_count = igraph_vector_int_size(used_colors_sorted);
     igraph_integer_t i = 0;
     igraph_integer_t col = 0;
-    while (i < color_count && VECTOR(*used_colors)[i] == col) {
-        while (i < color_count && VECTOR(*used_colors)[i] == col) {
+    while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
+        while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
             i++;
             if (i == color_count) {
                 break; /* loop second condition could read outside bounds without this */
@@ -254,28 +251,29 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
         IGRAPH_CHECK(igraph_gen2wheap_push_with_index(&node_degrees_heap, vertex, &dsatur));
     }
 
-    igraph_vector_int_t used_colors;
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&used_colors, 0);
+    igraph_vector_int_t used_colors_sorted;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&used_colors_sorted, 0);
 
     while (! igraph_gen2wheap_empty(&node_degrees_heap)) {
         igraph_integer_t node_to_color = igraph_gen2wheap_max_index(&node_degrees_heap);
         igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, node_to_color);
-        igraph_integer_t neighbour_count = igraph_vector_int_size(neighbors);
-        igraph_vector_int_clear(&used_colors);
-        for (igraph_integer_t i=0; i < neighbour_count; i++) {
-            igraph_integer_t neighbor = VECTOR(*neighbors)[i];
-            if (VECTOR(*colors)[neighbor] != -1) {
-                IGRAPH_CHECK(igraph_vector_int_push_back(&used_colors, VECTOR(*colors)[neighbor]));
+        igraph_integer_t nei_count = igraph_vector_int_size(neighbors);
+        igraph_vector_int_clear(&used_colors_sorted);
+        for (igraph_integer_t i=0; i < nei_count; i++) {
+            igraph_integer_t nei = VECTOR(*neighbors)[i];
+            if (VECTOR(*colors)[nei] != -1) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&used_colors_sorted, VECTOR(*colors)[nei]));
             }
         }
-        igraph_integer_t color = dsatur_get_first_viable_color(&used_colors);
+        igraph_vector_int_sort(&used_colors_sorted);
+        igraph_integer_t color = dsatur_get_first_viable_color(&used_colors_sorted);
         dsatur_update_heap(&adjlist, &node_degrees_heap, neighbors, colors, color);
         VECTOR(*colors)[node_to_color] = color;
 
         IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    igraph_vector_int_destroy(&used_colors);
+    igraph_vector_int_destroy(&used_colors_sorted);
     igraph_gen2wheap_destroy(&node_degrees_heap);
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(3);
