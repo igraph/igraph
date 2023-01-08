@@ -124,6 +124,20 @@ void test_graph_small(void) {
     igraph_destroy(&graph);
 }
 
+// Same as the graph above with multi-edges and self-loops added
+void test_graph_small_multi(void) {
+    igraph_t graph;
+
+    igraph_small(&graph, 8, IGRAPH_UNDIRECTED,
+                 0, 3, 0, 4, 1, 4, 2, 4, 1, 5, 2, 5, 3, 5, 0, 6, 1, 6, 2, 6, 3, 6, 0, 7, 1, 7, 2, 7, 4, 7, 5, 7,
+                 0, 4, 0, 4, 3, 5, 3, 5, 3, 5, 0, 0, 0, 0, 1, 1,
+                 -1);
+    printf("Testing small multigraph\n");
+    run_tests(&graph, true);
+
+    igraph_destroy(&graph);
+}
+
 // Note: This graph has chromatic number 4.
 // Currently implemented greedy heuristics don't produce an exact result.
 void test_graph_lcf(void) {
@@ -137,11 +151,24 @@ void test_graph_lcf(void) {
 }
 
 // Isolated vertices must be assigned color 0.
-void test_isolated_vertex(void) {
+void test_isolated_vertices(void) {
     igraph_t graph;
 
     igraph_small(&graph, 4, IGRAPH_UNDIRECTED, 0, 1, -1);
-    printf("testing graph with isolated vertex\n");
+    printf("Testing graph with isolated vertices\n");
+    run_tests(&graph, true);
+
+    igraph_destroy(&graph);
+}
+
+// Isolated vertices must be assigned color 0.
+void test_isolated_vertices_with_loops(void) {
+    igraph_t graph;
+
+    igraph_small(&graph, 3, IGRAPH_UNDIRECTED,
+                 0,0, 2,2, 2,2,
+                 -1);
+    printf("Testing graph with isolated vertices and self-loops\n");
     run_tests(&graph, true);
 
     igraph_destroy(&graph);
@@ -188,8 +215,10 @@ int main(void) {
     test_graph_1_vertex();
     test_graph_large();
     test_graph_small();
+    test_graph_small_multi();
     test_graph_lcf();
-    test_isolated_vertex();
+    test_isolated_vertices();
+    test_isolated_vertices_with_loops();
     test_wheel_graph();
     test_bipartite_graph();
 
