@@ -27,7 +27,8 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
-/* Heuristic: The next vertex to color will be the one with the most already-colored neighbors. */
+/* COLORED_NEIGHBORS: Choose vertices based on the number of already coloured neighbours. */
+
 static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
     igraph_integer_t i, vertex, maxdeg;
     igraph_integer_t vc = igraph_vcount(graph);
