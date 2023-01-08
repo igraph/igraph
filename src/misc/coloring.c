@@ -226,19 +226,11 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
 
     igraph_vector_int_fill(colors, -1); /* -1 as a color means uncolored */
 
+    /* Multi-edges and self-loops are removed from the adjacency list in order to ensure the correct
+     * updating of a vertex's neighbors' saturation degrees when that vertex is colored. */
     igraph_adjlist_t adjlist;
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-
-    /* Neighbor lists must contain each vertex at most once, and must not include self-loops.
-     * This is necessary for the correct updating of the saturation degree of a vertex's neighbors
-     * when that vertex is first colored.
-     *
-     * We use igraph_adjlist_simplify() to achieve this instead of IGRAPH_NO_LOOPS/IGRAPH_NO_MULTIPLE
-     * in order to be able to treat directed graphs with recipriocal edges as effective _simple_
-     * undirected graphs.
-     */
-    IGRAPH_CHECK(igraph_adjlist_simplify(&adjlist));
 
     igraph_gen2wheap_t node_degrees_heap;
     IGRAPH_CHECK(igraph_gen2wheap_init(&node_degrees_heap, dsatur_t_compare, sizeof(dsatur_t), vcount));
