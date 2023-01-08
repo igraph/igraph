@@ -197,14 +197,8 @@ static igraph_error_t dsatur_get_first_viable_color(const igraph_vector_int_t *u
     while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
         while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
             i++;
-            if (i == color_count) {
-                break; /* loop second condition could read outside bounds without this */
-            }
         }
         col++;
-        if (i == color_count) {
-            break;
-        }
     }
     return  col;
 }
