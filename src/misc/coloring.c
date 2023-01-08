@@ -271,19 +271,20 @@ static igraph_error_t igraph_i_vertex_coloring_dsatur(
  * \function igraph_vertex_coloring_greedy
  * \brief Computes a vertex coloring using a greedy algorithm.
  *
- * </para><para>
  * This function assigns a "color"—represented as a non-negative integer—to
  * each vertex of the graph in such a way that neighboring vertices never have
  * the same color. The obtained coloring is not necessarily minimal.
  *
  * </para><para>
- * Vertices are colored one by one, choosing the smallest color index that
- * differs from that of already colored neighbors.
- * Colors are represented with non-negative integers 0, 1, 2, ...
+ * Vertices are colored greedily, one by one, always choosing the smallest color
+ * index that differs from that of already colored neighbors. Vertices are picked
+ * in an order determined by the speified heuristic.
+ * Colors are represented by non-negative integers 0, 1, 2, ...
  *
  * \param graph The input graph.
  * \param colors Pointer to an initialized integer vector. The vertex colors will be stored here.
- * \param heuristic The vertex ordering heuristic to use during greedy coloring. See \ref igraph_coloring_greedy_t
+ * \param heuristic The vertex ordering heuristic to use during greedy coloring.
+ *    See \ref igraph_coloring_greedy_t for more information.
  *
  * \return Error code.
  *
