@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+
 ### Fixed
 
  - The Bellman-Ford shortest path finder is now interruptible.

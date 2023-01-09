@@ -20,13 +20,15 @@
 
 #include "igraph_coloring.h"
 
-#include "igraph_interface.h"
 #include "igraph_adjlist.h"
+#include "igraph_interface.h"
 
+#include "core/genheap.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
 
-/* Heuristic: The next vertex to color will be the one with the most already-colored neighbors. */
+/* COLORED_NEIGHBORS: Choose vertices based on the number of already coloured neighbours. */
+
 static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
     igraph_integer_t i, vertex, maxdeg;
     igraph_integer_t vc = igraph_vcount(graph);
@@ -135,24 +137,154 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
     return IGRAPH_SUCCESS;
 }
 
+/* DSATUR: Choose vertices based on the number of adjacent colours, i.e. "saturation degree" */
+
+typedef struct {
+    igraph_integer_t saturation_degree; /* number of colors used by neighbors */
+    igraph_integer_t edge_degree; /* degree in the subgraph induced by uncolored vertices */
+} dsatur_t;
+
+static int dsatur_t_compare(const void *left, const void *right) {
+    const dsatur_t *left_d  = left;
+    const dsatur_t *right_d = right;
+    if (left_d->saturation_degree == right_d->saturation_degree) {
+        return left_d->edge_degree - right_d->edge_degree;
+    }
+    return left_d->saturation_degree - right_d->saturation_degree;
+}
+
+static igraph_bool_t dsatur_is_color_used_by_neighbour(
+    const igraph_vector_int_t *colors, igraph_integer_t color,
+    const igraph_vector_int_t *neighbors
+) {
+    igraph_integer_t nei_count = igraph_vector_int_size(neighbors);
+
+    for (igraph_integer_t i=0; i < nei_count; i++) {
+        igraph_integer_t nei = VECTOR(*neighbors)[i];
+        if (VECTOR(*colors)[nei] == color) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void dsatur_update_heap(
+    const igraph_adjlist_t *adjlist, igraph_gen2wheap_t *node_degrees_heap,
+    const igraph_vector_int_t *neighbors, const igraph_vector_int_t *colors,
+    igraph_integer_t color
+) {
+    igraph_gen2wheap_delete_max(node_degrees_heap);
+    igraph_integer_t nei_count = igraph_vector_int_size(neighbors);
+    for (igraph_integer_t i=0; i < nei_count; i++) {
+        igraph_integer_t nei = VECTOR(*neighbors)[i];
+        if (!igraph_gen2wheap_has_elem(node_degrees_heap, nei)) {
+            continue;
+        }
+        dsatur_t deg_data = *((dsatur_t*) igraph_gen2wheap_get(node_degrees_heap, nei));
+        if (!dsatur_is_color_used_by_neighbour(colors, color, igraph_adjlist_get(adjlist, nei))) {
+            deg_data.saturation_degree++;
+        }
+        deg_data.edge_degree--;
+        igraph_gen2wheap_modify(node_degrees_heap, nei, &deg_data);
+    }
+}
+
+static igraph_error_t dsatur_get_first_viable_color(const igraph_vector_int_t *used_colors_sorted) {
+    igraph_integer_t color_count = igraph_vector_int_size(used_colors_sorted);
+    igraph_integer_t i = 0;
+    igraph_integer_t col = 0;
+    while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
+        while (i < color_count && VECTOR(*used_colors_sorted)[i] == col) {
+            i++;
+        }
+        col++;
+    }
+    return  col;
+}
+
+static igraph_error_t igraph_i_vertex_coloring_dsatur(
+    const igraph_t *graph, igraph_vector_int_t *colors
+) {
+    igraph_integer_t vcount = igraph_vcount(graph);
+    IGRAPH_CHECK(igraph_vector_int_resize(colors, vcount));
+
+    if (vcount == 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    if (vcount == 1) {
+        VECTOR(*colors)[0] = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    igraph_vector_int_fill(colors, -1); /* -1 as a color means uncolored */
+
+    /* Multi-edges and self-loops are removed from the adjacency list in order to ensure the correct
+     * updating of a vertex's neighbors' saturation degrees when that vertex is colored. */
+    igraph_adjlist_t adjlist;
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+    igraph_gen2wheap_t node_degrees_heap;
+    IGRAPH_CHECK(igraph_gen2wheap_init(&node_degrees_heap, dsatur_t_compare, sizeof(dsatur_t), vcount));
+    IGRAPH_FINALLY(igraph_gen2wheap_destroy, &node_degrees_heap);
+
+    for (igraph_integer_t vertex = 0; vertex < vcount; vertex++) {
+        dsatur_t dsatur;
+        dsatur.saturation_degree = 0;
+        dsatur.edge_degree = igraph_vector_int_size(igraph_adjlist_get(&adjlist, vertex));
+        IGRAPH_CHECK(igraph_gen2wheap_push_with_index(&node_degrees_heap, vertex, &dsatur));
+    }
+
+    igraph_vector_int_t used_colors_sorted;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&used_colors_sorted, 0);
+
+    while (! igraph_gen2wheap_empty(&node_degrees_heap)) {
+        igraph_integer_t node_to_color = igraph_gen2wheap_max_index(&node_degrees_heap);
+        igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, node_to_color);
+        igraph_integer_t nei_count = igraph_vector_int_size(neighbors);
+        igraph_vector_int_clear(&used_colors_sorted);
+        for (igraph_integer_t i=0; i < nei_count; i++) {
+            igraph_integer_t nei = VECTOR(*neighbors)[i];
+            if (VECTOR(*colors)[nei] != -1) {
+                IGRAPH_CHECK(igraph_vector_int_push_back(&used_colors_sorted, VECTOR(*colors)[nei]));
+            }
+        }
+        igraph_vector_int_sort(&used_colors_sorted);
+        igraph_integer_t color = dsatur_get_first_viable_color(&used_colors_sorted);
+        dsatur_update_heap(&adjlist, &node_degrees_heap, neighbors, colors, color);
+        VECTOR(*colors)[node_to_color] = color;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+    }
+
+    igraph_vector_int_destroy(&used_colors_sorted);
+    igraph_gen2wheap_destroy(&node_degrees_heap);
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
+}
 
 /**
  * \function igraph_vertex_coloring_greedy
  * \brief Computes a vertex coloring using a greedy algorithm.
  *
- * </para><para>
  * This function assigns a "color"—represented as a non-negative integer—to
  * each vertex of the graph in such a way that neighboring vertices never have
  * the same color. The obtained coloring is not necessarily minimal.
  *
  * </para><para>
- * Vertices are colored one by one, choosing the smallest color index that
- * differs from that of already colored neighbors.
- * Colors are represented with non-negative integers 0, 1, 2, ...
+ * Vertices are colored greedily, one by one, always choosing the smallest color
+ * index that differs from that of already colored neighbors. Vertices are picked
+ * in an order determined by the speified heuristic.
+ * Colors are represented by non-negative integers 0, 1, 2, ...
  *
  * \param graph The input graph.
  * \param colors Pointer to an initialized integer vector. The vertex colors will be stored here.
- * \param heuristic The vertex ordering heuristic to use during greedy coloring. See \ref igraph_coloring_greedy_t
+ * \param heuristic The vertex ordering heuristic to use during greedy coloring.
+ *    See \ref igraph_coloring_greedy_t for more information.
  *
  * \return Error code.
  *
@@ -162,6 +294,8 @@ igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vecto
     switch (heuristic) {
     case IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS:
         return igraph_i_vertex_coloring_greedy_cn(graph, colors);
+    case IGRAPH_COLORING_GREEDY_DSATUR:
+        return igraph_i_vertex_coloring_dsatur(graph, colors);
     default:
         IGRAPH_ERROR("Invalid heuristic for greedy vertex coloring.", IGRAPH_EINVAL);
     }
