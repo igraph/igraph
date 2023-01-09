@@ -492,6 +492,10 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
  *
  * Simplifies an adjacency list, i.e. removes loop and multiple edges.
  *
+ * </para><para>
+ * When the adjacency list is created with \ref igraph_adjlist_init(),
+ * use the \c loops and \c multiple parameters of that function instead.
+ *
  * \param al The adjacency list.
  * \return Error code.
  *

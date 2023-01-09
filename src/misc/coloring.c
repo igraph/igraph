@@ -26,12 +26,12 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
+/* Heuristic: The next vertex to color will be the one with the most already-colored neighbors. */
 static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
     igraph_integer_t i, vertex, maxdeg;
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_2wheap_t cn; /* indexed heap storing number of already coloured neighbours */
-    igraph_vector_int_t neigh_colors;
-    igraph_adjlist_t adjlist;
+    igraph_vector_int_t neighbors, nei_colors;
 
     IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
     igraph_vector_int_fill(colors, 0);
@@ -44,15 +44,11 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-
     /* find maximum degree and a corresponding vertex */
     {
         igraph_vector_int_t degree;
 
-        IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
         IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 0));
 
         vertex = igraph_vector_int_which_max(&degree);
@@ -62,46 +58,56 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&neigh_colors, 0));
-    IGRAPH_CHECK(igraph_vector_int_reserve(&neigh_colors, maxdeg));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &neigh_colors);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nei_colors, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&nei_colors, maxdeg));
 
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neighbors, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&neighbors, maxdeg));
+
+    /* two-way indexed heap holding number of already colored neighbors of yet-uncolored vertices */
     IGRAPH_CHECK(igraph_2wheap_init(&cn, vc));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &cn);
-    for (i = 0; i < vc; ++i)
+    for (i = 0; i < vc; ++i) {
         if (i != vertex) {
             igraph_2wheap_push_with_index(&cn, i, 0); /* should not fail since memory was already reserved */
         }
+    }
 
-    while (1) {
-        igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, vertex);
-        igraph_integer_t neigh_count = igraph_vector_int_size(neighbors);
+    /* Within this loop, a color of 0 means "uncolored", and valid color indices start at 1.
+     * At the beginning, all vertices are set as "uncolored", see the vector_int_fill() call above.
+     * Colors will be decremented to start at 0 later. */
+    while (true) {
+        IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_ALL));
+        igraph_integer_t nei_count = igraph_vector_int_size(&neighbors);
 
-        /* colour current vertex */
+        /* Colour current vertex by finding smallest available non-0 color.
+         * Note that self-loops are effectively skipped as they merely prevent
+         * the current vertex from being colored with the color value it presently
+         * has, which is 0 (meaning uncolored). */
         {
             igraph_integer_t col;
 
-            IGRAPH_CHECK(igraph_vector_int_resize(&neigh_colors, neigh_count));
-            for (i = 0; i < neigh_count; ++i) {
-                VECTOR(neigh_colors)[i] = VECTOR(*colors)[ VECTOR(*neighbors)[i] ];
+            IGRAPH_CHECK(igraph_vector_int_resize(&nei_colors, nei_count));
+            for (i = 0; i < nei_count; ++i) {
+                VECTOR(nei_colors)[i] = VECTOR(*colors)[ VECTOR(neighbors)[i] ];
             }
-            igraph_vector_int_sort(&neigh_colors);
+            igraph_vector_int_sort(&nei_colors);
 
             i = 0;
             col = 0;
             do {
-                while (i < neigh_count && VECTOR(neigh_colors)[i] == col) {
+                while (i < nei_count && VECTOR(nei_colors)[i] == col) {
                     i++;
                 }
                 col++;
-            } while (i < neigh_count && VECTOR(neigh_colors)[i] == col);
+            } while (i < nei_count && VECTOR(nei_colors)[i] == col);
 
             VECTOR(*colors)[vertex] = col;
         }
 
         /* increment number of coloured neighbours for each neighbour of vertex */
-        for (i = 0; i < neigh_count; ++i) {
-            igraph_integer_t idx = VECTOR(*neighbors)[i];
+        for (i = 0; i < nei_count; ++i) {
+            igraph_integer_t idx = VECTOR(neighbors)[i];
             if (igraph_2wheap_has_elem(&cn, idx)) {
                 igraph_2wheap_modify(&cn, idx, igraph_2wheap_get(&cn, idx) + 1);
             }
@@ -121,8 +127,8 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
     igraph_vector_int_add_constant(colors, -1);
 
     /* free data structures */
-    igraph_vector_int_destroy(&neigh_colors);
-    igraph_adjlist_destroy(&adjlist);
+    igraph_vector_int_destroy(&neighbors);
+    igraph_vector_int_destroy(&nei_colors);
     igraph_2wheap_destroy(&cn);
     IGRAPH_FINALLY_CLEAN(3);
 

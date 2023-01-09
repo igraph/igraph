@@ -372,18 +372,10 @@ static igraph_error_t igraph_i_eulerian_path_undirected(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
 
-    IGRAPH_CHECK(igraph_stack_int_init(&path, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
-
-    IGRAPH_CHECK(igraph_stack_int_init(&tracker, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &tracker);
-
-    IGRAPH_CHECK(igraph_stack_int_init(&edge_path, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &edge_path);
-
-    IGRAPH_CHECK(igraph_stack_int_init(&edge_tracker, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &edge_tracker);
-
+    IGRAPH_STACK_INT_INIT_FINALLY(&path, n);
+    IGRAPH_STACK_INT_INIT_FINALLY(&tracker, n);
+    IGRAPH_STACK_INT_INIT_FINALLY(&edge_path, n);
+    IGRAPH_STACK_INT_INIT_FINALLY(&edge_tracker, n);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited_list, m);
 
     IGRAPH_CHECK(igraph_stack_int_push(&tracker, start_of_path));
@@ -485,18 +477,10 @@ static igraph_error_t igraph_i_eulerian_path_directed(
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_stack_int_init(&path, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
-
-    IGRAPH_CHECK(igraph_stack_int_init(&tracker, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &tracker);
-
-    IGRAPH_CHECK(igraph_stack_int_init(&edge_path, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &edge_path);
-
-    IGRAPH_CHECK(igraph_stack_int_init(&edge_tracker, n));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &edge_tracker);
-
+    IGRAPH_STACK_INT_INIT_FINALLY(&path, n);
+    IGRAPH_STACK_INT_INIT_FINALLY(&tracker, n);
+    IGRAPH_STACK_INT_INIT_FINALLY(&edge_path, n);
+    IGRAPH_STACK_INT_INIT_FINALLY(&edge_tracker, n);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&visited_list, m);
 
     IGRAPH_CHECK(igraph_stack_int_push(&tracker, start_of_path));
