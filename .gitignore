@@ -2,7 +2,7 @@
 .*.swp
 .dirstamp
 .vscode/
-
+.DS_Store
 /tags
 /IGRAPH_VERSION
 /build
