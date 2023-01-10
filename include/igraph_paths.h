@@ -35,8 +35,9 @@
 __BEGIN_DECLS
 
 typedef enum {
-    IGRAPH_FLOYD_WARSHALL_ORIGINAL = 0,
-    IGRAPH_FLOYD_WARSHALL_TREE = 1
+    IGRAPH_FLOYD_WARSHALL_AUTOMATIC = 0,
+    IGRAPH_FLOYD_WARSHALL_ORIGINAL = 1,
+    IGRAPH_FLOYD_WARSHALL_TREE = 2
 } igraph_floyd_warshall_algorithm_t;
 
 IGRAPH_EXPORT igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,

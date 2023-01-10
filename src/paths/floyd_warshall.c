@@ -268,6 +268,7 @@ igraph_error_t igraph_distances_floyd_warshall(
     case IGRAPH_FLOYD_WARSHALL_ORIGINAL:
         IGRAPH_CHECK(igraph_distances_floyd_warshall_original(graph, res, weights));
         break;
+    case IGRAPH_FLOYD_WARSHALL_AUTOMATIC:
     case IGRAPH_FLOYD_WARSHALL_TREE:
         IGRAPH_CHECK(igraph_distances_floyd_warshall_tree(graph, res, weights));
         break;
