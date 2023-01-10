@@ -324,8 +324,8 @@ FAS_ALGORITHM:
     FLAGS: ENUM
 
 FWALGORITHM:
-    # Enum that describes the variant of the floyd-warshall algorithm to use in
-    # floyd-warshall graph distances computing function
+    # Enum that describes the variant of the Floyd-Warshall algorithm to use in
+    # Floyd-Warshall graph distances computing function
     CTYPE: igraph_floyd_warshall_algorithm_t
     FLAGS: ENUM
 

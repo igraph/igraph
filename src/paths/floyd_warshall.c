@@ -171,6 +171,20 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
  * to the graph density. In sparse graphs, other methods such as the Dijkstra or
  * Bellman-Ford algorithms will perform significantly better.
  *
+ * </para><para>
+ * In addition to the original Floyd-Warshall algorithm, igraph contains implementations
+ * of variants that offer better asymptotic complexity as well as better practical
+ * running times for most instances. See the reference below for more information.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Brodnik, A., Grgurovič, M., & Požar, R.:
+ * Modifications of the Floyd-Warshall algorithm with nearly quadratic expected-time,
+ * Ars Mathematica Contemporanea, vol. 22, issue 1, p. #P1.01 (2021).
+ * https://doi.org/10.26493/1855-3974.2467.497
+ *
  * \param graph The graph object.
  * \param res An intialized matrix, the distances will be stored here.
  * \param weights The edge weights. If \c NULL, all weights are assumed to be 1.
@@ -186,16 +200,28 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param method The type of the algorithm used. IGRAPH_FLOYD_WARSHALL_TREE
- *  should be faster for most use cases.
+ * \param method The type of the algorithm used.
+ *        \clist
+ *        \cli IGRAPH_FLOYD_WARSHALL_AUTOMATIC
+ *          tried to select the best performing variant for the current graph;
+ *          presently this option always uses the "Tree" method.
+ *        \cli IGRAPH_FLOYD_WARSHALL_ORIGINAL
+ *          the basic Floyd-Warshall algorithm.
+ *        \cli IGRAPH_FLOYD_WARSHALL_TREE
+ *          the "Tree" speedup of Brodnik et al., faster than the original algorithm
+ *          in most cases.
+ *        \endclist
  * \return Error code. \c IGRAPH_ENEGLOOP is returned if a negative-weight
  *   cycle is found.
  *
  * \sa \ref igraph_distances(), \ref igraph_distances_dijkstra(),
  * \ref igraph_distances_bellman_ford(), \ref igraph_distances_johnson()
  *
- * Time complexity: O(|V|^3 + |E|) where |V| is the number of vertices
- * and |E| is the number of edges.
+ * Time complexity:
+ * The original variant has complexity O(|V|^3 + |E|).
+ * Brodnik et al indicates expected-case complexity of O(|V|^2 log^2 |V|)
+ * for the "Tree" variant.
+ * Here |V| denotes the number of vertices and |E| is the number of edges.
  */
 igraph_error_t igraph_distances_floyd_warshall(
     const igraph_t *graph, igraph_matrix_t *res,
