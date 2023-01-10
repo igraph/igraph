@@ -180,7 +180,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
  * Reference:
  *
  * </para><para>
- * Brodnik, A., Grgurovič, M., & Požar, R.:
+ * Brodnik, A., Grgurovič, M., Požar, R.:
  * Modifications of the Floyd-Warshall algorithm with nearly quadratic expected-time,
  * Ars Mathematica Contemporanea, vol. 22, issue 1, p. #P1.01 (2021).
  * https://doi.org/10.26493/1855-3974.2467.497
