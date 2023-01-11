@@ -28,7 +28,10 @@
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
-            "extensions": ["ms-vscode.cpptools-extension-pack"]
+            "extensions": [
+                "ms-vscode.cpptools-extension-pack", // C/C++ and CMake support
+                "daohong-emilio.yash" // flex/bison support
+            ]
         }
     }
 
