@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2022-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,8 +22,9 @@
 
 
 static igraph_error_t igraph_distances_floyd_warshall_original(
-    const igraph_t *graph, igraph_matrix_t *res,
-    const igraph_vector_t *weights) {
+        const igraph_t *graph, igraph_matrix_t *res,
+        const igraph_vector_t *weights) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
@@ -54,15 +55,16 @@ static igraph_error_t igraph_distances_floyd_warshall_original(
 
 
 static igraph_error_t igraph_distances_floyd_warshall_tree(
-    const igraph_t *graph, igraph_matrix_t *res,
-    const igraph_vector_t *weights) {
+        const igraph_t *graph, igraph_matrix_t *res,
+        const igraph_vector_t *weights) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     /* predecessors[u][v] is the second but last vertex on the shortest path from u to v */
     igraph_matrix_int_t predecessors;
     IGRAPH_MATRIX_INT_INIT_FINALLY(&predecessors, no_of_nodes, no_of_nodes);
 
-    /* children[u][i] is the i-th children of u in a tree of shortest distances
+    /* children[u][i] is the i-th child of u in a tree of shortest distances
        rooted at k in the main loop below */
     igraph_matrix_int_t children;
     IGRAPH_MATRIX_INT_INIT_FINALLY(&children, no_of_nodes, no_of_nodes);
@@ -72,7 +74,8 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
     igraph_vector_int_t no_of_children;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children, no_of_nodes);
 
-    /* dfs_traversal and dfs_skip arrays for running time optimization */
+    /* dfs_traversal and dfs_skip arrays for running time optimization,
+       see "Practical improvement" in Section 3.1 of the paper */
     igraph_vector_int_t dfs_traversal;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dfs_traversal, no_of_nodes);
     igraph_vector_int_t dfs_skip;
@@ -89,9 +92,8 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
 
     for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
         /* resetting no_of_children vector */
-        for (igraph_integer_t parent = 0; parent < no_of_nodes; parent++) {
-            VECTOR(no_of_children)[parent] = 0;
-        }
+        igraph_vector_int_null(&no_of_children);
+
         /* constructing the tree out_k (as in the paper) but
            representing it as the children matrix */
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
@@ -102,18 +104,16 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
             MATRIX(children, parent, VECTOR(no_of_children)[parent]) = v;
             VECTOR(no_of_children)[parent]++;
         }
-        /* constructing dfs-traversal and dfs-skip arrays
-            for the out_k tree
-        */
+        /* constructing dfs-traversal and dfs-skip arrays for the out_k tree */
         IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
         igraph_integer_t counter = 0;
         while (!igraph_stack_int_empty(&stack)) {
             igraph_integer_t parent = igraph_stack_int_pop(&stack);
-            if (parent > -1) {
+            if (parent >= 0) {
                 VECTOR(dfs_traversal)[counter] = parent;
                 counter++;
-                // a negative marker -parent - 1 that is popped right after
-                // all the descendants of the parent were processed
+                /* a negative marker -parent - 1 that is popped right after
+                   all the descendants of the parent were processed */
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, -parent - 1));
                 for (igraph_integer_t l = 0; l < VECTOR(no_of_children)[parent]; l++) {
                     IGRAPH_CHECK(igraph_stack_int_push(&stack, MATRIX(children, parent, l)));
