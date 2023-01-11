@@ -1027,30 +1027,23 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_stack_int_t path;
     igraph_stack_int_t edgestack;
     igraph_inclist_t inclist;
-    igraph_integer_t i, counter, rootdfs = 0;
+    igraph_integer_t counter, rootdfs = 0;
     igraph_vector_int_t vertex_added;
     igraph_integer_t comps = 0;
     igraph_vector_int_list_t *mycomponents = components, vcomponents;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&nextptr, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nextptr);
-    IGRAPH_CHECK(igraph_vector_int_init(&num, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &num);
-    IGRAPH_CHECK(igraph_vector_int_init(&low, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
-    IGRAPH_CHECK(igraph_vector_bool_init(&found, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &found);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&found, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_stack_int_init(&path, 100));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
-    IGRAPH_CHECK(igraph_stack_int_init(&edgestack, 100));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &edgestack);
+    IGRAPH_STACK_INT_INIT_FINALLY(&path, 100);
+    IGRAPH_STACK_INT_INIT_FINALLY(&edgestack, 100);
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&vertex_added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &vertex_added);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_added, no_of_nodes);
 
     if (no) {
         *no = 0;
@@ -1072,7 +1065,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
         IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(mycomponents, 0);
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
 
         if (VECTOR(low)[i] != 0) {
             continue;    /* already visited */

@@ -13,6 +13,23 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+
+### Changed
+
+ - The `test` build target now only _runs_ the unit tests, but it does not _build_ them. In order to both build and run tests, use the `check` target, which continues to behave as before (PR #2291).
+
+### Fixed
+
+ - The Bellman-Ford shortest path finder is now interruptible.
+ - Running CTest no longer builds the tests automatically, as this interfered with VSCode, which would invoke the `ctest` executable after configuring a project in order to determine test executables. Use the `build_tests` target to build the tests first, or use the `check` target to both _build_ and _run_ all unit tests (PR #2291).
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.3] - 2022-12-30
 
 ### Added
