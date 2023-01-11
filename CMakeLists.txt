@@ -146,10 +146,6 @@ configure_file(
 # included as a sub-project in another CMake project
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
-  configure_file(
-    ${PROJECT_SOURCE_DIR}/etc/cmake/CTestCustom.cmake.in
-    ${PROJECT_BINARY_DIR}/CTestCustom.cmake
-  )
 endif()
 
 # Traverse subdirectories. vendor/ should come first because code in
