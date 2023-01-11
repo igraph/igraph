@@ -294,10 +294,9 @@ IGRAPH_EXPORT igraph_error_t igraph_steiner_dreyfus_wagner(
 IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
 
 IGRAPH_EXPORT igraph_error_t igraph_vertex_path_from_edge_path(
-   const igraph_t *graph, igraph_integer_t start,
-   const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
-   igraph_neimode_t mode
-);
+        const igraph_t *graph, igraph_integer_t start,
+        const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
+        igraph_neimode_t mode);
 
 /* Deprecated functions: */
 
