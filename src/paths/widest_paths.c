@@ -408,12 +408,15 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  * \brief Widths of widest paths between vertices.
  *
  * This function implements a modified Floyd-Warshall algorithm,
- * to find the widest path widths from a set of source vertices to
- * all other target vertices.
+ * to find the widest path widths between a set of source and target
+ * vertices. It is primarily useful for all-pairs path widths in very dense
+ * graphs, as its running time is manily determined by the vertex count,
+ * and is not sensitive to the graph density. In sparse graphs, other methods
+ * such as the Dijkstra algorithm, will perform better.
  *
  * </para><para>
- * Note that this function always computes the path width matrix for
- * all pairs of vertices. The \p from and \p to parameters only serve
+ * Note that internally this function always computes the path width matrix
+ * for all pairs of vertices. The \p from and \p to parameters only serve
  * to subset this matrix, but do not affect the time taken by the
  * calculation.
  *
