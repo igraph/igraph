@@ -28,6 +28,7 @@
 
 ### Other
 
+ - Improved the performance and memory usage of `igraph_widest_path_widths_floyd_warshall()`.
  - Documentation improvements.
 
 ## [0.10.3] - 2022-12-30
