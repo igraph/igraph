@@ -20,6 +20,7 @@
 #include "igraph_interface.h"
 #include "igraph_stack.h"
 
+#include "core/interruption.h"
 
 static igraph_error_t igraph_distances_floyd_warshall_original(
         const igraph_t *graph, igraph_matrix_t *res,
@@ -28,6 +29,8 @@ static igraph_error_t igraph_distances_floyd_warshall_original(
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
+        IGRAPH_ALLOW_INTERRUPTION();
+
         /* Iteration order matters for performance!
          * First j, then i, because matrices are stored as column-major. */
         for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
@@ -67,7 +70,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
     /* children[u][i] is the i-th child of u in a tree of shortest distances
        rooted at k in the main loop below */
     igraph_matrix_int_t children;
-    IGRAPH_MATRIX_INT_INIT_FINALLY(&children, no_of_nodes, no_of_nodes);
+    IGRAPH_MATRIX_INT_INIT_FINALLY(&children, no_of_nodes, no_of_nodes > 0 ? no_of_nodes-1 : 0);
 
     /* no_of_children[u] is the number of children of u
        rooted at k in the main loop below */
@@ -91,6 +94,8 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
     }
 
     for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
+        IGRAPH_ALLOW_INTERRUPTION();
+
         /* resetting no_of_children vector */
         igraph_vector_int_null(&no_of_children);
 
