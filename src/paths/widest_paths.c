@@ -648,8 +648,6 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
     igraph_integer_t no_of_from, no_of_to;
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j;
-    igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
-    igraph_real_t my_neginfinity = IGRAPH_NEGINFINITY;
     igraph_bool_t all_to;
     igraph_vector_int_t indexv;
 
@@ -695,7 +693,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-    igraph_matrix_fill(res, my_neginfinity);
+    igraph_matrix_fill(res, IGRAPH_NEGINFINITY);
 
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);
@@ -704,7 +702,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
         igraph_integer_t reached = 0;
         igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
         igraph_2wheap_clear(&Q);
-        igraph_2wheap_push_with_index(&Q, source, my_posinfinity);
+        igraph_2wheap_push_with_index(&Q, source, IGRAPH_POSINFINITY);
 
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t maxnei = igraph_2wheap_max_index(&Q);
@@ -738,7 +736,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                 igraph_real_t altwidth = maxwidth < edgewidth ? maxwidth : edgewidth;
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
-                igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : my_posinfinity;
+                igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : IGRAPH_POSINFINITY;
                 if (!has) {
                     /* This is the first time assigning a width to this vertex */
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, altwidth));
