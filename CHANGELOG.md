@@ -9,6 +9,7 @@
 ### Changed
 
  - The `test` build target now only _runs_ the unit tests, but it does not _build_ them. In order to both build and run tests, use the `check` target, which continues to behave as before (PR #2291).
+ - The experimental function `igraph_distances_floyd_warshall()` now has an additional `method` parameter to select a specific algorithm. A faster "Tree" variant of the Floyd-Warshall algorithm is now available (#2267, thanks to @rfulekjames).
 
 ### Fixed
 
