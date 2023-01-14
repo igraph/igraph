@@ -69,7 +69,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    /* predecessors[u][v] is the second vertex on the shortest path from v to u,
+    /* predecessors[v][u] is the second vertex on the shortest path from v to u,
        i.e. the parent of v in the IN_u tree. */
     igraph_matrix_int_t predecessors;
     IGRAPH_MATRIX_INT_INIT_FINALLY(&predecessors, no_of_nodes, no_of_nodes);
@@ -102,9 +102,9 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
     igraph_stack_int_t stack;
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
-    for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
-        for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
-            MATRIX(predecessors, u, v) = u;
+    for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
+        for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
+            MATRIX(predecessors, v, u) = u;
         }
     }
 
@@ -114,8 +114,8 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
         /* Count the children of each node in the shortest path tree, assuming that at
            this point all elements of no_of_children[] are zeros. */
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
-            if (k == v) continue;
-            igraph_integer_t parent = MATRIX(predecessors, k, v);
+            if (v == k) continue;
+            igraph_integer_t parent = MATRIX(predecessors, v, k);
             VECTOR(no_of_children)[parent]++;
         }
 
@@ -135,8 +135,8 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
            At the end of the calculation, all elements of no_of_children[] will be zeros,
            making this vector ready for the next iteration of the outer loop. */
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
-            if (k == v) continue;
-            igraph_integer_t parent = MATRIX(predecessors, k, v);
+            if (v == k) continue;
+            igraph_integer_t parent = MATRIX(predecessors, v, k);
             VECTOR(no_of_children)[parent]--;
             VECTOR(children)[ VECTOR(children_start)[parent] + VECTOR(no_of_children)[parent] ] = v;
         }
@@ -173,7 +173,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
                 igraph_real_t dd = MATRIX(*res, j, i);
                 if (di < dd) {
                     MATRIX(*res, j, i) = di;
-                    MATRIX(predecessors, i, j) = MATRIX(predecessors, k, j);
+                    MATRIX(predecessors, j, i) = MATRIX(predecessors, j, k);
                     counter++;
                 } else {
                     counter = VECTOR(dfs_skip)[j];
@@ -192,7 +192,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
     igraph_vector_int_destroy(&no_of_children);
     igraph_vector_int_destroy(&children_start);
     igraph_vector_int_destroy(&children);
-    igraph_matrix_int_destroy(&predecessors);    
+    igraph_matrix_int_destroy(&predecessors);
     IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
