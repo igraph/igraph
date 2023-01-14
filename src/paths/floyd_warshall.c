@@ -112,6 +112,9 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
             VECTOR(no_of_children)[parent]++;
         }
 
+        /* Note: we do not use igraph_vector_int_cumsum() here as that function produces
+           an output vector of the same length as the input vector. Here we need an output
+           one longer, with a 0 being prepended to what vector_cumsum() would produce. */
         igraph_integer_t cumsum = 0;
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
             VECTOR(children_start)[v] = cumsum;
