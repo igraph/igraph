@@ -61,16 +61,23 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
         const igraph_t *graph, igraph_matrix_t *res,
         const igraph_vector_t *weights) {
 
+    /* This is the "Tree" algorithm of Brodnik et al.
+     * A difference from the paper is that instead of using the OUT_k tree of shortest
+     * paths _starting_ in k, we use the IN_k tree of shortest paths _ending_ in k.
+     * This makes it easier to iterate through matrices in column-major order,
+     * i.e. storage order, thus increasing performance. */
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    /* predecessors[u][v] is the second but last vertex on the shortest path from u to v */
+    /* predecessors[u][v] is the second vertex on the shortest path from v to u,
+       i.e. the parent of v in the IN_u tree. */
     igraph_matrix_int_t predecessors;
     IGRAPH_MATRIX_INT_INIT_FINALLY(&predecessors, no_of_nodes, no_of_nodes);
 
     /* children[children_start[u] + i] is the i-th child of u in a tree of shortest paths
-       rooted at k in the main loop below (OUT_k). There are no_of_nodes-1 child vertices
-       in total, as the root vertex is excluded. This is essentially a contiguously stored
-       adjacency list representation of OUT_k. */
+       rooted at k, and ending in k, in the main loop below (IN_k). There are no_of_nodes-1
+       child vertices in total, as the root vertex is excluded. This is essentially a contiguously
+       stored adjacency list representation of IN_k. */
     igraph_vector_int_t children;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&children, no_of_nodes-1);
 
@@ -81,7 +88,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
     igraph_vector_int_t children_start;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&children_start, no_of_nodes+1);
 
-    /* no_of_children[u] is the number of children that u has in OUT_k in the main loop below. */
+    /* no_of_children[u] is the number of children that u has in IN_k in the main loop below. */
     igraph_vector_int_t no_of_children;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&no_of_children, no_of_nodes);
 
@@ -122,7 +129,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
         }
         VECTOR(children_start)[no_of_nodes] = cumsum;
 
-        /* Constructing the tree out_k (as in the paper) and representing it
+        /* Constructing the tree IN_k (as in the paper) and representing it
            as a contiguously stored adjacency list. The entires of the no_of_children
            vector as re-used as an index of where to insert child node indices.
            At the end of the calculation, all elements of no_of_children[] will be zeros,
@@ -134,7 +141,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
             VECTOR(children)[ VECTOR(children_start)[parent] + VECTOR(no_of_children)[parent] ] = v;
         }
 
-        /* constructing dfs-traversal and dfs-skip arrays for the OUT_k tree */
+        /* constructing dfs-traversal and dfs-skip arrays for the IN_k tree */
         IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
         igraph_integer_t counter = 0;
         while (!igraph_stack_int_empty(&stack)) {
