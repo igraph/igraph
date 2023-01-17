@@ -496,7 +496,7 @@ igraph_vs_t igraph_vss_range(igraph_integer_t start, igraph_integer_t end) {
  */
 
 igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to) {
-    *vs = igraph_vss_seq(from, to);
+    *vs = igraph_vss_range(from, to + 1);
     return IGRAPH_SUCCESS;
 }
 
@@ -1209,7 +1209,7 @@ igraph_es_t igraph_ess_range(igraph_integer_t start, igraph_integer_t end) {
  */
 
 igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to) {
-    *es = igraph_ess_seq(from, to);
+    *es = igraph_ess_range(from, to + 1);
     return IGRAPH_SUCCESS;
 }
 
