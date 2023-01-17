@@ -14,6 +14,7 @@
 ### Fixed
 
  - The Bellman-Ford shortest path finder is now interruptible.
+ - The Floyd-Warshall shortest path finder is now interruptible.
  - Running CTest no longer builds the tests automatically, as this interfered with VSCode, which would invoke the `ctest` executable after configuring a project in order to determine test executables. Use the `build_tests` target to build the tests first, or use the `check` target to both _build_ and _run_ all unit tests (PR #2291).
 
 ### Other
