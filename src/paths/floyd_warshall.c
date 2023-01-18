@@ -258,8 +258,8 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
  *
  * Time complexity:
  * The original variant has complexity O(|V|^3 + |E|).
- * Brodnik et al indicates expected-case complexity of O(|V|^2 log^2 |V|)
- * for the "Tree" variant.
+ * The "Tree" variant has expected-case complexity of O(|V|^2 log^2 |V|)
+ * according to Brodnik et al., while its worst-time complexity remains O(|V|^3).
  * Here |V| denotes the number of vertices and |E| is the number of edges.
  */
 igraph_error_t igraph_distances_floyd_warshall(
