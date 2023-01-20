@@ -303,6 +303,7 @@ add_library(
   internal/lsap.c
   internal/qsort_r.c
   internal/qsort.c
+  internal/utils.c
   internal/zeroin.c
 
   version.c
