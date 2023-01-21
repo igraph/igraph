@@ -553,6 +553,10 @@ ARPACKSTORAGE:
     CTYPE: igraph_arpack_storage_t
     FLAGS: BY_REF
 
+ASTAR_HEURISTIC_FUNC:
+    # A* heuristic function
+    CTYPE: igraph_astar_heuristic_func_t
+
 ATTRIBUTES:
     # An opaque data structure that a high-level interface may use to pass
     # information about graph/vertex/edge attributes to a low-level igraph
