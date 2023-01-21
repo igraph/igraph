@@ -190,6 +190,18 @@ int main(void) {
 
     igraph_vector_int_print(&vertices);
 
+    printf("Checking wrong weight length error.\n");
+    igraph_vector_destroy(&weights_vec);
+    igraph_vector_init_int(&weights_vec, 0);
+    igraph_destroy(&g);
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
+
+    printf("Checking wrong negative weight error.\n");
+    igraph_vector_destroy(&weights_vec);
+    igraph_vector_init_int(&weights_vec, 1, -1);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
+
     igraph_vector_int_destroy(&vertices);
     igraph_vector_int_destroy(&edges);
     igraph_vector_int_destroy(&vertices);

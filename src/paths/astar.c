@@ -97,12 +97,12 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     if (weights) { //If there are no weights, they are treated as 1.
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
         }
         if (no_of_edges > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
+                IGRAPH_ERRORF("Weight vector must be non-negative, found weight of %f.", IGRAPH_EINVAL, min);
             }
             else if (isnan(min)) {
                 IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
@@ -175,7 +175,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     } /* !igraph_2wheap_empty(&Q) */
 
     if (!found) {
-        IGRAPH_WARNING("Couldn't reach the vertex");
+        IGRAPH_WARNING("Couldn't reach the end vertex.");
     }
 
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
