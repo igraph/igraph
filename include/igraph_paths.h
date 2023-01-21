@@ -180,8 +180,6 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_path_astar(const igraph_t *grap
                                       igraph_integer_t to,
                                       const igraph_vector_t *weights,
                                       igraph_neimode_t mode,
-                                      igraph_vector_int_t *parents,
-                                      igraph_vector_int_t *inbound_edges,
                                       igraph_astar_heuristic_func_t *heuristic,
                                       void *extra);
 

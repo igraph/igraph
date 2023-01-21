@@ -57,52 +57,6 @@ int check_edges(const igraph_t *graph, const igraph_vector_int_t *vertices,
     return 0;
 }
 
-int check_parents_inbound(const igraph_t* graph, const igraph_vector_int_t* parents,
-                       const igraph_vector_int_t* inbound, int start, int error_code) {
-    igraph_integer_t i, n = igraph_vcount(graph);
-
-    if (igraph_vector_int_size(parents) != n ||
-        igraph_vector_int_size(inbound) != n) {
-        exit(error_code);
-    }
-
-    if (VECTOR(*parents)[start] != -1 || VECTOR(*inbound)[start] != -1) {
-        printf("%" IGRAPH_PRId "\n", VECTOR(*parents)[start]);
-        printf("%" IGRAPH_PRId "\n", VECTOR(*inbound)[start]);
-        exit(error_code + 1);
-    }
-
-    for (i = 0; i < n; i++) {
-        if (VECTOR(*parents)[i] == -2) {
-            if (VECTOR(*inbound)[i] != -1) {
-                exit(error_code + 2);
-            }
-        } else if (VECTOR(*parents)[i] == -1) {
-            if (i != start) {
-                exit(error_code + 3);
-            }
-            if (VECTOR(*inbound)[i] != -1) {
-                exit(error_code + 4);
-            }
-        } else {
-            igraph_integer_t eid = VECTOR(*inbound)[i];
-            igraph_integer_t u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
-            if (v != i && !igraph_is_directed(graph)) {
-                igraph_integer_t dummy = u;
-                u = v;
-                v = dummy;
-            }
-            if (v != i) {
-                exit(error_code + 5);
-            } else if (u != VECTOR(*parents)[i]) {
-                exit(error_code + 6);
-            }
-        }
-    }
-
-    return 0;
-}
-
 igraph_error_t no_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
     (void) source_id;
     (void) target_id;
@@ -140,7 +94,7 @@ igraph_error_t euclidean_heuristic(igraph_real_t *result, igraph_integer_t sourc
 int main(void) {
 
     igraph_t g;
-    igraph_vector_int_t parents, inbound, vertices, edges;
+    igraph_vector_int_t vertices, edges;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_vector_t weights_vec;
     struct xyt xy;
@@ -154,8 +108,6 @@ int main(void) {
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
 
-    igraph_vector_int_init(&parents, 0);
-    igraph_vector_int_init(&inbound, 0);
     igraph_vector_int_init(&vertices, 0);
     igraph_vector_int_init(&edges, 0);
 
@@ -163,11 +115,9 @@ int main(void) {
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 5,
                                        /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
-                                       &parents,
-                                       /*inbound_edges=*/ &inbound, no_heuristic, NULL);
+                                       no_heuristic, NULL);
 
     check_edges(&g, &vertices, &edges, /*error code*/10);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/40);
 
     igraph_vector_int_print(&vertices);
 
@@ -178,11 +128,9 @@ int main(void) {
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 5,
                                        &weights_vec, IGRAPH_OUT,
-                                       &parents,
-                                       /*inbound_edges=*/ &inbound, no_heuristic, NULL);
+                                       no_heuristic, NULL);
 
     check_edges(&g, &vertices, &edges, 20);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/50);
 
     igraph_vector_int_print(&vertices);
 
@@ -197,11 +145,9 @@ int main(void) {
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ LENGTH-1,
                                        /*weights*/NULL, IGRAPH_OUT,
-                                       &parents,
-                                       /*inbound_edges=*/ &inbound, lattice_heuristic, NULL);
+                                       lattice_heuristic, NULL);
     igraph_vector_int_print(&vertices);
     check_edges(&g, &vertices, &edges, /*error code*/60);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/70);
 
     igraph_destroy(&g);
  
@@ -224,12 +170,10 @@ int main(void) {
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ LENGTH-1,
                                        /*weights*/&weights_vec, IGRAPH_OUT,
-                                       &parents,
-                                       /*inbound_edges=*/ &inbound, euclidean_heuristic, &xy);
+                                       euclidean_heuristic, &xy);
 
     igraph_vector_int_print(&vertices);
     check_edges(&g, &vertices, &edges, /*error code*/80);
-    check_parents_inbound(&g, &parents, &inbound, /* from= */ 0, /*error code*/90);
 
     printf("Check with dijkstra:\n");
     igraph_get_shortest_path_dijkstra(&g, /*vertices=*/ &vertices,
@@ -242,16 +186,12 @@ int main(void) {
     igraph_get_shortest_path_astar(&g, &vertices,
                                        &edges, /*from=*/ 0, /*to=*/ LENGTH - 1,
                                        /*weights*/&weights_vec, IGRAPH_OUT,
-                                       &parents,
-                                       &inbound, 
                                        euclidean_heuristic, &xy);
 
     igraph_vector_int_print(&vertices);
 
     igraph_vector_int_destroy(&vertices);
     igraph_vector_int_destroy(&edges);
-    igraph_vector_int_destroy(&parents);
-    igraph_vector_int_destroy(&inbound);
     igraph_vector_int_destroy(&vertices);
     igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&weights_vec);

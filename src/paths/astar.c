@@ -56,23 +56,6 @@
  *        directions, \c IGRAPH_IN follows the opposite directions,
  *        and \c IGRAPH_ALL ignores edge directions. This argument is
  *        ignored for undirected graphs.
- * \param parents A pointer to an initialized igraph vector or null.
- *        If not null, a vector containing the parent of each vertex in
- *        the single source shortest path tree is returned here. The
- *        parent of vertex i in the tree is the vertex from which vertex i
- *        was reached. The parent of the start vertex (in the \c from
- *        argument) is -1. If the parent is -2, it means
- *        that the given vertex was not reached from the source during the
- *        search. Note that the search terminates if all the vertices in
- *        \c to are reached.
- * \param inbound_edges A pointer to an initialized igraph vector or null.
- *        If not null, a vector containing the inbound edge of each vertex in
- *        the single source shortest path tree is returned here. The
- *        inbound edge of vertex i in the tree is the edge via which vertex i
- *        was reached. The start vertex and vertices that were not reached
- *        during the search will have -1 in the corresponding entry of the
- *        vector. Note that the search terminates if all the vertices in
- *        \c to are reached.
  * \param heuristic A function that returns an estimate of the distance as
  *        \c igraph_real_t in its first argument. The second parameter is
  *        passed the vertex id as an \c igraph_integer_t, and the third
@@ -92,8 +75,6 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
                                       igraph_integer_t to,
                                       const igraph_vector_t *weights,
                                       igraph_neimode_t mode,
-                                      igraph_vector_int_t *parents,
-                                      igraph_vector_int_t *inbound_edges,
                                       igraph_astar_heuristic_func_t *heuristic,
                                       void *extra)
 {
@@ -191,39 +172,6 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     if (!found) {
         IGRAPH_WARNING("Couldn't reach the vertex");
-    }
-
-    /* Create `parents' if needed */
-    if (parents) {
-        IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
-
-        for (i = 0; i < no_of_nodes; i++) {
-            if (i == from) {
-                /* i is the start vertex */
-                VECTOR(*parents)[i] = -1;
-            } else if (parent_eids[i] <= 0) {
-                /* i was not reached */
-                VECTOR(*parents)[i] = -2;
-            } else {
-                /* i was reached via the edge with ID = parent_eids[i] - 1 */
-                VECTOR(*parents)[i] = IGRAPH_OTHER(graph, parent_eids[i] - 1, i);
-            }
-        }
-    }
-
-    /* Create `inbound_edges' if needed */
-    if (inbound_edges) {
-        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
-
-        for (i = 0; i < no_of_nodes; i++) {
-            if (parent_eids[i] <= 0) {
-                /* i was not reached */
-                VECTOR(*inbound_edges)[i] = -1;
-            } else {
-                /* i was reached via the edge with ID = parent_eids[i] - 1 */
-                VECTOR(*inbound_edges)[i] = parent_eids[i] - 1;
-            }
-        }
     }
 
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
