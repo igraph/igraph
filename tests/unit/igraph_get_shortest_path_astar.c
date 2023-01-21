@@ -197,7 +197,7 @@ int main(void) {
     igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
     CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
 
-    printf("Checking wrong negative weight error.\n");
+    printf("Checking negative weight error.\n");
     igraph_vector_destroy(&weights_vec);
     igraph_vector_init_int(&weights_vec, 1, -1);
     CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);

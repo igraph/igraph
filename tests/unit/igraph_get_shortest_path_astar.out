@@ -10,3 +10,5 @@ Check with dijkstra:
 0 13 17 24 20 9
 Same situation but through shortest_path_astar interface:
 0 13 17 24 20 9
+Checking wrong weight length error.
+Checking negative weight error.
