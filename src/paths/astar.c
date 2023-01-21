@@ -119,9 +119,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     igraph_vector_fill(&dists, IGRAPH_INFINITY);
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parent_eids == 0) {
-        IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(parent_eids, "Can't calculate shortest paths");
     IGRAPH_FINALLY(igraph_free, parent_eids);
 
     VECTOR(dists)[from] = 0.0;  /* zero distance */
