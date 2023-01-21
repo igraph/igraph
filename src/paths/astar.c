@@ -95,6 +95,14 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     igraph_integer_t i;
     igraph_bool_t found = false;
 
+    if (from < 0 || from >= no_of_nodes) {
+        IGRAPH_ERROR("Starting vertex out of range.", IGRAPH_EINVAL);
+    }
+
+    if (to < 0 || to >= no_of_nodes) {
+        IGRAPH_ERROR("End vertex out of range.", IGRAPH_EINVAL);
+    }
+
     if (weights) { //If there are no weights, they are treated as 1.
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);

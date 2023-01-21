@@ -106,12 +106,26 @@ int main(void) {
 
     /* Simple ring graph without weights */
 
-    igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
 
     igraph_vector_int_init(&vertices, 0);
     igraph_vector_int_init(&edges, 0);
 
-    printf("Astar, unweighted, no heuristic:\n");
+
+    printf("Astar on singleton, unweighted, no heuristic:\n");
+    igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1);
+    igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
+                                       /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 0,
+                                       /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
+                                       no_heuristic, NULL);
+
+    check_edges(&g, &vertices, &edges, /*error code*/10);
+
+    igraph_vector_int_print(&vertices);
+
+    igraph_destroy(&g);
+
+    printf("Astar on ring, unweighted, no heuristic:\n");
+    igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 5,
                                        /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
@@ -150,12 +164,12 @@ int main(void) {
     check_edges(&g, &vertices, &edges, /*error code*/60);
 
     igraph_destroy(&g);
- 
+
     printf("Astar, unweighted, grg with euclidean distance heuristic:\n");
     igraph_vector_init(&xy.x, 0);
     igraph_vector_init(&xy.y, 0);
 
-    igraph_grg_game(&g, /*nodes*/100, /*radius*/0.2, /*torus*/ false, &xy.x, &xy.y); 
+    igraph_grg_game(&g, /*nodes*/100, /*radius*/0.2, /*torus*/ false, &xy.x, &xy.y);
     igraph_vector_init(&weights_vec, igraph_ecount(&g));
 
     for (int i = 0; i < igraph_ecount(&g); i++) {
@@ -190,11 +204,19 @@ int main(void) {
 
     igraph_vector_int_print(&vertices);
 
+    printf("Checking from out of range.\n");
+    igraph_destroy(&g);
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 10, 1, NULL, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
+
+    printf("Checking to out of range.\n");
+    igraph_destroy(&g);
+    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 10, NULL, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
+
     printf("Checking wrong weight length error.\n");
     igraph_vector_destroy(&weights_vec);
     igraph_vector_init_int(&weights_vec, 0);
-    igraph_destroy(&g);
-    igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
     CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
 
     printf("Checking negative weight error.\n");

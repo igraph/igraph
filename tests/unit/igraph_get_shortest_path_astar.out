@@ -1,4 +1,6 @@
-Astar, unweighted, no heuristic:
+Astar on singleton, unweighted, no heuristic:
+0
+Astar on ring, unweighted, no heuristic:
 0 1 2 3 4 5
 Astar, weighted, no heuristic:
 0 9 8 7 6 5
@@ -10,5 +12,7 @@ Check with dijkstra:
 0 13 17 24 20 9
 Same situation but through shortest_path_astar interface:
 0 13 17 24 20 9
+Checking from out of range.
+Checking to out of range.
 Checking wrong weight length error.
 Checking negative weight error.
