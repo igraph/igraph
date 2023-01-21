@@ -1390,18 +1390,18 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
         igraph_integer_t bignode = VECTOR(mergehist)[2 * mincut_step + 1];
         igraph_integer_t i, idx;
         igraph_integer_t size = 1;
-        char *mark;
+        bool *mark;
 
-        mark = IGRAPH_CALLOC(no_of_nodes, char);
+        mark = IGRAPH_CALLOC(no_of_nodes, bool);
         IGRAPH_CHECK_OOM(mark, "Not enough memory for minimum cut.");
         IGRAPH_FINALLY(igraph_free, mark);
 
         /* first count the vertices in the partition */
-        mark[bignode] = 1;
+        mark[bignode] = true;
         for (i = mincut_step - 1; i >= 0; i--) {
             if ( mark[ VECTOR(mergehist)[2 * i] ] ) {
                 size++;
-                mark [ VECTOR(mergehist)[2 * i + 1] ] = 1;
+                mark [ VECTOR(mergehist)[2 * i + 1] ] = true;
             }
         }
 
@@ -1446,7 +1446,7 @@ static igraph_error_t igraph_i_mincut_undirected(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_int_append(cut, &mergehist));
         }
 
-        igraph_free(mark);
+        IGRAPH_FREE(mark);
         igraph_vector_int_destroy(&mergehist);
         IGRAPH_FINALLY_CLEAN(2);
     }
@@ -2491,9 +2491,9 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         VECTOR(partition)[mid + 1] = VECTOR(neighbors)[i];
     }
 
-    /* Create the tree graph; we use igraph_subgraph_edges here to keep the
+    /* Create the tree graph; we use igraph_subgraph_from_edges here to keep the
      * graph and vertex attributes */
-    IGRAPH_CHECK(igraph_subgraph_edges(graph, tree, igraph_ess_none(), 0));
+    IGRAPH_CHECK(igraph_subgraph_from_edges(graph, tree, igraph_ess_none(), 0));
     IGRAPH_CHECK(igraph_add_edges(tree, &partition, 0));
 
     /* Free the allocated memory */

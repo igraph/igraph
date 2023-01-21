@@ -56,6 +56,12 @@ __BEGIN_DECLS
  */
 typedef igraph_error_t igraph_astar_heuristic_func_t(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra);
 
+typedef enum {
+    IGRAPH_FLOYD_WARSHALL_AUTOMATIC = 0,
+    IGRAPH_FLOYD_WARSHALL_ORIGINAL = 1,
+    IGRAPH_FLOYD_WARSHALL_TREE = 2
+} igraph_floyd_warshall_algorithm_t;
+
 IGRAPH_EXPORT igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                                   igraph_integer_t *from, igraph_integer_t *to,
                                   igraph_vector_int_t *vertex_path, igraph_vector_int_t *edge_path,
@@ -103,8 +109,8 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_johnson(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_distances_floyd_warshall(const igraph_t *graph,
                                                              igraph_matrix_t *res,
                                                              const igraph_vector_t *weights,
-                                                             igraph_neimode_t mode);
-
+                                                             igraph_neimode_t mode,
+                                                             igraph_floyd_warshall_algorithm_t method);
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
                                         const igraph_vs_t from, const igraph_vs_t to,
                                         igraph_neimode_t mode);
@@ -321,10 +327,9 @@ IGRAPH_EXPORT igraph_error_t igraph_voronoi(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_expand_path_to_pairs(igraph_vector_int_t *path);
 
 IGRAPH_EXPORT igraph_error_t igraph_vertex_path_from_edge_path(
-   const igraph_t *graph, igraph_integer_t start,
-   const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
-   igraph_neimode_t mode
-);
+        const igraph_t *graph, igraph_integer_t start,
+        const igraph_vector_int_t *edge_path, igraph_vector_int_t *vertex_path,
+        igraph_neimode_t mode);
 
 /* Deprecated functions: */
 

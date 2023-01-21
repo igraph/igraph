@@ -4,12 +4,35 @@
 
 ### Added
 
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+
+### Changed
+
+ - The `test` build target now only _runs_ the unit tests, but it does not _build_ them. In order to both build and run tests, use the `check` target, which continues to behave as before (PR #2291).
+ - The experimental function `igraph_distances_floyd_warshall()` now has an additional `method` parameter to select a specific algorithm. A faster "Tree" variant of the Floyd-Warshall algorithm is now available (#2267, thanks to @rfulekjames).
+
+### Fixed
+
+ - The Bellman-Ford shortest path finder is now interruptible.
+ - The Floyd-Warshall shortest path finder is now interruptible.
+ - Running CTest no longer builds the tests automatically, as this interfered with VSCode, which would invoke the `ctest` executable after configuring a project in order to determine test executables. Use the `build_tests` target to build the tests first, or use the `check` target to both _build_ and _run_ all unit tests (PR #2291).
+
+### Other
+
+ - Improved the performance and memory usage of `igraph_widest_path_widths_floyd_warshall()`.
+ - Documentation improvements.
+
+## [0.10.3] - 2022-12-30
+
+### Added
+
  - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
  - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
  - `igraph_layout_umap_compute_weights()` computes weights for the UMAP layout algorithm from distances. This used to be part of `igraph_layout_umap()`, but it is now in a separate function to allow the user to experiment with different weighting schemes.
  - `igraph_triangular_lattice()` to generate triangular lattices of various kinds (#2235, thanks to @rfulekjames).
  - `igraph_hexagonal_lattice()` to generate hexagonal lattices of various kinds (#2262, thanks to @rfulekjames).
  - `igraph_tree_from_parent_vector()` to create a tree or a forest from a parent vector (i.e. a vector that encodes the parent vertex of each vertex).
+ - `igraph_induced_subgraph_edges()` produces the IDs of edges contained within a subgraph induced by the given vertices.
 
 ### Changed
 
@@ -24,7 +47,12 @@
  - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs. This was a regression in igraph 0.10.
  - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
  - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
+ - `igraph_calloc()` did not zero-initialize the allocated memory. This is now corrected. Note that the macro `IGRAPH_CALLOC()` was _not_ affected.
  - Fixed new warnings issued by the Xcode 14.1 toolchain.
+
+### Deprecated
+
+- `igraph_subgraph_edges()` is now deprecated to avoid confusion with `igraph_induced_subgraph_edges()`; its new name is `igraph_subgraph_from_edges()`. The old name is kept available until at least igraph 0.11.
 
 ### Other
 
@@ -1105,7 +1133,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.2..master
+[master]: https://github.com/igraph/igraph/compare/0.10.3..master
+[0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0

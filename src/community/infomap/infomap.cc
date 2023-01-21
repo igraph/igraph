@@ -187,7 +187,7 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  * \function igraph_community_infomap
  * \brief Find community structure that minimizes the expected description length of a random walker trajectory.
  *
- * Implementation of the InfoMap community detection algorithm of
+ * Implementation of the Infomap community detection algorithm of
  * Martin Rosvall and Carl T. Bergstrom.
  *
  * </para><para>
@@ -282,7 +282,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
 
         *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
 
-        IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+        IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
         return IGRAPH_SUCCESS;
     );

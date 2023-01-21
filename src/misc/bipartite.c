@@ -104,8 +104,7 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
     igraph_vector_int_t added;
     igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&added, no_of_nodes);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -191,10 +190,11 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_perm, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&vertex_perm, no_of_nodes));
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_index, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&added, no_of_nodes);
+
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
@@ -848,14 +848,12 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     igraph_dqueue_int_t Q;
     igraph_vector_int_t neis;
     igraph_bool_t bi = true;
-    igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_char_init(&seen, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &seen);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&seen, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    for (i = 0; bi && i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; bi && i < no_of_nodes; i++) {
 
         if (VECTOR(seen)[i]) {
             continue;
@@ -897,7 +895,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
 
     if (types && bi) {
         IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             VECTOR(*types)[i] = VECTOR(seen)[i] - 1;
         }
     }

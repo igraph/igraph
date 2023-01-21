@@ -46,6 +46,7 @@ add_library(
   core/error.c
   core/estack.c
   core/fixed_vectorlist.c
+  core/genheap.c
   core/grid.c
   core/heap.c
   core/indheap.c

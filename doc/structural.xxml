@@ -132,7 +132,7 @@
 <!-- doxrox-include igraph_edge_betweenness_cutoff -->
 </section>
 
-<section id="subset-limited-centrality-measures"><title>Subset-limited Centrality Measures</title>
+<section id="subset-limited-centrality-measures"><title>Subset-limited centrality measures</title>
 <!-- doxrox-include igraph_betweenness_subset-->
 <!-- doxrox-include igraph_edge_betweenness_subset-->
 </section>
@@ -205,7 +205,7 @@
 <!-- doxrox-include igraph_assortativity_degree -->
 </section>
 
-<section id="k-cores"><title>K-Cores and K-Trusses</title>
+<section id="k-cores"><title>K-cores and k-trusses</title>
 <!-- doxrox-include igraph_coreness -->
 <!-- doxrox-include igraph_trussness -->
 </section>

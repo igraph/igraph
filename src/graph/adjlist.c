@@ -30,12 +30,12 @@
 #include <string.h>   /* memset */
 #include <stdio.h>
 
-/*
+/**
  * Helper function that simplifies a sorted adjacency vector by removing
  * duplicate elements and optionally self-loops.
  *
  * has_loops and has_multiple are pointers to booleans that will be updated
- * to 1 if the function \em finds a loop or a multiple edge. These values will
+ * to \c true if the function \em finds a loop or a multiple edge. These values will
  * \em never be set back to zero by this function. The usage pattern for these
  * arguments is that the caller should set them to zero, followed by one or
  * multiple calls to this function; at the end of such a sequence the booleans
@@ -158,8 +158,6 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_multiple_t multiple) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t degrees;
-    igraph_bool_t has_loops = 0;
-    igraph_bool_t has_multiple = 0;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
         IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_EINVMODE);
@@ -194,12 +192,16 @@ igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
         }
     }
 
+    igraph_bool_t has_loops = false;
+    igraph_bool_t has_multiple = false;
     for (igraph_integer_t i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], VECTOR(degrees)[i]));
         IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
 
+        /* Attention: This function will only set values for has_loops and has_multiple
+         * if it finds loops/multi-edges. Otherwise they are left at their original value. */
         IGRAPH_CHECK(igraph_i_simplify_sorted_int_adjacency_vector_in_place(
             &al->adjs[i], i, mode, loops, multiple, &has_loops, &has_multiple
         ));
@@ -466,7 +468,12 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
  * \function igraph_adjlist_sort
  * \brief Sorts each vector in an adjacency list.
  *
- * Sorts every vector of the adjacency list.
+ * Sorts every vector of the adjacency list. Note that
+ * \ref igraph_adjlist_init() already produces sorted neighbor lists.
+ * This function is useful when the adjacency list is produced in
+ * a different manner, or is modified in a way that does not preserve
+ * the sorted order.
+ *
  * \param al The adjacency list.
  *
  * Time complexity: O(n log n), n is the total number of elements in
@@ -484,6 +491,10 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
  * \brief Simplifies an adjacency list.
  *
  * Simplifies an adjacency list, i.e. removes loop and multiple edges.
+ *
+ * </para><para>
+ * When the adjacency list is created with \ref igraph_adjlist_init(),
+ * use the \c loops and \c multiple parameters of that function instead.
  *
  * \param al The adjacency list.
  * \return Error code.
@@ -860,6 +871,7 @@ igraph_integer_t igraph_inclist_size(const igraph_inclist_t *il) {
     return il->length;
 }
 
+/* See the prototype above for a description of this function. */
 static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
     igraph_loops_t loops, igraph_multiple_t multiple, igraph_bool_t *has_loops,
@@ -897,9 +909,9 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                     p++;
                 } else {
                     if (VECTOR(*v)[i] == index) {
-                        *has_loops = 1;
+                        *has_loops = true;
                     } else if (i != n - 1 && VECTOR(*v)[i + 1] == VECTOR(*v)[i]) {
-                        *has_multiple = 1;
+                        *has_multiple = true;
                     }
                 }
             }
@@ -910,7 +922,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
                 } else {
-                    *has_loops = 1;
+                    *has_loops = true;
                 }
             }
         }
@@ -936,7 +948,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                        (mode != IGRAPH_ALL)  ||
                        (mode == IGRAPH_ALL && i < n - 2 && VECTOR(*v)[i + 2] == VECTOR(*v)[i])
                        ){
-                    *has_multiple = 1;
+                    *has_multiple = true;
                 }
             }
         } else {
@@ -947,7 +959,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
             for (i = 0; i < n; i++) {
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 if (VECTOR(*v)[i] == index) {
-                    *has_loops = 1;
+                    *has_loops = true;
                     /* this was a loop edge so if the next element is the same, we
                     * need to skip that */
                     if (i < n-1 && VECTOR(*v)[i + 1] == index) {
