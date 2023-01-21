@@ -34,8 +34,14 @@
  *
  * \experimental
  *
- * Calculates a single (positively) weighted shortest path from
- * a single vertex to another one, using the A* algorithm.
+ * Calculates a single shortest path from a single vertex to another
+ * one, using the A* algorithm. A* tries to find a shortest path by
+ * starting at \p from and moving to vertices that lie on a path with
+ * the lowest estimated length. This length estimate is the sum of two
+ * numbers: the distance from the start and the result of the heuristic.
+ * The heuristic is used to estimate the distance between the candidate
+ * vertex and the \to vertex. A* will give the correct shortest path
+ * (if one exists) if the heuristic does not overestimate distances.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param vertices Pointer to an initialized vector or a null
