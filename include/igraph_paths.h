@@ -60,7 +60,10 @@ __BEGIN_DECLS
  *
  * \sa \ref igraph_get_shortest_path_astar()
  */
-typedef igraph_error_t igraph_astar_heuristic_func_t(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra);
+typedef igraph_error_t igraph_astar_heuristic_func_t(
+            igraph_real_t *result,
+            igraph_integer_t from, igraph_integer_t to,
+            void *extra);
 
 typedef enum {
     IGRAPH_FLOYD_WARSHALL_AUTOMATIC = 0,

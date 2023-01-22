@@ -21,7 +21,6 @@
 
 #include "igraph_paths.h"
 #include "igraph_interface.h"
-#include "igraph_vector_list.h"
 #include "igraph_adjlist.h"
 #include "igraph_memory.h"
 
@@ -98,25 +97,24 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_vector_t dists;
     igraph_integer_t *parent_eids;
-    igraph_integer_t i;
-    igraph_bool_t found = false;
 
     if (from < 0 || from >= no_of_nodes) {
-        IGRAPH_ERROR("Starting vertex out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Starting vertex out of range.", IGRAPH_EINVVID);
     }
 
     if (to < 0 || to >= no_of_nodes) {
-        IGRAPH_ERROR("End vertex out of range.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("End vertex out of range.", IGRAPH_EINVVID);
     }
 
-    if (weights) { //If there are no weights, they are treated as 1.
+    if (weights) { /* If there are no weights, they are treated as 1. */
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
+            IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                          IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
         }
         if (no_of_edges > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERRORF("Weight vector must be non-negative, found weight of %f.", IGRAPH_EINVAL, min);
+                IGRAPH_ERRORF("Weight vector must be non-negative, found weight of %g.", IGRAPH_EINVAL, min);
             }
             else if (isnan(min)) {
                 IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
@@ -126,83 +124,97 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
+    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
+    /* dists[v] is the length of the shortest path found so far between 'from' and 'v'. */
     IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
     igraph_vector_fill(&dists, IGRAPH_INFINITY);
 
+    /* parent_eids[v] is the 1 + the ID of v's inbound edge in the shortest path tree.
+     * A value of 0 indicates unreachable vertices. */
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(parent_eids, "Can't calculate shortest paths");
+    IGRAPH_CHECK_OOM(parent_eids, "Can't calculate shortest paths.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
 
-    VECTOR(dists)[from] = 0.0;  /* zero distance */
+    VECTOR(dists)[from] = 0.0;
     IGRAPH_CHECK(heuristic(&heur_res, from, to, extra));
     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, from, -heur_res));
 
-    while (!igraph_2wheap_empty(&Q) && !found) {
-        igraph_integer_t nlen, minnei;
-        /*The sum of the distance and the heuristic is the estimate.
-         *The estimates should be on the heap,
-         *because the minimum estimate should always be handled next.
-         *The value taken off the heap is ignored, we just want the index.
-         */
-        igraph_2wheap_delete_max_index(&Q, &minnei);
-        igraph_vector_int_t *neis;
-
+    igraph_bool_t found = false;
+    while (!igraph_2wheap_empty(&Q)) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        if (minnei == to) {
+        /* The from -> u -> to distance estimate is the sum of the
+         * from -> u distance and the u -> to distance estimate
+         * obtained from the heuristic.
+         *
+         * We use an indexed heap to process 'u' vertices in order
+         * of the smallest from -> u -> to distance estimate. Since
+         * we only have a maximum heap available, we store negated values
+         * in order to obtain smallest values first. The value taken off
+         * the heap is ignored, we just want the index of 'u'. */
+
+        igraph_integer_t u;
+        igraph_2wheap_delete_max_index(&Q, &u);
+
+        /* Reached the target vertex, the search can be stopped. */
+        if (u == to) {
             found = true;
+            break;
         }
 
-        /* Now check all neighbors of 'minnei' for a shorter path */
-        neis = igraph_lazy_inclist_get(&inclist, minnei);
+        /* Now we check all neighbors 'u' for a path with a shorter actual (not estimated)
+         * length than what was found so far. */
+
+        igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, u);
         IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
-        nlen = igraph_vector_int_size(neis);
-        for (i = 0; i < nlen; i++) {
+
+        igraph_integer_t nlen = igraph_vector_int_size(neis);
+        for (igraph_integer_t i = 0; i < nlen; i++) {
             igraph_integer_t edge = VECTOR(*neis)[i];
-            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
-            igraph_real_t altdist;
+            igraph_integer_t v = IGRAPH_OTHER(graph, edge, u);
+            igraph_real_t altdist; /* candidate from -> v distance */
             if (weights) {
                 igraph_real_t weight = VECTOR(*weights)[edge];
+                /* TODO: Should infinite-weight edges be skipped?
+                 * See https://github.com/igraph/igraph/issues/2222 */
                 if (weight == IGRAPH_INFINITY) continue;
-                altdist = VECTOR(dists)[minnei] + weight;
+                altdist = VECTOR(dists)[u] + weight;
             } else {
-                altdist = VECTOR(dists)[minnei] + 1;
+                altdist = VECTOR(dists)[u] + 1;
             }
-            igraph_real_t curdist = VECTOR(dists)[tto];
+            igraph_real_t curdist = VECTOR(dists)[v];
             if (curdist == IGRAPH_INFINITY) {
-                /* This is the first finite distance */
-                VECTOR(dists)[tto] = altdist;
-                parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(heuristic(&heur_res, tto, to, extra));
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist -heur_res));
+                /* This is the first finite from -> v distance we found.
+                 * Here we rely on infinite weight edges having been skipped, see TODO above. */
+                VECTOR(dists)[v] = altdist;
+                parent_eids[v] = edge + 1;
+                IGRAPH_CHECK(heuristic(&heur_res, v, to, extra));
+                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, v, -(altdist + heur_res)));
             } else if (altdist < curdist) {
-                /* This is a shorter path */
-                VECTOR(dists)[tto] = altdist;
-                parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(heuristic(&heur_res, tto, to, extra));
-                igraph_2wheap_modify(&Q, tto, -altdist -heur_res);
+                /* This is a shorter from -> v path than what was found before. */
+                VECTOR(dists)[v] = altdist;
+                parent_eids[v] = edge + 1;
+                IGRAPH_CHECK(heuristic(&heur_res, v, to, extra));
+                igraph_2wheap_modify(&Q, v, -(altdist + heur_res));
             }
         }
     } /* !igraph_2wheap_empty(&Q) */
 
     if (!found) {
-        IGRAPH_WARNING("Couldn't reach the end vertex.");
+        IGRAPH_WARNING("Couldn't reach the target vertex.");
     }
 
     /* Reconstruct the shortest paths based on vertex and/or edge IDs */
     if (vertices || edges) {
         igraph_integer_t size, act, edge;
-        igraph_vector_int_t *vvec = 0, *evec = 0;
+
         if (vertices) {
-            vvec = vertices;
-            igraph_vector_int_clear(vvec);
+            igraph_vector_int_clear(vertices);
         }
         if (edges) {
-            evec = edges;
-            igraph_vector_int_clear(evec);
+            igraph_vector_int_clear(edges);
         }
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -214,31 +226,33 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
             edge = parent_eids[act] - 1;
             act = IGRAPH_OTHER(graph, edge, act);
         }
-        if (vvec && (size > 0 || to == from)) {
-            IGRAPH_CHECK(igraph_vector_int_resize(vvec, size + 1));
-            VECTOR(*vvec)[size] = to;
+        if (vertices && (size > 0 || to == from)) {
+            IGRAPH_CHECK(igraph_vector_int_resize(vertices, size + 1));
+            VECTOR(*vertices)[size] = to;
         }
-        if (evec) {
-            IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
+        if (edges) {
+            IGRAPH_CHECK(igraph_vector_int_resize(edges, size));
         }
         act = to;
         while (parent_eids[act]) {
             edge = parent_eids[act] - 1;
             act = IGRAPH_OTHER(graph, edge, act);
             size--;
-            if (vvec) {
-                VECTOR(*vvec)[size] = act;
+            if (vertices) {
+                VECTOR(*vertices)[size] = act;
             }
-            if (evec) {
-                VECTOR(*evec)[size] = edge;
+            if (edges) {
+                VECTOR(*edges)[size] = edge;
             }
         }
     }
 
+
+    IGRAPH_FREE(parent_eids);
+    igraph_vector_destroy(&dists);
     igraph_lazy_inclist_destroy(&inclist);
     igraph_2wheap_destroy(&Q);
-    igraph_vector_destroy(&dists);
-    IGRAPH_FREE(parent_eids);
     IGRAPH_FINALLY_CLEAN(4);
+
     return IGRAPH_SUCCESS;
 }
