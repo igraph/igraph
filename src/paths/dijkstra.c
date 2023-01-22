@@ -616,12 +616,14 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
 /**
  * \function igraph_get_shortest_path_dijkstra
- * \brief Weighted shortest path from one vertex to another one.
+ * \brief Weighted shortest path from one vertex to another one (Dijkstra).
  *
- * Calculates a single (positively) weighted shortest path from
- * a single vertex to another one, using Dijkstra's algorithm.
+ * Finds a weighted shortest path from a single source vertex to
+ * a single target, using Dijkstra's algorithm. If more than one
+ * shortest path exists, an arbitrary one is returned.
  *
- * </para><para>This function is a special case (and a wrapper) to
+ * </para><para>
+ * This function is a special case (and a wrapper) to
  * \ref igraph_get_shortest_paths_dijkstra().
  *
  * \param graph The input graph, it can be directed or undirected.
@@ -632,8 +634,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  * \param edges Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
+ * \param from The ID of the source vertex.
+ * \param to The ID of the target vertex.
  * \param weights The edge weights. All edge weights must be
  *       non-negative for Dijkstra's algorithm to work. Additionally, no
  *       edge weight may be NaN. If either case does not hold, an error
@@ -681,13 +683,15 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
                  from, igraph_vss_1(to),
                  weights, mode, NULL, NULL));
 
+    /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the
+       result to the output parameter. */
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
