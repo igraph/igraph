@@ -34,27 +34,30 @@
  *
  * \experimental
  *
- * Calculates a single shortest path from a single vertex to another
- * one, using the A* algorithm. A* tries to find a shortest path by
+ * Calculates a shortest path from a single source vertex to a single
+ * target, using the A* algorithm. A* tries to find a shortest path by
  * starting at \p from and moving to vertices that lie on a path with
  * the lowest estimated length. This length estimate is the sum of two
- * numbers: the distance from the start and the result of the heuristic.
- * The heuristic is used to estimate the distance between the candidate
- * vertex and the \to vertex. A* will give the correct shortest path
- * (if one exists) if the heuristic does not overestimate distances.
+ * numbers: the distance from the source (\p from) to the intermediate vertex,
+ * and the value returned by the heuristic function. The heuristic function
+ * provides an estimate the distance between intermediate candidate
+ * vertices and the target vertex \p to. The A* algorithm is guaranteed
+ * to give the correct shortest path (if one exists) only if the heuristic
+ * does not overestimate distances, i.e. if the heuristic function is
+ * \em admissible.
  *
  * \param graph The input graph, it can be directed or undirected.
- * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex IDs along
+ * \param vertices Pointer to an initialized vector or the \c NULL
+ *        pointer. If not\c NULL, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
- * \param edges Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the edge IDs along the
+ * \param edges Pointer to an initialized vector or the \c NULL
+ *        pointer. If not \c NULL, then the edge IDs along the
  *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
+ * \param from The ID of the source vertex.
+ * \param to The ID of the target vertex.
  * \param weights Optional edge weights. Supply \c NULL for unweighted graphs.
- *        all edge weights must be non-negative. Additionally, no
+ *        All edge weights must be non-negative. Additionally, no
  *        edge weight may be NaN. If either case does not hold, an error
  *        is returned.
  * \param mode A constant specifying how edge directions are
@@ -62,16 +65,19 @@
  *        directions, \c IGRAPH_IN follows the opposite directions,
  *        and \c IGRAPH_ALL ignores edge directions. This argument is
  *        ignored for undirected graphs.
- * \param heuristic A function that returns an estimate of the distance as
- *        \c igraph_real_t in its first argument. The second parameter is
- *        passed the vertex id as an \c igraph_integer_t, and the third
- *        parameter is passed \p extra.
- * \param extra This is passed on to the heuristic.
+ * \param heuristic A function that provides distance estimates to the
+ *        target vertex. See \ref igraph_astar_heuristic_func_t for
+ *        more information.
+ * \param extra This is passed on to the heuristic function.
  * \return Error code.
  *
- * Time complexity: O(|E|log|V|+|V|), |V| is the number of vertices,
+ * Time complexity: In the worst case, O(|E|log|V|+|V|), where
+ * |V| is the number of vertices and
  * |E| is the number of edges in the graph.
- *
+ * The running time depends on the accuracy of the distance estimates
+ * returned by the heuristic function. Assuming that the heuristic
+ * is admissible, the better the estimates, the shortert the running
+ * time.
  */
 
 igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,

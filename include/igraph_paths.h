@@ -36,21 +36,27 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_astar_heuristic_func_t
- * \brief Heuristic for A* algorithm.
+ * \brief Distance estimator for A* algorithm.
  *
- * \ref igraph_get_shortest_path_astar() uses a heuristic to determine
- *      which vertex to try next. For example this heuristic can be the
- *      Euclidean distance between two points.
+ * \ref igraph_get_shortest_path_astar() uses a heuristic based on a distance
+ * estimate to the target vertex to guide its search, and determine
+ * which vertex to try next. The heurstic function is expected to compute
+ * an estimate of the distance between \p from and \p to. In order for
+ * \ref igraph_get_shortest_path_astar() to find an exact shortest path,
+ * the distance must not be overestimated, i.e. the heuristic function
+ * must be \em admissible.
  *
- * \param result The result of the heuristic, a lower value will mean this
-        vertex will be a better candidate for exploration.
- * \param source_id The vertex id of the candidate vertex will be passed here.
- * \param target_id The vertex id of the end point will be passed here.
- * \param extra The extra argument that was passed to \ref
- *   igraph_get_shortest_path_astar().
- * \return \c IGRAPH_SUCCESS if there were no errors. This can be used to break
-        off the algorithm if something unexpected happens, like a failed memory
-        allocation (IGRAPH_ENOMEM).
+ * \param result The result of the heuristic, i.e. the estimated distance.
+ *    A lower value will mean this vertex will be a better candidate for
+ *    exploration.
+ * \param from The vertex ID of the candidate vertex will be passed here.
+ * \param to The vertex ID of endpoint of the path, i.e. the \c to parameter
+ *    given to \ref igraph_get_shortest_path_astar(), will be passed here.
+ * \param extra The \c extra argument that was passed to
+ *    \ref igraph_get_shortest_path_astar().
+ * \return Error code. Must return \c IGRAPH_SUCCESS if there were no errors.
+ *    This can be used to break off the algorithm if something unexpected happens,
+ *    like a failed memory allocation (\c IGRAPH_ENOMEM).
  *
  * \sa \ref igraph_get_shortest_path_astar()
  */
