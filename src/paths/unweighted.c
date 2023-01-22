@@ -538,12 +538,13 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
  * \brief Shortest path from one vertex to another one.
  *
  * Calculates and returns a single unweighted shortest path from a
- * given vertex to another one. If there are more than one shortest
- * paths between the two vertices, then an arbitrary one is returned.
+ * given vertex to another one. If there is more than one shortest
+ * path between the two vertices, then an arbitrary one is returned.
  *
- * </para><para>This function is a wrapper to \ref
- * igraph_get_shortest_paths(), for the special case when only one
- * target vertex is considered.
+ * </para><para>
+ * This function is a wrapper to \ref igraph_get_shortest_paths()
+ * for the special case when only one target vertex is considered.
+ *
  * \param graph The input graph, it can be directed or
  *        undirected. Directed paths are considered in directed
  *        graphs.
@@ -554,8 +555,8 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
  * \param edges Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
+ * \param from The ID of the source vertex.
+ * \param to The ID of the target vertex.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. Valid modes are:
  *        \c IGRAPH_OUT, follows edge directions;
