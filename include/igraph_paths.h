@@ -50,7 +50,7 @@ __BEGIN_DECLS
  *    A lower value will mean this vertex will be a better candidate for
  *    exploration.
  * \param from The vertex ID of the candidate vertex will be passed here.
- * \param to The vertex ID of endpoint of the path, i.e. the \c to parameter
+ * \param to The vertex ID of the endpoint of the path, i.e. the \c to parameter
  *    given to \ref igraph_get_shortest_path_astar(), will be passed here.
  * \param extra The \c extra argument that was passed to
  *    \ref igraph_get_shortest_path_astar().

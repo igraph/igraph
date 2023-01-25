@@ -482,7 +482,8 @@ igraph_get_shortest_path_astar:
     PARAMS: |-
         GRAPH graph,
         OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
-        VERTEX from, VERTEX to, OPTIONAL EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, ASTAR_HEURISTIC_FUNC heuristic, EXTRA extra
+        VERTEX from, VERTEX to, OPTIONAL EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
+        OPTIONAL ASTAR_HEURISTIC_FUNC heuristic=NULL, EXTRA extra=NULL
     DEPS: from ON graph, to ON graph, weights ON graph, vertices ON graph, edges ON graph
 
 igraph_get_shortest_paths:

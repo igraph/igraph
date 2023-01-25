@@ -27,6 +27,19 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
+static igraph_error_t null_heuristic(
+    igraph_real_t *result, igraph_integer_t from, igraph_integer_t to,
+	void *extra
+) {
+    IGRAPH_UNUSED(from);
+    IGRAPH_UNUSED(to);
+    IGRAPH_UNUSED(extra);
+
+    *result = 0;
+
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \function igraph_get_shortest_path_astar
  * \brief A* gives the shortest path from one vertex to another, with heuristic.
@@ -47,7 +60,7 @@
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param vertices Pointer to an initialized vector or the \c NULL
- *        pointer. If not\c NULL, then the vertex IDs along
+ *        pointer. If not \c NULL, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
  * \param edges Pointer to an initialized vector or the \c NULL
@@ -104,6 +117,10 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
 
     if (to < 0 || to >= no_of_nodes) {
         IGRAPH_ERROR("End vertex out of range.", IGRAPH_EINVVID);
+    }
+
+    if (!heuristic) {
+        heuristic = null_heuristic;
     }
 
     if (weights) { /* If there are no weights, they are treated as 1. */

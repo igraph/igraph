@@ -57,14 +57,6 @@ int check_edges(const igraph_t *graph, const igraph_vector_int_t *vertices,
     return 0;
 }
 
-igraph_error_t no_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
-    (void) source_id;
-    (void) target_id;
-    (void) extra;
-    *result = 0;
-    return IGRAPH_SUCCESS;
-}
-
 igraph_error_t lattice_heuristic(igraph_real_t *result, igraph_integer_t source_id, igraph_integer_t target_id, void *extra) {
     int x[4];
     for (int i = 0; i < 4; i++) {
@@ -115,8 +107,8 @@ int main(void) {
     igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1);
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 0,
-                                       /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
-                                       no_heuristic, NULL);
+                                       /*weights=*/ NULL, /*mode=*/ IGRAPH_OUT,
+                                       /*heuristic=*/ NULL, NULL);
 
     check_edges(&g, &vertices, &edges, /*error code*/10);
 
@@ -128,8 +120,8 @@ int main(void) {
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 5,
-                                       /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
-                                       no_heuristic, NULL);
+                                       /*weights=*/ NULL, /*mode=*/ IGRAPH_OUT,
+                                       /*heuristic=*/ NULL, NULL);
 
     check_edges(&g, &vertices, &edges, /*error code*/10);
 
@@ -142,7 +134,7 @@ int main(void) {
     igraph_get_shortest_path_astar(&g, /*vertices=*/ &vertices,
                                        /*edges=*/ &edges, /*from=*/ 0, /*to=*/ 5,
                                        &weights_vec, IGRAPH_OUT,
-                                       no_heuristic, NULL);
+                                       /*heuristic=*/ NULL, NULL);
 
     check_edges(&g, &vertices, &edges, 20);
 
@@ -207,22 +199,22 @@ int main(void) {
     printf("Checking from out of range.\n");
     igraph_destroy(&g);
     igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
-    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 10, 1, NULL, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 10, 1, NULL, IGRAPH_ALL, NULL, NULL), IGRAPH_EINVVID);
 
     printf("Checking to out of range.\n");
     igraph_destroy(&g);
     igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0, 1, -1);
-    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 10, NULL, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVVID);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 10, NULL, IGRAPH_ALL, NULL, NULL), IGRAPH_EINVVID);
 
     printf("Checking wrong weight length error.\n");
     igraph_vector_destroy(&weights_vec);
     igraph_vector_init_int(&weights_vec, 0);
-    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, NULL, NULL), IGRAPH_EINVAL);
 
     printf("Checking negative weight error.\n");
     igraph_vector_destroy(&weights_vec);
     igraph_vector_init_int(&weights_vec, 1, -1);
-    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, no_heuristic, NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_get_shortest_path_astar(&g, NULL, NULL, 0, 1, &weights_vec, IGRAPH_ALL, NULL, NULL), IGRAPH_EINVAL);
 
     igraph_vector_int_destroy(&vertices);
     igraph_vector_int_destroy(&edges);
