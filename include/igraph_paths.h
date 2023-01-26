@@ -117,6 +117,8 @@ IGRAPH_EXPORT igraph_error_t igraph_distances_johnson(const igraph_t *graph,
                                                 const igraph_vector_t *weights);
 IGRAPH_EXPORT igraph_error_t igraph_distances_floyd_warshall(const igraph_t *graph,
                                                              igraph_matrix_t *res,
+                                                             igraph_vs_t from,
+                                                             igraph_vs_t to,
                                                              const igraph_vector_t *weights,
                                                              igraph_neimode_t mode,
                                                              igraph_floyd_warshall_algorithm_t method);
