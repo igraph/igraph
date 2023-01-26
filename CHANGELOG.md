@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [master]
+## [0.10.4] - 2023-01-26
 
 ### Added
 
