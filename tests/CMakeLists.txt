@@ -313,6 +313,7 @@ add_legacy_tests(
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_path_astar
   igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
   igraph_get_shortest_paths_dijkstra
@@ -756,6 +757,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bipartite_create
+  igraph_bipartite_projection
   igraph_get_incidence
   igraph_incidence
 )

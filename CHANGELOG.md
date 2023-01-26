@@ -13,17 +13,23 @@
 
 ## [master]
 
+## [0.10.4] - 2023-01-26
+
 ### Added
 
+ - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
  - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
 
 ### Changed
 
  - The `test` build target now only _runs_ the unit tests, but it does not _build_ them. In order to both build and run tests, use the `check` target, which continues to behave as before (PR #2291).
+ - The experimental function `igraph_distances_floyd_warshall()` now has `from` and `to` parameters for choosing source and target vertices.
+ - The experimental function `igraph_distances_floyd_warshall()` now has an additional `method` parameter to select a specific algorithm. A faster "Tree" variant of the Floyd-Warshall algorithm is now available (#2267, thanks to @rfulekjames).
 
 ### Fixed
 
  - The Bellman-Ford shortest path finder is now interruptible.
+ - The Floyd-Warshall shortest path finder is now interruptible.
  - Running CTest no longer builds the tests automatically, as this interfered with VSCode, which would invoke the `ctest` executable after configuring a project in order to determine test executables. Use the `build_tests` target to build the tests first, or use the `check` target to both _build_ and _run_ all unit tests (PR #2291).
 
 ### Other
@@ -1142,7 +1148,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.3..master
+[master]: https://github.com/igraph/igraph/compare/0.10.4..master
+[0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
 [0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1

@@ -190,7 +190,7 @@ static void dsatur_update_heap(
     }
 }
 
-static igraph_error_t dsatur_get_first_viable_color(const igraph_vector_int_t *used_colors_sorted) {
+static igraph_integer_t dsatur_get_first_viable_color(const igraph_vector_int_t *used_colors_sorted) {
     igraph_integer_t color_count = igraph_vector_int_size(used_colors_sorted);
     igraph_integer_t i = 0;
     igraph_integer_t col = 0;

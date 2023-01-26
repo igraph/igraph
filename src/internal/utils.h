@@ -1,5 +1,6 @@
-/* IGraph library.
-   Copyright (C) 2022  The igraph development team <igraph@igraph.org>
+/*
+   IGraph library.
+   Copyright (C) 2008-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,16 +16,17 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <igraph.h>
+#ifndef IGRAPH_INTERNAL_UTILS_H
+#define IGRAPH_INTERNAL_UTILS_H
 
-int main(void) {
-    igraph_vector_int_t V;
+#include "igraph_datatype.h"
+#include "igraph_iterators.h"
+#include "igraph_matrix.h"
 
-    igraph_vector_int_init(&V, 0);
+igraph_error_t igraph_i_matrix_subset_vertices(
+        igraph_matrix_t *m,
+        const igraph_t *graph,
+        igraph_vs_t from,
+        igraph_vs_t to);
 
-    igraph_random_sample(&V, 0, 100, 5);
-
-    igraph_vector_int_print(&V);
-
-    igraph_vector_int_destroy(&V);
-}
+#endif /* IGRAPH_INTERNAL_UTILS_H */

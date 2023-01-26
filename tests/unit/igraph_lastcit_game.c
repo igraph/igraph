@@ -55,31 +55,30 @@ int main(void) {
     igraph_vector_destroy(&preference);
 
     VERIFY_FINALLY_STACK();
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     /*Negative number of nodes*/
     igraph_vector_init_int_end(&preference, -1, 1, 1, -1);
-    IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ -9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_lastcit_game(&g, /*nodes*/ -9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0), IGRAPH_EINVAL);
     igraph_vector_destroy(&preference);
 
     /*Too few agebins*/
     igraph_vector_init_int_end(&preference, -1, 1, -1);
-    IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 0, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 0, /*preference*/ &preference, /*directed*/ 0), IGRAPH_EINVAL);
     igraph_vector_destroy(&preference);
 
     /*Wrong vector size*/
     igraph_vector_init_int_end(&preference, -1, 1, -1);
-    IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0), IGRAPH_EINVAL);
     igraph_vector_destroy(&preference);
 
     /*No uncited preference*/
     igraph_vector_init_int_end(&preference, -1, 1, 0, -1);
-    IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0), IGRAPH_EINVAL);
     igraph_vector_destroy(&preference);
 
     /*Negative preference*/
-    igraph_vector_init_int_end(&preference, -1, -1, 1, -1);
-    IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_EINVAL);
+    igraph_vector_init_int_end(&preference, -1, -2, 1, -1);
+    CHECK_ERROR(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*agebins*/ 1, /*preference*/ &preference, /*directed*/ 0), IGRAPH_EINVAL);
     igraph_vector_destroy(&preference);
 
     VERIFY_FINALLY_STACK();
