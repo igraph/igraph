@@ -53,7 +53,7 @@ igraph_error_t igraph_i_matrix_subset_vertices(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t ncol = igraph_matrix_ncol(m);
-    igraph_integer_t nrow = igraph_matrix_ncol(m);
+    igraph_integer_t nrow = igraph_matrix_nrow(m);
 
     IGRAPH_ASSERT(nrow == no_of_nodes && nrow == ncol);
 
