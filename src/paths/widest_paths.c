@@ -30,6 +30,7 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+#include "internal/utils.h"
 
 /**
  * \function igraph_get_widest_paths
@@ -463,8 +464,6 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_matrix_t iadj;
-    igraph_matrix_t *padj;
     igraph_bool_t in = false, out = false;
 
     if (! weights) {
@@ -499,24 +498,11 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
         IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
     }
 
-    /* The most common use case is computing all-pairs path widths.
-     * In this case we will work directly in the 'res' output parameter
-     * matrix for better performance. */
-    igraph_bool_t all_pairs = igraph_vs_is_all(&from) && igraph_vs_is_all(&to);
-
-    if (all_pairs) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
-        padj = res;
-    } else {
-        IGRAPH_MATRIX_INIT_FINALLY(&iadj, no_of_nodes, no_of_nodes);
-        padj = &iadj;
-    }
-
     /* Fill out adjacency matrix */
-
-    igraph_matrix_fill(padj, IGRAPH_NEGINFINITY);
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
+    igraph_matrix_fill(res, IGRAPH_NEGINFINITY);
     for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        MATRIX(*padj, i, i) = IGRAPH_POSINFINITY;
+        MATRIX(*res, i, i) = IGRAPH_POSINFINITY;
     }
 
     for (igraph_integer_t edge=0; edge < no_of_edges; edge++) {
@@ -524,15 +510,15 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
         igraph_integer_t to = IGRAPH_TO(graph, edge);
         igraph_real_t w = VECTOR(*weights)[edge];
 
-        if (out && MATRIX(*padj, from, to) < w) MATRIX(*padj, from, to) = w;
-        if (in  && MATRIX(*padj, to, from) < w) MATRIX(*padj, to, from) = w;
+        if (out && MATRIX(*res, from, to) < w) MATRIX(*res, from, to) = w;
+        if (in  && MATRIX(*res, to, from) < w) MATRIX(*res, to, from) = w;
     }
 
     /* Run modified Floyd Warshall */
     for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
         /* Iterate in column-major order for better performance */
         for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
-            igraph_real_t width_kj = MATRIX(*padj, k, j);
+            igraph_real_t width_kj = MATRIX(*res, k, j);
             if (j == k || width_kj == IGRAPH_NEGINFINITY) continue;
 
             IGRAPH_ALLOW_INTERRUPTION();
@@ -543,45 +529,18 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
                 /* alternative_width := min(A(i,k), A(k,j))
                    A(i,j) := max(A(i,j), alternative_width) */
 
-                igraph_real_t altwidth = MATRIX(*padj, i, k);
+                igraph_real_t altwidth = MATRIX(*res, i, k);
                 if (width_kj < altwidth) {
                     altwidth = width_kj;
                 }
-                if (altwidth > MATRIX(*padj, i, j)) {
-                    MATRIX(*padj, i, j) = altwidth;
+                if (altwidth > MATRIX(*res, i, j)) {
+                    MATRIX(*res, i, j) = altwidth;
                 }
             }
         }
     }
 
-    /* When not working directly in 'res', copy results into the output parameter
-     * and free internal work matrix. */
-    if (! all_pairs) {
-        igraph_integer_t i, j;
-        igraph_vit_t fromvit, tovit;
-
-        IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
-        IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
-
-        IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
-        IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
-
-        IGRAPH_CHECK(igraph_matrix_resize(res, IGRAPH_VIT_SIZE(fromvit), IGRAPH_VIT_SIZE(tovit)));
-
-        /* Iterate in column-major order for better performance */
-        for (IGRAPH_VIT_RESET(tovit), j = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit), j++) {
-            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
-            for (IGRAPH_VIT_RESET(fromvit), i = 0; !IGRAPH_VIT_END(fromvit); IGRAPH_VIT_NEXT(fromvit), i++) {
-                igraph_integer_t u = IGRAPH_VIT_GET(fromvit);
-                MATRIX(*res, i, j) = MATRIX(*padj, u, v);
-            }
-        }
-
-        igraph_vit_destroy(&tovit);
-        igraph_vit_destroy(&fromvit);
-        igraph_matrix_destroy(&iadj);
-        IGRAPH_FINALLY_CLEAN(3);
-    }
+    IGRAPH_CHECK(igraph_i_matrix_subset_vertices(res, graph, from, to));
 
     return IGRAPH_SUCCESS;
 }
