@@ -478,6 +478,14 @@ igraph_get_shortest_path_dijkstra:
         VERTEX from, VERTEX to, OPTIONAL EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph, vertices ON graph, edges ON graph
 
+igraph_get_shortest_path_astar:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
+        VERTEX from, VERTEX to, OPTIONAL EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
+        OPTIONAL ASTAR_HEURISTIC_FUNC heuristic=NULL, EXTRA extra=NULL
+    DEPS: from ON graph, to ON graph, weights ON graph, vertices ON graph, edges ON graph
+
 igraph_get_shortest_paths:
     PARAMS: |-
         GRAPH graph,
@@ -551,7 +559,9 @@ igraph_distances_johnson:
 
 igraph_distances_floyd_warshall:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
+        FWALGORITHM method
     DEPS: weights ON graph
 
 igraph_voronoi:
@@ -745,6 +755,7 @@ igraph_transitivity_undirected:
 
 igraph_transitivity_local_undirected:
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL, TRANSITIVITY_MODE mode=NAN
+    DEPS: vids ON graph
 
 igraph_transitivity_avglocal_undirected:
     PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITY_MODE mode=NAN
@@ -1547,6 +1558,7 @@ igraph_community_walktrap:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGEWEIGHTS weights, INTEGER steps=4,
         OUT MATRIX_INT merges, OUT VECTOR modularity, OUT VECTOR_INT membership
+    DEPS: weights ON graph
 
 igraph_community_edge_betweenness:
     PARAMS: |-
@@ -1583,6 +1595,7 @@ igraph_modularity:
     PARAMS: |-
         GRAPH graph, VECTOR_INT membership, OPTIONAL EDGEWEIGHTS weights=NULL,
         REAL resolution=1.0, BOOLEAN directed=True, OUT REAL modularity
+    DEPS: weights ON graph
 
 igraph_modularity_matrix:
     PARAMS: |-
@@ -2454,6 +2467,7 @@ igraph_minimum_spanning_tree_unweighted:
 
 igraph_minimum_spanning_tree_prim:
     PARAMS: GRAPH graph, OUT GRAPH mst, EDGEWEIGHTS weights
+    DEPS: weights ON graph
 
 igraph_random_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, OPTIONAL VERTEX vid
@@ -2490,7 +2504,7 @@ igraph_moran_process:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL, INOUT VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
-    DEPS: quantities ON graph, strategies ON graph
+    DEPS: weights ON graph, quantities ON graph, strategies ON graph
 
 igraph_roulette_wheel_imitation:
     PARAMS: |-

@@ -46,6 +46,10 @@
  * far-apart veritces will have a smaller effect on the layout.
  *
  * </para><para>
+ * Disconnected graphs are handled by assuming that the graph distance between
+ * vertices in different components is the same as the graph diameter.
+ *
+ * </para><para>
  * This layout works particularly well for locally connected spatial networks
  * such as lattices.
  *
@@ -178,6 +182,7 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
     IGRAPH_CHECK(igraph_distances_dijkstra(graph, &dij, igraph_vss_all(),
                  igraph_vss_all(), weights, IGRAPH_ALL));
 
+    /* Find largest finite distance */
     max_dij = 0.0;
     for (i = 0; i < no_nodes; i++) {
         for (j = i + 1; j < no_nodes; j++) {
@@ -189,6 +194,9 @@ igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t
             }
         }
     }
+
+    /* Replace infinite distances by the largest finite distance,
+     * effectively making the graph connected. */
     for (i = 0; i < no_nodes; i++) {
         for (j = 0; j < no_nodes; j++) {
             if (MATRIX(dij, i, j) > max_dij) {
