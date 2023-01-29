@@ -2,6 +2,14 @@
 
 ## [master]
 
+### Deprecated
+
+- `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.4] - 2023-01-26
 
 ### Added
