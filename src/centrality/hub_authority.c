@@ -275,9 +275,9 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         IGRAPH_CHECK(igraph_adjlist_init(graph, &outadjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &outadjlist);
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &ininclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &ininclist, IGRAPH_IN, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &ininclist);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &outinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &outinclist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &outinclist);
     }
 
