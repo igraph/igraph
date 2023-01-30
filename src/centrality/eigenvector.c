@@ -491,6 +491,10 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * parameter, see below) and checking whether the eigenvalue is very close
  * to zero.
  *
+ * </para><para>
+ * When working with directed graphs, consider using hub and authority
+ * scores instead, see \ref igraph_hub_and_authority_scores().
+ *
  * \param graph The input graph. It may be directed.
  * \param vector Pointer to an initialized vector, it will be resized
  *     as needed. The result of the computation is stored here. It can
@@ -517,6 +521,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *
  * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for
  *   modifications of eigenvector centrality.
+ * \ref igraph_hub_and_authority_scores() for a similar pair of measures
+ * intended for directed graphs.
  *
  * \example examples/simple/eigenvector_centrality.c
  */
