@@ -120,6 +120,7 @@ int main(void) {
                  0, 1, 1, 2, 2, 2, 2, 3, 2, 3,
                  -1);
     print_hub_and_authority(&g, NULL, true, false, true);
+    igraph_destroy(&g);
 
     printf("Degenerate example:\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED,
