@@ -739,14 +739,14 @@ static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     }
 
     if (weights == 0) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &myinadjlist);
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &myininclist, IGRAPH_IN, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &myininclist);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &myoutinclist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &myoutinclist);
     }
 
