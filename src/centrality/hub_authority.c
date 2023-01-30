@@ -145,8 +145,10 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * is its transposed.
  *
  * </para><para>
- * Hub and authority scores are meaningful for directed graphs. In undirected
- * graphs, both the hub and authority
+ * The concept of hub and authority scores were developed for \em directed graphs.
+ * In undirected graphs, both the hub and authority scores are equal to the
+ * eigenvector centrality, which can be computed using
+ * \ref igraph_eigenvector_centrality().
  *
  * </para><para>
  * When both the hub and authority scores are needed (the typical use case),
@@ -185,7 +187,8 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \sa \ref igraph_hub_score(), \ref igraph_authority_score()
  * for the separate calculations,
  * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
- * \ref igraph_eigenvector_centrality() for similar measures.
+ * \ref igraph_eigenvector_centrality() for a similar measure intended
+ * for undirected graphs.
  */
 igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_vector_t *hub_vector, igraph_vector_t *authority_vector,
