@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_hub_and_authority_scores()`, `igraph_hub_score()` and `igraph_authority_score()` considered self-loops only once on the diagonal of the adjacency matrix of undirected graphs, thus the result was not identical to that obtained by `igraph_eigenvector_centrality()` on loopy undirected graphs. This is now corrected.
+
 ### Deprecated
 
 - `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
