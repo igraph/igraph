@@ -32,12 +32,12 @@ void print_hub_and_authority(igraph_t *g, igraph_vector_t *weights, igraph_bool_
     printf("--------------------------------------------------\n");
     if (split) {
         igraph_hub_score(g, &hub_vector, &value,
-                scale, weights, use_options ? &options : 0);
+                scale, weights, use_options ? &options : NULL);
         igraph_authority_score(g, &authority_vector, &value,
-                scale, weights, use_options ? &options : 0);
+                scale, weights, use_options ? &options : NULL);
     } else {
         igraph_hub_and_authority_scores(g, &hub_vector, &authority_vector, &value,
-                scale, weights, use_options ? &options : 0);
+                scale, weights, use_options ? &options : NULL);
     }
     vector_chop(&hub_vector, 10e-10);
     vector_chop(&authority_vector, 10e-10);
@@ -63,17 +63,22 @@ int main(void) {
 
     printf("Null graph:\n");
     igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
-    print_hub_and_authority(&g, NULL, 0, 1, 0);
+    print_hub_and_authority(&g, NULL, false, true, false);
     igraph_destroy(&g);
 
     printf("Singleton graph with loop:\n");
     igraph_small(&g, 1, IGRAPH_DIRECTED, 0,0, -1);
-    print_hub_and_authority(&g, NULL, 0, 1, 0);
+    print_hub_and_authority(&g, NULL, false, true, false);
+    igraph_destroy(&g);
+
+    printf("Singleton graph with three loops:\n");
+    igraph_small(&g, 1, IGRAPH_DIRECTED, 0,0, 0,0, 0,0, -1);
+    print_hub_and_authority(&g, NULL, false, true, false);
     igraph_destroy(&g);
 
     printf("Three vertices, no links:\n");
     igraph_small(&g, 3, IGRAPH_DIRECTED, -1);
-    print_hub_and_authority(&g, NULL, 0, 1, 0);
+    print_hub_and_authority(&g, NULL, false, true, false);
     igraph_destroy(&g);
 
     printf("Two hubs and one authority:\n");
@@ -81,7 +86,7 @@ int main(void) {
         0,2, 1,2, -1);
     igraph_vector_init_int(&weights, 2,
         1, 1);
-    print_hub_and_authority(&g, &weights, 0, 1, 0);
+    print_hub_and_authority(&g, &weights, false, true, false);
     igraph_destroy(&g);
     igraph_vector_destroy(&weights);
 
@@ -94,7 +99,7 @@ int main(void) {
     igraph_vector_init_int(&weights, 14,
         1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
         1, 2, 1, 1);
-    print_hub_and_authority(&g, &weights, 0, 0, 0);
+    print_hub_and_authority(&g, &weights, false, false, false);
     igraph_destroy(&g);
     igraph_vector_destroy(&weights);
 
@@ -105,9 +110,16 @@ int main(void) {
     igraph_vector_init_int(&weights, 14,
         1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
         1, 2, 1, 1);
-    print_hub_and_authority(&g, &weights, 1, 0, 1);
+    print_hub_and_authority(&g, &weights, true, false, true);
     igraph_destroy(&g);
     igraph_vector_destroy(&weights);
+
+    /* Verify that self-loops are counted twice in undirected graphs. */
+    printf("Undirected graph with self-loops and multi-edges:\n");
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0, 1, 1, 2, 2, 2, 2, 3, 2, 3,
+                 -1);
+    print_hub_and_authority(&g, NULL, true, false, true);
 
     printf("Degenerate example:\n");
     igraph_small(&g, 4, IGRAPH_DIRECTED,
