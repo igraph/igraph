@@ -490,6 +490,10 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
+    if (weights && igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERROR("Invalid length of weights vector when calculating PageRank scores.", IGRAPH_EINVAL);
+    }
+
     if (reset && igraph_vector_size(reset) != no_of_nodes) {
         IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
     }
@@ -502,10 +506,20 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         if (vector) {
             IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
             if (reset && no_of_nodes > 0) {
+                igraph_real_t reset_sum = igraph_vector_sum(vector);
+                if (reset_sum == 0) {
+                    IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
+                }
                 for (i=0; i < no_of_nodes; ++i) {
+                    if (VECTOR(*reset)[i] < 0) {
+                        IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
+                    }
+                    if (isnan(VECTOR(*reset)[i])) {
+                        IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
+                    }
                     VECTOR(*vector)[i] = VECTOR(*reset)[i];
                 }
-                igraph_vector_scale(vector, 1.0 / igraph_vector_sum(vector));
+                igraph_vector_scale(vector, 1.0 / reset_sum);
             } else {
                 igraph_vector_fill(vector, 1.0 / no_of_nodes);
             }
@@ -523,10 +537,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
     if (weights) {
         igraph_real_t min, max;
-
-        if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Invalid length of weights vector when calculating PageRank scores.", IGRAPH_EINVAL);
-        }
 
         /* Safe to call minmax, ecount == 0 case was caught earlier */
         igraph_vector_minmax(weights, &min, &max);
