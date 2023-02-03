@@ -218,15 +218,15 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  *     The random walker will favour edges with high weights over
  *     edges with low weights; the probability of picking a particular
  *     outbound edge from a node is directly proportional to its weight.
- *     If it is a NULL pointer then all edges will have equal
+ *     If it is \c NULL then all edges will have equal
  *     weights. The weights are expected to be positive.
  * \param v_weights Numeric vector giving the weights of the vertices.
  *     Vertices with higher weights are favoured by the random walker
  *     when it needs to "teleport" to a new node after getting stuck in
  *     a sink node (i.e. a node with no outbound edges). The probability
  *     of picking a vertex when the random walker teleports is directly
- *     proportional to the weight of the vertex. If this argument is a NULL
- *     pointer then all vertices will have equal weights. Weights are expected
+ *     proportional to the weight of the vertex. If this argument is \c NULL
+ *     then all vertices will have equal weights. Weights are expected
  *     to be positive.
  * \param nb_trials The number of attempts to partition the network
  *     (can be any integer value equal or larger than 1).
@@ -248,42 +248,74 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              igraph_vector_int_t *membership,
                              igraph_real_t *codelength) {
 
-    IGRAPH_HANDLE_EXCEPTIONS(
-        FlowGraph fgraph(graph, e_weights, v_weights);
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
-        // compute stationary distribution
-        fgraph.initiate();
+    if (e_weights) {
+        const igraph_integer_t ecount = igraph_ecount(graph);
+        if (igraph_vector_size(e_weights) != ecount) {
+            IGRAPH_ERROR("Invalid edge weight vector length.", IGRAPH_EINVAL);
+        }
+        if (ecount > 0) {
+            igraph_real_t minweight = igraph_vector_min(e_weights);
+            if (minweight <= 0) {
+                IGRAPH_ERROR("Edge weight vector must be positive.", IGRAPH_EINVAL);
+            } else if (isnan(minweight)) {
+                IGRAPH_ERROR("Edge weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
+        }
+    }
 
-        double shortestCodeLength = 1000.0;
+    if (v_weights) {
+        const igraph_integer_t vcount = igraph_vcount(graph);
+        if (igraph_vector_size(v_weights) != vcount) {
+            IGRAPH_ERROR("Invalid vertex weight vector length.", IGRAPH_EINVAL);
+        }
+        if (vcount > 0) {
+            igraph_real_t minweight = igraph_vector_min(v_weights);
+            if (minweight <= 0) {
+                IGRAPH_ERROR("Vertex weight vector must be positive.", IGRAPH_EINVAL);
+            } else if (isnan(minweight)) {
+                IGRAPH_ERROR("Vertex weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
+        }
+    }
 
-        // create membership vector
-        igraph_integer_t Nnode = fgraph.Nnode;
-        IGRAPH_CHECK(igraph_vector_int_resize(membership, Nnode));
+    FlowGraph fgraph(graph, e_weights, v_weights);
 
-        for (igraph_integer_t trial = 0; trial < nb_trials; trial++) {
-            FlowGraph cpy_fgraph(fgraph);
+    // compute stationary distribution
+    fgraph.initiate();
 
-            //partition the network
-            IGRAPH_CHECK(infomap_partition(cpy_fgraph, false));
+    double shortestCodeLength = 1000.0;
 
-            // if better than the better...
-            if (cpy_fgraph.codeLength < shortestCodeLength) {
-                shortestCodeLength = cpy_fgraph.codeLength;
-                // ... store the partition
-                for (igraph_integer_t i = 0 ; i < cpy_fgraph.Nnode ; i++) {
-                    size_t Nmembers = cpy_fgraph.node[i].members.size();
-                    for (size_t k = 0; k < Nmembers; k++) {
-                        //cluster[ cpy_fgraph->node[i].members[k] ] = i;
-                        VECTOR(*membership)[cpy_fgraph.node[i].members[k]] = i;
-                    }
+    // create membership vector
+    igraph_integer_t Nnode = fgraph.Nnode;
+    IGRAPH_CHECK(igraph_vector_int_resize(membership, Nnode));
+
+    for (igraph_integer_t trial = 0; trial < nb_trials; trial++) {
+        FlowGraph cpy_fgraph(fgraph);
+
+        //partition the network
+        IGRAPH_CHECK(infomap_partition(cpy_fgraph, false));
+
+        // if better than the better...
+        if (cpy_fgraph.codeLength < shortestCodeLength) {
+            shortestCodeLength = cpy_fgraph.codeLength;
+            // ... store the partition
+            for (igraph_integer_t i = 0 ; i < cpy_fgraph.Nnode ; i++) {
+                size_t Nmembers = cpy_fgraph.node[i].members.size();
+                for (size_t k = 0; k < Nmembers; k++) {
+                    //cluster[ cpy_fgraph->node[i].members[k] ] = i;
+                    VECTOR(*membership)[cpy_fgraph.node[i].members[k]] = i;
                 }
             }
         }
+    }
 
-        *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
+    *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
 
-        IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
-        return IGRAPH_SUCCESS;
-    );
+    return IGRAPH_SUCCESS;
+
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 }
