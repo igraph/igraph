@@ -277,6 +277,36 @@ int igraph_community_infomap(const igraph_t * graph,
                              igraph_vector_t *membership,
                              igraph_real_t *codelength) {
 
+    if (e_weights) {
+        const igraph_integer_t ecount = igraph_ecount(graph);
+        if (igraph_vector_size(e_weights) != ecount) {
+            IGRAPH_ERROR("Invalid edge weight vector length.", IGRAPH_EINVAL);
+        }
+        if (ecount > 0) {
+            igraph_real_t minweight = igraph_vector_min(e_weights);
+            if (minweight <= 0) {
+                IGRAPH_ERROR("Edge weight vector must be positive.", IGRAPH_EINVAL);
+            } else if (isnan(minweight)) {
+                IGRAPH_ERROR("Edge weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
+        }
+    }
+
+    if (v_weights) {
+        const igraph_integer_t vcount = igraph_vcount(graph);
+        if (igraph_vector_size(v_weights) != vcount) {
+            IGRAPH_ERROR("Invalid vertex weight vector length.", IGRAPH_EINVAL);
+        }
+        if (vcount > 0) {
+            igraph_real_t minweight = igraph_vector_min(v_weights);
+            if (minweight <= 0) {
+                IGRAPH_ERROR("Vertex weight vector must be positive.", IGRAPH_EINVAL);
+            } else if (isnan(minweight)) {
+                IGRAPH_ERROR("Vertex weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            }
+        }
+    }
+
     FlowGraph * fgraph = new FlowGraph(graph, e_weights, v_weights);
     IGRAPH_FINALLY(delete_FlowGraph, fgraph);
 
