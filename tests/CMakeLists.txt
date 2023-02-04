@@ -978,6 +978,7 @@ add_benchmarks(
   igraph_random_walk
   igraph_transitivity
   igraph_voronoi
+  error_checking
   inc_vs_adj
 )
 
