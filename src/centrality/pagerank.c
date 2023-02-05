@@ -486,6 +486,8 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
 
+    igraph_real_t reset_sum; /* used only when reset != NULL */
+
     if (no_of_nodes > INT_MAX) {
         IGRAPH_ERROR("Graph has too many vertices for ARPACK.", IGRAPH_EOVERFLOW);
     }
@@ -498,29 +500,32 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_ERROR("Invalid length of reset vector when calculating personalized PageRank scores.", IGRAPH_EINVAL);
     }
 
+    if (reset) {
+        reset_sum = igraph_vector_sum(reset);
+        if (no_of_nodes > 0 && reset_sum == 0) {
+            IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
+        }
+
+        igraph_real_t reset_min = igraph_vector_min(reset);
+        if (reset_min < 0) {
+            IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
+        }
+        if (isnan(reset_min)) {
+            IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
+    }
+
     if (no_of_edges == 0) {
         /* Special case: graph with no edges. Result is the same as the personalization vector. */
         if (value) {
             *value = 1.0;
         }
         if (vector) {
-            IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
             if (reset && no_of_nodes > 0) {
-                igraph_real_t reset_sum = igraph_vector_sum(vector);
-                if (reset_sum == 0) {
-                    IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
-                }
-                for (i=0; i < no_of_nodes; ++i) {
-                    if (VECTOR(*reset)[i] < 0) {
-                        IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
-                    }
-                    if (isnan(VECTOR(*reset)[i])) {
-                        IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
-                    }
-                    VECTOR(*vector)[i] = VECTOR(*reset)[i];
-                }
+                IGRAPH_CHECK(igraph_vector_update(vector, reset));
                 igraph_vector_scale(vector, 1.0 / reset_sum);
             } else {
+                IGRAPH_CHECK(igraph_vector_resize(vector, no_of_nodes));
                 igraph_vector_fill(vector, 1.0 / no_of_nodes);
             }
         }
@@ -583,19 +588,6 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
 
     if (reset) {
         /* Normalize reset vector so the sum is 1 */
-        igraph_real_t reset_sum, reset_min;
-        reset_min = igraph_vector_min(reset);
-        if (reset_min < 0) {
-            IGRAPH_ERROR("The reset vector must not contain negative elements.", IGRAPH_EINVAL);
-        }
-        if (isnan(reset_min)) {
-            IGRAPH_ERROR("The reset vector must not contain NaN values.", IGRAPH_EINVAL);
-        }
-        reset_sum = igraph_vector_sum(reset);
-        if (reset_sum == 0) {
-            IGRAPH_ERROR("The sum of the elements in the reset vector must not be zero.", IGRAPH_EINVAL);
-        }
-
         IGRAPH_CHECK(igraph_vector_init_copy(&normalized_reset, reset));
         IGRAPH_FINALLY(igraph_vector_destroy, &normalized_reset);
 
