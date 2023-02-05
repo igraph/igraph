@@ -10,6 +10,7 @@
 
  - `igraph_hub_and_authority_scores()`, `igraph_hub_score()` and `igraph_authority_score()` considered self-loops only once on the diagonal of the adjacency matrix of undirected graphs, thus the result was not identical to that obtained by `igraph_eigenvector_centrality()` on loopy undirected graphs. This is now corrected.
  - `igraph_community_infomap()` now checks edge and vertex weights for validity.
+ - `igraph_minimum_spanning_tree()` and `igraph_minimum_spanning_tree_prim()` now check that edge weights are not NaN.
 
 ### Deprecated
 
