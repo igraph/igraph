@@ -256,11 +256,13 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
             IGRAPH_ERROR("Invalid edge weight vector length.", IGRAPH_EINVAL);
         }
         if (ecount > 0) {
+            /* Allow both positive and zero weights.
+             * The conversion to Infomap format will simply skip zero-weight edges/ */
             igraph_real_t minweight = igraph_vector_min(e_weights);
-            if (minweight <= 0) {
-                IGRAPH_ERROR("Edge weight vector must be positive.", IGRAPH_EINVAL);
+            if (minweight < 0) {
+                IGRAPH_ERROR("Edge weights must not be negative.", IGRAPH_EINVAL);
             } else if (isnan(minweight)) {
-                IGRAPH_ERROR("Edge weight vector must not contain NaN values.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge weights must not be NaN values.", IGRAPH_EINVAL);
             }
         }
     }
@@ -271,11 +273,13 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
             IGRAPH_ERROR("Invalid vertex weight vector length.", IGRAPH_EINVAL);
         }
         if (vcount > 0) {
+            /* TODO: Currently we require strictly positive. Can this be
+             * relaxed to non-negative values? */
             igraph_real_t minweight = igraph_vector_min(v_weights);
             if (minweight <= 0) {
-                IGRAPH_ERROR("Vertex weight vector must be positive.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Vertex weights must be positive.", IGRAPH_EINVAL);
             } else if (isnan(minweight)) {
-                IGRAPH_ERROR("Vertex weight vector must not contain NaN values.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Vertex weights must not be NaN values.", IGRAPH_EINVAL);
             }
         }
     }
