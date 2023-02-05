@@ -219,7 +219,7 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
  *     edges with low weights; the probability of picking a particular
  *     outbound edge from a node is directly proportional to its weight.
  *     If it is \c NULL then all edges will have equal
- *     weights. The weights are expected to be positive.
+ *     weights. The weights are expected to be non-negative.
  * \param v_weights Numeric vector giving the weights of the vertices.
  *     Vertices with higher weights are favoured by the random walker
  *     when it needs to "teleport" to a new node after getting stuck in
