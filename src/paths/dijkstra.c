@@ -122,9 +122,9 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
+            IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
         } else if (isnan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
@@ -430,15 +430,15 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length does not match number of edges.", IGRAPH_EINVAL);
     }
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (isnan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
@@ -803,10 +803,10 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Edge weights must be non-negative.", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Edge weights must not be negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (isnan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
