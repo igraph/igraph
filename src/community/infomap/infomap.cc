@@ -253,7 +253,7 @@ int infomap_partition(FlowGraph * fgraph, bool rcall) {
  * \param graph The input graph.
  * \param e_weights Numeric vector giving the weights of the edges.
  *     If it is a NULL pointer then all edges will have equal
- *     weights. The weights are expected to be positive.
+ *     weights. The weights are expected to be non-negative.
  * \param v_weights Numeric vector giving the weights of the vertices.
  *     If it is a NULL pointer then all vertices will have equal
  *     weights. The weights are expected to be positive.
@@ -284,10 +284,10 @@ int igraph_community_infomap(const igraph_t * graph,
         }
         if (ecount > 0) {
             igraph_real_t minweight = igraph_vector_min(e_weights);
-            if (minweight <= 0) {
-                IGRAPH_ERROR("Edge weight vector must be positive.", IGRAPH_EINVAL);
+            if (minweight < 0) {
+                IGRAPH_ERROR("Edge weights must not be negative.", IGRAPH_EINVAL);
             } else if (isnan(minweight)) {
-                IGRAPH_ERROR("Edge weight vector must not contain NaN values.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Edge weights must not be NaN values.", IGRAPH_EINVAL);
             }
         }
     }
@@ -300,9 +300,9 @@ int igraph_community_infomap(const igraph_t * graph,
         if (vcount > 0) {
             igraph_real_t minweight = igraph_vector_min(v_weights);
             if (minweight <= 0) {
-                IGRAPH_ERROR("Vertex weight vector must be positive.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Vertex weights must be positive.", IGRAPH_EINVAL);
             } else if (isnan(minweight)) {
-                IGRAPH_ERROR("Vertex weight vector must not contain NaN values.", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Vertex weights must not be NaN values.", IGRAPH_EINVAL);
             }
         }
     }
