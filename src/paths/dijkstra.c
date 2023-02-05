@@ -784,7 +784,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_int_t order;
     igraph_vector_ptr_t parents, parents_edge;
 
-    unsigned char *is_target;
+    unsigned char *is_target; /* uses more than two discrete values, can't be 'bool' */
     igraph_integer_t i, n, to_reach;
     igraph_bool_t free_vertices = false;
     int cmp_result;
