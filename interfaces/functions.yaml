@@ -238,7 +238,7 @@ igraph_erdos_renyi_game_gnm:
 igraph_degree_sequence_game:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,
-        DEGSEQ_MODE method=SIMPLE
+        DEGSEQ_MODE method=CONFIGURATION
 
 igraph_growing_random_game:
     PARAMS: |-
