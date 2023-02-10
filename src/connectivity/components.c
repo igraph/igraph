@@ -933,9 +933,9 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * \brief Finds the articulation points in a graph.
  *
  * A vertex is an articulation point if its removal increases
- * the number of connected components in the graph.
+ * the number of (weakly) connected components in the graph.
  *
- * \param graph The input graph.
+ * \param graph The input graph. It will be treated as undirected.
  * \param res Pointer to an initialized vector, the
  *    articulation points will be stored here.
  * \return Error code.
@@ -947,7 +947,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_int_t *res) {
 
-    return igraph_biconnected_components(graph, 0, 0, 0, 0, res);
+    return igraph_biconnected_components(graph, NULL, NULL, NULL, NULL, res);
 }
 
 /**
@@ -974,7 +974,7 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * a single vertex only as being biconnected. Isolated vertices will
  * not be part of any of the biconnected components.
  *
- * \param graph The input graph.
+ * \param graph The input graph. It will be treated as undirected.
  * \param no If not a NULL pointer, the number of biconnected components will
  *     be stored here.
  * \param tree_edges If not a NULL pointer, then the found components
