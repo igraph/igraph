@@ -63,8 +63,13 @@
 #include "core/exceptions.h"
 #include "core/interruption.h"
 
-#include <limits.h>
-#include <math.h>
+#include <climits>
+#include <cmath>
+
+// This is necessary for GCC 5 and earlier, where including <cmath>
+// makes isnan() unusable without the std:: prefix, even if <math.h>
+// was included as well.
+using std::isnan;
 
 using namespace igraph::walktrap;
 

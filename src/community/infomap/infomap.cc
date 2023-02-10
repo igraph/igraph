@@ -38,9 +38,13 @@
 #include "infomap_FlowGraph.h"
 #include "infomap_Greedy.h"
 
+#include <cmath>
 #include <vector>
 
-#include <math.h>
+// This is necessary for GCC 5 and earlier, where including <cmath>
+// makes isnan() unusable without the std:: prefix, even if <math.h>
+// was included as well.
+using std::isnan;
 
 /****************************************************************************/
 static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
