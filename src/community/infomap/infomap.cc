@@ -39,7 +39,8 @@
 #include "infomap_Greedy.h"
 
 #include <vector>
-#include <cmath>
+
+#include <math.h>
 
 /****************************************************************************/
 static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {

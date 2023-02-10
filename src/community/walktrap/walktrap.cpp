@@ -63,7 +63,8 @@
 #include "core/exceptions.h"
 #include "core/interruption.h"
 
-#include <climits>
+#include <limits.h>
+#include <math.h>
 
 using namespace igraph::walktrap;
 
