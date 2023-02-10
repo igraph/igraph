@@ -57,6 +57,7 @@ static igraph_error_t igraph_distances_floyd_warshall_original(
     return IGRAPH_SUCCESS;
 }
 
+#define enc_dec_negative(n) (-n - 1)
 
 static igraph_error_t igraph_distances_floyd_warshall_tree(
         const igraph_t *graph, igraph_matrix_t *res,
@@ -152,12 +153,12 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
                 counter++;
                 /* a negative marker -parent - 1 that is popped right after
                    all the descendants of the parent were processed */
-                IGRAPH_CHECK(igraph_stack_int_push(&stack, -parent - 1));
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, enc_dec_negative(parent)));
                 for (igraph_integer_t l = VECTOR(children_start_in)[parent]; l < VECTOR(children_start_in)[parent + 1]; l++) {
                     IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(children_in)[l]));
                 }
             } else {
-                VECTOR(dfs_skip)[-(parent + 1)] = counter;
+                VECTOR(dfs_skip)[enc_dec_negative(parent)] = counter;
             }
         }
 
@@ -268,16 +269,6 @@ static igraph_error_t igraph_distances_floyd_warshall_hourglass(
     igraph_stack_int_t stack;
     IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
-
-    /* activate[v] being false corresponds to the removal of the subtree of OUT_k rooted at v
-       see line 12 of the Hourglass algorithm in the paper.
-       Then setting activate[v] to true corresponds to reinserting the substree of OUT_k rooted at v */
-    igraph_vector_bool_t active;
-    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&active, no_of_nodes);
-    for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
-        VECTOR(active)[v] = true;
-    }
-
     for (igraph_integer_t u = 0; u < no_of_nodes; u++) {
         for (igraph_integer_t v = 0; v < no_of_nodes; v++) {
             MATRIX(successors, v, u) = u;
@@ -350,6 +341,11 @@ static igraph_error_t igraph_distances_floyd_warshall_hourglass(
                 VECTOR(dfs_skip_in)[-(parent + 1)] = counter;
             }
         }
+         
+        /* it is convenient due to the dynamic mofications of the skip list below
+           to have the index of the "first" child in dfs_traversal_in of the root k to be
+           its value in the skip list*/
+        VECTOR(dfs_skip_in)[k] = 1;
 
         /* main inner loop */
         IGRAPH_CHECK(igraph_stack_int_push(&stack, k));
@@ -358,28 +354,31 @@ static igraph_error_t igraph_distances_floyd_warshall_hourglass(
             if (i >= 0) {
                 igraph_real_t dki = MATRIX(*res, k, i);
                 if (!(dki == IGRAPH_INFINITY || i == k)) {
-                    igraph_integer_t counter_in = 1;
+                    /* prev_vertex is used to keep track of the last vertex whose subtree was not removed.
+                       It is used below to modify dfs_skip_in to simulate the pruning 
+                       of IN_k tree.
+                    */
+                    igraph_integer_t prev_vertex = k;
+                    igraph_integer_t counter_in = VECTOR(dfs_skip_in)[prev_vertex];
                     while (counter_in < no_of_nodes) {
                         igraph_integer_t j = VECTOR(dfs_traversal_in)[counter_in];
-                        /* if vertex j is not active then we can skip its subtree */
-                        if (!VECTOR(active)[j]) {
-                            counter_in = VECTOR(dfs_skip_in)[j];
-                            continue;
-                        }
                         igraph_real_t di = MATRIX(*res, j, k) + dki;
                         igraph_real_t dd = MATRIX(*res, j, i);
                         if (di < dd) {
                             MATRIX(*res, j, i) = di;
                             MATRIX(successors, j, i) = MATRIX(successors, j, k);
                             MATRIX(predecessors, j, i) = MATRIX(predecessors, k, i);
+                            prev_vertex = j;
                             counter_in++;
                         } else {
-                            counter_in = VECTOR(dfs_skip_in)[j];
-                             /* deactivating vertex j 
-                                a negative marker -j - 1 that is popped right after
-                                all the descendants of the parent were processed */
-                            VECTOR(active)[j] = false;
-                            IGRAPH_CHECK(igraph_stack_int_push(&stack, -j - 1));
+                            /* "removing" the subtree rooted at vertex j by modifying dfs_skip_in array.
+                                A negative marker -prev_vertex - 1 that is popped right after
+                                all the descendants of the vertex i in OUT_k tree were processed
+                            */
+                            counter_in = VECTOR(dfs_skip_in)[j]; 
+                            IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(dfs_skip_in)[prev_vertex]));
+                            IGRAPH_CHECK(igraph_stack_int_push(&stack, enc_dec_negative(prev_vertex)));
+                            VECTOR(dfs_skip_in)[prev_vertex] = counter_in; 
                         }
                         if (i == j && MATRIX(*res, i, i) < 0) {
                             IGRAPH_ERROR("Negative cycle found while calculating distances with Floyd-Warshall.",
@@ -391,8 +390,9 @@ static igraph_error_t igraph_distances_floyd_warshall_hourglass(
                     IGRAPH_CHECK(igraph_stack_int_push(&stack, VECTOR(children_out)[l]));
                 }                
             } else {
-                /* reactivating the vertex i */
-                VECTOR(active)[-(i + 1)] = true;
+                /* reinserting the tree rooted at prev_vertex back to IN_k by modifying dfs_skip_in list */
+                igraph_integer_t prev_vertex = enc_dec_negative(i);
+                VECTOR(dfs_skip_in)[prev_vertex] = igraph_stack_int_pop(&stack);
             }    
         }
     }
@@ -408,8 +408,7 @@ static igraph_error_t igraph_distances_floyd_warshall_hourglass(
     igraph_vector_int_destroy(&children_out);
     igraph_matrix_int_destroy(&successors);
     igraph_matrix_int_destroy(&predecessors);
-    igraph_vector_bool_destroy(&active); 
-    IGRAPH_FINALLY_CLEAN(12);
+    IGRAPH_FINALLY_CLEAN(11);
 
     return IGRAPH_SUCCESS;
 }
