@@ -12,6 +12,7 @@
  - `igraph_community_infomap()` now checks edge and vertex weights for validity.
  - `igraph_minimum_spanning_tree()` and `igraph_minimum_spanning_tree_prim()` now check that edge weights are not NaN.
  - Fixed an initialization error in the string attribute combiner of the C attribute handler.
+ - Fixed an issue with the weighted clique number calculation when all the weights were the same.
 
 ### Deprecated
 
