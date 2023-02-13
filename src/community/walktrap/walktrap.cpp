@@ -181,13 +181,6 @@ igraph_error_t igraph_community_walktrap(const igraph_t *graph,
         }
     }
 
-    /*
-    if (membership && !(modularity && merges)) {
-        IGRAPH_ERROR("Cannot calculate membership without modularity or merges",
-                    IGRAPH_EINVAL);
-    }
-    */
-
     IGRAPH_HANDLE_EXCEPTIONS(
         Graph G;
         IGRAPH_CHECK(G.convert_from_igraph(graph, weights));
