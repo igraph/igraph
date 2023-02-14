@@ -973,6 +973,7 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
+  igraph_set
   igraph_transitivity
   igraph_voronoi
   inc_vs_adj

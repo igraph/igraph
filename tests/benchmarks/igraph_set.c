@@ -11,16 +11,14 @@ void unit_test_subgraph_edges(
     const char* bench_message
 ) {
     igraph_vector_int_t edges;
-    printf("bench called\n");
+    igraph_vector_int_init(&edges, 0);
 
-    ;
     BENCH(bench_message,
           REPEAT(
-                igraph_induced_subgraph_edges(graph, igraph_vss_range(0, induced_subgraph_vertice_count),&edges), 
-                benchmark_count
-            )
-        );
-    printf("bench complete");
+              igraph_induced_subgraph_edges(graph, igraph_vss_range(0, induced_subgraph_vertice_count), &edges),
+              benchmark_count
+          )
+         );
 
     igraph_vector_int_destroy(&edges);
 }
@@ -34,17 +32,37 @@ void bench_induced_subgraph_edges() {
 
     igraph_barabasi_game(&g, BARBASI_GRAPH_VERTICE_COUNT, 1, 100, NULL, true, 0,
                          IGRAPH_UNDIRECTED, IGRAPH_BARABASI_PSUMTREE_MULTIPLE, NULL);
-    printf("\nBenching the induced_subgraph_edges to bench the performance of sets\n");
 
 #define REP 10
 
-#define INDUCED_SUBGRAPH_VERTICE_COUNT 800
+#define INDUCED_SUBGRAPH_VERTICE_COUNT 100
 
-    printf("unit test called\n");
-    unit_test_subgraph_edges(&g, &vertices,INDUCED_SUBGRAPH_VERTICE_COUNT, REP,
-        "pref. attach. graph n= " TOSTR(BARBASI_GRAPH_VERTICE_COUNT) " m=100, e` = " TOSTR(INDUCED_SUBGRAPH_VERTICE_COUNT) ",\
+    unit_test_subgraph_edges(&g, &vertices, INDUCED_SUBGRAPH_VERTICE_COUNT, REP,
+                             "benching induced_subgraph_edges for barabasi graph with vertices= \
+" TOSTR(BARBASI_GRAPH_VERTICE_COUNT) " m=100, e` = " TOSTR(INDUCED_SUBGRAPH_VERTICE_COUNT) ",\
          " TOSTR(REP) " x"
-        );
+                            );
+
+#undef INDUCED_SUBGRAPH_VERTICE_COUNT
+
+#define INDUCED_SUBGRAPH_VERTICE_COUNT 1000
+
+    unit_test_subgraph_edges(&g, &vertices, INDUCED_SUBGRAPH_VERTICE_COUNT, REP,
+                             "benching induced_subgraph_edges for barabasi graph with vertices= \
+" TOSTR(BARBASI_GRAPH_VERTICE_COUNT) " m=100, e` = " TOSTR(INDUCED_SUBGRAPH_VERTICE_COUNT) ",\
+         " TOSTR(REP) " x"
+                            );
+
+#undef INDUCED_SUBGRAPH_VERTICE_COUNT
+
+
+#define INDUCED_SUBGRAPH_VERTICE_COUNT 10000
+
+    unit_test_subgraph_edges(&g, &vertices, INDUCED_SUBGRAPH_VERTICE_COUNT, REP,
+                             "benching induced_subgraph_edges for barabasi graph with vertices= \
+" TOSTR(BARBASI_GRAPH_VERTICE_COUNT) " m=100, e` = " TOSTR(INDUCED_SUBGRAPH_VERTICE_COUNT) ",\
+         " TOSTR(REP) " x"
+                            );
 
 #undef INDUCED_SUBGRAPH_VERTICE_COUNT
 
