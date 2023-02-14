@@ -23,7 +23,7 @@ void unit_test_subgraph_edges(
     igraph_vector_int_destroy(&edges);
 }
 
-void bench_induced_subgraph_edges() {
+void bench_induced_subgraph_edges(void) {
     igraph_t g;
     igraph_vector_int_t vertices;
     igraph_vector_int_t edges;
@@ -71,7 +71,7 @@ void bench_induced_subgraph_edges() {
 
 }
 
-int main() {
+int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 137);
     BENCH_INIT();
