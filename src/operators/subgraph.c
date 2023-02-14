@@ -422,7 +422,7 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 
 /**
  * \function igraph_induced_subgraph_edges
- * \brief The edges contained within an induced sugraph.
+ * \brief The edges contained within an induced subgraph.
  *
  * This function finds the IDs of those edges which connect vertices from
  * a given list, passed in the \p vids parameter.

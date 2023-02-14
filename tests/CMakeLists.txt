@@ -967,6 +967,7 @@ add_benchmarks(
   igraph_degree
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
