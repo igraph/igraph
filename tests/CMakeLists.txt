@@ -964,6 +964,7 @@ add_benchmarks(
   igraph_degree
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
@@ -973,7 +974,6 @@ add_benchmarks(
   igraph_power_law_fit
   igraph_qsort
   igraph_random_walk
-  igraph_set
   igraph_transitivity
   igraph_voronoi
   inc_vs_adj
