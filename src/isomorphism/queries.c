@@ -138,7 +138,7 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 
 /**
  * \function igraph_isomorphic_34
- * Graph isomorphism for 3-4 vertices (deprecated alias).
+ * \brief Graph isomorphism for 3-4 vertices (deprecated).
  *
  * \deprecated-by igraph_isomorphic 0.10.0
  *

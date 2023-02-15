@@ -13,6 +13,26 @@
 
 ## [master]
 
+### Changes
+
+ - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
+
+### Fixed
+
+ - `igraph_hub_and_authority_scores()`, `igraph_hub_score()` and `igraph_authority_score()` considered self-loops only once on the diagonal of the adjacency matrix of undirected graphs, thus the result was not identical to that obtained by `igraph_eigenvector_centrality()` on loopy undirected graphs. This is now corrected.
+ - `igraph_community_infomap()` now checks edge and vertex weights for validity.
+ - `igraph_minimum_spanning_tree()` and `igraph_minimum_spanning_tree_prim()` now check that edge weights are not NaN.
+ - Fixed an initialization error in the string attribute combiner of the C attribute handler.
+ - Fixed an issue with the weighted clique number calculation when all the weights were the same.
+
+### Deprecated
+
+- `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
+
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.4] - 2023-01-26
 
 ### Added

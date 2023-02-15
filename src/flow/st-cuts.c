@@ -398,21 +398,23 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
  *
  * \param graph A directed graph. If it is not a flowgraph, and it
  *        contains some vertices not reachable from the root vertex,
- *        then these vertices will be collected in the \c leftout
+ *        then these vertices will be collected in the \p leftout
  *        vector.
- * \param root The id of the root (or source) vertex, this will be the
+ * \param root The ID of the root (or source) vertex, this will be the
  *        root of the tree.
  * \param dom Pointer to an initialized vector or a null pointer. If
  *        not a null pointer, then the immediate dominator of each
  *        vertex will be stored here. For vertices that are not
- *        reachable from the root, -2 is stored here. For
- *        the root vertex itself, -1 is added.
- * \param domtree Pointer to an uninitialized igraph_t, or NULL. If
- *        not a null pointer, then the dominator tree is returned
- *        here. The graph contains the vertices that are unreachable
+ *        reachable from the root, <code>-2</code> is stored here. For
+ *        the root vertex itself, <code>-1</code> is added.
+ * \param domtree Pointer to an \em uninitialized <type>igraph_t</type>,
+ *        or \c NULL. If not a null pointer, then the dominator tree
+ *        is returned here. The graph contains the vertices that are unreachable
  *        from the root (if any), these will be isolates.
- * \param leftout Pointer to an initialized vector object, or NULL. If
- *        not NULL, then the IDs of the vertices that are unreachable
+ *        Graph and vertex attributes are preserved, but edge attributes
+ *        are discarded.
+ * \param leftout Pointer to an initialized vector object, or \c NULL. If
+ *        not \c NULL, then the IDs of the vertices that are unreachable
  *        from the root vertex (and thus not part of the dominator
  *        tree) are stored here.
  * \param mode Constant, must be \c IGRAPH_IN or \c IGRAPH_OUT. If it
@@ -447,24 +449,22 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     igraph_neimode_t invmode = IGRAPH_REVERSE_MODE(mode);
 
-    igraph_integer_t i;
-
     igraph_vector_int_t vdom, *mydom = dom;
 
     igraph_integer_t component_size = 0;
 
     if (root < 0 || root >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid root vertex ID for dominator tree",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid root vertex ID for dominator tree.",
+                     IGRAPH_EINVVID);
     }
 
     if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Dominator tree of an undirected graph requested",
+        IGRAPH_ERROR("Dominator tree of an undirected graph requested.",
                      IGRAPH_EINVAL);
     }
 
     if (mode == IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid neighbor mode for dominator tree",
+        IGRAPH_ERROR("Invalid neighbor mode for dominator tree.",
                      IGRAPH_EINVAL);
     }
 
@@ -497,7 +497,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                             /*dist=*/ NULL, /*in_callback=*/ NULL,
                             /*out_callback=*/ NULL, /*extra=*/ NULL));
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(vertex)[i] >= 0) {
             igraph_integer_t t = VECTOR(vertex)[i];
             VECTOR(semi)[t] = component_size + 1;
@@ -518,10 +518,10 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* We need to go over 'pred' because it should contain only the
        edges towards the target vertex. */
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *v = igraph_adjlist_get(&pred, i);
-        igraph_integer_t j, n = igraph_vector_int_size(v);
-        for (j = 0; j < n; ) {
+        igraph_integer_t n = igraph_vector_int_size(v);
+        for (igraph_integer_t j = 0; j < n; ) {
             igraph_integer_t v2 = VECTOR(*v)[j];
             if (VECTOR(parent)[v2] >= -1) {
                 j++;
@@ -535,7 +535,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* Now comes the main algorithm, steps 2 & 3 */
 
-    for (i = component_size - 1; i > 0; i--) {
+    for (igraph_integer_t i = component_size - 1; i > 0; i--) {
         igraph_integer_t w = VECTOR(vertex)[i] - 1;
         igraph_vector_int_t *predw = igraph_adjlist_get(&pred, w);
         igraph_integer_t j, n = igraph_vector_int_size(predw);
@@ -558,7 +558,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* Finally, step 4 */
 
-    for (i = 1; i < component_size; i++) {
+    for (igraph_integer_t i = 1; i < component_size; i++) {
         igraph_integer_t w = VECTOR(vertex)[i] - 1;
         if (VECTOR(*mydom)[w] != VECTOR(vertex)[VECTOR(semi)[w] - 1] - 1) {
             VECTOR(*mydom)[w] = VECTOR(*mydom)[VECTOR(*mydom)[w]];
@@ -580,7 +580,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         igraph_vector_int_t edges;
         igraph_integer_t ptr = 0;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, component_size * 2 - 2);
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             if (i != root && VECTOR(*mydom)[i] >= 0) {
                 if (mode == IGRAPH_OUT) {
                     VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
@@ -597,8 +597,8 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
 
         IGRAPH_I_ATTRIBUTE_DESTROY(domtree);
-        IGRAPH_I_ATTRIBUTE_COPY(domtree, graph, /*graph=*/ 1, /*vertex=*/ 1,
-                                /*edge=*/ 0);
+        IGRAPH_I_ATTRIBUTE_COPY(domtree, graph,
+                                /*graph=*/ true, /*vertex=*/ true, /*edge=*/ false);
     }
 
     if (!dom) {
