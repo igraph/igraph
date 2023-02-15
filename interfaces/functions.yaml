@@ -31,7 +31,7 @@ igraph_delete_vertices:
     PARAMS: INOUT GRAPH graph, VERTEX_SELECTOR vertices
     DEPS: vertices ON graph
 
-igraph_delete_vertices_map
+igraph_delete_vertices_map:
     PARAMS: |-
         INOUT GRAPH graph, VERTEX_SELECTOR vertices,
         OPTIONAL OUT VECTOR_INT idx,
