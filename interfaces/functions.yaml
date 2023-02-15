@@ -174,7 +174,7 @@ igraph_kautz:
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
 
 igraph_famous:
-    PARAMS: OUT GRAPH graph, CSTRING name=""
+    PARAMS: OUT GRAPH graph, CSTRING name
 
 igraph_lcf_vector:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
