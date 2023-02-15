@@ -76,7 +76,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     res->attr = 0;         /* Why is this needed? TODO */
     IGRAPH_CHECK(igraph_copy(res, graph));
     IGRAPH_FINALLY(igraph_destroy, res);
-    IGRAPH_CHECK(igraph_delete_vertices_idx(res, igraph_vss_vector(&delete),
+    IGRAPH_CHECK(igraph_delete_vertices_map(res, igraph_vss_vector(&delete),
                                             map, invmap));
 
     igraph_vector_int_destroy(&delete);
@@ -422,7 +422,7 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 
 /**
  * \function igraph_induced_subgraph_edges
- * \brief The edges contained within an induced subgraph.
+ * \brief The edges contained within an induced sugraph.
  *
  * This function finds the IDs of those edges which connect vertices from
  * a given list, passed in the \p vids parameter.
@@ -490,7 +490,7 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
 /**
  * \ingroup structural
  * \function igraph_subgraph_edges
- * \brief Creates a subgraph with the specified edges and their endpoints (deprecated alias).
+ * \brief Creates a subgraph with the specified edges and their endpoints.
  *
  * \deprecated-by igraph_subgraph_from_edges 0.10.3
  */
@@ -506,10 +506,11 @@ igraph_error_t igraph_subgraph_edges(
  * \function igraph_subgraph_from_edges
  * \brief Creates a subgraph with the specified edges and their endpoints.
  *
+ * </para><para>
  * This function collects the specified edges and their endpoints to a new
- * graph. As the vertex IDs in a graph always start with zero, this function
- * very likely needs to reassign IDs to the vertices. Attributes are preserved.
- *
+ * graph.
+ * As the vertex IDs in a graph always start with zero, this function
+ * very likely needs to reassign IDs to the vertices.
  * \param graph The graph object.
  * \param res The subgraph, another graph object will be stored here,
  *        do \em not initialize this object before calling this

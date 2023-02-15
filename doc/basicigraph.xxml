@@ -203,7 +203,7 @@ Upper and lower limits of <type>igraph_integer_t</type> and
 <!-- doxrox-include igraph_add_vertices -->
 <!-- doxrox-include igraph_delete_edges -->
 <!-- doxrox-include igraph_delete_vertices -->
-<!-- doxrox-include igraph_delete_vertices_idx -->
+<!-- doxrox-include igraph_delete_vertices_map -->
 </section>
 
 </section>
