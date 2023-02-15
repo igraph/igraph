@@ -239,6 +239,7 @@ add_library(
   operators/union.c
 
   paths/all_shortest_paths.c
+  paths/astar.c
   paths/bellman_ford.c
   paths/dijkstra.c
   paths/distances.c
@@ -302,6 +303,7 @@ add_library(
   internal/lsap.c
   internal/qsort_r.c
   internal/qsort.c
+  internal/utils.c
   internal/zeroin.c
 
   version.c

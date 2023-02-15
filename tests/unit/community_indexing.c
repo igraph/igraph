@@ -36,16 +36,12 @@ void check(const igraph_vector_int_t *m) {
 int main(void) {
     igraph_t graph;
     igraph_vector_int_t membership;
-    igraph_vector_t modularity; /* non-optional for walktrap */
-    igraph_matrix_int_t merges; /* non-optional for walktrap */
     igraph_error_handler_t *handler;
     igraph_error_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_vector_int_init(&membership, 0);
-    igraph_vector_init(&modularity, 0);
-    igraph_matrix_int_init(&merges, 0, 0);
 
     igraph_grg_game(&graph, 100, 0.2, false, NULL, NULL);
 
@@ -55,7 +51,7 @@ int main(void) {
     igraph_community_label_propagation(&graph, &membership, IGRAPH_ALL, NULL, NULL, NULL);
     check(&membership);
 
-    igraph_community_walktrap(&graph, NULL, 4, &merges, &modularity, &membership);
+    igraph_community_walktrap(&graph, NULL, 4, NULL, NULL, &membership);
     check(&membership);
 
     igraph_community_edge_betweenness(&graph, NULL, NULL, NULL, NULL, NULL, &membership, IGRAPH_UNDIRECTED, NULL);
@@ -84,8 +80,6 @@ int main(void) {
 
     igraph_destroy(&graph);
 
-    igraph_matrix_int_destroy(&merges);
-    igraph_vector_destroy(&modularity);
     igraph_vector_int_destroy(&membership);
 
     VERIFY_FINALLY_STACK();

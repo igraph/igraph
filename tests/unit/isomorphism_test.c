@@ -145,19 +145,19 @@ void test_bliss(void) {
         printf("Bliss failed on ring isomorphism.\n");
     }
 
-    igraph_automorphisms(&ring1, NULL, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&ring1, NULL, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "200") != 0) {
         printf("Biss automorphism count failed: ring1.\n");
     }
     igraph_free(info.group_size);
 
-    igraph_automorphisms(&ring2, NULL, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&ring2, NULL, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "200") != 0) {
         printf("Biss automorphism count failed: ring2.\n");
     }
     igraph_free(info.group_size);
 
-    igraph_automorphisms(&directed_ring, NULL, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&directed_ring, NULL, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "100") != 0) {
         printf("Biss automorphism count failed: directed_ring.\n");
     }
@@ -185,7 +185,7 @@ void test_bliss(void) {
 
     igraph_vector_int_init_range(&color, 0, igraph_vcount(&ring1));
 
-    igraph_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "1") != 0) {
         printf("Bliss automorphism count with color failed: ring1.\n");
     }
