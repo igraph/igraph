@@ -37,12 +37,29 @@ __BEGIN_DECLS
  * Set containing integer numbers regardless of the order
  * \ingroup types
  */
+enum COLOR {RED,BLACK};
 
-typedef struct s_set {
-    igraph_integer_t* stor_begin;
-    igraph_integer_t* stor_end;
-    igraph_integer_t* end;
+struct Node
+{
+    int data;
+    struct Node* left;
+    struct Node* right;
+    struct Node* parent;
+    enum COLOR color;
+} ;
+
+
+
+typedef struct s_set{
+    struct Node* root;
+    struct Node* reservoir;
+    igraph_integer_t size;
+    igraph_integer_t reservoir_size;
 } igraph_set_t;
+
+typedef struct s_iterator {
+    igraph_integer_t ok;
+} igraph_set_iterator_t;
 
 #define IGRAPH_SET_NULL { 0,0,0 }
 #define IGRAPH_SET_INIT_FINALLY(v, size) \
@@ -58,7 +75,7 @@ IGRAPH_PRIVATE_EXPORT void igraph_set_clear(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_set_size(const igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_add(igraph_set_t* v, igraph_integer_t e);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e);
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t* state,
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t* state,
                                                        igraph_integer_t* element);
 
 __END_DECLS

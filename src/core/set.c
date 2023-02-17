@@ -27,8 +27,6 @@
 
 #include <string.h>     /* memmove */
 
-#define SET(s) ((s).stor_begin)
-
 /**
  * \ingroup set
  * \function igraph_set_init
@@ -52,13 +50,13 @@ igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
 
     IGRAPH_ASSERT(capacity >= 0);
     alloc_size = capacity > 0 ? capacity : 1;
-    set->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
-    if (! set->stor_begin) {
+    set->reservoir = IGRAPH_CALLOC(alloc_size, struct Node);
+    if (! set->reservoir) {
         IGRAPH_ERROR("Cannot initialize set.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    set->stor_end = set->stor_begin + alloc_size;
-    set->end = set->stor_begin;
-
+    set->root = NULL;
+    set->size = 0;
+    set->reservoir_size = capacity;
     return IGRAPH_SUCCESS;
 }
 
@@ -73,8 +71,8 @@ igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    if (set->stor_begin != NULL) {
-        IGRAPH_FREE(set->stor_begin); /* sets to NULL */
+    if (set->reservoir != NULL) {
+        IGRAPH_FREE(set->reservoir); /* sets to NULL */
     }
 }
 
@@ -94,7 +92,7 @@ void igraph_set_destroy(igraph_set_t* set) {
  * Time complexity: O(1)
  */
 igraph_bool_t igraph_set_inited(igraph_set_t* set) {
-    return (set->stor_begin != NULL);
+    return (set->reservoir != NULL);
 }
 
 /**
@@ -112,17 +110,14 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
     igraph_integer_t actual_size = igraph_set_size(set);
     igraph_integer_t *tmp;
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->stor_begin != NULL);
+    IGRAPH_ASSERT(set->reservoir != NULL);
     if (capacity <= actual_size) {
         return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(set->stor_begin, capacity, igraph_integer_t);
+    tmp = IGRAPH_REALLOC(set->reservoir, capacity, struct Node);
     IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for set.");
-
-    set->stor_begin = tmp;
-    set->stor_end = set->stor_begin + capacity;
-    set->end = set->stor_begin + actual_size;
+    set->reservoir_size = capacity;
 
     return IGRAPH_SUCCESS;
 }
@@ -140,8 +135,8 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
  */
 igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->stor_begin != NULL);
-    return set->stor_begin == set->end;
+    IGRAPH_ASSERT(set->reservoir != NULL);
+    return set->size == 0;
 }
 
 /**
@@ -160,8 +155,9 @@ igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
  */
 void igraph_set_clear(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->stor_begin != NULL);
-    set->end = set->stor_begin;
+    IGRAPH_ASSERT(set->reservoir != NULL);
+    set->size = 0;
+    set->root = NULL;
 }
 
 
@@ -180,8 +176,161 @@ void igraph_set_clear(igraph_set_t* set) {
 
 igraph_integer_t igraph_set_size(const igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->stor_begin != NULL);
-    return set->end - set->stor_begin;
+    return set->size;
+}
+
+void LeftRotate(struct Node** T,struct Node** x)
+{
+    struct Node* y = (*x)->right;
+    (*x)->right = y->left;
+
+    if(y->left!=NULL)
+        y->left->parent = *x;
+
+    y->parent = (*x)->parent;
+
+    if((*x)->parent == NULL)
+        *T = y;
+
+    else if(*x == (*x)->parent->left)
+        (*x)->parent->left = y;
+
+    else
+        (*x)->parent->right = y;
+
+    y->left = *x;
+
+    (*x)->parent = y;
+
+}
+void RightRotate(struct Node** T,struct Node** x)
+{
+    struct Node* y = (*x)->left;
+    (*x)->left = y->right;
+
+    if(y->right!=NULL)
+        y->right->parent = *x;
+
+    y->parent = (*x)->parent;
+
+    if((*x)->parent==NULL)
+        *T = y;
+
+    else if((*x)== (*x)->parent->left)
+        (*x)->parent->left = y;
+
+    else
+        (*x)->parent->right = y;
+
+    y->right = *x;
+    (*x)->parent = y;
+
+}
+
+void RB_insert_fixup(struct Node** T, struct Node** z)
+{
+    struct Node* grandparent = NULL;
+    struct Node* parentpt = NULL;
+
+    while(((*z)!=*T)&& ((*z)->color!= BLACK) && ((*z)->parent->color == RED))
+    {
+        parentpt = (*z)->parent;
+        grandparent = (*z)->parent->parent;
+
+        if(parentpt == grandparent->left)
+        {
+            struct Node* uncle = grandparent->right;
+
+            if(uncle!=NULL && uncle->color == RED)
+            {
+                grandparent->color = RED;
+                parentpt->color = BLACK;
+                uncle->color = BLACK;
+                *z = grandparent;
+            }
+
+            else
+            {
+                if((*z) == parentpt->right)
+                {
+                    LeftRotate(T,&parentpt);
+                    (*z) = parentpt;
+                    parentpt = (*z)->parent;
+                }
+
+                RightRotate(T,&grandparent);
+                parentpt->color = BLACK;
+                grandparent->color = RED;
+                (*z) = parentpt;
+            }
+        }
+
+        else
+        {
+            struct Node* uncle = grandparent->left;
+
+            if(uncle!=NULL && uncle->color == RED)
+            {
+                grandparent->color = RED;
+                parentpt->color = BLACK;
+                uncle->color = BLACK;
+                (*z) = grandparent;
+            }
+
+            else
+            {
+                if((*z) == parentpt->left)
+                {
+                    RightRotate(T,&parentpt);
+                    (*z) = parentpt;
+                    parentpt = (*z)->parent;
+                }
+
+                LeftRotate(T,&grandparent);
+                parentpt->color = BLACK;
+                grandparent->color = RED;
+                (*z) = parentpt;
+            }
+        }
+    }
+    (*T)->color = BLACK;
+
+}
+
+struct Node* RB_insert(struct Node* T,int data, struct Node* z)
+{
+    z->data = data;
+    z->left = NULL;
+    z->right = NULL;
+    z->parent = NULL;
+    z->color = RED;
+
+    struct Node* y = NULL;
+    struct Node* x = T;//root
+
+    while(x!=NULL)
+    {
+        y = x;
+        if(z->data < x->data)
+            x = x->left;
+
+        else
+            x = x->right;
+    }
+    z->parent = y;
+
+    if(y==NULL)
+        T = z;
+
+    else if(z->data < y->data)
+        y->left = z;
+
+    else
+        y->right = z;
+
+    RB_insert_fixup(&T,&z);
+
+    return T;
 }
 
 
@@ -198,58 +347,26 @@ igraph_integer_t igraph_set_size(const igraph_set_t* set) {
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
 igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
-    igraph_integer_t left, right, middle;
-    igraph_integer_t size;
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->stor_begin != NULL);
-
-    size = igraph_set_size(set);
-
-    /* search where to insert the new element */
-    left = 0;
-    right = size - 1;
-    while (left < right - 1) {
-        middle = (left + right) / 2;
-        if (SET(*set)[middle] > e) {
-            right = middle;
-        } else if (SET(*set)[middle] < e) {
-            left = middle;
-        } else {
-            left = middle;
-            break;
-        }
+    IGRAPH_ASSERT(set->reservoir != NULL);
+    if(set->size >= set->reservoir_size){
+        IGRAPH_CHECK(igraph_set_reserve(set, set->reservoir_size + 1));
     }
+    set->root = RB_insert(set->root, e, set->reservoir + set->size);
+}
 
-    if (right >= 0 && SET(*set)[left] != e && SET(*set)[right] == e) {
-        left = right;
+igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e){
+    if(node == NULL){
+        return false;
     }
-
-    while (left < size && set->stor_begin[left] < e) {
-        left++;
+    if(node->data == e){
+        return true;
     }
-    if (left >= size || set->stor_begin[left] != e) {
-        /* full, allocate more storage */
-        if (set->stor_end == set->end) {
-            igraph_integer_t new_size = size < IGRAPH_INTEGER_MAX/2 ? size * 2 : IGRAPH_INTEGER_MAX;
-            if (size == IGRAPH_INTEGER_MAX) {
-                IGRAPH_ERROR("Cannot add to set, already at maximum size.", IGRAPH_EOVERFLOW);
-            }
-            if (new_size == 0) {
-                new_size = 1;
-            }
-            IGRAPH_CHECK(igraph_set_reserve(set, new_size));
-        }
-
-        /* Element should be inserted at position 'left' */
-        if (left < size)
-            memmove(set->stor_begin + left + 1, set->stor_begin + left,
-                    (size - left) * sizeof(set->stor_begin[0]));
-
-        set->stor_begin[left] = e;
-        set->end += 1;
+    if(node->data > e){
+        return BST_Search(node->left, e);
+    }else{
+        return BST_Search(node->right, e);
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -267,29 +384,10 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
     igraph_integer_t left, right, middle;
 
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->stor_begin != NULL);
-
-    left = 0;
-    right = igraph_set_size(set) - 1;
-
-    if (right == -1) {
-        return false;    /* the set is empty */
-    }
-
-    /* search for the new element */
-    while (left < right - 1) {
-        middle = (left + right) / 2;
-        if (SET(*set)[middle] > e) {
-            right = middle;
-        } else if (SET(*set)[middle] < e) {
-            left = middle;
-        } else {
-            return true;
-        }
-    }
-
-    return SET(*set)[left] == e || SET(*set)[right] == e;
+    IGRAPH_ASSERT(set->reservoir != NULL);
+    return BST_Search(set->root, e);
 }
+
 
 /**
  * \ingroup set
@@ -309,19 +407,9 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
  *
  * \return Nonzero if there are more elements, zero otherwise.
  */
-igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t *state,
+igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t *state,
                                  igraph_integer_t *element) {
     IGRAPH_ASSERT(set != 0);
-    IGRAPH_ASSERT(set->stor_begin != 0);
-    IGRAPH_ASSERT(state != 0);
-    IGRAPH_ASSERT(element != 0);
-
-    if (*state < igraph_set_size(set)) {
-        *element = set->stor_begin[*state];
-        *state = *state + 1;
-        return true;
-    } else {
-        *element = 0;
-        return false;
-    }
+    IGRAPH_ASSERT(set->reservoir != NULL);
+    return false;
 }
