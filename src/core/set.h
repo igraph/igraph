@@ -37,6 +37,9 @@ __BEGIN_DECLS
  * Set containing integer numbers regardless of the order
  * \ingroup types
  */
+
+enum STACK_MODE {LEFT,SELF};
+
 enum COLOR {RED,BLACK};
 
 struct Node
@@ -48,7 +51,23 @@ struct Node
     enum COLOR color;
 } ;
 
+struct Stack
+{
+    struct Node* data;
+    enum STACK_MODE mode;
+} ;
 
+#define STACK_LENGTH 20
+/*
+Stack length need to be greater than the depth of the rb-tree and 
+it not possible to make a tree with 2^20 Nodes so this number can be reduced futher.
+*/
+
+typedef struct s_set_itertor
+{
+    struct Stack stack[STACK_LENGTH];
+    igraph_integer_t stack_index;
+} igraph_set_iterator_t;
 
 typedef struct s_set{
     struct Node* root;
@@ -57,9 +76,6 @@ typedef struct s_set{
     igraph_integer_t reservoir_size;
 } igraph_set_t;
 
-typedef struct s_iterator {
-    igraph_integer_t ok;
-} igraph_set_iterator_t;
 
 #define IGRAPH_SET_NULL { 0,0,0 }
 #define IGRAPH_SET_INIT_FINALLY(v, size) \
@@ -77,6 +93,7 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_add(igraph_set_t* v, igraph_inte
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t* state,
                                                        igraph_integer_t* element);
+IGRAPH_PRIVATE_EXPORT void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* iterator);
 
 __END_DECLS
 

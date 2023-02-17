@@ -51,9 +51,7 @@ igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
     IGRAPH_ASSERT(capacity >= 0);
     alloc_size = capacity > 0 ? capacity : 1;
     set->reservoir = IGRAPH_CALLOC(alloc_size, struct Node);
-    if (! set->reservoir) {
-        IGRAPH_ERROR("Cannot initialize set.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(set->reservoir, "Cannot reserve space for set.");
     set->root = NULL;
     set->size = 0;
     set->reservoir_size = capacity;
@@ -115,8 +113,8 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
         return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(set->reservoir, capacity, struct Node);
-    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for set.");
+    set->reservoir = IGRAPH_REALLOC(set->reservoir, capacity, struct Node);
+    IGRAPH_CHECK_OOM(set->reservoir, "Cannot reserve space for set.");
     set->reservoir_size = capacity;
 
     return IGRAPH_SUCCESS;
@@ -135,7 +133,6 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
  */
 igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->reservoir != NULL);
     return set->size == 0;
 }
 
@@ -179,114 +176,110 @@ igraph_integer_t igraph_set_size(const igraph_set_t* set) {
     return set->size;
 }
 
-void LeftRotate(struct Node** T,struct Node** x)
-{
+void LeftRotate(struct Node** T, struct Node** x) {
     struct Node* y = (*x)->right;
     (*x)->right = y->left;
 
-    if(y->left!=NULL)
+    if (y->left != NULL) {
         y->left->parent = *x;
+    }
 
     y->parent = (*x)->parent;
 
-    if((*x)->parent == NULL)
+    if ((*x)->parent == NULL) {
         *T = y;
+    }
 
-    else if(*x == (*x)->parent->left)
+    else if (*x == (*x)->parent->left) {
         (*x)->parent->left = y;
+    }
 
-    else
+    else {
         (*x)->parent->right = y;
+    }
 
     y->left = *x;
 
     (*x)->parent = y;
 
 }
-void RightRotate(struct Node** T,struct Node** x)
-{
+void RightRotate(struct Node** T, struct Node** x) {
     struct Node* y = (*x)->left;
     (*x)->left = y->right;
 
-    if(y->right!=NULL)
+    if (y->right != NULL) {
         y->right->parent = *x;
+    }
 
     y->parent = (*x)->parent;
 
-    if((*x)->parent==NULL)
+    if ((*x)->parent == NULL) {
         *T = y;
+    }
 
-    else if((*x)== (*x)->parent->left)
+    else if ((*x) == (*x)->parent->left) {
         (*x)->parent->left = y;
+    }
 
-    else
+    else {
         (*x)->parent->right = y;
+    }
 
     y->right = *x;
     (*x)->parent = y;
 
 }
 
-void RB_insert_fixup(struct Node** T, struct Node** z)
-{
+void RB_insert_fixup(struct Node** T, struct Node** z) {
     struct Node* grandparent = NULL;
     struct Node* parentpt = NULL;
 
-    while(((*z)!=*T)&& ((*z)->color!= BLACK) && ((*z)->parent->color == RED))
-    {
+    while (((*z) != *T) && ((*z)->color != BLACK) && ((*z)->parent->color == RED)) {
         parentpt = (*z)->parent;
         grandparent = (*z)->parent->parent;
 
-        if(parentpt == grandparent->left)
-        {
+        if (parentpt == grandparent->left) {
             struct Node* uncle = grandparent->right;
 
-            if(uncle!=NULL && uncle->color == RED)
-            {
+            if (uncle != NULL && uncle->color == RED) {
                 grandparent->color = RED;
                 parentpt->color = BLACK;
                 uncle->color = BLACK;
                 *z = grandparent;
             }
 
-            else
-            {
-                if((*z) == parentpt->right)
-                {
-                    LeftRotate(T,&parentpt);
+            else {
+                if ((*z) == parentpt->right) {
+                    LeftRotate(T, &parentpt);
                     (*z) = parentpt;
                     parentpt = (*z)->parent;
                 }
 
-                RightRotate(T,&grandparent);
+                RightRotate(T, &grandparent);
                 parentpt->color = BLACK;
                 grandparent->color = RED;
                 (*z) = parentpt;
             }
         }
 
-        else
-        {
+        else {
             struct Node* uncle = grandparent->left;
 
-            if(uncle!=NULL && uncle->color == RED)
-            {
+            if (uncle != NULL && uncle->color == RED) {
                 grandparent->color = RED;
                 parentpt->color = BLACK;
                 uncle->color = BLACK;
                 (*z) = grandparent;
             }
 
-            else
-            {
-                if((*z) == parentpt->left)
-                {
-                    RightRotate(T,&parentpt);
+            else {
+                if ((*z) == parentpt->left) {
+                    RightRotate(T, &parentpt);
                     (*z) = parentpt;
                     parentpt = (*z)->parent;
                 }
 
-                LeftRotate(T,&grandparent);
+                LeftRotate(T, &grandparent);
                 parentpt->color = BLACK;
                 grandparent->color = RED;
                 (*z) = parentpt;
@@ -297,8 +290,7 @@ void RB_insert_fixup(struct Node** T, struct Node** z)
 
 }
 
-struct Node* RB_insert(struct Node* T,int data, struct Node* z)
-{
+struct Node* RB_insert(struct Node* T, int data, struct Node* z) {
     z->data = data;
     z->left = NULL;
     z->right = NULL;
@@ -308,27 +300,31 @@ struct Node* RB_insert(struct Node* T,int data, struct Node* z)
     struct Node* y = NULL;
     struct Node* x = T;//root
 
-    while(x!=NULL)
-    {
+    while (x != NULL) {
         y = x;
-        if(z->data < x->data)
+        if (z->data < x->data) {
             x = x->left;
+        }
 
-        else
+        else {
             x = x->right;
+        }
     }
     z->parent = y;
 
-    if(y==NULL)
+    if (y == NULL) {
         T = z;
+    }
 
-    else if(z->data < y->data)
+    else if (z->data < y->data) {
         y->left = z;
+    }
 
-    else
+    else {
         y->right = z;
+    }
 
-    RB_insert_fixup(&T,&z);
+    RB_insert_fixup(&T, &z);
 
     return T;
 }
@@ -347,24 +343,26 @@ struct Node* RB_insert(struct Node* T,int data, struct Node* z)
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
 igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
-    IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->reservoir != NULL);
-    if(set->size >= set->reservoir_size){
+    if(igraph_set_contains(set, e)){return IGRAPH_SUCCESS;}
+    
+    if (set->size >= set->reservoir_size) {
         IGRAPH_CHECK(igraph_set_reserve(set, set->reservoir_size + 1));
     }
     set->root = RB_insert(set->root, e, set->reservoir + set->size);
+    set->size++;
+    return IGRAPH_SUCCESS;
 }
 
-igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e){
-    if(node == NULL){
+igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e) {
+    if (node == NULL) {
         return false;
     }
-    if(node->data == e){
+    if (node->data == e) {
         return true;
     }
-    if(node->data > e){
+    if (node->data > e) {
         return BST_Search(node->left, e);
-    }else{
+    } else {
         return BST_Search(node->right, e);
     }
 }
@@ -388,13 +386,57 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
     return BST_Search(set->root, e);
 }
 
+void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
+    IGRAPH_ASSERT(set != NULL);
+    if (set->root == NULL) {
+        iterator->stack_index = -1;
+        return ;
+    }
+    iterator->stack[0].data = set->root;
+    iterator->stack_index = 0;
+    if (set->root->left != NULL) {
+        iterator->stack[0].mode = LEFT;
+    } else {
+        iterator->stack[0].mode = SELF;
+    }
+}
+
+igraph_integer_t iterate_self(igraph_set_iterator_t *state) {
+    struct Node *node = state->stack[state->stack_index].data;
+    if (node->right != NULL) {
+        state->stack[state->stack_index].data = node->right;
+        state->stack[state->stack_index].mode = LEFT;
+    } else if (node->parent != NULL && state->stack_index>0 ) {
+        state->stack_index--;
+        state->stack[state->stack_index].mode = SELF;
+    }else{
+        state->stack_index--;
+    }
+    return node->data;
+}
+
+igraph_integer_t iterate_left(igraph_set_iterator_t *state) {
+    struct Node *node = state->stack[state->stack_index].data;
+
+    if (node->left == NULL) {
+        return iterate_self(state);
+    }
+
+    for ( ; node->left != NULL ; state->stack_index++) {
+        state->stack[state->stack_index + 1 ].data = node->left;
+        state->stack[state->stack_index + 1 ].mode = LEFT;
+        node = node->left;
+    }
+    return iterate_self(state);
+}
+
 
 /**
  * \ingroup set
  * \function igraph_set_iterate
  * \brief Iterates through the element of the set.
  *
- * Elements are returned in an arbitrary order.
+ * Elements are returned in an sorted order.
  *
  * \param set The set object.
  * \param state Internal state of the iteration.
@@ -409,7 +451,20 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
  */
 igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t *state,
                                  igraph_integer_t *element) {
-    IGRAPH_ASSERT(set != 0);
+    IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->reservoir != NULL);
-    return false;
+    IGRAPH_ASSERT(state != NULL);
+    if (state->stack_index < 0) {
+        element = NULL;
+        return false;
+    }
+    enum STACK_MODE mode = state->stack[state->stack_index].mode;
+    switch (mode) {
+        case LEFT:
+            *element = iterate_left(state);
+            return true;
+        case SELF:
+            *element = iterate_self(state);
+            return true;
+    }
 }
