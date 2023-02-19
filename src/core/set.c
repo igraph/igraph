@@ -106,15 +106,21 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set) {
  */
 igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) {
     igraph_integer_t actual_size = igraph_set_size(set);
-    igraph_integer_t *tmp;
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->reservoir != NULL);
     if (capacity <= actual_size) {
         return IGRAPH_SUCCESS;
     }
 
-    set->reservoir = IGRAPH_REALLOC(set->reservoir, capacity, struct Node);
-    IGRAPH_CHECK_OOM(set->reservoir, "Cannot reserve space for set.");
+    // struct Node* tmp;
+    // tmp = IGRAPH_MALLOC(capacity *sizeof( struct Node));
+    // memcpy(tmp, set->reservoir, set->reservoir_size);
+    // set->reservoir = tmp;
+    // IGRAPH_CHECK_OOM(set->reservoir, "Cannot reserve space for set.");
+
+
+    set->reservoir = IGRAPH_REALLOC(set->reservoir,capacity, struct Node);
+
     set->reservoir_size = capacity;
 
     return IGRAPH_SUCCESS;
@@ -328,7 +334,37 @@ struct Node* RB_insert(struct Node* T, int data, struct Node* z) {
 
     return T;
 }
+void print2DUtil(struct Node* root, int space) {
+#define COUNT 10
 
+    // Base case
+    if (root == NULL) {
+        return;
+    }
+
+    // Increase distance between levels
+    space += COUNT;
+
+    // Process right child first
+    print2DUtil(root->right, space);
+
+    // Print current node after space
+    // count
+    printf("\n");
+    for (int i = COUNT; i < space; i++) {
+        printf(" ");
+    }
+    printf("%d\n", root->data);
+
+    // Process left child
+    print2DUtil(root->left, space);
+}
+
+// Wrapper over print2DUtil()
+void print2D(struct Node* root) {
+    // Pass initial space count as 0
+    print2DUtil(root, 0);
+}
 
 /**
  * \ingroup set
@@ -343,12 +379,19 @@ struct Node* RB_insert(struct Node* T, int data, struct Node* z) {
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
 igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
-    if(igraph_set_contains(set, e)){return IGRAPH_SUCCESS;}
-    
+    if (igraph_set_contains(set, e)) {
+        return IGRAPH_SUCCESS;
+    }
+
     if (set->size >= set->reservoir_size) {
         IGRAPH_CHECK(igraph_set_reserve(set, set->reservoir_size + 1));
     }
-    set->root = RB_insert(set->root, e, set->reservoir + set->size);
+    // printf("here's tree\ninserting value::%ld\nset size::%ld\nreservoir size%ld\n", e, set->size, set->reservoir_size);
+    // print2D(set->root);
+    // printf("tree print done\nsize::%ld\n", set->size);
+    // fflush(stdout);
+
+    set->root = RB_insert(set->root, e, &set->reservoir[set->size]);
     set->size++;
     return IGRAPH_SUCCESS;
 }
@@ -392,7 +435,7 @@ void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* 
         iterator->stack_index = -1;
         return ;
     }
-    iterator->stack[0].data = set->root;
+    iterator->stack[0].data = *(set->root);
     iterator->stack_index = 0;
     if (set->root->left != NULL) {
         iterator->stack[0].mode = LEFT;
@@ -402,28 +445,28 @@ void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* 
 }
 
 igraph_integer_t iterate_self(igraph_set_iterator_t *state) {
-    struct Node *node = state->stack[state->stack_index].data;
+    struct Node *node = &(state->stack[state->stack_index].data);
     if (node->right != NULL) {
-        state->stack[state->stack_index].data = node->right;
+        state->stack[state->stack_index].data = *(node->right);
         state->stack[state->stack_index].mode = LEFT;
-    } else if (node->parent != NULL && state->stack_index>0 ) {
+    } else if (node->parent != NULL && state->stack_index > 0 ) {
         state->stack_index--;
         state->stack[state->stack_index].mode = SELF;
-    }else{
+    } else {
         state->stack_index--;
     }
     return node->data;
 }
 
 igraph_integer_t iterate_left(igraph_set_iterator_t *state) {
-    struct Node *node = state->stack[state->stack_index].data;
+    struct Node *node = &(state->stack[state->stack_index].data);
 
     if (node->left == NULL) {
         return iterate_self(state);
     }
 
     for ( ; node->left != NULL ; state->stack_index++) {
-        state->stack[state->stack_index + 1 ].data = node->left;
+        state->stack[state->stack_index + 1 ].data = *(node->left);
         state->stack[state->stack_index + 1 ].mode = LEFT;
         node = node->left;
     }
@@ -460,11 +503,11 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
     }
     enum STACK_MODE mode = state->stack[state->stack_index].mode;
     switch (mode) {
-        case LEFT:
-            *element = iterate_left(state);
-            return true;
-        case SELF:
-            *element = iterate_self(state);
-            return true;
+    case LEFT:
+        *element = iterate_left(state);
+        return true;
+    case SELF:
+        *element = iterate_self(state);
+        return true;
     }
 }

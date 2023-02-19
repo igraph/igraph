@@ -53,7 +53,7 @@ struct Node
 
 struct Stack
 {
-    struct Node* data;
+    struct Node data;
     enum STACK_MODE mode;
 } ;
 
