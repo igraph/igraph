@@ -296,7 +296,7 @@ void RB_insert_fixup(struct Node** T, struct Node** z) {
 
 }
 
-struct Node* RB_insert(struct Node* T, int data, struct Node* z) {
+struct Node* RB_insert(struct Node* T, igraph_integer_t data, struct Node* z) {
     z->data = data;
     z->left = NULL;
     z->right = NULL;
@@ -354,7 +354,7 @@ void print2DUtil(struct Node* root, int space) {
     for (int i = COUNT; i < space; i++) {
         printf(" ");
     }
-    printf("%d\n", root->data);
+    printf("%ld\n", root->data);
 
     // Process left child
     print2DUtil(root->left, space);

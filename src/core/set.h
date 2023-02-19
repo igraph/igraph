@@ -44,7 +44,7 @@ enum COLOR {RED,BLACK};
 
 struct Node
 {
-    int data;
+    igraph_integer_t data;
     struct Node* left;
     struct Node* right;
     struct Node* parent;
