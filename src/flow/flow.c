@@ -1924,25 +1924,26 @@ igraph_error_t igraph_st_vertex_connectivity(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_vertex_connectivity_directed(const igraph_t *graph,
-                                                 igraph_integer_t *res) {
+static igraph_error_t igraph_i_vertex_connectivity_directed(
+    const igraph_t *graph, igraph_integer_t *res, igraph_bool_t all_edges_are_mutual
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i, j;
     igraph_integer_t minconn = no_of_nodes - 1, conn = 0;
 
     for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
+        for (j = all_edges_are_mutual ? i + 1 : 0; j < no_of_nodes; j++) {
             if (i == j) {
                 continue;
             }
 
             IGRAPH_ALLOW_INTERRUPTION();
 
-            IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn,
-                         i,
-                         j,
-                         IGRAPH_VCONN_NEI_NUMBER_OF_NODES));
+            IGRAPH_CHECK(igraph_st_vertex_connectivity(
+                graph, &conn, i, j, IGRAPH_VCONN_NEI_NUMBER_OF_NODES
+            ));
+
             if (conn < minconn) {
                 minconn = conn;
                 if (conn == 0) {
@@ -1970,7 +1971,7 @@ static igraph_error_t igraph_i_vertex_connectivity_undirected(const igraph_t *gr
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     IGRAPH_CHECK(igraph_to_directed(&newgraph, IGRAPH_TO_DIRECTED_MUTUAL));
 
-    IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(&newgraph, res));
+    IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(&newgraph, res, /* all_edges_are_mutual = */ 1));
 
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
@@ -2070,7 +2071,7 @@ igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_
     /* Are we done yet? */
     if (!ret) {
         if (igraph_is_directed(graph)) {
-            IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(graph, res));
+            IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(graph, res, /* all_edges_are_mutual = */ 0));
         } else {
             IGRAPH_CHECK(igraph_i_vertex_connectivity_undirected(graph, res));
         }
