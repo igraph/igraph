@@ -20,6 +20,7 @@
 
 ### Other
 
+ - Improved performance for `igraph_vertex_connectivity()`.
  - Documentation improvements.
 
 ## [0.10.4] - 2023-01-26
