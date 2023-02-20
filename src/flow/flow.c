@@ -40,6 +40,7 @@
 #include "core/buckets.h"
 #include "core/cutheap.h"
 #include "core/interruption.h"
+#include "flow/flow_internal.h"
 #include "math/safe_intop.h"
 
 /*
@@ -1785,14 +1786,15 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
                                                     igraph_integer_t target,
                                                     igraph_vconn_nei_t neighbors) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_vector_int_t edges;
+    igraph_integer_t no_of_vertices = igraph_vcount(graph);
+    igraph_integer_t no_of_edges;
     igraph_real_t real_res;
     igraph_t newgraph;
-    igraph_integer_t i;
+    igraph_integer_t i, len;
     igraph_bool_t done;
     igraph_integer_t no_conn;
+    igraph_vector_int_t incs;
+    igraph_vector_t capacity;
 
     IGRAPH_CHECK(igraph_i_st_vertex_connectivity_check_errors(graph, res, source, target, neighbors, &done, &no_conn));
     if (done) {
@@ -1800,41 +1802,40 @@ static igraph_error_t igraph_i_st_vertex_connectivity_directed(const igraph_t *g
     }
 
     /* Create the new graph */
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * (no_of_edges + no_of_nodes)));
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
-    IGRAPH_CHECK(igraph_vector_int_resize(&edges, 2 * (no_of_edges + no_of_nodes)));
-
-    for (i = 0; i < 2 * no_of_edges; i += 2) {
-        igraph_integer_t to = VECTOR(edges)[i + 1];
-        if (to != source && to != target) {
-            VECTOR(edges)[i + 1] = no_of_nodes + to;
-        }
-    }
-
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(edges)[ 2 * (no_of_edges + i)   ] = no_of_nodes + i;
-        VECTOR(edges)[ 2 * (no_of_edges + i) + 1 ] = i;
-    }
-
-    IGRAPH_CHECK(igraph_create(&newgraph, &edges, 2 * no_of_nodes,
-                               igraph_is_directed(graph)));
-
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_CHECK(igraph_i_split_vertices(graph, &newgraph));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
-    /* Do the maximum flow */
+    /* Create the capacity vector, fill it with ones */
+    no_of_edges = igraph_ecount(&newgraph);
+    IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
+    igraph_vector_fill(&capacity, 1);
 
+    /* "Disable" the edges incident on the input half of the source vertex
+     * and the output half of the target vertex */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incs, 0);
+    IGRAPH_CHECK(igraph_incident(&newgraph, &incs, source + no_of_vertices, IGRAPH_ALL));
+    len = igraph_vector_int_size(&incs);
+    for (i = 0; i < len; i++) {
+        VECTOR(capacity)[VECTOR(incs)[i]] = 0;
+    }
+    IGRAPH_CHECK(igraph_incident(&newgraph, &incs, target, IGRAPH_ALL));
+    len = igraph_vector_int_size(&incs);
+    for (i = 0; i < len; i++) {
+        VECTOR(capacity)[VECTOR(incs)[i]] = 0;
+    }
+    igraph_vector_int_destroy(&incs);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* Do the maximum flow */
     IGRAPH_CHECK(igraph_maxflow_value(&newgraph, &real_res,
-                                      source, target, 0, 0));
-    *res = (igraph_integer_t)real_res;
+                                      source, target + no_of_vertices, &capacity, 0));
+    *res = (igraph_integer_t) real_res;
 
     *res -= no_conn;
 
+    igraph_vector_destroy(&capacity);
     igraph_destroy(&newgraph);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
