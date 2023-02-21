@@ -23,16 +23,7 @@
 #ifndef IGRAPH_CORE_BUCKETS_H
 #define IGRAPH_CORE_BUCKETS_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-    #define __BEGIN_DECLS extern "C" {
-    #define __END_DECLS }
-#else
-    #define __BEGIN_DECLS /* empty */
-    #define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
@@ -41,40 +32,40 @@ __BEGIN_DECLS
 /* Buckets, needed for the maximum flow algorithm */
 
 typedef struct igraph_buckets_t {
-    igraph_vector_long_t bptr;
-    igraph_vector_long_t buckets;
+    igraph_vector_int_t bptr;
+    igraph_vector_int_t buckets;
     igraph_integer_t max, no;
 } igraph_buckets_t;
 
-int igraph_buckets_init(igraph_buckets_t *b, long int bsize, long int size);
+igraph_error_t igraph_buckets_init(igraph_buckets_t *b, igraph_integer_t bsize, igraph_integer_t size);
 void igraph_buckets_destroy(igraph_buckets_t *b);
 void igraph_buckets_clear(igraph_buckets_t *b);
-long int igraph_buckets_popmax(igraph_buckets_t *b);
-long int igraph_buckets_pop(igraph_buckets_t *b, long int bucket);
+igraph_integer_t igraph_buckets_popmax(igraph_buckets_t *b);
+igraph_integer_t igraph_buckets_pop(igraph_buckets_t *b, igraph_integer_t bucket);
 igraph_bool_t igraph_buckets_empty(const igraph_buckets_t *b);
 igraph_bool_t igraph_buckets_empty_bucket(const igraph_buckets_t *b,
-        long int bucket);
-void igraph_buckets_add(igraph_buckets_t *b, long int bucket,
-                        long int elem);
+        igraph_integer_t bucket);
+void igraph_buckets_add(igraph_buckets_t *b, igraph_integer_t bucket,
+                        igraph_integer_t elem);
 
 typedef struct igraph_dbuckets_t {
-    igraph_vector_long_t bptr;
-    igraph_vector_long_t next, prev;
+    igraph_vector_int_t bptr;
+    igraph_vector_int_t next, prev;
     igraph_integer_t max, no;
 } igraph_dbuckets_t;
 
-int igraph_dbuckets_init(igraph_dbuckets_t *b, long int bsize, long int size);
+igraph_error_t igraph_dbuckets_init(igraph_dbuckets_t *b, igraph_integer_t bsize, igraph_integer_t size);
 void igraph_dbuckets_destroy(igraph_dbuckets_t *b);
 void igraph_dbuckets_clear(igraph_dbuckets_t *b);
-long int igraph_dbuckets_popmax(igraph_dbuckets_t *b);
-long int igraph_dbuckets_pop(igraph_dbuckets_t *b, long int bucket);
+igraph_integer_t igraph_dbuckets_popmax(igraph_dbuckets_t *b);
+igraph_integer_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_integer_t bucket);
 igraph_bool_t igraph_dbuckets_empty(const igraph_dbuckets_t *b);
 igraph_bool_t igraph_dbuckets_empty_bucket(const igraph_dbuckets_t *b,
-        long int bucket);
-void igraph_dbuckets_add(igraph_dbuckets_t *b, long int bucket,
-                         long int elem);
-void igraph_dbuckets_delete(igraph_dbuckets_t *b, long int bucket,
-                            long int elem);
+        igraph_integer_t bucket);
+void igraph_dbuckets_add(igraph_dbuckets_t *b, igraph_integer_t bucket,
+                         igraph_integer_t elem);
+void igraph_dbuckets_delete(igraph_dbuckets_t *b, igraph_integer_t bucket,
+                            igraph_integer_t elem);
 
 __END_DECLS
 

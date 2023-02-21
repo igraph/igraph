@@ -21,7 +21,7 @@ if(STIMULUS_COMMAND)
 
     add_custom_target(
         check_stimulus
-		COMMAND test_stimulus
+        COMMAND test_stimulus
         DEPENDS test_stimulus
         COMMENT "Running C++ checker for Stimulus function and type specifications..."
     )

@@ -1,0 +1,26 @@
+Check error for negative min_dist.
+Check error for negative epochs.
+Check error for seed layout with wrong dimensions.
+Empty graph:
+Singleton graph:
+UMAP layout seems fine.
+Singleton graph, use seed:
+UMAP layout seems fine.
+layout of two clusters of vertices with 2 articulation points:
+UMAP layout seems fine.
+same graph, different epochs:
+UMAP layout seems fine.
+Same graph, no distances:
+UMAP layout seems fine.
+Same graph, 3D layout:
+UMAP layout seems fine.
+Same graph, custom initial layout:
+UMAP layout seems fine.
+Same graph, just compute weights from NULL distances:
+Connectivities from NULL distances seem fine.
+Same graph, just compute weights from distances:
+Connectivities from distances seem fine.
+Same graph, precomputed weights:
+UMAP layout seems fine.
+Large disjoint union of 3 full graphs:
+UMAP layout of large graph seems fine.

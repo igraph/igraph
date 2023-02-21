@@ -1,0 +1,21 @@
+Graph with loops and mutltiple edges, IGRAPH_IN, loops = 0:
+1 3 4 5
+2 3 4 5
+1 3 4 5
+0 4 5
+0 1 2 5
+0 1 2 3 4
+Same graph, loops = 1:
+0 1 3 4 5
+2 3 4 5
+1 2 3 4 5
+0 3 4 5
+0 1 2 4 5
+0 1 2 3 4 5
+Same graph, IGRAPH_OUT:
+3 4 5
+0 2 4 5
+1 4 5
+0 1 2 5
+0 1 2 3 5
+0 1 2 3 4

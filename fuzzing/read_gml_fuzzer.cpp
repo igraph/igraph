@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team
+   Copyright (C) 2021-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,16 +19,16 @@
 */
 
 #include "igraph.h"
-#include <cstdint>
-#include <cstring>
-#include <cstdlib>
 #include <cstdio>
 
 extern "C"
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    if (size < 5) return 0;
 
     igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
+
+    // Turn on attribute handling
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     // Create input file
     char filename[256];
@@ -58,5 +58,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     fclose(ifile);
     remove(filename);
+
+    IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
+
     return 0;
 }

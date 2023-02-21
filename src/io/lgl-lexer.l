@@ -44,7 +44,6 @@
 
 */
 
-#include "config.h"
 #include <stdlib.h>
 
 #include "io/lgl-header.h"
@@ -70,6 +69,7 @@
 %option reentrant
 %option bison-bridge
 %option bison-locations
+%option yylineno
 
 alnum [^ \t\r\n\0#]
 

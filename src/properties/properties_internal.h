@@ -21,11 +21,14 @@
 #define IGRAPH_PROPERTIES_INTERNAL_H
 
 #include "igraph_adjlist.h"
-#include "igraph_constants.h"
+#include "igraph_decls.h"
 #include "igraph_iterators.h"
-#include "igraph_types.h"
 
-int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
-                                const igraph_vector_int_t *rank);
+__BEGIN_DECLS
+
+igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+                                           const igraph_vector_int_t *rank);
+
+__END_DECLS
 
 #endif

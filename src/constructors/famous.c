@@ -24,20 +24,20 @@
 
 #include "igraph_constructors.h"
 
-#include "internal/hacks.h"
+#include "internal/hacks.h" /* strcasecmp */
 
-const igraph_real_t igraph_i_famous_bull[] = {
+const igraph_integer_t igraph_i_famous_bull[] = {
     5, 5, 0,
     0, 1, 0, 2, 1, 2, 1, 3, 2, 4
 };
 
-const igraph_real_t igraph_i_famous_chvatal[] = {
+const igraph_integer_t igraph_i_famous_chvatal[] = {
     12, 24, 0,
     5, 6, 6, 7, 7, 8, 8, 9, 5, 9, 4, 5, 4, 8, 2, 8, 2, 6, 0, 6, 0, 9, 3, 9, 3, 7,
     1, 7, 1, 5, 1, 10, 4, 10, 4, 11, 2, 11, 0, 10, 0, 11, 3, 11, 3, 10, 1, 2
 };
 
-const igraph_real_t igraph_i_famous_coxeter[] = {
+const igraph_integer_t igraph_i_famous_coxeter[] = {
     28, 42, 0,
     0, 1, 0, 2, 0, 7, 1, 4, 1, 13, 2, 3, 2, 8, 3, 6, 3, 9, 4, 5, 4, 12, 5, 6, 5,
     11, 6, 10, 7, 19, 7, 24, 8, 20, 8, 23, 9, 14, 9, 22, 10, 15, 10, 21, 11, 16,
@@ -45,24 +45,24 @@ const igraph_real_t igraph_i_famous_coxeter[] = {
     16, 20, 17, 20, 21, 23, 21, 26, 22, 24, 22, 27, 23, 25, 24, 26, 25, 27
 };
 
-const igraph_real_t igraph_i_famous_cubical[] = {
+const igraph_integer_t igraph_i_famous_cubical[] = {
     8, 12, 0,
     0, 1, 1, 2, 2, 3, 0, 3, 4, 5, 5, 6, 6, 7, 4, 7, 0, 4, 1, 5, 2, 6, 3, 7
 };
 
-const igraph_real_t igraph_i_famous_diamond[] = {
+const igraph_integer_t igraph_i_famous_diamond[] = {
     4, 5, 0,
     0, 1, 0, 2, 1, 2, 1, 3, 2, 3
 };
 
-const igraph_real_t igraph_i_famous_dodecahedron[] = {
+const igraph_integer_t igraph_i_famous_dodecahedron[] = {
     20, 30, 0,
     0, 1, 0, 4, 0, 5, 1, 2, 1, 6, 2, 3, 2, 7, 3, 4, 3, 8, 4, 9, 5, 10, 5, 11, 6,
     10, 6, 14, 7, 13, 7, 14, 8, 12, 8, 13, 9, 11, 9, 12, 10, 15, 11, 16, 12, 17,
     13, 18, 14, 19, 15, 16, 15, 19, 16, 17, 17, 18, 18, 19
 };
 
-const igraph_real_t igraph_i_famous_folkman[] = {
+const igraph_integer_t igraph_i_famous_folkman[] = {
     20, 40, 0,
     0, 5, 0, 8, 0, 10, 0, 13, 1, 7, 1, 9, 1, 12, 1, 14, 2, 6, 2, 8, 2, 11, 2, 13,
     3, 5, 3, 7, 3, 10, 3, 12, 4, 6, 4, 9, 4, 11, 4, 14, 5, 15, 5, 19, 6, 15, 6, 16,
@@ -70,59 +70,59 @@ const igraph_real_t igraph_i_famous_folkman[] = {
     16, 12, 17, 13, 17, 13, 18, 14, 18, 14, 19
 };
 
-const igraph_real_t igraph_i_famous_franklin[] = {
+const igraph_integer_t igraph_i_famous_franklin[] = {
     12, 18, 0,
     0, 1, 0, 2, 0, 6, 1, 3, 1, 7, 2, 4, 2, 10, 3, 5, 3, 11, 4, 5, 4, 6, 5, 7, 6, 8,
     7, 9, 8, 9, 8, 11, 9, 10, 10, 11
 };
 
-const igraph_real_t igraph_i_famous_frucht[] = {
+const igraph_integer_t igraph_i_famous_frucht[] = {
     12, 18, 0,
     0, 1, 0, 2, 0, 11, 1, 3, 1, 6, 2, 5, 2, 10, 3, 4, 3, 6, 4, 8, 4, 11, 5, 9, 5,
     10, 6, 7, 7, 8, 7, 9, 8, 9, 10, 11
 };
 
-const igraph_real_t igraph_i_famous_grotzsch[] = {
+const igraph_integer_t igraph_i_famous_grotzsch[] = {
     11, 20, 0,
     0, 1, 0, 2, 0, 7, 0, 10, 1, 3, 1, 6, 1, 9, 2, 4, 2, 6, 2, 8, 3, 4, 3, 8, 3, 10,
     4, 7, 4, 9, 5, 6, 5, 7, 5, 8, 5, 9, 5, 10
 };
 
-const igraph_real_t igraph_i_famous_heawood[] = {
+const igraph_integer_t igraph_i_famous_heawood[] = {
     14, 21, 0,
     0, 1, 0, 5, 0, 13, 1, 2, 1, 10, 2, 3, 2, 7, 3, 4, 3, 12, 4, 5, 4, 9, 5, 6, 6,
     7, 6, 11, 7, 8, 8, 9, 8, 13, 9, 10, 10, 11, 11, 12, 12, 13
 };
 
-const igraph_real_t igraph_i_famous_herschel[] = {
+const igraph_integer_t igraph_i_famous_herschel[] = {
     11, 18, 0,
     0, 2, 0, 3, 0, 4, 0, 5, 1, 2, 1, 3, 1, 6, 1, 7, 2, 10, 3, 9, 4, 8, 4, 9, 5, 8,
     5, 10, 6, 8, 6, 9, 7, 8, 7, 10
 };
 
-const igraph_real_t igraph_i_famous_house[] = {
+const igraph_integer_t igraph_i_famous_house[] = {
     5, 6, 0,
     0, 1, 0, 2, 1, 3, 2, 3, 2, 4, 3, 4
 };
 
-const igraph_real_t igraph_i_famous_housex[] = {
+const igraph_integer_t igraph_i_famous_housex[] = {
     5, 8, 0,
     0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3, 2, 4, 3, 4
 };
 
-const igraph_real_t igraph_i_famous_icosahedron[] = {
+const igraph_integer_t igraph_i_famous_icosahedron[] = {
     12, 30, 0,
     0, 1, 0, 2, 0, 3, 0, 4, 0, 8, 1, 2, 1, 6, 1, 7, 1, 8, 2, 4, 2, 5, 2, 6, 3, 4,
     3, 8, 3, 9, 3, 11, 4, 5, 4, 11, 5, 6, 5, 10, 5, 11, 6, 7, 6, 10, 7, 8, 7, 9, 7,
     10, 8, 9, 9, 10, 9, 11, 10, 11
 };
 
-const igraph_real_t igraph_i_famous_krackhardt_kite[] = {
+const igraph_integer_t igraph_i_famous_krackhardt_kite[] = {
     10, 18, 0,
     0, 1, 0, 2, 0, 3, 0, 5, 1, 3, 1, 4, 1, 6, 2, 3, 2, 5, 3, 4, 3, 5, 3, 6, 4, 6, 5, 6, 5, 7, 6, 7, 7, 8, 8, 9
 };
 
-const igraph_real_t igraph_i_famous_levi[] = {
+const igraph_integer_t igraph_i_famous_levi[] = {
     30, 45, 0,
     0, 1, 0, 7, 0, 29, 1, 2, 1, 24, 2, 3, 2, 11, 3, 4, 3, 16, 4, 5, 4, 21, 5, 6, 5,
     26, 6, 7, 6, 13, 7, 8, 8, 9, 8, 17, 9, 10, 9, 22, 10, 11, 10, 27, 11, 12, 12,
@@ -131,7 +131,7 @@ const igraph_real_t igraph_i_famous_levi[] = {
     28, 28, 29
 };
 
-const igraph_real_t igraph_i_famous_mcgee[] = {
+const igraph_integer_t igraph_i_famous_mcgee[] = {
     24, 36, 0,
     0, 1, 0, 7, 0, 23, 1, 2, 1, 18, 2, 3, 2, 14, 3, 4, 3, 10, 4, 5, 4, 21, 5, 6, 5,
     17, 6, 7, 6, 13, 7, 8, 8, 9, 8, 20, 9, 10, 9, 16, 10, 11, 11, 12, 11, 23, 12,
@@ -139,7 +139,7 @@ const igraph_real_t igraph_i_famous_mcgee[] = {
     21, 21, 22, 22, 23
 };
 
-const igraph_real_t igraph_i_famous_meredith[] = {
+const igraph_integer_t igraph_i_famous_meredith[] = {
     70, 140, 0,
     0, 4, 0, 5, 0, 6, 1, 4, 1, 5, 1, 6, 2, 4, 2, 5, 2, 6, 3, 4, 3, 5, 3, 6, 7, 11,
     7, 12, 7, 13, 8, 11, 8, 12, 8, 13, 9, 11, 9, 12, 9, 13, 10, 11, 10, 12, 10, 13,
@@ -157,14 +157,14 @@ const igraph_real_t igraph_i_famous_meredith[] = {
     28, 38, 42, 35, 66, 59, 63, 52, 56, 45, 49
 };
 
-const igraph_real_t igraph_i_famous_noperfectmatching[] = {
+const igraph_integer_t igraph_i_famous_noperfectmatching[] = {
     16, 27, 0,
     0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3, 2, 4, 3, 4, 4, 5, 5, 6, 5, 7, 6, 12, 6, 13,
     7, 8, 7, 9, 8, 9, 8, 10, 8, 11, 9, 10, 9, 11, 10, 11, 12, 13, 12, 14, 12, 15,
     13, 14, 13, 15, 14, 15
 };
 
-const igraph_real_t igraph_i_famous_nonline[] = {
+const igraph_integer_t igraph_i_famous_nonline[] = {
     50, 72, 0,
     0, 1, 0, 2, 0, 3, 4, 6, 4, 7, 5, 6, 5, 7, 6, 7, 7, 8, 9, 11, 9, 12, 9, 13, 10,
     11, 10, 12, 10, 13, 11, 12, 11, 13, 12, 13, 14, 15, 15, 16, 15, 17, 16, 17, 16,
@@ -175,17 +175,17 @@ const igraph_real_t igraph_i_famous_nonline[] = {
     43, 44, 45, 44, 46, 45, 46, 45, 47, 46, 47, 46, 48, 47, 48, 47, 49, 48, 49
 };
 
-const igraph_real_t igraph_i_famous_octahedron[] = {
+const igraph_integer_t igraph_i_famous_octahedron[] = {
     6, 12, 0,
     0, 1, 0, 2, 1, 2, 3, 4, 3, 5, 4, 5, 0, 3, 0, 5, 1, 3, 1, 4, 2, 4, 2, 5
 };
 
-const igraph_real_t igraph_i_famous_petersen[] = {
+const igraph_integer_t igraph_i_famous_petersen[] = {
     10, 15, 0,
     0, 1, 0, 4, 0, 5, 1, 2, 1, 6, 2, 3, 2, 7, 3, 4, 3, 8, 4, 9, 5, 7, 5, 8, 6, 8, 6, 9, 7, 9
 };
 
-const igraph_real_t igraph_i_famous_robertson[] = {
+const igraph_integer_t igraph_i_famous_robertson[] = {
     19, 38, 0,
     0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12,
     12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 0, 18, 0, 4, 4, 9, 9, 13, 13,
@@ -193,18 +193,18 @@ const igraph_real_t igraph_i_famous_robertson[] = {
     7, 14, 3, 14, 3, 11, 11, 18
 };
 
-const igraph_real_t igraph_i_famous_smallestcyclicgroup[] = {
+const igraph_integer_t igraph_i_famous_smallestcyclicgroup[] = {
     9, 15, 0,
     0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 1, 2, 1, 3, 1, 7, 1, 8, 2, 5, 2, 6, 2, 7, 3, 8,
     4, 5, 6, 7
 };
 
-const igraph_real_t igraph_i_famous_tetrahedron[] = {
+const igraph_integer_t igraph_i_famous_tetrahedron[] = {
     4, 6, 0,
     0, 3, 1, 3, 2, 3, 0, 1, 1, 2, 0, 2
 };
 
-const igraph_real_t igraph_i_famous_thomassen[] = {
+const igraph_integer_t igraph_i_famous_thomassen[] = {
     34, 52, 0,
     0, 2, 0, 3, 1, 3, 1, 4, 2, 4, 5, 7, 5, 8, 6, 8, 6, 9, 7, 9, 10, 12, 10, 13, 11,
     13, 11, 14, 12, 14, 15, 17, 15, 18, 16, 18, 16, 19, 17, 19, 9, 19, 4, 14, 24,
@@ -213,7 +213,7 @@ const igraph_real_t igraph_i_famous_thomassen[] = {
     23, 10, 27, 11, 28, 12, 29, 13, 30, 15, 30, 16, 31, 17, 32, 18, 33
 };
 
-const igraph_real_t igraph_i_famous_tutte[] = {
+const igraph_integer_t igraph_i_famous_tutte[] = {
     46, 69, 0,
     0, 10, 0, 11, 0, 12, 1, 2, 1, 7, 1, 19, 2, 3, 2, 41, 3, 4, 3, 27, 4, 5, 4, 33,
     5, 6, 5, 45, 6, 9, 6, 29, 7, 8, 7, 21, 8, 9, 8, 22, 9, 24, 10, 13, 10, 14, 11,
@@ -224,20 +224,20 @@ const igraph_real_t igraph_i_famous_tutte[] = {
     40, 39, 41, 40, 41, 42, 43, 43, 45, 44, 45
 };
 
-const igraph_real_t igraph_i_famous_uniquely3colorable[] = {
+const igraph_integer_t igraph_i_famous_uniquely3colorable[] = {
     12, 22, 0,
     0, 1, 0, 3, 0, 6, 0, 8, 1, 4, 1, 7, 1, 9, 2, 3, 2, 6, 2, 7, 2, 9, 2, 11, 3, 4,
     3, 10, 4, 5, 4, 11, 5, 6, 5, 7, 5, 8, 5, 10, 8, 11, 9, 10
 };
 
-const igraph_real_t igraph_i_famous_walther[] = {
+const igraph_integer_t igraph_i_famous_walther[] = {
     25, 31, 0,
     0, 1, 1, 2, 1, 8, 2, 3, 2, 13, 3, 4, 3, 16, 4, 5, 5, 6, 5, 19, 6, 7, 6, 20, 7,
     21, 8, 9, 8, 13, 9, 10, 9, 22, 10, 11, 10, 20, 11, 12, 13, 14, 14, 15, 14, 23,
     15, 16, 15, 17, 17, 18, 18, 19, 18, 24, 20, 24, 22, 23, 23, 24
 };
 
-const igraph_real_t igraph_i_famous_zachary[] = {
+const igraph_integer_t igraph_i_famous_zachary[] = {
     34, 78, 0,
     0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
     0, 10, 0, 11, 0, 12, 0, 13, 0, 17, 0, 19, 0, 21, 0, 31,
@@ -252,16 +252,15 @@ const igraph_real_t igraph_i_famous_zachary[] = {
     32, 33
 };
 
-static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
-    long int no_of_nodes = (long int) data[0];
-    long int no_of_edges = (long int) data[1];
+static igraph_error_t igraph_i_famous(igraph_t *graph, const igraph_integer_t *data) {
+    igraph_integer_t no_of_nodes = data[0];
+    igraph_integer_t no_of_edges = data[1];
     igraph_bool_t directed = (igraph_bool_t) data[2];
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
 
-    igraph_vector_view(&edges, data + 3, 2 * no_of_edges);
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
-    return 0;
+    igraph_vector_int_view(&edges, data + 3, 2 * no_of_edges);
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -417,14 +416,14 @@ static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
  *     given name.
  *
  * \sa Other functions for creating graph structures:
- * \ref igraph_ring(), \ref igraph_tree(), \ref igraph_lattice(), \ref
- * igraph_full().
+ * \ref igraph_ring(), \ref igraph_kary_tree(), \ref igraph_square_lattice(),
+ * \ref igraph_full().
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph.
  */
 
-int igraph_famous(igraph_t *graph, const char *name) {
+igraph_error_t igraph_famous(igraph_t *graph, const char *name) {
 
     if (!strcasecmp(name, "bull")) {
         return igraph_i_famous(graph, igraph_i_famous_bull);

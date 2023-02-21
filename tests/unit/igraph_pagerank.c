@@ -21,7 +21,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int is_almost_one(igraph_real_t x) {
     /* 2^5 = 32 is 5 binary digits  of tolerance */
@@ -32,13 +32,13 @@ int is_almost_one(igraph_real_t x) {
     return 1;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t res, reset, weights;
     igraph_arpack_options_t arpack_options;
     igraph_real_t value;
-    int err;
+    igraph_error_t err;
 
     /* The ARPACK method uses a random perturbation to the in-degrees
        to set the starting vector for ARPACK. */
@@ -105,9 +105,10 @@ int main() {
     printf("PRPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
-    /* Check twice more for consistency */
+    /* Check twice more for consistency, this time without explicitly
+     * supplied ARPACK options */
     igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
@@ -117,7 +118,7 @@ int main() {
     IGRAPH_ASSERT(is_almost_one(value));
 
     igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
-                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     printf("ARPACK: "); print_vector(&res);
     IGRAPH_ASSERT(is_almost_one(value));
 
@@ -197,7 +198,7 @@ int main() {
     printf("\nEdgeless graph, personalized PageRank\n");
 
     igraph_empty(&g, 4, IGRAPH_UNDIRECTED);
-    igraph_vector_init_seq(&reset, 1, 4);
+    igraph_vector_init_range(&reset, 1, 5);
 
     igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
                     igraph_vss_all(), 1, 0.85, &reset, 0, &arpack_options);
@@ -319,10 +320,10 @@ int main() {
     /* Graph with more than 127 vertices. PRPACK uses a different method above this size. */
 
     {
-        igraph_vector_t edges_to_delete;
+        igraph_vector_int_t edges_to_delete;
         igraph_vector_t res_arpack, res_prpack;
         igraph_vector_t weights;
-        long int i, n;
+        igraph_integer_t i, n;
 
         printf("\nLarge test graph, unweighted\n");
 
@@ -331,9 +332,9 @@ int main() {
 
         /* We delete some edges to break the symmetry of the graph.
          * Otherwise all vertices would have the same PageRank. */
-        igraph_vector_init_seq(&edges_to_delete, 0, 37);
+        igraph_vector_int_init_range(&edges_to_delete, 0, 38);
         igraph_delete_edges(&g, igraph_ess_vector(&edges_to_delete));
-        igraph_vector_destroy(&edges_to_delete);
+        igraph_vector_int_destroy(&edges_to_delete);
 
         /* Note: This test graph is not connected and has self-loops. */
 
@@ -353,7 +354,7 @@ int main() {
             igraph_real_t ar = VECTOR(res_arpack)[i];
             igraph_real_t pr = VECTOR(res_prpack)[i];
             if (fabs(ar - pr) > 1e-12) {
-                printf("Unexpected difference between ARPACK and PRPACK results for vertex %ld:\n"
+                printf("Unexpected difference between ARPACK and PRPACK results for vertex %" IGRAPH_PRId ":\n"
                        "ARPACK: %g\n"
                        "PRPACK: %g\n"
                        "Difference: %g\n",
@@ -363,7 +364,7 @@ int main() {
 
         printf("\nLarge test graph, weighted\n");
 
-        igraph_vector_init_seq(&weights, igraph_ecount(&g) + 1, 2*igraph_ecount(&g));
+        igraph_vector_init_range(&weights, igraph_ecount(&g) + 1, 2*igraph_ecount(&g) + 1);
 
         igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res_arpack, &value,
                         igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
@@ -378,7 +379,7 @@ int main() {
             igraph_real_t ar = VECTOR(res_arpack)[i];
             igraph_real_t pr = VECTOR(res_prpack)[i];
             if (fabs(ar - pr) > 1e-12) {
-                printf("Unexpected difference between ARPACK and PRPACK results for vertex %ld:\n"
+                printf("Unexpected difference between ARPACK and PRPACK results for vertex %" IGRAPH_PRId ":\n"
                        "ARPACK: %g\n"
                        "PRPACK: %g\n"
                        "Difference: %g\n",

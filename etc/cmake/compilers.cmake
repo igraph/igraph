@@ -5,15 +5,29 @@ if(MSVC)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS) # necessary to compile for UWP
 endif()
 
-if (NOT MSVC)
-  check_c_compiler_flag("-Wno-varargs" COMPILER_SUPPORTS_NO_VARARGS_FLAG)
-  check_c_compiler_flag("-Wno-unknown-warning-option" COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG)
+if(NOT MSVC)
+  # Even though we will later use 'no-unknown-warning-option', we perform the test for
+  # 'unknown-warning-option', without the 'no-' prefix. This is necessary because GCC
+  # will accept any warning option starting with 'no-', and will not error, yet it still
+  # prints a message about the unrecognized option.
+  check_c_compiler_flag("-Wunknown-warning-option" COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG)
 endif()
 
 set(
   IGRAPH_WARNINGS_AS_ERRORS ON CACHE BOOL
   "Treat warnings as errors with GCC-like compilers"
 )
+
+option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+if(FORCE_COLORED_OUTPUT)
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+   add_compile_options(-fdiagnostics-color=always)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+   add_compile_options(-fcolor-diagnostics)
+  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+   add_compile_options(-fcolor-diagnostics)
+  endif()
+endif()
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
@@ -26,23 +40,33 @@ macro(use_all_warnings TARGET_NAME)
       /wd4800 # forcing value to 'true' or 'false' (performance warning)
       /wd4204 # nonstandard extension used: non-constant aggregate initializer
       /wd4701 # potentially uninitialized local variable
+      /wd4054 # 'type cast': from function pointer '...' to data pointer 'void *'
+      /wd4055 # from data pointer 'void *' to function pointer '...'
+      /wd4221 # nonstandard extension used: '...': cannot be initialized using address of automatic variable '...'
     )
   else()
+    # Notes:
+    # GCC does not complain when encountering an unsupported "no"-prefixed wanring option such as -Wno-foo.
+    # Clang does complain, but these complaints can be silenced with -Wno-unknown-warning-option.
+    # Therefore it is generally safe to use -Wno-... options that are only supported by recent GCC/Clang.
     target_compile_options(${TARGET_NAME} PRIVATE
       # GCC-style compilers:
-      $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel>:
+      $<$<C_COMPILER_ID:GCC,Clang,AppleClang,Intel,IntelLLVM>:
         $<$<BOOL:${IGRAPH_WARNINGS_AS_ERRORS}>:-Werror>
         -Wall -Wextra -pedantic
-        -Wno-unused-function -Wno-unused-parameter -Wno-sign-compare
+        -Wstrict-prototypes
+        -Wno-unused-function -Wno-unused-parameter -Wno-unused-but-set-variable -Wno-sign-compare -Wno-constant-logical-operand
       >
-      $<$<BOOL:${COMPILER_SUPPORTS_NO_VARARGS_FLAG}>:-Wno-varargs>
-      $<$<BOOL:${COMPILER_SUPPORTS_NO_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
+      $<$<BOOL:${COMPILER_SUPPORTS_UNKNOWN_WARNING_OPTION_FLAG}>:-Wno-unknown-warning-option>
       # Intel compiler:
       $<$<C_COMPILER_ID:Intel>:
         # disable #279: controlling expression is constant; affecting assert(condition && "message")
-        # disable #188: enumerated type mixed with another type; affecting IGRAPH_CHECK
         # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED
-        -wd279 -wd188 -wd592 -diag-disable=remark
+        -wd279 -wd592 -diag-disable=remark
+      >
+      # Intel LLVM:
+      $<$<C_COMPILER_ID:IntelLLVM>:
+        -fp-model=precise # The default 'fast' mode is not compatible with igraph's extensive use of NaN/Inf
       >
     )
   endif()

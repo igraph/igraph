@@ -16,8 +16,8 @@
 <!-- doxrox-include igraph_write_graph_ncol -->
 <!-- doxrox-include igraph_read_graph_lgl -->
 <!-- doxrox-include igraph_write_graph_lgl -->
-<!-- doxrox-include igraph_read_graph_dimacs -->
-<!-- doxrox-include igraph_write_graph_dimacs -->
+<!-- doxrox-include igraph_read_graph_dimacs_flow -->
+<!-- doxrox-include igraph_write_graph_dimacs_flow -->
 </section>
 
 <section id="binary-formats"><title>Binary formats</title>
@@ -45,6 +45,20 @@
 
 <section id="graphviz-format"><title>Graphviz format</title>
 <!-- doxrox-include igraph_write_graph_dot -->
+</section>
+
+<section id="leda-format"><title>LEDA format</title>
+<!-- doxrox-include igraph_write_graph_leda -->
+</section>
+
+<section id="locale-helpers"><title>Convenience functions for locale change</title>
+<!-- doxrox-include igraph_enter_safelocale -->
+<!-- doxrox-include igraph_exit_safelocale -->
+</section>
+
+<section id="deprecated-formats"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_read_graph_dimacs -->
+<!-- doxrox-include igraph_write_graph_dimacs -->
 </section>
 
 </chapter>

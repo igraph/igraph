@@ -27,15 +27,17 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
+#include "math/safe_intop.h"
+
 /* Uniform sampling of labelled trees (igraph_tree_game) */
 
 /* The following implementation uniformly samples Prufer trees and converts
  * them to trees.
  */
 
-static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+static igraph_error_t igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     igraph_vector_int_t prufer;
-    long i;
+    igraph_integer_t i;
 
     if (directed) {
         IGRAPH_ERROR("The Prufer method for random tree generation does not support directed trees", IGRAPH_EINVAL);
@@ -74,19 +76,22 @@ static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph
         VECTOR(vec)[j] = temp; \
     }
 
-static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
-    igraph_vector_t edges;
+static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+    igraph_vector_int_t edges;
     igraph_vector_int_t vertices;
     igraph_vector_bool_t visited;
-    long i, j, k;
+    igraph_integer_t i, j, k;
+    igraph_integer_t no_edges;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (n - 1));
+    IGRAPH_SAFE_MULT(n - 1, 2, &no_edges);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_edges);
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
 
     /* The vertices vector contains visited vertices between 0..k-1, unvisited ones between k..n-1. */
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&vertices, 0, n - 1));
+    IGRAPH_CHECK(igraph_vector_int_init_range(&vertices, 0, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &vertices);
 
     RNG_BEGIN();
@@ -138,7 +143,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
 
     igraph_vector_int_destroy(&vertices);
     igraph_vector_bool_destroy(&visited);
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -179,7 +184,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  *
  */
 
-int igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
+igraph_error_t igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
     if (n < 2) {
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
         return IGRAPH_SUCCESS;

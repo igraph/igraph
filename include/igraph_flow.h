@@ -26,9 +26,10 @@
 
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
-#include "igraph_vector_ptr.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
@@ -38,8 +39,7 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_maxflow_stats_t
- * A simple data type to return some statistics from the
- * push-relabel maximum flow solver.
+ * \brief Data structure holding statistics from the push-relabel maximum flow solver.
  *
  * \param nopush The number of push operations performed.
  * \param norelabel The number of relabel operarions performed.
@@ -54,101 +54,101 @@ __BEGIN_DECLS
  */
 
 typedef struct {
-    int nopush, norelabel, nogap, nogapnodes, nobfs;
+    igraph_integer_t nopush, norelabel, nogap, nogapnodes, nobfs;
 } igraph_maxflow_stats_t;
 
-IGRAPH_EXPORT int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
-                                 igraph_vector_t *flow, igraph_vector_t *cut,
-                                 igraph_vector_t *partition, igraph_vector_t *partition2,
+IGRAPH_EXPORT igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
+                                 igraph_vector_t *flow, igraph_vector_int_t *cut,
+                                 igraph_vector_int_t *partition, igraph_vector_int_t *partition2,
                                  igraph_integer_t source, igraph_integer_t target,
                                  const igraph_vector_t *capacity,
                                  igraph_maxflow_stats_t *stats);
-IGRAPH_EXPORT int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
+IGRAPH_EXPORT igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
                                        igraph_integer_t source, igraph_integer_t target,
                                        const igraph_vector_t *capacity,
                                        igraph_maxflow_stats_t *stats);
 
-IGRAPH_EXPORT int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
-                                   igraph_vector_t *cut, igraph_vector_t *partition,
-                                   igraph_vector_t *partition2,
+IGRAPH_EXPORT igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
+                                   igraph_vector_int_t *cut, igraph_vector_int_t *partition,
+                                   igraph_vector_int_t *partition2,
                                    igraph_integer_t source, igraph_integer_t target,
                                    const igraph_vector_t *capacity);
-IGRAPH_EXPORT int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
                                          igraph_integer_t source, igraph_integer_t target,
                                          const igraph_vector_t *capacity);
 
-IGRAPH_EXPORT int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
                                       const igraph_vector_t *capacity);
-IGRAPH_EXPORT int igraph_mincut(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_mincut(const igraph_t *graph,
                                 igraph_real_t *value,
-                                igraph_vector_t *partition,
-                                igraph_vector_t *partition2,
-                                igraph_vector_t *cut,
+                                igraph_vector_int_t *partition,
+                                igraph_vector_int_t *partition2,
+                                igraph_vector_int_t *cut,
                                 const igraph_vector_t *capacity);
 
-IGRAPH_EXPORT int igraph_st_vertex_connectivity(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_st_vertex_connectivity(const igraph_t *graph,
                                                 igraph_integer_t *res,
                                                 igraph_integer_t source,
                                                 igraph_integer_t target,
                                                 igraph_vconn_nei_t neighbors);
-IGRAPH_EXPORT int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                              igraph_bool_t checks);
 
-IGRAPH_EXPORT int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                               igraph_integer_t source,
                                               igraph_integer_t target);
-IGRAPH_EXPORT int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
                                            igraph_bool_t checks);
 
-IGRAPH_EXPORT int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
                                              igraph_integer_t source,
                                              igraph_integer_t target);
-IGRAPH_EXPORT int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
                                                igraph_integer_t source,
                                                igraph_integer_t target);
 
-IGRAPH_EXPORT int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
                                   igraph_bool_t checks);
-IGRAPH_EXPORT int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
                                   igraph_bool_t checks);
 
 /* s-t cut listing related stuff */
 
-IGRAPH_EXPORT int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
+IGRAPH_EXPORT igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
                                                igraph_vector_t *capacity);
 
-IGRAPH_EXPORT int igraph_residual_graph(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_residual_graph(const igraph_t *graph,
                                         const igraph_vector_t *capacity,
                                         igraph_t *residual,
                                         igraph_vector_t *residual_capacity,
                                         const igraph_vector_t *flow);
 
-IGRAPH_EXPORT int igraph_reverse_residual_graph(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
                                                 const igraph_vector_t *capacity,
                                                 igraph_t *residual,
                                                 const igraph_vector_t *flow);
 
-IGRAPH_EXPORT int igraph_dominator_tree(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                                         igraph_integer_t root,
-                                        igraph_vector_t *dom,
+                                        igraph_vector_int_t *dom,
                                         igraph_t *domtree,
-                                        igraph_vector_t *leftout,
+                                        igraph_vector_int_t *leftout,
                                         igraph_neimode_t mode);
 
-IGRAPH_EXPORT int igraph_all_st_cuts(const igraph_t *graph,
-                                     igraph_vector_ptr_t *cuts,
-                                     igraph_vector_ptr_t *partition1s,
+IGRAPH_EXPORT igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
+                                     igraph_vector_int_list_t *cuts,
+                                     igraph_vector_int_list_t *partition1s,
                                      igraph_integer_t source,
                                      igraph_integer_t target);
 
-IGRAPH_EXPORT int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
-                                        igraph_vector_ptr_t *cuts,
-                                        igraph_vector_ptr_t *partition1s,
+IGRAPH_EXPORT igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
+                                        igraph_vector_int_list_t *cuts,
+                                        igraph_vector_int_list_t *partition1s,
                                         igraph_integer_t source,
                                         igraph_integer_t target,
                                         const igraph_vector_t *capacity);
 
-IGRAPH_EXPORT int igraph_gomory_hu_tree(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph,
                                         igraph_t *tree,
                                         igraph_vector_t *flows,
                                         const igraph_vector_t *capacity);

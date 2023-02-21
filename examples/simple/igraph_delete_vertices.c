@@ -23,53 +23,26 @@
 
 #include <igraph.h>
 
-int main() {
-
+int main(void) {
     igraph_t g;
-    igraph_vector_t v;
-    int ret;
 
     /* without edges */
-    igraph_empty(&g, 5, IGRAPH_DIRECTED);
-    igraph_add_vertices(&g, 2, 0);
-    igraph_add_vertices(&g, 3, 0);
-    igraph_add_vertices(&g, 1, 0);
-    igraph_add_vertices(&g, 4, 0);
-    if (igraph_vcount(&g) != 15)  {
-        return 1;
-    }
+    igraph_small(&g, 15, IGRAPH_UNDIRECTED, -1);
+
     igraph_delete_vertices(&g, igraph_vss_1(2));
     if (igraph_vcount(&g) != 14)  {
         return 2;
     }
     igraph_destroy(&g);
 
-    igraph_vector_init(&v, 8);
-    VECTOR(v)[0] = 0;
-    VECTOR(v)[1] = 1;
-    VECTOR(v)[2] = 1;
-    VECTOR(v)[3] = 2;
-    VECTOR(v)[4] = 2;
-    VECTOR(v)[5] = 3;
-    VECTOR(v)[6] = 2;
-    VECTOR(v)[7] = 2;
-    igraph_create(&g, &v, 0, 0);
-    igraph_vector_destroy(&v);
-
-    /* resize vector */
+    /* with edges */
+    igraph_small(&g, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, 2,2, -1);
     igraph_delete_vertices(&g, igraph_vss_1(2));
     if (igraph_vcount(&g) != 3) {
         return 3;
     }
     if (igraph_ecount(&g) != 1) {
         return 4;
-    }
-
-    /* error test */
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    ret = igraph_delete_vertices(&g, igraph_vss_1(3));
-    if (ret != IGRAPH_EINVVID) {
-        return 5;
     }
 
     igraph_destroy(&g);

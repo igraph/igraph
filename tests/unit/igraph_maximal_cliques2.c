@@ -23,45 +23,38 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-void sort_cliques(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+void sort_cliques(igraph_vector_int_list_t *cliques) {
+    igraph_integer_t i, n = igraph_vector_int_list_size(cliques);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_vector_sort(v);
+        igraph_vector_int_sort(igraph_vector_int_list_get_ptr(cliques, i));
     }
-    igraph_vector_ptr_sort(cliques, igraph_vector_lex_cmp);
+    igraph_vector_int_list_sort(cliques, igraph_vector_int_lex_cmp);
 }
 
-int print_and_destroy(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+void print_and_destroy(igraph_vector_int_list_t *cliques) {
     sort_cliques(cliques);
-    for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(*cliques)[i];
-        igraph_vector_print(v);
-        igraph_vector_destroy(v);
-    }
-    igraph_vector_ptr_destroy_all(cliques);
-    return 0;
+    print_vector_int_list(cliques);
+    igraph_vector_int_list_destroy(cliques);
 }
 
-int main() {
+int main(void) {
     igraph_t graph;
-    igraph_vector_ptr_t cliques;
+    igraph_vector_int_list_t cliques;
     igraph_integer_t no;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_ring(&graph, /*n=*/ 10, /*directed=*/ 0,
                 /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_vector_ptr_init(&cliques, 0);
+    igraph_vector_int_list_init(&cliques, 0);
 
     igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 0,
                            /*max_size=*/ 0);
     igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 0,
                                  /*max_size=*/ 0 /*no limit*/);
-    IGRAPH_ASSERT(no == igraph_vector_ptr_size(&cliques));
+    IGRAPH_ASSERT(no == igraph_vector_int_list_size(&cliques));
 
     print_and_destroy(&cliques);
     igraph_destroy(&graph);
@@ -73,13 +66,13 @@ int main() {
                             /*n=*/ 50, /*p=*/ 0.5, /*directed=*/ 0,
                             /*loops=*/ 0);
 
-    igraph_vector_ptr_init(&cliques, 0);
+    igraph_vector_int_list_init(&cliques, 0);
 
     igraph_maximal_cliques(&graph, &cliques, /*min_size=*/ 8,
                            /*max_size=*/ 0);
     igraph_maximal_cliques_count(&graph, &no, /*min_size=*/ 8,
                                  /*max_size=*/ 0 /*no limit*/);
-    IGRAPH_ASSERT(no == igraph_vector_ptr_size(&cliques));
+    IGRAPH_ASSERT(no == igraph_vector_int_list_size(&cliques));
 
     print_and_destroy(&cliques);
     igraph_destroy(&graph);

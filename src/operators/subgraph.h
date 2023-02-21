@@ -24,12 +24,19 @@
 #ifndef IGRAPH_OPERATORS_SUBGRAPH_INTERNAL_H
 #define IGRAPH_OPERATORS_SUBGRAPH_INTERNAL_H
 
-#include "igraph_interface.h"
+#include "igraph_decls.h"
+#include "igraph_datatype.h"
+#include "igraph_error.h"
+#include "igraph_iterators.h"
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_induced_subgraph_map(
+__BEGIN_DECLS
+
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_induced_subgraph_map(
     const igraph_t *graph, igraph_t *res, const igraph_vs_t vids,
-    igraph_subgraph_implementation_t impl, igraph_vector_t *map,
-    igraph_vector_t *invmap, igraph_bool_t map_is_prepared
+    igraph_subgraph_implementation_t impl, igraph_vector_int_t *map,
+    igraph_vector_int_t *invmap, igraph_bool_t map_is_prepared
 );
+
+__END_DECLS
 
 #endif

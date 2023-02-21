@@ -40,7 +40,7 @@
  * </para><para>
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
- * vertex ids.
+ * vertex IDs.
  *
  * </para><para>
  * Consider using \ref igraph_bfs_simple instead if you set most of the output
@@ -65,24 +65,34 @@
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
  * \param restricted If not a null pointer, then it must be a pointer
- *        to a vector containing vertex ids. The BFS is carried out
+ *        to a vector containing vertex IDs. The BFS is carried out
  *        only on these vertices.
- * \param order If not null pointer, then the vertex ids of the graph are
+ * \param order If not null pointer, then the vertex IDs of the graph are
  *        stored here, in the same order as they were visited.
  * \param rank If not a null pointer, then the rank of each vertex is
  *        stored here.
- * \param father If not a null pointer, then the id of the father of
- *        each vertex is stored here.
+ * \param parents If not a null pointer, then the id of the parent of
+ *        each vertex is stored here. When a vertex was not visited
+ *        during the traversal, -2 will be stored as the ID of its parent.
+ *        When a vertex was visited during the traversal and it was one of
+ *        the roots of the search trees, -1 will be stored as the ID of
+ *        its parent.
  * \param pred If not a null pointer, then the id of vertex that was
  *        visited before the current one is stored here. If there is
  *        no such vertex (the current vertex is the root of a search
- *        tree), then -1 is stored.
+ *        tree), then -1 is stored as the predecessor of the vertex.
+ *        If the vertex was not visited at all, then -2 is stored for
+ *        the predecessor of the vertex.
  * \param succ If not a null pointer, then the id of the vertex that
  *        was visited after the current one is stored here. If there
  *        is no such vertex (the current one is the last in a search
- *        tree), then -1 is stored.
+ *        tree), then -1 is stored as the successor of the vertex.
+ *        If the vertex was not visited at all, then -2 is stored for
+ *        the successor of the vertex.
  * \param dist If not a null pointer, then the distance from the root of
- *        the current search tree is stored here.
+ *        the current search tree is stored here for each vertex. If a
+ *        vertex was not reached during the traversal, its distance will
+ *        be -1 in this vector.
  * \param callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_bfshandler_t. This function
  *        will be called, whenever a new vertex is visited.
@@ -95,62 +105,54 @@
  * \example examples/simple/igraph_bfs.c
  * \example examples/simple/igraph_bfs_callback.c
  */
-int igraph_bfs(const igraph_t *graph,
-               igraph_integer_t root, const igraph_vector_t *roots,
+igraph_error_t igraph_bfs(const igraph_t *graph,
+               igraph_integer_t root, const igraph_vector_int_t *roots,
                igraph_neimode_t mode, igraph_bool_t unreachable,
-               const igraph_vector_t *restricted,
-               igraph_vector_t *order, igraph_vector_t *rank,
-               igraph_vector_t *father,
-               igraph_vector_t *pred, igraph_vector_t *succ,
-               igraph_vector_t *dist, igraph_bfshandler_t *callback,
+               const igraph_vector_int_t *restricted,
+               igraph_vector_int_t *order, igraph_vector_int_t *rank,
+               igraph_vector_int_t *parents,
+               igraph_vector_int_t *pred, igraph_vector_int_t *succ,
+               igraph_vector_int_t *dist, igraph_bfshandler_t *callback,
                void *extra) {
 
-    igraph_dqueue_t Q;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int actroot = 0;
-    igraph_vector_char_t added;
+    igraph_error_t ret;
+
+    igraph_dqueue_int_t Q;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t actroot = 0;
+    igraph_vector_bool_t added;
 
     igraph_lazy_adjlist_t adjlist;
 
-    long int act_rank = 0;
-    long int pred_vec = -1;
+    igraph_integer_t act_rank = 0;
+    igraph_integer_t pred_vec = -1;
 
-    long int rootpos = 0;
-    long int noroots = roots ? igraph_vector_size(roots) : 1;
+    igraph_integer_t rootpos = 0;
+    igraph_integer_t noroots = roots ? igraph_vector_int_size(roots) : 1;
 
     if (!roots && (root < 0 || root >= no_of_nodes)) {
-        IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid root vertex in BFS.", IGRAPH_EINVVID);
     }
 
-    if (roots && noroots > 0) {
-        igraph_real_t min, max;
-        igraph_vector_minmax(roots, &min, &max);
-        if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid root vertex in BFS", IGRAPH_EINVAL);
-        }
+    if (roots && !igraph_vector_int_isininterval(roots, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("Invalid root vertex in BFS.", IGRAPH_EINVVID);
     }
 
-    if (restricted && igraph_vector_size(restricted) > 0) {
-        igraph_real_t min, max;
-        igraph_vector_minmax(restricted, &min, &max);
-        if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Invalid vertex id in restricted set", IGRAPH_EINVAL);
-        }
+    if (restricted && !igraph_vector_int_isininterval(restricted, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("Invalid vertex ID in restricted set.", IGRAPH_EINVVID);
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, no_of_nodes);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
@@ -159,26 +161,28 @@ int igraph_bfs(const igraph_t *graph,
        found. Special care must be taken for vertices that are not in
        the restricted set, but are to be used as 'root' vertices. */
     if (restricted) {
-        long int i, n = igraph_vector_size(restricted);
-        igraph_vector_char_fill(&added, 1);
+        igraph_integer_t i, n = igraph_vector_int_size(restricted);
+        igraph_vector_bool_fill(&added, true);
         for (i = 0; i < n; i++) {
-            long int v = (long int) VECTOR(*restricted)[i];
-            VECTOR(added)[v] = 0;
+            igraph_integer_t v = VECTOR(*restricted)[i];
+            VECTOR(added)[v] = false;
         }
     }
 
     /* Resize result vectors, and fill them with IGRAPH_NAN */
 
-# define VINIT(v) if (v) {                      \
-        igraph_vector_resize((v), no_of_nodes);   \
-        igraph_vector_fill((v), IGRAPH_NAN); }
+# define VINIT(v, initial) \
+    if (v) { \
+        IGRAPH_CHECK(igraph_vector_int_resize((v), no_of_nodes)); \
+        igraph_vector_int_fill((v), initial); \
+    }
 
-    VINIT(order);
-    VINIT(rank);
-    VINIT(father);
-    VINIT(pred);
-    VINIT(succ);
-    VINIT(dist);
+    VINIT(order, -1);
+    VINIT(rank, -1);
+    VINIT(parents, -2);
+    VINIT(pred, -2);
+    VINIT(succ, -2);
+    VINIT(dist, -1);
 # undef VINIT
 
     while (1) {
@@ -187,7 +191,7 @@ int igraph_bfs(const igraph_t *graph,
 
         if (roots && rootpos < noroots) {
             /* We are still going through the 'roots' vector */
-            actroot = (long int) VECTOR(*roots)[rootpos++];
+            actroot = VECTOR(*roots)[rootpos++];
         } else if (!roots && rootpos == 0) {
             /* We have a single root vertex given, and start now */
             actroot = root;
@@ -209,28 +213,30 @@ int igraph_bfs(const igraph_t *graph,
         if (VECTOR(added)[actroot]) {
             continue;
         }
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, actroot));
-        IGRAPH_CHECK(igraph_dqueue_push(&Q, 0));
-        VECTOR(added)[actroot] = 1;
-        if (father) {
-            VECTOR(*father)[actroot] = -1;
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actroot));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&Q, 0));
+        VECTOR(added)[actroot] = true;
+        if (parents) {
+            VECTOR(*parents)[actroot] = -1;
         }
 
         pred_vec = -1;
 
-        while (!igraph_dqueue_empty(&Q)) {
-            long int actvect = (long int) igraph_dqueue_pop(&Q);
-            long int actdist = (long int) igraph_dqueue_pop(&Q);
-            long int succ_vec;
-            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist,
-                                    (igraph_integer_t) actvect);
-            long int i, n = igraph_vector_int_size(neis);
+        while (!igraph_dqueue_int_empty(&Q)) {
+            igraph_integer_t actvect = igraph_dqueue_int_pop(&Q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&Q);
+            igraph_integer_t succ_vec;
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
+            igraph_integer_t i, n;
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+            n = igraph_vector_int_size(neis);
 
             if (pred) {
                 VECTOR(*pred)[actvect] = pred_vec;
             }
             if (rank) {
-                VECTOR(*rank) [actvect] = act_rank;
+                VECTOR(*rank)[actvect] = act_rank;
             }
             if (order) {
                 VECTOR(*order)[act_rank++] = actvect;
@@ -240,31 +246,27 @@ int igraph_bfs(const igraph_t *graph,
             }
 
             for (i = 0; i < n; i++) {
-                long int nei = (long int) VECTOR(*neis)[i];
+                igraph_integer_t nei = VECTOR(*neis)[i];
                 if (! VECTOR(added)[nei]) {
-                    VECTOR(added)[nei] = 1;
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
-                    IGRAPH_CHECK(igraph_dqueue_push(&Q, actdist + 1));
-                    if (father) {
-                        VECTOR(*father)[nei] = actvect;
+                    VECTOR(added)[nei] = true;
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
+                    IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actdist + 1));
+                    if (parents) {
+                        VECTOR(*parents)[nei] = actvect;
                     }
                 }
             }
 
-            succ_vec = igraph_dqueue_empty(&Q) ? -1L :
-                       (long int) igraph_dqueue_head(&Q);
+            succ_vec = igraph_dqueue_int_empty(&Q) ? -1L :
+                       igraph_dqueue_int_head(&Q);
             if (callback) {
-                igraph_bool_t terminate =
-                    callback(graph, (igraph_integer_t) actvect, (igraph_integer_t)
-                             pred_vec, (igraph_integer_t) succ_vec,
-                             (igraph_integer_t) act_rank - 1, (igraph_integer_t) actdist,
-                             extra);
-                if (terminate) {
-                    igraph_lazy_adjlist_destroy(&adjlist);
-                    igraph_dqueue_destroy(&Q);
-                    igraph_vector_char_destroy(&added);
-                    IGRAPH_FINALLY_CLEAN(3);
-                    return 0;
+                IGRAPH_CHECK_CALLBACK(
+                    callback(graph, actvect, pred_vec, succ_vec, act_rank - 1, actdist, extra),
+                    &ret
+                );
+
+                if (ret == IGRAPH_STOP) {
+                    goto cleanup;
                 }
             }
 
@@ -277,12 +279,14 @@ int igraph_bfs(const igraph_t *graph,
 
     } /* for actroot < no_of_nodes */
 
+cleanup:
+
     igraph_lazy_adjlist_destroy(&adjlist);
-    igraph_dqueue_destroy(&Q);
-    igraph_vector_char_destroy(&added);
+    igraph_dqueue_int_destroy(&Q);
+    igraph_vector_bool_destroy(&added);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -297,26 +301,26 @@ int igraph_bfs(const igraph_t *graph,
  * be ignored.
  *
  * \param graph The input graph.
- * \param vid The id of the root vertex.
+ * \param root The id of the root vertex.
  * \param mode For directed graphs, it defines which edges to follow.
  *        \c IGRAPH_OUT means following the direction of the edges,
  *        \c IGRAPH_IN means the opposite, and
  *        \c IGRAPH_ALL ignores the direction of the edges.
  *        This parameter is ignored for undirected graphs.
- * \param vids If not a null pointer, then an initialized vector must be passed
- *        here. The ids of the vertices visited during the traversal will be
+ * \param order If not a null pointer, then an initialized vector must be passed
+ *        here. The IDs of the vertices visited during the traversal will be
  *        stored here, in the same order as they were visited.
  * \param layers If not a null pointer, then an initialized vector must be
  *        passed here. The i-th element of the vector will contain the index
- *        into \c vids where the vertices that are at distance i from the root
+ *        into \c order where the vertices that are at distance i from the root
  *        are stored. In other words, if you are interested in the vertices that
- *        are at distance i from the root, you need to look in the \c vids
+ *        are at distance i from the root, you need to look in the \c order
  *        vector from \c layers[i] to \c layers[i+1].
  * \param parents If not a null pointer, then an initialized vector must be
  *        passed here. The vector will be resized so its length is equal to the
  *        number of nodes, and it will contain the index of the parent node for
- *        each \em visited node. The values in the vector are undefined for
- *        vertices that were \em not visited.
+ *        each \em visited node. The values in the vector are set to -2 for
+ *        vertices that were \em not visited, and -1 for the root vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -324,17 +328,19 @@ int igraph_bfs(const igraph_t *graph,
  *
  * \example examples/simple/igraph_bfs_simple.c
  */
-int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
-                      igraph_vector_t *vids, igraph_vector_t *layers,
-                      igraph_vector_t *parents) {
+igraph_error_t igraph_bfs_simple(
+    const igraph_t *graph, igraph_integer_t root, igraph_neimode_t mode,
+    igraph_vector_int_t *order, igraph_vector_int_t *layers,
+    igraph_vector_int_t *parents
+) {
 
-    igraph_dqueue_t q;
-    long int num_visited = 0;
-    igraph_vector_t neis;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int i;
-    char *added;
-    long int lastlayer = -1;
+    igraph_dqueue_int_t q;
+    igraph_integer_t num_visited = 0;
+    igraph_vector_int_t neis;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i;
+    bool *added;
+    igraph_integer_t lastlayer = -1;
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
@@ -346,77 +352,79 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
     }
 
     /* temporary storage */
-    added = IGRAPH_CALLOC(no_of_nodes, char);
+    added = IGRAPH_CALLOC(no_of_nodes, bool);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
+    IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
+    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
     /* results */
-    if (vids) {
-        igraph_vector_clear(vids);
+    if (order) {
+        igraph_vector_int_clear(order);
     }
     if (layers) {
-        igraph_vector_clear(layers);
+        igraph_vector_int_clear(layers);
     }
     if (parents) {
-        IGRAPH_CHECK(igraph_vector_resize(parents, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
+        igraph_vector_int_fill(parents, -2);
     }
 
-    /* ok start with vid */
-    IGRAPH_CHECK(igraph_dqueue_push(&q, vid));
-    IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+    /* ok start with root */
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, root));
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
     if (layers) {
-        IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+        IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
     }
-    if (vids) {
-        IGRAPH_CHECK(igraph_vector_push_back(vids, vid));
+    if (order) {
+        IGRAPH_CHECK(igraph_vector_int_push_back(order, root));
     }
     if (parents) {
-        VECTOR(*parents)[(long int)vid] = vid;
+        VECTOR(*parents)[root] = -1;
     }
     num_visited++;
-    added[(long int)vid] = 1;
+    added[root] = true;
 
-    while (!igraph_dqueue_empty(&q)) {
-        long int actvect = (long int) igraph_dqueue_pop(&q);
-        long int actdist = (long int) igraph_dqueue_pop(&q);
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actvect,
+    while (!igraph_dqueue_int_empty(&q)) {
+        igraph_integer_t actvect = igraph_dqueue_int_pop(&q);
+        igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvect,
                                       mode));
-        for (i = 0; i < igraph_vector_size(&neis); i++) {
-            long int neighbor = (long int) VECTOR(neis)[i];
-            if (added[neighbor] == 0) {
-                added[neighbor] = 1;
+        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+        for (i = 0; i < nei_count; i++) {
+            igraph_integer_t neighbor = VECTOR(neis)[i];
+            if (! added[neighbor]) {
+                added[neighbor] = true;
                 if (parents) {
                     VECTOR(*parents)[neighbor] = actvect;
                 }
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
                 if (layers && lastlayer != actdist + 1) {
-                    IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
                 }
-                if (vids) {
-                    IGRAPH_CHECK(igraph_vector_push_back(vids, neighbor));
+                if (order) {
+                    IGRAPH_CHECK(igraph_vector_int_push_back(order, neighbor));
                 }
                 num_visited++;
                 lastlayer = actdist + 1;
             }
         } /* for i in neis */
-    } /* while ! dqueue_empty */
+    } /* while ! dqueue_int_empty */
 
     if (layers) {
-        IGRAPH_CHECK(igraph_vector_push_back(layers, num_visited));
+        IGRAPH_CHECK(igraph_vector_int_push_back(layers, num_visited));
     }
 
-    igraph_vector_destroy(&neis);
-    igraph_dqueue_destroy(&q);
+    igraph_vector_int_destroy(&neis);
+    igraph_dqueue_int_destroy(&q);
     IGRAPH_FREE(added);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -432,7 +440,7 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
  * </para><para>
  * If not all vertices can be reached from the supplied root vertex,
  * then additional root vertices will be used, in the order of their
- * vertex ids.
+ * vertex IDs.
  *
  * \param graph The input graph.
  * \param root The id of the root vertex.
@@ -445,15 +453,22 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
  *        the vertices that are unreachable from the given root
  *        node(s). If true, then additional searches are performed
  *        until all vertices are visited.
- * \param order If not null pointer, then the vertex ids of the graph are
- *        stored here, in the same order as they were discovered.
- * \param order_out If not a null pointer, then the vertex ids of the
+ * \param order If not null pointer, then the vertex IDs of the graph are
+ *        stored here, in the same order as they were discovered. The tail of
+ *        the vector will be padded with -1 to ensure that the length of the
+ *        vector is the same as the number of vertices, even if some vertices
+ *        were not visited during the traversal.
+ * \param order_out If not a null pointer, then the vertex IDs of the
  *        graphs are stored here, in the order of the completion of
- *        their subtree.
- * \param father If not a null pointer, then the id of the father of
- *        each vertex is stored here.
+ *        their subtree. The tail of the vector will be padded with -1 to ensure
+ *        that the length of the vector is the same as the number of vertices,
+ *        even if some vertices were not visited during the traversal.
+ * \param parents If not a null pointer, then the id of the parent of
+ *        each vertex is stored here. -1 will be stored for the root of the
+ *        search tree; -2 will be stored for vertices that were not visited.
  * \param dist If not a null pointer, then the distance from the root of
- *        the current search tree is stored here.
+ *        the current search tree is stored here. -1 will be stored for vertices
+ *        that were not visited.
  * \param in_callback If not null, then it should be a pointer to a
  *        function of type \ref igraph_dfshandler_t. This function
  *        will be called, whenever a new vertex is discovered.
@@ -467,23 +482,24 @@ int igraph_bfs_simple(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mo
  * edges.
  */
 
-int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
+igraph_error_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                igraph_neimode_t mode, igraph_bool_t unreachable,
-               igraph_vector_t *order,
-               igraph_vector_t *order_out, igraph_vector_t *father,
-               igraph_vector_t *dist, igraph_dfshandler_t *in_callback,
+               igraph_vector_int_t *order,
+               igraph_vector_int_t *order_out, igraph_vector_int_t *parents,
+               igraph_vector_int_t *dist, igraph_dfshandler_t *in_callback,
                igraph_dfshandler_t *out_callback,
                void *extra) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t adjlist;
-    igraph_stack_t stack;
+    igraph_stack_int_t stack;
     igraph_vector_char_t added;
-    igraph_vector_long_t nptr;
-    long int actroot;
-    long int act_rank = 0;
-    long int rank_out = 0;
-    long int act_dist = 0;
+    igraph_vector_int_t nptr;
+    igraph_error_t ret;
+    igraph_integer_t actroot;
+    igraph_integer_t act_rank = 0;
+    igraph_integer_t rank_out = 0;
+    igraph_integer_t act_dist = 0;
 
     if (root < 0 || root >= no_of_nodes) {
         IGRAPH_ERROR("Invalid root vertex for DFS", IGRAPH_EINVAL);
@@ -500,56 +516,56 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
     IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_stack_init(&stack, 100));
-    IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+    IGRAPH_CHECK(igraph_stack_int_init(&stack, 100));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
+    IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);
 
 # define FREE_ALL() do {            \
-        igraph_vector_long_destroy(&nptr);            \
+        igraph_vector_int_destroy(&nptr);            \
         igraph_lazy_adjlist_destroy(&adjlist);        \
-        igraph_stack_destroy(&stack);                 \
+        igraph_stack_int_destroy(&stack);                 \
         igraph_vector_char_destroy(&added);           \
         IGRAPH_FINALLY_CLEAN(4); } while (0)
 
-    /* Resize result vectors and fill them with IGRAPH_NAN */
+    /* Resize result vectors and fill them with the initial value */
 
-# define VINIT(v) if (v) {                      \
-        igraph_vector_resize(v, no_of_nodes);       \
-        igraph_vector_fill(v, IGRAPH_NAN); }
+# define VINIT(v, initial) if (v) {             \
+        IGRAPH_CHECK(igraph_vector_int_resize(v, no_of_nodes));       \
+        igraph_vector_int_fill(v, initial); }
 
-    VINIT(order);
-    VINIT(order_out);
-    VINIT(father);
-    VINIT(dist);
+    VINIT(order, -1);
+    VINIT(order_out, -1);
+    VINIT(parents, -2);
+    VINIT(dist, -1);
 
 # undef VINIT
 
-    IGRAPH_CHECK(igraph_stack_push(&stack, root));
-    VECTOR(added)[(long int)root] = 1;
-    if (father) {
-        VECTOR(*father)[(long int)root] = -1;
+    IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
+    VECTOR(added)[root] = 1;
+    if (parents) {
+        VECTOR(*parents)[root] = -1;
     }
     if (order) {
         VECTOR(*order)[act_rank++] = root;
     }
     if (dist) {
-        VECTOR(*dist)[(long int)root] = 0;
+        VECTOR(*dist)[root] = 0;
     }
     if (in_callback) {
-        igraph_bool_t terminate = in_callback(graph, root, 0, extra);
-        if (terminate) {
+        IGRAPH_CHECK_CALLBACK(in_callback(graph, root, 0, extra), &ret);
+        if (ret == IGRAPH_STOP) {
             FREE_ALL();
-            return 0;
+            return IGRAPH_SUCCESS;
         }
     }
 
     for (actroot = 0; actroot < no_of_nodes; ) {
 
         /* 'root' first, then all other vertices */
-        if (igraph_stack_empty(&stack)) {
+        if (igraph_stack_int_empty(&stack)) {
             if (!unreachable) {
                 break;
             }
@@ -557,10 +573,10 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                 actroot++;
                 continue;
             }
-            IGRAPH_CHECK(igraph_stack_push(&stack, actroot));
+            IGRAPH_CHECK(igraph_stack_int_push(&stack, actroot));
             VECTOR(added)[actroot] = 1;
-            if (father) {
-                VECTOR(*father)[actroot] = -1;
+            if (parents) {
+                VECTOR(*parents)[actroot] = -1;
             }
             if (order) {
                 VECTOR(*order)[act_rank++] = actroot;
@@ -570,37 +586,38 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
             }
 
             if (in_callback) {
-                igraph_bool_t terminate = in_callback(graph, (igraph_integer_t) actroot,
-                                                      0, extra);
-                if (terminate) {
+                IGRAPH_CHECK_CALLBACK(in_callback(graph, actroot, 0, extra), &ret);
+                if (ret == IGRAPH_STOP) {
                     FREE_ALL();
-                    return 0;
+                    return IGRAPH_SUCCESS;
                 }
             }
+
             actroot++;
         }
 
-        while (!igraph_stack_empty(&stack)) {
-            long int actvect = (long int) igraph_stack_top(&stack);
-            igraph_vector_int_t *neis =
-                igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actvect);
-            long int n = igraph_vector_int_size(neis);
-            long int *ptr = igraph_vector_long_e_ptr(&nptr, actvect);
+        while (!igraph_stack_int_empty(&stack)) {
+            igraph_integer_t actvect = igraph_stack_int_top(&stack);
+            igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, actvect);
+            igraph_integer_t n = igraph_vector_int_size(neis);
+            igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, actvect);
+
+            IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
 
             /* Search for a neighbor that was not yet visited */
-            igraph_bool_t any = 0;
-            long int nei = 0;
+            igraph_bool_t any = false;
+            igraph_integer_t nei = 0;
             while (!any && (*ptr) < n) {
-                nei = (long int) VECTOR(*neis)[(*ptr)];
+                nei = VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];
                 (*ptr) ++;
             }
             if (any) {
                 /* There is such a neighbor, add it */
-                IGRAPH_CHECK(igraph_stack_push(&stack, nei));
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, nei));
                 VECTOR(added)[nei] = 1;
-                if (father) {
-                    VECTOR(*father)[ nei ] = actvect;
+                if (parents) {
+                    VECTOR(*parents)[ nei ] = actvect;
                 }
                 if (order) {
                     VECTOR(*order)[act_rank++] = nei;
@@ -611,30 +628,33 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                 }
 
                 if (in_callback) {
-                    igraph_bool_t terminate = in_callback(graph, (igraph_integer_t) nei,
-                                                          (igraph_integer_t) act_dist,
-                                                          extra);
-                    if (terminate) {
+                    IGRAPH_CHECK_CALLBACK(
+                        in_callback(graph, nei, act_dist, extra),
+                        &ret
+                    );
+                    if (ret == IGRAPH_STOP) {
                         FREE_ALL();
-                        return 0;
+                        return IGRAPH_SUCCESS;
                     }
                 }
 
             } else {
                 /* There is no such neighbor, finished with the subtree */
-                igraph_stack_pop(&stack);
+                igraph_stack_int_pop(&stack);
                 if (order_out) {
                     VECTOR(*order_out)[rank_out++] = actvect;
                 }
                 act_dist--;
 
                 if (out_callback) {
-                    igraph_bool_t terminate = out_callback(graph, (igraph_integer_t)
-                                                           actvect, (igraph_integer_t)
-                                                           act_dist, extra);
-                    if (terminate) {
+                    IGRAPH_CHECK_CALLBACK(
+                        out_callback(graph, actvect, act_dist, extra),
+                        &ret
+                    );
+
+                    if (ret == IGRAPH_STOP) {
                         FREE_ALL();
-                        return 0;
+                        return IGRAPH_SUCCESS;
                     }
                 }
             }
@@ -644,5 +664,5 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     FREE_ALL();
 # undef FREE_ALL
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

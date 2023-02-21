@@ -26,21 +26,21 @@
 #define TRANSIT_TRIEDGES
 #endif
 
-long int no_of_nodes = igraph_vcount(graph);
-long int node, i, j, nn;
+igraph_integer_t no_of_nodes = igraph_vcount(graph);
+igraph_integer_t node, i, j, nn;
 igraph_adjlist_t allneis;
 igraph_vector_int_t *neis1, *neis2;
-long int neilen1, neilen2;
-long int *neis;
-long int maxdegree;
+igraph_integer_t neilen1, neilen2;
+igraph_integer_t *neis;
+igraph_integer_t maxdegree;
 
 #ifdef TRANSIT_TRIEDGES
-long int deg1;
+igraph_integer_t deg1;
 #endif
 
 igraph_vector_int_t order;
 igraph_vector_int_t rank;
-igraph_vector_t degree;
+igraph_vector_int_t degree;
 
 if (no_of_nodes == 0) {
 #ifndef TRIANGLES
@@ -51,9 +51,8 @@ if (no_of_nodes == 0) {
     return IGRAPH_SUCCESS;
 }
 
-igraph_vector_int_init(&order, no_of_nodes);
-IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
-IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
+IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
 
 IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
 IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
@@ -62,19 +61,18 @@ for (i = 0; i < no_of_nodes; i++) {
     VECTOR(degree)[i] = igraph_vector_int_size(igraph_adjlist_get(&allneis, i));
 }
 
-maxdegree = (long int) igraph_vector_max(&degree) + 1;
-igraph_vector_order1_int(&degree, &order, maxdegree);
-igraph_vector_int_init(&rank, no_of_nodes);
-IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
+maxdegree = igraph_vector_int_max(&degree) + 1;
+IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
+IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
 for (i = 0; i < no_of_nodes; i++) {
     VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
 }
 
 IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
 
-neis = IGRAPH_CALLOC(no_of_nodes, long int);
+neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
 if (neis == 0) {
-    IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
 }
 IGRAPH_FINALLY(igraph_free, neis);
 
@@ -94,20 +92,20 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
     neilen1 = igraph_vector_int_size(neis1);
 
 #ifdef TRANSIT_TRIEDGES
-    deg1 = (long int) VECTOR(degree)[node];
+    deg1 = VECTOR(degree)[node];
 #endif
 
     /* Mark the neighbors of the node */
     for (i = 0; i < neilen1; i++) {
-        neis[ (long int) VECTOR(*neis1)[i] ] = node + 1;
+        neis[ VECTOR(*neis1)[i] ] = node + 1;
     }
 
     for (i = 0; i < neilen1; i++) {
-        long int nei = (long int) VECTOR(*neis1)[i];
+        igraph_integer_t nei = VECTOR(*neis1)[i];
         neis2 = igraph_adjlist_get(&allneis, nei);
         neilen2 = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen2; j++) {
-            long int nei2 = (long int) VECTOR(*neis2)[j];
+            igraph_integer_t nei2 = VECTOR(*neis2)[j];
             if (neis[nei2] == node + 1) {
 #ifndef TRIANGLES
                 VECTOR(*res)[nei2] += 1;
@@ -134,7 +132,7 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
 igraph_free(neis);
 igraph_adjlist_destroy(&allneis);
 igraph_vector_int_destroy(&rank);
-igraph_vector_destroy(&degree);
+igraph_vector_int_destroy(&degree);
 igraph_vector_int_destroy(&order);
 IGRAPH_FINALLY_CLEAN(5);
 

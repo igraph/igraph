@@ -24,6 +24,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \ingroup generators
  * \function igraph_full
@@ -55,71 +57,275 @@
  * O(|E|)=O(|V||V|)
  * here.
  *
- * \sa \ref igraph_lattice(), \ref igraph_star(), \ref igraph_tree()
+ * \sa \ref igraph_square_lattice(), \ref igraph_star(), \ref igraph_kary_tree()
  * for creating other regular structures.
  *
  * \example examples/simple/igraph_full.c
  */
-int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
                 igraph_bool_t loops) {
 
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int i, j;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_integer_t no_of_edges2;
+    igraph_integer_t i, j;
 
     if (n < 0) {
-        IGRAPH_ERROR("invalid number of vertices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     if (directed && loops) {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * n * n));
+        /* ecount = n * n */
+        IGRAPH_SAFE_MULT(n, n, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-                igraph_vector_push_back(&edges, i); /* reserved */
-                igraph_vector_push_back(&edges, j); /* reserved */
+                igraph_vector_int_push_back(&edges, i); /* reserved */
+                igraph_vector_int_push_back(&edges, j); /* reserved */
             }
         }
     } else if (directed && !loops) {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * n * (n - 1)));
+        /* ecount = n * (n - 1) */
+        IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = 0; j < i; j++) {
-                igraph_vector_push_back(&edges, i); /* reserved */
-                igraph_vector_push_back(&edges, j); /* reserved */
+                igraph_vector_int_push_back(&edges, i); /* reserved */
+                igraph_vector_int_push_back(&edges, j); /* reserved */
             }
             for (j = i + 1; j < n; j++) {
-                igraph_vector_push_back(&edges, i); /* reserved */
-                igraph_vector_push_back(&edges, j); /* reserved */
+                igraph_vector_int_push_back(&edges, i); /* reserved */
+                igraph_vector_int_push_back(&edges, j); /* reserved */
             }
         }
     } else if (!directed && loops) {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * (n + 1)));
+        /* ecount = n * (n + 1) / 2 */
+        IGRAPH_SAFE_ADD(n, 1, &no_of_edges2);
+        IGRAPH_SAFE_MULT(n, no_of_edges2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = i; j < n; j++) {
-                igraph_vector_push_back(&edges, i); /* reserved */
-                igraph_vector_push_back(&edges, j); /* reserved */
+                igraph_vector_int_push_back(&edges, i); /* reserved */
+                igraph_vector_int_push_back(&edges, j); /* reserved */
             }
         }
     } else {
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, n * (n - 1)));
+        /* ecount = n * (n - 1) / 2 */
+        IGRAPH_SAFE_MULT(n, n - 1, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
         for (i = 0; i < n; i++) {
             for (j = i + 1; j < n; j++) {
-                igraph_vector_push_back(&edges, i); /* reserved */
-                igraph_vector_push_back(&edges, j); /* reserved */
+                igraph_vector_int_push_back(&edges, i); /* reserved */
+                igraph_vector_int_push_back(&edges, j); /* reserved */
             }
         }
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_full_multipartite
+ * \brief Create a full multipartite graph.
+ *
+ * A multipartite graph contains two or more types of vertices and connections
+ * are only possible between two vertices of different types. This function
+ * creates a complete multipartite graph.
+ *
+ * \param graph Pointer to an igraph_t object, the graph will be
+ *   created here.
+ * \param types Pointer to an integer vector. If not a null pointer,
+ *   the type of each vertex will be stored here.
+ * \param n Pointer to an integer vector, the number of vertices
+ *   of each type.
+ * \param directed Boolean, whether to create a directed graph.
+ * \param mode A constant that gives the type of connections for
+ *   directed graphs. If \c IGRAPH_OUT, then edges point from vertices
+ *   of low-index vertices to high-index vertices; if \c
+ *   IGRAPH_IN, then the opposite direction is realized; if \c
+ *   IGRAPH_ALL, then mutual edges will be created.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ *
+ * \sa \ref igraph_full_bipartite() for full bipartite graphs.
+ */
+igraph_error_t igraph_full_multipartite(igraph_t *graph,
+                          igraph_vector_int_t *types,
+                          const igraph_vector_int_t *n,
+                          igraph_bool_t directed,
+                          igraph_neimode_t mode) {
+
+    igraph_vector_int_t edges;
+    igraph_vector_int_t n_acc;
+
+    igraph_integer_t no_of_types = igraph_vector_int_size(n);
+
+    if (no_of_types == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+        if (types) {
+            igraph_vector_int_clear(types);
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    if (igraph_vector_int_min(n) < 0) {
+        IGRAPH_ERROR("Number of vertices must not be negative in any partition.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&n_acc, no_of_types+1);
+    VECTOR(n_acc)[0] = 0;
+    for (igraph_integer_t i = 1; i < no_of_types+1; i++) {
+        IGRAPH_SAFE_ADD(VECTOR(n_acc)[i-1], VECTOR(*n)[i-1],
+                    &VECTOR(n_acc)[i]);
+    }
+
+    igraph_integer_t no_of_edges2 = 0;
+
+    for (igraph_integer_t i = 0; i < no_of_types; i++) {
+        igraph_integer_t v = VECTOR(*n)[i];
+        igraph_integer_t partial_sum = VECTOR(n_acc)[no_of_types] - v;
+        IGRAPH_SAFE_MULT(partial_sum, v, &partial_sum);
+        IGRAPH_SAFE_ADD(no_of_edges2, partial_sum, &no_of_edges2);
+    }
+
+    if (directed && mode == IGRAPH_ALL) {
+        IGRAPH_SAFE_MULT(no_of_edges2, 2, &no_of_edges2);
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+
+    igraph_integer_t ptr = 0;
+
+    for (igraph_integer_t from_type = 0; from_type < no_of_types-1; from_type++) {
+        igraph_integer_t edge_from = VECTOR(n_acc)[from_type];
+        for (igraph_integer_t i = 0; i < VECTOR(*n)[from_type]; i++) {
+            for (igraph_integer_t to_type = from_type+1; to_type < no_of_types; to_type++) {
+                igraph_integer_t edge_to = VECTOR(n_acc)[to_type];
+                for (igraph_integer_t j = 0; j < VECTOR(*n)[to_type]; j++) {
+                    if (!directed || mode == IGRAPH_OUT) {
+                        VECTOR(edges)[ptr++] = edge_from;
+                        VECTOR(edges)[ptr++] = edge_to;
+                    } else if (mode == IGRAPH_IN) {
+                        VECTOR(edges)[ptr++] = edge_to;
+                        VECTOR(edges)[ptr++] = edge_from;
+                    } else {
+                        VECTOR(edges)[ptr++] = edge_from;
+                        VECTOR(edges)[ptr++] = edge_to;
+                        VECTOR(edges)[ptr++] = edge_to;
+                        VECTOR(edges)[ptr++] = edge_from;
+                    }
+                    edge_to++;
+                }
+            }
+            edge_from++;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, VECTOR(n_acc)[no_of_types], directed));
+
+    if (types) {
+        IGRAPH_CHECK(igraph_vector_int_resize(types, VECTOR(n_acc)[no_of_types]));
+        if (VECTOR(n_acc)[no_of_types] > 0) {
+            igraph_integer_t v = 1;
+            for (igraph_integer_t i = 0; i < VECTOR(n_acc)[no_of_types]; i++) {
+                if (i == VECTOR(n_acc)[v]) {
+                    v++;
+                }
+                VECTOR(*types)[i] = v-1;
+            }
+        }
+    }
+
+    igraph_vector_int_destroy(&edges);
+    igraph_vector_int_destroy(&n_acc);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_turan
+ * \brief Create a Turán graph.
+ *
+ * Turán graphs are complete multipartite graphs with the property
+ * that the sizes of the partitions are as close to equal as possible.
+ *
+ * This function generates undirected graphs. The null graph is
+ * returned when the number of vertices is zero. A complete graph is
+ * returned if the number of partitions is greater than the number of
+ * vertices.
+ *
+ * \param graph Pointer to an igraph_t object, the graph will be
+ *   created here.
+ * \param types Pointer to an integer vector. If not a null pointer,
+ *   the type (partition index) of each vertex will be stored here.
+ * \param n Integer, the number of vertices in the graph.
+ * \param r Integer, the number of partitions of the graph, must be
+ *   positive.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ *
+ * \sa \ref igraph_full_multipartite() for full multipartite graphs.
+ */
+igraph_error_t igraph_turan(igraph_t *graph,
+                            igraph_vector_int_t *types,
+                            igraph_integer_t n,
+                            igraph_integer_t r) {
+    igraph_integer_t quotient;
+    igraph_integer_t remainder;
+    igraph_vector_int_t subsets;
+
+    if (n < 0) {
+        IGRAPH_ERRORF("Number of vertices must not be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, n);
+    }
+
+    if (r <= 0) {
+        IGRAPH_ERRORF("Number of partitions must be positive, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, r);
+    }
+
+    if (n == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, 0, IGRAPH_UNDIRECTED));
+        if (types) {
+            igraph_vector_int_clear(types);
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    if (r > n) {
+        r = n;
+    }
+
+    quotient = n / r;
+    remainder = n % r;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&subsets, r);
+
+    igraph_vector_int_fill(&subsets, quotient);
+    for (igraph_integer_t i = 0; i < remainder; i++) {
+        VECTOR(subsets)[i]++;
+    }
+
+    IGRAPH_CHECK(igraph_full_multipartite(graph, types, &subsets,
+            IGRAPH_UNDIRECTED, IGRAPH_ALL));
+    igraph_vector_int_destroy(&subsets);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_full_citation
- * Creates a full citation graph
+ * \brief Creates a full citation graph.
  *
  * This is a directed graph, where every <code>i->j</code> edge is
  * present if and only if <code>j&lt;i</code>.
@@ -134,12 +340,21 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  *
  * Time complexity: O(|V|^2), as we have many edges.
  */
-int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
+igraph_error_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
                          igraph_bool_t directed) {
-    igraph_vector_t edges;
-    long int i, j, ptr = 0;
+    igraph_vector_int_t edges;
+    igraph_integer_t i, j, ptr = 0;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, n * (n - 1));
+    if (n < 0) {
+        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+    }
+
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(n, n-1, &no_of_edges2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges2);
+    }
+
     for (i = 1; i < n; i++) {
         for (j = 0; j < i; j++) {
             VECTOR(edges)[ptr++] = i;
@@ -148,7 +363,7 @@ int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

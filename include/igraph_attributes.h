@@ -24,11 +24,14 @@
 #ifndef IGRAPH_ATTRIBUTES_H
 #define IGRAPH_ATTRIBUTES_H
 
+#include "igraph_config.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_strvector.h"
+#include "igraph_vector_list.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_iterators.h"
 
@@ -41,10 +44,11 @@ __BEGIN_DECLS
 /**
  * \section about_attributes
  *
- * <para>Attributes are numbers or strings (or basically any kind
- * of data) associated with the vertices or edges of a graph, or
- * with the graph itself. Eg. you may label vertices with symbolic names
- * or attach numeric weights to the edges of a graph. </para>
+ * <para>Attributes are numbers, boolean values or strings associated with
+ * the vertices or edges of a graph, or with the graph itself. E.g. you may
+ * label vertices with symbolic names or attach numeric weights to the edges
+ * of a graph. In addition to these three basic types, a custom object
+ * type is supported as well.</para>
  *
  * <para>igraph attributes are designed to be flexible and extensible.
  * In igraph attributes are implemented via an interface abstraction:
@@ -52,7 +56,7 @@ __BEGIN_DECLS
  * for storing vertex, edge and graph attributes. This means that
  * different attribute implementations can be used together with
  * igraph. This is reasonable: if igraph is used from Python attributes can be
- * of any Python type, from GNU R all R types are allowed. There is an
+ * of any Python type, from R all R types are allowed. There is also an
  * experimental attribute implementation to be used when programming
  * in C, but by default it is currently turned off.</para>
  *
@@ -71,10 +75,13 @@ __BEGIN_DECLS
  * notify the attribute handling code about the structural changes in
  * a graph. See the documentation of this type for details.</para>
  *
- * <para>By default there is no attribute interface attached to \a igraph,
- * to attach one, call \ref igraph_set_attribute_table with your new
- * table. </para>
- *
+ * <para>By default there is no attribute interface attached to \a igraph.
+ * To attach one, call \ref igraph_set_attribute_table with your new
+ * table. This is normally done on program startup, and is kept untouched
+ * for the program's lifetime. It must be done before any graph object
+ * is created, as graphs created with a given attribute handler
+ * cannot be manipulated while a different attribute handler is
+ * active.</para>
  */
 
 /**
@@ -101,27 +108,29 @@ __BEGIN_DECLS
  *
  * Note that this is only the
  * type communicated by the attribute interface towards igraph
- * functions. Eg. in the GNU R attribute handler, it is safe to say
+ * functions. E.g. in the R attribute handler, it is safe to say
  * that all complex R object attributes are strings, as long as this
  * interface is able to serialize them into strings. See also \ref
  * igraph_attribute_table_t.
- * \enumval IGRAPH_ATTRIBUTE_DEFAULT Currently not used for anything.
+ * \enumval IGRAPH_ATTRIBUTE_UNSPECIFIED Currently used internally
+ *   as a "null value" or "placeholder value" in some algorithms.
+ *   Attribute records with this type must not be passed to igraph
+ *   functions.
  * \enumval IGRAPH_ATTRIBUTE_NUMERIC Numeric attribute.
  * \enumval IGRAPH_ATTRIBUTE_BOOLEAN Logical values, true or false.
  * \enumval IGRAPH_ATTRIBUTE_STRING Attribute that can be converted to
  *   a string.
- * \enumval IGRAPH_ATTRIBUTE_R_OBJECT An R object. This is usually
- *   ignored by the igraph functions.
- * \enumval IGRAPH_ATTRIBUTE_PY_OBJECT A Python object. Usually
- *   ignored by the igraph functions.
- *
+ * \enumval IGRAPH_ATTRIBUTE_OBJECT Custom attribute type, to be
+ *   used for special data types by client applications. The R and
+ *   Python interfaces use this for attributes that hold R or Python
+ *   objects. Usually ignored by igraph functions.
  */
-typedef enum { IGRAPH_ATTRIBUTE_DEFAULT = 0,
+typedef enum { IGRAPH_ATTRIBUTE_UNSPECIFIED = 0,
+               IGRAPH_ATTRIBUTE_DEFAULT IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_ATTRIBUTE_UNSPECIFIED,
                IGRAPH_ATTRIBUTE_NUMERIC = 1,
-               IGRAPH_ATTRIBUTE_BOOLEAN = 5,
-               IGRAPH_ATTRIBUTE_STRING = 2,
-               IGRAPH_ATTRIBUTE_R_OBJECT = 3,
-               IGRAPH_ATTRIBUTE_PY_OBJECT = 4
+               IGRAPH_ATTRIBUTE_BOOLEAN = 2,
+               IGRAPH_ATTRIBUTE_STRING = 3,
+               IGRAPH_ATTRIBUTE_OBJECT = 127
              } igraph_attribute_type_t;
 
 typedef struct igraph_attribute_record_t {
@@ -184,26 +193,27 @@ typedef struct igraph_attribute_combination_t {
 
 #define IGRAPH_NO_MORE_ATTRIBUTES ((const char*)0)
 
-IGRAPH_EXPORT int igraph_attribute_combination_init(igraph_attribute_combination_t *comb);
-IGRAPH_EXPORT int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...);
+IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_init(igraph_attribute_combination_t *comb);
+IGRAPH_EXPORT igraph_error_t igraph_attribute_combination(igraph_attribute_combination_t *comb, ...);
 IGRAPH_EXPORT void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb);
-IGRAPH_EXPORT int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
+IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
                                                    const char *name,
                                                    igraph_attribute_combination_type_t type,
                                                    igraph_function_pointer_t func);
-IGRAPH_EXPORT int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
+IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
                                                       const char *name);
-IGRAPH_EXPORT int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
+IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
                                                      const char *name,
                                                      igraph_attribute_combination_type_t *type,
                                                      igraph_function_pointer_t *func);
 
 /**
  * \struct igraph_attribute_table_t
- * \brief Table of functions to perform operations on attributes
+ * \brief Table of functions to perform operations on attributes.
  *
  * This type collects the functions defining an attribute handler.
  * It has the following members:
+ *
  * \member init This function is called whenever a new graph object is
  *    created, right after it is created but before any vertices or
  *    edges are added. It is supposed to set the \c attr member of the \c
@@ -277,58 +287,58 @@ IGRAPH_EXPORT int igraph_attribute_combination_query(const igraph_attribute_comb
  */
 
 typedef struct igraph_attribute_table_t {
-    int (*init)(igraph_t *graph, igraph_vector_ptr_t *attr);
-    void (*destroy)(igraph_t *graph);
-    int (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
-                igraph_bool_t va, igraph_bool_t ea);
-    int (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
-    int (*permute_vertices)(const igraph_t *graph,
-                            igraph_t *newgraph,
-                            const igraph_vector_t *idx);
-    int (*combine_vertices)(const igraph_t *graph,
-                            igraph_t *newgraph,
-                            const igraph_vector_ptr_t *merges,
-                            const igraph_attribute_combination_t *comb);
-    int (*add_edges)(igraph_t *graph, const igraph_vector_t *edges,
-                     igraph_vector_ptr_t *attr);
-    int (*permute_edges)(const igraph_t *graph,
-                         igraph_t *newgraph, const igraph_vector_t *idx);
-    int (*combine_edges)(const igraph_t *graph,
-                         igraph_t *newgraph,
-                         const igraph_vector_ptr_t *merges,
-                         const igraph_attribute_combination_t *comb);
-    int (*get_info)(const igraph_t *graph,
-                    igraph_strvector_t *gnames, igraph_vector_t *gtypes,
-                    igraph_strvector_t *vnames, igraph_vector_t *vtypes,
-                    igraph_strvector_t *enames, igraph_vector_t *etypes);
+    igraph_error_t (*init)(igraph_t *graph, igraph_vector_ptr_t *attr);
+    void           (*destroy)(igraph_t *graph);
+    igraph_error_t (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
+                           igraph_bool_t va, igraph_bool_t ea);
+    igraph_error_t (*add_vertices)(igraph_t *graph, igraph_integer_t nv, igraph_vector_ptr_t *attr);
+    igraph_error_t (*permute_vertices)(const igraph_t *graph,
+                                       igraph_t *newgraph,
+                                       const igraph_vector_int_t *idx);
+    igraph_error_t (*combine_vertices)(const igraph_t *graph,
+                                       igraph_t *newgraph,
+                                       const igraph_vector_int_list_t *merges,
+                                       const igraph_attribute_combination_t *comb);
+    igraph_error_t (*add_edges)(igraph_t *graph, const igraph_vector_int_t *edges,
+                                igraph_vector_ptr_t *attr);
+    igraph_error_t (*permute_edges)(const igraph_t *graph,
+                                    igraph_t *newgraph, const igraph_vector_int_t *idx);
+    igraph_error_t (*combine_edges)(const igraph_t *graph,
+                                    igraph_t *newgraph,
+                                    const igraph_vector_int_list_t *merges,
+                                    const igraph_attribute_combination_t *comb);
+    igraph_error_t (*get_info)(const igraph_t *graph,
+                               igraph_strvector_t *gnames, igraph_vector_int_t *gtypes,
+                               igraph_strvector_t *vnames, igraph_vector_int_t *vtypes,
+                               igraph_strvector_t *enames, igraph_vector_int_t *etypes);
     igraph_bool_t (*has_attr)(const igraph_t *graph, igraph_attribute_elemtype_t type,
                               const char *name);
-    int (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
-                   igraph_attribute_elemtype_t elemtype, const char *name);
-    int (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
-                                  igraph_vector_t *value);
-    int (*get_string_graph_attr)(const igraph_t *graph, const char *name,
-                                 igraph_strvector_t *value);
-    int (*get_bool_graph_attr)(const igraph_t *igraph, const char *name,
-                               igraph_vector_bool_t *value);
-    int (*get_numeric_vertex_attr)(const igraph_t *graph, const char *name,
-                                   igraph_vs_t vs,
-                                   igraph_vector_t *value);
-    int (*get_string_vertex_attr)(const igraph_t *graph, const char *name,
-                                  igraph_vs_t vs,
-                                  igraph_strvector_t *value);
-    int (*get_bool_vertex_attr)(const igraph_t *graph, const char *name,
-                                igraph_vs_t vs,
-                                igraph_vector_bool_t *value);
-    int (*get_numeric_edge_attr)(const igraph_t *graph, const char *name,
-                                 igraph_es_t es,
-                                 igraph_vector_t *value);
-    int (*get_string_edge_attr)(const igraph_t *graph, const char *name,
-                                igraph_es_t es,
-                                igraph_strvector_t *value);
-    int (*get_bool_edge_attr)(const igraph_t *graph, const char *name,
-                              igraph_es_t es,
-                              igraph_vector_bool_t *value);
+    igraph_error_t (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
+                              igraph_attribute_elemtype_t elemtype, const char *name);
+    igraph_error_t (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
+                                             igraph_vector_t *value);
+    igraph_error_t (*get_string_graph_attr)(const igraph_t *graph, const char *name,
+                                            igraph_strvector_t *value);
+    igraph_error_t (*get_bool_graph_attr)(const igraph_t *igraph, const char *name,
+                                          igraph_vector_bool_t *value);
+    igraph_error_t (*get_numeric_vertex_attr)(const igraph_t *graph, const char *name,
+                                              igraph_vs_t vs,
+                                              igraph_vector_t *value);
+    igraph_error_t (*get_string_vertex_attr)(const igraph_t *graph, const char *name,
+                                             igraph_vs_t vs,
+                                             igraph_strvector_t *value);
+    igraph_error_t (*get_bool_vertex_attr)(const igraph_t *graph, const char *name,
+                                           igraph_vs_t vs,
+                                           igraph_vector_bool_t *value);
+    igraph_error_t (*get_numeric_edge_attr)(const igraph_t *graph, const char *name,
+                                            igraph_es_t es,
+                                            igraph_vector_t *value);
+    igraph_error_t (*get_string_edge_attr)(const igraph_t *graph, const char *name,
+                                           igraph_es_t es,
+                                           igraph_strvector_t *value);
+    igraph_error_t (*get_bool_edge_attr)(const igraph_t *graph, const char *name,
+                                         igraph_es_t es,
+                                         igraph_vector_bool_t *value);
 } igraph_attribute_table_t;
 
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
@@ -356,57 +366,57 @@ IGRAPH_EXPORT igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const c
 IGRAPH_EXPORT const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
                                                 igraph_integer_t eid);
 
-IGRAPH_EXPORT int igraph_cattribute_VANV(const igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VANV(const igraph_t *graph, const char *name,
                                          igraph_vs_t vids, igraph_vector_t *result);
-IGRAPH_EXPORT int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EANV(const igraph_t *graph, const char *name,
                                          igraph_es_t eids, igraph_vector_t *result);
-IGRAPH_EXPORT int igraph_cattribute_VASV(const igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
                                          igraph_vs_t vids, igraph_strvector_t *result);
-IGRAPH_EXPORT int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EASV(const igraph_t *graph, const char *name,
                                          igraph_es_t eids, igraph_strvector_t *result);
-IGRAPH_EXPORT int igraph_cattribute_VABV(const igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VABV(const igraph_t *graph, const char *name,
                                          igraph_vs_t vids, igraph_vector_bool_t *result);
-IGRAPH_EXPORT int igraph_cattribute_EABV(const igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const char *name,
                                          igraph_es_t eids, igraph_vector_bool_t *result);
 
-IGRAPH_EXPORT int igraph_cattribute_list(const igraph_t *graph,
-                                         igraph_strvector_t *gnames, igraph_vector_t *gtypes,
-                                         igraph_strvector_t *vnames, igraph_vector_t *vtypes,
-                                         igraph_strvector_t *enames, igraph_vector_t *etypes);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_list(const igraph_t *graph,
+                                         igraph_strvector_t *gnames, igraph_vector_int_t *gtypes,
+                                         igraph_strvector_t *vnames, igraph_vector_int_t *vtypes,
+                                         igraph_strvector_t *enames, igraph_vector_int_t *etypes);
 IGRAPH_EXPORT igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
                                                        igraph_attribute_elemtype_t type,
                                                        const char *name);
 
-IGRAPH_EXPORT int igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
                                             igraph_real_t value);
-IGRAPH_EXPORT int igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_GAB_set(igraph_t *graph, const char *name,
                                             igraph_bool_t value);
-IGRAPH_EXPORT int igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
                                             const char *value);
-IGRAPH_EXPORT int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
                                             igraph_integer_t vid, igraph_real_t value);
-IGRAPH_EXPORT int igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
                                             igraph_integer_t vid, igraph_bool_t value);
-IGRAPH_EXPORT int igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
                                             igraph_integer_t vid, const char *value);
-IGRAPH_EXPORT int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
                                             igraph_integer_t eid, igraph_real_t value);
-IGRAPH_EXPORT int igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
                                             igraph_integer_t eid, igraph_bool_t value);
-IGRAPH_EXPORT int igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
                                             igraph_integer_t eid, const char *value);
 
-IGRAPH_EXPORT int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
                                              const igraph_vector_t *v);
-IGRAPH_EXPORT int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
                                              const igraph_vector_bool_t *v);
-IGRAPH_EXPORT int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
                                              const igraph_strvector_t *sv);
-IGRAPH_EXPORT int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
                                              const igraph_vector_t *v);
-IGRAPH_EXPORT int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
                                              const igraph_vector_bool_t *v);
-IGRAPH_EXPORT int igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
                                              const igraph_strvector_t *sv);
 
 IGRAPH_EXPORT void igraph_cattribute_remove_g(igraph_t *graph, const char *name);

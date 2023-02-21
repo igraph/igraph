@@ -2,9 +2,9 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t result;
     igraph_vector_t weights;
@@ -45,8 +45,8 @@ int main() {
     igraph_destroy(&g);
 
     /* degree-one vertices */
-    igraph_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
-    igraph_vector_init_seq(&weights, 1, igraph_ecount(&g));
+    igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&g) + 1);
 
     printf("Tree (having degree-one vertices):\n");
     igraph_diversity(&g, &weights, &result, igraph_vss_all());

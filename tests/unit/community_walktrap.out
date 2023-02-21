@@ -27,16 +27,17 @@ Membership: ( 0 0 1 )
 Small weighted graph
 
 Merges:
-[        0        1
-         3        4
-         2        6
-         5        7
-         8        9 ]
-Modularity: ( -0.181973 -0.00623583 0.169501 0.310941 0.452381 0 )
-Membership: ( 1 1 1 0 0 0 )
+[        3        4
+         1        2
+         0        5
+         7        8
+         6        9 ]
+Modularity: ( -0.196145 -0.0895692 -0.0147392 0.146259 0.122449 0 )
+Membership: ( 0 1 1 2 2 0 )
 
 Isolated vertices
 
 Merges:
+[ 0-by-2 ]
 Modularity: ( NaN )
 Membership: ( 0 1 2 3 4 )

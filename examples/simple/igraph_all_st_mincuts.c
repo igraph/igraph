@@ -25,21 +25,20 @@
 
 int print_and_destroy(igraph_t *g,
                       igraph_real_t value,
-                      igraph_vector_ptr_t *partitions,
-                      igraph_vector_ptr_t *cuts) {
-    long int i, e, m, n = igraph_vector_ptr_size(partitions);
-    printf("Found %li cuts, value: %g\n", n, value);
+                      igraph_vector_int_list_t *partitions,
+                      igraph_vector_int_list_t *cuts) {
+    igraph_integer_t i, e, m, n = igraph_vector_int_list_size(partitions);
+    printf("Found %" IGRAPH_PRId " cuts, value: %g\n", n, value);
     for (i = 0; i < n; i++) {
-        igraph_vector_t *vec = VECTOR(*partitions)[i];
-        igraph_vector_t *vec2 = cuts ? VECTOR(*cuts)[i] : 0;
-        printf("Partition %li: ", i);
-        igraph_vector_print(vec);
+        igraph_vector_int_t *vec = igraph_vector_int_list_get_ptr(partitions, i);
+        igraph_vector_int_t *vec2 = cuts ? igraph_vector_int_list_get_ptr(cuts, i) : 0;
+        printf("Partition %" IGRAPH_PRId ": ", i);
+        igraph_vector_int_print(vec);
         if (vec2) {
-            printf("Cut %li:\n", i);
-            m = igraph_vector_size(vec2);
+            printf("Cut %" IGRAPH_PRId ":\n", i);
+            m = igraph_vector_int_size(vec2);
             for (e = 0; e < m; e++) {
-                igraph_integer_t from, to;
-                igraph_edge(g, VECTOR(*vec2)[e], &from, &to);
+                igraph_integer_t from = IGRAPH_FROM(g, VECTOR(*vec2)[e]), to = IGRAPH_TO(g, VECTOR(*vec2)[e]);
                 if (igraph_is_directed(g)) {
                     printf("  %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n", from, to);
                 } else {
@@ -47,38 +46,30 @@ int print_and_destroy(igraph_t *g,
                 }
             }
         }
-
-        igraph_vector_destroy(vec);
-        if (vec2) {
-            igraph_vector_destroy(vec2);
-        }
-        igraph_free(vec);
-        if (vec2) {
-            igraph_free(vec2);
-        }
     }
-    igraph_vector_ptr_destroy(partitions);
+
+    igraph_vector_int_list_destroy(partitions);
     if (cuts) {
-        igraph_vector_ptr_destroy(cuts);
+        igraph_vector_int_list_destroy(cuts);
     }
     printf("\n");
 
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
-    igraph_vector_ptr_t partitions;
-    igraph_vector_ptr_t cuts;
+    igraph_vector_int_list_t partitions;
+    igraph_vector_int_list_t cuts;
     igraph_real_t value;
 
     igraph_small(&g, 5, IGRAPH_DIRECTED,
                  0, 1, 1, 2, 2, 3, 3, 4,
                  -1);
 
-    igraph_vector_ptr_init(&partitions, 0);
-    igraph_vector_ptr_init(&cuts, 0);
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 0, /*target=*/ 4,
                           /*capacity=*/ 0);
@@ -89,8 +80,8 @@ int main() {
     /* ---------------------------------------------------------------- */
 
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 3, 2, 4, 3, 4, 4, 5, -1);
-    igraph_vector_ptr_init(&partitions, 0);
-    igraph_vector_ptr_init(&cuts, 0);
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 0, /*target=*/ 5, /*capacity=*/ 0);
 
@@ -100,8 +91,8 @@ int main() {
     /* ---------------------------------------------------------------- */
 
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 3, 2, 4, 3, 4, 4, 5, -1);
-    igraph_vector_ptr_init(&partitions, 0);
-    igraph_vector_ptr_init(&cuts, 0);
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 0, /*target=*/ 4, /*capacity=*/ 0);
 
@@ -113,8 +104,8 @@ int main() {
     igraph_small(&g, 9, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 3, 2, 3,
                  1, 4, 4, 2, 1, 5, 5, 2, 1, 6, 6, 2, 1, 7, 7, 2, 1, 8, 8, 2,
                  -1);
-    igraph_vector_ptr_init(&partitions, 0);
-    igraph_vector_ptr_init(&cuts, 0);
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 0, /*target=*/ 3, /*capacity=*/ 0);
 
@@ -126,8 +117,8 @@ int main() {
                  1, 0, 2, 0, 2, 1, 3, 2,
                  -1);
 
-    igraph_vector_ptr_init(&partitions, 0);
-    igraph_vector_ptr_init(&cuts, 0);
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 2, /*target=*/ 0, /*capacity=*/ 0);
 
@@ -139,8 +130,8 @@ int main() {
                  1, 0, 2, 0, 2, 1, 2, 3,
                  -1);
 
-    igraph_vector_ptr_init(&partitions, 0);
-    igraph_vector_ptr_init(&cuts, 0);
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 2, /*target=*/ 0, /*capacity=*/ 0);
 
@@ -153,8 +144,8 @@ int main() {
                  4, 5,  5, 0,  5, 3,  6, 7,  7, 8,
                  -1);
 
-    igraph_vector_ptr_init(&partitions, 0);
-    igraph_vector_ptr_init(&cuts, 0);
+    igraph_vector_int_list_init(&partitions, 0);
+    igraph_vector_int_list_init(&cuts, 0);
     igraph_all_st_mincuts(&g, &value, &cuts, &partitions,
                           /*source=*/ 0, /*target=*/ 8, /*capacity=*/ 0);
 

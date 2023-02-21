@@ -25,412 +25,407 @@
 #include "igraph_structural.h"
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 #include <math.h>
 
-static int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-                                       igraph_sparsemat_t *sparseres,
-                                       igraph_bool_t normalized,
-                                       const igraph_vector_t *weights) {
+static igraph_error_t igraph_i_laplacian_validate_weights(
+    const igraph_t* graph,  const igraph_vector_t* weights
+) {
+    igraph_integer_t no_of_edges;
 
-    igraph_eit_t edgeit;
-    int no_of_nodes = (int) igraph_vcount(graph);
-    int no_of_edges = (int) igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_vector_t degree;
-    long int i;
+    if (weights == NULL) {
+        return IGRAPH_SUCCESS;
+    }
+
+    no_of_edges = igraph_ecount(graph);
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
-    if (res) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
-        igraph_matrix_null(res);
-    }
-    if (sparseres) {
-        int nz = directed ? no_of_edges + no_of_nodes :
-                 no_of_edges * 2 + no_of_nodes;
-        igraph_sparsemat_resize(sparseres, no_of_nodes, no_of_nodes, nz);
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
+        } else if (isnan(minweight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+        }
     }
 
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
-    IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_get_laplacian
+ * \brief Returns the Laplacian matrix of a graph.
+ *
+ * The Laplacian matrix \c L of a graph is defined as
+ * <code>L_ij = - A_ij</code> when <code>i != j</code> and
+ * <code>L_ii = d_i - A_ii</code>. Here \c A denotes the (possibly weighted)
+ * adjacency matrix and <code>d_i</code> is the degree (or strength, if weighted)
+ * of vertex \c i. In directed graphs, the \p mode parameter controls whether to use
+ * out- or in-degrees. Correspondingly, the rows or columns will sum to zero.
+ * In undirected graphs, <code>A_ii</code> is taken to be \em twice the number
+ * (or total weight) of self-loops, ensuring that <code>d_i = \sum_j A_ij</code>.
+ * Thus, the Laplacian of an undirected graph is the same as the Laplacian
+ * of a directed one obtained by replacing each undirected edge with two reciprocal
+ * directed ones.
+ *
+ * </para><para>
+ * More compactly, <code>L = D - A</code> where the \c D is a diagonal matrix
+ * containing the degrees. The Laplacian matrix can also be normalized, with several
+ * conventional normalization methods. See \ref igraph_laplacian_normalization_t for
+ * the methods available in igraph.
+ *
+ * </para><para>
+ * The first version of this function was written by Vincent Matossian.
+ *
+ * \param graph Pointer to the graph to convert.
+ * \param res Pointer to an initialized matrix object, the result is
+ *        stored here. It will be resized if needed.
+ * \param mode Controls whether to use out- or in-degrees in directed graphs.
+ *        If set to \c IGRAPH_ALL, edge directions will be ignored.
+ * \param normalization The normalization method to use when calculating the
+ *        Laplacian matrix. See \ref igraph_laplacian_normalization_t for
+ *        possible values.
+ * \param weights An optional vector containing non-negative edge weights,
+ *        to calculate the weighted Laplacian matrix. Set it to a null pointer to
+ *        calculate the unweighted Laplacian.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|^2), |V| is the number of vertices in the graph.
+ *
+ * \example examples/simple/igraph_get_laplacian.c
+ */
+
+igraph_error_t igraph_get_laplacian(
+    const igraph_t *graph, igraph_matrix_t *res, igraph_neimode_t mode,
+    igraph_laplacian_normalization_t normalization,
+    const igraph_vector_t *weights
+) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_vector_t degree;
+    igraph_integer_t i;
+
+    IGRAPH_ASSERT(res != NULL);
+
+    IGRAPH_CHECK(igraph_i_laplacian_validate_weights(graph, weights));
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
+    igraph_matrix_null(res);
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
 
-    if (directed) {
+    /* Value of 'mode' is validated in igraph_strength() call above. */
+    if (! directed) {
+        mode = IGRAPH_ALL;
+    } else if (mode == IGRAPH_ALL) {
+        directed = 0;
+    }
 
-        if (!normalized) {
+    for (i = 0; i < no_of_nodes; i++) {
+        switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            MATRIX(*res, i, i) = VECTOR(degree)[i];
+            break;
 
-            while (!IGRAPH_EIT_END(edgeit)) {
-                long int edge = IGRAPH_EIT_GET(edgeit);
-                long int from = IGRAPH_FROM(graph, edge);
-                long int to  = IGRAPH_TO  (graph, edge);
-                igraph_real_t weight = VECTOR(*weights)[edge];
-                if (from != to) {
-                    if (res) {
-                        MATRIX(*res, from, to) -= weight;
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int)to,
-                                                            -weight));
-                    }
-                    VECTOR(degree)[from] += weight;
-                }
-                IGRAPH_EIT_NEXT(edgeit);
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            if (VECTOR(degree)[i] > 0) {
+                MATRIX(*res, i, i) = 1;
+                VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
             }
+            break;
 
-            /* And the diagonal */
-            for (i = 0; i < no_of_nodes; i++) {
-                if (res) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i,
-                                                        VECTOR(degree)[i]));
-                }
+        case IGRAPH_LAPLACIAN_LEFT:
+        case IGRAPH_LAPLACIAN_RIGHT:
+            if (VECTOR(degree)[i] > 0) {
+                MATRIX(*res, i, i) = 1;
+                VECTOR(degree)[i] = 1.0 / VECTOR(degree)[i];
             }
+            break;
 
-        } else { /* normalized */
-
-            while (!IGRAPH_EIT_END(edgeit)) {
-                long int edge = IGRAPH_EIT_GET(edgeit);
-                long int from = IGRAPH_FROM(graph, edge);
-                long int to  = IGRAPH_TO  (graph, edge);
-                igraph_real_t weight = VECTOR(*weights)[edge];
-                if (from != to) {
-                    VECTOR(degree)[from] += weight;
-                }
-                IGRAPH_EIT_NEXT(edgeit);
-            }
-
-            for (i = 0; i < no_of_nodes; i++) {
-                int t = VECTOR(degree)[i] > 0 ? 1 : 0;
-                if (res) {
-                    MATRIX(*res, i, i) = t;
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i, t));
-                }
-            }
-
-            IGRAPH_EIT_RESET(edgeit);
-            while (!IGRAPH_EIT_END(edgeit)) {
-                long int edge = IGRAPH_EIT_GET(edgeit);
-                long int from = IGRAPH_FROM(graph, edge);
-                long int to  = IGRAPH_TO  (graph, edge);
-                igraph_real_t weight = VECTOR(*weights)[edge];
-                if (from != to) {
-                    igraph_real_t t = weight / VECTOR(degree)[from];
-                    if (res) {
-                        MATRIX(*res, from, to) -= t;
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int) to,
-                                                            -t));
-                    }
-                }
-                IGRAPH_EIT_NEXT(edgeit);
-            }
-
+        default:
+            IGRAPH_ERROR("Invalid Laplacian normalization method.", IGRAPH_EINVAL);
         }
+    }
 
-    } else { /* undirected */
+    for (i = 0; i < no_of_edges; i++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to   = IGRAPH_TO(graph, i);
+        igraph_real_t weight  = weights ? VECTOR(*weights)[i] : 1.0;
+        igraph_real_t norm;
 
-        if (!normalized) {
-
-            while (!IGRAPH_EIT_END(edgeit)) {
-                long int edge = IGRAPH_EIT_GET(edgeit);
-                long int from = IGRAPH_FROM(graph, edge);
-                long int to  = IGRAPH_TO  (graph, edge);
-                igraph_real_t weight = VECTOR(*weights)[edge];
-                if (from != to) {
-                    if (res) {
-                        MATRIX(*res, from, to) -= weight;
-                        MATRIX(*res, to, from) -= weight;
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int) to,
-                                                            -weight));
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) to, (int) from,
-                                                            -weight));
-                    }
-                    VECTOR(degree)[from] += weight;
-                    VECTOR(degree)[to] += weight;
-                }
-                IGRAPH_EIT_NEXT(edgeit);
+        switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            MATRIX(*res, from, to) -= weight;
+            if (!directed) {
+                MATRIX(*res, to, from) -= weight;
             }
+            break;
 
-            /* And the diagonal */
-            for (i = 0; i < no_of_nodes; i++) {
-                if (res) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i,
-                                                        VECTOR(degree)[i]));
-                }
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            norm = VECTOR(degree)[from] * VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero %s-%s, "
+                    "cannot perform symmetric normalization of Laplacian with '%s' mode.",
+                    IGRAPH_EINVAL,
+                    mode == IGRAPH_OUT ? "out" : "in", weights ? "strength" : "degree", mode == IGRAPH_OUT ? "out" : "in");
             }
-
-        } else { /* normalized */
-
-            while (!IGRAPH_EIT_END(edgeit)) {
-                long int edge = IGRAPH_EIT_GET(edgeit);
-                long int from = IGRAPH_FROM(graph, edge);
-                long int to  = IGRAPH_TO  (graph, edge);
-                igraph_real_t weight = VECTOR(*weights)[edge];
-                if (from != to) {
-                    VECTOR(degree)[from] += weight;
-                    VECTOR(degree)[to] += weight;
-                }
-                IGRAPH_EIT_NEXT(edgeit);
+            weight *= norm;
+            MATRIX(*res, from, to) -= weight;
+            if (!directed) {
+                MATRIX(*res, to, from) -= weight;
             }
+            break;
 
-            for (i = 0; i < no_of_nodes; i++) {
-                int t = VECTOR(degree)[i] > 0 ? 1 : 0;
-                if (res) {
-                    MATRIX(*res, i, i) = t;
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) i, (int) i, t));
-                }
-                VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
+        case IGRAPH_LAPLACIAN_LEFT:
+            norm = VECTOR(degree)[from];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero in-%s, "
+                    "cannot perform left stochastic normalization of Laplacian with 'in' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
             }
-
-            IGRAPH_EIT_RESET(edgeit);
-            while (!IGRAPH_EIT_END(edgeit)) {
-                long int edge = IGRAPH_EIT_GET(edgeit);
-                long int from = IGRAPH_FROM(graph, edge);
-                long int to  = IGRAPH_TO  (graph, edge);
-                igraph_real_t weight = VECTOR(*weights)[edge];
-                if (from != to) {
-                    double diff = weight / (VECTOR(degree)[from] * VECTOR(degree)[to]);
-                    if (res) {
-                        MATRIX(*res, from, to) -= diff;
-                        MATRIX(*res, to, from) -= diff;
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) from, (int) to,
-                                                            -diff));
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (int) to, (int) from,
-                                                            -diff));
-                    }
-                }
-                IGRAPH_EIT_NEXT(edgeit);
+            MATRIX(*res, from, to) -= weight * norm;
+            if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
+                MATRIX(*res, to, from) -= weight * VECTOR(degree)[to];
             }
+            break;
 
+        case IGRAPH_LAPLACIAN_RIGHT:
+            norm = VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero out-%s, "
+                    "cannot perform right stochastic normalization of Laplacian with 'out' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
+            }
+            MATRIX(*res, from, to) -= weight * norm;
+            if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
+                MATRIX(*res, to, from) -= weight * VECTOR(degree)[from];
+            }
+            break;
         }
-
     }
 
     igraph_vector_destroy(&degree);
-    igraph_eit_destroy(&edgeit);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_get_laplacian_sparse
+ * \brief Returns the Laplacian of a graph in a sparse matrix format.
+ *
+ * See \ref igraph_get_laplacian() for the definition of the Laplacian matrix.
+ *
+ * </para><para>
+ * The first version of this function was written by Vincent Matossian.
+ *
+ * \param graph Pointer to the graph to convert.
+ * \param sparseres Pointer to an initialized sparse matrix object, the
+ *        result is stored here.
+ * \param mode Controls whether to use out- or in-degrees in directed graphs.
+ *        If set to \c IGRAPH_ALL, edge directions will be ignored.
+ * \param normalization The normalization method to use when calculating the
+ *        Laplacian matrix. See \ref igraph_laplacian_normalization_t for
+ *        possible values.
+ * \param weights An optional vector containing non-negative edge weights,
+ *        to calculate the weighted Laplacian matrix. Set it to a null pointer to
+ *        calculate the unweighted Laplacian.
+ * \return Error code.
+ *
+ * Time complexity: O(|E|), |E| is the number of edges in the graph.
+ *
+ * \example examples/simple/igraph_get_laplacian_sparse.c
+ */
+
+igraph_error_t igraph_get_laplacian_sparse(
+    const igraph_t *graph, igraph_sparsemat_t *sparseres, igraph_neimode_t mode,
+    igraph_laplacian_normalization_t normalization,
+    const igraph_vector_t *weights
+) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_vector_t degree;
+    igraph_integer_t i;
+    igraph_integer_t nz;
+
+    if (directed) {
+        IGRAPH_SAFE_ADD(no_of_edges, no_of_nodes, &nz);
+    } else {
+        IGRAPH_SAFE_ADD(no_of_edges * 2, no_of_nodes, &nz);
+    }
+
+    IGRAPH_ASSERT(sparseres != NULL);
+
+    IGRAPH_CHECK(igraph_i_laplacian_validate_weights(graph, weights));
+
+    IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes, no_of_nodes, nz));
+
+    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), mode, IGRAPH_LOOPS, weights));
+
+    for (i = 0; i < no_of_nodes; i++) {
+        switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, VECTOR(degree)[i]));
+            break;
+
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            if (VECTOR(degree)[i] > 0) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
+                VECTOR(degree)[i] = 1.0 / sqrt(VECTOR(degree)[i]);
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_LEFT:
+        case IGRAPH_LAPLACIAN_RIGHT:
+            if (VECTOR(degree)[i] > 0) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, 1));
+                VECTOR(degree)[i] = 1.0 / VECTOR(degree)[i];
+            }
+            break;
+
+        default:
+            IGRAPH_ERROR("Invalid Laplacian normalization method.", IGRAPH_EINVAL);
+        }
+    }
+
+    for (i = 0; i < no_of_edges; i++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, i);
+        igraph_integer_t to   = IGRAPH_TO(graph, i);
+        igraph_real_t weight  = weights ? VECTOR(*weights)[i] : 1.0;
+        igraph_real_t norm;
+
+        switch (normalization) {
+        case IGRAPH_LAPLACIAN_UNNORMALIZED:
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight));
+            if (!directed) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight));
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_SYMMETRIC:
+            norm = VECTOR(degree)[from] * VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero %s-%s, "
+                    "cannot perform symmetric normalization of Laplacian with '%s' mode.",
+                    IGRAPH_EINVAL,
+                    mode == IGRAPH_OUT ? "out" : "in", weights ? "strength" : "degree", mode == IGRAPH_OUT ? "out" : "in");
+            }
+            weight *= norm;
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight));
+            if (!directed) {
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight));
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_LEFT:
+            norm = VECTOR(degree)[from];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero in-%s, "
+                    "cannot perform left stochastic normalization of Laplacian with 'in' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
+            }
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight * norm));
+            if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight * VECTOR(degree)[to]));
+            }
+            break;
+
+        case IGRAPH_LAPLACIAN_RIGHT:
+            norm = VECTOR(degree)[to];
+            if (norm == 0 && weight != 0) {
+                IGRAPH_ERRORF(
+                    "Found non-isolated vertex with zero out-%s, "
+                    "cannot perform right stochastic normalization of Laplacian with 'out' mode.",
+                    IGRAPH_EINVAL,
+                    weights ? "strength" : "degree");
+            }
+            IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -weight * norm));
+            if (!directed) {
+                /* no failure possible in undirected case, as zero degrees occur only for isolated vertices */
+                IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -weight * VECTOR(degree)[from]));
+            }
+            break;
+        }
+    }
+
+    igraph_vector_destroy(&degree);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_laplacian
- * \brief Returns the Laplacian matrix of a graph
+ * \brief Returns the Laplacian matrix of a graph (deprecated).
  *
- * </para><para>
- * The graph Laplacian matrix is similar to an adjacency matrix but
- * contains -1's instead of 1's and the vertex degrees are included in
- * the diagonal. So the result for edge i--j is -1 if i!=j and is equal
- * to the degree of vertex i if i==j. igraph_laplacian will work on a
- * directed graph; in this case, the diagonal will contain the out-degrees.
- * Loop edges will be ignored.
+ * This function produces the Laplacian matrix of a graph in either dense or
+ * sparse format. When \p normalized is set to true, the type of normalization
+ * used depends on the directnedness of the graph: symmetric normalization
+ * is used for undirected graphs and left stochastic normalization for
+ * directed graphs.
  *
- * </para><para>
- * The normalized version of the Laplacian matrix has 1 in the diagonal and
- * -1/sqrt(d[i]d[j]) if there is an edge from i to j.
- *
- * </para><para>
- * The first version of this function was written by Vincent Matossian.
  * \param graph Pointer to the graph to convert.
- * \param res Pointer to an initialized matrix object, the result is
- *        stored here. It will be resized if needed.
- *        If it is a null pointer, then it is ignored.
- *        At least one of \p res and \p sparseres must be a non-null pointer.
- * \param sparseres Pointer to an initialized sparse matrix object, the
- *        result is stored here, if it is not a null pointer.
- *        At least one of \p res and \p sparseres must be a non-null pointer.
- * \param normalized Whether to create a normalized Laplacian matrix.
- * \param weights An optional vector containing edge weights, to calculate
- *        the weighted Laplacian matrix. Set it to a null pointer to
+ * \param res Pointer to an initialized matrix object or \c NULL. The dense matrix
+ *        result will be stored here.
+ * \param sparseres Pointer to an initialized sparse matrix object or \c NULL.
+ *        The sparse matrix result will be stored here.
+ * \param mode Controls whether to use out- or in-degrees in directed graphs.
+ *        If set to \c IGRAPH_ALL, edge directions will be ignored.
+ * \param normalized Boolean, whether to normalize the result.
+ * \param weights An optional vector containing non-negative edge weights,
+ *        to calculate the weighted Laplacian matrix. Set it to a null pointer to
  *        calculate the unweighted Laplacian.
  * \return Error code.
  *
- * Time complexity: O(|V||V|),
- * |V| is the
- * number of vertices in the graph.
- *
- * \example examples/simple/igraph_laplacian.c
+ * \deprecated-by igraph_get_laplacian 0.10.0
  */
 
-int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-                     igraph_sparsemat_t *sparseres,
-                     igraph_bool_t normalized,
-                     const igraph_vector_t *weights) {
-
-    igraph_eit_t edgeit;
-    int no_of_nodes = (int) igraph_vcount(graph);
-    int no_of_edges = (int) igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
-    int from, to;
-    igraph_integer_t ffrom, fto;
-    igraph_vector_t degree;
-    int i;
+igraph_error_t igraph_laplacian(
+    const igraph_t *graph, igraph_matrix_t *res, igraph_sparsemat_t *sparseres,
+    igraph_bool_t normalized, const igraph_vector_t *weights
+) {
+    igraph_laplacian_normalization_t norm_method = IGRAPH_LAPLACIAN_UNNORMALIZED;
 
     if (!res && !sparseres) {
-        IGRAPH_ERROR("Laplacian: give at least one of `res' or `sparseres'",
+        IGRAPH_ERROR("Laplacian: specify at least one of 'res' or 'sparseres'",
                      IGRAPH_EINVAL);
     }
 
-    if (weights) {
-        return igraph_i_weighted_laplacian(graph, res, sparseres, normalized,
-                                           weights);
+    if (normalized) {
+        if (igraph_is_directed(graph)) {
+            norm_method = IGRAPH_LAPLACIAN_LEFT;
+        } else {
+            norm_method = IGRAPH_LAPLACIAN_SYMMETRIC;
+        }
     }
 
     if (res) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
-        igraph_matrix_null(res);
+        IGRAPH_CHECK(igraph_get_laplacian(graph, res, IGRAPH_OUT, norm_method, weights));
     }
+
     if (sparseres) {
-        int nz = directed ? no_of_edges + no_of_nodes :
-                 no_of_edges * 2 + no_of_nodes;
-        IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes,
-                                             no_of_nodes, nz));
-    }
-    IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
-    IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
-
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-                               IGRAPH_OUT, IGRAPH_NO_LOOPS));
-
-    if (directed) {
-        if (!normalized) {
-            for (i = 0; i < no_of_nodes; i++) {
-                if (res) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i,
-                                                        VECTOR(degree)[i]));
-                }
-            }
-            while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-                from = ffrom;
-                to = fto;
-                if (from != to) {
-                    if (res) {
-                        MATRIX(*res, from, to) -= 1;
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -1.0));
-                    }
-                }
-                IGRAPH_EIT_NEXT(edgeit);
-            }
-        } else {
-            for (i = 0; i < no_of_nodes; i++) {
-                int t = VECTOR(degree)[i] > 0 ? 1 : 0;
-                if (res) {
-                    MATRIX(*res, i, i) = t;
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, t));
-                }
-                if (VECTOR(degree)[i] > 0) {
-                    VECTOR(degree)[i] = 1.0 / VECTOR(degree)[i];
-                }
-            }
-
-            while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-                from = ffrom; to = fto;
-                if (from != to) {
-                    if (res) {
-                        MATRIX(*res, from, to) -= VECTOR(degree)[from];
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to,
-                                                            -VECTOR(degree)[from]));
-                    }
-                }
-                IGRAPH_EIT_NEXT(edgeit);
-            }
-        }
-
-    } else {
-
-        if (!normalized) {
-            for (i = 0; i < no_of_nodes; i++) {
-                if (res) {
-                    MATRIX(*res, i, i) = VECTOR(degree)[i];
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i,
-                                                        VECTOR(degree)[i]));
-                }
-            }
-
-            while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-                from = ffrom;
-                to = fto;
-
-                if (from != to) {
-                    if (res) {
-                        MATRIX(*res, to, from) -= 1;
-                        MATRIX(*res, from, to) -= 1;
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -1.0));
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -1.0));
-                    }
-                }
-
-                IGRAPH_EIT_NEXT(edgeit);
-            }
-        } else {
-            for (i = 0; i < no_of_nodes; i++) {
-                int t = VECTOR(degree)[i] > 0 ? 1 : 0;
-                if (res) {
-                    MATRIX(*res, i, i) = t;
-                }
-                if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, i, i, t));
-                }
-                VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
-            }
-
-            while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-                from = ffrom; to = fto;
-                if (from != to) {
-                    double diff = 1.0 / (VECTOR(degree)[from] * VECTOR(degree)[to]);
-                    if (res) {
-                        MATRIX(*res, from, to) -= diff;
-                        MATRIX(*res, to, from) -= diff;
-                    }
-                    if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, from, to, -diff));
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, to, from, -diff));
-                    }
-                }
-                IGRAPH_EIT_NEXT(edgeit);
-            }
-        }
-
+        IGRAPH_CHECK(igraph_get_laplacian_sparse(graph, sparseres, IGRAPH_OUT, norm_method, weights));
     }
 
-    igraph_vector_destroy(&degree);
-    igraph_eit_destroy(&edgeit);
-    IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

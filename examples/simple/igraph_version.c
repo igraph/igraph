@@ -24,14 +24,14 @@
 #include <igraph.h>
 #include <string.h>
 
-int main() {
+int main(void) {
 
     char tmp[100];
     const char *string;
     int major, minor, subminor;
 
     igraph_version(&string, &major, &minor, &subminor);
-    sprintf(tmp, "%i.%i.%i", major, minor, subminor);
+    snprintf(tmp, sizeof(tmp), "%i.%i.%i", major, minor, subminor);
 
     if (strncmp(string, tmp, strlen(tmp))) {
         return 1;

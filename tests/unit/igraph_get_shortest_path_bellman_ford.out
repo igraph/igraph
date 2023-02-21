@@ -1,0 +1,5 @@
+Basic example, don't ask for vertices and edges.
+Basic example, ask for vertices and edges:
+vertices: ( 0 1 )
+edges: ( 0 )
+Check error when passing null graph.

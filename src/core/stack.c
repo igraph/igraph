@@ -21,7 +21,6 @@
 
 */
 
-#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_stack.h"
 
@@ -30,12 +29,6 @@
 #include "stack.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
-
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "stack.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
 
 #define BASE_INT
 #include "igraph_pmt.h"
@@ -54,35 +47,3 @@
 #include "stack.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
-
-#define BASE_PTR
-#include "igraph_pmt.h"
-#include "stack.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_PTR
-
-/**
- * \ingroup stack
- * \brief Calls free() on all elements of a pointer stack.
- */
-
-void igraph_stack_ptr_free_all(igraph_stack_ptr_t* v) {
-    void **ptr;
-    IGRAPH_ASSERT(v != 0);
-    IGRAPH_ASSERT(v->stor_begin != 0);
-    for (ptr = v->stor_begin; ptr < v->end; ptr++) {
-        IGRAPH_FREE(*ptr);
-    }
-}
-
-/**
- * \ingroup stack
- * \brief Calls free() on all elements and destroys the stack.
- */
-
-void igraph_stack_ptr_destroy_all(igraph_stack_ptr_t* v) {
-    IGRAPH_ASSERT(v != 0);
-    IGRAPH_ASSERT(v->stor_begin != 0);
-    igraph_stack_ptr_free_all(v);
-    igraph_stack_ptr_destroy(v);
-}

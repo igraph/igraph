@@ -24,6 +24,7 @@
 #define IGRAPH_LAYOUT_MERGE_GRID_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 
 __BEGIN_DECLS
@@ -31,26 +32,26 @@ __BEGIN_DECLS
 /* A type of grid used for merging layouts; each cell is owned by exactly one graph */
 
 typedef struct igraph_i_layout_mergegrid_t {
-    long int *data;
-    long int stepsx, stepsy;
+    igraph_integer_t *data;
+    igraph_integer_t stepsx, stepsy;
     igraph_real_t minx, maxx, deltax;
     igraph_real_t miny, maxy, deltay;
 } igraph_i_layout_mergegrid_t;
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
-                                                         igraph_real_t minx, igraph_real_t maxx, long int stepsx,
-                                                         igraph_real_t miny, igraph_real_t maxy, long int stepsy);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+                                                                    igraph_real_t minx, igraph_real_t maxx, igraph_integer_t stepsx,
+                                                                    igraph_real_t miny, igraph_real_t maxy, igraph_integer_t stepsy);
 
 IGRAPH_PRIVATE_EXPORT void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid);
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
-                                                             igraph_real_t x, igraph_real_t y, igraph_real_t r,
-                                                             long int id);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+                                                                        igraph_real_t x, igraph_real_t y, igraph_real_t r,
+                                                                        igraph_integer_t id);
 
-long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
+igraph_integer_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y);
 
-long int igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
+igraph_integer_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
                                               igraph_real_t x, igraph_real_t y, igraph_real_t r);
 
 __END_DECLS

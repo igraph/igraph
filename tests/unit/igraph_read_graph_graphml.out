@@ -1,0 +1,67 @@
+Warning: Unknown attribute key 'd3' in a <data> tag, ignoring attribute.
+Directed graph:
+Vertices: 6
+Edges: 7
+Directed: 0
+0 1
+0 2
+1 3
+2 3
+2 4
+3 5
+4 5
+Vertex attribute 'gender': true true false true false false
+Vertex attribute 'color': 'green' 'yellow' 'blue' 'red "with entities"' 'yellow' 'turquoise'
+Warning: Unknown attribute key 'd3' in a <data> tag, ignoring attribute.
+Undirected graph:
+Vertices: 6
+Edges: 7
+Directed: 0
+0 1
+0 2
+1 3
+2 3
+2 4
+3 5
+4 5
+Vertex attribute 'gender': true true false true false false
+Vertex attribute 'color': 'green' 'yellow' 'blue' 'red "with entities"' 'yellow' 'turquoise'
+Graph with default attributes:
+Vertices: 3
+Edges: 2
+Directed: 1
+0 1
+0 2
+Vertex attribute 'type': false true true
+Vertex attribute 'gender': 'male' 'female' 'male'
+Vertex attribute 'age': 30 20 20
+Vertex attribute 'retired': false false false
+Graph with namespace:
+Vertices: 3
+Edges: 2
+Directed: 0
+0 1
+1 2
+Graph without namespace information:
+Vertices: 3
+Edges: 2
+Directed: 0
+0 1
+1 2
+Graph with whitespace in attributes:
+Vertices: 5
+Edges: 4
+Directed: 0
+0 1
+1 2
+1 3
+2 3
+Vertex attribute 'type': true false true true true
+Vertex attribute 'name': 'spam' '  ' '  ham' 'bacon  ' '  eggs '
+Vertex attribute 'weight': 1 NaN 3 4 5
+Graph from yEd:
+Vertices: 3
+Edges: 2
+Directed: 1
+1 0
+2 1

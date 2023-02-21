@@ -25,6 +25,7 @@
 #define IGRAPH_STATUSBAR_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 
 __BEGIN_DECLS
 
@@ -60,15 +61,17 @@ __BEGIN_DECLS
  * \param message The status message.
  * \param data Additional context, with user-defined semantics.
  *        Existing igraph functions pass a null pointer here.
+ * \return Error code. The current calculation will abort if you return anything
+ *         else than \c IGRAPH_SUCCESS here.
  */
 
-typedef int igraph_status_handler_t(const char *message, void *data);
+typedef igraph_error_t igraph_status_handler_t(const char *message, void *data);
 
 IGRAPH_EXPORT extern igraph_status_handler_t igraph_status_handler_stderr;
 
-IGRAPH_EXPORT igraph_status_handler_t * igraph_set_status_handler(igraph_status_handler_t new_handler);
+IGRAPH_EXPORT igraph_status_handler_t *igraph_set_status_handler(igraph_status_handler_t new_handler);
 
-IGRAPH_EXPORT int igraph_status(const char *message, void *data);
+IGRAPH_EXPORT igraph_error_t igraph_status(const char *message, void *data);
 
 /**
  * \define IGRAPH_STATUS
@@ -95,7 +98,7 @@ IGRAPH_EXPORT int igraph_status(const char *message, void *data);
         } \
     } while (0)
 
-IGRAPH_EXPORT int igraph_statusf(const char *message, void *data, ...);
+IGRAPH_EXPORT igraph_error_t igraph_statusf(const char *message, void *data, ...);
 
 /**
  * \define IGRAPH_STATUSF

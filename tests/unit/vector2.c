@@ -24,17 +24,17 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_vector_t v1, v2, v3;
     igraph_real_t min, max;
-    long int imin, imax;
+    igraph_integer_t imin, imax;
     int i;
 
-    igraph_vector_init_seq(&v1, 1, 10);
-    igraph_vector_init_seq(&v2, 0, 9);
+    igraph_vector_init_range(&v1, 1, 11);
+    igraph_vector_init_range(&v2, 0, 10);
 
     igraph_vector_swap(&v1, &v2);
     print_vector_format(&v1, stdout, "%g");
@@ -68,12 +68,12 @@ int main() {
 
     igraph_vector_minmax(&v1, &min, &max);
     igraph_vector_which_minmax(&v1, &imin, &imax);
-    printf("%g %g %li %li\n", min, max, imin, imax);
+    printf("%g %g %" IGRAPH_PRId " %" IGRAPH_PRId "\n", min, max, imin, imax);
 
     igraph_vector_destroy(&v1);
     igraph_vector_destroy(&v2);
 
-    igraph_vector_init_seq(&v1, 1, 10);
+    igraph_vector_init_range(&v1, 1, 11);
     igraph_vector_init(&v2, 10);
     for (i = 0; i < 10; i++) {
         VECTOR(v2)[i] = 10 - i;
@@ -81,10 +81,10 @@ int main() {
 
     igraph_vector_minmax(&v1, &min, &max);
     igraph_vector_which_minmax(&v1, &imin, &imax);
-    printf("%g %g %li %li\n", min, max, imin, imax);
+    printf("%g %g %" IGRAPH_PRId " %" IGRAPH_PRId "\n", min, max, imin, imax);
     igraph_vector_minmax(&v2, &min, &max);
     igraph_vector_which_minmax(&v2, &imin, &imax);
-    printf("%g %g %li %li\n", min, max, imin, imax);
+    printf("%g %g %" IGRAPH_PRId " %" IGRAPH_PRId "\n", min, max, imin, imax);
 
     if (igraph_vector_isnull(&v1)) {
         return 1;

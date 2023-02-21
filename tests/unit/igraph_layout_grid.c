@@ -25,9 +25,9 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t coords;
 

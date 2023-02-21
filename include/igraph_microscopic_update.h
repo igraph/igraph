@@ -25,34 +25,35 @@
 #include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_iterators.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT int igraph_deterministic_optimal_imitation(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
                                                          igraph_integer_t vid,
                                                          igraph_optimal_t optimality,
                                                          const igraph_vector_t *quantities,
-                                                         igraph_vector_t *strategies,
+                                                         igraph_vector_int_t *strategies,
                                                          igraph_neimode_t mode);
-IGRAPH_EXPORT int igraph_moran_process(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_moran_process(const igraph_t *graph,
                                        const igraph_vector_t *weights,
                                        igraph_vector_t *quantities,
-                                       igraph_vector_t *strategies,
+                                       igraph_vector_int_t *strategies,
                                        igraph_neimode_t mode);
-IGRAPH_EXPORT int igraph_roulette_wheel_imitation(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_roulette_wheel_imitation(const igraph_t *graph,
                                                   igraph_integer_t vid,
                                                   igraph_bool_t islocal,
                                                   const igraph_vector_t *quantities,
-                                                  igraph_vector_t *strategies,
+                                                  igraph_vector_int_t *strategies,
                                                   igraph_neimode_t mode);
-IGRAPH_EXPORT int igraph_stochastic_imitation(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
                                               igraph_integer_t vid,
                                               igraph_imitate_algorithm_t algo,
                                               const igraph_vector_t *quantities,
-                                              igraph_vector_t *strategies,
+                                              igraph_vector_int_t *strategies,
                                               igraph_neimode_t mode);
 
 __END_DECLS

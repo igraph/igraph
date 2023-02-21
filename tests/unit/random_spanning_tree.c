@@ -18,17 +18,17 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph, spanning_tree;
-    igraph_vector_t tree_edges;
+    igraph_vector_int_t tree_edges;
     igraph_bool_t is_tree;
     int err;
 
     igraph_rng_seed(igraph_rng_default(), 987);
 
-    igraph_vector_init(&tree_edges, 0);
+    igraph_vector_int_init(&tree_edges, 0);
 
     /* This is guaranteed to create a connected graph. */
     igraph_barabasi_game(&graph, 100, 2, 2, NULL, 0, 1, IGRAPH_UNDIRECTED, IGRAPH_BARABASI_PSUMTREE, NULL);
@@ -36,9 +36,9 @@ int main() {
     err = igraph_random_spanning_tree(&graph, &tree_edges, 0);
     IGRAPH_ASSERT(!err);
 
-    IGRAPH_ASSERT(igraph_vector_size(&tree_edges) == igraph_vcount(&graph) - 1);
+    IGRAPH_ASSERT(igraph_vector_int_size(&tree_edges) == igraph_vcount(&graph) - 1);
 
-    err = igraph_subgraph_edges(&graph, &spanning_tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ 0);
+    err = igraph_subgraph_from_edges(&graph, &spanning_tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ 0);
     IGRAPH_ASSERT(!err);
 
     IGRAPH_ASSERT(igraph_vcount(&spanning_tree) == igraph_vcount(&graph));
@@ -56,19 +56,19 @@ int main() {
     err = igraph_random_spanning_tree(&graph, &tree_edges, 0);
     IGRAPH_ASSERT(!err);
 
-    IGRAPH_ASSERT(igraph_vector_size(&tree_edges) == 1);
+    IGRAPH_ASSERT(igraph_vector_int_size(&tree_edges) == 1);
     IGRAPH_ASSERT(VECTOR(tree_edges)[0] == 0);
 
     /* Find a spanning forest */
     err = igraph_random_spanning_tree(&graph, &tree_edges, -1);
     IGRAPH_ASSERT(!err);
 
-    IGRAPH_ASSERT(igraph_vector_size(&tree_edges) == 2);
+    IGRAPH_ASSERT(igraph_vector_int_size(&tree_edges) == 2);
     IGRAPH_ASSERT(VECTOR(tree_edges)[0] == 0 && VECTOR(tree_edges)[1] == 1);
 
     igraph_destroy(&graph);
 
-    igraph_vector_destroy(&tree_edges);
+    igraph_vector_int_destroy(&tree_edges);
 
     VERIFY_FINALLY_STACK();
     return 0;

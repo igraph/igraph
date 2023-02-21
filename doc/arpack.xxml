@@ -14,6 +14,7 @@
 <!-- doxrox-include igraph_blas_ddot -->
 <!-- doxrox-include igraph_blas_dnrm2 -->
 <!-- doxrox-include igraph_blas_dgemv -->
+<!-- doxrox-include igraph_blas_dgemm -->
 <!-- doxrox-include igraph_blas_dgemv_array -->
 </section>
 

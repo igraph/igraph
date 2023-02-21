@@ -17,9 +17,9 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_vector_t v1, v2, v3, v4, v5, v6, v7, v8;
 
     igraph_vector_init_real(&v1, 3, 1e30, 2e30, 9e30);
@@ -32,19 +32,19 @@ int main() {
     igraph_vector_init_real(&v8, 2, 3e30, 3e30);
 
     igraph_vector_t *vectors[] = {&v1, &v2, &v3, &v4, &v5, &v6, &v7, &v8};
-    long n = sizeof(vectors) / sizeof(igraph_vector_t *);
+    size_t n = sizeof(vectors) / sizeof(igraph_vector_t *);
 
     printf("Lexicographical ordering:\n");
-    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_lex_cmp);
+    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_lex_cmp_untyped);
 
-    for (int i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {
         print_vector(vectors[i]);
     }
 
     printf("\nColexicographical ordering:\n");
-    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_colex_cmp);
+    igraph_qsort(vectors, n, sizeof(igraph_vector_t *), igraph_vector_colex_cmp_untyped);
 
-    for (int i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {
         print_vector(vectors[i]);
         igraph_vector_destroy(vectors[i]);
     }

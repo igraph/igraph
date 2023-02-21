@@ -13,7 +13,7 @@ void prpack_solver::initialize() {
     gsg = NULL;
     sg = NULL;
     sccg = NULL;
-	owns_bg = true;
+    owns_bg = true;
 }
 
 prpack_solver::prpack_solver(const prpack_csc* g) {
@@ -38,19 +38,21 @@ prpack_solver::prpack_solver(const prpack_edge_list* g) {
 
 prpack_solver::prpack_solver(prpack_base_graph* g, bool owns_bg) {
     initialize();
-	this->owns_bg = owns_bg;
+    this->owns_bg = owns_bg;
     TIME(read_time, bg = g);
 }
 
+#if 0
 prpack_solver::prpack_solver(const char* filename, const char* format, const bool weighted) {
     initialize();
     TIME(read_time, bg = new prpack_base_graph(filename, format, weighted));
 }
+#endif
 
 prpack_solver::~prpack_solver() {
-	if (owns_bg) {
-		delete bg;
-	}
+    if (owns_bg) {
+        delete bg;
+    }
     delete geg;
     delete gsg;
     delete sg;

@@ -25,24 +25,25 @@
 #define IGRAPH_PSUMTREE_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_vector.h"
 
 __BEGIN_DECLS
 
 typedef struct {
     igraph_vector_t v;
-    long int size;
-    long int offset;
+    igraph_integer_t size;
+    igraph_integer_t offset;
 } igraph_psumtree_t;
 
-IGRAPH_EXPORT int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
+IGRAPH_EXPORT igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size);
 IGRAPH_EXPORT void igraph_psumtree_reset(igraph_psumtree_t *t);
 IGRAPH_EXPORT void igraph_psumtree_destroy(igraph_psumtree_t *t);
-IGRAPH_EXPORT igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx);
-IGRAPH_EXPORT long int igraph_psumtree_size(const igraph_psumtree_t *t);
-IGRAPH_EXPORT int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+IGRAPH_EXPORT igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, igraph_integer_t idx);
+IGRAPH_EXPORT igraph_integer_t igraph_psumtree_size(const igraph_psumtree_t *t);
+IGRAPH_EXPORT igraph_error_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_integer_t *idx,
                                          igraph_real_t elem);
-IGRAPH_EXPORT int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
+IGRAPH_EXPORT igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_integer_t idx,
                                          igraph_real_t new_value);
 IGRAPH_EXPORT igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
 

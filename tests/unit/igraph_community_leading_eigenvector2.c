@@ -23,14 +23,14 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
-int main() {
+int main(void) {
 
     igraph_t g;
-    igraph_matrix_t merges;
-    igraph_vector_t membership;
+    igraph_matrix_int_t merges;
+    igraph_vector_int_t membership;
     igraph_vector_t x;
     igraph_arpack_options_t options;
     igraph_vector_t weights;
@@ -55,8 +55,8 @@ int main() {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_matrix_init(&merges, 0, 0);
-    igraph_vector_init(&membership, 0);
+    igraph_matrix_int_init(&merges, 0, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_vector_init(&x, 0);
     igraph_arpack_options_init(&options);
     igraph_vector_init(&weights, igraph_ecount(&g));
@@ -64,18 +64,18 @@ int main() {
 
     igraph_community_leading_eigenvector(&g, &weights, &merges,
                                          &membership, 1,
-                                         &options, /*modularity=*/ 0,
+                                         /* options = */ 0, /*modularity=*/ 0,
                                          /*start=*/ 0, /*eigenvalues=*/ 0,
                                          /*eigenvectors=*/ 0, /*history=*/ 0,
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix_round(&merges);
-    print_vector_round(&membership);
+    igraph_matrix_int_print(&merges);
+    print_vector_int(&membership);
 
     printf("\n");
 
-    /* Make all the steps */
+    /* Make all the steps, and use an explicit options object */
     igraph_community_leading_eigenvector(&g, &weights, &merges,
                                          &membership, igraph_vcount(&g),
                                          &options, /*modularity=*/ 0,
@@ -84,13 +84,13 @@ int main() {
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix_round(&merges);
-    print_vector_round(&membership);
+    igraph_matrix_int_print(&merges);
+    print_vector_int(&membership);
 
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&x);
-    igraph_vector_destroy(&membership);
-    igraph_matrix_destroy(&merges);
+    igraph_vector_int_destroy(&membership);
+    igraph_matrix_int_destroy(&merges);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

@@ -26,13 +26,13 @@
 
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
-#include "igraph_constants.h"
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT int igraph_adjacency_spectral_embedding(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
                                                       igraph_integer_t no,
                                                       const igraph_vector_t *weights,
                                                       igraph_eigen_which_position_t which,
@@ -50,7 +50,7 @@ typedef enum {
     IGRAPH_EMBEDDING_OAP
 } igraph_laplacian_spectral_embedding_type_t;
 
-IGRAPH_EXPORT int igraph_laplacian_spectral_embedding(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
                                                       igraph_integer_t no,
                                                       const igraph_vector_t *weights,
                                                       igraph_eigen_which_position_t which,
@@ -61,7 +61,7 @@ IGRAPH_EXPORT int igraph_laplacian_spectral_embedding(const igraph_t *graph,
                                                       igraph_vector_t *D,
                                                       igraph_arpack_options_t *options);
 
-IGRAPH_EXPORT int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim);
+IGRAPH_EXPORT igraph_error_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim);
 
 __END_DECLS
 

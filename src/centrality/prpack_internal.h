@@ -21,8 +21,8 @@
 
 */
 
-#ifndef IGRAPH_PRPACK
-#define IGRAPH_PRPACK
+#ifndef IGRAPH_PRPACK_H
+#define IGRAPH_PRPACK_H
 
 #include "igraph_decls.h"
 #include "igraph_types.h"
@@ -33,7 +33,7 @@
 
 __BEGIN_DECLS
 
-int igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
+igraph_error_t igraph_i_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
                                           igraph_real_t *value, const igraph_vs_t vids,
                                           igraph_bool_t directed, igraph_real_t damping,
                                           const igraph_vector_t *reset,

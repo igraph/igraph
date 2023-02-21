@@ -1,6 +1,7 @@
 include(helpers)
 
 include(CheckSymbolExists)
+include(CMakePushCheckState)
 
 # The threading library is not needed for igraph itself, but might be needed
 # for tests
@@ -8,7 +9,7 @@ include(FindThreads)
 
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored
-  set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK GMP PLFIT)
+  set(VENDORABLE_DEPENDENCIES BLAS GLPK LAPACK ARPACK GMP PLFIT)
 
   # Declare optional dependencies associated with IGRAPH_..._SUPPORT flags
   # Note that GLPK is both vendorable and optional
@@ -18,7 +19,6 @@ macro(find_dependencies)
   tristate(IGRAPH_USE_INTERNAL_GMP "Compile igraph with internal Mini-GMP" AUTO)
   tristate(IGRAPH_USE_INTERNAL_ARPACK "Compile igraph with internal ARPACK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_BLAS "Compile igraph with internal BLAS" AUTO)
-  tristate(IGRAPH_USE_INTERNAL_CXSPARSE "Compile igraph with internal CXSparse" AUTO)
   tristate(IGRAPH_USE_INTERNAL_GLPK "Compile igraph with internal GLPK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_LAPACK "Compile igraph with internal LAPACK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_PLFIT "Compile igraph with internal plfit" AUTO)
@@ -136,12 +136,11 @@ macro(find_dependencies)
 
   # Check whether we need to link to the math library
   if(NOT DEFINED CACHE{NEED_LINKING_AGAINST_LIBM})
-    set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
+    cmake_push_check_state()
     set(CMAKE_REQUIRED_QUIET ON)
     check_symbol_exists(sinh "math.h" SINH_FUNCTION_EXISTS)
     if(NOT SINH_FUNCTION_EXISTS)
       unset(SINH_FUNCTION_EXISTS CACHE)
-      set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
       list(APPEND CMAKE_REQUIRED_LIBRARIES m)
       check_symbol_exists(sinh "math.h" SINH_FUNCTION_EXISTS)
       if(SINH_FUNCTION_EXISTS)
@@ -149,10 +148,9 @@ macro(find_dependencies)
       else()
         message(FATAL_ERROR "Failed to figure out how to link to the math library on this platform")
       endif()
-      set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
     endif()
     unset(SINH_FUNCTION_EXISTS CACHE)
-    set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
+    cmake_pop_check_state()
   endif()
 
   if(NEED_LINKING_AGAINST_LIBM)

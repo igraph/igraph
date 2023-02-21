@@ -255,6 +255,7 @@ div.explanation {
 div.example-contents {
   display: none;
 }
+
 .example p.title {
   color: blue;
   font-size:0.8em;
@@ -266,4 +267,13 @@ div.example-contents {
   color: #00f;
   text-decoration: underline;
   cursor: hand;
+}
+
+.warning {
+  background-color: #ffc;
+  padding: 0.2em 1em;
+  border: 1px solid #f80;
+}
+.warning .title {
+  color: #f80;
 }

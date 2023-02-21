@@ -23,11 +23,12 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_matrix_t m, m1;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
+    igraph_real_t arr[] = { 1, 2, 11, 12, 21, 22 };
 
     /* igraph_matrix_init, igraph_matrix_destroy */
     igraph_matrix_init(&m, 10, 10);
@@ -108,7 +109,6 @@ int main() {
     igraph_matrix_destroy(&m);
 
     /* TODO: igraph_matrix_permdelete_rows */
-    /* TODO: igraph_matrix_delete_rows_neg */
 
     /* igraph_matrix_copy */
     igraph_matrix_init(&m, 2, 3);
@@ -117,10 +117,23 @@ int main() {
             MATRIX(m, i, j) = (i + 1) * (j + 1);
         }
     }
-    igraph_matrix_copy(&m1, &m);
+    igraph_matrix_init_copy(&m1, &m);
     print_matrix(&m1);
     igraph_matrix_destroy(&m);
     igraph_matrix_destroy(&m1);
+
+    /* igraph_matrix_init_array */
+    igraph_matrix_init_array(&m, arr, 2, 3, IGRAPH_COLUMN_MAJOR);
+    print_matrix(&m);
+    igraph_matrix_destroy(&m);
+
+    igraph_matrix_init_array(&m, arr, 2, 3, IGRAPH_ROW_MAJOR);
+    print_matrix(&m);
+    igraph_matrix_destroy(&m);
+
+    igraph_matrix_init_array(&m, arr, 3, 2, IGRAPH_ROW_MAJOR);
+    print_matrix(&m);
+    igraph_matrix_destroy(&m);
 
     /* in-place transpose */
     igraph_matrix_init(&m, 5, 2);

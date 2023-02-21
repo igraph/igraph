@@ -25,15 +25,16 @@ typedef struct TYPE(igraph_heap) {
     BASE* stor_begin;
     BASE* stor_end;
     BASE* end;
-    int destroy;
+    igraph_bool_t destroy;
 } TYPE(igraph_heap);
 
-IGRAPH_EXPORT int FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, long int size);
-IGRAPH_EXPORT int FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *t, BASE* data, long int len);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_integer_t capacity);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *t, const BASE *data, igraph_integer_t len);
 IGRAPH_EXPORT void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h);
-IGRAPH_EXPORT int FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem);
-IGRAPH_EXPORT BASE FUNCTION(igraph_heap, top)(TYPE(igraph_heap)* h);
+IGRAPH_EXPORT void FUNCTION(igraph_heap, clear)(TYPE(igraph_heap)* h);
+IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_heap, empty)(const TYPE(igraph_heap)* h);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem);
+IGRAPH_EXPORT BASE FUNCTION(igraph_heap, top)(const TYPE(igraph_heap)* h);
 IGRAPH_EXPORT BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h);
-IGRAPH_EXPORT long int FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h);
-IGRAPH_EXPORT int FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int size);
+IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_heap, size)(const TYPE(igraph_heap)* h);
+IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_integer_t capacity);

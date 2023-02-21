@@ -24,21 +24,22 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     FILE *f;
     igraph_matrix_t coords;
-    igraph_vector_t roots;
-    long int i, n;
+    igraph_vector_int_t roots;
+    igraph_integer_t i, n;
 
     f = fopen("igraph_layout_reingold_tilford_bug_879.in", "r");
-    igraph_read_graph_edgelist(&g, f, 0, 0);
+    IGRAPH_ASSERT(f != NULL);
+    igraph_read_graph_edgelist(&g, f, 0, IGRAPH_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
-    igraph_vector_init(&roots, 0);
-    igraph_vector_push_back(&roots, 0);
+    igraph_vector_int_init(&roots, 0);
+    igraph_vector_int_push_back(&roots, 0);
 
     igraph_layout_reingold_tilford(&g, &coords, IGRAPH_OUT, &roots, 0);
 
@@ -48,7 +49,7 @@ int main() {
     }
 
     igraph_matrix_destroy(&coords);
-    igraph_vector_destroy(&roots);
+    igraph_vector_int_destroy(&roots);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

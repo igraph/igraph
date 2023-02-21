@@ -24,9 +24,9 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_matrix_t coords;
@@ -34,8 +34,8 @@ int main() {
 
     igraph_rng_seed(igraph_rng_default(), 33);
 
-    igraph_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
-    /*   igraph_barabasi_game(&g, 1000, 1, 0, 0, IGRAPH_UNDIRECTED); */
+    printf("Testing graph with no vertices\n");
+    igraph_small(&g, 0, 0, -1);
     igraph_matrix_init(&coords, 0, 0);
     vc = igraph_vcount(&g);
     igraph_layout_lgl(&g, &coords,
@@ -47,6 +47,59 @@ int main() {
                       /* cellsize */   sqrt(sqrt(vc)),
                       /* root */       0);
 
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
+
+    printf("Testing k-ary tree\n");
+    igraph_kary_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
+    igraph_matrix_init(&coords, 0, 0);
+    vc = igraph_vcount(&g);
+    igraph_layout_lgl(&g, &coords,
+                      /* maxiter */    150,
+                      /* maxdelta */   vc,
+                      /* area */       vc * vc,
+                      /* coolexp */    1.5,
+                      /* repulserad */ vc * vc * vc,
+                      /* cellsize */   sqrt(sqrt(vc)),
+                      /* root */       0);
+
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
+
+    printf("Testing k-ary tree (many more times to stress-test igraph_2dgrid_t)\n");
+    igraph_kary_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
+    for (igraph_integer_t i = 0; i < 100; i++) {
+        igraph_matrix_init(&coords, 0, 0);
+        vc = igraph_vcount(&g);
+        igraph_layout_lgl(&g, &coords,
+                          /* maxiter */    150,
+                          /* maxdelta */   vc,
+                          /* area */       vc * vc,
+                          /* coolexp */    1.5,
+                          /* repulserad */ vc * vc * vc,
+                          /* cellsize */   sqrt(sqrt(vc)),
+                          /* root */       0);
+
+        igraph_matrix_destroy(&coords);
+    }
+    igraph_destroy(&g);
+
+    /* Test that a warning is printed for disconnected graphs */
+    printf("Testing disconnected graph\n");
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, 3, 4, -1);
+    igraph_matrix_init(&coords, 0, 0);
+    vc = igraph_vcount(&g);
+    EXPECT_WARNING(
+        igraph_layout_lgl(&g, &coords,
+                        /* maxiter */    150,
+                        /* maxdelta */   vc,
+                        /* area */       vc * vc,
+                        /* coolexp */    1.5,
+                        /* repulserad */ vc * vc * vc,
+                        /* cellsize */   sqrt(sqrt(vc)),
+                        /* root */       0),
+        "LGL layout does not support disconnected graphs yet."
+    );
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
 

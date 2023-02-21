@@ -1,10 +1,27 @@
+/*
+   IGraph library.
+   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Check that isoclass() and isoclass_create() are consistent with each other. */
-void verify_classes() {
+void verify_classes(void) {
     igraph_integer_t class;
     igraph_integer_t size;
 
@@ -41,7 +58,7 @@ void verify_classes() {
 }
 
 /* Generate small random graphs and check that their isoclasses are identified correctly. */
-void random_test() {
+void random_test(void) {
     igraph_integer_t size, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
@@ -89,14 +106,14 @@ void random_test() {
 
 /* Generate a random graph, select random subgraphs, and check that their
  * isoclasses are identified correctly. */
-void random_subgraph_test() {
+void random_subgraph_test(void) {
     igraph_t graph;
     igraph_integer_t size, i;
-    igraph_vector_t vids;
+    igraph_vector_int_t vids;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    igraph_vector_init(&vids, 0);
+    igraph_vector_int_init(&vids, 0);
 
     /* Directed */
 
@@ -148,10 +165,10 @@ void random_subgraph_test() {
 
     igraph_destroy(&graph);
 
-    igraph_vector_destroy(&vids);
+    igraph_vector_int_destroy(&vids);
 }
 
-int main() {
+int main(void) {
 
     verify_classes();
     random_test();

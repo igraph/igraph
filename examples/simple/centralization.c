@@ -24,94 +24,40 @@
 #include <igraph.h>
 #include <math.h>
 
-#define ALMOST_EQUALS(a, b) (fabs((a)-(b)) < 1e-8)
-
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t cent;
     igraph_arpack_options_t arpack_options;
 
     /****************************/
-    /* in-star */
-    igraph_star(&g, 10, IGRAPH_STAR_IN, /*center=*/ 0);
-
-    igraph_centralization_degree(&g, /*res=*/ 0,
-                                 /*mode=*/ IGRAPH_IN, IGRAPH_NO_LOOPS,
-                                 &cent, /*theoretical_max=*/ 0,
-                                 /*normalized=*/ 1);
-    if (cent != 1.0) {
-        fprintf(stderr, "in-star, degree: %g\n", cent);
-        return 1;
-    }
-
-    igraph_centralization_betweenness(&g, /*res=*/ 0,
-                                      IGRAPH_UNDIRECTED, &cent,
-                                      /*theoretical_max=*/ 0,
-                                      /*normalized=*/ 1);
-    if (cent != 1.0) {
-        fprintf(stderr, "in-star, betweenness: %g\n", cent);
-        return 2;
-    }
-
-    /* Skip closeness, as it is not well-defined for disconnected graphs such as an in-star. */
-
-    igraph_destroy(&g);
-
-    /****************************/
-    /* out-star */
-    igraph_star(&g, 10, IGRAPH_STAR_OUT, /*center=*/ 0);
-
-    igraph_centralization_degree(&g, /*res=*/ 0,
-                                 /*mode=*/ IGRAPH_OUT, IGRAPH_NO_LOOPS,
-                                 &cent, /*theoretical_max=*/ 0,
-                                 /*normalized=*/ 1);
-    if (cent != 1.0) {
-        fprintf(stderr, "out-star, degree: %g\n", cent);
-        return 11;
-    }
-
-    igraph_centralization_betweenness(&g, /*res=*/ 0,
-                                      IGRAPH_UNDIRECTED, &cent,
-                                      /*theoretical_max=*/ 0,
-                                      /*normalized=*/ 1);
-    if (cent != 1.0) {
-        fprintf(stderr, "out-star, betweenness: %g\n", cent);
-        return 12;
-    }
-
-    /* Skip closeness, as it is not well-defined for disconnected graphs such as an out-star. */
-
-    igraph_destroy(&g);
-
-    /****************************/
     /* undirected star */
     igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, /*center=*/ 0);
 
-    igraph_centralization_degree(&g, /*res=*/ 0,
+    igraph_centralization_degree(&g, /*res=*/ NULL,
                                  /*mode=*/ IGRAPH_ALL, IGRAPH_NO_LOOPS,
-                                 &cent, /*theoretical_max=*/ 0,
-                                 /*normalized=*/ 1);
+                                 &cent, /*theoretical_max=*/ NULL,
+                                 /*normalized=*/ true);
     if (cent != 1.0) {
         fprintf(stderr, "undirected star, degree: %g\n", cent);
         return 21;
     }
 
-    igraph_centralization_betweenness(&g, /*res=*/ 0,
+    igraph_centralization_betweenness(&g, /*res=*/ NULL,
                                       IGRAPH_UNDIRECTED, &cent,
-                                      /*theoretical_max=*/ 0,
-                                      /*normalized=*/ 1);
+                                      /*theoretical_max=*/ NULL,
+                                      /*normalized=*/ true);
     if (cent != 1.0) {
         fprintf(stderr, "undirected star, betweenness: %g\n", cent);
         return 22;
     }
 
-    igraph_centralization_closeness(&g, /*res=*/ 0,
+    igraph_centralization_closeness(&g, /*res=*/ NULL,
                                     IGRAPH_ALL, &cent,
-                                    /*theoretical_max=*/ 0,
-                                    /*normalization=*/ 1);
+                                    /*theoretical_max=*/ NULL,
+                                    /*normalized=*/ true);
 
-    if (!ALMOST_EQUALS(cent, 1.0)) {
+    if (!igraph_almost_equals(cent, 1.0, 1e-8)) {
         fprintf(stderr, "undirected star, closeness: %g\n", cent);
         return 23;
     }
@@ -125,30 +71,19 @@ int main() {
                  0, 1, -1);
 
     igraph_arpack_options_init(&arpack_options);
-    igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
-            /*value=*/ 0,
-            /*directed=*/ 1,
-            /*scale=*/ 1,
-            &arpack_options, &cent,
-            /*theoretical_max=*/ 0,
-            /*normalization=*/ 1);
+    igraph_centralization_eigenvector_centrality(
+                &g,
+                /*vector=*/ NULL,
+                /*value=*/ NULL,
+                IGRAPH_DIRECTED,
+                /*scale=*/ true,
+                &arpack_options, &cent,
+                /*theoretical_max=*/ NULL,
+                /*normalized=*/ true);
 
-    if (!ALMOST_EQUALS(cent, 1.0)) {
+    if (!igraph_almost_equals(cent, 1.0, 1e-8)) {
         fprintf(stderr, "dyad, eigenvector centrality: %g\n", cent);
         return 24;
-    }
-
-    igraph_centralization_eigenvector_centrality(&g, /*vector=*/ 0,
-            /*value=*/ 0,
-            /*directed=*/ 1,
-            /*scale=*/ 0,
-            &arpack_options, &cent,
-            /*theoretical_max=*/ 0,
-            /*normalization=*/ 1);
-
-    if (!ALMOST_EQUALS(cent, 1.0)) {
-        fprintf(stderr, "dyad, eigenvector centrality, not scaled: %g\n", cent);
-        return 25;
     }
 
     igraph_destroy(&g);

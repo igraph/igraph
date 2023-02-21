@@ -17,14 +17,14 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-void print_and_destroy(igraph_matrix_t *vectors, igraph_matrix_t *values, int nev, igraph_error_type_t error) {
+void print_and_destroy(igraph_matrix_t *vectors, igraph_matrix_t *values, igraph_integer_t nev, igraph_error_t error) {
     printf("vectors in:\n");
     print_matrix_format(vectors, stdout, "%6.2f");
     printf("values in:\n");
     print_matrix_format(values, stdout, "%6.2f");
-    IGRAPH_ASSERT(igraph_arpack_unpack_complex(vectors, values, nev) == (int)error);
+    IGRAPH_ASSERT(igraph_arpack_unpack_complex(vectors, values, nev) == error);
     printf("vectors out:\n");
     print_matrix_format(vectors, stdout, "%6.2f");
     printf("values out:\n");
@@ -34,7 +34,7 @@ void print_and_destroy(igraph_matrix_t *vectors, igraph_matrix_t *values, int ne
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t vectors;
     igraph_matrix_t values;
 

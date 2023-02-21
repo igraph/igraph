@@ -17,28 +17,28 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *graph, int size, igraph_vector_t *cut_prob,
-                    igraph_integer_t sample_size, igraph_vector_t *parsample) {
+                    igraph_integer_t sample_size, igraph_vector_int_t *parsample) {
     igraph_integer_t estimate;
     IGRAPH_ASSERT(igraph_motifs_randesu_estimate(graph, &estimate, size, cut_prob, sample_size, parsample) == IGRAPH_SUCCESS);
     printf("Estimate: %" IGRAPH_PRId "\n\n", estimate);
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_50_full, g_4_3_1;
     igraph_vector_t cut_prob_0_3;
     igraph_vector_t cut_prob_0_4;
     igraph_vector_t cut_prob_01;
-    igraph_vector_t parsample;
+    igraph_vector_int_t parsample;
     igraph_integer_t estimate;
 
     igraph_vector_init_real(&cut_prob_0_3, 3, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_0_4, 4, 0.0, 0.0, 0.0, 0.0);
     igraph_vector_init_real(&cut_prob_01, 3, 0.1, 0.1, 0.1);
-    igraph_vector_init_seq(&parsample, 0, 40);
+    igraph_vector_int_init_range(&parsample, 0, 41);
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -65,7 +65,7 @@ int main() {
     printf("Full graph of 50 vertices, motif size 3, sample first 40:\n");
     call_and_print(&g_50_full, /*size*/ 3, &cut_prob_0_3, /*sample_size*/ 0, &parsample);
 
-    printf("Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300:\n");
+    printf("Full graph of 50 vertices, motif size 4, sample 20 (50 choose 4 = 230300):\n");
     call_and_print(&g_50_full, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 20, /*parsample*/ NULL);
 
     printf("Triangle and a vertex, motif size 4, sample all:\n");
@@ -81,7 +81,7 @@ int main() {
     IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 40, /*parsample*/ NULL) == IGRAPH_EINVAL);
 
     printf("Too many parsamples.\n");
-    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 4, /*parsample*/ &parsample) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_motifs_randesu_estimate(&g_4_3_1, &estimate, /*size*/ 4, &cut_prob_0_4, /*sample_size*/ 4, /*parsample*/ &parsample) == IGRAPH_EINVVID);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
@@ -90,7 +90,7 @@ int main() {
     igraph_vector_destroy(&cut_prob_0_3);
     igraph_vector_destroy(&cut_prob_0_4);
     igraph_vector_destroy(&cut_prob_01);
-    igraph_vector_destroy(&parsample);
+    igraph_vector_int_destroy(&parsample);
 
     VERIFY_FINALLY_STACK();
     return 0;

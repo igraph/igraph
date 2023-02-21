@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraph-Basic">
-<title>About &igraph; graphs, the basic interface</title>
+<title>Basic data types and interface</title>
 
 <section id="igraph-data-model"><title>The &igraph; data model</title>
 <para>
@@ -13,7 +13,7 @@ The &igraph; library can handle directed and
 undirected graphs. The &igraph; graphs are multisets
 of ordered (if directed) or unordered (if undirected) labeled pairs.
 The labels of the pairs plus the number of vertices always starts with
-zero and ends with the number of edges minus one. In addition to that
+zero and ends with the number of edges minus one. In addition to that,
 a table of metadata is also attached to every graph, its most
 important entries being the number of vertices in the graph and whether
 the graph is directed or undirected.
@@ -63,7 +63,7 @@ An undirected graph is like this:
   )
 </programlisting>
 </informalexample>
-Here, an edge is an unordered pair of two vertex ids. A graph is a multiset
+Here, an edge is an unordered pair of two vertex IDs. A graph is a multiset
 of edges plus metadata, just like in the directed case.
 </para>
 
@@ -85,14 +85,14 @@ in their documentation. To eliminate multiple edges from a graph, you can use
 </para>
 </section>
 
-<section id="igraph-functions"><title>About &igraph; functions</title>
+<section id="igraph-functions"><title>General conventions of &igraph; functions</title>
 <para>
 &igraph; has a simple and consistent interface. Most functions check
 their input for validity and display an informative error message
 when something goes wrong. In order to support this, the majority of functions
 return an error code. In basic usage, this code can be ignored, as the
 default behaviour is to abort the program immediately upon error. See
-<link linkend="igraph-Error">the section on error handling</link> for 
+<link linkend="igraph-Error">the section on error handling</link> for
 more information on this topic.
 </para>
 
@@ -103,6 +103,70 @@ In almost all cases, this data structure is expected to be pre-initialized.
 A few simple functions communicate their result directly through their return
 value—these functions can never encounter an error.
 </para>
+</section>
+
+<section id="basic-data-types"><title>Atomic data types</title>
+
+<indexterm><primary>igraph_integer_t</primary></indexterm>
+
+<para>
+&igraph; introduces a few aliases to standard C data types that are then used
+throughout the library. The most important of these types is
+<type>igraph_integer_t</type>, which is an alias to either a 32-bit or a 64-bit
+<emphasis>signed</emphasis> integer, depending on whether &igraph; was compiled
+in 32-bit or 64-bit mode. The size of <type>igraph_integer_t</type> also
+influences the maximum number of vertices that an &igraph; graph can represent
+as the number of vertices is stored in a variable of type
+<type>igraph_integer_t</type>.
+</para>
+
+<para>Since the size of a variable of type <type>igraph_integer_t</type> may
+change depending on how &igraph; is compiled, you cannot simply use
+<code>%d</code> or <code>%ld</code> as a placeholder for &igraph; integers in
+<code>printf</code> format strings. &igraph; provides the
+<code>IGRAPH_PRId</code> macro, which maps to <code>d</code>, <code>ld</code>
+or <code>lld</code> depending on the size of <type>igraph_integer_t</type>, and
+you must use this macro in <code>printf</code> format strings to avoid compiler
+warnings.
+</para>
+
+<indexterm><primary>igraph_uint_t</primary></indexterm>
+
+<para>Similarly to how <type>igraph_integer_t</type> maps to the standard size
+signed integer in the library, <type>igraph_uint_t</type> maps to a 32-bit or
+a 64-bit <emphasis>unsigned</emphasis> integer. It is guaranteed that the size of
+<type>igraph_integer_t</type> is the same as the size of <type>igraph_uint_t</type>.
+&igraph; provides <code>IGRAPH_PRIu</code> as a format string placeholder for
+variables of type <type>igraph_uint_t</type>.
+</para>
+
+<indexterm><primary>igraph_real_t</primary></indexterm>
+
+<para>Real numbers (i.e. quantities that can potentially be fractional or
+infinite) are represented with a type named <type>igraph_real_t</type>. Currently
+<type>igraph_real_t</type> is always aliased to <type>double</type>, but it is
+still good practice to use <type>igraph_real_t</type> in your own code for sake
+of consistency.</para>
+
+<indexterm><primary>igraph_bool_t</primary></indexterm>
+
+<para>Boolean values are represented with a type named <type>igraph_bool_t</type>.
+It tries to be as small as possible since it only needs to represent a truth
+value. For printing purposes, you can treat it as an integer and use
+<code>%d</code> in format strings as a placeholder for an <type>igraph_bool_t</type>.
+</para>
+
+<indexterm><primary>IGRAPH_INTEGER_MAX</primary></indexterm>
+<indexterm><primary>IGRAPH_INTEGER_MIN</primary></indexterm>
+<indexterm><primary>IGRAPH_UINT_MAX</primary></indexterm>
+<indexterm><primary>IGRAPH_UINT_MIN</primary></indexterm>
+<para>
+Upper and lower limits of <type>igraph_integer_t</type> and
+<type>igraph_uint_t</type> are provided by the constants named
+<constant>IGRAPH_INTEGER_MIN</constant>, <constant>IGRAPH_INTEGER_MAX</constant>,
+<constant>IGRAPH_UINT_MIN</constant> and <constant>IGRAPH_UINT_MAX</constant>.
+</para>
+
 </section>
 
 <section id="basic-interface"><title>The basic interface</title>
@@ -118,6 +182,7 @@ value—these functions can never encounter an error.
 <section id="basic-query-operations"><title>Basic query operations</title>
 <!-- doxrox-include igraph_vcount -->
 <!-- doxrox-include igraph_ecount -->
+<!-- doxrox-include igraph_is_directed -->
 <!-- doxrox-include igraph_edge -->
 <!-- doxrox-include igraph_edges -->
 <!-- doxrox-include IGRAPH_FROM -->
@@ -125,12 +190,11 @@ value—these functions can never encounter an error.
 <!-- doxrox-include IGRAPH_OTHER -->
 <!-- doxrox-include igraph_get_eid -->
 <!-- doxrox-include igraph_get_eids -->
-<!-- doxrox-include igraph_get_eids_multi -->
+<!-- doxrox-include igraph_get_all_eids_between -->
 <!-- doxrox-include igraph_neighbors -->
 <!-- doxrox-include igraph_incident -->
-<!-- doxrox-include igraph_is_directed -->
-<!-- doxrox-include igraph_is_same_graph -->
 <!-- doxrox-include igraph_degree -->
+<!-- doxrox-include igraph_degree_1 -->
 </section>
 
 <section id="adding-and-deleting-vertices-and-edges"><title>Adding and deleting vertices and edges</title>
@@ -139,8 +203,17 @@ value—these functions can never encounter an error.
 <!-- doxrox-include igraph_add_vertices -->
 <!-- doxrox-include igraph_delete_edges -->
 <!-- doxrox-include igraph_delete_vertices -->
+<!-- doxrox-include igraph_delete_vertices_idx -->
 </section>
 
+</section>
+
+<section id="misc-helper-functions"><title>Miscellaneous macros and helper functions</title>
+<!-- doxrox-include IGRAPH_VCOUNT_MAX -->
+<!-- doxrox-include IGRAPH_ECOUNT_MAX -->
+<!-- doxrox-include igraph_expand_path_to_pairs -->
+<!-- doxrox-include igraph_invalidate_cache -->
+<!-- doxrox-include igraph_is_same_graph -->
 </section>
 
 </chapter>

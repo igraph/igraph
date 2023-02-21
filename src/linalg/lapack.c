@@ -22,8 +22,53 @@
 */
 
 #include "igraph_lapack.h"
-
 #include "linalg/lapack_internal.h"
+
+#include <limits.h>
+
+#define BASE_FORTRAN_INT
+#include "igraph_pmt.h"
+#include "igraph_vector_type.h"
+#include "igraph_vector_pmt.h"
+#include "../core/vector.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_FORTRAN_INT
+
+/* Converts a Fortran integer vector to an igraph vector */
+static igraph_error_t igraph_vector_int_update_from_fortran(
+    igraph_vector_int_t* vec, const igraph_vector_fortran_int_t* fortran_vec
+) {
+    igraph_integer_t size = igraph_vector_fortran_int_size(fortran_vec);
+
+    IGRAPH_CHECK(igraph_vector_int_resize(vec, size));
+
+    for (igraph_integer_t i = 0; i < size; i++) {
+        VECTOR(*vec)[i] = VECTOR(*fortran_vec)[i];
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/* Allocates a Fortran integer vector from the contents of an igraph vector */
+static igraph_error_t igraph_vector_int_copy_to_fortran(
+    const igraph_vector_int_t* vec, igraph_vector_fortran_int_t* fortran_vec
+) {
+    igraph_integer_t i, size = igraph_vector_int_size(vec);
+
+    IGRAPH_CHECK(igraph_vector_fortran_int_resize(fortran_vec, size));
+
+    for (i = 0; i < size; i++) {
+        if (VECTOR(*vec)[i] > INT_MAX) {
+            IGRAPH_ERROR(
+                "Overflow error while copying an igraph integer vector to a "
+                "Fortran integer vector.", IGRAPH_EOVERFLOW
+            );
+        }
+        VECTOR(*fortran_vec)[i] = (int) VECTOR(*vec)[i];
+    }
+
+    return IGRAPH_SUCCESS;
+}
 
 /**
  * \function igraph_lapack_dgetrf
@@ -53,22 +98,30 @@
  * Time complexity: TODO.
  */
 
-int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
+igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                          int *info) {
-    int m = (int) igraph_matrix_nrow(a);
-    int n = (int) igraph_matrix_ncol(a);
-    int lda = m > 0 ? m : 1;
-    igraph_vector_int_t *myipiv = ipiv, vipiv;
+    int m;
+    int n;
+    size_t num_elts;
+    int lda;
+    igraph_vector_fortran_int_t vipiv;
 
-    if (!ipiv) {
-        IGRAPH_CHECK(igraph_vector_int_init(&vipiv, m < n ? m : n));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &vipiv);
-        myipiv = &vipiv;
-    } else {
-        IGRAPH_CHECK(igraph_vector_int_resize(ipiv, m < n ? m : n));
+    if (igraph_matrix_nrow(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (igraph_matrix_ncol(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of columns in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
     }
 
-    igraphdgetrf_(&m, &n, VECTOR(a->data), &lda, VECTOR(*myipiv), info);
+    m = (int) igraph_matrix_nrow(a);
+    n = (int) igraph_matrix_ncol(a);
+    num_elts = m < n ? m : n;
+    lda = m > 0 ? m : 1;
+
+    IGRAPH_CHECK(igraph_vector_fortran_int_init(&vipiv, num_elts));
+    IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &vipiv);
+
+    igraphdgetrf_(&m, &n, VECTOR(a->data), &lda, VECTOR(vipiv), info);
 
     if (*info > 0) {
         IGRAPH_WARNING("LU: factor is exactly singular.");
@@ -98,12 +151,14 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
         }
     }
 
-    if (!ipiv) {
-        igraph_vector_int_destroy(&vipiv);
-        IGRAPH_FINALLY_CLEAN(1);
+    if (ipiv) {
+        IGRAPH_CHECK(igraph_vector_int_update_from_fortran(ipiv, &vipiv));
     }
 
-    return 0;
+    igraph_vector_fortran_int_destroy(&vipiv);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -120,8 +175,8 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  *      factorization A = P*L*U. L is expected to be unitriangular,
  *      diagonal entries are those of U. If A is singular, no warning or
  *      error wil be given and random output will be returned.
- * \param ipiv An integer vector, the pivot indices from \ref
- *      igraph_lapack_dgetrf() must be given here. Row \c i of A was
+ * \param ipiv An integer vector, the pivot indices from
+ *      \ref igraph_lapack_dgetrf() must be given here. Row \c i of A was
  *      interchanged with row <code>ipiv[i]</code>.
  * \param b The right hand side matrix must be given here. The solution
             will also be placed here.
@@ -130,14 +185,27 @@ int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  * Time complexity: TODO.
  */
 
-int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
+igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
                          const igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
     char trans = transpose ? 'T' : 'N';
-    int n = (int) igraph_matrix_nrow(a);
-    int nrhs = (int) igraph_matrix_ncol(b);
-    int lda = n > 0 ? n : 1;
-    int ldb = n > 0 ? n : 1;
+    int n;
+    int nrhs;
+    int lda;
+    int ldb;
     int info;
+    igraph_vector_fortran_int_t vipiv;
+
+    if (igraph_matrix_nrow(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (igraph_matrix_ncol(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of columns in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+
+    n = (int) igraph_matrix_nrow(a);
+    nrhs = (int) igraph_matrix_ncol(b);
+    lda = n > 0 ? n : 1;
+    ldb = n > 0 ? n : 1;
 
     if (n != igraph_matrix_ncol(a)) {
         IGRAPH_ERROR("Cannot LU solve matrix.", IGRAPH_NONSQUARE);
@@ -145,18 +213,22 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
-    if (igraph_vector_int_size(ipiv) > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(ipiv, &min, &max);
-        if (max > n || min < 1) {
+    if (! igraph_vector_int_isininterval(ipiv, 1, n)) {
             IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
-        }
     }
     if (igraph_vector_int_size(ipiv) != n) {
         IGRAPH_ERROR("Pivot vector length must match number of matrix rows.", IGRAPH_EINVAL);
     }
-    igraphdgetrs_(&trans, &n, &nrhs, VECTOR(a->data), &lda, VECTOR(*ipiv),
+
+    IGRAPH_CHECK(igraph_vector_fortran_int_init(&vipiv, igraph_vector_int_size(ipiv)));
+    IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &vipiv);
+    IGRAPH_CHECK(igraph_vector_int_copy_to_fortran(ipiv, &vipiv));
+
+    igraphdgetrs_(&trans, &n, &nrhs, VECTOR(a->data), &lda, VECTOR(vipiv),
                   VECTOR(b->data), &ldb, &info);
+
+    igraph_vector_fortran_int_destroy(&vipiv);
+    IGRAPH_FINALLY_CLEAN(1);
 
     if (info < 0) {
         switch (info) {
@@ -193,12 +265,12 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_lapack_dgesv
- * Solve system of linear equations with LU factorization
+ * \brief Solve system of linear equations with LU factorization.
  *
  * This function computes the solution to a real system of linear
  * equations A * X = B, where A is an N-by-N matrix and X and B are
@@ -210,6 +282,7 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
  * where P is a permutation matrix, L is unit lower triangular, and U is
  * upper triangular.  The factored form of A is then used to solve the
  * system of equations A * X = B.
+ *
  * \param a Matrix. On entry the N-by-N coefficient matrix, on exit,
  *        the factors L and U from the factorization A=P*L*U; the unit
  *        diagonal elements of L are not stored.
@@ -231,14 +304,20 @@ int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
  * \example examples/simple/igraph_lapack_dgesv.c
  */
 
-int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                        igraph_matrix_t *b, int *info) {
+igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
+                                   igraph_matrix_t *b, int *info) {
 
+    if (igraph_matrix_nrow(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
+    if (igraph_matrix_ncol(a) > INT_MAX) {
+        IGRAPH_ERROR("Number of columns in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(a);
     int nrhs = (int) igraph_matrix_ncol(b);
     int lda = n > 0 ? n : 1;
     int ldb = n > 0 ? n : 1;
-    igraph_vector_int_t *myipiv = ipiv, vipiv;
+    igraph_vector_fortran_int_t vipiv;
 
     if (n != igraph_matrix_ncol(a)) {
         IGRAPH_ERROR("Cannot LU solve matrix.", IGRAPH_NONSQUARE);
@@ -247,13 +326,10 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
 
-    if (!ipiv) {
-        IGRAPH_CHECK(igraph_vector_int_init(&vipiv, n));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &vipiv);
-        myipiv = &vipiv;
-    }
+    IGRAPH_CHECK(igraph_vector_fortran_int_init(&vipiv, n));
+    IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &vipiv);
 
-    igraphdgesv_(&n, &nrhs, VECTOR(a->data), &lda, VECTOR(*myipiv),
+    igraphdgesv_(&n, &nrhs, VECTOR(a->data), &lda, VECTOR(vipiv),
                  VECTOR(b->data), &ldb, info);
 
     if (*info > 0) {
@@ -290,24 +366,28 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
         }
     }
 
-    if (!ipiv) {
-        igraph_vector_int_destroy(&vipiv);
-        IGRAPH_FINALLY_CLEAN(1);
+    if (ipiv) {
+        IGRAPH_CHECK(igraph_vector_int_update_from_fortran(ipiv, &vipiv));
     }
 
-    return 0;
+    igraph_vector_fortran_int_destroy(&vipiv);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_lapack_dsyevr
- * Selected eigenvalues and optionally eigenvectors of a symmetric matrix
+ * \brief Selected eigenvalues and optionally eigenvectors of a symmetric matrix.
  *
  * Calls the DSYEVR LAPACK function to compute selected eigenvalues
  * and, optionally, eigenvectors of a real symmetric matrix A.
  * Eigenvalues and eigenvectors can be selected by specifying either
  * a range of values or a range of indices for the desired eigenvalues.
  *
- * </para><para>See more in the LAPACK documentation.
+ * </para><para>
+ * See more in the LAPACK documentation.
+ *
  * \param A Matrix, on entry it contains the symmetric input
  *        matrix. Only the leading N-by-N upper triangular part is
  *        used for the computation.
@@ -358,7 +438,7 @@ int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
  * \example examples/simple/igraph_lapack_dsyevr.c
  */
 
-int igraph_lapack_dsyevr(const igraph_matrix_t *A,
+igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                          igraph_lapack_dsyev_which_t which,
                          igraph_real_t vl, igraph_real_t vu, int vestimate,
                          int il, int iu, igraph_real_t abstol,
@@ -367,12 +447,15 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
 
     igraph_matrix_t Acopy;
     char jobz = vectors ? 'V' : 'N', range, uplo = 'U';
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A), lda = n, ldz = n;
     int m, info;
     igraph_vector_t *myvalues = values, vvalues;
-    igraph_vector_int_t *mysupport = support, vsupport;
+    igraph_vector_fortran_int_t mysupport;
     igraph_vector_t work;
-    igraph_vector_int_t iwork;
+    igraph_vector_fortran_int_t iwork;
     int lwork = -1, liwork = -1;
 
     if (n != igraph_matrix_ncol(A)) {
@@ -387,43 +470,41 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
         IGRAPH_ERROR("Invalid 'il' and/or 'iu' values.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
-    IGRAPH_CHECK(igraph_vector_int_init(&iwork, 1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &iwork);
+    IGRAPH_CHECK(igraph_vector_fortran_int_init(&iwork, 1));
+    IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &iwork);
 
     if (!values) {
         IGRAPH_VECTOR_INIT_FINALLY(&vvalues, 0);
         myvalues = &vvalues;
     }
-    if (!support) {
-        IGRAPH_CHECK(igraph_vector_int_init(&vsupport, 0));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &vsupport);
-        mysupport = &vsupport;
-    }
+
+    IGRAPH_CHECK(igraph_vector_fortran_int_init(&mysupport, 0));
+    IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &mysupport);
 
     IGRAPH_CHECK(igraph_vector_resize(myvalues, n));
 
     switch (which) {
     case IGRAPH_LAPACK_DSYEV_ALL:
         range = 'A';
-        IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2 * n));
+        IGRAPH_CHECK(igraph_vector_fortran_int_resize(&mysupport, 2 * n));
         if (vectors) {
             IGRAPH_CHECK(igraph_matrix_resize(vectors, n, n));
         }
         break;
     case IGRAPH_LAPACK_DSYEV_INTERVAL:
         range = 'V';
-        IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2 * vestimate));
+        IGRAPH_CHECK(igraph_vector_fortran_int_resize(&mysupport, 2 * vestimate));
         if (vectors) {
             IGRAPH_CHECK(igraph_matrix_resize(vectors, n, vestimate));
         }
         break;
     case IGRAPH_LAPACK_DSYEV_SELECT:
         range = 'I';
-        IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2 * (iu - il + 1)));
+        IGRAPH_CHECK(igraph_vector_fortran_int_resize(&mysupport, 2 * (iu - il + 1)));
         if (vectors) {
             IGRAPH_CHECK(igraph_matrix_resize(vectors, n, iu - il + 1));
         }
@@ -432,7 +513,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
 
     igraphdsyevr_(&jobz, &range, &uplo, &n, &MATRIX(Acopy, 0, 0), &lda,
                   &vl, &vu, &il, &iu, &abstol, &m, VECTOR(*myvalues),
-                  vectors ? &MATRIX(*vectors, 0, 0) : 0, &ldz, VECTOR(*mysupport),
+                  vectors ? &MATRIX(*vectors, 0, 0) : 0, &ldz, VECTOR(mysupport),
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
     if (info != 0) {
@@ -442,11 +523,11 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
     lwork = (int) VECTOR(work)[0];
     liwork = VECTOR(iwork)[0];
     IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
-    IGRAPH_CHECK(igraph_vector_int_resize(&iwork, liwork));
+    IGRAPH_CHECK(igraph_vector_fortran_int_resize(&iwork, liwork));
 
     igraphdsyevr_(&jobz, &range, &uplo, &n, &MATRIX(Acopy, 0, 0), &lda,
                   &vl, &vu, &il, &iu, &abstol, &m, VECTOR(*myvalues),
-                  vectors ? &MATRIX(*vectors, 0, 0) : 0, &ldz, VECTOR(*mysupport),
+                  vectors ? &MATRIX(*vectors, 0, 0) : 0, &ldz, VECTOR(mysupport),
                   VECTOR(work), &lwork, VECTOR(iwork), &liwork, &info);
 
     if (info != 0) {
@@ -460,29 +541,29 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
         IGRAPH_CHECK(igraph_matrix_resize(vectors, n, m));
     }
     if (support) {
+        IGRAPH_CHECK(igraph_vector_int_update_from_fortran(support, &mysupport));
         IGRAPH_CHECK(igraph_vector_int_resize(support, m));
     }
 
-    if (!support) {
-        igraph_vector_int_destroy(&vsupport);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
+    igraph_vector_fortran_int_destroy(&mysupport);
+    IGRAPH_FINALLY_CLEAN(1);
+
     if (!values) {
         igraph_vector_destroy(&vvalues);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_int_destroy(&iwork);
+    igraph_vector_fortran_int_destroy(&iwork);
     igraph_vector_destroy(&work);
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_lapack_dgeev
- * Eigenvalues and optionally eigenvectors of a non-symmetric matrix
+ * \brief Eigenvalues and optionally eigenvectors of a non-symmetric matrix.
  *
  * This function calls LAPACK to compute, for an N-by-N real
  * nonsymmetric matrix A, the eigenvalues and, optionally, the left
@@ -493,8 +574,8 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  *                    A * v(j) = lambda(j) * v(j)
  * where lambda(j) is its eigenvalue.
  * The left eigenvector u(j) of A satisfies
- *                u(j)**H * A = lambda(j) * u(j)**H
- * where u(j)**H denotes the conjugate transpose of u(j).
+ *                u(j)^H * A = lambda(j) * u(j)^H
+ * where u(j)^H denotes the conjugate transpose of u(j).
  *
  * </para><para>
  * The computed eigenvectors are normalized to have Euclidean norm
@@ -538,7 +619,7 @@ int igraph_lapack_dsyevr(const igraph_matrix_t *A,
  * \example examples/simple/igraph_lapack_dgeev.c
  */
 
-int igraph_lapack_dgeev(const igraph_matrix_t *A,
+igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                         igraph_vector_t *valuesreal,
                         igraph_vector_t *valuesimag,
                         igraph_matrix_t *vectorsleft,
@@ -547,6 +628,11 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
+    igraph_real_t dummy;   /* to prevent some Clang sanitizer warnings */
+
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A);
     int lda = n, ldvl = n, ldvr = n, lwork = -1;
     igraph_vector_t work;
@@ -558,7 +644,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
         IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev).", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
@@ -584,8 +670,8 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy, 0, 0), &lda,
                  VECTOR(*myreal), VECTOR(*myimag),
-                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                  VECTOR(work), &lwork, info);
 
     lwork = (int) VECTOR(work)[0];
@@ -593,8 +679,8 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
 
     igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy, 0, 0), &lda,
                  VECTOR(*myreal), VECTOR(*myimag),
-                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                 vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                 vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                  VECTOR(work), &lwork, info);
 
     if (*info < 0) {
@@ -620,12 +706,12 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_lapack_dgeevx
- * Eigenvalues/vectors of nonsymmetric matrices, expert mode
+ * \brief Eigenvalues/vectors of nonsymmetric matrices, expert mode.
  *
  * This function calculates the eigenvalues and optionally the left
  * and/or right eigenvectors of a nonsymmetric N-by-N real matrix.
@@ -659,7 +745,8 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  * Permuting rows and columns will not change the condition numbers
  * (in exact arithmetic) but diagonal scaling will.  For further
  * explanation of balancing, see section 4.10.2 of the LAPACK
- * Users' Guide.
+ * Users' Guide. Note that the eigenvectors obtained for the balanced
+ * matrix are backtransformed to those of \p A.
  *
  * \param balance Scalar that indicated, whether the input matrix
  *   should be balanced. Possible values:
@@ -690,12 +777,14 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  *   stored in a compressed form. If the j-th eigenvalue is real then
  *   column j contains the corresponding eigenvector. If the j-th and
  *   (j+1)-th eigenvalues form a complex conjugate pair, then the j-th
- *   and (j+1)-th columns contain their corresponding eigenvectors.
+ *   and (j+1)-th columns contain the real and imaginary parts of the
+ *   corresponding eigenvectors.
  * \param vectorsright An initialized matrix or a NULL pointer. If not
  *   a null pointer, then the right eigenvectors are stored here. The
  *   format is the same, as for the \p vectorsleft argument.
  * \param ilo
- * \param ihi \p ilo and \p ihi are integer values determined when A was
+ * \param ihi if not NULL, \p ilo and \p ihi point to integer values
+ *   determined when A was
  *   balanced.  The balanced A(i,j) = 0 if I>J and
  *   J=1,...,ilo-1 or I=ihi+1,...,N.
  * \param scale Pointer to an initialized vector or a NULL pointer. If
@@ -741,7 +830,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
  * \example examples/simple/igraph_lapack_dgeevx.c
  */
 
-int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
+igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                          const igraph_matrix_t *A,
                          igraph_vector_t *valuesreal,
                          igraph_vector_t *valuesimag,
@@ -757,15 +846,27 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
     char sense;
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A);
     int lda = n, ldvl = n, ldvr = n, lwork = -1;
     igraph_vector_t work;
-    igraph_vector_int_t iwork;
+    igraph_vector_fortran_int_t iwork;
     igraph_matrix_t Acopy;
     int error = *info;
     igraph_vector_t *myreal = valuesreal, *myimag = valuesimag, vreal, vimag;
     igraph_vector_t *myscale = scale, vscale;
+    igraph_real_t dummy;   /* to prevent some Clang sanitizer warnings */
+    int ilo_dummy;
+    int ihi_dummy;
 
+    if (ilo == NULL) {
+        ilo = &ilo_dummy;
+    }
+    if (ihi == NULL) {
+        ihi = &ihi_dummy;
+    }
     if (igraph_matrix_ncol(A) != n) {
         IGRAPH_ERROR("Cannot calculate eigenvalues (dgeevx).", IGRAPH_NONSQUARE);
     }
@@ -798,12 +899,12 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
         sense = 'B';
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
-    IGRAPH_CHECK(igraph_vector_int_init(&iwork, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &iwork);
+    IGRAPH_CHECK(igraph_vector_fortran_int_init(&iwork, n));
+    IGRAPH_FINALLY(igraph_vector_fortran_int_destroy, &iwork);
 
     if (!valuesreal) {
         IGRAPH_VECTOR_INIT_FINALLY(&vreal, n);
@@ -832,11 +933,11 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 
     igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy, 0, 0),
                   &lda, VECTOR(*myreal), VECTOR(*myimag),
-                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                   ilo, ihi, VECTOR(*myscale), abnrm,
-                  rconde ? VECTOR(*rconde) : 0,
-                  rcondv ? VECTOR(*rcondv) : 0,
+                  rconde ? VECTOR(*rconde) : &dummy,
+                  rcondv ? VECTOR(*rcondv) : &dummy,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     lwork = (int) VECTOR(work)[0];
@@ -844,11 +945,11 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
 
     igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy, 0, 0),
                   &lda, VECTOR(*myreal), VECTOR(*myimag),
-                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : 0, &ldvl,
-                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
+                  vectorsleft  ? &MATRIX(*vectorsleft, 0, 0) : &dummy, &ldvl,
+                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : &dummy, &ldvr,
                   ilo, ihi, VECTOR(*myscale), abnrm,
-                  rconde ? VECTOR(*rconde) : 0,
-                  rcondv ? VECTOR(*rcondv) : 0,
+                  rconde ? VECTOR(*rconde) : &dummy,
+                  rcondv ? VECTOR(*rcondv) : &dummy,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
     if (*info < 0) {
@@ -876,18 +977,21 @@ int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_int_destroy(&iwork);
+    igraph_vector_fortran_int_destroy(&iwork);
     igraph_vector_destroy(&work);
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_lapack_dgehrd(const igraph_matrix_t *A,
+igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
                          int ilo, int ihi,
                          igraph_matrix_t *result) {
 
+    if (igraph_matrix_nrow(A) > INT_MAX) {
+        IGRAPH_ERROR("Number of rows in matrix too large for LAPACK.", IGRAPH_EOVERFLOW);
+    }
     int n = (int) igraph_matrix_nrow(A);
     int lda = n;
     int lwork = -1;
@@ -908,10 +1012,10 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
 
     if (n <= 1) {
         IGRAPH_CHECK(igraph_matrix_update(result, A));
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_matrix_copy(&Acopy, A));
+    IGRAPH_CHECK(igraph_matrix_init_copy(&Acopy, A));
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
     IGRAPH_VECTOR_INIT_FINALLY(&tau, n - 1);
 
@@ -950,5 +1054,5 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

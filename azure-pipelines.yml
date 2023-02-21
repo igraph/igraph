@@ -4,9 +4,31 @@ pool:
 variables:
   CMAKE_GENERATOR: Ninja
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
+  CCACHE_MAXSIZE: 256M
+  ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
+  UBSAN_OTIONS: print_stacktrace=1:color=always
+  OMP_NUM_THREADS: 1
 
 jobs:
+  # In this test we install and generate locales so that igraph_enter/exit_safelocale() can be tested
   - job: linux_static_vendored
+    steps:
+      - script: |
+          sudo apt-get update
+          sudo apt-get install ninja-build ccache language-pack-de -y
+        displayName: Install dependencies
+
+      - script: |
+          sudo locale-gen de_DE
+          sudo update-locale
+        displayName: Generate locales
+
+      - template: .azure/build.yml
+        parameters:
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero"'
+
+  - job: linux_static_vendored_32
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
@@ -14,7 +36,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og"'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DIGRAPH_INTEGER_SIZE=32'
 
   - job: linux_static_external
     steps:
@@ -26,7 +48,6 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
@@ -50,11 +71,26 @@ jobs:
           int_blas: false
           int_lapack: false
           int_arpack: false
-          int_cxsparse: false
           int_gmp: false
           int_glpk: false
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
+
+  - job: linux_clang_15
+    pool:
+      vmImage: 'ubuntu-22.04'
+    steps:
+      - script: |
+          sudo apt-get install ninja-build ccache -y
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 15
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+        parameters:
+          build_type: Debug
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-15  -DCMAKE_CXX_COMPILER=clang++-15'
 
   - job: linux_x87
     steps:
@@ -69,11 +105,12 @@ jobs:
     steps:
       # https://github.com/alpinelinux/alpine-chroot-install
       - bash: |
-          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.13.2/alpine-chroot-install && echo '60c7e0b5d82e21d1a549fc9a46ba3b36688c09dc  alpine-chroot-install' | sha1sum -c || exit 1
+          set -e
+          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.14.0/alpine-chroot-install && echo 'ccbf65f85cdc351851f8ad025bb3e65bae4d5b06  alpine-chroot-install' | sha1sum -c || exit 1
           alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
           sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex gmp-dev'
           mkdir build && cd build
-          alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_ENABLE_TLS=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+          alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_ENABLE_TLS=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
           alpine cmake --build . --target build_tests
           alpine ctest -j `nproc` --output-on-failure
 
@@ -82,7 +119,6 @@ jobs:
       vmImage: macos-latest
     steps:
       - script: |
-          brew update
           brew install ninja ccache
         displayName: Install dependencies
 

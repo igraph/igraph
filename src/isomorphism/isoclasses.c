@@ -2525,6 +2525,7 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
  * (between 0 and 15), for undirected graph it is only 4. For graphs
  * with four vertices it is 218 (directed) and 11 (undirected).
  * For 5 and 6 vertex undirected graphs, it is 34 and 156, respectively.
+ * These values can also be retrieved using \ref igraph_graph_count().
  * For more information, see https://oeis.org/A000273 and https://oeis.org/A000088.
  *
  * </para><para>
@@ -2547,10 +2548,10 @@ const unsigned int igraph_i_classedges_6u[] = { 4, 5, 3, 5, 2, 5, 1, 5, 0, 5, 3,
  * </para><para>
  * Time complexity: O(|E|), the number of edges in the graph.
  */
-int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
-    long int e;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
+    igraph_integer_t e;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     unsigned int idx, mul;
     const unsigned int *arr_idx, *arr_code;
     unsigned int code;
@@ -2625,8 +2626,8 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  * Multi-edges and self-loops are ignored by this function.
  *
  * \param graph The graph object.
- * \param vids A vector containing the vertex ids to be considered as
- *        a subgraph. Each vertex id should be included at most once.
+ * \param vids A vector containing the vertex IDs to be considered as
+ *        a subgraph. Each vertex ID should be included at most once.
  * \param isoclass Pointer to an integer, this will be set to the
  *        isomorphism class.
  * \return Error code.
@@ -2636,18 +2637,18 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  * Time complexity: O((d+n)*n), d is the average degree in the network,
  * and n is the number of vertices in \c vids.
  */
-int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
+igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_int_t *vids,
                              igraph_integer_t *isoclass) {
-    int subgraph_size = (int) igraph_vector_size(vids);
-    igraph_vector_t neis;
+    igraph_integer_t subgraph_size = igraph_vector_int_size(vids);
+    igraph_vector_int_t neis;
 
     unsigned int mul, idx;
     const unsigned int *arr_idx, *arr_code;
     unsigned int code = 0;
 
-    long int i, j, s;
+    igraph_integer_t i, j, s;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     if (igraph_is_directed(graph)) {
         switch (subgraph_size) {
@@ -2694,20 +2695,20 @@ int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
     }
 
     for (i = 0; i < subgraph_size; i++) {
-        long int from = (long int) VECTOR(*vids)[i];
-        igraph_neighbors(graph, &neis, (igraph_integer_t) from, IGRAPH_OUT);
-        s = igraph_vector_size(&neis);
+        igraph_integer_t from = VECTOR(*vids)[i];
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, IGRAPH_OUT));
+        s = igraph_vector_int_size(&neis);
         for (j = 0; j < s; j++) {
-            long int nei = (long int) VECTOR(neis)[j], to;
-            if (igraph_vector_search(vids, 0, nei, &to)) {
+            igraph_integer_t nei = VECTOR(neis)[j], to;
+            if (igraph_vector_int_search(vids, 0, nei, &to)) {
                 idx = (mul * i + to);
                 code |= arr_idx[idx];
             }
         }
     }
 
-    *isoclass = (igraph_integer_t) arr_code[code];
-    igraph_vector_destroy(&neis);
+    *isoclass = arr_code[code];
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -2745,22 +2746,22 @@ int igraph_isoclass_subgraph(const igraph_t *graph, const igraph_vector_t *vids,
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph to create.
  */
-int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
+igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                            igraph_integer_t number, igraph_bool_t directed) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     const unsigned int *classedges;
-    long int graphcount;
-    long int power;
-    long int pos;
+    igraph_integer_t graphcount;
+    igraph_integer_t pos;
+    unsigned int power;
     unsigned int code;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
 #define CHECK_ISOCLASS(number, directed, size, graphcount) \
     IGRAPH_ERRORF( \
-        "Isoclass %" IGRAPH_PRId " requested, but there are only %ld" \
-        " %s graphs of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, \
-        (igraph_integer_t) number, graphcount, directed ? "directed" : "undirected", size)
+        "Isoclass %" IGRAPH_PRId " requested, but there are only %" \
+        IGRAPH_PRId " %s graphs of size %" IGRAPH_PRId ".", IGRAPH_EINVAL, \
+        number, graphcount, directed ? "directed" : "undirected", size)
 
     if (directed) {
         switch (size) {
@@ -2772,7 +2773,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_3[ (long int) number];
+            code = igraph_i_isographs_3[number];
             power = 32;
 
             break;
@@ -2785,7 +2786,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_4[ (long int) number];
+            code = igraph_i_isographs_4[number];
             power = 2048;
 
             break;
@@ -2805,7 +2806,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_3u[ (long int) number];
+            code = igraph_i_isographs_3u[number];
             power = 4;
 
             break;
@@ -2818,7 +2819,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_4u[ (long int) number];
+            code = igraph_i_isographs_4u[number];
             power = 32;
 
             break;
@@ -2831,7 +2832,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_5u[ (long int) number];
+            code = igraph_i_isographs_5u[number];
             power = 512;
 
             break;
@@ -2844,7 +2845,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
                 CHECK_ISOCLASS(number, directed, size, graphcount);
             }
 
-            code = igraph_i_isographs_6u[ (long int) number];
+            code = igraph_i_isographs_6u[number];
             power = 16384;
 
             break;
@@ -2860,8 +2861,8 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     pos = 0;
     while (code > 0) {
         if (code >= power) {
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2 * pos]));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2 * pos + 1]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, classedges[2 * pos]));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, classedges[2 * pos + 1]));
             code -= power;
         }
         power /= 2;
@@ -2869,8 +2870,64 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, size, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
+    return IGRAPH_SUCCESS;
+}
+
+/* https://oeis.org/A000088 */
+static igraph_integer_t undirected_graph_counts[] = {
+    1, 1, 2, 4, 11, 34, 156, 1044, 12346, 274668, 12005168, 1018997864,
+#if IGRAPH_INTEGER_SIZE == 64
+    165091172592, 50502031367952, 29054155657235488
+#endif
+};
+
+/* https://oeis.org/A000273 */
+static igraph_integer_t directed_graph_counts[] = {
+    1, 1, 3, 16, 218, 9608, 1540944, 882033440,
+#if IGRAPH_INTEGER_SIZE == 64
+    1793359192848, 13027956824399552
+#endif
+};
+
+/**
+ * \function igraph_graph_count
+ * \brief The number of unlabelled graphs on the given number of vertices.
+ *
+ * Gives the number of unlabelled \em simple graphs on the specified number of vertices.
+ * The "isoclass" of a graph of this size is at most one less than this value.
+ *
+ * </para><para>
+ * This function is meant to be used in conjunction with isoclass and motif finder
+ * functions. It will only work for small \p n values for which the result is
+ * represetable in an \type igraph_integer_t. For larger \p n values, an overflow
+ * error is raised.
+ *
+ * \param n The number of vertices.
+ * \param directed Boolean, whether to consider directed graphs.
+ * \param count Pointer to an integer, the result will be stored here.
+ * \return Error code.
+ *
+ * \sa \ref igraph_isoclass(), \ref igraph_motifs_randesu_callback().
+ *
+ * Time complexity: O(1).
+ */
+igraph_error_t igraph_graph_count(igraph_integer_t n, igraph_bool_t directed, igraph_integer_t *count) {
+    if (n < 0) {
+        IGRAPH_ERROR("Graph size must not be negative.", IGRAPH_EINVAL);
+    }
+    if (directed) {
+        if (n >= (igraph_integer_t) (sizeof directed_graph_counts / sizeof directed_graph_counts[0])) {
+            IGRAPH_ERRORF("Graph size of % " IGRAPH_PRId " too large.", IGRAPH_EOVERFLOW, n);
+        }
+        *count = directed_graph_counts[n];
+    } else {
+        if (n >= (igraph_integer_t) (sizeof undirected_graph_counts / sizeof undirected_graph_counts[0])) {
+            IGRAPH_ERRORF("Graph size of % " IGRAPH_PRId " too large.", IGRAPH_EOVERFLOW, n);
+        }
+        *count = undirected_graph_counts[n];
+    }
     return IGRAPH_SUCCESS;
 }

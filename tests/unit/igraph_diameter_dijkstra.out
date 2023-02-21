@@ -1,0 +1,79 @@
+Graph with zero nodes:
+Diameter: NaN, from -1 to -1
+Edges:
+( )
+Vertices:
+( )
+
+Graph with zero nodes, weighted:
+Diameter: NaN, from -1 to -1
+Edges:
+( )
+Vertices:
+( )
+
+Graph with one node:
+Diameter: 0, from 0 to 0
+Edges:
+( )
+Vertices:
+( 0 )
+
+Graph with one node, weighted:
+Diameter: 0, from 0 to 0
+Edges:
+( )
+Vertices:
+( 0 )
+
+Graph with one node, returns inf for unconnected:
+Diameter: 0, from 0 to 0
+Edges:
+( )
+Vertices:
+( 0 )
+
+Graph with two nodes:
+Diameter: 0, from 0 to 0
+Edges:
+( )
+Vertices:
+( 0 )
+
+Graph with two nodes, returns inf for unconnected:
+Diameter: Inf, from -1 to -1
+Edges:
+( )
+Vertices:
+( )
+
+Ring without weights:
+Diameter: 9, from 0 to 9
+Edges:
+( 0 1 2 3 4 5 6 7 8 )
+Vertices:
+( 0 1 2 3 4 5 6 7 8 9 )
+
+Ring with weights:
+Diameter: 19, from 0 to 9
+Edges:
+( 0 1 2 3 4 5 6 7 8 )
+Vertices:
+( 0 1 2 3 4 5 6 7 8 9 )
+
+Graph with loops and multiple edges:
+Diameter: 2, from 0 to 3
+Edges:
+( 0 3 )
+Vertices:
+( 0 1 3 )
+
+Graph with loops and multiple edges, direction ignored:
+Diameter: 3, from 0 to 4
+Edges:
+( 0 3 7 )
+Vertices:
+( 0 1 3 4 )
+
+Ring with some negative weights:
+Ring with wrong weight vector size:

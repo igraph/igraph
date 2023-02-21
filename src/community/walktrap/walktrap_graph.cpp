@@ -54,9 +54,12 @@
 // see readme.txt for more details
 
 #include "walktrap_graph.h"
+
 #include "igraph_interface.h"
+
 #include <algorithm>
-#include <cstring>      // strlen
+#include <stdexcept>
+#include <climits>
 
 using namespace std;
 
@@ -71,28 +74,23 @@ bool operator<(const Edge& E1, const Edge& E2) {
 
 Vertex::Vertex() {
     degree = 0;
-    edges = 0;
+    edges = nullptr;
     total_weight = 0.;
 }
 
 Vertex::~Vertex() {
-    if (edges) {
-        delete[] edges;
-    }
+    delete[] edges;
 }
 
 Graph::Graph() {
     nb_vertices = 0;
     nb_edges = 0;
-    vertices = 0;
-    index = 0;
+    vertices = nullptr;
     total_weight = 0.;
 }
 
 Graph::~Graph () {
-    if (vertices) {
-        delete[] vertices;
-    }
+    delete[] vertices;
 }
 
 class Edge_list {
@@ -112,16 +110,11 @@ public:
         V2 = new int[1024];
         W = new double[1024];
     }
+
     ~Edge_list() {
-        if (V1) {
-            delete[] V1;
-        }
-        if (V2) {
-            delete[] V2;
-        }
-        if (W) {
-            delete[] W;
-        }
+        delete[] V1;
+        delete[] V2;
+        delete[] W;
     }
 };
 
@@ -149,28 +142,27 @@ void Edge_list::add(int v1, int v2, double w) {
     size++;
 }
 
-int Graph::convert_from_igraph(const igraph_t *graph,
+igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
                                const igraph_vector_t *weights) {
     Graph &G = *this;
 
-    int max_vertex = (int)igraph_vcount(graph) - 1;
-    long int no_of_edges = (long int)igraph_ecount(graph);
-    long int i;
-    long int deg;
-    double w;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+    // Refactoring the walktrap code to support larger graphs is pointless
+    // as running the algorithm on them would take an impractically long time.
+    if (no_of_nodes > INT_MAX || no_of_edges > INT_MAX) {
+        IGRAPH_ERROR("Graph too large for walktrap community detection.", IGRAPH_EINVAL);
+    }
 
     Edge_list EL;
 
-    for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from, to;
-        int v1, v2;
-        w = weights ? VECTOR(*weights)[i] : 1.0;
-        igraph_edge(graph, i, &from, &to);
-        v1 = (int)from; v2 = (int)to;
-        EL.add(v1, v2, w);
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
+        igraph_real_t w = weights ? VECTOR(*weights)[i] : 1.0;
+        EL.add(IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i), w);
     }
 
-    G.nb_vertices = max_vertex + 1;
+    G.nb_vertices = no_of_nodes;
     G.vertices = new Vertex[G.nb_vertices];
     G.nb_edges = 0;
     G.total_weight = 0.0;
@@ -185,8 +177,8 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     for (int i = 0; i < G.nb_vertices; i++) {
-        deg = G.vertices[i].degree;
-        w = (deg == 0) ? 1.0 : (G.vertices[i].total_weight / double(deg));
+        int deg = G.vertices[i].degree;
+        double w = (deg == 0) ? 1.0 : (G.vertices[i].total_weight / double(deg));
         G.vertices[i].edges = new Edge[deg + 1];
         G.vertices[i].edges[0].neighbor = i;
         G.vertices[i].edges[0].weight = w;
@@ -204,7 +196,7 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     for (int i = 0; i < G.nb_vertices; i++) {
-        /* Check for zero strength, as it may lead to crashed in walktrap algorithm.
+        /* Check for zero strength, as it may lead to crashes the in walktrap algorithm.
          * See https://github.com/igraph/igraph/pull/2043 */
         if (G.vertices[i].total_weight == 0) {
             /* G.vertices will be destroyed by Graph::~Graph() */
@@ -227,20 +219,6 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     }
 
     return IGRAPH_SUCCESS;
-}
-
-long Graph::memory() {
-    size_t m = 0;
-    m += size_t(nb_vertices) * sizeof(Vertex);
-    m += 2 * size_t(nb_edges) * sizeof(Edge);
-    m += sizeof(Graph);
-    if (index != 0) {
-        m += size_t(nb_vertices) * sizeof(char*);
-        for (int i = 0; i < nb_vertices; i++) {
-            m += strlen(index[i]) + 1;
-        }
-    }
-    return m;
 }
 
 }

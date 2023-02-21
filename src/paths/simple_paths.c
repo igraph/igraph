@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2014-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,19 +13,15 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 
 #include "igraph_paths.h"
 
 #include "igraph_interface.h"
-#include "igraph_vector_ptr.h"
 #include "igraph_iterators.h"
 #include "igraph_adjlist.h"
-#include "igraph_stack.h"
 
 #include "core/interruption.h"
 
@@ -41,15 +35,15 @@
  * </para><para>
  * Note that potentially there are exponentially many
  * paths between two vertices of a graph, and you may
- * run out of memory when using this function, if your
- * graph is lattice-like.
+ * run out of memory when using this function when the
+ * graph has many cycles. Consider using the \p cutoff
+ * parameter when you do not need long paths.
  *
- * </para><para>
- * This function currently ignored multiple and loop edges.
  * \param graph The input graph.
- * \param res Initialized integer vector, all paths are
- *        returned here, separated by -1 markers. The paths
- *        are included in arbitrary order, as they are found.
+ * \param res Initialized integer vector. The paths are
+ *        returned here in terms of their vertices, separated
+ *        by <code>-1</code> markers. The paths are included in arbitrary
+ *        order, as they are found.
  * \param from The start vertex.
  * \param to The target vertices.
  * \param cutoff Maximum length of path that is considered. If
@@ -58,11 +52,13 @@
  *        for undirected graphs.
  * \return Error code.
  *
+ * \sa \ref igraph_get_k_shortest_paths()
+ *
  * Time complexity: O(n!) in the worst case, n is the number of
  * vertices.
  */
 
-int igraph_get_all_simple_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                 igraph_vector_int_t *res,
                                 igraph_integer_t from,
                                 const igraph_vs_t to,
@@ -72,41 +68,35 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_integer_t no_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
     igraph_bool_t toall = igraph_vs_is_all(&to);
-    igraph_vector_char_t markto;
     igraph_lazy_adjlist_t adjlist;
     igraph_vector_int_t stack, dist;
-    igraph_vector_char_t added;
+    igraph_vector_bool_t markto, added;
     igraph_vector_int_t nptr;
     int iteration = 0;
 
     if (from < 0 || from >= no_nodes) {
-        IGRAPH_ERROR("Invalid starting vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid starting vertex.", IGRAPH_EINVVID);
     }
 
     if (!toall) {
-        igraph_vector_char_init(&markto, no_nodes);
-        IGRAPH_FINALLY(igraph_vector_char_destroy, &markto);
+        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&markto, no_nodes);
         IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
         for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-            VECTOR(markto)[ IGRAPH_VIT_GET(vit) ] = 1;
+            VECTOR(markto)[ IGRAPH_VIT_GET(vit) ] = true;
         }
         igraph_vit_destroy(&vit);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_CHECK(igraph_vector_char_init(&added, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_vector_int_init(&stack, 100));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &stack);
-    IGRAPH_CHECK(igraph_vector_int_init(&dist, 100));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &dist);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, no_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&stack, 100);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dist, 100);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(
         graph, &adjlist, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
     ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nptr, no_nodes);
 
     igraph_vector_int_clear(res);
 
@@ -114,16 +104,20 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_int_clear(&dist);
     igraph_vector_int_push_back(&stack, from);
     igraph_vector_int_push_back(&dist, 0);
-    VECTOR(added)[from] = 1;
+    VECTOR(added)[from] = true;
     while (!igraph_vector_int_empty(&stack)) {
-        int act = igraph_vector_int_tail(&stack);
-        int curdist = igraph_vector_int_tail(&dist);
+        igraph_integer_t act = igraph_vector_int_tail(&stack);
+        igraph_integer_t curdist = igraph_vector_int_tail(&dist);
         igraph_vector_int_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
-        int n = igraph_vector_int_size(neis);
-        int *ptr = igraph_vector_int_e_ptr(&nptr, act);
+        igraph_integer_t n;
+        igraph_integer_t *ptr = igraph_vector_int_get_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
-        int nei;
+        igraph_integer_t nei;
+
+        IGRAPH_CHECK_OOM(neis, "Failed to query neighbors.");
+
+        n = igraph_vector_int_size(neis);
 
         if (iteration == 0) {
             IGRAPH_ALLOW_INTERRUPTION();
@@ -132,9 +126,9 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
         within_dist = (curdist < cutoff || cutoff < 0);
         if (within_dist) {
             /* Search for a neighbor that was not yet visited */
-            any = 0;
+            any = false;
             while (!any && (*ptr) < n) {
-                nei = (int) VECTOR(*neis)[(*ptr)];
+                nei = VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];
                 (*ptr) ++;
             }
@@ -143,7 +137,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
             /* There is such a neighbor, add it */
             IGRAPH_CHECK(igraph_vector_int_push_back(&stack, nei));
             IGRAPH_CHECK(igraph_vector_int_push_back(&dist, curdist + 1));
-            VECTOR(added)[nei] = 1;
+            VECTOR(added)[nei] = true;
             /* Add to results */
             if (toall || VECTOR(markto)[nei]) {
                 IGRAPH_CHECK(igraph_vector_int_append(res, &stack));
@@ -151,9 +145,9 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
             }
         } else {
             /* There is no such neighbor, finished with the subtree */
-            int up = igraph_vector_int_pop_back(&stack);
+            igraph_integer_t up = igraph_vector_int_pop_back(&stack);
             igraph_vector_int_pop_back(&dist);
-            VECTOR(added)[up] = 0;
+            VECTOR(added)[up] = false;
             VECTOR(nptr)[up] = 0;
         }
 
@@ -167,13 +161,13 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&dist);
     igraph_vector_int_destroy(&stack);
-    igraph_vector_char_destroy(&added);
+    igraph_vector_bool_destroy(&added);
     IGRAPH_FINALLY_CLEAN(5);
 
     if (!toall) {
-        igraph_vector_char_destroy(&markto);
+        igraph_vector_bool_destroy(&markto);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

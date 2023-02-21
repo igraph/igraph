@@ -1,0 +1,108 @@
+No vertices, no allowed starting vertex ID.
+
+Null graph without explicit start vertex:
+result: NaN, from -1 to -1
+
+1 vertex:
+result: 0, from 0 to 0
+
+2 vertices unconn = true:
+result: 0, from 0 to 0
+
+2 vertices unconn = false:
+result: Inf, from -1 to -1
+
+2 vertices, directed, unconn = true:
+result: 0, from 0 to 0
+
+2 vertices, directed, unconn = false:
+result: Inf, from -1 to -1
+
+Undirected disconnected graph with loops and multiple edges.
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 3, from 4 to 0
+
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 0, from 5 to 5
+
+Directed disconnected graph with loops and multiple edges, direction ignored.
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 3, from 4 to 0
+
+result: 3, from 0 to 4
+
+result: 3, from 4 to 0
+
+result: 0, from 5 to 5
+
+Directed disconnected graph with loops and multiple edges.
+result: 3, from 0 to 4
+
+result: 2, from 2 to 1
+
+result: 3, from 0 to 4
+
+result: 3, from 0 to 4
+
+result: 3, from 0 to 4
+
+result: 0, from 5 to 5
+
+Directed graph, pointing outward from 2.
+result: 2, from 2 to 0
+
+result: 2, from 2 to 0
+
+result: 2, from 2 to 0
+
+result: 2, from 2 to 0
+
+result: 2, from 2 to 4
+
+Same graph, direction ignored.
+result: 4, from 0 to 4
+
+result: 4, from 4 to 0
+
+result: 4, from 0 to 4
+
+result: 4, from 0 to 4
+
+result: 4, from 4 to 0
+
+Same graph, unconn = false.
+result: Inf, from -1 to -1
+
+Same graph, undirected.
+result: 4, from 0 to 4
+
+result: 4, from 4 to 0
+
+result: 4, from 0 to 4
+
+result: 4, from 0 to 4
+
+result: 4, from 4 to 0
+
+Petersen graph with random starts.
+result: 2, from 1 to 4
+
+result: 2, from 5 to 1
+
+result: 2, from 8 to 2
+
+result: 2, from 9 to 0
+
+result: 2, from 9 to 0
+
+result: 2, from 7 to 1
+

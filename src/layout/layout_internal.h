@@ -25,39 +25,45 @@
 
 #include "igraph_datatype.h"
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
+#include "igraph_matrix.h"
 
 #include "layout/merge_grid.h"
 
 __BEGIN_DECLS
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
-                                                    long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
+                                                    igraph_integer_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                                                     igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                                                     igraph_real_t killr);
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
                                                     igraph_real_t *y, igraph_real_t *r);
 
-IGRAPH_PRIVATE_EXPORT int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
                                                     igraph_real_t *y, igraph_real_t *z,
                                                     igraph_real_t *r);
 
-IGRAPH_PRIVATE_EXPORT float igraph_i_layout_point_segment_dist2(float v_x, float v_y,
-                                                                float u1_x, float u1_y,
-                                                                float u2_x, float u2_y);
+IGRAPH_PRIVATE_EXPORT igraph_real_t igraph_i_layout_point_segment_dist2(igraph_real_t v_x, igraph_real_t v_y,
+                                                                igraph_real_t u1_x, igraph_real_t u1_y,
+                                                                igraph_real_t u2_x, igraph_real_t u2_y);
 
-IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_i_layout_segments_intersect(float p0_x, float p0_y,
-                                                                       float p1_x, float p1_y,
-                                                                       float p2_x, float p2_y,
-                                                                       float p3_x, float p3_y);
+IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_i_layout_segments_intersect(igraph_real_t p0_x, igraph_real_t p0_y,
+                                                                       igraph_real_t p1_x, igraph_real_t p1_y,
+                                                                       igraph_real_t p2_x, igraph_real_t p2_y,
+                                                                       igraph_real_t p3_x, igraph_real_t p3_y);
 
-int igraph_i_layout_random_bounded(
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_umap_fit_ab(igraph_real_t min_dist,
+                                                          igraph_real_t *a_p,
+                                                          igraph_real_t *b_p);
+
+igraph_error_t igraph_i_layout_random_bounded(
         const igraph_t *graph, igraph_matrix_t *res,
         const igraph_vector_t *minx, const igraph_vector_t *maxx,
         const igraph_vector_t *miny, const igraph_vector_t *maxy);
 
-int igraph_i_layout_random_bounded_3d(
+igraph_error_t igraph_i_layout_random_bounded_3d(
         const igraph_t *graph, igraph_matrix_t *res,
         const igraph_vector_t *minx, const igraph_vector_t *maxx,
         const igraph_vector_t *miny, const igraph_vector_t *maxy,

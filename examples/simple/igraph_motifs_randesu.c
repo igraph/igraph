@@ -3,14 +3,14 @@
 
 /* This is a callback function suitable for use with igraph_motifs_randesu_callback().
  * It prints each motif it is calld with. */
-igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_t *vids,
-                          int isoclass, void* extra) {
-    printf("Found isoclass %2d:  ", isoclass);
-    igraph_vector_print(vids);
-    return 0; /* Return 'false': do not interrupt the search. */
+igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
+                          igraph_integer_t isoclass, void* extra) {
+    printf("Found isoclass %2" IGRAPH_PRId ":  ", isoclass);
+    igraph_vector_int_print(vids);
+    return IGRAPH_SUCCESS; /* Return 'IGRAPH_SUCCESS': do not interrupt the search. */
 }
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_vector_t hist;
@@ -29,7 +29,7 @@ int main() {
     igraph_real_t sum = 0.0;
     igraph_integer_t n = igraph_vector_size(&hist);
     for (igraph_integer_t i=0; i < n; i++) {
-        if (!igraph_is_nan(VECTOR(hist)[i])) {
+        if (!isnan(VECTOR(hist)[i])) {
             sum += VECTOR(hist)[i];
         }
     }

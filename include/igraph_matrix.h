@@ -25,6 +25,7 @@
 #define IGRAPH_MATRIX_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_vector.h"
 
 __BEGIN_DECLS
@@ -44,12 +45,6 @@ __BEGIN_DECLS
 #include "igraph_matrix_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_INT
-
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "igraph_matrix_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
@@ -73,6 +68,9 @@ __BEGIN_DECLS
 #define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
     do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \
         IGRAPH_FINALLY(igraph_matrix_destroy, m); } while (0)
+#define IGRAPH_MATRIX_INT_INIT_FINALLY(m, nr, nc) \
+    do { IGRAPH_CHECK(igraph_matrix_int_init(m, nr, nc)); \
+        IGRAPH_FINALLY(igraph_matrix_int_destroy, m); } while (0)
 
 /**
  * \ingroup matrix
@@ -89,11 +87,16 @@ __BEGIN_DECLS
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 
-IGRAPH_EXPORT igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
-                                                    const igraph_matrix_t *rhs,
-                                                    igraph_real_t tol);
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
+                                                                      const igraph_matrix_t *rhs,
+                                                                      igraph_real_t tol);
 
-IGRAPH_EXPORT int igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
+IGRAPH_EXPORT igraph_bool_t igraph_matrix_all_almost_e(const igraph_matrix_t *lhs,
+                                                           const igraph_matrix_t *rhs,
+                                                           igraph_real_t eps);
+
+IGRAPH_EXPORT igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
+IGRAPH_EXPORT igraph_error_t igraph_matrix_complex_zapsmall(igraph_matrix_complex_t *m, igraph_real_t tol);
 
 __END_DECLS
 

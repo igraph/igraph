@@ -23,6 +23,7 @@
 */
 
 #include "igraph_cocitation.h"
+
 #include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
@@ -31,7 +32,7 @@
 
 #include <math.h>
 
-int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids, igraph_neimode_t mode,
                            igraph_vector_t *weights);
 
@@ -40,21 +41,21 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_cocitation
  * \brief Cocitation coupling.
  *
- * </para><para>
  * Two vertices are cocited if there is another vertex citing both of
  * them. \ref igraph_cocitation() simply counts how many times two vertices are
  * cocited.
  * The cocitation score for each given vertex and all other vertices
  * in the graph will be calculated.
+ *
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in \p vids, the number of
+ *        number of vertex IDs in \p vids, the number of
  *        columns is the number of vertices in the graph.
- * \param vids The vertex ids of the vertices for which the
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *
  * Time complexity: O(|V|d^2), |V| is
  * the number of vertices in the graph,
@@ -66,9 +67,9 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  * \example examples/simple/igraph_cocitation.c
  */
 
-int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
                       const igraph_vs_t vids) {
-    return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT, 0);
+    return igraph_i_cocitation_real(graph, res, vids, IGRAPH_OUT, NULL);
 }
 
 /**
@@ -76,21 +77,21 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_bibcoupling
  * \brief Bibliographic coupling.
  *
- * </para><para>
  * The bibliographic coupling of two vertices is the number
  * of other vertices they both cite, \ref igraph_bibcoupling() calculates
  * this.
  * The bibliographic coupling  score for each given vertex and all
  * other vertices in the graph will be calculated.
+ *
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in \p vids, the number of
+ *        number of vertex IDs in \p vids, the number of
  *        columns is the number of vertices in the graph.
- * \param vids The vertex ids of the vertices for which the
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *
  * Time complexity: O(|V|d^2),
  * |V| is the number of vertices in
@@ -102,9 +103,9 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  * \example examples/simple/igraph_cocitation.c
  */
 
-int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
                        const igraph_vs_t vids) {
-    return igraph_cocitation_real(graph, res, vids, IGRAPH_IN, 0);
+    return igraph_i_cocitation_real(graph, res, vids, IGRAPH_IN, NULL);
 }
 
 /**
@@ -112,7 +113,6 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_similarity_inverse_log_weighted
  * \brief Vertex similarity based on the inverse logarithm of vertex degrees.
  *
- * </para><para>
  * The inverse log-weighted similarity of two vertices is the number of
  * their common neighbors, weighted by the inverse logarithm of their degrees.
  * It is based on the assumption that two vertices should be considered
@@ -126,13 +126,14 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * </para><para>
  * See the following paper for more details: Lada A. Adamic and Eytan Adar:
  * Friends and neighbors on the Web. Social Networks, 25(3):211-230, 2003.
+ * https://doi.org/10.1016/S0378-8733(03)00009-1
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in \p vids, the number of
+ *        number of vertex IDs in \p vids, the number of
  *        columns is the number of vertices in the graph.
- * \param vids The vertex ids of the vertices for which the
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
@@ -149,7 +150,7 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  *          degree.
  *        \endclist
  * \return Error code:
- *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex ID.
  *
  * Time complexity: O(|V|d^2),
  * |V| is the number of vertices in
@@ -159,11 +160,12 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * \example examples/simple/igraph_similarity.c
  */
 
-int igraph_similarity_inverse_log_weighted(const igraph_t *graph,
+igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
     igraph_vector_t weights;
+    igraph_vector_int_t degrees;
     igraph_neimode_t mode0;
-    long int i, no_of_nodes;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     switch (mode) {
     case IGRAPH_OUT: mode0 = IGRAPH_IN; break;
@@ -171,32 +173,34 @@ int igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     default: mode0 = IGRAPH_ALL;
     }
 
-    no_of_nodes = igraph_vcount(graph);
-
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &weights, igraph_vss_all(), mode0, 1));
-    for (i = 0; i < no_of_nodes; i++) {
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode0, true));
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        VECTOR(weights)[i] = VECTOR(degrees)[i];
         if (VECTOR(weights)[i] > 1) {
             VECTOR(weights)[i] = 1.0 / log(VECTOR(weights)[i]);
         }
     }
 
-    IGRAPH_CHECK(igraph_cocitation_real(graph, res, vids, mode0, &weights));
+    IGRAPH_CHECK(igraph_i_cocitation_real(graph, res, vids, mode0, &weights));
+    igraph_vector_int_destroy(&degrees);
     igraph_vector_destroy(&weights);
-    IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids,
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_vids;
-    long int from, i, j, k, l, u, v;
-    igraph_vector_t neis = IGRAPH_VECTOR_NULL;
-    igraph_vector_t vid_reverse_index;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_vids;
+    igraph_integer_t from, i, j;
+    igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t vid_reverse_index;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -206,38 +210,40 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 
     /* Create a mapping from vertex IDs to the row of the matrix where
      * the result for this vertex will appear */
-    IGRAPH_VECTOR_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
-    igraph_vector_fill(&vid_reverse_index, -1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vid_reverse_index, no_of_nodes);
+    igraph_vector_int_fill(&vid_reverse_index, -1);
     for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-        v = IGRAPH_VIT_GET(vit);
+        igraph_integer_t v = IGRAPH_VIT_GET(vit);
         if (v < 0 || v >= no_of_nodes) {
-            IGRAPH_ERROR("invalid vertex ID in vertex selector", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid vertex ID in vertex selector.", IGRAPH_EINVVID);
         }
         VECTOR(vid_reverse_index)[v] = i;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_vids, no_of_nodes));
     igraph_matrix_null(res);
 
     /* The result */
 
     for (from = 0; from < no_of_nodes; from++) {
-        igraph_real_t weight = 1;
+        igraph_real_t weight;
 
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis,
-                                      (igraph_integer_t) from, mode));
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
+        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
         if (weights) {
             weight = VECTOR(*weights)[from];
+        } else {
+            weight = 1;
         }
 
-        for (i = 0; i < igraph_vector_size(&neis) - 1; i++) {
-            u = (long int) VECTOR(neis)[i];
-            k = (long int) VECTOR(vid_reverse_index)[u];
-            for (j = i + 1; j < igraph_vector_size(&neis); j++) {
-                v = (long int) VECTOR(neis)[j];
-                l = (long int) VECTOR(vid_reverse_index)[v];
+        for (i = 0; i < nei_count - 1; i++) {
+            igraph_integer_t u = VECTOR(neis)[i];
+            igraph_integer_t k = VECTOR(vid_reverse_index)[u];
+            for (j = i + 1; j < nei_count; j++) {
+                igraph_integer_t v = VECTOR(neis)[j];
+                igraph_integer_t l = VECTOR(vid_reverse_index)[v];
                 if (k != -1) {
                     MATRIX(*res, k, v) += weight;
                 }
@@ -249,20 +255,21 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
     }
 
     /* Clean up */
-    igraph_vector_destroy(&neis);
-    igraph_vector_destroy(&vid_reverse_index);
+    igraph_vector_int_destroy(&neis);
+    igraph_vector_int_destroy(&vid_reverse_index);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
-static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
-                                      const igraph_vector_int_t *v2, long int *len_union,
-                                      long int *len_intersection) {
+static igraph_error_t igraph_i_neisets_intersect(
+    const igraph_vector_int_t *v1, const igraph_vector_int_t *v2,
+    igraph_integer_t *len_union, igraph_integer_t *len_intersection
+) {
     /* ASSERT: v1 and v2 are sorted */
-    long int i, j, i0, jj0;
+    igraph_integer_t i, j, i0, jj0;
     i0 = igraph_vector_int_size(v1); jj0 = igraph_vector_int_size(v2);
     *len_union = i0 + jj0; *len_intersection = 0;
     i = 0; j = 0;
@@ -276,7 +283,7 @@ static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
             j++;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -284,7 +291,6 @@ static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
  * \function igraph_similarity_jaccard
  * \brief Jaccard similarity coefficient for the given vertices.
  *
- * </para><para>
  * The Jaccard similarity coefficient of two vertices is the number of common
  * neighbors divided by the number of vertices that are neighbors of at
  * least one of the two vertices being considered. This function calculates
@@ -293,8 +299,8 @@ static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
  * \param graph The graph object to analyze
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
- *        as the number of vertex ids in \p vids.
- * \param vids The vertex ids of the vertices for which the
+ *        as the number of vertex IDs in \p vids.
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
@@ -314,7 +320,7 @@ static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -328,13 +334,14 @@ static int igraph_i_neisets_intersect(const igraph_vector_int_t *v1,
  *
  * \example examples/simple/igraph_similarity.c
  */
-int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
                               const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
     igraph_vit_t vit, vit2;
-    long int i, j, k;
-    long int len_union, len_intersection;
+    igraph_integer_t i, j;
+    igraph_integer_t len_union, len_intersection;
     igraph_vector_int_t *v1, *v2;
+    igraph_integer_t k;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -349,9 +356,10 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
     if (loops) {
         for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
             i = IGRAPH_VIT_GET(vit);
-            v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) i);
+            v1 = igraph_lazy_adjlist_get(&al, i);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, i, &k)) {
-                igraph_vector_int_insert(v1, k, i);
+                IGRAPH_CHECK(igraph_vector_int_insert(v1, k, i));
             }
         }
     }
@@ -364,9 +372,13 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
             if (j <= i) {
                 continue;
             }
+
             v1 = igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             v2 = igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
-            igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
+            IGRAPH_CHECK_OOM(v2, "Failed to query neighbors.");
+
+            IGRAPH_CHECK(igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection));
             if (len_union > 0) {
                 MATRIX(*res, i, j) = ((igraph_real_t)len_intersection) / len_union;
             } else {
@@ -381,7 +393,7 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vit_destroy(&vit2);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -389,7 +401,6 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_similarity_jaccard_pairs
  * \brief Jaccard similarity coefficient for given vertex pairs.
  *
- * </para><para>
  * The Jaccard similarity coefficient of two vertices is the number of common
  * neighbors divided by the number of vertices that are neighbors of at
  * least one of the two vertices being considered. This function calculates
@@ -421,7 +432,7 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -436,17 +447,16 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \example examples/simple/igraph_similarity.c
  */
-int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
-                                    const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
+igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
+                                    const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
-    long int i, j, k, u, v;
-    long int len_union, len_intersection;
+    igraph_integer_t u, v;
+    igraph_integer_t len_union, len_intersection;
     igraph_vector_int_t *v1, *v2;
-    igraph_bool_t *seen;
 
-    k = igraph_vector_size(pairs);
+    igraph_integer_t k = igraph_vector_int_size(pairs);
     if (k % 2 != 0) {
-        IGRAPH_ERROR("number of elements in `pairs' must be even", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of elements in `pairs' must be even.", IGRAPH_EINVAL);
     }
     IGRAPH_CHECK(igraph_vector_resize(res, k / 2));
 
@@ -455,41 +465,42 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
 
     if (loops) {
         /* Add the loop edges */
-        i = igraph_vcount(graph);
-        seen = IGRAPH_CALLOC(i, igraph_bool_t);
-        if (seen == 0) {
-            IGRAPH_ERROR("cannot calculate Jaccard similarity", IGRAPH_ENOMEM);
-        }
-        IGRAPH_FINALLY(igraph_free, seen);
 
-        for (i = 0; i < k; i++) {
-            j = (long int) VECTOR(*pairs)[i];
-            if (seen[j]) {
+        igraph_vector_bool_t seen;
+        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, igraph_vcount(graph));
+
+        for (igraph_integer_t i = 0; i < k; i++) {
+            igraph_integer_t j = VECTOR(*pairs)[i];
+            if (VECTOR(seen)[j]) {
                 continue;
             }
-            seen[j] = 1;
-            v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) j);
+            VECTOR(seen)[j] = true;
+            v1 = igraph_lazy_adjlist_get(&al, j);
+            IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
             if (!igraph_vector_int_binsearch(v1, j, &u)) {
-                igraph_vector_int_insert(v1, u, j);
+                IGRAPH_CHECK(igraph_vector_int_insert(v1, u, j));
             }
         }
 
-        IGRAPH_FREE(seen);
+        igraph_vector_bool_destroy(&seen);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    for (i = 0, j = 0; i < k; i += 2, j++) {
-        u = (long int) VECTOR(*pairs)[i];
-        v = (long int) VECTOR(*pairs)[i + 1];
+    for (igraph_integer_t i = 0, j = 0; i < k; i += 2, j++) {
+        u = VECTOR(*pairs)[i];
+        v = VECTOR(*pairs)[i + 1];
 
         if (u == v) {
             VECTOR(*res)[j] = 1.0;
             continue;
         }
 
-        v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) u);
-        v2 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) v);
-        igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
+        v1 = igraph_lazy_adjlist_get(&al, u);
+        IGRAPH_CHECK_OOM(v1, "Failed to query neighbors.");
+        v2 = igraph_lazy_adjlist_get(&al, v);
+        IGRAPH_CHECK_OOM(v2, "Failed to query neighbors.");
+
+        IGRAPH_CHECK(igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection));
         if (len_union > 0) {
             VECTOR(*res)[j] = ((igraph_real_t)len_intersection) / len_union;
         } else {
@@ -500,7 +511,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
     igraph_lazy_adjlist_destroy(&al);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -508,7 +519,6 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_similarity_jaccard_es
  * \brief Jaccard similarity coefficient for a given edge selector.
  *
- * </para><para>
  * The Jaccard similarity coefficient of two vertices is the number of common
  * neighbors divided by the number of vertices that are neighbors of at
  * least one of the two vertices being considered. This function calculates
@@ -539,7 +549,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -555,28 +565,15 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
  *
  * \example examples/simple/igraph_similarity.c
  */
-int igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
                                  const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_vector_t v;
-    igraph_eit_t eit;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&v, 0);
+    igraph_vector_int_t pairs;
 
-    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
-    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
-
-    while (!IGRAPH_EIT_END(eit)) {
-        long int eid = IGRAPH_EIT_GET(eit);
-        igraph_vector_push_back(&v, IGRAPH_FROM(graph, eid));
-        igraph_vector_push_back(&v, IGRAPH_TO(graph, eid));
-        IGRAPH_EIT_NEXT(eit);
-    }
-
-    igraph_eit_destroy(&eit);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, &v, mode, loops));
-    igraph_vector_destroy(&v);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&pairs, 0);
+    IGRAPH_CHECK(igraph_edges(graph, es, &pairs));
+    IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, &pairs, mode, loops));
+    igraph_vector_int_destroy(&pairs);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
@@ -587,16 +584,15 @@ int igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_similarity_dice
  * \brief Dice similarity coefficient.
  *
- * </para><para>
  * The Dice similarity coefficient of two vertices is twice the number of common
  * neighbors divided by the sum of the degrees of the vertices. This function
  * calculates the pairwise Dice similarities for some (or all) of the vertices.
  *
- * \param graph The graph object to analyze
+ * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
- *        as the number of vertex ids in \p vids.
- * \param vids The vertex ids of the vertices for which the
+ *        as the number of vertex IDs in \p vids.
+ * \param vids The vertex IDs of the vertices for which the
  *        calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
@@ -616,30 +612,30 @@ int igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
  *
  * Time complexity: O(|V|^2 d),
- * |V| is the number of vertices in the vertex iterator given, d is the
- * (maximum) degree of the vertices in the graph.
+ * where |V| is the number of vertices in the vertex iterator given, and
+ * d is the (maximum) degree of the vertices in the graph.
  *
  * \sa \ref igraph_similarity_jaccard(), a measure very similar to the Dice
  *   coefficient
  *
  * \example examples/simple/igraph_similarity.c
  */
-int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
-                           const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
-    long int i, j, nr, nc;
+igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
+                                      const igraph_vs_t vids,
+                                      igraph_neimode_t mode, igraph_bool_t loops) {
 
     IGRAPH_CHECK(igraph_similarity_jaccard(graph, res, vids, mode, loops));
 
-    nr = igraph_matrix_nrow(res);
-    nc = igraph_matrix_ncol(res);
-    for (i = 0; i < nr; i++) {
-        for (j = 0; j < nc; j++) {
+    igraph_integer_t nr = igraph_matrix_nrow(res);
+    igraph_integer_t nc = igraph_matrix_ncol(res);
+    for (igraph_integer_t i = 0; i < nr; i++) {
+        for (igraph_integer_t j = 0; j < nc; j++) {
             igraph_real_t x = MATRIX(*res, i, j);
             MATRIX(*res, i, j) = 2 * x / (1 + x);
         }
@@ -653,7 +649,6 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_similarity_dice_pairs
  * \brief Dice similarity coefficient for given vertex pairs.
  *
- * </para><para>
  * The Dice similarity coefficient of two vertices is twice the number of common
  * neighbors divided by the sum of the degrees of the vertices. This function
  * calculates the pairwise Dice similarities for a list of vertex pairs.
@@ -684,7 +679,7 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -699,13 +694,12 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \example examples/simple/igraph_similarity.c
  */
-int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
-                                 const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
-    long int i, n;
+igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
+                                 const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
 
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, pairs, mode, loops));
-    n = igraph_vector_size(res);
-    for (i = 0; i < n; i++) {
+    igraph_integer_t n = igraph_vector_size(res);
+    for (igraph_integer_t i = 0; i < n; i++) {
         igraph_real_t x = VECTOR(*res)[i];
         VECTOR(*res)[i] = 2 * x / (1 + x);
     }
@@ -718,7 +712,6 @@ int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_similarity_dice_es
  * \brief Dice similarity coefficient for a given edge selector.
  *
- * </para><para>
  * The Dice similarity coefficient of two vertices is twice the number of common
  * neighbors divided by the sum of the degrees of the vertices. This function
  * calculates the pairwise Dice similarities for the endpoints of edges in a given
@@ -748,7 +741,7 @@ int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -764,13 +757,12 @@ int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
  *
  * \example examples/simple/igraph_similarity.c
  */
-int igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
-    long int i, n;
 
     IGRAPH_CHECK(igraph_similarity_jaccard_es(graph, res, es, mode, loops));
-    n = igraph_vector_size(res);
-    for (i = 0; i < n; i++) {
+    igraph_integer_t n = igraph_vector_size(res);
+    for (igraph_integer_t i = 0; i < n; i++) {
         igraph_real_t x = VECTOR(*res)[i];
         VECTOR(*res)[i] = 2 * x / (1 + x);
     }

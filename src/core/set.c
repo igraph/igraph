@@ -21,9 +21,7 @@
 
 */
 
-#include "igraph_types.h"
 #include "igraph_memory.h"
-#include "igraph_error.h"
 
 #include "core/set.h"
 
@@ -36,8 +34,12 @@
  * \function igraph_set_init
  * \brief Initializes a set.
  *
- * \param set pointer to the set to be initialized
- * \param size the expected number of elements in the set
+ * Initializes an empty set (with zero elements). Allocates memory for
+ * the requested capacity. No re-allocation will be necessary until the
+ * number of elements exceeds this initial capacity.
+ *
+ * \param set Pointer to the set to be initialized.
+ * \param capacity The expected number of elements in the set.
  *
  * \return error code:
  *       \c IGRAPH_ENOMEM if there is not enough memory.
@@ -45,18 +47,19 @@
  * Time complexity: operating system dependent, should be around
  * O(n), n is the expected size of the set.
  */
-int igraph_set_init(igraph_set_t *set, int long size) {
-    long int alloc_size;
+igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
+    igraph_integer_t alloc_size;
 
-    if (size < 0) {
-        size = 0;
-    }
-    alloc_size = size > 0 ? size : 1;
+    IGRAPH_ASSERT(capacity >= 0);
+    alloc_size = capacity > 0 ? capacity : 1;
     set->stor_begin = IGRAPH_CALLOC(alloc_size, igraph_integer_t);
+    if (! set->stor_begin) {
+        IGRAPH_ERROR("Cannot initialize set.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    }
     set->stor_end = set->stor_begin + alloc_size;
     set->end = set->stor_begin;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -64,15 +67,14 @@ int igraph_set_init(igraph_set_t *set, int long size) {
  * \function igraph_set_destroy
  * \brief Destroys a set object.
  *
- * \param set pointer to the set to be destroyed
+ * \param set Pointer to the set to be destroyed.
  *
  * Time complexity: operating system dependent.
  */
 void igraph_set_destroy(igraph_set_t* set) {
-    IGRAPH_ASSERT(set != 0);
-    if (set->stor_begin != 0) {
-        IGRAPH_FREE(set->stor_begin);
-        set->stor_begin = NULL;
+    IGRAPH_ASSERT(set != NULL);
+    if (set->stor_begin != NULL) {
+        IGRAPH_FREE(set->stor_begin); /* sets to NULL */
     }
 }
 
@@ -92,38 +94,37 @@ void igraph_set_destroy(igraph_set_t* set) {
  * Time complexity: O(1)
  */
 igraph_bool_t igraph_set_inited(igraph_set_t* set) {
-    return (set->stor_begin != 0);
+    return (set->stor_begin != NULL);
 }
 
 /**
  * \ingroup set
  * \function igraph_set_reserve
- * \brief Reserve memory for a set.
+ * \brief Reserves memory for a set.
  *
  * \param set The set object.
- * \param size the new \em allocated size of the set.
+ * \param capacity the new \em allocated capacity of the set.
  *
  * Time complexity: operating system dependent, should be around
  * O(n), n is the new allocated size of the set.
  */
-int igraph_set_reserve(igraph_set_t* set, long int size) {
-    long int actual_size = igraph_set_size(set);
+igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) {
+    igraph_integer_t actual_size = igraph_set_size(set);
     igraph_integer_t *tmp;
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
-    if (size <= actual_size) {
-        return 0;
+    if (capacity <= actual_size) {
+        return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(set->stor_begin, (size_t) size, igraph_integer_t);
-    if (tmp == 0) {
-        IGRAPH_ERROR("cannot reserve space for set", IGRAPH_ENOMEM);
-    }
+    tmp = IGRAPH_REALLOC(set->stor_begin, capacity, igraph_integer_t);
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for set.");
+
     set->stor_begin = tmp;
-    set->stor_end = set->stor_begin + size;
+    set->stor_end = set->stor_begin + capacity;
     set->end = set->stor_begin + actual_size;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -146,13 +147,14 @@ igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
 /**
  * \ingroup set
  * \function igraph_set_clear
- * \brief Removes all elements from a set.
+ * \brief Removes all elements from the set.
  *
  * </para><para>
  * This function simply sets the size of the set to zero, it does
  * not free any allocated memory. For that you have to call
  * \ref igraph_set_destroy().
- * \param v The set object.
+ *
+ * \param set The set object.
  *
  * Time complexity: O(1).
  */
@@ -166,15 +168,17 @@ void igraph_set_clear(igraph_set_t* set) {
 /**
  * \ingroup set
  * \function igraph_set_size
- * \brief Gives the size (=length) of the set.
+ * \brief Gives the size of the set.
  *
- * \param v The set object
+ * The number of elements in the set.
+ *
+ * \param set The set object
  * \return The size of the set.
  *
  * Time complexity: O(1).
  */
 
-long int igraph_set_size(const igraph_set_t* set) {
+igraph_integer_t igraph_set_size(const igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
     return set->end - set->stor_begin;
@@ -193,9 +197,9 @@ long int igraph_set_size(const igraph_set_t* set) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
-    long int left, right, middle;
-    long int size;
+igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
+    igraph_integer_t left, right, middle;
+    igraph_integer_t size;
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
 
@@ -226,7 +230,10 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     if (left >= size || set->stor_begin[left] != e) {
         /* full, allocate more storage */
         if (set->stor_end == set->end) {
-            long int new_size = size * 2;
+            igraph_integer_t new_size = size < IGRAPH_INTEGER_MAX/2 ? size * 2 : IGRAPH_INTEGER_MAX;
+            if (size == IGRAPH_INTEGER_MAX) {
+                IGRAPH_ERROR("Cannot add to set, already at maximum size.", IGRAPH_EOVERFLOW);
+            }
             if (new_size == 0) {
                 new_size = 1;
             }
@@ -236,13 +243,13 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
         /* Element should be inserted at position 'left' */
         if (left < size)
             memmove(set->stor_begin + left + 1, set->stor_begin + left,
-                    (size_t) (size - left)*sizeof(set->stor_begin[0]));
+                    (size - left) * sizeof(set->stor_begin[0]));
 
         set->stor_begin[left] = e;
         set->end += 1;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -256,8 +263,8 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
  *
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
-igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
-    long int left, right, middle;
+igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
+    igraph_integer_t left, right, middle;
 
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(set->stor_begin != NULL);
@@ -266,7 +273,7 @@ igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
     right = igraph_set_size(set) - 1;
 
     if (right == -1) {
-        return 0;    /* the set is empty */
+        return false;    /* the set is empty */
     }
 
     /* search for the new element */
@@ -277,7 +284,7 @@ igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
         } else if (SET(*set)[middle] < e) {
             left = middle;
         } else {
-            return 1;
+            return true;
         }
     }
 
@@ -287,23 +294,23 @@ igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
 /**
  * \ingroup set
  * \function igraph_set_iterate
- * \brief Iterates through the element to the set.
+ * \brief Iterates through the element of the set.
  *
  * Elements are returned in an arbitrary order.
  *
  * \param set The set object.
  * \param state Internal state of the iteration.
- *   This should be a pointer to a \c long variable
+ *   This should be a pointer to an \c igraph_integer_t variable
  *   which must be zero for the first invocation.
- *   The object should not be adjusted and its value should
+ *   The object must not be adjusted and its value should
  *   not be used for anything during the iteration.
- * \param element The next element or \c NULL (if the iteration
+ * \param element The next element or 0 (if the iteration
  *   has ended) is returned here.
  *
  * \return Nonzero if there are more elements, zero otherwise.
  */
-igraph_bool_t igraph_set_iterate(igraph_set_t* set, long int* state,
-                                 igraph_integer_t* element) {
+igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_integer_t *state,
+                                 igraph_integer_t *element) {
     IGRAPH_ASSERT(set != 0);
     IGRAPH_ASSERT(set->stor_begin != 0);
     IGRAPH_ASSERT(state != 0);
@@ -312,9 +319,9 @@ igraph_bool_t igraph_set_iterate(igraph_set_t* set, long int* state,
     if (*state < igraph_set_size(set)) {
         *element = set->stor_begin[*state];
         *state = *state + 1;
-        return 1;
+        return true;
     } else {
         *element = 0;
-        return 0;
+        return false;
     }
 }

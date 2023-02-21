@@ -17,10 +17,10 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void test_print_destroy(igraph_t *g, igraph_vector_t *weights, float resolution, igraph_matrix_t *modmat, igraph_bool_t directed) {
-    int i, j;
+    igraph_integer_t i, j;
     IGRAPH_ASSERT(igraph_modularity_matrix(g, weights, resolution, modmat, directed) == IGRAPH_SUCCESS);
     for (i = 0; i < igraph_matrix_nrow(modmat); i++) {
         for (j = 0; j < igraph_matrix_ncol(modmat); j++) {
@@ -37,12 +37,13 @@ void test_print_destroy(igraph_t *g, igraph_vector_t *weights, float resolution,
     }
 }
 
-int main() {
+int main(void) {
     igraph_t g;
-    igraph_vector_t weights, membership;
+    igraph_vector_t weights;
+    igraph_vector_int_t membership;
     igraph_matrix_t modmat;
     igraph_real_t modularity, test_modularity;
-    int i, j;
+    igraph_integer_t i, j;
 
     printf("No vertices:\n");
     igraph_small(&g, 0, /*directed*/0, -1);
@@ -101,7 +102,7 @@ int main() {
     printf("Comparison with modularity:\n");
     igraph_small(&g, 5, /*directed*/1, 0,1, 0,2, 1,2, 3,4, 4,0, -1);
     igraph_vector_init_int(&weights, 5, 1, 2, 3, 4, 5);
-    igraph_vector_init_int(&membership, 5, 0, 0, 0, 1, 1);
+    igraph_vector_int_init_int(&membership, 5, 0, 0, 0, 1, 1);
     igraph_matrix_init(&modmat, 0, 0);
     IGRAPH_ASSERT(igraph_modularity_matrix(&g, &weights, 0.7, &modmat, 1) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_modularity(&g, &membership, &weights, 0.7, 1, &modularity) == IGRAPH_SUCCESS);
@@ -119,7 +120,7 @@ int main() {
     }
     printf("Modularity: %g, modularity via matrix: %g\n", modularity, test_modularity / igraph_vector_sum(&weights));
     igraph_destroy(&g);
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&weights);
     igraph_matrix_destroy(&modmat);
 

@@ -16,7 +16,7 @@ experienced with C, you can contribute in a number of ways:
      the issue stating that this is still a problem in version X.
    - Some [issues point out problems with the documentation](https://github.com/igraph/igraph/labels/documentation);
      perhaps you could help correct these?
-   - Some [issues require clarifying a mathematical problem, or some literature research](https://github.com/igraph/igraph/labels/theory), 
+   - Some [issues require clarifying a mathematical problem, or some literature research](https://github.com/igraph/igraph/labels/theory),
      before any programming can begin. Can you contribute through your theoretical expertise?
    - Looking to contribute code? Take a look at some [good first issues](https://github.com/igraph/igraph/labels/good%20first%20issue).
 
@@ -157,7 +157,7 @@ Follow the following steps if you would like to make a new pull request:
    ```bash
    git pull [--rebase] upstream <dev-branch>
    ```
-   
+
    Rebasing is preferable over merging as you do not need to deal with merge
    conflicts; however, if you already have many commits, merging the upstream
    development branch may be faster.

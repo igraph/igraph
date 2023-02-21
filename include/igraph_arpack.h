@@ -25,9 +25,10 @@
 #define IGRAPH_ARPACK_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
+#include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_matrix.h"
 
 __BEGIN_DECLS
 
@@ -96,14 +97,15 @@ __BEGIN_DECLS
 
 /**
  * \struct igraph_arpack_options_t
- * \brief Options for ARPACK
+ * \brief Options for ARPACK.
  *
- * This data structure contains the options of thee ARPACK eigenvalue
+ * This data structure contains the options of the ARPACK eigenvalue
  * solver routines. It must be initialized by calling \ref
  * igraph_arpack_options_init() on it. Then it can be used for
  * multiple ARPACK calls, as the ARPACK solvers do not modify it.
  *
  * Input options:
+ *
  * \member bmat Character. Whether to solve a standard ('I') ot a
  *    generalized problem ('B').
  * \member n Dimension of the eigenproblem.
@@ -186,6 +188,7 @@ __BEGIN_DECLS
  *    \ref igraph_arpack_rssolve() of \ref igraph_arpack_rnsolve() call.
  *
  * Output options:
+ *
  * \member info Error flag of ARPACK. Possible values:
  *    \clist \cli 0
  *                Normal exit.
@@ -256,7 +259,7 @@ typedef struct igraph_arpack_options_t {
 
 /**
  * \struct igraph_arpack_storage_t
- * \brief Storage for ARPACK
+ * \brief Storage for ARPACK.
  *
  * Public members, do not modify them directly, these are considered
  * to be read-only.
@@ -284,19 +287,21 @@ typedef struct igraph_arpack_storage_t {
     igraph_real_t *resid;
     igraph_real_t *ax;
     int *select;
-    igraph_real_t *di;        /* These two only for non-symmetric problems */
+    /* The following two are only used for non-symmetric problems: */
+    igraph_real_t *di;
     igraph_real_t *workev;
 } igraph_arpack_storage_t;
 
 IGRAPH_EXPORT void igraph_arpack_options_init(igraph_arpack_options_t *o);
+IGRAPH_EXPORT igraph_arpack_options_t* igraph_arpack_options_get_default(void);
 
-IGRAPH_EXPORT int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
-                                             long int maxncv, long int maxldv, igraph_bool_t symm);
+IGRAPH_EXPORT igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
+                                             igraph_integer_t maxncv, igraph_integer_t maxldv, igraph_bool_t symm);
 IGRAPH_EXPORT void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
 
 /**
  * \typedef igraph_arpack_function_t
- * Type of the ARPACK callback function
+ * \brief Type of the ARPACK callback function.
  *
  * \param to Pointer to an \c igraph_real_t, the result of the
  *    matrix-vector product is expected to be stored here.
@@ -307,25 +312,25 @@ IGRAPH_EXPORT void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
  * \param extra Extra argument to the matrix-vector calculation
  *    function. This is coming from the \ref igraph_arpack_rssolve()
  *    or \ref igraph_arpack_rnsolve() function.
- * \return Error code, if not zero, then the ARPACK solver considers
+ * \return Error code. If not \c IGRAPH_SUCCESS, then the ARPACK solver considers
  *    this as an error, stops and calls the igraph error handler.
  */
 
-typedef int igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
+typedef igraph_error_t igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
                                      int n, void *extra);
 
-IGRAPH_EXPORT int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
+IGRAPH_EXPORT igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                                         igraph_arpack_options_t *options,
                                         igraph_arpack_storage_t *storage,
                                         igraph_vector_t *values, igraph_matrix_t *vectors);
 
-IGRAPH_EXPORT int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
+IGRAPH_EXPORT igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                                         igraph_arpack_options_t *options,
                                         igraph_arpack_storage_t *storage,
                                         igraph_matrix_t *values, igraph_matrix_t *vectors);
 
-IGRAPH_EXPORT int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                                               long int nev);
+IGRAPH_EXPORT igraph_error_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
+                                               igraph_integer_t nev);
 
 __END_DECLS
 

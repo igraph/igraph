@@ -1,0 +1,36 @@
+
+# https://scan.coverity.com/projects/igraph-igraph
+name: Coverity
+
+# Coverity only allows a few builds per day.
+# Build once at 3 AM UTC every day.
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  coverity:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install dependencies
+      run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Create build environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    # Compile in Debug configuration to preserve assertions.
+    - name: Configure
+      run: cmake -G"Unix Makefiles" -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug -DFLEX_KEEP_LINE_NUMBERS=ON -DUSE_CCACHE=OFF
+
+    - uses: vapier/coverity-scan-action@v1
+      with:
+        email: ${{ secrets.COVERITY_SCAN_EMAIL }}
+        token: ${{ secrets.COVERITY_SCAN_TOKEN }}
+        command: cmake --build ${{github.workspace}}/build --parallel

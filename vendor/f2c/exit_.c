@@ -33,7 +33,7 @@ exit_(integer *rc)
 #ifdef NO_ONEXIT
 	f_exit();
 #endif
-	exit(*rc);
+	IGRAPH_FATAL("exit_() called from f2c code");
 	}
 #ifdef __cplusplus
 }

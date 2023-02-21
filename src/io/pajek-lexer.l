@@ -44,7 +44,6 @@
 
 */
 
-#include "config.h"
 #include <stdlib.h>
 
 #include "io/pajek-header.h"
@@ -70,66 +69,72 @@
 %option reentrant
 %option bison-bridge
 %option bison-locations
+%option yylineno
+%option caseless
 
 digit [0-9]
-word [^ \t\r\n\0]
+word [^ \t\v\f\r\n\0]
+whitespace [ \t\v\f]
+
+%x netline
 
 %%
 
-[ \t]+          { }
-%[^\n]*\n[\r]*  { }
-%[^\n]*\r[\n]*  { }
-\*[Nn][eE][Tt]                         { return NETWORKLINE; }
-\*[Nn][Ee][Tt][Ww][Oo][Rr][Kk]         { return NETWORKLINE; }
-\*[Vv][Ee][Rr][Tt][Ii][Cc][Ee][Ss]     { return VERTICESLINE; }
-\*[Aa][Rr][Cc][Ss]                     { return ARCSLINE; }
-\*[Ee][Dd][Gg][Ee][Ss]                 { return EDGESLINE; }
-\*[Aa][Rr][Cc][Ss][Ll][Ii][Ss][Tt]     { return ARCSLISTLINE; }
-\*[Ee][Dd][Gg][Ee][Ss][Ll][Ii][Ss][Tt] { return EDGESLISTLINE; }
-\*[Mm][Aa][Tt][Rr][Ii][Xx]             { return MATRIXLINE; }
-\n\r|\r\n|\n|\r   { yyextra->mode=0; return NEWLINE; }
-\"[^\"]*\"        { return QSTR; }
-\([^\)]*\)        { return PSTR; }
-\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
+<*>{whitespace}+  { }
+%[^\n\r\0]*[\n\r]*  { } /* comments */
+\*net             { BEGIN(netline); return NETWORKLINE; }
+\*network         { BEGIN(netline); return NETWORKLINE; }
+<netline>{whitespace}({word}|{whitespace})* { 
+   return NET_TITLE; }
+\*vertices        { return VERTICESLINE; }
+\*arcs            { return ARCSLINE; }
+\*edges           { return EDGESLINE; }
+\*arcslist        { return ARCSLISTLINE; }
+\*edgeslist       { return EDGESLISTLINE; }
+\*matrix          { return MATRIXLINE; }
+<*>[\n\r]+        { BEGIN(INITIAL); yyextra->mode=0; return NEWLINE; } /* skip over multiple newlines */
+\"[^\"\0]*\"      { return QSTR; }
+\([^\)\0]*\)      { return PSTR; }
+(\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
                     return NUM; }
 
-[Xx]_[Ff][Aa][Cc][Tt]/[ \t\n\r]  { if (yyextra->mode==1) { return VP_X_FACT; } else { return ALNUM; } }
-[Yy]_[Ff][Aa][Cc][Tt]/[ \t\n\r]  { if (yyextra->mode==1) { return VP_Y_FACT; } else { return ALNUM; } }
-[Ii][Cc]/[ \t\n\r]               { if (yyextra->mode==1) { return VP_IC; } else { return ALNUM; } }
-[Bb][Cc]/[ \t\n\r]               { if (yyextra->mode==1) { return VP_BC; } else { return ALNUM; } }
-[Bb][Ww]/[ \t\n\r]               { if (yyextra->mode==1) { return VP_BW; } else { return ALNUM; } }
-[Pp][Hh][Ii]/[ \t\n\r]           { if (yyextra->mode==1) { return VP_PHI; } else { return ALNUM; } }
-[Rr]/[ \t\n\r]                   { if (yyextra->mode==1) { return VP_R; } else { return ALNUM; } }
-[Qq]/[ \t\n\r]                   { if (yyextra->mode==1) { return VP_Q; } else { return ALNUM; } }
-[Ff][Oo][Nn][Tt]/[ \t\n\r]       { if (yyextra->mode==1) { return VP_FONT; } else { return ALNUM; } }
-[Uu][Rr][Ll]/[ \t\n\r]           { if (yyextra->mode==1) { return VP_URL; } else { return ALNUM; } }
+x_fact/[ \t\n\r]  { if (yyextra->mode==1) { return VP_X_FACT; } else { return ALNUM; } }
+y_fact/[ \t\n\r]  { if (yyextra->mode==1) { return VP_Y_FACT; } else { return ALNUM; } }
+ic/[ \t\n\r]      { if (yyextra->mode==1) { return VP_IC; } else { return ALNUM; } }
+bc/[ \t\n\r]      { if (yyextra->mode==1) { return VP_BC; } else { return ALNUM; } }
+bw/[ \t\n\r]      { if (yyextra->mode==1) { return VP_BW; } else { return ALNUM; } }
+phi/[ \t\n\r]     { if (yyextra->mode==1) { return VP_PHI; } else { return ALNUM; } }
+r/[ \t\n\r]       { if (yyextra->mode==1) { return VP_R; } else { return ALNUM; } }
+q/[ \t\n\r]       { if (yyextra->mode==1) { return VP_Q; } else { return ALNUM; } }
+font/[ \t\n\r]    { if (yyextra->mode==1) { return VP_FONT; } else { return ALNUM; } }
+url/[ \t\n\r]     { if (yyextra->mode==1) { return VP_URL; } else { return ALNUM; } }
 
-[Cc]/[ \t\n\r]       { if (yyextra->mode==2) { return EP_C; } else { return ALNUM; } }
-[Pp]/[ \t\n\r]       { if (yyextra->mode==2) { return EP_P; } else { return ALNUM; } }
-[Ss]/[ \t\n\r]       { if (yyextra->mode==2) { return EP_S; } else { return ALNUM; } }
-[Aa]/[ \t\n\r]       { if (yyextra->mode==2) { return EP_A; } else { return ALNUM; } }
-[Ww]/[ \t\n\r]       { if (yyextra->mode==2) { return EP_W; } else { return ALNUM; } }
-[Hh]1/[ \t\n\r]      { if (yyextra->mode==2) { return EP_H1; } else { return ALNUM; } }
-[Hh]2/[ \t\n\r]      { if (yyextra->mode==2) { return EP_H2; } else { return ALNUM; } }
-[Aa]1/[ \t\n\r]      { if (yyextra->mode==2) { return EP_A1; } else { return ALNUM; } }
-[Aa]2/[ \t\n\r]      { if (yyextra->mode==2) { return EP_A2; } else { return ALNUM; } }
-[Kk]1/[ \t\n\r]      { if (yyextra->mode==2) { return EP_K1; } else { return ALNUM; } }
-[Kk]2/[ \t\n\r]      { if (yyextra->mode==2) { return EP_K2; } else { return ALNUM; } }
-[Aa][Pp]/[ \t\n\r]   { if (yyextra->mode==2) { return EP_AP; } else { return ALNUM; } }
-[Ll]/[ \t\n\r]       { if (yyextra->mode==2) { return EP_L; } else { return ALNUM; } }
-[Ll][Pp]/[ \t\n\r]   { if (yyextra->mode==2) { return EP_LP; } else { return ALNUM; } }
+c/[ \t\n\r]       { if (yyextra->mode==2) { return EP_C; } else { return ALNUM; } }
+p/[ \t\n\r]       { if (yyextra->mode==2) { return EP_P; } else { return ALNUM; } }
+s/[ \t\n\r]       { if (yyextra->mode==2) { return EP_S; } else { return ALNUM; } }
+a/[ \t\n\r]       { if (yyextra->mode==2) { return EP_A; } else { return ALNUM; } }
+w/[ \t\n\r]       { if (yyextra->mode==2) { return EP_W; } else { return ALNUM; } }
+h1/[ \t\n\r]      { if (yyextra->mode==2) { return EP_H1; } else { return ALNUM; } }
+h2/[ \t\n\r]      { if (yyextra->mode==2) { return EP_H2; } else { return ALNUM; } }
+a1/[ \t\n\r]      { if (yyextra->mode==2) { return EP_A1; } else { return ALNUM; } }
+a2/[ \t\n\r]      { if (yyextra->mode==2) { return EP_A2; } else { return ALNUM; } }
+k1/[ \t\n\r]      { if (yyextra->mode==2) { return EP_K1; } else { return ALNUM; } }
+k2/[ \t\n\r]      { if (yyextra->mode==2) { return EP_K2; } else { return ALNUM; } }
+ap/[ \t\n\r]      { if (yyextra->mode==2) { return EP_AP; } else { return ALNUM; } }
+l/[ \t\n\r]       { if (yyextra->mode==2) { return EP_L; } else { return ALNUM; } }
+lp/[ \t\n\r]      { if (yyextra->mode==2) { return EP_LP; } else { return ALNUM; } }
 
-[Ll][Pp][Hh][Ii]/[ \t\n\r] { if (yyextra->mode==1) { return VP_LPHI; } else
+lphi/[ \t\n\r]    { if (yyextra->mode==1) { return VP_LPHI; } else
                              if (yyextra->mode==2) { return EP_LPHI; } else { return ALNUM; } }
-[Ll][Cc]/[ \t\n\r]         { if (yyextra->mode==1) { return VP_LC; } else
+lc/[ \t\n\r]      { if (yyextra->mode==1) { return VP_LC; } else
                              if (yyextra->mode==2) { return EP_LC; } else { return ALNUM; } }
-[Ll][Rr]/[ \t\n\r]         { if (yyextra->mode==1) { return VP_LR; } else
+lr/[ \t\n\r]      { if (yyextra->mode==1) { return VP_LR; } else
                              if (yyextra->mode==2) { return EP_LR; } else { return ALNUM; } }
-[Ll][Aa]/[ \t\n\r]         { if (yyextra->mode==1) { return VP_LA; } else
+la/[ \t\n\r]      { if (yyextra->mode==1) { return VP_LA; } else
                              if (yyextra->mode==2) { return EP_LA; } else { return ALNUM; } }
-[Ss][Ii][Zz][Ee]/[ \t\n\r] { if (yyextra->mode==1) { return VP_SIZE; } else
+size/[ \t\n\r]    { if (yyextra->mode==1) { return VP_SIZE; } else
                              if (yyextra->mode==2) { return EP_SIZE; } else { return ALNUM; } }
-[Ff][Oo][Ss]/[ \t\n\r]     { if (yyextra->mode==1) { return VP_FOS; } else
+fos/[ \t\n\r]     { if (yyextra->mode==1) { return VP_FOS; } else
                              if (yyextra->mode==2) { return EP_FOS; } else { return ALNUM; } }
 
 {word}+           { return ALNUM; }
@@ -142,6 +147,6 @@ word [^ \t\r\n\0]
                     }
                   }
 
-.                 { return ERROR; }
+<*>.              { return ERROR; }
 
 %%

@@ -40,9 +40,13 @@ typedef struct igraph_complex_t {
 IGRAPH_EXPORT igraph_complex_t igraph_complex(igraph_real_t x, igraph_real_t y);
 IGRAPH_EXPORT igraph_complex_t igraph_complex_polar(igraph_real_t r, igraph_real_t theta);
 
-IGRAPH_EXPORT igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
-                                                  igraph_complex_t z2,
-                                                  igraph_real_t tol);
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
+                                                                    igraph_complex_t z2,
+                                                                    igraph_real_t tol);
+
+IGRAPH_EXPORT igraph_bool_t igraph_complex_almost_equals(igraph_complex_t z1,
+                                                         igraph_complex_t z2,
+                                                         igraph_real_t eps);
 
 IGRAPH_EXPORT igraph_real_t igraph_complex_mod(igraph_complex_t z);
 IGRAPH_EXPORT igraph_real_t igraph_complex_arg(igraph_complex_t z);
@@ -98,6 +102,12 @@ IGRAPH_EXPORT igraph_complex_t igraph_complex_tan(igraph_complex_t z);
 IGRAPH_EXPORT igraph_complex_t igraph_complex_sec(igraph_complex_t z);
 IGRAPH_EXPORT igraph_complex_t igraph_complex_csc(igraph_complex_t z);
 IGRAPH_EXPORT igraph_complex_t igraph_complex_cot(igraph_complex_t z);
+
+IGRAPH_EXPORT int igraph_complex_printf(igraph_complex_t val);
+IGRAPH_EXPORT int igraph_complex_fprintf(FILE *file, igraph_complex_t val);
+IGRAPH_EXPORT int igraph_complex_printf_aligned(int width, igraph_complex_t val);
+IGRAPH_EXPORT int igraph_complex_fprintf_aligned(FILE *file, int width, igraph_complex_t val);
+IGRAPH_EXPORT int igraph_complex_snprintf(char *str, size_t size, igraph_complex_t val);
 
 __END_DECLS
 

@@ -28,10 +28,10 @@
 
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-int main() {
+int main(void) {
     igraph_matrix_t mat, mat2;
     igraph_sparsemat_t spmat, spmat2;
-    int i, j, nz1, nz2;
+    igraph_integer_t i, j, nz1, nz2;
     igraph_vector_t sums1, sums2;
 
 
@@ -43,7 +43,7 @@ int main() {
     for (i = 0; i < 10; i++) {
         igraph_sparsemat_entry(&spmat, INT(DIM1 - 1), INT(DIM2 - 1), 1.0);
     }
-    igraph_sparsemat_copy(&spmat2, &spmat);
+    igraph_sparsemat_init_copy(&spmat2, &spmat);
 
     igraph_matrix_init(&mat, 0, 0);
     igraph_sparsemat_as_matrix(&mat, &spmat);
@@ -58,7 +58,7 @@ int main() {
 
     igraph_sparsemat_compress(&spmat, &spmat2);
     igraph_sparsemat_destroy(&spmat);
-    igraph_sparsemat_copy(&spmat, &spmat2);
+    igraph_sparsemat_init_copy(&spmat, &spmat2);
 
     igraph_matrix_init(&mat2, 0, 0);
     igraph_sparsemat_as_matrix(&mat2, &spmat);
@@ -132,7 +132,7 @@ int main() {
         }
     }
     if (nz1 != nz2) {
-        printf("%i %i\n", nz1, nz2);
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", nz1, nz2);
         return 7;
     }
 
@@ -145,7 +145,7 @@ int main() {
         }
     }
     if (nz1 != nz2) {
-        printf("%i %i\n", nz1, nz2);
+        printf("%" IGRAPH_PRId " %" IGRAPH_PRId "\n", nz1, nz2);
         return 8;
     }
 

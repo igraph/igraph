@@ -25,12 +25,13 @@
 #include <igraph.h>
 #include <string.h>
 
-int main() {
+int main(void) {
     igraph_t g;
-    igraph_vector_t weights, result;
+    igraph_vector_t weights;
+    igraph_vector_int_t result;
     igraph_bool_t dag;
 
-    igraph_vector_init(&result, 0);
+    igraph_vector_int_init(&result, 0);
 
     /***********************************************************************/
     /* Approximation with Eades' method                                    */
@@ -39,7 +40,7 @@ int main() {
     /* Simple unweighted graph */
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 0, 2, 3, 2, 4, 0, 4, 4, 3, 5, 0, 6, 5, -1);
     igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_APPROX_EADES);
-    igraph_vector_print(&result);
+    igraph_vector_int_print(&result);
     igraph_delete_edges(&g, igraph_ess_vector(&result));
     igraph_is_dag(&g, &dag);
     if (!dag) {
@@ -51,7 +52,7 @@ int main() {
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 0, 2, 3, 2, 4, 0, 4, 4, 3, 5, 0, 6, 5, -1);
     igraph_vector_init_int_end(&weights, -1, 1, 1, 3, 1, 1, 1, 1, 1, 1, -1);
     igraph_feedback_arc_set(&g, &result, &weights, IGRAPH_FAS_APPROX_EADES);
-    igraph_vector_print(&result);
+    igraph_vector_int_print(&result);
     igraph_delete_edges(&g, igraph_ess_vector(&result));
     igraph_is_dag(&g, &dag);
     if (!dag) {
@@ -63,7 +64,7 @@ int main() {
     /* Simple unweighted graph with loops */
     igraph_small(&g, 0, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 0, 2, 3, 2, 4, 0, 4, 4, 3, 5, 0, 6, 5, 1, 1, 4, 4, -1);
     igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_APPROX_EADES);
-    igraph_vector_print(&result);
+    igraph_vector_int_print(&result);
     igraph_delete_edges(&g, igraph_ess_vector(&result));
     igraph_is_dag(&g, &dag);
     if (!dag) {
@@ -74,7 +75,7 @@ int main() {
     /* Null graph */
     igraph_empty(&g, 0, IGRAPH_DIRECTED);
     igraph_feedback_arc_set(&g, &result, NULL, IGRAPH_FAS_APPROX_EADES);
-    if (igraph_vector_size(&result) != 0) {
+    if (igraph_vector_int_size(&result) != 0) {
         return 4;
     }
     igraph_destroy(&g);
@@ -82,12 +83,12 @@ int main() {
     /* Singleton graph */
     igraph_empty(&g, 1, IGRAPH_DIRECTED);
     igraph_feedback_arc_set(&g, &result, NULL, IGRAPH_FAS_APPROX_EADES);
-    if (igraph_vector_size(&result) != 0) {
+    if (igraph_vector_int_size(&result) != 0) {
         return 5;
     }
     igraph_destroy(&g);
 
-    igraph_vector_destroy(&result);
+    igraph_vector_int_destroy(&result);
 
     return 0;
 }

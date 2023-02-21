@@ -1,0 +1,13 @@
+Check if 0 vertex graph crashes.
+Check seeded 1-vertex graph, no iterations.
+3 4
+Check if 0 vertex graph crashes without a seed.
+Check unseeded 1-vertex graph.
+Check 2-vertex graph.
+Check negative maxiter.
+Check negative temp_max.
+Check negative temp_min.
+Check negative temp_init.
+Check temp_init not between min and max.
+Check too many rows in seed.
+Check too many columns in seed.

@@ -17,11 +17,19 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_sir(igraph_sir_t *sir) {
-    printf("times: ");
-    print_vector(&sir->times);
+    igraph_integer_t i, n;
+
+    n = igraph_vector_size(&sir->times);
+    IGRAPH_ASSERT(n >= 2);
+
+    IGRAPH_ASSERT(VECTOR(sir->times)[0] == 0);
+    for (i = 1; i < n; i++) {
+        IGRAPH_ASSERT(VECTOR(sir->times)[i] > VECTOR(sir->times)[i-1]);
+    }
+
     printf("susceptibles: ");
     print_vector_int(&sir->no_s);
     printf("infected: ");
@@ -35,7 +43,7 @@ void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_i
     igraph_vector_ptr_t result;
     igraph_vector_ptr_init(&result, 0);
     IGRAPH_ASSERT(igraph_sir(g, beta, gamma, no_sim, &result) == IGRAPH_SUCCESS);
-    for (int i = 0; i < igraph_vector_ptr_size(&result); i++) {
+    for (igraph_integer_t i = 0; i < igraph_vector_ptr_size(&result); i++) {
         print_sir(VECTOR(result)[i]);
         igraph_sir_destroy(VECTOR(result)[i]);
     }
@@ -43,10 +51,10 @@ void print_result(igraph_t *g, igraph_real_t beta, igraph_real_t gamma, igraph_i
     printf("\n");
 }
 
-int main() {
+int main(void) {
     igraph_t g_empty, g_lm, g_line, g_1, g_2, g_full;
 
-    igraph_rng_seed(igraph_rng_default(), 42);
+    igraph_rng_seed(igraph_rng_default(), 43);
 
     igraph_small(&g_empty, 0, 0, -1);
     igraph_small(&g_lm, 6, 0, 0,1, 0,2, 1,1, 1,3, 2,0, 2,3, 3,4, 3,4, -1);

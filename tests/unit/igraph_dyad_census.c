@@ -17,18 +17,18 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void call_and_print(igraph_t *graph) {
-    igraph_integer_t mut, asym, null;
+    igraph_real_t mut, asym, null;
     IGRAPH_ASSERT(igraph_dyad_census(graph, &mut, &asym, &null) == IGRAPH_SUCCESS);
-    printf("Mutual: %" IGRAPH_PRId " ", mut);
-    printf("asymmetric: %" IGRAPH_PRId " ", asym);
-    printf("null: %" IGRAPH_PRId "\n\n", null);
+    printf("Mutual: %.f ", mut);
+    printf("asymmetric: %.f ", asym);
+    printf("null: %.f\n\n", null);
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_2, g_lm, g_lmu;
 
     igraph_small(&g_0, 0, IGRAPH_DIRECTED, -1);

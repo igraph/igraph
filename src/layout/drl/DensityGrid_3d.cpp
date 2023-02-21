@@ -35,10 +35,10 @@
 
 #include "drl_Node_3d.h"
 #include "DensityGrid_3d.h"
-#include "igraph_error.h"
 
-#include <deque>
 #include <cmath>
+#include <deque>
+#include <stdexcept>
 
 using namespace std;
 
@@ -65,20 +65,9 @@ DensityGrid::~DensityGrid () {
 
 void DensityGrid::Init() {
 
-    try {
-        Density = new float[GRID_SIZE][GRID_SIZE][GRID_SIZE];
-        fall_off = new float[RADIUS * 2 + 1][RADIUS * 2 + 1][RADIUS * 2 + 1];
-        Bins = new deque<Node>[GRID_SIZE * GRID_SIZE * GRID_SIZE];
-    } catch (bad_alloc&) {
-        // cout << "Error: Out of memory! Program stopped." << endl;
-#ifdef MUSE_MPI
-        MPI_Abort ( MPI_COMM_WORLD, 1 );
-#else
-        igraph_error("DrL is out of memory", IGRAPH_FILE_BASENAME, __LINE__,
-                     IGRAPH_ENOMEM);
-        return;
-#endif
-    }
+    Density = new float[GRID_SIZE][GRID_SIZE][GRID_SIZE];
+    fall_off = new float[RADIUS * 2 + 1][RADIUS * 2 + 1][RADIUS * 2 + 1];
+    Bins = new deque<Node>[GRID_SIZE * GRID_SIZE * GRID_SIZE];
 
     // Clear Grid
     int i;
@@ -203,9 +192,7 @@ void DensityGrid::Subtract(Node &N) {
 #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
-        igraph_error("Exceeded density grid in DrL", IGRAPH_FILE_BASENAME,
-                     __LINE__, IGRAPH_EDRL);
-        return;
+        throw runtime_error("Exceeded density grid in DrL.");
 #endif
     }
 
@@ -252,9 +239,7 @@ void DensityGrid::Add(Node &N) {
 #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
-        igraph_error("Exceeded density grid in DrL", IGRAPH_FILE_BASENAME,
-                     __LINE__, IGRAPH_EDRL);
-        return;
+        throw runtime_error("Exceeded density grid in DrL.");
 #endif
     }
 

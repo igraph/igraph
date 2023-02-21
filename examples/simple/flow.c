@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t flow;
@@ -36,8 +36,8 @@ int main() {
 
     /***************/
     infile = fopen("ak-4102.max", "r");
-    igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity,
-                             IGRAPH_DIRECTED);
+    igraph_read_graph_dimacs_flow(
+        &g, infile, 0, 0, &source, &target, &capacity, IGRAPH_DIRECTED);
     fclose(infile);
 
     igraph_maxflow_value(&g, &flow, source, target, &capacity, &stats);
@@ -50,7 +50,7 @@ int main() {
 
     /*   /\***************\/ */
     /*   infile=fopen("ak-8198.max", "r"); */
-    /*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
+    /*   igraph_read_graph_dimacs_flow(&g, infile, 0, 0, &source, &target, &capacity, */
     /*             IGRAPH_DIRECTED); */
     /*   fclose(infile); */
 
@@ -63,7 +63,7 @@ int main() {
 
     /*   /\***************\/ */
     /*   infile=fopen("ak-16390.max", "r"); */
-    /*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
+    /*   igraph_read_graph_dimacs_flow(&g, infile, 0, 0, &source, &target, &capacity, */
     /*             IGRAPH_DIRECTED); */
     /*   fclose(infile); */
 
@@ -76,7 +76,7 @@ int main() {
 
     /*   /\***************\/ */
     /*   infile=fopen("ak-32774.max", "r"); */
-    /*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
+    /*   igraph_read_graph_dimacs_flow(&g, infile, 0, 0, &source, &target, &capacity, */
     /*             IGRAPH_DIRECTED); */
     /*   fclose(infile); */
 
@@ -89,7 +89,7 @@ int main() {
 
     /*   /\***************\/ */
     /*   infile=fopen("ak-65542.max", "r"); */
-    /*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
+    /*   igraph_read_graph_dimacs_flow(&g, infile, 0, 0, &source, &target, &capacity, */
     /*             IGRAPH_DIRECTED); */
     /*   fclose(infile); */
 

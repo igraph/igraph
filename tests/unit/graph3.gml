@@ -1,0 +1,4 @@
+
+# Null graph, undirected
+
+graph []

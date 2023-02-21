@@ -23,194 +23,43 @@
 
 #include <igraph.h>
 
-#define DIM 10
-
-igraph_bool_t check_ev(const igraph_matrix_t *A,
-                       const igraph_vector_t *values,
-                       const igraph_matrix_t *vectors, igraph_real_t tol) {
-    igraph_vector_t v, y;
-    int i, j;
-    int m = igraph_matrix_ncol(vectors);
-    int n = igraph_matrix_nrow(A);
-
-    if (igraph_matrix_ncol(A) != n)       {
-        return 1;
-    }
-    if (igraph_vector_size(values) != m)  {
-        return 1;
-    }
-    if (igraph_matrix_nrow(vectors) != n) {
-        return 1;
-    }
-
-    igraph_vector_init(&y, n);
-
-    for (i = 0; i < m; i++) {
-        igraph_vector_view(&v, &MATRIX(*vectors, 0, i), n);
-        igraph_vector_update(&y, &v);
-        igraph_blas_dgemv(/*transpose=*/ 0, /*alpha=*/ 1.0, A, &v,
-                                         /*beta=*/ -VECTOR(*values)[i], &y);
-        for (j = 0; j < n; j++) {
-            if (fabs(VECTOR(y)[i]) > tol) {
-                printf("Matrix:\n");
-                igraph_matrix_print(A);
-                printf("lambda= %g\n", VECTOR(*values)[i]);
-                printf("v= ");
-                igraph_vector_print(&v);
-                printf("residual: ");
-                igraph_vector_print(&y);
-                return 1;
-            }
-        }
-    }
-
-    igraph_vector_destroy(&y);
-    return 0;
-}
-
-int main() {
+int main(void) {
 
     igraph_matrix_t A;
-    igraph_matrix_t vectors, vectors2;
-    igraph_vector_t values, values2;
-    int i, j;
-    int il, iu;
-    igraph_real_t vl, vu;
+    igraph_matrix_t vectors;
+    igraph_vector_t values;
 
-    igraph_rng_seed(igraph_rng_default(), 42);
-
-    igraph_matrix_init(&A, DIM, DIM);
+    igraph_matrix_init(&A, 2, 2);
     igraph_matrix_init(&vectors, 0, 0);
     igraph_vector_init(&values, 0);
 
-    /* All eigenvalues and eigenvectors */
+    MATRIX(A, 0, 0) = 2.0;
+    MATRIX(A, 0, 1) = -1.0;
+    MATRIX(A, 1, 0) = -1.0;
+    MATRIX(A, 1, 1) = 3.0;
 
-    for (i = 0; i < DIM; i++) {
-        for (j = i; j < DIM; j++) {
-            MATRIX(A, i, j) = MATRIX(A, j, i) =
-                                  igraph_rng_get_integer(igraph_rng_default(), 1, 10);
-        }
-    }
+    printf("Take a subset:\n");
 
-    igraph_lapack_dsyevr(&A, IGRAPH_LAPACK_DSYEV_ALL, /*vl=*/ 0, /*vu=*/ 0,
-                         /*vestimate=*/ 0, /*il=*/ 0, /*iu=*/ 0,
-                         /*abstol=*/ 1e-10, &values, &vectors, /*support=*/ 0);
-
-    if (igraph_vector_size(&values) != DIM) {
-        return 1;
-    }
-    if (igraph_matrix_nrow(&vectors) != DIM ||
-        igraph_matrix_ncol(&vectors) != DIM) {
-        return 2;
-    }
-    if (check_ev(&A, &values, &vectors, /*tol=*/ 1e-8)) {
-        return 3;
-    }
-
-    /* Only a subset */
-
-    igraph_matrix_init(&vectors2, 0, 0);
-    igraph_vector_init(&values2, 0);
-
-    il = 2;
-    iu = 5;
     igraph_lapack_dsyevr(&A, IGRAPH_LAPACK_DSYEV_SELECT, /*vl=*/ 0, /*vu=*/ 0,
-                         /*vestimate=*/ 0, /*il=*/ il, /*iu=*/ iu,
-                         /*abstol=*/ 1e-10, &values2, &vectors2,
+                         /*vestimate=*/ 0, /*il=*/ 1, /*iu=*/ 1,
+                         /*abstol=*/ 1e-10, &values, &vectors,
+                         /*support=*/ 0);
+    printf("eigenvalues:\n");
+    igraph_vector_print(&values);
+    printf("eigenvectors:\n");
+    igraph_matrix_print(&vectors);
+
+    printf("\nTake a subset based on an interval:\n");
+
+    igraph_lapack_dsyevr(&A, IGRAPH_LAPACK_DSYEV_INTERVAL, /*vl*/ 3, /*vu*/ 4,
+                         /*vestimate=*/ 1, /*il=*/ 0, /*iu=*/ 0,
+                         /*abstol=*/ 1e-10, &values, &vectors,
                          /*support=*/ 0);
 
-    if (igraph_vector_size(&values2) != iu - il + 1) {
-        return 4;
-    }
-    if (igraph_matrix_nrow(&vectors2) != DIM ||
-        igraph_matrix_ncol(&vectors2) != iu - il + 1) {
-        return 5;
-    }
-    for (i = 0; i < iu - il + 1; i++) {
-        igraph_real_t m1 = 1.0;
-
-        if (fabs(VECTOR(values)[il + i - 1] - VECTOR(values2)[i]) > 1e-8) {
-            printf("Full:   ");
-            igraph_vector_print(&values);
-            printf("Subset: ");
-            igraph_vector_print(&values2);
-            return 6;
-        }
-
-        if (MATRIX(vectors, 0, il + i - 1) * MATRIX(vectors2, 0, i) < 0) {
-            m1 = -1.0;
-        } else {
-            m1 = 1.0;
-        }
-
-        for (j = 0; j < DIM; j++) {
-            if (fabs(MATRIX(vectors, j, il + i - 1) -
-                     m1 * MATRIX(vectors2, j, i)) > 1e-8) {
-                printf("Full:\n");
-                igraph_matrix_print(&vectors);
-                printf("Subset:\n");
-                igraph_matrix_print(&vectors2);
-                return 7;
-            }
-        }
-    }
-
-    igraph_vector_destroy(&values2);
-    igraph_matrix_destroy(&vectors2);
-
-    /* Subset based on an interval */
-
-    igraph_matrix_init(&vectors2, 0, 0);
-    igraph_vector_init(&values2, 0);
-
-    il = 2;
-    iu = 5;
-    vl = (VECTOR(values)[il - 1] + VECTOR(values)[il - 2]) / 2.0;
-    vu = (VECTOR(values)[iu] + VECTOR(values)[iu - 1]) / 2.0;
-
-    igraph_lapack_dsyevr(&A, IGRAPH_LAPACK_DSYEV_INTERVAL, vl, vu,
-                         /*vestimate=*/ iu - il + 1, /*il=*/ 0, /*iu=*/ 0,
-                         /*abstol=*/ 1e-10, &values2, &vectors2,
-                         /*support=*/ 0);
-
-    if (igraph_vector_size(&values2) != iu - il + 1) {
-        return 4;
-    }
-    if (igraph_matrix_nrow(&vectors2) != DIM ||
-        igraph_matrix_ncol(&vectors2) != iu - il + 1) {
-        return 5;
-    }
-    for (i = 0; i < iu - il + 1; i++) {
-        igraph_real_t m1 = 1.0;
-
-        if (fabs(VECTOR(values)[il + i - 1] - VECTOR(values2)[i]) > 1e-8) {
-            printf("Full:   ");
-            igraph_vector_print(&values);
-            printf("Subset: ");
-            igraph_vector_print(&values2);
-            return 6;
-        }
-
-        if (MATRIX(vectors, 0, il + i - 1) * MATRIX(vectors2, 0, i) < 0) {
-            m1 = -1.0;
-        } else {
-            m1 = 1.0;
-        }
-
-        for (j = 0; j < DIM; j++) {
-            if (fabs(MATRIX(vectors, j, il + i - 1) -
-                     m1 * MATRIX(vectors2, j, i)) > 1e-8) {
-                printf("Full:\n");
-                igraph_matrix_print(&vectors);
-                printf("Subset:\n");
-                igraph_matrix_print(&vectors2);
-                return 7;
-            }
-        }
-    }
-
-    igraph_vector_destroy(&values2);
-    igraph_matrix_destroy(&vectors2);
+    printf("eigenvalues:\n");
+    igraph_vector_print(&values);
+    printf("eigenvectors:\n");
+    igraph_matrix_print(&vectors);
 
     igraph_vector_destroy(&values);
     igraph_matrix_destroy(&vectors);

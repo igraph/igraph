@@ -24,6 +24,8 @@
 
 #include "igraph_interface.h"
 
+#include "math/safe_intop.h"
+
 /**
  * \function igraph_kautz
  * \brief Generate a Kautz graph.
@@ -56,20 +58,19 @@
  * like O(|V|+|E|). |V| is the number of vertices, |E| is the number
  * of edges and \c m and \c n are the corresponding arguments.
  */
-int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
+igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
 
     /* m+1 - number of symbols */
     /* n+1 - length of strings */
 
-    long int mm = m;
-    long int no_of_nodes, no_of_edges;
-    long int allstrings;
-    long int i, j, idx = 0;
-    igraph_vector_t edges;
-    igraph_vector_long_t digits, table;
-    igraph_vector_long_t index1, index2;
-    long int actb = 0;
-    long int actvalue = 0;
+    igraph_integer_t no_of_nodes, no_of_edges;
+    igraph_integer_t allstrings;
+    igraph_integer_t i, j, idx = 0;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t digits, table;
+    igraph_vector_int_t index1, index2;
+    igraph_integer_t actb = 0;
+    igraph_integer_t actvalue = 0;
 
     if (m < 0 || n < 0) {
         IGRAPH_ERROR("`m' and `n' should be non-negative in a Kautz graph",
@@ -83,32 +84,50 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
         return igraph_empty(graph, 0, IGRAPH_DIRECTED);
     }
 
-    no_of_nodes = (long int) ((m + 1) * pow(m, n));
-    no_of_edges = no_of_nodes * m;
-    allstrings = (long int) pow(m + 1, n + 1);
+    /* no_of_nodes = ((m + 1) * pow(m, n)) */
+    {
+        igraph_real_t m_to_pow_n_real = pow(m, n);
+        igraph_integer_t m_to_pow_n = m_to_pow_n_real;
+        if (m_to_pow_n != m_to_pow_n_real) {
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Kautz graph.", IGRAPH_EINVAL,
+                          m, n);
+        }
+        IGRAPH_SAFE_MULT(m+1, m_to_pow_n, &no_of_nodes);
+    }
+    /* no_of_edges = m * no_of_nodes */
+    IGRAPH_SAFE_MULT(no_of_nodes, m, &no_of_edges);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    {
+        igraph_real_t allstrings_real = pow(m + 1, n + 1);
+        allstrings = allstrings_real;
+        if (allstrings != allstrings_real) {
+            IGRAPH_ERRORF("Parameters (%" IGRAPH_PRId ", %" IGRAPH_PRId ") too large for Kautz graph.", IGRAPH_EINVAL,
+                          m, n);
+        }
+    }
 
-    IGRAPH_CHECK(igraph_vector_long_init(&table, n + 1));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &table);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&table, n + 1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &table);
     j = 1;
     for (i = n; i >= 0; i--) {
         VECTOR(table)[i] = j;
         j *= (m + 1);
     }
 
-    IGRAPH_CHECK(igraph_vector_long_init(&digits, n + 1));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &digits);
-    IGRAPH_CHECK(igraph_vector_long_init(&index1, (long int) pow(m + 1, n + 1)));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &index1);
-    IGRAPH_CHECK(igraph_vector_long_init(&index2, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &index2);
+    IGRAPH_CHECK(igraph_vector_int_init(&digits, n + 1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &digits);
+    IGRAPH_CHECK(igraph_vector_int_init(&index1, pow(m + 1, n + 1)));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &index1);
+    IGRAPH_CHECK(igraph_vector_int_init(&index2, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &index2);
 
     /* Fill the index tables*/
     while (1) {
         /* at the beginning of the loop, 0:actb contain the valid prefix */
         /* we might need to fill it to get a valid string */
-        long int z = 0;
+        igraph_integer_t z = 0;
         if (VECTOR(digits)[actb] == 0) {
             z = 1;
         }
@@ -132,7 +151,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
         /* not yet, we need a valid prefix now */
         while (1) {
             /* try to increase digits at position actb */
-            long int next = VECTOR(digits)[actb] + 1;
+            igraph_integer_t next = VECTOR(digits)[actb] + 1;
             if (actb != 0 && VECTOR(digits)[actb - 1] == next) {
                 next++;
             }
@@ -149,15 +168,19 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
+    {
+        igraph_integer_t no_of_edges2;
+        IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges2);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, no_of_edges2));
+    }
 
     /* Now come the edges at last */
     for (i = 0; i < no_of_nodes; i++) {
-        long int fromvalue = VECTOR(index2)[i];
-        long int lastdigit = fromvalue % (mm + 1);
-        long int basis = (fromvalue * (mm + 1)) % allstrings;
+        igraph_integer_t fromvalue = VECTOR(index2)[i];
+        igraph_integer_t lastdigit = fromvalue % (m + 1);
+        igraph_integer_t basis = (fromvalue * (m + 1)) % allstrings;
         for (j = 0; j <= m; j++) {
-            long int tovalue, to;
+            igraph_integer_t tovalue, to;
             if (j == lastdigit) {
                 continue;
             }
@@ -166,21 +189,20 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
             if (to < 0) {
                 continue;
             }
-            igraph_vector_push_back(&edges, i);
-            igraph_vector_push_back(&edges, to);
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
         }
     }
 
-    igraph_vector_long_destroy(&index2);
-    igraph_vector_long_destroy(&index1);
-    igraph_vector_long_destroy(&digits);
-    igraph_vector_long_destroy(&table);
+    igraph_vector_int_destroy(&index2);
+    igraph_vector_int_destroy(&index1);
+    igraph_vector_int_destroy(&digits);
+    igraph_vector_int_destroy(&table);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               IGRAPH_DIRECTED));
-    igraph_vector_destroy(&edges);
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

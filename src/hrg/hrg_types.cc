@@ -43,6 +43,10 @@
 
 using std::string;
 
+#include <stdexcept>
+#include <climits>
+
+using namespace std;
 using namespace fitHRG;
 
 // ******** Red-Black Tree Methods ***************************************
@@ -1296,10 +1300,10 @@ int dendro::computeEdgeCount(const int a, const short int atype,
 
 // ***********************************************************************
 
-int dendro::countChildren(const string &s) {
-    int len = s.size();
-    int numC = 0;
-    for (int i = 0; i < len; i++) {
+size_t dendro::countChildren(const string &s) {
+    size_t len = s.size();
+    size_t numC = 0;
+    for (size_t i = 0; i < len; i++) {
         if (s[i] == 'C') {
             numC++;
         }
@@ -1418,7 +1422,13 @@ double dendro::getSplitTotalWeight() const {
 // ***********************************************************************
 
 bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
-    n = igraph_hrg_size(hrg);
+    igraph_integer_t size = igraph_hrg_size(hrg);
+
+    if (size > INT_MAX) {
+        throw std::range_error("Hierarchical random graph too large for the HRG module");
+    }
+
+    n = (int) size;
 
     // allocate memory for G, O(n)
     leaf = new elementd[n];
@@ -1587,7 +1597,7 @@ void dendro::makeRandomGraph() {
 
 // **********************************************************************
 
-bool dendro::monteCarloMove(double &delta, bool &ftaken, const double T) {
+void dendro::monteCarloMove(double &delta, bool &ftaken, const double T) {
     // A single MC move begins with the selection of a random internal
     // edge (a,b) of the dendrogram. This also determines the three
     // subtrees i, j, k that we will rearrange, and we choose uniformly
@@ -1876,7 +1886,6 @@ bool dendro::monteCarloMove(double &delta, bool &ftaken, const double T) {
             }
         }
     }
-    return true;
 }
 
 // **********************************************************************
@@ -1947,7 +1956,7 @@ int dendro::QsortPartition (block* array, int left, int right, int index) {
     return stored;
 }
 
-void dendro::recordConsensusTree(igraph_vector_t *parents,
+void dendro::recordConsensusTree(igraph_vector_int_t *parents,
                                  igraph_vector_t *weights) {
 
     keyValuePairSplit *curr, *prev;
@@ -2046,7 +2055,7 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
     }
 
     // Return the consensus tree
-    igraph_vector_resize(parents, ii + orig_nodes);
+    igraph_vector_int_resize(parents, ii + orig_nodes);
     if (weights) {
         igraph_vector_resize(weights, ii);
     }
@@ -2075,8 +2084,6 @@ void dendro::recordConsensusTree(igraph_vector_t *parents,
             VECTOR(*parents)[i] = -1;
         }
     }
-
-
 }
 
 // **********************************************************************
@@ -2094,13 +2101,13 @@ void dendro::recordDendrogramStructure(igraph_hrg_t *hrg) {
 }
 
 void dendro::recordGraphStructure(igraph_t *graph) {
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     int no_of_nodes = g->numNodes();
     int no_of_edges = g->numLinks() / 2;
     int idx = 0;
 
-    igraph_vector_init(&edges, no_of_edges * 2);
-    IGRAPH_FINALLY(igraph_vector_destroy, &edges);
+    igraph_vector_int_init(&edges, no_of_edges * 2);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
 
     for (int i = 0; i < n; i++) {
         const edge *curr = g->getNeighborList(i);
@@ -2115,7 +2122,7 @@ void dendro::recordGraphStructure(igraph_t *graph) {
 
     igraph_create(graph, &edges, no_of_nodes, /* directed= */ 0);
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 }
 
@@ -2146,7 +2153,7 @@ list* dendro::reversePathToRoot(const int leafIndex) {
 
 // ***********************************************************************
 
-bool dendro::sampleSplitLikelihoods(int &sample_num) {
+bool dendro::sampleSplitLikelihoods(igraph_integer_t &sample_num) {
     // In order to compute the majority agreement dendrogram at
     // equilibrium, we need to calculate the leaf partition defined by
     // each split (internal edge) of the tree. Because splits are only
@@ -2584,7 +2591,7 @@ void graph::resetLinks() {
 
 // **********************************************************************
 
-void graph::setAdjacencyHistograms(const int bin_count) {
+void graph::setAdjacencyHistograms(const igraph_integer_t bin_count) {
     // For all possible adjacencies, setup an edge histograms
     num_bins = bin_count + 1;
     bin_resolution = 1.0 / (double)(bin_count);
@@ -3082,7 +3089,7 @@ int splittree::returnNodecount() {
 
 keyValuePairSplit* splittree::returnTheseSplits(const int target) {
     keyValuePairSplit *head, *curr, *prev, *newhead, *newtail, *newpair;
-    int count, len;
+    size_t count, len;
 
     head = returnTreeAsList();
     prev = newhead = newtail = newpair = nullptr;

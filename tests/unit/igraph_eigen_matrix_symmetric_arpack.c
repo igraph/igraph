@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define DIM 10
 
@@ -63,7 +63,7 @@ int check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
     return 0;
 }
 
-int main() {
+int main(void) {
 
     igraph_matrix_t A;
     igraph_vector_t values;
@@ -105,7 +105,7 @@ int main() {
     which.pos = IGRAPH_EIGEN_BE;
     which.howmany = 5;
     igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
-                                  IGRAPH_EIGEN_ARPACK, &which, &options,
+                                  IGRAPH_EIGEN_ARPACK, &which, /*options=*/ 0,
                                   /*storage=*/ 0, &values, &vectors);
     igraph_vector_print(&values);
     check_ev(&A, &values, &vectors, 20);
@@ -113,7 +113,7 @@ int main() {
     which.pos = IGRAPH_EIGEN_SM;
     which.howmany = 5;
     igraph_eigen_matrix_symmetric(&A, /*sA=*/ 0, /*fun=*/ 0, DIM, /*extra=*/ 0,
-                                  IGRAPH_EIGEN_ARPACK, &which, &options,
+                                  IGRAPH_EIGEN_ARPACK, &which, /*options=*/ 0,
                                   /*storage=*/ 0, &values, &vectors);
     igraph_vector_print(&values);
     check_ev(&A, &values, &vectors, 30);

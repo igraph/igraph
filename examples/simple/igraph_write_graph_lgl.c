@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_strvector_t names;
@@ -34,7 +34,7 @@ int main() {
     }
     SETVASV(&graph, "names", &names);
 
-    igraph_vector_init_seq(&weights, 1, ecount);
+    igraph_vector_init_range(&weights, 1, ecount + 1);
     SETEANV(&graph, "weights", &weights);
 
     igraph_write_graph_lgl(&graph, stdout, "names", "weights", /*isolates*/ 0);

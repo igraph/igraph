@@ -24,12 +24,12 @@
 #include <igraph.h>
 #include <math.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Compare the elements of two vectors for equality, handling NaN values. */
 igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2) {
-    long int n1 = igraph_vector_size(v1), n2 = igraph_vector_size(v2);
-    long int i;
+    igraph_integer_t n1 = igraph_vector_size(v1), n2 = igraph_vector_size(v2);
+    igraph_integer_t i;
 
     if (n1 != n2) {
         return 0;
@@ -37,7 +37,7 @@ igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2)
 
     for (i=0; i < n1; ++i) {
         /* Since NaN == NaN compares false, we must handle NaN values early. */
-        if (igraph_is_nan(VECTOR(*v1)[i]) && igraph_is_nan(VECTOR(*v2)[i])) {
+        if (isnan(VECTOR(*v1)[i]) && isnan(VECTOR(*v2)[i])) {
             continue;
         }
         if (VECTOR(*v1)[i]  != VECTOR(*v2)[i]) {
@@ -50,13 +50,13 @@ igraph_bool_t vector_equal(const igraph_vector_t *v1, const igraph_vector_t *v2)
 
 /* Compute the average of a vector, ignoring NaN values. */
 igraph_real_t vector_avg(const igraph_vector_t *v) {
-    long int n = igraph_vector_size(v);
-    long int i;
+    igraph_integer_t n = igraph_vector_size(v);
+    igraph_integer_t i;
     igraph_real_t sum = 0.0, count;
 
     count = 0;
     for (i=0; i < n; ++i) {
-        if (igraph_is_nan(VECTOR(*v)[i])) {
+        if (isnan(VECTOR(*v)[i])) {
             continue;
         }
         sum += VECTOR(*v)[i];
@@ -65,7 +65,7 @@ igraph_real_t vector_avg(const igraph_vector_t *v) {
     return sum / count;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t result1, result2, result3;
@@ -90,7 +90,7 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100, 0.1,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
-    igraph_vs_seq(&vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&vertices, 0, igraph_vcount(&g));
 
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(),
                                          IGRAPH_TRANSITIVITY_NAN);
@@ -107,7 +107,7 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 50, 0.3,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
-    igraph_vs_seq(&vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&vertices, 0, igraph_vcount(&g));
 
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(),
                                          IGRAPH_TRANSITIVITY_NAN);
@@ -143,7 +143,7 @@ int main() {
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_NAN);
-    IGRAPH_ASSERT(igraph_is_nan(avg_local));
+    IGRAPH_ASSERT(isnan(avg_local));
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_ZERO);
     IGRAPH_ASSERT(avg_local == 0);
     igraph_destroy(&g);
@@ -153,7 +153,7 @@ int main() {
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_NAN);
-    IGRAPH_ASSERT(igraph_is_nan(avg_local));
+    IGRAPH_ASSERT(isnan(avg_local));
     igraph_transitivity_avglocal_undirected(&g, &avg_local, IGRAPH_TRANSITIVITY_ZERO);
     IGRAPH_ASSERT(avg_local == 0);
     igraph_destroy(&g);
@@ -194,13 +194,13 @@ int main() {
                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                  -1);
 
-    igraph_vs_seq(&vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&vertices, 0, igraph_vcount(&g));
 
     printf("\nDirected multi:\n");
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
 
-    igraph_vector_copy(&result3, &result1);
+    igraph_vector_init_copy(&result3, &result1);
 
     igraph_transitivity_local_undirected(&g, &result2, vertices, IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result2);
@@ -224,7 +224,7 @@ int main() {
     IGRAPH_ASSERT(fabs(avg_local - vector_avg(&result1)) < 1e-14);
 
     printf("\nUndirected simple:\n");
-    igraph_simplify(&g, 1, 1, NULL);
+    igraph_simplify(&g, true, true, NULL);
     igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
     print_vector(&result1);
     IGRAPH_ASSERT(vector_equal(&result1, &result3));

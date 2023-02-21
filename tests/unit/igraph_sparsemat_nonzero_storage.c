@@ -17,10 +17,10 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
-int main() {
+int main(void) {
     igraph_sparsemat_t spmat;
     igraph_sparsemat_t spmat_comp;
     int i, j;

@@ -25,27 +25,28 @@
 #define IGRAPH_GRAPHLETS_H
 
 #include "igraph_decls.h"
+
 #include "igraph_datatype.h"
-#include "igraph_vector_ptr.h"
-#include "igraph_interface.h"
+#include "igraph_error.h"
+#include "igraph_vector_list.h"
 
 __BEGIN_DECLS
 
-IGRAPH_EXPORT int igraph_graphlets_candidate_basis(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
                                                    const igraph_vector_t *weights,
-                                                   igraph_vector_ptr_t *cliques,
+                                                   igraph_vector_int_list_t *cliques,
                                                    igraph_vector_t *thresholds);
 
-IGRAPH_EXPORT int igraph_graphlets_project(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_graphlets_project(const igraph_t *graph,
                                            const igraph_vector_t *weights,
-                                           const igraph_vector_ptr_t *cliques,
+                                           const igraph_vector_int_list_t *cliques,
                                            igraph_vector_t *Mu, igraph_bool_t startMu,
-                                           int niter);
+                                           igraph_integer_t niter);
 
-IGRAPH_EXPORT int igraph_graphlets(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_graphlets(const igraph_t *graph,
                                    const igraph_vector_t *weights,
-                                   igraph_vector_ptr_t *cliques,
-                                   igraph_vector_t *Mu, int niter);
+                                   igraph_vector_int_list_t *cliques,
+                                   igraph_vector_t *Mu, igraph_integer_t niter);
 
 __END_DECLS
 

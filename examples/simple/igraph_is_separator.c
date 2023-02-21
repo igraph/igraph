@@ -26,10 +26,10 @@
 
 #define FAIL(msg, error) do { printf(msg "\n") ; return error; } while (0)
 
-int main() {
+int main(void) {
 
     igraph_t graph;
-    igraph_vector_t sep;
+    igraph_vector_int_t sep;
     igraph_bool_t result;
 
     /* Simple star graph, remove the center */
@@ -46,14 +46,14 @@ int main() {
     }
 
     /* Same graph, all vertices but the center */
-    igraph_is_separator(&graph, igraph_vss_seq(1, 9), &result);
+    igraph_is_separator(&graph, igraph_vss_range(1, 10), &result);
     if (result) {
         FAIL("All non-central vertices of star graph failed.", 5);
     }
     igraph_destroy(&graph);
 
     /* Same graph, all vertices */
-    igraph_is_separator(&graph, igraph_vss_seq(0, 9), &result);
+    igraph_is_separator(&graph, igraph_vss_range(0, 10), &result);
     if (result) {
         FAIL("All vertices of star graph failed.", 6);
     }
@@ -61,15 +61,15 @@ int main() {
 
     /* Karate club */
     igraph_famous(&graph, "zachary");
-    igraph_vector_init(&sep, 0);
-    igraph_vector_push_back(&sep, 32);
-    igraph_vector_push_back(&sep, 33);
+    igraph_vector_int_init(&sep, 0);
+    igraph_vector_int_push_back(&sep, 32);
+    igraph_vector_int_push_back(&sep, 33);
     igraph_is_separator(&graph, igraph_vss_vector(&sep), &result);
     if (!result) {
         FAIL("Karate network (32,33) failed", 3);
     }
 
-    igraph_vector_resize(&sep, 5);
+    igraph_vector_int_resize(&sep, 5);
     VECTOR(sep)[0] = 8;
     VECTOR(sep)[1] = 9;
     VECTOR(sep)[2] = 19;
@@ -81,7 +81,7 @@ int main() {
     }
 
     igraph_destroy(&graph);
-    igraph_vector_destroy(&sep);
+    igraph_vector_int_destroy(&sep);
 
     return 0;
 }

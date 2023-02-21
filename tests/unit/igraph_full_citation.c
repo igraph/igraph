@@ -18,12 +18,12 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g, g_test;
     igraph_bool_t same;
-    long int n_vertices = 4;
+    igraph_integer_t n_vertices = 4;
 
     /*    Undirected, should be a full graph    */
     IGRAPH_ASSERT(igraph_full_citation(&g, n_vertices, 0 /*undirected*/) == IGRAPH_SUCCESS);

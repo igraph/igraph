@@ -23,18 +23,18 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_bool_t type;
-    igraph_bool_t typev[] = { 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 };
+    igraph_bool_t typev[] = { false, true, false, true, false, true, false, true, false, true };
 
     /* turn on attribute handling */
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    igraph_ring(&graph, 10, IGRAPH_UNDIRECTED, /*mutual=*/ 0, /*circular=*/ 1);
-    igraph_vector_bool_view(&type, typev, sizeof(typev) / sizeof(igraph_bool_t));
+    igraph_ring(&graph, 10, IGRAPH_UNDIRECTED, /*mutual=*/ false, /*circular=*/ true);
+    igraph_vector_bool_view(&type, typev, sizeof(typev) / sizeof(typev[0]));
     SETVABV(&graph, "type", &type);
 
     igraph_write_graph_pajek(&graph, stdout);

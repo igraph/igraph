@@ -26,21 +26,35 @@
 
 #include "core/trie.h"
 
+/* According to Pajek's author, limits of the Pajek program as of 2022-1-1 are:
+ * "At the moment regular Pajek has limit one billion vertices,
+ *  PajekXXL two billions, while Pajek 3XL ten billions."
+ * Hard-coding the limit INT32_MAX is safe when compiling wiht 32-bit integers,
+ * and likely sufficient for practical applications.
+ */
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+/* Limit maximum vertex count when using a fuzzer, to avoid out-of-memory failure. */
+#define IGRAPH_PAJEK_MAX_VERTEX_COUNT (1 << 20)
+#else
+#define IGRAPH_PAJEK_MAX_VERTEX_COUNT INT32_MAX
+#endif
+
 typedef struct {
     void *scanner;
     int eof;
     char errmsg[300];
-    igraph_vector_t *vector;
+    igraph_error_t igraph_errno;
+    igraph_vector_int_t *vector;
     igraph_bool_t directed;
-    int vcount, vcount2;
-    int actfrom;
-    int actto;
+    igraph_integer_t vcount, vcount2;
+    igraph_integer_t actfrom;
+    igraph_integer_t actto;
     int mode; /* 0: general, 1: vertex, 2: edge */
     igraph_trie_t *vertex_attribute_names;
     igraph_vector_ptr_t *vertex_attributes;
     igraph_trie_t *edge_attribute_names;
     igraph_vector_ptr_t *edge_attributes;
-    int vertexid;
-    int actvertex;
-    int actedge;
+    igraph_integer_t vertexid;
+    igraph_integer_t actvertex;
+    igraph_integer_t actedge;
 } igraph_i_pajek_parsedata_t;

@@ -52,25 +52,25 @@
  * \param res Pointer to a real number, the result will be stored
  *   here.
  * \param loops Logical constant, whether to include self-loops in the
- *   calculation. If this constant is TRUE then
+ *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not
  *   necessarily mean that the graph really contains any loops). If
- *   this is FALSE then the result is only correct if the graph does not
+ *   this is \c false then the result is only correct if the graph does not
  *   contain loops.
  * \return Error code.
  *
  * Time complexity: O(1).
  */
-int igraph_density(const igraph_t *graph, igraph_real_t *res,
+igraph_error_t igraph_density(const igraph_t *graph, igraph_real_t *res,
                    igraph_bool_t loops) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_real_t no_of_edges = igraph_ecount(graph);
+    igraph_real_t no_of_nodes = (igraph_real_t) igraph_vcount(graph);
+    igraph_real_t no_of_edges = (igraph_real_t) igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
     if (no_of_nodes == 0) {
         *res = IGRAPH_NAN;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     if (!loops) {
@@ -89,12 +89,12 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_diversity
- * Structural diversity index of the vertices
+ * \brief Structural diversity index of the vertices.
  *
  * This measure was defined in Nathan Eagle, Michael Macy and Rob
  * Claxton: Network Diversity and Economic Development, Science 328,
@@ -117,7 +117,7 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  * graph with \ref igraph_to_undirected() .
  *
  * \param graph The undirected input graph.
- * \param weights The edge weights, in the order of the edge ids, must
+ * \param weights The edge weights, in the order of the edge IDs, must
  *    have appropriate length. Weights must be non-negative.
  * \param res An initialized vector, the results are stored here.
  * \param vids Vertex selector that specifies the vertices which to calculate
@@ -127,12 +127,12 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
  * Time complexity: O(|V|+|E|), linear.
  *
  */
-int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
+igraph_error_t igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
-    long int no_of_edges = igraph_ecount(graph);
-    long int k, i;
-    igraph_vector_t incident;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t k, i;
+    igraph_vector_int_t incident;
     igraph_bool_t has_multiple;
     igraph_vit_t vit;
 
@@ -157,12 +157,12 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight < 0) {
             IGRAPH_ERROR("Weight vector must be non-negative.", IGRAPH_EINVAL);
-        } else if (igraph_is_nan(minweight)) {
+        } else if (isnan(minweight)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&incident, 10);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&incident, 10);
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -172,10 +172,10 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         igraph_real_t d;
-        long int v = IGRAPH_VIT_GET(vit);
+        igraph_integer_t v = IGRAPH_VIT_GET(vit);
 
         IGRAPH_CHECK(igraph_incident(graph, &incident, v, /*mode=*/ IGRAPH_ALL));
-        k = igraph_vector_size(&incident); /* degree */
+        k = igraph_vector_int_size(&incident); /* degree */
 
         /*
          * Non-normalized diversity is defined as
@@ -196,7 +196,7 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
         } else {
             igraph_real_t s = 0.0, ent = 0.0;
             for (i = 0; i < k; i++) {
-                igraph_real_t w = VECTOR(*weights)[(long int)VECTOR(incident)[i]];
+                igraph_real_t w = VECTOR(*weights)[VECTOR(incident)[i]];
                 if (w == 0) continue;
                 s += w;
                 ent += (w * log(w));
@@ -208,7 +208,7 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
     }
 
     igraph_vit_destroy(&vit);
-    igraph_vector_destroy(&incident);
+    igraph_vector_int_destroy(&incident);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
@@ -257,37 +257,37 @@ int igraph_diversity(const igraph_t *graph, const igraph_vector_t *weights,
  *
  * \example examples/simple/igraph_reciprocity.c
  */
-int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
+igraph_error_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                        igraph_bool_t ignore_loops,
                        igraph_reciprocity_t mode) {
 
     igraph_integer_t nonrec = 0, rec = 0, loops = 0;
-    igraph_vector_t inneis, outneis;
-    long int i;
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t inneis, outneis;
+    igraph_integer_t i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (mode != IGRAPH_RECIPROCITY_DEFAULT &&
         mode != IGRAPH_RECIPROCITY_RATIO) {
-        IGRAPH_ERROR("Invalid reciprocity type", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid reciprocity type.", IGRAPH_EINVAL);
     }
 
     /* THIS IS AN EXIT HERE !!!!!!!!!!!!!! */
     if (!igraph_is_directed(graph)) {
         *res = 1.0;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&inneis, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&inneis, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&outneis, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
-        long int ip, op;
-        igraph_neighbors(graph, &inneis, (igraph_integer_t) i, IGRAPH_IN);
-        igraph_neighbors(graph, &outneis, (igraph_integer_t) i, IGRAPH_OUT);
+        igraph_integer_t ip, op;
+        IGRAPH_CHECK(igraph_neighbors(graph, &inneis, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_neighbors(graph, &outneis, i, IGRAPH_OUT));
 
         ip = op = 0;
-        while (ip < igraph_vector_size(&inneis) &&
-               op < igraph_vector_size(&outneis)) {
+        while (ip < igraph_vector_int_size(&inneis) &&
+               op < igraph_vector_int_size(&outneis)) {
             if (VECTOR(inneis)[ip] < VECTOR(outneis)[op]) {
                 nonrec += 1;
                 ip++;
@@ -310,8 +310,8 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                 op++;
             }
         }
-        nonrec += (igraph_vector_size(&inneis) - ip) +
-                  (igraph_vector_size(&outneis) - op);
+        nonrec += (igraph_vector_int_size(&inneis) - ip) +
+                  (igraph_vector_int_size(&outneis) - op);
     }
 
     if (mode == IGRAPH_RECIPROCITY_DEFAULT) {
@@ -324,8 +324,8 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
         *res = (igraph_real_t) rec / (rec + nonrec);
     }
 
-    igraph_vector_destroy(&inneis);
-    igraph_vector_destroy(&outneis);
+    igraph_vector_int_destroy(&inneis);
+    igraph_vector_int_destroy(&outneis);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

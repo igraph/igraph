@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     int nodes = 10;
     igraph_t tree;
@@ -36,10 +36,10 @@ int main() {
     igraph_eigen_which_t which;
     int i;
 
-    igraph_tree(&tree, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&tree, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
 
     igraph_matrix_init(&sto, nodes, nodes);
-    igraph_get_stochastic(&tree, &sto, /*column_wise=*/ 0);
+    igraph_get_stochastic(&tree, &sto, /*column_wise=*/ 0, /* weights = */ NULL);
     igraph_matrix_transpose(&sto);
 
     igraph_matrix_init(&hess, nodes, nodes);

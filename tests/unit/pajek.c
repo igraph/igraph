@@ -23,34 +23,35 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     FILE *ifile;
 
+    /* turn on attribute handling */
+    igraph_set_attribute_table(&igraph_cattribute_table);
+
     ifile = fopen("pajek5.net", "r");
-    if (!ifile) {
-        return 1;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-    if (igraph_vcount(&g) != 10 || igraph_ecount(&g) != 9 ||
-        igraph_is_directed(&g)) {
-        return 2;
-    }
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 9);
+
     igraph_destroy(&g);
 
     ifile = fopen("pajek6.net", "r");
-    if (!ifile) {
-        return 3;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-    if (igraph_vcount(&g) != 10 || igraph_ecount(&g) != 9 ||
-        !igraph_is_directed(&g)) {
-        return 4;
-    }
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 9);
+
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

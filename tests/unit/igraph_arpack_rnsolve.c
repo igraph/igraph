@@ -23,17 +23,18 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 typedef struct cb2_data_t {
     igraph_matrix_t *A;
 } cb2_data_t;
 
-int cb2(igraph_real_t *to, const igraph_real_t *from, int n, void *extra) {
+igraph_error_t cb2(igraph_real_t *to, const igraph_real_t *from, int n, void *extra) {
+    IGRAPH_UNUSED(n);
     cb2_data_t *data = (cb2_data_t*) extra;
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
                                            data->A, from, /*beta=*/ 0.0, to);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int check_eigenvector(
@@ -77,7 +78,7 @@ int check_eigenvector(
                    );
         }
         prod = igraph_complex_div(prod, eval);
-        if (!igraph_complex_eq_tol(prod, evec[i], 1e-6)) {
+        if (!igraph_complex_almost_equals(prod, evec[i], 1e-12)) {
             prod = igraph_complex_sub(prod, evec[i]);
             printf("%s: vector corresponding to eigenvalue (%.4f + %.4f*i) is not an "
                    "eigenvector, coordinate %d differs by %.4f + %.4f*i\n",
@@ -124,13 +125,15 @@ int check_eigenvectors(
 
 #define DIM 10
 
-int main() {
+int main(void) {
     igraph_matrix_t A;
     igraph_matrix_t values, vectors;
     igraph_arpack_options_t options;
     cb2_data_t data = { &A };
     int i, j;
 
+    /* Note: igraph_arpack_rnsolve() uses the RNG to generate a random
+     * starting vector for ARPACK. */
     igraph_rng_seed(igraph_rng_default(), 42 * 42);
 
     igraph_matrix_init(&A, DIM, DIM);

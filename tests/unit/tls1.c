@@ -25,11 +25,12 @@
 #include <pthread.h>
 
 void *thread_function(void *arg) {
+    IGRAPH_UNUSED(arg);
     IGRAPH_FINALLY(igraph_free, NULL);
     return 0;
 }
 
-int main() {
+int main(void) {
     pthread_t thread_id;
     void *exit_status;
 

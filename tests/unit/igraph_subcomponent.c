@@ -17,24 +17,24 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-void call_and_print(igraph_t *graph, igraph_real_t vertex, igraph_neimode_t mode) {
-    igraph_vector_t result;
-    igraph_vector_init(&result, 0);
+void call_and_print(igraph_t *graph, igraph_integer_t vertex, igraph_neimode_t mode) {
+    igraph_vector_int_t result;
+    igraph_vector_int_init(&result, 0);
     IGRAPH_ASSERT(igraph_subcomponent(graph, &result, vertex, mode) == IGRAPH_SUCCESS);
-    igraph_vector_sort(&result);
-    igraph_vector_print(&result);
-    igraph_vector_destroy(&result);
+    igraph_vector_int_sort(&result);
+    igraph_vector_int_print(&result);
+    igraph_vector_int_destroy(&result);
     printf("\n");
 }
 
 
-int main() {
+int main(void) {
     igraph_t g_0, g_1, g_lm, g_lmu;
-    igraph_vector_t result;
-    igraph_vector_init(&result, 0);
-    int i;
+    igraph_vector_int_t result;
+    igraph_vector_int_init(&result, 0);
+    igraph_integer_t i;
 
     igraph_small(&g_0, 0, 0, -1);
     igraph_small(&g_1, 1, 0, -1);
@@ -68,13 +68,13 @@ int main() {
     }
 
     printf("Check for invalid mode error handling.\n");
-    CHECK_ERROR(igraph_subcomponent(&g_1, &result, 0, 100), IGRAPH_EINVMODE);
+    CHECK_ERROR(igraph_subcomponent(&g_1, &result, 0, (igraph_neimode_t) 100), IGRAPH_EINVMODE);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);
     igraph_destroy(&g_lm);
     igraph_destroy(&g_lmu);
-    igraph_vector_destroy(&result);
+    igraph_vector_int_destroy(&result);
 
     VERIFY_FINALLY_STACK();
     return 0;

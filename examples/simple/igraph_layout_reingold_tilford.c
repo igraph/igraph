@@ -24,15 +24,15 @@
 #include <igraph.h>
 #include <math.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     FILE *f;
     igraph_matrix_t coords;
-    /* long int i, n; */
+    /* igraph_integer_t i, n; */
 
     f = fopen("igraph_layout_reingold_tilford.in", "r");
-    igraph_read_graph_edgelist(&g, f, 0, 1);
+    igraph_read_graph_edgelist(&g, f, 0, IGRAPH_DIRECTED);
     igraph_matrix_init(&coords, 0, 0);
     igraph_layout_reingold_tilford(&g, &coords, IGRAPH_IN, 0, 0);
 

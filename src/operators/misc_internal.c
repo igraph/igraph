@@ -25,44 +25,21 @@
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
-#include "igraph_memory.h"
 #include "igraph_qsort.h"
 
-void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
-    long int i, n = igraph_vector_ptr_size(v);
-    for (i = 0; i < n; i++) {
-        if (VECTOR(*v)[i] != 0) {
-            igraph_vector_destroy(VECTOR(*v)[i]);
-            IGRAPH_FREE(VECTOR(*v)[i]);
-        }
-    }
-    igraph_vector_ptr_destroy(v);
-}
-
-void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v) {
-    long int i, n = igraph_vector_ptr_size(v);
-    for (i = 0; i < n; i++) {
-        if (VECTOR(*v)[i] != 0) {
-            igraph_vector_long_destroy(VECTOR(*v)[i]);
-            IGRAPH_FREE(VECTOR(*v)[i]);
-        }
-    }
-    igraph_vector_ptr_destroy(v);
-}
-
 int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
-    igraph_vector_t *edgelist = edges;
-    long int edge1 = (*(const long int*) e1) * 2;
-    long int edge2 = (*(const long int*) e2) * 2;
-    long int from1 = VECTOR(*edgelist)[edge1];
-    long int from2 = VECTOR(*edgelist)[edge2];
+    igraph_vector_int_t *edgelist = edges;
+    igraph_integer_t edge1 = (*(const igraph_integer_t*) e1) * 2;
+    igraph_integer_t edge2 = (*(const igraph_integer_t*) e2) * 2;
+    igraph_integer_t from1 = VECTOR(*edgelist)[edge1];
+    igraph_integer_t from2 = VECTOR(*edgelist)[edge2];
     if (from1 < from2) {
         return -1;
     } else if (from1 > from2) {
         return 1;
     } else {
-        long int to1 = VECTOR(*edgelist)[edge1 + 1];
-        long int to2 = VECTOR(*edgelist)[edge2 + 1];
+        igraph_integer_t to1 = VECTOR(*edgelist)[edge1 + 1];
+        igraph_integer_t to2 = VECTOR(*edgelist)[edge2 + 1];
         if (to1 < to2) {
             return -1;
         } else if (to1 > to2) {
@@ -73,54 +50,57 @@ int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
     }
 }
 
-int igraph_i_merge(igraph_t *res, int mode,
+igraph_error_t igraph_i_merge(igraph_t *res, igraph_i_merge_mode_t mode,
                    const igraph_t *left, const igraph_t *right,
-                   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
+                   igraph_vector_int_t *edge_map1, igraph_vector_int_t *edge_map2) {
 
-    long int no_of_nodes_left = igraph_vcount(left);
-    long int no_of_nodes_right = igraph_vcount(right);
-    long int no_of_nodes;
-    long int no_edges_left = igraph_ecount(left);
-    long int no_edges_right = igraph_ecount(right);
+    igraph_integer_t no_of_nodes_left = igraph_vcount(left);
+    igraph_integer_t no_of_nodes_right = igraph_vcount(right);
+    igraph_integer_t no_of_nodes;
+    igraph_integer_t no_edges_left = igraph_ecount(left);
+    igraph_integer_t no_edges_right = igraph_ecount(right);
     igraph_bool_t directed = igraph_is_directed(left);
-    igraph_vector_t edges;
-    igraph_vector_t edges1, edges2;
-    igraph_vector_long_t order1, order2;
-    long int i, j, eptr = 0;
-    long int idx1, idx2, edge1 = -1, edge2 = -1, from1 = -1, from2 = -1, to1 = -1, to2 = -1;
+    igraph_vector_int_t edges;
+    igraph_vector_int_t edges1, edges2;
+    igraph_vector_int_t order1, order2;
+    igraph_integer_t i, j, eptr = 0;
+    igraph_integer_t idx1, idx2, edge1 = -1, edge2 = -1, from1 = -1, from2 = -1, to1 = -1, to2 = -1;
     igraph_bool_t l;
 
     if (directed != igraph_is_directed(right)) {
-        IGRAPH_ERROR("Cannot make union or intersection of directed "
-                     "and undirected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot create union or intersection of directed and undirected graph.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges1, no_edges_left * 2);
-    IGRAPH_VECTOR_INIT_FINALLY(&edges2, no_edges_right * 2);
-    IGRAPH_CHECK(igraph_vector_long_init(&order1, no_edges_left));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &order1);
-    IGRAPH_CHECK(igraph_vector_long_init(&order2, no_edges_right));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &order2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges1, no_edges_left * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges2, no_edges_right * 2);
+    IGRAPH_CHECK(igraph_vector_int_init(&order1, no_edges_left));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &order1);
+    IGRAPH_CHECK(igraph_vector_int_init(&order2, no_edges_right));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &order2);
 
     if (edge_map1) {
         switch (mode) {
         case IGRAPH_MERGE_MODE_UNION:
-            IGRAPH_CHECK(igraph_vector_resize(edge_map1, no_edges_left));
+            IGRAPH_CHECK(igraph_vector_int_resize(edge_map1, no_edges_left));
             break;
         case IGRAPH_MERGE_MODE_INTERSECTION:
-            igraph_vector_clear(edge_map1);
+            igraph_vector_int_clear(edge_map1);
             break;
+        default:
+            IGRAPH_FATAL("Invalid merge mode.");
         }
     }
     if (edge_map2) {
         switch (mode) {
         case IGRAPH_MERGE_MODE_UNION:
-            IGRAPH_CHECK(igraph_vector_resize(edge_map2, no_edges_right));
+            IGRAPH_CHECK(igraph_vector_int_resize(edge_map2, no_edges_right));
             break;
         case IGRAPH_MERGE_MODE_INTERSECTION:
-            igraph_vector_clear(edge_map2);
+            igraph_vector_int_clear(edge_map2);
             break;
+        default:
+            IGRAPH_FATAL("Invalid merge mode.");
         }
     }
 
@@ -129,22 +109,22 @@ int igraph_i_merge(igraph_t *res, int mode,
 
     /* We merge the two edge lists. We need to sort them first.
        For undirected graphs, we also need to make sure that
-       for every edge, that larger (non-smaller) vertex id is in the
+       for every edge, the larger (non-smaller) vertex ID is in the
        second column. */
 
-    IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ 0));
-    IGRAPH_CHECK(igraph_get_edgelist(right, &edges2, /*bycol=*/ 0));
+    IGRAPH_CHECK(igraph_get_edgelist(left, &edges1, /*bycol=*/ false));
+    IGRAPH_CHECK(igraph_get_edgelist(right, &edges2, /*bycol=*/ false));
     if (!directed) {
         for (i = 0, j = 0; i < no_edges_left; i++, j += 2) {
             if (VECTOR(edges1)[j] > VECTOR(edges1)[j + 1]) {
-                long int tmp = VECTOR(edges1)[j];
+                igraph_integer_t tmp = VECTOR(edges1)[j];
                 VECTOR(edges1)[j] = VECTOR(edges1)[j + 1];
                 VECTOR(edges1)[j + 1] = tmp;
             }
         }
         for (i = 0, j = 0; i < no_edges_right; i++, j += 2) {
             if (VECTOR(edges2)[j] > VECTOR(edges2)[j + 1]) {
-                long int tmp = VECTOR(edges2)[j];
+                igraph_integer_t tmp = VECTOR(edges2)[j];
                 VECTOR(edges2)[j] = VECTOR(edges2)[j + 1];
                 VECTOR(edges2)[j + 1] = tmp;
             }
@@ -196,8 +176,8 @@ int igraph_i_merge(igraph_t *res, int mode,
             (idx1 < no_edges_left && from1 == from2 && to1 < to2)) {
             /* Edge from first graph */
             if (mode == IGRAPH_MERGE_MODE_UNION) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, from1));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, to1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from1));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to1));
                 if (edge_map1) {
                     VECTOR(*edge_map1)[edge1] = eptr;
                 }
@@ -209,8 +189,8 @@ int igraph_i_merge(igraph_t *res, int mode,
                    (idx2 < no_edges_right && from1 == from2 && to2 < to1)) {
             /* Edge from second graph */
             if (mode == IGRAPH_MERGE_MODE_UNION) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, from2));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, to2));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from2));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to2));
                 if (edge_map2) {
                     VECTOR(*edge_map2)[edge2] = eptr;
                 }
@@ -219,8 +199,8 @@ int igraph_i_merge(igraph_t *res, int mode,
             INC2();
         } else {
             /* Edge from both */
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, from1));
-            IGRAPH_CHECK(igraph_vector_push_back(&edges, to1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from1));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to1));
             if (mode == IGRAPH_MERGE_MODE_UNION) {
                 if (edge_map1) {
                     VECTOR(*edge_map1)[edge1] = eptr;
@@ -230,10 +210,10 @@ int igraph_i_merge(igraph_t *res, int mode,
                 }
             } else if (mode == IGRAPH_MERGE_MODE_INTERSECTION) {
                 if (edge_map1) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map1, edge1));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map1, edge1));
                 }
                 if (edge_map2) {
-                    IGRAPH_CHECK(igraph_vector_push_back(edge_map2, edge2));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(edge_map2, edge2));
                 }
             }
             eptr++;
@@ -246,14 +226,15 @@ int igraph_i_merge(igraph_t *res, int mode,
 #undef INC1
 #undef INC2
 
-    igraph_vector_long_destroy(&order2);
-    igraph_vector_long_destroy(&order1);
-    igraph_vector_destroy(&edges2);
-    igraph_vector_destroy(&edges1);
+    igraph_vector_int_destroy(&order2);
+    igraph_vector_int_destroy(&order1);
+    igraph_vector_int_destroy(&edges2);
+    igraph_vector_int_destroy(&edges1);
     IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }

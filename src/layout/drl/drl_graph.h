@@ -45,7 +45,7 @@ namespace drl {
 
 // layout schedule information
 struct layout_schedule {
-    int iterations;
+    igraph_integer_t iterations;
     float temperature;
     float attraction;
     float damping_mult;
@@ -61,8 +61,7 @@ public:
     void init_parms ( const igraph_layout_drl_options_t *options );
     void read_parms ( char *parms_file );
     void read_real ( char *real_file );
-    int read_real ( const igraph_matrix_t *real_mat,
-                    const igraph_vector_bool_t *fixed);
+    int read_real ( const igraph_matrix_t *real_mat );
     void scan_int ( char *filename );
     void read_int ( char *file_name );
     void draw_graph ( int int_out, char *coord_file );
@@ -83,13 +82,13 @@ private:
     // Methods
     int ReCompute ( );
     void update_nodes ( );
-    float Compute_Node_Energy ( int node_ind );
-    void Solve_Analytic ( int node_ind, float &pos_x, float &pos_y );
-    void get_positions ( std::vector<int> &node_indices, float return_positions[2 * MAX_PROCS] );
-    void update_density ( std::vector<int> &node_indices,
+    float Compute_Node_Energy ( igraph_integer_t node_ind );
+    void Solve_Analytic ( igraph_integer_t node_ind, float &pos_x, float &pos_y );
+    void get_positions ( std::vector<igraph_integer_t> &node_indices, float return_positions[2 * MAX_PROCS] );
+    void update_density ( std::vector<igraph_integer_t> &node_indices,
                           float old_positions[2 * MAX_PROCS],
                           float new_positions[2 * MAX_PROCS] );
-    void update_node_pos ( int node_ind,
+    void update_node_pos ( igraph_integer_t node_ind,
                            float old_positions[2 * MAX_PROCS],
                            float new_positions[2 * MAX_PROCS] );
 
@@ -97,17 +96,18 @@ private:
     int myid, num_procs;
 
     // graph decomposition information
-    int num_nodes;                  // number of nodes in graph
+    igraph_integer_t num_nodes;                  // number of nodes in graph
     float highest_sim;              // highest sim for normalization
-    std::map <int, int> id_catalog;      // id_catalog[file id] = internal id
-    std::map <int, std::map <int, float> > neighbors;     // neighbors of nodes on this proc.
+    std::map <igraph_integer_t, igraph_integer_t> id_catalog;      // id_catalog[file id] = internal id
+    std::map <igraph_integer_t, std::map <igraph_integer_t, float> > neighbors;     // neighbors of nodes on this proc.
 
     // graph layout information
     std::vector<Node> positions;
     DensityGrid density_server;
 
     // original VxOrd information
-    int STAGE, iterations;
+    int STAGE;
+    igraph_integer_t iterations;
     float temperature, attraction, damping_mult;
     float min_edges, CUT_END, cut_length_end, cut_off_length, cut_rate;
     bool first_add, fine_first_add, fineDensity;
@@ -123,9 +123,9 @@ private:
     time_t start_time, stop_time;
 
     // online clustering information
-    int real_iterations;    // number of iterations to hold .real input fixed
-    int tot_iterations;
-    int tot_expected_iterations; // for progress bar
+    igraph_integer_t real_iterations;    // number of iterations to hold .real input fixed
+    igraph_integer_t tot_iterations;
+    igraph_integer_t tot_expected_iterations; // for progress bar
     bool real_fixed;
 };
 

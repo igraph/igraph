@@ -23,10 +23,13 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     FILE *input;
+
+    /* Turn on attribute handling. */
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* Without names and weights */
     input = fopen("igraph_read_graph_lgl-1.lgl", "r");

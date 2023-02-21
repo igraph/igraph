@@ -27,11 +27,13 @@
 #define DIM 10
 
 void igraph_print_warning(const char *reason, const char *file,
-                          int line, int igraph_errno) {
+                          int line) {
+    IGRAPH_UNUSED(file);
+    IGRAPH_UNUSED(line);
     printf("Warning: %s\n", reason);
 }
 
-int main() {
+int main(void) {
 
     igraph_matrix_t A, B, RHS;
     int info;
@@ -46,7 +48,7 @@ int main() {
         MATRIX(B, i, 0) = i + 1;
     }
 
-    igraph_matrix_copy(&RHS, &B);
+    igraph_matrix_init_copy(&RHS, &B);
     igraph_lapack_dgesv(&A, /*ipiv=*/ 0, &RHS, &info);
 
     if (info != 0) {
@@ -106,7 +108,7 @@ int main() {
         return 5;
     }
     for (i = 0; i < DIM; i++) {
-        if (fabs(MATRIX(B, i, 0) - MATRIX(RHS, i, 0)) > 1e-13) {
+        if (fabs(MATRIX(B, i, 0) - MATRIX(RHS, i, 0)) > 1e-11) {
             return 6;
         }
     }

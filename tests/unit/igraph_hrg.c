@@ -24,23 +24,23 @@
 #include <igraph.h>
 #include <stdio.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_t full, tree;
     igraph_hrg_t hrg;
     igraph_t dendrogram;
     // int i, j;
-    // igraph_vector_t neis;
+    // igraph_vector_int_t neis;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
     // We need attributes
     igraph_set_attribute_table(&igraph_cattribute_table);
 
-    igraph_full(&full, 10, /*directed=*/ 0, /*loops=*/ 0);
-    igraph_tree(&tree, 15, /*children=*/ 2, /*type=*/ IGRAPH_TREE_UNDIRECTED);
+    igraph_full(&full, 10, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_kary_tree(&tree, 15, /*children=*/ 2, /*type=*/ IGRAPH_TREE_UNDIRECTED);
     igraph_disjoint_union(&graph, &full, &tree);
     igraph_add_edge(&graph, 0, 10);
 
@@ -49,13 +49,13 @@ int main() {
 
     // Fit
     igraph_hrg_init(&hrg, igraph_vcount(&graph));
-    igraph_hrg_fit(&graph, &hrg, /*start=*/ 0, /*steps=*/ 0);
+    igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 0);
 
     // Create a graph from it
     igraph_hrg_dendrogram(&dendrogram, &hrg);
 
     // Print the tree, with labels
-    // igraph_vector_init(&neis, 0);
+    // igraph_vector_int_init(&neis, 0);
     // for (i=0; i<igraph_vcount(&graph)-1; i++) {
     //   printf("Vertex # %2i, ", (int) (i+igraph_vcount(&graph)));
     //   igraph_neighbors(&dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT);
@@ -64,9 +64,27 @@ int main() {
     //   printf("prob: %6.2g\n",
     //       VAN(&dendrogram, "probability", i+igraph_vcount(&graph)));
     // }
-    // igraph_vector_destroy(&neis);
+    // igraph_vector_int_destroy(&neis);
 
     igraph_destroy(&dendrogram);
+    igraph_hrg_destroy(&hrg);
+    igraph_destroy(&graph);
+
+    // test small graph
+    igraph_small(&graph, 3, IGRAPH_UNDIRECTED,
+                 0,1,
+                 -1);
+    igraph_hrg_init(&hrg, igraph_vcount(&graph));
+    igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 0);
+    igraph_hrg_dendrogram(&dendrogram, &hrg);
+    igraph_destroy(&dendrogram);
+    igraph_hrg_destroy(&hrg);
+    igraph_destroy(&graph);
+
+    // graph must have at least 3 vertices at the moment
+    igraph_full(&graph, 2, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_hrg_init(&hrg, igraph_vcount(&graph));
+    CHECK_ERROR(igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 0), IGRAPH_EINVAL);
     igraph_hrg_destroy(&hrg);
     igraph_destroy(&graph);
 

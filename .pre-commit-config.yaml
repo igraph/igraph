@@ -14,4 +14,3 @@ repos:
         exclude: "\\.out$"
       - id: check-merge-conflict
       - id: fix-byte-order-marker
-

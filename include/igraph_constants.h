@@ -24,9 +24,8 @@
 #ifndef IGRAPH_CONSTANTS_H
 #define IGRAPH_CONSTANTS_H
 
+#include "igraph_config.h"
 #include "igraph_decls.h"
-#include "igraph_types.h"
-#include "igraph_datatype.h"
 
 __BEGIN_DECLS
 
@@ -48,9 +47,9 @@ typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
 typedef enum { IGRAPH_MINIMUM = 0, IGRAPH_MAXIMUM = 1 } igraph_optimal_t;
 
-typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3,
-               IGRAPH_TOTAL = 3
-             } igraph_neimode_t;
+/* Do not renumber the following values! Some internal code treats them as bitmasks
+ * and assumes that IGRAPH_ALL == IGRAPH_IN | IGRAPH_OUT and IGRAPH_IN & IGRAPH_OUT == 0. */
+typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3 } igraph_neimode_t;
 
 /* Reverse IGRAPH_OUT to IGRAPH_IN and vice versa. Leave other values alone. */
 #define IGRAPH_REVERSE_MODE(mode) \
@@ -63,15 +62,21 @@ typedef enum { IGRAPH_RECIPROCITY_DEFAULT = 0,
              } igraph_reciprocity_t;
 
 typedef enum { IGRAPH_ADJ_DIRECTED = 0,
-               IGRAPH_ADJ_UNDIRECTED = 1, IGRAPH_ADJ_MAX = 1,
+               IGRAPH_ADJ_UNDIRECTED,
                IGRAPH_ADJ_UPPER, IGRAPH_ADJ_LOWER, IGRAPH_ADJ_MIN,
-               IGRAPH_ADJ_PLUS
+               IGRAPH_ADJ_PLUS,
+               IGRAPH_ADJ_MAX,
              } igraph_adjacency_t;
 
 typedef enum { IGRAPH_STAR_OUT = 0, IGRAPH_STAR_IN,
                IGRAPH_STAR_UNDIRECTED,
                IGRAPH_STAR_MUTUAL
              } igraph_star_mode_t;
+
+typedef enum { IGRAPH_WHEEL_OUT = 0, IGRAPH_WHEEL_IN,
+               IGRAPH_WHEEL_UNDIRECTED,
+               IGRAPH_WHEEL_MUTUAL
+             } igraph_wheel_mode_t;
 
 typedef enum { IGRAPH_TREE_OUT = 0, IGRAPH_TREE_IN,
                IGRAPH_TREE_UNDIRECTED
@@ -86,10 +91,16 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER = 0,
                IGRAPH_GET_ADJACENCY_BOTH
              } igraph_get_adjacency_t;
 
-typedef enum { IGRAPH_DEGSEQ_SIMPLE = 0,
-               IGRAPH_DEGSEQ_VL,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE,
-               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM
+typedef enum { IGRAPH_DEGSEQ_CONFIGURATION = 0,     /* Configuration model, allowing non-simple graphs */
+               IGRAPH_DEGSEQ_VL,                    /* Viger-Latapy, generates simple connected graphs */
+               IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,      /* Fast heuristic, generates simple graphs */
+               IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE,  /* Configuration model, generates simple graphs */
+               IGRAPH_DEGSEQ_EDGE_SWITCHING_SIMPLE, /* Edge-switching MCMC, generates simple graphs */
+
+               /* Deprecated, kept for backwards compatibility: */
+               IGRAPH_DEGSEQ_SIMPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION,
+               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_FAST_HEUR_SIMPLE,
+               IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE
              } igraph_degseq_t;
 
 typedef enum { IGRAPH_REALIZE_DEGSEQ_SMALLEST = 0,
@@ -181,13 +192,6 @@ typedef enum { IGRAPH_IMITATE_AUGMENTED = 0,
                IGRAPH_IMITATE_CONTRACTED
              } igraph_imitate_algorithm_t;
 
-typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
-        const igraph_vector_t *par,
-        void* extra);
-typedef void igraph_vector_function_t(const igraph_vector_t *var,
-                                      const igraph_vector_t *par,
-                                      igraph_vector_t* res, void* extra);
-
 typedef enum { IGRAPH_LAYOUT_GRID = 0,
                IGRAPH_LAYOUT_NOGRID,
                IGRAPH_LAYOUT_AUTOGRID
@@ -197,6 +201,14 @@ typedef enum { IGRAPH_RANDOM_WALK_STUCK_ERROR = 0,
                IGRAPH_RANDOM_WALK_STUCK_RETURN
              } igraph_random_walk_stuck_t;
 
+typedef enum { IGRAPH_VORONOI_FIRST = 0,
+               IGRAPH_VORONOI_LAST,
+               IGRAPH_VORONOI_RANDOM
+             } igraph_voronoi_tiebreaker_t;
+
+typedef enum { IGRAPH_ROW_MAJOR = 0,
+               IGRAPH_COLUMN_MAJOR = 1
+             } igraph_matrix_storage_t;
 
 __END_DECLS
 

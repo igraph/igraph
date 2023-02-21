@@ -18,18 +18,18 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
-    igraph_vector_ptr_t paths;
-    igraph_vector_t nrgeo, weights;
+    igraph_vector_int_list_t paths, paths_edge;
+    igraph_vector_int_t nrgeo;
+    igraph_vector_t weights;
     igraph_integer_t from, to;
-    long int i;
 
-    igraph_vector_ptr_init(&paths, 0);
-    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&paths, igraph_vector_destroy);
-    igraph_vector_init(&nrgeo, 0);
+    igraph_vector_int_list_init(&paths, 0);
+    igraph_vector_int_list_init(&paths_edge, 0);
+    igraph_vector_int_init(&nrgeo, 0);
 
     igraph_vector_init(&weights, 0);
 
@@ -46,26 +46,20 @@ int main() {
 
     from = 0; to = 0;
 
-    igraph_get_all_shortest_paths(&graph, &paths, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
+    igraph_get_all_shortest_paths(&graph, &paths, NULL, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
 
-    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
-    }
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
-
-    igraph_vector_ptr_free_all(&paths);
+    printf("Vertex paths:\n");
+    print_vector_int_list(&paths);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&paths) == VECTOR(nrgeo)[to]);
 
     printf("\nSingleton graph, weighted\n");
     igraph_vector_resize(&weights, igraph_ecount(&graph));
     igraph_vector_fill(&weights, 1);
-    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
+    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, NULL, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
-    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
-    }
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
-
-    igraph_vector_ptr_free_all(&paths);
+    printf("Vertex paths:\n");
+    print_vector_int_list(&paths);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&paths) == VECTOR(nrgeo)[to]);
 
     igraph_destroy(&graph);
 
@@ -74,14 +68,13 @@ int main() {
 
     from = 0; to = 1;
 
-    igraph_get_all_shortest_paths(&graph, &paths, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
+    igraph_get_all_shortest_paths(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
 
-    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
-    }
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
-
-    igraph_vector_ptr_free_all(&paths);
+    printf("Vertex paths:\n");
+    print_vector_int_list(&paths);
+    printf("Edge paths:\n");
+    print_vector_int_list(&paths_edge);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&paths) == VECTOR(nrgeo)[to]);
 
     igraph_destroy(&graph);
 
@@ -95,40 +88,38 @@ int main() {
     from = 0; to = 4;
 
     printf("\nUnweighted\n");
-    igraph_get_all_shortest_paths(&graph, &paths, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
+    igraph_get_all_shortest_paths(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL);
 
-    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
-    }
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
-
-    igraph_vector_ptr_free_all(&paths);
+    printf("Vertex paths:\n");
+    print_vector_int_list(&paths);
+    printf("Edge paths:\n");
+    print_vector_int_list(&paths_edge);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&paths) == VECTOR(nrgeo)[to]);
 
     printf("\nWeighted, uniform weights\n");
     igraph_vector_resize(&weights, igraph_ecount(&graph));
     igraph_vector_fill(&weights, 1.5); /* constant weights */
 
-    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
+    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
-    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
-    }
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
-
-    igraph_vector_ptr_free_all(&paths);
+    printf("Vertex paths:\n");
+    print_vector_int_list(&paths);
+    printf("Edge paths:\n");
+    print_vector_int_list(&paths_edge);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&paths) == VECTOR(nrgeo)[to]);
 
     printf("\nWeighted, multiple weighted shortest paths\n");
     VECTOR(weights)[1] = 3.0; /* create path with one more hop, but equal weighted length */
     VECTOR(weights)[4] = 2.0; /* break symmetry on pair of parallel edges */
 
-    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
+    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), &weights, IGRAPH_ALL);
 
-    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
-    }
-    IGRAPH_ASSERT(igraph_vector_ptr_size(&paths) == VECTOR(nrgeo)[to]);
+    printf("Vertex paths:\n");
+    print_vector_int_list(&paths);
+    printf("Edge paths:\n");
+    print_vector_int_list(&paths_edge);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&paths) == VECTOR(nrgeo)[to]);
 
-    igraph_vector_ptr_free_all(&paths);
     igraph_vector_destroy(&weights);
     igraph_destroy(&graph);
 
@@ -149,18 +140,20 @@ int main() {
     printf("From: %" IGRAPH_PRId ", to: all.\n", from);
 
     igraph_vector_view(&weights, weights_raw, sizeof(weights_raw) / sizeof(igraph_real_t));
-    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &nrgeo, from, igraph_vss_all(), &weights, IGRAPH_ALL);
+    igraph_get_all_shortest_paths_dijkstra(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_all(), &weights, IGRAPH_ALL);
 
-    for (i=0; i < igraph_vector_ptr_size(&paths); ++i) {
-        print_vector(VECTOR(paths)[i]);
-    }
+    printf("Vertex paths:\n");
+    print_vector_int_list(&paths);
+    printf("Edge paths:\n");
+    print_vector_int_list(&paths_edge);
 
     printf("nrgeo: ");
-    print_vector(&nrgeo);
+    print_vector_int(&nrgeo);
 
-    igraph_vector_ptr_destroy_all(&paths);
+    igraph_vector_int_list_destroy(&paths);
+    igraph_vector_int_list_destroy(&paths_edge);
 
-    igraph_vector_destroy(&nrgeo);
+    igraph_vector_int_destroy(&nrgeo);
     igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();

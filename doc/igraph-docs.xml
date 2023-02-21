@@ -51,6 +51,13 @@
       <address>Room 211, Botany and High St, Kensington, NSW, 2033, Australia</address>
       </affiliation>
       </author>
+
+      <author><firstname>Daniel</firstname><surname>Noom</surname>
+      <affiliation>
+      <orgname>jitjit software development</orgname>
+      <address>Amsterdam, Netherlands</address>
+      </affiliation>
+      </author>
     </authorgroup>
 
     <legalnotice>
@@ -58,7 +65,7 @@
 
       <para>
       Copyright (C) 2005-2019 Gábor Csárdi and Tamás Nepusz.
-      Copyright (C) 2020-2021 igraph development team.
+      Copyright (C) 2020-2022 igraph development team.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
@@ -86,12 +93,12 @@
     <xi:include href="pmt.xml"/>
     <xi:include href="vector.xml"/>
     <xi:include href="matrix.xml"/>
-    <xi:include href="sparsematrix.xml"/>
     <xi:include href="sparsemat.xml"/>
     <xi:include href="stack.xml"/>
     <xi:include href="dqueue.xml"/>
     <xi:include href="heap.xml"/>
     <xi:include href="strvector.xml"/>
+    <xi:include href="vectorlist.xml"/>
     <xi:include href="adjlist.xml"/>
     <xi:include href="psumtree.xml"/>
   </chapter>
@@ -133,8 +140,6 @@
   <xi:include href="graphlets.xml"/>
 
   <xi:include href="hrg.xml"/>
-
-  <xi:include href="scg.xml"/>
 
   <xi:include href="embedding.xml"/>
 

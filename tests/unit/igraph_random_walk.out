@@ -1,0 +1,42 @@
+Only vertices required, edges = NULL:
+Singleton graph with zero steps:
+( 0 )
+Singleton graph with one step:
+( 0 1 )
+Line graph:
+( 0 1 2 3 4 )
+Line graph, 10 steps, returns on stuck:
+( 0 1 2 3 4 )
+Line graph backward:
+( 4 3 2 1 0 )
+Loop at vertex 0:
+( 0 0 0 0 0 )
+Checking an actual random walk with seed 42:
+( 4 2 11 16 19 )
+
+Both vertices and edges required:
+Singleton graph with zero steps:
+( 0 )
+Singleton graph with one step:
+( 0 1 )
+Line graph:
+( 0 1 2 3 4 )
+Line graph, 10 steps, returns on stuck:
+( 0 1 2 3 4 )
+Line graph backward:
+( 4 3 2 1 0 )
+Loop at vertex 0:
+( 0 0 0 0 0 )
+Checking an actual random walk with seed 42:
+( 4 2 11 16 19 )
+
+Only edges required, vertices = NULL:
+Checking error handling:
+
+Only vertices required, edges = NULL:
+unweighted directed line graph, 10 steps, errors on stuck.
+Vertex out of range.
+Negative number of steps.
+
+Both vertices and edges required:
+unweighted directed line graph, 10 steps, errors on stuck.

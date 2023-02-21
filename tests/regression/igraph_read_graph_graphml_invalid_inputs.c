@@ -24,15 +24,16 @@
 #include "igraph.h"
 #include <stdio.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 int test_file(const char* fname, igraph_bool_t should_parse) {
     FILE *ifile;
     igraph_t g;
-    int retval;
+    igraph_error_t retval;
 
     ifile = fopen(fname, "r");
     if (ifile == 0) {
+        printf("Cannot open input file: %s\n", fname);
         return 1;
     }
 
@@ -61,17 +62,20 @@ int test_file(const char* fname, igraph_bool_t should_parse) {
     VERIFY_FINALLY_STACK();               \
 }
 
-int main(int argc, char* argv[]) {
+int main(void) {
     int index = 0;
 
     /* We do not care about errors; all we care about is that the library
-     * should not segfault and should not accept invalid input either */
+     * should not segfault, should not accept invalid input and should not
+     * print anything to stdout or stderr while parsing, apart from warnings */
     igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_set_warning_handler(igraph_warning_handler_ignore);
 
     RUN_TEST("invalid1.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid2.graphml", /* should_parse = */ 1);
     RUN_TEST("invalid3.graphml", /* should_parse = */ 0);
     RUN_TEST("invalid4.graphml", /* should_parse = */ 0);
+    RUN_TEST("invalid5.graphml", /* should_parse = */ 0);
 
     return 0;
 }

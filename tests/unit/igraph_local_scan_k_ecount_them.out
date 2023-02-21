@@ -1,0 +1,58 @@
+First some tests where us and them are equal:
+No vertices:
+( )
+
+One vertex:
+( 0 )
+
+Directed disconnected graph with loops and multiple edges, no weights, k = 0, IGRAPH_IN:
+( 1 2 1 2 2 0 )
+
+Same graph, with weights:
+( 0.3 0 0 0.6 1.1 0 )
+
+Same graph, k=1:
+( 2 2 2 3 2 0 )
+
+Same graph, k=1, IGRAPH_ALL:
+( 4 3 3 5 2 0 )
+
+Same graph, without loops, k=1:
+( 2 1 2 2 2 0 )
+
+Same graph with loop, k=1, undirected:
+( 4 3 3 5 2 0 )
+
+Same graph, directed, k=2:
+( 2 4 2 6 5 0 )
+
+Same graph, undirected, k=2:
+( 6 8 8 8 5 0 )
+
+Same graph, weighted:
+( 0.9 2 2 2 1.8 0 )
+
+Now some tests where us and them are not equal:
+Us = same graph, them = edgless, directed, k=1, should show 0, because there are no edges:
+( 0 0 0 0 0 0 )
+
+Switched us and them, should show only 1 at the loop:
+( 0 1 0 0 0 0 )
+
+Us = same graph, them = only edge from 0 to 1, directed, k=1, IGRAPH_IN, should show edge from 0 to 1:
+( 0 1 0 0 0 0 )
+
+Switched us and them, should show edge from 0 to 1 and loop:
+( 0 2 0 0 0 0 )
+
+Us = same graph, them = full graph, directed, k=3, IGRAPH_ALL, should show 4*5=20 edges for the connected part:
+( 20 20 20 20 20 0 )
+
+Switched us and them, should show 8 edges for the whole graph:
+( 8 8 8 8 8 8 )
+
+Check error handling:
+Wrong size weights.
+Negative k.
+Number of vertices in us and them not equal.
+Directedness in us and them not equal.

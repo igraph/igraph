@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     FILE *ifile;
     int i, n;
@@ -34,18 +34,16 @@ int main() {
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     ifile = fopen("bipartite.net", "r");
-    if (!ifile) {
-        return 5;
-    }
+    IGRAPH_ASSERT(ifile != NULL);
+
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-    if (igraph_vcount(&g) != 13 || igraph_ecount(&g) != 11 ||
-        igraph_is_directed(&g)) {
-        return 6;
-    }
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 13);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 11);
 
     for (i = 0, n = igraph_vcount(&g); i < n; i++) {
-        printf("%i ", (int) VAN(&g, "type", i));
+        printf("%d ", (int) VAB(&g, "type", i));
     }
     printf("\n");
 

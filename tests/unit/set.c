@@ -26,21 +26,21 @@
 
 #include "core/set.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_set(igraph_set_t *set, FILE *f) {
-    long int state = 0;
+    igraph_integer_t state = 0;
     igraph_integer_t element;
     while (igraph_set_iterate(set, &state, &element)) {
-        fprintf(f, " %li", (long int) element);
+        fprintf(f, " %" IGRAPH_PRId , element);
     }
     fprintf(f, "\n");
 }
 
-int main() {
+int main(void) {
 
     igraph_set_t set;
-    int i;
+    igraph_integer_t i;
 
     /* simple init */
     igraph_set_init(&set, 0);

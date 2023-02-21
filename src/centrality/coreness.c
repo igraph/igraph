@@ -40,6 +40,8 @@
  * This function implements the algorithm presented in Vladimir
  * Batagelj, Matjaz Zaversnik: An O(m) Algorithm for Cores
  * Decomposition of Networks.
+ * https://arxiv.org/abs/cs/0310049
+ *
  * \param graph The input graph.
  * \param cores Pointer to an initialized vector, the result of the
  *        computation will be stored here. It will be resized as
@@ -55,14 +57,14 @@
  * Time complexity: O(|E|), the number of edges.
  */
 
-int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
-                    igraph_neimode_t mode) {
+igraph_error_t igraph_coreness(const igraph_t *graph,
+        igraph_vector_int_t *cores, igraph_neimode_t mode) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int *bin, *vert, *pos;
-    long int maxdeg;
-    long int i, j = 0;
-    igraph_vector_t neis;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t *bin, *vert, *pos;
+    igraph_integer_t maxdeg;
+    igraph_integer_t i, j = 0;
+    igraph_vector_int_t neis;
     igraph_neimode_t omode;
 
     if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
@@ -77,50 +79,50 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
     }
 
     if (no_of_nodes == 0) {
-        igraph_vector_clear(cores);
+        igraph_vector_int_clear(cores);
         return IGRAPH_SUCCESS;
     }
 
-    vert = IGRAPH_CALLOC(no_of_nodes, long int);
+    vert = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (vert == 0) {
-        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, vert);
-    pos = IGRAPH_CALLOC(no_of_nodes, long int);
+    pos = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (pos == 0) {
-        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, pos);
 
     /* maximum degree + degree of vertices */
-    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode,
-                               IGRAPH_LOOPS));
-    maxdeg = (long int) igraph_vector_max(cores);
+    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode, /* loops= */ true));
 
-    bin = IGRAPH_CALLOC(maxdeg + 1, long int);
+    maxdeg = igraph_vector_int_max(cores);
+
+    bin = IGRAPH_CALLOC(maxdeg + 1, igraph_integer_t);
     if (bin == 0) {
-        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot calculate k-cores", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, bin);
 
     /* degree histogram */
     for (i = 0; i < no_of_nodes; i++) {
-        bin[ (long int)VECTOR(*cores)[i] ] += 1;
+        bin[VECTOR(*cores)[i] ] += 1;
     }
 
     /* start pointers */
     j = 0;
     for (i = 0; i <= maxdeg; i++) {
-        long int k = bin[i];
+        igraph_integer_t k = bin[i];
         bin[i] = j;
         j += k;
     }
 
     /* sort in vert (and corrupt bin) */
     for (i = 0; i < no_of_nodes; i++) {
-        pos[i] = bin[(long int)VECTOR(*cores)[i]];
+        pos[i] = bin[VECTOR(*cores)[i]];
         vert[pos[i]] = i;
-        bin[(long int)VECTOR(*cores)[i]] += 1;
+        bin[VECTOR(*cores)[i]] += 1;
     }
 
     /* correct bin */
@@ -130,17 +132,18 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
     bin[0] = 0;
 
     /* this is the main algorithm */
-    IGRAPH_VECTOR_INIT_FINALLY(&neis, maxdeg);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, maxdeg);
     for (i = 0; i < no_of_nodes; i++) {
-        long int v = vert[i];
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, omode));
-        for (j = 0; j < igraph_vector_size(&neis); j++) {
-            long int u = (long int) VECTOR(neis)[j];
+        igraph_integer_t v = vert[i];
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, omode));
+        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
+        for (j = 0; j < nei_count; j++) {
+            igraph_integer_t u = VECTOR(neis)[j];
             if (VECTOR(*cores)[u] > VECTOR(*cores)[v]) {
-                long int du = (long int) VECTOR(*cores)[u];
-                long int pu = pos[u];
-                long int pw = bin[du];
-                long int w = vert[pw];
+                igraph_integer_t du = VECTOR(*cores)[u];
+                igraph_integer_t pu = pos[u];
+                igraph_integer_t pw = bin[du];
+                igraph_integer_t w = vert[pw];
                 if (u != w) {
                     pos[u] = pw;
                     pos[w] = pu;
@@ -153,12 +156,13 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
         }
     }
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(1);
 
     igraph_free(bin);
     igraph_free(pos);
     igraph_free(vert);
     IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }

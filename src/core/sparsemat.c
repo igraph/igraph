@@ -21,17 +21,29 @@
 
 */
 
-#include <cs.h>
-
 #include "igraph_sparsemat.h"
-#include "igraph_error.h"
-#include "igraph_interface.h"
-#include "igraph_constructors.h"
-#include "igraph_memory.h"
-#include "igraph_vector_ptr.h"
-#include "igraph_attributes.h"
 
+#include "igraph_attributes.h"
+#include "igraph_constructors.h"
+#include "igraph_interface.h"
+#include "igraph_memory.h"
+#include "igraph_types.h"
+#include "igraph_vector_ptr.h"
+
+#include "internal/hacks.h"    /* IGRAPH_STATIC_ASSERT */
+
+#include <limits.h>
 #include <string.h>
+
+#include <cs/cs.h>
+#undef cs  /* because otherwise it messes up the name of the 'cs' member in igraph_sparsemat_t */
+
+/* Returns the number of potential nonzero elements in the given sparse matrix.
+ * The returned value can be used to iterate over A->cs->x no matter whether the
+ * matrix is in triplet or column-compressed form */
+static CS_INT igraph_i_sparsemat_count_elements(const igraph_sparsemat_t* A) {
+    return A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
+}
 
 /**
  * \section about_sparsemat About sparse matrices
@@ -98,7 +110,10 @@
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax) {
+igraph_error_t igraph_sparsemat_init(igraph_sparsemat_t *A, igraph_integer_t rows,
+        igraph_integer_t cols, igraph_integer_t nzmax) {
+    IGRAPH_STATIC_ASSERT(sizeof(igraph_integer_t) == sizeof(CS_INT));
+    IGRAPH_STATIC_ASSERT(sizeof(igraph_real_t) == sizeof(CS_ENTRY));
 
     if (rows < 0) {
         IGRAPH_ERROR("Negative number of rows", IGRAPH_EINVAL);
@@ -110,14 +125,14 @@ int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax) 
     A->cs = cs_spalloc( rows, cols, nzmax, /*values=*/ 1,
                         /*triplet=*/ 1);
     if (!A->cs) {
-        IGRAPH_ERROR("Cannot allocate memory for sparse matrix", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot allocate memory for sparse matrix", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
- * \function igraph_sparsemat_copy
+ * \function igraph_sparsemat_init_copy
  * \brief Copies a sparse matrix.
  *
  * Create a sparse matrix object, by copying another one. The source
@@ -135,8 +150,9 @@ int igraph_sparsemat_init(igraph_sparsemat_t *A, int rows, int cols, int nzmax) 
  * number of non-zero elements.
  */
 
-int igraph_sparsemat_copy(igraph_sparsemat_t *to,
-                          const igraph_sparsemat_t *from) {
+igraph_error_t igraph_sparsemat_init_copy(
+    igraph_sparsemat_t *to, const igraph_sparsemat_t *from
+) {
 
     CS_INT ne = from->cs->nz == -1 ? from->cs->n + 1 : from->cs->nzmax;
 
@@ -149,11 +165,24 @@ int igraph_sparsemat_copy(igraph_sparsemat_t *to,
     to->cs->n     = from->cs->n;
     to->cs->nz    = from->cs->nz;
 
-    memcpy(to->cs->p, from->cs->p, sizeof(int) * (size_t) ne);
-    memcpy(to->cs->i, from->cs->i, sizeof(int) * (size_t) (from->cs->nzmax));
-    memcpy(to->cs->x, from->cs->x, sizeof(double) * (size_t) (from->cs->nzmax));
+    memcpy(to->cs->p, from->cs->p, sizeof(CS_INT) * (size_t) ne);
+    memcpy(to->cs->i, from->cs->i, sizeof(CS_INT) * (size_t) (from->cs->nzmax));
+    memcpy(to->cs->x, from->cs->x, sizeof(CS_ENTRY) * (size_t) (from->cs->nzmax));
 
-    return 0;
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_sparsemat_copy
+ * \brief Copies a sparse matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_sparsemat_init_copy 0.10
+ */
+
+igraph_error_t igraph_sparsemat_copy(
+    igraph_sparsemat_t *to, const igraph_sparsemat_t *from
+) {
+    return igraph_sparsemat_init_copy(to, from);
 }
 
 /**
@@ -187,9 +216,9 @@ void igraph_sparsemat_destroy(igraph_sparsemat_t *A) {
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_realloc(igraph_sparsemat_t *A, int nzmax) {
+igraph_error_t igraph_sparsemat_realloc(igraph_sparsemat_t *A, igraph_integer_t nzmax) {
     if (!cs_sprealloc(A->cs, nzmax)) {
-        IGRAPH_ERROR("Could not allocate more memory for sparse matrix.", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Could not allocate more memory for sparse matrix.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     return IGRAPH_SUCCESS;
 }
@@ -204,7 +233,7 @@ int igraph_sparsemat_realloc(igraph_sparsemat_t *A, int nzmax) {
  * Time complexity: O(1).
  */
 
-long int igraph_sparsemat_nrow(const igraph_sparsemat_t *A) {
+igraph_integer_t igraph_sparsemat_nrow(const igraph_sparsemat_t *A) {
     return A->cs->m;
 }
 
@@ -218,7 +247,7 @@ long int igraph_sparsemat_nrow(const igraph_sparsemat_t *A) {
  * Time complexity: O(1).
  */
 
-long int igraph_sparsemat_ncol(const igraph_sparsemat_t *A) {
+igraph_integer_t igraph_sparsemat_ncol(const igraph_sparsemat_t *A) {
     return A->cs->n;
 }
 
@@ -236,7 +265,7 @@ long int igraph_sparsemat_ncol(const igraph_sparsemat_t *A) {
  */
 
 igraph_sparsemat_type_t igraph_sparsemat_type(const igraph_sparsemat_t *A) {
-    return A->cs->nz < 0 ? IGRAPH_SPARSEMAT_CC : IGRAPH_SPARSEMAT_TRIPLET;
+    return igraph_sparsemat_is_cc(A) ? IGRAPH_SPARSEMAT_CC : IGRAPH_SPARSEMAT_TRIPLET;
 }
 
 /**
@@ -286,57 +315,59 @@ igraph_bool_t igraph_sparsemat_is_cc(const igraph_sparsemat_t *A) {
  * columns plus the number of non-zero elements in the matrix.
  */
 
-int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
-                             const igraph_vector_int_t *p,
-                             const igraph_vector_int_t *q,
-                             igraph_sparsemat_t *res) {
+igraph_error_t igraph_sparsemat_permute(const igraph_sparsemat_t *A,
+                                        const igraph_vector_int_t *p,
+                                        const igraph_vector_int_t *q,
+                                        igraph_sparsemat_t *res) {
 
     CS_INT nrow = A->cs->m, ncol = A->cs->n;
-    igraph_vector_int_t pinv;
+    CS_INT* pinv;
     CS_INT i;
 
     if (nrow != igraph_vector_int_size(p)) {
-        IGRAPH_ERROR("Invalid row permutation length", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Invalid row permutation length.", IGRAPH_FAILURE);
     }
     if (ncol != igraph_vector_int_size(q)) {
-        IGRAPH_ERROR("Invalid column permutation length", IGRAPH_FAILURE);
+        IGRAPH_ERROR("Invalid column permutation length.", IGRAPH_FAILURE);
     }
 
     /* We invert the permutation by hand */
-    IGRAPH_CHECK(igraph_vector_int_init(&pinv, nrow));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &pinv);
+    pinv = IGRAPH_CALLOC(nrow, CS_INT);
+    if (pinv == 0) {
+        IGRAPH_ERROR("Cannot allocate index vector for permutation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    }
+    IGRAPH_FINALLY(igraph_free, pinv);
     for (i = 0; i < nrow; i++) {
-        VECTOR(pinv)[ VECTOR(*p)[i] ] = (int) i;
+        pinv[ VECTOR(*p)[i] ] = i;
     }
 
     /* And call the permutation routine */
-    res->cs = cs_permute(A->cs, VECTOR(pinv), VECTOR(*q), /*values=*/ 1);
+    res->cs = cs_permute(A->cs, pinv, (const CS_INT*) VECTOR(*q), /*values=*/ 1);
     if (!res->cs) {
         IGRAPH_ERROR("Cannot index sparse matrix", IGRAPH_FAILURE);
     }
 
-    igraph_vector_int_destroy(&pinv);
+    IGRAPH_FREE(pinv);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_index_rows(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_index_rows(const igraph_sparsemat_t *A,
                                          const igraph_vector_int_t *p,
                                          igraph_sparsemat_t *res,
                                          igraph_real_t *constres) {
 
     igraph_sparsemat_t II, II2;
     CS_INT nrow = A->cs->m;
-    long int idx_rows = igraph_vector_int_size(p);
-    long int k;
+    igraph_integer_t idx_rows = igraph_vector_int_size(p);
+    igraph_integer_t k;
 
     /* Create index matrix */
-    IGRAPH_CHECK(igraph_sparsemat_init(&II2, (int) idx_rows, (int) nrow,
-                                       (int) idx_rows));
+    IGRAPH_CHECK(igraph_sparsemat_init(&II2, idx_rows, nrow, idx_rows));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &II2);
     for (k = 0; k < idx_rows; k++) {
-        igraph_sparsemat_entry(&II2, (int) k, VECTOR(*p)[k], 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&II2, &II));
     igraph_sparsemat_destroy(&II2);
@@ -356,25 +387,24 @@ static int igraph_i_sparsemat_index_rows(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_index_cols(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_index_cols(const igraph_sparsemat_t *A,
                                          const igraph_vector_int_t *q,
                                          igraph_sparsemat_t *res,
                                          igraph_real_t *constres) {
 
     igraph_sparsemat_t JJ, JJ2;
     CS_INT ncol = A->cs->n;
-    long int idx_cols = igraph_vector_int_size(q);
-    long int k;
+    igraph_integer_t idx_cols = igraph_vector_int_size(q);
+    igraph_integer_t k;
 
     /* Create index matrix */
-    IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, (int) ncol, (int) idx_cols,
-                                       (int) idx_cols));
+    IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, ncol, idx_cols, idx_cols));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &JJ2);
     for (k = 0; k < idx_cols; k++) {
-        igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], (int) k, 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&JJ2, &JJ));
     igraph_sparsemat_destroy(&JJ2);
@@ -394,7 +424,7 @@ static int igraph_i_sparsemat_index_cols(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -424,7 +454,7 @@ static int igraph_i_sparsemat_index_cols(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_index(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_index(const igraph_sparsemat_t *A,
                            const igraph_vector_int_t *p,
                            const igraph_vector_int_t *q,
                            igraph_sparsemat_t *res,
@@ -433,9 +463,9 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
     igraph_sparsemat_t II, JJ, II2, JJ2, tmp;
     CS_INT nrow = A->cs->m;
     CS_INT ncol = A->cs->n;
-    long int idx_rows = p ? igraph_vector_int_size(p) : -1;
-    long int idx_cols = q ? igraph_vector_int_size(q) : -1;
-    long int k;
+    igraph_integer_t idx_rows = p ? igraph_vector_int_size(p) : -1;
+    igraph_integer_t idx_cols = q ? igraph_vector_int_size(q) : -1;
+    igraph_integer_t k;
 
     igraph_sparsemat_t *myres = res, mres;
 
@@ -460,11 +490,10 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
     }
 
     /* Create first index matrix */
-    IGRAPH_CHECK(igraph_sparsemat_init(&II2, (int) idx_rows, (int) nrow,
-                                       (int) idx_rows));
+    IGRAPH_CHECK(igraph_sparsemat_init(&II2, idx_rows, nrow, idx_rows));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &II2);
     for (k = 0; k < idx_rows; k++) {
-        igraph_sparsemat_entry(&II2, (int) k, VECTOR(*p)[k], 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&II2, k, VECTOR(*p)[k], 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&II2, &II));
     igraph_sparsemat_destroy(&II2);
@@ -472,11 +501,10 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &II);
 
     /* Create second index matrix */
-    IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, (int) ncol, (int) idx_cols,
-                                       (int) idx_cols));
+    IGRAPH_CHECK(igraph_sparsemat_init(&JJ2, ncol, idx_cols, idx_cols));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &JJ2);
     for (k = 0; k < idx_cols; k++) {
-        igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], (int) k, 1.0);
+        IGRAPH_CHECK(igraph_sparsemat_entry(&JJ2, VECTOR(*q)[k], k, 1.0));
     }
     IGRAPH_CHECK(igraph_sparsemat_compress(&JJ2, &JJ));
     igraph_sparsemat_destroy(&JJ2);
@@ -505,7 +533,7 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
         igraph_sparsemat_destroy(myres);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -526,8 +554,8 @@ int igraph_sparsemat_index(const igraph_sparsemat_t *A,
  * Time complexity: O(1) on average.
  */
 
-int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col,
-                           igraph_real_t elem) {
+igraph_error_t igraph_sparsemat_entry(igraph_sparsemat_t *A,
+        igraph_integer_t row, igraph_integer_t col, igraph_real_t elem) {
     if (!igraph_sparsemat_is_triplet(A)) {
         IGRAPH_ERROR("Entries can only be added to sparse matrices that are in triplet format.",
                      IGRAPH_EINVAL);
@@ -557,7 +585,7 @@ int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col,
  * Time complexity: O(nz) where \c nz is the number of non-zero elements.
  */
 
-int igraph_sparsemat_compress(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_compress(const igraph_sparsemat_t *A,
                               igraph_sparsemat_t *res) {
 
     if (! igraph_sparsemat_is_triplet(A)) {
@@ -571,6 +599,75 @@ int igraph_sparsemat_compress(const igraph_sparsemat_t *A,
     return IGRAPH_SUCCESS;
 }
 
+static igraph_real_t igraph_i_sparsemat_get_cc(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+) {
+    /* elements in column 'col' are at indices
+     * A->cs->p[col] .. A->cs->p[col+1] (open from right) in
+     * A->cs->x .
+     *
+     * Their corresponding row indices are in A->cs->i .
+     */
+
+    CS_INT lo = A->cs->p[col];
+    CS_INT hi = A->cs->p[col + 1];
+    igraph_real_t result = 0.0;
+
+    /* TODO: this could be faster with binary search if A->cs->i
+     * is sorted, which I think should be */
+    for (; lo < hi; lo++) {
+        if (A->cs->i[lo] == row) {
+            result += A->cs->x[lo];
+        }
+    }
+
+    return result;
+}
+
+static igraph_real_t igraph_i_sparsemat_get_triplet(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+) {
+    igraph_sparsemat_iterator_t it;
+    igraph_real_t result = 0.0;
+
+    igraph_sparsemat_iterator_init(&it, A);
+    while (!igraph_sparsemat_iterator_end(&it)) {
+        if (
+            igraph_sparsemat_iterator_row(&it) == row &&
+            igraph_sparsemat_iterator_col(&it) == col
+        ) {
+            result += igraph_sparsemat_iterator_get(&it);
+        }
+        igraph_sparsemat_iterator_next(&it);
+    }
+
+    return result;
+}
+
+/**
+ * \function igraph_sparsemat_get
+ * \brief Return the value of a single element from a sparse matrix.
+ *
+ * \param A The input matrix, in triplet or column-compressed format.
+ * \param row The row index
+ * \param col The column index
+ * \return The value of the cell with the given row and column indices in the
+ *         matrix; zero if the indices are out of bounds.
+ *
+ * Time complexity: TODO.
+ */
+igraph_real_t igraph_sparsemat_get(
+    const igraph_sparsemat_t *A, igraph_integer_t row, igraph_integer_t col
+) {
+    if (row < 0 || col < 0 || row >= A->cs->m || col >= A->cs->n) {
+        return 0.0;
+    } else if (igraph_sparsemat_is_cc(A)) {
+        return igraph_i_sparsemat_get_cc(A, row, col);
+    } else {
+        return igraph_i_sparsemat_get_triplet(A, row, col);
+    }
+}
+
 /**
  * \function igraph_sparsemat_transpose
  * \brief Transposes a sparse matrix.
@@ -578,55 +675,52 @@ int igraph_sparsemat_compress(const igraph_sparsemat_t *A,
  * \param A The input matrix, column-compressed or triple format.
  * \param res Pointer to an uninitialized sparse matrix, the result is
  *    stored here.
- * \param values If this is non-zero, the matrix transpose is
- *    calculated the normal way. If it is zero, then only the pattern
- *    of the input matrix is stored in the result, the values are not.
  * \return Error code.
  *
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
-                               igraph_sparsemat_t *res,
-                               int values) {
+igraph_error_t igraph_sparsemat_transpose(
+    const igraph_sparsemat_t *A, igraph_sparsemat_t *res
+) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         /* column-compressed */
-        res->cs = cs_transpose(A->cs, values);
+        res->cs = cs_transpose(A->cs, /* values = */ 1);
         if (!res->cs) {
             IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
         }
     } else {
         /* triplets */
         CS_INT *tmp;
-        IGRAPH_CHECK(igraph_sparsemat_copy(res, A));
+        IGRAPH_CHECK(igraph_sparsemat_init_copy(res, A));
         tmp = res->cs->p;
         res->cs->p = res->cs->i;
         res->cs->i = tmp;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A, igraph_bool_t *result) {
+static igraph_error_t igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A, igraph_bool_t *result) {
     igraph_sparsemat_t t, tt;
     igraph_bool_t res;
-    int nz;
+    igraph_integer_t nz;
 
-    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &t, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &t));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &t);
     IGRAPH_CHECK(igraph_sparsemat_dupl(&t));
-    IGRAPH_CHECK(igraph_sparsemat_transpose(&t, &tt, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(&t, &tt));
     igraph_sparsemat_destroy(&t);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &tt);
-    IGRAPH_CHECK(igraph_sparsemat_transpose(&tt, &t, /*values=*/ 1));
+    IGRAPH_CHECK(igraph_sparsemat_transpose(&tt, &t));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, &t);
 
     nz = t.cs->p[t.cs->n];
-    res = memcmp(t.cs->i, tt.cs->i, sizeof(int) * (size_t) nz) == 0;
-    res = res && memcmp(t.cs->p, tt.cs->p, sizeof(int) *
+    res = memcmp(t.cs->i, tt.cs->i, sizeof(CS_INT) * (size_t) nz) == 0;
+    res = res && memcmp(t.cs->p, tt.cs->p, sizeof(CS_INT) *
                         (size_t)(t.cs->n + 1)) == 0;
-    res = res && memcmp(t.cs->x, tt.cs->x, sizeof(igraph_real_t) * (size_t)nz) == 0;
+    res = res && memcmp(t.cs->x, tt.cs->x, sizeof(CS_ENTRY) * (size_t)nz) == 0;
 
     igraph_sparsemat_destroy(&t);
     igraph_sparsemat_destroy(&tt);
@@ -637,7 +731,7 @@ static int igraph_i_sparsemat_is_symmetric_cc(const igraph_sparsemat_t *A, igrap
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_is_symmetric_triplet(const igraph_sparsemat_t *A, igraph_bool_t *result) {
+static igraph_error_t igraph_i_sparsemat_is_symmetric_triplet(const igraph_sparsemat_t *A, igraph_bool_t *result) {
     igraph_sparsemat_t tmp;
 
     IGRAPH_CHECK(igraph_sparsemat_compress(A, &tmp));
@@ -649,24 +743,24 @@ static int igraph_i_sparsemat_is_symmetric_triplet(const igraph_sparsemat_t *A, 
     return IGRAPH_SUCCESS;
 }
 
-igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
-    igraph_bool_t res = 0;
+/**
+ * \function igraph_sparsemat_is_symmetric
+ * \brief Returns whether a sparse matrix is symmetric.
+ *
+ * \param A The input matrix
+ * \param result Pointer to an \c igraph_bool_t ; the result is provided here.
+ * \return Error code.
+ */
 
+igraph_error_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A, igraph_bool_t *result) {
     if (A->cs->m != A->cs->n) {
-        return 0;
-    }
-
-    /* TODO(ntamas): return values from igraph_i_sparsemat_is_symmetric_... are
-     * ignored here; this should be fixed. Right now these functions don't
-     * change 'res' if they fail so we will report matrices as not being
-     * symmetric if an error happens */
-    if (A->cs->nz < 0) {
-        igraph_i_sparsemat_is_symmetric_cc(A, &res);
+        *result = false;
+    } else if (igraph_sparsemat_is_cc(A)) {
+        IGRAPH_CHECK(igraph_i_sparsemat_is_symmetric_cc(A, result));
     } else {
-        igraph_i_sparsemat_is_symmetric_triplet(A, &res);
+        IGRAPH_CHECK(igraph_i_sparsemat_is_symmetric_triplet(A, result));
     }
-
-    return res;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -683,14 +777,25 @@ igraph_bool_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A) {
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
+igraph_error_t igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
 
     if (!cs_dupl(A->cs)) {
         IGRAPH_ERROR("Cannot remove duplicates from sparse matrix",
                      IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
+}
+
+struct fkeep_wrapper_data {
+    igraph_integer_t (*fkeep) (igraph_integer_t, igraph_integer_t, igraph_real_t, void*);
+    void* data;
+};
+
+static CS_INT fkeep_wrapper(CS_INT row, CS_INT col, double value, void* data) {
+    return ((struct fkeep_wrapper_data*)data)->fkeep(
+        row, col, value, ((struct fkeep_wrapper_data*)data)->data
+    );
 }
 
 /**
@@ -703,8 +808,8 @@ int igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
  * from the matrix.
  * \param A The input matrix, in column-compressed format.
  * \param fkeep The filter function. It must take four arguments: the
- *    first is an \c int, the row index of the entry, the second is
- *    another \c int, the column index. The third is \c igraph_real_t,
+ *    first is an \c igraph_integer_t, the row index of the entry, the second is
+ *    another \c igraph_integer_t, the column index. The third is \c igraph_real_t,
  *    the value of the entry. The fourth element is a \c void pointer,
  *    the \p other argument is passed here. The function must return
  *    an \c int. If this is zero, then the entry is deleted, otherwise
@@ -716,18 +821,22 @@ int igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_fkeep(
+igraph_error_t igraph_sparsemat_fkeep(
     igraph_sparsemat_t *A,
     igraph_integer_t (*fkeep)(igraph_integer_t, igraph_integer_t, igraph_real_t, void*),
     void *other
 ) {
+    struct fkeep_wrapper_data wrapper_data = {
+        /* .fkeep = */ fkeep,
+        /* .data = */ other
+    };
 
     IGRAPH_ASSERT(A);
     IGRAPH_ASSERT(fkeep);
     if (!igraph_sparsemat_is_cc(A)) {
         IGRAPH_ERROR("The sparse matrix is not in compressed format.", IGRAPH_EINVAL);
     }
-    if (cs_fkeep(A->cs, fkeep, other) < 0) {
+    if (cs_fkeep(A->cs, fkeep_wrapper, &wrapper_data) < 0) {
         IGRAPH_ERROR("External function cs_keep has returned an unknown error while filtering the matrix.", IGRAPH_FAILURE);
     }
 
@@ -746,13 +855,13 @@ int igraph_sparsemat_fkeep(
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A) {
+igraph_error_t igraph_sparsemat_dropzeros(igraph_sparsemat_t *A) {
 
     if (!cs_dropzeros(A->cs)) {
         IGRAPH_ERROR("Cannot drop zeros from sparse matrix", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -769,7 +878,7 @@ int igraph_sparsemat_dropzeros(igraph_sparsemat_t *A) {
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol) {
+igraph_error_t igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol) {
 
     IGRAPH_ASSERT(A);
     if (!igraph_sparsemat_is_cc(A)) {
@@ -798,7 +907,7 @@ int igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol) {
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
                               const igraph_sparsemat_t *B,
                               igraph_sparsemat_t *res) {
 
@@ -807,7 +916,7 @@ int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Cannot multiply matrices", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -827,7 +936,7 @@ int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_add(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_add(const igraph_sparsemat_t *A,
                          const igraph_sparsemat_t *B,
                          igraph_real_t alpha,
                          igraph_real_t beta,
@@ -838,7 +947,7 @@ int igraph_sparsemat_add(const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Cannot add matrices", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -855,7 +964,7 @@ int igraph_sparsemat_add(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
                            const igraph_vector_t *x,
                            igraph_vector_t *res) {
 
@@ -870,7 +979,7 @@ int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
                      IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -887,7 +996,7 @@ int igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_lsolve(const igraph_sparsemat_t *L,
+igraph_error_t igraph_sparsemat_lsolve(const igraph_sparsemat_t *L,
                             const igraph_vector_t *b,
                             igraph_vector_t *res) {
 
@@ -903,7 +1012,7 @@ int igraph_sparsemat_lsolve(const igraph_sparsemat_t *L,
         IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -920,7 +1029,7 @@ int igraph_sparsemat_lsolve(const igraph_sparsemat_t *L,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_ltsolve(const igraph_sparsemat_t *L,
+igraph_error_t igraph_sparsemat_ltsolve(const igraph_sparsemat_t *L,
                              const igraph_vector_t *b,
                              igraph_vector_t *res) {
 
@@ -937,7 +1046,7 @@ int igraph_sparsemat_ltsolve(const igraph_sparsemat_t *L,
         IGRAPH_ERROR("Cannot perform lower triangular solve", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -953,7 +1062,7 @@ int igraph_sparsemat_ltsolve(const igraph_sparsemat_t *L,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
+igraph_error_t igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
                             const igraph_vector_t *b,
                             igraph_vector_t *res) {
 
@@ -969,7 +1078,7 @@ int igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
         IGRAPH_ERROR("Cannot perform upper triangular solve", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -986,7 +1095,7 @@ int igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
+igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
                              const igraph_vector_t *b,
                              igraph_vector_t *res) {
 
@@ -1004,7 +1113,7 @@ int igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
                      IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1023,10 +1132,10 @@ int igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
                              const igraph_vector_t *b,
                              igraph_vector_t *res,
-                             int order) {
+                             igraph_integer_t order) {
 
     if (A->cs->m != A->cs->n) {
         IGRAPH_ERROR("Cannot perform sparse symmetric solve",
@@ -1041,7 +1150,7 @@ int igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Cannot perform sparse symmetric solve", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1063,10 +1172,10 @@ int igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
                            const igraph_vector_t *b,
                            igraph_vector_t *res,
-                           int order,
+                           igraph_integer_t order,
                            igraph_real_t tol) {
 
     if (A->cs->m != A->cs->n) {
@@ -1082,26 +1191,26 @@ int igraph_sparsemat_lusol(const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Cannot perform LU solve", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
                                  igraph_bool_t directed) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     CS_INT no_of_nodes = A->cs->m;
     CS_INT no_of_edges = A->cs->p[A->cs->n];
     CS_INT *p = A->cs->p;
     CS_INT *i = A->cs->i;
-    long int from = 0;
-    long int to = 0;
-    long int e = 0;
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0;
 
     if (no_of_nodes != A->cs->n) {
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     while (*p < no_of_edges) {
         while (to < * (p + 1)) {
@@ -1115,31 +1224,30 @@ static int igraph_i_sparsemat_cc(igraph_t *graph, const igraph_sparsemat_t *A,
         from++;
         p++;
     }
-    igraph_vector_resize(&edges, e);
+    igraph_vector_int_resize(&edges, e);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
-    igraph_vector_destroy(&edges);
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t *A,
                                       igraph_bool_t directed) {
 
-    igraph_vector_t edges;
+    igraph_vector_int_t edges;
     CS_INT no_of_nodes = A->cs->m;
     CS_INT no_of_edges = A->cs->nz;
     CS_INT *i = A->cs->p;
     CS_INT *j = A->cs->i;
-    long int e;
+    igraph_integer_t e;
 
     if (no_of_nodes != A->cs->n) {
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     for (e = 0; e < 2 * no_of_edges; i++, j++) {
         if (directed || *i >= *j) {
@@ -1147,14 +1255,13 @@ static int igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t 
             VECTOR(edges)[e++] = (*j);
         }
     }
-    igraph_vector_resize(&edges, e);
+    igraph_vector_int_resize(&edges, e);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
-                               directed));
-    igraph_vector_destroy(&edges);
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1176,34 +1283,34 @@ static int igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_sparsemat_t 
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
                      igraph_bool_t directed) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         return (igraph_i_sparsemat_cc(graph, A, directed));
     } else {
         return (igraph_i_sparsemat_triplet(graph, A, directed));
     }
 }
 
-static int igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A,
                                           igraph_bool_t directed, const char *attr,
                                           igraph_bool_t loops,
-                                          igraph_vector_t *edges,
+                                          igraph_vector_int_t *edges,
                                           igraph_vector_t *weights) {
 
     CS_INT no_of_edges = A->cs->p[A->cs->n];
     CS_INT *p = A->cs->p;
     CS_INT *i = A->cs->i;
     CS_ENTRY *x = A->cs->x;
-    long int from = 0;
-    long int to = 0;
-    long int e = 0, w = 0;
+    igraph_integer_t from = 0;
+    igraph_integer_t to = 0;
+    igraph_integer_t e = 0, w = 0;
 
     IGRAPH_UNUSED(attr);
 
-    igraph_vector_resize(edges, no_of_edges * 2);
-    igraph_vector_resize(weights, no_of_edges);
+    IGRAPH_CHECK(igraph_vector_int_resize(edges, no_of_edges * 2));
+    IGRAPH_CHECK(igraph_vector_resize(weights, no_of_edges));
 
     while (*p < no_of_edges) {
         while (to < * (p + 1)) {
@@ -1220,17 +1327,17 @@ static int igraph_i_weighted_sparsemat_cc(const igraph_sparsemat_t *A,
         p++;
     }
 
-    igraph_vector_resize(edges, e);
-    igraph_vector_resize(weights, w);
+    igraph_vector_int_resize(edges, e); /* shrinks */
+    igraph_vector_resize(weights, w); /* shrinks */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat_t *A,
                                                igraph_bool_t directed,
                                                const char *attr,
                                                igraph_bool_t loops,
-                                               igraph_vector_t *edges,
+                                               igraph_vector_int_t *edges,
                                                igraph_vector_t *weights) {
 
     IGRAPH_UNUSED(A); IGRAPH_UNUSED(directed); IGRAPH_UNUSED(attr);
@@ -1241,12 +1348,13 @@ static int igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat_t *A,
                  IGRAPH_UNIMPLEMENTED);
 }
 
-int igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
+igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
                               igraph_bool_t directed, const char *attr,
                               igraph_bool_t loops) {
 
-    igraph_vector_t edges, weights;
-    CS_INT pot_edges = A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
+    igraph_vector_int_t edges;
+    igraph_vector_t weights;
+    CS_INT pot_edges = igraph_i_sparsemat_count_elements(A);
     const char* default_attr = "weight";
     igraph_vector_ptr_t attr_vec;
     igraph_attribute_record_t attr_rec;
@@ -1256,11 +1364,11 @@ int igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Cannot create graph object", IGRAPH_NONSQUARE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, pot_edges * 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, pot_edges * 2);
     IGRAPH_VECTOR_INIT_FINALLY(&weights, pot_edges);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&attr_vec, 1);
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         IGRAPH_CHECK(igraph_i_weighted_sparsemat_cc(A, directed, attr, loops,
                      &edges, &weights));
     } else {
@@ -1276,57 +1384,20 @@ int igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,
     VECTOR(attr_vec)[0] = &attr_rec;
 
     /* Create graph */
-    IGRAPH_CHECK(igraph_empty(graph, (igraph_integer_t) no_of_nodes, directed));
+    IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
-    if (igraph_vector_size(&edges) > 0) {
+    if (igraph_vector_int_size(&edges) > 0) {
         IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
     }
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Cleanup */
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     igraph_vector_destroy(&weights);
     igraph_vector_ptr_destroy(&attr_vec);
     IGRAPH_FINALLY_CLEAN(3);
 
-    return 0;
-}
-
-/**
- * \function igraph_get_sparsemat
- * \brief Converts an igraph graph to a sparse matrix.
- *
- * If the graph is undirected, then a symmetric matrix is created.
- * \param graph The input graph.
- * \param res Pointer to an uninitialized sparse matrix. The result
- *    will be stored here.
- * \return Error code.
- *
- * Time complexity: TODO.
- */
-
-int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
-
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    igraph_bool_t directed = igraph_is_directed(graph);
-    long int nzmax = directed ? no_of_edges : no_of_edges * 2;
-    long int i;
-
-    IGRAPH_CHECK(igraph_sparsemat_init(res, (igraph_integer_t) no_of_nodes,
-                                       (igraph_integer_t) no_of_nodes,
-                                       (igraph_integer_t) nzmax));
-
-    for (i = 0; i < no_of_edges; i++) {
-        long int from = IGRAPH_FROM(graph, i);
-        long int to = IGRAPH_TO(graph, i);
-        IGRAPH_CHECK(igraph_sparsemat_entry(res, (int) from, (int) to, 1.0));
-        if (!directed && from != to) {
-            IGRAPH_CHECK(igraph_sparsemat_entry(res, (int) to, (int) from, 1.0));
-        }
-    }
-
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define CHECK(x) if ((x)<0) { IGRAPH_ERROR("Cannot write to file", IGRAPH_EFILE); }
@@ -1347,10 +1418,10 @@ int igraph_get_sparsemat(const igraph_t *graph, igraph_sparsemat_t *res) {
  * n is the number columns in the matrix.
  */
 
-int igraph_sparsemat_print(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_print(const igraph_sparsemat_t *A,
                            FILE *outstream) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         /* CC */
         CS_INT j, p;
         for (j = 0; j < A->cs->n; j++) {
@@ -1369,27 +1440,30 @@ int igraph_sparsemat_print(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #undef CHECK
 
-static int igraph_i_sparsemat_eye_triplet(igraph_sparsemat_t *A, int n, int nzmax,
-                                          igraph_real_t value) {
-    long int i;
+static igraph_error_t igraph_i_sparsemat_eye_triplet(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
+    igraph_real_t value
+) {
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_sparsemat_init(A, n, n, nzmax));
 
     for (i = 0; i < n; i++) {
-        igraph_sparsemat_entry(A, (int) i, (int) i, value);
+        IGRAPH_CHECK(igraph_sparsemat_entry(A, i, i, value));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_eye_cc(igraph_sparsemat_t *A, int n,
-                                     igraph_real_t value) {
-    CS_INT i;
+static igraph_error_t igraph_i_sparsemat_eye_cc(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_real_t value
+) {
+    igraph_integer_t i;
 
     A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0);
     if (!A->cs) {
@@ -1403,11 +1477,11 @@ static int igraph_i_sparsemat_eye_cc(igraph_sparsemat_t *A, int n,
     }
     A->cs->p [n] = n;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
- * \function igraph_sparsemat_eye
+ * \function igraph_sparsemat_init_eye
  * \brief Creates a sparse identity matrix.
  *
  * \param A An uninitialized sparse matrix, the result is stored
@@ -1424,32 +1498,48 @@ static int igraph_i_sparsemat_eye_cc(igraph_sparsemat_t *A, int n,
  * Time complexity: O(n).
  */
 
-int igraph_sparsemat_eye(igraph_sparsemat_t *A, int n, int nzmax,
-                         igraph_real_t value,
-                         igraph_bool_t compress) {
+igraph_error_t igraph_sparsemat_init_eye(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
+    igraph_real_t value, igraph_bool_t compress
+) {
     if (compress) {
-        return (igraph_i_sparsemat_eye_cc(A, n, value));
+        return igraph_i_sparsemat_eye_cc(A, n, value);
     } else {
-        return (igraph_i_sparsemat_eye_triplet(A, n, nzmax, value));
+        return igraph_i_sparsemat_eye_triplet(A, n, nzmax, value);
     }
 }
 
-static int igraph_i_sparsemat_diag_triplet(igraph_sparsemat_t *A, int nzmax,
-                                           const igraph_vector_t *values) {
+/**
+ * \function igraph_sparsemat_eye
+ * \brief Creates a sparse identity matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_sparsemat_init_eye 0.10
+ */
 
-    int i, n = (int) igraph_vector_size(values);
+igraph_error_t igraph_sparsemat_eye(
+    igraph_sparsemat_t *A, igraph_integer_t n, igraph_integer_t nzmax,
+    igraph_real_t value, igraph_bool_t compress
+) {
+    return igraph_sparsemat_init_eye(A, n, nzmax, value, compress);
+}
+
+static igraph_error_t igraph_i_sparsemat_init_diag_triplet(
+    igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values
+) {
+
+    CS_INT i, n = igraph_vector_size(values);
 
     IGRAPH_CHECK(igraph_sparsemat_init(A, n, n, nzmax));
 
     for (i = 0; i < n; i++) {
-        igraph_sparsemat_entry(A, i, i, VECTOR(*values)[i]);
+        IGRAPH_CHECK(igraph_sparsemat_entry(A, i, i, VECTOR(*values)[i]));
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
-static int igraph_i_sparsemat_diag_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_init_diag_cc(igraph_sparsemat_t *A,
                                       const igraph_vector_t *values) {
 
     CS_INT i, n = igraph_vector_size(values);
@@ -1466,12 +1556,12 @@ static int igraph_i_sparsemat_diag_cc(igraph_sparsemat_t *A,
     }
     A->cs->p [n] = n;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
 /**
- * \function igraph_sparsemat_diag
+ * \function igraph_sparsemat_init_diag
  * \brief Creates a sparse diagonal matrix.
  *
  * \param A An uninitialized sparse matrix, the result is stored
@@ -1488,18 +1578,32 @@ static int igraph_i_sparsemat_diag_cc(igraph_sparsemat_t *A,
  * Time complexity: O(n), the length of the diagonal vector.
  */
 
-int igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
-                          const igraph_vector_t *values,
-                          igraph_bool_t compress) {
-
+igraph_error_t igraph_sparsemat_init_diag(
+    igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values,
+    igraph_bool_t compress
+) {
     if (compress) {
-        return (igraph_i_sparsemat_diag_cc(A, values));
+        return (igraph_i_sparsemat_init_diag_cc(A, values));
     } else {
-        return (igraph_i_sparsemat_diag_triplet(A, nzmax, values));
+        return (igraph_i_sparsemat_init_diag_triplet(A, nzmax, values));
     }
 }
 
-static int igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
+/**
+ * \function igraph_sparsemat_diag
+ * \brief Creates a sparse diagonal matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_sparsemat_init_diag 0.10
+ */
+
+igraph_error_t igraph_sparsemat_diag(
+    igraph_sparsemat_t *A, igraph_integer_t nzmax, const igraph_vector_t *values,
+    igraph_bool_t compress
+) {
+    return igraph_sparsemat_init_diag(A, nzmax, values, compress);
+}
+
+static igraph_error_t igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
                                               const igraph_real_t *from,
                                               int n,
                                               void *extra) {
@@ -1509,7 +1613,7 @@ static int igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
     igraph_vector_view(&vfrom, from, n);
     igraph_vector_null(&vto);
     IGRAPH_CHECK(igraph_sparsemat_gaxpy(A, &vfrom, &vto));
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct igraph_i_sparsemat_arpack_rssolve_data_t {
@@ -1519,7 +1623,7 @@ typedef struct igraph_i_sparsemat_arpack_rssolve_data_t {
     igraph_sparsemat_solve_t method;
 } igraph_i_sparsemat_arpack_rssolve_data_t;
 
-static int igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
+static igraph_error_t igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
                                            const igraph_real_t *from,
                                            int n,
                                            void *extra) {
@@ -1539,7 +1643,7 @@ static int igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
 
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1547,10 +1651,10 @@ static int igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
  * \brief Eigenvalues and eigenvectors of a symmetric sparse matrix via ARPACK.
  *
  * \param The input matrix, must be column-compressed.
- * \param options It is passed to \ref igraph_arpack_rssolve(). See
- *    \ref igraph_arpack_options_t for the details. If \c mode is 1,
- *    then ARPACK uses regular mode, if \c mode is 3, then shift and
- *    invert mode is used and the \c sigma structure member defines
+ * \param options It is passed to \ref igraph_arpack_rssolve(). Supply
+ *    \c NULL here to use the defaults. See \ref igraph_arpack_options_t for the
+ *    details. If \c mode is 1, then ARPACK uses regular mode, if \c mode is 3,
+ *    then shift and invert mode is used and the \c sigma structure member defines
  *    the shift.
  * \param storage Storage for ARPACK. See \ref
  *    igraph_arpack_rssolve() and \ref igraph_arpack_storage_t for
@@ -1573,20 +1677,28 @@ static int igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
                                     igraph_arpack_options_t *options,
                                     igraph_arpack_storage_t *storage,
                                     igraph_vector_t *values,
                                     igraph_matrix_t *vectors,
                                     igraph_sparsemat_solve_t solvemethod) {
 
-    int n = (int) igraph_sparsemat_nrow(A);
+    igraph_integer_t n = igraph_sparsemat_nrow(A);
 
     if (n != igraph_sparsemat_ncol(A)) {
         IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
     }
 
-    options->n = n;
+    if (n > INT_MAX) {
+        IGRAPH_ERROR("Matrix too large for ARPACK", IGRAPH_EOVERFLOW);
+    }
+
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
+    }
+
+    options->n = (int) n;
 
     if (options->mode == 1) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_sparsemat_arpack_multiply,
@@ -1603,7 +1715,7 @@ int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
         /*-----------------------------------*/
 
         /* Create (A-sigma*I) */
-        IGRAPH_CHECK(igraph_sparsemat_eye(&eye, /*n=*/ n, /*nzmax=*/ n,
+        IGRAPH_CHECK(igraph_sparsemat_init_eye(&eye, /*n=*/ n, /*nzmax=*/ n,
                                           /*value=*/ -sigma, /*compress=*/ 1));
         IGRAPH_FINALLY(igraph_sparsemat_destroy, &eye);
         IGRAPH_CHECK(igraph_sparsemat_add(/*A=*/ A, /*B=*/ &eye, /*alpha=*/ 1.0,
@@ -1642,7 +1754,7 @@ int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
         IGRAPH_FINALLY_CLEAN(3);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1652,8 +1764,8 @@ int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
  * Eigenvalues and/or eigenvectors of a nonsymmetric sparse matrix.
  * \param A The input matrix, in column-compressed mode.
  * \param options ARPACK options, it is passed to \ref
- *    igraph_arpack_rnsolve(). See also \ref igraph_arpack_options_t
- *    for details.
+ *    igraph_arpack_rnsolve(). Supply \c NULL here to use the defaults.
+ *    See also \ref igraph_arpack_options_t for details.
  * \param storage Storage for ARPACK, this is passed to \ref
  *    igraph_arpack_rnsolve(). See \ref igraph_arpack_storage_t for
  *    details.
@@ -1669,19 +1781,27 @@ int igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
                                     igraph_arpack_options_t *options,
                                     igraph_arpack_storage_t *storage,
                                     igraph_matrix_t *values,
                                     igraph_matrix_t *vectors) {
 
-    int n = (int) igraph_sparsemat_nrow(A);
+    igraph_integer_t n = igraph_sparsemat_nrow(A);
+
+    if (n > INT_MAX) {
+        IGRAPH_ERROR("Matrix too large for ARPACK", IGRAPH_EOVERFLOW);
+    }
 
     if (n != igraph_sparsemat_ncol(A)) {
         IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
     }
 
-    options->n = n;
+    if (options == 0) {
+        options = igraph_arpack_options_get_default();
+    }
+
+    options->n = (int) n;
 
     return igraph_arpack_rnsolve(igraph_i_sparsemat_arpack_multiply,
                                  (void*) A, options, storage,
@@ -1708,15 +1828,15 @@ int igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_symbqr(igraph_integer_t order, const igraph_sparsemat_t *A,
                             igraph_sparsemat_symbolic_t *dis) {
 
-    dis->symbolic = cs_sqr((int) order, A->cs, /*qr=*/ 1);
+    dis->symbolic = cs_sqr(order, A->cs, /*qr=*/ 1);
     if (!dis->symbolic) {
         IGRAPH_ERROR("Cannot do symbolic QR decomposition", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1738,15 +1858,15 @@ int igraph_sparsemat_symbqr(long int order, const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_symblu(long int order, const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_symblu(igraph_integer_t order, const igraph_sparsemat_t *A,
                             igraph_sparsemat_symbolic_t *dis) {
 
-    dis->symbolic = cs_sqr((int) order, A->cs, /*qr=*/ 0);
+    dis->symbolic = cs_sqr(order, A->cs, /*qr=*/ 0);
     if (!dis->symbolic) {
         IGRAPH_ERROR("Cannot do symbolic LU decomposition", IGRAPH_FAILURE);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1768,14 +1888,14 @@ int igraph_sparsemat_symblu(long int order, const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_lu(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_lu(const igraph_sparsemat_t *A,
                         const igraph_sparsemat_symbolic_t *dis,
                         igraph_sparsemat_numeric_t *din, double tol) {
     din->numeric = cs_lu(A->cs, dis->symbolic, tol);
     if (!din->numeric) {
         IGRAPH_ERROR("Cannot do LU decomposition", IGRAPH_FAILURE);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1797,14 +1917,14 @@ int igraph_sparsemat_lu(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_qr(const igraph_sparsemat_t *A,
                         const igraph_sparsemat_symbolic_t *dis,
                         igraph_sparsemat_numeric_t *din) {
     din->numeric = cs_qr(A->cs, dis->symbolic);
     if (!din->numeric) {
         IGRAPH_ERROR("Cannot do QR decomposition", IGRAPH_FAILURE);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1825,11 +1945,11 @@ int igraph_sparsemat_qr(const igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
+igraph_error_t igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
                              const igraph_sparsemat_numeric_t *din,
                              const igraph_vector_t *b,
                              igraph_vector_t *res) {
-    int n = din->numeric->L->n;
+    igraph_integer_t n = din->numeric->L->n;
     igraph_real_t *workspace;
 
     if (res != b) {
@@ -1838,7 +1958,7 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
 
     workspace = IGRAPH_CALLOC(n, igraph_real_t);
     if (!workspace) {
-        IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot LU (re)solve sparse matrix", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, workspace);
 
@@ -1858,7 +1978,7 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
     IGRAPH_FREE(workspace);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1880,13 +2000,13 @@ int igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
+igraph_error_t igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
                              const igraph_sparsemat_numeric_t *din,
                              const igraph_vector_t *b,
                              igraph_vector_t *res) {
-    int n = din->numeric->L->n;
+    igraph_integer_t n = din->numeric->L->n;
     igraph_real_t *workspace;
-    int k;
+    igraph_integer_t k;
 
     if (res != b) {
         IGRAPH_CHECK(igraph_vector_update(res, b));
@@ -1917,7 +2037,7 @@ int igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
     IGRAPH_FREE(workspace);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1968,12 +2088,12 @@ void igraph_sparsemat_numeric_destroy(igraph_sparsemat_numeric_t *din) {
  * matrix.
  */
 
-int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
+igraph_error_t igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
                                const igraph_matrix_t *mat,
                                igraph_real_t tol) {
-    int nrow = (int) igraph_matrix_nrow(mat);
-    int ncol = (int) igraph_matrix_ncol(mat);
-    int i, j, nzmax = 0;
+    igraph_integer_t nrow = igraph_matrix_nrow(mat);
+    igraph_integer_t ncol = igraph_matrix_ncol(mat);
+    igraph_integer_t i, j, nzmax = 0;
 
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
@@ -1993,14 +2113,14 @@ int igraph_matrix_as_sparsemat(igraph_sparsemat_t *res,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
+static igraph_error_t igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
                                            const igraph_sparsemat_t *spmat) {
 
-    long int nrow = igraph_sparsemat_nrow(spmat);
-    long int ncol = igraph_sparsemat_ncol(spmat);
+    igraph_integer_t nrow = igraph_sparsemat_nrow(spmat);
+    igraph_integer_t ncol = igraph_sparsemat_ncol(spmat);
     CS_INT from = 0, to = 0;
     CS_INT *p = spmat->cs->p;
     CS_INT *i = spmat->cs->i;
@@ -2021,13 +2141,13 @@ static int igraph_i_sparsemat_as_matrix_cc(igraph_matrix_t *res,
         p++;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
+static igraph_error_t igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
                                                 const igraph_sparsemat_t *spmat) {
-    long int nrow = igraph_sparsemat_nrow(spmat);
-    long int ncol = igraph_sparsemat_ncol(spmat);
+    igraph_integer_t nrow = igraph_sparsemat_nrow(spmat);
+    igraph_integer_t ncol = igraph_sparsemat_ncol(spmat);
     CS_INT *i = spmat->cs->p;
     CS_INT *j = spmat->cs->i;
     CS_ENTRY *x = spmat->cs->x;
@@ -2041,7 +2161,7 @@ static int igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
         MATRIX(*res, *j, *i) += *x;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2058,7 +2178,7 @@ static int igraph_i_sparsemat_as_matrix_triplet(igraph_matrix_t *res,
  * matrix.
  */
 
-int igraph_sparsemat_as_matrix(igraph_matrix_t *res,
+igraph_error_t igraph_sparsemat_as_matrix(igraph_matrix_t *res,
                                const igraph_sparsemat_t *spmat) {
     if (spmat->cs->nz < 0) {
         return (igraph_i_sparsemat_as_matrix_cc(res, spmat));
@@ -2086,7 +2206,7 @@ igraph_real_t igraph_sparsemat_max(igraph_sparsemat_t *A) {
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return IGRAPH_NEGINFINITY;
     }
@@ -2122,7 +2242,7 @@ igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A) {
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return IGRAPH_POSINFINITY;
     }
@@ -2150,7 +2270,7 @@ igraph_real_t igraph_sparsemat_min(igraph_sparsemat_t *A) {
  */
 
 
-int igraph_sparsemat_minmax(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_minmax(igraph_sparsemat_t *A,
                             igraph_real_t *min, igraph_real_t *max) {
     CS_INT i, n;
     CS_ENTRY *ptr;
@@ -2158,11 +2278,11 @@ int igraph_sparsemat_minmax(igraph_sparsemat_t *A,
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         *min = IGRAPH_POSINFINITY;
         *max = IGRAPH_NEGINFINITY;
-        return 0;
+        return IGRAPH_SUCCESS;
     }
     *min = *max = *ptr;
     for (i = 1; i < n; i++, ptr++) {
@@ -2172,7 +2292,7 @@ int igraph_sparsemat_minmax(igraph_sparsemat_t *A,
             *min = *ptr;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2185,15 +2305,15 @@ int igraph_sparsemat_minmax(igraph_sparsemat_t *A,
  * Time complexity: TODO.
  */
 
-long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
+igraph_integer_t igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
     CS_INT i, n;
     CS_ENTRY *ptr;
-    int res = 0;
+    igraph_integer_t res = 0;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return 0;
     }
@@ -2218,16 +2338,16 @@ long int igraph_sparsemat_count_nonzero(igraph_sparsemat_t *A) {
  * Time complexity: TODO.
  */
 
-long int igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
+igraph_integer_t igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
         igraph_real_t tol) {
     CS_INT i, n;
     CS_ENTRY *ptr;
-    int res = 0;
+    igraph_integer_t res = 0;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
     ptr = A->cs->x;
-    n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+    n = igraph_i_sparsemat_count_elements(A);
     if (n == 0) {
         return 0;
     }
@@ -2239,7 +2359,7 @@ long int igraph_sparsemat_count_nonzerotol(igraph_sparsemat_t *A,
     return res;
 }
 
-static int igraph_i_sparsemat_rowsums_triplet(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_rowsums_triplet(const igraph_sparsemat_t *A,
                                               igraph_vector_t *res) {
     CS_INT i;
     CS_INT *pi = A->cs->i;
@@ -2252,10 +2372,10 @@ static int igraph_i_sparsemat_rowsums_triplet(const igraph_sparsemat_t *A,
         VECTOR(*res)[ *pi ] += *px;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_rowsums_cc(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_rowsums_cc(const igraph_sparsemat_t *A,
                                          igraph_vector_t *res) {
     CS_INT ne = A->cs->p[A->cs->n];
     CS_ENTRY *px = A->cs->x;
@@ -2268,7 +2388,7 @@ static int igraph_i_sparsemat_rowsums_cc(const igraph_sparsemat_t *A,
         VECTOR(*res)[ *pi ] += *px;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2283,7 +2403,7 @@ static int igraph_i_sparsemat_rowsums_cc(const igraph_sparsemat_t *A,
  * Time complexity: O(nz), the number of non-zero elements.
  */
 
-int igraph_sparsemat_rowsums(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_rowsums(const igraph_sparsemat_t *A,
                              igraph_vector_t *res) {
     if (igraph_sparsemat_is_triplet(A)) {
         return igraph_i_sparsemat_rowsums_triplet(A, res);
@@ -2292,15 +2412,14 @@ int igraph_sparsemat_rowsums(const igraph_sparsemat_t *A,
     }
 }
 
-static int igraph_i_sparsemat_rowmins_triplet(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_rowmins_triplet(const igraph_sparsemat_t *A,
                                               igraph_vector_t *res) {
     CS_INT i;
     CS_INT *pi = A->cs->i;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pi++, px++) {
         if (*px < VECTOR(*res)[ *pi ]) {
@@ -2308,15 +2427,14 @@ static int igraph_i_sparsemat_rowmins_triplet(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_rowmins_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_rowmins_cc(igraph_sparsemat_t *A,
                                          igraph_vector_t *res) {
     CS_INT ne;
     CS_ENTRY *px;
     CS_INT *pi;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2325,7 +2443,7 @@ static int igraph_i_sparsemat_rowmins_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
 
     for (; pi < A->cs->i + ne; pi++, px++) {
         if (*px < VECTOR(*res)[ *pi ]) {
@@ -2333,10 +2451,10 @@ static int igraph_i_sparsemat_rowmins_cc(igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_rowmins(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_rowmins(igraph_sparsemat_t *A,
                              igraph_vector_t *res) {
     if (igraph_sparsemat_is_triplet(A)) {
         return igraph_i_sparsemat_rowmins_triplet(A, res);
@@ -2346,15 +2464,14 @@ int igraph_sparsemat_rowmins(igraph_sparsemat_t *A,
 }
 
 
-static int igraph_i_sparsemat_rowmaxs_triplet(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_rowmaxs_triplet(const igraph_sparsemat_t *A,
                                               igraph_vector_t *res) {
     CS_INT i;
     CS_INT *pi = A->cs->i;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pi++, px++) {
         if (*px > VECTOR(*res)[ *pi ]) {
@@ -2362,15 +2479,14 @@ static int igraph_i_sparsemat_rowmaxs_triplet(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_rowmaxs_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_rowmaxs_cc(igraph_sparsemat_t *A,
                                          igraph_vector_t *res) {
     CS_INT ne;
     CS_ENTRY *px;
     CS_INT *pi;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2379,7 +2495,7 @@ static int igraph_i_sparsemat_rowmaxs_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
 
     for (; pi < A->cs->i + ne; pi++, px++) {
         if (*px > VECTOR(*res)[ *pi ]) {
@@ -2387,10 +2503,10 @@ static int igraph_i_sparsemat_rowmaxs_cc(igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_rowmaxs(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_rowmaxs(igraph_sparsemat_t *A,
                              igraph_vector_t *res) {
     if (igraph_sparsemat_is_triplet(A)) {
         return igraph_i_sparsemat_rowmaxs_triplet(A, res);
@@ -2399,15 +2515,14 @@ int igraph_sparsemat_rowmaxs(igraph_sparsemat_t *A,
     }
 }
 
-static int igraph_i_sparsemat_colmins_triplet(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_colmins_triplet(const igraph_sparsemat_t *A,
                                               igraph_vector_t *res) {
     CS_INT i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pp++, px++) {
         if (*px < VECTOR(*res)[ *pp ]) {
@@ -2415,17 +2530,16 @@ static int igraph_i_sparsemat_colmins_triplet(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_colmins_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_colmins_cc(igraph_sparsemat_t *A,
                                          igraph_vector_t *res) {
     CS_INT n;
     CS_ENTRY *px;
     CS_INT *pp;
     CS_INT *pi;
     double *pr;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2435,7 +2549,7 @@ static int igraph_i_sparsemat_colmins_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     pr = VECTOR(*res);
 
     for (; pp < A->cs->p + n; pp++, pr++) {
@@ -2445,10 +2559,10 @@ static int igraph_i_sparsemat_colmins_cc(igraph_sparsemat_t *A,
             }
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_colmins(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_colmins(igraph_sparsemat_t *A,
                              igraph_vector_t *res) {
     if (igraph_sparsemat_is_triplet(A)) {
         return igraph_i_sparsemat_colmins_triplet(A, res);
@@ -2457,15 +2571,14 @@ int igraph_sparsemat_colmins(igraph_sparsemat_t *A,
     }
 }
 
-static int igraph_i_sparsemat_colmaxs_triplet(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_colmaxs_triplet(const igraph_sparsemat_t *A,
                                               igraph_vector_t *res) {
     CS_INT i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
 
     for (i = 0; i < A->cs->nz; i++, pp++, px++) {
         if (*px > VECTOR(*res)[ *pp ]) {
@@ -2473,17 +2586,16 @@ static int igraph_i_sparsemat_colmaxs_triplet(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_colmaxs_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_colmaxs_cc(igraph_sparsemat_t *A,
                                          igraph_vector_t *res) {
     CS_INT n;
     CS_ENTRY *px;
     CS_INT *pp;
     CS_INT *pi;
     double *pr;
-    double inf = IGRAPH_NEGINFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2493,7 +2605,7 @@ static int igraph_i_sparsemat_colmaxs_cc(igraph_sparsemat_t *A,
     pi = A->cs->i;
 
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, -IGRAPH_INFINITY);
     pr = VECTOR(*res);
 
     for (; pp < A->cs->p + n; pp++, pr++) {
@@ -2503,10 +2615,10 @@ static int igraph_i_sparsemat_colmaxs_cc(igraph_sparsemat_t *A,
             }
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_colmaxs(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_colmaxs(igraph_sparsemat_t *A,
                              igraph_vector_t *res) {
     if (igraph_sparsemat_is_triplet(A)) {
         return igraph_i_sparsemat_colmaxs_triplet(A, res);
@@ -2515,18 +2627,17 @@ int igraph_sparsemat_colmaxs(igraph_sparsemat_t *A,
     }
 }
 
-static int igraph_i_sparsemat_which_min_rows_triplet(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_which_min_rows_triplet(igraph_sparsemat_t *A,
                                                      igraph_vector_t *res,
                                                      igraph_vector_int_t *pos) {
     CS_INT i;
     CS_INT *pi = A->cs->i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
     IGRAPH_CHECK(igraph_vector_int_resize(pos, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     igraph_vector_int_null(pos);
 
     for (i = 0; i < A->cs->nz; i++, pi++, px++, pp++) {
@@ -2536,18 +2647,17 @@ static int igraph_i_sparsemat_which_min_rows_triplet(igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_which_min_rows_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_which_min_rows_cc(igraph_sparsemat_t *A,
                                                 igraph_vector_t *res,
                                                 igraph_vector_int_t *pos) {
     CS_INT n;
     CS_ENTRY *px;
     CS_INT *pp;
     CS_INT *pi;
-    double inf = IGRAPH_INFINITY;
-    int j;
+    igraph_integer_t j;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2558,7 +2668,7 @@ static int igraph_i_sparsemat_which_min_rows_cc(igraph_sparsemat_t *A,
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
     IGRAPH_CHECK(igraph_vector_int_resize(pos, A->cs->m));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     igraph_vector_int_null(pos);
 
     for (j = 0; pp < A->cs->p + n; pp++, j++) {
@@ -2570,10 +2680,10 @@ static int igraph_i_sparsemat_which_min_rows_cc(igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_which_min_rows(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_which_min_rows(igraph_sparsemat_t *A,
                                     igraph_vector_t *res,
                                     igraph_vector_int_t *pos) {
     if (igraph_sparsemat_is_triplet(A)) {
@@ -2583,7 +2693,7 @@ int igraph_sparsemat_which_min_rows(igraph_sparsemat_t *A,
     }
 }
 
-static int igraph_i_sparsemat_which_min_cols_triplet(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_which_min_cols_triplet(igraph_sparsemat_t *A,
                                                      igraph_vector_t *res,
                                                      igraph_vector_int_t *pos) {
 
@@ -2591,11 +2701,10 @@ static int igraph_i_sparsemat_which_min_cols_triplet(igraph_sparsemat_t *A,
     CS_INT *pi = A->cs->i;
     CS_INT *pp = A->cs->p;
     CS_ENTRY *px = A->cs->x;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_vector_resize(res, A->cs->n));
     IGRAPH_CHECK(igraph_vector_int_resize(pos, A->cs->n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     igraph_vector_int_null(pos);
 
     for (i = 0; i < A->cs->nz; i++, pi++, pp++, px++) {
@@ -2605,17 +2714,16 @@ static int igraph_i_sparsemat_which_min_cols_triplet(igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_which_min_cols_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_which_min_cols_cc(igraph_sparsemat_t *A,
                                                 igraph_vector_t *res,
                                                 igraph_vector_int_t *pos) {
     CS_INT n, j, p;
     CS_ENTRY *px;
     double *pr;
     igraph_integer_t *ppos;
-    double inf = IGRAPH_INFINITY;
 
     IGRAPH_CHECK(igraph_sparsemat_dupl(A));
 
@@ -2623,7 +2731,7 @@ static int igraph_i_sparsemat_which_min_cols_cc(igraph_sparsemat_t *A,
     px = A->cs->x;
 
     IGRAPH_CHECK(igraph_vector_resize(res, n));
-    igraph_vector_fill(res, inf);
+    igraph_vector_fill(res, IGRAPH_INFINITY);
     pr = VECTOR(*res);
     IGRAPH_CHECK(igraph_vector_int_resize(pos, n));
     igraph_vector_int_null(pos);
@@ -2637,10 +2745,10 @@ static int igraph_i_sparsemat_which_min_cols_cc(igraph_sparsemat_t *A,
             }
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_which_min_cols(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_which_min_cols(igraph_sparsemat_t *A,
                                     igraph_vector_t *res,
                                     igraph_vector_int_t *pos) {
     if (igraph_sparsemat_is_triplet(A)) {
@@ -2650,7 +2758,7 @@ int igraph_sparsemat_which_min_cols(igraph_sparsemat_t *A,
     }
 }
 
-static int igraph_i_sparsemat_colsums_triplet(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_colsums_triplet(const igraph_sparsemat_t *A,
                                               igraph_vector_t *res) {
     CS_INT i;
     CS_INT *pp = A->cs->p;
@@ -2663,10 +2771,10 @@ static int igraph_i_sparsemat_colsums_triplet(const igraph_sparsemat_t *A,
         VECTOR(*res)[ *pp ] += *px;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_colsums_cc(const igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_colsums_cc(const igraph_sparsemat_t *A,
                                          igraph_vector_t *res) {
     CS_INT n = A->cs->n;
     CS_ENTRY *px = A->cs->x;
@@ -2683,7 +2791,7 @@ static int igraph_i_sparsemat_colsums_cc(const igraph_sparsemat_t *A,
             *pr += *px;
         }
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2700,7 +2808,7 @@ static int igraph_i_sparsemat_colsums_cc(const igraph_sparsemat_t *A,
  * the number of columns.
  */
 
-int igraph_sparsemat_colsums(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_colsums(const igraph_sparsemat_t *A,
                              igraph_vector_t *res) {
     if (igraph_sparsemat_is_triplet(A)) {
         return igraph_i_sparsemat_colsums_triplet(A, res);
@@ -2722,17 +2830,16 @@ int igraph_sparsemat_colsums(const igraph_sparsemat_t *A,
  * matrix.
  */
 
-int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by) {
+igraph_error_t igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by) {
 
     CS_ENTRY *px = A->cs->x;
-    CS_INT n = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
-    CS_ENTRY *stop = px + n;
+    CS_ENTRY *stop = px + igraph_i_sparsemat_count_elements(A);
 
     for (; px < stop; px++) {
         *px *= by;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2748,9 +2855,9 @@ int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by) {
  * Time complexity: O(1).
  */
 
-int igraph_sparsemat_add_rows(igraph_sparsemat_t *A, long int n) {
+igraph_error_t igraph_sparsemat_add_rows(igraph_sparsemat_t *A, igraph_integer_t n) {
     A->cs->m += n;
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2766,14 +2873,14 @@ int igraph_sparsemat_add_rows(igraph_sparsemat_t *A, long int n) {
  * Time complexity: TODO.
  */
 
-int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n) {
+igraph_error_t igraph_sparsemat_add_cols(igraph_sparsemat_t *A, igraph_integer_t n) {
     if (igraph_sparsemat_is_triplet(A)) {
         A->cs->n += n;
     } else {
         CS_INT realloc_ok = 0, i;
-        CS_INT *newp = cs_realloc(A->cs->p, (A->cs->n + n + 1), sizeof(int), &realloc_ok);
+        CS_INT *newp = cs_realloc(A->cs->p, (A->cs->n + n + 1), sizeof(CS_INT), &realloc_ok);
         if (!realloc_ok) {
-            IGRAPH_ERROR("Cannot add columns to sparse matrix", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Cannot add columns to sparse matrix", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
         if (newp != A->cs->p) {
             A->cs->p = newp;
@@ -2783,15 +2890,15 @@ int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n) {
         }
         A->cs->n += n;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_sparsemat_resize
- * \brief Resizes a sparse matrix.
+ * \brief Resizes a sparse matrix and clears all the elements.
  *
  * This function resizes a sparse matrix. The resized sparse matrix
- * will be empty.
+ * will become empty, even if it contained nonzero entries.
  *
  * \param A The initialized sparse matrix to resize.
  * \param nrow The new number of rows.
@@ -2802,21 +2909,21 @@ int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n) {
  * Time complexity: O(nzmax), the maximum number of non-zero elements.
  */
 
-int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow,
-                            long int ncol, int nzmax) {
+igraph_error_t igraph_sparsemat_resize(igraph_sparsemat_t *A, igraph_integer_t nrow,
+                            igraph_integer_t ncol, igraph_integer_t nzmax) {
 
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         igraph_sparsemat_t tmp;
-        IGRAPH_CHECK(igraph_sparsemat_init(&tmp, (int) nrow, (int) ncol, nzmax));
+        IGRAPH_CHECK(igraph_sparsemat_init(&tmp, nrow, ncol, nzmax));
         igraph_sparsemat_destroy(A);
         *A = tmp;
     } else {
         IGRAPH_CHECK(igraph_sparsemat_realloc(A, nzmax));
-        A->cs->m = (int) nrow;
-        A->cs->n = (int) ncol;
+        A->cs->m = nrow;
+        A->cs->n = ncol;
         A->cs->nz = 0;
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -2835,15 +2942,38 @@ int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow,
  * Time complexity: O(1).
  */
 
-int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
-    if (A->cs->nz < 0) {
-        return A->cs->p[A->cs->n];
-    } else {
-        return A->cs->nz;
-    }
+igraph_integer_t igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A) {
+    return igraph_i_sparsemat_count_elements(A);
 }
 
-int igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
+
+/**
+ * \function igraph_sparsemat_getelements
+ * \brief Returns all elements of a sparse matrix.
+ *
+ * This function will return the elements of a sparse matrix in three vectors.
+ * Two vectors will indicate where the elements are located, and one will
+ * specify the elements themselves.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \param i An initialized integer vector. This will store the rows of the
+ *          returned elements.
+ * \param j An initialized integer vector. For a triplet matrix this will
+ *          store the columns of the returned elements. For a compressed
+ *          matrix, if the column index is \c k, then <code>j[k]</code>
+ *          is the index in \p x of the start of the \c k-th column, and
+ *          the last element of \c j is the total number of elements.
+ *          The total number of elements in the \c k-th column is
+ *          therefore <code>j[k+1] - j[k]</code>. For example, if there
+ *          is one element in the first column, and five in the second,
+ *          \c j will be set to <code>{0, 1, 6}</code>.
+ * \param x An initialized vector. The elements will be placed here.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of stored elements in the sparse matrix.
+ */
+
+igraph_error_t igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
                                  igraph_vector_int_t *i,
                                  igraph_vector_int_t *j,
                                  igraph_vector_t *x) {
@@ -2853,25 +2983,25 @@ int igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
         IGRAPH_CHECK(igraph_vector_int_resize(i, nz));
         IGRAPH_CHECK(igraph_vector_int_resize(j, A->cs->n + 1));
         IGRAPH_CHECK(igraph_vector_resize(x, nz));
-        memcpy(VECTOR(*i), A->cs->i, (size_t) nz * sizeof(int));
-        memcpy(VECTOR(*j), A->cs->p, (size_t) (A->cs->n + 1) * sizeof(int));
-        memcpy(VECTOR(*x), A->cs->x, (size_t) nz * sizeof(igraph_real_t));
+        memcpy(VECTOR(*i), A->cs->i, (size_t) nz * sizeof(CS_INT));
+        memcpy(VECTOR(*j), A->cs->p, (size_t) (A->cs->n + 1) * sizeof(CS_INT));
+        memcpy(VECTOR(*x), A->cs->x, (size_t) nz * sizeof(CS_ENTRY));
     } else {
         IGRAPH_CHECK(igraph_vector_int_resize(i, nz));
         IGRAPH_CHECK(igraph_vector_int_resize(j, nz));
         IGRAPH_CHECK(igraph_vector_resize(x, nz));
-        memcpy(VECTOR(*i), A->cs->i, (size_t) nz * sizeof(int));
-        memcpy(VECTOR(*j), A->cs->p, (size_t) nz * sizeof(int));
-        memcpy(VECTOR(*x), A->cs->x, (size_t) nz * sizeof(igraph_real_t));
+        memcpy(VECTOR(*i), A->cs->i, (size_t) nz * sizeof(CS_INT));
+        memcpy(VECTOR(*j), A->cs->p, (size_t) nz * sizeof(CS_INT));
+        memcpy(VECTOR(*x), A->cs->x, (size_t) nz * sizeof(CS_ENTRY));
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
                                 const igraph_vector_t *fact) {
     CS_INT *i = A->cs->i;
     CS_ENTRY *x = A->cs->x;
-    CS_INT no_of_edges = A->cs->nz < 0 ? A->cs->p[A->cs->n] : A->cs->nz;
+    CS_INT no_of_edges = igraph_i_sparsemat_count_elements(A);
     CS_INT e;
 
     for (e = 0; e < no_of_edges; e++, x++, i++) {
@@ -2879,10 +3009,10 @@ int igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
         (*x) *= f;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_scale_cols_cc(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_scale_cols_cc(igraph_sparsemat_t *A,
                                             const igraph_vector_t *fact) {
     CS_INT *i = A->cs->i;
     CS_ENTRY *x = A->cs->x;
@@ -2899,10 +3029,10 @@ static int igraph_i_sparsemat_scale_cols_cc(igraph_sparsemat_t *A,
         (*x) *= f;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_sparsemat_scale_cols_triplet(igraph_sparsemat_t *A,
+static igraph_error_t igraph_i_sparsemat_scale_cols_triplet(igraph_sparsemat_t *A,
                                                  const igraph_vector_t *fact) {
     CS_INT *j = A->cs->p;
     CS_ENTRY *x = A->cs->x;
@@ -2914,26 +3044,26 @@ static int igraph_i_sparsemat_scale_cols_triplet(igraph_sparsemat_t *A,
         (*x) *= f;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_scale_cols(igraph_sparsemat_t *A,
                                 const igraph_vector_t *fact) {
-    if (A->cs->nz < 0) {
+    if (igraph_sparsemat_is_cc(A)) {
         return igraph_i_sparsemat_scale_cols_cc(A, fact);
     } else {
         return igraph_i_sparsemat_scale_cols_triplet(A, fact);
     }
 }
 
-int igraph_sparsemat_multiply_by_dense(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_multiply_by_dense(const igraph_sparsemat_t *A,
                                        const igraph_matrix_t *B,
                                        igraph_matrix_t *res) {
 
-    int m = (int) igraph_sparsemat_nrow(A);
-    int n = (int) igraph_sparsemat_ncol(A);
-    int p = (int) igraph_matrix_ncol(B);
-    int i;
+    igraph_integer_t m = igraph_sparsemat_nrow(A);
+    igraph_integer_t n = igraph_sparsemat_ncol(A);
+    igraph_integer_t p = igraph_matrix_ncol(B);
+    igraph_integer_t i;
 
     if (igraph_matrix_nrow(B) != n) {
         IGRAPH_ERROR("Invalid dimensions in sparse-dense matrix product",
@@ -2950,16 +3080,16 @@ int igraph_sparsemat_multiply_by_dense(const igraph_sparsemat_t *A,
         }
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
+igraph_error_t igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
                                     const igraph_sparsemat_t *B,
                                     igraph_matrix_t *res) {
-    int m = (int) igraph_matrix_nrow(A);
-    int n = (int) igraph_matrix_ncol(A);
-    int p = (int) igraph_sparsemat_ncol(B);
-    int r, c;
+    igraph_integer_t m = igraph_matrix_nrow(A);
+    igraph_integer_t n = igraph_matrix_ncol(A);
+    igraph_integer_t p = igraph_sparsemat_ncol(B);
+    igraph_integer_t r, c;
     CS_INT *Bp = B->cs->p;
 
     if (igraph_sparsemat_nrow(B) != n) {
@@ -2977,7 +3107,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
 
     for (c = 0; c < p; c++) {
         for (r = 0; r < m; r++) {
-            int idx = *Bp;
+            igraph_integer_t idx = *Bp;
             while (idx < * (Bp + 1)) {
                 MATRIX(*res, r, c) += MATRIX(*A, r, B->cs->i[idx]) * B->cs->x[idx];
                 idx++;
@@ -2986,7 +3116,7 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
         Bp++;
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -3039,53 +3169,108 @@ int igraph_sparsemat_dense_multiply(const igraph_matrix_t *A,
  * Time complexity: O(1).
  */
 
-int igraph_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
-                          int *p, int *i, double *x, int nz) {
+igraph_error_t igraph_sparsemat_view(igraph_sparsemat_t *A, igraph_integer_t nzmax, igraph_integer_t m, igraph_integer_t n,
+                          igraph_integer_t *p, igraph_integer_t *i, igraph_real_t *x, igraph_integer_t nz) {
 
-    A->cs = IGRAPH_CALLOC(1, cs_di);
+    A->cs = IGRAPH_CALLOC(1, cs_igraph);
     A->cs->nzmax = nzmax;
     A->cs->m = m;
     A->cs->n = n;
-    A->cs->p = p;
-    A->cs->i = i;
+    A->cs->p = (CS_INT*) p;
+    A->cs->i = (CS_INT*) i;
     A->cs->x = x;
     A->cs->nz = nz;
 
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_sparsemat_view(igraph_sparsemat_t *A, int nzmax, int m, int n,
-                            int *p, int *i, double *x, int nz) {
-    IGRAPH_WARNING("igraph_i_sparsemat_view() is deprecated, use igraph_sparsemat_view()");
-    return igraph_sparsemat_view(A, nzmax, m, n, p, i, x, nz);
-}
 
-int igraph_sparsemat_sort(const igraph_sparsemat_t *A,
+/**
+ * \function igraph_sparsemat_sort
+ * \brief Sorts all elements of a sparse matrix by row and column indices.
+ *
+ * This function will sort the elements of a sparse matrix such that iterating
+ * over the entries will return them sorted by column indices; elements in the
+ * same column are then sorted by row indices.
+ *
+ * \param A A sparse matrix in either triplet or compressed form.
+ * \param sorted An uninitialized sparse matrix; the result will be returned
+ *        here. The result will be in triplet form if the input was in triplet
+ *        form, otherwise it will be in compressed form. Note that sorting is
+ *        more efficient when the matrix is already in compressed form.
+ * \return Error code.
+ *
+ * Time complexity: TODO
+ */
+
+igraph_error_t igraph_sparsemat_sort(const igraph_sparsemat_t *A,
                           igraph_sparsemat_t *sorted) {
-
     igraph_sparsemat_t tmp;
+    igraph_sparsemat_t tmp2;
 
-    IGRAPH_CHECK(igraph_sparsemat_transpose(A, &tmp, /*values=*/ 1));
-    IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
-    IGRAPH_CHECK(igraph_sparsemat_transpose(&tmp, sorted, /*values=*/ 1));
-    igraph_sparsemat_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(1);
+    if (igraph_sparsemat_is_cc(A)) {
+        /* for column-compressed matrices, we will transpose the matrix twice,
+         * which will sort the indices as a side effect */
+        IGRAPH_CHECK(igraph_sparsemat_transpose(A, &tmp));
+        IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+        IGRAPH_CHECK(igraph_sparsemat_transpose(&tmp, sorted));
+        igraph_sparsemat_destroy(&tmp);
+        IGRAPH_FINALLY_CLEAN(1);
+    } else {
+        igraph_sparsemat_iterator_t it;
 
-    return 0;
+        /* for triplet matrices, we convert it to compressed column representation,
+         * sort it, then we convert back */
+        IGRAPH_CHECK(igraph_sparsemat_compress(A, &tmp));
+        IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+        IGRAPH_CHECK(igraph_sparsemat_sort(&tmp, &tmp2));
+
+        igraph_sparsemat_destroy(&tmp);
+        tmp = tmp2;   /* tmp is still protected in the FINALLY stack */
+
+        IGRAPH_CHECK(igraph_sparsemat_init(
+            sorted,
+            igraph_sparsemat_nrow(&tmp),
+            igraph_sparsemat_ncol(&tmp),
+            igraph_i_sparsemat_count_elements(&tmp)
+        ));
+        IGRAPH_FINALLY(igraph_sparsemat_destroy, sorted);
+
+        IGRAPH_CHECK(igraph_sparsemat_iterator_init(&it, &tmp));
+        while (!igraph_sparsemat_iterator_end(&it)) {
+            IGRAPH_CHECK(igraph_sparsemat_entry(
+                sorted,
+                igraph_sparsemat_iterator_row(&it),
+                igraph_sparsemat_iterator_col(&it),
+                igraph_sparsemat_iterator_get(&it)
+            ));
+            igraph_sparsemat_iterator_next(&it);
+        }
+
+        igraph_sparsemat_destroy(&tmp);
+        IGRAPH_FINALLY_CLEAN(2);  /* tmp + sorted */
+    }
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_sparsemat_getelements_sorted
- * \brief Returns the sorted elements of a sparse matrix.
+ * \brief Returns all elements of a sparse matrix, sorted by row and column indices.
  *
- * This function will sort a sparse matrix and return the elements in
- * 3 vectors. Two vectors will indicate where the elements are located,
- * and one will give the elements.
+ * This function will sort a sparse matrix and return the elements in three
+ * vectors. Two vectors will indicate where the elements are located,
+ * and one will specify the elements themselves.
+ *
+ * </para><para>
+ * Sorting is done based on the \em indices of the elements, not their
+ * numeric values. The returned entries will be sorted by column indices;
+ * entries in the same column are then sorted by row indices.
  *
  * \param A A sparse matrix in either triplet or compressed form.
- * \param i An initialized int vector. This will store the rows of the
+ * \param i An initialized integer vector. This will store the rows of the
  *          returned elements.
- * \param j An initialized int vector. For a triplet matrix this will
+ * \param j An initialized integer vector. For a triplet matrix this will
  *          store the columns of the returned elements. For a compressed
  *          matrix, if the column index is \c k, then <code>j[k]</code>
  *          is the index in \p x of the start of the \c k-th column, and
@@ -3097,40 +3282,115 @@ int igraph_sparsemat_sort(const igraph_sparsemat_t *A,
  * \param x An initialized vector. The elements will be placed here.
  * \return Error code.
  *
- * Time complexity: O(n), the number of stored elements in the sparse matrix.
+ * Time complexity: TODO.
  */
 
-int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
+igraph_error_t igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
                                         igraph_vector_int_t *i,
                                         igraph_vector_int_t *j,
                                         igraph_vector_t *x) {
-    if (A->cs->nz < 0) {
-        igraph_sparsemat_t tmp;
-        IGRAPH_CHECK(igraph_sparsemat_sort(A, &tmp));
-        IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
-        IGRAPH_CHECK(igraph_sparsemat_getelements(&tmp, i, j, x));
-        igraph_sparsemat_destroy(&tmp);
-        IGRAPH_FINALLY_CLEAN(1);
-    } else {
-        IGRAPH_CHECK(igraph_sparsemat_getelements(A, i, j, x));
-    }
+    igraph_sparsemat_t tmp;
+    IGRAPH_CHECK(igraph_sparsemat_sort(A, &tmp));
+    IGRAPH_FINALLY(igraph_sparsemat_destroy, &tmp);
+    IGRAPH_CHECK(igraph_sparsemat_getelements(&tmp, i, j, x));
+    igraph_sparsemat_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* TODO: in triplets format, we could in theory sort the entries without
+     * going through an extra sorting step (which temporarily converts the
+     * matrix into compressed format). This is not implemented yet. */
 
     return IGRAPH_SUCCESS;
 }
 
-int igraph_sparsemat_nzmax(const igraph_sparsemat_t *A) {
+igraph_integer_t igraph_sparsemat_nzmax(const igraph_sparsemat_t *A) {
     return A->cs->nzmax;
 }
 
-int igraph_sparsemat_neg(igraph_sparsemat_t *A) {
-    CS_INT i, nz = A->cs->nz == -1 ? A->cs->p[A->cs->n] : A->cs->nz;
+igraph_error_t igraph_sparsemat_neg(igraph_sparsemat_t *A) {
+    CS_INT i;
+    CS_INT nz = igraph_i_sparsemat_count_elements(A);
     CS_ENTRY *px = A->cs->x;
 
     for (i = 0; i < nz; i++, px++) {
         *px = - (*px);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_sparsemat_normalize_cols
+ * \brief Normalizes the column sums of a sparse matrix to a given value.
+ *
+ * \param  sparsemat    the sparse matrix to normalize
+ * \param  allow_zeros  whether to allow columns with zero sums
+ * \return \c IGRAPH_SUCCESS if everything was successful,
+ *         \c IGRAPH_EINVAL if there is at least one column with zero sum and it
+ *         is disallowed,
+ *         \c IGRAPH_ENOMEM for out-of-memory conditions
+ */
+
+igraph_error_t igraph_sparsemat_normalize_cols(
+    igraph_sparsemat_t *sparsemat, igraph_bool_t allow_zeros
+) {
+    igraph_vector_t sum;
+    igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(sparsemat);
+    igraph_integer_t i;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
+
+    IGRAPH_CHECK(igraph_sparsemat_colsums(sparsemat, &sum));
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(sum)[i] != 0.0) {
+            VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+        } else if (!allow_zeros) {
+            IGRAPH_ERROR("Columns with zero sum are not allowed", IGRAPH_EINVAL);
+        }
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_cols(sparsemat, &sum));
+
+    igraph_vector_destroy(&sum);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_sparsemat_normalize_rows
+ * \brief Normalizes the row sums of a sparse matrix to a given value.
+ *
+ * \param  sparsemat    the sparse matrix to normalize
+ * \param  allow_zeros  whether to allow rows with zero sums
+ * \return \c IGRAPH_SUCCESS if everything was successful,
+ *         \c IGRAPH_EINVAL if there is at least one row with zero sum and it
+ *         is disallowed,
+ *         \c IGRAPH_ENOMEM for out-of-memory conditions
+ */
+
+igraph_error_t igraph_sparsemat_normalize_rows(
+    igraph_sparsemat_t *sparsemat, igraph_bool_t allow_zeros
+) {
+    igraph_vector_t sum;
+    igraph_integer_t no_of_nodes = igraph_sparsemat_nrow(sparsemat);
+    igraph_integer_t i;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
+
+    IGRAPH_CHECK(igraph_sparsemat_rowsums(sparsemat, &sum));
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(sum)[i] != 0.0) {
+            VECTOR(sum)[i] = 1.0 / VECTOR(sum)[i];
+        } else if (!allow_zeros) {
+            IGRAPH_ERROR("Rows with zero sum are not allowed", IGRAPH_EINVAL);
+        }
+    }
+    IGRAPH_CHECK(igraph_sparsemat_scale_rows(sparsemat, &sum));
+
+    igraph_vector_destroy(&sum);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -3144,8 +3404,9 @@ int igraph_sparsemat_neg(igraph_sparsemat_t *A) {
  * Time complexity: O(n), the number of columns of the sparse matrix.
  */
 
-int igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
-                                   igraph_sparsemat_t *sparsemat) {
+igraph_error_t igraph_sparsemat_iterator_init(
+    igraph_sparsemat_iterator_t *it, const igraph_sparsemat_t *sparsemat
+) {
 
     it->mat = sparsemat;
     igraph_sparsemat_iterator_reset(it);
@@ -3162,7 +3423,7 @@ int igraph_sparsemat_iterator_init(igraph_sparsemat_iterator_t *it,
  * Time complexity: O(n), the number of columns of the sparse matrix.
  */
 
-int igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it) {
+igraph_error_t igraph_sparsemat_iterator_reset(igraph_sparsemat_iterator_t *it) {
     it->pos = 0;
     it->col = 0;
     if (!igraph_sparsemat_is_triplet(it->mat)) {
@@ -3202,7 +3463,7 @@ igraph_sparsemat_iterator_end(const igraph_sparsemat_iterator_t *it) {
  * Time complexity: O(1).
  */
 
-int igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it) {
+igraph_integer_t igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it) {
     return it->mat->cs->i[it->pos];
 }
 
@@ -3216,7 +3477,7 @@ int igraph_sparsemat_iterator_row(const igraph_sparsemat_iterator_t *it) {
  * Time complexity: O(1).
  */
 
-int igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it) {
+igraph_integer_t igraph_sparsemat_iterator_col(const igraph_sparsemat_iterator_t *it) {
     if (igraph_sparsemat_is_triplet(it->mat)) {
         return it->mat->cs->p[it->pos];
     } else {
@@ -3249,7 +3510,7 @@ igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it) {
  * Time complexity: O(n), the number of columns of the sparse matrix.
  */
 
-int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it) {
+igraph_integer_t igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it) {
     it->pos += 1;
     while (it->col < it->mat->cs->n &&
            it->mat->cs->p[it->col + 1] == it->pos) {
@@ -3268,6 +3529,6 @@ int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it) {
  * Time complexity: O(1).
  */
 
-int igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it) {
+igraph_integer_t igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it) {
     return it->pos;
 }

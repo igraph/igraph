@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void make_box(int vertices, float half_size, igraph_vector_t *bounds) {
     for (int i = 0; i < 4; i++) {
@@ -43,7 +43,7 @@ void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
     igraph_matrix_destroy(result);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t result;
     igraph_vector_t bounds[4];

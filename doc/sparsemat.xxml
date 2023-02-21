@@ -4,8 +4,8 @@
 <!ENTITY igraph "igraph">
 ]>
 
-<section id="igraph-SparseMatrices2">
-<title>Sparse matrices, another kind</title>
+<section id="igraph-SparseMatrices">
+<title>Sparse matrices</title>
 
 <section id="about-sparsemat">
 <!-- doxrox-include about_sparsemat -->
@@ -13,11 +13,11 @@
 
 <section id="creating-sparse-matrix-objects"><title>Creating sparse matrix objects</title>
 <!-- doxrox-include igraph_sparsemat_init -->
-<!-- doxrox-include igraph_sparsemat_copy -->
+<!-- doxrox-include igraph_sparsemat_init_copy -->
+<!-- doxrox-include igraph_sparsemat_init_diag -->
+<!-- doxrox-include igraph_sparsemat_init_eye -->
 <!-- doxrox-include igraph_sparsemat_realloc -->
 <!-- doxrox-include igraph_sparsemat_destroy -->
-<!-- doxrox-include igraph_sparsemat_eye -->
-<!-- doxrox-include igraph_sparsemat_diag -->
 <!-- doxrox-include igraph_sparsemat_view -->
 </section>
 
@@ -28,6 +28,9 @@
 <!-- doxrox-include igraph_sparsemat_type -->
 <!-- doxrox-include igraph_sparsemat_is_triplet -->
 <!-- doxrox-include igraph_sparsemat_is_cc -->
+<!-- doxrox-include igraph_sparsemat_is_symmetric -->
+<!-- doxrox-include igraph_sparsemat_get -->
+<!-- doxrox-include igraph_sparsemat_getelements -->
 <!-- doxrox-include igraph_sparsemat_getelements_sorted -->
 <!-- doxrox-include igraph_sparsemat_min -->
 <!-- doxrox-include igraph_sparsemat_max -->
@@ -53,6 +56,7 @@
 <!-- doxrox-include igraph_sparsemat_add_rows -->
 <!-- doxrox-include igraph_sparsemat_add_cols -->
 <!-- doxrox-include igraph_sparsemat_resize -->
+<!-- doxrox-include igraph_sparsemat_sort -->
 </section>
 
 <section id="operations-on_sparse_matrix_iterators"><title>Operations on sparse matrix iterators</title>
@@ -95,13 +99,18 @@
 
 <section id="conversion-to-other-data-types"><title>Conversion to other data types</title>
 <!-- doxrox-include igraph_sparsemat -->
-<!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_matrix_as_sparsemat -->
 <!-- doxrox-include igraph_sparsemat_as_matrix -->
 </section>
 
 <section id="writing-to-a-file-or-to-the-screen"><title>Writing to a file, or to the screen</title>
 <!-- doxrox-include igraph_sparsemat_print -->
+</section>
+
+<section id="sparse-matrix-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_sparsemat_copy -->
+<!-- doxrox-include igraph_sparsemat_diag -->
+<!-- doxrox-include igraph_sparsemat_eye -->
 </section>
 
 </section>

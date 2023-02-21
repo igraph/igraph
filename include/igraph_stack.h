@@ -25,6 +25,7 @@
 #define IGRAPH_STACK_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 
 __BEGIN_DECLS
@@ -38,12 +39,6 @@ __BEGIN_DECLS
 #include "igraph_stack_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
-
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "igraph_stack_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
 
 #define BASE_INT
 #include "igraph_pmt.h"
@@ -63,16 +58,13 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
-#define BASE_PTR
-#include "igraph_pmt.h"
-#include "igraph_stack_pmt.h"
-#include "igraph_pmt_off.h"
-#undef BASE_PTR
-
 #define IGRAPH_STACK_NULL { 0,0,0 }
-
-IGRAPH_EXPORT void igraph_stack_ptr_free_all(igraph_stack_ptr_t* s);
-IGRAPH_EXPORT void igraph_stack_ptr_destroy_all(igraph_stack_ptr_t* s);
+#define IGRAPH_STACK_INIT_FINALLY(s, capacity) \
+    do { IGRAPH_CHECK(igraph_stack_init(s, capacity)); \
+        IGRAPH_FINALLY(igraph_stack_destroy, s); } while (0)
+#define IGRAPH_STACK_INT_INIT_FINALLY(s, capacity) \
+    do { IGRAPH_CHECK(igraph_stack_int_init(s, capacity)); \
+        IGRAPH_FINALLY(igraph_stack_int_destroy, s); } while (0)
 
 __END_DECLS
 

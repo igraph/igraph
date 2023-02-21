@@ -26,20 +26,22 @@
 
 #include "core/indheap.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
 
     igraph_vector_t elems;
     igraph_2wheap_t Q;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t prev = IGRAPH_INFINITY;
 
-    srand(42); /* make tests deterministic */
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
+
+    RNG_BEGIN();
 
     igraph_vector_init(&elems, 100);
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        VECTOR(elems)[i] = rand() / (double)RAND_MAX;
+        VECTOR(elems)[i] = RNG_UNIF01();
     }
 
     igraph_2wheap_init(&Q, igraph_vector_size(&elems));
@@ -58,7 +60,7 @@ int main() {
     /*****/
 
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        long int j;
+        igraph_integer_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 2;
@@ -81,7 +83,7 @@ int main() {
         return 5;
     }
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        VECTOR(elems)[i] = rand() / (double)RAND_MAX;
+        VECTOR(elems)[i] = RNG_UNIF01();
         igraph_2wheap_modify(&Q, i, VECTOR(elems)[i]);
     }
     for (i = 0; i < igraph_vector_size(&elems); i++) {
@@ -91,7 +93,7 @@ int main() {
     }
     prev = IGRAPH_INFINITY;
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        long int j;
+        igraph_integer_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 7;
@@ -163,6 +165,8 @@ int main() {
     igraph_2wheap_destroy(&Q);
 
     VERIFY_FINALLY_STACK();
+
+    RNG_END();
 
     return 0;
 }

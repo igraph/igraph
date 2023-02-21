@@ -27,39 +27,41 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
-    int k;
-    for (k = 0; k < 20; k++) {
+    for (int k = 0; k < 20; k++) {
         igraph_t g;
-        igraph_matrix_t merges;
-        igraph_vector_t membership;
+        igraph_matrix_int_t merges;
+        igraph_vector_int_t membership;
         igraph_arpack_options_t options;
         double modularity;
         igraph_vector_t history;
         FILE *DLFile = fopen("input.dl", "r");
 
-        igraph_read_graph_dl(&g, DLFile, /*directed=*/ 0);
+        IGRAPH_ASSERT(DLFile != NULL);
+
+        igraph_read_graph_dl(&g, DLFile, IGRAPH_UNDIRECTED);
         fclose(DLFile);
 
-        igraph_matrix_init(&merges, 0, 0);
-        igraph_vector_init(&membership, 0);
+        igraph_matrix_int_init(&merges, 0, 0);
+        igraph_vector_int_init(&membership, 0);
         igraph_vector_init(&history, 0);
         igraph_arpack_options_init(&options);
 
-        igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges,
+        igraph_community_leading_eigenvector(&g, /*weights=*/ NULL, &merges,
                                              &membership, igraph_vcount(&g),
                                              &options, &modularity,
-                                             /*start=*/ 0, /*eigenvalues=*/ 0,
-                                             /*eigenvectors=*/ 0, &history,
-                                             /*callback=*/ 0,
-                                             /*callback_extra=*/ 0);
+                                             /*start=*/ 0, /*eigenvalues=*/ NULL,
+                                             /*eigenvectors=*/ NULL, &history,
+                                             /*callback=*/ NULL,
+                                             /*callback_extra=*/ NULL);
 
         igraph_vector_destroy(&history);
-        igraph_vector_destroy(&membership);
-        igraph_matrix_destroy(&merges);
+        igraph_vector_int_destroy(&membership);
+        igraph_matrix_int_destroy(&merges);
         igraph_destroy(&g);
     }
 

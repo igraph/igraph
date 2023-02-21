@@ -34,10 +34,10 @@ __BEGIN_DECLS
 #define IGRAPH_VERSION_PATCH @PACKAGE_VERSION_PATCH@
 #define IGRAPH_VERSION_PRERELEASE "@PACKAGE_VERSION_PRERELEASE@"
 
-IGRAPH_EXPORT int igraph_version(const char **version_string,
-                                 int *major,
-                                 int *minor,
-                                 int *subminor);
+IGRAPH_EXPORT void igraph_version(const char **version_string,
+                                  int *major,
+                                  int *minor,
+                                  int *subminor);
 
 __END_DECLS
 

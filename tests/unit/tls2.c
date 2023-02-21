@@ -27,7 +27,7 @@
 
 #include "linalg/arpack_internal.h"
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Test whether ARPACK is thread-safe. We will create two threads,
    each calling a different ARPACK eigensolver. We will make sure that
@@ -41,7 +41,7 @@ typedef struct thread_data_t {
     int *steps, *othersteps;
 } thread_data_t;
 
-int arpack_mult(igraph_real_t *to, igraph_real_t *from, int n,
+int arpack_mult(igraph_real_t *to, igraph_real_t *from,
                 igraph_matrix_t *matrix) {
     /* TODO */
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0, matrix,
@@ -120,7 +120,7 @@ void *thread_function(void *arg) {
 
             igraph_real_t *from = workd + options.ipntr[0] - 1;
             igraph_real_t *to = workd + options.ipntr[1] - 1;
-            arpack_mult(to, from, options.n, M);
+            arpack_mult(to, from, M);
 
         } else {
             break;
@@ -167,6 +167,10 @@ void *thread_function(void *arg) {
         VECTOR(*result)[i] = v[i];
     }
 
+    if (VECTOR(*result)[0] < 0) {
+        igraph_vector_scale(result, -1.0);
+    }
+
     free(v);
     free(workl);
     free(workd);
@@ -178,7 +182,7 @@ void *thread_function(void *arg) {
     return 0;
 }
 
-int main() {
+int main(void) {
     pthread_t thread_id1, thread_id2;
     void *exit_status1, *exit_status2;
     igraph_matrix_t m1, m2;

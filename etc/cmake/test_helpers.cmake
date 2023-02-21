@@ -13,6 +13,9 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   use_all_warnings(${TARGET_NAME})
   add_dependencies(build_tests ${TARGET_NAME})
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
+  if (NAMESPACE STREQUAL "test")
+    target_link_libraries(${TARGET_NAME} PRIVATE test_utilities)
+  endif()
 
   if (NOT BUILD_SHARED_LIBS)
     # Add a compiler definition required to compile igraph in static mode
@@ -25,12 +28,9 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
     ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
   )
 
-  # Some tests include cs.h from CXSparse. The following ensures that the
-  # correct version is included, depending on whether CXSparse is vendored
+  # Some tests include cs.h from CXSparse
   target_include_directories(
-    ${TARGET_NAME} PRIVATE
-    $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>
-    $<$<BOOL:${CXSPARSE_INCLUDE_DIRS}>:${CXSPARSE_INCLUDE_DIRS}>
+    ${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor/cs
   )
 
   if (MSVC)
@@ -44,6 +44,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   get_filename_component(WORK_DIR ${EXPECTED_OUTPUT_FILE} DIRECTORY)
 
   if(EXISTS ${EXPECTED_OUTPUT_FILE})
+    get_property(CROSSCOMPILING_EMULATOR TARGET ${TARGET_NAME} PROPERTY CROSSCOMPILING_EMULATOR)
     add_test(
       NAME ${TEST_NAME}
       COMMAND ${CMAKE_COMMAND}
@@ -54,6 +55,7 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
         -DDIFF_TOOL=${DIFF_TOOL}
         -DFC_TOOL=${FC_TOOL}
         -DIGRAPH_VERSION=${PACKAGE_VERSION}
+        "-DCROSSCOMPILING_EMULATOR=${CROSSCOMPILING_EMULATOR}"
         -P ${CMAKE_SOURCE_DIR}/etc/cmake/run_legacy_test.cmake
     )
     set_property(TEST ${TEST_NAME} PROPERTY SKIP_REGULAR_EXPRESSION "Test skipped")

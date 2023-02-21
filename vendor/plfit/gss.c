@@ -45,7 +45,7 @@
  */
 static const gss_parameter_t _defparam = {
     /* .epsilon = */  DBL_MIN,
-	/* .on_error = */ GSS_ERROR_STOP
+    /* .on_error = */ GSS_ERROR_STOP
 };
 
 /**
@@ -57,8 +57,8 @@ void gss_parameter_init(gss_parameter_t *param) {
     memcpy(param, &_defparam, sizeof(*param));
 }
 
-unsigned short int gss_get_warning_flag() {
-	return gss_i_warning_flag;
+unsigned short int gss_get_warning_flag(void) {
+    return gss_i_warning_flag;
 }
 
 #define TERMINATE {        \
@@ -80,7 +80,7 @@ unsigned short int gss_get_warning_flag() {
         retval = proc_progress(instance, x, fx, min, fmin, \
                 (a < b) ? a : b, (a < b) ? b : a, k); \
         if (retval) { \
-			TERMINATE;            \
+            TERMINATE;            \
             return PLFIT_SUCCESS; \
         } \
     } \
@@ -97,7 +97,7 @@ int gss(double a, double b, double *_min, double *_fmin,
 
     gss_parameter_t param = _param ? (*_param) : _defparam;
 
-	gss_i_warning_flag = 0;
+    gss_i_warning_flag = 0;
 
     if (a > b) {
         c = a; a = b; b = c;
@@ -113,12 +113,12 @@ int gss(double a, double b, double *_min, double *_fmin,
     EVALUATE(c, fc);
 
     if (fc >= fa || fc >= fb) {
-		if (param.on_error == GSS_ERROR_STOP) {
-			return PLFIT_FAILURE;
-		} else {
-			gss_i_warning_flag = 1;
-		}
-	}
+        if (param.on_error == GSS_ERROR_STOP) {
+            return PLFIT_FAILURE;
+        } else {
+            gss_i_warning_flag = 1;
+        }
+    }
 
     while (fabs(a-b) > param.epsilon) {
         k++;
@@ -127,12 +127,12 @@ int gss(double a, double b, double *_min, double *_fmin,
         EVALUATE(d, fd);
 
         if (fd >= fa || fd >= fb) {
-			if (param.on_error == GSS_ERROR_STOP) {
-				successful = 0;
-				break;
-			} else {
-				gss_i_warning_flag = 1;
-			}
+            if (param.on_error == GSS_ERROR_STOP) {
+                successful = 0;
+                break;
+            } else {
+                gss_i_warning_flag = 1;
+            }
         }
 
         if (fc <= fd) {
@@ -146,7 +146,7 @@ int gss(double a, double b, double *_min, double *_fmin,
         c = (a+b) / 2.0;
         k++;
         EVALUATE(c, fc);
-		TERMINATE;
+        TERMINATE;
     }
 
     return successful ? PLFIT_SUCCESS : PLFIT_FAILURE;

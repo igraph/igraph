@@ -25,18 +25,27 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define sqr(x) ((x)*(x))
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t coords, dist_mat;
-    int i, j;
+    igraph_integer_t i, j;
 
-    srand(42); /* make tests deterministic */
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
-    igraph_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
+    RNG_BEGIN();
+
+    igraph_small(&g, 0, 0, -1);
+    igraph_matrix_init(&coords, 0, 0);
+    igraph_layout_mds(&g, &coords, 0, 2);
+    print_matrix(&coords);
+    igraph_matrix_destroy(&coords);
+    igraph_destroy(&g);
+
+    igraph_kary_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
     igraph_layout_mds(&g, &coords, 0, 2);
     if (MATRIX(coords, 0, 0) > 0) {
@@ -49,7 +58,7 @@ int main() {
             MATRIX(coords, i, 1) *= -1;
         }
     }
-    igraph_matrix_print(&coords);
+    print_matrix(&coords);
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
 
@@ -58,7 +67,7 @@ int main() {
     igraph_matrix_init(&dist_mat, 8, 8);
     for (i = 0; i < 8; i++)
         for (j = 0; j < 2; j++) {
-            MATRIX(coords, i, j) = rand() % 1000;
+            MATRIX(coords, i, j) = RNG_INTEGER(0, 1000);
         }
     for (i = 0; i < 8; i++)
         for (j = i + 1; j < 8; j++) {
@@ -75,7 +84,7 @@ int main() {
             dist_sq += sqr(MATRIX(coords, i, 0) - MATRIX(coords, j, 0));
             dist_sq += sqr(MATRIX(coords, i, 1) - MATRIX(coords, j, 1));
             if (fabs(sqrt(dist_sq) - MATRIX(dist_mat, i, j)) > 1e-2) {
-                printf("dist(%d,%d) should be %.4f, but it is %.4f\n",
+                printf("dist(%" IGRAPH_PRId ", %" IGRAPH_PRId ") should be %.4f, but it is %.4f\n",
                        i, j, MATRIX(dist_mat, i, j), sqrt(dist_sq));
                 return 1;
             }
@@ -85,6 +94,8 @@ int main() {
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
+
+    RNG_END();
 
     return 0;
 }

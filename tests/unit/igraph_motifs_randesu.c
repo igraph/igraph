@@ -23,16 +23,16 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_t *vids,
-                          int isoclass, void* extra) {
-    printf("Class %d: ", isoclass);
-    print_vector(vids);
-    return 0;
+igraph_error_t print_motif(const igraph_t *graph, igraph_vector_int_t *vids,
+                          igraph_integer_t isoclass, void* extra) {
+    printf("Class %" IGRAPH_PRId ": ", isoclass);
+    print_vector_int(vids);
+    return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_vector_t hist;

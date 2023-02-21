@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2021  The igraph development team
+   Copyright (C) 2021-2022  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,13 +18,13 @@
    02110-1301 USA
 */
 
+#include <igraph.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include "igraph.h"
 #include <stdio.h>
 
-#include "../unit/test_utilities.inc"
+#include "../unit/test_utilities.h"
 
 int test_file(const char* fname) {
     FILE *ifile;
@@ -59,7 +59,7 @@ int test_file(const char* fname) {
     VERIFY_FINALLY_STACK(); \
 }
 
-int main(int argc, char* argv[]) {
+int main(void) {
     int index = 0;
 
     /* We do not care about errors; all we care about is that the library
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 
     RUN_TEST("invalid1.gml");
     RUN_TEST("invalid2.gml");
-    RUN_TEST("invalid3.gml");
+    /* invalid3.gml was removed, parser now supports it */
     RUN_TEST("invalid4.gml");
     RUN_TEST("invalid5.gml");
     RUN_TEST("invalid6.gml");

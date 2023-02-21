@@ -1,0 +1,197 @@
+Empty directed graph, zero vertices:directed: true
+vcount: 0
+edges: {
+}
+
+Partition type:
+
+
+Directed graph with one partition, 4 vertices:directed: true
+vcount: 4
+edges: {
+}
+
+Partition type:
+0 0 0 0
+
+Directed graph with 3 partitions:directed: true
+vcount: 8
+edges: {
+0 2
+0 3
+0 4
+0 5
+0 6
+0 7
+1 2
+1 3
+1 4
+1 5
+1 6
+1 7
+2 0
+2 1
+2 5
+2 6
+2 7
+3 0
+3 1
+3 5
+3 6
+3 7
+4 0
+4 1
+4 5
+4 6
+4 7
+5 0
+5 1
+5 2
+5 3
+5 4
+6 0
+6 1
+6 2
+6 3
+6 4
+7 0
+7 1
+7 2
+7 3
+7 4
+}
+
+Partition type:
+0 0 1 1 1 2 2 2
+
+Directed graph, 4 partitions, mode=IN:directed: true
+vcount: 11
+edges: {
+2 0
+2 1
+3 0
+3 1
+4 0
+4 1
+5 0
+5 1
+5 2
+5 3
+5 4
+6 0
+6 1
+6 2
+6 3
+6 4
+7 0
+7 1
+7 2
+7 3
+7 4
+8 0
+8 1
+8 2
+8 3
+8 4
+9 0
+9 1
+9 2
+9 3
+9 4
+9 5
+9 6
+9 7
+9 8
+10 0
+10 1
+10 2
+10 3
+10 4
+10 5
+10 6
+10 7
+10 8
+}
+
+Partition type:
+0 0 1 1 1 2 2 2 2 3 3
+
+Undirected graph, 4 partitions:directed: false
+vcount: 11
+edges: {
+0 2
+0 3
+0 4
+0 5
+0 6
+0 7
+0 8
+0 9
+0 10
+1 2
+1 3
+1 4
+1 5
+1 6
+1 7
+1 8
+1 9
+1 10
+2 5
+2 6
+2 7
+2 8
+2 9
+2 10
+3 5
+3 6
+3 7
+3 8
+3 9
+3 10
+4 5
+4 6
+4 7
+4 8
+4 9
+4 10
+5 9
+5 10
+6 9
+6 10
+7 9
+7 10
+8 9
+8 10
+}
+
+Partition type:
+0 0 1 1 1 2 2 2 2 3 3
+
+Directed graph with 3 partitions, all partitions with size zero:directed: true
+vcount: 0
+edges: {
+}
+
+Partition type:
+
+
+Directed graph with 3 partitions, one parition with size zero:directed: true
+vcount: 5
+edges: {
+0 2
+0 3
+0 4
+1 2
+1 3
+1 4
+2 0
+2 1
+3 0
+3 1
+4 0
+4 1
+}
+
+Partition type:
+0 0 1 1 1

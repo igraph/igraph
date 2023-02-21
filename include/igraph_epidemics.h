@@ -26,6 +26,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_datatype.h"
+#include "igraph_error.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 
@@ -55,10 +56,10 @@ typedef struct igraph_sir_t {
     igraph_vector_int_t no_s, no_i, no_r;
 } igraph_sir_t;
 
-IGRAPH_EXPORT int igraph_sir_init(igraph_sir_t *sir);
+IGRAPH_EXPORT igraph_error_t igraph_sir_init(igraph_sir_t *sir);
 IGRAPH_EXPORT void igraph_sir_destroy(igraph_sir_t *sir);
 
-IGRAPH_EXPORT int igraph_sir(const igraph_t *graph, igraph_real_t beta,
+IGRAPH_EXPORT igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
                              igraph_real_t gamma, igraph_integer_t no_sim,
                              igraph_vector_ptr_t *result);
 

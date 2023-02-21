@@ -1,0 +1,152 @@
+bool_graph_attr=1
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=1
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=0
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 bool_edge_attr=1
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 bool_edge_attr=0
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 bool_edge_attr=0
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 bool_edge_attr=0
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 bool_edge_attr=0
+
+bool_graph_attr=1
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=1
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=0
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 bool_edge_attr=1
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 bool_edge_attr=0
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 bool_edge_attr=0
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 bool_edge_attr=0
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 bool_edge_attr=0
+
+bool_graph_attr=1
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=1
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=0
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Vertex 5: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Vertex 6: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 bool_edge_attr=1
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 bool_edge_attr=0
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 bool_edge_attr=0
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 bool_edge_attr=0
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 bool_edge_attr=0
+
+bool_graph_attr=1
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=1
+Vertex 1: id="2" name="2" x=0.8188 y=0.2458 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=0
+Vertex 2: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 3: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Vertex 5: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Vertex 6: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 bool_edge_attr=1
+Edge 1 (1-0): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=120 velocity1=1.3 angle2=-120 velocity2=0.3 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=19 labelpos=0.5 labeldegree=180 labelangle2=270 linepattern="" hook1=0 bool_edge_attr=0
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=NaN color="" arrowsize=NaN angle1=40 velocity1=2.8 angle2=30 velocity2=0.8 arrowpos=25 label="Bezier arc" labelcolor="" fontsize=NaN labelangle=NaN labelpos=0.65 labeldegree=0 labelangle2=90 linepattern="" hook1=0 bool_edge_attr=0
+Edge 3 (3-1): weight=-1 hook2=0 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=250 arrowpos=25 label="Circular arc" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=0 bool_edge_attr=0
+Edge 4 (2-3): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 5 (0-2): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 6 (2-2): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 bool_edge_attr=0
+Edge 7 (1-1): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN bool_edge_attr=0
+Edge 8 (2-5): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN bool_edge_attr=0
+Edge 9 (3-6): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN bool_edge_attr=0
+
+bool_graph_attr=1
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=1
+Vertex 1: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 2: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 3: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Edge 0 (0-0): weight=1 hook2=0 edgewidth=3 color="Blue" arrowsize=3 angle1=-130 velocity1=0.6 angle2=-130 velocity2=0.6 arrowpos=0.5 label="Bezier loop" labelcolor="BlueViolet" fontsize=20 labelangle=58 labelpos=0.3 labeldegree=360 labelangle2=0 linepattern="" hook1=0 bool_edge_attr=1
+Edge 1 (1-2): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 2 (0-1): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 3 (1-1): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 bool_edge_attr=0
+Edge 4 (2-4): weight=NaN hook2=NaN edgewidth=NaN color="" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=NaN label="" labelcolor="" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="" hook1=NaN bool_edge_attr=0
+
+bool_graph_attr=1
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=1
+Vertex 1: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 2: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 3: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Edge 0 (1-2): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 1 (0-1): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 2 (1-1): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 bool_edge_attr=0
+
+Before deleting some attributes:
+bool_graph_attr=1 id=10 name="toy" is_regular=0
+Vertex 0: id="1" name="1" x=0.0938 y=0.0896 shape="ellipse" xfact=1 yfact=1 bool_vertex_attr=1
+Vertex 1: id="3" name="3" x=0.3688 y=0.7792 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 2: id="4" name="4" x=0.9583 y=0.8563 shape="ellipse" xfact=1 yfact=0 bool_vertex_attr=0
+Vertex 3: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Vertex 4: id="" name="" x=NaN y=NaN shape="" xfact=NaN yfact=NaN bool_vertex_attr=0
+Edge 0 (1-2): weight=1 hook2=0 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 label="Straight arc" labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 1 (0-1): weight=1 hook2=0 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 label="Oval arc" labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" hook1=0 bool_edge_attr=0
+Edge 2 (1-1): weight=-1 hook2=12 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 label="Circular loop" labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" hook1=6 bool_edge_attr=0
+
+After deleting some attributes:
+bool_graph_attr=1
+Vertex 0: id="1" name="1" y=0.0896 bool_vertex_attr=1
+Vertex 1: id="3" name="3" y=0.7792 bool_vertex_attr=0
+Vertex 2: id="4" name="4" y=0.8563 bool_vertex_attr=0
+Vertex 3: id="" name="" y=NaN bool_vertex_attr=0
+Vertex 4: id="" name="" y=NaN bool_vertex_attr=0
+Edge 0 (1-2): weight=1 edgewidth=2 color="OliveGreen" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" bool_edge_attr=0
+Edge 1 (0-1): weight=1 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" bool_edge_attr=0
+Edge 2 (1-1): weight=-1 edgewidth=1 color="Red" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" bool_edge_attr=0
+
+After setting vertex and edge attributes:
+bool_graph_attr=1
+Vertex 0: id="foo" name="1" y=-1 bool_vertex_attr=1 type=1
+Vertex 1: id="bar" name="3" y=2.1 bool_vertex_attr=0 type=0
+Vertex 2: id="4" name="4" y=0.8563 bool_vertex_attr=0 type=0
+Vertex 3: id="" name="" y=NaN bool_vertex_attr=0 type=0
+Vertex 4: id="" name="" y=NaN bool_vertex_attr=0 type=0
+Edge 0 (1-2): weight=-100.1 edgewidth=2 color="Blue" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" bool_edge_attr=0 type=1
+Edge 1 (0-1): weight=1 edgewidth=5 color="Brown" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" bool_edge_attr=0 type=0
+Edge 2 (1-1): weight=100 edgewidth=1 color="RED" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" bool_edge_attr=0 type=0
+
+After setting vertex and edge attributes by vector:
+bool_graph_attr=1
+Vertex 0: id="0" name="1" y=1.23 bool_vertex_attr=1 type=0 foobar=0 foo="0"
+Vertex 1: id="1" name="3" y=1.23 bool_vertex_attr=0 type=1 foobar=1 foo="1"
+Vertex 2: id="2" name="4" y=1.23 bool_vertex_attr=0 type=0 foobar=2 foo="2"
+Vertex 3: id="3" name="" y=1.23 bool_vertex_attr=0 type=1 foobar=3 foo="3"
+Vertex 4: id="4" name="" y=1.23 bool_vertex_attr=0 type=0 foobar=4 foo="4"
+Edge 0 (1-2): weight=12.3 edgewidth=2 color="0" arrowsize=NaN angle1=NaN velocity1=NaN angle2=NaN velocity2=NaN arrowpos=25 labelcolor="PineGreen" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" bool_edge_attr=0 type=0 foobar=0 foo="0"
+Edge 1 (0-1): weight=12.3 edgewidth=5 color="1" arrowsize=NaN angle1=NaN velocity1=-1 angle2=NaN velocity2=-20 arrowpos=25 labelcolor="Black" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=NaN labelangle2=NaN linepattern="Dashed" bool_edge_attr=0 type=1 foobar=1 foo="1"
+Edge 2 (1-1): weight=12.3 edgewidth=1 color="2" arrowsize=NaN angle1=NaN velocity1=-2 angle2=NaN velocity2=-15 arrowpos=0.5 labelcolor="OrangeRed" fontsize=NaN labelangle=NaN labelpos=NaN labeldegree=180 labelangle2=270 linepattern="" bool_edge_attr=0 type=0 foobar=2 foo="2"
+
+After deleting all attributes:
+Vertex 0:
+Vertex 1:
+Vertex 2:
+Vertex 3:
+Vertex 4:
+Edge 0 (1-2):
+Edge 1 (0-1):
+Edge 2 (1-1):
+
+Setting attributes on vertex 0, permuting with 2
+Permuting to different graph:
+Vertex 0: foo=NaN bar=0 baz=""
+Vertex 1: foo=NaN bar=0 baz=""
+Vertex 2: foo=5 bar=1 baz="foobar"
+Edge 0 (2-1):
+Edge 1 (1-0):
+
+Permuting to same graph:
+Vertex 0: foo=NaN bar=0 baz=""
+Vertex 1: foo=NaN bar=0 baz=""
+Vertex 2: foo=5 bar=1 baz="foobar"
+Edge 0 (0-1):
+Edge 1 (1-2):
+

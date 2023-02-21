@@ -24,11 +24,10 @@
 #define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
 #define R_UNIF(a,b) (igraph_rng_get_unif(igraph_rng_default(), (a), (b)))
 
-int main() {
+int main(void) {
     igraph_real_t d;
     igraph_vector_t u, v;
-    int ret;
-    long int i, k, n;
+    igraph_integer_t i, k, n;
 
     /********************************
      * Example usage
@@ -98,8 +97,8 @@ int main() {
 
     /* empty sequence */
     igraph_vector_init(&v, 0);
-    ret = igraph_vector_shuffle(&v);
+    igraph_vector_shuffle(&v);
     igraph_vector_destroy(&v);
 
-    return ret == 0 ? 0 : 6;
+    return 0;
 }

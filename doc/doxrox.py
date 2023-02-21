@@ -35,26 +35,31 @@ can be used to speed up the processing of multiple input files as you can
 generate the chunks once and then re-use them for multiple input files.
 """
 
-import sys
+import os
 import re
+import sys
 
 from argparse import ArgumentParser
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from contextlib import contextmanager
+from dataclasses import dataclass
+from enum import Enum
+from fnmatch import fnmatch
 from hashlib import sha1
 from operator import itemgetter
 from pathlib import Path
 from pickle import dump, load
 from time import time
+from typing import Any, Callable, Dict, Iterator, List, Optional, Pattern
 
 #: Constant indicating the start of a comment that doxrox.py will process
-DOXHEAD = r"/\*\*"
+DOXHEAD: str = r"/\*\*"
 
 #: Stores whether we want verbose output
-verbose = False
+verbose: bool = False
 
 
-def fatal(message, code = 1):
+def fatal(message: str, code: int = 1):
     """Prints an error message and exits the program with the given error code."""
     print(message, file=sys.stderr)
     sys.exit(code)
@@ -74,9 +79,10 @@ def main():
     parser = create_argument_parser()
     arguments = parser.parse_args()
 
-    outputfile = arguments.output_file
+    outputfile: str = arguments.output_file
+    inputs: List[str] = arguments.inputs
+
     verbose = arguments.verbose
-    inputs = arguments.inputs
 
     if (
         arguments.template_file in inputs
@@ -89,6 +95,7 @@ def main():
     cache = ChunkCache(arguments.cache_file) if arguments.cache_file else None
 
     # get all regular expressions
+    rules: List[Rule]
     if arguments.rules_file:
         with operation("Reading regular expressions...") as op:
             rules = read_regex_rules_file(arguments.rules_file)
@@ -127,14 +134,18 @@ def main():
             if chunks is not None:
                 op("{0} chunks read from cache".format(len(chunks)))
             else:
-                chunks = collect_chunks_from_input_file(contents, rules, rule_timings)
+                chunks = collect_chunks_from_input_file(
+                    ifile, contents, rules, rule_timings
+                )
                 op("{0} chunks parsed".format(len(chunks)))
-                if key:
+                if key and cache:
                     cache.put(key, chunks)
 
             for name, chunk in chunks.items():
                 if name in all_chunks:
-                    fatal("Multiple files provide chunks for {0!r}".format(name), code=4)
+                    fatal(
+                        "Multiple files provide chunks for {0!r}".format(name), code=4
+                    )
                 all_chunks[name] = chunk
 
     if arguments.timing_stats and rule_timings:
@@ -195,14 +206,15 @@ def main():
 #########################################################################
 
 
-def create_argument_parser():
+def create_argument_parser() -> ArgumentParser:
     """Creates the command line argument parser that the script uses."""
-    parser = ArgumentParser(description=sys.modules[__name__].__doc__.strip())
+    parser = ArgumentParser(description=(sys.modules[__name__].__doc__ or "").strip())
 
     parser.add_argument(
-        "--cache", metavar="FILE",
+        "--cache",
+        metavar="FILE",
         dest="cache_file",
-        help="optional cache file to store chunks from already processed files"
+        help="optional cache file to store chunks from already processed files",
     )
     parser.add_argument(
         "-t",
@@ -245,7 +257,7 @@ def create_argument_parser():
         dest="timing_stats",
         action="store_true",
         default=False,
-        help="print the average time it takes to process regex rules from the rules file"
+        help="print the average time it takes to process regex rules from the rules file",
     )
     parser.add_argument(
         "inputs", metavar="INPUT", nargs="*", help="input files to process"
@@ -259,10 +271,41 @@ def create_argument_parser():
 #################
 
 
-Rule = namedtuple("Rule", "regex replacement name type")
+class RuleType(Enum):
+    REPLACE = "replace"
+    RUN = "run"
 
 
-def read_regex_rules_file(filename):
+@dataclass
+class Rule:
+    regex: Pattern[str]
+    """The regular expression that the rule will attempt to match."""
+
+    replacement: str
+    """The replacement string for the match, or the code to execute on the
+    match.
+    """
+
+    type: RuleType
+    """Type of the rule"""
+
+    name: Optional[str]
+    """Name of the rule, for debugging purposes."""
+
+    glob: Optional[str] = None
+    """Optional glob pattern that specifies which input files the rule
+    applies to.
+    """
+
+    def applies_to_filename(self, filename: str) -> bool:
+        """Returns whether the rule applies to files with the given name."""
+        if self.glob:
+            return fnmatch(filename, self.glob)
+        else:
+            return True
+
+
+def read_regex_rules_file(filename) -> List[Rule]:
     """Parses the file containing the regex-based rules that we use to chop
     up the input source files into chunks that can later be fed into a
     DocBook document.
@@ -274,24 +317,31 @@ def read_regex_rules_file(filename):
         the rules that were parsed from the input file
     """
 
-    rules = []
+    rules: List[Rule] = []
 
     def parse_error(lineno):
         """Helper function to indicate a parse error at the given line."""
         fatal(
-            "Parse error in regex file ({0}), line {1}".format(regexfile, lineno),
-            code = 4
+            "Parse error in regex file ({0}), line {1}".format(filename, lineno), code=4
         )
 
-    def store(rule, replacement, rule_name, rule_type):
+    def store(
+        rule: List[str],
+        replacement: List[str],
+        rule_name: Optional[str],
+        rule_type: RuleType,
+        glob: Optional[str],
+    ) -> None:
         """Helper function to append the current rule to the result."""
         regex = re.compile("".join(rule), re.VERBOSE | re.MULTILINE | re.DOTALL)
-        replacement = "".join(replacement)[:-1]
-        rules.append(Rule(regex, replacement, rule_name, rule_type))
+        replacement_str = "".join(replacement)[:-1]
+        rules.append(Rule(regex, replacement_str, rule_type, rule_name, glob))
 
     mode = "empty"
     regex, replacement = [], []
-    rule_name, rule_type = None, ""
+    rule_name: Optional[str] = None
+    rule_type: Optional[RuleType] = None
+    glob: Optional[str] = None
 
     try:
         with open(filename, "r") as f:
@@ -301,14 +351,18 @@ def read_regex_rules_file(filename):
                     if mode not in ("empty", "with"):
                         parse_error(lineno)
                     else:
-                        if regex:
-                            store(regex, replacement, rule_name, rule_type)
+                        if regex and rule_type:
+                            store(regex, replacement, rule_name, rule_type, glob)
                         regex.clear()
                         replacement.clear()
                         mode = "replace"
 
-                        match = re.match(r"^REPLACE\s+-+\s+(?P<name>.*)\s+-", line)
+                        match = re.match(
+                            r"^REPLACE( IN (?P<glob>[^\s]+))?\s+-+\s+(?P<name>.*)\s+-",
+                            line,
+                        )
                         rule_name = match.group("name") if match else None
+                        glob = match.group("glob") if match else None
 
                 elif line.startswith("WITH") or line.startswith("RUN"):
                     # the second half of the pattern block starts
@@ -316,7 +370,9 @@ def read_regex_rules_file(filename):
                         parse_error(lineno)
                     else:
                         mode = "with"
-                    rule_type = "with" if line.startswith("WITH") else "run"
+                    rule_type = (
+                        RuleType.REPLACE if line.startswith("WITH") else RuleType.RUN
+                    )
 
                 elif re.match(r"^\s*$", line):
                     # empty line, do nothing
@@ -331,11 +387,11 @@ def read_regex_rules_file(filename):
                     else:
                         parse_error(lineno)
 
-            if regex != "":
-                store(regex, replacement, rule_name, rule_type)
+            if regex != "" and rule_type:
+                store(regex, replacement, rule_name, rule_type, glob)
 
     except IOError:
-        fatal("Error reading regex file: " + regexfile, code = 4)
+        fatal("Error reading regex file: " + filename, code=4)
 
     return rules
 
@@ -343,18 +399,23 @@ def read_regex_rules_file(filename):
 #################
 # parse an input file string
 #################
-def collect_chunks_from_input_file(strinput, rules, rule_timings):
-    result = {}
+def collect_chunks_from_input_file(
+    path: str, strinput: str, rules: List[Rule], rule_timings
+) -> Dict[str, str]:
+    result: Dict[str, str] = {}
 
     # split the file
     chunks = re.split(DOXHEAD, strinput)
     chunks = chunks[1:]
 
+    # get the filename part of the path
+    filename = os.path.basename(path)
+
     # apply all rules to the chunks
     for chunk in chunks:
-        name = None
+        name: Optional[str] = None
 
-        for index, rule in enumerate(rules):
+        for rule in rules:
             start = time()
 
             if not name and "name" in rule.regex.groupindex:
@@ -367,23 +428,24 @@ def collect_chunks_from_input_file(strinput, rules, rule_timings):
                     except IndexError:
                         name = ""
 
-            if rule.type == "with":
-                # This is a simple regex replacement rule
-                try:
-                    chunk = rule.regex.sub(rule.replacement, chunk)
-                except IndexError:
-                    print("Index error:" + ch[0:60] + "...")
-                    print("Pattern:\n" + rule.regex.pattern)
-                    print("Current state:" + chunk[0:60] + "...")
-                    fatal(code=6)
-            elif rule.type == "run":
-                # This is a piece of Python code that has to be executed on
-                # the part that matched
-                matched = rule.regex.search(chunk)
-                if matched:
-                    exec(rule.replacement)
-            else:
-                fatal("Invalid rule type: {0!r}".format(rule.type), code=6)
+            if rule.applies_to_filename(filename):
+                if rule.type is RuleType.REPLACE:
+                    # This is a simple regex replacement rule
+                    try:
+                        chunk = rule.regex.sub(rule.replacement, chunk)
+                    except IndexError:
+                        print("Index error:" + chunk[0:60] + "...")
+                        print("Pattern:\n" + rule.regex.pattern)
+                        print("Current state:" + chunk[0:60] + "...")
+                        fatal("Parsing error", code=6)
+                elif rule.type is RuleType.RUN:
+                    # This is a piece of Python code that has to be executed on
+                    # the part that matched
+                    matched = rule.regex.search(chunk)
+                    if matched:
+                        exec(rule.replacement)
+                else:
+                    fatal("Invalid rule type: {0!r}".format(rule.type), code=6)
 
             rule_timings[rule.name].append((time() - start) * 1000000)
 
@@ -397,7 +459,7 @@ def collect_chunks_from_input_file(strinput, rules, rule_timings):
 
 
 @contextmanager
-def operation(message):
+def operation(message: str) -> Iterator[Callable[[Any], None]]:
     """Helper function to show progress messages for a potentially long-running
     operation in verbose mode.
 
@@ -411,7 +473,7 @@ def operation(message):
 
     result = [None]
 
-    def set_result(obj):
+    def set_result(obj: Any) -> None:
         result[0] = obj
 
     success = False
@@ -431,7 +493,11 @@ class ChunkCache:
     DocBook documentation chunks that were parsed from them.
     """
 
-    def __init__(self, filename, hash=sha1):
+    _data: Optional[Dict[str, Dict[str, str]]]
+    _dirty: bool
+    _path: Path
+
+    def __init__(self, filename: str, hash=sha1):
         """Constructor.
 
         Parameters:
@@ -443,7 +509,7 @@ class ChunkCache:
         self._hash = hash
         self._path = Path(filename)
 
-    def _load(self):
+    def _load(self) -> None:
         """Populates the in-memory copy of the cache from the disk."""
         if self._path.exists():
             try:
@@ -456,40 +522,43 @@ class ChunkCache:
             self._data = {}
         self._dirty = False
 
-    def close(self):
+    def close(self) -> None:
         """Closes the cache and flushes its contents back to the disk if it
         changed recently.
         """
         if self._dirty:
             self.flush()
 
-    def flush(self):
+    def flush(self) -> None:
         """Flushes the contents of the cache back to the disk."""
         with self._path.open("wb") as fp:
             dump(self._data, fp)
         self._dirty = False
 
-    def get(self, key):
+    def get(self, key: str) -> Optional[Dict[str, str]]:
         """Returns the chunks associated to the file with the given key, or
         `None` if the key is not in the cache.
         """
         if self._data is None:
             self._load()
+
+        assert self._data is not None
         return self._data.get(key)
 
-    def key_of(self, contents, encoding = "utf-8"):
+    def key_of(self, contents, encoding: str = "utf-8") -> str:
         """Returns the hash key corresponding to the file with the given
         contents.
         """
         if not isinstance(contents, bytes):
-            contents = contents.encode("utf-8")
+            contents = contents.encode(encoding)
 
         key = self._hash()
         key.update(contents)
         return key.hexdigest()
 
-    def put(self, key, chunks):
+    def put(self, key: str, chunks: Dict[str, str]) -> None:
         """Stores some chunks associated to the file with the given key."""
+        assert self._data is not None
         self._data[key] = chunks
         self._dirty = True
 

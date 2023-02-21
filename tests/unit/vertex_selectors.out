@@ -19,4 +19,21 @@ Edgeless graph:
 2
 3
 4
+Copy of vs:
+2
+3
+4
 Graph without vertices should fail.
+As vector should give all 5 vertices:
+0 1 2 3 4
+As vector should give 0 vertices:
+
+Checking vs_range:
+2
+3
+4
+Checking vss_range using vs_range parameters:
+2
+3
+4
+Checking whether vss_range accepts an empty range.

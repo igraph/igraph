@@ -25,6 +25,7 @@
 #define IGRAPH_PROGRESS_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 
 __BEGIN_DECLS
@@ -142,16 +143,16 @@ __BEGIN_DECLS
  *     error code \c IGRAPH_INTERRUPTED in this case.
  */
 
-typedef int igraph_progress_handler_t(const char *message, igraph_real_t percent,
+typedef igraph_error_t igraph_progress_handler_t(const char *message, igraph_real_t percent,
                                       void *data);
 
 IGRAPH_EXPORT extern igraph_progress_handler_t igraph_progress_handler_stderr;
 
 IGRAPH_EXPORT igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
-IGRAPH_EXPORT int igraph_progress(const char *message, igraph_real_t percent, void *data);
+IGRAPH_EXPORT igraph_error_t igraph_progress(const char *message, igraph_real_t percent, void *data);
 
-IGRAPH_EXPORT int igraph_progressf(const char *message, igraph_real_t percent, void *data,
+IGRAPH_EXPORT igraph_error_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
                                    ...);
 
 /**

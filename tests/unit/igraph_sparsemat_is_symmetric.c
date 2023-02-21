@@ -23,16 +23,17 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define DIM 10
 
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-int main() {
+int main(void) {
     int runs = 100;
     const int noelements = 20;
     igraph_sparsemat_t A;
+    igraph_bool_t result;
     int i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -47,7 +48,8 @@ int main() {
             igraph_sparsemat_entry(&A, row, col, val);
             igraph_sparsemat_entry(&A, col, row, val);
         }
-        if (!igraph_sparsemat_is_symmetric(&A)) {
+        igraph_sparsemat_is_symmetric(&A, &result);
+        if (!result) {
             return 1;
         }
         igraph_sparsemat_destroy(&A);
@@ -56,7 +58,8 @@ int main() {
         for (i = 0; i < noelements; i++) {
             igraph_sparsemat_entry(&A, INT(DIM - 1), INT(DIM - 1), INT(100));
         }
-        if (igraph_sparsemat_is_symmetric(&A)) {
+        igraph_sparsemat_is_symmetric(&A, &result);
+        if (result) {
             return 2;
         }
         igraph_sparsemat_destroy(&A);

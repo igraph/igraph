@@ -21,61 +21,39 @@
 
 */
 
-#include "igraph_memory.h"
-
 #include "core/fixed_vectorlist.h"
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
-    long int i, n = igraph_vector_ptr_size(&l->v);
-    for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(l->v)[i];
-        if (v) {
-            igraph_vector_destroy(v);
-        }
-    }
-    igraph_vector_ptr_destroy(&l->v);
-    igraph_free(l->vecs);
+    igraph_vector_int_list_destroy(&l->vecs);
 }
 
-int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
-                                    const igraph_vector_t *from,
-                                    long int size) {
+igraph_error_t igraph_fixed_vectorlist_convert(
+    igraph_fixed_vectorlist_t *l, const igraph_vector_int_t *from,
+    igraph_integer_t size
+) {
+    igraph_vector_int_t sizes;
+    igraph_integer_t i, no = igraph_vector_int_size(from), to;
 
-    igraph_vector_t sizes;
-    long int i, no = igraph_vector_size(from);
-
-    l->vecs = IGRAPH_CALLOC(size, igraph_vector_t);
-    if (!l->vecs) {
-        IGRAPH_ERROR("Cannot merge attributes for simplify",
-                     IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, l->vecs);
-    IGRAPH_CHECK(igraph_vector_ptr_init(&l->v, size));
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &l->v);
-    IGRAPH_VECTOR_INIT_FINALLY(&sizes, size);
+    IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&l->vecs, size);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, size);
 
     for (i = 0; i < no; i++) {
-        long int to = (long int) VECTOR(*from)[i];
+        to = VECTOR(*from)[i];
         if (to >= 0) {
             VECTOR(sizes)[to] += 1;
         }
     }
-    for (i = 0; i < size; i++) {
-        igraph_vector_t *v = &(l->vecs[i]);
-        IGRAPH_CHECK(igraph_vector_init(v, (long int) VECTOR(sizes)[i]));
-        igraph_vector_clear(v);
-        VECTOR(l->v)[i] = v;
-    }
+
     for (i = 0; i < no; i++) {
-        long int to = (long int) VECTOR(*from)[i];
+        to = VECTOR(*from)[i];
         if (to >= 0) {
-            igraph_vector_t *v = &(l->vecs[to]);
-            igraph_vector_push_back(v, i);
+            igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(&l->vecs, to);
+            IGRAPH_CHECK(igraph_vector_int_push_back(v, i));
         }
     }
 
-    igraph_vector_destroy(&sizes);
-    IGRAPH_FINALLY_CLEAN(3);
+    igraph_vector_int_destroy(&sizes);
+    IGRAPH_FINALLY_CLEAN(2);  /* + l->vecs */
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

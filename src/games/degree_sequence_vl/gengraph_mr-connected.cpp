@@ -22,7 +22,6 @@
 #include "gengraph_graph_molloy_optimized.h"
 #include "gengraph_graph_molloy_hash.h"
 #include "gengraph_degree_sequence.h"
-#include "gengraph_random.h"
 
 #include "igraph_datatype.h"
 #include "igraph_graphicality.h"
@@ -30,11 +29,12 @@
 #include "igraph_error.h"
 
 #include "core/exceptions.h"
+#include "games/degree_sequence_vl/degree_sequence_vl.h"
 
 namespace gengraph {
 
 // return negative number if program should exit
-int parse_options(int &argc, char** &argv);
+// int parse_options(int &argc, char** &argv);
 
 // options
 // static const bool MONITOR_TIME = false;
@@ -135,58 +135,54 @@ static const int  SHUFFLE_TYPE = FINAL_HEURISTICS;
 
 using namespace gengraph;
 
-extern "C" {
+igraph_error_t igraph_degree_sequence_game_vl(igraph_t *graph,
+                                              const igraph_vector_int_t *out_seq,
+                                              const igraph_vector_int_t *in_seq) {
+    IGRAPH_HANDLE_EXCEPTIONS(
+        igraph_bool_t is_graphical;
 
-    int igraph_degree_sequence_game_vl(igraph_t *graph,
-                                       const igraph_vector_t *out_seq,
-                                       const igraph_vector_t *in_seq) {
-        IGRAPH_HANDLE_EXCEPTIONS(
-            igraph_bool_t is_graphical;
+        if (in_seq && igraph_vector_int_size(in_seq) != 0) {
+            IGRAPH_ERROR("The Viger-Latapy sampler support only undirected graphs.", IGRAPH_EINVAL);
+        }
 
-            if (in_seq && igraph_vector_size(in_seq) != 0) {
-                IGRAPH_ERROR("This generator works with undirected graphs only", IGRAPH_EINVAL);
-            }
+        IGRAPH_CHECK(igraph_is_graphical(out_seq, 0, IGRAPH_SIMPLE_SW, &is_graphical));
+        if (!is_graphical) {
+            IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph.",
+                         IGRAPH_EINVAL);
+        }
 
-            IGRAPH_CHECK(igraph_is_graphical(out_seq, 0, IGRAPH_SIMPLE_SW, &is_graphical));
-            if (!is_graphical) {
-                IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph",
-                             IGRAPH_EINVAL);
-            }
+        RNG_BEGIN();
 
-            RNG_BEGIN();
+        degree_sequence *dd = new degree_sequence(out_seq);
 
-            degree_sequence *dd = new degree_sequence(out_seq);
+        graph_molloy_opt *g = new graph_molloy_opt(*dd);
+        delete dd;
 
-            graph_molloy_opt *g = new graph_molloy_opt(*dd);
-            delete dd;
-
-            if (!g->havelhakimi()) {
-                delete g;
-                RNG_END();
-                IGRAPH_FATAL("g->havelhakimi() failed; please report as a bug.");
-            }
-
-            if (!g->make_connected()) {
-                delete g;
-                RNG_END();
-                IGRAPH_ERROR("Cannot make a connected graph from the given degree sequence",
-                             IGRAPH_EINVAL);
-            }
-
-            int *hc = g->hard_copy();
+        if (!g->havelhakimi()) {
             delete g;
-            graph_molloy_hash *gh = new graph_molloy_hash(hc);
-            delete [] hc;
-
-            gh->shuffle(5 * gh->nbarcs(), 100 * gh->nbarcs(), SHUFFLE_TYPE);
-
-            IGRAPH_CHECK(gh->print(graph));
-            delete gh;
-
             RNG_END();
-        );
+            IGRAPH_FATAL("g->havelhakimi() failed; please report as a bug.");
+        }
 
-        return IGRAPH_SUCCESS;
-    }
+        if (!g->make_connected()) {
+            delete g;
+            RNG_END();
+            IGRAPH_ERROR("Cannot make a connected graph from the given degree sequence.",
+                         IGRAPH_EINVAL);
+        }
 
+        igraph_integer_t *hc = g->hard_copy();
+        delete g;
+        graph_molloy_hash *gh = new graph_molloy_hash(hc);
+        delete [] hc;
+
+        gh->shuffle(5 * gh->nbarcs(), 100 * gh->nbarcs(), SHUFFLE_TYPE);
+
+        IGRAPH_CHECK(gh->print(graph));
+        delete gh;
+
+        RNG_END();
+    );
+
+    return IGRAPH_SUCCESS;
 }

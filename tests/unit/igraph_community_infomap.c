@@ -24,37 +24,38 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 
 void gsummary(const igraph_t * g) {
-    printf("|V|=%d |E|=%d directed=%d\n", (int)igraph_vcount(g), (int)igraph_ecount(g), (int)igraph_is_directed(g));
+    printf("|V|=%" IGRAPH_PRId " |E|=%" IGRAPH_PRId " directed=%d\n",
+           igraph_vcount(g), igraph_ecount(g), (int) igraph_is_directed(g));
 }
 
-void show_results(igraph_vector_t * membership, igraph_real_t codelength) {
+void show_results(igraph_vector_int_t * membership, igraph_real_t codelength) {
     int i;
-    printf("Codelength: %0.5f (in %d modules)\n", codelength, (int)igraph_vector_max(membership) + 1 );
+    printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n", codelength, igraph_vector_int_max(membership) + 1 );
     printf("Membership: ");
-    for (i = 0; i < igraph_vector_size(membership); i++) {
-        printf("%li ", (long)VECTOR(*membership)[i] );
+    for (i = 0; i < igraph_vector_int_size(membership); i++) {
+        printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i] );
     }
     printf("\n");
 }
 
-void show_results_lite(igraph_vector_t * membership, igraph_real_t codelength) {
+void show_results_lite(igraph_vector_int_t * membership, igraph_real_t codelength) {
     int i;
-    printf("Codelength: %0.5f (in %d modules)\n", codelength, (int)igraph_vector_max(membership) + 1 );
+    printf("Codelength: %0.5f (in %" IGRAPH_PRId " modules)\n", codelength, igraph_vector_int_max(membership) + 1 );
     printf("Membership (1/100 of vertices): ");
-    for (i = 0; i < igraph_vector_size(membership); i += 100) {
-        printf("%li ", (long)VECTOR(*membership)[i] );
+    for (i = 0; i < igraph_vector_int_size(membership); i += 100) {
+        printf("%" IGRAPH_PRId " ", VECTOR(*membership)[i] );
     }
     printf("\n");
 }
 
 igraph_real_t infomap_weighted_test(const igraph_t * g, const igraph_vector_t *weights, igraph_bool_t smoke_test) {
-    igraph_vector_t membership;
+    igraph_vector_int_t membership;
     igraph_real_t codelength = 1000;
-    igraph_vector_init(&membership, 0);
+    igraph_vector_int_init(&membership, 0);
 
     igraph_community_infomap(/*in */ g, /*e_weight=*/ weights, NULL, /*nb_trials=*/5,
                                      /*out*/ &membership, &codelength);
@@ -66,7 +67,7 @@ igraph_real_t infomap_weighted_test(const igraph_t * g, const igraph_vector_t *w
         }
     }
 
-    igraph_vector_destroy(&membership);
+    igraph_vector_int_destroy(&membership);
 
     return codelength;
 }
@@ -77,7 +78,7 @@ igraph_real_t infomap_test(const igraph_t * g, igraph_bool_t smoke_test) {
 }
 
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t weights;
     igraph_real_t codelength;
@@ -95,18 +96,13 @@ int main() {
     infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
 
-    /* Two 4-cliques with one commun vertex (vertex 3) */
+    /* Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5) */
     printf("# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)\n");
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1,  0, 2,  0, 3,  1, 2,  1, 3,  2, 3, /* 4-clique 0,1,2,3 */
                  7, 4,  7, 5,  7, 6,  4, 5,  4, 6,  5, 6, /* 4-clique 4,5,6,7 */
                  0, 4,  1, 5, /* 8, 0, 8, 4, */
                  -1);
-    infomap_test(&g, /* smoke_test = */ 0);
-
-    printf("# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)\n");
-    igraph_add_edge(&g, 0, 4);
-    igraph_add_edge(&g, 1, 5);
     infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
 
@@ -255,7 +251,8 @@ int main() {
      * this is more reliable. */
     printf("# Wiktionary english verbs (synonymy 2008)\n");
     wikt = fopen("wikti_en_V_syn.elist", "r");
-    igraph_read_graph_edgelist(&g, wikt, 0, 0);
+    IGRAPH_ASSERT(wikt != NULL);
+    igraph_read_graph_edgelist(&g, wikt, 0, IGRAPH_UNDIRECTED);
     fclose(wikt);
     gsummary(&g);
     codelength = infomap_test(&g, /* smoke_test = */ 1);

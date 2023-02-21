@@ -1,7 +1,24 @@
+/*
+   IGraph library.
+   Copyright (C) 2020-2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 int test_graph(const char* name, const igraph_t* graph, const igraph_real_t* weights_array) {
     igraph_real_t eff;
@@ -96,7 +113,7 @@ int test_graph(const char* name, const igraph_t* graph, const igraph_real_t* wei
     return 0;
 }
 
-int test_ring() {
+int test_ring(void) {
     int result;
     igraph_t graph;
     const igraph_real_t weights_array[] = {1, 1, 1, 1};
@@ -105,10 +122,12 @@ int test_ring() {
     result = test_graph("Ring graph", &graph, weights_array);
     igraph_destroy(&graph);
 
+    VERIFY_FINALLY_STACK();
+
     return result;
 }
 
-int test_small_graph() {
+int test_small_graph(void) {
     int result;
     igraph_t graph;
     const igraph_real_t weights_array[] = {4, 4, 4, 3, 1, 5, 1, 2, 4, 5, 3, 5, 5, 4, 1, 1, 5, 4, 1, 1, 2, 1, 3, 5};
@@ -120,11 +139,12 @@ int test_small_graph() {
     result = test_graph("Small test graph", &graph, weights_array);
     igraph_destroy(&graph);
 
+    VERIFY_FINALLY_STACK();
+
     return result;
 }
 
-int main() {
-    int retval;
+int main(void) {
 
     RUN_TEST(test_ring);
     RUN_TEST(test_small_graph);

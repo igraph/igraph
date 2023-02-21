@@ -1,0 +1,4 @@
+Testing graph with no vertices
+Testing k-ary tree
+Testing k-ary tree (many more times to stress-test igraph_2dgrid_t)
+Testing disconnected graph

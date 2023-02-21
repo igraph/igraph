@@ -39,33 +39,33 @@ __BEGIN_DECLS
 typedef struct s_igraph_trie_node {
     igraph_strvector_t strs;
     igraph_vector_ptr_t children;
-    igraph_vector_t values;
+    igraph_vector_int_t values;
 } igraph_trie_node_t;
 
 typedef struct s_igraph_trie {
-    igraph_strvector_t strs;
-    igraph_vector_ptr_t children;
-    igraph_vector_t values;
-    long int maxvalue;
+    igraph_trie_node_t node;
+    igraph_integer_t maxvalue;
     igraph_bool_t storekeys;
     igraph_strvector_t keys;
 } igraph_trie_t;
 
-#define IGRAPH_TRIE_NULL { IGRAPH_STRVECTOR_NULL, IGRAPH_VECTOR_PTR_NULL, \
-        IGRAPH_VECTOR_NULL, 0, 0, IGRAPH_STRVECTOR_NULL }
+#define IGRAPH_TRIE_NULL \
+        { { IGRAPH_STRVECTOR_NULL, IGRAPH_VECTOR_PTR_NULL, IGRAPH_VECTOR_NULL}, \
+            0, 0, IGRAPH_STRVECTOR_NULL }
 #define IGRAPH_TRIE_INIT_FINALLY(tr, sk) \
     do { IGRAPH_CHECK(igraph_trie_init(tr, sk)); \
         IGRAPH_FINALLY(igraph_trie_destroy, tr); } while (0)
 
-IGRAPH_PRIVATE_EXPORT int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys);
 IGRAPH_PRIVATE_EXPORT void igraph_trie_destroy(igraph_trie_t *t);
-IGRAPH_PRIVATE_EXPORT int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id);
-IGRAPH_PRIVATE_EXPORT int igraph_trie_check(igraph_trie_t *t, const char *key, long int *id);
-IGRAPH_PRIVATE_EXPORT int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
-                                           long int *id);
-IGRAPH_PRIVATE_EXPORT void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
-IGRAPH_PRIVATE_EXPORT int igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv);
-IGRAPH_PRIVATE_EXPORT long int igraph_trie_size(igraph_trie_t *t);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_trie_get_len(igraph_trie_t *t, const char *key, igraph_integer_t length,
+                                           igraph_integer_t *id);
+IGRAPH_PRIVATE_EXPORT const char* igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx);
+IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_trie_size(igraph_trie_t *t);
+
+const igraph_strvector_t* igraph_i_trie_borrow_keys(igraph_trie_t *t);
 
 __END_DECLS
 

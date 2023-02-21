@@ -24,19 +24,17 @@
 #include "igraph_interrupt.h"
 #include "config.h"
 
-IGRAPH_THREAD_LOCAL igraph_interruption_handler_t
-*igraph_i_interruption_handler = 0;
+IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_handler = 0;
 
-int igraph_allow_interruption(void* data) {
+igraph_error_t igraph_allow_interruption(void *data) {
     if (igraph_i_interruption_handler) {
         return igraph_i_interruption_handler(data);
     }
     return IGRAPH_SUCCESS;
 }
 
-igraph_interruption_handler_t *
-igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler) {
-    igraph_interruption_handler_t * previous_handler = igraph_i_interruption_handler;
+igraph_interruption_handler_t *igraph_set_interruption_handler (igraph_interruption_handler_t *new_handler) {
+    igraph_interruption_handler_t *previous_handler = igraph_i_interruption_handler;
     igraph_i_interruption_handler = new_handler;
     return previous_handler;
 }

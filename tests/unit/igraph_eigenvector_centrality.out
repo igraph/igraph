@@ -1,0 +1,51 @@
+Undirected graph with no vertices:
+Eigenvalue: 0
+Eigenvector:
+
+
+Directed graph with no vertices:
+Eigenvalue: 0
+Eigenvector:
+
+
+Undirected graph with no edges:
+Eigenvalue: 0
+Eigenvector:
+1 1 1 1 1
+
+Directed graph with no edges:
+Eigenvalue: 0
+Eigenvector:
+1 1 1 1 1
+
+Undirected full graph:
+Eigenvalue: 4
+Eigenvector:
+1 1 1 1 1
+
+Directed full graph:
+Eigenvalue: 4
+Eigenvector:
+1 1 1 1 1
+
+Undirected full graph with weights:
+Eigenvalue: 4
+Eigenvector:
+1 1 1 1 1
+
+Directed full graph with weights:
+Eigenvalue: 4
+Eigenvector:
+1 1 1 1 1
+
+Undirected star graph with weights:
+Eigenvalue: 2
+Eigenvector:
+1 0.5 0.5 0.5 0.5
+
+Directed star graph with weights:
+Eigenvalue: 0
+Eigenvector:
+0 0 0 0 0
+
+Check handling of wrong number of weights.

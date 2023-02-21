@@ -25,6 +25,7 @@
 #define IGRAPH_LAPACK_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
@@ -56,11 +57,11 @@ __BEGIN_DECLS
  * </para>
  */
 
-IGRAPH_EXPORT int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
+IGRAPH_EXPORT igraph_error_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                                        int *info);
-IGRAPH_EXPORT int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
+IGRAPH_EXPORT igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
                                        const igraph_vector_int_t *ipiv, igraph_matrix_t *b);
-IGRAPH_EXPORT int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
+IGRAPH_EXPORT igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
                                       igraph_matrix_t *b, int *info);
 
 typedef enum { IGRAPH_LAPACK_DSYEV_ALL,
@@ -68,7 +69,7 @@ typedef enum { IGRAPH_LAPACK_DSYEV_ALL,
                IGRAPH_LAPACK_DSYEV_SELECT
              } igraph_lapack_dsyev_which_t;
 
-IGRAPH_EXPORT int igraph_lapack_dsyevr(const igraph_matrix_t *A,
+IGRAPH_EXPORT igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                                        igraph_lapack_dsyev_which_t which,
                                        igraph_real_t vl, igraph_real_t vu, int vestimate,
                                        int il, int iu, igraph_real_t abstol,
@@ -77,7 +78,7 @@ IGRAPH_EXPORT int igraph_lapack_dsyevr(const igraph_matrix_t *A,
 
 /* TODO: should we use complex vectors/matrices? */
 
-IGRAPH_EXPORT int igraph_lapack_dgeev(const igraph_matrix_t *A,
+IGRAPH_EXPORT igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                                       igraph_vector_t *valuesreal,
                                       igraph_vector_t *valuesimag,
                                       igraph_matrix_t *vectorsleft,
@@ -90,7 +91,7 @@ typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE = 0,
              }
 igraph_lapack_dgeevx_balance_t;
 
-IGRAPH_EXPORT int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
+IGRAPH_EXPORT igraph_error_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                                        const igraph_matrix_t *A,
                                        igraph_vector_t *valuesreal,
                                        igraph_vector_t *valuesimag,
@@ -102,7 +103,7 @@ IGRAPH_EXPORT int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                                        igraph_vector_t *rcondv,
                                        int *info);
 
-IGRAPH_EXPORT int igraph_lapack_dgehrd(const igraph_matrix_t *A,
+IGRAPH_EXPORT igraph_error_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
                                        int ilo, int ihi,
                                        igraph_matrix_t *result);
 

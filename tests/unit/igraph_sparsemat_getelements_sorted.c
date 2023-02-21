@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void print_res_i_j(igraph_vector_t *result, igraph_vector_int_t *i, igraph_vector_int_t *j) {
     print_vector(result);
@@ -40,7 +40,7 @@ void init_all(igraph_vector_t *result, igraph_vector_int_t *i, igraph_vector_int
     igraph_sparsemat_init(spmat, 0, 0, 0);
 }
 
-int main() {
+int main(void) {
     igraph_sparsemat_t spmat;
     igraph_sparsemat_t spmat_comp;
     igraph_vector_t result;
@@ -61,9 +61,15 @@ int main() {
 
     printf("\n3x3 matrix\n");
     init_all(&result, &i, &j, &spmat);
+    /* make sure to fill spmat in an order that is not _already_ sorted by
+     * row indices first */
     for (k = 0; k < size; k += 2) {
         for (l = 0; l < size; l ++) {
             igraph_sparsemat_entry(&spmat, k, l, 100);
+        }
+    }
+    for (k = 0; k < size; k += 2) {
+        for (l = 0; l < size; l ++) {
             igraph_sparsemat_entry(&spmat, k, l, k * size + l);
         }
     }

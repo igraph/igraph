@@ -19,8 +19,13 @@
 <!-- doxrox-include igraph_bliss_info_t -->
 <!-- doxrox-include igraph_canonical_permutation -->
 <!-- doxrox-include igraph_isomorphic_bliss -->
-<!-- doxrox-include igraph_automorphisms -->
+<!-- doxrox-include igraph_count_automorphisms -->
 <!-- doxrox-include igraph_automorphism_group -->
+
+<section id="bliss-algorithm-deprecated"><title>Deprecated aliases</title>
+<!-- doxrox-include igraph_automorphisms -->
+</section>
+
 </section>
 
 <section id="vf2-algorithm"><title>The VF2 algorithm</title>
@@ -28,13 +33,19 @@
 <!-- doxrox-include igraph_isomorphic_vf2 -->
 <!-- doxrox-include igraph_count_isomorphisms_vf2 -->
 <!-- doxrox-include igraph_get_isomorphisms_vf2 -->
+<!-- doxrox-include igraph_get_isomorphisms_vf2_callback -->
 <!-- doxrox-include igraph_isohandler_t -->
 <!-- doxrox-include igraph_isocompat_t -->
-<!-- doxrox-include igraph_isomorphic_function_vf2 -->
 <!-- doxrox-include igraph_subisomorphic_vf2 -->
 <!-- doxrox-include igraph_count_subisomorphisms_vf2 -->
 <!-- doxrox-include igraph_get_subisomorphisms_vf2 -->
+<!-- doxrox-include igraph_get_subisomorphisms_vf2_callback -->
+
+<section id="vf2-algorithm-deprecated"><title>Deprecated aliases</title>
+<!-- doxrox-include igraph_isomorphic_function_vf2 -->
 <!-- doxrox-include igraph_subisomorphic_function_vf2 -->
+</section>
+
 </section>
 
 <section id="lad-algorithm"><title>The LAD algorithm</title>
@@ -42,16 +53,20 @@
 <!-- doxrox-include igraph_subisomorphic_lad -->
 </section>
 
-<section id="functions-for-graphs-with-3-or-4-vertices"><title>Functions for graphs with 3 or 4 vertices</title>
-<!-- doxrox-include igraph_isomorphic_34 -->
+<section id="functions-for-graphs-with-3-or-4-vertices"><title>Functions for small graphs</title>
 <!-- doxrox-include igraph_isoclass -->
 <!-- doxrox-include igraph_isoclass_subgraph -->
 <!-- doxrox-include igraph_isoclass_create -->
+<!-- doxrox-include igraph_graph_count -->
 </section>
 
 <section id="isomorphism-utility-functions"><title>Utility functions</title>
 <!-- doxrox-include igraph_permute_vertices -->
 <!-- doxrox-include igraph_simplify_and_colorize -->
+</section>
+
+<section id="isomorphism-deprecated-functions"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_isomorphic_34 -->
 </section>
 
 </chapter>

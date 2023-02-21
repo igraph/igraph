@@ -1,0 +1,26 @@
+matrix multiplication, A={{1,2},{3,4}} B ={{5,6},{7,8}}
+19 22
+43 50
+transpose a first
+26 30
+38 44
+transpose b first
+17 23
+39 53
+transpose both matrices first
+23 31
+34 46
+multiply by 0.5
+ 9.5 11
+21.5 25
+multiply by 1.5 by using previous result
+28.5 33
+64.5 75
+matrix multiplication, A={{1,2},{3,4}} B={{5,6,7},{8,9,10}}
+21 24 27
+47 54 61
+matrix multiplication, A={{5,8},{6,9},{7,10}} B={{1,2},{3,4}}
+29 42
+33 48
+37 54
+check error when matrix sizes don't match

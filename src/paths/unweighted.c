@@ -29,18 +29,190 @@
 
 /**
  * \ingroup structural
- * \function igraph_shortest_paths
- * \brief The length of the shortest paths between vertices.
+ * \function igraph_distances_cutoff
+ * \brief Length of the shortest paths between vertices, with cutoff.
+ *
+ * \experimental
+ *
+ * This function is similar to \ref igraph_distances(), but
+ * paths longer than \p cutoff will not be considered.
  *
  * \param graph The graph object.
  * \param res The result of the calculation, a matrix. A pointer to an
  *        initialized matrix, to be more precise. The matrix will be
  *        resized if needed. It will have the same
- *        number of rows as the length of the \c from
+ *        number of rows as the length of the \p from
  *        argument, and its number of columns is the number of
- *        vertices in the \c to argument. One row of the matrix shows the
- *        distances from/to a given vertex to the ones in \c to.
- *        For the unreachable vertices IGRAPH_INFINITY is returned.
+ *        vertices in the \p to argument. One row of the matrix shows the
+ *        distances from/to a given vertex to the ones in \p to.
+ *        For the unreachable vertices \c IGRAPH_INFINITY is returned.
+ * \param from The source vertices._d
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
+ * \param mode The type of shortest paths to be used for the
+ *        calculation in directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the lengths of the outgoing paths are calculated.
+ *        \cli IGRAPH_IN
+ *          the lengths of the incoming paths are calculated.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an undirected one for
+ *          the computation.
+ *        \endclist
+ * \param cutoff The maximal length of paths that will be considered.
+ *    When the distance of two vertices is greater than this value,
+ *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs are
+ *    treated as infinity.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary
+ *           data.
+ *        \cli IGRAPH_EINVVID
+ *           invalid vertex ID passed.
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *
+ * Time complexity: O(s |E| + |V|), where s is the number of source vertices to use,
+ * and |V| and |E| are the number of vertices and edges in the graph.
+ *
+ * \sa  \ref igraph_distances_dijkstra_cutoff() for the weighted version with non-negative
+ * weights.
+ *
+ * \example examples/simple/distances.c
+ */
+igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igraph_matrix_t *res,
+                          const igraph_vs_t from, const igraph_vs_t to,
+                          igraph_neimode_t mode, igraph_real_t cutoff) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_from, no_of_to;
+    igraph_integer_t *already_counted;
+    igraph_adjlist_t adjlist;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
+    igraph_vector_int_t *neis;
+    igraph_bool_t all_to;
+
+    igraph_integer_t i, j;
+    igraph_vit_t fromvit, tovit;
+    igraph_vector_int_t indexv;
+
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
+        mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
+    }
+
+    IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
+    no_of_from = IGRAPH_VIT_SIZE(fromvit);
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+    already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    IGRAPH_CHECK_OOM(already_counted, "Insufficient memory for graph distance calculation.");
+    IGRAPH_FINALLY(igraph_free, already_counted);
+
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
+
+    all_to = igraph_vs_is_all(&to);
+    if (all_to) {
+        no_of_to = no_of_nodes;
+    } else {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&indexv, no_of_nodes);
+        IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
+        IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
+        no_of_to = IGRAPH_VIT_SIZE(tovit);
+        for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
+            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
+            if (VECTOR(indexv)[v]) {
+                IGRAPH_ERROR("Target vertex list must not have any duplicates.",
+                             IGRAPH_EINVAL);
+            }
+            VECTOR(indexv)[v] = ++i;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
+    igraph_matrix_fill(res, IGRAPH_INFINITY);
+
+    for (IGRAPH_VIT_RESET(fromvit), i = 0;
+         !IGRAPH_VIT_END(fromvit);
+         IGRAPH_VIT_NEXT(fromvit), i++) {
+        igraph_integer_t reached = 0;
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, IGRAPH_VIT_GET(fromvit)));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
+        already_counted[ IGRAPH_VIT_GET(fromvit) ] = i + 1;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        while (!igraph_dqueue_int_empty(&q)) {
+            igraph_integer_t act = igraph_dqueue_int_pop(&q);
+            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+
+            if (cutoff >= 0 && actdist > cutoff) {
+                continue;
+            }
+
+            if (all_to) {
+                MATRIX(*res, i, act) = actdist;
+            } else {
+                if (VECTOR(indexv)[act]) {
+                    MATRIX(*res, i, VECTOR(indexv)[act] - 1) = actdist;
+                    reached++;
+                    if (reached == no_of_to) {
+                        igraph_dqueue_int_clear(&q);
+                        break;
+                    }
+                }
+            }
+
+            neis = igraph_adjlist_get(&adjlist, act);
+            igraph_integer_t nei_count = igraph_vector_int_size(neis);
+            for (j = 0; j < nei_count; j++) {
+                igraph_integer_t neighbor = VECTOR(*neis)[j];
+                if (already_counted[neighbor] == i + 1) {
+                    continue;
+                }
+                already_counted[neighbor] = i + 1;
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
+                IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
+            }
+        }
+    }
+
+    /* Clean */
+    if (!all_to) {
+        igraph_vit_destroy(&tovit);
+        igraph_vector_int_destroy(&indexv);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+
+    IGRAPH_FREE(already_counted);
+    igraph_dqueue_int_destroy(&q);
+    igraph_vit_destroy(&fromvit);
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_distances
+ * \brief Length of the shortest paths between vertices.
+ *
+ * \param graph The graph object.
+ * \param res The result of the calculation, a matrix. A pointer to an
+ *        initialized matrix, to be more precise. The matrix will be
+ *        resized if needed. It will have the same
+ *        number of rows as the length of the \p from
+ *        argument, and its number of columns is the number of
+ *        vertices in the \p to argument. One row of the matrix shows the
+ *        distances from/to a given vertex to the ones in \p to.
+ *        For the unreachable vertices \c IGRAPH_INFINITY is returned.
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
@@ -61,132 +233,40 @@
  *           not enough memory for temporary
  *           data.
  *        \cli IGRAPH_EINVVID
- *           invalid vertex id passed.
+ *           invalid vertex ID passed.
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
  *
  * Time complexity: O(n(|V|+|E|)),
- * n is the
- * number of vertices to calculate, |V| and
- * |E| are the number of vertices and
- * edges in the graph.
+ * n is the number of vertices to calculate,
+ * |V| and |E| are the number of vertices and edges in the graph.
  *
  * \sa \ref igraph_get_shortest_paths() to get the paths themselves,
- * \ref igraph_shortest_paths_dijkstra() for the weighted version.
+ * \ref igraph_distances_dijkstra() for the weighted version with non-negative
+ * weights, \ref igraph_distances_bellman_ford() if you also have negative
+ * weights.
+ *
+ * \example examples/simple/distances.c
  */
-int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
-                          const igraph_vs_t from, const igraph_vs_t to,
-                          igraph_neimode_t mode) {
+igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
+                                const igraph_vs_t from, const igraph_vs_t to,
+                                igraph_neimode_t mode) {
+    return igraph_distances_cutoff(graph, res, from, to, mode, -1);
+}
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_from, no_of_to;
-    long int *already_counted;
-    igraph_adjlist_t adjlist;
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
-    igraph_vector_int_t *neis;
-    igraph_bool_t all_to;
-
-    long int i, j;
-    igraph_vit_t fromvit, tovit;
-    igraph_real_t my_infinity = IGRAPH_INFINITY;
-    igraph_vector_t indexv;
-
-    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
-        mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
-    }
-
-    IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
-    no_of_from = IGRAPH_VIT_SIZE(fromvit);
-
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-
-    already_counted = IGRAPH_CALLOC(no_of_nodes, long int);
-    if (already_counted == 0) {
-        IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, already_counted);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
-
-    all_to = igraph_vs_is_all(&to);
-    if (all_to) {
-        no_of_to = no_of_nodes;
-    } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
-        IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
-        IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
-        no_of_to = IGRAPH_VIT_SIZE(tovit);
-        for (i = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
-            long int v = IGRAPH_VIT_GET(tovit);
-            if (VECTOR(indexv)[v]) {
-                IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed",
-                             IGRAPH_EINVAL);
-            }
-            VECTOR(indexv)[v] = ++i;
-        }
-    }
-
-    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-    igraph_matrix_fill(res, my_infinity);
-
-    for (IGRAPH_VIT_RESET(fromvit), i = 0;
-         !IGRAPH_VIT_END(fromvit);
-         IGRAPH_VIT_NEXT(fromvit), i++) {
-        long int reached = 0;
-        IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(fromvit)));
-        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
-        already_counted[ (long int) IGRAPH_VIT_GET(fromvit) ] = i + 1;
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        while (!igraph_dqueue_empty(&q)) {
-            long int act = (long int) igraph_dqueue_pop(&q);
-            long int actdist = (long int) igraph_dqueue_pop(&q);
-
-            if (all_to) {
-                MATRIX(*res, i, act) = actdist;
-            } else {
-                if (VECTOR(indexv)[act]) {
-                    MATRIX(*res, i, (long int)(VECTOR(indexv)[act] - 1)) = actdist;
-                    reached++;
-                    if (reached == no_of_to) {
-                        igraph_dqueue_clear(&q);
-                        break;
-                    }
-                }
-            }
-
-            neis = igraph_adjlist_get(&adjlist, act);
-            long int nei_count = igraph_vector_int_size(neis);
-            for (j = 0; j < nei_count; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
-                if (already_counted[neighbor] == i + 1) {
-                    continue;
-                }
-                already_counted[neighbor] = i + 1;
-                IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
-            }
-        }
-    }
-
-    /* Clean */
-    if (!all_to) {
-        igraph_vit_destroy(&tovit);
-        igraph_vector_destroy(&indexv);
-        IGRAPH_FINALLY_CLEAN(2);
-    }
-
-    IGRAPH_FREE(already_counted);
-    igraph_dqueue_destroy(&q);
-    igraph_vit_destroy(&fromvit);
-    igraph_adjlist_destroy(&adjlist);
-    IGRAPH_FINALLY_CLEAN(4);
-
-    return 0;
+/**
+ * \function igraph_shortest_paths
+ * \brief Length of the shortest paths between vertices.
+ *
+ * \deprecated-by igraph_distances 0.10.0
+ */
+igraph_error_t igraph_shortest_paths(const igraph_t *graph,
+                                     igraph_matrix_t *res,
+                                     const igraph_vs_t from,
+                                     const igraph_vs_t to,
+                                     igraph_neimode_t mode) {
+    return igraph_distances(graph, res, from, to, mode);
 }
 
 /**
@@ -198,23 +278,17 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  * If there is more than one geodesic between two vertices, this
  * function gives only one of them.
  * \param graph The graph object.
- * \param vertices The result, the ids of the vertices along the paths.
- *        This is a pointer vector, each element points to a vector
- *        object. These should be initialized before passing them to
- *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
- *        the vertices. Supply a null pointer here if you don't need
- *        these vectors.
- * \param edges The result, the ids of the edges along the paths.
- *        This is a pointer vector, each element points to a vector
- *        object. These should be initialized before passing them to
- *        the function, which will properly clear and/or resize them
- *        and fill the ids of the vertices along the geodesics from/to
- *        the vertices. Supply a null pointer here if you don't need
- *        these vectors.
+ * \param vertices The result, the IDs of the vertices along the paths.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
+ * \param edges The result, the IDs of the edges along the paths.
+ *        This is a list of integer vectors where each element is an
+ *        \ref igraph_vector_int_t object. The list will be resized as needed.
+ *        Supply a null pointer here if you don't need these vectors.
  * \param from The id of the vertex from/to which the geodesics are
  *        calculated.
- * \param to Vertex sequence with the ids of the vertices to/from which the
+ * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
  * \param mode The type of shortest paths to be used for the
@@ -228,12 +302,12 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param predecessors A pointer to an initialized igraph vector or null.
- *        If not null, a vector containing the predecessor of each vertex in
+ * \param parents A pointer to an initialized igraph vector or null.
+ *        If not null, a vector containing the parent of each vertex in
  *        the single source shortest path tree is returned here. The
- *        predecessor of vertex i in the tree is the vertex from which vertex i
- *        was reached. The predecessor of the start vertex (in the \c from
- *        argument) is itself by definition. If the predecessor is -1, it means
+ *        parent of vertex i in the tree is the vertex from which vertex i
+ *        was reached. The parent of the start vertex (in the \c from
+ *        argument) is -1. If the parent is -2, it means
  *        that the given vertex was not reached from the source during the
  *        search. Note that the search terminates if all the vertices in
  *        \c to are reached.
@@ -251,8 +325,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *        \cli IGRAPH_ENOMEM
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           \p from is invalid vertex id, or the length of \p to is
- *           not the same as the length of \p res.
+ *           \p from is invalid vertex ID
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
@@ -262,105 +335,104 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  * |E| the number of edges in the
  * graph.
  *
- * \sa \ref igraph_shortest_paths() if you only need the path length but
+ * \sa \ref igraph_distances() if you only need the path lengths but
  * not the paths themselves.
  *
  * \example examples/simple/igraph_get_shortest_paths.c
  */
-int igraph_get_shortest_paths(const igraph_t *graph,
-                              igraph_vector_ptr_t *vertices,
-                              igraph_vector_ptr_t *edges,
+igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
+                              igraph_vector_int_list_t *vertices,
+                              igraph_vector_int_list_t *edges,
                               igraph_integer_t from, const igraph_vs_t to,
                               igraph_neimode_t mode,
-                              igraph_vector_long_t *predecessors,
-                              igraph_vector_long_t *inbound_edges) {
+                              igraph_vector_int_t *parents,
+                              igraph_vector_int_t *inbound_edges) {
 
     /* TODO: use inclist_t if to is long (longer than 1?) */
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int *father;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t *parent_eids;
 
-    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
-    long int i, j, vsize;
-    igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i, j, vsize;
+    igraph_vector_int_t tmp = IGRAPH_VECTOR_NULL;
 
     igraph_vit_t vit;
 
-    long int to_reach;
-    long int reached = 0;
+    igraph_integer_t to_reach;
+    igraph_integer_t reached = 0;
 
     if (from < 0 || from >= no_of_nodes) {
-        IGRAPH_ERROR("cannot get shortest paths", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Vertex index out of range.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-    if (vertices && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(vertices)) {
-        IGRAPH_ERROR("Size of the `vertices' and the `to' should match", IGRAPH_EINVAL);
+    if (vertices) {
+        IGRAPH_CHECK(igraph_vector_int_list_resize(vertices, IGRAPH_VIT_SIZE(vit)));
     }
-    if (edges && IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(edges)) {
-        IGRAPH_ERROR("Size of the `edges' and the `to' should match", IGRAPH_EINVAL);
+    if (edges) {
+        IGRAPH_CHECK(igraph_vector_int_list_resize(edges, IGRAPH_VIT_SIZE(vit)));
     }
 
-    father = IGRAPH_CALLOC(no_of_nodes, long int);
-    if (father == 0) {
-        IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, father);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for shortest path calculation.");
+    IGRAPH_FINALLY(igraph_free, parent_eids);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        if (father[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
-            father[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
+        if (parent_eids[ IGRAPH_VIT_GET(vit) ] == 0) {
+            parent_eids[ IGRAPH_VIT_GET(vit) ] = -1;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
     }
 
-    /* Meaning of father[i]:
+    /* Meaning of parent_eids[i]:
      *
-     * - If father[i] < 0, it means that vertex i has to be reached and has not
+     * - If parent_eids[i] < 0, it means that vertex i has to be reached and has not
      *   been reached yet.
      *
-     * - If father[i] = 0, it means that vertex i does not have to be reached and
+     * - If parent_eids[i] = 0, it means that vertex i does not have to be reached and
      *   it has not been reached yet.
      *
-     * - If father[i] = 1, it means that vertex i is the start vertex.
+     * - If parent_eids[i] = 1, it means that vertex i is the start vertex.
      *
-     * - Otherwise, father[i] is the ID of the edge from which vertex i was
+     * - Otherwise, parent_eids[i] is the ID of the edge from which vertex i was
      *   reached plus 2.
      */
 
-    IGRAPH_CHECK(igraph_dqueue_push(&q, from + 1));
-    if (father[ (long int) from ] < 0) {
+    IGRAPH_CHECK(igraph_dqueue_int_push(&q, from + 1));
+    if (parent_eids[ from ] < 0) {
         reached++;
     }
-    father[ (long int)from ] = 1;
+    parent_eids[ from ] = 1;
 
-    while (!igraph_dqueue_empty(&q) && reached < to_reach) {
-        long int act = (long int) igraph_dqueue_pop(&q) - 1;
+    while (!igraph_dqueue_int_empty(&q) && reached < to_reach) {
+        igraph_integer_t act = igraph_dqueue_int_pop(&q) - 1;
 
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act, mode));
-        vsize = igraph_vector_size(&tmp);
+        IGRAPH_CHECK(igraph_incident(graph, &tmp, act, mode));
+        vsize = igraph_vector_int_size(&tmp);
         for (j = 0; j < vsize; j++) {
-            long int edge = (long int) VECTOR(tmp)[j];
-            long int neighbor = IGRAPH_OTHER(graph, edge, act);
-            if (father[neighbor] > 0) {
+            igraph_integer_t edge = VECTOR(tmp)[j];
+            igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, act);
+            if (parent_eids[neighbor] > 0) {
                 continue;
-            } else if (father[neighbor] < 0) {
+            } else if (parent_eids[neighbor] < 0) {
                 reached++;
             }
-            father[neighbor] = edge + 2;
-            IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor + 1));
+            parent_eids[neighbor] = edge + 2;
+            IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor + 1));
         }
     }
 
@@ -368,35 +440,35 @@ int igraph_get_shortest_paths(const igraph_t *graph,
         IGRAPH_WARNING("Couldn't reach some vertices");
     }
 
-    /* Create `predecessors' if needed */
-    if (predecessors) {
-        IGRAPH_CHECK(igraph_vector_long_resize(predecessors, no_of_nodes));
+    /* Create `parents' if needed */
+    if (parents) {
+        IGRAPH_CHECK(igraph_vector_int_resize(parents, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
-            if (father[i] <= 0) {
+            if (parent_eids[i] <= 0) {
                 /* i was not reached */
-                VECTOR(*predecessors)[i] = -1;
-            } else if (father[i] == 1) {
+                VECTOR(*parents)[i] = -2;
+            } else if (parent_eids[i] == 1) {
                 /* i is the start vertex */
-                VECTOR(*predecessors)[i] = i;
+                VECTOR(*parents)[i] = -1;
             } else {
-                /* i was reached via the edge with ID = father[i] - 2 */
-                VECTOR(*predecessors)[i] = IGRAPH_OTHER(graph, father[i] - 2, i);
+                /* i was reached via the edge with ID = parent_eids[i] - 2 */
+                VECTOR(*parents)[i] = IGRAPH_OTHER(graph, parent_eids[i] - 2, i);
             }
         }
     }
 
     /* Create `inbound_edges' if needed */
     if (inbound_edges) {
-        IGRAPH_CHECK(igraph_vector_long_resize(inbound_edges, no_of_nodes));
+        IGRAPH_CHECK(igraph_vector_int_resize(inbound_edges, no_of_nodes));
 
         for (i = 0; i < no_of_nodes; i++) {
-            if (father[i] <= 1) {
+            if (parent_eids[i] <= 1) {
                 /* i was not reached or i is the start vertex */
                 VECTOR(*inbound_edges)[i] = -1;
             } else {
-                /* i was reached via the edge with ID = father[i] - 2 */
-                VECTOR(*inbound_edges)[i] = father[i] - 2;
+                /* i was reached via the edge with ID = parent_eids[i] - 2 */
+                VECTOR(*inbound_edges)[i] = parent_eids[i] - 2;
             }
         }
     }
@@ -406,39 +478,39 @@ int igraph_get_shortest_paths(const igraph_t *graph,
         for (IGRAPH_VIT_RESET(vit), j = 0;
              !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), j++) {
-            long int node = IGRAPH_VIT_GET(vit);
-            igraph_vector_t *vvec = 0, *evec = 0;
+            igraph_integer_t node = IGRAPH_VIT_GET(vit);
+            igraph_vector_int_t *vvec = 0, *evec = 0;
             if (vertices) {
-                vvec = VECTOR(*vertices)[j];
-                igraph_vector_clear(vvec);
+                vvec = igraph_vector_int_list_get_ptr(vertices, j);
+                igraph_vector_int_clear(vvec);
             }
             if (edges) {
-                evec = VECTOR(*edges)[j];
-                igraph_vector_clear(evec);
+                evec = igraph_vector_int_list_get_ptr(edges, j);
+                igraph_vector_int_clear(evec);
             }
 
             IGRAPH_ALLOW_INTERRUPTION();
 
-            if (father[node] > 0) {
-                long int act = node;
-                long int size = 0;
-                long int edge;
-                while (father[act] > 1) {
+            if (parent_eids[node] > 0) {
+                igraph_integer_t act = node;
+                igraph_integer_t size = 0;
+                igraph_integer_t edge;
+                while (parent_eids[act] > 1) {
                     size++;
-                    edge = father[act] - 2;
+                    edge = parent_eids[act] - 2;
                     act = IGRAPH_OTHER(graph, edge, act);
                 }
                 if (vvec) {
-                    IGRAPH_CHECK(igraph_vector_resize(vvec, size + 1));
+                    IGRAPH_CHECK(igraph_vector_int_resize(vvec, size + 1));
                     VECTOR(*vvec)[size] = node;
                 }
                 if (evec) {
-                    IGRAPH_CHECK(igraph_vector_resize(evec, size));
+                    IGRAPH_CHECK(igraph_vector_int_resize(evec, size));
                 }
                 act = node;
-                while (father[act] > 1) {
+                while (parent_eids[act] > 1) {
                     size--;
-                    edge = father[act] - 2;
+                    edge = parent_eids[act] - 2;
                     act = IGRAPH_OTHER(graph, edge, act);
                     if (vvec) {
                         VECTOR(*vvec)[size] = act;
@@ -452,13 +524,13 @@ int igraph_get_shortest_paths(const igraph_t *graph,
     }
 
     /* Clean */
-    IGRAPH_FREE(father);
-    igraph_dqueue_destroy(&q);
-    igraph_vector_destroy(&tmp);
+    IGRAPH_FREE(parent_eids);
+    igraph_dqueue_int_destroy(&q);
+    igraph_vector_int_destroy(&tmp);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -466,24 +538,25 @@ int igraph_get_shortest_paths(const igraph_t *graph,
  * \brief Shortest path from one vertex to another one.
  *
  * Calculates and returns a single unweighted shortest path from a
- * given vertex to another one. If there are more than one shortest
- * paths between the two vertices, then an arbitrary one is returned.
+ * given vertex to another one. If there is more than one shortest
+ * path between the two vertices, then an arbitrary one is returned.
  *
- * </para><para>This function is a wrapper to \ref
- * igraph_get_shortest_paths(), for the special case when only one
- * target vertex is considered.
+ * </para><para>
+ * This function is a wrapper to \ref igraph_get_shortest_paths()
+ * for the special case when only one target vertex is considered.
+ *
  * \param graph The input graph, it can be directed or
  *        undirected. Directed paths are considered in directed
  *        graphs.
  * \param vertices Pointer to an initialized vector or a null
- *        pointer. If not a null pointer, then the vertex ids along
+ *        pointer. If not a null pointer, then the vertex IDs along
  *        the path are stored here, including the source and target
  *        vertices.
- * \param edges Pointer to an uninitialized vector or a null
- *        pointer. If not a null pointer, then the edge ids along the
+ * \param edges Pointer to an initialized vector or a null
+ *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
+ * \param from The ID of the source vertex.
+ * \param to The ID of the target vertex.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. Valid modes are:
  *        \c IGRAPH_OUT, follows edge directions;
@@ -499,42 +572,44 @@ int igraph_get_shortest_paths(const igraph_t *graph,
  * vertices.
  */
 
-int igraph_get_shortest_path(const igraph_t *graph,
-                             igraph_vector_t *vertices,
-                             igraph_vector_t *edges,
+igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
+                             igraph_vector_int_t *vertices,
+                             igraph_vector_int_t *edges,
                              igraph_integer_t from,
                              igraph_integer_t to,
                              igraph_neimode_t mode) {
 
-    igraph_vector_ptr_t vertices2, *vp = &vertices2;
-    igraph_vector_ptr_t edges2, *ep = &edges2;
+    igraph_vector_int_list_t vertices2, *vp = &vertices2;
+    igraph_vector_int_list_t edges2, *ep = &edges2;
 
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&vertices2, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vertices2);
-        VECTOR(vertices2)[0] = vertices;
+        IGRAPH_CHECK(igraph_vector_int_list_init(&vertices2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &vertices2);
     } else {
-        vp = 0;
+        vp = NULL;
     }
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&edges2, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &edges2);
-        VECTOR(edges2)[0] = edges;
+        IGRAPH_CHECK(igraph_vector_int_list_init(&edges2, 1));
+        IGRAPH_FINALLY(igraph_vector_int_list_destroy, &edges2);
     } else {
-        ep = 0;
+        ep = NULL;
     }
 
     IGRAPH_CHECK(igraph_get_shortest_paths(graph, vp, ep, from,
-                                           igraph_vss_1(to), mode, 0, 0));
+                                           igraph_vss_1(to), mode, NULL, NULL));
 
+    /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the
+       result to the output parameter. */
     if (edges) {
-        igraph_vector_ptr_destroy(&edges2);
+        IGRAPH_CHECK(igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        igraph_vector_ptr_destroy(&vertices2);
+        IGRAPH_CHECK(igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

@@ -116,7 +116,7 @@ static double* extract_smaller(double* begin, double* end, double xmin,
     size_t counter = count_smaller(begin, end, xmin);
     double *p, *result;
 
-    result = calloc(counter, sizeof(double));
+    result = calloc(counter > 0 ? counter : 1, sizeof(double));
     if (result == 0)
         return 0;
 
@@ -350,7 +350,7 @@ static int plfit_i_calculate_p_value_continuous(double* xs, size_t n,
 #endif
 
         /* Allocate memory to sample into */
-        ys = calloc(n, sizeof(double));
+        ys = calloc(n > 0 ? n : 1, sizeof(double));
         if (ys == 0) {
             retval = PLFIT_ENOMEM;
         } else {
@@ -540,7 +540,7 @@ static int plfit_i_continuous_xmin_opt_linear_scan(
                         local_opt_data.last.xmin, local_opt_data.last.D);
 #endif
                 local_best_result = local_opt_data.last;
-                local_best_n = local_opt_data.end - local_opt_data.probes[i] + 1;
+                local_best_n = local_opt_data.end - local_opt_data.probes[i];
             }
         }
 
@@ -583,9 +583,15 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
 
     int success;
     size_t i, best_n, num_uniques = 0;
-    double x, *px, **uniques;
+    double x, *px, **uniques, **strata;
+    int error_code, retval = PLFIT_SUCCESS;
 
     DATA_POINTS_CHECK;
+
+    /* Set up pointers that we will allocate */
+    opt_data.begin = NULL;
+    uniques = NULL;
+    strata = NULL;
 
     /* Sane defaults */
     best_n = n;
@@ -599,8 +605,10 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
     /* Create an array containing pointers to the unique elements of the input. From
      * each block of unique elements, we add the pointer to the first one. */
     uniques = unique_element_pointers(opt_data.begin, opt_data.end, &num_uniques);
-    if (uniques == 0)
+    if (uniques == 0) {
+        free(opt_data.begin);
         PLFIT_ERROR("cannot fit continuous power-law", PLFIT_ENOMEM);
+    }
 
     /* We will now determine the best xmin that yields the lowest D-score. The
      * 'success' variable will denote whether the search procedure we tried was
@@ -634,7 +642,6 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                 const size_t subdivision_length = 10;
                 size_t num_strata = num_uniques / subdivision_length;
                 double **strata = calloc(num_strata, sizeof(double*));
-                int error_code;
 
                 for (i = 0; i < num_strata; i++) {
                     strata[i] = uniques[i * subdivision_length];
@@ -644,8 +651,8 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                 opt_data.num_probes = num_strata;
                 error_code = plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
                 if (error_code != PLFIT_SUCCESS) {
-                    free(strata);
-                    return error_code;
+                    retval = error_code;
+                    goto cleanup;
                 }
 
                 opt_data.num_probes = 0;
@@ -664,14 +671,17 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
                     }
                 }
 
-                free(strata);
+                free(strata); strata = NULL;
+
                 if (opt_data.num_probes > 0) {
                     /* Do a strict linear scan in the subrange determined above */
-                    PLFIT_CHECK(
-                        plfit_i_continuous_xmin_opt_linear_scan(
-                            &opt_data, &best_result, &best_n
-                        )
-                    ); 
+                    error_code = plfit_i_continuous_xmin_opt_linear_scan(
+                        &opt_data, &best_result, &best_n
+                    );
+                    if (error_code) {
+                        retval = error_code;
+                        goto cleanup;
+                    }
                     success = 1;
                 } else {
                     /* This should not happen, but we handle it anyway */
@@ -689,26 +699,47 @@ int plfit_continuous(double* xs, size_t n, const plfit_continuous_options_t* opt
         /* More advanced search methods failed or were skipped; try linear search */
         opt_data.probes = uniques;
         opt_data.num_probes = num_uniques;
-        PLFIT_CHECK(plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n));
+        error_code = plfit_i_continuous_xmin_opt_linear_scan(&opt_data, &best_result, &best_n);
+        if (error_code) {
+            retval = error_code;
+            goto cleanup;
+        }
         success = 1;
     }
 
     /* Get rid of the uniques array, we don't need it any more */
-    free(uniques);
+    free(uniques); uniques = NULL;
 
     /* Sort out the result */
     *result = best_result;
     if (options->finite_size_correction)
         plfit_i_perform_finite_size_correction(result, best_n);
 
-    PLFIT_CHECK(plfit_log_likelihood_continuous(opt_data.begin + n - best_n, best_n,
-            result->alpha, result->xmin, &result->L));
-    PLFIT_CHECK(plfit_i_calculate_p_value_continuous(opt_data.begin, n, options, 0, result));
+    error_code = plfit_log_likelihood_continuous(
+        opt_data.begin + n - best_n, best_n, result->alpha, result->xmin,
+        &result->L
+    );
+    if (error_code) {
+        retval = error_code;
+        goto cleanup;
+    }
 
-    /* Get rid of the copied data as well */
+    error_code = plfit_i_calculate_p_value_continuous(opt_data.begin, n, options, 0, result);
+    if (error_code) {
+        retval = error_code;
+        goto cleanup;
+    }
+
+cleanup:
+    if (strata) {
+        free(strata);
+    }
+    if (uniques) {
+        free(uniques);
+    }
     free(opt_data.begin);
 
-    return PLFIT_SUCCESS;
+    return retval;
 }
 
 /********** Discrete power law distribution fitting **********/
@@ -1040,7 +1071,7 @@ static int plfit_i_calculate_p_value_discrete(double* xs, size_t n,
 #endif
 
         /* Allocate memory to sample into */
-        ys = calloc(n, sizeof(double));
+        ys = calloc(n > 0 ? n : 1, sizeof(double));
         if (ys == 0) {
             retval = PLFIT_ENOMEM;
         } else {
@@ -1220,7 +1251,7 @@ int plfit_discrete(double* xs, size_t n, const plfit_discrete_options_t* options
     if (options->finite_size_correction)
         plfit_i_perform_finite_size_correction(result, best_n);
 
-    PLFIT_CHECK(plfit_log_likelihood_discrete(xs_copy+(n-best_n), best_n,
+    PLFIT_CHECK(plfit_log_likelihood_discrete(xs_copy + n - best_n, best_n,
                 result->alpha, result->xmin, &result->L));
     PLFIT_CHECK(plfit_i_calculate_p_value_discrete(xs_copy, n, options, 0, result));
 

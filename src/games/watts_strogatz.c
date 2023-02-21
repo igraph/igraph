@@ -43,8 +43,7 @@
  * \param dim The dimension of the lattice.
  * \param size The size of the lattice along each dimension.
  * \param nei The size of the neighborhood for each vertex. This is
- *    the same as the \p nei argument of \ref
- *    igraph_connect_neighborhood().
+ *    the same as the \p nei argument of \ref igraph_connect_neighborhood().
  * \param p The rewiring probability. A real number between zero and
  *   one (inclusive).
  * \param loops Logical, whether to generate loop edges.
@@ -52,7 +51,7 @@
  *   generated graph.
  * \return Error code.
  *
- * \sa \ref igraph_lattice(), \ref igraph_connect_neighborhood() and
+ * \sa \ref igraph_square_lattice(), \ref igraph_connect_neighborhood() and
  * \ref igraph_rewire_edges() can be used if more flexibility is
  * needed, e.g. a different type of lattice.
  *
@@ -60,13 +59,13 @@
  * vertices and edges, d is the average degree, o is the \p nei
  * argument.
  */
-int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
+igraph_error_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                                igraph_integer_t size, igraph_integer_t nei,
                                igraph_real_t p, igraph_bool_t loops,
                                igraph_bool_t multiple) {
 
-    igraph_vector_t dimvector;
-    long int i;
+    igraph_vector_int_t dimvector;
+    igraph_vector_bool_t periodic;
 
     if (dim < 1) {
         IGRAPH_ERROR("WS game: dimension should be at least one", IGRAPH_EINVAL);
@@ -82,15 +81,18 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 
     /* Create the lattice first */
 
-    IGRAPH_VECTOR_INIT_FINALLY(&dimvector, dim);
-    for (i = 0; i < dim; i++) {
-        VECTOR(dimvector)[i] = size;
-    }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dimvector, dim);
+    igraph_vector_int_fill(&dimvector, size);
 
-    IGRAPH_CHECK(igraph_lattice(graph, &dimvector, nei, IGRAPH_UNDIRECTED,
-                                0 /* mutual */, 1 /* circular */));
-    igraph_vector_destroy(&dimvector);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&periodic, dim);
+    igraph_vector_bool_fill(&periodic, true);
+
+    IGRAPH_CHECK(igraph_square_lattice(graph, &dimvector, nei, IGRAPH_UNDIRECTED,
+                                /* mutual */ false, &periodic));
+
+    igraph_vector_bool_destroy(&periodic);
+    igraph_vector_int_destroy(&dimvector);
+    IGRAPH_FINALLY_CLEAN(2);
     IGRAPH_FINALLY(igraph_destroy, graph);
 
     /* Rewire the edges then */
@@ -98,5 +100,5 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
     IGRAPH_CHECK(igraph_rewire_edges(graph, p, loops, multiple));
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

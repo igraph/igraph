@@ -26,16 +26,22 @@
 #include "igraph_interface.h"
 
 #include "io/dl-header.h"
+#include "io/parsers/dl-parser.h"
 
 int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
                                 void* scanner);
-void igraph_dl_yylex_destroy (void *scanner );
+int igraph_dl_yylex_destroy (void *scanner );
 int igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
 void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
 
+/* for IGRAPH_FINALLY, which assumes that destructor functions return void */
+void igraph_dl_yylex_destroy_wrapper (void *scanner ) {
+    (void) igraph_dl_yylex_destroy(scanner);
+}
+
 /**
  * \function igraph_read_graph_dl
- * \brief Read a file in the DL format of UCINET
+ * \brief Reads a file in the DL format of UCINET.
  *
  * This is a simple textual file format used by UCINET. See
  * http://www.analytictech.com/networks/dataentry.htm for
@@ -58,11 +64,10 @@ void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
  * \example examples/simple/igraph_read_graph_dl.c
  */
 
-int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                          igraph_bool_t directed) {
 
-    int i;
-    long int n, n2;
+    igraph_integer_t n, n2;
     const igraph_strvector_t *namevec = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
@@ -75,32 +80,53 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     context.n = -1;
     context.from = 0;
     context.to = 0;
+    context.errmsg[0] = '\0';
+    context.igraph_errno = IGRAPH_SUCCESS;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&context.edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&context.edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&context.weights, 0);
     IGRAPH_CHECK(igraph_strvector_init(&context.labels, 0));
     IGRAPH_FINALLY(igraph_strvector_destroy, &context.labels);
     IGRAPH_TRIE_INIT_FINALLY(&context.trie, /*names=*/ 1);
 
     igraph_dl_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_dl_yylex_destroy, context.scanner);
+    IGRAPH_FINALLY(igraph_dl_yylex_destroy_wrapper, context.scanner);
 
     igraph_dl_yyset_in(instream, context.scanner);
 
-    i = igraph_dl_yyparse(&context);
-    if (i != 0) {
+    /* Use ENTER/EXIT to avoid destroying context.scanner before this function returns */
+    IGRAPH_FINALLY_ENTER();
+    int err = igraph_dl_yyparse(&context);
+    IGRAPH_FINALLY_EXIT();
+    switch (err) {
+    case 0: /* success */
+        break;
+    case 1: /* parse error */
         if (context.errmsg[0] != 0) {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
+        } else if (context.igraph_errno != IGRAPH_SUCCESS) {
+            IGRAPH_ERROR("", context.igraph_errno);
         } else {
-            IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
+            IGRAPH_ERROR("Cannot read DL file.", IGRAPH_PARSEERROR);
         }
+        break;
+    case 2: /* out of memory */
+        IGRAPH_ERROR("Cannot read DL file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        break;
+    default: /* must never reach here */
+        /* Hint: This will usually be triggered if an IGRAPH_CHECK() is used in a Bison
+         * action instead of an IGRAPH_YY_CHECK(), resulting in an igraph errno being
+         * returned in place of a Bison error code.
+         * TODO: What if future Bison versions introduce error codes other than 0, 1 and 2?
+         */
+        IGRAPH_FATALF("Parser returned unexpected error code (%d) when reading DL file.", err);
     }
 
     /* Extend the weight vector, if needed */
     n = igraph_vector_size(&context.weights);
-    n2 = igraph_vector_size(&context.edges) / 2;
+    n2 = igraph_vector_int_size(&context.edges) / 2;
     if (n != 0) {
-        igraph_vector_resize(&context.weights, n2);
+        IGRAPH_CHECK(igraph_vector_resize(&context.weights, n2));
         for (; n < n2; n++) {
             VECTOR(context.weights)[n] = IGRAPH_NAN;
         }
@@ -108,7 +134,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     /* Check number of vertices */
     if (n2 > 0) {
-        n = (long int) igraph_vector_max(&context.edges);
+        n = igraph_vector_int_max(&context.edges);
     } else {
         n = 0;
     }
@@ -117,15 +143,13 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         context.n = n;
     }
 
-    /* OK, everything is ready, create the graph */
-    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
-    IGRAPH_FINALLY(igraph_destroy, graph);
+    /* Prepare attributes */
 
     /* Labels */
     if (igraph_strvector_size(&context.labels) != 0) {
         namevec = (const igraph_strvector_t*) &context.labels;
     } else if (igraph_trie_size(&context.trie) != 0) {
-        igraph_trie_getkeys(&context.trie, &namevec);
+        namevec = igraph_i_trie_borrow_keys(&context.trie);
     }
     if (namevec) {
         IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
@@ -148,7 +172,10 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         VECTOR(weight)[0] = &weightrec;
     }
 
-    IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) context.n, pname));
+    /* Create graph */
+    IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+    IGRAPH_FINALLY(igraph_destroy, graph);
+    IGRAPH_CHECK(igraph_add_vertices(graph, context.n, pname));
     IGRAPH_CHECK(igraph_add_edges(graph, &context.edges, pweight));
 
     if (pweight) {
@@ -166,10 +193,10 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     igraph_trie_destroy(&context.trie);
     igraph_strvector_destroy(&context.labels);
-    igraph_vector_destroy(&context.edges);
+    igraph_vector_int_destroy(&context.edges);
     igraph_vector_destroy(&context.weights);
     igraph_dl_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(5);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

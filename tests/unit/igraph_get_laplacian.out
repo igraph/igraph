@@ -1,0 +1,113 @@
+=== normalization: none, unweighted, undirected
+ 2 -1  0  0 -1 0
+-1  3 -2  0  0 0
+ 0 -2  3 -1  0 0
+ 0  0 -1  3 -2 0
+-1  0  0 -2  3 0
+ 0  0  0  0  0 0
+=== normalization: none, unweighted, directed
+ 1 -1  0  0  0 0
+ 0  2 -2  0  0 0
+ 0  0  1 -1  0 0
+ 0  0  0  2 -2 0
+-1  0  0  0  1 0
+ 0  0  0  0  0 0
+=== normalization: none, weighted, undirected
+ 6 -1  0  0 -5 0
+-1  6 -5  0  0 0
+ 0 -5  8 -3  0 0
+ 0  0 -3 10 -7 0
+-5  0  0 -7 12 0
+ 0  0  0  0  0 0
+=== normalization: none, weighted, directed
+ 1 -1  0  0  0 0
+ 0  5 -5  0  0 0
+ 0  0  3 -3  0 0
+ 0  0  0  7 -7 0
+-5  0  0  0  5 0
+ 0  0  0  0  0 0
+=== normalization: symmetric, unweighted, undirected
+        1 -0.316228         0         0 -0.408248 0
+-0.316228       0.6      -0.4         0         0 0
+        0      -0.4       0.6 -0.258199         0 0
+        0         0 -0.258199         1 -0.666667 0
+-0.408248         0         0 -0.666667         1 0
+        0         0         0         0         0 0
+=== normalization: symmetric, unweighted, directed
+ 1 -0.57735         0    0        0 0
+ 0 0.666667 -0.816497    0        0 0
+ 0        0       0.5 -0.5        0 0
+ 0        0         0    1 -1.41421 0
+-1        0         0    0        1 0
+ 0        0         0    0        0 0
+=== normalization: symmetric, weighted, undirected
+        1 -0.129099         0         0 -0.589256 0
+-0.129099       0.6 -0.456435         0         0 0
+        0 -0.456435  0.666667 -0.273861         0 0
+        0         0 -0.273861         1  -0.63901 0
+-0.589256         0         0  -0.63901         1 0
+        0         0         0         0         0 0
+=== normalization: symmetric, weighted, directed
+       1 -0.377964         0         0        0 0
+       0  0.714286 -0.845154         0        0 0
+       0         0       0.6 -0.507093        0 0
+       0         0         0         1 -1.18322 0
+-2.23607         0         0         0        1 0
+       0         0         0         0        0 0
+=== normalization: left, unweighted, undirected
+        1 -0.5         0         0      -0.5 0
+     -0.2  0.6      -0.4         0         0 0
+        0 -0.4       0.6      -0.2         0 0
+        0    0 -0.333333         1 -0.666667 0
+-0.333333    0         0 -0.666667         1 0
+        0    0         0         0         0 0
+=== normalization: left, unweighted, directed
+ 1       -1         0    0  0 0
+ 0 0.666667 -0.666667    0  0 0
+ 0        0       0.5 -0.5  0 0
+ 0        0         0    1 -1 0
+-1        0         0    0  1 0
+ 0        0         0    0  0 0
+=== normalization: left, weighted, undirected
+        1 -0.166667        0         0 -0.833333 0
+     -0.1       0.6     -0.5         0         0 0
+        0 -0.416667 0.666667     -0.25         0 0
+        0         0     -0.3         1      -0.7 0
+-0.416667         0        0 -0.583333         1 0
+        0         0        0         0         0 0
+=== normalization: left, weighted, directed
+ 1       -1         0    0  0 0
+ 0 0.714286 -0.714286    0  0 0
+ 0        0       0.6 -0.6  0 0
+ 0        0         0    1 -1 0
+-1        0         0    0  1 0
+ 0        0         0    0  0 0
+=== normalization: right, unweighted, undirected
+   1 -0.2    0         0 -0.333333 0
+-0.5  0.6 -0.4         0         0 0
+   0 -0.4  0.6 -0.333333         0 0
+   0    0 -0.2         1 -0.666667 0
+-0.5    0    0 -0.666667         1 0
+   0    0    0         0         0 0
+=== normalization: right, unweighted, directed
+ 1 -0.333333   0    0  0 0
+ 0  0.666667  -1    0  0 0
+ 0         0 0.5 -0.5  0 0
+ 0         0   0    1 -2 0
+-1         0   0    0  1 0
+ 0         0   0    0  0 0
+=== normalization: right, weighted, undirected
+        1 -0.1         0    0 -0.416667 0
+-0.166667  0.6 -0.416667    0         0 0
+        0 -0.5  0.666667 -0.3         0 0
+        0    0     -0.25    1 -0.583333 0
+-0.833333    0         0 -0.7         1 0
+        0    0         0    0         0 0
+=== normalization: right, weighted, directed
+ 1 -0.142857   0         0    0 0
+ 0  0.714286  -1         0    0 0
+ 0         0 0.6 -0.428571    0 0
+ 0         0   0         1 -1.4 0
+-5         0   0         0    1 0
+ 0         0   0         0    0 0
+Check errors for zero out/in and non-zero in/out degree.

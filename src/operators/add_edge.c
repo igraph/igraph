@@ -48,17 +48,16 @@
  * Time complexity: O(|V|+|E|), the number of edges plus the number of
  * vertices.
  */
-int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to) {
-    igraph_vector_t edges;
-    int ret;
+igraph_error_t igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to) {
+    igraph_vector_int_t edges;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2);
 
     VECTOR(edges)[0] = from;
     VECTOR(edges)[1] = to;
-    IGRAPH_CHECK(ret = igraph_add_edges(graph, &edges, 0));
+    IGRAPH_CHECK(igraph_add_edges(graph, &edges, 0));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return ret;
+    return IGRAPH_SUCCESS;
 }

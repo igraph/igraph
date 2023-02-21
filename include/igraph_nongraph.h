@@ -25,12 +25,27 @@
 #define IGRAPH_NONGRAPH_H
 
 #include "igraph_decls.h"
-#include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_matrix.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
 __BEGIN_DECLS
+
+/**
+ * \def IGRAPH_SHORTEST_PATH_EPSILON
+ *
+ * Relative error threshold used in weighted shortest path calculations
+ * to decide whether two shortest paths are of equal length.
+ */
+#define IGRAPH_SHORTEST_PATH_EPSILON 1e-10
+
+typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var,
+        const igraph_vector_t *par,
+        void* extra);
+typedef void igraph_vector_function_t(const igraph_vector_t *var,
+                                      const igraph_vector_t *par,
+                                      igraph_vector_t* res, void* extra);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
@@ -38,7 +53,7 @@ __BEGIN_DECLS
 
 /**
  * \struct igraph_plfit_result_t
- * \brief Result of fitting a power-law distribution to a vector
+ * \brief Result of fitting a power-law distribution to a vector.
  *
  * This data structure contains the result of \ref igraph_power_law_fit(),
  * which tries to fit a power-law distribution to a vector of numbers. The
@@ -56,36 +71,44 @@ __BEGIN_DECLS
  * \member D     The test statistic of a Kolmogorov-Smirnov test that compares
  *               the fitted distribution with the input vector. Smaller scores
  *               denote better fit.
- * \member p     The p-value of the Kolmogorov-Smirnov test. Small p-values
- *               (less than 0.05) indicate that the test rejected the hypothesis
- *               that the original data could have been drawn from the fitted
- *               power-law distribution.
+ * \member p     The p-value of the Kolmogorov-Smirnov test; \c NaN if it has
+ *               not been calculated yet. Small p-values (less than 0.05)
+ *               indicate that the test rejected the hypothesis that the
+ *               original data could have been drawn from the fitted power-law
+ *               distribution.
+ * \member data  The vector containing the original input data. May not be valid
+ *               any more if the caller already destroyed the vector.
  */
 typedef struct igraph_plfit_result_t {
     igraph_bool_t continuous;
-    double alpha;
-    double xmin;
-    double L;
-    double D;
-    double p;
+    igraph_real_t alpha;
+    igraph_real_t xmin;
+    igraph_real_t L;
+    igraph_real_t D;
+    const igraph_vector_t* data;
 } igraph_plfit_result_t;
 
-IGRAPH_EXPORT int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
+IGRAPH_EXPORT igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
                                       igraph_integer_t binwidth);
-IGRAPH_EXPORT int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+IGRAPH_EXPORT igraph_error_t igraph_random_sample(igraph_vector_int_t *res, igraph_integer_t l, igraph_integer_t h,
                                        igraph_integer_t length);
-IGRAPH_EXPORT int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+IGRAPH_EXPORT igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_int_t *resverts,
                                      igraph_matrix_t *rescoords);
-IGRAPH_EXPORT int igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
-                                igraph_real_t (*f)(igraph_real_t x, void *info),
-                                void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
-IGRAPH_EXPORT int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
-                              igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
-                              int maxit, int trace,
-                              igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
-                              igraph_integer_t *fncount, igraph_integer_t *grcount);
-IGRAPH_EXPORT int igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
-                                       igraph_real_t xmin, igraph_bool_t force_continuous);
+IGRAPH_EXPORT igraph_bool_t igraph_almost_equals(double a, double b, double eps);
+IGRAPH_EXPORT int igraph_cmp_epsilon(double a, double b, double eps);
+
+IGRAPH_EXPORT igraph_error_t igraph_power_law_fit(
+    const igraph_vector_t* vector, igraph_plfit_result_t* result,
+    igraph_real_t xmin, igraph_bool_t force_continuous
+);
+IGRAPH_EXPORT igraph_error_t igraph_plfit_result_calculate_p_value(
+    const igraph_plfit_result_t* model, igraph_real_t* result, igraph_real_t precision
+);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_zeroin(
+    igraph_real_t *ax, igraph_real_t *bx, igraph_real_t (*f)(igraph_real_t x, void *info),
+    void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res
+);
 
 __END_DECLS
 

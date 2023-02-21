@@ -23,7 +23,6 @@
 
 #include "gengraph_definitions.h"
 #include "gengraph_degree_sequence.h"
-#include "gengraph_qsort.h"
 
 #include <assert.h>
 #include "gengraph_random.h"
@@ -38,28 +37,28 @@ private:
     // Random generator
     KW_RNG::RNG rng;
     // Number of vertices
-    int n;
+    igraph_integer_t n;
     //Number of arcs ( = #edges * 2 )
-    int a;
+    igraph_integer_t a;
     // The degree sequence of the graph
-    int *deg;
+    igraph_integer_t *deg;
     // The array containing all links
-    int *links;
+    igraph_integer_t *links;
     // The array containing pointers to adjacency list of every vertices
-    int **neigh;
+    igraph_integer_t **neigh;
     // Allocate memory according to degree_sequence (for constructor use only!!)
     void alloc(degree_sequence &);
     // Compute #edges
     inline void refresh_nbarcs() {
         a = 0;
-        for (int* d = deg + n; d != deg; ) {
+        for (igraph_integer_t* d = deg + n; d != deg; ) {
             a += *(--d);
         }
     }
     // Build neigh with deg and links
     void compute_neigh();
     // Swap edges. The swap MUST be valid !!!
-    inline void swap_edges(int from1, int to1, int from2, int to2) {
+    inline void swap_edges(igraph_integer_t from1, igraph_integer_t to1, igraph_integer_t from2, igraph_integer_t to2) {
         fast_rpl(neigh[from1], to1, to2);
         fast_rpl(neigh[from2], to2, to1);
         fast_rpl(neigh[to1], from1, from2);
@@ -67,103 +66,86 @@ private:
     }
 
     // Swap edges only if they are simple. return false if unsuccessful.
-    bool swap_edges_simple(int, int, int, int);
+    bool swap_edges_simple(igraph_integer_t, igraph_integer_t, igraph_integer_t, igraph_integer_t);
     // Test if vertex is in an isolated component of size<K
-    bool isolated(int v, int K, int *Kbuff, bool *visited);
+    bool isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited);
     // Pick random edge, and gives a corresponding vertex
-    inline int pick_random_vertex() {
+    inline igraph_integer_t pick_random_vertex() {
         return links[my_random() % a];
     };
     // Pick random neighbour
-    inline int* random_neighbour(const int v) {
+    inline igraph_integer_t* random_neighbour(const igraph_integer_t v) {
         return neigh[v] + (my_random() % deg[v]);
     };
     // Returns complexity of isolation test
-    long effective_isolated(int v, int K, int *Kbuff, bool *visited);
+    igraph_integer_t effective_isolated(igraph_integer_t v, igraph_integer_t K, igraph_integer_t *Kbuff, bool *visited);
     // Depth-Exploration. Returns number of steps done. Stops when encounter vertex of degree > dmax.
-    void depth_isolated(int v, long &calls, int &left_to_explore, int dmax, int * &Kbuff, bool *visited);
+    void depth_isolated(igraph_integer_t v, igraph_integer_t &calls, igraph_integer_t &left_to_explore, igraph_integer_t dmax, igraph_integer_t * &Kbuff, bool *visited);
     // breadth-first search. Store the distance (modulo 3)  in dist[]. Returns eplorated component size.
-    int width_search(unsigned char *dist, int *buff, int v0 = 0, int toclear = -1);
+    igraph_integer_t width_search(unsigned char *dist, igraph_integer_t *buff, igraph_integer_t v0 = 0, igraph_integer_t toclear = -1);
     // depth-first search.
-    int depth_search(bool *visited, int *buff, int v0 = 0);
+    igraph_integer_t depth_search(bool *visited, igraph_integer_t *buff, igraph_integer_t v0 = 0);
     // breadth-first search that count the number of shortest paths going from src to each vertex
-    int breadth_path_search(int src, int *buff, double *paths, unsigned char *dist);
-    // Used by traceroute_sample() ONLY
-    void add_traceroute_edge(int, int, int*, double** red = NULL, double t = 1.0);
-    // Used by traceroute() and betweenness(). if newdeg[]=NULL, do not discover edges.
-    // breadth_path_search() must have been called to give the corresponding buff[],dist[],paths[] and nb_vertices
-    void explore_usp(double *target, int nb_vertices, int *buff, double *paths, unsigned char *dist, int *newdeg = NULL, double **edge_redudancy = NULL);
-    void explore_asp(double *target, int nb_vertices, int *buff, double *paths, unsigned char *dist, int *newdeg = NULL, double **edge_redudancy = NULL);
-    void explore_rsp(double *target, int nb_vertices, int *buff, double *paths, unsigned char *dist, int *newdeg = NULL, double **edge_redudancy = NULL);
+    igraph_integer_t breadth_path_search(igraph_integer_t src, igraph_integer_t *buff, double *paths, unsigned char *dist);
     // Return component indexes where vertices belong to, starting from 0,
     // sorted by size (biggest component has index 0)
-    int *components(int *comp = NULL);
-    // pick k random vertices of degree > 0.
-    int *pick_random_vertices(int &k, int *output = NULL, int nb_v = -1, int *among = NULL);
+    igraph_integer_t *components(igraph_integer_t *comp = NULL);
 
 public:
     // neigh[]
-    inline int** neighbors() {
+    inline igraph_integer_t** neighbors() {
         return neigh;
     };
     // deg[]
-    inline int* degrees() {
+    inline igraph_integer_t* degrees() {
         return deg;
     };
     //adjacency list of v
-    inline int* operator[](const int v) {
+    inline igraph_integer_t* operator[](const igraph_integer_t v) {
         return neigh[v];
     };
     //degree of v
-    inline int degree(const int v) {
+    inline igraph_integer_t degree(const igraph_integer_t v) {
         return deg[v];
-    };
-    //compare adjacency lists
-    inline int compare(const int v, const int w) {
-        return deg[v] == deg[w] ? lex_comp(neigh[v], neigh[w], deg[v]) : (deg[v] > deg[w] ? -1 : 1);
     };
     // Detach deg[] and neigh[]
     void detach();
     // Destroy deg and links
     ~graph_molloy_opt();
     // Create graph from file (stdin not supported unless rewind() possible)
-    graph_molloy_opt(FILE *f);
+    //graph_molloy_opt(FILE *f);
     // Allocate memory for the graph. Create deg and links. No edge is created.
     graph_molloy_opt(degree_sequence &);
     // Create graph from hard copy
-    graph_molloy_opt(int *);
+    graph_molloy_opt(igraph_integer_t *);
     // Create hard copy of graph
-    int *hard_copy();
+    igraph_integer_t *hard_copy();
     // Remove unused edges, updates neigh[], recreate links[]
     void clean();
     // nb arcs
-    inline int nbarcs() {
+    inline igraph_integer_t nbarcs() {
         return a;
     };
     // last degree
-    inline int last_degree() {
+    inline igraph_integer_t last_degree() {
         return deg[n - 1];
     };
     // nb vertices
-    inline int nbvertices() {
+    inline igraph_integer_t nbvertices() {
         return n;
     };
     // nb vertices having degree > 0
-    inline int nbvertices_real() {
-        int s = 0;
-        for (int *d = deg + n; d-- != deg; ) if (*d) {
+    inline igraph_integer_t nbvertices_real() {
+        igraph_integer_t s = 0;
+        for (igraph_integer_t *d = deg + n; d-- != deg; ) {
+            if (*d) {
                 s++;
             }
+        }
         return s;
     };
     // return list of vertices with degree > 0. Compute #vertices, if not given.
-    int *vertices_real(int &nb_v);
-    // Keep only giant component
-    void giant_comp();
-    // nb vertices in giant component
-    int nbvertices_comp();
-    // nb arcs in giant component
-    int nbarcs_comp();
+    igraph_integer_t *vertices_real(igraph_integer_t &nb_v);
     // print graph in SUCC_LIST mode, in stdout
     void print(FILE *f = stdout, bool NOZERO = true);
     // Bind the graph avoiding multiple edges or self-edges (return false if fail)
@@ -173,72 +155,35 @@ public:
     // Test if graph is connected
     bool is_connected();
     // Maximum degree
-    int max_degree();
-    // breadth-first search. Store the distance (modulo 3)  in dist[].
-    void breadth_search(int *dist, int v0 = 0, int* buff = NULL);
+    igraph_integer_t max_degree();
     // is edge ?
-    inline bool is_edge(const int u, const int v) {
+    inline bool is_edge(const igraph_integer_t u, const igraph_integer_t v) {
         if (deg[v] < deg[u]) {
             return (fast_search(neigh[v], deg[v], u) != NULL);
         } else {
             return (fast_search(neigh[u], deg[u], v) != NULL);
         }
     }
-    // Backup graph [sizeof(int) bytes per edge]
-    int* backup(int *here = NULL);
+    // Backup graph [sizeof(igraph_integer_t) bytes per edge]
+    igraph_integer_t* backup(igraph_integer_t *here = NULL);
     // Restore from backup. Assume that degrees haven't changed
-    void restore(int* back);
+    void restore(igraph_integer_t* back);
     // Resplace with hard backup.
-    void replace(int* _hardbackup);
+    void replace(igraph_integer_t* _hardbackup);
     // Backup degs of graph
-    int* backup_degs(int *here = NULL);
+    igraph_integer_t* backup_degs(igraph_integer_t *here = NULL);
     // Restore degs from neigh[]. Need last degree, though
-    void restore_degs(int last_degree);
+    void restore_degs(igraph_integer_t last_degree);
     // Restore degs[] from backup. Assume that links[] has only been permuted
-    void restore_degs_only(int* backup_degs);
+    void restore_degs_only(igraph_integer_t* backup_degs);
     // Restore degs[] and neigh[]. Assume that links[] has only been permuted
-    void restore_degs_and_neigh(int* backup_degs);
-// WARNING : the following shuffle() algorithms are slow.
-// Use graph_molloy_hash::connected_shuffle() instead.
-    // "Fab" Shuffle (Optimized heuristic of Gkantsidis algo.)
-    long fab_connected_shuffle(long);
-    // "Optimized-Fab" Shuffle (Optimized heuristic of Gkantsidis algo, with isolated pairs)
-    long opt_fab_connected_shuffle(long);
-    // Gkantsidis Shuffle
-    long gkantsidis_connected_shuffle(long);
-    // Connected Shuffle
-    long slow_connected_shuffle(long);
-    // shortest paths where vertex is an extremity
-    double *vertex_betweenness(int mode, bool trivial_path = false);
-    // Sample the graph with traceroute-like exploration from src[] to dst[].
-    // if dst[]=NULL, pick nb_dst new random destinations for each src
-    double traceroute_sample(int mode, int nb_src, int *src, int nb_dst, int* dst, double *redudancy = NULL, double **edge_redudancy = NULL);
-    // does one breadth-first search and returns the average_distance.
-    double avg_dist(unsigned char *dist, int *buff, int v0, int &nb_vertices, int toclear = -1);
-    // Number of edges needed to disconnect graph (one random instance)
-    int disconnecting_edges();
-    // Compute vertex covering of the graph. Warning : this modifies degs[]
-    void vertex_covering();
-    // Path sampling. Input is nb_dst[] and dst[]. nb_dst[v],dst[v] describe all paths (v,x)
-    double path_sampling(int *nb_dst, int *dst = NULL, double *redudancies = NULL, double **edge_redudancy = NULL);
-    // keep only core (tree parts are deleted). Returns number of removed vertices.
-    int core();
-    // try to disconnect the graph by swapping edges (with isolation tests)
-    int try_disconnect(int K, int max_tries = 10000000);
-    // Eric & Cun-Hui estimator
-    double rho(int mode, int nb_src, int *src, int nb_dst, int *dst = NULL);
+    void restore_degs_and_neigh(igraph_integer_t* backup_degs);
     // sort adjacency lists
     void sort();
-    // sort the vertices according to their degrees (highest first) and to their adjacency lists (lexicographic)
-    int* sort_vertices(int *buff = NULL);
     // count cycles passing through vertex v
-    int cycles(int v);
+    //int cycles(int v);
     // remove vertex (i.e. remove all edges adjacent to vertex)
-    void remove_vertex(int v);
-    // pick k random vertices of degree > 0. If k \in [0,1[, k is understood as a density.
-    int *pick_random_src(double k, int *nb = NULL, int* buff = NULL, int nb_v = -1, int* among = NULL);
-    // pick k random vertices of degree > 0. If k \in [0,1], k is understood as a density.
-    int *pick_random_dst(double k, int *nb = NULL, int* buff = NULL, int nb_v = -1, int* among = NULL);
+    //void remove_vertex(int v);
 
     // For debug purposes : verify validity of the graph (symetry, simplicity)
 #define VERIFY_NORMAL  0

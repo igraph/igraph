@@ -3,7 +3,7 @@
 #include "bench.h"
 
 void rand_weight_vec(igraph_vector_t *vec, const igraph_t *graph) {
-    long i, n = igraph_ecount(graph);
+    igraph_integer_t i, n = igraph_ecount(graph);
     igraph_vector_resize(vec, n);
     for (i=0; i < n; ++i) {
         VECTOR(*vec)[i] = RNG_UNIF(1, 10);
@@ -13,7 +13,7 @@ void rand_weight_vec(igraph_vector_t *vec, const igraph_t *graph) {
 #define TOSTR1(x) #x
 #define TOSTR(x) TOSTR1(x)
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_vector_t betweenness, weight;
 

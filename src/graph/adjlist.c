@@ -33,17 +33,34 @@
 /**
  * Helper function that simplifies a sorted adjacency vector by removing
  * duplicate elements and optionally self-loops.
+ *
+ * has_loops and has_multiple are pointers to booleans that will be updated
+ * to \c true if the function \em finds a loop or a multiple edge. These values will
+ * \em never be set back to zero by this function. The usage pattern for these
+ * arguments is that the caller should set them to zero, followed by one or
+ * multiple calls to this function; at the end of such a sequence the booleans
+ * will contain whether the function found at least one loop or multiple edge
+ * in the set of vertices that were investigated.
+ *
+ * Note the usage of the word "found" -- it might be the case that the
+ * function is not interested in loop or multiple edges due to how it is
+ * parameterized; in this case, we don't spend extra time in investigating the
+ * existence of loop or multiple edges, so the values of the has_loops and
+ * has_multiple arguments will stay as is. Therefore, upon exiting the
+ * function, finding \c false in one of these variables does \em not mean that
+ * there is no loop or multiple edge, only that the function hasn't found one.
  */
-static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
-    igraph_loops_t loops, igraph_multiple_t multiple
+    igraph_loops_t loops, igraph_multiple_t multiple, igraph_bool_t *has_loops,
+    igraph_bool_t *has_multiple
 );
 
 /**
  * Helper function that removes loops from an incidence vector (either both
  * occurrences or only one of them).
  */
-static int igraph_i_remove_loops_from_incidence_vector_in_place(
+static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
     igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
 );
 
@@ -99,77 +116,121 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
  * adjacency list contains the state of the graph at the time of its
  * initialization.
  *
+ * </para><para>
+ * This function returns each neighbor list in sorted order, just
+ * like \ref igraph_neighbors().
+ *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE or setting \p multiple to a
+ * different value from \c IGRAPH_MULTIPLE.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
- * \param mode Constant specifying whether outgoing
- *   (<code>IGRAPH_OUT</code>), incoming (<code>IGRAPH_IN</code>),
- *   or both (<code>IGRAPH_ALL</code>) types of neighbors to include
- *   in the adjacency list. It is ignored for undirected networks.
- * \param loops Specifies how to treat loop edges. <code>IGRAPH_NO_LOOPS</code>
- *   removes loop edges from the adjacency list. <code>IGRAPH_LOOPS_ONCE</code>
+ * \param mode Constant specifying whether to include only outgoing
+ *   (\c IGRAPH_OUT), only incoming (\c IGRAPH_IN),
+ *   or both (\c IGRAPH_ALL) types of neighbors
+ *   in the adjacency list. It is ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *   removes loop edges from the adjacency list. \c IGRAPH_LOOPS_ONCE
  *   makes each loop edge appear only once in the adjacency list of the
- *   corresponding vertex. <code>IGRAPH_LOOPS_TWICE</code> makes loop edges
+ *   corresponding vertex. \c IGRAPH_LOOPS_TWICE makes loop edges
  *   appear \em twice in the adjacency list of the corresponding vertex,
- *   but only if the graph is undirected or <code>mode</code> is set to
- *   <code>IGRAPH_ALL</code>.
+ *   but only if the graph is undirected or \p mode is set to
+ *   \c IGRAPH_ALL.
  * \param multiple Specifies how to treat multiple (parallel) edges.
- *   <code>IGRAPH_NO_MULTIPLE</code> collapses parallel edges into a single one;
- *   <code>IGRAPH_MULTIPLE</code> keeps the multiplicities of parallel edges
+ *   \c IGRAPH_NO_MULTIPLE collapses parallel edges into a single one;
+ *   \c IGRAPH_MULTIPLE keeps the multiplicities of parallel edges
  *   so the same vertex will appear as many times in the adjacency list of
  *   another vertex as the number of parallel edges going between the two
  *   vertices.
  * \return Error code.
  *
+ * \sa \ref igraph_neighbors() for getting the neighbor lists of individual
+ * vertices.
+ *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
 
-int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
+igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_neimode_t mode, igraph_loops_t loops,
                         igraph_multiple_t multiple) {
-    igraph_integer_t i;
-    igraph_vector_t tmp;
-    int j, n;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t degrees;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannot create adjacency list view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Cannot create adjacency list view.", IGRAPH_EINVMODE);
     }
-
-    igraph_vector_init(&tmp, 0);
-    IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
-    al->length = igraph_vcount(graph);
-    al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create adjacency list view", IGRAPH_ENOMEM);
-    }
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+    /* igraph_degree() is fast when loops=true */
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, /* loops= */ true));
 
+    al->length = no_of_nodes;
+    al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating adjacency list view.");
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
-    for (i = 0; i < al->length; i++) {
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, i, mode));
-
-        n = igraph_vector_size(&tmp);
-        IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
-        for (j = 0; j < n; j++) {
-            VECTOR(al->adjs[i])[j] = VECTOR(tmp)[j];
-        }
-
-        IGRAPH_CHECK(igraph_i_simplify_sorted_int_adjacency_vector_in_place(
-            &al->adjs[i], i, mode, loops, multiple
-        ));
+    /* if we already know there are no multi-edges, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        multiple = IGRAPH_MULTIPLE;
     }
 
-    igraph_vector_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(2);
+    /* if we already know there are no loops, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        if (mode == IGRAPH_ALL) {
+            loops = IGRAPH_LOOPS_TWICE;
+        } else {
+            loops = IGRAPH_LOOPS_ONCE;
+        }
+    }
 
-    return 0;
+    igraph_bool_t has_loops = false;
+    igraph_bool_t has_multiple = false;
+    for (igraph_integer_t i = 0; i < al->length; i++) {
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], VECTOR(degrees)[i]));
+        IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
+
+        /* Attention: This function will only set values for has_loops and has_multiple
+         * if it finds loops/multi-edges. Otherwise they are left at their original value. */
+        IGRAPH_CHECK(igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+            &al->adjs[i], i, mode, loops, multiple, &has_loops, &has_multiple
+        ));
+    }
+    if (has_loops) {
+        /* If we have found at least one loop above, set the cache to true */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, true);
+    } else if (loops == IGRAPH_NO_LOOPS) {
+        /* If we explicitly _checked_ for loops (to remove them) and haven't
+         * found one, set the cache to false. This is the only case when a
+         * definite "no" from has_loops really means that there are no loops at
+         * all */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+    }
+    if (has_multiple) {
+        /* If we have found at least one multiedge above, set the cache to true */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, true);
+    } else if (multiple == IGRAPH_NO_MULTIPLE) {
+        /* If we explicitly _checked_ for multi-edges (to remove them) and
+         * haven't found one, set the cache to false. This is the only case
+         * when a definite "no" from has_multiple really means that there are
+         * no multi-edges at all all */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
+    }
+
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(2); /* + igraph_adjlist_destroy */
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -179,28 +240,27 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  * Creates a list of vectors, one for each vertex. This is useful when you
  * are \em constructing a graph using an adjacency list representation as
  * it does not require your graph to exist yet.
+ *
  * \param no_of_nodes The number of vertices
  * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
  * \return Error code.
  *
  * Time complexity: O(|V|), linear in the number of vertices.
  */
-int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
-    long int i;
+igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes) {
 
     al->length = no_of_nodes;
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
-    }
-
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating adjlist.");
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
-    for (i = 0; i < al->length; i++) {
+
+    for (igraph_integer_t i = 0; i < al->length; i++) {
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], 0));
     }
+
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -211,28 +271,34 @@ int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes
  * of the input graph. In the complementer graph all edges are present
  * which are not present in the original graph. Multiple edges in the
  * input graph are ignored.
+ *
+ * </para><para>
+ * This function returns each neighbor list in sorted order.
+ *
  * \param graph The input graph.
  * \param al Pointer to a not yet initialized adjacency list.
  * \param mode Constant specifying whether outgoing
- *   (<code>IGRAPH_OUT</code>), incoming (<code>IGRAPH_IN</code>),
- *   or both (<code>IGRAPH_ALL</code>) types of neighbors (in the
+ *   (\c IGRAPH_OUT), incoming (\c IGRAPH_IN),
+ *   or both (\c IGRAPH_ALL) types of neighbors (in the
  *   complementer graph) to include in the adjacency list. It is
  *   ignored for undirected networks.
  * \param loops Whether to consider loop edges.
  * \return Error code.
  *
+ * \sa \ref igraph_adjlist_init(), \ref igraph_complementer()
+ *
  * Time complexity: O(|V|^2+|E|), quadratic in the number of vertices.
  */
-int igraph_adjlist_init_complementer(const igraph_t *graph,
+igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                      igraph_adjlist_t *al,
                                      igraph_neimode_t mode,
                                      igraph_bool_t loops) {
-    igraph_integer_t i, j, k, n;
-    igraph_bool_t* seen;
-    igraph_vector_t vec;
+
+    igraph_vector_bool_t seen;
+    igraph_vector_int_t neis;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid neighbor mode specified for complementer adjlist view.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
@@ -241,48 +307,114 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 
     al->length = igraph_vcount(graph);
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t);
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
-    }
-
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating complementer adjlist view.");
     IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
-    n = al->length;
-    seen = IGRAPH_CALLOC(n, igraph_bool_t);
-    if (seen == 0) {
-        IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, seen);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, al->length);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+    for (igraph_integer_t i = 0; i < al->length; i++) {
+        /* For each vertex, we mark neighbors within the 'seen' bool vector.
+         * Then we iterate over 'seen' and record non-marked vertices in
+         * the adjacency list. */
 
-    for (i = 0; i < al->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        igraph_neighbors(graph, &vec, i, mode);
-        memset(seen, 0, sizeof(igraph_bool_t) * (unsigned) al->length);
-        n = al->length;
+
+        /* Reset neighbor counter and 'seen' vector. */
+        igraph_vector_bool_null(&seen);
+        igraph_integer_t n = al->length;
+
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, mode));
+
         if (!loops) {
-            seen[i] = 1;
+            VECTOR(seen)[i] = true;
             n--;
         }
-        for (j = 0; j < igraph_vector_size(&vec); j++) {
-            if (! seen [ (long int) VECTOR(vec)[j] ] ) {
+
+        igraph_integer_t neis_size = igraph_vector_int_size(&neis);
+        for (igraph_integer_t j = 0; j < neis_size; j++) {
+            if (! VECTOR(seen)[ VECTOR(neis)[j] ] ) {
                 n--;
-                seen[ (long int) VECTOR(vec)[j] ] = 1;
+                VECTOR(seen)[ VECTOR(neis)[j] ] = true;
             }
         }
+
+        /* Produce "non-neighbor" list in sorted order. */
         IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
-        for (j = 0, k = 0; k < n; j++) {
-            if (!seen[j]) {
+        for (igraph_integer_t j = 0, k = 0; k < n; j++) {
+            if (!VECTOR(seen)[j]) {
                 VECTOR(al->adjs[i])[k++] = j;
             }
         }
     }
 
-    IGRAPH_FREE(seen);
-    igraph_vector_destroy(&vec);
-    IGRAPH_FINALLY_CLEAN(3);
-    return 0;
+    igraph_vector_bool_destroy(&seen);
+    igraph_vector_int_destroy(&neis);
+    IGRAPH_FINALLY_CLEAN(3); /* +1 for the adjlist itself */
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_adjlist_init_from_inclist
+ * \brief Constructs an adjacency list of vertices from an incidence list.
+ *
+ * In some algorithms it is useful to have an adjacency list \em and an incidence
+ * list representation of the same graph, and in many cases it is the most useful
+ * if they are consistent with each other, i.e. if can be guaranteed that the
+ * vertex ID in the i-th entry of the adjacency list of vertex v is the
+ * \em other endpoint of the edge in the i-th entry of the incidence list of the
+ * same vertex. This function creates such an adjacency list from the corresponding
+ * incidence list by looking up the endpoints of each edge in the incidence
+ * list and constructing the corresponding adjacenecy vectors.
+ *
+ * </para><para>
+ * The adjacency list is independent of the graph or the incidence list after
+ * creation; in other words, modifications that are made to the graph or the
+ * incidence list are not reflected in the adjacency list.
+ *
+ * \param graph The input graph.
+ * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
+ * \param il Pointer to an \em initialized <type>igraph_inclist_t</type> object
+ *        that will be converted into an adjacency list.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
+igraph_error_t igraph_adjlist_init_from_inclist(
+    const igraph_t *graph, igraph_adjlist_t *al, const igraph_inclist_t *il) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, j, num_neis;
+
+    igraph_vector_int_t *neis;
+    igraph_vector_int_t *incs;
+
+    if (igraph_inclist_size(il) != no_of_nodes) {
+        IGRAPH_ERRORF(
+            "Incidence list has %" IGRAPH_PRId " entries but the graph has %" IGRAPH_PRId " vertices.",
+            IGRAPH_EINVAL,
+            igraph_inclist_size(il),
+            no_of_nodes
+        );
+    }
+
+    IGRAPH_CHECK(igraph_adjlist_init_empty(al, no_of_nodes));
+    for (i = 0; i < no_of_nodes; i++) {
+        neis = igraph_adjlist_get(al, i);
+        incs = igraph_inclist_get(il, i);
+
+        num_neis = igraph_vector_int_size(incs);
+        IGRAPH_CHECK(igraph_vector_int_resize(neis, num_neis));
+
+        for (j = 0; j < num_neis; j++) {
+            VECTOR(*neis)[j] = IGRAPH_OTHER(graph, VECTOR(*incs)[j], i);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -295,8 +427,10 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
  * Time complexity: depends on memory management.
  */
 void igraph_adjlist_destroy(igraph_adjlist_t *al) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < al->length; i++) {
+        /* This works if some igraph_vector_int_t's contain NULL,
+           because igraph_vector_int_destroy can handle this. */
         igraph_vector_int_destroy(&al->adjs[i]);
     }
     IGRAPH_FREE(al->adjs);
@@ -311,7 +445,7 @@ void igraph_adjlist_destroy(igraph_adjlist_t *al) {
  * the total number of elements in the adjacency list.
  */
 void igraph_adjlist_clear(igraph_adjlist_t *al) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < al->length; i++) {
         igraph_vector_int_clear(&al->adjs[i]);
     }
@@ -334,14 +468,19 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
  * \function igraph_adjlist_sort
  * \brief Sorts each vector in an adjacency list.
  *
- * Sorts every vector of the adjacency list.
+ * Sorts every vector of the adjacency list. Note that
+ * \ref igraph_adjlist_init() already produces sorted neighbor lists.
+ * This function is useful when the adjacency list is produced in
+ * a different manner, or is modified in a way that does not preserve
+ * the sorted order.
+ *
  * \param al The adjacency list.
  *
  * Time complexity: O(n log n), n is the total number of elements in
  * the adjacency list.
  */
 void igraph_adjlist_sort(igraph_adjlist_t *al) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < al->length; i++) {
         igraph_vector_int_sort(&al->adjs[i]);
     }
@@ -353,24 +492,28 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
  *
  * Simplifies an adjacency list, i.e. removes loop and multiple edges.
  *
+ * </para><para>
+ * When the adjacency list is created with \ref igraph_adjlist_init(),
+ * use the \c loops and \c multiple parameters of that function instead.
+ *
  * \param al The adjacency list.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of edges and
  * vertices.
  */
-int igraph_adjlist_simplify(igraph_adjlist_t *al) {
-    long int i;
-    long int n = al->length;
+igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     igraph_vector_int_t mark;
-    igraph_vector_int_init(&mark, n);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mark, n);
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
-        long int j, l = igraph_vector_int_size(v);
+        igraph_integer_t j, l = igraph_vector_int_size(v);
         VECTOR(mark)[i] = i + 1;
         for (j = 0; j < l; /* nothing */) {
-            long int e = (long int) VECTOR(*v)[j];
+            igraph_integer_t e = VECTOR(*v)[j];
             if (VECTOR(mark)[e] != i + 1) {
                 VECTOR(mark)[e] = i + 1;
                 j++;
@@ -384,74 +527,40 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al) {
 
     igraph_vector_int_destroy(&mark);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
-}
-
-int igraph_adjlist_remove_duplicate(const igraph_t *graph,
-                                    igraph_adjlist_t *al) {
-    long int i, j, l, n, p;
-    igraph_vector_int_t *v;
-
-    IGRAPH_WARNING(
-        "igraph_adjlist_remove_duplicate() is deprecated; use the constructor "
-        "arguments of igraph_adjlist_init() to specify whether you want loop "
-        "edges to appear once or twice in the adjacency list."
-    );
-
-    IGRAPH_UNUSED(graph);
-
-    n = al->length;
-    for (i = 0; i < n; i++) {
-        v = &al->adjs[i];
-        l = igraph_vector_int_size(v);
-        if (l > 0) {
-            p = 1;
-            for (j = 1; j < l; j++) {
-                long int e = (long int) VECTOR(*v)[j];
-                /* Non-loop edges, and one end of loop edges are fine. */
-                /* We assume that the vector is sorted and we also keep it sorted */
-                if (e != i || VECTOR(*v)[j - 1] != e) {
-                    VECTOR(*v)[p++] = e;
-                }
-            }
-            igraph_vector_int_resize(v, p);
-        }
-    }
-
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #ifndef USING_R
-int igraph_adjlist_print(const igraph_adjlist_t *al) {
-    long int i;
-    long int n = al->length;
+igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al) {
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_vector_int_print(v);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
-int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
-    long int i;
-    long int n = al->length;
+igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->adjs[i];
         igraph_vector_int_fprint(v, outfile);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 #define ADJLIST_CANON_EDGE(from, to, directed) \
     do {                     \
         igraph_integer_t temp;         \
-        if((!directed) && from < to) {     \
+        if ((!directed) && from < to) {     \
             temp = to;               \
             to = from;               \
             from = temp;             \
         }                      \
-    } while(0);
+    } while (0);
 
 igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed) {
     igraph_vector_int_t* fromvec;
@@ -461,40 +570,52 @@ igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t fro
 
 }
 
-int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
+igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
     igraph_vector_int_t *oldfromvec, *newfromvec;
-    int err1, err2;
-    long int oldpos, newpos;
+    igraph_bool_t found_old, found_new;
+    igraph_integer_t oldpos, newpos;
     igraph_integer_t oldfrom = from, newfrom = from;
+
     ADJLIST_CANON_EDGE(oldfrom, oldto, directed);
     ADJLIST_CANON_EDGE(newfrom, newto, directed);
 
     oldfromvec = igraph_adjlist_get(al, oldfrom);
     newfromvec = igraph_adjlist_get(al, newfrom);
 
-
-    err1 = igraph_vector_int_binsearch(oldfromvec, oldto, &oldpos);
-    err2 = igraph_vector_int_binsearch(newfromvec, newto, &newpos);
-
     /* oldfrom -> oldto should exist; newfrom -> newto should not. */
-    if ((!err1) || err2) {
-        return 1;
+    found_old = igraph_vector_int_binsearch(oldfromvec, oldto, &oldpos);
+    if (! found_old) {
+        IGRAPH_ERROR("Edge to replace does not exist.", IGRAPH_EINVAL);
+    }
+    found_new = igraph_vector_int_binsearch(newfromvec, newto, &newpos);
+    if (found_new) {
+        IGRAPH_ERROR("New edge already exists.", IGRAPH_EINVAL);
     }
 
-    igraph_vector_int_remove(oldfromvec, oldpos);
-    if (oldfromvec == newfromvec && oldpos < newpos) {
-        --newpos;
+    if (oldfromvec != newfromvec) {
+        /* grow the new vector first and then remove the item from the old one
+         * to ensure that we don't end up in a situation where the removal
+         * succeeds but the addition does not */
+        IGRAPH_CHECK(igraph_vector_int_insert(newfromvec, newpos, newto));
+        igraph_vector_int_remove(oldfromvec, oldpos);
+    } else {
+        /* moving item within the same vector; here we can safely remove first
+         * and insert afterwards because there is no need to re-allocate memory */
+        igraph_vector_int_remove(oldfromvec, oldpos);
+        if (oldpos < newpos) {
+            --newpos;
+        }
+        IGRAPH_CHECK(igraph_vector_int_insert(newfromvec, newpos, newto));
     }
-    IGRAPH_CHECK(igraph_vector_int_insert(newfromvec, newpos, newto));
 
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
-static int igraph_i_remove_loops_from_incidence_vector_in_place(
+static igraph_error_t igraph_i_remove_loops_from_incidence_vector_in_place(
     igraph_vector_int_t *v, const igraph_t *graph, igraph_loops_t loops
 ) {
-    long int i, length, eid, write_ptr;
+    igraph_integer_t i, length, eid, write_ptr;
     igraph_vector_int_t *seen_loops = 0;
 
     /* In this function we make use of the fact that we are dealing with
@@ -561,49 +682,26 @@ static int igraph_i_remove_loops_from_incidence_vector_in_place(
     return IGRAPH_SUCCESS;
 }
 
-int igraph_inclist_remove_duplicate(const igraph_t *graph, igraph_inclist_t *il) {
-    long int i, n;
-
-    IGRAPH_WARNING(
-        "igraph_inclist_remove_duplicate() is deprecated; use the constructor "
-        "arguments of igraph_inclist_init() to specify whether you want loop "
-        "edges to appear once or twice in the incidence list."
-    );
-
-    IGRAPH_UNUSED(graph);
-
-    n = il->length;
-    for (i = 0; i < n; i++) {
-        IGRAPH_CHECK(
-            igraph_i_remove_loops_from_incidence_vector_in_place(
-                &il->incs[i], graph, IGRAPH_LOOPS_ONCE
-            )
-        );
-    }
-
-    return 0;
-}
-
 #ifndef USING_R
-int igraph_inclist_print(const igraph_inclist_t *al) {
-    long int i;
-    long int n = al->length;
+igraph_error_t igraph_inclist_print(const igraph_inclist_t *al) {
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->incs[i];
         igraph_vector_int_print(v);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 #endif
 
-int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
-    long int i;
-    long int n = al->length;
+igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
+    igraph_integer_t i;
+    igraph_integer_t n = al->length;
     for (i = 0; i < n; i++) {
         igraph_vector_int_t *v = &al->incs[i];
         igraph_vector_int_fprint(v, outfile);
     }
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -625,6 +723,10 @@ int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
  * argument to control whether this will be the case (\c IGRAPH_LOOPS_TWICE )
  * or not (\c IGRAPH_LOOPS_ONCE or \c IGRAPH_NO_LOOPS).
  *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE.
+ *
  * \param graph The input graph.
  * \param il Pointer to an uninitialized incidence list.
  * \param mode Constant specifying whether incoming edges
@@ -643,44 +745,37 @@ int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
-int igraph_inclist_init(const igraph_t *graph,
+igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_inclist_t *il,
                         igraph_neimode_t mode,
                         igraph_loops_t loops) {
-    igraph_integer_t i;
-    igraph_vector_t tmp;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t degrees;
 
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_EINVMODE);
     }
-
-    igraph_vector_init(&tmp, 0);
-    IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
     }
 
-    il->length = igraph_vcount(graph);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+    /* igraph_degrees() is fast when loops=true */
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), mode, /* loops= */ 1));
+
+    il->length = no_of_nodes;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create incidence list view.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
-    for (i = 0; i < il->length; i++) {
-        int j, n;
-
+    for (igraph_integer_t i = 0; i < il->length; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
 
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, i, mode));
-
-        n = igraph_vector_size(&tmp);
-        IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], n));
-
-        for (j = 0; j < n; j++) {
-            VECTOR(il->incs[i])[j] = VECTOR(tmp)[j];
-        }
+        IGRAPH_CHECK(igraph_vector_int_init(&il->incs[i], VECTOR(degrees)[i]));
+        IGRAPH_CHECK(igraph_incident(graph, &il->incs[i], i, mode));
 
         if (loops != IGRAPH_LOOPS_TWICE) {
             IGRAPH_CHECK(
@@ -689,9 +784,10 @@ int igraph_inclist_init(const igraph_t *graph,
         }
     }
 
-    igraph_vector_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+    igraph_vector_int_destroy(&degrees);
+    IGRAPH_FINALLY_CLEAN(2); /* + igraph_inclist_destroy */
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -709,13 +805,13 @@ int igraph_inclist_init(const igraph_t *graph,
  * Time complexity: O(|V|), linear in the number of vertices.
  */
 
-int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
-    long int i;
+igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
+    igraph_integer_t i;
 
     il->length = n;
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t);
     if (il->incs == 0) {
-        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     IGRAPH_FINALLY(igraph_inclist_destroy, il);
@@ -724,7 +820,7 @@ int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -737,10 +833,10 @@ int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
  */
 
 void igraph_inclist_destroy(igraph_inclist_t *il) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < il->length; i++) {
-        /* This works if some igraph_vector_int_t's are 0,
-           because igraph_vector_destroy can handle this. */
+        /* This works if some igraph_vector_int_t's contain NULL,
+           because igraph_vector_int_destroy can handle this. */
         igraph_vector_int_destroy(&il->incs[i]);
     }
     IGRAPH_FREE(il->incs);
@@ -756,7 +852,7 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
  * the total number of elements in the incidence list.
  */
 void igraph_inclist_clear(igraph_inclist_t *il) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < il->length; i++) {
         igraph_vector_int_clear(&il->incs[i]);
     }
@@ -775,12 +871,22 @@ igraph_integer_t igraph_inclist_size(const igraph_inclist_t *il) {
     return il->length;
 }
 
-static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
+/* See the prototype above for a description of this function. */
+static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     igraph_vector_int_t *v, igraph_integer_t index, igraph_neimode_t mode,
-    igraph_loops_t loops, igraph_multiple_t multiple
+    igraph_loops_t loops, igraph_multiple_t multiple, igraph_bool_t *has_loops,
+    igraph_bool_t *has_multiple
+
 ) {
-    long int i, p = 0;
-    long int n = igraph_vector_int_size(v);
+    igraph_bool_t dummy1, dummy2;
+    if (has_loops == NULL) {
+        has_loops = &dummy1;
+    }
+    if (has_multiple == NULL) {
+        has_multiple = &dummy2;
+    }
+    igraph_integer_t i, p = 0;
+    igraph_integer_t n = igraph_vector_int_size(v);
 
     if (
         multiple == IGRAPH_MULTIPLE &&
@@ -801,6 +907,12 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                     (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i])) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
+                } else {
+                    if (VECTOR(*v)[i] == index) {
+                        *has_loops = true;
+                    } else if (i != n - 1 && VECTOR(*v)[i + 1] == VECTOR(*v)[i]) {
+                        *has_multiple = true;
+                    }
                 }
             }
         } else {
@@ -809,6 +921,8 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 if (VECTOR(*v)[i] != index) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
+                } else {
+                    *has_loops = true;
                 }
             }
         }
@@ -816,11 +930,25 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
         if (multiple == IGRAPH_NO_MULTIPLE) {
             /* We need to get rid of multiple edges completely (including
              * multiple loop edges), but keep one edge from each loop edge */
-            /* TODO(ntamas): think this through! */
             for (i = 0; i < n; i++) {
                 if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                     VECTOR(*v)[p] = VECTOR(*v)[i];
                     p++;
+                } else if (
+                        /* If this is not a loop then we have a multigraph.
+                           Else we have at least two loops.
+                           The v vector comes from a call to igraph_neighbors.
+                           This will count loops twice if mode == IGRAPH_ALL.
+                           So if mode != IGRAPH_ALL,
+                           then we have a multigraph.
+                           If mode == IGRAPH_ALL and we have three loops
+                           then we also have a multigraph
+                           */
+                        (VECTOR(*v)[i] != index) ||
+                       (mode != IGRAPH_ALL)  ||
+                       (mode == IGRAPH_ALL && i < n - 2 && VECTOR(*v)[i + 2] == VECTOR(*v)[i])
+                       ){
+                    *has_multiple = true;
                 }
             }
         } else {
@@ -831,6 +959,7 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
             for (i = 0; i < n; i++) {
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 if (VECTOR(*v)[i] == index) {
+                    *has_loops = true;
                     /* this was a loop edge so if the next element is the same, we
                     * need to skip that */
                     if (i < n-1 && VECTOR(*v)[i + 1] == index) {
@@ -843,12 +972,12 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
     } else if (loops == IGRAPH_LOOPS_TWICE && multiple == IGRAPH_NO_MULTIPLE) {
         /* We need to get rid of multiple edges completely (including
          * multiple loop edges), but keep both edge from each loop edge */
-        /* TODO(ntamas): think this through! */
         for (i = 0; i < n; i++) {
             if (i == n - 1 || VECTOR(*v)[i + 1] != VECTOR(*v)[i]) {
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 p++;
             } else {
+                *has_multiple = 1;
                 /* Current item is the same as the next one, but if it is a
                  * loop edge, then the first one or two items are okay. We need
                  * to keep one if mode == IGRAPH_IN or mode == IGRAPH_OUT,
@@ -882,39 +1011,74 @@ static int igraph_i_simplify_sorted_int_adjacency_vector_in_place(
 
 /**
  * \function igraph_lazy_adjlist_init
- * \brief Initialized a lazy adjacency list.
+ * \brief Initializes a lazy adjacency list.
  *
  * Create a lazy adjacency list for vertices. This function only
  * allocates some memory for storing the vectors of an adjacency list,
- * but the neighbor vertices are not queried, only at the \ref
- * igraph_lazy_adjlist_get() calls.
+ * but the neighbor vertices are not queried, only at the
+ * \ref igraph_lazy_adjlist_get() calls. Neighbor lists will be returned
+ * in sorted order.
+ *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE or setting \p multiple to a
+ * different value from \c IGRAPH_MULTIPLE.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized adjacency list object.
- * \param mode Constant, it gives whether incoming edges
- *   (<code>IGRAPH_IN</code>), outgoing edges
- *   (<code>IGRPAH_OUT</code>) or both types of edges
- *   (<code>IGRAPH_ALL</code>) are considered. It is ignored for
- *   undirected graphs.
- * \param simplify Constant, it gives whether to simplify the vectors
- *   in the adjacency list (<code>IGRAPH_SIMPLIFY</code>) or not
- *   (<code>IGRAPH_DONT_SIMPLIFY</code>).
+ * \param mode Constant specifying whether to include only outgoing
+ *   (\c IGRAPH_OUT), only incoming (\c IGRAPH_IN),
+ *   or both (\c IGRAPH_ALL) types of neighbors
+ *   in the adjacency list. It is ignored for undirected graphs.
+ * \param loops Specifies how to treat loop edges. \c IGRAPH_NO_LOOPS
+ *   removes loop edges from the adjacency list. \c IGRAPH_LOOPS_ONCE
+ *   makes each loop edge appear only once in the adjacency list of the
+ *   corresponding vertex. \c IGRAPH_LOOPS_TWICE makes loop edges
+ *   appear \em twice in the adjacency list of the corresponding vertex,
+ *   but only if the graph is undirected or \p mode is set to
+ *   \c IGRAPH_ALL.
+ * \param multiple Specifies how to treat multiple (parallel) edges.
+ *   \c IGRAPH_NO_MULTIPLE collapses parallel edges into a single one;
+ *   \c IGRAPH_MULTIPLE keeps the multiplicities of parallel edges
+ *   so the same vertex will appear as many times in the adjacency list of
+ *   another vertex as the number of parallel edges going between the two
+ *   vertices.
  * \return Error code.
+ *
+ * \sa \ref igraph_neighbors() for getting the neighbor lists of individual
+ * vertices.
  *
  * Time complexity: O(|V|), the number of vertices, possibly, but
  * depends on the underlying memory management too.
  */
 
-int igraph_lazy_adjlist_init(const igraph_t *graph,
+igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                              igraph_lazy_adjlist_t *al,
                              igraph_neimode_t mode,
                              igraph_loops_t loops,
                              igraph_multiple_t multiple) {
     if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Cannor create lazy adjacency list view", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Cannot create lazy adjacency list view.", IGRAPH_EINVMODE);
     }
 
     if (!igraph_is_directed(graph)) {
         mode = IGRAPH_ALL;
+    }
+
+    /* if we already know there are no multi-edges, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        multiple = IGRAPH_MULTIPLE;
+    }
+
+    /* if we already know there are no loops, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        if (mode == IGRAPH_ALL) {
+            loops = IGRAPH_LOOPS_TWICE;
+        } else {
+            loops = IGRAPH_LOOPS_ONCE;
+        }
     }
 
     al->mode = mode;
@@ -924,17 +1088,9 @@ int igraph_lazy_adjlist_init(const igraph_t *graph,
 
     al->length = igraph_vcount(graph);
     al->adjs = IGRAPH_CALLOC(al->length, igraph_vector_int_t*);
+    IGRAPH_CHECK_OOM(al->adjs, "Insufficient memory for creating lazy adjacency list view.");
 
-    if (al->adjs == 0) {
-        IGRAPH_ERROR("Cannot create lazy adjacency list view", IGRAPH_ENOMEM);
-    }
-
-    IGRAPH_FINALLY(igraph_free, al->adjs);
-
-    IGRAPH_CHECK(igraph_vector_init(&al->dummy, 0));
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -949,7 +1105,6 @@ int igraph_lazy_adjlist_init(const igraph_t *graph,
 
 void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
     igraph_lazy_adjlist_clear(al);
-    igraph_vector_destroy(&al->dummy);
     IGRAPH_FREE(al->adjs);
 }
 
@@ -962,7 +1117,7 @@ void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
  * the total number of elements in the adjacency list.
  */
 void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al) {
-    long int i, n = al->length;
+    igraph_integer_t i, n = al->length;
     for (i = 0; i < n; i++) {
         if (al->adjs[i] != 0) {
             igraph_vector_int_destroy(al->adjs[i]);
@@ -984,46 +1139,36 @@ igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al) {
     return al->length;
 }
 
-igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
-        igraph_integer_t pno) {
-    igraph_integer_t no = pno;
-    long int i, n;
-    int ret;
+igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, igraph_integer_t no) {
+    igraph_error_t ret;
 
-    if (al->adjs[no] == 0) {
-        ret = igraph_neighbors(al->graph, &al->dummy, no, al->mode);
-        if (ret != 0) {
-            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
-            return 0;
-        }
-
+    if (al->adjs[no] == NULL) {
         al->adjs[no] = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (al->adjs[no] == 0) {
-            igraph_error("Lazy adjlist failed", IGRAPH_FILE_BASENAME, __LINE__,
-                         IGRAPH_ENOMEM);
-            return 0;
+        if (al->adjs[no] == NULL) {
+            return NULL;
         }
 
-        n = igraph_vector_size(&al->dummy);
-        ret = igraph_vector_int_init(al->adjs[no], n);
-        if (ret != 0) {
+        ret = igraph_vector_int_init(al->adjs[no], 0);
+        if (ret != IGRAPH_SUCCESS) {
             IGRAPH_FREE(al->adjs[no]);
-            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
-            return 0;
+            return NULL;
         }
 
-        for (i = 0; i < n; i++) {
-            VECTOR(*al->adjs[no])[i] = VECTOR(al->dummy)[i];
+        ret = igraph_neighbors(al->graph, al->adjs[no], no, al->mode);
+        if (ret != IGRAPH_SUCCESS) {
+            igraph_vector_int_destroy(al->adjs[no]);
+            IGRAPH_FREE(al->adjs[no]);
+            return NULL;
         }
 
         ret = igraph_i_simplify_sorted_int_adjacency_vector_in_place(
-            al->adjs[no], no, al->mode, al->loops, al->multiple
+            al->adjs[no], no, al->mode, al->loops, al->multiple, NULL,
+            NULL
         );
-        if (ret != 0) {
+        if (ret != IGRAPH_SUCCESS) {
             igraph_vector_int_destroy(al->adjs[no]);
             IGRAPH_FREE(al->adjs[no]);
-            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
-            return 0;
+            return NULL;
         }
     }
 
@@ -1046,6 +1191,10 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
  * and once for the target edge. It also means that the edge IDs of loop edges
  * will appear \em twice for the \em same vertex.
  *
+ * </para><para>
+ * As of igraph 0.10, there is a small performance cost to setting \p loops
+ * to a different value than \c IGRAPH_LOOPS_TWICE.
+ *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized incidence list.
  * \param mode Constant, it gives whether incoming edges
@@ -1066,7 +1215,7 @@ igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
  * also depends on the underlying memory management.
  */
 
-int igraph_lazy_inclist_init(const igraph_t *graph,
+igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
                              igraph_lazy_inclist_t *il,
                              igraph_neimode_t mode,
                              igraph_loops_t loops) {
@@ -1086,15 +1235,10 @@ int igraph_lazy_inclist_init(const igraph_t *graph,
     il->length = igraph_vcount(graph);
     il->incs = IGRAPH_CALLOC(il->length, igraph_vector_int_t*);
     if (il->incs == 0) {
-
-        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot create lazy incidence list view", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
-    IGRAPH_FINALLY(igraph_free, il->incs);
 
-    IGRAPH_CHECK(igraph_vector_init(&il->dummy, 0));
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return 0;
+    return IGRAPH_SUCCESS;
 
 }
 
@@ -1110,7 +1254,6 @@ int igraph_lazy_inclist_init(const igraph_t *graph,
 
 void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il) {
     igraph_lazy_inclist_clear(il);
-    igraph_vector_destroy(&il->dummy);
     IGRAPH_FREE(il->incs);
 }
 
@@ -1124,7 +1267,7 @@ void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il) {
  * the total number of elements in the incidence list.
  */
 void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il) {
-    long int i, n = il->length;
+    igraph_integer_t i, n = il->length;
     for (i = 0; i < n; i++) {
         if (il->incs[i] != 0) {
             igraph_vector_int_destroy(il->incs[i]);
@@ -1146,44 +1289,34 @@ igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclist_t *il) {
     return il->length;
 }
 
-igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
-        igraph_integer_t pno) {
-    igraph_integer_t no = pno;
-    int ret;
-    long int i, n;
+igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il, igraph_integer_t no) {
+    igraph_error_t ret;
 
-    if (il->incs[no] == 0) {
-        ret = igraph_incident(il->graph, &il->dummy, no, il->mode);
-        if (ret != 0) {
-            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
-            return 0;
-        }
-
+    if (il->incs[no] == NULL) {
         il->incs[no] = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (il->incs[no] == 0) {
-            igraph_error("Lazy incidence list query failed", IGRAPH_FILE_BASENAME, __LINE__,
-                         IGRAPH_ENOMEM);
-            return 0;
+        if (il->incs[no] == NULL) {
+            return NULL;
         }
 
-        n = igraph_vector_size(&il->dummy);
-        ret = igraph_vector_int_init(il->incs[no], n);
-        if (ret != 0) {
+        ret = igraph_vector_int_init(il->incs[no], 0);
+        if (ret != IGRAPH_SUCCESS) {
             IGRAPH_FREE(il->incs[no]);
-            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
-            return 0;
+            return NULL;
         }
 
-        for (i = 0; i < n; i++) {
-            VECTOR(*il->incs[no])[i] = VECTOR(il->dummy)[i];
+        ret = igraph_incident(il->graph, il->incs[no], no, il->mode);
+        if (ret != IGRAPH_SUCCESS) {
+            igraph_vector_int_destroy(il->incs[no]);
+            IGRAPH_FREE(il->incs[no]);
+            return NULL;
         }
 
         if (il->loops != IGRAPH_LOOPS_TWICE) {
             ret = igraph_i_remove_loops_from_incidence_vector_in_place(il->incs[no], il->graph, il->loops);
-            if (ret != 0) {
+            if (ret != IGRAPH_SUCCESS) {
                 igraph_vector_int_destroy(il->incs[no]);
                 IGRAPH_FREE(il->incs[no]);
-                return 0;
+                return NULL;
             }
         }
     }

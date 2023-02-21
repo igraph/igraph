@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <math.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_real_t res;

@@ -22,7 +22,7 @@
 */
 
 #include "igraph_complex.h"
-#include "core/math.h"
+
 #include <math.h>
 
 /**
@@ -43,6 +43,10 @@ igraph_complex_t igraph_complex_polar(igraph_real_t r, igraph_real_t theta) {
     return res;
 }
 
+/**
+ * Deprecated in favour of igraph_complex_almost_equals(), which uses relative
+ * tolerances. Will be removed in 0.11.
+ */
 igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
                                     igraph_complex_t z2,
                                     igraph_real_t tol) {
@@ -51,12 +55,6 @@ igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
         return 0;
     }
     return 1;
-}
-
-igraph_real_t igraph_complex_mod(igraph_complex_t z) {
-    igraph_real_t x = IGRAPH_REAL(z);
-    igraph_real_t y = IGRAPH_IMAG(z);
-    return hypot(x, y);
 }
 
 igraph_real_t igraph_complex_arg(igraph_complex_t z) {
@@ -194,6 +192,7 @@ igraph_complex_t igraph_complex_inv(igraph_complex_t z) {
 }
 
 igraph_real_t igraph_complex_abs(igraph_complex_t z) {
+    /* hypot() avoids overflow at intermediate stages of the calculation */
     return hypot(IGRAPH_REAL(z), IGRAPH_IMAG(z));
 }
 

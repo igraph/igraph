@@ -44,17 +44,17 @@
  * \param edges The edges to add, the first two elements are the first
  *        edge, etc.
  * \param n The number of vertices in the graph, if smaller or equal
- *        to the highest vertex id in the \p edges vector it
+ *        to the highest vertex ID in the \p edges vector it
  *        will be increased automatically. So it is safe to give 0
  *        here.
  * \param directed Boolean, whether to create a directed graph or
  *        not. If yes, then the first edge points from the first
- *        vertex id in \p edges to the second, etc.
+ *        vertex ID in \p edges to the second, etc.
  * \return Error code:
  *         \c IGRAPH_EINVEVECTOR: invalid edges
  *         vector (odd number of vertices).
  *         \c IGRAPH_EINVVID: invalid (negative)
- *         vertex id.
+ *         vertex ID.
  *
  * Time complexity: O(|V|+|E|),
  * |V| is the number of vertices,
@@ -63,30 +63,34 @@
  *
  * \example examples/simple/igraph_create.c
  */
-int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
+igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
                   igraph_integer_t n, igraph_bool_t directed) {
-    igraph_bool_t has_edges = igraph_vector_size(edges) > 0;
-    igraph_real_t max = has_edges ? igraph_vector_max(edges) + 1 : 0;
+    igraph_bool_t has_edges = igraph_vector_int_size(edges) > 0;
+    igraph_integer_t max;
 
-    if (igraph_vector_size(edges) % 2 != 0) {
-        IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
+    if (igraph_vector_int_size(edges) % 2 != 0) {
+        IGRAPH_ERROR("Invalid (odd) edges vector.", IGRAPH_EINVEVECTOR);
     }
-    if (has_edges && !igraph_vector_isininterval(edges, 0, max - 1)) {
-        IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
+    if (has_edges && !igraph_vector_int_isininterval(edges, 0, IGRAPH_VCOUNT_MAX-1)) {
+        IGRAPH_ERROR("Invalid (negative or too large) vertex ID.", IGRAPH_EINVVID);
     }
+
+    /* The + 1 here cannot overflow as above we have already
+     * checked that vertex IDs are within range. */
+    max = has_edges ? igraph_vector_int_max(edges) + 1 : 0;
 
     IGRAPH_CHECK(igraph_empty(graph, n, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
     if (has_edges) {
-        igraph_integer_t vc = igraph_vcount(graph);
-        if (vc < max) {
-            IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) (max - vc), 0));
+        n = igraph_vcount(graph);
+        if (n < max) {
+            IGRAPH_CHECK(igraph_add_vertices(graph, (max - n), 0));
         }
         IGRAPH_CHECK(igraph_add_edges(graph, edges, 0));
     }
 
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -96,16 +100,16 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
  * </para><para>
  * This function is handy when a relatively small graph needs to be created.
  * Instead of giving the edges as a vector, they are given simply as
- * arguments and a '-1' needs to be given after the last meaningful
+ * arguments and a <code>-1</code> needs to be given after the last meaningful
  * edge argument.
  *
- * </para><para>Note that only graphs which have vertices less than
- * the highest value of the 'int' type can be created this way. If you
- * give larger values then the result is undefined.
+ * </para><para>Note that only graphs which have vertex IDs smaller than
+ * the largest value representable by the <type>int</type> type can be created this way.
+ * If you give larger values then the result is undefined.
  *
  * \param graph Pointer to an uninitialized graph object. The result
  *        will be stored here.
- * \param n The number of vertices in the graph; a nonnegative integer.
+ * \param n The number of vertices in the graph; a non-negative integer.
  * \param directed Logical constant; gives whether the graph should be
  *        directed. Supported values are:
  *        \clist
@@ -115,8 +119,9 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
  *          The graph to be created will be \em undirected.
  *        \endclist
  * \param ... The additional arguments giving the edges of the
- *        graph. Don't forget to supply an additional '-1' after the last
- *        (meaningful) argument.
+ *        graph. Don't forget to supply an additional <code>-1</code> after the last
+ *        (meaningful) argument. The \p first parameter is present for
+ *        technical reasons and represents the first variadic argument.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
@@ -125,25 +130,24 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
  * \example examples/simple/igraph_small.c
  */
 
-int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
-                 ...) {
-    igraph_vector_t edges;
+igraph_error_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+                            int first, ...) {
+    igraph_vector_int_t edges;
     va_list ap;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    va_start(ap, directed);
-    while (1) {
-        int num = va_arg(ap, int);
-        if (num == -1) {
-            break;
-        }
-        igraph_vector_push_back(&edges, num);
+    va_start(ap, first);
+    int num = first;
+    while (num != -1) {
+        igraph_vector_int_push_back(&edges, num);
+        num = va_arg(ap, int);
     }
+    va_end(ap);
 
     IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
 
-    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }

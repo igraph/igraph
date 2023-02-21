@@ -24,35 +24,30 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
-
+int main(void) {
     igraph_t graph;
-    igraph_vector_ptr_t separators;
-    long int i, n;
+    igraph_vector_int_list_t separators;
+    igraph_integer_t i, n;
 
     igraph_famous(&graph, "zachary");
-    igraph_vector_ptr_init(&separators, 0);
+    igraph_vector_int_list_init(&separators, 0);
     igraph_all_minimal_st_separators(&graph, &separators);
 
-    n = igraph_vector_ptr_size(&separators);
+    n = igraph_vector_int_list_size(&separators);
     for (i = 0; i < n; i++) {
         igraph_bool_t res;
-        igraph_vector_t *sep = VECTOR(separators)[i];
+        igraph_vector_int_t *sep = igraph_vector_int_list_get_ptr(&separators, i);
+
         igraph_is_separator(&graph, igraph_vss_vector(sep), &res);
         if (!res) {
-            printf("Vertex set %li is not a separator!\n", i);
-            igraph_vector_print(sep);
+            printf("Vertex set %" IGRAPH_PRId " is not a separator!\n", i);
+            igraph_vector_int_print(sep);
             return 1;
         }
     }
 
     igraph_destroy(&graph);
-    for (i = 0; i < n; i++) {
-        igraph_vector_t *v = VECTOR(separators)[i];
-        igraph_vector_destroy(v);
-        IGRAPH_FREE(v);
-    }
-    igraph_vector_ptr_destroy(&separators);
+    igraph_vector_int_list_destroy(&separators);
 
     return 0;
 }

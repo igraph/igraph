@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /*
 
@@ -35,28 +35,25 @@
 
 */
 
-int main() {
+int main(void) {
 
     igraph_t graph;
     igraph_matrix_t U, V;
-    igraph_arpack_options_t options;
     igraph_vector_t cvec;
 
-    igraph_tree(&graph, /*n=*/ 14, /*children=*/ 4, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&graph, /*n=*/ 14, /*children=*/ 4, IGRAPH_TREE_OUT);
 
     igraph_matrix_init(&U, 0, 0);
     igraph_matrix_init(&V, 0, 0);
-    igraph_arpack_options_init(&options);
 
     igraph_vector_init(&cvec, 0);
-    igraph_degree(&graph, &cvec, igraph_vss_all(), IGRAPH_ALL,
-                  IGRAPH_LOOPS);
+    igraph_strength(&graph, &cvec, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS, 0);
     igraph_vector_scale(&cvec, .5);
 
     igraph_adjacency_spectral_embedding(&graph, 4, /*weights=*/ 0,
                                         IGRAPH_EIGEN_LA,
                                         /*scaled=*/ 0, &U, &V, /*D=*/ 0,
-                                        &cvec, &options);
+                                        &cvec, /*options=*/ 0);
 
     /* eigenvectors are in the columns of U and V; make sure that the
      * first row contains positive values */

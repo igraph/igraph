@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+int main(void) {
 
     igraph_t g;
     igraph_strvector_t names;
@@ -36,16 +36,16 @@ int main() {
 
     /* add some vertex attributes */
     igraph_strvector_init(&names, 0);
-    igraph_strvector_add(&names, "A");
-    igraph_strvector_add(&names, "B");
-    igraph_strvector_add(&names, "C");
-    igraph_strvector_add(&names, "D");
-    igraph_strvector_add(&names, "E");
-    igraph_strvector_add(&names, "F");
-    igraph_strvector_add(&names, "G");
-    igraph_strvector_add(&names, "H");
-    igraph_strvector_add(&names, "I");
-    igraph_strvector_add(&names, "J");
+    igraph_strvector_push_back(&names, "A");
+    igraph_strvector_push_back(&names, "B");
+    igraph_strvector_push_back(&names, "C");
+    igraph_strvector_push_back(&names, "D");
+    igraph_strvector_push_back(&names, "E");
+    igraph_strvector_push_back(&names, "F");
+    igraph_strvector_push_back(&names, "G");
+    igraph_strvector_push_back(&names, "H");
+    igraph_strvector_push_back(&names, "I");
+    igraph_strvector_push_back(&names, "J");
     SETVASV(&g, "id", &names);
     igraph_strvector_destroy(&names);
 
@@ -53,16 +53,16 @@ int main() {
     igraph_write_graph_pajek(&g, stdout);
 
     igraph_strvector_init(&names, 0);
-    igraph_strvector_add(&names, "square");
-    igraph_strvector_add(&names, "square");
-    igraph_strvector_add(&names, "square");
-    igraph_strvector_add(&names, "square");
-    igraph_strvector_add(&names, "escaping spaces");
-    igraph_strvector_add(&names, "square");
-    igraph_strvector_add(&names, "square");
-    igraph_strvector_add(&names, "escaping \\backslashes\\");
-    igraph_strvector_add(&names, "square");
-    igraph_strvector_add(&names, "escaping \"quotes\"");
+    igraph_strvector_push_back(&names, "square");
+    igraph_strvector_push_back(&names, "square");
+    igraph_strvector_push_back(&names, "square");
+    igraph_strvector_push_back(&names, "square");
+    igraph_strvector_push_back(&names, "escaping spaces");
+    igraph_strvector_push_back(&names, "square");
+    igraph_strvector_push_back(&names, "square");
+    igraph_strvector_push_back(&names, "escaping \\backslashes\\");
+    igraph_strvector_push_back(&names, "square");
+    igraph_strvector_push_back(&names, "escaping \"quotes\"");
     SETVASV(&g, "shape", &names);
     igraph_strvector_destroy(&names);
 

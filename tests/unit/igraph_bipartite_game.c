@@ -1,9 +1,9 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t graph;
     igraph_bool_t bipartite;
     igraph_integer_t n1, n2, m;

@@ -26,6 +26,7 @@
 
 #include "igraph_decls.h"
 #include "igraph_constants.h"
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 
@@ -36,25 +37,30 @@ typedef struct igraph_adjlist_t {
     igraph_vector_int_t *adjs;
 } igraph_adjlist_t;
 
-IGRAPH_EXPORT int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
+typedef struct igraph_inclist_t {
+    igraph_integer_t length;
+    igraph_vector_int_t *incs;
+} igraph_inclist_t;
+
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                                       igraph_neimode_t mode, igraph_loops_t loops,
                                       igraph_multiple_t multiple);
-IGRAPH_EXPORT int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
 IGRAPH_EXPORT igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al);
-IGRAPH_EXPORT int igraph_adjlist_init_complementer(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                                    igraph_adjlist_t *al,
                                                    igraph_neimode_t mode,
                                                    igraph_bool_t loops);
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_init_from_inclist(
+    const igraph_t *graph, igraph_adjlist_t *al, const igraph_inclist_t *il);
 IGRAPH_EXPORT void igraph_adjlist_destroy(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_clear(igraph_adjlist_t *al);
 IGRAPH_EXPORT void igraph_adjlist_sort(igraph_adjlist_t *al);
-IGRAPH_EXPORT int igraph_adjlist_simplify(igraph_adjlist_t *al);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_adjlist_remove_duplicate(const igraph_t *graph,
-                                                                    igraph_adjlist_t *al);
-IGRAPH_EXPORT int igraph_adjlist_print(const igraph_adjlist_t *al);
-IGRAPH_EXPORT int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al);
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al);
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
 IGRAPH_EXPORT igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed);
-IGRAPH_EXPORT int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed);
+IGRAPH_EXPORT igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed);
 
 /**
  * \define igraph_adjlist_get
@@ -68,35 +74,28 @@ IGRAPH_EXPORT int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integ
  *
  * Time complexity: O(1).
  */
-#define igraph_adjlist_get(al,no) (&(al)->adjs[(long int)(no)])
+#define igraph_adjlist_get(al,no) (&(al)->adjs[(igraph_integer_t)(no)])
 
-IGRAPH_EXPORT int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
+IGRAPH_EXPORT igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                                  igraph_neimode_t mode, igraph_bool_t duplicate);
 
-typedef struct igraph_inclist_t {
-    igraph_integer_t length;
-    igraph_vector_int_t *incs;
-} igraph_inclist_t;
-
-IGRAPH_EXPORT int igraph_inclist_init(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_inclist_init(const igraph_t *graph,
                                       igraph_inclist_t *il,
                                       igraph_neimode_t mode,
                                       igraph_loops_t loops);
-IGRAPH_EXPORT int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
+IGRAPH_EXPORT igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
 IGRAPH_EXPORT igraph_integer_t igraph_inclist_size(const igraph_inclist_t *al);
 IGRAPH_EXPORT void igraph_inclist_destroy(igraph_inclist_t *il);
 IGRAPH_EXPORT void igraph_inclist_clear(igraph_inclist_t *il);
-IGRAPH_DEPRECATED IGRAPH_EXPORT int igraph_inclist_remove_duplicate(const igraph_t *graph,
-                                                                    igraph_inclist_t *il);
-IGRAPH_EXPORT int igraph_inclist_print(const igraph_inclist_t *il);
-IGRAPH_EXPORT int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
+IGRAPH_EXPORT igraph_error_t igraph_inclist_print(const igraph_inclist_t *il);
+IGRAPH_EXPORT igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
 /**
  * \define igraph_inclist_get
  * \brief Query a vector in an incidence list.
  *
  * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
- * incidence list containing edge ids. The vector can be modified,
+ * incidence list containing edge IDs. The vector can be modified,
  * resized, etc. as desired.
  * \param il Pointer to the incidence list.
  * \param no The vertex for which the incident edges are returned.
@@ -104,7 +103,7 @@ IGRAPH_EXPORT int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfil
  *
  * Time complexity: O(1).
  */
-#define igraph_inclist_get(il,no) (&(il)->incs[(long int)(no)])
+#define igraph_inclist_get(il,no) (&(il)->incs[(igraph_integer_t)(no)])
 
 typedef struct igraph_lazy_adjlist_t {
     const igraph_t *graph;
@@ -113,10 +112,9 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_neimode_t mode;
     igraph_loops_t loops;
     igraph_multiple_t multiple;
-    igraph_vector_t dummy;
 } igraph_lazy_adjlist_t;
 
-IGRAPH_EXPORT int igraph_lazy_adjlist_init(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                                            igraph_lazy_adjlist_t *al,
                                            igraph_neimode_t mode,
                                            igraph_loops_t loops,
@@ -126,6 +124,19 @@ IGRAPH_EXPORT void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlist_t *al);
 
 /**
+ * \define igraph_lazy_adjlist_has
+ * \brief Are adjacenct vertices already stored in a lazy adjacency list?
+ *
+ * \param al The lazy adjacency list.
+ * \param no The vertex ID to query.
+ * \return True if the adjacent vertices of this vertex are already computed
+ *   and stored, false otherwise.
+ *
+ * Time complexity: O(1).
+ */
+#define igraph_lazy_adjlist_has(al,no) ((igraph_bool_t) (al)->adjs[(igraph_integer_t)(no)])
+
+/**
  * \define igraph_lazy_adjlist_get
  * \brief Query neighbor vertices.
  *
@@ -133,17 +144,23 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlis
  * result is stored in the adjacency list and no further query
  * operations are needed when the neighbors of the same vertex are
  * queried again.
+ *
  * \param al The lazy adjacency list.
  * \param no The vertex ID to query.
- * \return Pointer to a vector. It is allowed to modify it and
+ * \return Pointer to a vector, or \c NULL upon error. Errors can only
+ *   occur the first time this function is called for a given vertex.
+ *   It is safe to modify this vector,
  *   modification does not affect the original graph.
+ *
+ * \sa \ref igraph_lazy_adjlist_has() to check if this function has
+ *   already been called for a vertex.
  *
  * Time complexity: O(d), the number of neighbor vertices for the
  * first time, O(1) for subsequent calls.
  */
 #define igraph_lazy_adjlist_get(al,no) \
-    ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
-     (igraph_i_lazy_adjlist_get_real(al, no)))
+    (igraph_lazy_adjlist_has(al,no) ? ((al)->adjs[(igraph_integer_t)(no)]) \
+                                    : (igraph_i_lazy_adjlist_get_real(al, no)))
 IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al, igraph_integer_t no);
 
 typedef struct igraph_lazy_inclist_t {
@@ -151,17 +168,29 @@ typedef struct igraph_lazy_inclist_t {
     igraph_integer_t length;
     igraph_vector_int_t **incs;
     igraph_neimode_t mode;
-    igraph_vector_t dummy;
     igraph_loops_t loops;
 } igraph_lazy_inclist_t;
 
-IGRAPH_EXPORT int igraph_lazy_inclist_init(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
                                            igraph_lazy_inclist_t *il,
                                            igraph_neimode_t mode,
                                            igraph_loops_t loops);
 IGRAPH_EXPORT void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il);
 IGRAPH_EXPORT void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
 IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclist_t *il);
+
+/**
+ * \define igraph_lazy_inclist_has
+ * \brief Are incident edges already stored in a lazy inclist?
+ *
+ * \param il The lazy incidence list.
+ * \param no The vertex ID to query.
+ * \return True if the incident edges of this vertex are already computed
+ *   and stored, false otherwise.
+ *
+ * Time complexity: O(1).
+ */
+#define igraph_lazy_inclist_has(il,no) ((igraph_bool_t) (il)->incs[(igraph_integer_t)(no)])
 
 /**
  * \define igraph_lazy_inclist_get
@@ -171,18 +200,24 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclis
  * result is stored in the incidence list and no further query
  * operations are needed when the incident edges of the same vertex are
  * queried again.
- * \param al The lazy incidence list object.
- * \param no The vertex id to query.
- * \return Pointer to a vector. It is allowed to modify it and
+ *
+ * \param il The lazy incidence list object.
+ * \param no The vertex ID to query.
+ * \return Pointer to a vector, or \c NULL upon error. Errors can only
+ *   occur the first time this function is called for a given vertex.
+ *   It is safe to modify this vector,
  *   modification does not affect the original graph.
+ *
+ * \sa \ref igraph_lazy_inclist_has() to check if this function has
+ *   already been called for a vertex.
  *
  * Time complexity: O(d), the number of incident edges for the first
  * time, O(1) for subsequent calls with the same \p no argument.
  */
-#define igraph_lazy_inclist_get(al,no) \
-    ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
-     (igraph_i_lazy_inclist_get_real(al, no)))
-IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *al, igraph_integer_t no);
+#define igraph_lazy_inclist_get(il,no) \
+    (igraph_lazy_inclist_has(il,no) ? ((il)->incs[(igraph_integer_t)(no)]) \
+                                    : (igraph_i_lazy_inclist_get_real(il,no)))
+IGRAPH_EXPORT igraph_vector_int_t *igraph_i_lazy_inclist_get_real(igraph_lazy_inclist_t *il, igraph_integer_t no);
 
 __END_DECLS
 

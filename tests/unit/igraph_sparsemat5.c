@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 #define EPS 1e-13
 
@@ -45,7 +45,7 @@ void test_1x1(igraph_real_t value) {
     igraph_matrix_init(&values, 0, 0);
     igraph_matrix_init(&vectors, 0, 0);
     options.mode = 1;
-    igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rnsolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values, &vectors);
     printf("rnsolve:\n  - eigenvalues:\n");
     print_matrix(&values);
@@ -57,7 +57,7 @@ void test_1x1(igraph_real_t value) {
     igraph_vector_init(&values2, 0);
     igraph_matrix_init(&vectors, 0, 0);
     options.mode = 1;
-    igraph_sparsemat_arpack_rssolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rssolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values2, &vectors, IGRAPH_SPARSEMAT_SOLVE_LU);
     printf("rssolve:\n  - eigenvalues:\n");
     print_vector(&values2);
@@ -115,15 +115,19 @@ void test_2x2(igraph_real_t a, igraph_real_t b, igraph_real_t c, igraph_real_t d
     igraph_sparsemat_destroy(&B);
 }
 
-int main() {
+int main(void) {
 
     igraph_sparsemat_t A, B;
     igraph_matrix_t vectors, values2;
     igraph_vector_t values;
-    long int i;
+    igraph_integer_t i;
     igraph_arpack_options_t options;
     igraph_real_t min, max;
     igraph_t g1, g2, g3;
+
+    /* igraph_arpack_rssolve()/rnsolve() use the RNG to generate
+     * a random starting vector for ARPACK. */
+    igraph_rng_seed(igraph_rng_default(), 123);
 
     /***********************************************************************/
 
@@ -232,13 +236,14 @@ int main() {
     /* A tree, plus a ring */
     printf("\n== A tree, plus a ring ==\n");
 #define DIM 10
-    igraph_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_UNDIRECTED);
+    igraph_kary_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_UNDIRECTED);
     igraph_ring(&g2, DIM, IGRAPH_UNDIRECTED, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_union(&g3, &g1, &g2, /*edge_map1=*/ 0, /*edge_map1=*/ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
-    igraph_get_sparsemat(&g3, &A);
+    igraph_sparsemat_init(&A, 1, 1, 0);
+    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
     igraph_destroy(&g3);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
@@ -297,16 +302,17 @@ int main() {
 
     /***********************************************************************/
 
-    /* A directed tree and a directed, mutual ring */
+    /* A directed tree and a directed, mutual ring, no ARPACK options */
     printf("\n== A directed tree and a directed, mutual ring ==\n");
 #define DIM 10
-    igraph_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_OUT);
+    igraph_kary_tree(&g1, DIM, /*children=*/ 2, IGRAPH_TREE_OUT);
     igraph_ring(&g2, DIM, IGRAPH_DIRECTED, /*mutual=*/ 1, /*circular=*/ 1);
     igraph_union(&g3, &g1, &g2, /*edge_map1=*/ 0, /*edge_map2=*/ 0);
     igraph_destroy(&g1);
     igraph_destroy(&g2);
 
-    igraph_get_sparsemat(&g3, &A);
+    igraph_sparsemat_init(&A, 1, 1, 0);
+    igraph_get_adjacency_sparse(&g3, &A, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
     igraph_destroy(&g3);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
@@ -316,7 +322,7 @@ int main() {
 
     /* Regular mode */
     options.mode = 1;
-    igraph_sparsemat_arpack_rnsolve(&B, &options, /*storage=*/ 0,
+    igraph_sparsemat_arpack_rnsolve(&B, /*options=*/ 0, /*storage=*/ 0,
                                     &values2, &vectors);
 
     if (MATRIX(vectors, 0, 0) < 0.0) {
@@ -344,7 +350,8 @@ int main() {
                  6, 1, 6, 4, 7, 9, 8, 5, 8, 7, 9, 8, 10, 0,
                  -1);
 
-    igraph_get_sparsemat(&g1, &A);
+    igraph_sparsemat_init(&A, 1, 1, 0);
+    igraph_get_adjacency_sparse(&g1, &A, IGRAPH_GET_ADJACENCY_BOTH, NULL, IGRAPH_LOOPS_ONCE);
     igraph_destroy(&g1);
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);

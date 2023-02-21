@@ -17,9 +17,9 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t result;
     igraph_vector_bool_t types;
@@ -95,13 +95,12 @@ int main() {
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
-    igraph_set_error_handler(igraph_error_handler_ignore);
 
     printf("4 vertices, negative hgaps, emits error.\n");
     igraph_small(&g, 4, 0, 0,1, 1,2, 2,3, 3,0, -1);
     igraph_matrix_init(&result, 0, 0);
     igraph_vector_bool_init_int(&types, 4, 0, 1, 0, 1);
-    IGRAPH_ASSERT(igraph_layout_bipartite(&g, &types, &result, /*hgap*/ -1.0, /*vgap*/ 1.0, /*maxiter*/ 100) == IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_layout_bipartite(&g, &types, &result, /*hgap*/ -1.0, /*vgap*/ 1.0, /*maxiter*/ 100), IGRAPH_EINVAL);
     igraph_vector_bool_destroy(&types);
     igraph_matrix_destroy(&result);
     igraph_destroy(&g);

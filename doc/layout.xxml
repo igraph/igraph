@@ -29,9 +29,15 @@
 <!-- doxrox-include igraph_layout_davidson_harel -->
 <!-- doxrox-include igraph_layout_mds -->
 <!-- doxrox-include igraph_layout_lgl -->
+</section>
+
+<section id="layouts-for-trees-and-acyclic-graphs"><title>Layouts for trees and acyclic graphs</title>
 <!-- doxrox-include igraph_layout_reingold_tilford -->
 <!-- doxrox-include igraph_layout_reingold_tilford_circular -->
+<!-- doxrox-include igraph_roots_for_tree_layout -->
 <!-- doxrox-include igraph_layout_sugiyama -->
+<!-- doxrox-include igraph_layout_umap -->
+<!-- doxrox-include igraph_layout_umap_compute_weights -->
 </section>
 
 <section id="three-d-layout-generators"><title>3D layout generators</title>
@@ -40,6 +46,7 @@
 <!-- doxrox-include igraph_layout_grid_3d -->
 <!-- doxrox-include igraph_layout_fruchterman_reingold_3d -->
 <!-- doxrox-include igraph_layout_kamada_kawai_3d -->
+<!-- doxrox-include igraph_layout_umap_3d -->
 </section>
 
 <section id="merging-layouts"><title>Merging layouts</title>

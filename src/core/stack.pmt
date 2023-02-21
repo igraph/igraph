@@ -24,7 +24,6 @@
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
-#include "config.h"
 
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
@@ -35,28 +34,27 @@
  * \brief Initializes a stack.
  *
  * The initialized stack is always empty.
+ *
  * \param s Pointer to an uninitialized stack.
- * \param size The number of elements to allocate memory for.
+ * \param capacity The number of elements to allocate memory for.
  * \return Error code.
  *
  * Time complexity: O(\p size).
  */
 
-int FUNCTION(igraph_stack, init)       (TYPE(igraph_stack)* s, long int size) {
-    long int alloc_size;
+igraph_error_t FUNCTION(igraph_stack, init)(TYPE(igraph_stack)* s, igraph_integer_t capacity) {
+    igraph_integer_t alloc_size;
+    IGRAPH_ASSERT(capacity >= 0);
+    alloc_size = capacity > 0 ? capacity : 1;
     IGRAPH_ASSERT(s != NULL);
-    if (size < 0) {
-        size = 0;
-    }
-    alloc_size = size > 0 ? size : 1;
     s->stor_begin = IGRAPH_CALLOC(alloc_size, BASE);
-    if (s->stor_begin == 0) {
-        IGRAPH_ERROR("stack init failed", IGRAPH_ENOMEM);
+    if (s->stor_begin == NULL) {
+        IGRAPH_ERROR("Cannot initialize stack.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     s->stor_end = s->stor_begin + alloc_size;
     s->end = s->stor_begin;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -74,10 +72,32 @@ int FUNCTION(igraph_stack, init)       (TYPE(igraph_stack)* s, long int size) {
 
 void FUNCTION(igraph_stack, destroy)    (TYPE(igraph_stack)* s) {
     IGRAPH_ASSERT(s != NULL);
-    if (s->stor_begin != 0) {
+    if (s->stor_begin != NULL) {
         IGRAPH_FREE(s->stor_begin);
         s->stor_begin = NULL;
     }
+}
+
+/**
+ * \ingroup stack
+ * \function igraph_stack_capacity
+ * \brief Returns the allocated capacity of the stack.
+ *
+ * Note that this might be different from the size of the stack (as
+ * queried by \ref igraph_stack_size()), and specifies how many elements
+ * the stack can hold, without reallocation.
+ *
+ * \param v Pointer to the (previously initialized) stack object
+ *          to query.
+ * \return The allocated capacity.
+ *
+ * \sa \ref igraph_stack_size().
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_integer_t FUNCTION(igraph_stack, capacity)(const TYPE(igraph_stack) *s) {
+    return s->stor_end - s->stor_begin;
 }
 
 /**
@@ -96,25 +116,28 @@ void FUNCTION(igraph_stack, destroy)    (TYPE(igraph_stack)* s) {
  * the stack.
  */
 
-int FUNCTION(igraph_stack, reserve)    (TYPE(igraph_stack)* s, long int size) {
-    long int actual_size = FUNCTION(igraph_stack, size)(s);
+igraph_error_t FUNCTION(igraph_stack, reserve)(TYPE(igraph_stack)* s, igraph_integer_t capacity) {
+    igraph_integer_t current_capacity;
     BASE *tmp;
+
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(capacity >= 0);
 
-    if (size <= actual_size) {
-        return 0;
+    current_capacity = FUNCTION(igraph_stack, capacity)(s);
+
+    if (capacity <= current_capacity) {
+        return IGRAPH_SUCCESS;
     }
 
-    tmp = IGRAPH_REALLOC(s->stor_begin, (size_t) size, BASE);
-    if (tmp == 0) {
-        IGRAPH_ERROR("stack reserve failed", IGRAPH_ENOMEM);
-    }
+    tmp = IGRAPH_REALLOC(s->stor_begin, capacity, BASE);
+    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for stack.");
+
+    s->end = tmp + (s->end - s->stor_begin);
     s->stor_begin = tmp;
-    s->stor_end = s->stor_begin + size;
-    s->end = s->stor_begin + actual_size;
+    s->stor_end = s->stor_begin + capacity;
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -123,16 +146,15 @@ int FUNCTION(igraph_stack, reserve)    (TYPE(igraph_stack)* s, long int size) {
  * \brief Decides whether a stack object is empty.
  *
  * \param s The stack object.
- * \return Boolean, \c TRUE if the stack is empty, \c FALSE
+ * \return Boolean, \c true if the stack is empty, \c false
  * otherwise.
  *
  * Time complexity: O(1).
  */
 
-igraph_bool_t FUNCTION(igraph_stack, empty)      (TYPE(igraph_stack)* s) {
+igraph_bool_t FUNCTION(igraph_stack, empty)(TYPE(igraph_stack)* s) {
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
-    IGRAPH_ASSERT(s->end != NULL);
     return s->stor_begin == s->end;
 }
 
@@ -147,7 +169,7 @@ igraph_bool_t FUNCTION(igraph_stack, empty)      (TYPE(igraph_stack)* s) {
  * Time complexity: O(1).
  */
 
-long int FUNCTION(igraph_stack, size)       (const TYPE(igraph_stack)* s) {
+igraph_integer_t FUNCTION(igraph_stack, size)(const TYPE(igraph_stack)* s) {
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
     return s->end - s->stor_begin;
@@ -163,7 +185,7 @@ long int FUNCTION(igraph_stack, size)       (const TYPE(igraph_stack)* s) {
  * Time complexity: O(1).
  */
 
-void FUNCTION(igraph_stack, clear)      (TYPE(igraph_stack)* s) {
+void FUNCTION(igraph_stack, clear)(TYPE(igraph_stack)* s) {
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
     s->end = s->stor_begin;
@@ -184,34 +206,27 @@ void FUNCTION(igraph_stack, clear)      (TYPE(igraph_stack)* s) {
  * in O(n) time.
  */
 
-int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
+igraph_error_t FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
-    if (s->end == s->stor_end) {
+
+    if (s->stor_end == s->end) {
         /* full, allocate more storage */
-
-        BASE *bigger = NULL, *old = s->stor_begin;
-
-        bigger = IGRAPH_CALLOC(2 * FUNCTION(igraph_stack, size)(s), BASE);
-        if (bigger == 0) {
-            IGRAPH_ERROR("stack push failed", IGRAPH_ENOMEM);
+        igraph_integer_t old_size = FUNCTION(igraph_stack, size)(s);
+        igraph_integer_t new_size = old_size < IGRAPH_INTEGER_MAX/2 ? old_size * 2 : IGRAPH_INTEGER_MAX;
+        if (old_size == IGRAPH_INTEGER_MAX) {
+            IGRAPH_ERROR("Cannot push to stack, already at maximum size.", IGRAPH_EOVERFLOW);
         }
-        memcpy(bigger, s->stor_begin,
-               (size_t) FUNCTION(igraph_stack, size)(s)*sizeof(BASE));
-
-        s->end        = bigger + (s->stor_end - s->stor_begin);
-        s->stor_end   = bigger + 2 * (s->stor_end - s->stor_begin);
-        s->stor_begin = bigger;
-
-        *(s->end) = elem;
-        (s->end) += 1;
-
-        IGRAPH_FREE(old);
-    } else {
-        *(s->end) = elem;
-        (s->end) += 1;
+        if (new_size == 0) {
+            new_size = 1;
+        }
+        IGRAPH_CHECK(FUNCTION(igraph_stack, reserve)(s, new_size));
     }
-    return 0;
+
+    *(s->end) = elem;
+    s->end += 1;
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -227,8 +242,7 @@ int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_stack, pop)        (TYPE(igraph_stack)* s) {
-
+BASE FUNCTION(igraph_stack, pop)(TYPE(igraph_stack)* s) {
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
     IGRAPH_ASSERT(s->end != NULL);
@@ -252,8 +266,7 @@ BASE FUNCTION(igraph_stack, pop)        (TYPE(igraph_stack)* s) {
  * Time complexity: O(1).
  */
 
-BASE FUNCTION(igraph_stack, top)        (const TYPE(igraph_stack)* s) {
-
+BASE FUNCTION(igraph_stack, top)(const TYPE(igraph_stack)* s) {
     IGRAPH_ASSERT(s != NULL);
     IGRAPH_ASSERT(s->stor_begin != NULL);
     IGRAPH_ASSERT(s->end != NULL);
@@ -262,32 +275,32 @@ BASE FUNCTION(igraph_stack, top)        (const TYPE(igraph_stack)* s) {
     return *(s->end - 1);
 }
 
-#if defined (OUT_FORMAT)
+#if defined(OUT_FORMAT) || defined(FPRINTFUNC)
+
 #ifndef USING_R
-
-int FUNCTION(igraph_stack, print)(const TYPE(igraph_stack) *s) {
-    long int i, n = FUNCTION(igraph_stack, size)(s);
-    if (n != 0) {
-        printf(OUT_FORMAT, s->stor_begin[0]);
-    }
-    for (i = 1; i < n; i++) {
-        printf(" " OUT_FORMAT, s->stor_begin[i]);
-    }
-    printf("\n");
-    return 0;
+igraph_error_t FUNCTION(igraph_stack, print)(const TYPE(igraph_stack) *s) {
+    return FUNCTION(igraph_stack, fprint)(s, stdout);
 }
-#endif
+#endif /* USING_R */
 
-int FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack) *s, FILE *file) {
-    long int i, n = FUNCTION(igraph_stack, size)(s);
+igraph_error_t FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack) *s, FILE *file) {
+    igraph_integer_t i, n = FUNCTION(igraph_stack, size)(s);
     if (n != 0) {
+#ifdef FPRINTFUNC
+        FPRINTFUNC(file, s->stor_begin[0]);
+#else
         fprintf(file, OUT_FORMAT, s->stor_begin[0]);
+#endif
     }
     for (i = 1; i < n; i++) {
+#ifdef FPRINTFUNC
+        fputc(' ', file); fprintf(file, OUT_FORMAT, s->stor_begin[i]);
+#else
         fprintf(file, " " OUT_FORMAT, s->stor_begin[i]);
+#endif
     }
     fprintf(file, "\n");
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
-#endif
+#endif /* defined(OUT_FORMAT) || defined(FPRINTFUNC) */

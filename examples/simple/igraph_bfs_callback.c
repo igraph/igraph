@@ -22,18 +22,23 @@
 
 #include <igraph.h>
 
-igraph_bool_t bfs_callback(const igraph_t *graph,
+igraph_error_t bfs_callback(const igraph_t *graph,
                            igraph_integer_t vid,
                            igraph_integer_t pred,
                            igraph_integer_t succ,
                            igraph_integer_t rank,
                            igraph_integer_t dist,
                            void *extra) {
-    printf(" %li", (long int) vid);
-    return 0;
+    IGRAPH_UNUSED(graph);
+    IGRAPH_UNUSED(pred);
+    IGRAPH_UNUSED(succ);
+    IGRAPH_UNUSED(rank);
+    IGRAPH_UNUSED(dist);
+    printf(" %" IGRAPH_PRId "", vid);
+    return IGRAPH_SUCCESS;
 }
 
-int main() {
+int main(void) {
     igraph_t graph, ring;
 
     /* Create a disjoint union of two rings */

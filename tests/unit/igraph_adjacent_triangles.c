@@ -1,9 +1,26 @@
+/*
+   IGraph library.
+   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_vector_t res;
     igraph_vs_t vertices;
@@ -24,7 +41,7 @@ int main() {
                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                  -1);
 
-    igraph_vs_seq(&vertices, 0, igraph_vcount(&g) - 1);
+    igraph_vs_range(&vertices, 0, igraph_vcount(&g));
 
     printf("\nDirected multi:\n");
     igraph_adjacent_triangles(&g, &res, igraph_vss_all());
@@ -40,7 +57,7 @@ int main() {
     print_vector(&res);
 
     printf("\nSimple:\n");
-    igraph_simplify(&g, 1, 1, NULL);
+    igraph_simplify(&g, true, true, NULL);
     igraph_adjacent_triangles(&g, &res, igraph_vss_all());
     print_vector(&res);
     igraph_adjacent_triangles(&g, &res, vertices);

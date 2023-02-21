@@ -61,6 +61,7 @@
 #ifndef IGRAPH_HRG_GRAPH
 #define IGRAPH_HRG_GRAPH
 
+#include <igraph_types.h>
 #include "hrg/rbtree.h"
 
 #include <string>
@@ -135,7 +136,7 @@ public:
     // clear all links from graph
     void resetLinks();
     // allocate edge histograms
-    void setAdjacencyHistograms(int);
+    void setAdjacencyHistograms(igraph_integer_t);
     // set name of vertex i
     bool setName(int, const std::string &);
 

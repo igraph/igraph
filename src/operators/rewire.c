@@ -39,12 +39,13 @@
 #define REWIRE_ADJLIST_THRESHOLD 10
 
 /* Not declared static so that the testsuite can use it, but not part of the public API. */
-int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     char message[256];
     igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
-    igraph_vector_t eids, edgevec, alledges;
+    igraph_vector_int_t eids;
+    igraph_vector_int_t edgevec, alledges;
     igraph_bool_t directed, loops, ok;
     igraph_es_t es;
     igraph_adjlist_t al;
@@ -58,7 +59,7 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
 
     RNG_BEGIN();
 
-    IGRAPH_VECTOR_INIT_FINALLY(&eids, 2);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 2);
 
     if (use_adjlist) {
         /* As well as the sorted adjacency list, we maintain an unordered
@@ -66,10 +67,10 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
          */
         IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-        IGRAPH_VECTOR_INIT_FINALLY(&alledges, no_of_edges * 2);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&alledges, no_of_edges * 2);
         igraph_get_edgelist(graph, &alledges, /*bycol=*/ 0);
     } else {
-        IGRAPH_VECTOR_INIT_FINALLY(&edgevec, 4);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edgevec, 4);
         es = igraph_ess_vector(&eids);
     }
 
@@ -104,15 +105,13 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
 
             /* Get the endpoints */
             if (use_adjlist) {
-                a = VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[0]) * 2];
-                b = VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[0]) * 2) + 1];
-                c = VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[1]) * 2];
-                d = VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1];
+                a = VECTOR(alledges)[VECTOR(eids)[0] * 2];
+                b = VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1];
+                c = VECTOR(alledges)[VECTOR(eids)[1] * 2];
+                d = VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1];
             } else {
-                IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[0],
-                                         &a, &b));
-                IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[1],
-                                         &c, &d));
+                IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[0], &a, &b));
+                IGRAPH_CHECK(igraph_edge(graph, VECTOR(eids)[1], &c, &d));
             }
 
             /* For an undirected graph, we have two "variants" of each edge, i.e.
@@ -123,8 +122,8 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
                 if (use_adjlist) {
                     /* Flip the edge in the unordered edge-list, so the update later on
                      * hits the correct end. */
-                    VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[1]) * 2] = c;
-                    VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = d;
+                    VECTOR(alledges)[VECTOR(eids)[1] * 2] = c;
+                    VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = d;
                 }
             }
 
@@ -173,22 +172,22 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
 
             /* If we are still okay, we can perform the rewiring */
             if (ok) {
-                /* printf("Deleting: %ld -> %ld, %ld -> %ld\n",
-                              (long)a, (long)b, (long)c, (long)d); */
+                /* printf("Deleting: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
+                              a, b, c, d); */
                 if (use_adjlist) {
                     /* Replace entry in sorted adjlist: */
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, c, d, b, directed));
                     /* Also replace in unsorted edgelist: */
-                    VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[0]) * 2) + 1] = d;
-                    VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = b;
+                    VECTOR(alledges)[VECTOR(eids)[0] * 2 + 1] = d;
+                    VECTOR(alledges)[VECTOR(eids)[1] * 2 + 1] = b;
                 } else {
                     IGRAPH_CHECK(igraph_delete_edges(graph, es));
                     VECTOR(edgevec)[0] = a; VECTOR(edgevec)[1] = d;
                     VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
-                    /* printf("Adding: %ld -> %ld, %ld -> %ld\n",
-                                (long)a, (long)d, (long)c, (long)b); */
-                    igraph_add_edges(graph, &edgevec, 0);
+                    /* printf("Adding: %" IGRAPH_PRId " -> %" IGRAPH_PRId ", %" IGRAPH_PRId " -> %" IGRAPH_PRId "\n",
+                                a, d, c, b); */
+                    IGRAPH_CHECK(igraph_add_edges(graph, &edgevec, 0));
                 }
                 num_successful_swaps++;
             }
@@ -209,18 +208,18 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
     IGRAPH_PROGRESS("Random rewiring: ", 100.0, 0);
 
     if (use_adjlist) {
-        igraph_vector_destroy(&alledges);
+        igraph_vector_int_destroy(&alledges);
         igraph_adjlist_destroy(&al);
     } else {
-        igraph_vector_destroy(&edgevec);
+        igraph_vector_int_destroy(&edgevec);
     }
 
-    igraph_vector_destroy(&eids);
+    igraph_vector_int_destroy(&eids);
     IGRAPH_FINALLY_CLEAN(use_adjlist ? 3 : 2);
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -262,7 +261,7 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
  *
  * Time complexity: TODO.
  */
-int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
+igraph_error_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
     igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
     return igraph_i_rewire(graph, n, mode, use_adjlist);
 }

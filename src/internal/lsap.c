@@ -24,30 +24,30 @@
 #define NOREDUCE      0
 
 typedef struct {
-    int        n;            /* order of problem             */
-    double   **C;            /* cost matrix          */
-    double   **c;            /* reduced cost matrix      */
-    int       *s;            /* assignment                   */
-    int       *f;            /* column i is assigned to f[i] */
-    int       na;            /* number of assigned items;    */
-    int     runs;            /* number of iterations     */
-    double  cost;            /* minimum cost         */
-    time_t rtime;            /* time                         */
+    igraph_integer_t    n;            /* order of problem             */
+    double            **C;            /* cost matrix          */
+    double            **c;            /* reduced cost matrix      */
+    igraph_integer_t   *s;            /* assignment                   */
+    igraph_integer_t   *f;            /* column i is assigned to f[i] */
+    igraph_integer_t   na;            /* number of assigned items;    */
+    igraph_integer_t runs;            /* number of iterations     */
+    double           cost;            /* minimum cost         */
+    time_t          rtime;            /* time                         */
 } AP;
 
 /* public interface */
 
 /* constructors and destructor */
-static AP     *ap_create_problem(double *t, int n);
+static AP     *ap_create_problem(double *t, igraph_integer_t n);
 /* static AP     *ap_create_problem_from_matrix(double **t, int n); */
 /* static AP     *ap_read_problem(char *file); */
 static void    ap_free(AP *p);
 
-static int     ap_assignment(AP *p, int *res);
+static igraph_integer_t ap_assignment(AP *p, igraph_integer_t *res);
 /* static int     ap_costmatrix(AP *p, double **m); */
 /* static int     ap_datamatrix(AP *p, double **m); */
 /* static int     ap_iterations(AP *p); */
-static int     ap_hungarian(AP *p);
+static igraph_error_t     ap_hungarian(AP *p);
 /* static double  ap_mincost(AP *p); */
 /* static void    ap_print_solution(AP *p); */
 /* static void    ap_show_data(AP *p); */
@@ -60,15 +60,16 @@ static int     ap_hungarian(AP *p);
 /* private functions */
 static void    preprocess(AP *p);
 static void    preassign(AP *p);
-static int     cover(AP *p, int *ri, int *ci);
-static void    reduce(AP *p, int *ri, int *ci);
+static int     cover(AP *p, igraph_integer_t *ri, igraph_integer_t *ci);
+static void    reduce(AP *p, igraph_integer_t *ri, igraph_integer_t *ci);
 
-int ap_hungarian(AP *p) {
-    int      n;            /* size of problem */
-    int    *ri;            /* covered rows    */
-    int    *ci;            /* covered columns */
+igraph_error_t ap_hungarian(AP *p) {
+    igraph_integer_t   n;  /* size of problem */
+    igraph_integer_t *ri;  /* covered rows    */
+    igraph_integer_t *ci;  /* covered columns */
     time_t start, end;     /* timer           */
-    int i, j, ok;
+    igraph_integer_t i, j;
+    igraph_integer_t ok;
 
     start = time(0);
 
@@ -76,14 +77,14 @@ int ap_hungarian(AP *p) {
     p->runs = 0;
 
     /* allocate memory */
-    p->s = calloc(1 + n, sizeof(int));
-    p->f = calloc(1 + n, sizeof(int));
+    p->s = calloc(1 + n, sizeof(igraph_integer_t));
+    p->f = calloc(1 + n, sizeof(igraph_integer_t));
 
-    ri = calloc(1 + n, sizeof(int));
-    ci = calloc(1 + n, sizeof(int));
+    ri = calloc(1 + n, sizeof(igraph_integer_t));
+    ci = calloc(1 + n, sizeof(igraph_integer_t));
 
     if (ri == NULL || ci == NULL || p->s == NULL || p->f == NULL) {
-        IGRAPH_ERROR("ap_hungarian: could not allocate memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("ap_hungarian: could not allocate memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
 
     preprocess(p);
@@ -128,12 +129,12 @@ int ap_hungarian(AP *p) {
     free(ri);
     free(ci);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* abbreviated interface */
-int ap_assignment(AP *p, int *res) {
-    int i;
+igraph_integer_t ap_assignment(AP *p, igraph_integer_t *res) {
+    igraph_integer_t i;
 
     if (p->s == NULL) {
         ap_hungarian(p);
@@ -282,8 +283,8 @@ AP     *ap_create_problem_from_matrix(double **t, int n) {
 #endif
 
 /* read data from vector */
-AP *ap_create_problem(double *t, int n) {
-    int i, j;
+AP *ap_create_problem(double *t, igraph_integer_t n) {
+    igraph_integer_t i, j;
     AP *p;
 
     p = (AP*) malloc(sizeof(AP));
@@ -321,7 +322,7 @@ AP *ap_create_problem(double *t, int n) {
 
 /* destructor */
 void ap_free(AP *p) {
-    int i;
+    igraph_integer_t i;
 
     free(p->s);
     free(p->f);
@@ -341,7 +342,7 @@ void ap_free(AP *p) {
 /*
 void ap_show_data(AP *p)
 {
-    int i, j;
+    igraph_integer_t i, j;
 
     for(i = 1; i <= p->n; i++){
     for(j = 1; j <= p->n; j++)
@@ -358,7 +359,7 @@ double ap_mincost(AP *p) {
     return p->cost;
 }
 
-int ap_size(AP *p) {
+igraph_integer_t ap_size(AP *p) {
     return p->n;
 }
 
@@ -372,7 +373,7 @@ int ap_iterations(AP *p) {
 
 void ap_print_solution(AP *p)
 {
-    int i;
+    igraph_integer_t i;
 
     printf("%d itertations, %d secs.\n",p->runs, (int)p->rtime);
     printf("Min Cost: %10.4f\n",p->cost);
@@ -383,7 +384,7 @@ void ap_print_solution(AP *p)
 }
 
 int ap_costmatrix(AP *p, double **m) {
-    int i, j;
+    igraph_integer_t i, j;
 
     for (i = 0; i < p->n; i++)
         for (j = 0; j < p->n; j++) {
@@ -394,7 +395,7 @@ int ap_costmatrix(AP *p, double **m) {
 }
 
 int ap_datamatrix(AP *p, double **m) {
-    int i, j;
+    igraph_integer_t i, j;
 
     for (i = 0; i < p->n; i++)
         for (j = 0; j < p->n; j++) {
@@ -420,12 +421,12 @@ void ap_error(char *message)
 /* by ap_hungarian                                           */
 /*************************************************************/
 
-int cover(AP *p, int *ri, int *ci) {
-    int *mr, i, r;
-    int n;
+int cover(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
+    igraph_integer_t *mr, i, r;
+    igraph_integer_t n;
 
     n = p->n;
-    mr = calloc(1 + p->n, sizeof(int));
+    mr = calloc(1 + p->n, sizeof(igraph_integer_t));
 
     /* reset cover indices */
     for (i = 1; i <= n; i++) {
@@ -475,8 +476,8 @@ int cover(AP *p, int *ri, int *ci) {
     return REDUCE;
 }
 
-void reduce(AP *p, int *ri, int *ci) {
-    int i, j, n;
+void reduce(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
+    igraph_integer_t i, j, n;
     double min;
 
     n = p->n;
@@ -505,19 +506,19 @@ void reduce(AP *p, int *ri, int *ci) {
 }
 
 void preassign(AP *p) {
-    int i, j, min, r, c, n, count;
-    int *ri, *ci, *rz, *cz;
+    igraph_integer_t i, j, min, r, c, n, count;
+    igraph_integer_t *ri, *ci, *rz, *cz;
 
     n = p->n;
     p->na = 0;
 
     /* row and column markers */
-    ri = calloc(1 + n, sizeof(int));
-    ci = calloc(1 + n, sizeof(int));
+    ri = calloc(1 + n, sizeof(igraph_integer_t));
+    ci = calloc(1 + n, sizeof(igraph_integer_t));
 
     /* row and column counts of zeroes */
-    rz = calloc(1 + n, sizeof(int));
-    cz = calloc(1 + n, sizeof(int));
+    rz = calloc(1 + n, sizeof(igraph_integer_t));
+    cz = calloc(1 + n, sizeof(igraph_integer_t));
 
     for (i = 1; i <= n; i++) {
         count = 0;
@@ -539,7 +540,7 @@ void preassign(AP *p) {
 
     while (TRUE) {
         /* find unassigned row with least number of zeroes > 0 */
-        min = INT_MAX;
+        min = IGRAPH_INTEGER_MAX;
         r = 0;
         for (i = 1; i <= n; i++)
             if (rz[i] > 0 && rz[i] < min && ri[i] == UNASSIGNED) {
@@ -553,7 +554,7 @@ void preassign(AP *p) {
 
         /* find unassigned column in row r with least number of zeroes */
         c = 0;
-        min = INT_MAX;
+        min = IGRAPH_INTEGER_MAX;
         for (i = 1; i <= n; i++)
             if (p->c[r][i] == 0 && cz[i] < min && ci[i] == UNASSIGNED) {
                 min = cz[i];
@@ -585,7 +586,7 @@ void preassign(AP *p) {
 }
 
 void preprocess(AP *p) {
-    int i, j, n;
+    igraph_integer_t i, j, n;
     double min;
 
     n = p->n;
@@ -619,7 +620,7 @@ void preprocess(AP *p) {
  * \function igraph_solve_lsap
  * \brief Solve a balanced linear assignment problem.
  *
- * This functions solves a linear assinment problem using the Hungarian
+ * This functions solves a linear assignment problem using the Hungarian
  * method. A number of tasks, an equal number of agents, and the cost
  * of each agent to perform the tasks is given. This function then
  * assigns one task to each agent in such a way that the total cost is
@@ -631,7 +632,7 @@ void preprocess(AP *p) {
  *
  * </param><param>
  * To solve an unbalanced assignment problem, where the number of agents
- * is greater than the number of tasks, an extra task with zero cost
+ * is greater than the number of tasks, extra tasks with zero costs
  * should be added.
  *
  * \param c The assignment problem, where the number of rows is the
@@ -646,18 +647,18 @@ void preprocess(AP *p) {
  *
  * Time complexity: O(n^3), where n is the number of agents.
  */
-int igraph_solve_lsap(igraph_matrix_t *c, igraph_integer_t n,
+igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
                       igraph_vector_int_t *p) {
     AP *ap;
 
-    if(n != igraph_matrix_nrow(c)) {
+    if (n != igraph_matrix_nrow(c)) {
         IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
-                      "not equal to number of agents (%ld).", IGRAPH_EINVAL,
+                      "not equal to number of agents (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       n, igraph_matrix_nrow(c));
     }
-    if(n != igraph_matrix_ncol(c)) {
+    if (n != igraph_matrix_ncol(c)) {
         IGRAPH_ERRORF("n (%" IGRAPH_PRId ") "
-                      "not equal to number of tasks (%ld).", IGRAPH_EINVAL,
+                      "not equal to number of tasks (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
                       n, igraph_matrix_ncol(c));
     }
     IGRAPH_CHECK(igraph_vector_int_resize(p, n));

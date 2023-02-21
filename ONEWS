@@ -796,7 +796,7 @@ New in the C layer
 - Some stochastic test results are ignored (for spinglass community
   detection, some Erdos-Renyi generator tests)
 - Weighted shortest paths, Dijkstra's algorithm.
-- The unweigthed shortest path routine returns 'Inf' for unreachable
+- The unweighted shortest path routine returns 'Inf' for unreachable
   vertices.
 - New function, igraph_adjlist can create igraph graphs from
   adjacency lists.
@@ -1326,7 +1326,7 @@ Changes in the R interface
 - graph.edgelist to create a graph from an edge list, can also handle
   edge lists with symbolic names
 - get.edgelist has now a 'names' argument and can return symbolic
-  vertex names instead of vertex ids, by default id uses the 'name'
+  vertex names instead of vertex IDs, by default id uses the 'name'
   vertex attribute is returned
 - printing graphs on screen also prints symbolic symbolic names
   (the 'name' attribute if present)

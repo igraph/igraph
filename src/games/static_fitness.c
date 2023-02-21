@@ -31,6 +31,7 @@
 #include "igraph_random.h"
 
 #include "core/interruption.h"
+#include "core/math.h" /* M_SQRT2 */
 
 /**
  * \ingroup generators
@@ -67,8 +68,12 @@
  * which generates the fitnesses for you with a given exponent.
  *
  * </para><para>
- * Reference: Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
- * in scale-free networks. Phys Rev Lett 87(27):278701, 2001.
+ * Reference:
+ *
+ * </para><para>
+ * Goh K-I, Kahng B, Kim D: Universal behaviour of load distribution
+ * in scale-free networks. Phys Rev Lett 87(27):278701, 2001
+ * https://doi.org/10.1103/PhysRevLett.87.278701.
  *
  * \param graph        Pointer to an uninitialized graph object.
  * \param fitness_out  A numeric vector containing the fitness of each vertex.
@@ -88,10 +93,10 @@
  *
  * Time complexity: O(|V| + |E| log |E|).
  */
-int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
+igraph_error_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                                const igraph_vector_t *fitness_out, const igraph_vector_t *fitness_in,
                                igraph_bool_t loops, igraph_bool_t multiple) {
-    igraph_vector_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_integer_t no_of_nodes;
     igraph_integer_t outnodes, innodes, nodes;
     igraph_vector_t cum_fitness_in, cum_fitness_out;
@@ -99,19 +104,17 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
     igraph_real_t x, max_in, max_out;
     igraph_real_t max_no_of_edges;
     igraph_bool_t is_directed = (fitness_in != 0);
-    float num_steps;
+    igraph_real_t num_steps;
     igraph_integer_t step_counter = 0;
-    long int i, from, to, pos;
+    igraph_integer_t i, from, to, pos;
 
-    if (fitness_out == 0) {
-        IGRAPH_ERROR("fitness_out must not be null.", IGRAPH_EINVAL);
-    }
+    IGRAPH_ASSERT(fitness_out != NULL);
 
     if (no_of_edges < 0) {
         IGRAPH_ERRORF("Number of edges cannot be negative, got %" IGRAPH_PRId ".", IGRAPH_EINVAL, no_of_edges);
     }
 
-    no_of_nodes = (igraph_integer_t) igraph_vector_size(fitness_out);
+    no_of_nodes = igraph_vector_size(fitness_out);
     if (no_of_nodes == 0) {
         IGRAPH_CHECK(igraph_empty(graph, 0, is_directed));
         return IGRAPH_SUCCESS;
@@ -181,8 +184,8 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
     if (multiple) {
         /* Generating when multiple edges are allowed */
 
-        IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+        IGRAPH_CHECK(igraph_vector_int_reserve(&edges, 2 * no_of_edges));
 
         while (no_of_edges > 0) {
             /* Report progress after every 10000 edges */
@@ -201,8 +204,8 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                 continue;
             }
 
-            igraph_vector_push_back(&edges, from);
-            igraph_vector_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, from);
+            igraph_vector_int_push_back(&edges, to);
 
             no_of_edges--;
         }
@@ -211,7 +214,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
         IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, is_directed));
 
         /* Clear the edge list */
-        igraph_vector_destroy(&edges);
+        igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         /* Multiple edges are disallowed */
@@ -337,7 +340,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
  *                     For directed graphs, this specifies the exponent of the
  *                     out-degree distribution. It must be greater than or
  *                     equal to 2. If you pass \c IGRAPH_INFINITY here, you
- *                     will get back an Erdos-Renyi random network.
+ *                     will get back an Erdős-Rényi random network.
  * \param exponent_in  If negative, the generated graph will be undirected.
  *                     If greater than or equal to 2, this argument specifies
  *                     the exponent of the in-degree distribution. If
@@ -355,7 +358,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
  *
  * Time complexity: O(|V| + |E| log |E|).
  */
-int igraph_static_power_law_game(igraph_t *graph,
+igraph_error_t igraph_static_power_law_game(igraph_t *graph,
                                  igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
                                  igraph_real_t exponent_out, igraph_real_t exponent_in,
                                  igraph_bool_t loops, igraph_bool_t multiple,
@@ -363,7 +366,7 @@ int igraph_static_power_law_game(igraph_t *graph,
 
     igraph_vector_t fitness_out, fitness_in;
     igraph_real_t alpha_out = 0.0, alpha_in = 0.0;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t j;
 
     if (no_of_nodes < 0) {
@@ -373,7 +376,7 @@ int igraph_static_power_law_game(igraph_t *graph,
     /* Calculate alpha_out */
     if (exponent_out < 2) {
         IGRAPH_ERRORF("Out-degree exponent must be >= 2, got %g.", IGRAPH_EINVAL, exponent_out);
-    } else if (igraph_finite(exponent_out)) {
+    } else if (isfinite(exponent_out)) {
         alpha_out = -1.0 / (exponent_out - 1);
     } else {
         alpha_out = 0.0;
@@ -385,7 +388,7 @@ int igraph_static_power_law_game(igraph_t *graph,
     if (finite_size_correction && alpha_out < -0.5) {
         /* See the Cho et al paper, first page first column + footnote 7 */
         j += pow(no_of_nodes, 1 + 0.5 / alpha_out) *
-             pow(10 * sqrt(2) * (1 + alpha_out), -1.0 / alpha_out) - 1;
+             pow(10 * M_SQRT2 * (1 + alpha_out), -1.0 / alpha_out) - 1;
     }
     if (j < no_of_nodes) {
         j = no_of_nodes;
@@ -398,7 +401,7 @@ int igraph_static_power_law_game(igraph_t *graph,
         if (exponent_in < 2) {
             IGRAPH_ERRORF("For directed graphs the in-degree exponent must be >= 2, got %g.",
                           IGRAPH_EINVAL, exponent_in);
-        } else if (igraph_finite(exponent_in)) {
+        } else if (isfinite(exponent_in)) {
             alpha_in = -1.0 / (exponent_in - 1);
         } else {
             alpha_in = 0.0;
@@ -409,7 +412,7 @@ int igraph_static_power_law_game(igraph_t *graph,
         if (finite_size_correction && alpha_in < -0.5) {
             /* See the Cho et al paper, first page first column + footnote 7 */
             j += pow(no_of_nodes, 1 + 0.5 / alpha_in) *
-                 pow(10 * sqrt(2) * (1 + alpha_in), -1.0 / alpha_in) - 1;
+                 pow(10 * M_SQRT2 * (1 + alpha_in), -1.0 / alpha_in) - 1;
         }
         if (j < no_of_nodes) {
             j = no_of_nodes;

@@ -33,4 +33,4 @@ inline double _plfit_round(double x) {
 
 /* Dummy function to prevent a warning when compiling with Clang - the file
  * would contain no symbols */
-void _plfit_i_unused() {}
+void _plfit_i_unused(void) {}

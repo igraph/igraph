@@ -22,9 +22,10 @@
 */
 
 #include "igraph_games.h"
-#include "igraph_random.h"
-#include "igraph_constructors.h"
+
 #include "igraph_blas.h"
+#include "igraph_constructors.h"
+#include "igraph_random.h"
 
 /**
  * \function igraph_dot_product_game
@@ -56,21 +57,21 @@
  * for functions to generate the latent vectors.
  */
 
-int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
+igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                             igraph_bool_t directed) {
 
     igraph_integer_t nrow = igraph_matrix_nrow(vecs);
     igraph_integer_t ncol = igraph_matrix_ncol(vecs);
-    int i, j;
-    igraph_vector_t edges;
-    igraph_bool_t warned_neg = 0, warned_big = 0;
+    igraph_integer_t i, j;
+    igraph_vector_int_t edges;
+    igraph_bool_t warned_neg = false, warned_big = false;
 
-    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     RNG_BEGIN();
 
     for (i = 0; i < ncol; i++) {
-        int from = directed ? 0 : i + 1;
+        igraph_integer_t from = directed ? 0 : i + 1;
         igraph_vector_t v1;
         igraph_vector_view(&v1, &MATRIX(*vecs, 0, i), nrow);
         for (j = from; j < ncol; j++) {
@@ -82,34 +83,33 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
             igraph_vector_view(&v2, &MATRIX(*vecs, 0, j), nrow);
             igraph_blas_ddot(&v1, &v2, &prob);
             if (prob < 0 && ! warned_neg) {
-                warned_neg = 1;
-                IGRAPH_WARNING("Negative connection probability in "
-                               "dot-product graph");
+                warned_neg = true;
+                IGRAPH_WARNING("Negative connection probability in dot-product graph.");
             } else if (prob > 1 && ! warned_big) {
-                warned_big = 1;
-                IGRAPH_WARNING("Greater than 1 connection probability in "
-                               "dot-product graph");
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+                warned_big = true;
+                IGRAPH_WARNING("Greater than 1 connection probability in dot-product graph.");
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             } else if (RNG_UNIF01() < prob) {
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-                IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, j));
             }
         }
     }
 
     RNG_END();
 
-    igraph_create(graph, &edges, ncol, directed);
-    igraph_vector_destroy(&edges);
+    IGRAPH_CHECK(igraph_create(graph, &edges, ncol, directed));
+
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_sample_sphere_surface
- * Sample points uniformly from the surface of a sphere
+ * \brief Sample points uniformly from the surface of a sphere.
  *
  * The center of the sphere is at the origin.
  *
@@ -130,7 +130,7 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
  * igraph_sample_dirichlet() for other similar samplers.
  */
 
-int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
+igraph_error_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
                                  igraph_real_t radius,
                                  igraph_bool_t positive,
                                  igraph_matrix_t *res) {
@@ -138,13 +138,13 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
 
     if (dim < 2) {
         IGRAPH_ERROR("Sphere must be at least two dimensional to sample from "
-                     "surface", IGRAPH_EINVAL);
+                     "surface.", IGRAPH_EINVAL);
     }
     if (n < 0) {
-        IGRAPH_ERROR("Number of samples must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of samples must be non-negative.", IGRAPH_EINVAL);
     }
     if (radius <= 0) {
-        IGRAPH_ERROR("Sphere radius must be positive", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Sphere radius must be positive.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, dim, n));
@@ -171,12 +171,12 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_sample_sphere_volume
- * Sample points uniformly from the volume of a sphere
+ * \brief Sample points uniformly from the volume of a sphere.
  *
  * The center of the sphere is at the origin.
  *
@@ -198,7 +198,7 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
  */
 
 
-int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
+igraph_error_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
                                 igraph_real_t radius,
                                 igraph_bool_t positive,
                                 igraph_matrix_t *res) {
@@ -221,12 +221,12 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_sample_dirichlet
- * Sample points from a Dirichlet distribution
+ * \brief Sample points from a Dirichlet distribution.
  *
  * \param n The number of vectors to sample.
  * \param alpha The parameters of the Dirichlet distribution. They
@@ -245,7 +245,7 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
  * latent vectors.
  */
 
-int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
+igraph_error_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
                             igraph_matrix_t *res) {
 
     igraph_integer_t len = igraph_vector_size(alpha);
@@ -253,16 +253,17 @@ int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
     igraph_vector_t vec;
 
     if (n < 0) {
-        IGRAPH_ERROR("Number of samples should be non-negative",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Number of samples should be non-negative, got %" IGRAPH_PRId ".",
+                     IGRAPH_EINVAL, n);
     }
     if (len < 2) {
-        IGRAPH_ERROR("Dirichlet parameter vector too short, must "
-                     "have at least two entries", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Dirichlet parameter vector too short, must "
+                     "have at least two entries, got %" IGRAPH_PRId
+                     ".", IGRAPH_EINVAL, len);
     }
     if (igraph_vector_min(alpha) <= 0) {
-        IGRAPH_ERROR("Dirichlet concentration parameters must be positive",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Dirichlet concentration parameters must be positive, got %g.",
+                     IGRAPH_EINVAL, igraph_vector_min(alpha));
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, len, n));
@@ -276,5 +277,5 @@ int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
 
     RNG_END();
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }

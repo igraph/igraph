@@ -22,73 +22,61 @@
 #define DEGREE_SEQUENCE_H
 
 #include "igraph_types.h"
-#include "igraph_datatype.h"
+#include "igraph_vector.h"
 
 namespace gengraph {
 
 class degree_sequence {
 
 private:
-    int n;
-    int * deg;
-    int total;
+    igraph_integer_t n;
+    igraph_integer_t *deg;
+    igraph_integer_t total;
 
 public :
     // #vertices
-    inline int size() {
+    inline igraph_integer_t size() {
         return n;
     };
-    inline int sum() {
+    inline igraph_integer_t sum() {
         return total;
     };
-    inline int operator[](int i) {
+    inline igraph_integer_t operator[](igraph_integer_t i) {
         return deg[i];
     };
-    inline int *seq() {
+    inline igraph_integer_t *seq() {
         return deg;
     };
-    inline void assign(int n0, int* d0) {
+    inline void assign(igraph_integer_t n0, igraph_integer_t* d0) {
         n = n0;
         deg = d0;
     };
-    inline int dmax() {
-        int dm = deg[0];
-        for (int i = 1; i < n; i++) if (deg[i] > dm) {
+    inline igraph_integer_t dmax() {
+        igraph_integer_t dm = deg[0];
+        for (igraph_integer_t i = 1; i < n; i++) if (deg[i] > dm) {
                 dm = deg[i];
             }
         return dm;
     }
 
-    void make_even(int mini = -1, int maxi = -1);
-    void sort();
-    void shuffle();
-
-    // raw constructor
-    degree_sequence(int n, int *degs);
-
-    // read-from-file constrictor
-    degree_sequence(FILE *f, bool DISTRIB = true);
-
-    // simple power-law constructor : Pk = int((x+k0)^(-exp),x=k..k+1), with k0 so that avg(X)=z
-    degree_sequence(int n, double exp, int degmin, int degmax, double avg_degree = -1.0);
+    degree_sequence(igraph_integer_t n, igraph_integer_t *degs);
 
     // igraph constructor
-    degree_sequence(const igraph_vector_t *out_seq);
+    degree_sequence(const igraph_vector_int_t *out_seq);
 
     // destructor
     ~degree_sequence();
 
-    // unbind the deg[] vector (so that it doesn't get deleted when the class is destroyed)
-    void detach();
-
     // compute total number of arcs
     void compute_total();
 
+#if 0
     // raw print (vertex by vertex)
     void print();
 
     // distribution print (degree frequency)
     void print_cumul();
+#endif
 
     // is degree sequence realizable ?
     bool havelhakimi();

@@ -25,6 +25,8 @@
 #define IGRAPH_ARRAY_H
 
 #include "igraph_decls.h"
+#include "igraph_error.h"
+#include "igraph_vector.h"
 
 __BEGIN_DECLS
 
@@ -38,11 +40,11 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
-#define BASE_LONG
+#define BASE_INT
 #include "igraph_pmt.h"
 #include "igraph_array_pmt.h"
 #include "igraph_pmt_off.h"
-#undef BASE_LONG
+#undef BASE_INT
 
 #define BASE_CHAR
 #include "igraph_pmt.h"

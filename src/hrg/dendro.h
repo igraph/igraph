@@ -231,7 +231,7 @@ private:
     // compute number of edges between two internal subtrees
     int computeEdgeCount(int, short int, int, short int);
     // (consensus tree) counts children
-    int countChildren(const std::string &s);
+    size_t countChildren(const std::string &s);
     // find internal node of D that is common ancestor of i,j
     elementd* findCommonAncestor(list**, int, int);
     // return reverse of path to leaf from root
@@ -251,7 +251,7 @@ public:
         paths(nullptr), ctree(nullptr), cancestor(nullptr), g(nullptr) { }
     ~dendro();
 
-    void setGraph(const igraph_t *igraph);
+    igraph_error_t setGraph(const igraph_t *igraph);
     void setGraph(graph *ig) { g = ig; }
     const graph *getGraph() const { return g; }
 
@@ -276,9 +276,9 @@ public:
     // make random G from D
     void makeRandomGraph();
     // make single MCMC move
-    bool monteCarloMove(double &, bool &, double);
+    void monteCarloMove(double &, bool &, double);
     // record consensus tree from splithist
-    void recordConsensusTree(igraph_vector_t *parents,
+    void recordConsensusTree(igraph_vector_int_t *parents,
                              igraph_vector_t *weights);
     // record D structure
     void recordDendrogramStructure(igraph_hrg_t *hrg);
@@ -291,7 +291,7 @@ public:
     // reset the dendrograph structures
     void resetDendrograph();
     // sample dendrogram's splits and update the split histogram
-    bool sampleSplitLikelihoods(int &);
+    bool sampleSplitLikelihoods(igraph_integer_t &);
 };
 
 } // namespace fitHRG

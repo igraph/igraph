@@ -37,6 +37,14 @@
     #undef BASE_EPSILON
 #endif
 
+#ifdef BASE_MATRIX
+    #undef BASE_MATRIX
+#endif
+
+#ifdef BASE_VECTOR
+    #undef BASE_VECTOR
+#endif
+
 #ifdef CONCAT2
     #undef CONCAT2
 #endif
@@ -61,6 +69,14 @@
     #undef CONCAT4x
 #endif
 
+#ifdef CONCAT5
+    #undef CONCAT5
+#endif
+
+#ifdef CONCAT5x
+    #undef CONCAT5x
+#endif
+
 #ifdef FP
     #undef FP
 #endif
@@ -71,6 +87,10 @@
 
 #ifdef IN_FORMAT
     #undef IN_FORMAT
+#endif
+
+#ifdef INTERNAL_FUNCTION
+    #undef INTERNAL_FUNCTION
 #endif
 
 #ifdef MULTIPLICITY
@@ -149,8 +169,16 @@
     #undef PRINTFUNC
 #endif
 
+#ifdef SNPRINTFUNC
+    #undef SNPRINTFUNC
+#endif
+
+#ifdef FPRINTFUNC_ALIGNED
+    #undef FPRINTFUNC_ALIGNED
+#endif
+
 #ifdef FPRINTFUNC
-    #undef PRINTFUNC
+    #undef FPRINTFUNC
 #endif
 
 #ifdef UNSIGNED

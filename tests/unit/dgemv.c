@@ -1,11 +1,28 @@
+/*
+   IGraph library.
+   Copyright (C) 2021-2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* Matrix-vector multiplication: y = A.x */
 void matmul(const igraph_matrix_t *A, const igraph_vector_t *x, igraph_vector_t *y, igraph_real_t beta) {
-    long int i, j, nr = igraph_matrix_nrow(A), nc = igraph_matrix_ncol(A);
+    igraph_integer_t i, j, nr = igraph_matrix_nrow(A), nc = igraph_matrix_ncol(A);
 
     IGRAPH_ASSERT(nc == igraph_vector_size(x));
     IGRAPH_ASSERT(nr == igraph_vector_size(y));
@@ -19,11 +36,11 @@ void matmul(const igraph_matrix_t *A, const igraph_vector_t *x, igraph_vector_t 
     }
 }
 
-int main() {
+int main(void) {
     igraph_matrix_t A;
     igraph_vector_t x, y1, y2;
-    long int i, j;
-    const long int nr = 5, nc = 8;
+    igraph_integer_t i, j;
+    const igraph_integer_t nr = 5, nc = 8;
 
     igraph_rng_seed(igraph_rng_default(), 54632);
 
@@ -31,8 +48,8 @@ int main() {
     igraph_vector_init(&x, nc);
 
     /* Fill with arbitrary values. Should be zeroes by beta. */
-    igraph_vector_init_seq(&y1, 1, nr);
-    igraph_vector_copy(&y2, &y1);
+    igraph_vector_init_range(&y1, 1, nr + 1);
+    igraph_vector_init_copy(&y2, &y1);
 
     for (i=0; i < nr; ++i) {
         for (j=0; j < nc; ++j) {

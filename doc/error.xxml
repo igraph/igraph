@@ -21,6 +21,7 @@
 
 <section id="error-codes">
 <!-- doxrox-include error_codes -->
+<!-- doxrox-include igraph_error_t -->
 <!-- doxrox-include igraph_error_type_t -->
 <!-- doxrox-include igraph_strerror -->
 </section>
@@ -52,6 +53,7 @@
 <!-- doxrox-include igraph_error -->
 <!-- doxrox-include igraph_errorf -->
 <!-- doxrox-include IGRAPH_CHECK -->
+<!-- doxrox-include IGRAPH_CHECK_CALLBACK -->
 </section>
 
 <section id="deallocating-memory">

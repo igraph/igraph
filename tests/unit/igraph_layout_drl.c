@@ -17,40 +17,40 @@
 */
 
 #include <igraph.h>
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 void set_options_fast(igraph_layout_drl_options_t *options) {
-        options->edge_cut = 4.0/5.0;
+    options->edge_cut = 4.0/5.0;
 
-        options->init_iterations   = 10;
-        options->init_temperature  = 2000;
-        options->init_attraction   = 10;
-        options->init_damping_mult = 1.0;
+    options->init_iterations   = 10;
+    options->init_temperature  = 2000;
+    options->init_attraction   = 10;
+    options->init_damping_mult = 1.0;
 
-        options->liquid_iterations   = 10;
-        options->liquid_temperature  = 2000;
-        options->liquid_attraction   = 10;
-        options->liquid_damping_mult = 1.0;
+    options->liquid_iterations   = 10;
+    options->liquid_temperature  = 2000;
+    options->liquid_attraction   = 10;
+    options->liquid_damping_mult = 1.0;
 
-        options->expansion_iterations   = 10;
-        options->expansion_temperature  = 2000;
-        options->expansion_attraction   = 2;
-        options->expansion_damping_mult = 1.0;
+    options->expansion_iterations   = 10;
+    options->expansion_temperature  = 2000;
+    options->expansion_attraction   = 2;
+    options->expansion_damping_mult = 1.0;
 
-        options->cooldown_iterations   = 10;
-        options->cooldown_temperature  = 2000;
-        options->cooldown_attraction   = 1;
-        options->cooldown_damping_mult = .1;
+    options->cooldown_iterations   = 10;
+    options->cooldown_temperature  = 2000;
+    options->cooldown_attraction   = 1;
+    options->cooldown_damping_mult = .1;
 
-        options->crunch_iterations   = 10;
-        options->crunch_temperature  = 250;
-        options->crunch_attraction   = 1;
-        options->crunch_damping_mult = 0.25;
+    options->crunch_iterations   = 10;
+    options->crunch_temperature  = 250;
+    options->crunch_attraction   = 1;
+    options->crunch_damping_mult = 0.25;
 
-        options->simmer_iterations   = 10;
-        options->simmer_temperature  = 250;
-        options->simmer_attraction   = .5;
-        options->simmer_damping_mult = 1;
+    options->simmer_iterations   = 10;
+    options->simmer_temperature  = 250;
+    options->simmer_attraction   = .5;
+    options->simmer_damping_mult = 1;
 }
 
 void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
@@ -61,7 +61,7 @@ void check_and_destroy(igraph_matrix_t *result, igraph_real_t half_size) {
     igraph_matrix_destroy(result);
 }
 
-int main() {
+int main(void) {
     igraph_t g;
     igraph_matrix_t result;
     igraph_layout_drl_options_t options;
@@ -70,24 +70,25 @@ int main() {
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-    set_options_fast(&options);
+    igraph_layout_drl_options_init(&options, IGRAPH_LAYOUT_DRL_DEFAULT);
 
     printf("The Zachary karate club.\n");
     igraph_famous(&g, "zachary");
     igraph_matrix_init(&result, 0, 0);
     IGRAPH_ASSERT(igraph_layout_drl(&g, &result, /*use_seed*/ 0, &options,
-                  /*weights*/ NULL, /*fixed*/ 0) == IGRAPH_SUCCESS);
+                  /*weights*/ NULL) == IGRAPH_SUCCESS);
     check_and_destroy(&result, 50);
 
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
+    set_options_fast(&options);
     printf("Negative damping.\n");
     igraph_matrix_init(&result, 0, 0);
     for (i = 0; i < 6; i++) {
         *damping_muls[i] *= -1.0;
         IGRAPH_ASSERT(igraph_layout_drl(&g, &result, /*use_seed*/ 0, &options,
-                    /*weights*/ NULL, /*fixed*/ 0) == IGRAPH_EINVAL);
+                    /*weights*/ NULL) == IGRAPH_EINVAL);
         *damping_muls[i] *= -1.0;
     }
     igraph_matrix_destroy(&result);

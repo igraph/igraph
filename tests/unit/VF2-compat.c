@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "test_utilities.h"
 
 /* ----------------------------------------------------------- */
 
@@ -34,6 +34,9 @@ igraph_bool_t compat_parity(const igraph_t *graph1,
                             const igraph_integer_t g1_num,
                             const igraph_integer_t g2_num,
                             void *arg) {
+    IGRAPH_UNUSED(graph1);
+    IGRAPH_UNUSED(graph2);
+    IGRAPH_UNUSED(arg);
     return (g1_num % 2) == (g2_num % 2);
 }
 
@@ -43,10 +46,14 @@ igraph_bool_t compat_not0(const igraph_t *graph1,
                           const igraph_integer_t g1_num,
                           const igraph_integer_t g2_num,
                           void *arg) {
+    IGRAPH_UNUSED(graph1);
+    IGRAPH_UNUSED(graph2);
+    IGRAPH_UNUSED(arg);
+    IGRAPH_UNUSED(g2_num);
     return g1_num != 0;
 }
 
-int match_rings() {
+int match_rings(void) {
 
     igraph_t r1, r2;
     igraph_bool_t iso;
@@ -141,7 +148,7 @@ int match_rings() {
     return 0;
 }
 
-int match_rings_open_closed() {
+int match_rings_open_closed(void) {
     igraph_t ro, rc;
     igraph_bool_t iso;
     igraph_integer_t count;
@@ -241,7 +248,7 @@ int match_rings_open_closed() {
 
 /* ----------------------------------------------------------- */
 
-int main() {
+int main(void) {
     match_rings();
     match_rings_open_closed();
 
