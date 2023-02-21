@@ -204,6 +204,12 @@ static igraph_error_t igraph_i_hrg_getgraph(const igraph_t *igraph,
         IGRAPH_ERROR("Graph too large for the HRG module.", IGRAPH_EOVERFLOW);
     }
 
+    // TODO: Can this be relaxed? buildDendrogram() creates a tree with n-2 internal edges,
+    // i.e. zero internal edges for a 2-vertex graph. This is not handled at the moment.
+    if (no_of_nodes < 3) {
+        IGRAPH_ERROR("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL);
+    }
+
     // Create graph
     d->g = new graph((int) no_of_nodes);
 
@@ -237,6 +243,11 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
 
     if (no_of_nodes > INT_MAX) {
         IGRAPH_ERROR("Graph too large for the HRG module.", IGRAPH_EOVERFLOW);
+    }
+
+    // TODO: See analogous TODO item in igraph_i_hrg_getgraph()
+    if (no_of_nodes < 3) {
+        IGRAPH_ERROR("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL);
     }
 
     // Create graphs
