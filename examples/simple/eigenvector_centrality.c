@@ -33,7 +33,7 @@ int main(void) {
 
     /* Create a star graph, with vertex 0 at the center, and associated edge weights. */
     igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
-    igraph_vector_init_range(&weights, 0, igraph_ecount(&graph));
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&graph)+1);
 
     /* Initialize the vector where the result will be stored. */
     igraph_vector_init(&vector, 0);
