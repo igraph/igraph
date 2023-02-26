@@ -13,6 +13,7 @@
  - `igraph_minimum_spanning_tree()` and `igraph_minimum_spanning_tree_prim()` now check that edge weights are not NaN.
  - Fixed an initialization error in the string attribute combiner of the C attribute handler.
  - Fixed an issue with the weighted clique number calculation when all the weights were the same.
+ - HRG functions now require a graph with at least vertices; previous versions crashed with smaller graphs.
 
 ### Deprecated
 
@@ -20,6 +21,7 @@
 
 ### Other
 
+ - Improved performance for `igraph_vertex_connectivity()`.
  - Documentation improvements.
 
 ## [0.10.4] - 2023-01-26
