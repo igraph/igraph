@@ -27,32 +27,30 @@
 
 int main(void) {
 
-    igraph_t g;
-    igraph_vector_t v, weights;
+    igraph_t graph;
+    igraph_vector_t vector, weights;
     igraph_real_t value;
-    igraph_arpack_options_t options;
 
-    igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-    igraph_vector_init(&weights, 9);
-    igraph_vector_fill(&weights, 1);
+    /* Create a star graph, with vertex 0 at the center, and associated edge weights. */
+    igraph_star(&graph, 10, IGRAPH_STAR_UNDIRECTED, 0);
+    igraph_vector_init_range(&weights, 1, igraph_ecount(&graph)+1);
 
-    igraph_arpack_options_init(&options);
-    igraph_vector_init(&v, 0);
-    igraph_eigenvector_centrality(&g, &v, &value, /*directed=*/ 0,
-                                  /*scale=*/1, &weights,
-                                  &options);
+    /* Initialize the vector where the result will be stored. */
+    igraph_vector_init(&vector, 0);
 
-    if (options.info != 0) {
-        return 1;
-    }
+    /* Compute eigenvector centrality. */
+    igraph_eigenvector_centrality(&graph, &vector, &value, IGRAPH_UNDIRECTED,
+                                  /*scale=*/ true, &weights, /*options=*/ NULL);
 
+    /* Print results. */
     printf("eigenvalue: %g\n", value);
     printf("eigenvector:\n");
-    igraph_vector_print(&v);
+    igraph_vector_print(&vector);
 
-    igraph_destroy(&g);
-    igraph_vector_destroy(&v);
+    /* Free allocated data structures. */
+    igraph_vector_destroy(&vector);
     igraph_vector_destroy(&weights);
+    igraph_destroy(&graph);
 
     return 0;
 }

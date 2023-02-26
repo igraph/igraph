@@ -978,6 +978,7 @@ add_benchmarks(
   igraph_qsort
   igraph_random_walk
   igraph_transitivity
+  igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
 )
