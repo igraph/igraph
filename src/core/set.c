@@ -32,30 +32,24 @@
  * \function igraph_set_init
  * \brief Initializes a set.
  *
- * Initializes an empty set (with zero elements). Allocates memory for
- * the requested capacity. No re-allocation will be necessary until the
- * number of elements exceeds this initial capacity.
+ * Initializes an empty set (with zero elements). 
+ * \param set Pointer to the set to be initialized.in the set.
  *
- * \param set Pointer to the set to be initialized.
- * \param capacity The expected number of elements in the set.
- *
- * \return error code:
- *       \c IGRAPH_ENOMEM if there is not enough memory.
- *
- * Time complexity: operating system dependent, should be around
- * O(n), n is the expected size of the set.
+ * Time complexity: O(1)
  */
 igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
-    igraph_integer_t alloc_size;
-
-    IGRAPH_ASSERT(capacity >= 0);
-    alloc_size = capacity > 0 ? capacity : 1;
-    set->reservoir = IGRAPH_CALLOC(alloc_size, struct Node);
-    IGRAPH_CHECK_OOM(set->reservoir, "Cannot reserve space for set.");
     set->root = NULL;
     set->size = 0;
-    set->reservoir_size = capacity;
     return IGRAPH_SUCCESS;
+}
+
+void set_destroy_internal(struct Node* node) {
+    if (node == NULL) {
+        return ;
+    }
+    set_destroy_internal(node->left);
+    set_destroy_internal(node->right);
+    IGRAPH_FREE(node);
 }
 
 /**
@@ -69,62 +63,11 @@ igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    if (set->reservoir != NULL) {
-        IGRAPH_FREE(set->reservoir); /* sets to NULL */
-    }
+    set_destroy_internal(set->root);
+    set->root = NULL;
+    set->size = 0;
 }
 
-/**
- * \ingroup set
- * \function igraph_set_inited
- * \brief Determines whether a set is initialized or not.
- *
- * This function checks whether the internal storage for the members of the
- * set has been allocated or not, and it assumes that the pointer for the
- * internal storage area contains \c NULL if the area is not initialized yet.
- * This only applies if you have allocated an array of sets with \c IGRAPH_CALLOC or
- * if you used the \c IGRAPH_SET_NULL constant to initialize the set.
- *
- * \param set The set object.
- *
- * Time complexity: O(1)
- */
-igraph_bool_t igraph_set_inited(igraph_set_t* set) {
-    return (set->reservoir != NULL);
-}
-
-/**
- * \ingroup set
- * \function igraph_set_reserve
- * \brief Reserves memory for a set.
- *
- * \param set The set object.
- * \param capacity the new \em allocated capacity of the set.
- *
- * Time complexity: operating system dependent, should be around
- * O(n), n is the new allocated size of the set.
- */
-igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) {
-    igraph_integer_t actual_size = igraph_set_size(set);
-    IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->reservoir != NULL);
-    if (capacity <= actual_size) {
-        return IGRAPH_SUCCESS;
-    }
-
-    // struct Node* tmp;
-    // tmp = IGRAPH_MALLOC(capacity *sizeof( struct Node));
-    // memcpy(tmp, set->reservoir, set->reservoir_size);
-    // set->reservoir = tmp;
-    // IGRAPH_CHECK_OOM(set->reservoir, "Cannot reserve space for set.");
-
-
-    set->reservoir = IGRAPH_REALLOC(set->reservoir,capacity, struct Node);
-
-    set->reservoir_size = capacity;
-
-    return IGRAPH_SUCCESS;
-}
 
 /**
  * \ingroup set
@@ -140,27 +83,6 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t capacity) 
 igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
     return set->size == 0;
-}
-
-/**
- * \ingroup set
- * \function igraph_set_clear
- * \brief Removes all elements from the set.
- *
- * </para><para>
- * This function simply sets the size of the set to zero, it does
- * not free any allocated memory. For that you have to call
- * \ref igraph_set_destroy().
- *
- * \param set The set object.
- *
- * Time complexity: O(1).
- */
-void igraph_set_clear(igraph_set_t* set) {
-    IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->reservoir != NULL);
-    set->size = 0;
-    set->root = NULL;
 }
 
 
@@ -360,11 +282,11 @@ void print2DUtil(struct Node* root, int space) {
     print2DUtil(root->left, space);
 }
 
-// Wrapper over print2DUtil()
-void print2D(struct Node* root) {
-    // Pass initial space count as 0
-    print2DUtil(root, 0);
+
+void igraph_set_print_tree(const igraph_set_t* set){
+    print2DUtil(set->root, 0);
 }
+
 
 /**
  * \ingroup set
@@ -383,17 +305,22 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
         return IGRAPH_SUCCESS;
     }
 
-    if (set->size >= set->reservoir_size) {
-        IGRAPH_CHECK(igraph_set_reserve(set, set->reservoir_size + 1));
-    }
     // printf("here's tree\ninserting value::%ld\nset size::%ld\nreservoir size%ld\n", e, set->size, set->reservoir_size);
     // print2D(set->root);
     // printf("tree print done\nsize::%ld\n", set->size);
     // fflush(stdout);
 
-    set->root = RB_insert(set->root, e, &set->reservoir[set->size]);
+    struct Node* newNode = IGRAPH_CALLOC(1, struct Node);
+    if(newNode == NULL){
+        IGRAPH_CHECK_OOM(newNode, "Cannot reserve space for the new set element.");
+    }
+    set->root = RB_insert(set->root, e, newNode);
     set->size++;
     return IGRAPH_SUCCESS;
+}
+
+void igraph_set_clear(igraph_set_t* set){
+    igraph_set_destroy(set);
 }
 
 igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e) {
@@ -425,8 +352,11 @@ igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
     igraph_integer_t left, right, middle;
 
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->reservoir != NULL);
     return BST_Search(set->root, e);
+}
+
+igraph_bool_t igraph_set_inited(igraph_set_t* set){
+    return true;
 }
 
 void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
@@ -437,15 +367,12 @@ void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* 
     }
     iterator->stack[0].data = *(set->root);
     iterator->stack_index = 0;
-    if (set->root->left != NULL) {
-        iterator->stack[0].mode = LEFT;
-    } else {
-        iterator->stack[0].mode = SELF;
-    }
+    iterator->stack[0].mode = LEFT;
 }
 
 igraph_integer_t iterate_self(igraph_set_iterator_t *state) {
     struct Node *node = &(state->stack[state->stack_index].data);
+    igraph_integer_t data = node->data;
     if (node->right != NULL) {
         state->stack[state->stack_index].data = *(node->right);
         state->stack[state->stack_index].mode = LEFT;
@@ -455,24 +382,42 @@ igraph_integer_t iterate_self(igraph_set_iterator_t *state) {
     } else {
         state->stack_index--;
     }
-    return node->data;
+    return data;
 }
 
 igraph_integer_t iterate_left(igraph_set_iterator_t *state) {
     struct Node *node = &(state->stack[state->stack_index].data);
-
-    if (node->left == NULL) {
-        return iterate_self(state);
-    }
 
     for ( ; node->left != NULL ; state->stack_index++) {
         state->stack[state->stack_index + 1 ].data = *(node->left);
         state->stack[state->stack_index + 1 ].mode = LEFT;
         node = node->left;
     }
-    return iterate_self(state);
+    state->stack_index--;
+    if(state->stack_index >= 0){
+        state->stack[state->stack_index].mode = SELF;
+    }
+    // printf("inside iterate left, last state data %ld\n", state->stack[state->stack_index].data.data);
+    return node->data;
 }
 
+
+void print_stack(igraph_set_iterator_t *state){
+    return ;
+    for(igraph_integer_t i = 0 ; i <= state->stack_index ; i++){
+        printf("index::%ld value::%ld mode::", i,state->stack[i].data.data);
+        switch (state->stack[i].mode)
+        {
+        case LEFT:
+            printf("left\n");
+            break;
+        case SELF:
+            printf("self\n");
+        default:
+            break;
+        }
+    }
+}
 
 /**
  * \ingroup set
@@ -495,7 +440,6 @@ igraph_integer_t iterate_left(igraph_set_iterator_t *state) {
 igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t *state,
                                  igraph_integer_t *element) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(set->reservoir != NULL);
     IGRAPH_ASSERT(state != NULL);
     if (state->stack_index < 0) {
         element = NULL;
@@ -503,11 +447,13 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
     }
     enum STACK_MODE mode = state->stack[state->stack_index].mode;
     switch (mode) {
-    case LEFT:
-        *element = iterate_left(state);
-        return true;
-    case SELF:
-        *element = iterate_self(state);
-        return true;
+        case LEFT:
+            *element = iterate_left(state);
+            print_stack(state);
+            return true;
+        case SELF:
+            *element = iterate_self(state);
+            print_stack(state);
+            return true;
     }
 }

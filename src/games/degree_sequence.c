@@ -476,7 +476,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
-        IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*degseq)[i]));
+        // IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*degseq)[i]));
     }
 
     RNG_BEGIN();
@@ -595,7 +595,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
-        IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*out_deg)[i]));
+        // IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*out_deg)[i]));  
     }
 
     RNG_BEGIN();
