@@ -36,6 +36,7 @@ void print_set(igraph_set_t *set, FILE *f) {
         fprintf(f, " %" IGRAPH_PRId , element);
     }
     fprintf(f, "\n");
+    igraph_set_print_tree(set, stdout);
 }
 
 int main(void) {
