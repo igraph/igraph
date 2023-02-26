@@ -37,10 +37,10 @@
  *
  * Time complexity: O(1)
  */
-igraph_error_t igraph_set_init(igraph_set_t *set, igraph_integer_t capacity) {
+void igraph_set_init(igraph_set_t *set) {
+    IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
-    return IGRAPH_SUCCESS;
 }
 
 void set_destroy_internal(struct Node* node) {
@@ -59,7 +59,7 @@ void set_destroy_internal(struct Node* node) {
  *
  * \param set Pointer to the set to be destroyed.
  *
- * Time complexity: operating system dependent.
+ * Time complexity: O(n * log(n) ).
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
@@ -256,37 +256,51 @@ struct Node* RB_insert(struct Node* T, igraph_integer_t data, struct Node* z) {
 
     return T;
 }
-void print2DUtil(struct Node* root, int space) {
-#define COUNT 10
 
-    // Base case
+
+void print2DUtil(struct Node* root, int space, FILE * output_stream) {
+    #define COUNT 10
     if (root == NULL) {
         return;
     }
-
-    // Increase distance between levels
     space += COUNT;
-
-    // Process right child first
-    print2DUtil(root->right, space);
-
-    // Print current node after space
-    // count
-    printf("\n");
+    print2DUtil(root->right, space,output_stream);
+    fprintf(output_stream, "\n");
     for (int i = COUNT; i < space; i++) {
-        printf(" ");
+        fprintf(output_stream, " ");
     }
     printf("%ld\n", root->data);
-
-    // Process left child
-    print2DUtil(root->left, space);
+    print2DUtil(root->left, space,output_stream);
 }
 
-
-void igraph_set_print_tree(const igraph_set_t* set){
-    print2DUtil(set->root, 0);
+/**
+ * \ingroup set
+ * \function igraph_set_print_tree
+ * \brief Prints the internal BST of the set in 2D format.
+ *
+ * For example the set with number 1 to 7 will be printed as
+ *
+ *                     7
+ * 
+ *           3
+ * 
+ *                     6
+ * 
+ * 1
+ * 
+ *                     5
+ * 
+ *           2
+ * 
+ *                     4
+ * 
+ * \param set The set to be prited.
+ * \param output_stream The file stream to write the result to. Set this to stdout to write to console.
+ * Time complexity: O(n * log(n)), n is the number of elements in \p set.
+ */
+void igraph_set_print_tree(const igraph_set_t* set, FILE * output_stream){
+    print2DUtil(set->root, 0, output_stream);
 }
-
 
 /**
  * \ingroup set
@@ -305,11 +319,6 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
         return IGRAPH_SUCCESS;
     }
 
-    // printf("here's tree\ninserting value::%ld\nset size::%ld\nreservoir size%ld\n", e, set->size, set->reservoir_size);
-    // print2D(set->root);
-    // printf("tree print done\nsize::%ld\n", set->size);
-    // fflush(stdout);
-
     struct Node* newNode = IGRAPH_CALLOC(1, struct Node);
     if(newNode == NULL){
         IGRAPH_CHECK_OOM(newNode, "Cannot reserve space for the new set element.");
@@ -319,9 +328,7 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     return IGRAPH_SUCCESS;
 }
 
-void igraph_set_clear(igraph_set_t* set){
-    igraph_set_destroy(set);
-}
+
 
 igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e) {
     if (node == NULL) {
@@ -349,17 +356,36 @@ igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e) {
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
 igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
-    igraph_integer_t left, right, middle;
-
     IGRAPH_ASSERT(set != NULL);
     return BST_Search(set->root, e);
 }
 
+
+/**
+ * \ingroup set
+ * \function igraph_set_inited
+ * \brief Determines whether a set is initialized or not.
+ *
+ * \param set The set object.
+ *
+ * Time complexity: O(1)
+ */
 igraph_bool_t igraph_set_inited(igraph_set_t* set){
     return true;
 }
 
-void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
+
+/**
+ * \ingroup set
+ * \function igraph_set_iterator_init
+ * \brief Initializes a set iterator
+ *
+ * \param set Pointer to the set to be iterated upon.
+ * \param iterator Pointer to the Iterator to be initialised 
+ *
+ * Time complexity: O(1)
+ */
+void igraph_set_iterator_init(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
     IGRAPH_ASSERT(set != NULL);
     if (set->root == NULL) {
         iterator->stack_index = -1;
@@ -402,34 +428,21 @@ igraph_integer_t iterate_left(igraph_set_iterator_t *state) {
 }
 
 
-void print_stack(igraph_set_iterator_t *state){
-    return ;
-    for(igraph_integer_t i = 0 ; i <= state->stack_index ; i++){
-        printf("index::%ld value::%ld mode::", i,state->stack[i].data.data);
-        switch (state->stack[i].mode)
-        {
-        case LEFT:
-            printf("left\n");
-            break;
-        case SELF:
-            printf("self\n");
-        default:
-            break;
-        }
-    }
-}
 
 /**
  * \ingroup set
  * \function igraph_set_iterate
  * \brief Iterates through the element of the set.
  *
- * Elements are returned in an sorted order.
+ * Elements are returned in an sorted order. 
+ * Inserting elements while iterating might be ignored.
+ * Deleting elements while iterating might be ignored (they might still be returned).
+ * Deleting the element the iterate is pointing to(the latest one returned) will have no issue. 
  *
  * \param set The set object.
  * \param state Internal state of the iteration.
- *   This should be a pointer to an \c igraph_integer_t variable
- *   which must be zero for the first invocation.
+ *   This should be a pointer to an \c igraph_set_iterator_t variable
+ *   which must be first initialised via igraph_set_iterator_init.
  *   The object must not be adjusted and its value should
  *   not be used for anything during the iteration.
  * \param element The next element or 0 (if the iteration
@@ -449,11 +462,9 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
     switch (mode) {
         case LEFT:
             *element = iterate_left(state);
-            print_stack(state);
             return true;
         case SELF:
             *element = iterate_self(state);
-            print_stack(state);
             return true;
     }
 }

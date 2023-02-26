@@ -30,7 +30,7 @@
 
 void print_set(igraph_set_t *set, FILE *f) {
     igraph_set_iterator_t state;
-    igraph_set_create_iterator(set, &state);
+    igraph_set_iterator_init(set, &state);
     igraph_integer_t element;
     while (igraph_set_iterate(set, &state, &element)) {
         fprintf(f, " %" IGRAPH_PRId , element);
@@ -44,11 +44,11 @@ int main(void) {
     igraph_integer_t i;
 
     /* simple init */
-    igraph_set_init(&set, 0);
+    igraph_set_init(&set);
     igraph_set_destroy(&set);
 
     /* addition, igraph_set_size */
-    igraph_set_init(&set, 10);
+    igraph_set_init(&set);
     i = 10;
     while (igraph_set_size(&set) < 10) {
         igraph_set_add(&set, 2 * i);
@@ -75,7 +75,7 @@ int main(void) {
     if (igraph_set_empty(&set)) {
         return 1;
     }
-    igraph_set_clear(&set);
+    igraph_set_destroy(&set);
     if (!igraph_set_empty(&set)) {
         return 2;
     }

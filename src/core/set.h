@@ -76,22 +76,21 @@ typedef struct s_set{
 
 
 #define IGRAPH_SET_NULL { 0,0,0 }
-#define IGRAPH_SET_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_set_init(v, size)); \
+#define IGRAPH_SET_INIT_FINALLY(v) \
+    do { igraph_set_init(v); \
         IGRAPH_FINALLY(igraph_set_destroy, v); } while (0)
 
-IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_init(igraph_set_t* set, igraph_integer_t size);
+IGRAPH_PRIVATE_EXPORT void igraph_set_init(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT void igraph_set_destroy(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_inited(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_empty(const igraph_set_t* set);
-IGRAPH_PRIVATE_EXPORT void igraph_set_clear(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_integer_t igraph_set_size(const igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_add(igraph_set_t* v, igraph_integer_t e);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t* state,
                                                        igraph_integer_t* element);
-IGRAPH_PRIVATE_EXPORT void igraph_set_create_iterator(const igraph_set_t* set, igraph_set_iterator_t* iterator);
-IGRAPH_PRIVATE_EXPORT void igraph_set_print_tree(const igraph_set_t* set);
+IGRAPH_PRIVATE_EXPORT void igraph_set_iterator_init(const igraph_set_t* set, igraph_set_iterator_t* iterator);
+IGRAPH_PRIVATE_EXPORT void igraph_set_print_tree(const igraph_set_t* set, FILE* output_stream);
 __END_DECLS
 
 #endif

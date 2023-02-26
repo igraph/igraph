@@ -164,7 +164,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&stubs, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&stubs, outsum));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&residual_degrees, no_of_nodes);
-    IGRAPH_CHECK(igraph_set_init(&incomplete_vertices, 0));
+    igraph_set_init(&incomplete_vertices);
     IGRAPH_FINALLY(igraph_set_destroy, &incomplete_vertices);
 
     /* Start the RNG */
@@ -197,7 +197,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
 
             /* Clear the skipped stub counters and the set of incomplete vertices */
             igraph_vector_int_null(&residual_degrees);
-            igraph_set_clear(&incomplete_vertices);
+            igraph_set_destroy(&incomplete_vertices);
 
             /* Shuffle the stubs in-place */
             igraph_vector_int_shuffle(&stubs);
@@ -232,9 +232,9 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
                  * is done by enumerating all possible pairs and checking whether at
                  * least one feasible pair is found. */
                 failed = 1;
-                igraph_set_create_iterator(&incomplete_vertices, &set_iter_i);
+                igraph_set_iterator_init(&incomplete_vertices, &set_iter_i);
                 while (failed && igraph_set_iterate(&incomplete_vertices, &set_iter_i, &from)) {
-                    igraph_set_create_iterator(&incomplete_vertices, &set_iter_j);
+                    igraph_set_iterator_init(&incomplete_vertices, &set_iter_j);
                     while (igraph_set_iterate(&incomplete_vertices, &set_iter_j, &to)) {
                         
                         if (from == to) {
@@ -312,9 +312,9 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
     IGRAPH_CHECK(igraph_vector_int_reserve(&in_stubs, outsum));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&residual_out_degrees, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&residual_in_degrees, no_of_nodes);
-    IGRAPH_CHECK(igraph_set_init(&incomplete_out_vertices, 0));
+    igraph_set_init(&incomplete_out_vertices);
     IGRAPH_FINALLY(igraph_set_destroy, &incomplete_out_vertices);
-    IGRAPH_CHECK(igraph_set_init(&incomplete_in_vertices, 0));
+    igraph_set_init(&incomplete_in_vertices);
     IGRAPH_FINALLY(igraph_set_destroy, &incomplete_in_vertices);
 
     /* Start the RNG */
@@ -353,8 +353,8 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
             /* Clear the skipped stub counters and the set of incomplete vertices */
             igraph_vector_int_null(&residual_out_degrees);
             igraph_vector_int_null(&residual_in_degrees);
-            igraph_set_clear(&incomplete_out_vertices);
-            igraph_set_clear(&incomplete_in_vertices);
+            igraph_set_destroy(&incomplete_out_vertices);
+            igraph_set_destroy(&incomplete_in_vertices);
 
             /* Shuffle the out-stubs in-place */
             igraph_vector_int_shuffle(&out_stubs);
@@ -387,9 +387,9 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
                  * is done by enumerating all possible pairs and checking whether at
                  * least one feasible pair is found. */
                 failed = 1;
-                igraph_set_create_iterator(&incomplete_out_vertices, &set_iter_i);
+                igraph_set_iterator_init(&incomplete_out_vertices, &set_iter_i);
                 while (failed && igraph_set_iterate(&incomplete_out_vertices, &set_iter_i, &from)) {
-                    igraph_set_create_iterator(&incomplete_out_vertices, &set_iter_j);
+                    igraph_set_iterator_init(&incomplete_out_vertices, &set_iter_j);
                     while (igraph_set_iterate(&incomplete_in_vertices, &set_iter_j, &to)) {
                         neis = igraph_adjlist_get(&al, from);
                         if (from != to && !igraph_vector_int_binsearch(neis, to, 0)) {
@@ -474,7 +474,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
         if (! set) {
             IGRAPH_ERROR("Cannot sample from configuration model (simple graphs).", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        IGRAPH_CHECK(igraph_set_init(set, 0));
+        igraph_set_init(set);
         VECTOR(adjlist)[i] = set;
         // IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*degseq)[i]));
     }
@@ -524,7 +524,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
 
         /* Clear adjacency list. */
         for (j = 0; j < vcount; ++j) {
-            igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
+            igraph_set_destroy((igraph_set_t *) VECTOR(adjlist)[j]);
         }
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -593,7 +593,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
         if (! set) {
             IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        IGRAPH_CHECK(igraph_set_init(set, 0));
+        igraph_set_init(set);
         VECTOR(adjlist)[i] = set;
         // IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*out_deg)[i]));  
     }
@@ -641,7 +641,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
 
         /* Clear adjacency list. */
         for (j = 0; j < vcount; ++j) {
-            igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
+            igraph_set_destroy((igraph_set_t *) VECTOR(adjlist)[j]);
         }
 
         IGRAPH_ALLOW_INTERRUPTION();

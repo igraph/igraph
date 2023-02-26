@@ -455,7 +455,7 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-    IGRAPH_SET_INIT_FINALLY(&vids_set, IGRAPH_VIT_SIZE(vit));
+    IGRAPH_SET_INIT_FINALLY(&vids_set);
     for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         IGRAPH_CHECK(igraph_set_add(&vids_set, IGRAPH_VIT_GET(vit)));
     }
