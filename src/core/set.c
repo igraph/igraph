@@ -269,7 +269,7 @@ void print2DUtil(struct Node* root, int space, FILE * output_stream) {
     for (int i = COUNT; i < space; i++) {
         fprintf(output_stream, " ");
     }
-    printf("%ld\n", root->data);
+    printf("%" IGRAPH_PRId "\n", root->data);
     print2DUtil(root->left, space,output_stream);
 }
 
