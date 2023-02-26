@@ -33,9 +33,10 @@ void print_set(igraph_set_t *set, FILE *f) {
     igraph_set_iterator_init(set, &state);
     igraph_integer_t element;
     while (igraph_set_iterate(set, &state, &element)) {
-        fprintf(f, " %" IGRAPH_PRId , element);
+        fprintf(f, " %" IGRAPH_PRId, element);
     }
     fprintf(f, "\n");
+    fprintf(f, "priting 2D tree ");
     igraph_set_print_tree(set, stdout);
 }
 
@@ -71,6 +72,13 @@ int main(void) {
     if (igraph_set_contains(&set, 42) || !igraph_set_contains(&set, 7)) {
         return 3;
     }
+
+    for (igraph_integer_t i = 1 ; i <= 21 ; i++) {
+        if (i % 3 == 0) {
+            igraph_set_delete(&set, i);
+        }
+    }
+    print_set(&set, stdout);
 
     /* igraph_set_empty, igraph_set_clear */
     if (igraph_set_empty(&set)) {

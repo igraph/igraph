@@ -328,7 +328,186 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     return IGRAPH_SUCCESS;
 }
 
+struct Node* Tree_minimum(struct Node* node)
+{
+    while(node->left!=NULL)
+        node = node->left;
 
+    return node;
+}
+
+void RB_delete_fixup(struct Node** T, struct Node** x)
+{
+    while((*x)!=*T && (*x)->color == BLACK)
+    {
+        if((*x)==(*x)->parent->left)
+        {
+            struct Node* w = (*x)->parent->right;
+
+            if(w->color==RED)
+            {
+                w->color = BLACK;
+                (*x)->parent->color = BLACK;
+                LeftRotate(T,&((*x)->parent));
+                w = (*x)->parent->right;
+            }
+
+            if(w->left->color==BLACK && w->right->color == BLACK)
+            {
+                w->color = RED;
+                (*x) = (*x)->parent;
+            }
+
+            else
+            {
+                if(w->right->color == BLACK)
+                {
+                    w->left->color = BLACK;
+                    w->color = RED;
+                    RightRotate(T,&w);
+                    w = (*x)->parent->right;
+                }
+
+                w->color = (*x)->parent->color;
+                (*x)->parent->color = BLACK;
+                w->right->color = BLACK;
+                LeftRotate(T,&((*x)->parent));
+                (*x) = *T;
+            }
+        }
+
+        else
+        {
+            struct Node* w = (*x)->parent->left;
+
+            if(w->color==RED)
+            {
+                w->color = BLACK;
+                (*x)->parent->color = BLACK;
+                RightRotate(T,&((*x)->parent));
+                w = (*x)->parent->left;
+            }
+
+            if(w->right->color==BLACK && w->left->color == BLACK)
+            {
+                w->color = RED;
+                (*x) = (*x)->parent;
+            }
+
+            else
+            {
+                if(w->left->color == BLACK)
+                {
+                    w->right->color = BLACK;
+                    w->color = RED;
+                    LeftRotate(T,&w);
+                    w = (*x)->parent->left;
+                }
+
+                w->color = (*x)->parent->color;
+                (*x)->parent->color = BLACK;
+                w->left->color = BLACK;
+                RightRotate(T,&((*x)->parent));
+                (*x) = *T;
+            }
+        }
+    }
+    (*x)->color = BLACK;
+
+}
+
+void RB_transplat(struct Node** T, struct Node** u,struct Node** v)
+{
+    if((*u)->parent == NULL)
+        *T = *v;
+
+    else if((*u)==(*u)->parent->left)
+        (*u)->parent->left = *v;
+    else
+        (*u)->parent->right = *v;
+
+    if((*v)!=NULL) 
+        (*v)->parent = (*u)->parent;
+}
+
+struct Node* RB_delete(struct Node *T,struct Node* z)
+{
+    struct Node *y = z;
+    enum COLOR yoc;
+    yoc = z->color; // y's original color
+
+    struct Node* x;
+
+    if(z->left==NULL )
+    {
+        x = z->right;
+        RB_transplat(&T,&z,&(z->right));
+    }
+
+    else if(z->right==NULL )
+    {
+        x = z->left;
+        RB_transplat(&T,&z,&(z->left));
+    }
+
+    else
+    {
+        y = Tree_minimum(z->right);
+        yoc = y->color;
+        x = y->right;
+
+        if(y->parent==z && x!=NULL)
+            x->parent = y;
+
+        if(y->parent!=z)
+        {
+            RB_transplat(&T,&y,&(y->right));
+            y->right = z->right;
+            y->right->parent = y;
+        }
+
+        RB_transplat(&T,&z,&y);
+        y->left = z->left;
+        y->left->parent = y;
+        y->color = z->color;
+    }
+
+    if(yoc==BLACK)
+        RB_delete_fixup(&T,&x);
+
+    return T;
+}
+struct Node* BST_search(struct Node* root, int x)
+{
+    if(root==NULL || root->data == x)
+        return root;
+
+    if(root->data > x)
+       return  BST_search(root->left,x);
+    else
+        return BST_search(root->right,x);
+}
+
+
+/**
+ * \ingroup set
+ * \function igraph_set_delete
+ * \brief Removes an element to the set.
+ *
+ * \param set The set object.
+ * \param e The element to be removed.
+ *
+ * Time complexity: O(log(n)), n is the number of elements in \p set.
+ */
+void igraph_set_delete(igraph_set_t* set, igraph_integer_t e){
+    IGRAPH_ASSERT(set != NULL);
+    struct Node* node_to_delete = BST_search(set->root, e);
+    if(node_to_delete == NULL){
+        return ;
+    }    
+    set->root = RB_delete(set->root, node_to_delete);
+    IGRAPH_FREE(node_to_delete);
+}
 
 igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e) {
     if (node == NULL) {
