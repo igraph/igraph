@@ -205,14 +205,14 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
-            VECTOR(vertex_index)[i] = ++remaining_nodes;
+            VECTOR(vertex_index)[i] = remaining_nodes++;
             igraph_vector_int_push_back(&vertex_perm, i);
         }
     }
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
-            igraph_integer_t new_i = VECTOR(vertex_index)[i] - 1;
+            igraph_integer_t new_i = VECTOR(vertex_index)[i];
             igraph_integer_t iedges = 0;
             neis1 = igraph_adjlist_get(&adjlist, i);
             neilen1 = igraph_vector_int_size(neis1);
@@ -247,7 +247,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                            old vertex IDs here and rewrite it later */
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei2));
                     } else {
-                        new_nei2 = VECTOR(vertex_index)[nei2] - 1;
+                        new_nei2 = VECTOR(vertex_index)[nei2];
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_nei2));
                     }
                 }
@@ -259,7 +259,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                 igraph_integer_t from = now - iedges * 2;
                 for (j = from; j < now; j += 2) {
                     igraph_integer_t nei2 = VECTOR(edges)[j + 1];
-                    igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2] - 1;
+                    igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2];
                     igraph_integer_t m = VECTOR(mult)[nei2];
                     VECTOR(edges)[j + 1] = new_nei2;
                     IGRAPH_CHECK(igraph_vector_int_push_back(multiplicity, m));
