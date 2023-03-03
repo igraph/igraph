@@ -220,7 +220,6 @@ int main(void) {
     printf("\n");
     printf("Small example graph second projection:\n");
     print_weighted_graph(&p2, &proj_weights2);
-    printf("\n");
 
     igraph_vector_destroy(&proj_weights1);
     igraph_vector_destroy(&proj_weights2);
