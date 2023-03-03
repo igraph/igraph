@@ -25,25 +25,56 @@
 #include <stdlib.h>
 #include "test_utilities.h"
 
-int check_projection(const igraph_t *graph,
-                     const igraph_vector_bool_t *types,
-                     const igraph_t *proj1,
-                     const igraph_t *proj2) {
+int check_projection_sizes(
+    const char* test_name, const igraph_t *graph, const igraph_vector_bool_t *types,
+    const igraph_t *proj1, const igraph_t *proj2
+) {
     igraph_integer_t vcount1, ecount1, vcount2, ecount2;
     igraph_bipartite_projection_size(graph, types, &vcount1, &ecount1,
                                      &vcount2, &ecount2);
+
+    if (proj1 && igraph_is_directed(proj1)) {
+        printf("%s: first projection is directed", test_name);
+        exit(14);
+    }
     if (proj1 && igraph_vcount(proj1) != vcount1) {
+        printf(
+            "%s: first projection is expected to have %" IGRAPH_PRId
+            " vertices, got %" IGRAPH_PRId,
+            test_name, vcount1, igraph_vcount(proj1)
+        );
         exit(10);
     }
     if (proj1 && igraph_ecount(proj1) != ecount1) {
+        printf(
+            "%s: first projection is expected to have %" IGRAPH_PRId
+            " edges, got %" IGRAPH_PRId,
+            test_name, ecount1, igraph_ecount(proj1)
+        );
         exit(11);
     }
+
+    if (proj2 && igraph_is_directed(proj2)) {
+        printf("%s: second projection is directed", test_name);
+        exit(15);
+    }
     if (proj2 && igraph_vcount(proj2) != vcount2) {
+        printf(
+            "%s: second projection is expected to have %" IGRAPH_PRId
+            " vertices, got %" IGRAPH_PRId,
+            test_name, vcount2, igraph_vcount(proj2)
+        );
         exit(12);
     }
     if (proj2 && igraph_ecount(proj2) != ecount2) {
+        printf(
+            "%s: second projection is expected to have %" IGRAPH_PRId
+            " edges, got %" IGRAPH_PRId,
+            test_name, ecount2, igraph_ecount(proj2)
+        );
         exit(13);
     }
+
     return 0;
 }
 
@@ -65,7 +96,7 @@ int main(void) {
 
     /* Get both projections */
     igraph_bipartite_projection(&g, &types, &p1, &p2, 0, 0, /*probe1=*/ -1);
-    check_projection(&g, &types, &p1, &p2);
+    check_projection_sizes("Full bipartite graph", &g, &types, &p1, &p2);
 
     /* Check first projection */
     igraph_full(&full, igraph_vcount(&p1), /*directed=*/0, /*loops=*/0);
@@ -103,7 +134,7 @@ int main(void) {
 
     /* Get both projections */
     igraph_bipartite_projection(&g, &types, &p1, &p2, 0, 0, /*probe1=*/ -1);
-    check_projection(&g, &types, &p1, &p2);
+    check_projection_sizes("Ring graph", &g, &types, &p1, &p2);
 
     /* Check first projection */
     igraph_ring(&ring, igraph_vcount(&g) / 2, /*directed=*/ 0,
@@ -142,7 +173,7 @@ int main(void) {
     igraph_vector_int_init(&mult2, 0);
     igraph_bipartite_projection(&g, &types, &p1, &p2, &mult1, &mult2,
                                 /*probe=*/ -1);
-    check_projection(&g, &types, &p1, &p2);
+    check_projection_sizes("Multiplicity test graph", &g, &types, &p1, &p2);
 
     if (igraph_vector_int_size(&mult1) != igraph_ecount(&p1)) {
         return 21;
