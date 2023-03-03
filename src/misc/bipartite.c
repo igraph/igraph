@@ -206,7 +206,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
             VECTOR(vertex_index)[i] = remaining_nodes++;
-            igraph_vector_int_push_back(&vertex_perm, i);
+            igraph_vector_int_push_back(&vertex_perm, i);  /* allocated */
         }
     }
 
@@ -274,8 +274,114 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     igraph_vector_int_destroy(&vertex_index);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes,
-                               /*directed=*/ 0));
+    IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes, IGRAPH_UNDIRECTED));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY(igraph_destroy, proj);
+
+    IGRAPH_I_ATTRIBUTE_DESTROY(proj);
+    IGRAPH_I_ATTRIBUTE_COPY(proj, graph, 1, 0, 0);
+    IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, proj, &vertex_perm));
+    igraph_vector_int_destroy(&vertex_perm);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_i_weighted_bipartite_projection(
+    const igraph_t *graph, const igraph_vector_bool_t *types,
+    const igraph_vector_t *weights, igraph_t *proj, int which,
+    igraph_vector_t *proj_weights
+) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t i, j, k, proj_weights_len;
+    igraph_integer_t remaining_nodes = 0;
+    igraph_vector_int_t vertex_perm, vertex_index;
+    igraph_vector_int_t edges;
+    igraph_inclist_t inclist;
+    igraph_vector_int_t *inc_edges1, *inc_edges2;
+    igraph_integer_t inc_edge_count1, inc_edge_count2;
+    igraph_vector_int_t added;
+
+    if (which < 0) {
+        return IGRAPH_SUCCESS;
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_perm, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&vertex_perm, no_of_nodes));
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_index, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&added, no_of_nodes);
+
+    IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
+
+    if (proj_weights) {
+        igraph_vector_clear(proj_weights);
+        proj_weights_len = 0;
+    }
+
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(*types)[i] == which) {
+            VECTOR(vertex_index)[i] = remaining_nodes++;
+            igraph_vector_int_push_back(&vertex_perm, i);  /* allocated */
+        }
+    }
+
+    for (i = 0; i < no_of_nodes; i++) {
+        if (VECTOR(*types)[i] == which) {
+            igraph_integer_t new_i = VECTOR(vertex_index)[i];
+            inc_edges1 = igraph_inclist_get(&inclist, i);
+            inc_edge_count1 = igraph_vector_int_size(inc_edges1);
+            for (j = 0; j < inc_edge_count1; j++) {
+                igraph_integer_t inc = VECTOR(*inc_edges1)[j];
+                igraph_integer_t nei = IGRAPH_OTHER(graph, inc, i);
+                if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
+                    IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
+                                 IGRAPH_EINVAL);
+                }
+                inc_edges2 = igraph_inclist_get(&inclist, nei);
+                inc_edge_count2 = igraph_vector_int_size(inc_edges2);
+                for (k = 0; k < inc_edge_count2; k++) {
+                    igraph_integer_t inc2 = VECTOR(*inc_edges2)[k];
+                    igraph_integer_t nei2 = IGRAPH_OTHER(graph, inc2, nei);
+                    igraph_integer_t new_nei2;
+                    if (nei2 <= i) {
+                        continue;
+                    }
+
+                    if (VECTOR(added)[nei2] != i + 1) {
+                        VECTOR(added)[nei2] = i + 1;
+                        new_nei2 = VECTOR(vertex_index)[nei2];
+
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_i));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_nei2));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_nei2));
+                        IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_i));
+                        if (proj_weights) {
+                            IGRAPH_CHECK(igraph_vector_push_back(proj_weights, 0));
+                            IGRAPH_CHECK(igraph_vector_push_back(proj_weights, 0));
+                            proj_weights_len = igraph_vector_size(proj_weights);
+                        }
+                    }
+
+                    if (proj_weights) {
+                        VECTOR(*proj_weights)[proj_weights_len - 2] += VECTOR(*weights)[inc];
+                        VECTOR(*proj_weights)[proj_weights_len - 1] += VECTOR(*weights)[inc2];
+                    }
+                }
+            }
+        } /* if VECTOR(*type)[i] == which */
+    }
+
+    igraph_inclist_destroy(&inclist);
+    igraph_vector_int_destroy(&added);
+    igraph_vector_int_destroy(&vertex_index);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes, IGRAPH_DIRECTED));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_FINALLY(igraph_destroy, proj);
@@ -345,7 +451,13 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
     int t1, t2;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid bipartite type vector size", IGRAPH_EINVAL);
+        IGRAPH_ERRORF(
+            "Type vector length (%" IGRAPH_PRId ") should match number of "
+            "vertices (%" IGRAPH_PRId ") when calculating bipartite projections.",
+            IGRAPH_EINVAL,
+            igraph_vector_bool_size(types),
+            no_of_nodes
+        );
     }
 
     if (probe1 >= no_of_nodes) {
@@ -370,9 +482,141 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj1, t1, multiplicity1));
     IGRAPH_FINALLY(igraph_destroy, proj1);
+
     IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj2, t2, multiplicity2));
 
     IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_weighted_bipartite_projection
+ * \brief Create one or both projections of a weighted bipartite (two-mode) network.
+ *
+ * Creates one or both projections of a weighted bipartite graph. Both projections
+ * will be directed even if the original graph was undirected, and the weights
+ * of the projected edges will be based on the sum of the weights of the original
+ * edges in the input graph that the projection was created from. In particular,
+ * the weight of an edge from vertex \c u to \c v (both of type 1) in the
+ * projected graph will be the sum of the weights of all edges from vertex \c u
+ * to any vertex \c p of type 2 in the original graph.
+ *
+ * </para><para>
+ * Note that even though the projections are directed, all the edges in the
+ * projection will be mutual (but with potentially different weights in the
+ * two directions).
+ *
+ * \param graph The bipartite input graph. Directedness of the edges
+ *   is ignored.
+ * \param types Boolean vector giving the vertex types of the graph.
+ * \param weights An optional weight vector for weighted bipartite
+ *        projections. No edge weight may be NaN. Supply a null
+ *        pointer here if all weights are assumed to be 1. (Note that this
+ *        is not the same as the unweighted projection as the projections will
+ *        still be directed).
+ * \param proj1 Pointer to an uninitialized graph object, the first
+ *   projection will be created here. It a null pointer, then it is
+ *   ignored, see also the \p probe1 argument.
+ * \param proj2 Pointer to an uninitialized graph object, the second
+ *   projection is created here, if it is not a null pointer. See also
+ *   the \p probe1 argument.
+ * \param proj1_weights Pointer to a vector, or a null pointer. If not
+ *   the latter, then the weights of the edges in the first projection are stored
+ *   here.
+ * \param proj2_weights Pointer to a vector, or a null pointer. If not
+ *   the latter, then the weights of the edges in the second projection are stored
+ *   here.
+ * \param probe1 This argument can be used to specify the order of the
+ *   projections in the resulting list. When it is non-negative, then
+ *   it is considered as a vertex ID and the projection containing
+ *   this vertex will be the first one in the result. Setting this
+ *   argument to a non-negative value implies that \c proj1 must be
+ *   a non-null pointer. If you don't care about the ordering of the
+ *   projections, pass -1 here.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
+ * is the number of edges, d is the average (total) degree of the
+ * graphs.
+ */
+
+igraph_error_t igraph_weighted_bipartite_projection(
+    const igraph_t *graph, const igraph_vector_bool_t *types,
+    const igraph_vector_t *weights, igraph_t *proj1, igraph_t *proj2,
+    igraph_vector_t *proj1_weights, igraph_vector_t *proj2_weights,
+    igraph_integer_t probe1
+) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+
+    /* t1 is -1 if proj1 is omitted, it is 0 if it belongs to type zero,
+       it is 1 if it belongs to type one. The same for t2 */
+    int t1, t2;
+
+    if (igraph_vector_bool_size(types) != no_of_nodes) {
+        IGRAPH_ERRORF(
+            "Type vector length (%" IGRAPH_PRId ") should match number of "
+            "vertices (%" IGRAPH_PRId ") when calculating bipartite projections.",
+            IGRAPH_EINVAL,
+            igraph_vector_bool_size(types),
+            no_of_nodes
+        );
+    }
+
+    if (weights != 0 && igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF(
+            "Weights vector length (%" IGRAPH_PRId ") should match number of "
+            "edges (%" IGRAPH_PRId ") when calculating bipartite projections.",
+            IGRAPH_EINVAL,
+            igraph_vector_size(weights),
+            no_of_edges
+        );
+    }
+
+    if (proj1 == 0 && proj1_weights != 0) {
+        IGRAPH_ERROR(
+            "Cannot return weights for the first projection if the graph "
+            "itself is not constructed.",
+            IGRAPH_EINVAL
+        );
+    }
+
+    if (proj2 == 0 && proj2_weights != 0) {
+        IGRAPH_ERROR(
+            "Cannot return weights for the second projection if the graph "
+            "itself is not constructed.",
+            IGRAPH_EINVAL
+        );
+    }
+
+    if (probe1 >= no_of_nodes) {
+        IGRAPH_ERROR("No such vertex to probe", IGRAPH_EINVAL);
+    }
+
+    if (probe1 >= 0 && !proj1) {
+        IGRAPH_ERROR("`probe1' given, but `proj1' is a null pointer", IGRAPH_EINVAL);
+    }
+
+    if (probe1 >= 0) {
+        t1 = VECTOR(*types)[probe1];
+        if (proj2) {
+            t2 = 1 - t1;
+        } else {
+            t2 = -1;
+        }
+    } else {
+        t1 = proj1 ? 0 : -1;
+        t2 = proj2 ? 1 : -1;
+    }
+
+    IGRAPH_CHECK(igraph_i_weighted_bipartite_projection(graph, types, weights, proj1, t1, proj1_weights));
+    IGRAPH_FINALLY(igraph_destroy, proj1);
+
+    IGRAPH_CHECK(igraph_i_weighted_bipartite_projection(graph, types, weights, proj2, t2, proj2_weights));
+
+    IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 

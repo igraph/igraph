@@ -760,6 +760,7 @@ add_legacy_tests(
   igraph_bipartite_projection
   igraph_get_incidence
   igraph_incidence
+  igraph_weighted_bipartite_projection
 )
 
 # centralization.at
