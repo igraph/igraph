@@ -979,6 +979,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                       options->iparam, options->ipntr,
                       workd, workl, &options->lworkl, &options->info);
 #endif
+        /* When there is a non-zero error code in options->info, we expect that
+         * ARPACK requests a termination of the iteration by setting ido=99. */
+        IGRAPH_ASSERT(ido == 99 || options->info == 0);
 
         if (ido == -1 || ido == 1) {
             from = workd + options->ipntr[0] - 1;
@@ -1254,6 +1257,9 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                       options->iparam, options->ipntr,
                       workd, workl, &options->lworkl, &options->info);
 #endif
+        /* When there is a non-zero error code in options->info, we expect that
+         * ARPACK requests a termination of the iteration by setting ido=99. */
+        IGRAPH_ASSERT(ido == 99 || options->info == 0);
 
         if (ido == -1 || ido == 1) {
             from = workd + options->ipntr[0] - 1;
