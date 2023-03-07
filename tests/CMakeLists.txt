@@ -965,6 +965,7 @@ add_benchmarks(
   igraph_coloring
   igraph_decompose
   igraph_degree
+  igraph_degree_sequence_game
   igraph_distances
   igraph_ecc
   igraph_induced_subgraph_edges
