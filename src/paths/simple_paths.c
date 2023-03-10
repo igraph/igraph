@@ -80,7 +80,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     int iteration = 0;
 
     if (from < 0 || from >= no_nodes) {
-        IGRAPH_ERROR("Invalid starting vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
 
     if (!toall) {
