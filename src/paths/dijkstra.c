@@ -429,6 +429,10 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                          parents, inbound_edges);
     }
 
+    if (from < 0 || from >= no_of_nodes) {
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
+    }
+
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match number of edges.", IGRAPH_EINVAL);
     }
@@ -792,6 +796,10 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
     if (!weights) {
         return igraph_get_all_shortest_paths(graph, vertices, edges, nrgeo, from, to, mode);
+    }
+
+    if (from < 0 || from >= no_of_nodes) {
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
 
     if (vertices == NULL && nrgeo == NULL && edges == NULL) {
