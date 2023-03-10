@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
  * \param weights The vector giving the edge weights, it may be \c NULL,
  *     in which case all edges are weighted equally. The edge weights
  *     must be positive unless using the \c IGRAPH_SPINCOMM_IMP_NEG
- *     implementation. This condition is not verified by the function.
+ *     implementation.
  * \param modularity Pointer to a real number, if not \c NULL then the
  *     modularity score of the solution will be stored here. This is the
  *     gereralized modularity that simplifies to the one defined in
@@ -244,6 +244,9 @@ static igraph_error_t igraph_i_community_spinglass_orig(
             IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
         }
         use_weights = 1;
+        if (igraph_vector_min(weights) < 0) {
+            IGRAPH_ERROR("Cannot work with negative weights in this implementation.", IGRAPH_EINVAL);
+        }
     }
     if (coolfact < 0 || coolfact >= 1.0) {
         IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
