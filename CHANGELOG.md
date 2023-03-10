@@ -20,6 +20,7 @@
 ### Deprecated
 
 - `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
+- `igraph_hub_score()` and `igraph_authority_score()` are now deprecated. Use `igraph_hub_and_authority_scores()` instead.
 
 ### Other
 
