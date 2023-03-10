@@ -14,6 +14,7 @@
  - Fixed an initialization error in the string attribute combiner of the C attribute handler.
  - Fixed an issue with the weighted clique number calculation when all the weights were the same.
  - HRG functions now require a graph with at least 3 vertices; previous versions crashed with smaller graphs.
+ - `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, i.e. the ARPACK interface in igraph, are now interruptible. As a result, several other functions that rely on ARPACK (eigenvector centrality, hub and authority scores, etc.) also became interruptible.
 
 ### Deprecated
 
