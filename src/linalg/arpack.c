@@ -26,6 +26,7 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 
+#include "core/interruption.h"
 #include "linalg/arpack_internal.h"
 
 #include <math.h>
@@ -965,6 +966,8 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     while (1) {
         igraph_real_t *from, *to;
 
+        IGRAPH_ALLOW_INTERRUPTION();
+
 #ifdef HAVE_GFORTRAN
         igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1242,6 +1245,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     /* Ok, we have everything */
     while (1) {
         igraph_real_t *from, *to;
+
+        IGRAPH_ALLOW_INTERRUPTION();
 
 #ifdef HAVE_GFORTRAN
         igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
