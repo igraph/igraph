@@ -139,8 +139,15 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \function igraph_hub_and_authority_scores
  * \brief Kleinberg's hub and authority scores.
  *
+ * Hub and authority scores are a generalization of the ideas behind
+ * eigenvector centrality to directed graphs. The authority score of
+ * a vertex is proportional to the sum of the hub scores of vertices
+ * that point to it. Conversely, the hub score of a vertex is proportional
+ * to the sum of authority scores of vertices that it points to.
+ *
+ * </para><para>
  * The hub and authority scores of the vertices are defined as the principal
- * eigenvectors of <code>A*A^T</code> and <code>A^T*A</code>, respectively,
+ * eigenvectors of <code>A A^T</code> and <code>A^T A</code>, respectively,
  * where <code>A</code> is the adjacency matrix of the graph and <code>A^T</code>
  * is its transposed.
  *
@@ -151,16 +158,13 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \ref igraph_eigenvector_centrality().
  *
  * </para><para>
- * When both the hub and authority scores are needed (the typical use case),
- * using this function is more efficient than separate calculations
- * with \ref igraph_hub_score() and \ref igraph_authority_score().
- *
- * </para><para>
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
  * Algorithms, \eme 1998. Extended version in \emb Journal of the
- * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
+ * ACM \eme 46(1999).
+ * https://doi.org/10.1145/324133.324140
+ * Also appears as IBM Research Report RJ 10076, May
  * 1997.
  *
  * \param graph The input graph. Can be directed and undirected.
@@ -172,7 +176,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  *    corresponding to the calculated eigenvectors is stored here.
  * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
- * \param weights A null pointer (=no edge weights), or a vector
+ * \param weights A null pointer (meaning no edge weights), or a vector
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Supply \c NULL here to use the defaults. Note that the function
@@ -392,8 +396,10 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
  * \function igraph_hub_score
  * \brief Kleinberg's hub scores.
  *
+ * \deprecated-by igraph_hub_and_authority_scores 0.10.5
+ *
  * The hub scores of the vertices are defined as the principal
- * eigenvector of <code>A*A^T</code>, where <code>A</code> is the adjacency
+ * eigenvector of <code>A A^T</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
  *
  * </para><para>
@@ -441,8 +447,10 @@ igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  * \function igraph_authority_score
  * \brief Kleinberg's authority scores.
  *
+ * \deprecated-by igraph_hub_and_authority_scores 0.10.5
+ *
  * The authority scores of the vertices are defined as the principal
- * eigenvector of <code>A^T*A</code>, where <code>A</code> is the adjacency
+ * eigenvector of <code>A^T A</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
  *
  * </para><para>
