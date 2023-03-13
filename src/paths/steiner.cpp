@@ -44,9 +44,11 @@ typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
  *  Populates the subsetMap data structure as well.
  *
  */
-static std::set<int_set> generateSubsets(const igraph_vector_int_t *steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap) {
+static igraph_error_t generateSubsets(const igraph_vector_int_t *steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap, std::set<int_set> & allSubsets) {
+    if (n > sizeof(igraph_integer_t)){
+        IGRAPH_ERRORF("igraph_integer_overflow detected. The given n = %" IGRAPH_PRId "is more than what the computer can handle which is %lld.",IGRAPH_EINVAL,n,sizeof(igraph_integer_t));
+    }
     igraph_integer_t count = ((igraph_integer_t)1 << n);
-    std::set<int_set> allSubsets;
     igraph_integer_t subsetIndex = graphsize;
 
     // The outer for loop will run 2^n times to get all subset .
@@ -73,7 +75,7 @@ static std::set<int_set> generateSubsets(const igraph_vector_int_t *steinerTermi
             }
         }
     }
-    return allSubsets;
+    return IGRAPH_SUCCESS;
 }
 
 /*
@@ -82,10 +84,9 @@ static std::set<int_set> generateSubsets(const igraph_vector_int_t *steinerTermi
  */
 static igraph_integer_t fetchIndexofMapofSets(const int_set &subset, const dictionary& subsetMap) {
 
-    for (const auto & kv : subsetMap) {
-        if (kv.first == subset) {
-            return kv.second;
-        }
+    auto it = subsetMap.find(subset);
+    if (it != subsetMap.end()){
+        return it->second;
     }
     IGRAPH_FATAL("The Subset's index that you tried to find doesn't exist. Hence the code won't run.");
 }
@@ -471,7 +472,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
      * The index would be used in DP table.
      */
     dictionary subsetMap;
-    allSubsets = generateSubsets(&steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_nodes, subsetMap);
+    IGRAPH_CHECK(generateSubsets(&steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_nodes, subsetMap, allSubsets));
 
     int steiner_terminals_copy_size = igraph_vector_int_size(&steiner_terminals_copy);
     for (igraph_integer_t m = 2; m <= steiner_terminals_copy_size; m++) {
