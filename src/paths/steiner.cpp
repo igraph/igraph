@@ -54,7 +54,7 @@ static igraph_error_t generateSubsets(const igraph_vector_int_t *steinerTerminal
     // The outer for loop will run 2^n times to get all subset .
     // Here variable i will act as a binary counter
 
-    for (igraph_integer_t i = 0; i < count; i++) {
+    for (igraph_integer_t i = 2; i < count; i++) {
         // The inner for loop will run n times , As the maximum number of elements a set can have is n
         // This loop will generate a subset
         int_set newSubset;
