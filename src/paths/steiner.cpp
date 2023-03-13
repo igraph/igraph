@@ -46,7 +46,7 @@ typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
  */
 static igraph_error_t generateSubsets(const igraph_vector_int_t *steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap, std::set<int_set> & allSubsets) {
     if (n > sizeof(igraph_integer_t)){
-        IGRAPH_ERRORF("igraph_integer_overflow detected. The given n = %" IGRAPH_PRId "is more than what the computer can handle which is %lld.",IGRAPH_EINVAL,n,sizeof(igraph_integer_t));
+        IGRAPH_ERROR("igraph_integer_overflow detected. The given number of terminals is more than what the computer can handle.",IGRAPH_EINVAL);
     }
     igraph_integer_t count = ((igraph_integer_t)1 << n);
     igraph_integer_t subsetIndex = graphsize;
@@ -426,7 +426,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_vector_int_t steiner_terminals_copy;
     igraph_matrix_t dp_cache; // dynamic programming table
     igraph_integer_t q;
-    std::set<int_set> allSubsets;
+    std::set<int_set> allSubsets = std::set<int_set>();
     igraph_matrix_t distance;
 
     if (igraph_vector_size(pweights) != no_of_edges) {

@@ -341,6 +341,7 @@ add_legacy_tests(
   igraph_random_walk
   igraph_rewire # Uses internal igraph_i_rewire
   igraph_similarity
+  igraph_steiner_tree_fpt
   igraph_transitive_closure_dag
   igraph_transitivity_avglocal_undirected
   igraph_transitivity_barrat
