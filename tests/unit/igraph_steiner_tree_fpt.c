@@ -55,9 +55,9 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple;
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple,g_k1,g_k7_self_loop;
     igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real;
-    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple;
+    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple,weights_k7_loop;
 
     /* Null graph */
     igraph_empty(&g_null, 0, 0);
@@ -182,6 +182,35 @@ int main(void) {
                            2, 1,
                            1);
 
+    // A graph with 1 node.
+    igraph_small(&g_k1, 1, IGRAPH_UNDIRECTED,-1);
+    
+
+    /* 
+        K_7 graph with a specific edge ordering and a self loop 
+        edge 0-1 is removed so it's not a complate graph
+    */
+    igraph_small(&g_k7_self_loop, 7, IGRAPH_UNDIRECTED,
+                 0, 0, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6,
+                 1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
+                 2, 3, 2, 4, 2, 5, 2, 6,
+                 3, 4, 3, 5, 3, 6,
+                 4, 5, 4, 6,
+                 5, 6,
+                 -1);
+    // 1 , 1
+    igraph_vector_init_int(&weights_k7_loop, 21,
+                           2, 2, 2, 1, 1, 2,
+                           2, 2, 2, 1, 2,
+                           2, 2, 2, 1,
+                           1, 2, 1,
+                           2, 1,
+                           1);
+
+    igraph_vector_int_init_int(&terminals_k7, 4,
+                               0, 1, 2, 3);
+
+
 
     printf("Null graph:\n");
     check_graph(&g_null, &terminals_null, &weights_null);
@@ -221,6 +250,12 @@ int main(void) {
     printf("\nK_7 graph with parallel edges:\n");
     check_graph(&g_k7_non_simple, &terminals_k7, &weights_k7_non_simple);
 
+    printf("\nA graph with single node:\n");
+    check_graph(&g_k1,&terminals_null,&weights_null);
+
+    printf("\nK_7 graph with self loop:\n");
+    check_graph(&g_k7_self_loop,&terminals_k7,&weights_k7_loop);
+
 
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
@@ -229,6 +264,7 @@ int main(void) {
     igraph_destroy(&g_k7_n1);
     igraph_destroy(&g_k7_n);
     igraph_destroy(&g_k7_non_simple);
+    
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);

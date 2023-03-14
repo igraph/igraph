@@ -25,3 +25,11 @@ Total Steiner tree weight: 2.5
 K_7 graph with parallel edges:
 ( 4 10 21 15 18 )
 Total Steiner tree weight: 5
+
+A graph with single node:
+( )
+Total Steiner tree weight: 0
+
+K_7 graph with self loop:
+( 4 9 20 14 17 )
+Total Steiner tree weight: 5
