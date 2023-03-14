@@ -264,7 +264,8 @@ int main(void) {
     igraph_destroy(&g_k7_n1);
     igraph_destroy(&g_k7_n);
     igraph_destroy(&g_k7_non_simple);
-    
+    igraph_destroy(&g_k1);
+
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
@@ -273,11 +274,13 @@ int main(void) {
     igraph_vector_destroy(&weights_k7_n1);
     igraph_vector_destroy(&weights_k7_real);
     igraph_vector_destroy(&weights_k7_non_simple);
+    igraph_vector_destroy(&weights_k7_loop);
 
     igraph_vector_int_destroy(&terminals_k7);
     igraph_vector_int_destroy(&terminals_null);
     igraph_vector_int_destroy(&terminals_k6_k1);
     igraph_vector_int_destroy(&terminals_k7_real);
+
 
     VERIFY_FINALLY_STACK();
 
