@@ -245,7 +245,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         }
         use_weights = 1;
         if (igraph_vector_min(weights) < 0) {
-            IGRAPH_ERROR("Cannot work with negative weights in this implementation.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weights must not be negative when using the original implementation of spinglass communities. Select the implementation meant for negative weights.", IGRAPH_EINVAL);
         }
     }
     if (coolfact < 0 || coolfact >= 1.0) {
