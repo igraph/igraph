@@ -282,7 +282,7 @@ int main(void) {
     igraph_vector_int_destroy(&terminals_null);
     igraph_vector_int_destroy(&terminals_k6_k1);
     igraph_vector_int_destroy(&terminals_k7_real);
-
+    igraph_vector_int_destroy(&terminals_k7);
 
     VERIFY_FINALLY_STACK();
 
