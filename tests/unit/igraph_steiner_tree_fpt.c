@@ -207,10 +207,7 @@ int main(void) {
                            2, 1,
                            1);
 
-    igraph_vector_int_init_int(&terminals_k7, 4,
-                               0, 1, 2, 3);
-
-
+    
 
     printf("Null graph:\n");
     check_graph(&g_null, &terminals_null, &weights_null);
@@ -282,7 +279,6 @@ int main(void) {
     igraph_vector_int_destroy(&terminals_null);
     igraph_vector_int_destroy(&terminals_k6_k1);
     igraph_vector_int_destroy(&terminals_k7_real);
-    igraph_vector_int_destroy(&terminals_k7);
 
     VERIFY_FINALLY_STACK();
 
