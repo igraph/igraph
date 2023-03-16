@@ -1141,13 +1141,13 @@ igraph_create_bipartite:
         OUT GRAPH graph, IN BIPARTITE_TYPES types,
         VECTOR_INT edges, BOOLEAN directed=False
 
-igraph_incidence:
+igraph_biadjacency:
     PARAMS: |-
         OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
-igraph_get_incidence:
+igraph_get_biadjacency:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids

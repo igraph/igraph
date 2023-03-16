@@ -758,8 +758,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
-  igraph_get_incidence
-  igraph_incidence
+  igraph_biadjacency
+  igraph_get_biadjacency
 )
 
 # centralization.at
