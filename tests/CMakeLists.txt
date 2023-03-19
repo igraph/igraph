@@ -599,6 +599,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_all_st_mincuts
   igraph_dominator_tree
   igraph_st_mincut_value
   igraph_vertex_disjoint_paths
