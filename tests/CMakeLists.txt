@@ -794,6 +794,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_cohesive_blocks
+  igraph_minimum_size_separators
 )
 
 add_legacy_tests(
