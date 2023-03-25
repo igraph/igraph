@@ -574,12 +574,8 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
 
-    if (parsample && igraph_vector_int_size(parsample) != 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(parsample, &min, &max);
-        if (min < 0 || max >= no_of_nodes) {
-            IGRAPH_ERROR("Sample vertex ID out of range.", IGRAPH_EINVAL);
-        }
+    if (parsample && !igraph_vector_int_isininterval(parsample, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("Sample vertex ID out of range.", IGRAPH_EINVVID);
     }
 
     if (no_of_nodes == 0) {

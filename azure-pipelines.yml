@@ -6,6 +6,7 @@ variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   CCACHE_MAXSIZE: 256M
   ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
+  UBSAN_OTIONS: print_stacktrace=1:color=always
   OMP_NUM_THREADS: 1
 
 jobs:
@@ -25,7 +26,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og"'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero"'
 
   - job: linux_static_vendored_32
     steps:
@@ -35,7 +36,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og" -DIGRAPH_INTEGER_SIZE=32'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DIGRAPH_INTEGER_SIZE=32'
 
   - job: linux_static_external
     steps:
@@ -75,17 +76,21 @@ jobs:
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
 
-  - job: linux_clang
+  - job: linux_clang_15
     pool:
       vmImage: 'ubuntu-22.04'
     steps:
-      - script: sudo apt-get install ninja-build ccache clang -y
+      - script: |
+          sudo apt-get install ninja-build ccache -y
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 15
         displayName: Install dependencies
 
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og" -DCMAKE_CXX_FLAGS="-Og" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-15  -DCMAKE_CXX_COMPILER=clang++-15'
 
   - job: linux_x87
     steps:
@@ -114,7 +119,6 @@ jobs:
       vmImage: macos-latest
     steps:
       - script: |
-          brew update
           brew install ninja ccache
         displayName: Install dependencies
 

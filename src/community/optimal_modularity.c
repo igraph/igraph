@@ -42,7 +42,7 @@
 
 /**
  * \function igraph_community_optimal_modularity
- * Calculate the community structure with the highest modularity value
+ * \brief Calculate the community structure with the highest modularity value.
  *
  * This function calculates the optimal community structure for a
  * graph, in terms of maximal modularity score.
@@ -52,10 +52,11 @@
  * into an integer programming problem, and then calling the GLPK
  * library to solve that. Please see Ulrik Brandes et al.: On
  * Modularity Clustering, IEEE Transactions on Knowledge and Data
- * Engineering 20(2):172-188, 2008.
+ * Engineering 20(2):172-188, 2008
+ * https://doi.org/10.1109/TKDE.2007.190689.
  *
  * </para><para>
- * Note that modularity optimization is an NP-complete problem, and
+ * Note that exact modularity optimization is an NP-complete problem, and
  * all known algorithms for it have exponential time complexity. This
  * means that you probably don't want to run this function on larger
  * graphs. Graphs with up to fifty vertices should be fine, graphs
@@ -115,7 +116,7 @@ igraph_error_t igraph_community_optimal_modularity(const igraph_t *graph,
             if (minweight < 0) {
                 IGRAPH_ERROR("Negative weights are not allowed in weight vector.", IGRAPH_EINVAL);
             }
-            if (igraph_is_nan(minweight)) {
+            if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
             }
         }

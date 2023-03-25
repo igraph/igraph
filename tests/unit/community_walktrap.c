@@ -104,7 +104,7 @@ int main(void) {
 
   igraph_destroy(&graph);
 
-  /* Test for bug https://github.com/igraph/igraph/issues */
+  /* Test for bug https://github.com/igraph/igraph/issues/2042 */
 
   printf("\nBug 2042\n\n");
 

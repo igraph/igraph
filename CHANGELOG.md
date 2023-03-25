@@ -1,38 +1,138 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [master]
 
-### Added
+### Changes
 
- - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs.
- - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
-
-### Changed
-
- - `igraph_edge()` now checks that the input edge ID is valid.
-
- - `igraph_community_leading_eigenvector()`,
-   `igraph_adjacency_spectral_embedding()`,
-   `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and
-   `igraph_arpack_rnsolve()` now generate a random starting vector using
-   igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so.
-   This makes sure that the results obtained from these functions remain the
-   same if igraph's RNG is seeded with the same value.
+ - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
 
 ### Fixed
 
+ - `igraph_hub_and_authority_scores()`, `igraph_hub_score()` and `igraph_authority_score()` considered self-loops only once on the diagonal of the adjacency matrix of undirected graphs, thus the result was not identical to that obtained by `igraph_eigenvector_centrality()` on loopy undirected graphs. This is now corrected.
+ - `igraph_community_infomap()` now checks edge and vertex weights for validity.
+ - `igraph_minimum_spanning_tree()` and `igraph_minimum_spanning_tree_prim()` now check that edge weights are not NaN.
+ - Fixed an initialization error in the string attribute combiner of the C attribute handler.
+ - Fixed an issue with the weighted clique number calculation when all the weights were the same.
+ - HRG functions now require a graph with at least 3 vertices; previous versions crashed with smaller graphs.
+ - `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, i.e. the ARPACK interface in igraph, are now interruptible. As a result, several other functions that rely on ARPACK (eigenvector centrality, hub and authority scores, etc.) also became interruptible.
+ - `igraph_get_shortest_paths_dijkstra()`, `igraph_get_all_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` now validate the `from` vertex.
+
+### Deprecated
+
+- `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
+- `igraph_hub_score()` and `igraph_authority_score()` are now deprecated. Use `igraph_hub_and_authority_scores()` instead.
+- `igraph_get_incidence()` is now deprecated; its new name is `igraph_get_biadjacency()` to reflect that the returned matrix is an _adjacency_ matrix between pairs of vertices and not an _incidence_ matrix between vertices and edges. The new name is kept available until at least igraph 0.11. We plan to re-use the name in later versions to provide a proper incidence matrix where the rows are vertices and the columns are edges.
+
+### Other
+
+ - Improved performance for `igraph_vertex_connectivity()`.
+ - Documentation improvements.
+
+## [0.10.4] - 2023-01-26
+
+### Added
+
+ - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+
+### Changed
+
+ - The `test` build target now only _runs_ the unit tests, but it does not _build_ them. In order to both build and run tests, use the `check` target, which continues to behave as before (PR #2291).
+ - The experimental function `igraph_distances_floyd_warshall()` now has `from` and `to` parameters for choosing source and target vertices.
+ - The experimental function `igraph_distances_floyd_warshall()` now has an additional `method` parameter to select a specific algorithm. A faster "Tree" variant of the Floyd-Warshall algorithm is now available (#2267, thanks to @rfulekjames).
+
+### Fixed
+
+ - The Bellman-Ford shortest path finder is now interruptible.
+ - The Floyd-Warshall shortest path finder is now interruptible.
+ - Running CTest no longer builds the tests automatically, as this interfered with VSCode, which would invoke the `ctest` executable after configuring a project in order to determine test executables. Use the `build_tests` target to build the tests first, or use the `check` target to both _build_ and _run_ all unit tests (PR #2291).
+
+### Other
+
+ - Improved the performance and memory usage of `igraph_widest_path_widths_floyd_warshall()`.
+ - Documentation improvements.
+
+## [0.10.3] - 2022-12-30
+
+### Added
+
+ - `igraph_matrix_init_array()` to initialize an igraph matrix by copying an existing C array in column-major or row-major order.
+ - `igraph_layout_umap_compute_weights()` computes weights for the UMAP layout algorithm from distances. This used to be part of `igraph_layout_umap()`, but it is now in a separate function to allow the user to experiment with different weighting schemes.
+ - `igraph_triangular_lattice()` to generate triangular lattices of various kinds (#2235, thanks to @rfulekjames).
+ - `igraph_hexagonal_lattice()` to generate hexagonal lattices of various kinds (#2262, thanks to @rfulekjames).
+ - `igraph_tree_from_parent_vector()` to create a tree or a forest from a parent vector (i.e. a vector that encodes the parent vertex of each vertex).
+ - `igraph_induced_subgraph_edges()` produces the IDs of edges contained within a subgraph induced by the given vertices.
+
+### Changed
+
+ - The signature of the experimental `igraph_layout_umap()` function changed; the last argument is now a Boolean that specifies whether distances should already be treated as weights, and the sampling probability argument was removed.
+
+### Fixed
+
+ - `igraph_transitivity_barrat()`, `igraph_community_fluid_communities()`, `igraph_sir()`, `igraph_trussness()` and graphlet functions did not correctly detect when a directed input graph had effective multi-edges due to ignoring edge directions. Such graphs are now rejected by these functions.
+ - Fixed a bug in `igraph_2dgrid_move()` that sometimes crashed the Large Graph Layout function when a grid cell became empty.
+ - `igraph_pagerank()` and `igraph_personalized_pagerank()` would fail to converge when the ARPACK implementation was used and a vertex had more than one outgoing edge but all these edges had zero weights.
+ - `igraph_pagerank()` and `igraph_personalized_pagerank()` no longer allow negative weights. Previously, edges with negative weights were silently ignored when using the PRPACK implementation. The ARPACK implementation would issue a warning saying that they are ignored, but in fact it computed an incorrect result.
+ - `igraph_all_st_cuts()` and `igraph_all_st_mincuts()` no longer trigger the "Finally stack too large" fatal error when called on certain large graphs. This was a regression in igraph 0.10.
+ - `igraph_community_label_propagation()` no longer rounds weights to integers. This was a regression in igraph 0.10.
+ - `igraph_read_graph_graphdb()` does more thorough checks on the input file.
+ - `igraph_calloc()` did not zero-initialize the allocated memory. This is now corrected. Note that the macro `IGRAPH_CALLOC()` was _not_ affected.
+ - Fixed new warnings issued by the Xcode 14.1 toolchain.
+
+### Deprecated
+
+- `igraph_subgraph_edges()` is now deprecated to avoid confusion with `igraph_induced_subgraph_edges()`; its new name is `igraph_subgraph_from_edges()`. The old name is kept available until at least igraph 0.11.
+
+### Other
+
+ - Significantly improved performance for `igraph_matrix_transpose()`.
+ - Documentation improvements.
+
+## [0.10.2] - 2022-10-14
+
+### Added
+
+ - `igraph_distances_cutoff()` and `igraph_distances_dijkstra_cutoff()` calculate shortest paths with an upper limit on the path length (experimental functions).
+ - `igraph_distances_floyd_warshall()` for computing all-pairs shortest path lengths in dense graphs (experimental function).
+ - `igraph_ecc()` computes the edge clustering coefficient of some edges (experimental function).
+ - `igraph_voronoi()` computes a Voronoi partitioning of vertices (experimental function).
+ - `igraph_count_multiple_1()` determines the multiplicity of a single edge in the graph.
+ - `igraph_dqueue_get()` accesses an element in a queue by index.
+ - `igraph_degree_1()` efficiently retrieves the degee of a single vertex.
+ - `igraph_lazy_adjlist_has()` and `igraph_lazy_inclist_has()` to check if adjacent vertices / incident edges have already been computed and stored for a given vertex in a lazy adjlist / inclist.
+
+### Changed
+
+ - `igraph_edge()` now verifies that the input edge ID is valid.
+ - `igraph_community_leading_eigenvector()`, `igraph_adjacency_spectral_embedding()`, `igraph_laplacian_spectral_embedding()`, `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()` now generate a random starting vector using igraph's own RNG if needed instead of relying on LAPACK or ARPACK to do so. This makes sure that the results obtained from these functions remain the same if igraph's RNG is seeded with the same value.
+ - `igraph_community_leading_eigenvector()` does not stop the splitting process any more when there are multiple equally likely splits (indicated by the multiplicity of the leading eigenvector being larger than 1). The algorithm picks an arbitrary split instead and proceeds normally.
+
+### Fixed
+
+ - Fixed a bug in `igraph_get_k_shortest_paths()` that sometimes yielded incorrect results on undirected graphs when the `mode` argument was set to `IGRAPH_OUT` or `IGRAPH_IN`.
  - `igraph_trussness()` is now interruptible.
+ - `igraph_spanner()` is now interruptible.
+ - `igraph_layout_umap()` and `igraph_layout_umap3d()` are now interruptible.
  - In some rare cases, roundoff errors would cause `igraph_distance_johnson()` to fail on graphs with negative weights.
  - `igraph_eulerian_cycle()` and `igraph_eulerian_path()` now returns a more specific error code (`IGRAPH_ENOSOL`) when the graph contains no Eulerian cycle or path.
+ - `igraph_heap_init_array()` did not copy the array data correctly for non-real specializations.
+ - `igraph_layout_umap_3d()` now actually uses three dimensions.
+ - `igraph_layout_umap()` and `igraph_layout_umap_3d()` are now interruptible.
+ - `igraph_vit_create()` and `igraph_eit_create()` no longer fails when trying to create an iterator for the null graph or edgeless graph from an empty range-based vertex or edge selector.
+ - `igraph_write_graph_leda()` did not correctly print attribute names in some warning messages.
  - Addressed new warnings introduced by Clang 15.
+ - In the generated pkg-config file, libxml2 is now placed in the `Requires.private` section instead of the `Libs.private` one.
 
 ### Removed
 
  - Removed unused and undocumented `igraph_bfgs()` function.
+ - Removed the undocumented function `igraph_complex_mod()`. Use `igraph_complex_abs()` instead, as it has identical functionality.
 
 ### Deprecated
 
  - The `IGRAPH_EDRL` error code was deprecated; the DrL algorithm now returns `IGRAPH_FAILURE` when it used to return `IGRAPH_EDRL` (not likely to happen in practice).
+ - The undocumented function `igraph_dqueue_e()` is now deprecated and replaced by `igraph_dqueue_get()`.
+ - `igraph_finite()`, `igraph_is_nan()`, `igraph_is_inf()`, `igraph_is_posinf()` and `igraph_is_neginf()` are now deprecated. They were relics from a time when no standard alternatives existed. Use the C99 standard `isfinite()`, `isnan()` and `isinf()` instead.
 
 ### Other
 
@@ -1062,7 +1162,10 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[Unreleased]: https://github.com/igraph/igraph/compare/0.10.1..HEAD
+[master]: https://github.com/igraph/igraph/compare/0.10.4..master
+[0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
+[0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
+[0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2
 [0.10.1]: https://github.com/igraph/igraph/compare/0.10.0..0.10.1
 [0.10.0]: https://github.com/igraph/igraph/compare/0.9.10..0.10.0
 [0.9.10]: https://github.com/igraph/igraph/compare/0.9.9...0.9.10

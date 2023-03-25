@@ -34,7 +34,7 @@
 
 /* The "code" of an edge is a single index representing its location in the adjacency matrix,
  * More specifically, the relevant parts of the adjacency matrix (i.e. non-diagonal in directed,
- * upper triangular in undirecred) are column-wise concatenated into an array. The "code" is
+ * upper triangular in undirected) are column-wise concatenated into an array. The "code" is
  * the index in this array. We use floating point numbers for the code, as it can easily
  * exceed integers representable on 32 bits.
  */
@@ -159,7 +159,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
-    /* The samping method used is analogous to the one in igraph_erdos_renyi_game_gnp(),
+    /* The sampling method used is analogous to the one in igraph_erdos_renyi_game_gnp(),
      * and assumes that the edge list of the old graph is in order of increasing "codes".
      * Even IGRAPH_EDGEORDER_TO does not guarantee this, therefore we sort explicitly.
      */
@@ -245,7 +245,7 @@ igraph_error_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_g
 
             /* add an edge */
             igraph_integer_t to, from;
-            IGRAPH_ASSERT(igraph_finite(next_a));
+            IGRAPH_ASSERT(isfinite(next_a));
             if (directed) {
                 to = floor(next_a / no_of_nodes);
                 from = next_a - ((igraph_real_t)to) * no_of_nodes;

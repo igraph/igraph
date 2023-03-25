@@ -58,7 +58,7 @@ int main(void) {
     igraph_vector_int_init(&succ, 0);
     igraph_vector_int_init(&dist, 0);
 
-    igraph_bfs(&graph, /*root=*/0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/0, /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, /*restricted=*/ 0,
                &order, &rank, &father, &pred, &succ, &dist,
                /*callback=*/ 0, /*extra=*/ 0);
@@ -80,7 +80,7 @@ int main(void) {
     /* Test the callback */
 
     printf("(");
-    igraph_bfs(&graph, /*root=*/ 0, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/ 0, /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, /*restricted=*/ 0,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
@@ -88,7 +88,7 @@ int main(void) {
     /* Test different roots */
 
     printf("(");
-    igraph_bfs(&graph, /*root=*/ 2, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/ 2, /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, /*restricted=*/ 0,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
@@ -100,7 +100,7 @@ int main(void) {
         igraph_vector_int_push_back(&restricted, i);
     }
     printf("(");
-    igraph_bfs(&graph, /*root=*/ 5, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/ 5, /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
@@ -108,13 +108,13 @@ int main(void) {
     /* Root not in restricted set */
 
     printf("(");
-    igraph_bfs(&graph, /*root=*/ 4, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/ 4, /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 1, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
 
     printf("(");
-    igraph_bfs(&graph, /*root=*/ 3, /*roots=*/ 0, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/ 3, /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 0, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
@@ -126,7 +126,7 @@ int main(void) {
     VECTOR(roots)[1] = 4;
     VECTOR(roots)[2] = 6;
     printf("(");
-    igraph_bfs(&graph, /*root=*/ -1, &roots, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/ -1, &roots, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 0, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");
@@ -135,7 +135,7 @@ int main(void) {
 
     igraph_vector_int_clear(&roots);
     printf("(");
-    igraph_bfs(&graph, /*root=*/ -1, &roots, /*neimode=*/ IGRAPH_OUT,
+    igraph_bfs(&graph, /*root=*/ -1, &roots, /*mode=*/ IGRAPH_OUT,
                /*unreachable=*/ 0, &restricted,
                0, 0, 0, 0, 0, 0, &bfs_callback, 0);
     printf(" )\n");

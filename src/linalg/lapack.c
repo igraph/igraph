@@ -213,12 +213,8 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
     if (n != igraph_matrix_nrow(b)) {
         IGRAPH_ERROR("Cannot LU solve matrix, RHS of wrong size.", IGRAPH_EINVAL);
     }
-    if (igraph_vector_int_size(ipiv) > 0) {
-        igraph_integer_t min, max;
-        igraph_vector_int_minmax(ipiv, &min, &max);
-        if (max > n || min < 1) {
+    if (! igraph_vector_int_isininterval(ipiv, 1, n)) {
             IGRAPH_ERROR("Pivot index out of range.", IGRAPH_EINVAL);
-        }
     }
     if (igraph_vector_int_size(ipiv) != n) {
         IGRAPH_ERROR("Pivot vector length must match number of matrix rows.", IGRAPH_EINVAL);
@@ -274,7 +270,7 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
 
 /**
  * \function igraph_lapack_dgesv
- * Solve system of linear equations with LU factorization
+ * \brief Solve system of linear equations with LU factorization.
  *
  * This function computes the solution to a real system of linear
  * equations A * X = B, where A is an N-by-N matrix and X and B are
@@ -286,6 +282,7 @@ igraph_error_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix
  * where P is a permutation matrix, L is unit lower triangular, and U is
  * upper triangular.  The factored form of A is then used to solve the
  * system of equations A * X = B.
+ *
  * \param a Matrix. On entry the N-by-N coefficient matrix, on exit,
  *        the factors L and U from the factorization A=P*L*U; the unit
  *        diagonal elements of L are not stored.
@@ -381,14 +378,16 @@ igraph_error_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv
 
 /**
  * \function igraph_lapack_dsyevr
- * Selected eigenvalues and optionally eigenvectors of a symmetric matrix
+ * \brief Selected eigenvalues and optionally eigenvectors of a symmetric matrix.
  *
  * Calls the DSYEVR LAPACK function to compute selected eigenvalues
  * and, optionally, eigenvectors of a real symmetric matrix A.
  * Eigenvalues and eigenvectors can be selected by specifying either
  * a range of values or a range of indices for the desired eigenvalues.
  *
- * </para><para>See more in the LAPACK documentation.
+ * </para><para>
+ * See more in the LAPACK documentation.
+ *
  * \param A Matrix, on entry it contains the symmetric input
  *        matrix. Only the leading N-by-N upper triangular part is
  *        used for the computation.
@@ -564,7 +563,7 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
 
 /**
  * \function igraph_lapack_dgeev
- * Eigenvalues and optionally eigenvectors of a non-symmetric matrix
+ * \brief Eigenvalues and optionally eigenvectors of a non-symmetric matrix.
  *
  * This function calls LAPACK to compute, for an N-by-N real
  * nonsymmetric matrix A, the eigenvalues and, optionally, the left
@@ -575,8 +574,8 @@ igraph_error_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
  *                    A * v(j) = lambda(j) * v(j)
  * where lambda(j) is its eigenvalue.
  * The left eigenvector u(j) of A satisfies
- *                u(j)**H * A = lambda(j) * u(j)**H
- * where u(j)**H denotes the conjugate transpose of u(j).
+ *                u(j)^H * A = lambda(j) * u(j)^H
+ * where u(j)^H denotes the conjugate transpose of u(j).
  *
  * </para><para>
  * The computed eigenvectors are normalized to have Euclidean norm
@@ -712,7 +711,7 @@ igraph_error_t igraph_lapack_dgeev(const igraph_matrix_t *A,
 
 /**
  * \function igraph_lapack_dgeevx
- * Eigenvalues/vectors of nonsymmetric matrices, expert mode
+ * \brief Eigenvalues/vectors of nonsymmetric matrices, expert mode.
  *
  * This function calculates the eigenvalues and optionally the left
  * and/or right eigenvectors of a nonsymmetric N-by-N real matrix.

@@ -42,7 +42,7 @@ int main(void) {
     igraph_complex_t c, d, e;
 
     /* polar, mod, arg */
-    c = igraph_complex_polar(igraph_complex_mod(a), igraph_complex_arg(a));
+    c = igraph_complex_polar(igraph_complex_abs(a), igraph_complex_arg(a));
     IGRAPH_ASSERT(igraph_complex_almost_equals(a, c, 1e-14));
 
     /* add */
@@ -117,9 +117,6 @@ int main(void) {
     d = igraph_complex(1.0, 0.0);
     e = igraph_complex_div(d, a);
     IGRAPH_ASSERT(igraph_complex_almost_equals(c, e, 1e-14));
-
-    /* abs */
-    IGRAPH_ASSERT(igraph_complex_abs(a) == igraph_complex_mod(a));
 
     /* logabs */
 

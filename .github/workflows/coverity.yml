@@ -6,7 +6,7 @@ name: Coverity
 # Build once at 3 AM UTC every day.
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
       run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 

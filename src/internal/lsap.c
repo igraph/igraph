@@ -69,7 +69,7 @@ igraph_error_t ap_hungarian(AP *p) {
     igraph_integer_t *ci;  /* covered columns */
     time_t start, end;     /* timer           */
     igraph_integer_t i, j;
-    igraph_bool_t ok;
+    igraph_integer_t ok;
 
     start = time(0);
 

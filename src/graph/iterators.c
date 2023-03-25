@@ -496,7 +496,7 @@ igraph_vs_t igraph_vss_range(igraph_integer_t start, igraph_integer_t end) {
  */
 
 igraph_error_t igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to) {
-    *vs = igraph_vss_seq(from, to);
+    *vs = igraph_vss_range(from, to + 1);
     return IGRAPH_SUCCESS;
 }
 
@@ -730,8 +730,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
  * \ref igraph_vs_nonadj(), |V| is the number of vertices in the graph.
  */
 
-igraph_error_t igraph_vit_create(const igraph_t *graph,
-                      igraph_vs_t vs, igraph_vit_t *vit) {
+igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_vit_t *vit) {
     igraph_vector_int_t vec;
     igraph_vector_int_t *vec_int;
     igraph_bool_t *seen;
@@ -830,11 +829,16 @@ igraph_error_t igraph_vit_create(const igraph_t *graph,
         }
         break;
     case IGRAPH_VS_RANGE:
-        if (vs.data.range.start < 0 || vs.data.range.start >= igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create sequence iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
-        }
-        if (vs.data.range.end < 0 || vs.data.range.end > igraph_vcount(graph)) {
-            IGRAPH_ERROR("Cannot create sequence iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
+        {
+            igraph_integer_t no_of_nodes = igraph_vcount(graph);
+            if (vs.data.range.start < 0 ||
+                vs.data.range.start > no_of_nodes ||
+                (no_of_nodes > 0 && vs.data.range.start == no_of_nodes)) {
+                IGRAPH_ERROR("Cannot create range iterator, starting vertex ID out of range.", IGRAPH_EINVAL);
+            }
+            if (vs.data.range.end < 0 || vs.data.range.end > no_of_nodes) {
+                IGRAPH_ERROR("Cannot create range iterator, ending vertex ID out of range.", IGRAPH_EINVAL);
+            }
         }
         vit->type = IGRAPH_VIT_RANGE;
         vit->pos = vs.data.range.start;
@@ -1205,7 +1209,7 @@ igraph_es_t igraph_ess_range(igraph_integer_t start, igraph_integer_t end) {
  */
 
 igraph_error_t igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to) {
-    *es = igraph_ess_seq(from, to);
+    *es = igraph_ess_range(from, to + 1);
     return IGRAPH_SUCCESS;
 }
 
@@ -1951,8 +1955,7 @@ static igraph_error_t igraph_i_eit_all_between(
  * incident edges of the vertex.
  */
 
-igraph_error_t igraph_eit_create(const igraph_t *graph,
-                      igraph_es_t es, igraph_eit_t *eit) {
+igraph_error_t igraph_eit_create(const igraph_t *graph, igraph_es_t es, igraph_eit_t *eit) {
     switch (es.type) {
     case IGRAPH_ES_ALL:
         eit->type = IGRAPH_EIT_RANGE;
@@ -1996,11 +1999,16 @@ igraph_error_t igraph_eit_create(const igraph_t *graph,
         }
         break;
     case IGRAPH_ES_RANGE:
-        if (es.data.range.start < 0 || es.data.range.start >= igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create sequence iterator, starting edge ID out of range.", IGRAPH_EINVAL);
-        }
-        if (es.data.range.end < 0 || es.data.range.end > igraph_ecount(graph)) {
-            IGRAPH_ERROR("Cannot create sequence iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+        {
+            igraph_integer_t no_of_edges = igraph_ecount(graph);
+            if (es.data.range.start < 0 ||
+                es.data.range.start > no_of_edges ||
+                (no_of_edges > 0 && es.data.range.start == no_of_edges)) {
+                IGRAPH_ERROR("Cannot create range iterator, starting edge ID out of range.", IGRAPH_EINVAL);
+            }
+            if (es.data.range.end < 0 || es.data.range.end > no_of_edges) {
+                IGRAPH_ERROR("Cannot create range iterator, ending edge ID out of range.", IGRAPH_EINVAL);
+            }
         }
         eit->type = IGRAPH_EIT_RANGE;
         eit->pos = es.data.range.start;

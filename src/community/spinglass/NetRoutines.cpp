@@ -82,11 +82,11 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
         }
 
         node1 = net->node_list->Get(i1);
-        sprintf(name, "%" IGRAPH_PRId "", i1+1);
+        snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", i1+1);
         node1->Set_Name(name);
 
         node2 = net->node_list->Get(i2);
-        sprintf(name, "%" IGRAPH_PRId "", i2+1);
+        snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", i2+1);
         node2->Set_Name(name);
 
         node1->Connect_To(node2, Links);

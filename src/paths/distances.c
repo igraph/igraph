@@ -49,14 +49,12 @@ static igraph_error_t igraph_i_eccentricity(const igraph_t *graph,
     igraph_integer_t i, mark = 1;
     igraph_integer_t min_degree = 0;
 
-    IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&counted, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &counted);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&counted, no_of_nodes);
 
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
     igraph_vector_fill(res, -1);
@@ -200,7 +198,7 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
         degree_i  = igraph_vector_int_size(neis);
 
         if (dist > *ecc) {
-            if (!IGRAPH_FINITE(dist)) {
+            if (!isfinite(dist)) {
                 if (!unconn) {
                     *ecc = IGRAPH_INFINITY;
                     *vid_ecc = -1;
@@ -319,8 +317,8 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
 
@@ -328,7 +326,7 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
-        } else if (igraph_is_nan(min)) {
+        } else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -696,8 +694,8 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number "
-                      " of edges (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
                       igraph_vector_size(weights), no_of_edges);
     }
     if (no_of_edges > 0) {
@@ -705,7 +703,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
-        else if (igraph_is_nan(min)) {
+        else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -739,7 +737,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_i_eccentricity_dijkstra(graph, weights, &ecc_u, vid_start, &vid_ecc, unconn, &inclist));
 
-        inf = !IGRAPH_FINITE(ecc_u);
+        inf = !isfinite(ecc_u);
 
         if (!inf) {
             while (1) {

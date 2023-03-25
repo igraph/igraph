@@ -221,7 +221,7 @@ igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_integer_t idx
     const igraph_vector_t *tree = &t->v;
     igraph_real_t difference;
 
-    if (new_value >= 0 && igraph_finite(new_value)) {
+    if (new_value >= 0 && isfinite(new_value)) {
         idx = idx + t->offset + 1;
         difference = new_value - VECTOR(*tree)[idx - 1];
 

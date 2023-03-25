@@ -31,9 +31,8 @@
  * \function igraph_callaway_traits_game
  * \brief Simulates a growing network with vertex types.
  *
- * </para><para>
  * The different types of vertices prefer to connect other types of
- * vertices with a given probability.</para><para>
+ * vertices with a given probability.
  *
  * </para><para>
  * The simulation goes like this: in each discrete time step a new
@@ -110,7 +109,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
         if (lo < 0) {
             IGRAPH_ERROR("The vertex type distribution vector must not contain negative values.", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo)) {
+        if (isnan(lo)) {
             IGRAPH_ERROR("The vertex type distribution vector must not contain NaN.", IGRAPH_EINVAL);
         }
     }
@@ -126,7 +125,7 @@ igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nod
         if (lo < 0 || hi > 1) {
             IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
         }
-        if (igraph_is_nan(lo) || igraph_is_nan(hi)) {
+        if (isnan(lo) || isnan(hi)) {
             IGRAPH_ERROR("The preference matrix must not contain NaN.", IGRAPH_EINVAL);
         }
     }

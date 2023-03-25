@@ -97,7 +97,7 @@ igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         IGRAPH_CHECK(igraph_transitivity_local_undirected(graph, &vec, igraph_vss_all(), mode));
 
         for (i = 0, nans = 0; i < no_of_nodes; i++) {
-            if (!igraph_is_nan(VECTOR(vec)[i])) {
+            if (!isnan(VECTOR(vec)[i])) {
                 sum += VECTOR(vec)[i];
             } else {
                 nans++;
@@ -334,7 +334,7 @@ static igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *grap
 
 /**
  * \function igraph_transitivity_local_undirected
- * \brief Calculates the local transitivity (clustering coefficient) of a graph.
+ * \brief The local transitivity (clustering coefficient) of some vertices.
  *
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the local transitivity, this
@@ -811,7 +811,7 @@ static igraph_error_t igraph_i_transitivity_barrat4(
 
 /**
  * \function igraph_transitivity_barrat
- * \brief Weighted transitivity, as defined by A. Barrat.
+ * \brief Weighted local transitivity of some vertices, as defined by A. Barrat.
  *
  * This is a local transitivity, i.e. a vertex-level index. For a
  * given vertex \c i, from all triangles in which it participates we
@@ -876,11 +876,14 @@ igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_has_multiple(graph, &has_multiple));
+    if (! has_multiple && igraph_is_directed(graph)) {
+        /* When the graph is directed, mutual edges are effectively multi-edges as we
+         * are ignoring edge directions. */
+        IGRAPH_CHECK(igraph_has_mutual(graph, &has_multiple, false));
+    }
     if (has_multiple) {
-        IGRAPH_ERROR(
-            "Barrat's weighted transitivity measure works only if the graph "
-            "has no multiple edges.", IGRAPH_EINVAL
-        );
+        IGRAPH_ERROR("Barrat's weighted transitivity measure works only if the graph has no multi-edges.",
+                     IGRAPH_EINVAL);
     }
 
     /* Preconditions validated, now we can call the real implementation */

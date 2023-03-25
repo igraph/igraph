@@ -19,6 +19,7 @@
 
 #include "igraph_constructors.h"
 
+#include "core/exceptions.h"
 #include "math/safe_intop.h"
 
 #include <vector>
@@ -144,15 +145,15 @@ static igraph_error_t igraph_i_havel_hakimi_index(const igraph_vector_int_t *deg
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(n);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
     }
 
-    for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
+    for (const auto &pt : pointers) {
         vertices.sort(degree_greater<vd_pair>);
 
-        vd_pair vd = **pt;
-        vertices.erase(*pt);
+        vd_pair vd = *pt;
+        vertices.erase(pt);
 
         if (vd.degree == 0) {
             continue;
@@ -302,7 +303,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(vcount);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
     }
 
@@ -310,12 +311,12 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
     vertices.sort(degree_greater<vd_pair>);
 
     igraph_integer_t ec = 0;
-    for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
-        vd_pair vd = **pt;
-        vertices.erase(*pt);
+    for (const auto &pt : pointers) {
+        vd_pair vd = *pt;
+        vertices.erase(pt);
 
         while (vd.degree > 0) {
-            vlist::iterator uit = vertices.begin();
+            auto uit = vertices.begin();
 
             if (vertices.empty() || uit->degree == 0) {
                 // We are out of non-zero degree vertices to connect to.
@@ -342,7 +343,7 @@ static igraph_error_t igraph_i_realize_undirected_multi_index(const igraph_vecto
             // re-sort the list. A possible optimization would be a version of
             // bubble_up() that can exchange list nodes instead of swapping their values.
             if (vertices.size() > 1) {
-                vlist::iterator wit = uit;
+                auto wit = uit;
                 ++wit;
 
                 if (wit->degree > uit->degree) {
@@ -413,7 +414,7 @@ static igraph_error_t igraph_i_kleitman_wang(const igraph_vector_int_t *outdeg, 
 
         // create the connections
         igraph_integer_t k = 0;
-        for (std::vector<vbd_pair>::iterator it = vertices.begin();
+        for (auto it = vertices.begin();
              k < vdp->degree.second;
              ++it) {
             if (it->vertex == vdp->vertex) {
@@ -454,17 +455,17 @@ static igraph_error_t igraph_i_kleitman_wang_index(const igraph_vector_int_t *ou
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(n);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
     }
 
-    for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
+    for (const auto &pt : pointers) {
         // sort vertices by (in, out) degree pairs in decreasing order
         // note: std::list::sort does a stable sort
         vertices.sort(degree_greater<vbd_pair>);
 
         // choose a vertex the out-stubs of which will be connected
-        vbd_pair &vd = **pt;
+        vbd_pair &vd = *pt;
 
         if (vd.degree.second == 0) {
             continue;
@@ -527,9 +528,9 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
     }
 
     igraph_vector_int_t edges;
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, deg_sum));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, deg_sum);
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
     if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) && (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW ) )
     {
         switch (method) {
@@ -591,8 +592,9 @@ static igraph_error_t igraph_i_realize_undirected_degree_sequence(
          * so no explanatory error message for now. */
         return IGRAPH_UNIMPLEMENTED;
     }
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_integer_t(node_count), false));
+    IGRAPH_CHECK(igraph_create(graph, &edges, node_count, false));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -633,9 +635,9 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
 
     igraph_vector_int_t edges;
     IGRAPH_SAFE_MULT(edge_count, 2, &edge_count2);
-    IGRAPH_CHECK(igraph_vector_int_init(&edges, edge_count2));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, edge_count2);
 
+    IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
     switch (method) {
     case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
         IGRAPH_CHECK(igraph_i_kleitman_wang(outdeg, indeg, &edges, true));
@@ -649,8 +651,9 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
     default:
         IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
     }
+    IGRAPH_HANDLE_EXCEPTIONS_END;
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, igraph_integer_t(node_count), true));
+    IGRAPH_CHECK(igraph_create(graph, &edges, node_count, true));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -708,8 +711,8 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *
  * </para><para>
  * Sz. Horvát and C. D. Modes,
- * Connectivity matters: Construction and exact random sampling of connected graphs (2020).
- * https://arxiv.org/abs/2009.03747
+ * Connectedness matters: construction and exact random sampling of connected networks (2021).
+ * https://doi.org/10.1088/2632-072X/abced5
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param outdeg The degree sequence of an undirected graph
@@ -736,7 +739,7 @@ static igraph_error_t igraph_i_realize_directed_degree_sequence(
  *          The vertex with smallest remaining degree is selected first. The result is usually
  *          a graph with high negative degree assortativity. In the undirected case, this method
  *          is guaranteed to generate a connected graph, regardless of whether multi-edges are allowed,
- *          provided that a connected realization exists (see Horvát and Modes, 2020, as well as
+ *          provided that a connected realization exists (see Horvát and Modes, 2021, as well as
  *          http://szhorvat.net/pelican/hh-connected-graphs.html).
  *          In the directed case it tends to generate weakly connected graphs, but this is not
  *          guaranteed.
@@ -775,15 +778,11 @@ igraph_error_t igraph_realize_degree_sequence(
         igraph_edge_type_sw_t allowed_edge_types,
         igraph_realize_degseq_t method)
 {
-    bool directed = indeg != 0;
+    bool directed = indeg != NULL;
 
-    try {
-        if (directed) {
-            return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, allowed_edge_types, method);
-        } else {
-            return igraph_i_realize_undirected_degree_sequence(graph, outdeg, allowed_edge_types, method);
-        }
-    } catch (const std::bad_alloc &) {
-        IGRAPH_ERROR("Cannot realize degree sequence due to insufficient memory.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    if (directed) {
+        return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, allowed_edge_types, method);
+    } else {
+        return igraph_i_realize_undirected_degree_sequence(graph, outdeg, allowed_edge_types, method);
     }
 }

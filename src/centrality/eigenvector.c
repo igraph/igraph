@@ -30,7 +30,8 @@
 
 #include <limits.h>
 
-static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
+/* Multiplies vector 'from' by the unweighted adjacency matrix and stores the result in 'to'. */
+static igraph_error_t adjmat_mul_unweighted(igraph_real_t *to, const igraph_real_t *from,
                                            int n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
     igraph_vector_int_t *neis;
@@ -46,7 +47,6 @@ static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const i
         }
     }
 
-
     return IGRAPH_SUCCESS;
 }
 
@@ -56,7 +56,8 @@ typedef struct igraph_i_eigenvector_centrality_t {
     const igraph_vector_t *weights;
 } igraph_i_eigenvector_centrality_t;
 
-static igraph_error_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
+/* Multiplies vector 'from' by the weighted adjacency matrix and stores the result in 'to'. */
+static igraph_error_t adjmat_mul_weighted(igraph_real_t *to, const igraph_real_t *from,
                                             int n, void *extra) {
 
     igraph_i_eigenvector_centrality_t *data = extra;
@@ -171,7 +172,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
+        IGRAPH_CHECK(igraph_arpack_rssolve(adjmat_mul_unweighted,
                                            &adjlist, options, 0, &values, &vectors));
 
         igraph_adjlist_destroy(&adjlist);
@@ -189,7 +190,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
+        IGRAPH_CHECK(igraph_arpack_rssolve(adjmat_mul_weighted,
                                            &data, options, 0, &values, &vectors));
 
         igraph_inclist_destroy(&inclist);
@@ -280,8 +281,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
     IGRAPH_CHECK(igraph_is_dag(graph, &dag));
     if (dag) {
         /* special case: graph is a DAG */
-        IGRAPH_WARNING("graph is directed and acyclic; eigenvector centralities "
-                       "will be zeros");
+        IGRAPH_WARNING("Graph is directed and acyclic; eigenvector centralities will be zeros.");
         if (value) {
             *value = 0;
         }
@@ -310,7 +310,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         if (min < 0.0) {
             /* When there are negative weights, the eigenvalue and the eigenvector are no
              * longer guaranteed to be non-negative, or even real-valued. */
-            negative_weights = 1;
+            negative_weights = true;
             IGRAPH_WARNING("Negative weights in directed graph, eigenpair may be complex.");
         }
         if (min == 0.0 && max == 0.0) {
@@ -362,8 +362,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality,
-                                           &adjlist, options, 0, &values,
+        IGRAPH_CHECK(igraph_arpack_rnsolve(adjmat_mul_unweighted,
+                                           &adjlist, options, NULL, &values,
                                            &vectors));
 
         igraph_adjlist_destroy(&adjlist);
@@ -379,8 +379,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality2,
-                                           &data, options, 0, &values, &vectors));
+        IGRAPH_CHECK(igraph_arpack_rnsolve(adjmat_mul_weighted,
+                                           &data, options, NULL, &values, &vectors));
 
         igraph_inclist_destroy(&inclist);
         IGRAPH_FINALLY_CLEAN(1);
@@ -492,6 +492,10 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  * parameter, see below) and checking whether the eigenvalue is very close
  * to zero.
  *
+ * </para><para>
+ * When working with directed graphs, consider using hub and authority
+ * scores instead, see \ref igraph_hub_and_authority_scores().
+ *
  * \param graph The input graph. It may be directed.
  * \param vector Pointer to an initialized vector, it will be resized
  *     as needed. The result of the computation is stored here. It can
@@ -518,6 +522,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
  *
  * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for
  *   modifications of eigenvector centrality.
+ * \ref igraph_hub_and_authority_scores() for a similar pair of measures
+ * intended for directed graphs.
  *
  * \example examples/simple/eigenvector_centrality.c
  */

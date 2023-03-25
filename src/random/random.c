@@ -145,7 +145,7 @@
  * igraph_rng_set_default() function.
  */
 
-extern IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default; /* defined in rng_mt19937.c */
+extern IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default; /* defined in rng_pcg32.c */
 
 /**
  * \function igraph_rng_set_default
@@ -706,7 +706,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
 
 igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
     const igraph_rng_type_t *type = rng->type;
-    if (!igraph_finite(p) || p <= 0 || p > 1) {
+    if (!isfinite(p) || p <= 0 || p > 1) {
         return IGRAPH_NAN;
     }
     if (type->get_geom) {
@@ -820,7 +820,7 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
 
 igraph_real_t igraph_rng_get_pois(igraph_rng_t *rng, igraph_real_t rate) {
     const igraph_rng_type_t *type = rng->type;
-    if (igraph_is_nan(rate) || rate < 0) {
+    if (isnan(rate) || rate < 0) {
         return IGRAPH_NAN;
     } else if (rate == 0) {
         return 0;
@@ -1600,7 +1600,7 @@ static double igraph_i_rpois(igraph_rng_t *rng, double mu) {
     double pois = -1.;
     int k, kflag, big_mu, new_big_mu = FALSE;
 
-    if (!igraph_finite(mu) || mu < 0) {
+    if (!isfinite(mu) || mu < 0) {
         ML_ERR_return_NAN;
     }
 
@@ -1804,7 +1804,7 @@ static double igraph_i_rbinom(igraph_rng_t *rng, igraph_integer_t n, double pp) 
     double p, q, np, g, r, al, alv, amaxp, ffm, ynorm;
     igraph_integer_t i, ix, k;
 
-    if (!igraph_finite(pp) ||
+    if (!isfinite(pp) ||
         /* n=0, p=0, p=1 are not errors <TSL>*/
         n < 0 || pp < 0. || pp > 1.) {
         ML_ERR_return_NAN;
@@ -1966,7 +1966,7 @@ finis:
 
 static igraph_real_t igraph_i_rexp(igraph_rng_t *rng, double rate) {
     igraph_real_t scale = 1.0 / rate;
-    if (!IGRAPH_FINITE(scale) || scale <= 0.0) {
+    if (!isfinite(scale) || scale <= 0.0) {
         if (scale == 0.0) {
             return 0.0;
         }
@@ -2059,7 +2059,7 @@ static double igraph_i_rgamma(igraph_rng_t *rng, double a, double scale) {
 
     double e, p, q, r, t, u, v, w, x, ret_val;
 
-    if (!igraph_finite(a) || !igraph_finite(scale) || a < 0.0 || scale <= 0.0) {
+    if (!isfinite(a) || !isfinite(scale) || a < 0.0 || scale <= 0.0) {
         if (scale == 0.) {
             return 0.;
         }

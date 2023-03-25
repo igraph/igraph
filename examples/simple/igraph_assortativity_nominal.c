@@ -16,7 +16,7 @@ int main(void) {
             MATRIX(pref_matrix, i, j) = (i == j ? 0.1: 0.01);
         }
     }
-    
+
     igraph_vector_int_t node_type_vec;
     igraph_vector_int_init(&node_type_vec, nodes);
 
@@ -36,7 +36,7 @@ int main(void) {
         igraph_assortativity_nominal(&g, &node_type_vec, &assortativity, IGRAPH_UNDIRECTED, 1);
         printf("Assortativity after rewiring = %g\n\n", assortativity);
 
-        igraph_destroy(&g);    
+        igraph_destroy(&g);
     }
     igraph_vector_int_destroy(&node_type_vec);
     igraph_matrix_destroy(&pref_matrix);

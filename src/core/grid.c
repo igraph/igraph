@@ -53,13 +53,13 @@ static void igraph_i_2dgrid_which(
 igraph_error_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
                        igraph_real_t minx, igraph_real_t maxx, igraph_real_t deltax,
                        igraph_real_t miny, igraph_real_t maxy, igraph_real_t deltay) {
-    igraph_integer_t i;
+    igraph_integer_t no_of_points;
 
     IGRAPH_ASSERT(minx <= maxx);
     IGRAPH_ASSERT(miny <= maxy);
     IGRAPH_ASSERT(deltax > 0 && deltay > 0);
-    IGRAPH_ASSERT(igraph_finite(minx) && igraph_finite(maxx) && igraph_finite(miny) && igraph_finite(maxy));
-    IGRAPH_ASSERT(igraph_finite(deltax) && igraph_finite(deltay));
+    IGRAPH_ASSERT(isfinite(minx) && isfinite(maxx) && isfinite(miny) && isfinite(maxy));
+    IGRAPH_ASSERT(isfinite(deltax) && isfinite(deltay));
 
     grid->coords = coords;
     grid->minx = minx;
@@ -72,14 +72,15 @@ igraph_error_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords
     grid->stepsx = ceil((maxx - minx) / deltax);
     grid->stepsy = ceil((maxy - miny) / deltay);
 
+    no_of_points = igraph_matrix_nrow(coords);
+
     IGRAPH_CHECK(igraph_matrix_int_init(&grid->startidx, grid->stepsx, grid->stepsy));
     IGRAPH_FINALLY(igraph_matrix_int_destroy, &grid->startidx);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&grid->next, igraph_matrix_nrow(coords));
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&grid->prev, igraph_matrix_nrow(coords));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&grid->next, no_of_points);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&grid->prev, no_of_points);
 
-    for (i = 0; i < igraph_vector_int_size(&grid->next); i++) {
-        VECTOR(grid->next)[i] = -1;
-    }
+    igraph_vector_int_fill(&grid->prev, 0);
+    igraph_vector_int_fill(&grid->next, 0);
 
     grid->massx = 0;
     grid->massy = 0;

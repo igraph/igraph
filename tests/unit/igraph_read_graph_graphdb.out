@@ -1,0 +1,8 @@
+directed: true
+vcount: 4
+edges: {
+0 2
+1 0
+3 0
+3 2
+}

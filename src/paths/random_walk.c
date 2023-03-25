@@ -71,7 +71,7 @@ static igraph_error_t igraph_i_random_walk_adjlist(const igraph_t *graph,
 
         nn = igraph_vector_int_size(neis);
         if (IGRAPH_UNLIKELY(nn == 0)) {
-            igraph_vector_int_resize(vertices, i);
+            igraph_vector_int_resize(vertices, i); /* shrinks */
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN) {
                 break;
             } else {
@@ -331,7 +331,7 @@ igraph_error_t igraph_random_walk(const igraph_t *graph,
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
                 IGRAPH_ERROR("Weights must be non-negative.", IGRAPH_EINVAL);
-            } else if (igraph_is_nan(min)) {
+            } else if (isnan(min)) {
                 IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }

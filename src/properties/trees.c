@@ -63,7 +63,6 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_roots = igraph_vector_int_size(roots);
     igraph_integer_t tree_vertex_count = no_of_nodes;
-    igraph_integer_t root_min, root_max;
 
     igraph_vector_int_t edges;
     igraph_vector_bool_t seen_vertices;
@@ -72,13 +71,10 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_dqueue_int_t Q;
     igraph_vector_int_t neis;
 
-    igraph_integer_t i, n, r, v_ptr = no_of_nodes;
+    igraph_integer_t v_ptr = no_of_nodes;
 
-    if (no_of_roots > 0) {
-        igraph_vector_int_minmax(roots, &root_min, &root_max);
-        if (root_max >= no_of_nodes || root_min < 0)  {
-            IGRAPH_ERROR("All roots should be vertices of the graph.", IGRAPH_EINVAL);
-        }
+    if (! igraph_vector_int_isininterval(roots, 0, no_of_nodes-1)) {
+        IGRAPH_ERROR("All roots should be vertices of the graph.", IGRAPH_EINVVID);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -89,24 +85,22 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_edges, no_of_edges);
 
     if (vertex_index) {
-        IGRAPH_CHECK(igraph_vector_int_resize(vertex_index, no_of_nodes));
-        for (i = 0; i < no_of_nodes; i++) {
-            VECTOR(*vertex_index)[i] = i;
-        }
+        IGRAPH_CHECK(igraph_vector_int_range(vertex_index, 0, no_of_nodes));
     }
 
-    for (r = 0; r < no_of_roots; r++) {
+    for (igraph_integer_t r = 0; r < no_of_roots; r++) {
 
         igraph_integer_t root = VECTOR(*roots)[r];
-        VECTOR(seen_vertices)[root] = 1;
+        VECTOR(seen_vertices)[root] = true;
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, root));
 
         while (!igraph_dqueue_int_empty(&Q)) {
             igraph_integer_t actnode = igraph_dqueue_int_pop(&Q);
 
             IGRAPH_CHECK(igraph_incident(graph, &neis, actnode, mode));
-            n = igraph_vector_int_size(&neis);
-            for (i = 0; i < n; i++) {
+
+            igraph_integer_t n = igraph_vector_int_size(&neis);
+            for (igraph_integer_t i = 0; i < n; i++) {
 
                 igraph_integer_t edge = VECTOR(neis)[i];
                 igraph_integer_t from = IGRAPH_FROM(graph, edge);
@@ -115,14 +109,14 @@ igraph_error_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
                 if (! VECTOR(seen_edges)[edge]) {
 
-                    VECTOR(seen_edges)[edge] = 1;
+                    VECTOR(seen_edges)[edge] = true;
 
                     if (! VECTOR(seen_vertices)[nei]) {
 
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from));
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
 
-                        VECTOR(seen_vertices)[nei] = 1;
+                        VECTOR(seen_vertices)[nei] = true;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
 
                     } else {
@@ -357,7 +351,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
 
     break;
     default:
-        IGRAPH_ERROR("Invalid mode,", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVMODE);
     }
 
     /* if no suitable root was found, skip visiting vertices */
@@ -416,7 +410,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
          */
         u = igraph_stack_int_pop(stack);
         if (IGRAPH_LIKELY(! VECTOR(*visited)[u])) {
-            VECTOR(*visited)[u] = 1;
+            VECTOR(*visited)[u] = true;
             *visited_count += 1;
         }
         else {

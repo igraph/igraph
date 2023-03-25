@@ -79,9 +79,9 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
     /* Check if we have the vertex attribute */
     if (vertex_attr_name &&
         !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vertex_attr_name)) {
-        vertex_attr_name = NULL;
         IGRAPH_WARNINGF("The vertex attribute '%s' does not exist. No vertex values will be written.",
                         vertex_attr_name);
+        vertex_attr_name = NULL;
     }
     if (vertex_attr_name) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &vertex_attr_type,
@@ -89,19 +89,19 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         if (vertex_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             vertex_attr_type != IGRAPH_ATTRIBUTE_STRING &&
             vertex_attr_type != IGRAPH_ATTRIBUTE_BOOLEAN) {
-            vertex_attr_name = NULL; vertex_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
             IGRAPH_WARNINGF("The vertex attribute '%s' is not numeric, string or boolean. "
                             "No vertex values will be written.",
                             vertex_attr_name);
+            vertex_attr_name = NULL; vertex_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
         }
     }
 
     /* Check if we have the edge attribute */
     if (edge_attr_name &&
         !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, edge_attr_name)) {
-        edge_attr_name = NULL;
         IGRAPH_WARNINGF("The edge attribute '%s' does not exist. No edge values will be written.",
                         edge_attr_name);
+        edge_attr_name = NULL;
     }
     if (edge_attr_name) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &edge_attr_type,
@@ -109,10 +109,10 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         if (edge_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             edge_attr_type != IGRAPH_ATTRIBUTE_STRING &&
             edge_attr_type != IGRAPH_ATTRIBUTE_BOOLEAN) {
-            edge_attr_name = NULL; edge_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
             IGRAPH_WARNINGF("The edge attribute '%s' is not numeric, string or boolean. "
                             "No edge values will be written.",
                             edge_attr_name);
+            edge_attr_name = NULL; edge_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
         }
     }
 

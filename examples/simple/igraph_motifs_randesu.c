@@ -29,7 +29,7 @@ int main(void) {
     igraph_real_t sum = 0.0;
     igraph_integer_t n = igraph_vector_size(&hist);
     for (igraph_integer_t i=0; i < n; i++) {
-        if (!igraph_is_nan(VECTOR(hist)[i])) {
+        if (!isnan(VECTOR(hist)[i])) {
             sum += VECTOR(hist)[i];
         }
     }

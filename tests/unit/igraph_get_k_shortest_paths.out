@@ -194,6 +194,26 @@ result (edge IDs):
   3: ( 0 1 8 )
 }
 
+3x3 square lattice:
+result (vertex IDs): 
+{
+  0: ( 0 1 2 5 8 )
+  1: ( 0 3 4 5 8 )
+  2: ( 0 1 4 7 8 )
+  3: ( 0 3 4 7 8 )
+  4: ( 0 1 4 5 8 )
+  5: ( 0 3 6 7 8 )
+}
+result (edge IDs): 
+{
+  0: ( 0 2 4 9 )
+  1: ( 1 5 7 9 )
+  2: ( 0 3 8 11 )
+  3: ( 1 5 8 11 )
+  4: ( 0 3 7 9 )
+  5: ( 1 6 10 11 )
+}
+
 Zero vertices, from and to don't exist:
 Wrong weights length:
 Non-existent mode:

@@ -36,12 +36,14 @@
  * score. Consequently, the higher the centralization index of the
  * graph, the more centralized the structure is.
  *
- * </para><para>In order to make graphs of different sizes comparable,
+ * </para><para>
+ * In order to make graphs of different sizes comparable,
  * the centralization index is usually normalized to a number between
  * zero and one, by dividing the (unnormalized) centralization score
  * of the most centralized structure with the same number of vertices.
  *
- * </para><para>For most centrality indices the most centralized
+ * </para><para>
+ * For most centrality indices the most centralized
  * structure is the star graph, a single center connected to all other
  * nodes in the network. There are some variation depending on whether
  * the graph is directed or not, whether loop edges are allowed, etc.
@@ -51,8 +53,7 @@
  * level scores and the theoretical maximum are given. It is called by
  * all the measure-specific centralization functions.
  *
- * \param scores A vector containing the node-level centrality
- *     scores.
+ * \param scores A vector containing the node-level centrality scores.
  * \param theoretical_max The graph level centrality score of the most
  *     centralized graph with the same number of vertices. Only used
  *     if \c normalized set to true.

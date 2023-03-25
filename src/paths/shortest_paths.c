@@ -57,10 +57,9 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
 
     *res = 0;
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (already_added == 0) {
-        IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for average path length.");
     IGRAPH_FINALLY(igraph_free, already_added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(
@@ -162,7 +161,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
        - the opposite of the distance is stored in the heap, as it is a
          maximum heap and we need a minimum heap.
        - we don't use IGRAPH_INFINITY in the res matrix during the
-         computation, as IGRAPH_FINITE() might involve a function call
+         computation, as isfinite() might involve a function call
          and we want to spare that. -1 will denote infinity instead.
     */
 
@@ -187,7 +186,7 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
-        else if (igraph_is_nan(min)) {
+        else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -549,7 +548,7 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
        - the opposite of the distance is stored in the heap, as it is a
          maximum heap and we need a minimum heap.
        - we don't use IGRAPH_INFINITY in the res matrix during the
-         computation, as IGRAPH_FINITE() might involve a function call
+         computation, as isfinite() might involve a function call
          and we want to spare that. -1 will denote infinity instead.
     */
 
@@ -743,9 +742,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
         igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
         already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-        if (already_counted == 0) {
-            IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(already_counted, "Insufficient memory for local efficiency calculation.");
         IGRAPH_FINALLY(igraph_free, already_counted);
 
         IGRAPH_CHECK(igraph_adjlist_init(
@@ -778,15 +775,15 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
         igraph_2wheap_t Q;
 
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector length does not match the number of edges.", IGRAPH_EINVAL);
         }
         if (no_of_edges > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+                IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
             }
-            else if (igraph_is_nan(min)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            else if (isnan(min)) {
+                IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
 
@@ -981,10 +978,9 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
         dirmode = IGRAPH_ALL;
     }
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (already_added == 0) {
-        IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for diameter calculation.");
     IGRAPH_FINALLY(igraph_free, already_added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -1045,7 +1041,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
         *to = ito;
     }
     if ((vertex_path) || (edge_path)) {
-        if (! igraph_finite(ires)) {
+        if (! isfinite(ires)) {
             if (vertex_path) {
                 igraph_vector_int_clear(vertex_path);
             }
@@ -1127,7 +1123,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
        Dirty tricks:
        - the opposite of the distance is stored in the heap, as it is a
          maximum heap and we need a minimum heap.
-       - we don't use IGRAPH_INFINITY during the computation, as IGRAPH_FINITE()
+       - we don't use IGRAPH_INFINITY during the computation, as isfinite()
          might involve a function call and we want to spare that. -1 will denote
          infinity instead.
     */
@@ -1186,7 +1182,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
         if (min < 0) {
             IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
         }
-        else if (igraph_is_nan(min)) {
+        else if (isnan(min)) {
             IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
@@ -1267,7 +1263,7 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
         *to = ito;
     }
     if ((vertex_path) || (edge_path)) {
-        if (!igraph_finite(ires)) {
+        if (!isfinite(ires)) {
             if (vertex_path){
                 igraph_vector_int_clear(vertex_path);
             }
@@ -1284,6 +1280,18 @@ igraph_error_t igraph_diameter_dijkstra(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * Temporarily removes all edges incident on the vertex with the given ID from
+ * the graph by setting the weights of these edges to infinity.
+ *
+ * \param graph   the graph
+ * \param weights the weights of the edges of the graph
+ * \param vid     the ID of the vertex to remove
+ * \param edges_removed  vector that records the IDs of the edges that were
+ *        "removed" (i.e. their weights were set to infinity)
+ * \param eids    temporary vector that is used to retrieve the IDs of the
+ *        incident edges, to make this function free of memory allocations
+ */
 static igraph_error_t igraph_i_semidelete_vertex(
     const igraph_t *graph, igraph_vector_t *weights,
     igraph_integer_t vid, igraph_vector_int_t *edges_removed,
@@ -1311,7 +1319,7 @@ static igraph_bool_t igraph_i_has_edge_with_infinite_weight(
     n = weights ? igraph_vector_int_size(path) : 0;
     for (i = 0; i < n; i++) {
         igraph_integer_t edge = VECTOR(*path)[i];
-        if (!IGRAPH_FINITE(VECTOR(*weights)[edge])) {
+        if (!isfinite(VECTOR(*weights)[edge])) {
             return true;
         }
     }
@@ -1421,6 +1429,10 @@ igraph_error_t igraph_get_k_shortest_paths(
     igraph_vector_int_t eids;
     igraph_real_t path_weight, shortest_path_weight;
     igraph_integer_t edge_paths_owned = 0;
+
+    if (!igraph_is_directed(graph) && (mode == IGRAPH_IN || mode == IGRAPH_OUT)) {
+        mode = IGRAPH_ALL;
+    }
 
     if (vertex_paths) {
         igraph_vector_int_list_clear(vertex_paths);

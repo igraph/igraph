@@ -322,9 +322,9 @@ igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_int_t *dimvec
  *
  * </para><para>
  * The vertices of the resulting graph are ordered such that the
- * index of the vertex at position <code>(i_0, i_1, i_2, ..., i_d)</code>
- * in a lattice of size <code>(n_0, n_1, ..., n_d)</code> will be
- * <code>i_0 + n_0 * i_1 + n_0 * n_1 * i_2 + ...</code>.
+ * index of the vertex at position <code>(i_1, i_2, i_3, ..., i_d)</code>
+ * in a lattice of size <code>(n_1, n_2, ..., n_d)</code> will be
+ * <code>i_1 + n_1 * i_2 + n_1 * n_2 * i_3 + ...</code>.
  *
  * \param graph An uninitialized graph object.
  * \param dimvector Vector giving the sizes of the lattice in each of
@@ -381,15 +381,13 @@ igraph_error_t igraph_square_lattice(
     /* init coords & weights */
 
     coords = IGRAPH_CALLOC(dims, igraph_integer_t);
-    if (coords == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(coords, "Lattice creation failed.");
     IGRAPH_FINALLY(igraph_free, coords);
+
     weights = IGRAPH_CALLOC(dims, igraph_integer_t);
-    if (weights == 0) {
-        IGRAPH_ERROR("Lattice creation failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(weights, "Lattice creation failed.");
     IGRAPH_FINALLY(igraph_free, weights);
+
     if (dims > 0) {
         weights[0] = 1;
         for (i = 1; i < dims; i++) {
@@ -589,7 +587,7 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  *        \clist
  *        \cli IGRAPH_TREE_OUT
  *          directed tree, the edges point
- *          from the parents to their children,
+ *          from the parents to their children.
  *        \cli IGRAPH_TREE_IN
  *          directed tree, the edges point from
  *          the children to their parents.
@@ -691,7 +689,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  *        \clist
  *        \cli IGRAPH_TREE_OUT
  *          directed tree, the edges point
- *          from the parents to their children,
+ *          from the parents to their children.
  *        \cli IGRAPH_TREE_IN
  *          directed tree, the edges point from
  *          the children to their parents.
@@ -791,7 +789,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t 
  *        \clist
  *        \cli IGRAPH_TREE_OUT
  *          directed tree, the edges point
- *          from the parents to their children,
+ *          from the parents to their children.
  *        \cli IGRAPH_TREE_IN
  *          directed tree, the edges point from
  *          the children to their parents.

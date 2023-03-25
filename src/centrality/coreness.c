@@ -40,6 +40,8 @@
  * This function implements the algorithm presented in Vladimir
  * Batagelj, Matjaz Zaversnik: An O(m) Algorithm for Cores
  * Decomposition of Networks.
+ * https://arxiv.org/abs/cs/0310049
+ *
  * \param graph The input graph.
  * \param cores Pointer to an initialized vector, the result of the
  *        computation will be stored here. It will be resized as
@@ -93,8 +95,7 @@ igraph_error_t igraph_coreness(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_free, pos);
 
     /* maximum degree + degree of vertices */
-    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode,
-        mode == IGRAPH_ALL ? IGRAPH_LOOPS_TWICE : IGRAPH_LOOPS_ONCE));
+    IGRAPH_CHECK(igraph_degree(graph, cores, igraph_vss_all(), mode, /* loops= */ true));
 
     maxdeg = igraph_vector_int_max(cores);
 

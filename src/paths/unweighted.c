@@ -29,19 +29,24 @@
 
 /**
  * \ingroup structural
- * \function igraph_distances
- * \brief Length of the shortest paths between vertices.
+ * \function igraph_distances_cutoff
+ * \brief Length of the shortest paths between vertices, with cutoff.
+ *
+ * \experimental
+ *
+ * This function is similar to \ref igraph_distances(), but
+ * paths longer than \p cutoff will not be considered.
  *
  * \param graph The graph object.
  * \param res The result of the calculation, a matrix. A pointer to an
  *        initialized matrix, to be more precise. The matrix will be
  *        resized if needed. It will have the same
- *        number of rows as the length of the \c from
+ *        number of rows as the length of the \p from
  *        argument, and its number of columns is the number of
- *        vertices in the \c to argument. One row of the matrix shows the
- *        distances from/to a given vertex to the ones in \c to.
- *        For the unreachable vertices IGRAPH_INFINITY is returned.
- * \param from The source vertices.
+ *        vertices in the \p to argument. One row of the matrix shows the
+ *        distances from/to a given vertex to the ones in \p to.
+ *        For the unreachable vertices \c IGRAPH_INFINITY is returned.
+ * \param from The source vertices._d
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
  * \param mode The type of shortest paths to be used for the
@@ -55,6 +60,10 @@
  *          the directed graph is considered as an undirected one for
  *          the computation.
  *        \endclist
+ * \param cutoff The maximal length of paths that will be considered.
+ *    When the distance of two vertices is greater than this value,
+ *    it will be returned as \c IGRAPH_INFINITY. Negative cutoffs are
+ *    treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -66,20 +75,17 @@
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(n(|V|+|E|)),
- * n is the
- * number of vertices to calculate, |V| and
- * |E| are the number of vertices and
- * edges in the graph.
+ * Time complexity: O(s |E| + |V|), where s is the number of source vertices to use,
+ * and |V| and |E| are the number of vertices and edges in the graph.
  *
- * \sa \ref igraph_get_shortest_paths() to get the paths themselves,
- * \ref igraph_distances_dijkstra() for the weighted version with non-negative
- * weights, \ref igraph_distances_bellman_ford() if you also have negative
+ * \sa  \ref igraph_distances_dijkstra_cutoff() for the weighted version with non-negative
  * weights.
+ *
+ * \example examples/simple/distances.c
  */
-igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_distances_cutoff(const igraph_t *graph, igraph_matrix_t *res,
                           const igraph_vs_t from, const igraph_vs_t to,
-                          igraph_neimode_t mode) {
+                          igraph_neimode_t mode, igraph_real_t cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_from, no_of_to;
@@ -106,10 +112,9 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (already_counted == 0) {
-        IGRAPH_ERROR("Insufficient memory for graph distance calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(already_counted, "Insufficient memory for graph distance calculation.");
     IGRAPH_FINALLY(igraph_free, already_counted);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     all_to = igraph_vs_is_all(&to);
@@ -146,6 +151,10 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
         while (!igraph_dqueue_int_empty(&q)) {
             igraph_integer_t act = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
+
+            if (cutoff >= 0 && actdist > cutoff) {
+                continue;
+            }
 
             if (all_to) {
                 MATRIX(*res, i, act) = actdist;
@@ -188,6 +197,62 @@ igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_distances
+ * \brief Length of the shortest paths between vertices.
+ *
+ * \param graph The graph object.
+ * \param res The result of the calculation, a matrix. A pointer to an
+ *        initialized matrix, to be more precise. The matrix will be
+ *        resized if needed. It will have the same
+ *        number of rows as the length of the \p from
+ *        argument, and its number of columns is the number of
+ *        vertices in the \p to argument. One row of the matrix shows the
+ *        distances from/to a given vertex to the ones in \p to.
+ *        For the unreachable vertices \c IGRAPH_INFINITY is returned.
+ * \param from The source vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
+ * \param mode The type of shortest paths to be used for the
+ *        calculation in directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the lengths of the outgoing paths are calculated.
+ *        \cli IGRAPH_IN
+ *          the lengths of the incoming paths are calculated.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an undirected one for
+ *          the computation.
+ *        \endclist
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary
+ *           data.
+ *        \cli IGRAPH_EINVVID
+ *           invalid vertex ID passed.
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *
+ * Time complexity: O(n(|V|+|E|)),
+ * n is the number of vertices to calculate,
+ * |V| and |E| are the number of vertices and edges in the graph.
+ *
+ * \sa \ref igraph_get_shortest_paths() to get the paths themselves,
+ * \ref igraph_distances_dijkstra() for the weighted version with non-negative
+ * weights, \ref igraph_distances_bellman_ford() if you also have negative
+ * weights.
+ *
+ * \example examples/simple/distances.c
+ */
+igraph_error_t igraph_distances(const igraph_t *graph, igraph_matrix_t *res,
+                                const igraph_vs_t from, const igraph_vs_t to,
+                                igraph_neimode_t mode) {
+    return igraph_distances_cutoff(graph, res, from, to, mode, -1);
 }
 
 /**
@@ -299,7 +364,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     igraph_integer_t reached = 0;
 
     if (from < 0 || from >= no_of_nodes) {
-        IGRAPH_ERROR("Vertex index out of range.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
@@ -317,10 +382,9 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     }
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parent_eids == 0) {
-        IGRAPH_ERROR("Insufficient memory for shortest path calculation.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for shortest path calculation.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
@@ -474,12 +538,13 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
  * \brief Shortest path from one vertex to another one.
  *
  * Calculates and returns a single unweighted shortest path from a
- * given vertex to another one. If there are more than one shortest
- * paths between the two vertices, then an arbitrary one is returned.
+ * given vertex to another one. If there is more than one shortest
+ * path between the two vertices, then an arbitrary one is returned.
  *
- * </para><para>This function is a wrapper to \ref
- * igraph_get_shortest_paths(), for the special case when only one
- * target vertex is considered.
+ * </para><para>
+ * This function is a wrapper to \ref igraph_get_shortest_paths()
+ * for the special case when only one target vertex is considered.
+ *
  * \param graph The input graph, it can be directed or
  *        undirected. Directed paths are considered in directed
  *        graphs.
@@ -490,8 +555,8 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
  * \param edges Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
+ * \param from The ID of the source vertex.
+ * \param to The ID of the target vertex.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. Valid modes are:
  *        \c IGRAPH_OUT, follows edge directions;
@@ -533,13 +598,15 @@ igraph_error_t igraph_get_shortest_path(const igraph_t *graph,
     IGRAPH_CHECK(igraph_get_shortest_paths(graph, vp, ep, from,
                                            igraph_vss_1(to), mode, NULL, NULL));
 
+    /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the
+       result to the output parameter. */
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
