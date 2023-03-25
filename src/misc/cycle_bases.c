@@ -133,8 +133,7 @@ igraph_i_fundamental_cycles_bfs(
 
                 u_back_len = igraph_vector_int_size(&u_back);
                 v_back_len = igraph_vector_int_size(&v_back);
-                IGRAPH_CHECK(igraph_vector_int_init(&cycle, u_back_len + v_back_len));
-                IGRAPH_FINALLY(igraph_vector_int_destroy, &cycle);
+                IGRAPH_VECTOR_INT_INIT_FINALLY(&cycle, u_back_len + v_back_len);
 
                 for (j=0; j < v_back_len; ++j) {
                     VECTOR(cycle)[j] = VECTOR(v_back)[j];

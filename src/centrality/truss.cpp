@@ -114,13 +114,9 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
     }
 
     // Initialize variables needed below.
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS,
-                                     IGRAPH_MULTIPLE));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&commonNeighbors, 0);
-
-    /* Sort each vector of neighbors, so it's done once for all */
-    igraph_adjlist_sort(&adjlist);
 
     // Move through the levels, one level at a time, starting at first level.
     for (igraph_integer_t level = 1; level <= max; ++level) {
@@ -137,8 +133,8 @@ static igraph_error_t igraph_i_trussness(const igraph_t *graph, igraph_vector_in
             igraph_integer_t toVertex = IGRAPH_TO(graph, seed);
 
             /* Find neighbors of both vertices. If they run into each other,
-             * there is a triangle. Because we sorted the adjacency list already,
-             * we don't need to sort it for every edge here */
+             * there is a triangle. We rely on the neighbor lists being sorted,
+             * as guaranteed by igraph_adjlist_init(), when computing intersections. */
             igraph_vector_int_t *fromNeighbors = igraph_adjlist_get(&adjlist, fromVertex);
             igraph_vector_int_t *toNeighbors = igraph_adjlist_get(&adjlist, toVertex);
             igraph_vector_int_t *q1 = fromNeighbors;

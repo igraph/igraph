@@ -339,7 +339,7 @@ igraph_error_t igraph_bfs_simple(
     igraph_vector_int_t neis;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
-    char *added;
+    bool *added;
     igraph_integer_t lastlayer = -1;
 
     if (!igraph_is_directed(graph)) {
@@ -352,7 +352,7 @@ igraph_error_t igraph_bfs_simple(
     }
 
     /* temporary storage */
-    added = IGRAPH_CALLOC(no_of_nodes, char);
+    added = IGRAPH_CALLOC(no_of_nodes, bool);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
@@ -386,7 +386,7 @@ igraph_error_t igraph_bfs_simple(
         VECTOR(*parents)[root] = -1;
     }
     num_visited++;
-    added[root] = 1;
+    added[root] = true;
 
     while (!igraph_dqueue_int_empty(&q)) {
         igraph_integer_t actvect = igraph_dqueue_int_pop(&q);
@@ -396,8 +396,8 @@ igraph_error_t igraph_bfs_simple(
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
         for (i = 0; i < nei_count; i++) {
             igraph_integer_t neighbor = VECTOR(neis)[i];
-            if (added[neighbor] == 0) {
-                added[neighbor] = 1;
+            if (! added[neighbor]) {
+                added[neighbor] = true;
                 if (parents) {
                     VECTOR(*parents)[neighbor] = actvect;
                 }

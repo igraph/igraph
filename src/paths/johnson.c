@@ -31,19 +31,30 @@
  * \function igraph_distances_johnson
  * \brief Weighted shortest path lengths between vertices, using Johnson's algorithm.
  *
- * See Wikipedia at http://en.wikipedia.org/wiki/Johnson's_algorithm
- * for Johnson's algorithm. This algorithm works even if the graph
- * contains negative edge weights, and it is worth using it if we
- * calculate the shortest paths from many sources.
+ * This algorithm supports directed graphs with negative edge weights, and performs
+ * better than the Bellman-Ford method when distances are calculated from many different
+ * sources, the typical use case being all-pairs distance calculations. It works by using
+ * a single-source Bellman-Ford run to transform all edge weights to non-negative ones,
+ * then invoking Dijkstra's algorithm with the new weights. See the Wikipedia page
+ * for more details: http://en.wikipedia.org/wiki/Johnson's_algorithm.
  *
  * </para><para>
- * If no edge weights are supplied, then the unweighted
- * version, \ref igraph_distances() is called.
+ * If no edge weights are supplied, then the unweighted version, \ref igraph_distances()
+ * is called. If none of the supplied edge weights are negative, then Dijkstra's algorithm
+ * is used by calling \ref igraph_distances_dijkstra().
  *
  * </para><para>
- * If all the supplied edge weights are non-negative,
- * then Dijkstra's algorithm is used by calling
- * \ref igraph_distances_dijkstra().
+ * Note that Johnson's algorithm applies only to directed graphs. This function rejects
+ * undirected graphs with \em any negative edge weights, even when the \p from and \p to
+ * vertices are all in connected components that are free of negative weights.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Donald B. Johnson: Efficient Algorithms for Shortest Paths in Sparse Networks.
+ * J. ACM 24, 1 (1977), 1–13.
+ * https://doi.org/10.1145/321992.321993
  *
  * \param graph The input graph. If negative weights are present, it
  *   should be directed.

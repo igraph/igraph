@@ -1,0 +1,94 @@
+Testing null graph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+( )
+testing greedy coloring with DSATUR heuristic
+( )
+
+Testing singleton graph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 1
+( 0 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 1
+( 0 )
+
+Testing large simple graph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 11
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 8
+
+Testing large graph with loops and multi-edges
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 11
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 8
+
+Testing small simple graph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 4
+( 2 2 2 3 1 1 0 0 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 3
+( 2 2 2 0 1 1 1 0 )
+
+Testing small multigraph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 4
+( 3 1 1 1 0 0 0 2 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 3
+( 2 2 2 0 1 1 1 0 )
+
+Testing small LCF graph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 5
+( 0 4 3 2 1 0 2 1 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 5
+( 4 3 2 1 0 2 1 0 )
+
+Testing graph with isolated vertices
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 2
+( 0 1 0 0 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 2
+( 1 0 0 0 )
+
+Testing graph with isolated vertices and self-loops
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 1
+( 0 0 0 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 1
+( 0 0 0 )
+
+Testing wheel graph with odd number of vertices
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 3
+( 0 2 1 2 1 2 1 2 1 2 1 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 3
+( 0 2 1 2 1 2 1 2 1 2 1 )
+
+Testing wheel graph with even number of vertices
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 4
+( 0 3 2 1 2 1 2 1 2 1 2 1 )
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 4
+( 0 3 2 1 2 1 2 1 2 1 2 1 )
+
+Testing complete bipartite graph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 2
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 2
+
+Testing large bipartite graph
+testing greedy coloring with COLORED_NEIGHBORS heuristic
+Number of colors used: 2
+testing greedy coloring with DSATUR heuristic
+Number of colors used: 2
+

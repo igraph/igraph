@@ -114,6 +114,7 @@ add_legacy_tests(
   cutheap
   d_indheap
   marked_queue
+  gen2wheap
   set
   trie
 )
@@ -300,6 +301,7 @@ add_legacy_tests(
   igraph_diameter_dijkstra
   igraph_diversity
   igraph_distances_floyd_warshall
+  igraph_distances_floyd_warshall_speedup
   igraph_distances_johnson
   igraph_ecc
   igraph_eccentricity
@@ -311,6 +313,7 @@ add_legacy_tests(
   igraph_get_all_shortest_paths_dijkstra
   igraph_get_k_shortest_paths
   igraph_get_shortest_paths2
+  igraph_get_shortest_path_astar
   igraph_get_shortest_path_bellman_ford
   igraph_get_shortest_paths_bellman_ford
   igraph_get_shortest_paths_dijkstra
@@ -459,6 +462,12 @@ add_examples(
   FOLDER examples/simple NAMES
   igraph_coloring
 )
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_coloring
+)
+
 
 # motifs.at
 add_examples(
@@ -748,6 +757,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bipartite_create
+  igraph_bipartite_projection
   igraph_get_incidence
   igraph_incidence
 )
@@ -957,6 +967,7 @@ add_benchmarks(
   igraph_degree
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
@@ -964,8 +975,10 @@ add_benchmarks(
   igraph_pagerank
   igraph_pagerank_weighted
   igraph_power_law_fit
+  igraph_qsort
   igraph_random_walk
   igraph_transitivity
+  igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
 )

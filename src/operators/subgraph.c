@@ -76,7 +76,7 @@ static igraph_error_t igraph_i_induced_subgraph_copy_and_delete(
     res->attr = 0;         /* Why is this needed? TODO */
     IGRAPH_CHECK(igraph_copy(res, graph));
     IGRAPH_FINALLY(igraph_destroy, res);
-    IGRAPH_CHECK(igraph_delete_vertices_idx(res, igraph_vss_vector(&delete),
+    IGRAPH_CHECK(igraph_delete_vertices_map(res, igraph_vss_vector(&delete),
                                             map, invmap));
 
     igraph_vector_int_destroy(&delete);

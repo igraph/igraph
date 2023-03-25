@@ -90,7 +90,20 @@ igraph_error_t igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t d
  * \example examples/simple/igraph_delete_vertices.c
  */
 igraph_error_t igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
-    return igraph_delete_vertices_idx(graph, vertices, /* idx= */ 0, /* invidx= */ 0);
+    return igraph_delete_vertices_map(graph, vertices, /* idx= */ 0, /* invidx= */ 0);
+}
+
+/**
+ * \function igraph_delete_vertices_idx
+ * \brief Removes some vertices (with all their edges) from the graph (deprecated alias).
+ *
+ * \deprecated-by igraph_delete_vertices_map 0.11.0
+ */
+igraph_error_t igraph_delete_vertices_idx(
+    igraph_t *graph, const igraph_vs_t vertices, igraph_vector_int_t *idx,
+    igraph_vector_int_t *invidx
+) {
+    return igraph_delete_vertices_map(graph, vertices, idx, invidx);
 }
 
 /**

@@ -177,22 +177,22 @@ BIPARTITE_TYPES:
     CTYPE: igraph_vector_bool_t
     FLAGS: BY_REF
 
-EDGE_CAPACITY:
+EDGE_CAPACITIES:
     # A vector containing edge capacities (typically for max-flow algorithms)
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-EDGE_COLOR:
+EDGE_COLORS:
     # A vector containing edge colors
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
-EDGEWEIGHTS:
+EDGE_WEIGHTS:
     # A vector containing edge weights
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
 
-EDGESET_LIST:
+EDGE_INDICES_LIST:
     # A list containing vectors of igraph integers where each such
     # vector represents a sequence of edge indices.
     CTYPE: igraph_vector_int_list_t
@@ -208,7 +208,7 @@ GRAPH_PTR_LIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
-VERTEX_QTY:
+VERTEX_QTYS:
     # A vector of floating-point numbers where each entry corresponds to
     # one of the vertices in a graph and its value represents some quantity
     # associated to the vertex with the same index. Higher-level interfaces may
@@ -222,18 +222,18 @@ SIR_LIST:
     CTYPE: igraph_vector_ptr_t
     FLAGS: BY_REF
 
-VERTEXSET_LIST:
+VERTEX_INDICES_LIST:
     # A list containing vectors of igraph integers where each such
     # vector represents a sequence of vertex indices.
     CTYPE: igraph_vector_int_list_t
     FLAGS: BY_REF
 
-VERTEX_COLOR:
+VERTEX_COLORS:
     # A vector containing vertex colors
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
-VERTEXWEIGHTS:
+VERTEX_WEIGHTS:
     # A vector containing vertex weights
     CTYPE: igraph_vector_t
     FLAGS: BY_REF
@@ -321,6 +321,12 @@ ERDOS_RENYI_TYPE:
 FAS_ALGORITHM:
     # Enum representing feedback arc set algorithms
     CTYPE: igraph_fas_algorithm_t
+    FLAGS: ENUM
+
+FWALGORITHM:
+    # Enum that describes the variant of the Floyd-Warshall algorithm to use in
+    # Floyd-Warshall graph distances computing function
+    CTYPE: igraph_floyd_warshall_algorithm_t
     FLAGS: ENUM
 
 GETADJACENCY:
@@ -500,7 +506,7 @@ WRITE_GML_SW:
 # Callbacks
 ###############################################################################
 
-ARPACKFUNC:
+ARPACK_FUNC:
     # ARPACK matrix multiplication function.
     CTYPE: igraph_arpack_function_t
 
@@ -529,7 +535,7 @@ ISOMORPHISM_FUNC:
     # isomorphism is found
     CTYPE: igraph_isohandler_t
 
-LEVCFUNC:
+LEVC_FUNC:
     # Callback function for igraph_leading_eigenvector_community(). Called
     # after each eigenvalue / eigenvector calculation.
     CTYPE: igraph_community_leading_eigenvector_callback_t
@@ -538,20 +544,24 @@ LEVCFUNC:
 # Miscellaneous
 ###############################################################################
 
-ARPACKFUNC:
+ARPACK_FUNC:
     # ARPACK matrix multiplication function.
     CTYPE: igraph_arpack_function_t
 
-ARPACKOPT:
+ARPACK_OPTIONS:
     # Structure that contains the options of the ARPACK eigensolver.
     CTYPE: igraph_arpack_options_t
     FLAGS: BY_REF
 
-ARPACKSTORAGE:
+ARPACK_STORAGE:
     # Pointer to a general-purpose memory block that ARPACK-based algorithms
     # may use as a working area.
     CTYPE: igraph_arpack_storage_t
     FLAGS: BY_REF
+
+ASTAR_HEURISTIC_FUNC:
+    # A* heuristic function
+    CTYPE: igraph_astar_heuristic_func_t
 
 ATTRIBUTES:
     # An opaque data structure that a high-level interface may use to pass
