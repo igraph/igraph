@@ -600,6 +600,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_all_st_mincuts
   igraph_dominator_tree
   igraph_st_mincut_value
   igraph_vertex_disjoint_paths
@@ -679,6 +680,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_clique_size_hist
+  igraph_maximal_cliques
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
@@ -759,8 +761,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
-  igraph_get_incidence
-  igraph_incidence
+  igraph_biadjacency
+  igraph_get_biadjacency
 )
 
 # centralization.at
@@ -795,6 +797,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_cohesive_blocks
+  igraph_minimum_size_separators
 )
 
 add_legacy_tests(
@@ -966,8 +969,10 @@ add_benchmarks(
   igraph_coloring
   igraph_decompose
   igraph_degree
+  igraph_degree_sequence_game
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
@@ -978,6 +983,7 @@ add_benchmarks(
   igraph_qsort
   igraph_random_walk
   igraph_transitivity
+  igraph_vertex_connectivity
   igraph_voronoi
   inc_vs_adj
 )

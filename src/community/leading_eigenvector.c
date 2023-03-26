@@ -410,14 +410,11 @@ igraph_error_t igraph_community_leading_eigenvector(
         igraph_vector_list_clear(eigenvectors);
     }
 
-    IGRAPH_STATUS("Starting leading eigenvector method.\n", 0);
-
     if (!start) {
         /* Calculate the weakly connected components in the graph and use them as
          * an initial split */
         IGRAPH_CHECK(igraph_connected_components(graph, mymembership, &idx, 0, IGRAPH_WEAK));
         communities = igraph_vector_int_size(&idx);
-        IGRAPH_STATUSF(("Starting from %" IGRAPH_PRId " component(s).\n", 0, communities));
         if (history) {
             IGRAPH_CHECK(igraph_vector_push_back(history,
                                                  IGRAPH_LEVC_HIST_START_FULL));
@@ -425,8 +422,6 @@ igraph_error_t igraph_community_leading_eigenvector(
     } else {
         /* Just create the idx vector for the given membership vector */
         communities = igraph_vector_int_max(mymembership) + 1;
-        IGRAPH_STATUSF(("Starting from given membership vector with %" IGRAPH_PRId
-                        " communities.\n", 0, communities));
         if (history) {
             IGRAPH_CHECK(igraph_vector_push_back(history,
                                                  IGRAPH_LEVC_HIST_START_GIVEN));
@@ -512,7 +507,6 @@ igraph_error_t igraph_community_leading_eigenvector(
         /* depth first search */
         igraph_integer_t size = 0;
 
-        IGRAPH_STATUSF(("Trying to split community %" IGRAPH_PRId "... ", 0, comm));
         IGRAPH_ALLOW_INTERRUPTION();
 
         for (i = 0; i < no_of_nodes; i++) {
@@ -631,7 +625,6 @@ igraph_error_t igraph_community_leading_eigenvector(
         }
 
         if (storage.d[0] <= 0) {
-            IGRAPH_STATUS("no split.\n", 0);
             if (history) {
                 IGRAPH_CHECK(igraph_vector_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));
@@ -651,7 +644,6 @@ igraph_error_t igraph_community_leading_eigenvector(
             }
         }
         if (l == 0 || l == size) {
-            IGRAPH_STATUS("no split.\n", 0);
             if (history) {
                 IGRAPH_CHECK(igraph_vector_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));
@@ -667,7 +659,6 @@ igraph_error_t igraph_community_leading_eigenvector(
             mod += storage.v[size + i] * storage.v[i];
         }
         if (mod <= 1e-8) {
-            IGRAPH_STATUS("no modularity increase, no split.\n", 0);
             if (history) {
                 IGRAPH_CHECK(igraph_vector_push_back(history,
                                                      IGRAPH_LEVC_HIST_FAILED));
@@ -677,7 +668,6 @@ igraph_error_t igraph_community_leading_eigenvector(
         }
 
         communities++;
-        IGRAPH_STATUS("split.\n", 0);
 
         /* Rewrite the mymembership vector */
         for (j = 0; j < size; j++) {
@@ -719,8 +709,6 @@ igraph_error_t igraph_community_leading_eigenvector(
     igraph_vector_destroy(&tmp);
     igraph_vector_int_destroy(&idx2);
     IGRAPH_FINALLY_CLEAN(3);
-
-    IGRAPH_STATUS("Done.\n", 0);
 
     /* reform the mymerges vector */
     if (merges) {

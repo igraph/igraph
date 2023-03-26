@@ -1107,27 +1107,26 @@ static igraph_error_t igraph_i_cattributes_cn_func(const igraph_attribute_record
 
     const igraph_vector_t *oldv = oldrec->value;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
-    igraph_integer_t i;
-    igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
-    igraph_vector_t values;
 
-    if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
+    IGRAPH_CHECK_OOM(newv, "Cannot combine attributes.");
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_INIT_FINALLY(newv, newlen);
 
+    igraph_vector_t values;
     IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
 
-    for (i = 0; i < newlen; i++) {
+    for (igraph_integer_t i = 0; i < newlen; i++) {
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
-        igraph_integer_t j, n = igraph_vector_int_size(idx);
-        igraph_real_t res;
+
+        igraph_integer_t n = igraph_vector_int_size(idx);
         IGRAPH_CHECK(igraph_vector_resize(&values, n));
-        for (j = 0; j < n; j++) {
+        for (igraph_integer_t j = 0; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
             VECTOR(values)[j] = VECTOR(*oldv)[x];
         }
+
+        igraph_real_t res;
         IGRAPH_CHECK(func(&values, &res));
         VECTOR(*newv)[i] = res;
     }
@@ -1363,29 +1362,26 @@ static igraph_error_t igraph_i_cattributes_cb_func(const igraph_attribute_record
 
     const igraph_vector_bool_t *oldv = oldrec->value;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
-    igraph_integer_t i;
-    igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-    igraph_vector_bool_t values;
 
-    if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    igraph_vector_bool_t *newv = IGRAPH_CALLOC(1, igraph_vector_bool_t);
+    IGRAPH_CHECK_OOM(newv, "Cannot combine attributes.");
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(newv, newlen);
 
+    igraph_vector_bool_t values;
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&values, 0);
 
-    for (i = 0; i < newlen; i++) {
+    for (igraph_integer_t i = 0; i < newlen; i++) {
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
-        igraph_integer_t j, n = igraph_vector_int_size(idx);
-        igraph_bool_t res;
 
+        igraph_integer_t n = igraph_vector_int_size(idx);
         IGRAPH_CHECK(igraph_vector_bool_resize(&values, n));
-        for (j = 0; j < n; j++) {
+        for (igraph_integer_t j = 0; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
             VECTOR(values)[j] = VECTOR(*oldv)[x];
         }
 
+        igraph_bool_t res;
         IGRAPH_CHECK(func(&values, &res));
         VECTOR(*newv)[i] = res;
     }
@@ -1554,33 +1550,34 @@ static igraph_error_t igraph_i_cattributes_sn_func(const igraph_attribute_record
 
     const igraph_strvector_t *oldv = oldrec->value;
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
-    igraph_integer_t i;
-    igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
-    igraph_strvector_t values;
 
-    if (!newv) {
-        IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    igraph_strvector_t *newv = IGRAPH_CALLOC(1, igraph_strvector_t);
+    IGRAPH_CHECK_OOM(newv, "Cannot combine attributes.");
     IGRAPH_FINALLY(igraph_free, newv);
     IGRAPH_STRVECTOR_INIT_FINALLY(newv, newlen);
 
-    IGRAPH_STRVECTOR_INIT_FINALLY(newv, 0);
+    igraph_strvector_t values;
+    IGRAPH_STRVECTOR_INIT_FINALLY(&values, 0);
 
-    for (i = 0; i < newlen; i++) {
+    for (igraph_integer_t i = 0; i < newlen; i++) {
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
-        igraph_integer_t j, n = igraph_vector_int_size(idx);
-        char *res;
+
+        igraph_integer_t n = igraph_vector_int_size(idx);
         IGRAPH_CHECK(igraph_strvector_resize(&values, n));
-        for (j = 0; j < n; j++) {
+        for (igraph_integer_t j = 0; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
             const char *elem = igraph_strvector_get(oldv, x);
             IGRAPH_CHECK(igraph_strvector_set(newv, j, elem));
         }
+
+        char *res;
         IGRAPH_CHECK(func(&values, &res));
         IGRAPH_FINALLY(igraph_free, res);
+
         IGRAPH_CHECK(igraph_strvector_set(newv, i, res));
-        IGRAPH_FINALLY_CLEAN(1);
+
         IGRAPH_FREE(res);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     igraph_strvector_destroy(&values);

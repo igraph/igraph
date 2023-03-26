@@ -249,8 +249,6 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    IGRAPH_STATUS("Starting cohesive block calculation.\n", NULL);
-
     if (blocks)   {
         igraph_vector_int_list_clear(blocks);
     }
@@ -304,15 +302,11 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_integer_t nsepv = 0;
         igraph_bool_t addedsep = false;
 
-        IGRAPH_STATUSF(("Candidate %li: %li vertices,",
-                        0, Qptr, mynodes));
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Get the separators */
         IGRAPH_CHECK(igraph_minimum_size_separators(mygraph, &separators));
         nsep = igraph_vector_int_list_size(&separators);
-
-        IGRAPH_STATUSF((" %li separators,", 0, nsep));
 
         /* Remove them from the graph, also mark them */
         IGRAPH_CHECK(igraph_vector_bool_resize(&marked, mynodes));
@@ -349,8 +343,6 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             IGRAPH_CHECK(igraph_vector_int_push_back(&components, -1));
             no++;
         }
-
-        IGRAPH_STATUSF((" %li new candidates,", 0, no));
 
         for (i = 0; i < no; i++) {
             igraph_t *newgraph;
@@ -397,8 +389,6 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                 IGRAPH_FINALLY_CLEAN(2);
             }
         }
-
-        IGRAPH_STATUSF((" keeping %li.\n", 0, kept));
 
         igraph_destroy(mygraph);
         igraph_free(mygraph);
@@ -499,10 +489,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
         for (i = 0; i < Qptr; i++) {
             if (VECTOR(removed)[i]) {
-                IGRAPH_STATUSF(("Candidate %li ignored.\n", 0, i));
                 continue;
-            } else {
-                IGRAPH_STATUSF(("Candidate %li is a cohesive (sub)block\n", 0, i));
             }
             VECTOR(rewritemap)[i] = resptr;
             if (cohesion) {
@@ -575,8 +562,6 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     igraph_vector_ptr_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(2); /* + the elements of Q, they were already destroyed */
-
-    IGRAPH_STATUS("Cohesive blocking done.\n", 0);
 
     return IGRAPH_SUCCESS;
 }
