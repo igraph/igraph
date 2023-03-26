@@ -51,17 +51,15 @@ static igraph_error_t generateSubsets(const igraph_vector_int_t *steinerTerminal
     igraph_integer_t count = ((igraph_integer_t)1 << n);
     igraph_integer_t subsetIndex = graphsize;
 
-    // The outer for loop will run 2^n times to get all subset .
-    // Here variable i will act as a binary counter
-
+    /*
+        As per algorithm the subsets that are explored have size atleast 2. 
+        The distance information between singleton vertices is already captured by the adjacency matrix.
+    */
     for (igraph_integer_t i = 2; i < count; i++) {
-        // The inner for loop will run n times , As the maximum number of elements a set can have is n
-        // This loop will generate a subset
+        
         int_set newSubset;
         for (igraph_integer_t j = 0; j < n; j++) {
-            // This if condition will check if jth bit in binary representation of  i  is set or not
-            // if the value of (i & (1 << j)) is greater than 0 , include arr[j] in the current subset
-            // otherwise exclude arr[j]
+       
             if ((i & ((igraph_integer_t)1 << j)) > 0) {
                 newSubset.insert(VECTOR(*steinerTerminals)[j]);
             }
@@ -501,12 +499,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                         /*
                          *  A set with Singleton value E removed from subset D
                          */
-                        for (auto item :  DMinusE) {
-                            if (item == E) {
-                                DMinusE.erase(item);
-                                break;
-                            }
-                        }
+                        
+                        DMinusE.erase(E);
 
                         igraph_integer_t indexOfSubsetDMinusE;
                         if (DMinusE.size() == 1) {
