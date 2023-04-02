@@ -547,8 +547,6 @@ igraph_integer_t graph_molloy_hash::optimal_window() {
             optimal_T = Tmax;
         }
     }
-    // on cree Tmin
-    igraph_integer_t Tmin = igraph_integer_t(0.5 * double(a) / (min_cost - 1.0));
     // on cherche autour
     double span = 2.0;
     int try_again = 4;
