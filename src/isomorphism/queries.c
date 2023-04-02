@@ -69,15 +69,13 @@ static igraph_error_t igraph_i_isomorphic_small(
  * first graph into the edge set of the second. This mapping is called
  * an \em isomorphism.
  *
- * </para><para>Currently, this function supports simple graphs and graphs
- * with self-loops, but does not support multigraphs.
- *
  * </para><para>This function decides which graph isomorphism algorithm to be
  * used based on the input graphs. Right now it does the following:
  * \olist
  * \oli If one graph is directed and the other undirected then an
  *    error is triggered.
- * \oli If one of the graphs has multi-edges then an error is triggered.
+ * \oli If one of the graphs has multi-edges then both graphs are
+ *    simplified and colorized and sent to VF2.
  * \oli If the two graphs does not have the same number of vertices
  *    and edges it returns with \c false.
  * \oli Otherwise, if the \ref igraph_isoclass() function supports both
@@ -112,7 +110,31 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
     IGRAPH_CHECK(igraph_has_multiple(graph2, &multi2));
 
     if (multi1 || multi2) {
-        IGRAPH_ERROR("Isomorphism testing is not implemented for multigraphs", IGRAPH_UNIMPLEMENTED);
+        igraph_t r1;
+        igraph_t r2;
+        igraph_vector_int_t vc1;
+        igraph_vector_int_t vc2;
+        igraph_vector_int_t ec1;
+        igraph_vector_int_t ec2;
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vc1, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vc2, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&ec1, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&ec2, 0);
+        IGRAPH_CHECK(igraph_simplify_and_colorize(graph1, &r1, &vc1, &ec1));
+        IGRAPH_FINALLY(igraph_destroy, &r1);
+        IGRAPH_CHECK(igraph_simplify_and_colorize(graph2, &r2, &vc2, &ec2));
+        IGRAPH_FINALLY(igraph_destroy, &r2);
+        IGRAPH_CHECK(igraph_isomorphic_vf2(&r1, &r2, &vc1, &vc2, &ec1, &ec2, iso,
+                NULL, NULL, NULL, NULL, NULL));
+        igraph_destroy(&r2);
+        igraph_destroy(&r1);
+        igraph_vector_int_destroy(&ec2);
+        igraph_vector_int_destroy(&ec1);
+        igraph_vector_int_destroy(&vc2);
+        igraph_vector_int_destroy(&vc1);
+        IGRAPH_FINALLY_CLEAN(6);
+
+        return IGRAPH_SUCCESS;
     }
 
     if (dir1 != dir2) {
