@@ -106,6 +106,10 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
     igraph_bool_t dir1 = igraph_is_directed(graph1), dir2 = igraph_is_directed(graph2);
     igraph_bool_t loop1, loop2, multi1, multi2;
 
+    if (dir1 != dir2) {
+        IGRAPH_ERROR("Cannot compare directed and undirected graphs for isomorphism.", IGRAPH_EINVAL);
+    }
+
     IGRAPH_CHECK(igraph_has_multiple(graph1, &multi1));
     IGRAPH_CHECK(igraph_has_multiple(graph2, &multi2));
 
@@ -116,6 +120,7 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
         igraph_vector_int_t vc2;
         igraph_vector_int_t ec1;
         igraph_vector_int_t ec2;
+
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vc1, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vc2, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&ec1, 0);
@@ -137,10 +142,8 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
         return IGRAPH_SUCCESS;
     }
 
-    if (dir1 != dir2) {
-        IGRAPH_ERROR("Cannot compare directed and undirected graphs", IGRAPH_EINVAL);
-    } else if (nodes1 != nodes2 || edges1 != edges2) {
-        *iso = 0;
+    if (nodes1 != nodes2 || edges1 != edges2) {
+        *iso = false;
     } else if (nodes1 >= 3 && nodes1 <= (dir1 ? 4 : 6)) {
         IGRAPH_CHECK(igraph_has_loop(graph1, &loop1));
         IGRAPH_CHECK(igraph_has_loop(graph2, &loop2));
@@ -148,11 +151,11 @@ igraph_error_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
             IGRAPH_CHECK(igraph_i_isomorphic_small(graph1, graph2, iso));
         } else {
             IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
-                                                 0, 0, /*sh=*/ IGRAPH_BLISS_FL, 0, 0));
+                                                 NULL, NULL, /*sh=*/ IGRAPH_BLISS_FL, NULL, NULL));
         }
     } else {
         IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
-                                             0, 0, /*sh=*/ IGRAPH_BLISS_FL, 0, 0));
+                                             NULL, NULL, /*sh=*/ IGRAPH_BLISS_FL, NULL, NULL));
     }
 
     return IGRAPH_SUCCESS;
