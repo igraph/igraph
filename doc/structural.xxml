@@ -120,8 +120,6 @@
 <!-- doxrox-include igraph_strength -->
 <!-- doxrox-include igraph_eigenvector_centrality -->
 <!-- doxrox-include igraph_hub_and_authority_scores -->
-<!-- doxrox-include igraph_hub_score -->
-<!-- doxrox-include igraph_authority_score -->
 <!-- doxrox-include igraph_convergence_degree -->
 </section>
 
@@ -253,6 +251,8 @@
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_laplacian -->
+<!-- doxrox-include igraph_hub_score -->
+<!-- doxrox-include igraph_authority_score -->
 </section>
 
 </chapter>

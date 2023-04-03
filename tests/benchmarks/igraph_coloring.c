@@ -12,7 +12,7 @@ int main(void) {
 
     igraph_vector_int_init(&colors, 0);
 
-    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 50000, 1000000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&g, 50000, 1000000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     BENCH(" 1 COLORED_NEIGHBORS, random graph with 50,000 vertices and 2,000,000 edges",
           igraph_vertex_coloring_greedy(&g, &colors, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS)
          );

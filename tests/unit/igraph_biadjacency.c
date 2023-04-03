@@ -24,7 +24,7 @@ void print_and_destroy(igraph_matrix_t *incidence, igraph_bool_t directed, igrap
     igraph_vector_bool_t types;
     igraph_vector_bool_init(&types, 0);
 
-    igraph_incidence(&g, &types, incidence, directed, mode, multiple);
+    igraph_biadjacency(&g, &types, incidence, directed, mode, multiple);
 
     print_graph_canon(&g);
     printf("types: ");
@@ -87,7 +87,7 @@ int main(void) {
         printf("\nCheck error for negative element.\n");
         int elem[] = {-5};
         matrix_init_int_row_major(&incidence, 1, 1, elem);
-        CHECK_ERROR(igraph_incidence(&g, &types, &incidence, IGRAPH_DIRECTED,
+        CHECK_ERROR(igraph_biadjacency(&g, &types, &incidence, IGRAPH_DIRECTED,
                     IGRAPH_ALL, 1), IGRAPH_EINVAL);
         igraph_matrix_destroy(&incidence);
     }
