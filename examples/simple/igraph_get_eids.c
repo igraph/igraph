@@ -52,8 +52,7 @@ int main(void) {
         igraph_vector_int_clear(&path);
         igraph_vector_int_clear(&eids);
 
-        igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, nodes, p,
-                                /*directed=*/ 0, /*loops=*/ 0);
+        igraph_erdos_renyi_game_gnp(&g, nodes, p, /*directed=*/ 0, /*loops=*/ 0);
         ecount = igraph_ecount(&g);
         for (e = 0; e < edges; e++) {
             igraph_integer_t edge = RNG_INTEGER(0, ecount - 1);

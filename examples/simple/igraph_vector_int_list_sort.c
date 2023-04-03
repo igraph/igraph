@@ -11,7 +11,7 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 31415);
 
     /* Create a random graph with a given number of vertices and edges */
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 15, 80, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 15, 80, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     /* Find all maximal cliques in the graph */
     igraph_vector_int_list_init(&cliques, 0);

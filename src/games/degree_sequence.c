@@ -748,8 +748,8 @@ igraph_error_t igraph_i_degree_sequence_game_edge_switching(
  *                  for \c IGRAPH_DEGSEQ_SIMPLE. The time complexity of the
  *                  other modes is not known.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game(),
- *     \ref igraph_is_graphical()
+ * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game_gnm(),
+ *     \ref igraph_erdos_renyi_game_gnp(), \ref igraph_is_graphical()
  *
  * \example examples/simple/igraph_degree_sequence_game.c
  */

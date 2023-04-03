@@ -44,9 +44,7 @@ int main(void) {
     igraph_vector_int_list_t cliques;
 
     igraph_rng_seed(igraph_rng_default(), 41);
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP,
-                            /*n=*/ 100, /*p=*/ 0.7, /*directed=*/ 0,
-                            /*loops=*/ 0);
+    igraph_erdos_renyi_game_gnp(&graph, 100, 0.7, /*directed=*/ 0, /*loops=*/ 0);
 
     igraph_vector_int_list_init(&cliques, 0);
 

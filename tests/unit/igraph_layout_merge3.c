@@ -33,8 +33,7 @@ int main(void) {
     igraph_matrix_init(&coords, 0, 0);
 
     for (i = 0; i < 10; i++) {
-        igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, /*n=*/ 100,
-                                /*p=*/ 2.0 / 100, IGRAPH_UNDIRECTED, /*loops=*/ 0);
+        igraph_erdos_renyi_game_gnp(&graph, 100, 2.0 / 100, IGRAPH_UNDIRECTED, /*loops=*/ 0);
         igraph_layout_mds(&graph, &coords, /*dist=*/ 0, /*dim=*/ 2);
         igraph_destroy(&graph);
     }

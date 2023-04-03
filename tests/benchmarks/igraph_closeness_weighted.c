@@ -91,7 +91,7 @@ int main(void) {
 #define NAME "GNM(3000,10000)"
 #define REP 1
 
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 3000, 10000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 3000, 10000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
 
     BENCH(" 9 Closeness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
           REPEAT(igraph_closeness(&graph, &closeness, NULL, NULL, igraph_vss_all(), IGRAPH_OUT, NULL, 1), REP)
@@ -119,7 +119,7 @@ int main(void) {
 #define NAME "GNM(3000,30000)"
 #define REP 1
 
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 3000, 30000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 3000, 30000, IGRAPH_DIRECTED, IGRAPH_LOOPS);
 
     BENCH("13 Closeness, unweighted, " NAME ", directed, " TOSTR(REP) "x",
           REPEAT(igraph_closeness(&graph, &closeness, NULL, NULL, igraph_vss_all(), IGRAPH_OUT, NULL, 1), REP)

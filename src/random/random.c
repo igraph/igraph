@@ -1072,7 +1072,7 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
  * \brief Generates an increasing random sequence of integers (igraph_real_t version).
  *
  * This function is the 'real' version of \ref igraph_random_sample(), and was added
- * so \ref igraph_erdos_renyi_game() and related function can use a random sample
+ * so \ref igraph_erdos_renyi_game_gnm() and related functions can use a random sample
  * of doubles instead of integers to prevent overflows on systems with 32-bit
  * \type igraph_integer_t.
  *
@@ -1096,7 +1096,7 @@ static void igraph_i_random_sample_alga_real(igraph_vector_t *res,
 igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
                     igraph_real_t h, igraph_integer_t length) {
     /* This function is the 'real' version of igraph_random_sample, and was added
-     * so erdos_renyi_game can use a random sample of doubles instead of integers
+     * so erdos_renyi_game_gnm can use a random sample of doubles instead of integers
      * to prevent overflows on systems with 32-bits igraph_integer_t.
      */
     igraph_real_t N = h - l + 1;
