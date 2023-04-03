@@ -10,16 +10,14 @@ int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 1122);
 
-    igraph_erdos_renyi_game(&g1, IGRAPH_ERDOS_RENYI_GNP,
-                            100, 3.0 / 100, /*directed=*/ 0, /*loops=*/ 0);
+    igraph_erdos_renyi_game_gnp(&g1, 100, 3.0 / 100, /*directed=*/ 0, /*loops=*/ 0);
 
     /* Seed the generator with the same seed again,
      * and create a graph with the same method. */
 
     igraph_rng_seed(igraph_rng_default(), 1122);
 
-    igraph_erdos_renyi_game(&g2, IGRAPH_ERDOS_RENYI_GNP,
-                            100, 3.0 / 100, /*directed=*/ 0, /*loops=*/ 0);
+    igraph_erdos_renyi_game_gnp(&g2, 100, 3.0 / 100, /*directed=*/ 0, /*loops=*/ 0);
 
     /* The two graphs will be identical. */
 

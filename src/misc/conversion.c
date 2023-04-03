@@ -35,6 +35,8 @@
 #include "graph/attributes.h"
 #include "math/safe_intop.h"
 
+#define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
+
 /**
  * \ingroup conversion
  * \function igraph_get_adjacency
@@ -88,8 +90,6 @@
  *
  * Time complexity: O(|V||V|), |V| is the number of vertices in the graph.
  */
-
-#define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
 
 igraph_error_t igraph_get_adjacency(
     const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,

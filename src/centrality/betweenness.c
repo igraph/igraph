@@ -1129,21 +1129,21 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_integer_t source, j;
-    unsigned char *is_target;
+    bool *is_target;
     igraph_stack_int_t S;
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
-    is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
+    is_target = IGRAPH_CALLOC(no_of_nodes, bool);
     IGRAPH_CHECK_OOM(is_target, "Insufficient memory for subset edge betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        is_target[IGRAPH_VIT_GET(vit)] = 1;
+        is_target[IGRAPH_VIT_GET(vit)] = true;
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);

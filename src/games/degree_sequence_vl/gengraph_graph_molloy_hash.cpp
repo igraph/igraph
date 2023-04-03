@@ -26,7 +26,6 @@
 
 #include "igraph_constructors.h"
 #include "igraph_error.h"
-#include "igraph_statusbar.h"
 #include "igraph_progress.h"
 
 #include <stdexcept>
@@ -401,20 +400,6 @@ igraph_integer_t graph_molloy_hash::shuffle(igraph_integer_t times,
         IGRAPH_WARNING("Cannot shuffle graph, maybe it is the only realization of its degree sequence?");
     }
 
-    // Status report
-    {
-        igraph_status("*** Shuffle Monitor ***\n", NULL);
-        igraph_statusf(" - Average cost : %f / validated edge swap\n", NULL,
-                       double(cost) / double(nb_swaps));
-        igraph_statusf(" - Connectivity tests : %" IGRAPH_PRId " (%" IGRAPH_PRId " successes, %" IGRAPH_PRId " failures)\n",
-                       NULL, successes + failures, successes, failures);
-        // %.f rounds to integer
-        igraph_statusf(" - Average window : %.f\n", NULL,
-                       avg_T / double(successes + failures));
-        if (type == FINAL_HEURISTICS || type == BRUTE_FORCE_HEURISTICS)
-            igraph_statusf(" - Average isolation test width : %f\n", NULL,
-                           avg_K / double(successes + failures));
-    }
     return nb_swaps;
 }
 
@@ -561,16 +546,11 @@ igraph_integer_t graph_molloy_hash::optimal_window() {
             min_cost = c;
             optimal_T = Tmax;
         }
-        igraph_statusf("Tmax = %" IGRAPH_PRId " [%f]", 0, Tmax, min_cost);
     }
-    // on cree Tmin
-    igraph_integer_t Tmin = igraph_integer_t(0.5 * double(a) / (min_cost - 1.0));
-    igraph_statusf("Optimal T is in [%" IGRAPH_PRId ", %" IGRAPH_PRId "]\n", 0, Tmin, Tmax);
     // on cherche autour
     double span = 2.0;
     int try_again = 4;
     while (span > 1.05 && optimal_T <= 5 * a) {
-        igraph_statusf("Best T [cost]: %" IGRAPH_PRId " [%f]", 0, optimal_T, min_cost);
         igraph_integer_t T_low  = igraph_integer_t(double(optimal_T) / span);
         igraph_integer_t T_high = igraph_integer_t(double(optimal_T) * span);
         double c_low  = average_cost(T_low, back, min_cost);
@@ -578,11 +558,6 @@ igraph_integer_t graph_molloy_hash::optimal_window() {
         if (c_low < min_cost && c_high < min_cost) {
             if (try_again--) {
                 continue;
-            }
-            {
-                igraph_status("Warning: when looking for optimal T,\n", 0);
-                igraph_statusf("Low: %" IGRAPH_PRId " [%f]  Middle: %" IGRAPH_PRId " [%f]  High: %" IGRAPH_PRId " [%f]\n", 0,
-                               T_low, c_low, optimal_T, min_cost, T_high, c_high);
             }
             delete[] back;
             return optimal_T;

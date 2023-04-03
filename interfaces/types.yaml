@@ -323,6 +323,12 @@ FAS_ALGORITHM:
     CTYPE: igraph_fas_algorithm_t
     FLAGS: ENUM
 
+FWALGORITHM:
+    # Enum that describes the variant of the Floyd-Warshall algorithm to use in
+    # Floyd-Warshall graph distances computing function
+    CTYPE: igraph_floyd_warshall_algorithm_t
+    FLAGS: ENUM
+
 GETADJACENCY:
     # Enum storing how to retrieve the adjacency matrix from a graph
     CTYPE: igraph_get_adjacency_t
@@ -552,6 +558,10 @@ ARPACKSTORAGE:
     # may use as a working area.
     CTYPE: igraph_arpack_storage_t
     FLAGS: BY_REF
+
+ASTAR_HEURISTIC_FUNC:
+    # A* heuristic function
+    CTYPE: igraph_astar_heuristic_func_t
 
 ATTRIBUTES:
     # An opaque data structure that a high-level interface may use to pass

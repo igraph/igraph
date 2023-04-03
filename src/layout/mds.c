@@ -176,8 +176,8 @@ igraph_error_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t
  *        function does not check whether the matrix is indeed
  *        symmetric. Results are unspecified if you pass a non-symmetric
  *        matrix here. You can set this parameter to null; in this
- *        case, the shortest path lengths between vertices will be
- *        used as distances.
+ *        case, the undirected shortest path lengths between vertices
+ *        will be used as distances.
  * \param dim The number of dimensions in the embedding space. For
  *        2D layouts, supply 2 here.
  * \return Error code.

@@ -139,22 +139,32 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \function igraph_hub_and_authority_scores
  * \brief Kleinberg's hub and authority scores.
  *
- * The hub and authority scores of the vertices are defined as the principal
- * eigenvectors of <code>A*A^T</code> and <code>A^T*A</code>, respectively,
- * where <code>A</code> is the adjacency
- * matrix of the graph, <code>A^T</code> is its transposed.
+ * Hub and authority scores are a generalization of the ideas behind
+ * eigenvector centrality to directed graphs. The authority score of
+ * a vertex is proportional to the sum of the hub scores of vertices
+ * that point to it. Conversely, the hub score of a vertex is proportional
+ * to the sum of authority scores of vertices that it points to.
  *
  * </para><para>
- * When both the hub and authority scores are needed (the typical use case),
- * using this function is more efficient than separate calculations
- * with \ref igraph_hub_score() and \ref igraph_authority_score().
+ * The hub and authority scores of the vertices are defined as the principal
+ * eigenvectors of <code>A A^T</code> and <code>A^T A</code>, respectively,
+ * where <code>A</code> is the adjacency matrix of the graph and <code>A^T</code>
+ * is its transposed.
+ *
+ * </para><para>
+ * The concept of hub and authority scores were developed for \em directed graphs.
+ * In undirected graphs, both the hub and authority scores are equal to the
+ * eigenvector centrality, which can be computed using
+ * \ref igraph_eigenvector_centrality().
  *
  * </para><para>
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
  * Algorithms, \eme 1998. Extended version in \emb Journal of the
- * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
+ * ACM \eme 46(1999).
+ * https://doi.org/10.1145/324133.324140
+ * Also appears as IBM Research Report RJ 10076, May
  * 1997.
  *
  * \param graph The input graph. Can be directed and undirected.
@@ -166,7 +176,7 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  *    corresponding to the calculated eigenvectors is stored here.
  * \param scale If not zero then the result will be scaled such that
  *     the absolute value of the maximum centrality is one.
- * \param weights A null pointer (=no edge weights), or a vector
+ * \param weights A null pointer (meaning no edge weights), or a vector
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Supply \c NULL here to use the defaults. Note that the function
@@ -181,7 +191,8 @@ static igraph_error_t igraph_i_kleinberg_weighted(igraph_real_t *to,
  * \sa \ref igraph_hub_score(), \ref igraph_authority_score()
  * for the separate calculations,
  * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
- * \ref igraph_eigenvector_centrality() for similar measures.
+ * \ref igraph_eigenvector_centrality() for a similar measure intended
+ * for undirected graphs.
  */
 igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_vector_t *hub_vector, igraph_vector_t *authority_vector,
@@ -196,13 +207,12 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     igraph_matrix_t vectors;
     igraph_i_kleinberg_data_t extra;
     igraph_i_kleinberg_data2_t extra2;
-    igraph_integer_t i;
     igraph_vector_t *my_hub_vector_p;
     igraph_vector_t my_hub_vector;
 
 
-    if (igraph_ecount(graph) == 0 || no_of_nodes == 1) {
-        /* special case: empty graph or single vertex */
+    if (igraph_ecount(graph) == 0) {
+        /* special case: empty graph */
         if (value) {
             *value = igraph_ecount(graph) ? 1.0 : IGRAPH_NAN;
         }
@@ -263,20 +273,20 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
 
-    if (weights == 0) {
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &inadjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+    if (weights == NULL) {
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &inadjlist, IGRAPH_IN, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &inadjlist);
-        IGRAPH_CHECK(igraph_adjlist_init(graph, &outadjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
+        IGRAPH_CHECK(igraph_adjlist_init(graph, &outadjlist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &outadjlist);
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &ininclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &ininclist, IGRAPH_IN, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &ininclist);
-        IGRAPH_CHECK(igraph_inclist_init(graph, &outinclist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE));
+        IGRAPH_CHECK(igraph_inclist_init(graph, &outinclist, IGRAPH_OUT, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &outinclist);
     }
 
     IGRAPH_CHECK(igraph_strength(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0, 0));
-    for (i = 0; i < options->n; i++) {
+    for (igraph_integer_t i = 0; i < options->n; i++) {
         if (VECTOR(tmp)[i] != 0) {
             MATRIX(vectors, i, 0) = VECTOR(tmp)[i];
         } else {
@@ -292,7 +302,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     options->which[0] = 'L'; options->which[1] = 'A';
 
-    if (weights == 0) {
+    if (weights == NULL) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,
                                            options, 0, &values, &vectors));
     } else {
@@ -316,7 +326,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_integer_t which = 0;
 
         IGRAPH_CHECK(igraph_vector_resize(my_hub_vector_p, options->n));
-        for (i = 0; i < options->n; i++) {
+        for (igraph_integer_t i = 0; i < options->n; i++) {
             igraph_real_t tmp;
             VECTOR(*my_hub_vector_p)[i] = MATRIX(vectors, i, 0);
             tmp = fabs(VECTOR(*my_hub_vector_p)[i]);
@@ -332,7 +342,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         }
 
         /* Correction for numeric inaccuracies (eliminating -0.0) */
-        for (i = 0; i < options->n; i++) {
+        for (igraph_integer_t i = 0; i < options->n; i++) {
             if (VECTOR(*my_hub_vector_p)[i] < 0) {
                 VECTOR(*my_hub_vector_p)[i] = 0;
             }
@@ -350,7 +360,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_real_t norm;
         IGRAPH_CHECK(igraph_vector_resize(authority_vector, no_of_nodes));
         igraph_vector_null(authority_vector);
-        if (weights == 0) {
+        if (weights == NULL) {
             igraph_i_kleinberg_unweighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &inadjlist);
         } else {
             igraph_i_kleinberg_weighted_hub_to_auth(no_of_nodes, authority_vector, &VECTOR(*my_hub_vector_p)[0], &ininclist, graph, weights);
@@ -367,7 +377,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
         igraph_vector_destroy(&my_hub_vector);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    if (weights == 0) {
+    if (weights == NULL) {
         igraph_adjlist_destroy(&outadjlist);
         igraph_adjlist_destroy(&inadjlist);
         IGRAPH_FINALLY_CLEAN(2);
@@ -378,6 +388,7 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
     }
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -385,8 +396,10 @@ igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph,
  * \function igraph_hub_score
  * \brief Kleinberg's hub scores.
  *
+ * \deprecated-by igraph_hub_and_authority_scores 0.10.5
+ *
  * The hub scores of the vertices are defined as the principal
- * eigenvector of <code>A*A^T</code>, where <code>A</code> is the adjacency
+ * eigenvector of <code>A A^T</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
  *
  * </para><para>
@@ -434,8 +447,10 @@ igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  * \function igraph_authority_score
  * \brief Kleinberg's authority scores.
  *
+ * \deprecated-by igraph_hub_and_authority_scores 0.10.5
+ *
  * The authority scores of the vertices are defined as the principal
- * eigenvector of <code>A^T*A</code>, where <code>A</code> is the adjacency
+ * eigenvector of <code>A^T A</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
  *
  * </para><para>

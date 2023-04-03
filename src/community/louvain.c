@@ -266,19 +266,15 @@ static igraph_error_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
+    IGRAPH_ASSERT(igraph_vector_int_size(membership) == no_of_nodes);
+
     if (no_of_nodes == 0) {
         return IGRAPH_SUCCESS;
     }
 
-    /* TODO: should this be an assertion instead? */
-    if (igraph_vector_int_size(membership) < no_of_nodes) {
-        IGRAPH_ERROR("Cannot shrink graph, membership vector too short.",
-                     IGRAPH_EINVAL);
-    }
-
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 2*no_of_edges);
 
-    IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
     /* Create the new edgelist */
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, /* bycol= */ false));
