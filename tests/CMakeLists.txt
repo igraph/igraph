@@ -196,7 +196,6 @@ add_legacy_tests(
   constructor-failure
   erdos_renyi_game_gnm
   erdos_renyi_game_gnp
-  erdos_renyi_game_multi
   full
   igraph_adjacency
   igraph_atlas

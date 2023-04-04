@@ -40,7 +40,7 @@ int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_vector_int_init(&degrees, 0);
-    igraph_erdos_renyi_game_gnm(&template, 200, 600, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&template, 200, 600, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_degree(&template, &degrees, igraph_vss_all(), IGRAPH_ALL, 1);
     BENCH(" 3 Degree sequence of undirected Erdos-Renyi graph, N=150, m=450, CONFIGURATION_SIMPLE",
           igraph_degree_sequence_game(&g, &degrees, /* indeg = */ NULL, IGRAPH_DEGSEQ_CONFIGURATION_SIMPLE)
@@ -88,7 +88,7 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_vector_int_init(&outdeg, 0);
     igraph_vector_int_init(&indeg, 0);
-    igraph_erdos_renyi_game_gnm(&template, 15000, 45000, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&template, 15000, 45000, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_degree(&template, &outdeg, igraph_vss_all(), IGRAPH_OUT, true);
     igraph_degree(&template, &indeg, igraph_vss_all(), IGRAPH_IN, true);
     BENCH(" 7 Degree sequence of directed Erdos-Renyi graph, N=15000, m=45000, CONFIGURATION_SIMPLE",

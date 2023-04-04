@@ -44,7 +44,7 @@ int main(void) {
 
     /* Random graph */
     acyclic = 0;
-    igraph_erdos_renyi_game_gnm(&graph, 20, 40, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 20, 40, IGRAPH_UNDIRECTED, IGRAPH_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_feedback_arc_set(&graph, &result, NULL, IGRAPH_FAS_APPROX_EADES);
     igraph_delete_edges(&graph, igraph_ess_vector(&result));
     igraph_is_forest(&graph, &acyclic, NULL, IGRAPH_ALL);

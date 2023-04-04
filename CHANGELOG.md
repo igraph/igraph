@@ -49,6 +49,7 @@
 
  - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
  - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+ - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdos-Renyi graphs with multi-edges
 
 ### Changed
 
@@ -76,7 +77,6 @@
  - `igraph_triangular_lattice()` to generate triangular lattices of various kinds (#2235, thanks to @rfulekjames).
  - `igraph_hexagonal_lattice()` to generate hexagonal lattices of various kinds (#2262, thanks to @rfulekjames).
  - `igraph_tree_from_parent_vector()` to create a tree or a forest from a parent vector (i.e. a vector that encodes the parent vertex of each vertex).
- - `igraph_erdos_renyi_game_gnm_multi()` to generate Erdos-Renyi graphs with multi-edges
  - `igraph_induced_subgraph_edges()` produces the IDs of edges contained within a subgraph induced by the given vertices.
 
 ### Changed
