@@ -171,7 +171,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
 /**
  * \ingroup generators
- * \function igraph_erdos_renyi_game_gnp
+ * \function igraph_erdos_renyi_game_gnm
  * \brief Generates a random (Erdős-Rényi) graph with a fixed number of edges.
  *
  * In this model, a graph with n vertices and m edges is generated such that the
@@ -335,8 +335,6 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
  *
  * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
  * \ref igraph_erdos_renyi_game_gnm(), \ref igraph_erdos_renyi_game_gnp()
- *
- * \example examples/simple/igraph_erdos_renyi_game.c
  */
 igraph_error_t igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
                             igraph_integer_t n, igraph_real_t p_or_m,
