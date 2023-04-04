@@ -636,6 +636,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&verts, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
+    igraph_vector_int_fill(&vids_old2new, -1);
 
     /* vids_old2new would have been created internally in igraph_induced_subgraph(),
        but it is slow if the graph is large and consists of many small components,
@@ -743,6 +744,8 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
     /* The result */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids_old2new, no_of_nodes);
+    igraph_vector_int_fill(&vids_old2new, -1);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&verts, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&next_nei, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&out, 0);

@@ -275,7 +275,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             running = false;
         } else {
             /* Shuffle the node ordering vector if we are in the label updating iteration */
-            IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+            igraph_vector_int_shuffle(&node_order);
         }
 
         RNG_BEGIN();
@@ -406,7 +406,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
 
         /* In the directed case, the outcome depends on the node ordering, thus we
          * shuffle nodes one more time. */
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+        igraph_vector_int_shuffle(&node_order);
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 

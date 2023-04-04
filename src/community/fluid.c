@@ -132,7 +132,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     igraph_vector_fill(&density, max_density);
 
     /* Initialize com_to_numvertices and initialize communities into membership vector */
-    IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+    igraph_vector_int_shuffle(&node_order);
     for (i = 0; i < no_of_communities; i++) {
         /* Initialize membership at initial nodes for each community
          * where 0 refers to have no label*/
@@ -165,7 +165,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
         running = false;
 
         /* Shuffle the node ordering vector */
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
+        igraph_vector_int_shuffle(&node_order);
         /* In the prescribed order, loop over the vertices and reassign labels */
         for (i = 0; i < no_of_nodes; i++) {
             /* Clear dominant_labels and nonzero_labels vectors */

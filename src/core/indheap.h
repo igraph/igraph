@@ -42,11 +42,10 @@ typedef struct s_indheap {
     igraph_real_t* stor_begin;
     igraph_real_t* stor_end;
     igraph_real_t* end;
-    igraph_bool_t destroy;
     igraph_integer_t* index_begin;
 } igraph_indheap_t;
 
-#define IGRAPH_INDHEAP_NULL { 0,0,0,0,0 }
+#define IGRAPH_INDHEAP_NULL { 0,0,0,0 }
 
 igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_integer_t size);
 igraph_error_t igraph_indheap_init_array(igraph_indheap_t *t, const igraph_real_t *data, igraph_integer_t len);
@@ -81,13 +80,12 @@ typedef struct s_indheap_d {
     igraph_real_t* stor_begin;
     igraph_real_t* stor_end;
     igraph_real_t* end;
-    igraph_bool_t destroy;
     igraph_integer_t* index_begin;
     igraph_integer_t* index2_begin;
 } igraph_d_indheap_t;
 
 
-#define IGRAPH_D_INDHEAP_NULL { 0,0,0,0,0,0 }
+#define IGRAPH_D_INDHEAP_NULL { 0,0,0,0,0 }
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t *h, igraph_integer_t size);
 IGRAPH_PRIVATE_EXPORT void igraph_d_indheap_destroy(igraph_d_indheap_t *h);

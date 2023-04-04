@@ -601,7 +601,7 @@ igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
     /* at random. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
     IGRAPH_CHECK(igraph_neighbors(graph, &adj, vid, mode));
-    IGRAPH_CHECK(igraph_vector_int_shuffle(&adj));
+    igraph_vector_int_shuffle(&adj);
     /* maximum deterministic imitation */
     i = vid;
     q = VECTOR(*quantities)[vid];

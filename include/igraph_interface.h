@@ -46,9 +46,10 @@ IGRAPH_EXPORT igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer
                                       void *attr);
 IGRAPH_EXPORT igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges);
 IGRAPH_EXPORT igraph_error_t igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
-IGRAPH_EXPORT igraph_error_t igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
-                                             igraph_vector_int_t *idx,
-                                             igraph_vector_int_t *invidx);
+IGRAPH_EXPORT igraph_error_t igraph_delete_vertices_map(
+    igraph_t *graph, const igraph_vs_t vertices, igraph_vector_int_t *map,
+    igraph_vector_int_t *invmap
+);
 IGRAPH_EXPORT igraph_integer_t igraph_vcount(const igraph_t *graph);
 IGRAPH_EXPORT igraph_integer_t igraph_ecount(const igraph_t *graph);
 IGRAPH_EXPORT igraph_error_t igraph_neighbors(const igraph_t *graph, igraph_vector_int_t *neis, igraph_integer_t vid,
@@ -132,6 +133,11 @@ IGRAPH_EXPORT void igraph_i_property_cache_invalidate_all(const igraph_t *graph)
  */
 #define IGRAPH_OTHER(graph,eid,vid) \
     ((igraph_integer_t)(IGRAPH_TO(graph,(eid))==(vid) ? IGRAPH_FROM((graph),(eid)) : IGRAPH_TO((graph),(eid))))
+
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_delete_vertices_idx(
+    igraph_t *graph, const igraph_vs_t vertices, igraph_vector_int_t *idx,
+    igraph_vector_int_t *invidx
+);
 
 __END_DECLS
 
