@@ -10,7 +10,7 @@ int main(void) {
 
   igraph_erdos_renyi_game_gnm(
     &graph, num_vertices, num_edges,
-    IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS
+    IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
   );
 
   igraph_diameter(

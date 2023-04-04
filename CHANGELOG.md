@@ -49,6 +49,7 @@
 
  - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
  - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+ - `igraph_erdos_renyi_game_gnm()` gained a `multiple` Boolean argument to generate Erdos-Renyi graphs with multi-edges
 
 ### Changed
 

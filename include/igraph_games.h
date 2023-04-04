@@ -52,7 +52,7 @@ IGRAPH_EXPORT igraph_error_t igraph_barabasi_game(igraph_t *graph, igraph_intege
 IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real_t p,
                                               igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
-                                              igraph_bool_t directed, igraph_bool_t loops);
+                                              igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple);
 IGRAPH_EXPORT igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_int_t *out_deg,
                                               const igraph_vector_int_t *in_deg,
                                               igraph_degseq_t method);

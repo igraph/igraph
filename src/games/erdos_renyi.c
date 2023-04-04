@@ -171,6 +171,61 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
 
 /**
  * \ingroup generators
+ * \function igraph_erdos_renyi_game_gnm_multi
+ * \brief Generates a random (Erdős-Rényi) graph with multi-edges.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param m The number of edges in the graph.
+ * \param directed Logical, whether to generate a directed graph.
+ * \param loops Logical, whether to generate loops (self) edges.
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
+ *         \c IGRAPH_ENOMEM: there is not enough
+ *         memory for the operation.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ */
+static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
+    igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
+    igraph_bool_t directed, igraph_bool_t loops
+) {
+
+    igraph_vector_int_t edges;
+
+    /* No need for checking n or m here; it has already been done in
+     * igraph_erdos_renyi_game_gnm() */
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
+
+    RNG_BEGIN();
+    for (igraph_integer_t i = 0; i < m; i++) {
+        igraph_integer_t from, to;
+        from = RNG_INTEGER(0, n - 1);
+        if (loops) {
+            to = RNG_INTEGER(0, n - 1);
+        } else {
+            to = RNG_INTEGER(0, n - 2);
+            if (from == to) {
+                to = n - 1;
+            }
+        }
+        igraph_vector_int_push_back(&edges, from); /* reserved */
+        igraph_vector_int_push_back(&edges, to); /* reserved */
+    }
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup generators
  * \function igraph_erdos_renyi_game_gnm
  * \brief Generates a random (Erdős-Rényi) graph with a fixed number of edges.
  *
@@ -182,6 +237,8 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * \param m The number of edges in the graph.
  * \param directed Logical, whether to generate a directed graph.
  * \param loops Logical, whether to generate loops (self) edges.
+ * \param multiple Logical, whether it is allowed to generate more than one
+ *        edge between the same pair of vertices.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -196,7 +253,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  */
 igraph_error_t igraph_erdos_renyi_game_gnm(
     igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
-    igraph_bool_t directed, igraph_bool_t loops
+    igraph_bool_t directed, igraph_bool_t loops, igraph_bool_t multiple
 ) {
 
     /* This function uses doubles in its `s` vector, and for `maxedges` and `last`.
@@ -215,6 +272,10 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     }
     if (m < 0 || m > IGRAPH_ECOUNT_MAX) {
         IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
+    }
+
+    if (multiple) {
+        return igraph_i_erdos_renyi_game_gnm_multi(graph, n, m, directed, loops);
     }
 
     if (m == 0.0 || no_of_nodes == 0) {
@@ -343,7 +404,7 @@ igraph_error_t igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t typ
     if (type == IGRAPH_ERDOS_RENYI_GNP) {
         return igraph_erdos_renyi_game_gnp(graph, n, p_or_m, directed, loops);
     } else if (type == IGRAPH_ERDOS_RENYI_GNM) {
-        return igraph_erdos_renyi_game_gnm(graph, n, (igraph_integer_t) p_or_m, directed, loops);
+        return igraph_erdos_renyi_game_gnm(graph, n, (igraph_integer_t) p_or_m, directed, loops, IGRAPH_NO_MULTIPLE);
     } else {
         IGRAPH_ERROR("Invalid type", IGRAPH_EINVAL);
     }
