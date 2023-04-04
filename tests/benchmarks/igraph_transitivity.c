@@ -119,7 +119,7 @@ int main(void) {
     igraph_vs_destroy(&all_vertices);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game_gnm(&g, 50, 300, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOP, IGRAPH_NO_MULTIPLE);
+    igraph_erdos_renyi_game_gnm(&g, 50, 300, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE);
     igraph_vector_resize(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
