@@ -5,6 +5,7 @@
 ### Changes
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
+ - `igraph_isomorphic()` now supports multigraphs.
 
 ### Fixed
 
