@@ -111,13 +111,18 @@ igraph_error_t igraph_gen2wheap_init(
         int (*cmp)(const void *, const void *),
         size_t item_size, igraph_integer_t max_size
 ) {
+    /* TODO: Currently, storage is allocated for the maximum number of elements
+     * right from the start. This is sufficient for the only use case as of this
+     * writing, the D-SATUR graph colouring algorithm, but it may not be efficcient
+     * for other use cases. Consider improving this in the future.
+     */
     h->max_size = max_size;
     /* We start with the biggest */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&h->index2, max_size);
     h->cmp = cmp;
     h->item_size = item_size;
     h->data = igraph_calloc(max_size, item_size);
-    IGRAPH_CHECK_OOM(h->data, "Cannot initialized generic heap.");
+    IGRAPH_CHECK_OOM(h->data, "Cannot initialize generic heap.");
     IGRAPH_FINALLY(igraph_free, h->data);
     IGRAPH_CHECK(igraph_vector_int_init(&h->index, 0));
 
