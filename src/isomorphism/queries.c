@@ -75,7 +75,7 @@ static igraph_error_t igraph_i_isomorphic_small(
  * \oli If one graph is directed and the other undirected then an
  *    error is triggered.
  * \oli If one of the graphs has multi-edges then both graphs are
- *    simplified and colorized and sent to VF2.
+ *    simplified and colorized using \ref igraph_simplify_and_colorize() and sent to VF2.
  * \oli If the two graphs does not have the same number of vertices
  *    and edges it returns with \c false.
  * \oli Otherwise, if the \ref igraph_isoclass() function supports both
