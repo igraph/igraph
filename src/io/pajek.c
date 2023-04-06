@@ -137,8 +137,8 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * \c labelcolor, \c c to \c color.
  *
  * </para><para>
- * In addition the following vertex attributes might be added: \c id
- * if there are vertex IDs in the file, \c x and \c y or \c x
+ * In addition the following vertex attributes might be added: \c name
+ * if there are vertex labels in the file, \c x and \c y or \c x
  * and \c y and \c z if there are vertex coordinates in the file.
  *
  * </para><para>The \c weight edge attribute might be
