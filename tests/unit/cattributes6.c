@@ -125,7 +125,7 @@ int main(void) {
     FILE *ifile;
     igraph_integer_t i;
     igraph_vector_t y;
-    igraph_strvector_t id;
+    igraph_strvector_t name;
     igraph_vector_bool_t type;
     char str[21];
 
@@ -199,8 +199,8 @@ int main(void) {
     SETVAN(&g, "y", 0, -1);
     SETVAN(&g, "y", 1, 2.1);
 
-    SETVAS(&g, "id", 0, "foo");
-    SETVAS(&g, "id", 1, "bar");
+    SETVAS(&g, "name", 0, "foo");
+    SETVAS(&g, "name", 1, "bar");
 
     SETVAB(&g, "type", 0, 1);
     SETVAB(&g, "type", 1, 0);
@@ -236,21 +236,21 @@ int main(void) {
     SETVABV(&g, "type", &type);
     igraph_vector_bool_destroy(&type);
 
-    igraph_strvector_init(&id, igraph_vcount(&g));
+    igraph_strvector_init(&name, igraph_vcount(&g));
     for (i = 0; i < igraph_vcount(&g); i++) {
         snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
-        igraph_strvector_set(&id, i, str);
+        igraph_strvector_set(&name, i, str);
     }
-    SETVASV(&g, "foo", &id);
-    igraph_strvector_destroy(&id);
+    SETVASV(&g, "foo", &name);
+    igraph_strvector_destroy(&name);
 
-    igraph_strvector_init(&id, igraph_vcount(&g));
+    igraph_strvector_init(&name, igraph_vcount(&g));
     for (i = 0; i < igraph_vcount(&g); i++) {
         snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
-        igraph_strvector_set(&id, i, str);
+        igraph_strvector_set(&name, i, str);
     }
-    SETVASV(&g, "id", &id);
-    igraph_strvector_destroy(&id);
+    SETVASV(&g, "name", &name);
+    igraph_strvector_destroy(&name);
 
     /* Set edge attributes as vector */
     igraph_vector_init(&y, igraph_ecount(&g));
@@ -269,21 +269,21 @@ int main(void) {
     SETEABV(&g, "type", &type);
     igraph_vector_bool_destroy(&type);
 
-    igraph_strvector_init(&id, igraph_ecount(&g));
+    igraph_strvector_init(&name, igraph_ecount(&g));
     for (i = 0; i < igraph_ecount(&g); i++) {
         snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
-        igraph_strvector_set(&id, i, str);
+        igraph_strvector_set(&name, i, str);
     }
-    SETEASV(&g, "foo", &id);
-    igraph_strvector_destroy(&id);
+    SETEASV(&g, "foo", &name);
+    igraph_strvector_destroy(&name);
 
-    igraph_strvector_init(&id, igraph_ecount(&g));
+    igraph_strvector_init(&name, igraph_ecount(&g));
     for (i = 0; i < igraph_ecount(&g); i++) {
         snprintf(str, sizeof(str) - 1, "%" IGRAPH_PRId, i);
-        igraph_strvector_set(&id, i, str);
+        igraph_strvector_set(&name, i, str);
     }
-    SETEASV(&g, "color", &id);
-    igraph_strvector_destroy(&id);
+    SETEASV(&g, "color", &name);
+    igraph_strvector_destroy(&name);
 
     printf("After setting vertex and edge attributes by vector:\n");
     print_attributes(&g);

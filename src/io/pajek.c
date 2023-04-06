@@ -455,7 +455,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     igraph_bool_t write_vertex_attrs = false;
 
     /* Same order as the #define's */
-    const char *vnames[] = { "id", "x", "y", "z", "shape", "xfact", "yfact",
+    const char *vnames[] = { "name", "x", "y", "z", "shape", "xfact", "yfact",
                              "", "", "", "", "", "", "", "", "",
                              "labeldist", "labeldegree2", "framewidth",
                              "fontsize", "rotation", "radius",
