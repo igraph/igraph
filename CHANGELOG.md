@@ -11,6 +11,10 @@
  - `igraph_vector_shuffle()` no longer returns an error code.
  - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
 
+### Changes
+
+ - The Pajek format reader and writer now map vertex labels to the `name` vertex attribute in igraph. The `id` attribute is no longer used.
+
 ### Deprecated
 
 - `igraph_delete_vertices_idx()` is now deprecated in favour of `igraph_delete_vertices_map()`, which is functionally equivalent but has a name that is consistent with `igraph_induced_subgraph_map()`.
