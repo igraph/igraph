@@ -364,7 +364,7 @@ igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
     igraph_integer_t reached = 0;
 
     if (from < 0 || from >= no_of_nodes) {
-        IGRAPH_ERROR("Vertex index out of range.", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {

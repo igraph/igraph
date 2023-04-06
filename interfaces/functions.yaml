@@ -224,16 +224,11 @@ igraph_barabasi_game:
         BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG,
         OPTIONAL GRAPH start_from
 
-igraph_erdos_renyi_game:
-    PARAMS: |-
-        OUT GRAPH graph, ERDOS_RENYI_TYPE type, INTEGER n, REAL p_or_m,
-        BOOLEAN directed=False, BOOLEAN loops=False
-
 igraph_erdos_renyi_game_gnp:
     PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
 
 igraph_erdos_renyi_game_gnm:
-    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False, BOOLEAN loops=False
+    PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, BOOLEAN directed=False, BOOLEAN loops=False, BOOLEAN multiple=False
 
 igraph_degree_sequence_game:
     PARAMS: |-
@@ -1141,13 +1136,13 @@ igraph_create_bipartite:
         OUT GRAPH graph, IN BIPARTITE_TYPES types,
         VECTOR_INT edges, BOOLEAN directed=False
 
-igraph_incidence:
+igraph_biadjacency:
     PARAMS: |-
         OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
-igraph_get_incidence:
+igraph_get_biadjacency:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids

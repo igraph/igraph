@@ -331,6 +331,10 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                          parents, inbound_edges);
     }
 
+    if (from < 0 || from >= no_of_nodes) {
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
+    }
+
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length must match number of edges.", IGRAPH_EINVAL);
     }
