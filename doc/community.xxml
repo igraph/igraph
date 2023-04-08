@@ -56,4 +56,8 @@
 <!-- doxrox-include igraph_community_infomap -->
 </section>
 
+<section id="voronoi-communities"><title>Voronoi communities</title>
+    <!-- doxrox-include igraph_community_voronoi -->
+</section>
+
 </chapter>
