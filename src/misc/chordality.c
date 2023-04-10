@@ -279,7 +279,7 @@ igraph_error_t igraph_is_chordal(const igraph_t *graph,
                       igraph_vector_int_t *fill_in,
                       igraph_t *newgraph) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     const igraph_vector_int_t *my_alpha = alpha, *my_alpham1 = alpham1;
     igraph_vector_int_t v_alpha, v_alpham1;
     igraph_vector_int_t f, index;

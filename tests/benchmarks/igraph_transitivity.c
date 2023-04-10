@@ -38,8 +38,7 @@ int main(void) {
     igraph_rng_seed(igraph_rng_default(), 42);
     BENCH_INIT();
 
-    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, N, M,
-                            IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&g, N, M, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_init(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
@@ -91,8 +90,7 @@ int main(void) {
     igraph_vs_destroy(&all_vertices);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 500, 2000,
-                            IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&g, 500, 2000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_resize(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 
@@ -121,8 +119,7 @@ int main(void) {
     igraph_vs_destroy(&all_vertices);
     igraph_destroy(&g);
 
-    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 50, 300,
-                            IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&g, 50, 300, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_vector_resize(&trans, igraph_vcount(&g));
     igraph_vs_range(&all_vertices, 0, igraph_vcount(&g));
 

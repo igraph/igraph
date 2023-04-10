@@ -5,12 +5,12 @@ int main(void) {
     igraph_t graph;
     igraph_vector_int_t colors;
 
-    /* Setting a seed makes the result of erdos_renyi_game deterministic. */
+    /* Setting a seed makes the result of erdos_renyi_game_gnm deterministic. */
     igraph_rng_seed(igraph_rng_default(), 42);
 
     /* IGRAPH_UNDIRECTED and IGRAPH_NO_LOOPS are both equivalent to 0/FALSE, but
        communicate intent better in this context. */
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNM, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnm(&graph, 1000, 10000, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     /* As with all igraph functions, the vector in which the result is returned must
        be initialized in advance. */

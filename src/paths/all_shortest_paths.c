@@ -110,17 +110,17 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     igraph_vector_int_t neis;
     igraph_vector_int_t ptrlist;
     igraph_vector_int_t ptrhead;
-    igraph_integer_t n, j, i;
+    igraph_integer_t n;
     igraph_integer_t to_reach, reached = 0, maxdist = 0;
 
     igraph_vit_t vit;
 
     if (from < 0 || from >= no_of_nodes) {
-        IGRAPH_ERROR("cannot get shortest paths", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
         mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+        IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
@@ -148,14 +148,11 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
      * one larger than the length of the shortest path from the
      * source */
     geodist = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (geodist == 0) {
-        IGRAPH_ERROR("Cannot calculate shortest paths", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(geodist, "Insufficient memory for calculating shortest paths.");
     IGRAPH_FINALLY(igraph_free, geodist);
     /* dequeue to store the BFS queue -- odd elements are the vertex indices,
      * even elements are the distances from the root */
-    IGRAPH_CHECK(igraph_dqueue_int_init(&q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     if (nrgeo) {
         IGRAPH_CHECK(igraph_vector_int_resize(nrgeo, no_of_nodes));
@@ -204,10 +201,7 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
              * any of the nodes we wanted to reach */
             if (actdist > maxdist) {
                 /* safety check, maxdist should have been set when we reached the last node */
-                if (maxdist < 0) {
-                    IGRAPH_ERROR("possible bug in igraph_get_all_shortest_paths, "
-                                 "maxdist is negative", IGRAPH_EINVAL);
-                }
+                IGRAPH_ASSERT(maxdist >= 0);
                 break;
             }
         }
@@ -223,9 +217,9 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
         }
 
         n = igraph_vector_int_size(&neis);
-        for (j = 0; j < n; j++) {
+        for (igraph_integer_t j = 0; j < n; j++) {
             igraph_integer_t neighbor;
-            igraph_integer_t fatherptr;
+            igraph_integer_t parentptr;
 
             if (edges) {
                 /* user needs the edge-paths, so 'neis' contains edge IDs, we need to resolve
@@ -263,24 +257,24 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
             geodist[neighbor] = actdist + 2;
 
             /* copy all existing paths to the parent */
-            fatherptr = VECTOR(ptrhead)[actnode];
-            while (fatherptr != 0) {
+            parentptr = VECTOR(ptrhead)[actnode];
+            while (parentptr != 0) {
                 /* allocate a new igraph_vector_int_t at the end of paths */
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_new(&paths, &vptr));
-                IGRAPH_CHECK(igraph_vector_int_update(vptr, igraph_vector_int_list_get_ptr(&paths, fatherptr - 1)));
+                IGRAPH_CHECK(igraph_vector_int_update(vptr, igraph_vector_int_list_get_ptr(&paths, parentptr - 1)));
                 IGRAPH_CHECK(igraph_vector_int_push_back(vptr, neighbor));
 
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_new(&path_edge, &vptr_e));
                 if (actnode != from) {
                     /* If the previous vertex was the source then there is no edge to add*/
-                    IGRAPH_CHECK(igraph_vector_int_update(vptr_e, igraph_vector_int_list_get_ptr(&path_edge, fatherptr - 1)));
+                    IGRAPH_CHECK(igraph_vector_int_update(vptr_e, igraph_vector_int_list_get_ptr(&path_edge, parentptr - 1)));
                 }
                 IGRAPH_CHECK(igraph_vector_int_push_back(vptr_e, VECTOR(neis)[j]));
 
                 IGRAPH_CHECK(igraph_vector_int_push_back(&ptrlist, VECTOR(ptrhead)[neighbor]));
                 VECTOR(ptrhead)[neighbor] = igraph_vector_int_size(&ptrlist);
 
-                fatherptr = VECTOR(ptrlist)[fatherptr - 1];
+                parentptr = VECTOR(ptrlist)[parentptr - 1];
             }
         }
     }
@@ -301,26 +295,30 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
         igraph_vector_int_list_clear(edges);
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t fatherptr = VECTOR(ptrhead)[i];
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        igraph_integer_t parentptr = VECTOR(ptrhead)[i];
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* do we need the paths leading to vertex i? */
         if (geodist[i] > 0) {
-            /* yes, copy them to the result vector */
-            while (fatherptr != 0) {
+            /* yes, transfer them to the result vector */
+            while (parentptr != 0) {
+                /* Given two vector lists, list1 and list2, an efficient way to transfer
+                 * a vector from list1 to the end of list2 is to extend list2 with an
+                 * empty vector, then swap that empty vector with the given element of
+                 * list1. This approach avoids creating a full copy of the vector. */
                 if (vertices) {
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(
-                        vertices, igraph_vector_int_list_get_ptr(&paths, fatherptr - 1)
-                    ));
+                    igraph_vector_int_t *p;
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(vertices, &p));
+                    igraph_vector_int_swap(p, igraph_vector_int_list_get_ptr(&paths, parentptr - 1));
                 }
                 if (edges) {
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(
-                        edges, igraph_vector_int_list_get_ptr(&path_edge, fatherptr - 1)
-                    ));
+                    igraph_vector_int_t *p;
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(edges, &p));
+                    igraph_vector_int_swap(p, igraph_vector_int_list_get_ptr(&path_edge, parentptr - 1));
                 }
-                fatherptr = VECTOR(ptrlist)[fatherptr - 1];
+                parentptr = VECTOR(ptrlist)[parentptr - 1];
             }
         }
     }
@@ -333,5 +331,6 @@ igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
     igraph_vector_int_list_destroy(&path_edge);
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(7);
+
     return IGRAPH_SUCCESS;
 }

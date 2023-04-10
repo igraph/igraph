@@ -28,12 +28,12 @@ void test_spanner(igraph_t *graph, igraph_vector_int_t *spanner, double stretch,
     igraph_vector_t spanner_weights;
     igraph_matrix_t res_spanner, res_graph;
 
-    /* create the spanner graph with igraph_subgraph_edges() as recommended in the docs,
+    /* create the spanner graph with igraph_subgraph_from_edges() as recommended in the docs,
        then compare it with the original graph and validate the stretch factor */
     if (weights) {
         igraph_cattribute_EAN_setv(graph, "weight", weights);
     }
-    igraph_subgraph_edges(graph, &spanner_graph, igraph_ess_vector(spanner), 0);
+    igraph_subgraph_from_edges(graph, &spanner_graph, igraph_ess_vector(spanner), 0);
     igraph_vector_init(&spanner_weights, igraph_vector_int_size(spanner));
     if (weights){
         igraph_cattribute_EANV(&spanner_graph, "weight", igraph_ess_all(IGRAPH_EDGEORDER_ID), &spanner_weights);
@@ -124,7 +124,7 @@ int main(void) {
 
     /* Random Erdos-Renyi graph */
     printf("Random Erdos-Renyi graph\n");
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.25, IGRAPH_UNDIRECTED, 0);
+    igraph_erdos_renyi_game_gnp(&graph, 200, 0.25, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {
@@ -162,7 +162,7 @@ int main(void) {
     /* Error conditions */
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 200, 0.9, IGRAPH_UNDIRECTED, 0);
+    igraph_erdos_renyi_game_gnp(&graph, 200, 0.9, IGRAPH_UNDIRECTED, 0);
     no_of_edges = igraph_ecount(&graph);
     igraph_vector_init(&weights, no_of_edges);
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {

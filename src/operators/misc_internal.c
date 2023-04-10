@@ -87,6 +87,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, igraph_i_merge_mode_t mode,
         case IGRAPH_MERGE_MODE_INTERSECTION:
             igraph_vector_int_clear(edge_map1);
             break;
+        default:
+            IGRAPH_FATAL("Invalid merge mode.");
         }
     }
     if (edge_map2) {
@@ -97,6 +99,8 @@ igraph_error_t igraph_i_merge(igraph_t *res, igraph_i_merge_mode_t mode,
         case IGRAPH_MERGE_MODE_INTERSECTION:
             igraph_vector_int_clear(edge_map2);
             break;
+        default:
+            IGRAPH_FATAL("Invalid merge mode.");
         }
     }
 

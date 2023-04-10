@@ -138,7 +138,7 @@ static void igraph_i_clear_lightest_edges_to_clusters(
  *        is directed, the directions of the edges will be ignored.
  * \param spanner An initialized vector, the IDs of the edges that constitute
  *        the calculated spanner will be returned here. Use
- * \ref igraph_subgraph_edges() to extract the spanner as a separate
+ * \ref igraph_subgraph_from_edges() to extract the spanner as a separate
  *        graph object.
  * \param stretch The stretch factor of the spanner.
  * \param weights The edge weights or NULL.

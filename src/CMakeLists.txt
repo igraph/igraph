@@ -46,6 +46,7 @@ add_library(
   core/error.c
   core/estack.c
   core/fixed_vectorlist.c
+  core/genheap.c
   core/grid.c
   core/heap.c
   core/indheap.c
@@ -102,11 +103,13 @@ add_library(
   constructors/full.c
   constructors/generalized_petersen.c
   constructors/kautz.c
+  constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
   constructors/prufer.c
   constructors/regular.c
-  constructors/lattices.c
+  constructors/trees.c
+
 
   games/barabasi.c
   games/callaway_traits.c
@@ -177,6 +180,7 @@ add_library(
   cycles/simple_cycles.c
 
   flow/flow.c
+  flow/flow_conversion.c
   flow/st-cuts.c
 
   hrg/hrg_types.cc
@@ -238,6 +242,7 @@ add_library(
   operators/union.c
 
   paths/all_shortest_paths.c
+  paths/astar.c
   paths/bellman_ford.c
   paths/dijkstra.c
   paths/distances.c
@@ -301,6 +306,7 @@ add_library(
   internal/lsap.c
   internal/qsort_r.c
   internal/qsort.c
+  internal/utils.c
   internal/zeroin.c
 
   version.c

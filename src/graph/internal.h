@@ -33,7 +33,7 @@ IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_neighbors(
 
 IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_i_incident(
    const igraph_t *graph, igraph_vector_int_t *eids, igraph_integer_t pnode,
-   igraph_neimode_t mode, igraph_loops_t loops, igraph_multiple_t multiple);
+   igraph_neimode_t mode, igraph_loops_t loops);
 
 igraph_error_t igraph_i_reverse(igraph_t *graph);
 

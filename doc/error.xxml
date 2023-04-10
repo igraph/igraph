@@ -70,6 +70,7 @@
 <section id="fatal-error-handlers">
 <!-- doxrox-include fatal_error_handlers -->
 <!-- doxrox-include igraph_fatal_handler_t -->
+<!-- doxrox-include igraph_set_fatal_handler -->
 <!-- doxrox-include igraph_fatal_handler_abort -->
 <!-- doxrox-include IGRAPH_FATAL -->
 <!-- doxrox-include IGRAPH_FATALF -->

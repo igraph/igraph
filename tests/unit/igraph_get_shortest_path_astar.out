@@ -1,0 +1,18 @@
+Astar on singleton, unweighted, no heuristic:
+0
+Astar on ring, unweighted, no heuristic:
+0 1 2 3 4 5
+Astar, weighted, no heuristic:
+0 9 8 7 6 5
+Astar, unweighted, lattice with manhattan distance heuristic:
+0 1 2 3 4 5 6 7 8 9
+Astar, unweighted, grg with euclidean distance heuristic:
+0 13 17 24 20 9
+Check with dijkstra:
+0 13 17 24 20 9
+Same situation but through shortest_path_astar interface:
+0 13 17 24 20 9
+Checking from out of range.
+Checking to out of range.
+Checking wrong weight length error.
+Checking negative weight error.

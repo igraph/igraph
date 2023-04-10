@@ -108,8 +108,10 @@ igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_int_
  */
 igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_int_t *result,
         const igraph_vector_t *weights, igraph_vector_int_t *layering) {
+
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t edges;
-    igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_nodes > 0 ? no_of_nodes - 1 : 0);
     if (weights) {
@@ -133,10 +135,9 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
     igraph_vector_int_sort(&edges);
     IGRAPH_CHECK(igraph_vector_int_push_back(&edges, -1));  /* guard element */
 
-    if (result != 0) {
+    if (result) {
         igraph_vector_int_clear(result);
-        n = igraph_ecount(graph);
-        for (i = 0, j = 0; i < n; i++) {
+        for (igraph_integer_t i = 0, j = 0; i < no_of_edges; i++) {
             if (i == VECTOR(edges)[j]) {
                 j++;
                 continue;
@@ -145,14 +146,14 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
         }
     }
 
-    if (layering != 0) {
+    if (layering) {
         igraph_vector_t degrees;
         igraph_vector_int_t roots;
 
         IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&roots, no_of_nodes);
         IGRAPH_CHECK(igraph_strength(graph, &degrees, igraph_vss_all(),
-                                     IGRAPH_ALL, 0, weights));
+                                     IGRAPH_ALL, /* loops */ false, weights));
         IGRAPH_CHECK(igraph_vector_qsort_ind(&degrees, &roots, IGRAPH_DESCENDING));
 
         IGRAPH_CHECK(igraph_bfs(graph,
@@ -186,16 +187,19 @@ igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igrap
  */
 igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_int_t *result,
                                     const igraph_vector_t *weights, igraph_vector_int_t *layers) {
-    igraph_integer_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t i, j, k, v, eid, nodes_left;
     igraph_dqueue_int_t sources, sinks;
     igraph_vector_int_t neis;
     igraph_vector_int_t indegrees, outdegrees;
     igraph_vector_t instrengths, outstrengths;
-    igraph_integer_t* ordering;
+    igraph_integer_t *ordering;
     igraph_integer_t order_next_pos = 0, order_next_neg = -1;
     igraph_real_t diff, maxdiff;
 
     ordering = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+    IGRAPH_CHECK_OOM(ordering, "Insufficient memory for finding feedback arc set.");
     IGRAPH_FINALLY(igraph_free, ordering);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&indegrees, no_of_nodes);
@@ -377,10 +381,9 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     }
 
     /* Find the feedback edges based on the ordering */
-    if (result != 0) {
+    if (result) {
         igraph_vector_int_clear(result);
-        j = igraph_ecount(graph);
-        for (i = 0; i < j; i++) {
+        for (i = 0; i < no_of_edges; i++) {
             igraph_integer_t from = IGRAPH_FROM(graph, i), to = IGRAPH_TO(graph, i);
             if (from == to || ordering[from] > ordering[to]) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(result, i));
@@ -389,7 +392,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     }
 
     /* If we have also requested a layering, return that as well */
-    if (layers != 0) {
+    if (layers) {
         igraph_vector_int_t ranks;
         igraph_vector_int_t order_vec;
 
@@ -427,7 +430,7 @@ igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vec
     }
 
     /* Free the ordering vector */
-    igraph_free(ordering);
+    IGRAPH_FREE(ordering);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
