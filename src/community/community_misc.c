@@ -56,6 +56,7 @@
  * If \p merges is not a complete dendrogram, it is possible to
  * take \p steps steps if \p steps is not bigger than the number
  * lines in \p merges.
+ *
  * \param merges The two-column matrix containing the merge
  *    operations. See \ref igraph_community_walktrap() for the
  *    detailed syntax.
@@ -438,8 +439,8 @@ igraph_error_t igraph_compare_communities(const igraph_vector_int_t *comm1,
     IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
-    IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
-    IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(&c1, NULL, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(&c2, NULL, NULL));
 
     switch (method) {
     case IGRAPH_COMMCMP_VI:
@@ -542,8 +543,8 @@ igraph_error_t igraph_split_join_distance(const igraph_vector_int_t *comm1,
     IGRAPH_CHECK(igraph_vector_int_init_copy(&c2, comm2));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &c2);
 
-    IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
-    IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(&c1, NULL, NULL));
+    IGRAPH_CHECK(igraph_reindex_membership(&c2, NULL, NULL));
 
     IGRAPH_CHECK(igraph_i_split_join_distance(&c1, &c2, distance12, distance21));
 

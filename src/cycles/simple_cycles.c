@@ -56,10 +56,10 @@ typedef struct igraph_simple_cycle_search_state_t {
     igraph_adjlist_t B;
 
     /* Stack in which the vertices of the current cycle are pushed */
-    igraph_vector_int_t v_stack;
+    igraph_vector_int_t vertex_stack;
 
     /* Stack in which the edges of the current cycle are pushed */
-    igraph_vector_int_t e_stack;
+    igraph_vector_int_t edge_stack;
 
     /* Boolean vector indicating which vertices are blocked */
     igraph_vector_bool_t blocked;
@@ -116,57 +116,70 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
  * \experimental
  *
  * The implementation of procedure CIRCUIT from Johnson's paper
+ *
+ * Arguments:
+ *
+ * - state: local state object of the search
+ * - V: vertex to start the search from
+ * - E: ID of edge leading into this vertex, -1 if this is the first vertex
+ * - S:
+ * - vertices: vector in which the results with the vertex IDs should be stored
+ * - edges: vector in which the results with the edge IDs should be stored
+ * - found: output argument, set to true if a cycle was found
  */
 
 static igraph_error_t igraph_i_simple_cycles_circuit(
-    igraph_simple_cycle_search_state_t *state, igraph_integer_t V,igraph_integer_t E,
-    igraph_integer_t S, igraph_vector_int_list_t *v_results, igraph_vector_int_list_t *e_results, bool *found,
-    igraph_simple_cycle_search_mode_t search_mode
+    igraph_simple_cycle_search_state_t *state, igraph_integer_t V,
+    igraph_integer_t E, igraph_integer_t S,
+    igraph_vector_int_list_t *vertices, igraph_vector_int_list_t *edges,
+    igraph_bool_t *found
 ) {
-    bool local_found = false;
+    igraph_bool_t local_found = false;
     igraph_vector_int_t* neighbors;
-    igraph_vector_int_t* neighbors_e;
+    igraph_vector_int_t* incident_edges;
     igraph_integer_t num_neighbors;
 
     // stack v & e
-    IGRAPH_CHECK(igraph_vector_int_push_back(&state->v_stack, V));
+    IGRAPH_CHECK(igraph_vector_int_push_back(&state->vertex_stack, V));
     if (E >= 0) {
-        IGRAPH_CHECK(igraph_vector_int_push_back(&state->e_stack, E));
+        IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, E));
     }
-    // printf("Pushing %lld to stack, stack size is %lld, result size is %lld\n", V, igraph_vector_int_size(&state->v_stack), igraph_vector_int_list_size(results));
+    // printf("Pushing %lld to stack, stack size is %lld, result size is %lld\n", V, igraph_vector_int_size(&state->vertex_stack), igraph_vector_int_list_size(results));
     VECTOR(state->blocked)[V] = true;
 
     // L1
     neighbors = igraph_adjlist_get(&state->AK, V);
-    neighbors_e = igraph_inclist_get(&state->IK, V);
+    incident_edges = igraph_inclist_get(&state->IK, V);
     num_neighbors = igraph_vector_int_size(neighbors);
-    IGRAPH_ASSERT(igraph_vector_int_size(neighbors_e) == num_neighbors);
+    IGRAPH_ASSERT(igraph_vector_int_size(incident_edges) == num_neighbors);
     for (igraph_integer_t i = 0; i < num_neighbors; ++i) {
         igraph_integer_t W = VECTOR(*neighbors)[i];
-        igraph_integer_t WE = VECTOR(*neighbors_e)[i];
+        igraph_integer_t WE = VECTOR(*incident_edges)[i];
         // NOTE: possibly dangerous fix for undirected graphs,
         // disabling finding any two-vertex-loops
         if (W == S) {
-            IGRAPH_CHECK(igraph_vector_int_push_back(&state->e_stack, WE));
-            if ((state->directed || igraph_vector_int_size(&state->v_stack) > 2)) {
+            IGRAPH_CHECK(igraph_vector_int_push_back(&state->edge_stack, WE));
+            if (state->directed || igraph_vector_int_size(&state->vertex_stack) > 2) {
                 local_found = true;
                 // output circuit composed of stack
-                // printf("Found cycle with size %" IGRAPH_PRId "\n", igraph_vector_int_size(&state->v_stack));
+                // printf("Found cycle with size %" IGRAPH_PRId "\n", igraph_vector_int_size(&state->vertex_stack));
 
-                // copy output: from stack to vector
+                // copy output: from stack to vector. No need to reverse because
+                // we were putting vertices in the stack in reverse order anyway.
                 igraph_vector_int_t v_res;
-                IGRAPH_CHECK(igraph_vector_int_init_copy(&v_res, &state->v_stack));
+                IGRAPH_CHECK(igraph_vector_int_init_copy(&v_res, &state->vertex_stack));
                 IGRAPH_FINALLY(igraph_vector_int_destroy, &v_res);
-                IGRAPH_CHECK(igraph_vector_int_reverse(&v_res));
+
                 // same for edges
                 igraph_vector_int_t e_res;
-                IGRAPH_CHECK(igraph_vector_int_init_copy(&e_res, &state->e_stack));
+                IGRAPH_CHECK(igraph_vector_int_init_copy(&e_res, &state->edge_stack));
                 IGRAPH_FINALLY(igraph_vector_int_destroy, &e_res);
-                IGRAPH_CHECK(igraph_vector_int_reverse(&e_res));
-                // undirected graphs lead to every cycle being found twice.
+
+                // undirected graphs lead to some cycles being found multiple
+                // times.
                 // this is our naïve filter for now
                 igraph_bool_t persist_result = true;
-                if (!state->directed && search_mode == IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE) {
+                if (!state->directed) {
                     print_vector_int(&v_res);
                     igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, v_results, e_results, &v_res, &e_res);
                     if (duplicate_found) {
@@ -174,18 +187,29 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     }
                 }
                 // end filter
+
                 if (persist_result) {
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(v_results, &v_res));
-                    if (e_results != NULL) {
-                        IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(e_results, &e_res));
+                    /* Order is important: e_res is at the top of the finally
+                     * stack so we need to deal with it first */
+                    if (edges != NULL) {
+                        /* e_res ownership transferred to 'edges' */
+                        IGRAPH_CHECK(igraph_vector_int_list_push_back(edges, &e_res));
+                    } else {
+                        igraph_vector_int_destroy(&e_res);
                     }
+                    IGRAPH_FINALLY_CLEAN(1);
+
+                    /* v_res ownership transferred to 'vertices' */
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back(vertices, &v_res));
+                    IGRAPH_FINALLY_CLEAN(1);
+                } else {
+                    igraph_vector_int_destroy(&v_res);
+                    igraph_vector_int_destroy(&e_res);
+                    IGRAPH_FINALLY_CLEAN(2);
                 }
-                igraph_vector_int_destroy(&v_res);
-                igraph_vector_int_destroy(&e_res);
-                IGRAPH_FINALLY_CLEAN(2);
             }
         } else if (!(VECTOR(state->blocked)[W])) {
-            IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, W, WE, S, v_results, e_results, &local_found, search_mode));
+            IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, W, WE, S, vertices, edges, &local_found));
         }
     }
     *found = local_found;
@@ -203,15 +227,15 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
         }
     }
 
-    IGRAPH_ASSERT(!igraph_vector_int_empty(&state->v_stack));
+    IGRAPH_ASSERT(!igraph_vector_int_empty(&state->vertex_stack));
 
     // unstack v
     // printf("Unstacking %lld\n", V);
-    igraph_vector_int_pop_back(&state->v_stack);
-    if (!igraph_vector_int_empty(&state->e_stack)) {
+    igraph_vector_int_pop_back(&state->vertex_stack);
+    if (!igraph_vector_int_empty(&state->edge_stack)) {
         // can be empty for the starting point.
         // alternatively, V == S
-        igraph_vector_int_pop_back(&state->e_stack);
+        igraph_vector_int_pop_back(&state->edge_stack);
     }
 
     return IGRAPH_SUCCESS;
@@ -236,12 +260,12 @@ igraph_error_t igraph_simple_cycle_search_state_init(
 ) {
     state->N = igraph_vcount(graph);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&state->v_stack, 0));
-    IGRAPH_CHECK(igraph_vector_int_reserve(&state->v_stack, 8));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &state->v_stack);
-    IGRAPH_CHECK(igraph_vector_int_init(&state->e_stack, 0));
-    IGRAPH_CHECK(igraph_vector_int_reserve(&state->e_stack, 8));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &state->e_stack);
+    IGRAPH_CHECK(igraph_vector_int_init(&state->vertex_stack, 0));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&state->vertex_stack, 8));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &state->vertex_stack);
+    IGRAPH_CHECK(igraph_vector_int_init(&state->edge_stack, 0));
+    IGRAPH_CHECK(igraph_vector_int_reserve(&state->edge_stack, 8));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &state->edge_stack);
     IGRAPH_CHECK(igraph_vector_bool_init(&state->blocked, state->N));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &state->blocked);
     IGRAPH_CHECK(igraph_inclist_init(graph, &state->IK, IGRAPH_OUT, IGRAPH_LOOPS_ONCE)); // TODO: understand what we actually want to include
@@ -272,8 +296,8 @@ igraph_error_t igraph_simple_cycle_search_state_init(
  * \ref igraph_simple_cycle_search_state_init
  */
 void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t *state) {
-    igraph_vector_int_destroy(&state->v_stack);
-    igraph_vector_int_destroy(&state->e_stack);
+    igraph_vector_int_destroy(&state->vertex_stack);
+    igraph_vector_int_destroy(&state->edge_stack);
     igraph_vector_bool_destroy(&state->blocked);
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
@@ -288,18 +312,8 @@ void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t
  *
  * \param state The state structure to search on
  * \param s The vertex index to start search with
- * \param results The vertices of each cycle will be stored here
- * \param search_mode What to do with undirected graphs. Ignored for directed graphs.
- *                    Possible values:
- *        \clist
- *        \cli IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH
- *          For undirected graphs, each loop will be returned twice,
- *          each once in one and once in the other direction.
- *        \cli IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE
- *          For undirected graphs, the double loops will be filtered out.
- *          This has considerable performance implications, currently,
- *          and additionally leads to the returned loops' vertices being sorted.
- *        \endclist
+ * \param vertices The vertex IDs of each cycle will be stored here
+ * \param edges The edge IDs of each cycle will be stored here
  * \return Error code.
  *
  * @see https://en.wikipedia.org/wiki/Johnson%27s_algorithm
@@ -308,9 +322,8 @@ void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t
  */
 igraph_error_t igraph_simple_cycles_search_from_one_vertex(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t s,
-    igraph_vector_int_list_t *v_results,
-    igraph_vector_int_list_t *e_results,
-    igraph_simple_cycle_search_mode_t search_mode
+    igraph_vector_int_list_t *vertices,
+    igraph_vector_int_list_t *edges
 ) {
     // L3:
     for (igraph_integer_t i = s; i < state->N; ++i) {
@@ -318,8 +331,8 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
         igraph_vector_int_clear(igraph_adjlist_get(&state->B, i));
     }
 
-    bool found = false;
-    IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, -1, s, v_results, e_results, &found, search_mode));
+    igraph_bool_t found = false;
+    IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, s, -1, s, vertices, edges, &found));
 
     for (igraph_integer_t i = 0; i < state->N; ++i) {
         // we want to remove the vertex with value s, not at position s
@@ -332,7 +345,6 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
     igraph_vector_int_clear(igraph_adjlist_get(&state->AK, s));
     igraph_vector_int_clear(igraph_inclist_get(&state->IK, s));
 
-    // TODO: currently, only the nodes are returned
     return IGRAPH_SUCCESS;
 }
 
@@ -351,17 +363,14 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  *
  *
  * \param graph The graph to search for
- * \param v_results Initialized integer vector list; The vertices of each cycle will be stored here
- * \param e_results Initialized integer vector list; The edges of each cycle will be stored here
- * \param search_mode How search should handle undirected graphs.
- *    See \ref igraph_simple_cycles_search_from_one_vertex
+ * \param vertices The vertex IDs of each cycle will be stored here
+ * \param edges The edge IDs of each cycle will be stored here
  * \return Error code.
  */
 igraph_error_t igraph_simple_cycles_search_all(
     const igraph_t *graph,
     igraph_vector_int_list_t *v_result,
-    igraph_vector_int_list_t *e_result,
-    igraph_simple_cycle_search_mode_t search_mode
+    igraph_vector_int_list_t *e_result
 ) {
     igraph_simple_cycle_search_state_t state;
     igraph_integer_t i;
@@ -372,7 +381,7 @@ igraph_error_t igraph_simple_cycles_search_all(
     // TODO: depending on the graph, it is rather unreasonable to search cycles from each and every node
     for (i = 0; i < state.N; i++) {
         if (!igraph_vector_int_empty(igraph_adjlist_get(&state.AK, i))) {
-            IGRAPH_CHECK(igraph_simple_cycles_search_from_one_vertex(&state, i, v_result, e_result, search_mode));
+            IGRAPH_CHECK(igraph_simple_cycles_search_from_one_vertex(&state, i, v_result, e_result));
         }
     }
 

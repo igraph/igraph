@@ -1,3 +1,20 @@
+/*
+   IGraph library.
+   Copyright (C) 2015-2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 #include <stdio.h>
@@ -128,19 +145,19 @@ void test_bliss(void) {
         printf("Bliss failed on ring isomorphism.\n");
     }
 
-    igraph_automorphisms(&ring1, NULL, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&ring1, NULL, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "200") != 0) {
         printf("Biss automorphism count failed: ring1.\n");
     }
     igraph_free(info.group_size);
 
-    igraph_automorphisms(&ring2, NULL, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&ring2, NULL, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "200") != 0) {
         printf("Biss automorphism count failed: ring2.\n");
     }
     igraph_free(info.group_size);
 
-    igraph_automorphisms(&directed_ring, NULL, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&directed_ring, NULL, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "100") != 0) {
         printf("Biss automorphism count failed: directed_ring.\n");
     }
@@ -168,7 +185,7 @@ void test_bliss(void) {
 
     igraph_vector_int_init_range(&color, 0, igraph_vcount(&ring1));
 
-    igraph_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
+    igraph_count_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "1") != 0) {
         printf("Bliss automorphism count with color failed: ring1.\n");
     }

@@ -37,6 +37,31 @@
  * they generate a different graph every time you call them. </para>
  */
 
+/**
+ * \ingroup generators
+ * \function igraph_erdos_renyi_game_gnp
+ * \brief Generates a random (Erdős-Rényi) graph with fixed edge probabilities.
+ *
+ * In this model, a graph with n vertices is generated such that every possible
+ * edge is included in the graph with probability p.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param p The probability of the existence of an edge in the graph.
+ * \param directed Logical, whether to generate a directed graph.
+ * \param loops Logical, whether to generate loops (self) edges.
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
+ *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
+ * \ref igraph_erdos_renyi_game_gnm()
+ *
+ * \example examples/simple/igraph_erdos_renyi_game_gnp.c
+ */
 igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_t *graph, igraph_integer_t n, igraph_real_t p,
     igraph_bool_t directed, igraph_bool_t loops
@@ -144,6 +169,31 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup generators
+ * \function igraph_erdos_renyi_game_gnm
+ * \brief Generates a random (Erdős-Rényi) graph with a fixed number of edges.
+ *
+ * In this model, a graph with n vertices and m edges is generated such that the
+ * edges are selected uniformly at random.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param m The number of edges in the graph.
+ * \param directed Logical, whether to generate a directed graph.
+ * \param loops Logical, whether to generate loops (self) edges.
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
+ *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
+ *
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
+ * \ref igraph_erdos_renyi_game_gnp()
+ *
+ * \example examples/simple/igraph_erdos_renyi_game_gnm.c
+ */
 igraph_error_t igraph_erdos_renyi_game_gnm(
     igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
     igraph_bool_t directed, igraph_bool_t loops
@@ -249,6 +299,9 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
  * \function igraph_erdos_renyi_game
  * \brief Generates a random (Erdős-Rényi) graph.
  *
+ * This function is deprecated; use \ref igraph_erdos_renyi_game_gnm() or
+ * \ref igraph_erdos_renyi_game_gnp() instead.
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param type The type of the random graph, possible values:
  *        \clist
@@ -280,9 +333,8 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
  *
- * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game()
- *
- * \example examples/simple/igraph_erdos_renyi_game.c
+ * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game(),
+ * \ref igraph_erdos_renyi_game_gnm(), \ref igraph_erdos_renyi_game_gnp()
  */
 igraph_error_t igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
                             igraph_integer_t n, igraph_real_t p_or_m,

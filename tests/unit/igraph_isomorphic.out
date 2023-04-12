@@ -1,0 +1,7 @@
+Two multigraphs: 1
+Only second graph is multigraph: 0
+Only first graph is multigraph: 0
+Two multigraphs, first has loop: 0
+Two multigraphs, both have loops: 1
+Two multigraphs, only loops: 1
+Check error for two multigraphs, different directedness

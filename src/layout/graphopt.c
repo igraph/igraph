@@ -35,7 +35,7 @@ static igraph_real_t igraph_i_distance_between(
         const igraph_matrix_t *c,
         igraph_integer_t a, igraph_integer_t b);
 
-static igraph_error_t igraph_i_determine_electric_axal_forces(
+static void igraph_i_determine_electric_axal_forces(
         const igraph_matrix_t *pos,
         igraph_real_t *x,
         igraph_real_t *y,
@@ -44,7 +44,7 @@ static igraph_error_t igraph_i_determine_electric_axal_forces(
         igraph_integer_t other_node,
         igraph_integer_t this_node);
 
-static igraph_error_t igraph_i_apply_electrical_force(
+static void igraph_i_apply_electrical_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -52,7 +52,7 @@ static igraph_error_t igraph_i_apply_electrical_force(
         igraph_real_t node_charge,
         igraph_real_t distance);
 
-static igraph_error_t igraph_i_determine_spring_axal_forces(
+static void igraph_i_determine_spring_axal_forces(
         const igraph_matrix_t *pos,
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
@@ -61,7 +61,7 @@ static igraph_error_t igraph_i_determine_spring_axal_forces(
         igraph_integer_t other_node,
         igraph_integer_t this_node);
 
-static igraph_error_t igraph_i_apply_spring_force(
+static void igraph_i_apply_spring_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -69,7 +69,7 @@ static igraph_error_t igraph_i_apply_spring_force(
         igraph_integer_t this_node, igraph_real_t spring_length,
         igraph_real_t spring_constant);
 
-static igraph_error_t igraph_i_move_nodes(
+static void igraph_i_move_nodes(
         igraph_matrix_t *pos,
         const igraph_vector_t *pending_forces_x,
         const igraph_vector_t *pending_forces_y,
@@ -84,7 +84,7 @@ static igraph_real_t igraph_i_distance_between(
     return sqrt(diffx*diffx + diffy*diffy);
 }
 
-static igraph_error_t igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
+static void igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
         igraph_real_t *x,
         igraph_real_t *y,
         igraph_real_t directed_force,
@@ -133,11 +133,9 @@ static igraph_error_t igraph_i_determine_electric_axal_forces(const igraph_matri
     if (MATRIX(*pos, other_node, 1) < MATRIX(*pos, this_node, 1)) {
         *y = *y * -1;
     }
-
-    return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_apply_electrical_force(
+static void igraph_i_apply_electrical_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -157,11 +155,9 @@ static igraph_error_t igraph_i_apply_electrical_force(
     VECTOR(*pending_forces_y)[this_node] += y_force;
     VECTOR(*pending_forces_x)[other_node] -= x_force;
     VECTOR(*pending_forces_y)[other_node] -= y_force;
-
-    return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_determine_spring_axal_forces(
+static void igraph_i_determine_spring_axal_forces(
         const igraph_matrix_t *pos,
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
@@ -196,11 +192,9 @@ static igraph_error_t igraph_i_determine_spring_axal_forces(
         *x = 0.5 * *x;
         *y = 0.5 * *y;
     }
-
-    return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_apply_spring_force(
+static void igraph_i_apply_spring_force(
         const igraph_matrix_t *pos,
         igraph_vector_t *pending_forces_x,
         igraph_vector_t *pending_forces_y,
@@ -222,7 +216,7 @@ static igraph_error_t igraph_i_apply_spring_force(
     // and when it does, electrical force will probably push one or both of them
     // one way or another anyway.
     if (distance == 0.0) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     displacement = distance - spring_length;
@@ -243,11 +237,9 @@ static igraph_error_t igraph_i_apply_spring_force(
     VECTOR(*pending_forces_y)[this_node] += y_force;
     VECTOR(*pending_forces_x)[other_node] -= x_force;
     VECTOR(*pending_forces_y)[other_node] -= y_force;
-
-    return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_move_nodes(
+static void igraph_i_move_nodes(
         igraph_matrix_t *pos,
         const igraph_vector_t *pending_forces_x,
         const igraph_vector_t *pending_forces_y,
@@ -292,19 +284,16 @@ static igraph_error_t igraph_i_move_nodes(
         MATRIX(*pos, this_node, 1) += y_movement;
 
     }
-    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_layout_graphopt
  * \brief Optimizes vertex layout via the graphopt algorithm.
  *
- * </para><para>
  * This is a port of the graphopt layout algorithm by Michael Schmuhl.
- * graphopt version 0.4.1 was rewritten in C and the support for
- * layers was removed (might be added later) and a code was a bit
- * reorganized to avoid some unnecessary steps is the node charge (see below)
- * is zero.
+ * graphopt version 0.4.1 was rewritten in C, the support for
+ * layers was removed and the code was reorganized to avoid some
+ * unnecessary steps when the node charge (see below) is zero.
  *
  * </para><para>
  * Graphopt uses physical analogies for defining attracting and repelling
@@ -314,6 +303,7 @@ static igraph_error_t igraph_i_move_nodes(
  *
  * </para><para>
  * See also http://www.schmuhl.org/graphopt/ for the original graphopt.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result will be stored here
  *    and its initial contents are used as the starting point of the simulation

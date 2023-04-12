@@ -120,7 +120,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
     igraph_dqueue_int_t Q;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t actroot = 0;
-    igraph_vector_char_t added;
+    igraph_vector_bool_t added;
 
     igraph_lazy_adjlist_t adjlist;
 
@@ -151,10 +151,8 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         mode = IGRAPH_ALL;
     }
 
-    IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
-    IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, no_of_nodes);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
@@ -164,10 +162,10 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
        the restricted set, but are to be used as 'root' vertices. */
     if (restricted) {
         igraph_integer_t i, n = igraph_vector_int_size(restricted);
-        igraph_vector_char_fill(&added, 1);
+        igraph_vector_bool_fill(&added, true);
         for (i = 0; i < n; i++) {
             igraph_integer_t v = VECTOR(*restricted)[i];
-            VECTOR(added)[v] = 0;
+            VECTOR(added)[v] = false;
         }
     }
 
@@ -217,7 +215,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
         }
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actroot));
         IGRAPH_CHECK(igraph_dqueue_int_push(&Q, 0));
-        VECTOR(added)[actroot] = 1;
+        VECTOR(added)[actroot] = true;
         if (parents) {
             VECTOR(*parents)[actroot] = -1;
         }
@@ -250,7 +248,7 @@ igraph_error_t igraph_bfs(const igraph_t *graph,
             for (i = 0; i < n; i++) {
                 igraph_integer_t nei = VECTOR(*neis)[i];
                 if (! VECTOR(added)[nei]) {
-                    VECTOR(added)[nei] = 1;
+                    VECTOR(added)[nei] = true;
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, nei));
                     IGRAPH_CHECK(igraph_dqueue_int_push(&Q, actdist + 1));
                     if (parents) {
@@ -285,7 +283,7 @@ cleanup:
 
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_dqueue_int_destroy(&Q);
-    igraph_vector_char_destroy(&added);
+    igraph_vector_bool_destroy(&added);
     IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
@@ -341,7 +339,7 @@ igraph_error_t igraph_bfs_simple(
     igraph_vector_int_t neis;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t i;
-    char *added;
+    bool *added;
     igraph_integer_t lastlayer = -1;
 
     if (!igraph_is_directed(graph)) {
@@ -354,7 +352,7 @@ igraph_error_t igraph_bfs_simple(
     }
 
     /* temporary storage */
-    added = IGRAPH_CALLOC(no_of_nodes, char);
+    added = IGRAPH_CALLOC(no_of_nodes, bool);
     if (added == 0) {
         IGRAPH_ERROR("Cannot calculate BFS", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
@@ -388,7 +386,7 @@ igraph_error_t igraph_bfs_simple(
         VECTOR(*parents)[root] = -1;
     }
     num_visited++;
-    added[root] = 1;
+    added[root] = true;
 
     while (!igraph_dqueue_int_empty(&q)) {
         igraph_integer_t actvect = igraph_dqueue_int_pop(&q);
@@ -398,8 +396,8 @@ igraph_error_t igraph_bfs_simple(
         igraph_integer_t nei_count = igraph_vector_int_size(&neis);
         for (i = 0; i < nei_count; i++) {
             igraph_integer_t neighbor = VECTOR(neis)[i];
-            if (added[neighbor] == 0) {
-                added[neighbor] = 1;
+            if (! added[neighbor]) {
+                added[neighbor] = true;
                 if (parents) {
                     VECTOR(*parents)[neighbor] = actvect;
                 }

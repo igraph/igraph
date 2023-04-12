@@ -131,7 +131,7 @@ igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
 
 /* Update the value of an active vertex, if not active it will be ignored */
 
-igraph_error_t igraph_i_cutheap_update(
+void igraph_i_cutheap_update(
     igraph_i_cutheap_t *ch, igraph_integer_t index, igraph_real_t add) {
     igraph_real_t hidx = VECTOR(ch->hptr)[index];
     if (hidx != INACTIVE && hidx != UNDEFINED) {
@@ -141,7 +141,6 @@ igraph_error_t igraph_i_cutheap_update(
         igraph_i_cutheap_sink(ch, hidx2);
         igraph_i_cutheap_shift_up(ch, hidx2);
     }
-    return IGRAPH_SUCCESS;
 }
 
 /* Reset the value of all vertices to zero and make them active */

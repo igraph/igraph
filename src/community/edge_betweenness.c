@@ -28,6 +28,7 @@
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
+#include "igraph_nongraph.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 
@@ -37,15 +38,14 @@
 #include <string.h>
 
 static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *membership) {
-    igraph_integer_t no = igraph_vector_int_max(membership) + 1;
+    const igraph_integer_t no = igraph_vector_int_max(membership) + 1;
     igraph_vector_t idx;
     igraph_integer_t realno = 0;
-    igraph_integer_t i;
-    igraph_integer_t len = igraph_vector_int_size(membership);
+    const igraph_integer_t len = igraph_vector_int_size(membership);
 
     IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
-    for (i = 0; i < len; i++) {
-        igraph_integer_t t = VECTOR(*membership)[i];
+    for (igraph_integer_t i = 0; i < len; i++) {
+        const igraph_integer_t t = VECTOR(*membership)[i];
         if (VECTOR(idx)[t]) {
             VECTOR(*membership)[i] = VECTOR(idx)[t] - 1;
         } else {
@@ -69,21 +69,18 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              igraph_vector_int_t *membership) {
 
     igraph_vector_int_t mymembership;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t maxmod = -1;
     igraph_integer_t midx = 0;
     igraph_integer_t no_comps;
-    igraph_bool_t use_directed = directed && igraph_is_directed(graph);
+    const igraph_bool_t use_directed = directed && igraph_is_directed(graph);
     igraph_integer_t max_merges;
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&mymembership, no_of_nodes);
 
     if (membership) {
         IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
     }
     if (modularity || res || bridges) {
-        IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
+        IGRAPH_CHECK(igraph_connected_components(graph, NULL, NULL, &no_comps, IGRAPH_WEAK));
         max_merges = no_of_nodes - no_comps;
 
         if (modularity) {
@@ -99,9 +96,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         }
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(mymembership)[i] = i;
-    }
+    IGRAPH_CHECK(igraph_vector_int_init_range(&mymembership, 0, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &mymembership);
+
     if (membership) {
         IGRAPH_CHECK(igraph_vector_int_update(membership, &mymembership));
     }
@@ -113,14 +110,14 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
         VECTOR(*modularity)[0] = maxmod;
     }
 
-    for (i = igraph_vector_int_size(edges) - 1; i >= 0; i--) {
+    for (igraph_integer_t i = igraph_vector_int_size(edges) - 1; i >= 0; i--) {
         igraph_integer_t edge = VECTOR(*edges)[i];
         igraph_integer_t from = IGRAPH_FROM(graph, edge);
         igraph_integer_t to = IGRAPH_TO(graph, edge);
         igraph_integer_t c1 = VECTOR(mymembership)[from];
         igraph_integer_t c2 = VECTOR(mymembership)[to];
         igraph_real_t actmod;
-        igraph_integer_t j;
+
         if (c1 != c2) {     /* this is a merge */
             if (res) {
                 MATRIX(*res, midx, 0) = c1;
@@ -131,7 +128,7 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
             }
 
             /* The new cluster has id no_of_nodes+midx+1 */
-            for (j = 0; j < no_of_nodes; j++) {
+            for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
                 if (VECTOR(mymembership)[j] == c1 ||
                     VECTOR(mymembership)[j] == c2) {
                     VECTOR(mymembership)[j] = no_of_nodes + midx;
@@ -170,7 +167,6 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * \function igraph_community_eb_get_merges
  * \brief Calculating the merges, i.e. the dendrogram for an edge betweenness community structure.
  *
- * </para><para>
  * This function is handy if you have a sequence of edges which are
  * gradually removed from the network and you would like to know how
  * the network falls apart into separate components. The edge sequence
@@ -202,9 +198,9 @@ static igraph_error_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  *    the number of vertices in the graph. So if the first line
  *    contains \c a and \c b that means that components \c a and \c b
  *    are merged into component \c n, the second line creates
- *    component \c n+1, etc. The matrix will be resized as needed.
+ *    component <code>n+1</code>, etc. The matrix will be resized as needed.
  * \param bridges Pointer to an initialized vector of \c NULL. If not
- *     NULL then the indices into \p edges of all edges which caused
+ *     \c NULL then the indices into \p edges of all edges which caused
  *     one of the merges will be put here. This is equal to all edge removals
  *     which separated the network into more components, in reverse order.
  * \param modularity If not a null pointer, then the modularity values
@@ -229,12 +225,12 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    igraph_vector_t *modularity,
                                    igraph_vector_int_t *membership) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t ptr;
-    igraph_integer_t i, midx = 0;
+    igraph_integer_t midx = 0;
     igraph_integer_t no_comps;
-    igraph_integer_t no_removed_edges = igraph_vector_int_size(edges);
+    const igraph_integer_t no_removed_edges = igraph_vector_int_size(edges);
     igraph_integer_t max_merges;
 
     if (! igraph_vector_int_isininterval(edges, 0, no_of_edges-1)) {
@@ -243,7 +239,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
     if (no_removed_edges < no_of_edges) {
             IGRAPH_ERRORF("Number of removed edges (%" IGRAPH_PRId ") should be equal to "
                     "number of edges in graph (%" IGRAPH_PRId ").", IGRAPH_EINVAL,
-                    no_removed_edges, igraph_ecount(graph));
+                    no_removed_edges, no_of_edges);
     }
 
     /* catch null graph early */
@@ -271,7 +267,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                 res, bridges, modularity, membership);
     }
 
-    IGRAPH_CHECK(igraph_connected_components(graph, 0, 0, &no_comps, IGRAPH_WEAK));
+    IGRAPH_CHECK(igraph_connected_components(graph, NULL, NULL, &no_comps, IGRAPH_WEAK));
 
     max_merges = no_of_nodes - no_comps;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&ptr, no_of_nodes * 2 - 1);
@@ -282,7 +278,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_resize(bridges, max_merges));
     }
 
-    for (i = igraph_vector_int_size(edges) - 1; i >= 0; i--) {
+    for (igraph_integer_t i = igraph_vector_int_size(edges) - 1; i >= 0; i--) {
         igraph_integer_t edge = VECTOR(*edges)[i];
         igraph_integer_t from, to, c1, c2, idx;
         IGRAPH_CHECK(igraph_edge(graph, edge, &from, &to));
@@ -322,7 +318,7 @@ igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
 
 /* Find the smallest active element in the vector */
 static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
-                                                   const char *passive) {
+                                                   const bool *passive) {
     igraph_integer_t which, i = 0, size = igraph_vector_size(v);
     igraph_real_t max;
     while (passive[i]) {
@@ -419,13 +415,12 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                                       igraph_bool_t directed,
                                       const igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     double *distance, *tmpscore;
     double *nrgeo;
-    igraph_integer_t source, i, e;
 
-    igraph_inclist_t elist_out, elist_in, fathers;
+    igraph_inclist_t elist_out, elist_in, parents;
     igraph_inclist_t *elist_out_p, *elist_in_p;
     igraph_vector_int_t *neip;
     igraph_integer_t neino;
@@ -433,25 +428,24 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_integer_t maxedge, pos;
     igraph_integer_t from, to;
     igraph_bool_t result_owned = false;
-    igraph_stack_int_t stack = IGRAPH_STACK_NULL;
+    igraph_stack_int_t stack;
     igraph_real_t steps, steps_done;
 
-    char *passive;
+    bool *passive;
 
     /* Needed only for the unweighted case */
-    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
+    igraph_dqueue_int_t q;
 
     /* Needed only for the weighted case */
     igraph_2wheap_t heap;
 
-    if (result == 0) {
+    if (result == NULL) {
         result = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (result == 0) {
-            IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(result, "Insufficient memory for edge betweenness-based community detection.");
         IGRAPH_FINALLY(igraph_free, result);
+
         IGRAPH_VECTOR_INT_INIT_FINALLY(result, 0);
-        result_owned = 1;
+        result_owned = true;
     }
 
     directed = directed && igraph_is_directed(graph);
@@ -469,22 +463,18 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     distance = IGRAPH_CALLOC(no_of_nodes, double);
-    if (distance == 0) {
-        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(distance, "Insufficient memory for edge betweenness-based community detection.");
     IGRAPH_FINALLY(igraph_free, distance);
+
     nrgeo = IGRAPH_CALLOC(no_of_nodes, double);
-    if (nrgeo == 0) {
-        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(nrgeo, "Insufficient memory for edge betweenness-based community detection.");
     IGRAPH_FINALLY(igraph_free, nrgeo);
+
     tmpscore = IGRAPH_CALLOC(no_of_nodes, double);
-    if (tmpscore == 0) {
-        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(tmpscore, "Insufficient memory for edge betweenness-based community detection.");
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
-    if (weights == 0) {
+    if (weights == NULL) {
         IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     } else {
         if (igraph_vector_size(weights) != no_of_edges) {
@@ -503,12 +493,12 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
             }
         }
 
-        if (membership != 0) {
+        if (membership != NULL) {
             IGRAPH_WARNING("Membership vector will be selected based on the highest "
                            "modularity score.");
         }
 
-        if (modularity != 0 || membership != 0) {
+        if (modularity != NULL || membership != NULL) {
             IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "
                            "community detection might not make sense -- modularity treats edge "
                            "weights as similarities while edge betwenness treats them as "
@@ -517,12 +507,11 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
         IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
         IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
-        IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
-        IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
+        IGRAPH_CHECK(igraph_inclist_init_empty(&parents, no_of_nodes));
+        IGRAPH_FINALLY(igraph_inclist_destroy, &parents);
     }
 
-    IGRAPH_CHECK(igraph_stack_int_init(&stack, no_of_nodes));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
+    IGRAPH_STACK_INT_INIT_FINALLY(&stack, no_of_nodes);
 
     IGRAPH_CHECK(igraph_vector_int_resize(result, no_of_edges));
     if (edge_betweenness) {
@@ -534,10 +523,8 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&eb, no_of_edges);
 
-    passive = IGRAPH_CALLOC(no_of_edges, char);
-    if (!passive) {
-        IGRAPH_ERROR("Edge betweenness community structure failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    passive = IGRAPH_CALLOC(no_of_edges, bool);
+    IGRAPH_CHECK_OOM(passive, "Insufficient memory for edge betweenness-based community detection.");
     IGRAPH_FINALLY(igraph_free, passive);
 
     /* Estimate the number of steps to be taken.
@@ -549,18 +536,18 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
     steps = no_of_edges / 2.0 * (no_of_edges + 1);
     steps_done = 0;
 
-    for (e = 0; e < no_of_edges; steps_done += no_of_edges - e, e++) {
+    for (igraph_integer_t e = 0; e < no_of_edges; steps_done += no_of_edges - e, e++) {
         IGRAPH_PROGRESS("Edge betweenness community detection: ",
                         100.0 * steps_done / steps, NULL);
 
         igraph_vector_null(&eb);
 
-        if (weights == 0) {
+        if (weights == NULL) {
             /* Unweighted variant follows */
 
             /* The following for loop is copied almost intact from
              * igraph_edge_betweenness_cutoff */
-            for (source = 0; source < no_of_nodes; source++) {
+            for (igraph_integer_t source = 0; source < no_of_nodes; source++) {
 
                 IGRAPH_ALLOW_INTERRUPTION();
 
@@ -579,7 +566,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
                     neip = igraph_inclist_get(elist_out_p, actnode);
                     neino = igraph_vector_int_size(neip);
-                    for (i = 0; i < neino; i++) {
+                    for (igraph_integer_t i = 0; i < neino; i++) {
                         igraph_integer_t edge = VECTOR(*neip)[i];
                         igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, actnode);
                         if (nrgeo[neighbor] != 0) {
@@ -609,7 +596,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     /* set the temporary score of the friends */
                     neip = igraph_inclist_get(elist_in_p, actnode);
                     neino = igraph_vector_int_size(neip);
-                    for (i = 0; i < neino; i++) {
+                    for (igraph_integer_t i = 0; i < neino; i++) {
                         igraph_integer_t edge = VECTOR(*neip)[i];
                         igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, actnode);
                         if (distance[neighbor] == distance[actnode] - 1 &&
@@ -626,9 +613,12 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
         } else {
             /* Weighted variant follows */
 
+            const igraph_real_t eps = IGRAPH_SHORTEST_PATH_EPSILON;
+            int cmp_result;
+
             /* The following for loop is copied almost intact from
              * igraph_i_edge_betweenness_cutoff_weighted */
-            for (source = 0; source < no_of_nodes; source++) {
+            for (igraph_integer_t source = 0; source < no_of_nodes; source++) {
                 /* This will contain the edge betweenness in the current step */
                 IGRAPH_ALLOW_INTERRUPTION();
 
@@ -649,32 +639,37 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     neip = igraph_inclist_get(elist_out_p, minnei);
                     neino = igraph_vector_int_size(neip);
 
-                    for (i = 0; i < neino; i++) {
+                    for (igraph_integer_t i = 0; i < neino; i++) {
                         igraph_integer_t edge = VECTOR(*neip)[i];
                         igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
                         igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                         igraph_real_t curdist = distance[to];
                         igraph_vector_int_t *v;
 
+                        /* Note: curdist == 0 means infinity, and for this case
+                         * cmp_result should be -1. However, this case is handled
+                         * specially below, without referring to cmp_result. */
+                        cmp_result = igraph_cmp_epsilon(altdist, curdist - 1, eps);
+
                         if (curdist == 0) {
                             /* This is the first finite distance to 'to' */
-                            v = igraph_inclist_get(&fathers, to);
+                            v = igraph_inclist_get(&parents, to);
                             igraph_vector_int_resize(v, 1);
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
                             IGRAPH_CHECK(igraph_2wheap_push_with_index(&heap, to, -altdist));
-                        } else if (altdist < curdist - 1) {
+                        } else if (cmp_result < 0) {
                             /* This is a shorter path */
-                            v = igraph_inclist_get(&fathers, to);
+                            v = igraph_inclist_get(&parents, to);
                             igraph_vector_int_resize(v, 1);
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
                             igraph_2wheap_modify(&heap, to, -altdist);
-                        } else if (altdist == curdist - 1) {
+                        } else if (cmp_result == 0) {
                             /* Another path with the same length */
-                            v = igraph_inclist_get(&fathers, to);
+                            v = igraph_inclist_get(&parents, to);
                             IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                             nrgeo[to] += nrgeo[minnei];
                         }
@@ -683,11 +678,11 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
                 while (!igraph_stack_int_empty(&stack)) {
                     igraph_integer_t w = igraph_stack_int_pop(&stack);
-                    igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
-                    igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
+                    igraph_vector_int_t *parv = igraph_inclist_get(&parents, w);
+                    igraph_integer_t parv_len = igraph_vector_int_size(parv);
 
-                    for (i = 0; i < fatv_len; i++) {
-                        igraph_integer_t fedge = VECTOR(*fatv)[i];
+                    for (igraph_integer_t i = 0; i < parv_len; i++) {
+                        igraph_integer_t fedge = VECTOR(*parv)[i];
                         igraph_integer_t neighbor = IGRAPH_OTHER(graph, fedge, w);
                         tmpscore[neighbor] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                         VECTOR(eb)[fedge] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
@@ -696,7 +691,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                     tmpscore[w] = 0;
                     distance[w] = 0;
                     nrgeo[w] = 0;
-                    igraph_vector_int_clear(fatv);
+                    igraph_vector_int_clear(parv);
                 }
             } /* source < no_of_nodes */
         }
@@ -711,7 +706,7 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                 VECTOR(*edge_betweenness)[e] /= 2.0;
             }
         }
-        passive[maxedge] = 1;
+        passive[maxedge] = true;
         IGRAPH_CHECK(igraph_edge(graph, maxedge, &from, &to));
 
         neip = igraph_inclist_get(elist_in_p, to);
@@ -729,17 +724,17 @@ igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
 
     IGRAPH_PROGRESS("Edge betweenness community detection: ", 100.0, NULL);
 
-    igraph_free(passive);
+    IGRAPH_FREE(passive);
     igraph_vector_destroy(&eb);
     igraph_stack_int_destroy(&stack);
     IGRAPH_FINALLY_CLEAN(3);
 
-    if (weights == 0) {
+    if (weights == NULL) {
         igraph_dqueue_int_destroy(&q);
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         igraph_2wheap_destroy(&heap);
-        igraph_inclist_destroy(&fathers);
+        igraph_inclist_destroy(&parents);
         IGRAPH_FINALLY_CLEAN(2);
     }
     igraph_free(tmpscore);

@@ -122,9 +122,9 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERRORF("Weight vector must be non-negative, got %g.", IGRAPH_EINVAL, min);
+            IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
         } else if (isnan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
@@ -429,16 +429,20 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                          parents, inbound_edges);
     }
 
+    if (from < 0 || from >= no_of_nodes) {
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
+    }
+
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length does not match number of edges.", IGRAPH_EINVAL);
     }
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (isnan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
@@ -616,12 +620,14 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
 /**
  * \function igraph_get_shortest_path_dijkstra
- * \brief Weighted shortest path from one vertex to another one.
+ * \brief Weighted shortest path from one vertex to another one (Dijkstra).
  *
- * Calculates a single (positively) weighted shortest path from
- * a single vertex to another one, using Dijkstra's algorithm.
+ * Finds a weighted shortest path from a single source vertex to
+ * a single target, using Dijkstra's algorithm. If more than one
+ * shortest path exists, an arbitrary one is returned.
  *
- * </para><para>This function is a special case (and a wrapper) to
+ * </para><para>
+ * This function is a special case (and a wrapper) to
  * \ref igraph_get_shortest_paths_dijkstra().
  *
  * \param graph The input graph, it can be directed or undirected.
@@ -632,8 +638,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  * \param edges Pointer to an initialized vector or a null
  *        pointer. If not a null pointer, then the edge IDs along the
  *        path are stored here.
- * \param from The id of the source vertex.
- * \param to The id of the target vertex.
+ * \param from The ID of the source vertex.
+ * \param to The ID of the target vertex.
  * \param weights The edge weights. All edge weights must be
  *       non-negative for Dijkstra's algorithm to work. Additionally, no
  *       edge weight may be NaN. If either case does not hold, an error
@@ -681,13 +687,15 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
                  from, igraph_vss_1(to),
                  weights, mode, NULL, NULL));
 
+    /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the
+       result to the output parameter. */
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_update(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_update(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        IGRAPH_CHECK(igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
@@ -780,7 +788,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_vector_int_t order;
     igraph_vector_ptr_t parents, parents_edge;
 
-    unsigned char *is_target;
+    unsigned char *is_target; /* uses more than two discrete values, can't be 'bool' */
     igraph_integer_t i, n, to_reach;
     igraph_bool_t free_vertices = false;
     int cmp_result;
@@ -788,6 +796,10 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
 
     if (!weights) {
         return igraph_get_all_shortest_paths(graph, vertices, edges, nrgeo, from, to, mode);
+    }
+
+    if (from < 0 || from >= no_of_nodes) {
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
 
     if (vertices == NULL && nrgeo == NULL && edges == NULL) {
@@ -799,10 +811,10 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (no_of_edges > 0) {
         igraph_real_t min = igraph_vector_min(weights);
         if (min < 0) {
-            IGRAPH_ERROR("Edge weights must be non-negative.", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Edge weights must not be negative, got %g.", IGRAPH_EINVAL, min);
         }
         else if (isnan(min)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 

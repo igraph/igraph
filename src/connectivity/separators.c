@@ -657,8 +657,8 @@ igraph_error_t igraph_minimum_size_separators(
 
     /* ---------------------------------------------------------------- */
     /* 1 Find the vertex connectivity of 'graph' */
-    IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn,
-                                            /* checks= */ 1)); k = conn;
+    IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /* checks= */ true));
+    k = conn;
 
     /* Special cases for low connectivity, two exits here! */
     if (conn == 0) {
