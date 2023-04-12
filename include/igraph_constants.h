@@ -210,10 +210,6 @@ typedef enum { IGRAPH_ROW_MAJOR = 0,
                IGRAPH_COLUMN_MAJOR = 1
              } igraph_matrix_storage_t;
 
-typedef enum { IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH = 0,
-               IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE = 1
-             } igraph_simple_cycle_search_mode_t;
-
 __END_DECLS
 
 #endif

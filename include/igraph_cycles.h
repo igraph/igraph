@@ -31,14 +31,12 @@ IGRAPH_EXPORT void igraph_simple_cycle_search_state_destroy(
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_from_one_vertex(
     struct igraph_simple_cycle_search_state_t *state, igraph_integer_t start,
     igraph_vector_int_list_t *v_result,
-    igraph_vector_int_list_t *e_result,
-    igraph_simple_cycle_search_mode_t search_mode);
+    igraph_vector_int_list_t *e_result);
 
 IGRAPH_EXPORT igraph_error_t igraph_simple_cycles_search_all(
-    const igraph_t *graph, 
+    const igraph_t *graph,
     igraph_vector_int_list_t *v_result,
-    igraph_vector_int_list_t *e_result,
-    igraph_simple_cycle_search_mode_t search_mode);
+    igraph_vector_int_list_t *e_result);
 
 __END_DECLS
 
