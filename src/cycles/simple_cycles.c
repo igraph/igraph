@@ -25,6 +25,7 @@
 #include "igraph_interface.h"
 #include "igraph_stack.h"
 #include "igraph_structural.h"
+#include "../../tests/unit/test_utilities.h"
 
 #include "core/interruption.h"
 
@@ -67,7 +68,30 @@ typedef struct igraph_simple_cycle_search_state_t {
     igraph_bool_t directed;
 } igraph_simple_cycle_search_state_t;
 
-/* The implementation of procedure UNBLOCK from Johnson's paper */
+/**
+ * \experimental
+ *
+ * A custom function to prevent double results in the search when using undirected graphs
+ */
+
+static igraph_bool_t igraph_i_cycle_has_been_found_already(
+    igraph_simple_cycle_search_state_t *state,
+    igraph_vector_int_list_t *v_results, igraph_vector_int_list_t *e_results,
+    igraph_vector_int_t *v_res, igraph_vector_int_t *e_res
+) {
+    if (igraph_vector_int_size(v_res) < 2) {
+        return false;
+    }
+    // TODO: other things to compare
+    return VECTOR(*v_res)[0] < VECTOR(*v_res)[1];
+}
+
+/**
+ * \experimental
+ *
+ * The implementation of procedure UNBLOCK from Johnson's paper
+ *
+ */
 
 static igraph_error_t igraph_i_simple_cycles_unblock(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t u
@@ -88,7 +112,11 @@ static igraph_error_t igraph_i_simple_cycles_unblock(
     return IGRAPH_SUCCESS;
 }
 
-/* The implementation of procedure CIRCUIT from Johnson's paper */
+/**
+ * \experimental
+ *
+ * The implementation of procedure CIRCUIT from Johnson's paper
+ */
 
 static igraph_error_t igraph_i_simple_cycles_circuit(
     igraph_simple_cycle_search_state_t *state, igraph_integer_t V,igraph_integer_t E,
@@ -139,25 +167,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 // this is our naïve filter for now
                 igraph_bool_t persist_result = true;
                 if (!state->directed && search_mode == IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE) {
-                    igraph_vector_int_sort(&v_res);
-                    igraph_bool_t duplicate_found = false;
-                    for (igraph_integer_t results_idx = 0; results_idx < igraph_vector_int_list_size(v_results); ++results_idx) {
-                        if (igraph_vector_int_size(igraph_vector_int_list_get_ptr(v_results, results_idx)) != igraph_vector_int_size(&v_res)) {
-                            continue;
-                        }
-                        igraph_bool_t discrepancy_found = false;
-                        for (igraph_integer_t res_idx = 0; res_idx < igraph_vector_int_size(&v_res); ++res_idx) {
-                            if (igraph_vector_int_get(&v_res, res_idx) != igraph_vector_int_get(igraph_vector_int_list_get_ptr(v_results, results_idx), res_idx)) {
-                                discrepancy_found = true;
-                                break;
-                            }
-                        }
-                        if (!discrepancy_found) {
-                            // found this loop already.
-                            duplicate_found = true;
-                            break;
-                        }
-                    }
+                    print_vector_int(&v_res);
+                    igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, v_results, e_results, &v_res, &e_res);
                     if (duplicate_found) {
                         persist_result = false;
                     }
@@ -210,6 +221,8 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
  * \function igraph_simple_cycle_search_state_init
  * \brief Initialize the cycle search state
  *
+ * \experimental
+ *
  * \param state The state structure to initialize
  * \param graph The graph object
  * \return Error code.
@@ -249,6 +262,8 @@ igraph_error_t igraph_simple_cycle_search_state_init(
  * \function igraph_simple_cycle_search_state_destroy
  * \brief Destroy the cycle search state
  *
+ * \experimental
+ *
  * \param state The state structure to destroy
  * \return Error code.
  *
@@ -268,6 +283,8 @@ void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t
 /**
  * \function igraph_simple_cycles_search_from_one_vertex
  * \brief Search simple cycles starting from one vertex
+ *
+ * \experimental
  *
  * \param state The state structure to search on
  * \param s The vertex index to start search with
@@ -323,9 +340,19 @@ igraph_error_t igraph_simple_cycles_search_from_one_vertex(
  * \function igraph_simple_cycles_search_all
  * \brief Search all simple cycles
  *
+ * \experimental
+ *
+ * This function searches for all simple cycles,
+ * using Johnson's cycle detection algorithm
+ * based on the original implementation in:
+ * Johnson DB: Finding all the elementary circuits of a directed graph.
+ * SIAM J Comput 4(1):77-84.
+ * https://epubs.siam.org/doi/10.1137/0204007
+ *
+ *
  * \param graph The graph to search for
- * \param v_results The vertices of each cycle will be stored here
- * \param e_results The edges of each cycle will be stored here
+ * \param v_results Initialized integer vector list; The vertices of each cycle will be stored here
+ * \param e_results Initialized integer vector list; The edges of each cycle will be stored here
  * \param search_mode How search should handle undirected graphs.
  *    See \ref igraph_simple_cycles_search_from_one_vertex
  * \return Error code.

@@ -29,7 +29,7 @@ void checkGraphForNrOfCycles(igraph_t *graph, const igraph_integer_t expectedNrO
     igraph_vector_int_list_init(&results_e, 0);
     igraph_simple_cycles_search_all(graph, &results_v, &results_e, search_mode);
     printf("Finished search, found %" IGRAPH_PRId " cycles.\n\n", igraph_vector_int_list_size(&results_v));
-    if (igraph_vector_int_list_size(&results_v) != expectedNrOfCycles)
+    if (igraph_vector_int_list_size(&results_v) != expectedNrOfCycles || (igraph_is_directed(graph) && search_mode == IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH))
     {
         printf("Unexpectedly found %" IGRAPH_PRId " cycles instead of %" IGRAPH_PRId ": ", igraph_vector_int_list_size(&results_v), expectedNrOfCycles);
         for (int i = 0; i < igraph_vector_int_list_size(&results_v); i++)
@@ -94,6 +94,7 @@ int main(void)
     // call cycles finder, expect 1 cycle to be found
     checkGraphForNrOfCycles(&g_ring_plus_star_undirected, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     igraph_add_edge(&g_ring_plus_star_undirected, 7, 13); // add a random edge between the two structures to make them connected
+    printf("\nCreated connection of undirected wheel and star\n");
     checkGraphForNrOfCycles(&g_ring_plus_star_undirected, 1, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     // clean up
     igraph_destroy(&g_ring_plus_star_undirected);
@@ -116,6 +117,23 @@ int main(void)
     checkGraphForNrOfCycles(&g_wheel_undirected, 65, IGRAPH_UNDIRECTED_CYCLE_SEARCH_ONE);
     // clean up
     igraph_destroy(&g_wheel_undirected);
+
+    igraph_t g_wheel_undirected_2;
+    igraph_wheel(&g_wheel_undirected_2, 10, IGRAPH_WHEEL_UNDIRECTED, 0);
+    printf("\nCreated undirected wheel\n");
+    // call cycles finder, expect 65 cycles to be found (
+    // 1 cycle of 10 nodes,
+    // 10 cycles of 9 nodes,
+    // 9 cycles of 8 nodes,
+    // 9 cycles of 7 nodes,
+    // 9 cycles of 6 nodes,
+    // 9 cycles of 5 nodes,
+    // 9 cycles of 4 nodes
+    // 9 cycles of 3 nodes,
+    // )
+    checkGraphForNrOfCycles(&g_wheel_undirected_2, 146, IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH);
+    // clean up
+    igraph_destroy(&g_wheel_undirected_2);
 
     ////////////////////////////////
     // Tests as requested in https://github.com/igraph/igraph/pull/2181#issuecomment-1326064152
