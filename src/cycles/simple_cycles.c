@@ -66,6 +66,12 @@ typedef struct igraph_simple_cycle_search_state_t {
 
     /* Whether the graph is directed */
     igraph_bool_t directed;
+
+    /* Hashes of the vertices of found cycles (for filtering in undirected graphs) */
+    igraph_vector_int_t found_cycles_vertex_hashes;
+
+    /* Hashes of the edges of found cycles (for filtering in undirected graphs) */
+    igraph_vector_int_t found_cycles_edge_hashes;
 } igraph_simple_cycle_search_state_t;
 
 /**
@@ -77,13 +83,48 @@ typedef struct igraph_simple_cycle_search_state_t {
 static igraph_bool_t igraph_i_cycle_has_been_found_already(
     igraph_simple_cycle_search_state_t *state,
     igraph_vector_int_list_t *v_results, igraph_vector_int_list_t *e_results,
-    igraph_vector_int_t *v_res, igraph_vector_int_t *e_res
+    igraph_vector_int_t *v_res, igraph_vector_int_t *e_res,
+    unsigned long long vertex_hash, unsigned long long edge_hash
 ) {
     if (igraph_vector_int_size(v_res) < 2) {
         return false;
     }
-    // TODO: other things to compare
-    return VECTOR(*v_res)[0] < VECTOR(*v_res)[1];
+
+    // TODO: improve performance of this by using some sort of hash table lookup
+    igraph_integer_t pos;
+    if (!igraph_vector_int_search(&state->found_cycles_edge_hashes, 0, edge_hash, &pos)) {
+        return false;
+    }
+    // In principle, it should not be possible to have the same edges but different vertices
+    // Yet this is just another safeguard against a possible (edge) hash collision
+    while (VECTOR(state->found_cycles_vertex_hashes)[pos] != vertex_hash && igraph_vector_int_size(&VECTOR(*v_results)[pos]) != igraph_vector_int_size(v_res)) {
+        if (!igraph_vector_int_search(&state->found_cycles_edge_hashes, pos+1, edge_hash, &pos)) {
+            return false;
+        }
+    }
+
+    // if all of edge_hash, vertex_hash and cycle size match, we assume we got a duplicate
+    return true;
+}
+
+/**
+ * \experimental
+ *
+ * A hashing algorithm
+ */
+static unsigned long long igraph_i_hash_vector_int(igraph_vector_int_t *vec) {
+
+    unsigned long long hash_product = 1.;
+    unsigned long long hash_sum = 0;
+    unsigned int hash_xor = 0;
+
+    for (igraph_integer_t i = 0; i < igraph_vector_int_size(vec); ++i) {
+        hash_product *= VECTOR(*vec)[i];
+        hash_sum += VECTOR(*vec)[i];
+        hash_xor ^= VECTOR(*vec)[i];
+    }
+
+    return hash_product + hash_sum + ((unsigned long long) hash_xor << 32);
 }
 
 /**
@@ -169,21 +210,27 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                 igraph_vector_int_t v_res;
                 IGRAPH_CHECK(igraph_vector_int_init_copy(&v_res, &state->vertex_stack));
                 IGRAPH_FINALLY(igraph_vector_int_destroy, &v_res);
+                unsigned long long vertex_hash = igraph_i_hash_vector_int(&v_res);
 
                 // same for edges
                 igraph_vector_int_t e_res;
                 IGRAPH_CHECK(igraph_vector_int_init_copy(&e_res, &state->edge_stack));
                 IGRAPH_FINALLY(igraph_vector_int_destroy, &e_res);
+                unsigned long long edge_hash = igraph_i_hash_vector_int(&e_res);
 
                 // undirected graphs lead to some cycles being found multiple
                 // times.
                 // this is our naïve filter for now
                 igraph_bool_t persist_result = true;
                 if (!state->directed) {
-                    print_vector_int(&v_res);
-                    igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, v_results, e_results, &v_res, &e_res);
+                    // print_vector_int(&v_res);
+                    // printf("Has hashes %llu, %llu\n", vertex_hash, edge_hash);
+                    igraph_bool_t duplicate_found = igraph_i_cycle_has_been_found_already(state, vertices, edges, &v_res, &e_res, vertex_hash, edge_hash);
                     if (duplicate_found) {
                         persist_result = false;
+                    } else {
+                        igraph_vector_int_push_back(&state->found_cycles_vertex_hashes, vertex_hash);
+                        igraph_vector_int_push_back(&state->found_cycles_edge_hashes, edge_hash);
                     }
                 }
                 // end filter
@@ -208,6 +255,7 @@ static igraph_error_t igraph_i_simple_cycles_circuit(
                     IGRAPH_FINALLY_CLEAN(2);
                 }
             }
+            igraph_vector_int_pop_back(&state->edge_stack);
         } else if (!(VECTOR(state->blocked)[W])) {
             IGRAPH_CHECK(igraph_i_simple_cycles_circuit(state, W, WE, S, vertices, edges, &local_found));
         }
@@ -276,8 +324,16 @@ igraph_error_t igraph_simple_cycle_search_state_init(
     state->directed = igraph_is_directed(graph);
     IGRAPH_CHECK(igraph_adjlist_init_empty(&state->B, state->N));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &state->B);
+    if (!state->directed) {
+        IGRAPH_CHECK(igraph_vector_int_init(&state->found_cycles_vertex_hashes, 0));
+        IGRAPH_CHECK(igraph_vector_int_reserve(&state->found_cycles_vertex_hashes, 8));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &state->found_cycles_vertex_hashes);
+        IGRAPH_CHECK(igraph_vector_int_init(&state->found_cycles_edge_hashes, 0));
+        IGRAPH_CHECK(igraph_vector_int_reserve(&state->found_cycles_edge_hashes, 8));
+        IGRAPH_FINALLY(igraph_vector_int_destroy, &state->found_cycles_edge_hashes);
+    }
 
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(state->directed ? 6 : 8);
 
     return IGRAPH_SUCCESS;
 }
@@ -302,6 +358,10 @@ void igraph_simple_cycle_search_state_destroy(igraph_simple_cycle_search_state_t
     igraph_adjlist_destroy(&state->AK);
     igraph_inclist_destroy(&state->IK);
     igraph_adjlist_destroy(&state->B);
+    if (!state->directed) {
+        igraph_vector_int_destroy(&state->found_cycles_vertex_hashes);
+        igraph_vector_int_destroy(&state->found_cycles_edge_hashes);
+    }
 }
 
 /**

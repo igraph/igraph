@@ -131,8 +131,8 @@ int main(void) {
     igraph_t g_wheel_undirected_2;
     igraph_wheel(&g_wheel_undirected_2, 10, IGRAPH_WHEEL_UNDIRECTED, 0);
     printf("\nCreated undirected wheel\n");
-    // call cycles finder, expect 65 cycles to be found (
-    // 1 cycle of 10 nodes,
+    // call cycles finder, expect 73 cycles to be found (
+    // 9 cycle of 10 nodes,
     // 10 cycles of 9 nodes,
     // 9 cycles of 8 nodes,
     // 9 cycles of 7 nodes,
@@ -141,7 +141,7 @@ int main(void) {
     // 9 cycles of 4 nodes
     // 9 cycles of 3 nodes,
     // )
-    checkGraphForNrOfCycles(&g_wheel_undirected_2, 146, IGRAPH_UNDIRECTED_CYCLE_SEARCH_BOTH);
+    check_cycles(&g_wheel_undirected_2, 73);
     // clean up
     igraph_destroy(&g_wheel_undirected_2);
 
@@ -150,10 +150,9 @@ int main(void) {
     /*
      * This graph looks like:
      *
-     *  /\
-     * 1--2
-     * |  |
-     * 3--4
+     * 1--2\
+     * |  | |
+     * 4--3/
      *
      */
     printf("\nTesting directed graph with a cycle of length 4 and a multi-edge\n");
@@ -164,7 +163,7 @@ int main(void) {
     // same, but undirected
     printf("\nTesting undirected graph with a cycle of length 4 and a multi-edge\n");
     igraph_small(&g, 5, IGRAPH_UNDIRECTED, 1, 2, 2, 3, 2, 3, 3, 4, 4, 1, -1);
-    check_cycles(&g, 1);
+    check_cycles(&g, 2);
     igraph_destroy(&g);
 
     // check that self-loops are handled
