@@ -19,7 +19,8 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, const igraph_vector_t *weights) {
+void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, const igraph_vector_t *weights)
+{
     igraph_real_t value;
     igraph_vector_int_t tree_edges;
 
@@ -34,13 +35,15 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     /* Check total tree weight. */
     igraph_real_t value2 = 0.0;
     igraph_integer_t tree_size = igraph_vector_int_size(&tree_edges);
-    for (igraph_integer_t i = 0; i < tree_size; i++) {
-        value2 += VECTOR(*weights)[ VECTOR(tree_edges)[i] ];
+    for (igraph_integer_t i = 0; i < tree_size; i++)
+    {
+        value2 += VECTOR(*weights)[VECTOR(tree_edges)[i]];
     }
     IGRAPH_ASSERT(value == value2);
 
     /* Check that the result is indeed a tree. */
-    if (igraph_vector_int_size(terminals) > 0) {
+    if (igraph_vector_int_size(terminals) > 0)
+    {
         igraph_t tree;
         igraph_subgraph_from_edges(graph, &tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ true);
 
@@ -54,16 +57,17 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     igraph_vector_int_destroy(&tree_edges);
 }
 
-int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple,g_k1,g_k7_self_loop;
+int main(void)
+{
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple, g_k1, g_k7_self_loop;
     igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real;
-    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple,weights_k7_loop;
+    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple, weights_k7_loop;
 
     /* Null graph */
     igraph_empty(&g_null, 0, 0);
     igraph_vector_init(&weights_null, 0);
     igraph_vector_int_init(&terminals_null, 0);
-
+  
     /* K_7 complete graph with a specific edge ordering. */
     igraph_small(&g_k7, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6,
@@ -85,7 +89,6 @@ int main(void) {
     igraph_vector_int_init_int(&terminals_k7, 4,
                                0, 1, 2, 3);
 
-
     /* K_7 non-complete graph with edges 0-4,0-5 removed */
     igraph_small(&g_k7_n, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 6,
@@ -104,7 +107,6 @@ int main(void) {
                            2, 1,
                            1);
 
-
     /* K_7 non-complete graph with edges 0-4 removed */
     igraph_small(&g_k7_n1, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 0, 6,
@@ -122,7 +124,6 @@ int main(void) {
                            1, 2, 1,
                            2, 1,
                            1);
-
 
     /* Disconnected graph: K_6 with a specific edge order and an additional isolated vertex. */
     igraph_small(&g_k6_k1, 7, IGRAPH_UNDIRECTED,
@@ -163,7 +164,6 @@ int main(void) {
     igraph_vector_int_init_int(&terminals_k7_real, 4,
                                0, 1, 2, 3);
 
-
     /* K_7 complete graph with a specific edge ordering. */
     igraph_small(&g_k7_non_simple, 7, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 5, 0, 6,
@@ -183,11 +183,10 @@ int main(void) {
                            1);
 
     // A graph with 1 node.
-    igraph_small(&g_k1, 1, IGRAPH_UNDIRECTED,-1);
-    
+    igraph_small(&g_k1, 1, IGRAPH_UNDIRECTED, -1);
 
-    /* 
-        K_7 graph with a specific edge ordering and a self loop 
+    /*
+        K_7 graph with a specific edge ordering and a self loop
         edge 0-1 is removed so it's not a complate graph
     */
     igraph_small(&g_k7_self_loop, 7, IGRAPH_UNDIRECTED,
@@ -206,9 +205,7 @@ int main(void) {
                            1, 2, 1,
                            2, 1,
                            1);
-
     
-
     printf("Null graph:\n");
     check_graph(&g_null, &terminals_null, &weights_null);
 
@@ -229,7 +226,6 @@ int main(void) {
 
     igraph_vector_int_destroy(&tree_edges);
 
-
     igraph_real_t value_unit;
     igraph_vector_int_t tree_edges_unit;
     igraph_vector_int_init(&tree_edges_unit, 0);
@@ -248,11 +244,10 @@ int main(void) {
     check_graph(&g_k7_non_simple, &terminals_k7, &weights_k7_non_simple);
 
     printf("\nA graph with single node:\n");
-    check_graph(&g_k1,&terminals_null,&weights_null);
+    check_graph(&g_k1, &terminals_null, &weights_null);
 
     printf("\nK_7 graph with self loop:\n");
-    check_graph(&g_k7_self_loop,&terminals_k7,&weights_k7_loop);
-
+    check_graph(&g_k7_self_loop, &terminals_k7, &weights_k7_loop);
 
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
@@ -264,7 +259,6 @@ int main(void) {
     igraph_destroy(&g_k1);
     igraph_destroy(&g_k7_self_loop);
 
-
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
     igraph_vector_destroy(&weights_k6_k1);
@@ -273,12 +267,24 @@ int main(void) {
     igraph_vector_destroy(&weights_k7_real);
     igraph_vector_destroy(&weights_k7_non_simple);
     igraph_vector_destroy(&weights_k7_loop);
-    
 
     igraph_vector_int_destroy(&terminals_k7);
     igraph_vector_int_destroy(&terminals_null);
     igraph_vector_int_destroy(&terminals_k6_k1);
     igraph_vector_int_destroy(&terminals_k7_real);
+
+    igraph_t g;
+    igraph_vector_int_t terminals;
+    igraph_full(&g, 10, IGRAPH_UNDIRECTED, 0);
+    igraph_vector_int_init_int(&terminals, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8);
+    igraph_vector_int_init(&tree_edges, 0);
+    igraph_steiner_dreyfus_wagner(&g, &terminals, NULL, &value, &tree_edges);
+    printf("\n");
+    igraph_vector_int_print(&tree_edges);
+    printf("value: %f", value);
+    igraph_destroy(&g);
+    igraph_vector_int_destroy(&tree_edges);
+    igraph_vector_int_destroy(&terminals);
 
     VERIFY_FINALLY_STACK();
 
