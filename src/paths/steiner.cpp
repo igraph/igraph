@@ -32,7 +32,7 @@
 #include <set>
 #include <vector>
 
-
+#include <iostream>
 typedef std::set<igraph_integer_t> int_set;
 typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
 
@@ -45,7 +45,7 @@ typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
  *
  */
 static igraph_error_t generateSubsets(const igraph_vector_int_t *steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary& subsetMap, std::set<int_set> & allSubsets) {
-    if (n > sizeof(igraph_integer_t)){
+    if (n > sizeof(igraph_integer_t)*8 -2){
         IGRAPH_ERROR("igraph_integer_overflow detected. The given number of terminals is more than what the computer can handle.",IGRAPH_EINVAL);
     }
     igraph_integer_t count = ((igraph_integer_t)1 << n);
@@ -447,10 +447,11 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
     /*
-     * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy - 1)
-     * 2 ^ (number of steiner_terminals_copy - 1) is number of subsets.
+     * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1)
+     * 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1) is number of subsets.
      */
-    IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy) - 1), no_of_nodes));
+
+    IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy) ) - (igraph_vector_int_size(&steiner_terminals_copy) +1 ) , no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &dp_cache);
 
     igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
