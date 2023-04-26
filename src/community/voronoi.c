@@ -29,8 +29,7 @@
 #include "core/indheap.h"
 
 /**
- * \function igraph_local_relative_density
- * \brief Unweighted local relative density for some vertices.
+ * Unweighted local relative density for some vertices.
  *
  * This function ignores self-loops and edge multiplicities.
  * For isolated vertices, zero is returned.
@@ -309,7 +308,8 @@ static igraph_real_t peakx(
 }
 
 /**
- * Simple Brent's method optimizer. It must be called with x2 > x1.
+ * Simple Brent's method optimizer, with some specializations for the use
+ * case at hand (see code comments). It must be called with x2 > x1.
  * The optimal argument is the last one for which f() is invoked.
  * f() is expected to record this in 'extra'.
  */
@@ -340,7 +340,7 @@ static igraph_error_t brent_opt(optfun_t *f, igraph_real_t x1, igraph_real_t x2,
                      IGRAPH_DIVERGED);
     }
 
-    /* It sometimes happens in disconnected graphs that the maximum is reached at or neat the
+    /* It sometimes happens in disconnected graphs that the maximum is reached at or near the
      * top of the radius range. If so, we bisect the (f3, f2) interval to search for a configuration
      * where f3 >= f2. */
     if (f2 > f3) {
@@ -363,8 +363,8 @@ static igraph_error_t brent_opt(optfun_t *f, igraph_real_t x1, igraph_real_t x2,
 
         /* We need to decide whether we drop (x1, f1) or (x2, f2) for the following iterations.
          * The sign of a1 (or a2) determines whether dropping x1 (or x2) yields a convex or concave
-         * parabola in the next iteration. We need a negative sign = concave parabola.
-         * We always keep (x3, f3) as it was the last added point. */
+         * parabola in the next iteration. We need a negative sign = concave parabola,
+         * as we are looking for a maximum. We always keep (x3, f3) as it was the last added point. */
         igraph_real_t a1 = coeff2(x2, x3, newx, f2, f3, newf);
         igraph_real_t a2 = coeff2(x1, x3, newx, f1, f3, newf);
 
