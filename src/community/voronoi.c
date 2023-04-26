@@ -437,12 +437,12 @@ static igraph_error_t get_modularity(igraph_real_t r, igraph_real_t *modularity,
     IGRAPH_CHECK(choose_generators(gm->graph, gm->generators, NULL,
                                    gm->local_dens, gm->lengths, gm->mode,
                                    r));
-    igraph_voronoi(gm->graph, gm->membership, NULL,
-                   gm->generators, gm->lengths,
-                   gm->mode, IGRAPH_VORONOI_RANDOM);
-    igraph_modularity(gm->graph, gm->membership, gm->weights,
-                      1, gm->mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED,
-                      &gm->modularity);
+    IGRAPH_CHECK(igraph_voronoi(gm->graph, gm->membership, NULL,
+                                gm->generators, gm->lengths,
+                                gm->mode, IGRAPH_VORONOI_RANDOM));
+    IGRAPH_CHECK(igraph_modularity(gm->graph, gm->membership, gm->weights,
+                                   1, gm->mode == IGRAPH_ALL ? IGRAPH_UNDIRECTED : IGRAPH_DIRECTED,
+                                   &gm->modularity));
     *modularity = gm->modularity;
 
     return IGRAPH_SUCCESS;
