@@ -47,6 +47,14 @@ int main(void) {
         return 7;
     }
 
+    /* no error test, deleting edges with attributes */
+    igraph_set_attribute_table(&igraph_cattribute_table);
+    igraph_cattribute_EAN_set(&g, "test", 2, 9);
+    igraph_delete_edges(&g, igraph_ess_1(1)); // CHECK_NO_ERROR
+    if (igraph_ecount(&g) != 2) {
+        return 9;
+    }
+
     igraph_es_destroy(&es);
     igraph_destroy(&g);
 
