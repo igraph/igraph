@@ -34,10 +34,15 @@
 /*====================================================================*/
 /* Simple types: */
 
+/* Changed in igraph: do not try to redefine the standard 'bool',
+ * needed for C23 compatibility. */
+/*
 typedef int bool;
 
 #define true  1
 #define false 0
+*/
+#include <stdbool.h>
 
 typedef int  lit;
 #if 0 /* by mao */

@@ -244,96 +244,6 @@ static igraph_error_t igraph_i_local_scan_1_directed_all(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
-                                            igraph_vector_t *res,
-                                            const igraph_vector_t *weights) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t node, i, j, nn;
-    igraph_inclist_t allinc;
-    igraph_vector_int_t *neis1, *neis2;
-    igraph_integer_t neilen1, neilen2;
-    igraph_integer_t *neis;
-    igraph_integer_t maxdegree;
-
-    igraph_vector_int_t order;
-    igraph_vector_int_t rank;
-    igraph_vector_int_t degree, *edge1 = &degree; /* reuse degree as edge1 */
-
-    if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
-    }
-
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
-
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
-                               IGRAPH_LOOPS));
-    maxdegree = igraph_vector_int_max(&degree) + 1;
-    IGRAPH_CHECK(igraph_vector_int_order1(&degree, &order, maxdegree));
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&rank, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
-        VECTOR(rank)[ VECTOR(order)[i] ] = no_of_nodes - i - 1;
-    }
-
-    IGRAPH_CHECK(igraph_inclist_init(graph, &allinc, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
-    IGRAPH_FINALLY(igraph_inclist_destroy, &allinc);
-    IGRAPH_CHECK(igraph_i_trans4_il_simplify(graph, &allinc, &rank));
-
-    neis = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (neis == 0) {
-        IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_free, neis);
-
-    IGRAPH_CHECK(igraph_strength(graph, res, igraph_vss_all(), IGRAPH_ALL,
-                                 IGRAPH_LOOPS, weights));
-
-    for (nn = no_of_nodes - 1; nn >= 0; nn--) {
-        node = VECTOR(order)[nn];
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        neis1 = igraph_inclist_get(&allinc, node);
-        neilen1 = igraph_vector_int_size(neis1);
-
-        /* Mark the neighbors of the node */
-        for (i = 0; i < neilen1; i++) {
-            igraph_integer_t edge = VECTOR(*neis1)[i];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
-            VECTOR(*edge1)[nei] = VECTOR(*weights)[edge];
-            neis[nei] = node + 1;
-        }
-
-        for (i = 0; i < neilen1; i++) {
-            igraph_integer_t edge = VECTOR(*neis1)[i];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, node);
-            igraph_real_t w = VECTOR(*weights)[edge];
-            neis2 = igraph_inclist_get(&allinc, nei);
-            neilen2 = igraph_vector_int_size(neis2);
-            for (j = 0; j < neilen2; j++) {
-                igraph_integer_t edge2 = VECTOR(*neis2)[j];
-                igraph_integer_t nei2 = IGRAPH_OTHER(graph, edge2, nei);
-                igraph_real_t w2 = VECTOR(*weights)[edge2];
-                if (neis[nei2] == node + 1) {
-                    VECTOR(*res)[node] += w2;
-                    VECTOR(*res)[nei2] += w;
-                    VECTOR(*res)[nei] += VECTOR(*edge1)[nei2];
-                }
-            }
-        }
-    }
-
-    igraph_free(neis);
-    igraph_inclist_destroy(&allinc);
-    igraph_vector_int_destroy(&rank);
-    igraph_vector_int_destroy(&degree);
-    igraph_vector_int_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(5);
-
-    return IGRAPH_SUCCESS;
-}
-
 /**
  * \function igraph_local_scan_1_ecount
  * Local scan-statistics, k=1, edge count and sum of weights
@@ -362,11 +272,7 @@ igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t
             return igraph_i_local_scan_1_directed_all(graph, res, weights);
         }
     } else {
-        if (weights) {
-            return igraph_i_local_scan_1_sumweights(graph, res, weights);
-        } else {
-            return igraph_local_scan_k_ecount(graph, 1, res, weights, mode);
-        }
+        return igraph_local_scan_k_ecount(graph, 1, res, weights, mode);
     }
 }
 

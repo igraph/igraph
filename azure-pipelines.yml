@@ -76,7 +76,7 @@ jobs:
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
 
-  - job: linux_clang_15
+  - job: linux_clang_17
     pool:
       vmImage: 'ubuntu-22.04'
     steps:
@@ -84,13 +84,13 @@ jobs:
           sudo apt-get install ninja-build ccache -y
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 15
+          sudo ./llvm.sh 17
         displayName: Install dependencies
 
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-15  -DCMAKE_CXX_COMPILER=clang++-15'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-17  -DCMAKE_CXX_COMPILER=clang++-17'
 
   - job: linux_x87
     steps:

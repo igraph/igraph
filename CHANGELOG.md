@@ -21,6 +21,7 @@
  - HRG functions now require a graph with at least 3 vertices; previous versions crashed with smaller graphs.
  - `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, i.e. the ARPACK interface in igraph, are now interruptible. As a result, several other functions that rely on ARPACK (eigenvector centrality, hub and authority scores, etc.) also became interruptible.
  - `igraph_get_shortest_paths_dijkstra()`, `igraph_get_all_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` now validate the `from` vertex.
+ - Fixed bugs in `igraph_local_scan_1_ecount()` for weighted undirected graphs which would miscount loops and multi-edges.
 
 ### Deprecated
 
