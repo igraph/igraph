@@ -202,27 +202,20 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
          */
         if (D.size() > 2) {
 
-            /*
-             *  Purpose is to fetch the count of number of times scan in the DP table is necessary.
-             *  The formula |C| combination (D.size - 1) where combination is mathematical combination
-             *  and C is steiner terminal set with one element removed.
-             */
-            igraph_integer_t numElementsScan = Combination(len, D.size() - 1);
+           /*
+                We iterate through the subset D and split it into E and F where E is singleton set during every iteration.
+                This process leads to find out value where distance (E,k) + (F,k) is minimum.
+           */
             igraph_real_t min_value = IGRAPH_INFINITY;
-
-            igraph_integer_t holder = fetchIndexofMapofSets(D, subsetMap);
-            for (igraph_integer_t i = 1; i <= numElementsScan; i++) {
-
-                // retrieving the set associated with index = holder - i from subsetMap
-                IGRAPH_ALLOW_INTERRUPTION();
-                int_set F = fetchSetsBasedonIndex(holder - i, subsetMap);
-
+            igraph_integer_t D_size = D.size();
+            for (igraph_integer_t i = 0; i < D_size; i++) {
+                igraph_integer_t E_raw = *next(D.begin(), i);  
+                int_set F;
                 int_set E;
-
-                std::set_difference(D.begin(), D.end(), F.begin(), F.end(), std::inserter(E, E.end()));
-
-                igraph_real_t temp_value = MATRIX(*dp_cache, *E.begin(), k) + MATRIX(*dp_cache, holder - i, k);
-
+                E.insert(E_raw);
+                std::set_difference(D.begin(), D.end(), E.begin(), E.end(), std::inserter(F, F.end()));
+                igraph_integer_t indexF = fetchIndexofMapofSets(D, subsetMap);
+                igraph_real_t temp_value = MATRIX(*dp_cache,*E.begin(), k) + MATRIX(*dp_cache, indexF, k);
                 if (temp_value < min_value) {
                     min_value = temp_value;
                     min_E_value = *E.begin();
@@ -447,6 +440,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
     /*
+     * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1)
+     * 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1) is number of subsets.
      * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1)
      * 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1) is number of subsets.
      */

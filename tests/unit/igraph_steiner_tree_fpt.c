@@ -276,10 +276,10 @@ int main(void)
     igraph_t g;
     igraph_vector_int_t terminals;
     igraph_full(&g, 10, IGRAPH_UNDIRECTED, 0);
+    printf("\nA graph with n-1 terminals:\n");
     igraph_vector_int_init_int(&terminals, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8);
     igraph_vector_int_init(&tree_edges, 0);
     igraph_steiner_dreyfus_wagner(&g, &terminals, NULL, &value, &tree_edges);
-    printf("\n");
     igraph_vector_int_print(&tree_edges);
     printf("value: %f", value);
     igraph_destroy(&g);
