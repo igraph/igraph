@@ -172,8 +172,6 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
     int_set C = fetchSetsBasedonIndex(indexD, subsetMap);
     // Initially the value of m is the vertex that was removed from Steiner Terminals
     igraph_integer_t m = q;
-
-    igraph_integer_t len = C.size();
     int_set D = C;
 
     while (D.size() > 1) {
