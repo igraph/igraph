@@ -21,8 +21,7 @@
 void print_and_destroy(igraph_t *g, igraph_integer_t order, igraph_neimode_t mode) {
     igraph_t res;
     igraph_graph_power(g, &res, order, mode);
-    // TODO should be print_graph_canon
-    print_graph(&res);
+    print_graph_canon(&res);
     igraph_destroy(&res);
 }
 
