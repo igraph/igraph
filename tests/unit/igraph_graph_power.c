@@ -22,11 +22,16 @@ void print_and_destroy(igraph_t *g, igraph_integer_t order, igraph_neimode_t mod
     igraph_t res;
     igraph_graph_power(g, &res, order, mode);
     print_graph_canon(&res);
+    if (order == 0) {
+        print_attributes(&res);
+    }
     igraph_destroy(&res);
 }
 
 int main(void) {
     igraph_t g;
+
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     printf("Graph with no vertices:\n");
     igraph_small(&g, IGRAPH_UNDIRECTED, 0, -1);
@@ -35,7 +40,12 @@ int main(void) {
 
     printf("Directed graph with loops and multiple edges, order 0, IGRAPH_OUT:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
+    SETGAB(&g, "bool_graph_attr", 1);
+    SETEAB(&g, "bool_edge_attr", 0, 1);
+    SETVAB(&g, "bool_vertex_attr", 0, 1);
+
     print_and_destroy(&g, 0, IGRAPH_OUT);
+
     printf("Same graph, order 1:\n");
     print_and_destroy(&g, 1, IGRAPH_OUT);
 

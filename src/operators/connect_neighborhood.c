@@ -165,7 +165,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
 
 /**
  * \function igraph_graph_power
- * \brief connect each vertex to its neighborhood.
+ * \brief Connect each vertex to its neighborhood.
  *
  * This function adds new edges to the input graph. Each vertex is connected
  * to all vertices reachable by at most \p order steps from it
@@ -187,9 +187,6 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  *    considered as an undirected one.
  * \return Error code.
  *
- * \sa \ref igraph_square_lattice() uses this function to connect the
- * neighborhood of the vertices.
- *
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
  * graph, d is the average degree and k is the \p order argument.
  */
@@ -209,8 +206,12 @@ igraph_error_t igraph_graph_power(igraph_t *graph, igraph_t *res, igraph_integer
     }
 
     if (order == 0) {
-        //TODO this handles attributes incorrectly, I guess you want all the graph and vertex attributes to remain the same?
-        IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
+        if (igraph_has_attribute_table()) {
+            IGRAPH_CHECK(igraph_copy(res, graph));
+            igraph_delete_edges(res, igraph_ess_all(IGRAPH_EDGEORDER_ID));
+        } else {
+            IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
+        }
         return IGRAPH_SUCCESS;
     }
 
@@ -226,7 +227,7 @@ igraph_error_t igraph_graph_power(igraph_t *graph, igraph_t *res, igraph_integer
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     if (added == 0) {
-        IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+        IGRAPH_ERROR("Cannot take the graph power.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
     }
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);

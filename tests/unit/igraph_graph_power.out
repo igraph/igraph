@@ -8,6 +8,14 @@ directed: true
 vcount: 6
 edges: {
 }
+bool_graph_attr=1
+Vertex 0: bool_vertex_attr=1
+Vertex 1: bool_vertex_attr=0
+Vertex 2: bool_vertex_attr=0
+Vertex 3: bool_vertex_attr=0
+Vertex 4: bool_vertex_attr=0
+Vertex 5: bool_vertex_attr=0
+
 Same graph, order 1:
 directed: true
 vcount: 6
