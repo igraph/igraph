@@ -190,7 +190,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
  * graph, d is the average degree and k is the \p order argument.
  */
-igraph_error_t igraph_graph_power(igraph_t *graph, igraph_t *res, igraph_integer_t order,
+igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res, igraph_integer_t order,
                                 igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
