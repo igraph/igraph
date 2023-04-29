@@ -55,10 +55,10 @@ int main(void) {
     printf("Same starting graph, order 12, IGRAPH_IN:\n");
     print_and_destroy(&g, 12, IGRAPH_IN);
 
-    printf("Same starting graph, but undirected, order 3, IGRAPH_OUT:\n");
+    printf("Same starting graph, but undirected, order 2, IGRAPH_OUT:\n");
     igraph_destroy(&g);
     igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    print_and_destroy(&g, 3, IGRAPH_OUT);
+    print_and_destroy(&g, 2, IGRAPH_OUT);
 
     VERIFY_FINALLY_STACK();
 

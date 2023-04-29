@@ -98,7 +98,7 @@ edges: {
 2 4
 0 4
 }
-Same starting graph, but undirected, order 3, IGRAPH_OUT:
+Same starting graph, but undirected, order 2, IGRAPH_OUT:
 directed: false
 vcount: 6
 edges: {
