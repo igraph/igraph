@@ -8,6 +8,11 @@ directed: true
 vcount: 6
 edges: {
 }
+Directed graph with loops and multiple edges, order 0, IGRAPH_OUT, with attributes set:
+directed: true
+vcount: 6
+edges: {
+}
 bool_graph_attr=1
 Vertex 0: bool_vertex_attr=1
 Vertex 1: bool_vertex_attr=0
