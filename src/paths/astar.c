@@ -123,7 +123,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
         heuristic = null_heuristic;
     }
 
-    if (0 && weights) { /* If there are no weights, they are treated as 1. */
+    if (weights) { /* If there are no weights, they are treated as 1. */
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
                           IGRAPH_EINVAL, igraph_vector_size(weights), no_of_edges);
