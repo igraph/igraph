@@ -155,8 +155,6 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
         IGRAPH_ERROR("Graph too large for walktrap community detection.", IGRAPH_EINVAL);
     }
 
-    int max_vertex = no_of_nodes - 1;
-
     Edge_list EL;
 
     for (igraph_integer_t i = 0; i < no_of_edges; i++) {
@@ -164,7 +162,7 @@ igraph_error_t Graph::convert_from_igraph(const igraph_t *graph,
         EL.add(IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i), w);
     }
 
-    G.nb_vertices = max_vertex + 1;
+    G.nb_vertices = no_of_nodes;
     G.vertices = new Vertex[G.nb_vertices];
     G.nb_edges = 0;
     G.total_weight = 0.0;

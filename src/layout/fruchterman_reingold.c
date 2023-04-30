@@ -343,7 +343,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
  *        IGRAPH_LAYOUT_AUTOGRID. The last one uses the grid based
  *        version only for large graphs, currently the ones with
  *        more than 1000 vertices.
- * \param weight Pointer to a vector containing edge weights,
+ * \param weights Pointer to a vector containing edge weights,
  *        the attraction along the edges will be multiplied by these.
  *        Weights must be positive.
  *        It will be ignored if it is a null-pointer.
@@ -370,7 +370,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                        igraph_integer_t niter,
                                        igraph_real_t start_temp,
                                        igraph_layout_grid_t grid,
-                                       const igraph_vector_t *weight,
+                                       const igraph_vector_t *weights,
                                        const igraph_vector_t *minx,
                                        const igraph_vector_t *maxx,
                                        const igraph_vector_t *miny,
@@ -390,10 +390,10 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                      "Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
-    if (weight && igraph_vector_size(weight) != no_edges) {
+    if (weights && igraph_vector_size(weights) != no_edges) {
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
-    if (weight && no_edges > 0 && igraph_vector_min(weight) <= 0) {
+    if (weights && no_edges > 0 && igraph_vector_min(weights) <= 0) {
         IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
@@ -426,10 +426,10 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
 
     if (grid == IGRAPH_LAYOUT_GRID) {
         return igraph_layout_i_grid_fr(graph, res, use_seed, niter, start_temp,
-                                       weight, minx, maxx, miny, maxy);
+                                       weights, minx, maxx, miny, maxy);
     } else {
         return igraph_layout_i_fr(graph, res, use_seed, niter, start_temp,
-                                  weight, minx, maxx, miny, maxy);
+                                  weights, minx, maxx, miny, maxy);
     }
 }
 
@@ -452,7 +452,7 @@ igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  *        of movement alloved along one axis, within one step, for a
  *        vertex. Currently it is decreased linearly to zero during
  *        the iteration.
- * \param weight Pointer to a vector containing edge weights,
+ * \param weights Pointer to a vector containing edge weights,
  *        the attraction along the edges will be multiplied by these.
  *        Weights must be positive.
  *        It will be ignored if it is a null-pointer.
@@ -486,7 +486,7 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         igraph_bool_t use_seed,
         igraph_integer_t niter,
         igraph_real_t start_temp,
-        const igraph_vector_t *weight,
+        const igraph_vector_t *weights,
         const igraph_vector_t *minx,
         const igraph_vector_t *maxx,
         const igraph_vector_t *miny,
@@ -514,10 +514,10 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
                      "Fruchterman-Reingold layout", IGRAPH_EINVAL);
     }
 
-    if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
-    if (weight && no_edges > 0 && igraph_vector_min(weight) <= 0) {
+    if (weights && no_edges > 0 && igraph_vector_min(weights) <= 0) {
         IGRAPH_ERROR("Weights must be positive for Fruchterman-Reingold layout.", IGRAPH_EINVAL);
     }
 
@@ -633,7 +633,7 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
             igraph_real_t dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             igraph_real_t dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             igraph_real_t dz = MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
-            igraph_real_t w = weight ? VECTOR(*weight)[e] : 1.0;
+            igraph_real_t w = weights ? VECTOR(*weights)[e] : 1.0;
             igraph_real_t dlen = sqrt(dx * dx + dy * dy + dz * dz) * w;
             VECTOR(dispx)[v] -= (dx * dlen);
             VECTOR(dispy)[v] -= (dy * dlen);

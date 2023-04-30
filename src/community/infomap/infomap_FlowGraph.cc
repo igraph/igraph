@@ -50,8 +50,7 @@ FlowGraph::FlowGraph(igraph_integer_t n, const igraph_vector_t *v_weights) {
     init(n, v_weights);
 }
 
-/* Build the graph from igraph_t object
- */
+/* Build the graph from igraph_t object */
 FlowGraph::FlowGraph(const igraph_t *graph,
                      const igraph_vector_t *e_weights,
                      const igraph_vector_t *v_weights) {
@@ -82,6 +81,8 @@ FlowGraph::FlowGraph(const igraph_t *graph,
         }
 
         // Populate node from igraph_graph
+        // Negative edge weights were checked for already.
+        // We skip adding zero-weight edges.
         if (linkWeight > 0.0) {
             if (from != to) {
                 node[from].outLinks.push_back(make_pair(to, linkWeight));

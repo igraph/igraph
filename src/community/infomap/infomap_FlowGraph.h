@@ -27,14 +27,16 @@
 
 #include "infomap_Node.h"
 
-#include "igraph_interface.h"
+#include "igraph_datatype.h"
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 #include <vector>
 #include <set>
 #include <cmath>
 
 inline double plogp(double x) {
-    return x > 0.0 ? x*log(x) : 0.0;
+    return x > 0.0 ? x*std::log(x) : 0.0;
 }
 
 class FlowGraph {

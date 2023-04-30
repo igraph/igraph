@@ -422,7 +422,7 @@ igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 
 /**
  * \function igraph_induced_subgraph_edges
- * \brief The edges contained within an induced sugraph.
+ * \brief The edges contained within an induced subgraph.
  *
  * This function finds the IDs of those edges which connect vertices from
  * a given list, passed in the \p vids parameter.
@@ -490,7 +490,7 @@ igraph_error_t igraph_induced_subgraph_edges(const igraph_t *graph, igraph_vs_t 
 /**
  * \ingroup structural
  * \function igraph_subgraph_edges
- * \brief Creates a subgraph with the specified edges and their endpoints.
+ * \brief Creates a subgraph with the specified edges and their endpoints (deprecated alias).
  *
  * \deprecated-by igraph_subgraph_from_edges 0.10.3
  */
@@ -506,11 +506,10 @@ igraph_error_t igraph_subgraph_edges(
  * \function igraph_subgraph_from_edges
  * \brief Creates a subgraph with the specified edges and their endpoints.
  *
- * </para><para>
  * This function collects the specified edges and their endpoints to a new
- * graph.
- * As the vertex IDs in a graph always start with zero, this function
- * very likely needs to reassign IDs to the vertices.
+ * graph. As the vertex IDs in a graph always start with zero, this function
+ * very likely needs to reassign IDs to the vertices. Attributes are preserved.
+ *
  * \param graph The graph object.
  * \param res The subgraph, another graph object will be stored here,
  *        do \em not initialize this object before calling this

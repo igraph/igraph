@@ -2,6 +2,34 @@
 
 ## [master]
 
+### Changes
+
+ - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
+ - `igraph_isomorphic()` now supports multigraphs.
+
+### Fixed
+
+ - `igraph_hub_and_authority_scores()`, `igraph_hub_score()` and `igraph_authority_score()` considered self-loops only once on the diagonal of the adjacency matrix of undirected graphs, thus the result was not identical to that obtained by `igraph_eigenvector_centrality()` on loopy undirected graphs. This is now corrected.
+ - `igraph_community_infomap()` now checks edge and vertex weights for validity.
+ - `igraph_minimum_spanning_tree()` and `igraph_minimum_spanning_tree_prim()` now check that edge weights are not NaN.
+ - Fixed an initialization error in the string attribute combiner of the C attribute handler.
+ - Fixed an issue with the weighted clique number calculation when all the weights were the same.
+ - HRG functions now require a graph with at least 3 vertices; previous versions crashed with smaller graphs.
+ - `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, i.e. the ARPACK interface in igraph, are now interruptible. As a result, several other functions that rely on ARPACK (eigenvector centrality, hub and authority scores, etc.) also became interruptible.
+ - `igraph_get_shortest_paths_dijkstra()`, `igraph_get_all_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` now validate the `from` vertex.
+ - Fixed bugs in `igraph_local_scan_1_ecount()` for weighted undirected graphs which would miscount loops and multi-edges.
+
+### Deprecated
+
+- `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
+- `igraph_hub_score()` and `igraph_authority_score()` are now deprecated. Use `igraph_hub_and_authority_scores()` instead.
+- `igraph_get_incidence()` is now deprecated; its new name is `igraph_get_biadjacency()` to reflect that the returned matrix is an _adjacency_ matrix between pairs of vertices and not an _incidence_ matrix between vertices and edges. The new name is kept available until at least igraph 0.11. We plan to re-use the name in later versions to provide a proper incidence matrix where the rows are vertices and the columns are edges.
+
+### Other
+
+ - Improved performance for `igraph_vertex_connectivity()`.
+ - Documentation improvements.
+
 ## [0.10.4] - 2023-01-26
 
 ### Added

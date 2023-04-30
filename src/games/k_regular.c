@@ -34,10 +34,11 @@
  *
  * </para><para>
  * Currently, this game simply uses \ref igraph_degree_sequence_game with
- * the \c SIMPLE_NO_MULTIPLE method and appropriately constructed degree sequences.
- * Thefore, it does not sample uniformly: while it can generate all k-regular graphs
- * with the given number of vertices, it does not generate each one with the same
- * probability.
+ * the \c IGRAPH_DEGSEQ_CONFIGURATION or the \c IGRAPH_DEGSEQ_FAST_SIMPLE
+ * method and appropriately constructed degree sequences.
+ * Thefore, it does not sample uniformly: while it can generate all k-regular
+ * graphs with the given number of vertices, it does not generate each one with
+ * the same probability.
  *
  * \param graph        Pointer to an uninitialized graph object.
  * \param no_of_nodes  The number of nodes in the generated graph.

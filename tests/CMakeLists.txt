@@ -176,7 +176,8 @@ add_examples(
   igraph_barabasi_game2
   igraph_create
   igraph_degree_sequence_game
-  igraph_erdos_renyi_game
+  igraph_erdos_renyi_game_gnm
+  igraph_erdos_renyi_game_gnp
   igraph_full
   igraph_grg_game
   igraph_kary_tree
@@ -193,7 +194,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   constructor-failure
-  erdos_renyi_game
+  erdos_renyi_game_gnm
   erdos_renyi_game_gnp
   full
   igraph_adjacency
@@ -447,6 +448,7 @@ add_legacy_tests(
   bliss_automorphisms
   igraph_get_isomorphisms_vf2
   igraph_get_subisomorphisms_vf2
+  igraph_isomorphic
   igraph_isomorphic_vf2
   igraph_subisomorphic
   igraph_subisomorphic_lad
@@ -599,6 +601,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_all_st_mincuts
   igraph_dominator_tree
   igraph_st_mincut_value
   igraph_vertex_disjoint_paths
@@ -678,6 +681,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_clique_size_hist
+  igraph_maximal_cliques
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
@@ -758,8 +762,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
-  igraph_get_incidence
-  igraph_incidence
+  igraph_biadjacency
+  igraph_get_biadjacency
 )
 
 # centralization.at
@@ -794,6 +798,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_cohesive_blocks
+  igraph_minimum_size_separators
 )
 
 add_legacy_tests(
@@ -965,8 +970,10 @@ add_benchmarks(
   igraph_coloring
   igraph_decompose
   igraph_degree
+  igraph_degree_sequence_game
   igraph_distances
   igraph_ecc
+  igraph_induced_subgraph_edges
   igraph_layout_umap
   igraph_matrix_transpose
   igraph_maximal_cliques
@@ -977,6 +984,7 @@ add_benchmarks(
   igraph_qsort
   igraph_random_walk
   igraph_transitivity
+  igraph_vertex_connectivity
   igraph_voronoi
   error_checking
   inc_vs_adj

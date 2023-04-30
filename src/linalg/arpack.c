@@ -23,6 +23,8 @@
 */
 
 #include "igraph_arpack.h"
+
+#include "core/interruption.h"
 #include "linalg/arpack_internal.h"
 
 #include "igraph_memory.h"
@@ -1054,6 +1056,8 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     while (1) {
         igraph_real_t *from, *to;
 
+        IGRAPH_ALLOW_INTERRUPTION();
+
 #ifdef HAVE_GFORTRAN
         igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1068,6 +1072,9 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                       options->iparam, options->ipntr,
                       workd, workl, &options->lworkl, &options->info);
 #endif
+        /* When there is a non-zero error code in options->info, we expect that
+         * ARPACK requests a termination of the iteration by setting ido=99. */
+        IGRAPH_ASSERT(ido == 99 || options->info == 0);
 
         if (ido == -1 || ido == 1) {
             from = workd + options->ipntr[0] - 1;
@@ -1329,6 +1336,8 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     while (1) {
         igraph_real_t *from, *to;
 
+        IGRAPH_ALLOW_INTERRUPTION();
+
 #ifdef HAVE_GFORTRAN
         igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1343,6 +1352,9 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                       options->iparam, options->ipntr,
                       workd, workl, &options->lworkl, &options->info);
 #endif
+        /* When there is a non-zero error code in options->info, we expect that
+         * ARPACK requests a termination of the iteration by setting ido=99. */
+        IGRAPH_ASSERT(ido == 99 || options->info == 0);
 
         if (ido == -1 || ido == 1) {
             from = workd + options->ipntr[0] - 1;

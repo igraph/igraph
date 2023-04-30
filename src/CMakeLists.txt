@@ -178,6 +178,7 @@ add_library(
   connectivity/separators.c
 
   flow/flow.c
+  flow/flow_conversion.c
   flow/st-cuts.c
 
   hrg/hrg_types.cc

@@ -57,10 +57,9 @@ static igraph_error_t igraph_i_average_path_length_unweighted(
 
     *res = 0;
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (already_added == 0) {
-        IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for average path length.");
     IGRAPH_FINALLY(igraph_free, already_added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(
@@ -743,9 +742,7 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
         igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
         already_counted = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-        if (already_counted == 0) {
-            IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(already_counted, "Insufficient memory for local efficiency calculation.");
         IGRAPH_FINALLY(igraph_free, already_counted);
 
         IGRAPH_CHECK(igraph_adjlist_init(
@@ -778,15 +775,15 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
         igraph_2wheap_t Q;
 
         if (igraph_vector_size(weights) != no_of_edges) {
-            IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector length does not match the number of edges.", IGRAPH_EINVAL);
         }
         if (no_of_edges > 0) {
             igraph_real_t min = igraph_vector_min(weights);
             if (min < 0) {
-                IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+                IGRAPH_ERRORF("Weights must not be negative, got %g.", IGRAPH_EINVAL, min);
             }
             else if (isnan(min)) {
-                IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
             }
         }
 
@@ -981,10 +978,9 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
         dirmode = IGRAPH_ALL;
     }
     already_added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (already_added == 0) {
-        IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for diameter calculation.");
     IGRAPH_FINALLY(igraph_free, already_added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));

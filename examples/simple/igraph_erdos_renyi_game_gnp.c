@@ -7,12 +7,12 @@ int main(void) {
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make program deterministic */
 
-    /* Sample a graph from the Erdős-Rényi G(n,m) model */
+    /* Sample a graph from the Erdős-Rényi G(n,p) model */
 
-    igraph_erdos_renyi_game(
-                &graph, IGRAPH_ERDOS_RENYI_GNM,
-                /* n= */ 100, /* m= */ 100,
-                IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    igraph_erdos_renyi_game_gnp(
+        &graph, /* n= */ 100, /* p= */ 0.01,
+        IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS
+    );
 
     /* Compute the fraction of vertices contained within the largest connected component */
 

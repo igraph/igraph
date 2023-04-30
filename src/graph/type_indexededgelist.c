@@ -1334,11 +1334,11 @@ igraph_error_t igraph_degree(const igraph_t *graph, igraph_vector_int_t *res,
         igraph_integer_t start2 = VECTOR(graph->is)[xto]; \
         igraph_integer_t end2 = VECTOR(graph->is)[xto+1]; \
         igraph_integer_t N2 = end2; \
-        igraph_integer_t *nullptr = 0; \
+        igraph_integer_t *nullpointer = NULL; \
         if (end-start < end2-start2) { \
-            BINSEARCH(start, end, xto, graph->oi, graph->to, N, eid, nullptr); \
+            BINSEARCH(start, end, xto, graph->oi, graph->to, N, eid, nullpointer); \
         } else { \
-            BINSEARCH(start2, end2, xfrom, graph->ii, graph->from, N2, eid, nullptr); \
+            BINSEARCH(start2, end2, xfrom, graph->ii, graph->from, N2, eid, nullpointer); \
         } \
     } while (0)
 

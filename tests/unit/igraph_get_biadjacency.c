@@ -26,8 +26,8 @@ void call_and_print(igraph_t *graph, igraph_vector_bool_t *types) {
     igraph_matrix_init(&result, 0, 0);
     igraph_vector_int_init(&row_ids, 0);
     igraph_vector_int_init(&col_ids, 0);
-    IGRAPH_ASSERT(igraph_get_incidence(graph, types, &result, &row_ids, &col_ids) == IGRAPH_SUCCESS);
-    printf("Incidence matrix:\n");
+    IGRAPH_ASSERT(igraph_get_biadjacency(graph, types, &result, &row_ids, &col_ids) == IGRAPH_SUCCESS);
+    printf("Bipartite adjacency matrix:\n");
     print_matrix(&result);
     printf("Row ids:\n");
     print_vector_int(&row_ids);
@@ -71,7 +71,7 @@ int main(void) {
     VERIFY_FINALLY_STACK();
 
     printf("Checking wrong type vector size error handling.\n");
-    CHECK_ERROR(igraph_get_incidence(&g_mu, &t_0, &result, NULL, NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_get_biadjacency(&g_mu, &t_0, &result, NULL, NULL), IGRAPH_EINVAL);
 
     igraph_destroy(&g_0);
     igraph_destroy(&g_1);

@@ -291,14 +291,23 @@ igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_
 
 /**
  * \function igraph_automorphisms
+ * \brief Number of automorphisms using Bliss (deprecated alias).
+ *
+ * \deprecated-by igraph_count_automorphisms 0.10.5
+ */
+igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
+                                    igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+    return igraph_count_automorphisms(graph, colors, sh, info);
+}
+
+/**
+ * \function igraph_count_automorphisms
  * \brief Number of automorphisms using Bliss.
  *
  * The number of automorphisms of a graph is computed using Bliss. The
  * result is returned as part of the \p info structure, in tag \c
  * group_size. It is returned as a string, as it can be very high even
- * for relatively small graphs. If the GNU MP library is used then
- * this number is exact, otherwise a <type>long double</type> is used
- * and it is only approximate. See also \ref igraph_bliss_info_t.
+ * for relatively small graphs. See also \ref igraph_bliss_info_t.
  *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
@@ -313,7 +322,7 @@ igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
+igraph_error_t igraph_count_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
                          igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);

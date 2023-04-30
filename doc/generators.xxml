@@ -20,6 +20,8 @@
 <!-- doxrox-include igraph_star -->
 <!-- doxrox-include igraph_wheel -->
 <!-- doxrox-include igraph_square_lattice -->
+<!-- doxrox-include igraph_triangular_lattice -->
+<!-- doxrox-include igraph_hexagonal_lattice -->
 <!-- doxrox-include igraph_ring -->
 <!-- doxrox-include igraph_kary_tree -->
 <!-- doxrox-include igraph_symmetric_tree -->
@@ -45,7 +47,8 @@
 <!-- doxrox-include about_games -->
 <!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->
-<!-- doxrox-include igraph_erdos_renyi_game -->
+<!-- doxrox-include igraph_erdos_renyi_game_gnm -->
+<!-- doxrox-include igraph_erdos_renyi_game_gnp -->
 <!-- doxrox-include igraph_watts_strogatz_game -->
 <!-- doxrox-include igraph_rewire_edges -->
 <!-- doxrox-include igraph_rewire_directed_edges -->
@@ -77,6 +80,7 @@
 </section>
 
 <section id="deprecated-graph-generators"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_erdos_renyi_game -->
 <!-- doxrox-include igraph_lattice -->
 <!-- doxrox-include igraph_tree -->
 </section>

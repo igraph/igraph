@@ -174,7 +174,7 @@ igraph_kautz:
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
 
 igraph_famous:
-    PARAMS: OUT GRAPH graph, CSTRING name=""
+    PARAMS: OUT GRAPH graph, CSTRING name
 
 igraph_lcf_vector:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
@@ -224,11 +224,6 @@ igraph_barabasi_game:
         BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG,
         OPTIONAL GRAPH start_from
 
-igraph_erdos_renyi_game:
-    PARAMS: |-
-        OUT GRAPH graph, ERDOS_RENYI_TYPE type, INTEGER n, REAL p_or_m,
-        BOOLEAN directed=False, BOOLEAN loops=False
-
 igraph_erdos_renyi_game_gnp:
     PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
 
@@ -238,7 +233,7 @@ igraph_erdos_renyi_game_gnm:
 igraph_degree_sequence_game:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,
-        DEGSEQ_MODE method=SIMPLE
+        DEGSEQ_MODE method=CONFIGURATION
 
 igraph_growing_random_game:
     PARAMS: |-
@@ -562,7 +557,7 @@ igraph_distances_floyd_warshall:
         GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
         VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
         FWALGORITHM method
-    DEPS: weights ON graph
+    DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_voronoi:
     PARAMS: |-
@@ -775,7 +770,7 @@ igraph_ecc:
 igraph_reciprocity:
     PARAMS: |-
         GRAPH graph, OUT REAL res, BOOLEAN ignore_loops=True,
-        RECIP mode=Default
+        RECIP mode=DEFAULT
 
 igraph_constraint:
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL, OPTIONAL EDGEWEIGHTS weights
@@ -1141,13 +1136,13 @@ igraph_create_bipartite:
         OUT GRAPH graph, IN BIPARTITE_TYPES types,
         VECTOR_INT edges, BOOLEAN directed=False
 
-igraph_incidence:
+igraph_biadjacency:
     PARAMS: |-
         OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
-igraph_get_incidence:
+igraph_get_biadjacency:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
@@ -1546,6 +1541,7 @@ igraph_community_spinglass:
         INTEGER spins=25, BOOLEAN parupdate=False, REAL starttemp=1, REAL stoptemp=0.01,
         REAL coolfact=0.99, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0,
         SPINGLASS_IMPLEMENTATION implementation=ORIG, REAL lambda=1.0
+    DEPS: weights ON graph
 
 igraph_community_spinglass_single:
     PARAMS: |-
@@ -1553,6 +1549,7 @@ igraph_community_spinglass_single:
         OUT VECTOR_INT community, OUT REAL cohesion, OUT REAL adhesion,
         OUT INTEGER inner_links, OUT INTEGER outer_links,
         INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
+    DEPS: weights ON graph
 
 igraph_community_walktrap:
     PARAMS: |-

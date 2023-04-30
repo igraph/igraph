@@ -204,6 +204,12 @@ static igraph_error_t igraph_i_hrg_getgraph(const igraph_t *igraph,
         IGRAPH_ERROR("Graph too large for the HRG module.", IGRAPH_EOVERFLOW);
     }
 
+    // TODO: Can this be relaxed? buildDendrogram() creates a tree with n-2 internal edges,
+    // i.e. zero internal edges for a 2-vertex graph. This is not handled at the moment.
+    if (no_of_nodes < 3) {
+        IGRAPH_ERROR("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL);
+    }
+
     // Create graph
     d->g = new graph((int) no_of_nodes);
 
@@ -237,6 +243,11 @@ static igraph_error_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
 
     if (no_of_nodes > INT_MAX) {
         IGRAPH_ERROR("Graph too large for the HRG module.", IGRAPH_EOVERFLOW);
+    }
+
+    // TODO: See analogous TODO item in igraph_i_hrg_getgraph()
+    if (no_of_nodes < 3) {
+        IGRAPH_ERROR("Graph must have at least 3 vertices for HRG, got only %" IGRAPH_PRId " vertices.", IGRAPH_EINVAL);
     }
 
     // Create graphs
@@ -408,36 +419,32 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    dendro *d;
 
     RNG_BEGIN();
 
-    d = new dendro;
+    dendro d;
 
     // If we want to start from HRG
     if (start) {
         if (igraph_hrg_size(hrg) != no_of_nodes) {
-            delete d;
             IGRAPH_ERROR("Invalid HRG to start from.", IGRAPH_EINVAL);
         }
         // Convert the igraph graph
-        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
-        d->clearDendrograph();
-        d->importDendrogramStructure(hrg);
+        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, &d));
+        d.clearDendrograph();
+        d.importDendrogramStructure(hrg);
     } else {
         // Convert the igraph graph
-        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+        IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, &d));
         IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_nodes));
     }
 
     // Run fixed number of steps, or until convergence
     if (steps > 0) {
-        IGRAPH_CHECK(markovChainMonteCarlo(d, steps, hrg));
+        IGRAPH_CHECK(markovChainMonteCarlo(&d, steps, hrg));
     } else {
-        IGRAPH_CHECK(MCMCEquilibrium_Find(d, hrg));
+        IGRAPH_CHECK(MCMCEquilibrium_Find(&d, hrg));
     }
-
-    delete d;
 
     RNG_END();
 

@@ -63,11 +63,11 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
                                               igraph_vector_int_t *multiplicity2,
                                               igraph_integer_t probe1);
 
-IGRAPH_EXPORT igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
-                                   const igraph_matrix_t *incidence, igraph_bool_t directed,
+IGRAPH_EXPORT igraph_error_t igraph_biadjacency(igraph_t *graph, igraph_vector_bool_t *types,
+                                   const igraph_matrix_t *input, igraph_bool_t directed,
                                    igraph_neimode_t mode, igraph_bool_t multiple);
 
-IGRAPH_EXPORT igraph_error_t igraph_get_incidence(const igraph_t *graph,
+IGRAPH_EXPORT igraph_error_t igraph_get_biadjacency(const igraph_t *graph,
                                        const igraph_vector_bool_t *types,
                                        igraph_matrix_t *res,
                                        igraph_vector_int_t *row_ids,
@@ -92,6 +92,18 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_v
                                             igraph_integer_t n1, igraph_integer_t n2,
                                             igraph_integer_t m, igraph_bool_t directed,
                                             igraph_neimode_t mode);
+
+/* Deprecated functions: */
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_incidence(
+   igraph_t *graph, igraph_vector_bool_t *types, const igraph_matrix_t *incidence,
+   igraph_bool_t directed, igraph_neimode_t mode, igraph_bool_t multiple
+);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_incidence(
+   const igraph_t *graph, const igraph_vector_bool_t *types, igraph_matrix_t *res,
+   igraph_vector_int_t *row_ids, igraph_vector_int_t *col_ids
+);
 
 __END_DECLS
 
