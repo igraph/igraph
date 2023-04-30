@@ -35,6 +35,7 @@ int main(void) {
     BENCH("vector fill of " TOSTRING(big) " 1s", igraph_vector_fill(&weights, 1));
 
     BENCH("50000000 vertices ring graph astar from 0 to 0, 1x", REPEAT(igraph_get_shortest_path_astar(&graph, NULL, NULL, 0, 0, &weights, IGRAPH_ALL, NULL, NULL), 1));
+    BENCH("50000000 vertices ring graph astar from 0 to " TOSTRING(big) " -1, 1x", REPEAT(igraph_get_shortest_path_astar(&graph, NULL, NULL, 0, big - 1, &weights, IGRAPH_ALL, NULL, NULL), 1));
     igraph_destroy(&graph);
 
     igraph_full(&graph, 10000, IGRAPH_UNDIRECTED, 0);
