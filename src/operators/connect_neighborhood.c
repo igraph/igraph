@@ -189,8 +189,8 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
  * graph, d is the average degree and k is the \p order argument.
  */
-igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res, igraph_integer_t order,
-                                igraph_neimode_t mode) {
+igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
+                                  igraph_integer_t order) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
@@ -215,12 +215,9 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res, igraph_i
     }
 
     IGRAPH_CHECK(igraph_copy(res, graph));
+    IGRAPH_CHECK(igraph_simplify(res, true, true, NULL));
     if (order == 1) {
         return IGRAPH_SUCCESS;
-    }
-
-    if (!igraph_is_directed(graph)) {
-        mode = IGRAPH_ALL;
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
@@ -233,7 +230,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res, igraph_i
 
     for (i = 0; i < no_of_nodes; i++) {
         added[i] = i + 1;
-        IGRAPH_CHECK(igraph_neighbors(res, &neis, i, mode));
+        IGRAPH_CHECK(igraph_neighbors(res, &neis, i, IGRAPH_OUT));
         in = igraph_vector_int_size(&neis);
         if (order > 1) {
             for (j = 0; j < in; j++) {
@@ -248,7 +245,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res, igraph_i
             igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
-            IGRAPH_CHECK(igraph_neighbors(res, &neis, actnode, mode));
+            IGRAPH_CHECK(igraph_neighbors(res, &neis, actnode, IGRAPH_OUT));
             n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
@@ -258,14 +255,9 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res, igraph_i
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
-                        if (mode != IGRAPH_ALL || i < nei) {
-                            if (mode == IGRAPH_IN) {
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                            } else {
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
-                            }
+                        if (igraph_is_directed(res) || i < nei) {
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
                         }
                     }
                 }
@@ -274,14 +266,9 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res, igraph_i
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
-                        if (mode != IGRAPH_ALL || i < nei) {
-                            if (mode == IGRAPH_IN) {
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                            } else {
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
-                            }
+                        if (igraph_is_directed(res) || i < nei) {
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
                         }
                     }
                 }
