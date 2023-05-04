@@ -64,9 +64,7 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
 
     if (dynamic_alloc) {
         tmp = IGRAPH_CALLOC(length+1, char);
-        if (tmp == NULL) {
-            IGRAPH_ERROR("Failed to parse integer.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(tmp, "Failed to parse integer.");
     } else {
         tmp = buffer;
     }
@@ -106,7 +104,7 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
 
 /* Converts a string to a real number. Throws an error if the result is not representable.
  *
- * The input is a not-necesarily-null-terminated string that must contain only the number.
+ * The input is a not-necessarily-null-terminated string that must contain only the number.
  * Any additional characters at the end of the string, such as whitespace, will trigger
  * a parsing error.
  *
@@ -126,9 +124,7 @@ igraph_error_t igraph_i_parse_real(const char *str, size_t length, igraph_real_t
 
     if (dynamic_alloc) {
         tmp = IGRAPH_CALLOC(length+1, char);
-        if (tmp == NULL) {
-            IGRAPH_ERROR("Failed to parse real number.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(tmp, "Failed to parse real number.");
     } else {
         tmp = buffer;
     }
@@ -343,9 +339,7 @@ igraph_error_t igraph_enter_safelocale(igraph_safelocale_t *loc) {
     l->original_locale = uselocale(l->c_locale);
 #else
     l->original_locale = strdup(setlocale(LC_NUMERIC, NULL));
-    if (! l->original_locale) {
-        IGRAPH_ERROR("Not enough memory.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(l->original_locale, "Not enough memory.");
 # ifdef HAVE__CONFIGTHREADLOCALE
     /* On Windows, we can enable per-thread locale */
     l->per_thread_locale = _configthreadlocale(0);
