@@ -42,7 +42,7 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     IGRAPH_ASSERT(value == value2);
 
     /* Check that the result is indeed a tree. */
-    if (igraph_vector_int_size(terminals) > 2)
+    if (igraph_vector_int_size(terminals) > 0)
     {
         igraph_t tree;
         igraph_subgraph_from_edges(graph, &tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ true);
