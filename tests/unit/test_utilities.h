@@ -159,12 +159,10 @@ void record_last_warning(const char *reason, const char *file, int line);
         IGRAPH_ASSERT(IGRAPH_SUCCESS == funcall); \
         igraph_set_warning_handler(handler); \
         if (expect_warning_ctx.observed == NULL) { \
-            printf("Expected this warning but none was raised:\n  %s\n", expected_warning); \
-            abort(); \
+            IGRAPH_FATALF("Expected this warning but none was raised:\n  %s\n", expected_warning); \
         } else if (strcmp(expect_warning_ctx.observed, expect_warning_ctx.expected)) { \
-            printf("Expected warning:\n  %s\ngot:\n  %s\n", expected_warning, expect_warning_ctx.observed); \
-            free(expect_warning_ctx.observed); \
-            abort(); \
+            IGRAPH_FATALF("Expected warning:\n  %s\ngot:\n  %s\n", expected_warning, expect_warning_ctx.observed); \
+            /* no need to free(expect_warning_ctx.observed); as previous line aborts immediately */ \
         } else { \
             free(expect_warning_ctx.observed); \
         } \
