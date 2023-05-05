@@ -275,7 +275,7 @@ igraph_error_t igraph_i_fget_real(FILE *file, igraph_real_t *value) {
  * numbers uses a decimal point instead of a comma.
  *
  * These functions attempt to set the locale only for the current thread on a best-effort
- * basis. On some platforms this is not possible, so the global locale will be changes.
+ * basis. On some platforms this is not possible, so the global locale will be changed.
  * This is not safe to do in multi-threaded programs (not even if igraph runs only in
  * a single thread).
  */
@@ -300,7 +300,7 @@ struct igraph_safelocale_s {
  *
  * igraph's foreign format readers and writers require a locale that uses a
  * decimal point instead of a decimal comma. This is a convenience function
- * that temporarily sets the C locale so that readers and writer would work
+ * that temporarily sets the C locale so that readers and writers would work
  * correctly. It \em must be paired with a call to \ref igraph_exit_safelocale(),
  * otherwise a memory leak will occur.
  *
