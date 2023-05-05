@@ -371,7 +371,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         }
     }
     /* Handle the cases of the null graph and no terminals. */
-    if (no_of_nodes == 0 || no_of_terminals == 0) {
+    if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
         igraph_vector_int_clear(res_tree);
         *res = 0.0;
         return IGRAPH_SUCCESS;
@@ -444,7 +444,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
      * 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1) is number of subsets.
      */
 
-    IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy) ) - (igraph_vector_int_size(&steiner_terminals_copy) +1 ) , no_of_nodes));
+    IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy) ) - (igraph_vector_int_size(&steiner_terminals_copy) + 1 ) , no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &dp_cache);
 
     igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
