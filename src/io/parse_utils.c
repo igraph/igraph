@@ -28,7 +28,7 @@
  *     igraph_i_trim_whitespace(str, strlen(str), &res, &len);
  *
  * This does not carry a performance penalty, as the end of the string would need to be
- * determinted anyway.
+ * determined anyway.
  */
 void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res, size_t *res_len) {
     const char *beg = str, *end = str + str_len;
@@ -43,7 +43,7 @@ void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res,
 
 /* Converts a string to an integer. Throws an error if the result is not representable.
  *
- * The input is a not-necesarily-null-terminated string that must contain only the number.
+ * The input is a not-necessarily-null-terminated string that must contain only the number.
  * Any additional characters at the end of the string, such as whitespace, will trigger
  * a parsing error.
  *

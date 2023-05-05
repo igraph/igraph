@@ -118,7 +118,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
         }
     }
 
-    /* Look for the next node that was neighter removed, not visited */
+    /* Look for the next node that was neither removed, not visited */
     while (start < no_of_nodes && VECTOR(*removed)[start]) {
         start++;
     }
