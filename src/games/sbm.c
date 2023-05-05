@@ -68,7 +68,7 @@
  * vertices, |E| is the number of edges, and K is the number of
  * groups.
  *
- * \sa \ref igraph_erdos_renyi_game() for a simple Bernoulli graph.
+ * \sa \ref igraph_erdos_renyi_game_gnp() for a simple Bernoulli graph.
  *
  */
 

@@ -42,7 +42,7 @@ type.
 </para></listitem>
 <listitem><para>
 Fourth, the <link
-linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
+linkend="igraph_erdos_renyi_game_gnm"><function>igraph_erdos_renyi_game_gnm()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
 destroys it, i.e. deallocates the memory associated to it.
@@ -114,7 +114,7 @@ not enabled in the CMake project.</para>
 
 <para>C++ support is enabled by default when no languages are explicitly
 specified in CMake's <ulink url="https://cmake.org/cmake/help/latest/command/project.html"><code>project</code></ulink>
-command, e.g. <code>project(igraph_test)</code>. If you do specify some languages explicitly, 
+command, e.g. <code>project(igraph_test)</code>. If you do specify some languages explicitly,
 make sure to also include <code>CXX</code>, e.g. <code>project(igraph_test C CXX)</code>.
 </para>
 </note>

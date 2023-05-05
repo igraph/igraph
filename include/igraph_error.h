@@ -777,8 +777,8 @@ IGRAPH_EXPORT int IGRAPH_FINALLY_STACK_SIZE(void);
  *
  * \param expr An expression, usually a call to a user-defined callback function.
  * It is guaranteed to be evaluated only once.
- * \param code Pointer to an optional variable of type \c igraph_error_t; the
- * value of this variable will be set to the error code if it is not a null
+ * \param code Pointer to an optional variable of type <type>igraph_error_t</type>;
+ * the value of this variable will be set to the error code if it is not a null
  * pointer.
  */
 #define IGRAPH_CHECK_CALLBACK(expr, code) \
@@ -852,6 +852,7 @@ typedef void igraph_warning_handler_t (const char *reason, const char *file, int
  * \brief Installs a warning handler.
  *
  * Install the supplied warning handler function.
+ *
  * \param new_handler The new warning handler function to install.
  *        Supply a null pointer here to uninstall the current
  *        warning handler, without installing a new one.
@@ -976,7 +977,7 @@ IGRAPH_EXPORT void igraph_warningf(const char *reason, const char *file, int lin
  *
  * \param reason Textual description of the error.
  * \param file The source file in which the error is noticed.
- * \param line The number of the line in the source file which triggered the error
+ * \param line The number of the line in the source file which triggered the error.
  */
 
 typedef void igraph_fatal_handler_t (const char *reason, const char *file, int line);
@@ -1046,6 +1047,7 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_NORETURN void igraph_fatalf(const char *reason, co
  * \a igraph functions can use this macro when a fatal error occurs and
  * want to pass on extra information to the user about what went wrong.
  * It calls \ref igraph_fatalf() with the proper parameters.
+ *
  * \param reason Textual description of the error, a template string
  *        with the same syntax as the standard printf C library function.
  * \param ... The additional arguments to be substituted into the

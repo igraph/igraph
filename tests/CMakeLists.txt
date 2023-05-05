@@ -176,7 +176,8 @@ add_examples(
   igraph_barabasi_game2
   igraph_create
   igraph_degree_sequence_game
-  igraph_erdos_renyi_game
+  igraph_erdos_renyi_game_gnm
+  igraph_erdos_renyi_game_gnp
   igraph_full
   igraph_grg_game
   igraph_kary_tree
@@ -193,7 +194,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   constructor-failure
-  erdos_renyi_game
+  erdos_renyi_game_gnm
   erdos_renyi_game_gnp
   full
   igraph_adjacency
@@ -448,6 +449,7 @@ add_legacy_tests(
   bliss_automorphisms
   igraph_get_isomorphisms_vf2
   igraph_get_subisomorphisms_vf2
+  igraph_isomorphic
   igraph_isomorphic_vf2
   igraph_subisomorphic
   igraph_subisomorphic_lad

@@ -224,11 +224,6 @@ igraph_barabasi_game:
         BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG,
         OPTIONAL GRAPH start_from
 
-igraph_erdos_renyi_game:
-    PARAMS: |-
-        OUT GRAPH graph, ERDOS_RENYI_TYPE type, INTEGER n, REAL p_or_m,
-        BOOLEAN directed=False, BOOLEAN loops=False
-
 igraph_erdos_renyi_game_gnp:
     PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
 
