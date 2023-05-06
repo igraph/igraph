@@ -372,6 +372,10 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     }
     /* Handle the cases of the null graph and no terminals. */
     if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
+        if (!weights) {
+            igraph_vector_destroy(&iweights);
+            IGRAPH_FINALLY_CLEAN(1);
+        }
         igraph_vector_int_clear(res_tree);
         *res = 0.0;
         return IGRAPH_SUCCESS;

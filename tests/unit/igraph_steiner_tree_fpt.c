@@ -277,16 +277,29 @@ int main(void)
     igraph_vector_int_t terminals;
     igraph_full(&g, 10, IGRAPH_UNDIRECTED, 0);
     printf("\nA graph with n-1 terminals:\n");
-    igraph_vector_int_init_int(&terminals, 1, 3);
+    igraph_vector_int_init_int(&terminals, 9, 0,1,2,3,4,5,6,7,8);
     igraph_vector_int_init(&tree_edges, 0);
     igraph_error_t x = igraph_steiner_dreyfus_wagner(&g, &terminals, NULL, &value, &tree_edges);
     IGRAPH_ASSERT(x == IGRAPH_SUCCESS);
     igraph_vector_int_print(&tree_edges);
-    printf("value: %f", value);
-    igraph_destroy(&g);
+    printf("value: %f\n", value);
+    
     igraph_vector_int_destroy(&tree_edges);
     igraph_vector_int_destroy(&terminals);
     
+
+    igraph_vector_int_t terminals_1;
+    printf("\nA graph with 1 terminal:\n");
+    igraph_vector_int_init_int(&terminals_1, 1,0);
+    igraph_vector_int_init(&tree_edges, 0);
+    igraph_error_t x1 = igraph_steiner_dreyfus_wagner(&g, &terminals_1, NULL, &value, &tree_edges);
+    IGRAPH_ASSERT(x1 == IGRAPH_SUCCESS);
+    igraph_vector_int_print(&tree_edges);
+    printf("value: %f", value);
+    igraph_destroy(&g);
+    igraph_vector_int_destroy(&tree_edges);
+    igraph_vector_int_destroy(&terminals_1);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

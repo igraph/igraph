@@ -37,3 +37,7 @@ Total Steiner tree weight: 5
 A graph with n-1 terminals:
 0 9 17 24 30 35 39 42
 value: 8.000000
+
+A graph with 1 terminal:
+
+value: 0.000000
