@@ -31,7 +31,7 @@ endif()
 if(NOT GMP_IS_VENDORED)
   target_link_libraries(
     bliss
-    PUBLIC
+    PRIVATE
     ${GMP_LIBRARY}
   )
 endif()
