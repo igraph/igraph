@@ -391,6 +391,11 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             tree_weight  += VECTOR(*pweights)[VECTOR(*res_tree)[i]];
         }
         *res = tree_weight;
+        
+        if (!weights) {
+            igraph_vector_destroy(&iweights);
+            IGRAPH_FINALLY_CLEAN(1);
+        }
 
         return IGRAPH_SUCCESS;
     }
