@@ -383,19 +383,29 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     else if (no_of_terminals == 2) {
         igraph_vector_int_t vertices;
         igraph_real_t tree_weight = 0.0;
-        
-        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vertices, res_tree, VECTOR(*terminals)[0], VECTOR(*terminals)[1],pweights, IGRAPH_ALL));
-        igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
+        igraph_vector_int_t edges_res;
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&vertices, 0);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_res, 0);
+
+        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vertices, &edges_res, VECTOR(*terminals)[0], VECTOR(*terminals)[1],pweights, IGRAPH_ALL));
+        igraph_integer_t tree_size = igraph_vector_int_size(&edges_res);
 
         for (igraph_integer_t i = 0; i < tree_size; i++) {
-            tree_weight  += VECTOR(*pweights)[VECTOR(*res_tree)[i]];
+            tree_weight  += VECTOR(*pweights)[VECTOR(edges_res)[i]];
         }
         *res = tree_weight;
         
+        IGRAPH_CHECK(igraph_vector_int_append(res_tree, &edges_res));
+
         if (!weights) {
             igraph_vector_destroy(&iweights);
             IGRAPH_FINALLY_CLEAN(1);
         }
+
+        igraph_vector_int_destroy(&vertices);
+        igraph_vector_int_destroy(&edges_res);
+        IGRAPH_FINALLY_CLEAN(2);
 
         return IGRAPH_SUCCESS;
     }
