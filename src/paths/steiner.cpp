@@ -380,6 +380,20 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         *res = 0.0;
         return IGRAPH_SUCCESS;
     }
+    else if (no_of_terminals == 2) {
+        igraph_vector_int_t vertices;
+        igraph_real_t tree_weight = 0.0;
+        
+        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vertices, res_tree, VECTOR(*terminals)[0], VECTOR(*terminals)[1],pweights, IGRAPH_ALL));
+        igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
+
+        for (igraph_integer_t i = 0; i < tree_size; i++) {
+            tree_weight  += VECTOR(*pweights)[VECTOR(*res_tree)[i]];
+        }
+        *res = tree_weight;
+
+        return IGRAPH_SUCCESS;
+    }
     /* Check whether all terminals are within the same connected component. */
     {
         igraph_vector_int_t membership;
