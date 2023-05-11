@@ -301,18 +301,19 @@ int main(void)
     igraph_vector_int_destroy(&terminals_1);
 
     igraph_vector_int_t terminals_2;
-    igraph_vector_int_t tree_edges_k;
-    igraph_vector_int_init(&tree_edges_k, 0);
+    
+    
     printf("\nA graph with 2 terminals:\n");
     igraph_vector_int_init_int(&terminals_2, 2, 1, 5);
     igraph_vector_int_init(&tree_edges, 0);
+    
     igraph_error_t x2 = igraph_steiner_dreyfus_wagner(&g, &terminals_2, NULL, &value, &tree_edges);
     IGRAPH_ASSERT(x2 == IGRAPH_SUCCESS);
-    igraph_vector_int_print(&tree_edges_k);
+    igraph_vector_int_print(&tree_edges);
     printf("value: %f", value);
     
     igraph_destroy(&g);
-    igraph_vector_int_destroy(&tree_edges_k);
+    igraph_vector_int_destroy(&tree_edges);
     igraph_vector_int_destroy(&terminals_2);
 
 
