@@ -369,7 +369,7 @@ target_include_directories(
 )
 
 if(MATH_LIBRARY)
-  target_link_libraries(igraph PRIVATE ${MATH_LIBRARY})
+  target_link_libraries(igraph PUBLIC ${MATH_LIBRARY})
 endif()
 
 if(ARPACK_LIBRARIES)
