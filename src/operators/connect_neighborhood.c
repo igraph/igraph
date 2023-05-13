@@ -166,6 +166,8 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * \function igraph_graph_power
  * \brief Connect each vertex to its neighborhood.
  *
+ * \experimental
+ *
  * This function adds new edges to the input graph. Each vertex is connected
  * to all vertices reachable by at most \p order steps from it
  * (unless a connection already existed).  In other words, the \p order power of
@@ -175,8 +177,8 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * symmetric: if vertex A can be reached from vertex B in at
  * most \p order steps, then the opposite is also true. Only one
  * undirected (A,B) edge will be added in this case.
-  *
-  * \param graph The input graph.
+ *
+ * \param graph The input graph.
  * \param res The resulting graph.
  * \param order Integer constant, it gives the distance within which
  *    the vertices will be connected to the source vertex.
