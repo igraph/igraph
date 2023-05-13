@@ -26,6 +26,8 @@
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 
+#include "graph/attributes.h"
+
 /**
  * \function igraph_connect_neighborhood
  * \brief Graph power: connect each vertex to its neighborhood.
@@ -203,11 +205,10 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
     }
 
     if (order == 0) {
+        IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
         if (igraph_has_attribute_table()) {
-            IGRAPH_CHECK(igraph_copy(res, graph));
-            igraph_delete_edges(res, igraph_ess_all(IGRAPH_EDGEORDER_ID));
-        } else {
-            IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
+            IGRAPH_I_ATTRIBUTE_DESTROY(res);
+            IGRAPH_I_ATTRIBUTE_COPY(res, graph, 1, 1, 0);
         }
         return IGRAPH_SUCCESS;
     }
