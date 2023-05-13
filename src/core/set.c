@@ -37,10 +37,11 @@
  *
  * Time complexity: O(1)
  */
-void igraph_set_init(igraph_set_t *set) {
+igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
+    return IGRAPH_SUCCESS;
 }
 
 void set_destroy_internal(struct Node* node) {
@@ -320,9 +321,7 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     }
 
     struct Node* newNode = IGRAPH_CALLOC(1, struct Node);
-    if(newNode == NULL){
         IGRAPH_CHECK_OOM(newNode, "Cannot reserve space for the new set element.");
-    }
     set->root = RB_insert(set->root, e, newNode);
     set->size++;
     return IGRAPH_SUCCESS;

@@ -787,7 +787,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_set_init(&clqdata.buckets[i]);
+        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i]));
     }
 
     igraph_vector_int_list_clear(res);
@@ -866,7 +866,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_set_init(&clqdata.buckets[i]);
+        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i]));
     }
 
     /* Do the show */
@@ -1028,7 +1028,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_set_init(&clqdata.buckets[i]);
+        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i]));
     }
 
     if (res) {

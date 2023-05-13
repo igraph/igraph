@@ -80,7 +80,7 @@ typedef struct s_set{
     do { igraph_set_init(v); \
         IGRAPH_FINALLY(igraph_set_destroy, v); } while (0)
 
-IGRAPH_PRIVATE_EXPORT void igraph_set_init(igraph_set_t* set);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_init(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT void igraph_set_destroy(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_inited(igraph_set_t* set);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_empty(const igraph_set_t* set);

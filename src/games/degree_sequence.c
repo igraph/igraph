@@ -164,7 +164,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&stubs, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&stubs, outsum));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&residual_degrees, no_of_nodes);
-    igraph_set_init(&incomplete_vertices);
+    IGRAPH_CHECK(igraph_set_init(&incomplete_vertices));
     IGRAPH_FINALLY(igraph_set_destroy, &incomplete_vertices);
 
     /* Start the RNG */
@@ -312,9 +312,9 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
     IGRAPH_CHECK(igraph_vector_int_reserve(&in_stubs, outsum));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&residual_out_degrees, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&residual_in_degrees, no_of_nodes);
-    igraph_set_init(&incomplete_out_vertices);
+    IGRAPH_CHECK(igraph_set_init(&incomplete_out_vertices));
     IGRAPH_FINALLY(igraph_set_destroy, &incomplete_out_vertices);
-    igraph_set_init(&incomplete_in_vertices);
+    IGRAPH_CHECK(igraph_set_init(&incomplete_in_vertices));
     IGRAPH_FINALLY(igraph_set_destroy, &incomplete_in_vertices);
 
     /* Start the RNG */
@@ -474,7 +474,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_undirec
         if (! set) {
             IGRAPH_ERROR("Cannot sample from configuration model (simple graphs).", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        igraph_set_init(set);
+        IGRAPH_CHECK(igraph_set_init(set));
         VECTOR(adjlist)[i] = set;
         // IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*degseq)[i]));
     }
@@ -593,7 +593,7 @@ static igraph_error_t igraph_i_degree_sequence_game_configuration_simple_directe
         if (! set) {
             IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
         }
-        igraph_set_init(set);
+        IGRAPH_CHECK(igraph_set_init(set));
         VECTOR(adjlist)[i] = set;
         // IGRAPH_CHECK(igraph_set_reserve(set, VECTOR(*out_deg)[i]));  
     }
