@@ -175,15 +175,11 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * symmetric: if vertex A can be reached from vertex B in at
  * most \p order steps, then the opposite is also true. Only one
  * undirected (A,B) edge will be added in this case.
- * \param graph The input graph.
+  *
+  * \param graph The input graph.
  * \param res The resulting graph.
  * \param order Integer constant, it gives the distance within which
  *    the vertices will be connected to the source vertex.
- * \param mode Constant, it specifies how the neighborhood search is
- *    performed for directed graphs. If \c IGRAPH_OUT then vertices
- *    reachable from the source vertex will be connected, \c IGRAPH_IN
- *    is the opposite. If \c IGRAPH_ALL then the directed graph is
- *    considered as an undirected one.
  * \return Error code.
  *
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
