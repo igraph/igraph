@@ -28,7 +28,7 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
     igraph_vector_init(&res, 0);
 
     /* First, query the similarities for all the vertices to a matrix */
-    igraph_similarity_jaccard(g, m, igraph_vss_all(), mode, loops);
+    igraph_similarity_jaccard(g, m, igraph_vss_all(), igraph_vss_all(), mode, loops);
 
     /* Second, query the similarities for all pairs using a pair vector */
     n = igraph_vcount(g);
@@ -87,7 +87,7 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
     igraph_vector_init(&res, 0);
 
     /* First, query the similarities for all the vertices to a matrix */
-    igraph_similarity_dice(g, m, igraph_vss_all(), mode, loops);
+    igraph_similarity_dice(g, m, igraph_vss_all(), igraph_vss_all(), mode, loops);
 
     /* Second, query the similarities for all pairs using a pair vector */
     n = igraph_vcount(g);
@@ -154,7 +154,10 @@ int main(void) {
         return 1;
     }
 
-    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), IGRAPH_ALL, 0);
+    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), igraph_vss_range(1,3), IGRAPH_ALL, 0);
+    print_matrix(&m);
+
+    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), igraph_vss_1(1), IGRAPH_ALL, 0);
     print_matrix(&m);
 
     ret = check_jaccard_all(&g, &m, IGRAPH_OUT, 1);
