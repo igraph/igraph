@@ -45,6 +45,7 @@ enum COLOR {RED,BLACK};
 struct Node
 {
     igraph_integer_t data;
+    igraph_integer_t index;
     struct Node* left;
     struct Node* right;
     struct Node* parent;
@@ -57,7 +58,8 @@ struct Stack
     enum STACK_MODE mode;
 } ;
 
-#define STACK_LENGTH 20
+#define IGRAPH_SET_PARAMETER_STACK_LENGTH 20
+#define IGRAPH_SET_PARAMETER_STARTING_CAPACITY 100
 /*
 Stack length need to be greater than the depth of the rb-tree and 
 it not possible to make a tree with 2^20 Nodes so this number can be reduced futher.
@@ -65,13 +67,16 @@ it not possible to make a tree with 2^20 Nodes so this number can be reduced fut
 
 typedef struct s_set_itertor
 {
-    struct Stack stack[STACK_LENGTH];
+    struct Stack stack[IGRAPH_SET_PARAMETER_STACK_LENGTH];
     igraph_integer_t stack_index;
 } igraph_set_iterator_t;
 
 typedef struct s_set{
     struct Node* root;
     igraph_integer_t size;
+    struct Node* pool;
+    igraph_integer_t capacity;
+    
 } igraph_set_t;
 
 
@@ -90,6 +95,7 @@ IGRAPH_PRIVATE_EXPORT void igraph_set_delete(igraph_set_t* set, igraph_integer_t
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_contains(const igraph_set_t *set, igraph_integer_t e);
 IGRAPH_PRIVATE_EXPORT igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t* state,
                                                        igraph_integer_t* element);
+IGRAPH_PRIVATE_EXPORT igraph_error_t igraph_set_shrink_to_fit(const igraph_set_t *set);
 IGRAPH_PRIVATE_EXPORT void igraph_set_iterator_init(const igraph_set_t* set, igraph_set_iterator_t* iterator);
 IGRAPH_PRIVATE_EXPORT void igraph_set_print_tree(const igraph_set_t* set, FILE* output_stream);
 __END_DECLS

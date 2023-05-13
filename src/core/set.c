@@ -41,17 +41,12 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
+    set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
+    IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
+    set->capacity = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
     return IGRAPH_SUCCESS;
 }
 
-void set_destroy_internal(struct Node* node) {
-    if (node == NULL) {
-        return ;
-    }
-    set_destroy_internal(node->left);
-    set_destroy_internal(node->right);
-    IGRAPH_FREE(node);
-}
 
 /**
  * \ingroup set
@@ -60,13 +55,15 @@ void set_destroy_internal(struct Node* node) {
  *
  * \param set Pointer to the set to be destroyed.
  *
- * Time complexity: O(n * log(n) ).
+ * Time complexity: Operating System Dependent.
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    set_destroy_internal(set->root);
+    IGRAPH_FREE(set->pool);
     set->root = NULL;
     set->size = 0;
+    set->pool = NULL;
+    set->capacity = 0;
 }
 
 
@@ -303,6 +300,36 @@ void igraph_set_print_tree(const igraph_set_t* set, FILE * output_stream){
     print2DUtil(set->root, 0, output_stream);
 }
 
+igraph_error_t igraph_set_reserve(igraph_set_t* set){
+    /*In case someone uses a set after calling destroy is it, since destroy is just used a clear function*/
+    if(set->capacity == 0){
+        set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
+        IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
+        set->capacity = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
+        return IGRAPH_SUCCESS;
+    }
+    igraph_integer_t new_capacity = set->capacity + set->capacity / 2;
+    set->capacity = new_capacity;
+//    printf("New set capacity %ld\n Old Capacity %ld\n", new_capacity, set->capacity);
+    struct Node* new_pool = IGRAPH_REALLOC(set->pool, new_capacity, struct Node);
+    IGRAPH_CHECK_OOM(new_pool, "Cannot reserve space for set.");
+    size_t new_position_difference = new_pool - set->pool;
+    for(igraph_integer_t i=0; i < set->size ; i++){
+
+        if((new_pool+i)->left != NULL){
+            (new_pool+i)->left = (new_pool+i)->left + new_position_difference;
+        }
+        if((new_pool+i)->right != NULL){
+            (new_pool+i)->right = (new_pool+i)->right + new_position_difference;
+        }
+        if((new_pool+i)->parent != NULL){
+            (new_pool+i)->parent = (new_pool+i)->parent + new_position_difference;
+        }
+    }
+    set->pool = new_pool;
+    return IGRAPH_SUCCESS;
+}
+
 /**
  * \ingroup set
  * \function igraph_set_add
@@ -319,9 +346,10 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     if (igraph_set_contains(set, e)) {
         return IGRAPH_SUCCESS;
     }
-
-    struct Node* newNode = IGRAPH_CALLOC(1, struct Node);
-        IGRAPH_CHECK_OOM(newNode, "Cannot reserve space for the new set element.");
+    if(set->size == set->capacity){
+        IGRAPH_CHECK(igraph_set_reserve(set));
+    }
+    struct Node* newNode = set->pool + set->size;
     set->root = RB_insert(set->root, e, newNode);
     set->size++;
     return IGRAPH_SUCCESS;
@@ -505,7 +533,6 @@ void igraph_set_delete(igraph_set_t* set, igraph_integer_t e){
         return ;
     }    
     set->root = RB_delete(set->root, node_to_delete);
-    IGRAPH_FREE(node_to_delete);
 }
 
 igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e) {
