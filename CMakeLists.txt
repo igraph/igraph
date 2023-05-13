@@ -168,3 +168,8 @@ endif()
 
 # Show result of configuration
 include(summary)
+
+
+if (EMSCRIPTEN)
+  add_subdirectory(wasm)
+endif()
