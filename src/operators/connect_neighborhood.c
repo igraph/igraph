@@ -196,7 +196,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
     igraph_vector_int_t neis;
 
     if (order < 0) {
-        IGRAPH_ERRORF("Order can not be negative, found %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Order cannot be negative, found %" IGRAPH_PRId ".",
                 IGRAPH_EINVAL, order);
     }
 
