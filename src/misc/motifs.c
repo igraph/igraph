@@ -309,15 +309,11 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to find motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     subg = IGRAPH_CALLOC(no_of_nodes, char);
-    if (subg == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(subg, "Insufficient memory to find motifs.");
     IGRAPH_FINALLY(igraph_free, subg);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
@@ -579,9 +575,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to count motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
@@ -592,9 +586,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 
     if (parsample == NULL) {
         sample = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (sample == NULL) {
-            IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(sample, "Insufficient memory to count motifs.");
         IGRAPH_FINALLY(igraph_free, sample);
         IGRAPH_VECTOR_INT_INIT_FINALLY(sample, 0);
         IGRAPH_CHECK(igraph_random_sample(sample, 0, no_of_nodes - 1, sample_size));
@@ -778,9 +770,7 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to count motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
