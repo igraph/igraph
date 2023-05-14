@@ -41,13 +41,13 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
-    set->pool_index = 0;
+    set->pool_index = -1;
     set->pool_current_level_filled = 0;
     set->pool[0] = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
     IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
     set->capacity[0] = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
     for(igraph_integer_t i=1 ; i < IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH ; i++){
-        set->capacity[i] = set->capacity[i] * IGRAPH_SET_PARAMETER_SIZE_INCREASE_FACTOR;
+        set->capacity[i] = set->capacity[i] << 1;
     }
     return IGRAPH_SUCCESS;
 }
@@ -64,7 +64,7 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    for(igraph_integer_t i = 0 ;i <= set->pool_current_level_filled ; i++){
+    for(igraph_integer_t i = 0 ;i <= set->pool_index ; i++){
         IGRAPH_FREE(set->pool[i]);
     }
     set->pool_current_level_filled = 0;
@@ -136,6 +136,7 @@ void LeftRotate(struct Node** T, struct Node** x) {
     (*x)->parent = y;
 
 }
+
 void RightRotate(struct Node** T, struct Node** x) {
     struct Node* y = (*x)->left;
     (*x)->left = y->right;
@@ -302,6 +303,7 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     struct Node* newNode = set->pool[set->pool_index] + set->pool_current_level_filled;
     set->root = RB_insert(set->root, e, newNode);
     set->size++;
+    set->pool_current_level_filled++;
     return IGRAPH_SUCCESS;
 }
 

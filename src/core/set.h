@@ -60,7 +60,6 @@ struct Stack
 #define IGRAPH_SET_PARAMETER_STACK_LENGTH 20
 #define IGRAPH_SET_PARAMETER_STARTING_CAPACITY 100
 #define IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH 32
-#define IGRAPH_SET_PARAMETER_SIZE_INCREASE_FACTOR 2.0f
 
 /*
 Stack length need to be greater than the depth of the rb-tree and 
