@@ -45,7 +45,6 @@ enum COLOR {RED,BLACK};
 struct Node
 {
     igraph_integer_t data;
-    igraph_integer_t index;
     struct Node* left;
     struct Node* right;
     struct Node* parent;
@@ -60,6 +59,9 @@ struct Stack
 
 #define IGRAPH_SET_PARAMETER_STACK_LENGTH 20
 #define IGRAPH_SET_PARAMETER_STARTING_CAPACITY 100
+#define IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH 32
+#define IGRAPH_SET_PARAMETER_SIZE_INCREASE_FACTOR 2.0f
+
 /*
 Stack length need to be greater than the depth of the rb-tree and 
 it not possible to make a tree with 2^20 Nodes so this number can be reduced futher.
@@ -74,8 +76,10 @@ typedef struct s_set_itertor
 typedef struct s_set{
     struct Node* root;
     igraph_integer_t size;
-    struct Node* pool;
-    igraph_integer_t capacity;
+    igraph_integer_t pool_index;
+    igraph_integer_t pool_current_level_filled;
+    struct Node* pool[IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH];
+    igraph_integer_t capacity[IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH];
     
 } igraph_set_t;
 

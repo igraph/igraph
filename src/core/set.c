@@ -41,9 +41,14 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
-    set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
+    set->pool_index = 0;
+    set->pool_current_level_filled = 0;
+    set->pool[0] = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
     IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
-    set->capacity = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
+    set->capacity[0] = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
+    for(igraph_integer_t i=1 ; i < IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH ; i++){
+        set->capacity[i] = set->capacity[i] * IGRAPH_SET_PARAMETER_SIZE_INCREASE_FACTOR;
+    }
     return IGRAPH_SUCCESS;
 }
 
@@ -59,11 +64,13 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_FREE(set->pool);
+    for(igraph_integer_t i = 0 ;i <= set->pool_current_level_filled ; i++){
+        IGRAPH_FREE(set->pool[i]);
+    }
+    set->pool_current_level_filled = 0;
+    set->pool_index = -1;
     set->root = NULL;
     set->size = 0;
-    set->pool = NULL;
-    set->capacity = 0;
 }
 
 
@@ -256,78 +263,21 @@ struct Node* RB_insert(struct Node* T, igraph_integer_t data, struct Node* z) {
 }
 
 
-void print2DUtil(struct Node* root, int space, FILE * output_stream) {
-    #define COUNT 10
-    if (root == NULL) {
-        return;
-    }
-    space += COUNT;
-    print2DUtil(root->right, space,output_stream);
-    fprintf(output_stream, "\n");
-    for (int i = COUNT; i < space; i++) {
-        fprintf(output_stream, " ");
-    }
-    printf("%" IGRAPH_PRId "\n", root->data);
-    print2DUtil(root->left, space,output_stream);
-}
-
-/**
- * \ingroup set
- * \function igraph_set_print_tree
- * \brief Prints the internal BST of the set in 2D format.
- *
- * For example the set with number 1 to 7 will be printed as
- *
- *                     7
- * 
- *           3
- * 
- *                     6
- * 
- * 1
- * 
- *                     5
- * 
- *           2
- * 
- *                     4
- * 
- * \param set The set to be prited.
- * \param output_stream The file stream to write the result to. Set this to stdout to write to console.
- * Time complexity: O(n * log(n)), n is the number of elements in \p set.
- */
-void igraph_set_print_tree(const igraph_set_t* set, FILE * output_stream){
-    print2DUtil(set->root, 0, output_stream);
-}
-
 igraph_error_t igraph_set_reserve(igraph_set_t* set){
-    /*In case someone uses a set after calling destroy is it, since destroy is just used a clear function*/
-    if(set->capacity == 0){
-        set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
-        IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
-        set->capacity = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
+    if(set->pool_index == -1){
+        set->pool_index = 0;
+        set->pool_current_level_filled = 0;
+        set->pool[0] = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
+        IGRAPH_CHECK_OOM(set->pool[0], "Cannot reserve space for set.");
         return IGRAPH_SUCCESS;
     }
-    igraph_integer_t new_capacity = set->capacity + set->capacity / 2;
-    set->capacity = new_capacity;
-//    printf("New set capacity %ld\n Old Capacity %ld\n", new_capacity, set->capacity);
-    struct Node* new_pool = IGRAPH_REALLOC(set->pool, new_capacity, struct Node);
-    IGRAPH_CHECK_OOM(new_pool, "Cannot reserve space for set.");
-    size_t new_position_difference = new_pool - set->pool;
-    for(igraph_integer_t i=0; i < set->size ; i++){
-
-        if((new_pool+i)->left != NULL){
-            (new_pool+i)->left = (new_pool+i)->left + new_position_difference;
-        }
-        if((new_pool+i)->right != NULL){
-            (new_pool+i)->right = (new_pool+i)->right + new_position_difference;
-        }
-        if((new_pool+i)->parent != NULL){
-            (new_pool+i)->parent = (new_pool+i)->parent + new_position_difference;
-        }
+    set->pool_index++;
+    if(set->pool_index == IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH){
+        IGRAPH_ERROR("Cannot reserve space for set.", IGRAPH_ENOMEM);
     }
-    set->pool = new_pool;
-    return IGRAPH_SUCCESS;
+    set->pool[set->pool_index] = IGRAPH_CALLOC(set->capacity[set->pool_index], struct Node);
+    IGRAPH_CHECK_OOM(set->pool[set->pool_index], "Cannot reserve space for set.");
+    set->pool_current_level_filled = 0;
 }
 
 /**
@@ -346,10 +296,10 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     if (igraph_set_contains(set, e)) {
         return IGRAPH_SUCCESS;
     }
-    if(set->size == set->capacity){
+    if(set->pool_index == -1 || set->pool_current_level_filled == set->capacity[set->pool_index]){
         IGRAPH_CHECK(igraph_set_reserve(set));
     }
-    struct Node* newNode = set->pool + set->size;
+    struct Node* newNode = set->pool[set->pool_index] + set->pool_current_level_filled;
     set->root = RB_insert(set->root, e, newNode);
     set->size++;
     return IGRAPH_SUCCESS;
@@ -672,4 +622,48 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
             *element = iterate_self(state);
             return true;
     }
+}
+
+void print2DUtil(struct Node* root, int space, FILE * output_stream) {
+    #define COUNT 10
+    if (root == NULL) {
+        return;
+    }
+    space += COUNT;
+    print2DUtil(root->right, space,output_stream);
+    fprintf(output_stream, "\n");
+    for (int i = COUNT; i < space; i++) {
+        fprintf(output_stream, " ");
+    }
+    printf("%" IGRAPH_PRId "\n", root->data);
+    print2DUtil(root->left, space,output_stream);
+}
+
+/**
+ * \ingroup set
+ * \function igraph_set_print_tree
+ * \brief Prints the internal BST of the set in 2D format.
+ *
+ * For example the set with number 1 to 7 will be printed as
+ *
+ *                     7
+ * 
+ *           3
+ * 
+ *                     6
+ * 
+ * 1
+ * 
+ *                     5
+ * 
+ *           2
+ * 
+ *                     4
+ * 
+ * \param set The set to be prited.
+ * \param output_stream The file stream to write the result to. Set this to stdout to write to console.
+ * Time complexity: O(n * log(n)), n is the number of elements in \p set.
+ */
+void igraph_set_print_tree(const igraph_set_t* set, FILE * output_stream){
+    print2DUtil(set->root, 0, output_stream);
 }
