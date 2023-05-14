@@ -41,7 +41,7 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
-    set->pool_index = -1;
+    set->pool_index = 0;
     set->pool_current_level_filled = 0;
     set->pool[0] = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
     IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
