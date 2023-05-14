@@ -47,7 +47,7 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
     set->capacity[0] = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
     for(igraph_integer_t i=1 ; i < IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH ; i++){
-        set->capacity[i] = set->capacity[i] << 1;
+        set->capacity[i] = set->capacity[i-1] << 1;
     }
     return IGRAPH_SUCCESS;
 }
