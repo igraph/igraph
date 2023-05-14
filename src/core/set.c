@@ -279,6 +279,7 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set){
     set->pool[set->pool_index] = IGRAPH_CALLOC(set->capacity[set->pool_index], struct Node);
     IGRAPH_CHECK_OOM(set->pool[set->pool_index], "Cannot reserve space for set.");
     set->pool_current_level_filled = 0;
+        return IGRAPH_SUCCESS;
 }
 
 /**
