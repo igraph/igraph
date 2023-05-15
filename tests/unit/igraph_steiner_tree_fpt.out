@@ -45,3 +45,7 @@ value: 0.000000
 A graph with 2 terminals:
 12
 value: 1.000000
+
+A graph with 3 terminals:
+10 12
+value: 2.000000
