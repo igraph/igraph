@@ -101,17 +101,7 @@ static int_set fetchSetsBasedonIndex(igraph_integer_t index, const  dictionary& 
     IGRAPH_FATAL("The index that you tried to find doesn't exist. Hence the code won't run.");
 }
 
-/*
-    Destroting the vector iweights when the weights passed to function are null.
-    This was done to reduce the duplicate code
-*/
 
-static igraph_error_t destroy_i_weights(igraph_vector_t iweights){
-
-    igraph_vector_destroy(&iweights);
-    IGRAPH_FINALLY_CLEAN(1);
-    return IGRAPH_SUCCESS;
-}
 
 /*
  * Calculating factorial of a number.
@@ -385,7 +375,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     /* Handle the cases of the null graph and no terminals. */
     if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
         if (!weights) {
-            destroy_i_weights(iweights);
+            igraph_vector_destroy(&iweights);
+            IGRAPH_FINALLY_CLEAN(1);
+            
         }
         igraph_vector_int_clear(res_tree);
         *res = 0.0;
@@ -410,7 +402,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         IGRAPH_CHECK(igraph_vector_int_append(res_tree, &edges_res));
 
         if (!weights) {
-            destroy_i_weights(iweights);
+            igraph_vector_destroy(&iweights);
+            IGRAPH_FINALLY_CLEAN(1);
+            
         }
 
         igraph_vector_int_destroy(&vertices);
@@ -530,7 +524,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         }
 
         if (!weights) {
-            destroy_i_weights(iweights);
+            igraph_vector_destroy(&iweights);
+            IGRAPH_FINALLY_CLEAN(1);
         }
 
         igraph_matrix_destroy(&distance);
@@ -676,7 +671,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     IGRAPH_FINALLY_CLEAN(3);
 
     if (!weights) {
-        IGRAPH_CHECK(destroy_i_weights(iweights));
+        igraph_vector_destroy(&iweights);
+        IGRAPH_FINALLY_CLEAN(1);
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_HANDLE_EXCEPTIONS_END;
