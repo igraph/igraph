@@ -27,6 +27,13 @@
 
 #include <string.h>     /* memmove */
 
+struct Node* SET(const igraph_set_t *set, igraph_integer_t x){
+    return x != -1 ? set->pool + x : NULL ;
+}
+igraph_integer_t SET_ROOT_INDEX(const igraph_set_t *set){
+    return set->root ? set->root->index : -1;
+}
+
 /**
  * \ingroup set
  * \function igraph_set_init

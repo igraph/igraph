@@ -59,9 +59,7 @@ struct Stack
 } ;
 
 #define IGRAPH_SET_PARAMETER_STACK_LENGTH 20
-#define IGRAPH_SET_PARAMETER_STARTING_CAPACITY 100
-#define SET(s,x) (x!=-1?s->pool+x:NULL)
-#define SET_ROOT_INDEX(s) (s->root?s->root->index : -1) 
+#define IGRAPH_SET_PARAMETER_STARTING_CAPACITY 100 
 /*
 Stack length need to be greater than the depth of the rb-tree and 
 it not possible to make a tree with 2^20 Nodes so this number can be reduced futher.
