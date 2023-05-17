@@ -372,16 +372,14 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
         }
     }
+    
+    igraph_integer_t flag_terminals = 0;
     /* Handle the cases of the null graph and no terminals. */
     if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
-        if (!weights) {
-            igraph_vector_destroy(&iweights);
-            IGRAPH_FINALLY_CLEAN(1);
-            
-        }
+
         igraph_vector_int_clear(res_tree);
         *res = 0.0;
-        return IGRAPH_SUCCESS;
+        flag_terminals = 1;
     }
     else if (no_of_terminals == 2) {
         igraph_vector_int_t vertices;
@@ -401,18 +399,24 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         
         IGRAPH_CHECK(igraph_vector_int_append(res_tree, &edges_res));
 
-        if (!weights) {
-            igraph_vector_destroy(&iweights);
-            IGRAPH_FINALLY_CLEAN(1);
-            
-        }
-
         igraph_vector_int_destroy(&vertices);
         igraph_vector_int_destroy(&edges_res);
         IGRAPH_FINALLY_CLEAN(2);
 
+        flag_terminals = 1;
+    
+    }
+    
+    if (flag_terminals == 1){
+        if (!weights) {
+            igraph_vector_destroy(&iweights);
+            IGRAPH_FINALLY_CLEAN(1);
+        }
+
         return IGRAPH_SUCCESS;
     }
+    
+    
     /* Check whether all terminals are within the same connected component. */
     {
         igraph_vector_int_t membership;
@@ -523,18 +527,21 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     
         }
 
+        igraph_matrix_destroy(&distance);
+        igraph_vector_int_destroy(&steiner_terminals_copy);
+        IGRAPH_FINALLY_CLEAN(2);
+        flag_terminals = 1;
+    }
+    
+    if (flag_terminals == 1) {
+        
         if (!weights) {
             igraph_vector_destroy(&iweights);
             IGRAPH_FINALLY_CLEAN(1);
         }
 
-        igraph_matrix_destroy(&distance);
-        igraph_vector_int_destroy(&steiner_terminals_copy);
-        IGRAPH_FINALLY_CLEAN(2);
-
         return IGRAPH_SUCCESS;
     }
-    
     
     q = VECTOR(steiner_terminals_copy)[0];
 
