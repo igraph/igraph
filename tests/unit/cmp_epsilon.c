@@ -55,6 +55,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_cmp_epsilon(-IGRAPH_INFINITY, IGRAPH_NAN, 0.1) != 0);
     IGRAPH_ASSERT(igraph_cmp_epsilon(0, IGRAPH_NAN, 1e-7) != 0);
     IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, 0, 1e-7) != 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, IGRAPH_NAN, 1e-7) != 0);
 
     return 0;
 }
