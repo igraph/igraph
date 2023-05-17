@@ -530,6 +530,7 @@ set_property(TEST example::igraph_power_law_fit APPEND PROPERTY ENVIRONMENT "OMP
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_almost_e
+  cmp_epsilon
   igraph_almost_equals
   igraph_convex_hull
   igraph_power_law_fit
