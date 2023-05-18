@@ -91,6 +91,17 @@ igraph_bool_t igraph_almost_equals(double a, double b, double eps) {
  * Determines whether two double-precision floats are "almost equal"
  * to each other with a given level of tolerance on the relative error.
  *
+ * </para><para>
+ * The function supports infinities and NaN values. NaN values are considered
+ * not equal to any other value (even another NaN), but the ordering is
+ * arbitrary; in other words, we only guarantee that comparing a NaN with
+ * any other value will not return zero. Positive infinity is considered to
+ * be greater than any finite value with any tolerance. Negative infinity is
+ * considered to be smaller than any finite value with any tolerance.
+ * Positive infinity is considered to be equal to another positive infinity
+ * with any tolerance. Negative infinity is considered to be equal to another
+ * negative infinity with any tolerance.
+ *
  * \param  a  The first float.
  * \param  b  The second float.
  * \param  eps  The level of tolerance on the relative error. The relative
