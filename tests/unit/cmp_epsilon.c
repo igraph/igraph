@@ -17,6 +17,7 @@
 */
 
 #include <igraph.h>
+#include <float.h>
 
 #include "test_utilities.h"
 
@@ -56,6 +57,21 @@ int main(void) {
     IGRAPH_ASSERT(igraph_cmp_epsilon(0, IGRAPH_NAN, 1e-7) != 0);
     IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, 0, 1e-7) != 0);
     IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, IGRAPH_NAN, 1e-7) != 0);
+
+    /* Comparison with zero tolerance should be a "strict" comparison */
+    IGRAPH_ASSERT(igraph_cmp_epsilon(1, 2, 0) < 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(2, 1, 0) > 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(2, 2, 0) == 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(0, DBL_MIN, 0) < 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(DBL_MIN, 0, 0) > 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(-IGRAPH_INFINITY, 0, 0) < 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(-IGRAPH_INFINITY, -IGRAPH_INFINITY, 0) == 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_INFINITY, 0, 0) > 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_INFINITY, IGRAPH_INFINITY, 0) == 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, 0, 0) != 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, IGRAPH_NAN, 0) != 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, IGRAPH_INFINITY, 0) != 0);
+    IGRAPH_ASSERT(igraph_cmp_epsilon(IGRAPH_NAN, -IGRAPH_INFINITY, 0) != 0);
 
     return 0;
 }
