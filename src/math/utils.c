@@ -107,6 +107,9 @@ igraph_bool_t igraph_almost_equals(double a, double b, double eps) {
  * \param  eps  The level of tolerance on the relative error. The relative
  *         error is defined as <code>abs(a-b) / (abs(a) + abs(b))</code>. The
  *         two numbers are considered equal if this is less than \c eps.
+ *         Negative epsilon values are not allowed; the returned value will
+ *         be undefined in this case. Zero means to do an exact comparison
+ *         without tolerance.
  *
  * \return Zero if the two floats are nearly equal to each other within
  *         the given level of tolerance, positive number if the first float is
