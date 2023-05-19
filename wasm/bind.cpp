@@ -70,5 +70,6 @@ EMSCRIPTEN_BINDINGS(AnimatelyGif)
   function("destroy", &igraph_destroy, allow_raw_pointers());
   function("create", &igraph_create, allow_raw_pointers());
   function("ring", &igraph_ring, allow_raw_pointers());
+  function("edgelist", &igraph_get_edgelist, allow_raw_pointers());
 }
 #endif
