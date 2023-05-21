@@ -41,14 +41,10 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
-    set->pool_index = 0;
-    set->pool_current_level_filled = 0;
-    set->pool[0] = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
+    set->capacity_used = 0;
+    set->capacity = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
+    set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, igraph_set_internal_node_t*);
     IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
-    set->capacity[0] = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
-    for(igraph_integer_t i=1 ; i < IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH ; i++){
-        set->capacity[i] = set->capacity[i-1] << 1;
-    }
     return IGRAPH_SUCCESS;
 }
 
@@ -64,13 +60,14 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    for(igraph_integer_t i = 0 ;i <= set->pool_index ; i++){
+    for(igraph_integer_t i = 0 ;i < set->capacity_used ; i++){
         IGRAPH_FREE(set->pool[i]);
     }
-    set->pool_current_level_filled = 0;
-    set->pool_index = -1;
+    IGRAPH_FREE(set->pool);
+    set->capacity = 0;
     set->root = NULL;
     set->size = 0;
+    set->capacity_used = 0;
 }
 
 
@@ -109,8 +106,8 @@ igraph_integer_t igraph_set_size(const igraph_set_t* set) {
     return set->size;
 }
 
-void LeftRotate(struct Node** T, struct Node** x) {
-    struct Node* y = (*x)->right;
+void LeftRotate(igraph_set_internal_node_t** T, igraph_set_internal_node_t** x) {
+    igraph_set_internal_node_t* y = (*x)->right;
     (*x)->right = y->left;
 
     if (y->left != NULL) {
@@ -137,8 +134,8 @@ void LeftRotate(struct Node** T, struct Node** x) {
 
 }
 
-void RightRotate(struct Node** T, struct Node** x) {
-    struct Node* y = (*x)->left;
+void RightRotate(igraph_set_internal_node_t** T, igraph_set_internal_node_t** x) {
+    igraph_set_internal_node_t* y = (*x)->left;
     (*x)->left = y->right;
 
     if (y->right != NULL) {
@@ -164,16 +161,16 @@ void RightRotate(struct Node** T, struct Node** x) {
 
 }
 
-void RB_insert_fixup(struct Node** T, struct Node** z) {
-    struct Node* grandparent = NULL;
-    struct Node* parentpt = NULL;
+void RB_insert_fixup(igraph_set_internal_node_t** T, igraph_set_internal_node_t** z) {
+    igraph_set_internal_node_t* grandparent = NULL;
+    igraph_set_internal_node_t* parentpt = NULL;
 
     while (((*z) != *T) && ((*z)->color != BLACK) && ((*z)->parent->color == RED)) {
         parentpt = (*z)->parent;
         grandparent = (*z)->parent->parent;
 
         if (parentpt == grandparent->left) {
-            struct Node* uncle = grandparent->right;
+            igraph_set_internal_node_t* uncle = grandparent->right;
 
             if (uncle != NULL && uncle->color == RED) {
                 grandparent->color = RED;
@@ -197,7 +194,7 @@ void RB_insert_fixup(struct Node** T, struct Node** z) {
         }
 
         else {
-            struct Node* uncle = grandparent->left;
+            igraph_set_internal_node_t* uncle = grandparent->left;
 
             if (uncle != NULL && uncle->color == RED) {
                 grandparent->color = RED;
@@ -224,15 +221,15 @@ void RB_insert_fixup(struct Node** T, struct Node** z) {
 
 }
 
-struct Node* RB_insert(struct Node* T, igraph_integer_t data, struct Node* z) {
+igraph_set_internal_node_t* RB_insert(igraph_set_internal_node_t* T, igraph_integer_t data, igraph_set_internal_node_t* z) {
     z->data = data;
     z->left = NULL;
     z->right = NULL;
     z->parent = NULL;
     z->color = RED;
 
-    struct Node* y = NULL;
-    struct Node* x = T;//root
+    igraph_set_internal_node_t* y = NULL;
+    igraph_set_internal_node_t* x = T;//root
 
     while (x != NULL) {
         y = x;
@@ -265,21 +262,13 @@ struct Node* RB_insert(struct Node* T, igraph_integer_t data, struct Node* z) {
 
 
 igraph_error_t igraph_set_reserve(igraph_set_t* set){
-    if(set->pool_index == -1){
-        set->pool_index = 0;
-        set->pool_current_level_filled = 0;
-        set->pool[0] = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
-        IGRAPH_CHECK_OOM(set->pool[0], "Cannot reserve space for set.");
-        return IGRAPH_SUCCESS;
+    if(set->capacity == 0){
+        IGRAPH_CHECK(igraph_set_init(set));
     }
-    set->pool_index++;
-    if(set->pool_index == IGRAPH_SET_PARAMETER_POOL_ARRAY_LENGTH){
-        IGRAPH_ERROR("Cannot reserve space for set.", IGRAPH_ENOMEM);
-    }
-    set->pool[set->pool_index] = IGRAPH_CALLOC(set->capacity[set->pool_index], struct Node);
-    IGRAPH_CHECK_OOM(set->pool[set->pool_index], "Cannot reserve space for set.");
-    set->pool_current_level_filled = 0;
-        return IGRAPH_SUCCESS;
+    set->capacity *= 2;
+    set->pool = IGRAPH_REALLOC(set->pool, set->capacity, igraph_set_internal_node_t *);
+    IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -297,18 +286,18 @@ igraph_error_t igraph_set_reserve(igraph_set_t* set){
 igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     if (igraph_set_contains(set, e)) {
         return IGRAPH_SUCCESS;
-    }
-    if(set->pool_index == -1 || set->pool_current_level_filled == set->capacity[set->pool_index]){
+    } 
+    if(set->capacity_used == set->capacity){
         IGRAPH_CHECK(igraph_set_reserve(set));
     }
-    struct Node* newNode = set->pool[set->pool_index] + set->pool_current_level_filled;
-    set->root = RB_insert(set->root, e, newNode);
+    set->pool[set->capacity_used] = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, igraph_set_internal_node_t);
+    set->root = RB_insert(set->root, e, set->pool[set->size]);
     set->size++;
-    set->pool_current_level_filled++;
+    set->capacity_used++;
     return IGRAPH_SUCCESS;
 }
 
-struct Node* Tree_minimum(struct Node* node)
+igraph_set_internal_node_t* Tree_minimum(igraph_set_internal_node_t* node)
 {
     while(node->left!=NULL)
         node = node->left;
@@ -316,13 +305,13 @@ struct Node* Tree_minimum(struct Node* node)
     return node;
 }
 
-void RB_delete_fixup(struct Node** T, struct Node** x)
+void RB_delete_fixup(igraph_set_internal_node_t** T, igraph_set_internal_node_t** x)
 {
     while((*x)!=*T && (*x)->color == BLACK)
     {
         if((*x)==(*x)->parent->left)
         {
-            struct Node* w = (*x)->parent->right;
+            igraph_set_internal_node_t* w = (*x)->parent->right;
 
             if(w->color==RED)
             {
@@ -358,7 +347,7 @@ void RB_delete_fixup(struct Node** T, struct Node** x)
 
         else
         {
-            struct Node* w = (*x)->parent->left;
+            igraph_set_internal_node_t* w = (*x)->parent->left;
 
             if(w->color==RED)
             {
@@ -396,7 +385,7 @@ void RB_delete_fixup(struct Node** T, struct Node** x)
 
 }
 
-void RB_transplat(struct Node** T, struct Node** u,struct Node** v)
+void RB_transplat(igraph_set_internal_node_t** T, igraph_set_internal_node_t** u,igraph_set_internal_node_t** v)
 {
     if((*u)->parent == NULL)
         *T = *v;
@@ -410,13 +399,13 @@ void RB_transplat(struct Node** T, struct Node** u,struct Node** v)
         (*v)->parent = (*u)->parent;
 }
 
-struct Node* RB_delete(struct Node *T,struct Node* z)
+igraph_set_internal_node_t* RB_delete(igraph_set_internal_node_t *T,igraph_set_internal_node_t* z)
 {
-    struct Node *y = z;
+    igraph_set_internal_node_t *y = z;
     enum COLOR yoc;
     yoc = z->color; // y's original color
 
-    struct Node* x;
+    igraph_set_internal_node_t* x;
 
     if(z->left==NULL )
     {
@@ -457,7 +446,7 @@ struct Node* RB_delete(struct Node *T,struct Node* z)
 
     return T;
 }
-struct Node* BST_search(struct Node* root, int x)
+igraph_set_internal_node_t* BST_search(igraph_set_internal_node_t* root, int x)
 {
     if(root==NULL || root->data == x)
         return root;
@@ -481,14 +470,15 @@ struct Node* BST_search(struct Node* root, int x)
  */
 void igraph_set_delete(igraph_set_t* set, igraph_integer_t e){
     IGRAPH_ASSERT(set != NULL);
-    struct Node* node_to_delete = BST_search(set->root, e);
+    igraph_set_internal_node_t* node_to_delete = BST_search(set->root, e);
     if(node_to_delete == NULL){
         return ;
     }    
     set->root = RB_delete(set->root, node_to_delete);
+    set->size--;
 }
 
-igraph_bool_t BST_Search(const struct Node* node, igraph_integer_t e) {
+igraph_bool_t BST_Search(const igraph_set_internal_node_t* node, igraph_integer_t e) {
     if (node == NULL) {
         return false;
     }
@@ -543,51 +533,20 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set){
  *
  * Time complexity: O(1)
  */
+
+
 void igraph_set_iterator_init(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
     IGRAPH_ASSERT(set != NULL);
-    if (set->root == NULL) {
+    igraph_set_internal_node_t* node = set->root;
+    if(node == NULL){
         iterator->stack_index = -1;
-        return ;
     }
-    iterator->stack[0].data = *(set->root);
     iterator->stack_index = 0;
-    iterator->stack[0].mode = LEFT;
+    iterator->stack[0].data = *set->root;
+    iterator->stack[0].visited = false;
 }
 
-igraph_integer_t iterate_self(igraph_set_iterator_t *state) {
-    struct Node *node = &(state->stack[state->stack_index].data);
-    igraph_integer_t data = node->data;
-    if (node->right != NULL) {
-        state->stack[state->stack_index].data = *(node->right);
-        state->stack[state->stack_index].mode = LEFT;
-    } else if (node->parent != NULL && state->stack_index > 0 ) {
-        state->stack_index--;
-        state->stack[state->stack_index].mode = SELF;
-    } else {
-        state->stack_index--;
-    }
-    return data;
-}
-
-igraph_integer_t iterate_left(igraph_set_iterator_t *state) {
-    struct Node *node = &(state->stack[state->stack_index].data);
-
-    for ( ; node->left != NULL ; state->stack_index++) {
-        state->stack[state->stack_index + 1 ].data = *(node->left);
-        state->stack[state->stack_index + 1 ].mode = LEFT;
-        node = node->left;
-    }
-    state->stack_index--;
-    if(state->stack_index >= 0){
-        state->stack[state->stack_index].mode = SELF;
-    }
-    // printf("inside iterate left, last state data %ld\n", state->stack[state->stack_index].data.data);
-    return node->data;
-}
-
-
-
-/**
+/** 
  * \ingroup set
  * \function igraph_set_iterate
  * \brief Iterates through the element of the set.
@@ -616,18 +575,33 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
         element = NULL;
         return false;
     }
-    enum STACK_MODE mode = state->stack[state->stack_index].mode;
-    switch (mode) {
-        case LEFT:
-            *element = iterate_left(state);
-            return true;
-        case SELF:
-            *element = iterate_self(state);
-            return true;
+    while(true){
+        igraph_bool_t visisted = state->stack[state->stack_index].visited;
+        if(visisted){
+            *element = state->stack[state->stack_index].data.data;
+            state->stack_index--;
+            return true; 
+        }
+        igraph_set_internal_node_t node = state->stack[state->stack_index].data;
+        state->stack_index--;
+        if(node.right){
+            state->stack_index++;
+            state->stack[state->stack_index].data = *node.right;            
+            state->stack[state->stack_index].visited = false;
+        }
+        state->stack_index++;
+        state->stack[state->stack_index].data = node;
+        state->stack[state->stack_index].visited = true;
+        if(node.left){
+            state->stack_index++;
+            state->stack[state->stack_index].data = *node.left;
+            state->stack[state->stack_index].visited = false;
+        }
     }
+    return true; //control flow won't get here but compiler doesn't know that
 }
 
-void print2DUtil(struct Node* root, int space, FILE * output_stream) {
+void print2DUtil(igraph_set_internal_node_t* root, int space, FILE * output_stream) {
     #define COUNT 10
     if (root == NULL) {
         return;

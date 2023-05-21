@@ -389,7 +389,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
                 failed = 1;
                 igraph_set_iterator_init(&incomplete_out_vertices, &set_iter_i);
                 while (failed && igraph_set_iterate(&incomplete_out_vertices, &set_iter_i, &from)) {
-                    igraph_set_iterator_init(&incomplete_out_vertices, &set_iter_j);
+                    igraph_set_iterator_init(&incomplete_in_vertices, &set_iter_j);
                     while (igraph_set_iterate(&incomplete_in_vertices, &set_iter_j, &to)) {
                         neis = igraph_adjlist_get(&al, from);
                         if (from != to && !igraph_vector_int_binsearch(neis, to, 0)) {
