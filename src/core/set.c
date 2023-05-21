@@ -63,6 +63,15 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     return IGRAPH_SUCCESS;
 }
 
+void set_destroy_internal(struct Node* node) {
+    if(node->left != NULL)
+        set_destroy_internal(node->left);
+    
+    if(node->right != NULL)
+        set_destroy_internal(node->right);
+    IGRAPH_FREE(node);
+}
+
 
 /**
  * \ingroup set
@@ -73,23 +82,53 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
  *
  * Time complexity: Operating System Dependent.
  */
+// #define OLD_SET_DESTROY_IMPLEMENTATION
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    if(set->pool) IGRAPH_FREE(set->pool);
-    set->pool = NULL;
-    if(set->left) IGRAPH_FREE(set->left);
-    set->left = NULL;
-    if(set->right) IGRAPH_FREE(set->right);
-    set->right = NULL;
-    if(set->parent) IGRAPH_FREE(set->parent);
-    set->parent = NULL;
-    IGRAPH_FREE(set->color);
-    set->color = NULL;
+    if(set->size < 1){
+        return ;
+    }
+    if(set->size < RECUSIVE_DELETE_SIZE_LIMIT || true){
+        set_destroy_internal(set->root);
+        set->root = NULL;
+        set->size = 0;
+        return ;
+    }
+    // printf("destructor entered\n");
+    // fflush(stdout);
+    // return;
+    igraph_set_internal_node_t *stack_first[STACK_LENGTH];
+    igraph_bool_t stack_second[STACK_LENGTH];
+    stack_first[0] = set->root;
+    stack_second[0] = false;
+    igraph_integer_t stack_index = 0;
+    while(stack_index >=0){
+        IGRAPH_ASSERT(stack_index < STACK_LENGTH);
+        if(stack_second[stack_index]){
+            IGRAPH_FREE(stack_first[stack_index]);
+            stack_index--;
+            continue;
+        }
+        igraph_set_internal_node_t *node = stack_first[stack_index];
+        stack_second[stack_index] = true;
+        
+        if(node->right != NULL){
+            stack_index++;
+            stack_second[stack_index] = false;
+            stack_first[stack_index] = node->right;
+        }
+
+        if(node->left != NULL){
+            stack_index++;
+            stack_second[stack_index] = false;
+            stack_first[stack_index] = node->left;
+        }
+    }
     set->root = NULL;
     set->size = 0;
-    set->capacity = 0;
+    // printf("destructor finished\n");
+    // fflush(stdout);
 }
-
 
 /**
  * \ingroup set
@@ -670,18 +709,20 @@ void InOrder(const igraph_set_t *set, igraph_set_internal_rbnode* node, igraph_s
  *
  * Time complexity: O(1)
  */
-void igraph_set_iterator_init(
-    const igraph_set_t* set, igraph_set_iterator_t* iterator
-){
+
+
+void igraph_set_iterator_init(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_ASSERT(iterator != NULL);
-    iterator->data = IGRAPH_CALLOC(set->size, igraph_integer_t);
-    iterator->index = 0;
-    InOrder(set, set->root, iterator);
-    iterator->index = 0;
+    igraph_set_internal_node_t* node = set->root;
+    if(node == NULL){
+        iterator->stack_index = -1;
+    }
+    iterator->stack_index = 0;
+    iterator->stack[0].data = *set->root;
+    iterator->stack[0].visited = false;
 }
 
-/**
+/** 
  * \ingroup set
  * \function igraph_set_iterate
  * \brief Iterates through the element of the set.
@@ -714,21 +755,30 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
         element = NULL;
         return false;
     }
-}
-
-void print2DUtil(const igraph_set_t *set, igraph_set_internal_rbnode* node, int space, FILE * output_stream) {
-    #define COUNT 10
-    if (node == NULL) {
-        return;
+    while(true){
+        igraph_bool_t visisted = state->stack[state->stack_index].visited;
+        if(visisted){
+            *element = state->stack[state->stack_index].data.data;
+            state->stack_index--;
+            return true; 
+        }
+        igraph_set_internal_node_t node = state->stack[state->stack_index].data;
+        state->stack_index--;
+        if(node.right){
+            state->stack_index++;
+            state->stack[state->stack_index].data = *node.right;            
+            state->stack[state->stack_index].visited = false;
+        }
+        state->stack_index++;
+        state->stack[state->stack_index].data = node;
+        state->stack[state->stack_index].visited = true;
+        if(node.left){
+            state->stack_index++;
+            state->stack[state->stack_index].data = *node.left;
+            state->stack[state->stack_index].visited = false;
+        }
     }
-    space += COUNT;
-    print2DUtil(set, SETWITHCHECK(set, RIGHT(set, node->index)), space,output_stream);
-    fprintf(output_stream, "\n");
-    for (int i = COUNT; i < space; i++) {
-        fprintf(output_stream, " ");
-    }
-    printf("%" IGRAPH_PRId "\n", node->data);
-    print2DUtil(set, SETWITHCHECK(set, LEFT(set, node->index)), space,output_stream);
+    return true; //control flow won't get here but compiler doesn't know that
 }
 
 /**

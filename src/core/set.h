@@ -38,28 +38,38 @@ __BEGIN_DECLS
  * \ingroup types
  */
 
-#define IGRAPH_SET_PARAMETER_STACK_LENGTH 20
-#define IGRAPH_SET_PARAMETER_STARTING_CAPACITY 100
-#define PARENT(s,x) (*(s->parent + x))
-#define LEFT(s,x) (*(s->left + x))
-#define RIGHT(s,x) (*(s->right + x))
-#define COLOR(s,x) (*(s->color + x))
-#define SET(s,x) (s->pool + x)
-#define SETWITHCHECK(s, x) (x!=-1 ? SET(s,x) : NULL)
-#define ROOTINDEX(s) (s->root ? s->root->index : -1)
-
-enum STACK_MODE {LEFT,SELF};
-
 enum COLOR {RED,BLACK};
 
 typedef struct Node
 {
     igraph_integer_t data;
-    igraph_integer_t index;
-} igraph_set_internal_rbnode;
+    struct Node* left;
+    struct Node* right;
+    struct Node* parent;
+    enum COLOR color;
+} igraph_set_internal_node_t;
+
+typedef struct Stack
+{
+    igraph_set_internal_node_t data;
+    igraph_bool_t visited;
+} igraph_set_internal_stack_t;
+
+#define STACK_LENGTH 20
+#define RECUSIVE_DELETE_SIZE_LIMIT 25
+/*
+Stack length need to be greater than the depth of the rb-tree and 
+it not possible to make a tree with 2^20 Nodes so this number can be reduced futher.
+*/
+
+typedef struct s_set_itertor
+{
+    igraph_set_internal_stack_t stack[STACK_LENGTH];
+    igraph_integer_t stack_index;
+} igraph_set_iterator_t;
 
 typedef struct s_set{
-    igraph_set_internal_rbnode* root;
+    igraph_set_internal_node_t* root;
     igraph_integer_t size;
     igraph_integer_t* left;
     igraph_integer_t* right;
