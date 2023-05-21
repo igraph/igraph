@@ -299,7 +299,7 @@ static igraph_error_t igraph_i_neisets_intersect(
  * \param graph The graph object to analyze
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
- *        as the number of vertex IDs in \p vids.
+ *        as the number of vertex IDs in \p from and \p to, respectively.
  * \param from The vertex IDs of the first vertices of the
  *        pairs for which the calculation will be done.
  * \param to The vertex IDs of the second vertices of the
@@ -593,7 +593,7 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
- *        as the number of vertex IDs in \p vids.
+ *        as the number of vertex IDs in \p from and \p to, respectively.
  * \param from The vertex IDs of the first vertices of the
  *        pairs for which the calculation will be done.
  * \param to The vertex IDs of the second vertices of the
