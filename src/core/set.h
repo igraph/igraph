@@ -56,6 +56,7 @@ typedef struct Stack
 } igraph_set_internal_stack_t;
 
 #define STACK_LENGTH 20
+#define RECUSIVE_DELETE_SIZE_LIMIT 25
 /*
 Stack length need to be greater than the depth of the rb-tree and 
 it not possible to make a tree with 2^20 Nodes so this number can be reduced futher.

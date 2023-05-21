@@ -45,13 +45,14 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
 }
 
 void set_destroy_internal(struct Node* node) {
-    if (node == NULL) {
-        return ;
-    }
-    set_destroy_internal(node->left);
-    set_destroy_internal(node->right);
+    if(node->left != NULL)
+        set_destroy_internal(node->left);
+    
+    if(node->right != NULL)
+        set_destroy_internal(node->right);
     IGRAPH_FREE(node);
 }
+
 
 /**
  * \ingroup set
@@ -62,13 +63,53 @@ void set_destroy_internal(struct Node* node) {
  *
  * Time complexity: O(n * log(n) ).
  */
+// #define OLD_SET_DESTROY_IMPLEMENTATION
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    set_destroy_internal(set->root);
+    if(set->size < 1){
+        return ;
+    }
+    if(set->size < RECUSIVE_DELETE_SIZE_LIMIT || true){
+        set_destroy_internal(set->root);
+        set->root = NULL;
+        set->size = 0;
+        return ;
+    }
+    // printf("destructor entered\n");
+    // fflush(stdout);
+    // return;
+    igraph_set_internal_node_t *stack_first[STACK_LENGTH];
+    igraph_bool_t stack_second[STACK_LENGTH];
+    stack_first[0] = set->root;
+    stack_second[0] = false;
+    igraph_integer_t stack_index = 0;
+    while(stack_index >=0){
+        IGRAPH_ASSERT(stack_index < STACK_LENGTH);
+        if(stack_second[stack_index]){
+            IGRAPH_FREE(stack_first[stack_index]);
+            stack_index--;
+            continue;
+        }
+        igraph_set_internal_node_t *node = stack_first[stack_index];
+        stack_second[stack_index] = true;
+        
+        if(node->right != NULL){
+            stack_index++;
+            stack_second[stack_index] = false;
+            stack_first[stack_index] = node->right;
+        }
+
+        if(node->left != NULL){
+            stack_index++;
+            stack_second[stack_index] = false;
+            stack_first[stack_index] = node->left;
+        }
+    }
     set->root = NULL;
     set->size = 0;
+    // printf("destructor finished\n");
+    // fflush(stdout);
 }
-
 
 /**
  * \ingroup set
