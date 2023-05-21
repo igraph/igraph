@@ -20,6 +20,8 @@
 
 */
 
+#include "igraph_adjlist.h"
+#include "igraph_error.h"
 #include "igraph_operators.h"
 
 #include "igraph_dqueue.h"
@@ -198,27 +200,44 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
     igraph_integer_t i, j, in;
     igraph_integer_t *added;
     igraph_vector_int_t neis;
+    igraph_adjlist_t al;
 
     if (order < 0) {
         IGRAPH_ERRORF("Order cannot be negative, found %" IGRAPH_PRId ".",
                 IGRAPH_EINVAL, order);
     }
 
+    IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
+    if (igraph_has_attribute_table()) {
+        IGRAPH_I_ATTRIBUTE_DESTROY(res);
+        IGRAPH_I_ATTRIBUTE_COPY(res, graph, 1, 1, 0);
+    }
     if (order == 0) {
-        IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
-        if (igraph_has_attribute_table()) {
-            IGRAPH_I_ATTRIBUTE_DESTROY(res);
-            IGRAPH_I_ATTRIBUTE_COPY(res, graph, 1, 1, 0);
-        }
         return IGRAPH_SUCCESS;
     }
 
-    IGRAPH_CHECK(igraph_copy(res, graph));
-    IGRAPH_CHECK(igraph_simplify(res, true, true, NULL));
+    /* initialize res with a copy of the graph, but with multi-edges and loops removed */
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT, IGRAPH_NO_LOOPS, false));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+    for (i = 0; i < no_of_nodes; i++) {
+        igraph_vector_int_t *tmp = igraph_adjlist_get(&al, i);
+        for (j = 0; j < igraph_vector_int_size(tmp); j++) {
+            if (igraph_is_directed(graph) || i < VECTOR(*tmp)[j]) {
+                igraph_vector_int_push_back(&edges, i);
+                igraph_vector_int_push_back(&edges, VECTOR(*tmp)[j]);
+            }
+        }
+    }
+    IGRAPH_CHECK(igraph_add_edges(res, &edges, NULL));
+    igraph_adjlist_destroy(&al);
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(2);
     if (order == 1) {
         return IGRAPH_SUCCESS;
     }
 
+    /*Order > 1, so add more edges */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     IGRAPH_CHECK_OOM(added, "Cannot take the graph power.");
