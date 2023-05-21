@@ -39,6 +39,10 @@ igraph_vector_int_t create_vector(val arr) {
     return v;
 }
 
+igraph_error_t famous(igraph_t* graph, std::string name) {
+    return igraph_famous(graph, name.c_str());
+}
+
 IGRAPH_VECTOR_EMCC(from)
 IGRAPH_VECTOR_EMCC(to)
 IGRAPH_VECTOR_EMCC(oi)
@@ -71,5 +75,6 @@ EMSCRIPTEN_BINDINGS(AnimatelyGif)
   function("create", &igraph_create, allow_raw_pointers());
   function("ring", &igraph_ring, allow_raw_pointers());
   function("edgelist", &igraph_get_edgelist, allow_raw_pointers());
+  function("famous", &famous, allow_raw_pointers());
 }
 #endif
