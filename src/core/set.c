@@ -563,51 +563,20 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set){
  *
  * Time complexity: O(1)
  */
+
+
 void igraph_set_iterator_init(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
     IGRAPH_ASSERT(set != NULL);
-    if (set->root == NULL) {
+    igraph_set_internal_node_t* node = set->root;
+    if(node == NULL){
         iterator->stack_index = -1;
-        return ;
     }
-    iterator->stack[0].data = *(set->root);
     iterator->stack_index = 0;
-    iterator->stack[0].mode = LEFT;
+    iterator->stack[0].data = *set->root;
+    iterator->stack[0].visited = false;
 }
 
-igraph_integer_t iterate_self(igraph_set_iterator_t *state) {
-    struct Node *node = &(state->stack[state->stack_index].data);
-    igraph_integer_t data = node->data;
-    if (node->right != NULL) {
-        state->stack[state->stack_index].data = *(node->right);
-        state->stack[state->stack_index].mode = LEFT;
-    } else if (node->parent != NULL && state->stack_index > 0 ) {
-        state->stack_index--;
-        state->stack[state->stack_index].mode = SELF;
-    } else {
-        state->stack_index--;
-    }
-    return data;
-}
-
-igraph_integer_t iterate_left(igraph_set_iterator_t *state) {
-    struct Node *node = &(state->stack[state->stack_index].data);
-
-    for ( ; node->left != NULL ; state->stack_index++) {
-        state->stack[state->stack_index + 1 ].data = *(node->left);
-        state->stack[state->stack_index + 1 ].mode = LEFT;
-        node = node->left;
-    }
-    state->stack_index--;
-    if(state->stack_index >= 0){
-        state->stack[state->stack_index].mode = SELF;
-    }
-    // printf("inside iterate left, last state data %ld\n", state->stack[state->stack_index].data.data);
-    return node->data;
-}
-
-
-
-/**
+/** 
  * \ingroup set
  * \function igraph_set_iterate
  * \brief Iterates through the element of the set.
@@ -636,13 +605,28 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
         element = NULL;
         return false;
     }
-    enum STACK_MODE mode = state->stack[state->stack_index].mode;
-    switch (mode) {
-        case LEFT:
-            *element = iterate_left(state);
-            return true;
-        case SELF:
-            *element = iterate_self(state);
-            return true;
+    while(true){
+        igraph_bool_t visisted = state->stack[state->stack_index].visited;
+        if(visisted){
+            *element = state->stack[state->stack_index].data.data;
+            state->stack_index--;
+            return true; 
+        }
+        igraph_set_internal_node_t node = state->stack[state->stack_index].data;
+        state->stack_index--;
+        if(node.right){
+            state->stack_index++;
+            state->stack[state->stack_index].data = *node.right;            
+            state->stack[state->stack_index].visited = false;
+        }
+        state->stack_index++;
+        state->stack[state->stack_index].data = node;
+        state->stack[state->stack_index].visited = true;
+        if(node.left){
+            state->stack_index++;
+            state->stack[state->stack_index].data = *node.left;
+            state->stack[state->stack_index].visited = false;
+        }
     }
+    return true; //control flow won't get here but compiler doesn't know that
 }

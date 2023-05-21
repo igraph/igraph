@@ -38,24 +38,22 @@ __BEGIN_DECLS
  * \ingroup types
  */
 
-enum STACK_MODE {LEFT,SELF};
-
 enum COLOR {RED,BLACK};
 
-struct Node
+typedef struct Node
 {
     igraph_integer_t data;
     struct Node* left;
     struct Node* right;
     struct Node* parent;
     enum COLOR color;
-} ;
+} igraph_set_internal_node_t;
 
-struct Stack
+typedef struct Stack
 {
-    struct Node data;
-    enum STACK_MODE mode;
-} ;
+    igraph_set_internal_node_t data;
+    igraph_bool_t visited;
+} igraph_set_internal_stack_t;
 
 #define STACK_LENGTH 20
 /*
@@ -65,12 +63,12 @@ it not possible to make a tree with 2^20 Nodes so this number can be reduced fut
 
 typedef struct s_set_itertor
 {
-    struct Stack stack[STACK_LENGTH];
+    igraph_set_internal_stack_t stack[STACK_LENGTH];
     igraph_integer_t stack_index;
 } igraph_set_iterator_t;
 
 typedef struct s_set{
-    struct Node* root;
+    igraph_set_internal_node_t* root;
     igraph_integer_t size;
 } igraph_set_t;
 
