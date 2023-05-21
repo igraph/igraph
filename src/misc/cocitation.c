@@ -300,8 +300,10 @@ static igraph_error_t igraph_i_neisets_intersect(
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
  *        as the number of vertex IDs in \p vids.
- * \param vids The vertex IDs of the vertices for which the
- *        calculation will be done.
+ * \param from The vertex IDs of the first vertices of the
+ *        pairs for which the calculation will be done.
+ * \param to The vertex IDs of the second vertices of the
+ *        pairs for which the calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
  *        \clist
@@ -592,8 +594,10 @@ igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows and columns is the same
  *        as the number of vertex IDs in \p vids.
- * \param vids The vertex IDs of the vertices for which the
- *        calculation will be done.
+ * \param from The vertex IDs of the first vertices of the
+ *        pairs for which the calculation will be done.
+ * \param to The vertex IDs of the second vertices of the
+ *        pairs for which the calculation will be done.
  * \param mode The type of neighbors to be used for the calculation in
  *        directed graphs. Possible values:
  *        \clist
