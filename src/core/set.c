@@ -48,9 +48,18 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
     IGRAPH_ASSERT(set != NULL);
     set->root = NULL;
     set->size = 0;
-    set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
+    set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, igraph_set_internal_rbnode);
     IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
+    set->left = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, igraph_integer_t);
+    IGRAPH_CHECK_OOM(set->left, "Cannot reserve space for set.");
+    set->right = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, igraph_integer_t);
+    IGRAPH_CHECK_OOM(set->right, "Cannot reserve space for set.");
+    set->parent = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, igraph_integer_t);
+    IGRAPH_CHECK_OOM(set->parent, "Cannot reserve space for set.");
+    set->color = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, enum COLOR);
+    IGRAPH_CHECK_OOM(set->color, "Cannot reserve space for set.");
     set->capacity = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
+    
     return IGRAPH_SUCCESS;
 }
 
@@ -66,10 +75,18 @@ igraph_error_t igraph_set_init(igraph_set_t *set) {
  */
 void igraph_set_destroy(igraph_set_t* set) {
     IGRAPH_ASSERT(set != NULL);
-    IGRAPH_FREE(set->pool);
+    if(set->pool) IGRAPH_FREE(set->pool);
+    set->pool = NULL;
+    if(set->left) IGRAPH_FREE(set->left);
+    set->left = NULL;
+    if(set->right) IGRAPH_FREE(set->right);
+    set->right = NULL;
+    if(set->parent) IGRAPH_FREE(set->parent);
+    set->parent = NULL;
+    IGRAPH_FREE(set->color);
+    set->color = NULL;
     set->root = NULL;
     set->size = 0;
-    set->pool = NULL;
     set->capacity = 0;
 }
 
@@ -109,167 +126,214 @@ igraph_integer_t igraph_set_size(const igraph_set_t* set) {
     return set->size;
 }
 
-void LeftRotate(igraph_set_t *set, igraph_integer_t x) {
-    igraph_integer_t y = SET(set, x)->right;
-    SET(set, x)->right = SET(set, y)->left;
+void LeftRotate(igraph_set_t* set, igraph_integer_t x){
+    igraph_integer_t y = RIGHT(set, x);
+    RIGHT(set, x) = LEFT(set, y);
 
-    if (SET(set, y)->left != -1) {
-        SET(set, SET(set, y)->left)->parent = x;
+    if (LEFT(set, y) != -1) {
+        PARENT(set, LEFT(set, y)) = x;
     }
 
-    SET(set, y)->parent = SET(set, x)->parent;
+    PARENT(set, y) = PARENT(set, x);
 
-    if (SET(set, x)->parent == -1) {
+    if (PARENT(set, x) == -1) {
         set->root = SET(set, y);
     }
 
-    else if (x == SET(set, SET(set,x)->parent)->left) {
-        SET(set, SET(set,x)->parent)->left = y;
+    else if (x == LEFT(set, PARENT(set, x))) {
+        LEFT(set, PARENT(set, x)) = y;
     }
 
     else {
-        SET(set, SET(set,x)->parent)->right = y;
+        RIGHT(set, PARENT(set, x)) = y;
     }
 
-    SET(set, y)->left = x;
+    LEFT(set, y) = x;
 
-    SET(set, x)->parent = y;
+    PARENT(set, x) = y;
+
 }
 
-void RightRotate(igraph_set_t *set, igraph_integer_t x) {
-    igraph_integer_t y = SET(set, x)->left;
-    SET(set, x)->left = SET(set, y)->right;
-
-    if (SET(set,y)->right != -1) {
-        SET(set, SET(set, y)->right)->parent = x;
+void RightRotate(igraph_set_t* set, igraph_integer_t x) {
+    igraph_integer_t y = LEFT(set, x);
+    LEFT(set, x) = RIGHT(set, y);
+    if (RIGHT(set, y) != -1) {
+        PARENT(set, RIGHT(set, y)) = x;
     }
 
-    SET(set, y)->parent = SET(set, x)->parent;
+    PARENT(set, y) = PARENT(set, x);
 
-    if (SET(set, x)->parent == -1) {
+    if (PARENT(set, x) == -1) {
         set->root = SET(set, y);
     }
 
-    else if (x == SET(set, SET(set, x)->parent)->left) {
-        SET(set, SET(set, x)->parent)->left = y;
+    else if (x == LEFT(set, PARENT(set, x))) {
+        LEFT(set, PARENT(set, x)) = y;
     }
 
     else {
-        SET(set, SET(set, x)->parent)->right = y;
+        RIGHT(set, PARENT(set, x)) = y;
     }
 
-    SET(set, y)->right = x;
-    SET(set, x)->parent = y;
+    RIGHT(set, y) = x;
+
+    PARENT(set, x) = y;
 
 }
 
-void RB_insert_fixup(igraph_set_t *set, igraph_integer_t z) {
+void RB_insert_fixup(igraph_set_t* set, igraph_integer_t z) {
     igraph_integer_t grandparent = -1;
     igraph_integer_t parentpt = -1;
 
-    while (((z) != SET_ROOT_INDEX(set)) && (SET(set, z)->color != BLACK) && (SET(set, SET(set, z)->parent)->color == RED)) {
-        parentpt = SET(set, z)->parent;
-        grandparent = SET(set, SET(set, z)->parent)->parent;
 
-        if (parentpt == SET(set, grandparent)->left) {
-            igraph_integer_t uncle = SET(set, grandparent)->right;
+    while ((z != ROOTINDEX(set)) && (COLOR(set, z) != BLACK) && (COLOR(set, PARENT(set, z)) == RED)) {
+        parentpt = PARENT(set, z);
+        grandparent = PARENT(set, PARENT(set, z));
 
-            if (uncle != -1 && SET(set,uncle)->color == RED) {
-                SET(set, grandparent)->color = RED;
-                SET(set, parentpt)->color = BLACK;
-                SET(set, uncle)->color = BLACK;
+        if (parentpt == LEFT(set, grandparent)) {
+            igraph_integer_t uncle = RIGHT(set, grandparent);
+
+            if (uncle != -1 && COLOR(set, uncle) == RED) {
+                COLOR(set, grandparent) = RED;
+                COLOR(set, parentpt) = BLACK;
+                COLOR(set, uncle) = BLACK;
                 z = grandparent;
             }
 
             else {
-                if (z == SET(set, parentpt)->right) {
+                if (z == RIGHT(set, parentpt)) {
                     LeftRotate(set, parentpt);
                     z = parentpt;
-                    parentpt = SET(set, z)->parent;
+                    parentpt = PARENT(set, z);
                 }
 
                 RightRotate(set, grandparent);
-                SET(set, parentpt)->color = BLACK;
-                SET(set, grandparent)->color = RED;
+                COLOR(set, parentpt) = BLACK;
+                COLOR(set, grandparent) = RED;
                 z = parentpt;
             }
         }
 
         else {
-            igraph_integer_t uncle = SET(set, grandparent)->left;
+            igraph_integer_t uncle = LEFT(set, grandparent);
 
-            if (uncle != -1 && SET(set, uncle)->color == RED) {
-                SET(set, grandparent)->color = RED;
-                SET(set, parentpt)->color = BLACK;
-                SET(set, uncle)->color = BLACK;
+            if (uncle != -1 && COLOR(set, uncle) == RED) {
+                COLOR(set, grandparent) = RED;
+                COLOR(set, parentpt) = BLACK;
+                COLOR(set, uncle) = BLACK;
                 z = grandparent;
             }
 
             else {
-                if (z == SET(set, parentpt)->left) {
+                if (z == PARENT(set, parentpt)) {
                     RightRotate(set, parentpt);
                     z = parentpt;
-                    parentpt = SET(set, z)->parent;
+                    parentpt = PARENT(set, z);
                 }
 
                 LeftRotate(set, grandparent);
-                SET(set, parentpt)->color = BLACK;
-                SET(set, grandparent)->color = RED;
+                COLOR(set, parentpt) = BLACK;
+                COLOR(set, grandparent) = RED;
                 z = parentpt;
             }
         }
     }
-    set->root->color = BLACK;
+    COLOR(set, set->root->index) = BLACK;
 
 }
 
-struct Node* RB_insert(igraph_set_t* set, igraph_integer_t z) {
-    
-    igraph_integer_t y = -1;
-    igraph_integer_t x = SET_ROOT_INDEX(set);//root
 
+igraph_set_internal_rbnode* RB_insert(
+    igraph_set_t* set, igraph_set_internal_rbnode* z, 
+    igraph_integer_t data, igraph_integer_t index
+){
+    z->data = data;
+    z->index = index;
+    PARENT(set, index) = -1;
+    RIGHT(set, index) = -1;
+    LEFT(set, index) = -1;
+    COLOR(set, index) = RED;
+
+    igraph_integer_t y = -1;
+    igraph_integer_t x = ROOTINDEX(set);//root
     while (x != -1) {
         y = x;
-        if (SET(set, z)->data < SET(set, x)->data) {
-            x = SET(set, x)->left;
+        if (z->data < SET(set, x)->data) {
+            x = LEFT(set, x);
         }
 
         else {
-            x = SET(set, x)->right;
+            x = RIGHT(set, x);
         }
     }
-    SET(set, z)->parent = y;
+    PARENT(set, z->index) = y;
 
     if (y == -1) {
-        set->root = SET(set, z);
+        set->root = z;
     }
 
-    else if (SET(set, z)->data < SET(set,y)->data) {
-        SET(set, y)->left = z;
+    else if (z->data < SET(set, y)->data) {
+        LEFT(set, y) = z->index;
     }
 
     else {
-        SET(set, y)->right = z;
+        RIGHT(set, y) = z->index;
     }
 
-    RB_insert_fixup(set, z);
+    RB_insert_fixup(set, z->index);
 
     return set->root;
 }
 
+
 igraph_error_t igraph_set_reserve(igraph_set_t* set){
     /*In case someone uses a set after calling destroy is it, since destroy is just used a clear function*/
     if(set->capacity == 0){
-        set->pool = IGRAPH_CALLOC(IGRAPH_SET_PARAMETER_STARTING_CAPACITY, struct Node);
-        IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
-        set->capacity = IGRAPH_SET_PARAMETER_STARTING_CAPACITY;
-        return IGRAPH_SUCCESS;
+        IGRAPH_CHECK(igraph_set_init(set));
     }
-    set->capacity = set->capacity + set->capacity / 2;
-    //printf("New set capacity %ld\n Old Capacity %ld\n", new_capacity, set->capacity);
-    set->pool = IGRAPH_REALLOC(set->pool, set->capacity, struct Node);
+    set->capacity = set->capacity << 1;
+
+    set->pool = IGRAPH_REALLOC(set->pool, set->capacity, igraph_set_internal_rbnode);
     IGRAPH_CHECK_OOM(set->pool, "Cannot reserve space for set.");
+    set->left = IGRAPH_REALLOC(set->left, set->capacity, igraph_integer_t);
+    IGRAPH_CHECK_OOM(set->left, "Cannot reserve space for set.");
+    set->right = IGRAPH_REALLOC(set->right, set->capacity, igraph_integer_t);
+    IGRAPH_CHECK_OOM(set->right, "Cannot reserve space for set.");
+    set->parent = IGRAPH_REALLOC(set->parent, set->capacity, igraph_integer_t);
+    IGRAPH_CHECK_OOM(set->parent, "Cannot reserve space for set.");
+    set->color = IGRAPH_REALLOC(set->color, set->capacity, enum COLOR);
+    IGRAPH_CHECK_OOM(set->color, "Cannot reserve space for set.");
+
     return IGRAPH_SUCCESS;
+}
+ 
+igraph_set_internal_rbnode* BST_search(
+    const igraph_set_t* set, igraph_set_internal_rbnode* node,
+    int x
+){
+    if(node == NULL || node->data == x)
+        return node;
+
+    if(node->data > x)
+       return  BST_search(set, SETWITHCHECK(set, LEFT(set, node->index)),x);
+    else
+       return BST_search(set, SETWITHCHECK(set, RIGHT(set, node->index)),x);
+}
+
+/**
+ * \ingroup set
+ * \function igraph_set_contains
+ * \brief Checks whether a given element is in the set or not.
+ *
+ * \param set The set object.
+ * \param e The element being sought.
+ * \return Positive integer (true) if \p e is found, zero (false) otherwise.
+ *
+ * Time complexity: O(log(n)), n is the number of elements in \p set.
+ */
+igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
+    IGRAPH_ASSERT(set != NULL);
+    return BST_search(set, set->root, e);
 }
 
 /**
@@ -291,175 +355,151 @@ igraph_error_t igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     if(set->size == set->capacity){
         IGRAPH_CHECK(igraph_set_reserve(set));
     }
-    struct Node* z = set->pool + set->size;
-    z->data = e;
-    z->left = -1;
-    z->right = -1;
-    z->parent = -1;
-    z->color = RED;
-    z->index = set->size;
-    set->root = RB_insert(set, z->index);
+    igraph_set_internal_rbnode* newNode = set->pool + set->size;
+    set->root = RB_insert(set, newNode, e, set->size);
     set->size++;
     return IGRAPH_SUCCESS;
 }
 
-igraph_integer_t Tree_minimum(igraph_set_t *set, igraph_integer_t node)
+
+igraph_set_internal_rbnode* Tree_minimum(igraph_set_t *set, igraph_set_internal_rbnode* node)
 {
-    while(SET(set, node)->left!=-1)
-        node = SET(set, node)->left;
+    while( LEFT(set, node->index) != -1)
+        node = SET(set, LEFT(set, node->index));
 
     return node;
 }
 
-void RB_delete_fixup(igraph_set_t *set,igraph_integer_t x)
-{
-    while(x!=SET_ROOT_INDEX(set) && SET(set, x)->color == BLACK)
-    {
-        if(x==SET(set, SET(set, x)->parent)->left)
-        {
-            igraph_integer_t w = SET(set, SET(set, x)->parent)->right;
+void RB_delete_fixup(igraph_set_t *set, igraph_integer_t x){
+    while(x != ROOTINDEX(set) && COLOR(set, x) == BLACK){
+        if( x == LEFT(set, PARENT(set, x))){
+            igraph_integer_t w = RIGHT(set, PARENT(set, x));
 
-            if(SET(set,w)->color==RED)
-            {
-                SET(set,w)->color = BLACK;
-                SET(set, SET(set, x)->parent)->color = BLACK;
-                LeftRotate(set, SET(set, x)->parent);
-                w = SET(set, SET(set, x)->parent)->right;
+            if( COLOR(set, w) == RED ){
+                COLOR(set, w) = BLACK;
+                COLOR(set, PARENT(set, x)) = BLACK;
+                LeftRotate(set, PARENT(set, x));
+                w = RIGHT(set, PARENT(set, x));
             }
 
-            if(SET(set, SET(set, w)->left)->color==BLACK && SET(set, SET(set, w)->right)->color == BLACK)
-            {
-                SET(set, w)->color = RED;
-                x = SET(set, x)->parent;
+            if( COLOR(set, LEFT(set, w)) == BLACK && COLOR(set, RIGHT(set, w)) == BLACK){
+                COLOR(set, w) = RED;
+                x = PARENT(set, x);
             }
 
             else
             {
-                if(SET(set, SET(set, w)->right)->color == BLACK)
+                if(COLOR(set, RIGHT(set, w)) == BLACK)
                 {
-                    SET(set, SET(set, w)->left)->color = BLACK;
-                    SET(set, w)->color = RED;
+                    COLOR(set, LEFT(set, w)) = BLACK;
+                    COLOR(set, w) = RED;
                     RightRotate(set, w);
-                    w = SET(set, SET(set, x)->parent)->right;
+                    w = PARENT(set, RIGHT(set, x));
                 }
 
-                SET(set, w)->color = SET(set, SET(set, x)->parent)->color;
-                SET(set, SET(set, x)->parent)->color = BLACK;
-                SET(set, SET(set, w)->right)->color = BLACK;
-                LeftRotate(set, SET(set, x)->parent);
-                x = SET_ROOT_INDEX(set);
+                COLOR(set, w) = COLOR(set, PARENT(set, x));
+                COLOR(set, PARENT(set, x)) = BLACK;
+                COLOR(set, RIGHT(set, w)) = BLACK;
+                LeftRotate(set, PARENT(set, x));
+                x = ROOTINDEX(set);
             }
         }
 
         else
         {
-            igraph_integer_t w = SET(set, SET(set, x)->parent)->left;
+            igraph_integer_t w = LEFT(set, PARENT(set, x));
 
-            if(SET(set, w)->color==RED)
-            {
-                SET(set, w)->color = BLACK;
-                SET(set, SET(set, x)->parent)->color = BLACK;
-                RightRotate(set, SET(set, x)->parent);
-                w = SET(set, SET(set, x)->parent)->left;
+            if( COLOR(set, w) == RED ){
+                COLOR(set, w) = BLACK;
+                COLOR(set, PARENT(set, x)) = BLACK;
+                RightRotate(set, PARENT(set, x));
+                w = LEFT(set, PARENT(set, x));
             }
 
-            if(SET(set, SET(set, w)->right)->color==BLACK && SET(set, SET(set, w)->left)->color == BLACK)
-            {
-                SET(set, w)->color = RED;
-                x = SET(set, x)->parent;
+            if( COLOR(set, LEFT(set, w)) == BLACK && COLOR(set, RIGHT(set, w)) == BLACK){
+                COLOR(set, w) = RED;
+                x = PARENT(set, x);
             }
 
             else
             {
-                if(SET(set, SET(set, w)->left)->color == BLACK)
+                if( COLOR(set, LEFT(set, w)) == BLACK )
                 {
-                    SET(set, SET(set, w)->right)->color = BLACK;
-                    SET(set, w)->color = RED;
+                    COLOR(set, RIGHT(set, w)) = BLACK;
+                    COLOR(set, w) = RED;
                     LeftRotate(set, w);
-                    w = SET(set, SET(set, x)->parent)->left;
+                    w = LEFT(set, PARENT(set, x));
                 }
 
-                SET(set, w)->color = SET(set, SET(set, x)->parent)->color;
-                SET(set, SET(set, x)->parent)->color = BLACK;
-                SET(set, SET(set, w)->left)->color = BLACK;
-                RightRotate(set, SET(set, x)->parent);
-                x = SET_ROOT_INDEX(set);
+                COLOR(set, w) = COLOR(set, PARENT(set, x));
+                COLOR(set, PARENT(set, x)) = BLACK;
+                COLOR(set, LEFT(set, w)) = BLACK;
+                RightRotate(set, PARENT(set, x));
+                x = ROOTINDEX(set);
             }
         }
     }
-    SET(set, x)->color = BLACK;
+    COLOR(set, x) = BLACK;
+
 }
 
-void RB_transplat(igraph_set_t *set, igraph_integer_t u,igraph_integer_t v)
+void RB_transplat(igraph_set_t *set, igraph_integer_t u, igraph_integer_t v)
 {
-    if(SET(set, u)->parent == -1)
+    if(PARENT(set, u) == -1)
         set->root = SET(set, v);
-
-    else if(u==SET(set, SET(set, u)->parent)->left)
-        SET(set, SET(set, u)->parent)->left  = v;
+    else if (u == LEFT(set, PARENT(set, u)))
+        LEFT(set, PARENT(set, u)) = v;
     else
-        SET(set, SET(set, u)->parent)->right = v;
+        RIGHT(set, PARENT(set, u)) = v;
 
-    if(v!=-1) 
-        SET(set, v)->parent = SET(set, u)->parent;
+    if( v != -1 ) 
+        PARENT(set, v) = PARENT(set, u);
 }
 
-struct Node* RB_delete(igraph_set_t *set,igraph_integer_t z)
-{
+igraph_set_internal_rbnode* RB_delete(igraph_set_t *set, igraph_integer_t z){
     igraph_integer_t y = z;
     enum COLOR yoc;
-    yoc = SET(set, z)->color; // y's original color
+    yoc = COLOR(set, z); // y's original color
 
     igraph_integer_t x;
 
-    if(SET(set, z)->left==-1 )
-    {
-        x = SET(set, z)->right;
-        RB_transplat(set, z, SET(set, z)->right);
+    if( LEFT(set, z) == -1 ){
+        x = RIGHT(set, z);
+        RB_transplat(set, z, RIGHT(set, z));
     }
 
-    else if(SET(set, z)->right==-1 )
+    else if( RIGHT(set, z) == -1 )
     {
-        x = SET(set, z)->left;
-        RB_transplat(set, z, SET(set, z)->left);
+        x = LEFT(set, z);
+        RB_transplat(set , z, LEFT(set, z));
     }
 
     else
     {
-        y = Tree_minimum(set, SET(set, z)->right);
-        yoc = SET(set, y)->color;
-        x = SET(set, y)->right;
+        y = Tree_minimum(set, SET(set, RIGHT(set, z))) ->index;
+        yoc = COLOR(set, y);
+        x = RIGHT(set, y);
 
-        if(SET(set, y)->parent==z && x!=-1)
-            SET(set, x)->parent = y;
+        if( PARENT(set, y) == z && x != -1 )
+            PARENT(set, x) = y;
 
-        if(SET(set, y)->parent!=z)
+        if( PARENT(set, y) != z )
         {
-            RB_transplat(set, y, SET(set, y)->right);
-            SET(set, y)->right = SET(set, z)->right;
-            SET(set, SET(set, y)->right)->parent = y;
+            RB_transplat(set, y, RIGHT(set, y));
+            RIGHT(set, y) = RIGHT(set, z);
+            PARENT(set, RIGHT(set, y)) = y;
         }
 
         RB_transplat(set, z, y);
-        SET(set, y)->left = SET(set, z)->left;
-        SET(set, SET(set, y)->left)->parent = y;
-        SET(set, y)->color = SET(set, z)->color;
+        LEFT(set, y) = LEFT(set, z);
+        PARENT(set, LEFT(set, y)) = y;
+        COLOR(set, y) = COLOR(set, z);
     }
 
     if(yoc==BLACK)
         RB_delete_fixup(set, x);
 
     return set->root;
-}
-struct Node* BST_search(const igraph_set_t *set, struct Node* node, int x)
-{
-    if(node==NULL || node->data == x)
-        return node;
-
-    if(node->data > x)
-       return  BST_search(set, SET(set, node->left),x);
-    else
-        return BST_search(set, SET(set, node->right),x);
 }
 
 
@@ -480,23 +520,9 @@ void igraph_set_delete(igraph_set_t* set, igraph_integer_t e){
         return ;
     }    
     set->root = RB_delete(set, node_to_delete->index);
+    set->size--;
 }
 
-/**
- * \ingroup set
- * \function igraph_set_contains
- * \brief Checks whether a given element is in the set or not.
- *
- * \param set The set object.
- * \param e The element being sought.
- * \return Positive integer (true) if \p e is found, zero (false) otherwise.
- *
- * Time complexity: O(log(n)), n is the number of elements in \p set.
- */
-igraph_bool_t igraph_set_contains(const igraph_set_t* set, igraph_integer_t e) {
-    IGRAPH_ASSERT(set != NULL);
-    return BST_search(set, set->root, e);
-}
 
 
 /**
@@ -513,6 +539,127 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set){
 }
 
 
+// igraph_set_internal_iterator_node create_iterator_node(
+//     igraph_set_internal_rbnode* src,const igraph_set_t* set
+// ){
+//     igraph_set_internal_iterator_node dest;
+//     dest.data = src->data;
+//     dest.right  =  SETWITHCHECK(set, RIGHT(set, src->index));
+//     dest.parent = SETWITHCHECK(set, PARENT(set, src->index));
+//     dest.left   =   SETWITHCHECK(set, LEFT(set, src->index));
+//     dest.index = src->index;
+//     return dest;     
+// }
+
+// /**
+//  * \ingroup set
+//  * \function igraph_set_iterator_init
+//  * \brief Initializes a set iterator
+//  *
+//  * \param set Pointer to the set to be iterated upon.
+//  * \param iterator Pointer to the Iterator to be initialised 
+//  *
+//  * Time complexity: O(1)
+//  */
+// void igraph_set_iterator_init(
+//     const igraph_set_t* set, igraph_set_iterator_t* iterator
+// ){
+//     IGRAPH_ASSERT(set != NULL);
+//     if (set->root == NULL) {
+//         iterator->stack_index = -1;
+//         return ;
+//     }
+//     iterator->stack[0].data = create_iterator_node(set->root, set);
+//     iterator->stack_index = 0;
+//     iterator->stack[0].mode = LEFT;
+// }
+
+// igraph_integer_t iterate_self(
+//     const igraph_set_t* set, igraph_set_iterator_t *state
+// ){
+//     igraph_set_internal_iterator_node *node = &(state->stack[state->stack_index].data);
+//     igraph_integer_t data = node->data;
+//     if (node->right != NULL) {
+//         state->stack[state->stack_index].data = create_iterator_node(node->right, set);
+//         state->stack[state->stack_index].mode = LEFT;
+//     } else if (node->parent != NULL && state->stack_index > 0 ) {
+//         state->stack_index--;
+//         state->stack[state->stack_index].mode = SELF;
+//     } else {
+//         state->stack_index--;
+//     }
+//     return data;
+// }
+
+// igraph_integer_t iterate_left(
+//     const igraph_set_t* set, igraph_set_iterator_t *state
+// ){
+//     igraph_set_internal_rbnode node;
+//     node.data = state->stack[state->stack_index].data.data;
+//     node.index = state->stack[state->stack_index].data.index;
+//     for ( ; LEFT(set, node.index) != -1 ; state->stack_index++) {
+//         state->stack[state->stack_index + 1 ].data = create_iterator_node(SETWITHCHECK(set, LEFT(set, node.index)), set);
+//         state->stack[state->stack_index + 1 ].mode = LEFT;
+//         node = *SET(set, LEFT(set, node.index));
+//     }
+//     state->stack_index--;
+//     if(state->stack_index >= 0){
+//         state->stack[state->stack_index].mode = SELF;
+//     }
+//     // printf("inside iterate left, last state data %ld\n", state->stack[state->stack_index].data.data);
+//     return node.data;
+// }
+
+
+
+// /**
+//  * \ingroup set
+//  * \function igraph_set_iterate
+//  * \brief Iterates through the element of the set.
+//  *
+//  * Elements are returned in an sorted order. 
+//  * Inserting elements while iterating might be ignored.
+//  * Deleting elements while iterating might be ignored (they might still be returned).
+//  * Deleting the element the iterate is pointing to(the latest one returned) will have no issue. 
+//  *
+//  * \param set The set object.
+//  * \param state Internal state of the iteration.
+//  *   This should be a pointer to an \c igraph_set_iterator_t variable
+//  *   which must be first initialised via igraph_set_iterator_init.
+//  *   The object must not be adjusted and its value should
+//  *   not be used for anything during the iteration.
+//  * \param element The next element or 0 (if the iteration
+//  *   has ended) is returned here.
+//  *
+//  * \return Nonzero if there are more elements, zero otherwise.
+//  */
+// igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t *state,
+//                                  igraph_integer_t *element) {
+//     IGRAPH_ASSERT(set != NULL);
+//     IGRAPH_ASSERT(state != NULL);
+//     if (state->stack_index < 0) {
+//         element = NULL;
+//         return false;
+//     }
+//     enum STACK_MODE mode = state->stack[state->stack_index].mode;
+//     switch (mode) {
+//         case LEFT:
+//             *element = iterate_left(set, state);
+//             return true;
+//         case SELF:
+//             *element = iterate_self(set, state);
+//             return true;
+//     }
+// }
+
+void InOrder(const igraph_set_t *set, igraph_set_internal_rbnode* node, igraph_set_iterator_t* iterator) {
+    if(node == NULL) return ;
+    InOrder(set, SETWITHCHECK(set, LEFT(set, node->index)), iterator);
+    iterator->data[iterator->index] = node->data;
+    iterator->index++;
+    InOrder(set, SETWITHCHECK(set, RIGHT(set, node->index)), iterator);
+}
+
 /**
  * \ingroup set
  * \function igraph_set_iterator_init
@@ -523,49 +670,16 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set){
  *
  * Time complexity: O(1)
  */
-void igraph_set_iterator_init(const igraph_set_t* set, igraph_set_iterator_t* iterator) {
+void igraph_set_iterator_init(
+    const igraph_set_t* set, igraph_set_iterator_t* iterator
+){
     IGRAPH_ASSERT(set != NULL);
-    if (set->root == NULL) {
-        iterator->stack_index = -1;
-        return ;
-    }
-    iterator->stack[0].data = *(set->root);
-    iterator->stack_index = 0;
-    iterator->stack[0].mode = LEFT;
+    IGRAPH_ASSERT(iterator != NULL);
+    iterator->data = IGRAPH_CALLOC(set->size, igraph_integer_t);
+    iterator->index = 0;
+    InOrder(set, set->root, iterator);
+    iterator->index = 0;
 }
-
-igraph_integer_t iterate_self(const igraph_set_t *set, igraph_set_iterator_t *state) {
-    struct Node *node = &(state->stack[state->stack_index].data);
-    igraph_integer_t data = node->data;
-    if (node->right != -1) {
-        state->stack[state->stack_index].data = *SET(set, node->right);
-        state->stack[state->stack_index].mode = LEFT;
-    } else if (node->parent != -1 && state->stack_index > 0 ) {
-        state->stack_index--;
-        state->stack[state->stack_index].mode = SELF;
-    } else {
-        state->stack_index--;
-    }
-    return data;
-}
-
-igraph_integer_t iterate_left(const igraph_set_t *set, igraph_set_iterator_t *state) {
-    struct Node *node = &(state->stack[state->stack_index].data);
-
-    for ( ; node->left != -1 ; state->stack_index++) {
-        state->stack[state->stack_index + 1 ].data = *SET(set, node->left);
-        state->stack[state->stack_index + 1 ].mode = LEFT;
-        node = SET(set, node->left);
-    }
-    state->stack_index--;
-    if(state->stack_index >= 0){
-        state->stack[state->stack_index].mode = SELF;
-    }
-    // printf("inside iterate left, last state data %ld\n", state->stack[state->stack_index].data.data);
-    return node->data;
-}
-
-
 
 /**
  * \ingroup set
@@ -592,34 +706,29 @@ igraph_bool_t igraph_set_iterate(const igraph_set_t *set, igraph_set_iterator_t 
                                  igraph_integer_t *element) {
     IGRAPH_ASSERT(set != NULL);
     IGRAPH_ASSERT(state != NULL);
-    if (state->stack_index < 0) {
+    if(state->index < set->size){
+        *element = *(state->data + state->index);
+        state->index++;
+        return true;
+    }else{
         element = NULL;
         return false;
     }
-    enum STACK_MODE mode = state->stack[state->stack_index].mode;
-    switch (mode) {
-        case LEFT:
-            *element = iterate_left(set, state);
-            return true;
-        case SELF:
-            *element = iterate_self(set, state);
-            return true;
-    }
 }
 
-void print2DUtil(const igraph_set_t* set, struct Node* root, int space, FILE * output_stream) {
+void print2DUtil(const igraph_set_t *set, igraph_set_internal_rbnode* node, int space, FILE * output_stream) {
     #define COUNT 10
-    if (root == NULL) {
+    if (node == NULL) {
         return;
     }
     space += COUNT;
-    print2DUtil(set, SET(set, root->right), space,output_stream);
+    print2DUtil(set, SETWITHCHECK(set, RIGHT(set, node->index)), space,output_stream);
     fprintf(output_stream, "\n");
     for (int i = COUNT; i < space; i++) {
         fprintf(output_stream, " ");
     }
-    printf("%" IGRAPH_PRId "\n", root->data);
-    print2DUtil(set, SET(set, root->left), space,output_stream);
+    printf("%" IGRAPH_PRId "\n", node->data);
+    print2DUtil(set, SETWITHCHECK(set, LEFT(set, node->index)), space,output_stream);
 }
 
 /**
