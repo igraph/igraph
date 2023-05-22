@@ -50,7 +50,7 @@ IGRAPH_VECTOR_EMCC(ii)
 IGRAPH_VECTOR_EMCC(is)
 IGRAPH_VECTOR_EMCC(os)
 
-EMSCRIPTEN_BINDINGS(AnimatelyGif)
+EMSCRIPTEN_BINDINGS(IGraph)
 {
   class_<igraph_t>("graph").
     constructor().
