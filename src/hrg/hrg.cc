@@ -626,8 +626,6 @@ igraph_error_t igraph_from_hrg_dendrogram(
 
 /**
  * \function igraph_hrg_dendrogram
- * \deprecated-by igraph_hrg_dendrogram 0.10.5
- *
  * \brief Create a dendrogram from a hierarchical random graph.
  *
  * Creates the igraph graph equivalent of an \ref igraph_hrg_t data
@@ -639,6 +637,8 @@ igraph_error_t igraph_from_hrg_dendrogram(
  * \return Error code.
  *
  * Time complexity: O(n), the number of vertices in the graph.
+ *
+ * \deprecated-by igraph_hrg_dendrogram 0.10.5
  */
 igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
    igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
