@@ -24,6 +24,7 @@
 - `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
 - `igraph_hub_score()` and `igraph_authority_score()` are now deprecated. Use `igraph_hub_and_authority_scores()` instead.
 - `igraph_get_incidence()` is now deprecated; its new name is `igraph_get_biadjacency()` to reflect that the returned matrix is an _adjacency_ matrix between pairs of vertices and not an _incidence_ matrix between vertices and edges. The new name is kept available until at least igraph 0.11. We plan to re-use the name in later versions to provide a proper incidence matrix where the rows are vertices and the columns are edges.
+- `igraph_hrg_dendrogram()` is deprecated because it requires an attribute handler and it goes against the convention of returning attributes in vectors where possible. Use `igraph_from_hrg_dendrogram()` instead, which constructs the dendrogram as an igraph graph _and_ returns the associated probabilities in a vector.
 
 ### Other
 

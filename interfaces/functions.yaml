@@ -1706,9 +1706,6 @@ igraph_hrg_sample_many:
 igraph_hrg_game:
     PARAMS: OUT GRAPH graph, HRG hrg
 
-igraph_hrg_dendrogram:
-    PARAMS: OUT GRAPH graph, HRG hrg
-
 igraph_hrg_consensus:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT parents, OUT VECTOR weights,
@@ -1732,6 +1729,9 @@ igraph_hrg_resize:
 igraph_hrg_size:
     PARAMS: HRG hrg
     RETURN: INTEGER
+
+igraph_from_hrg_dendrogram:
+    PARAMS: OUT GRAPH graph, HRG hrg, OUT VECTOR prob
 
 #######################################
 # Conversion
