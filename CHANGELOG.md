@@ -36,7 +36,7 @@
 ### Added
 
  - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
- - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics through `IGRAPH_COLORING_GREEDY_DSATUR` (#2284, thanks to @professorcode1).
 
 ### Changed
 
