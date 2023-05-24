@@ -771,6 +771,7 @@ igraph_error_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A, igraph
  * single matrix entry in multiple pieces. The entry is then the sum
  * of all its pieces. (Some functions create matrices like this.) This
  * function eliminates the multiple pieces.
+ *
  * \param A The input matrix, in column-compressed format.
  * \return Error code.
  *
@@ -806,6 +807,7 @@ static CS_INT fkeep_wrapper(CS_INT row, CS_INT col, double value, void* data) {
  * sparse matrix. For all entries, it calls the supplied function and
  * depending on the return values either keeps, or deleted the element
  * from the matrix.
+ *
  * \param A The input matrix, in column-compressed format.
  * \param fkeep The filter function. It must take four arguments: the
  *    first is an \c igraph_integer_t, the row index of the entry, the second is
@@ -849,6 +851,7 @@ igraph_error_t igraph_sparsemat_fkeep(
  *
  * As a result of matrix operations, some of the entries in a sparse
  * matrix might be zero. This function removes these entries.
+ *
  * \param A The input matrix, it must be in column-compressed format.
  * \return Error code.
  *
@@ -871,6 +874,7 @@ igraph_error_t igraph_sparsemat_dropzeros(igraph_sparsemat_t *A) {
  * This function is similar to \ref igraph_sparsemat_dropzeros(), but it
  * also drops entries that are closer to zero than the given tolerance
  * threshold.
+ *
  * \param A The input matrix, it must be in column-compressed format.
  * \param tol Real number, giving the tolerance threshold.
  * \return Error code.
@@ -896,6 +900,7 @@ igraph_error_t igraph_sparsemat_droptol(igraph_sparsemat_t *A, igraph_real_t tol
  * \brief Matrix multiplication.
  *
  * Multiplies two sparse matrices.
+ *
  * \param A The first input matrix (left hand side), in
  *   column-compressed format.
  * \param B The second input matrix (right hand side), in
@@ -988,6 +993,7 @@ igraph_error_t igraph_sparsemat_gaxpy(const igraph_sparsemat_t *A,
  *
  * Solve the Lx=b linear equation system, where the L coefficient
  * matrix is square and lower-triangular, with a zero-free diagonal.
+ *
  * \param L The input matrix, in column-compressed format.
  * \param b The right hand side of the linear system.
  * \param res An initialized vector, the result is stored here.
@@ -1021,6 +1027,7 @@ igraph_error_t igraph_sparsemat_lsolve(const igraph_sparsemat_t *L,
  *
  * Solve the L'x=b linear equation system, where the L
  * matrix is square and lower-triangular, with a zero-free diagonal.
+ *
  * \param L The input matrix, in column-compressed format.
  * \param b The right hand side of the linear system.
  * \param res An initialized vector, the result is stored here.
@@ -1054,6 +1061,7 @@ igraph_error_t igraph_sparsemat_ltsolve(const igraph_sparsemat_t *L,
  * \brief Solves an upper-triangular linear system.
  *
  * Solves the Ux=b upper triangular system.
+ *
  * \param U The input matrix, in column-compressed format.
  * \param b The right hand side of the linear system.
  * \param res An initialized vector, the result is stored here.
@@ -1087,6 +1095,7 @@ igraph_error_t igraph_sparsemat_usolve(const igraph_sparsemat_t *U,
  *
  * This is the same as \ref igraph_sparsemat_usolve(), but U'x=b is
  * solved, where the apostrophe denotes the transpose.
+ *
  * \param U The input matrix, in column-compressed format.
  * \param b The right hand side of the linear system.
  * \param res An initialized vector, the result is stored here.
@@ -1121,6 +1130,7 @@ igraph_error_t igraph_sparsemat_utsolve(const igraph_sparsemat_t *U,
  * \brief Solves a symmetric linear system via Cholesky decomposition.
  *
  * Solve Ax=b, where A is a symmetric positive definite matrix.
+ *
  * \param A The input matrix, in column-compressed format.
  * \param v The right hand side.
  * \param res An initialized vector, the result is stored here.
@@ -1158,6 +1168,7 @@ igraph_error_t igraph_sparsemat_cholsol(const igraph_sparsemat_t *A,
  * \brief Solves a linear system via LU decomposition.
  *
  * Solve Ax=b, via LU factorization of A.
+ *
  * \param A The input matrix, in column-compressed format.
  * \param b The right hand side of the equation.
  * \param res An initialized vector, the result is stored here.
@@ -1273,6 +1284,7 @@ static igraph_error_t igraph_i_sparsemat_triplet(igraph_t *graph, const igraph_s
  * then delete the entries in the upper diagonal first, or call \ref
  * igraph_simplify() on the result graph to eliminate the multiple
  * edges.
+ *
  * \param graph Pointer to an uninitialized igraph_t object, the
  *    graphs is stored here.
  * \param A The input matrix, in triplet or column-compressed format.
@@ -1409,6 +1421,7 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
  * Only the non-zero entries are printed. This function serves more as
  * a debugging utility, as currently there is no function that could
  * read back the printed matrix from the file.
+ *
  * \param A The input matrix, triplet or column-compressed format.
  * \param outstream The stream to print it to.
  * \return Error code.
@@ -1762,6 +1775,7 @@ igraph_error_t igraph_sparsemat_arpack_rssolve(const igraph_sparsemat_t *A,
  * \brief Eigenvalues and eigenvectors of a nonsymmetric sparse matrix via ARPACK.
  *
  * Eigenvalues and/or eigenvectors of a nonsymmetric sparse matrix.
+ *
  * \param A The input matrix, in column-compressed mode.
  * \param options ARPACK options, it is passed to \ref
  *    igraph_arpack_rnsolve(). Supply \c NULL here to use the defaults.
@@ -1815,6 +1829,7 @@ igraph_error_t igraph_sparsemat_arpack_rnsolve(const igraph_sparsemat_t *A,
  * QR decomposition of sparse matrices involves two steps, the first
  * is calling this function, and then \ref
  * igraph_sparsemat_qr().
+ *
  * \param order The ordering to use: 0 means natural ordering, 1 means
  *   minimum degree ordering of A+A', 2 is minimum degree ordering of
  *   A'A after removing the dense rows from A, and 3 is the minimum
@@ -1845,6 +1860,7 @@ igraph_error_t igraph_sparsemat_symbqr(igraph_integer_t order, const igraph_spar
  *
  * LU decomposition of sparse matrices involves two steps, the first
  * is calling this function, and then \ref igraph_sparsemat_lu().
+ *
  * \param order The ordering to use: 0 means natural ordering, 1 means
  *   minimum degree ordering of A+A', 2 is minimum degree ordering of
  *   A'A after removing the dense rows from A, and 3 is the minimum
@@ -1874,6 +1890,7 @@ igraph_error_t igraph_sparsemat_symblu(igraph_integer_t order, const igraph_spar
  * \brief LU decomposition of a sparse matrix.
  *
  * Performs numeric sparse LU decomposition of a matrix.
+ *
  * \param A The input matrix, in column-compressed format.
  * \param dis The symbolic analysis for LU decomposition, coming from
  *    a call to the \ref igraph_sparsemat_symblu() function.
@@ -1903,6 +1920,7 @@ igraph_error_t igraph_sparsemat_lu(const igraph_sparsemat_t *A,
  * \brief QR decomposition of a sparse matrix.
  *
  * Numeric QR decomposition of a sparse matrix.
+ *
  * \param A The input matrix, in column-compressed format.
  * \param dis The result of the symbolic QR analysis, from the
  *    function \ref igraph_sparsemat_symbqr().
@@ -1932,6 +1950,7 @@ igraph_error_t igraph_sparsemat_qr(const igraph_sparsemat_t *A,
  * \brief Solves a linear system using a precomputed LU decomposition.
  *
  * Uses the LU decomposition of a matrix to solve linear systems.
+ *
  * \param dis The symbolic analysis of the coefficient matrix, the
  *    result of \ref igraph_sparsemat_symblu().
  * \param din The LU decomposition, the result of a call to \ref
@@ -1987,6 +2006,7 @@ igraph_error_t igraph_sparsemat_luresol(const igraph_sparsemat_symbolic_t *dis,
  *
  * Solves a linear system using a QR decomposition of its coefficient
  * matrix.
+ *
  * \param dis Symbolic analysis of the coefficient matrix, the result
  *    of \ref igraph_sparsemat_symbqr().
  * \param din The QR decomposition of the coefficient matrix, the
@@ -2046,6 +2066,7 @@ igraph_error_t igraph_sparsemat_qrresol(const igraph_sparsemat_symbolic_t *dis,
  *
  * Frees the memory allocated by \ref igraph_sparsemat_symbqr() or
  * \ref igraph_sparsemat_symblu().
+ *
  * \param dis The symbolic analysis.
  *
  * Time complexity: O(1).
@@ -2062,6 +2083,7 @@ void igraph_sparsemat_symbolic_destroy(igraph_sparsemat_symbolic_t *dis) {
  *
  * Frees the memoty allocated by \ref igraph_sparsemat_qr() or \ref
  * igraph_sparsemat_lu().
+ *
  * \param din The LU or QR decomposition.
  *
  * Time complexity: O(1).
