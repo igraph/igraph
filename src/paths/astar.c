@@ -151,7 +151,7 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
     /* parent_eids[v] is the 1 + the ID of v's inbound edge in the shortest path tree.
      * A value of 0 indicates unreachable vertices. */
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(parent_eids, "Can't calculate shortest paths.");
+    IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for shortest paths with A* algorithm.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
 
     VECTOR(dists)[from] = 0.0;
