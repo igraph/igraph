@@ -10,6 +10,7 @@
  - `igraph_distances_johnson()` now takes a mode parameter to determine in which direction paths should be followed.
  - `igraph_vector_shuffle()` no longer returns an error code.
  - `igraph_rng_set_default()` now returns a pointer to the previous RNG. Furthermore, this function now only stores a pointer to the `igraph_rng_t` struct passed to it, instead of copying the struct. Thus the `igraph_rng_t` must continue to exist for as long as it is used as the default RNG.
+ - `igraph_similarity_jaccard()` and `igraph_similarity_dice()` now take two sets of vertices to create vertex pairs of, instead of one.
 
 ### Changes
 
