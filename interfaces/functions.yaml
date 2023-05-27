@@ -1488,9 +1488,9 @@ igraph_bibcoupling:
 
 igraph_similarity_dice:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL, VERTEX_SELECTOR to=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR vit_from=ALL, VERTEX_SELECTOR vit_to=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
-    DEPS: from ON graph, to ON graph, res ON from, res ON to
+    DEPS: vit_from ON graph, vit_to ON graph, res ON vit_from, res ON vit_to
 
 igraph_similarity_dice_es:
     PARAMS: |-
@@ -1510,9 +1510,9 @@ igraph_similarity_inverse_log_weighted:
 
 igraph_similarity_jaccard:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL, VERTEX_SELECTOR to=ALL, NEIMODE mode=ALL,
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR vit_from=ALL, VERTEX_SELECTOR vit_to=ALL, NEIMODE mode=ALL,
         BOOLEAN loops=False
-    DEPS: from ON graph, to ON graph, res ON from, res ON to
+    DEPS: vit_from ON graph, vit_to ON graph, res ON vit_from, res ON vit_to
 
 igraph_similarity_jaccard_es:
     PARAMS: |-
