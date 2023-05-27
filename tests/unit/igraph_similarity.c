@@ -154,10 +154,10 @@ int main(void) {
         return 1;
     }
 
-    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), igraph_vss_range(1,3), IGRAPH_ALL, 0);
+    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), igraph_vss_range(1, 3), IGRAPH_ALL, IGRAPH_NO_LOOPS);
     print_matrix(&m);
 
-    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), igraph_vss_1(1), IGRAPH_ALL, 0);
+    igraph_similarity_jaccard(&g, &m, igraph_vss_range(1, 3), igraph_vss_1(1), IGRAPH_ALL, IGRAPH_NO_LOOPS);
     print_matrix(&m);
 
     ret = check_jaccard_all(&g, &m, IGRAPH_OUT, 1);
