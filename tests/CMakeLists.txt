@@ -284,6 +284,7 @@ add_legacy_tests(
   all_shortest_paths
   assortativity
   coreness
+  direct_betweenness
   efficiency
   global_transitivity
   hub_and_authority
