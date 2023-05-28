@@ -41,26 +41,41 @@ igraph_error_t igraph_direct_betweenness_cutoff(
 
     for (igraph_integer_t i_all = 0; i_all < no_of_nodes; i_all ++) {
         igraph_vs_range(&vs_rest, i_all, no_of_nodes);
-        if (!weights) {
-            igraph_get_all_shortest_paths(graph, &vertices, NULL, NULL, i_all, vs_rest, mode);
+        if (cutoff == -1) {
+            if (!weights) {
+                /* when there is more than one shortest path between two vertices,
+                 * all of them will be returned. */
+                /*   The vectors are
+                 *   ordered according to their target vertex: first the shortest paths to
+                 *   vertex 0, then to vertex 1, etc.
+                 *   */
+                igraph_get_all_shortest_paths(graph, &vertices, NULL, NULL, i_all, vs_rest, mode);
+            } else {
+                igraph_get_all_shortest_paths_dijkstra(graph, &vertices, NULL, NULL, i_all, vs_rest, weights, mode);
+            }
         } else {
-            igraph_get_all_shortest_paths_dijkstra(graph, &vertices, NULL, NULL, i_all, vs_rest, weights, mode);
+            IGRAPH_ERROR("Cutoffs are not implemented, set it to -1", IGRAPH_EINVAL);
         }
         igraph_integer_t no_of_paths = igraph_vector_int_list_size(&vertices);
         for (igraph_integer_t i = 0; i < no_of_paths; i++) {
             igraph_vector_int_t *path = igraph_vector_int_list_get_ptr(&vertices, i);
             igraph_integer_t no_of_path_nodes = igraph_vector_int_size(path);
+            igraph_integer_t no_of_geodesics_with_these_endpoints = 0;
+            for (igraph_integer_t k = 0; k < no_of_paths; k++) {
+                igraph_vector_int_t *path2 = igraph_vector_int_list_get_ptr(&vertices, k);
+                igraph_integer_t no_of_path2_nodes = igraph_vector_int_size(path2);
+                if (VECTOR(*path)[0] == VECTOR(*path2)[0] && VECTOR(*path)[no_of_path_nodes - 1] == VECTOR(*path2)[no_of_path2_nodes -1]) {
+                    no_of_geodesics_with_these_endpoints++;
+                }
+            }
             for (igraph_integer_t j = 1; j < no_of_path_nodes - 1; j++) { //don't count the endpoints
                 for (IGRAPH_VIT_RESET(vit), i_res = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i_res ++) {
                     if (VECTOR(*path)[j] == IGRAPH_VIT_GET(vit)) {
-                        VECTOR(*res)[i_res] += 1.0;
+                        VECTOR(*res)[i_res] += 1.0 / no_of_geodesics_with_these_endpoints;
                     }
                 }
             }
         }
-        //for (IGRAPH_VIT_RESET(vit), i_res = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i_res ++) {
-        //    VECTOR(*res)[i_res] /= no_of_paths;
-        //}
     }
 
     igraph_vector_int_list_destroy(&vertices);
@@ -69,25 +84,59 @@ igraph_error_t igraph_direct_betweenness_cutoff(
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+void compare(igraph_t *graph) {
     igraph_vector_t test_res, res;
-    igraph_t graph;
-
     igraph_vector_init(&res, 0);
     igraph_vector_init(&test_res, 0);
-    igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0,1, 0,2, -1);
-
-    igraph_betweenness(&graph, &res,
+    igraph_betweenness(graph, &res,
                        igraph_vss_all(), true,
                        NULL);
-    igraph_vector_print(&res);
-    igraph_vector_destroy(&res);
+    //igraph_vector_print(&res);
 
-    igraph_direct_betweenness_cutoff(&graph, &test_res,
+    igraph_direct_betweenness_cutoff(graph, &test_res,
                        igraph_vss_all(), true,
-                       NULL, 0.0);
-    igraph_vector_print(&test_res);
-    igraph_vector_destroy(&test_res);
+                       NULL, -1);
+    //igraph_vector_print(&test_res);
 
+    for (igraph_integer_t i = 0; i < igraph_vector_size(&res); i++) {
+        if (igraph_cmp_epsilon(VECTOR(res)[i], VECTOR(test_res)[i], 0.01)) {
+            printf("index: %ld, values: %f, %f", i, VECTOR(res)[i], VECTOR(test_res)[i]);
+        }
+    }
+
+    igraph_vector_destroy(&res);
+    igraph_vector_destroy(&test_res);
+}
+
+
+int main() {
+    igraph_t graph;
+
+    igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0,1, 0,2, -1);
+    compare(&graph);
+    igraph_destroy(&graph);
+
+    igraph_barabasi_game(/* graph= */    &graph,
+                                         /* n= */        100,
+                                         /* power= */    1,
+                                         /* m= */        3,
+                                         /* outseq= */   0,
+                                         /* outpref= */  0,
+                                         /* A= */        1,
+                                         /* directed= */ 0,
+                                         /* algo= */     IGRAPH_BARABASI_BAG,
+                                         /* start_from= */ 0);
+
+    compare(&graph);
+    igraph_destroy(&graph);
+
+    printf("\ndirected graph:\n");
+    igraph_erdos_renyi_game_gnp(&graph, 100, 0.3, IGRAPH_DIRECTED, /*loops*/true);
+    compare(&graph);
+    igraph_destroy(&graph);
+
+    printf("\nundirected graph:\n");
+    igraph_erdos_renyi_game_gnp(&graph, 100, 0.3, IGRAPH_UNDIRECTED, /*loops*/true);
+    compare(&graph);
     igraph_destroy(&graph);
 }
