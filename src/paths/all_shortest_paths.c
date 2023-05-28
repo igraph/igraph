@@ -35,7 +35,7 @@
  * \function igraph_get_all_shortest_paths
  * \brief All shortest paths (geodesics) from a vertex.
  *
- * When there is more than one shortest path between two vertices,
+ * when there is more than one shortest path between two vertices,
  * all of them will be returned.
  *
  * \param graph The graph object.
