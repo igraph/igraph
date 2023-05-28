@@ -7,10 +7,6 @@
  // TODO also do \function igraph_betweenness_subset
  // TODO do the cutoff
 
-//TODO  * The betweenness centrality of a vertex is the number of geodesics
-// * going through it. If there are more than one geodesic between two
-// * vertices, the value of these geodesics are weighted by one over the
-// * number of geodesics.
 igraph_error_t igraph_direct_betweenness_cutoff(
         const igraph_t *graph, igraph_vector_t *res,
         const igraph_vs_t vids, igraph_bool_t directed,
@@ -24,6 +20,10 @@ igraph_error_t igraph_direct_betweenness_cutoff(
     igraph_integer_t i_res;
 
     IGRAPH_CHECK(igraph_vs_size(graph, &vids, &no_of_selected_nodes));
+
+    if (!igraph_is_directed(graph)) {
+        directed = false;
+    }
 
     if (directed) {
         mode = IGRAPH_OUT;
@@ -40,7 +40,11 @@ igraph_error_t igraph_direct_betweenness_cutoff(
     IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&vertices, 0);
 
     for (igraph_integer_t i_all = 0; i_all < no_of_nodes; i_all ++) {
-        igraph_vs_range(&vs_rest, i_all, no_of_nodes);
+        if (directed) {
+            igraph_vs_range(&vs_rest, 0, no_of_nodes);
+        } else {
+            igraph_vs_range(&vs_rest, i_all, no_of_nodes);
+        }
         if (cutoff == -1) {
             if (!weights) {
                 /* when there is more than one shortest path between two vertices,
@@ -84,17 +88,17 @@ igraph_error_t igraph_direct_betweenness_cutoff(
     return IGRAPH_SUCCESS;
 }
 
-void compare(igraph_t *graph) {
+void compare_directed(igraph_t *graph, igraph_bool_t directed) {
     igraph_vector_t test_res, res;
     igraph_vector_init(&res, 0);
     igraph_vector_init(&test_res, 0);
     igraph_betweenness(graph, &res,
-                       igraph_vss_all(), true,
+                       igraph_vss_all(), directed,
                        NULL);
     //igraph_vector_print(&res);
 
     igraph_direct_betweenness_cutoff(graph, &test_res,
-                       igraph_vss_all(), true,
+                       igraph_vss_all(), directed,
                        NULL, -1);
     //igraph_vector_print(&test_res);
 
@@ -108,6 +112,12 @@ void compare(igraph_t *graph) {
     igraph_vector_destroy(&test_res);
 }
 
+void compare(igraph_t *graph) {
+    printf("directed test:\n");
+    compare_directed(graph, true);
+    printf("undirected test:\n");
+    compare_directed(graph, false);
+}
 
 int main() {
     igraph_t graph;
