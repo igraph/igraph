@@ -26,6 +26,8 @@
 #include "igraph_decls.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
+#include <set>
+namespace set{
 
 __BEGIN_DECLS
 
@@ -38,48 +40,9 @@ __BEGIN_DECLS
  * \ingroup types
  */
 
-enum STACK_MODE {LEFT,SELF};
+typedef std::set<int> igraph_set_t;
+typedef std::set<int>::iterator igraph_set_iterator_t;
 
-enum COLOR {RED,BLACK};
-
-typedef struct Node
-{
-    igraph_integer_t data;
-    struct Node* left;
-    struct Node* right;
-    struct Node* parent;
-    enum COLOR color;
-} igraph_set_internal_node_t;
-
-typedef struct Stack
-{
-    igraph_set_internal_node_t data;
-    igraph_bool_t visited;
-} igraph_set_internal_stack_t;
-
-#define IGRAPH_SET_PARAMETER_STACK_LENGTH 20
-#define IGRAPH_SET_PARAMETER_STARTING_CAPACITY 1
-
-/*
-Stack length need to be greater than the depth of the rb-tree and 
-it not possible to make a tree with 2^20 Nodes so this number can be reduced futher.
-*/
-typedef struct s_set_itertor
-{
-    igraph_set_internal_stack_t stack[IGRAPH_SET_PARAMETER_STACK_LENGTH];
-    igraph_integer_t stack_index;
-} igraph_set_iterator_t;
-
-typedef struct s_set{
-    igraph_set_internal_node_t* root;
-    igraph_integer_t size;
-    igraph_integer_t capacity;
-    igraph_integer_t capacity_used;
-    igraph_set_internal_node_t** pool;
-} igraph_set_t;
-
-
-#define IGRAPH_SET_NULL { 0,0,0 }
 #define IGRAPH_SET_INIT_FINALLY(v) \
     do { igraph_set_init(v); \
         IGRAPH_FINALLY(igraph_set_destroy, v); } while (0)
@@ -99,3 +62,5 @@ IGRAPH_PRIVATE_EXPORT void igraph_set_print_tree(const igraph_set_t* set, FILE* 
 __END_DECLS
 
 #endif
+
+}

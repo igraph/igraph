@@ -58,7 +58,7 @@ add_library(
   core/printing.c
   core/progress.c
   core/psumtree.c
-  core/set.c
+  core/set.cpp
   core/sparsemat.c
   core/stack.c
   core/statusbar.c
