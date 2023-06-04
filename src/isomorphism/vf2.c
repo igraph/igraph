@@ -858,6 +858,7 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
  * This function counts the number of isomorphic mappings between two
  * graphs. It uses the generic \ref igraph_get_isomorphisms_vf2_callback()
  * function.
+ *
  * \param graph1 The first input graph, may be directed or undirected.
  * \param graph2 The second input graph, it must have the same
  *   directedness as \p graph1, or an error will be reported.
@@ -883,6 +884,8 @@ static igraph_error_t igraph_i_count_isomorphisms_vf2_cb(
  * \param arg Extra argument to supply to functions \p node_compat_fn and
  *   \p edge_compat_fn.
  * \return Error code.
+ *
+ * \sa igraph_count_automorphisms()
  *
  * Time complexity: exponential.
  */

@@ -871,7 +871,6 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
                         if (v != -1) {
                             igraph_i_lad_addToDelete(v, listDV, &nbDV, markedV);
                         }
-                        j = 0;
                         for (i = 0; i < nbSucc[u]; i++) { /* delete edge (u, v) */
                             v = succ[u * sizeOfV + i];
                             for (j = 0; ((j < nbPred[v]) && (u != pred[v * sizeOfU + j])); j++) { }

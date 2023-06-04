@@ -44,10 +44,11 @@ __BEGIN_DECLS
 /**
  * \section about_attributes
  *
- * <para>Attributes are numbers or strings (or basically any kind
- * of data) associated with the vertices or edges of a graph, or
- * with the graph itself. E.g. you may label vertices with symbolic names
- * or attach numeric weights to the edges of a graph. </para>
+ * <para>Attributes are numbers, boolean values or strings associated with
+ * the vertices or edges of a graph, or with the graph itself. E.g. you may
+ * label vertices with symbolic names or attach numeric weights to the edges
+ * of a graph. In addition to these three basic types, a custom object
+ * type is supported as well.</para>
  *
  * <para>igraph attributes are designed to be flexible and extensible.
  * In igraph attributes are implemented via an interface abstraction:
@@ -55,7 +56,7 @@ __BEGIN_DECLS
  * for storing vertex, edge and graph attributes. This means that
  * different attribute implementations can be used together with
  * igraph. This is reasonable: if igraph is used from Python attributes can be
- * of any Python type, from GNU R all R types are allowed. There is an
+ * of any Python type, from R all R types are allowed. There is also an
  * experimental attribute implementation to be used when programming
  * in C, but by default it is currently turned off.</para>
  *
@@ -74,10 +75,13 @@ __BEGIN_DECLS
  * notify the attribute handling code about the structural changes in
  * a graph. See the documentation of this type for details.</para>
  *
- * <para>By default there is no attribute interface attached to \a igraph,
- * to attach one, call \ref igraph_set_attribute_table with your new
- * table. </para>
- *
+ * <para>By default there is no attribute interface attached to \a igraph.
+ * To attach one, call \ref igraph_set_attribute_table with your new
+ * table. This is normally done on program startup, and is kept untouched
+ * for the program's lifetime. It must be done before any graph object
+ * is created, as graphs created with a given attribute handler
+ * cannot be manipulated while a different attribute handler is
+ * active.</para>
  */
 
 /**
@@ -205,10 +209,11 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
 
 /**
  * \struct igraph_attribute_table_t
- * \brief Table of functions to perform operations on attributes
+ * \brief Table of functions to perform operations on attributes.
  *
  * This type collects the functions defining an attribute handler.
  * It has the following members:
+ *
  * \member init This function is called whenever a new graph object is
  *    created, right after it is created but before any vertices or
  *    edges are added. It is supposed to set the \c attr member of the \c

@@ -39,8 +39,7 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_maxflow_stats_t
- * A simple data type to return some statistics from the
- * push-relabel maximum flow solver.
+ * \brief Data structure holding statistics from the push-relabel maximum flow solver.
  *
  * \param nopush The number of push operations performed.
  * \param norelabel The number of relabel operarions performed.

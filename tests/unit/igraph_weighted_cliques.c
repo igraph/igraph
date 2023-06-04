@@ -5,17 +5,15 @@
 #include "test_utilities.h"
 
 int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
-    igraph_integer_t s1, s2, i;
-
-    s1 = igraph_vector_int_size(v1);
-    s2 = igraph_vector_int_size(v2);
+    igraph_integer_t s1 = igraph_vector_int_size(v1);
+    igraph_integer_t s2 = igraph_vector_int_size(v2);
     if (s1 < s2) {
         return -1;
     }
     if (s1 > s2) {
         return 1;
     }
-    for (i = 0; i < s1; ++i) {
+    for (igraph_integer_t i = 0; i < s1; ++i) {
         if (VECTOR(*v1)[i] < VECTOR(*v2)[i]) {
             return -1;
         }
@@ -28,9 +26,8 @@ int compare_vectors(const igraph_vector_int_t *v1, const igraph_vector_int_t *v2
 
 /* Takes a pointer vector of vectors. Sorts each vector, then sorts the pointer vector */
 void canonicalize_list(igraph_vector_int_list_t *list) {
-    igraph_integer_t i, len;
-    len = igraph_vector_int_list_size(list);
-    for (i = 0; i < len; ++i) {
+    igraph_integer_t len = igraph_vector_int_list_size(list);
+    for (igraph_integer_t i = 0; i < len; ++i) {
         igraph_vector_int_sort(igraph_vector_int_list_get_ptr(list, i));
     }
     igraph_vector_int_list_sort(list, &compare_vectors);
@@ -45,7 +42,7 @@ void print_weighted_clique(const igraph_vector_int_t *clique, const igraph_vecto
         clique_weight += vertex_weights ? igraph_vector_get(vertex_weights, v) : 1;
         printf(" %d", v);
     }
-    printf(" w=%.1f\n", clique_weight);
+    printf(" w=%g\n", clique_weight);
 }
 
 /* Prints a clique list and clears it */
@@ -89,7 +86,7 @@ int main(void) {
 
     /* create graph */
     igraph_vector_int_init_array(&edges, edge_data, (sizeof edge_data) / sizeof(edge_data[0]));
-    igraph_create(&graph, &edges, n, /* directed= */ 0);
+    igraph_create(&graph, &edges, n, IGRAPH_UNDIRECTED);
 
     /* set up vertex weight vector */
     igraph_vector_init_array(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(vertex_weight_data[0]));
@@ -99,7 +96,7 @@ int main(void) {
 
 
     /* all weighted cliques above weight 6 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 6, 0, /* maximal= */ 0);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, 6, 0, /* maximal= */ false);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " weighted cliques found above weight 6\n", count);
@@ -107,7 +104,7 @@ int main(void) {
 
 
     /* all weighted cliques between weights 5 and 10 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 5, 10, /* maximal= */ 0);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, 5, 10, /* maximal= */ false);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " weighted cliques found between weights 5 and 10\n", count);
@@ -115,7 +112,7 @@ int main(void) {
 
 
     /* maximal weighted cliques above weight 7 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 7, 0, /* maximal= */ 1);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, 7, 0, /* maximal= */ true);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal weighted cliques found above weight 7\n", count);
@@ -123,7 +120,7 @@ int main(void) {
 
 
     /* maximal weighed cliques beteen weights 5 and 10 */
-    igraph_weighted_cliques(&graph, &vertex_weights, &result, 5, 10, /* maximal= */ 1);
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, 5, 10, /* maximal= */ true);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " maximal weighted cliques found between weights 5 and 10\n", count);
@@ -138,36 +135,66 @@ int main(void) {
     print_and_clear_weighted_clique_list(&result, &vertex_weights);
 
     igraph_weighted_clique_number(&graph, &vertex_weights, &weighted_clique_no);
-    printf("weighted clique number: %.1f\n", weighted_clique_no);
+    printf("weighted clique number: %g\n", weighted_clique_no);
 
+
+    /* Test unweighted fallback: */
+    printf("\nUnweighted case:\n");
 
     /* test fallback to unweighted variants: all cliques */
-    igraph_weighted_cliques(&graph, 0, &result, 4, 5, /* maximal= */ 0);
+    igraph_weighted_cliques(&graph, NULL, &result, 4, 5, /* maximal= */ false);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " unweighted cliques found between sizes 4 and 5\n", count);
     print_and_clear_weighted_clique_list(&result, 0);
 
-
     /* test fallback to unweighted variants: maximal cliques */
-    igraph_weighted_cliques(&graph, 0, &result, 4, 5, /* maximal= */ 1);
+    igraph_weighted_cliques(&graph, NULL, &result, 4, 5, /* maximal= */ true);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " unweighted maximal cliques found between sizes 4 and 5\n", count);
     print_and_clear_weighted_clique_list(&result, 0);
 
-
     /* test fallback to unweighted variants: largest cliques */
-    igraph_largest_weighted_cliques(&graph, 0, &result);
+    igraph_largest_weighted_cliques(&graph, NULL, &result);
 
     count = igraph_vector_int_list_size(&result);
     printf("%" IGRAPH_PRId " largest unweighted cliques found\n", count);
     print_and_clear_weighted_clique_list(&result, 0);
 
-
     /* test fallback to unweighted variants: clique number */
-    igraph_weighted_clique_number(&graph, 0, &weighted_clique_no);
-    printf("unweighted clique number: %.1f\n", weighted_clique_no);
+    igraph_weighted_clique_number(&graph, NULL, &weighted_clique_no);
+    printf("unweighted clique number: %g\n", weighted_clique_no);
+
+    /* Here we test unit weights, which should give identical results to the unweighted case: */
+    printf("\nUnit weights:\n");
+
+    igraph_vector_fill(&vertex_weights, 1);
+
+    /* test unit weights: all cliques */
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, 4, 5, /* maximal= */ false);
+
+    count = igraph_vector_int_list_size(&result);
+    printf("%" IGRAPH_PRId " cliques with unit weights found between sizes 4 and 5\n", count);
+    print_and_clear_weighted_clique_list(&result, 0);
+
+    /* test unit weights: maximal cliques */
+    igraph_weighted_cliques(&graph, &vertex_weights, &result, 4, 5, /* maximal= */ true);
+
+    count = igraph_vector_int_list_size(&result);
+    printf("%" IGRAPH_PRId " maximal cliques with unit weights between sizes 4 and 5\n", count);
+    print_and_clear_weighted_clique_list(&result, 0);
+
+    /* test unit weights: largest cliques */
+    igraph_largest_weighted_cliques(&graph, &vertex_weights, &result);
+
+    count = igraph_vector_int_list_size(&result);
+    printf("%" IGRAPH_PRId " largest cliques with unit weights found\n", count);
+    print_and_clear_weighted_clique_list(&result, 0);
+
+    /* test unit weights: clique number */
+    igraph_weighted_clique_number(&graph, NULL, &weighted_clique_no);
+    printf("clique number with unit weights: %g\n", weighted_clique_no);
 
 
     /* free data structures */
@@ -175,6 +202,46 @@ int main(void) {
     igraph_vector_destroy(&vertex_weights);
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&edges);
+
+    /* additional small examples */
+
+    printf("\nP_2 graph with weights (5, 5):\n");
+    igraph_small(&graph, 2, IGRAPH_UNDIRECTED,
+                 0,1,
+                 -1);
+
+    igraph_vector_init_int(&vertex_weights, 2,
+                           5, 5);
+
+    igraph_weighted_clique_number(&graph, &vertex_weights, &weighted_clique_no);
+    printf("weighted clique number: %g\n", weighted_clique_no);
+
+    printf("\nP_2 graph with weights (5, 4):\n");
+    VECTOR(vertex_weights)[1] = 4;
+
+    igraph_weighted_clique_number(&graph, &vertex_weights, &weighted_clique_no);
+    printf("weighted clique number: %g\n", weighted_clique_no);
+
+    igraph_vector_destroy(&vertex_weights);
+    igraph_destroy(&graph);
+
+    printf("\nK_3 graph with weights (3, 3, 3):\n");
+    igraph_full(&graph, 3, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+
+    igraph_vector_init_int(&vertex_weights, 3,
+                           3, 3, 3);
+
+    igraph_weighted_clique_number(&graph, &vertex_weights, &weighted_clique_no);
+    printf("weighted clique number: %g\n", weighted_clique_no);
+
+    printf("\nK_3 graph with weights (3, 4, 3):\n");
+    VECTOR(vertex_weights)[1] = 4;
+
+    igraph_weighted_clique_number(&graph, &vertex_weights, &weighted_clique_no);
+    printf("weighted clique number: %g\n", weighted_clique_no);
+
+    igraph_vector_destroy(&vertex_weights);
+    igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
 

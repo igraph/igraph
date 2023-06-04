@@ -371,9 +371,8 @@ igraph_error_t igraph_maximal_cliques(
 
 /**
  * \function igraph_maximal_cliques_count
- * Count the number of maximal cliques in a graph
+ * \brief Count the number of maximal cliques in a graph.
  *
- * </para><para>
  * The current implementation uses a modified Bron-Kerbosch
  * algorithm to find the maximal cliques, see: David Eppstein,
  * Maarten Löffler, Darren Strash: Listing All Maximal Cliques in
@@ -444,16 +443,13 @@ igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
 
 /**
  * \function igraph_maximal_cliques_subset
- * Maximal cliques for a subset of initial vertices
+ * \brief Maximal cliques for a subset of initial vertices.
  *
  * This function enumerates all maximal cliques for a subset of initial
  * vertices and writes them to file.
  *
  * </para><para>
- *
  * Edge directions are ignored.
- *
- * </para><para>
  *
  * \param graph The input graph.
  * \param subset Pointer to an \c  igraph_vector_int_t containing the
@@ -496,7 +492,7 @@ igraph_error_t igraph_maximal_cliques_subset(
  * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
  * callback function as a pointer to an \ref igraph_vector_int_t. The vector is
  * owned by the maximal clique search routine so users are expected to make a
- * copy of the vector usign \ref igraph_vector_int_init_copy() if they want to
+ * copy of the vector using \ref igraph_vector_int_init_copy() if they want to
  * hold on to it.
  *
  * </para><para>

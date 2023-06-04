@@ -52,7 +52,7 @@ igraph_i_fundamental_cycles_bfs(
         igraph_vector_int_t *visited,
         igraph_integer_t mark /* mark used in 'visited' */) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vector_int_t pred_edge;
     igraph_vector_int_t u_back, v_back;
@@ -133,8 +133,7 @@ igraph_i_fundamental_cycles_bfs(
 
                 u_back_len = igraph_vector_int_size(&u_back);
                 v_back_len = igraph_vector_int_size(&v_back);
-                IGRAPH_CHECK(igraph_vector_int_init(&cycle, u_back_len + v_back_len));
-                IGRAPH_FINALLY(igraph_vector_int_destroy, &cycle);
+                IGRAPH_VECTOR_INT_INIT_FINALLY(&cycle, u_back_len + v_back_len);
 
                 for (j=0; j < v_back_len; ++j) {
                     VECTOR(cycle)[j] = VECTOR(v_back)[j];
@@ -208,8 +207,8 @@ igraph_error_t igraph_fundamental_cycles(const igraph_t *graph,
                                          igraph_integer_t bfs_cutoff,
                                          const igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t estimated_rank;
     igraph_integer_t i;
     igraph_inclist_t inclist;
@@ -323,7 +322,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
                                            const igraph_vector_int_t *cycle,
                                            igraph_bool_t *independent) {
 
-    igraph_integer_t nrow = igraph_vector_int_list_size(reduced_matrix);
+    const igraph_integer_t nrow = igraph_vector_int_list_size(reduced_matrix);
     igraph_integer_t i;
 
     igraph_vector_int_t work, tmp;
@@ -418,9 +417,8 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
                                           igraph_bool_t use_cycle_order,
                                           const igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i;
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t rank;
     igraph_vector_int_list_t candidates;
 
@@ -452,7 +450,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_int_list_reserve(&candidates, rank));
 
         mark = 0;
-        for (i=0; i < no_of_nodes; ++i) {
+        for (igraph_integer_t i=0; i < no_of_nodes; ++i) {
             igraph_integer_t degree = VECTOR(degrees)[i];
             igraph_bool_t vis = VECTOR(visited)[i] % 3 != 0; /* was vertex i visited already? */
 
@@ -483,7 +481,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
     {
         igraph_integer_t cand_count = igraph_vector_int_list_size(&candidates);
 
-        for (i=0; i < cand_count; ++i) {
+        for (igraph_integer_t i=0; i < cand_count; ++i) {
             igraph_vector_int_sort(igraph_vector_int_list_get_ptr(&candidates, i));
         }
         igraph_vector_int_list_sort(&candidates, &cycle_cmp);
@@ -502,7 +500,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
 
         IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&reduced_matrix, 0);
 
-        for (i=0; i < cand_len; ++i) {
+        for (igraph_integer_t i=0; i < cand_len; ++i) {
             const igraph_vector_int_t *cycle = igraph_vector_int_list_get_ptr(&candidates, i);
 
             IGRAPH_ALLOW_INTERRUPTION();
@@ -529,7 +527,7 @@ igraph_error_t igraph_minimum_cycle_basis(const igraph_t *graph,
         igraph_integer_t result_size = igraph_vector_int_list_size(result);
         igraph_vector_int_t tmp;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&tmp, 0);
-        for (i=0; i < result_size; ++i) {
+        for (igraph_integer_t i=0; i < result_size; ++i) {
             igraph_vector_int_t *cycle = igraph_vector_int_list_get_ptr(result, i);
             IGRAPH_CHECK(igraph_vector_int_update(&tmp, cycle));
             IGRAPH_CHECK(igraph_i_order_cycle(graph, &tmp, cycle));

@@ -460,6 +460,7 @@ static igraph_error_t igraph_i_betweenness_check_weights(
  * going through it. If there are more than one geodesic between two
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
+ *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        betweenness scores for the specified vertices.
@@ -689,11 +690,11 @@ igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t 
  * \function igraph_edge_betweenness
  * \brief Betweenness centrality of the edges.
  *
- * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
  * vertices, the value of these geodesics are weighted by one over the
  * number of geodesics.
+ *
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the
  *        betweenness scores for the edges.
@@ -728,8 +729,6 @@ igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *r
  * \function igraph_edge_betweenness_cutoff
  * \brief Range-limited betweenness centrality of the edges.
  *
- * </para><para>
- * </para><para>
  * This function computes a range-limited version of edge betweenness centrality
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
@@ -864,7 +863,6 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
  * \function igraph_betweenness_subset
  * \brief Betweenness centrality for a subset of source and target vertices.
  *
- * </para><para>
  * This function computes the subset-limited version of betweenness centrality
  * by considering only those shortest paths that lie between vertices in a given
  * source and target subset.
@@ -888,9 +886,9 @@ igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vect
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p vids,
  *        \p sources or \p targets
  *
- * Time complexity: O(|S||E|),
- * |S| The number of vertices in the subset
- * |E| The number of edges in the graph
+ * Time complexity: O(|S||E|), where
+ * |S| is the number of vertices in the subset and
+ * |E| is the number of edges in the graph.
  *
  * \sa \ref igraph_betweenness() to calculate the exact vertex betweenness and
  * \ref igraph_betweenness_cutoff() to calculate the range-limited vertex
@@ -916,7 +914,7 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_vit_t vit;
-    unsigned char *is_target;
+    bool *is_target;
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
@@ -946,14 +944,14 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
     IGRAPH_CHECK_OOM(tmpscore, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, tmpscore);
 
-    is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
+    is_target = IGRAPH_CALLOC(no_of_nodes, bool);
     IGRAPH_CHECK_OOM(is_target, "Insufficient memory for subset betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        is_target[IGRAPH_VIT_GET(vit)] = 1;
+        is_target[IGRAPH_VIT_GET(vit)] = true;
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1085,7 +1083,6 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
  * \function igraph_edge_betweenness_subset
  * \brief Edge betweenness centrality for a subset of source and target vertices.
  *
- * </para><para>
  * This function computes the subset-limited version of edge betweenness centrality
  * by considering only those shortest paths that lie between vertices in a given
  * source and target subset.
@@ -1108,9 +1105,9 @@ igraph_error_t igraph_betweenness_subset(const igraph_t *graph, igraph_vector_t 
  *        \c IGRAPH_ENOMEM, not enough memory for temporary data.
  *        \c IGRAPH_EINVVID, invalid vertex ID passed in \p sources or \p targets
  *
- * Time complexity: O(|S||E|),
- * |S| The number of vertices in the subset
- * |E| The number of edges in the graph
+ * Time complexity: O(|S||E|), where
+ * |S| is the number of vertices in the subset and
+ * |E| is the number of edges in the graph.
  *
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_edge_betweenness_cutoff() to compute the range-limited edge betweenness.
@@ -1132,21 +1129,21 @@ igraph_error_t igraph_edge_betweenness_subset(const igraph_t *graph, igraph_vect
     igraph_real_t *nrgeo;
     igraph_real_t *tmpscore;
     igraph_integer_t source, j;
-    unsigned char *is_target;
+    bool *is_target;
     igraph_stack_int_t S;
 
     IGRAPH_CHECK(igraph_i_betweenness_check_weights(weights, no_of_edges));
 
     IGRAPH_CHECK(igraph_vs_size(graph, &sources, &no_of_sources));
 
-    is_target = IGRAPH_CALLOC(no_of_nodes, unsigned char);
+    is_target = IGRAPH_CALLOC(no_of_nodes, bool);
     IGRAPH_CHECK_OOM(is_target, "Insufficient memory for subset edge betweenness calculation.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     IGRAPH_CHECK(igraph_vit_create(graph, targets, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        is_target[IGRAPH_VIT_GET(vit)] = 1;
+        is_target[IGRAPH_VIT_GET(vit)] = true;
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);

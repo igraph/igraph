@@ -131,6 +131,10 @@ igraph_square_lattice:
         OUT GRAPH graph, VECTOR_INT dimvector, INTEGER nei=1,
         BOOLEAN directed=False, BOOLEAN mutual=False, OPTIONAL VECTOR_BOOL periodic
 
+igraph_triangular_lattice:
+    PARAMS: |-
+        OUT GRAPH graph, VECTOR_INT dimvector, BOOLEAN directed=False, BOOLEAN mutual=False
+
 igraph_ring:
     PARAMS: |-
         OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False,
@@ -170,7 +174,7 @@ igraph_kautz:
     PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
 
 igraph_famous:
-    PARAMS: OUT GRAPH graph, CSTRING name=""
+    PARAMS: OUT GRAPH graph, CSTRING name
 
 igraph_lcf_vector:
     PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT shifts, INTEGER repeats=1
@@ -220,11 +224,6 @@ igraph_barabasi_game:
         BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG,
         OPTIONAL GRAPH start_from
 
-igraph_erdos_renyi_game:
-    PARAMS: |-
-        OUT GRAPH graph, ERDOS_RENYI_TYPE type, INTEGER n, REAL p_or_m,
-        BOOLEAN directed=False, BOOLEAN loops=False
-
 igraph_erdos_renyi_game_gnp:
     PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
 
@@ -234,7 +233,7 @@ igraph_erdos_renyi_game_gnm:
 igraph_degree_sequence_game:
     PARAMS: |-
         OUT GRAPH graph, VECTOR_INT out_deg, OPTIONAL VECTOR_INT in_deg,
-        DEGSEQ_MODE method=SIMPLE
+        DEGSEQ_MODE method=CONFIGURATION
 
 igraph_growing_random_game:
     PARAMS: |-
@@ -474,6 +473,14 @@ igraph_get_shortest_path_dijkstra:
         VERTEX from, VERTEX to, OPTIONAL EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
     DEPS: from ON graph, to ON graph, weights ON graph, vertices ON graph, edges ON graph
 
+igraph_get_shortest_path_astar:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VERTEX_INDICES vertices, OPTIONAL OUT EDGE_INDICES edges,
+        VERTEX from, VERTEX to, OPTIONAL EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
+        OPTIONAL ASTAR_HEURISTIC_FUNC heuristic=NULL, EXTRA extra=NULL
+    DEPS: from ON graph, to ON graph, weights ON graph, vertices ON graph, edges ON graph
+
 igraph_get_shortest_paths:
     PARAMS: |-
         GRAPH graph,
@@ -547,8 +554,10 @@ igraph_distances_johnson:
 
 igraph_distances_floyd_warshall:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX res, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT
-    DEPS: weights ON graph
+        GRAPH graph, OUT MATRIX res, VERTEX_SELECTOR from=ALL,
+        VERTEX_SELECTOR to=ALL, EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT,
+        FWALGORITHM method
+    DEPS: from ON graph, to ON graph, weights ON graph
 
 igraph_voronoi:
     PARAMS: |-
@@ -708,7 +717,7 @@ igraph_induced_subgraph:
     PARAMS: GRAPH graph, OUT GRAPH res, VERTEX_SELECTOR vids, SUBGRAPH_IMPL impl=AUTO
     DEPS: vids ON graph
 
-igraph_subgraph_edges:
+igraph_subgraph_from_edges:
     PARAMS: GRAPH graph, OUT GRAPH res, EDGE_SELECTOR eids, BOOLEAN delete_vertices=True
     DEPS: eids ON graph
 
@@ -741,6 +750,7 @@ igraph_transitivity_undirected:
 
 igraph_transitivity_local_undirected:
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL, TRANSITIVITY_MODE mode=NAN
+    DEPS: vids ON graph
 
 igraph_transitivity_avglocal_undirected:
     PARAMS: GRAPH graph, OUT REAL res, TRANSITIVITY_MODE mode=NAN
@@ -760,7 +770,7 @@ igraph_ecc:
 igraph_reciprocity:
     PARAMS: |-
         GRAPH graph, OUT REAL res, BOOLEAN ignore_loops=True,
-        RECIP mode=Default
+        RECIP mode=DEFAULT
 
 igraph_constraint:
     PARAMS: GRAPH graph, OUT VECTOR res, VERTEX_SELECTOR vids=ALL, OPTIONAL EDGEWEIGHTS weights
@@ -1126,13 +1136,13 @@ igraph_create_bipartite:
         OUT GRAPH graph, IN BIPARTITE_TYPES types,
         VECTOR_INT edges, BOOLEAN directed=False
 
-igraph_incidence:
+igraph_biadjacency:
     PARAMS: |-
         OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
-igraph_get_incidence:
+igraph_get_biadjacency:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
@@ -1451,14 +1461,18 @@ igraph_layout_davidson_harel:
 igraph_layout_umap:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
-        REAL sampling_prob
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_weights=False
 
 igraph_layout_umap_3d:
     PARAMS: |-
         GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False,
-        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.01, INTEGER epochs=500,
-        REAL sampling_prob
+        OPTIONAL VECTOR distances=NULL, REAL min_dist=0.0, INTEGER epochs=200,
+        BOOLEAN distances_are_weights=False
+
+igraph_layout_umap_compute_weights:
+    PARAMS: |-
+        GRAPH graph, VECTOR distances, INOUT VECTOR weights
 
 #######################################
 # Cocitation and other similarity measures
@@ -1527,6 +1541,7 @@ igraph_community_spinglass:
         INTEGER spins=25, BOOLEAN parupdate=False, REAL starttemp=1, REAL stoptemp=0.01,
         REAL coolfact=0.99, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0,
         SPINGLASS_IMPLEMENTATION implementation=ORIG, REAL lambda=1.0
+    DEPS: weights ON graph
 
 igraph_community_spinglass_single:
     PARAMS: |-
@@ -1534,11 +1549,13 @@ igraph_community_spinglass_single:
         OUT VECTOR_INT community, OUT REAL cohesion, OUT REAL adhesion,
         OUT INTEGER inner_links, OUT INTEGER outer_links,
         INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
+    DEPS: weights ON graph
 
 igraph_community_walktrap:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGEWEIGHTS weights, INTEGER steps=4,
         OUT MATRIX_INT merges, OUT VECTOR modularity, OUT VECTOR_INT membership
+    DEPS: weights ON graph
 
 igraph_community_edge_betweenness:
     PARAMS: |-
@@ -1575,6 +1592,7 @@ igraph_modularity:
     PARAMS: |-
         GRAPH graph, VECTOR_INT membership, OPTIONAL EDGEWEIGHTS weights=NULL,
         REAL resolution=1.0, BOOLEAN directed=True, OUT REAL modularity
+    DEPS: weights ON graph
 
 igraph_modularity_matrix:
     PARAMS: |-
@@ -1688,9 +1706,6 @@ igraph_hrg_sample_many:
 igraph_hrg_game:
     PARAMS: OUT GRAPH graph, HRG hrg
 
-igraph_hrg_dendrogram:
-    PARAMS: OUT GRAPH graph, HRG hrg
-
 igraph_hrg_consensus:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT parents, OUT VECTOR weights,
@@ -1714,6 +1729,9 @@ igraph_hrg_resize:
 igraph_hrg_size:
     PARAMS: HRG hrg
     RETURN: INTEGER
+
+igraph_from_hrg_dendrogram:
+    PARAMS: OUT GRAPH graph, HRG hrg, OUT VECTOR prob
 
 #######################################
 # Conversion
@@ -2361,7 +2379,7 @@ igraph_random_sample:
     PARAMS: OUT VECTOR_INT res, INTEGER l, INTEGER h, INTEGER length
 
 igraph_convex_hull:
-    PARAMS: MATRIX data, OUT VECTOR_INT resverts, OUT MATRIX rescoords
+    PARAMS: MATRIX data, OUT INDEX_VECTOR resverts, OUT MATRIX rescoords
 
 igraph_dim_select:
     PARAMS: VECTOR sv, OUT INTEGER dim
@@ -2434,6 +2452,9 @@ igraph_from_prufer:
 igraph_to_prufer:
     PARAMS: GRAPH graph, OUT INDEX_VECTOR prufer
 
+igraph_tree_from_parent_vector:
+    PARAMS: OUT GRAPH graph, INDEX_VECTOR parents, TREE_MODE type=OUT
+
 igraph_minimum_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, EDGEWEIGHTS weights=NULL
     DEPS: res ON graph, weights ON graph
@@ -2443,6 +2464,7 @@ igraph_minimum_spanning_tree_unweighted:
 
 igraph_minimum_spanning_tree_prim:
     PARAMS: GRAPH graph, OUT GRAPH mst, EDGEWEIGHTS weights
+    DEPS: weights ON graph
 
 igraph_random_spanning_tree:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res, OPTIONAL VERTEX vid
@@ -2479,7 +2501,7 @@ igraph_moran_process:
     PARAMS: |-
         GRAPH graph, EDGEWEIGHTS weights=NULL, INOUT VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
-    DEPS: quantities ON graph, strategies ON graph
+    DEPS: weights ON graph, quantities ON graph, strategies ON graph
 
 igraph_roulette_wheel_imitation:
     PARAMS: |-

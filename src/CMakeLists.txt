@@ -46,6 +46,7 @@ add_library(
   core/error.c
   core/estack.c
   core/fixed_vectorlist.c
+  core/genheap.c
   core/grid.c
   core/heap.c
   core/indheap.c
@@ -102,10 +103,13 @@ add_library(
   constructors/full.c
   constructors/generalized_petersen.c
   constructors/kautz.c
+  constructors/lattices.c
   constructors/lcf.c
   constructors/linegraph.c
   constructors/prufer.c
   constructors/regular.c
+  constructors/trees.c
+
 
   games/barabasi.c
   games/callaway_traits.c
@@ -174,6 +178,7 @@ add_library(
   connectivity/separators.c
 
   flow/flow.c
+  flow/flow_conversion.c
   flow/st-cuts.c
 
   hrg/hrg_types.cc
@@ -235,6 +240,7 @@ add_library(
   operators/union.c
 
   paths/all_shortest_paths.c
+  paths/astar.c
   paths/bellman_ford.c
   paths/dijkstra.c
   paths/distances.c
@@ -298,6 +304,7 @@ add_library(
   internal/lsap.c
   internal/qsort_r.c
   internal/qsort.c
+  internal/utils.c
   internal/zeroin.c
 
   version.c
@@ -366,31 +373,31 @@ if(MATH_LIBRARY)
 endif()
 
 if(ARPACK_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${ARPACK_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${ARPACK_LIBRARIES})
 endif()
 
-if(BLAS_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${BLAS_LIBRARIES})
+if(BLAS_FOUND)
+  target_link_libraries(igraph PRIVATE ${BLAS_LIBRARIES})
 endif()
 
 if(GLPK_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${GLPK_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${GLPK_LIBRARIES})
 endif()
 
 if(GMP_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${GMP_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${GMP_LIBRARIES})
 endif()
 
 if(LAPACK_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${LAPACK_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${LAPACK_LIBRARIES})
 endif()
 
 if(LIBXML2_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${LIBXML2_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${LIBXML2_LIBRARIES})
 endif()
 
 if(PLFIT_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${PLFIT_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${PLFIT_LIBRARIES})
 endif()
 
 # Link igraph statically to some of the libraries from the subdirectories

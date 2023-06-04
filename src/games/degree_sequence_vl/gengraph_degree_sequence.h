@@ -70,11 +70,13 @@ public :
     // compute total number of arcs
     void compute_total();
 
+#if 0
     // raw print (vertex by vertex)
     void print();
 
     // distribution print (degree frequency)
     void print_cumul();
+#endif
 
     // is degree sequence realizable ?
     bool havelhakimi();

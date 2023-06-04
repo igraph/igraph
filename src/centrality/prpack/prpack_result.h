@@ -2,6 +2,7 @@
 #define PRPACK_RESULT
 
 #include <string>
+#include <cstdint>
 
 namespace prpack {
 
@@ -15,7 +16,7 @@ namespace prpack {
             double read_time;
             double preprocess_time;
             double compute_time;
-            long num_es_touched;
+            int64_t num_es_touched;
             std::string method;
             int converged;
             // constructor

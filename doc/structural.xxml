@@ -31,6 +31,8 @@
 <!-- doxrox-include igraph_get_shortest_path_dijkstra -->
 <!-- doxrox-include igraph_get_shortest_paths_bellman_ford -->
 <!-- doxrox-include igraph_get_shortest_path_bellman_ford -->
+<!-- doxrox-include igraph_get_shortest_path_astar -->
+<!-- doxrox-include igraph_astar_heuristic_func_t -->
 <!-- doxrox-include igraph_get_all_shortest_paths -->
 <!-- doxrox-include igraph_get_all_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_get_k_shortest_paths -->
@@ -117,8 +119,7 @@
 <!-- doxrox-include igraph_maxdegree -->
 <!-- doxrox-include igraph_strength -->
 <!-- doxrox-include igraph_eigenvector_centrality -->
-<!-- doxrox-include igraph_hub_score -->
-<!-- doxrox-include igraph_authority_score -->
+<!-- doxrox-include igraph_hub_and_authority_scores -->
 <!-- doxrox-include igraph_convergence_degree -->
 </section>
 
@@ -129,7 +130,7 @@
 <!-- doxrox-include igraph_edge_betweenness_cutoff -->
 </section>
 
-<section id="subset-limited-centrality-measures"><title>Subset-limited Centrality Measures</title>
+<section id="subset-limited-centrality-measures"><title>Subset-limited centrality measures</title>
 <!-- doxrox-include igraph_betweenness_subset-->
 <!-- doxrox-include igraph_edge_betweenness_subset-->
 </section>
@@ -202,7 +203,7 @@
 <!-- doxrox-include igraph_assortativity_degree -->
 </section>
 
-<section id="k-cores"><title>K-Cores and K-Trusses</title>
+<section id="k-cores"><title>K-cores and k-trusses</title>
 <!-- doxrox-include igraph_coreness -->
 <!-- doxrox-include igraph_trussness -->
 </section>
@@ -250,6 +251,8 @@
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_laplacian -->
+<!-- doxrox-include igraph_hub_score -->
+<!-- doxrox-include igraph_authority_score -->
 </section>
 
 </chapter>

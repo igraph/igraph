@@ -17,9 +17,9 @@
 <!-- doxrox-include igraph_bipartite_game -->
 </section>
 
-<section id="incidence-matrices"><title>Incidence matrices</title>
-<!-- doxrox-include igraph_incidence -->
-<!-- doxrox-include igraph_get_incidence -->
+<section id="bipartite-adjacency-matrices"><title>Bipartite adjacency matrices</title>
+<!-- doxrox-include igraph_biadjacency -->
+<!-- doxrox-include igraph_get_biadjacency -->
 </section>
 
 <section id="project-two-mode-graphs"><title>Project two-mode graphs</title>
@@ -29,6 +29,11 @@
 
 <section id="other-operations-on-bipartite-graphs"><title>Other operations on bipartite graphs</title>
 <!-- doxrox-include igraph_is_bipartite -->
+</section>
+
+<section id="deprecated-bipartite"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_incidence -->
+<!-- doxrox-include igraph_get_incidence -->
 </section>
 
 </chapter>

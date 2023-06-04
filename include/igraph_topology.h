@@ -218,11 +218,12 @@ IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_subisomorphic_function_vf2
 /* BLISS family */
 /**
  * \struct igraph_bliss_info_t
- * Information about a BLISS run
+ * \brief Information about a Bliss run.
  *
- * Some secondary information found by the BLISS algorithm is stored
+ * Some secondary information found by the Bliss algorithm is stored
  * here. It is useful if you wany to study the internal working of the
  * algorithm.
+ *
  * \member nof_nodes The number of nodes in the search tree.
  * \member nof_leaf_nodes The number of leaf nodes in the search tree.
  * \member nof_bad_nodes Number of bad nodes.
@@ -233,7 +234,7 @@ IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_subisomorphic_function_vf2
  *    given as a string. It should be deallocated via
  *    \ref igraph_free() if not needed any more.
  *
- * See http://www.tcs.hut.fi/Software/bliss/index.html
+ * See https://users.aalto.fi/~tjunttil/bliss/
  * for details about the algorithm and these parameters.
  */
 typedef struct igraph_bliss_info_t {
@@ -280,8 +281,13 @@ IGRAPH_EXPORT igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, con
                                           igraph_bliss_sh_t sh,
                                           igraph_bliss_info_t *info1, igraph_bliss_info_t *info2);
 
-IGRAPH_EXPORT igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
-                                       igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
+IGRAPH_EXPORT igraph_error_t igraph_count_automorphisms(
+        const igraph_t *graph, const igraph_vector_int_t *colors,
+        igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_automorphisms(
+        const igraph_t *graph, const igraph_vector_int_t *colors,
+        igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 
 IGRAPH_EXPORT igraph_error_t igraph_automorphism_group(
     const igraph_t *graph, const igraph_vector_int_t *colors,

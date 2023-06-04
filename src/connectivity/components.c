@@ -108,7 +108,7 @@ static igraph_error_t igraph_i_connected_components_weak(
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    char *already_added;
+    bool *already_added;
     igraph_integer_t first_node, act_cluster_size = 0, no_of_clusters = 0;
 
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
@@ -116,10 +116,8 @@ static igraph_error_t igraph_i_connected_components_weak(
     igraph_integer_t i;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("Cannot calculate weakly connected components.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for calculating weakly connected components.");
     IGRAPH_FINALLY(igraph_free, already_added);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes / 10);
@@ -136,12 +134,12 @@ static igraph_error_t igraph_i_connected_components_weak(
     /* The algorithm */
 
     for (first_node = 0; first_node < no_of_nodes; ++first_node) {
-        if (already_added[first_node] == 1) {
+        if (already_added[first_node]) {
             continue;
         }
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[first_node] = 1;
+        already_added[first_node] = true;
         act_cluster_size = 1;
         if (membership) {
             VECTOR(*membership)[first_node] = no_of_clusters;
@@ -154,11 +152,11 @@ static igraph_error_t igraph_i_connected_components_weak(
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
             for (i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
-                if (already_added[neighbor] == 1) {
+                if (already_added[neighbor]) {
                     continue;
                 }
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
-                already_added[neighbor] = 1;
+                already_added[neighbor] = true;
                 act_cluster_size++;
                 if (membership) {
                     VECTOR(*membership)[neighbor] = no_of_clusters;
@@ -451,7 +449,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
 static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_edges = igraph_ecount(graph);
     igraph_integer_t added_count;
-    char *already_added;
+    bool *already_added;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
 
@@ -468,17 +466,15 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
         goto exit;
     }
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("Weak connectedness check failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for computing weakly connected components.");
     IGRAPH_FINALLY(igraph_free, already_added);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 10);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     /* Try to find at least two clusters */
-    already_added[0] = 1;
+    already_added[0] = true;
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, 0));
 
     added_count = 1;
@@ -498,7 +494,7 @@ static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_boo
 
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
             added_count++;
-            already_added[neighbor] = 1;
+            already_added[neighbor] = true;
 
             if (added_count == no_of_nodes) {
                 /* We have already reached all nodes: the graph is connected.
@@ -616,7 +612,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     igraph_integer_t actstart;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t resco = 0;   /* number of graphs created so far */
-    char *already_added;
+    bool *already_added;
     igraph_dqueue_int_t q;
     igraph_vector_int_t verts;
     igraph_vector_int_t neis;
@@ -632,10 +628,8 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
     igraph_graph_list_clear(components);
 
     /* already_added keeps track of what nodes made it into a graph already */
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for decomponsing graph into connected components.");
     IGRAPH_FINALLY(igraph_free, already_added);
 
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
@@ -659,7 +653,7 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
         igraph_vector_int_clear(&verts);
 
         /* add the node itself */
-        already_added[actstart] = 1;
+        already_added[actstart] = true;
         IGRAPH_CHECK(igraph_vector_int_push_back(&verts, actstart));
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, actstart));
 
@@ -672,11 +666,11 @@ static igraph_error_t igraph_i_decompose_weak(const igraph_t *graph,
             /* iterate over the neighbors */
             for (i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
-                if (already_added[neighbor] == 1) {
+                if (already_added[neighbor]) {
                     continue;
                 }
                 /* add neighbor */
-                already_added[neighbor] = 1;
+                already_added[neighbor] = true;
 
                 /* recursion: append neighbor to the queues */
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
@@ -939,9 +933,9 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * \brief Finds the articulation points in a graph.
  *
  * A vertex is an articulation point if its removal increases
- * the number of connected components in the graph.
+ * the number of (weakly) connected components in the graph.
  *
- * \param graph The input graph.
+ * \param graph The input graph. It will be treated as undirected.
  * \param res Pointer to an initialized vector, the
  *    articulation points will be stored here.
  * \return Error code.
@@ -953,7 +947,7 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
 
 igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_int_t *res) {
 
-    return igraph_biconnected_components(graph, 0, 0, 0, 0, res);
+    return igraph_biconnected_components(graph, NULL, NULL, NULL, NULL, res);
 }
 
 /**
@@ -980,7 +974,7 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * a single vertex only as being biconnected. Isolated vertices will
  * not be part of any of the biconnected components.
  *
- * \param graph The input graph.
+ * \param graph The input graph. It will be treated as undirected.
  * \param no If not a NULL pointer, the number of biconnected components will
  *     be stored here.
  * \param tree_edges If not a NULL pointer, then the found components
@@ -1026,30 +1020,23 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_stack_int_t path;
     igraph_stack_int_t edgestack;
     igraph_inclist_t inclist;
-    igraph_integer_t i, counter, rootdfs = 0;
+    igraph_integer_t counter, rootdfs = 0;
     igraph_vector_int_t vertex_added;
     igraph_integer_t comps = 0;
     igraph_vector_int_list_t *mycomponents = components, vcomponents;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&nextptr, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nextptr);
-    IGRAPH_CHECK(igraph_vector_int_init(&num, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &num);
-    IGRAPH_CHECK(igraph_vector_int_init(&low, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
-    IGRAPH_CHECK(igraph_vector_bool_init(&found, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &found);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&found, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_stack_int_init(&path, 100));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &path);
-    IGRAPH_CHECK(igraph_stack_int_init(&edgestack, 100));
-    IGRAPH_FINALLY(igraph_stack_int_destroy, &edgestack);
+    IGRAPH_STACK_INT_INIT_FINALLY(&path, 100);
+    IGRAPH_STACK_INT_INIT_FINALLY(&edgestack, 100);
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&vertex_added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &vertex_added);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_added, no_of_nodes);
 
     if (no) {
         *no = 0;
@@ -1071,7 +1058,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
         IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(mycomponents, 0);
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
 
         if (VECTOR(low)[i] != 0) {
             continue;    /* already visited */
@@ -1131,7 +1118,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                         /*------------------------------------*/
                         /* Record the biconnected component just found */
                         if (tree_edges || mycomponents) {
-                            igraph_vector_int_t *v = 0, *v2 = 0;
+                            igraph_vector_int_t *v, *v2;
                             comps++;
                             if (tree_edges) {
                                 IGRAPH_CHECK(igraph_vector_int_list_push_back_new(tree_edges, &v));
@@ -1388,7 +1375,7 @@ igraph_error_t igraph_subcomponent(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
-    char *already_added;
+    bool *already_added;
     igraph_integer_t i, vsize;
     igraph_vector_int_t tmp = IGRAPH_VECTOR_NULL;
 
@@ -1400,10 +1387,8 @@ igraph_error_t igraph_subcomponent(
         IGRAPH_ERROR("Invalid mode argument.", IGRAPH_EINVMODE);
     }
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("Subcomponent failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for computing subcomponent.");
     IGRAPH_FINALLY(igraph_free, already_added);
 
     igraph_vector_int_clear(res);
@@ -1413,7 +1398,7 @@ igraph_error_t igraph_subcomponent(
 
     IGRAPH_CHECK(igraph_dqueue_int_push(&q, vertex));
     IGRAPH_CHECK(igraph_vector_int_push_back(res, vertex));
-    already_added[vertex] = 1;
+    already_added[vertex] = true;
 
     while (!igraph_dqueue_int_empty(&q)) {
         igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
@@ -1428,7 +1413,7 @@ igraph_error_t igraph_subcomponent(
             if (already_added[neighbor]) {
                 continue;
             }
-            already_added[neighbor] = 1;
+            already_added[neighbor] = true;
             IGRAPH_CHECK(igraph_vector_int_push_back(res, neighbor));
             IGRAPH_CHECK(igraph_dqueue_int_push(&q, neighbor));
         }

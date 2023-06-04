@@ -75,84 +75,79 @@ static igraph_error_t igraph_i_find_k_indsets(
             for (l = 0; l < size - 1 && c1[l] == c2[l]; l++) {
                 (*new_member_storage)[m++] = c1[l];
             }
-            /* Now, if l == size-1, the two vectors are totally equal.
-            This is a bug */
-            if (l == size - 1) {
-                IGRAPH_WARNING("possible bug in igraph_independent_vertex_sets");
-                m = n;
-            } else {
-                /* Assuming that j<k, c1[l] is always less than c2[l], since indsets
-                 * are ordered alphabetically. Now add c1[l] and store c2[l] in a
-                 * dummy variable */
-                (*new_member_storage)[m++] = c1[l];
-                v1 = c1[l];
-                v2 = c2[l];
-                l++;
-                /* Copy the remaining part of the two vectors. Every member pair
-                 * found in the remaining parts satisfies the following:
-                 * 1. If they are equal, they should be added.
-                 * 2. If they are not equal, the smaller must be equal to the
-                 *    one stored in the dummy variable. If not, the two vectors
-                 *    differ in more than one place. The larger will be stored in
-                 *    the dummy variable again.
-                 */
-                ok = 1;
-                for (; l < size - 1; l++) {
-                    if (c1[l] == c2[l]) {
-                        (*new_member_storage)[m++] = c1[l];
-                        ok = 0;
-                    } else if (ok) {
-                        if (c1[l] < c2[l]) {
-                            if (c1[l] == v1) {
-                                (*new_member_storage)[m++] = c1[l];
-                                v2 = c2[l];
-                            } else {
-                                break;
-                            }
+            /* Now, if l == size-1, the two vectors are totally equal. This is a bug */
+            IGRAPH_ASSERT(l != size-1);
+            /* Assuming that j<k, c1[l] is always less than c2[l], since indsets
+                * are ordered alphabetically. Now add c1[l] and store c2[l] in a
+                * dummy variable */
+            (*new_member_storage)[m++] = c1[l];
+            v1 = c1[l];
+            v2 = c2[l];
+            l++;
+            /* Copy the remaining part of the two vectors. Every member pair
+                * found in the remaining parts satisfies the following:
+                * 1. If they are equal, they should be added.
+                * 2. If they are not equal, the smaller must be equal to the
+                *    one stored in the dummy variable. If not, the two vectors
+                *    differ in more than one place. The larger will be stored in
+                *    the dummy variable again.
+                */
+            ok = 1;
+            for (; l < size - 1; l++) {
+                if (c1[l] == c2[l]) {
+                    (*new_member_storage)[m++] = c1[l];
+                    ok = 0;
+                } else if (ok) {
+                    if (c1[l] < c2[l]) {
+                        if (c1[l] == v1) {
+                            (*new_member_storage)[m++] = c1[l];
+                            v2 = c2[l];
                         } else {
-                            if (ok && c2[l] == v1) {
-                                (*new_member_storage)[m++] = c2[l];
-                                v2 = c1[l];
-                            } else {
-                                break;
-                            }
+                            break;
                         }
                     } else {
-                        break;
-                    }
-                }
-                /* Now, if l != size-1, the two vectors had a difference in more than
-                 * one place, so the whole independent vertex set is invalid. */
-                if (l != size - 1) {
-                    /* Step back in new_member_storage */
-                    m = n;
-                } else {
-                    /* v1 and v2 are the two different vertices. Check for the
-                     * absence of an edge since we are looking for independent
-                     * vertex sets */
-                    IGRAPH_CHECK(igraph_neighbors(graph, neis, v1, IGRAPH_ALL));
-                    if (!igraph_vector_int_search(neis, 0, v2, 0)) {
-                        /* Found a new independent vertex set, step forward in new_member_storage */
-                        if (m == n || v2 > (*new_member_storage)[m - 1]) {
-                            (*new_member_storage)[m++] = v2;
-                            n = m;
+                        if (ok && c2[l] == v1) {
+                            (*new_member_storage)[m++] = c2[l];
+                            v2 = c1[l];
                         } else {
-                            m = n;
+                            break;
                         }
+                    }
+                } else {
+                    break;
+                }
+            }
+            /* Now, if l != size-1, the two vectors had a difference in more than
+                * one place, so the whole independent vertex set is invalid. */
+            if (l != size - 1) {
+                /* Step back in new_member_storage */
+                m = n;
+            } else {
+                /* v1 and v2 are the two different vertices. Check for the
+                    * absence of an edge since we are looking for independent
+                    * vertex sets */
+                IGRAPH_CHECK(igraph_neighbors(graph, neis, v1, IGRAPH_ALL));
+                if (!igraph_vector_int_search(neis, 0, v2, 0)) {
+                    /* Found a new independent vertex set, step forward in new_member_storage */
+                    if (m == n || v2 > (*new_member_storage)[m - 1]) {
+                        (*new_member_storage)[m++] = v2;
+                        n = m;
                     } else {
                         m = n;
                     }
+                } else {
+                    m = n;
                 }
-                /* See if new_member_storage is full. If so, reallocate */
-                if (m == new_member_storage_size) {
-                    IGRAPH_FINALLY_CLEAN(1);
-                    *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
-                                                         (size_t) new_member_storage_size * 2,
-                                                         igraph_integer_t);
-                    IGRAPH_CHECK_OOM(*new_member_storage, "igraph_independent_vertex_sets failed");
-                    new_member_storage_size *= 2;
-                    IGRAPH_FINALLY(igraph_free, *new_member_storage);
-                }
+            }
+            /* See if new_member_storage is full. If so, reallocate */
+            if (m == new_member_storage_size) {
+                IGRAPH_FINALLY_CLEAN(1);
+                *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
+                                                        (size_t) new_member_storage_size * 2,
+                                                        igraph_integer_t);
+                IGRAPH_CHECK_OOM(*new_member_storage, "igraph_independent_vertex_sets failed");
+                new_member_storage_size *= 2;
+                IGRAPH_FINALLY(igraph_free, *new_member_storage);
             }
         }
     }

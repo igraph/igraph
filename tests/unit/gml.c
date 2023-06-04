@@ -29,8 +29,7 @@ void test_input(const char *filename) {
 
     ifile = fopen(filename, "r");
     if (! ifile) {
-        fprintf(stderr, "Cannot open '%s'.\n", filename);
-        abort();
+        IGRAPH_FATALF("Cannot open '%s'.\n", filename);
     }
 
     printf("===== %s =====\n", filename);

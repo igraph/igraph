@@ -111,7 +111,7 @@ IGRAPH_PRIVATE_EXPORT void igraph_d_indheap_max_index(igraph_d_indheap_t *h, igr
 
 typedef struct igraph_2wheap_t {
     /** Number of items in the heap */
-    igraph_integer_t size;
+    igraph_integer_t max_size;
 
     /** The items themselves in the heap */
     igraph_vector_t data;

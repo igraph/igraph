@@ -4,7 +4,8 @@
 #  * CROSSCOMPILING_EMULATOR can be a semicolon-separated list to pass arguments (3.15)
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
-cmake_minimum_required(VERSION 3.18...3.22)
+#  * cmake -E cat (3.18)
+cmake_minimum_required(VERSION 3.18...3.25)
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
@@ -146,10 +147,6 @@ configure_file(
 # included as a sub-project in another CMake project
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
-  configure_file(
-    ${PROJECT_SOURCE_DIR}/etc/cmake/CTestCustom.cmake.in
-    ${PROJECT_BINARY_DIR}/CTestCustom.cmake
-  )
 endif()
 
 # Traverse subdirectories. vendor/ should come first because code in

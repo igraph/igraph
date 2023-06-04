@@ -82,7 +82,7 @@ IGRAPH_EXPORT igraph_error_t igraph_edge_betweenness_subset(const igraph_t *grap
 
 /**
  * \typedef igraph_pagerank_algo_t
- * \brief PageRank algorithm implementation
+ * \brief PageRank algorithm implementation.
  *
  * Algorithms to calculate PageRank.
  * \enumval IGRAPH_PAGERANK_ALGO_ARPACK Use the ARPACK library, this
@@ -122,14 +122,6 @@ IGRAPH_EXPORT igraph_error_t igraph_eigenvector_centrality(const igraph_t *graph
                                                 const igraph_vector_t *weights,
                                                 igraph_arpack_options_t *options);
 
-IGRAPH_EXPORT igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
-                                   igraph_real_t *value, igraph_bool_t scale,
-                                   const igraph_vector_t *weights,
-                                   igraph_arpack_options_t *options);
-IGRAPH_EXPORT igraph_error_t igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
-                                         igraph_real_t *value, igraph_bool_t scale,
-                                         const igraph_vector_t *weights,
-                                         igraph_arpack_options_t *options);
 IGRAPH_EXPORT igraph_error_t igraph_hub_and_authority_scores(const igraph_t *graph, igraph_vector_t *hub_vector,
                                          igraph_vector_t *authority_vector,
                                          igraph_real_t *value, igraph_bool_t scale,
@@ -195,6 +187,17 @@ IGRAPH_EXPORT igraph_error_t igraph_centralization_eigenvector_centrality_tmax(
     igraph_bool_t directed,
     igraph_bool_t scale,
     igraph_real_t *res);
+
+/* Deprecated functions: */
+
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
+                                   igraph_real_t *value, igraph_bool_t scale,
+                                   const igraph_vector_t *weights,
+                                   igraph_arpack_options_t *options);
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
+                                         igraph_real_t *value, igraph_bool_t scale,
+                                         const igraph_vector_t *weights,
+                                         igraph_arpack_options_t *options);
 
 __END_DECLS
 

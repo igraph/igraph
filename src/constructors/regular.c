@@ -587,7 +587,7 @@ igraph_error_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t di
  *        \clist
  *        \cli IGRAPH_TREE_OUT
  *          directed tree, the edges point
- *          from the parents to their children,
+ *          from the parents to their children.
  *        \cli IGRAPH_TREE_IN
  *          directed tree, the edges point from
  *          the children to their parents.
@@ -689,7 +689,7 @@ igraph_error_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t
  *        \clist
  *        \cli IGRAPH_TREE_OUT
  *          directed tree, the edges point
- *          from the parents to their children,
+ *          from the parents to their children.
  *        \cli IGRAPH_TREE_IN
  *          directed tree, the edges point from
  *          the children to their parents.
@@ -789,7 +789,7 @@ igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph_vector_int_t 
  *        \clist
  *        \cli IGRAPH_TREE_OUT
  *          directed tree, the edges point
- *          from the parents to their children,
+ *          from the parents to their children.
  *        \cli IGRAPH_TREE_IN
  *          directed tree, the edges point from
  *          the children to their parents.

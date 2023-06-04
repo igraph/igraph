@@ -807,13 +807,13 @@ static void igraph_i_2wheap_sink(igraph_2wheap_t *h,
 /* ------------------ */
 
 /**
- * Initializes a new two-way heap. The size parameter defines the maximum
+ * Initializes a new two-way heap. The max_size parameter defines the maximum
  * number of items that the heap can hold.
  */
-igraph_error_t igraph_2wheap_init(igraph_2wheap_t *h, igraph_integer_t size) {
-    h->size = size;
+igraph_error_t igraph_2wheap_init(igraph_2wheap_t *h, igraph_integer_t max_size) {
+    h->max_size = max_size;
     /* We start with the biggest */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&h->index2, size);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&h->index2, max_size);
     IGRAPH_VECTOR_INIT_FINALLY(&h->data, 0);
     IGRAPH_CHECK(igraph_vector_int_init(&h->index, 0));
     /* IGRAPH_FINALLY(igraph_vector_int_destroy, &h->index); */
@@ -887,7 +887,7 @@ igraph_integer_t igraph_2wheap_size(const igraph_2wheap_t *h) {
  * \c igraph_2wheap_push_with_index .
  */
 igraph_integer_t igraph_2wheap_max_size(const igraph_2wheap_t *h) {
-    return h->size;
+    return h->max_size;
 }
 
 /**
@@ -970,7 +970,7 @@ igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h) {
 }
 
 /**
- * Deletess the largest element from the heap and returns it along with its
+ * Deletes the largest element from the heap and returns it along with its
  * associated index (the latter being returned in an output argument).
  *
  * This function does \em not change the indices associated to the elements

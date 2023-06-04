@@ -64,7 +64,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
         igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
         neis = igraph_adjlist_get(&allneis, actnode);
         n = igraph_vector_int_size(neis);
-        VECTOR(visited)[actnode] = 1;
+        VECTOR(visited)[actnode] = true;
         for (j = 0; j < n; j++) {
             igraph_integer_t neighbor = VECTOR(*neis)[j];
             if (!VECTOR(visited)[neighbor]) {
@@ -74,7 +74,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_unreachable(
     }
 
     for (j = 0; j < no_of_nodes; j++) {
-        no_of_newedges += 1 - VECTOR(visited)[j];
+        no_of_newedges += VECTOR(visited)[j] ? 0 : 1;
     }
 
     /* if any nodes are unreachable, add edges between them and real_root */
@@ -122,9 +122,9 @@ struct igraph_i_reingold_tilford_vertex {
     igraph_real_t offset_to_right_extreme;  /* X offset when jumping to the right extreme node */
 };
 
-static igraph_error_t igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
+static void igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
                                                       igraph_integer_t node, igraph_integer_t vcount);
-static igraph_error_t igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
+static void igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
                                                         igraph_matrix_t *res, igraph_integer_t node,
                                                         igraph_integer_t vcount, igraph_real_t xpos);
 
@@ -210,14 +210,14 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
 #ifdef LAYOUT_RT_DEBUG
     for (i = 0; i < no_of_nodes; i++) {
         printf(
-            "%3ld: offset = %.2f, contours = [%ld, %ld], contour offsets = [%.2f, %.2f]\n",
+            "%3" IGRAPH_PRId ": offset = %.2f, contours = [%" IGRAPH_PRId ", %" IGRAPH_PRId "], contour offsets = [%.2f, %.2f]\n",
             i, vdata[i].offset,
             vdata[i].left_contour, vdata[i].right_contour,
             vdata[i].offset_to_left_contour, vdata[i].offset_to_right_contour
         );
         if (vdata[i].left_extreme != i || vdata[i].right_extreme != i) {
             printf(
-                "     extrema = [%ld, %ld], offsets to extrema = [%.2f, %.2f]\n",
+                "     extrema = [%" IGRAPH_PRId ", %" IGRAPH_PRId "], offsets to extrema = [%.2f, %.2f]\n",
                 vdata[i].left_extreme, vdata[i].right_extreme,
                 vdata[i].offset_to_left_extreme, vdata[i].offset_to_right_extreme
             );
@@ -228,13 +228,13 @@ static igraph_error_t igraph_i_layout_reingold_tilford(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_layout_reingold_tilford_calc_coords(
+static void igraph_i_layout_reingold_tilford_calc_coords(
         struct igraph_i_reingold_tilford_vertex *vdata,
         igraph_matrix_t *res, igraph_integer_t node,
         igraph_integer_t vcount, igraph_real_t xpos) {
-    igraph_integer_t i;
+
     MATRIX(*res, node, 0) = xpos;
-    for (i = 0; i < vcount; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -243,23 +243,23 @@ static igraph_error_t igraph_i_layout_reingold_tilford_calc_coords(
                     xpos + vdata[i].offset);
         }
     }
-    return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
+static void igraph_i_layout_reingold_tilford_postorder(
         struct igraph_i_reingold_tilford_vertex *vdata,
         igraph_integer_t node, igraph_integer_t vcount) {
-    igraph_integer_t i, j, childcount, leftroot, leftrootidx;
+
+    igraph_integer_t childcount, leftroot, leftrootidx;
     const igraph_real_t minsep = 1;
     igraph_real_t avg;
 
 #ifdef LAYOUT_RT_DEBUG
-    printf("Starting visiting node %ld\n", node);
+    printf("Starting visiting node %" IGRAPH_PRId "\n", node);
 #endif
 
     /* Check whether this node is a leaf node */
     childcount = 0;
-    for (i = 0; i < vcount; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -271,7 +271,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
     }
 
     if (childcount == 0) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     /* Here we can assume that all of the subtrees have been placed and their
@@ -285,9 +285,9 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
     leftroot = leftrootidx = -1;
     avg = 0.0;
 #ifdef LAYOUT_RT_DEBUG
-    printf("Visited node %ld and arranged its subtrees\n", node);
+    printf("Visited node %" IGRAPH_PRId " and arranged its subtrees\n", node);
 #endif
-    for (i = 0, j = 0; i < vcount; i++) {
+    for (igraph_integer_t i = 0, j = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -299,7 +299,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
                 igraph_real_t loffset, roffset, rootsep, newoffset;
 
 #ifdef LAYOUT_RT_DEBUG
-                printf("  Placing child %ld on level %ld, to the right of %ld\n", i, vdata[i].level, leftroot);
+                printf("  Placing child %" IGRAPH_PRId " on level %" IGRAPH_PRId ", to the right of %" IGRAPH_PRId "\n", i, vdata[i].level, leftroot);
 #endif
                 lnode = leftroot; rnode = i;
                 rootsep = vdata[leftroot].offset + minsep;
@@ -311,7 +311,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
                 vdata[node].offset_to_right_contour = rootsep;
 
 #ifdef LAYOUT_RT_DEBUG
-                printf("    Contour: [%ld, %ld], offsets: [%lf, %lf], rootsep: %lf\n",
+                printf("    Contour: [%" IGRAPH_PRId ", %" IGRAPH_PRId "], offsets: [%lf, %lf], rootsep: %lf\n",
                        lnode, rnode, loffset, roffset, rootsep);
 #endif
                 while ((lnode >= 0) && (rnode >= 0)) {
@@ -341,8 +341,8 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
                             vdata[node].offset_to_left_extreme = vdata[i].offset_to_left_extreme + rootsep;
                             vdata[node].offset_to_right_extreme = vdata[i].offset_to_right_extreme + rootsep;
 #ifdef LAYOUT_RT_DEBUG
-                            printf("      Left subtree ended earlier, continuing left subtree's left and right contour on right subtree (node %ld gets connected to node %ld)\n", auxnode, vdata[rnode].left_contour);
-                            printf("      New contour following offset for node %ld is %lf\n", auxnode, vdata[auxnode].offset_to_left_contour);
+                            printf("      Left subtree ended earlier, continuing left subtree's left and right contour on right subtree (node %" IGRAPH_PRId " gets connected to node %" IGRAPH_PRId ")\n", auxnode, vdata[rnode].left_contour);
+                            printf("      New contour following offset for node %" IGRAPH_PRId " is %lf\n", auxnode, vdata[auxnode].offset_to_left_contour);
 #endif
                         } else {
                             /* Both subtrees are ending at the same time; the
@@ -376,14 +376,14 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
                              * rooted at 'node' because the right subtree was
                              * smaller */
 #ifdef LAYOUT_RT_DEBUG
-                            printf("      Right subtree ended earlier, continuing right subtree's left and right contour on left subtree (node %ld gets connected to node %ld)\n", auxnode, lnode);
-                            printf("      New contour following offset for node %ld is %lf\n", auxnode, vdata[auxnode].offset_to_left_contour);
+                            printf("      Right subtree ended earlier, continuing right subtree's left and right contour on left subtree (node %" IGRAPH_PRId " gets connected to node %" IGRAPH_PRId ")\n", auxnode, lnode);
+                            printf("      New contour following offset for node %" IGRAPH_PRId " is %lf\n", auxnode, vdata[auxnode].offset_to_left_contour);
 #endif
                         }
                         rnode = -1;
                     }
 #ifdef LAYOUT_RT_DEBUG
-                    printf("    Contour: [%ld, %ld], offsets: [%lf, %lf], rootsep: %lf\n",
+                    printf("    Contour: [%" IGRAPH_PRId ", %" IGRAPH_PRId "], offsets: [%lf, %lf], rootsep: %lf\n",
                            lnode, rnode, loffset, roffset, rootsep);
 #endif
 
@@ -399,7 +399,7 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
                 }
 
 #ifdef LAYOUT_RT_DEBUG
-                printf("  Offset of subtree with root node %ld will be %lf\n", i, rootsep);
+                printf("  Offset of subtree with root node %" IGRAPH_PRId " will be %lf\n", i, rootsep);
 #endif
                 vdata[i].offset = rootsep;
                 vdata[node].offset_to_right_contour = rootsep;
@@ -407,10 +407,10 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
                 leftrootidx = j;
                 leftroot = i;
             } else {
-                /* This is the first child of the node being considered so we
-                 * can simply place the subtree on our virtual canvas */
+                /* This is the first child of the node being considered,
+                 * so we can simply place the subtree on our virtual canvas. */
 #ifdef LAYOUT_RT_DEBUG
-                printf("  Placing child %ld on level %ld as first child\n", i, vdata[i].level);
+                printf("  Placing child %" IGRAPH_PRId " on level %" IGRAPH_PRId " as first child\n", i, vdata[i].level);
 #endif
                 leftrootidx = j;
                 leftroot = i;
@@ -428,13 +428,13 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
         }
     }
 #ifdef LAYOUT_RT_DEBUG
-    printf("Shifting node %ld to be centered above children. Shift amount: %lf\n", node, avg);
+    printf("Shifting node %" IGRAPH_PRId " to be centered above children. Shift amount: %lf\n", node, avg);
 #endif
     vdata[node].offset_to_left_contour -= avg;
     vdata[node].offset_to_right_contour -= avg;
     vdata[node].offset_to_left_extreme -= avg;
     vdata[node].offset_to_right_extreme -= avg;
-    for (i = 0, j = 0; i < vcount; i++) {
+    for (igraph_integer_t i = 0; i < vcount; i++) {
         if (i == node) {
             continue;
         }
@@ -442,8 +442,6 @@ static igraph_error_t igraph_i_layout_reingold_tilford_postorder(
             vdata[i].offset -= avg;
         }
     }
-
-    return IGRAPH_SUCCESS;
 }
 
 /* This function computes the number of outgoing (or incoming) connections
@@ -499,7 +497,7 @@ igraph_error_t igraph_i_layout_reingold_tilford_cluster_degrees_directed(
  * In the directed case, one root is chosen from each strongly connected component
  * that has no incoming (or outgoing) edges (depending on 'mode').
  * When more than one root choice is possible, nodes are prioritized based on
- * either lowest ecccentricity (if 'use_ecccentricity' is true) or based on
+ * either lowest eccentricity (if 'use_eccentricity' is true) or based on
  * highest degree (out- or in-degree in directed mode).
  */
 
@@ -531,7 +529,7 @@ igraph_error_t igraph_i_layout_reingold_tilford_cluster_degrees_directed(
  *           Choose the vertices with the lowest eccentricity. This usually results
  *           in a "wide and shallow" tree layout. While this heuristic produces
  *           high-quality results, it is slow for large graphs: computing the
- *           eccentricities has quadractic complexity in the number of vertices.
+ *           eccentricities has quadratic complexity in the number of vertices.
  *          \endclist
  * \return Error code.
  *
@@ -551,9 +549,9 @@ igraph_error_t igraph_roots_for_tree_layout(
 
     switch (heuristic) {
     case IGRAPH_ROOT_CHOICE_DEGREE:
-        use_eccentricity = 0; break;
+        use_eccentricity = false; break;
     case IGRAPH_ROOT_CHOICE_ECCENTRICITY:
-        use_eccentricity = 1; break;
+        use_eccentricity = true; break;
     default:
         IGRAPH_ERROR("Invalid root choice heuristic given.", IGRAPH_EINVAL);
     }
@@ -569,7 +567,7 @@ igraph_error_t igraph_roots_for_tree_layout(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
     if (use_eccentricity) {
-        /* Sort vertices by decreasing eccenticity. */
+        /* Sort vertices by decreasing eccentricity. */
 
         igraph_vector_t ecc;
 
@@ -693,12 +691,12 @@ igraph_error_t igraph_roots_for_tree_layout(
  *   vertices are calculated, if they are not given. See the \p roots parameter.
  * \param roots The index of the root vertex or root vertices. The set of roots
  *   should be specified so that all vertices of the graph are reachable from them.
- *   Simply put, in the udirected case, one root should be given from each
+ *   Simply put, in the undirected case, one root should be given from each
  *   connected component. If \p roots is \c NULL or a pointer to an empty vector,
  *   then the roots will be selected automatically. Currently, automatic root
  *   selection prefers low eccentricity vertices in graphs with fewer than
- *   500 vertices, and high degree vertices (acording to \p mode) in larger graphs.
- *   The root selecton heuristic may change without notice. To ensure a consistent
+ *   500 vertices, and high degree vertices (according to \p mode) in larger graphs.
+ *   The root selection heuristic may change without notice. To ensure a consistent
  *   output, please specify the roots manually. The \ref igraph_roots_for_tree_layout()
  *   function gives more control over automatic root selection.
  * \param rootlevel This argument can be useful when drawing forests which are
@@ -720,14 +718,13 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                                    const igraph_vector_int_t *roots,
                                    const igraph_vector_int_t *rootlevel) {
 
-    igraph_integer_t no_of_nodes_orig = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes_orig = igraph_vcount(graph);
     igraph_integer_t no_of_nodes = no_of_nodes_orig;
     igraph_integer_t real_root;
     igraph_t extended;
     const igraph_t *pextended = graph;
     igraph_vector_int_t myroots;
     const igraph_vector_int_t *proots = roots;
-    igraph_integer_t i;
     igraph_vector_int_t newedges;
 
 
@@ -766,7 +763,6 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         /* Many roots were given to us, check 'rootlevel' */
 
         igraph_integer_t plus_levels = 0;
-        igraph_integer_t i;
 
         if (igraph_vector_int_size(roots) != igraph_vector_int_size(rootlevel)) {
             IGRAPH_ERROR("Reingold-Tilford: 'roots' and 'rootlevel' lengths differ",
@@ -774,7 +770,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         }
 
         /* count the rootlevels that are not zero */
-        for (i = 0; i < igraph_vector_int_size(roots); i++) {
+        for (igraph_integer_t i = 0; i < igraph_vector_int_size(roots); i++) {
             plus_levels += VECTOR(*rootlevel)[i];
         }
 
@@ -789,7 +785,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
 
             igraph_vector_int_resize(&newedges, plus_levels * 2);
 
-            for (i = 0; i < igraph_vector_int_size(roots); i++) {
+            for (igraph_integer_t i = 0; i < igraph_vector_int_size(roots); i++) {
                 igraph_integer_t rl = VECTOR(*rootlevel)[i];
                 igraph_integer_t rn = VECTOR(*roots)[i];
                 igraph_integer_t j;
@@ -881,7 +877,7 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
         /* add edges from the roots to real_root */
         no_of_newedges = igraph_vector_int_size(proots);
         igraph_vector_int_resize(&newedges, no_of_newedges * 2);
-        for (i = 0; i < no_of_newedges; i++) {
+        for (igraph_integer_t i = 0; i < no_of_newedges; i++) {
             VECTOR(newedges)[2 * i] = no_of_nodes - 1;
             VECTOR(newedges)[2 * i + 1] = VECTOR(*proots)[i];
         }
@@ -945,7 +941,6 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
  * \function igraph_layout_reingold_tilford_circular
  * \brief Circular Reingold-Tilford layout for trees.
  *
- * </para><para>
  * This layout is almost the same as \ref igraph_layout_reingold_tilford(), but
  * the tree is drawn in a circular way, with the root vertex in the center.
  *
@@ -960,12 +955,12 @@ igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
  *   vertices are calculated, if they are not given. See the \p roots parameter.
  * \param roots The index of the root vertex or root vertices. The set of roots
  *   should be specified so that all vertices of the graph are reachable from them.
- *   Simply put, in the udirected case, one root should be given from each
+ *   Simply put, in the undirected case, one root should be given from each
  *   connected component. If \p roots is \c NULL or a pointer to an empty vector,
  *   then the roots will be selected automatically. Currently, automatic root
- *   selection prefers low ecccentricity vertices in graphs with fewer than
- *   500 vertices, and high degree vertices (acording to \p mode) in larger graphs.
- *   The root selecton heuristic may change without notice. To ensure a consistent
+ *   selection prefers low eccentricity vertices in graphs with fewer than
+ *   500 vertices, and high degree vertices (according to \p mode) in larger graphs.
+ *   The root selection heuristic may change without notice. To ensure a consistent
  *   output, please specify the roots manually.
  * \param rootlevel This argument can be useful when drawing forests which are
  *   not trees (i.e. they are unconnected and have tree components). It specifies
@@ -983,7 +978,6 @@ igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
         const igraph_vector_int_t *rootlevel) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
     igraph_real_t ratio;
     igraph_real_t minx, maxx;
 
@@ -996,7 +990,7 @@ igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
     ratio = 2 * M_PI * (no_of_nodes - 1.0) / no_of_nodes;
 
     minx = maxx = MATRIX(*res, 0, 0);
-    for (i = 1; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 1; i < no_of_nodes; i++) {
         if (MATRIX(*res, i, 0) > maxx) {
             maxx = MATRIX(*res, i, 0);
         }
@@ -1007,7 +1001,7 @@ igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
     if (maxx > minx) {
         ratio /= (maxx - minx);
     }
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_real_t phi = (MATRIX(*res, i, 0) - minx) * ratio;
         igraph_real_t r = MATRIX(*res, i, 1);
         MATRIX(*res, i, 0) = r * cos(phi);

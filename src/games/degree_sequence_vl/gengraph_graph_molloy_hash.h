@@ -130,7 +130,7 @@ public:
         return deg[v];
     };
     // For debug purposes : verify validity of the graph (symetry, simplicity)
-    bool verify();
+    //bool verify();
     // Destroy deg[], neigh[] and links[]
     ~graph_molloy_hash();
     // Allocate memory for the graph. Create deg and links. No edge is created.

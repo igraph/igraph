@@ -1,8 +1,6 @@
-/* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2014-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,11 +13,9 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 
 #include "igraph_paths.h"
 
@@ -46,7 +42,7 @@
  * \param graph The input graph.
  * \param res Initialized integer vector. The paths are
  *        returned here in terms of their vertices, separated
- *        by -1 markers. The paths are included in arbitrary
+ *        by <code>-1</code> markers. The paths are included in arbitrary
  *        order, as they are found.
  * \param from The start vertex.
  * \param to The target vertices.
@@ -72,40 +68,35 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_integer_t no_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
     igraph_bool_t toall = igraph_vs_is_all(&to);
-    igraph_vector_char_t markto;
     igraph_lazy_adjlist_t adjlist;
     igraph_vector_int_t stack, dist;
-    igraph_vector_char_t added;
+    igraph_vector_bool_t markto, added;
     igraph_vector_int_t nptr;
     int iteration = 0;
 
     if (from < 0 || from >= no_nodes) {
-        IGRAPH_ERROR("Invalid starting vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Index of source vertex is out of range.", IGRAPH_EINVVID);
     }
 
     if (!toall) {
-        IGRAPH_VECTOR_CHAR_INIT_FINALLY(&markto, no_nodes);
+        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&markto, no_nodes);
         IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
         IGRAPH_FINALLY(igraph_vit_destroy, &vit);
         for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-            VECTOR(markto)[ IGRAPH_VIT_GET(vit) ] = 1;
+            VECTOR(markto)[ IGRAPH_VIT_GET(vit) ] = true;
         }
         igraph_vit_destroy(&vit);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_CHECK(igraph_vector_char_init(&added, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_vector_int_init(&stack, 100));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &stack);
-    IGRAPH_CHECK(igraph_vector_int_init(&dist, 100));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &dist);
+    IGRAPH_VECTOR_BOOL_INIT_FINALLY(&added, no_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&stack, 100);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dist, 100);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(
         graph, &adjlist, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
     ));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nptr, no_nodes);
 
     igraph_vector_int_clear(res);
 
@@ -113,7 +104,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_int_clear(&dist);
     igraph_vector_int_push_back(&stack, from);
     igraph_vector_int_push_back(&dist, 0);
-    VECTOR(added)[from] = 1;
+    VECTOR(added)[from] = true;
     while (!igraph_vector_int_empty(&stack)) {
         igraph_integer_t act = igraph_vector_int_tail(&stack);
         igraph_integer_t curdist = igraph_vector_int_tail(&dist);
@@ -135,7 +126,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
         within_dist = (curdist < cutoff || cutoff < 0);
         if (within_dist) {
             /* Search for a neighbor that was not yet visited */
-            any = 0;
+            any = false;
             while (!any && (*ptr) < n) {
                 nei = VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];
@@ -146,7 +137,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
             /* There is such a neighbor, add it */
             IGRAPH_CHECK(igraph_vector_int_push_back(&stack, nei));
             IGRAPH_CHECK(igraph_vector_int_push_back(&dist, curdist + 1));
-            VECTOR(added)[nei] = 1;
+            VECTOR(added)[nei] = true;
             /* Add to results */
             if (toall || VECTOR(markto)[nei]) {
                 IGRAPH_CHECK(igraph_vector_int_append(res, &stack));
@@ -156,7 +147,7 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
             /* There is no such neighbor, finished with the subtree */
             igraph_integer_t up = igraph_vector_int_pop_back(&stack);
             igraph_vector_int_pop_back(&dist);
-            VECTOR(added)[up] = 0;
+            VECTOR(added)[up] = false;
             VECTOR(nptr)[up] = 0;
         }
 
@@ -170,11 +161,11 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_lazy_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&dist);
     igraph_vector_int_destroy(&stack);
-    igraph_vector_char_destroy(&added);
+    igraph_vector_bool_destroy(&added);
     IGRAPH_FINALLY_CLEAN(5);
 
     if (!toall) {
-        igraph_vector_char_destroy(&markto);
+        igraph_vector_bool_destroy(&markto);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

@@ -87,8 +87,6 @@
  * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
  * is the number of edges, d is the average (total) degree of the
  * graphs.
- *
- * \example examples/simple/igraph_bipartite_projection.c
  */
 
 igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
@@ -104,8 +102,7 @@ igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
     igraph_vector_int_t added;
     igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&added, no_of_nodes);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -191,10 +188,11 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_perm, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&vertex_perm, no_of_nodes));
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_index, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&added, no_of_nodes);
+
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
@@ -207,14 +205,14 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
-            VECTOR(vertex_index)[i] = ++remaining_nodes;
+            VECTOR(vertex_index)[i] = remaining_nodes++;
             igraph_vector_int_push_back(&vertex_perm, i);
         }
     }
 
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
-            igraph_integer_t new_i = VECTOR(vertex_index)[i] - 1;
+            igraph_integer_t new_i = VECTOR(vertex_index)[i];
             igraph_integer_t iedges = 0;
             neis1 = igraph_adjlist_get(&adjlist, i);
             neilen1 = igraph_vector_int_size(neis1);
@@ -249,7 +247,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                            old vertex IDs here and rewrite it later */
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei2));
                     } else {
-                        new_nei2 = VECTOR(vertex_index)[nei2] - 1;
+                        new_nei2 = VECTOR(vertex_index)[nei2];
                         IGRAPH_CHECK(igraph_vector_int_push_back(&edges, new_nei2));
                     }
                 }
@@ -261,7 +259,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                 igraph_integer_t from = now - iedges * 2;
                 for (j = from; j < now; j += 2) {
                     igraph_integer_t nei2 = VECTOR(edges)[j + 1];
-                    igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2] - 1;
+                    igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2];
                     igraph_integer_t m = VECTOR(mult)[nei2];
                     VECTOR(edges)[j + 1] = new_nei2;
                     IGRAPH_CHECK(igraph_vector_int_push_back(multiplicity, m));
@@ -330,8 +328,6 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
  * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
  * is the number of edges, d is the average (total) degree of the
  * graphs.
- *
- * \example examples/simple/igraph_bipartite_projection.c
  */
 
 igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
@@ -559,10 +555,25 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
 
 /**
  * \function igraph_incidence
- * \brief Creates a bipartite graph from an incidence matrix.
+ * \brief Creates a bipartite graph from a bipartite adjacency matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_biadjacency 0.10.5
+ */
+
+igraph_error_t igraph_incidence(
+    igraph_t *graph, igraph_vector_bool_t *types,
+    const igraph_matrix_t *incidence, igraph_bool_t directed,
+    igraph_neimode_t mode, igraph_bool_t multiple
+) {
+    return igraph_biadjacency(graph, types, incidence, directed, mode, multiple);
+}
+
+/**
+ * \function igraph_biadjacency
+ * \brief Creates a bipartite graph from a bipartite adjacency matrix.
  *
  * A bipartite (or two-mode) graph contains two types of vertices and
- * edges always connect vertices of different types. An incidence
+ * edges always connect vertices of different types. A bipartite adjacency
  * matrix is an \em n x \em m matrix, \em n and \em m are the number of vertices
  * of the two types, respectively. Nonzero elements in the matrix denote
  * edges between the two corresponding vertices.
@@ -570,7 +581,7 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
  * </para><para>
  * Note that this function can operate in two modes, depending on the
  * \p multiple argument. If it is \c false, then a single edge is
- * created for every non-zero element in the incidence matrix. If \p
+ * created for every non-zero element in the bipartite adjacency matrix. If \p
  * multiple is \c true, then the matrix elements are rounded up
  * to the closest non-negative integer to get the number of edges to
  * create between a pair of vertices.
@@ -583,8 +594,9 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
  * \param types Pointer to an initialized boolean vector, or a null
  *   pointer. If not a null pointer, then the vertex types are stored
  *   here. It is resized as needed.
- * \param incidence The incidence matrix.
- * \param directed Gives whether to create an undirected or a directed
+ * \param input The bipartite adjacency matrix that serves as an input
+ *   to this function.
+ * \param directed Specifies whether to create an undirected or a directed
  *   graph.
  * \param mode Specifies the direction of the edges in a directed
  *   graph. If \c IGRAPH_OUT, then edges point from vertices
@@ -592,36 +604,38 @@ igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool
  *   second kind (corresponding to columns); if \c
  *   IGRAPH_IN, then the opposite direction is realized; if \c
  *   IGRAPH_ALL, then mutual edges will be created.
- * \param multiple How to interpret the incidence matrix elements. See
- *   details below.
+ * \param multiple How to interpret the matrix elements. See details below.
  * \return Error code.
  *
- * Time complexity: O(n*m), the size of the incidence matrix.
+ * Time complexity: O(n*m), the size of the bipartite adjacency matrix.
  */
 
-igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
-                     const igraph_matrix_t *incidence,
-                     igraph_bool_t directed,
-                     igraph_neimode_t mode, igraph_bool_t multiple) {
+igraph_error_t igraph_biadjacency(
+    igraph_t *graph, igraph_vector_bool_t *types,
+    const igraph_matrix_t *input, igraph_bool_t directed,
+    igraph_neimode_t mode, igraph_bool_t multiple
+) {
 
-    igraph_integer_t n1 = igraph_matrix_nrow(incidence);
-    igraph_integer_t n2 = igraph_matrix_ncol(incidence);
+    igraph_integer_t n1 = igraph_matrix_nrow(input);
+    igraph_integer_t n2 = igraph_matrix_ncol(input);
     igraph_integer_t no_of_nodes = n1 + n2;
     igraph_vector_int_t edges;
     igraph_integer_t i, j, k;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
-    if (n1 > 0 && n2 > 0 && igraph_matrix_min(incidence) < 0) {
-        IGRAPH_ERRORF("Incidence matrix elements should be non-negative, found %g.",
-                IGRAPH_EINVAL, igraph_matrix_min(incidence));
+    if (n1 > 0 && n2 > 0 && igraph_matrix_min(input) < 0) {
+        IGRAPH_ERRORF(
+            "Bipartite adjacencey matrix elements should be non-negative, found %g.",
+            IGRAPH_EINVAL, igraph_matrix_min(input)
+        );
     }
 
     if (multiple) {
 
         for (i = 0; i < n1; i++) {
             for (j = 0; j < n2; j++) {
-                igraph_integer_t elem = ceil(MATRIX(*incidence, i, j));
+                igraph_integer_t elem = ceil(MATRIX(*input, i, j));
                 igraph_integer_t from, to;
 
                 if (!elem) {
@@ -658,7 +672,7 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
             for (j = 0; j < n2; j++) {
                 igraph_integer_t from, to;
 
-                if (MATRIX(*incidence, i, j) != 0) {
+                if (MATRIX(*input, i, j) != 0) {
                     if (mode == IGRAPH_IN) {
                         from = n1 + j;
                         to = i;
@@ -700,7 +714,22 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
 /**
  * \function igraph_get_incidence
- * \brief Convert a bipartite graph into an incidence matrix.
+ * \brief Convert a bipartite graph into a bipartite adjacency matrix (deprecated alias).
+ *
+ * \deprecated-by igraph_get_biadjacency 0.10.5
+ */
+
+igraph_error_t igraph_get_incidence(const igraph_t *graph,
+                         const igraph_vector_bool_t *types,
+                         igraph_matrix_t *res,
+                         igraph_vector_int_t *row_ids,
+                         igraph_vector_int_t *col_ids) {
+    return igraph_get_biadjacency(graph, types, res, row_ids, col_ids);
+}
+
+/**
+ * \function igraph_get_biadjacency
+ * \brief Convert a bipartite graph into a bipartite adjacency matrix.
  *
  * \param graph The input graph, edge directions are ignored.
  * \param types Boolean vector containing the vertex types. All vertices
@@ -722,14 +751,14 @@ igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  * Time complexity: O(n*m), n and m are number of vertices of the two
  * different kind.
  *
- * \sa \ref igraph_incidence() for the opposite operation.
+ * \sa \ref igraph_biadjacency() for the opposite operation.
  */
 
-igraph_error_t igraph_get_incidence(const igraph_t *graph,
-                         const igraph_vector_bool_t *types,
-                         igraph_matrix_t *res,
-                         igraph_vector_int_t *row_ids,
-                         igraph_vector_int_t *col_ids) {
+igraph_error_t igraph_get_biadjacency(
+    const igraph_t *graph, const igraph_vector_bool_t *types,
+    igraph_matrix_t *res, igraph_vector_int_t *row_ids,
+    igraph_vector_int_t *col_ids
+) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -848,14 +877,12 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
     igraph_dqueue_int_t Q;
     igraph_vector_int_t neis;
     igraph_bool_t bi = true;
-    igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_char_init(&seen, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_char_destroy, &seen);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&seen, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&Q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    for (i = 0; bi && i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; bi && i < no_of_nodes; i++) {
 
         if (VECTOR(seen)[i]) {
             continue;
@@ -897,7 +924,7 @@ igraph_error_t igraph_is_bipartite(const igraph_t *graph,
 
     if (types && bi) {
         IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             VECTOR(*types)[i] = VECTOR(seen)[i] - 1;
         }
     }
@@ -1130,7 +1157,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
  *          probability p.
  *        \endclist
  * \param n1 The number of bottom vertices.
- * \param n2 The number of top verices.
+ * \param n2 The number of top vertices.
  * \param p The connection probability for G(n,p) graphs. It is
  *     ignored for G(n,m) graphs.
  * \param m The number of edges for G(n,m) graphs. It is ignored for

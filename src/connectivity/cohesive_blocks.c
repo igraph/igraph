@@ -140,7 +140,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
 
 /**
  * \function igraph_cohesive_blocks
- * Identifies the hierarchical cohesive block structure of a graph
+ * \brief Identifies the hierarchical cohesive block structure of a graph.
  *
  * Cohesive blocking is a method of determining hierarchical subsets of
  * graph vertices based on their structural cohesion (or vertex
@@ -150,13 +150,20 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
  * Cohesive blocking is a process through which, given a
  * k-cohesive set of vertices, maximally l-cohesive subsets are
  * recursively identified with l>k. Thus a hiearchy of vertex subsets
- * is found, with the entire graph G at its root. See the following
- * reference for details: J. Moody and D. R. White. Structural
+ * is found, with the entire graph G at its root.
+ *
+ * </para><para>
+ * This function implements cohesive blocking and
+ * calculates the complete cohesive block hierarchy of a graph.
+ *
+ * </para><para>
+ * See the following reference for details:
+ *
+ * </para><para>
+ * J. Moody and D. R. White. Structural
  * cohesion and embeddedness: A hierarchical concept of social
  * groups. American Sociological Review, 68(1):103--127, Feb 2003.
- *
- * </para><para>This function implements cohesive blocking and
- * calculates the complete cohesive block hierarchy of a graph.
+ * https://doi.org/10.2307/3088904
  *
  * \param graph The input graph. It must be undirected and simple. See
  *    \ref igraph_is_simple().
@@ -166,12 +173,12 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_int_t *needle,
  *    contains the vertex IDs of the block.
  * \param cohesion If not a null pointer, then it must be an initialized
  *    vector and the cohesion of the blocks is stored here, in the same
- *    order as the blocks in the \p blocks pointer vector.
+ *    order as the blocks in the \p blocks vector list.
  * \param parent If not a null pointer, then it must be an initialized
  *    vector and the block hierarchy is stored here. For each block, the
- *    id (i.e. the position in the \p blocks pointer vector) of its
+ *    ID (i.e. the position in the \p blocks vector list) of its
  *    parent block is stored. For the top block in the hierarchy,
- *    -1 is stored.
+ *    <code>-1</code> is stored.
  * \param block_tree If not a null pointer, then it must be a pointer
  *    to an uninitialized graph, and the block hierarchy is stored
  *    here as an igraph graph. The vertex IDs correspond to the order
@@ -232,17 +239,15 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     igraph_vector_int_t neis;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Cohesive blocking only works on undirected graphs",
+        IGRAPH_ERROR("Cohesive blocking only works on undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
     if (!is_simple) {
-        IGRAPH_ERROR("Cohesive blocking only works on simple graphs",
+        IGRAPH_ERROR("Cohesive blocking only works on simple graphs.",
                      IGRAPH_EINVAL);
     }
-
-    IGRAPH_STATUS("Starting cohesive block calculation.\n", 0);
 
     if (blocks)   {
         igraph_vector_int_list_clear(blocks);
@@ -277,13 +282,12 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     /* Put the input graph in the queue */
     graph_copy = IGRAPH_CALLOC(1, igraph_t);
-    if (!graph_copy) {
-        IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(graph_copy, "Insufficient memory for cohesive blocking.");
+
     IGRAPH_CHECK(igraph_copy(graph_copy, graph));
     VECTOR(Q)[0] = graph_copy;
     VECTOR(Qparent)[0] = -1;  /* Has no parent */
-    IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /*checks=*/ 1));
+    IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /*checks=*/ true));
     VECTOR(Qcohesion)[0] = conn;
     VECTOR(Qcheck)[0] = 0;
 
@@ -298,15 +302,11 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
         igraph_integer_t nsepv = 0;
         igraph_bool_t addedsep = false;
 
-        IGRAPH_STATUSF(("Candidate %li: %li vertices,",
-                        0, Qptr, mynodes));
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Get the separators */
         IGRAPH_CHECK(igraph_minimum_size_separators(mygraph, &separators));
         nsep = igraph_vector_int_list_size(&separators);
-
-        IGRAPH_STATUSF((" %li separators,", 0, nsep));
 
         /* Remove them from the graph, also mark them */
         IGRAPH_CHECK(igraph_vector_bool_resize(&marked, mynodes));
@@ -318,7 +318,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                 igraph_integer_t vv = VECTOR(*v)[j];
                 if (!VECTOR(marked)[vv]) {
                     nsepv++;
-                    VECTOR(marked)[vv] = 1;
+                    VECTOR(marked)[vv] = true;
                 }
             }
         }
@@ -344,15 +344,13 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             no++;
         }
 
-        IGRAPH_STATUSF((" %li new candidates,", 0, no));
-
         for (i = 0; i < no; i++) {
             igraph_t *newgraph;
             igraph_integer_t maxdeg;
 
             igraph_vector_int_clear(&compvertices);
 
-            while (1) {
+            while (true) {
                 igraph_integer_t v = VECTOR(components)[cptr++];
                 if (v < 0) {
                     break;
@@ -361,15 +359,14 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             }
 
             newgraph = IGRAPH_CALLOC(1, igraph_t);
-            if (!newgraph) {
-                IGRAPH_ERROR("Cannot do cohesive blocking", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(newgraph, "Insufficient memory for cohesive blocking.");
             IGRAPH_FINALLY(igraph_free, newgraph);
+
             IGRAPH_CHECK(igraph_induced_subgraph_map(mygraph, newgraph,
-                         igraph_vss_vector(&compvertices),
-                         IGRAPH_SUBGRAPH_AUTO,
-                         /*map=*/ 0,
-                         /*invmap=*/ &newmapping));
+                                                     igraph_vss_vector(&compvertices),
+                                                     IGRAPH_SUBGRAPH_AUTO,
+                                                     /*map=*/ NULL,
+                                                     /*invmap=*/ &newmapping));
             IGRAPH_FINALLY(igraph_destroy, newgraph);
 
             IGRAPH_CHECK(igraph_maxdegree(newgraph, &maxdeg, igraph_vss_all(),
@@ -393,11 +390,9 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
             }
         }
 
-        IGRAPH_STATUSF((" keeping %li.\n", 0, kept));
-
         igraph_destroy(mygraph);
         igraph_free(mygraph);
-        VECTOR(Q)[Qptr] = 0;
+        VECTOR(Q)[Qptr] = NULL;
 
         Qptr++;
     }
@@ -494,10 +489,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
         for (i = 0; i < Qptr; i++) {
             if (VECTOR(removed)[i]) {
-                IGRAPH_STATUSF(("Candidate %li ignored.\n", 0, i));
                 continue;
-            } else {
-                IGRAPH_STATUSF(("Candidate %li is a cohesive (sub)block\n", 0, i));
             }
             VECTOR(rewritemap)[i] = resptr;
             if (cohesion) {
@@ -570,8 +562,6 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
 
     igraph_vector_ptr_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(2); /* + the elements of Q, they were already destroyed */
-
-    IGRAPH_STATUS("Cohesive blocking done.\n", 0);
 
     return IGRAPH_SUCCESS;
 }

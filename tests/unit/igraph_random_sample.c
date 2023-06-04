@@ -18,11 +18,37 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+void check(igraph_integer_t l, igraph_integer_t h, igraph_integer_t s) {
+    igraph_vector_int_t v;
+
+    igraph_vector_int_init(&v, 0);
+    igraph_random_sample(&v, l, h, s);
+
+    IGRAPH_ASSERT(igraph_vector_int_size(&v) == s);
+    IGRAPH_ASSERT(VECTOR(v)[0] >= l);
+    IGRAPH_ASSERT(VECTOR(v)[igraph_vector_int_size(&v) - 1] <= h);
+
+    for (igraph_integer_t i = 0; i < s - 1; i++) {
+        IGRAPH_ASSERT(VECTOR(v)[i] < VECTOR(v)[i + 1]);
+    }
+
+    igraph_vector_int_destroy(&v);
+}
+
 int main(void) {
     igraph_vector_int_t v;
 
-    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
+    igraph_rng_seed(igraph_rng_default(), 42);
+
+    check(-100, 100, 10);
+    check(-10000, 10000, 100);
+    check(0, 0, 1);
+    check(100, 110, 11);
+
     igraph_vector_int_init(&v, 0);
+
+    igraph_random_sample(&v, 100, 1000, 0);
+    IGRAPH_ASSERT(igraph_vector_int_size(&v) == 0);
 
     /* test parameters */
     /*----------low----high----length*/

@@ -997,6 +997,29 @@ void FUNCTION(remove_consecutive_duplicates)(
     v->end = p + j;
 }
 
+/**
+ * \function igraph_vector_list_reverse
+ * \brief Reverses the elements of a vector list.
+ *
+ * The first element will be last, the last element will be
+ * first, etc.
+ * \param v The input vector list.
+ * \return Error code, currently always \c IGRAPH_SUCCESS.
+ *
+ * Time complexity: O(n), the number of elements.
+ */
+igraph_error_t FUNCTION(reverse)(TYPE *v) {
+    igraph_integer_t n = FUNCTION(size)(v), n2 = n / 2;
+    igraph_integer_t i, j;
+    for (i = 0, j = n - 1; i < n2; i++, j--) {
+        ITEM_TYPE tmp;
+        tmp = VECTOR(*v)[i];
+        VECTOR(*v)[i] = VECTOR(*v)[j];
+        VECTOR(*v)[j] = tmp;
+    }
+    return IGRAPH_SUCCESS;
+}
+
 /* ************************************************************************ */
 
 #ifndef CUSTOM_INIT_DESTROY

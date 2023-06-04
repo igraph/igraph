@@ -1,9 +1,6 @@
-/* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2011  Gabor Csardi <csardi.gabor@gmail.com>
-   Rue de l'Industrie 5, Lausanne 1005, Switzerland
+   Copyright (C) 2011-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,10 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_adjlist.h"
@@ -44,23 +38,22 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
  * \function igraph_minimum_spanning_tree
  * \brief Calculates one minimum spanning tree of a graph.
  *
- * </para><para>
- * If the graph has more minimum spanning trees (this is always the
- * case, except if it is a forest) this implementation returns only
- * the same one.
+ * Finds a spanning tree of the graph. If the graph is not connected
+ * then its minimum spanning forest is returned. This is the set of the
+ * minimum spanning trees of each component.
  *
  * </para><para>
  * Directed graphs are considered as undirected for this computation.
  *
  * </para><para>
- * If the graph is not connected then its minimum spanning forest is
- * returned. This is the set of the minimum spanning trees of each
- * component.
+ * This function is deterministic, i.e. it always returns the same
+ * spanning tree. See \ref igraph_random_spanning_tree() for the uniform
+ * random sampling of spanning trees of a graph.
  *
  * \param graph The graph object.
  * \param res An initialized vector, the IDs of the edges that constitute
  *        a spanning tree will be returned here. Use
- *        \ref igraph_subgraph_edges() to extract the spanning tree as
+ *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
  *        a separate graph object.
  * \param weights A vector containing the weights of the edges
  *        in the same order as the simple edge iterator visits them
@@ -80,9 +73,9 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
  * \example examples/simple/igraph_minimum_spanning_tree.c
  */
 igraph_error_t igraph_minimum_spanning_tree(
-    const igraph_t* graph, igraph_vector_int_t* res, const igraph_vector_t* weights
+    const igraph_t *graph, igraph_vector_int_t *res, const igraph_vector_t *weights
 ) {
-    if (weights == 0) {
+    if (weights == NULL) {
         IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, res));
     } else {
         IGRAPH_CHECK(igraph_i_minimum_spanning_tree_prim(graph, res, weights));
@@ -95,7 +88,6 @@ igraph_error_t igraph_minimum_spanning_tree(
  * \function igraph_minimum_spanning_tree_unweighted
  * \brief Calculates one minimum spanning tree of an unweighted graph.
  *
- * </para><para>
  * If the graph has more minimum spanning trees (this is always the
  * case, except if it is a forest) this implementation returns only
  * the same one.
@@ -107,7 +99,8 @@ igraph_error_t igraph_minimum_spanning_tree(
  * If the graph is not connected then its minimum spanning forest is
  * returned. This is the set of the minimum spanning trees of each
  * component.
- * \param graph The graph object.
+ *
+ * \param graph The graph object. Edge directions will be ignored.
  * \param mst The minimum spanning tree, another graph object. Do
  *        \em not initialize this object before passing it to
  *        this function, but be sure to call \ref igraph_destroy() on it if
@@ -128,13 +121,13 @@ igraph_error_t igraph_minimum_spanning_tree(
 
 igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
         igraph_t *mst) {
-    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_nodes > 0 ? no_of_nodes - 1 : 0);
     IGRAPH_CHECK(igraph_i_minimum_spanning_tree_unweighted(graph, &edges));
-    IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
-                                       igraph_ess_vector(&edges), /* delete_vertices = */ 0));
+    IGRAPH_CHECK(igraph_subgraph_from_edges(
+        graph, mst, igraph_ess_vector(&edges), /* delete_vertices = */ false));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -146,26 +139,24 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * \function igraph_minimum_spanning_tree_prim
  * \brief Calculates one minimum spanning tree of a weighted graph.
  *
- * </para><para>
- * This function uses Prim's method for carrying out the computation,
- * see Prim, R.C.: Shortest connection networks and some
- * generalizations, Bell System Technical
- * Journal, Vol. 36,
- * 1957, 1389--1401.
- *
- * </para><para>
- * If the graph has more than one minimum spanning tree, the current
- * implementation returns always the same one.
+ * Finds a spanning tree or spanning forest for which the sum of edge
+ * weights is the smallest. This function uses Prim's method for carrying
+ * out the computation.
  *
  * </para><para>
  * Directed graphs are considered as undirected for this computation.
  *
  * </para><para>
- * If the graph is not connected then its minimum spanning forest is
- * returned. This is the set of the minimum spanning trees of each
- * component.
+ * Reference:
  *
- * \param graph The graph object.
+ * </para><para>
+ * Prim, R.C.: Shortest connection networks and some
+ * generalizations, Bell System Technical
+ * Journal, Vol. 36,
+ * 1957, 1389--1401.
+ * https://doi.org/10.1002/j.1538-7305.1957.tb01515.x
+ *
+ * \param graph The graph object. Edge directions will be ignored.
  * \param mst The result of the computation, a graph object containing
  *        the minimum spanning tree of the graph.
  *        Do \em not initialize this object before passing it to
@@ -193,12 +184,12 @@ igraph_error_t igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
 
 igraph_error_t igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
                                       const igraph_vector_t *weights) {
-    igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
+    igraph_vector_int_t edges;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, igraph_vcount(graph) - 1);
     IGRAPH_CHECK(igraph_i_minimum_spanning_tree_prim(graph, &edges, weights));
-    IGRAPH_CHECK(igraph_subgraph_edges(graph, mst,
-                                       igraph_ess_vector(&edges), /* delete_vertices = */ 0));
+    IGRAPH_CHECK(igraph_subgraph_from_edges(
+        graph, mst, igraph_ess_vector(&edges), /* delete_vertices = */ false));
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
@@ -210,36 +201,33 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    char *already_added;
-    char *added_edges;
+    bool *already_added, *added_edges;
 
-    igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
-    igraph_vector_int_t eids = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j;
+    igraph_dqueue_int_t q;
+    igraph_vector_int_t eids;
 
     igraph_vector_int_clear(res);
 
-    added_edges = IGRAPH_CALLOC(no_of_edges, char);
-    if (added_edges == 0) {
-        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    added_edges = IGRAPH_CALLOC(no_of_edges, bool);
+    IGRAPH_CHECK_OOM(added_edges, "Insufficient memory for unweighted spanning tree.");
     IGRAPH_FINALLY(igraph_free, added_edges);
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for unweighted spanning tree.");
     IGRAPH_FINALLY(igraph_free, already_added);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
-    for (i = 0; i < no_of_nodes; i++) {
-        if (already_added[i] > 0) {
+    /* Perform a BFS */
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        if (already_added[i]) {
             continue;
         }
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[i] = 1;
+        already_added[i] = true;
         IGRAPH_CHECK(igraph_dqueue_int_push(&q, i));
         while (! igraph_dqueue_int_empty(&q)) {
             igraph_integer_t eids_size;
@@ -247,13 +235,13 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
             IGRAPH_CHECK(igraph_incident(graph, &eids, act_node,
                                          IGRAPH_ALL));
             eids_size = igraph_vector_int_size(&eids);
-            for (j = 0; j < eids_size; j++) {
+            for (igraph_integer_t j = 0; j < eids_size; j++) {
                 igraph_integer_t edge = VECTOR(eids)[j];
-                if (added_edges[edge] == 0) {
+                if (! added_edges[edge]) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
-                    if (already_added[to] == 0) {
-                        already_added[to] = 1;
-                        added_edges[edge] = 1;
+                    if (! already_added[to]) {
+                        already_added[to] = true;
+                        added_edges[edge] = true;
                         IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
                         IGRAPH_CHECK(igraph_dqueue_int_push(&q, to));
                     }
@@ -263,8 +251,8 @@ static igraph_error_t igraph_i_minimum_spanning_tree_unweighted(const igraph_t* 
     }
 
     igraph_dqueue_int_destroy(&q);
-    IGRAPH_FREE(already_added);
     igraph_vector_int_destroy(&eids);
+    IGRAPH_FREE(already_added);
     IGRAPH_FREE(added_edges);
     IGRAPH_FINALLY_CLEAN(4);
 
@@ -276,57 +264,56 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    char *already_added;
-    char *added_edges;
+    bool *already_added, *added_edges;
 
-    igraph_d_indheap_t heap = IGRAPH_D_INDHEAP_NULL;
-    igraph_neimode_t mode = IGRAPH_ALL;
+    igraph_d_indheap_t heap;
+    const igraph_neimode_t mode = IGRAPH_ALL;
 
     igraph_vector_int_t adj;
 
-    igraph_integer_t i, j;
-
     igraph_vector_int_clear(res);
 
-    if (weights == 0) {
+    if (weights == NULL) {
         return igraph_i_minimum_spanning_tree_unweighted(graph, res);
     }
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length does not match number of edges.", IGRAPH_EINVAL);
     }
 
-    added_edges = IGRAPH_CALLOC(no_of_edges, char);
-    if (added_edges == 0) {
-        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
+    if (igraph_vector_is_any_nan(weights)) {
+        IGRAPH_ERROR("Weigths must not contain NaN values.", IGRAPH_EINVAL);
     }
+
+    added_edges = IGRAPH_CALLOC(no_of_edges, bool);
+    IGRAPH_CHECK_OOM(added_edges, "Insufficient memory for minimum spanning tree calculation.");
     IGRAPH_FINALLY(igraph_free, added_edges);
-    already_added = IGRAPH_CALLOC(no_of_nodes, char);
-    if (already_added == 0) {
-        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for minimum spanning tree calculation.");
     IGRAPH_FINALLY(igraph_free, already_added);
+
     IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
     IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_integer_t adj_size;
-        if (already_added[i] > 0) {
+        if (already_added[i]) {
             continue;
         }
         IGRAPH_ALLOW_INTERRUPTION();
 
-        already_added[i] = 1;
+        already_added[i] = true;
         /* add all edges of the first vertex */
         IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
         adj_size = igraph_vector_int_size(&adj);
-        for (j = 0; j < adj_size; j++) {
+        for (igraph_integer_t j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = VECTOR(adj)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, i);
-            if (already_added[neighbor] == 0) {
-                IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
-                                                   edgeno));
+            if (! already_added[neighbor]) {
+                IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i, edgeno));
             }
         }
 
@@ -339,23 +326,22 @@ static igraph_error_t igraph_i_minimum_spanning_tree_prim(
             igraph_d_indheap_delete_max(&heap);
 
             /* Is this edge already included? */
-            if (added_edges[edge] == 0) {
+            if (! added_edges[edge]) {
                 igraph_integer_t to = IGRAPH_OTHER(graph, edge, from);
 
                 /* Does it point to a visited node? */
-                if (already_added[to] == 0) {
-                    already_added[to] = 1;
-                    added_edges[edge] = 1;
+                if (! already_added[to]) {
+                    already_added[to] = true;
+                    added_edges[edge] = true;
                     IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
                     /* add all outgoing edges */
                     IGRAPH_CHECK(igraph_incident(graph, &adj, to, mode));
                     adj_size = igraph_vector_int_size(&adj);
-                    for (j = 0; j < adj_size; j++) {
+                    for (igraph_integer_t j = 0; j < adj_size; j++) {
                         igraph_integer_t edgeno = VECTOR(adj)[j];
                         igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, to);
-                        if (already_added[neighbor] == 0) {
-                            IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
-                                                               edgeno));
+                        if (! already_added[neighbor]) {
+                            IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to, edgeno));
                         }
                     }
                 } /* for */
@@ -388,10 +374,10 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
 
     IGRAPH_CHECK(igraph_vector_int_reserve(res, igraph_vector_int_size(res) + comp_size - 1));
 
-    RNG_BEGIN();
-
     VECTOR(*visited)[start] = 1;
     visited_count = 1;
+
+    RNG_BEGIN();
 
     while (visited_count < comp_size) {
         igraph_integer_t degree, edge;
@@ -438,7 +424,7 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
  * \param graph The input graph. Edge directions are ignored.
  * \param res An initialized vector, the IDs of the edges that constitute
  *        a spanning tree will be returned here. Use
- *        \ref igraph_subgraph_edges() to extract the spanning tree as
+ *        \ref igraph_subgraph_from_edges() to extract the spanning tree as
  *        a separate graph object.
  * \param vid This parameter is relevant if the graph is not connected.
  *        If negative, a random spanning forest of all components will be
@@ -457,7 +443,7 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
     igraph_integer_t vcount = igraph_vcount(graph);
 
     if (vid >= vcount) {
-        IGRAPH_ERROR("Invalid vertex ID given for random spanning tree", IGRAPH_EINVVID);
+        IGRAPH_ERROR("Invalid vertex ID given for random spanning tree.", IGRAPH_EINVVID);
     }
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
@@ -471,7 +457,6 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
     if (vid < 0) { /* generate random spanning forest: consider each component separately */
         igraph_vector_int_t membership, csize;
         igraph_integer_t comp_count;
-        igraph_integer_t i;
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&membership, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&csize, 0);
@@ -479,7 +464,7 @@ igraph_error_t igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_
         IGRAPH_CHECK(igraph_connected_components(graph, &membership, &csize, &comp_count, IGRAPH_WEAK));
 
         /* for each component ... */
-        for (i = 0; i < comp_count; ++i) {
+        for (igraph_integer_t i = 0; i < comp_count; ++i) {
             /* ... find a vertex to start the LERW from */
             igraph_integer_t j = 0;
             while (VECTOR(membership)[j] != i) {

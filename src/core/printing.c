@@ -30,7 +30,7 @@
 /* The number of digits chosen here will be used in all places where
  * igraph_real_fprintf_precise() is used, including all textual graph
  * formats such as GML, GraphML, Pajek, etc. DBL_DIG digits are sufficient
- * to preserve the decimal reprensentation during a
+ * to preserve the decimal representation during a
  * decimal (textual) -> binary -> decimal (textual) round-trip conversion.
  * This many digits are however not sufficient for a lossless
  * binary -> decimal -> binary conversion. Thus, writing numerical attributes

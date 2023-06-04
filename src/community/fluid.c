@@ -67,10 +67,9 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     igraph_integer_t no_of_nodes, i, j, k, kv1;
     igraph_adjlist_t al;
     igraph_real_t max_density;
-    igraph_bool_t res, running;
-    igraph_vector_t density, label_counters, dominant_labels, nonzero_labels;
-    igraph_vector_int_t node_order;
-    igraph_vector_int_t com_to_numvertices;
+    igraph_bool_t is_simple, is_connected, running;
+    igraph_vector_t density, label_counters;
+    igraph_vector_int_t dominant_labels, node_order, com_to_numvertices;
 
     /* Initialization of variables needed for initial checking */
     no_of_nodes = igraph_vcount(graph);
@@ -90,12 +89,21 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
         IGRAPH_ERROR("Number of requested communities must not be greater than the number of nodes.",
                      IGRAPH_EINVAL);
     }
-    IGRAPH_CHECK(igraph_is_simple(graph, &res));
-    if (!res) {
+    IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
+    if (!is_simple) {
         IGRAPH_ERROR("Fluid community detection supports only simple graphs.", IGRAPH_EINVAL);
     }
-    IGRAPH_CHECK(igraph_is_connected(graph, &res, IGRAPH_WEAK));
-    if (!res) {
+    if (igraph_is_directed(graph)) {
+        /* When the graph is directed, mutual edges are effectively multi-edges as we
+         * are ignoring edge directions. */
+        igraph_bool_t has_mutual;
+        IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
+        if (has_mutual) {
+            IGRAPH_ERROR("Fluid community detection supports only simple graphs.", IGRAPH_EINVAL);
+        }
+    }
+    IGRAPH_CHECK(igraph_is_connected(graph, &is_connected, IGRAPH_WEAK));
+    if (!is_connected) {
         IGRAPH_ERROR("Fluid community detection supports only connected graphs.", IGRAPH_EINVAL);
     }
     if (igraph_is_directed(graph)) {
@@ -138,8 +146,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
     /* Create storage space for counting distinct labels and dominant ones */
-    IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, no_of_communities);
-    IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, no_of_communities);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&dominant_labels, no_of_communities);
 
     IGRAPH_CHECK(igraph_vector_init(&label_counters, no_of_communities));
     IGRAPH_FINALLY(igraph_vector_destroy, &label_counters);
@@ -147,22 +154,22 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     RNG_BEGIN();
 
     /* running is the convergence boolean variable */
-    running = 1;
+    running = true;
     while (running) {
-        /* Declarations of varibales used inside main loop */
+        /* Declarations of variables used inside main loop */
         igraph_integer_t v1, size, rand_idx;
         igraph_real_t max_count, label_counter_diff;
         igraph_vector_int_t *neis;
         igraph_bool_t same_label_in_dominant;
 
-        running = 0;
+        running = false;
 
         /* Shuffle the node ordering vector */
         IGRAPH_CHECK(igraph_vector_int_shuffle(&node_order));
         /* In the prescribed order, loop over the vertices and reassign labels */
         for (i = 0; i < no_of_nodes; i++) {
             /* Clear dominant_labels and nonzero_labels vectors */
-            igraph_vector_clear(&dominant_labels);
+            igraph_vector_int_clear(&dominant_labels);
             igraph_vector_null(&label_counters);
 
             /* Obtain actual node index */
@@ -175,7 +182,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                 /* Set up max_count */
                 max_count = VECTOR(density)[kv1 - 1];
                 /* Initialize dominant_labels */
-                IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
+                IGRAPH_CHECK(igraph_vector_int_resize(&dominant_labels, 1));
                 VECTOR(dominant_labels)[0] = kv1;
             }
 
@@ -194,23 +201,23 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
                 /* Check if this label must be included in dominant_labels vector */
                 if (label_counter_diff > 0.0001) {
                     max_count = VECTOR(label_counters)[k - 1];
-                    IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
+                    IGRAPH_CHECK(igraph_vector_int_resize(&dominant_labels, 1));
                     VECTOR(dominant_labels)[0] = k;
                 } else if (-0.0001 < label_counter_diff && label_counter_diff < 0.0001) {
-                    IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
+                    IGRAPH_CHECK(igraph_vector_int_push_back(&dominant_labels, k));
                 }
             }
 
-            if (!igraph_vector_empty(&dominant_labels)) {
+            if (!igraph_vector_int_empty(&dominant_labels)) {
                 /* Maintain same label if it exists in dominant_labels */
-                same_label_in_dominant = igraph_vector_contains(&dominant_labels, kv1);
+                same_label_in_dominant = igraph_vector_int_contains(&dominant_labels, kv1);
 
                 if (!same_label_in_dominant) {
                     /* We need at least one more iteration */
-                    running = 1;
+                    running = true;
 
                     /* Select randomly from the dominant labels */
-                    rand_idx = RNG_INTEGER(0, igraph_vector_size(&dominant_labels) - 1);
+                    rand_idx = RNG_INTEGER(0, igraph_vector_int_size(&dominant_labels) - 1);
                     k = VECTOR(dominant_labels)[rand_idx];
 
                     if (kv1 != 0) {
@@ -238,7 +245,7 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     /* There must be no 0 labels in membership vector at this point */
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(*membership)[i] -= 1;
-        IGRAPH_ASSERT(VECTOR(*membership)[i] >= 0); /* all vertices must have a community assinged */
+        IGRAPH_ASSERT(VECTOR(*membership)[i] >= 0); /* all vertices must have a community assigned */
     }
 
     igraph_adjlist_destroy(&al);
@@ -248,9 +255,8 @@ igraph_error_t igraph_community_fluid_communities(const igraph_t *graph,
     igraph_vector_destroy(&density);
     igraph_vector_int_destroy(&com_to_numvertices);
     igraph_vector_destroy(&label_counters);
-    igraph_vector_destroy(&dominant_labels);
-    igraph_vector_destroy(&nonzero_labels);
-    IGRAPH_FINALLY_CLEAN(6);
+    igraph_vector_int_destroy(&dominant_labels);
+    IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
 }

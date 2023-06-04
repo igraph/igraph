@@ -25,7 +25,12 @@
 #include "core/interruption.h"
 
 /* Computes the size of the intersection of two sorted vectors, treated as sets.
- * It is assumed that the vectors contain no duplicates. */
+ * It is assumed that the vectors contain no duplicates.
+ *
+ * We rely on (lazy_)adjlist_get() producing sorted neighbor lists and
+ * (lazy_)adjlist_init() being called with IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE
+ * to prevent duplicate entries.
+ */
 static igraph_integer_t vector_int_intersection_size_sorted(
         const igraph_vector_int_t *v1, const igraph_vector_int_t *v2) {
     igraph_integer_t n1 = igraph_vector_int_size(v1), n2 = igraph_vector_int_size(v2);
@@ -47,19 +52,6 @@ static igraph_integer_t vector_int_intersection_size_sorted(
     return count;
 }
 
-/* Get a neighbour list from a lazy adjacency list, and sort it if is hasn't been sorted yet. */
-#define AL_SORTED_GET(al, v, res) \
-    do { \
-        igraph_bool_t had = igraph_lazy_adjlist_has(&al, v); \
-        res = igraph_lazy_adjlist_get(&al, v); \
-        if (! had) { \
-            /* OOM error can only occur when originally retrieving a neighbour list, \
-             * not on subsequent call to lazy_adjlist_get(). */ \
-            IGRAPH_CHECK_OOM(res, "Not enough memory for edge clustering coefficient."); \
-            igraph_vector_int_sort(res); \
-        } \
-    } while(0)
-
 
 /* Optimized for the case when computing ECC for all edges. */
 static igraph_error_t igraph_i_ecc3_1(
@@ -74,10 +66,6 @@ static igraph_error_t igraph_i_ecc3_1(
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-
-    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        igraph_vector_int_sort(igraph_adjlist_get(&al, i));
-    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
@@ -158,9 +146,8 @@ static igraph_error_t igraph_i_ecc3_2(
             z = 0.0;
             s = 0.0;
         } else {
-            igraph_vector_int_t *a1, *a2;
-            AL_SORTED_GET(al, v1, a1);
-            AL_SORTED_GET(al, v2, a2);
+            igraph_vector_int_t *a1 = igraph_lazy_adjlist_get(&al, v1);
+            igraph_vector_int_t *a2 = igraph_lazy_adjlist_get(&al, v2);
 
             igraph_integer_t d1, d2;
             IGRAPH_CHECK(igraph_degree_1(graph, &d1, v1, IGRAPH_ALL, IGRAPH_LOOPS));
@@ -195,10 +182,6 @@ static igraph_error_t igraph_i_ecc4_1(
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-
-    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
-        igraph_vector_int_sort(igraph_adjlist_get(&al, i));
-    }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
@@ -313,10 +296,9 @@ static igraph_error_t igraph_i_ecc4_2(
 
             z = 0.0;
 
-            igraph_vector_int_t *a1;
-            AL_SORTED_GET(al, v1, a1);
-            const igraph_integer_t n = igraph_vector_int_size(a1);
+            igraph_vector_int_t *a1 = igraph_lazy_adjlist_get(&al, v1);
 
+            const igraph_integer_t n = igraph_vector_int_size(a1);
             for (igraph_integer_t j=0; j < n; j++) {
                 igraph_integer_t v3 = VECTOR(*a1)[j];
 
@@ -324,9 +306,8 @@ static igraph_error_t igraph_i_ecc4_2(
 
                 if (v3 == v2) continue;
 
-                igraph_vector_int_t *a2, *a3;
-                AL_SORTED_GET(al, v2, a2);
-                AL_SORTED_GET(al, v3, a3);
+                igraph_vector_int_t *a2 = igraph_lazy_adjlist_get(&al, v2);
+                igraph_vector_int_t *a3 = igraph_lazy_adjlist_get(&al, v3);
 
                 z += vector_int_intersection_size_sorted(a2, a3) - 1.0;
             }

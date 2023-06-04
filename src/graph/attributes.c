@@ -278,6 +278,12 @@ igraph_error_t igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
  * igraph is compiled in thread-local mode. In the vast majority of cases,
  * this is not a significant restriction.
  *
+ * </para><para>
+ * Attribute handlers are normally attached on program startup, and are
+ * left active for the program's lifetime. This is because a graph object
+ * created with a given attribute handler must not be manipulated while
+ * a different attribute handler is active.
+ *
  * \param table Pointer to an \ref igraph_attribute_table_t object
  *    containing the functions for attribute manipulation. Supply \c
  *    NULL here if you don't want attributes.

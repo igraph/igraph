@@ -2,7 +2,7 @@
 language: c
 cache: ccache
 os: linux
-dist: jammy
+dist: focal
 
 # Ignore branches with names starting with certain keywords:
 branches:
@@ -39,7 +39,6 @@ addons:
 #      - libblas-dev
 #      - liblapack-dev
       - libopenblas-dev
-      - libsuitesparse-dev
       - libxml2-dev
       - git
       - colordiff

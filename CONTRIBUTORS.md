@@ -74,6 +74,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Gomango999"><img src="https://avatars.githubusercontent.com/u/37771462?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kevin Zhu</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=Gomango999" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/pradkrish"><img src="https://avatars.githubusercontent.com/u/47261443?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pradeep Krishnamurthy</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=pradkrish" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/flange-ipb"><img src="https://avatars.githubusercontent.com/u/34936695?v=4?s=100" width="100px;" alt=""/><br /><sub><b>flange-ipb</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=flange-ipb" title="Code">💻</a></td>
+    <td align="center"><a href="http://goo.gl/IlWG8U"><img src="https://avatars.githubusercontent.com/u/500?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Juan Julián Merelo Guervós</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=JJ" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/rfulekjames"><img src="https://avatars.githubusercontent.com/u/54232342?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Radoslav Fulek</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=rfulekjames" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/professorcode1"><img src="https://avatars.githubusercontent.com/u/42749164?v=4?s=100" width="100px;" alt=""/><br /><sub><b>professorcode1</b></sub></a><br /><a href="https://github.com/igraph/igraph/commits?author=professorcode1" title="Code">💻</a></td>
   </tr>
 </table>
 

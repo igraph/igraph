@@ -1187,7 +1187,6 @@ igraph_error_t clique_unweighted_find_single(graph_t *g,int min_size,int max_siz
 	}
 	ASSERT(reorder_is_bijection(table,g->n));
 
-
 	if (unweighted_clique_search_single(table,min_size,g,opts) == 0) {
 		set_free(current_clique);
 		current_clique=NULL;
@@ -1222,6 +1221,7 @@ igraph_error_t clique_unweighted_find_single(graph_t *g,int min_size,int max_siz
 	}
 
     cleanreturn:
+	*clique = current_clique;
 
 	/* Free resources */
 	for (i=0; i < temp_count; i++)
@@ -1232,8 +1232,6 @@ igraph_error_t clique_unweighted_find_single(graph_t *g,int min_size,int max_siz
 
 	ENTRANCE_RESTORE();
 	entrance_level--;
-
-	*clique = current_clique;
 
 	return retval;
 }

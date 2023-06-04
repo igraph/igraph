@@ -67,8 +67,9 @@ jobs:
         run: cmake --build . --target build_tests
         working-directory: build-${{ matrix.arch }}
 
+      # The glpk_error test is temporarily disabled, see https://github.com/igraph/igraph/issues/1850
       - name: Test
-        run: ctest -j $(nproc) --output-on-failure --timeout 180
+        run: ctest -j $(nproc) --exclude-regex glpk_error --output-on-failure --timeout 180
         working-directory: build-${{ matrix.arch }}
 
       - name: Ccache stats

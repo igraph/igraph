@@ -30,6 +30,7 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
+#include "internal/utils.h"
 
 /**
  * \function igraph_get_widest_paths
@@ -407,9 +408,18 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  * \function igraph_widest_path_widths_floyd_warshall
  * \brief Widths of widest paths between vertices.
  *
- * This function implements a modified Floyd Warshalls algorithm,
- * to find the widest path widths from a set of source vertices to
- * all other target vertices.
+ * This function implements a modified Floyd-Warshall algorithm,
+ * to find the widest path widths between a set of source and target
+ * vertices. It is primarily useful for all-pairs path widths in very dense
+ * graphs, as its running time is manily determined by the vertex count,
+ * and is not sensitive to the graph density. In sparse graphs, other methods
+ * such as the Dijkstra algorithm, will perform better.
+ *
+ * </para><para>
+ * Note that internally this function always computes the path width matrix
+ * for all pairs of vertices. The \p from and \p to parameters only serve
+ * to subset this matrix, but do not affect the time taken by the
+ * calculation.
  *
  * \param graph The input graph, can be directed.
  * \param res The result, a matrix. A pointer to an initialized matrix
@@ -419,8 +429,7 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  *    Unreachable vertices have width \c IGRAPH_NEGINFINITY, and vertices
  *    have a width of \c IGRAPH_POSINFINITY to themselves.
  * \param from The source vertices.
- * \param to The target vertices. It is not allowed to include a
- *    vertex twice or more.
+ * \param to The target vertices.
  * \param weights The edge weights. Edge weights can be negative. If this
  *        is a null pointer or if any edge weight is NaN, then an error
  *        is returned.
@@ -455,15 +464,9 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_lazy_inclist_t inclist;
-    igraph_matrix_t adj;
-    igraph_integer_t i, j, k;
-    igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
-    igraph_real_t my_neginfinity = IGRAPH_NEGINFINITY;
-    igraph_vit_t fromvit, tovit;
-    igraph_integer_t no_of_from, no_of_to;
+    igraph_bool_t in = false, out = false;
 
-    if (!weights) {
+    if (! weights) {
         IGRAPH_ERROR("Weight vector is required.", IGRAPH_EINVAL);
     }
 
@@ -477,84 +480,67 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
         IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
     }
 
-    /* Construct adjacency matrix */
-    IGRAPH_CHECK(igraph_matrix_init(&adj, no_of_nodes, no_of_nodes));
-    IGRAPH_FINALLY(igraph_matrix_destroy, &adj);
-
-    IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode, IGRAPH_LOOPS));
-    IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
-
-    for (i = 0; i < no_of_nodes; i++) {
-        for (j = 0; j < no_of_nodes; j++) {
-            if (i == j) {
-                MATRIX(adj, i, j) = my_posinfinity;
-            } else {
-                MATRIX(adj, i, j) = my_neginfinity;
-            }
-        }
+    if (! igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
-        igraph_vector_int_t *neis = igraph_lazy_inclist_get(&inclist, i);
-        igraph_integer_t nlen;
+    switch (mode) {
+    case IGRAPH_ALL:
+        in = out = true;
+        break;
+    case IGRAPH_OUT:
+        out = true;
+        break;
+    case IGRAPH_IN:
+        in = true;
+        break;
+    default:
+        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+    }
 
-        IGRAPH_CHECK_OOM(neis, "Failed to query incident edges.");
+    /* Fill out adjacency matrix */
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
+    igraph_matrix_fill(res, IGRAPH_NEGINFINITY);
+    for (igraph_integer_t i=0; i < no_of_nodes; i++) {
+        MATRIX(*res, i, i) = IGRAPH_POSINFINITY;
+    }
 
-        nlen = igraph_vector_int_size(neis);
-        for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t tto = IGRAPH_OTHER(graph, edge, i);
-            if (VECTOR(*weights)[edge] >  MATRIX(adj, i, tto)) {
-                MATRIX(adj, i, tto) = VECTOR(*weights)[edge];
-            }
-        }
+    for (igraph_integer_t edge=0; edge < no_of_edges; edge++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_integer_t to = IGRAPH_TO(graph, edge);
+        igraph_real_t w = VECTOR(*weights)[edge];
+
+        if (out && MATRIX(*res, from, to) < w) MATRIX(*res, from, to) = w;
+        if (in  && MATRIX(*res, to, from) < w) MATRIX(*res, to, from) = w;
     }
 
     /* Run modified Floyd Warshall */
-    for (k = 0; k < no_of_nodes; k++) {
-        for (i = 0; i < no_of_nodes; i++) {
-            if (i == k) continue;
+    for (igraph_integer_t k = 0; k < no_of_nodes; k++) {
+        /* Iterate in column-major order for better performance */
+        for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
+            igraph_real_t width_kj = MATRIX(*res, k, j);
+            if (j == k || width_kj == IGRAPH_NEGINFINITY) continue;
+
             IGRAPH_ALLOW_INTERRUPTION();
 
-            for (j = 0; j < no_of_nodes; j++) {
-                if (i == j || j == k) continue;
+            for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+                if (i == j || i == k) continue;
 
-                igraph_real_t altwidth = MATRIX(adj, i, k);
-                if (MATRIX(adj, k, j) < altwidth) {
-                    altwidth = MATRIX(adj, k, j);
+                /* alternative_width := min(A(i,k), A(k,j))
+                   A(i,j) := max(A(i,j), alternative_width) */
+
+                igraph_real_t altwidth = MATRIX(*res, i, k);
+                if (width_kj < altwidth) {
+                    altwidth = width_kj;
                 }
-                if (altwidth > MATRIX(adj, i, j)) {
-                    MATRIX(adj, i, j) = altwidth;
+                if (altwidth > MATRIX(*res, i, j)) {
+                    MATRIX(*res, i, j) = altwidth;
                 }
             }
         }
     }
 
-    /* Write into results matrix */
-    IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
-    no_of_from = IGRAPH_VIT_SIZE(fromvit);
-
-    IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
-    no_of_to = IGRAPH_VIT_SIZE(tovit);
-
-    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-
-    for (IGRAPH_VIT_RESET(fromvit), i = 0; !IGRAPH_VIT_END(fromvit); IGRAPH_VIT_NEXT(fromvit), i++) {
-        igraph_integer_t u = IGRAPH_VIT_GET(fromvit);
-        for (IGRAPH_VIT_RESET(tovit),j = 0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit), j++) {
-            igraph_integer_t v = IGRAPH_VIT_GET(tovit);
-            MATRIX(*res, i, j) = MATRIX(adj, u, v);
-        }
-    }
-
-    /* Final deletion stuff */
-    igraph_vit_destroy(&tovit);
-    igraph_vit_destroy(&fromvit);
-    igraph_lazy_inclist_destroy(&inclist);
-    igraph_matrix_destroy(&adj);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_CHECK(igraph_i_matrix_subset_vertices(res, graph, from, to));
 
     return IGRAPH_SUCCESS;
 }
@@ -624,8 +610,6 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
     igraph_integer_t no_of_from, no_of_to;
     igraph_lazy_inclist_t inclist;
     igraph_integer_t i, j;
-    igraph_real_t my_posinfinity = IGRAPH_POSINFINITY;
-    igraph_real_t my_neginfinity = IGRAPH_NEGINFINITY;
     igraph_bool_t all_to;
     igraph_vector_int_t indexv;
 
@@ -671,7 +655,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
-    igraph_matrix_fill(res, my_neginfinity);
+    igraph_matrix_fill(res, IGRAPH_NEGINFINITY);
 
     for (IGRAPH_VIT_RESET(fromvit), i = 0;
          !IGRAPH_VIT_END(fromvit);
@@ -680,7 +664,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
         igraph_integer_t reached = 0;
         igraph_integer_t source = IGRAPH_VIT_GET(fromvit);
         igraph_2wheap_clear(&Q);
-        igraph_2wheap_push_with_index(&Q, source, my_posinfinity);
+        igraph_2wheap_push_with_index(&Q, source, IGRAPH_POSINFINITY);
 
         while (!igraph_2wheap_empty(&Q)) {
             igraph_integer_t maxnei = igraph_2wheap_max_index(&Q);
@@ -714,7 +698,7 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                 igraph_real_t altwidth = maxwidth < edgewidth ? maxwidth : edgewidth;
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
-                igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : my_posinfinity;
+                igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : IGRAPH_POSINFINITY;
                 if (!has) {
                     /* This is the first time assigning a width to this vertex */
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, altwidth));

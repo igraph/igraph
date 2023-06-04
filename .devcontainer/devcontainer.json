@@ -1,0 +1,40 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+    "name": "igraph dev environment",
+
+    // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    "features": {
+        "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+            "packages": "build-essential,clang,cmake,cmake-curses-gui,ninja-build,ccache,colordiff,astyle,bison,flex,libxml2-dev,libarpack2-dev,libglpk-dev,libgmp-dev,xmlto,texinfo,source-highlight,libxml2-utils,xsltproc,fop"
+        }
+    },
+
+    // Environment variables containing settings for various tools
+    "containerEnv": {
+        "CMAKE_GENERATOR": "Ninja",
+        "ASAN_OPTIONS": "color=always"
+    },
+
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [],
+
+    // Use 'postCreateCommand' to run commands after the container is created.
+    // "postCreateCommand": "uname -a",
+
+    // Configure tool-specific properties.
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools-extension-pack", // C/C++ and CMake support
+                "daohong-emilio.yash" // flex/bison support
+            ]
+        }
+    }
+
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "root"
+}

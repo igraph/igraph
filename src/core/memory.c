@@ -81,7 +81,7 @@ void igraph_free(void *ptr) {
  */
 
 void *igraph_calloc(size_t count, size_t size) {
-    return IGRAPH_MALLOC(count * size);
+    return (void *) IGRAPH_CALLOC(count * size, char);
 }
 
 

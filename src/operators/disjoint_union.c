@@ -70,7 +70,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
     igraph_integer_t i;
 
     if (directed_left != igraph_is_directed(right)) {
-        IGRAPH_ERROR("Cannot union directed and undirected graphs",
+        IGRAPH_ERROR("Cannot create disjoint union of directed and undirected graphs.",
                      IGRAPH_EINVAL);
     }
 
@@ -79,20 +79,22 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
                                        2 * (no_of_edges_left + no_of_edges_right)));
     for (i = 0; i < no_of_edges_left; i++) {
         igraph_edge(left, i, &from, &to);
-        igraph_vector_int_push_back(&edges, from);
-        igraph_vector_int_push_back(&edges, to);
+        igraph_vector_int_push_back(&edges, from); /* reserved */
+        igraph_vector_int_push_back(&edges, to); /* reserved */
     }
     for (i = 0; i < no_of_edges_right; i++) {
         igraph_edge(right, i, &from, &to);
-        igraph_vector_int_push_back(&edges, from + no_of_nodes_left);
-        igraph_vector_int_push_back(&edges, to + no_of_nodes_left);
+        igraph_vector_int_push_back(&edges, from + no_of_nodes_left); /* reserved */
+        igraph_vector_int_push_back(&edges, to + no_of_nodes_left); /* reserved */
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges,
                                (no_of_nodes_left + no_of_nodes_right),
                                directed_left));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -144,7 +146,7 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
             graph = VECTOR(*graphs)[i];
             no_of_edges += igraph_ecount(graph);
             if (directed != igraph_is_directed(graph)) {
-                IGRAPH_ERROR("Cannot union directed and undirected graphs",
+                IGRAPH_ERROR("Cannot create disjoint union of directed and undirected graphs.",
                              IGRAPH_EINVAL);
             }
         }
@@ -159,14 +161,16 @@ igraph_error_t igraph_disjoint_union_many(igraph_t *res,
         ec = igraph_ecount(graph);
         for (j = 0; j < ec; j++) {
             igraph_edge(graph, j, &from, &to);
-            igraph_vector_int_push_back(&edges, from + shift);
-            igraph_vector_int_push_back(&edges, to + shift);
+            igraph_vector_int_push_back(&edges, from + shift); /* reserved */
+            igraph_vector_int_push_back(&edges, to + shift); /* reserved */
         }
         shift += igraph_vcount(graph);
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, shift, directed));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }

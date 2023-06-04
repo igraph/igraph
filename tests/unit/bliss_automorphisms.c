@@ -1,10 +1,27 @@
+/*
+   IGraph library.
+   Copyright (C) 2020-2022  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 
 #include <igraph.h>
 
 #include "test_utilities.h"
 
 #define TEST_GRAPH(name) \
-    igraph_automorphisms(&graph, NULL, IGRAPH_BLISS_F, &info); \
+    igraph_count_automorphisms(&graph, NULL, IGRAPH_BLISS_F, &info); \
     printf("%s: %s\n", name, info.group_size); \
     igraph_free(info.group_size); \
     igraph_destroy(&graph);

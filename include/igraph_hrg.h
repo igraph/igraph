@@ -35,7 +35,7 @@ __BEGIN_DECLS
 
 /**
  * \struct igraph_hrg_t
- * Data structure to store a hierarchical random graph
+ * \brief Data structure to store a hierarchical random graph.
  *
  * A hierarchical random graph (HRG) can be given as a binary tree,
  * where the internal vertices are labeled with real numbers.
@@ -47,6 +47,7 @@ __BEGIN_DECLS
  *
  * </para><para>
  * It has the following members:
+ *
  * \member left Vector that contains the left children of the internal
  *    tree vertices. The first vertex is always the root vertex, so
  *    the first element of the vector is the left child of the root
@@ -97,8 +98,9 @@ IGRAPH_EXPORT igraph_error_t igraph_hrg_game(
     igraph_t *graph, const igraph_hrg_t *hrg
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
-                                        const igraph_hrg_t *hrg);
+IGRAPH_EXPORT igraph_error_t igraph_from_hrg_dendrogram(
+    igraph_t *graph, const igraph_hrg_t *hrg, igraph_vector_t *prob
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
                                        igraph_vector_int_t *parents,
@@ -118,6 +120,12 @@ IGRAPH_EXPORT igraph_error_t igraph_hrg_predict(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                                     const igraph_t *graph,
                                     const igraph_vector_t *prob);
+
+/* Deprecated functions: */
+
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(
+    igraph_t *graph, const igraph_hrg_t *hrg
+);
 
 __END_DECLS
 

@@ -954,9 +954,6 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
     vextra.imag = imag;
     extra = &vextra;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&idx, nev));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &idx);
-
     switch (which->pos) {
     case IGRAPH_EIGEN_LM:
         INITMAG();
@@ -1002,9 +999,8 @@ static igraph_error_t igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t
         break;
     }
 
-    for (i = 0; i < nev; i++) {
-        VECTOR(idx)[i] = i;
-    }
+    IGRAPH_CHECK(igraph_vector_int_init_range(&idx, 0, nev));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &idx);
 
     igraph_qsort_r(VECTOR(idx), (size_t) nev, sizeof(VECTOR(idx)[0]), extra,
                    cmpfunc);

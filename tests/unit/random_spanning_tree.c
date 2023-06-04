@@ -38,7 +38,7 @@ int main(void) {
 
     IGRAPH_ASSERT(igraph_vector_int_size(&tree_edges) == igraph_vcount(&graph) - 1);
 
-    err = igraph_subgraph_edges(&graph, &spanning_tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ 0);
+    err = igraph_subgraph_from_edges(&graph, &spanning_tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ 0);
     IGRAPH_ASSERT(!err);
 
     IGRAPH_ASSERT(igraph_vcount(&spanning_tree) == igraph_vcount(&graph));

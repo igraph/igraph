@@ -486,6 +486,33 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "JJ",
+      "name": "Juan Julián Merelo Guervós",
+      "avatar_url": "https://avatars.githubusercontent.com/u/500?v=4",
+      "profile": "http://goo.gl/IlWG8U",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rfulekjames",
+      "name": "Radoslav Fulek",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54232342?v=4",
+      "profile": "https://github.com/rfulekjames",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "professorcode1",
+      "name": "professorcode1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42749164?v=4",
+      "profile": "https://github.com/professorcode1",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

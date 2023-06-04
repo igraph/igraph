@@ -33,11 +33,19 @@ __BEGIN_DECLS
  *
  * Ordering heuristics for \ref igraph_vertex_coloring_greedy().
  *
- * \enumval IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS  Choose vertex with largest number of already colored neighbors.
- *
+ * \enumval IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS
+ *    Choose the vertex with largest number of already colored neighbors.
+ * \enumval IGRAPH_COLORING_GREEDY_DSATUR
+ *    Choose the vertex with largest number of unique colors in its neighborhood, i.e. its
+ *    "saturation degree". When multiple vertices have the same saturation degree, choose
+ *    the one with the most not yet colored neighbors. Added in igraph 0.10.4. This heuristic
+ *    is known as "DSatur", and was proposed in
+ *    Daniel Brélaz: New methods to color the vertices of a graph,
+ *    Commun. ACM 22, 4 (1979), 251–256. https://doi.org/10.1145/359094.359101
  */
 typedef enum {
-    IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS = 0
+    IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS = 0,
+    IGRAPH_COLORING_GREEDY_DSATUR = 1
 } igraph_coloring_greedy_t;
 
 

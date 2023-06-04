@@ -69,6 +69,8 @@ IGRAPH_EXPORT igraph_error_t igraph_symmetric_tree(igraph_t *graph, const igraph
                                                    igraph_tree_mode_t type);
 IGRAPH_EXPORT igraph_error_t igraph_regular_tree(igraph_t *graph, igraph_integer_t h, igraph_integer_t k,
                                                  igraph_tree_mode_t type);
+IGRAPH_EXPORT igraph_error_t igraph_tree_from_parent_vector(igraph_t *graph, const igraph_vector_int_t *parents,
+                                                            igraph_tree_mode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer);
 IGRAPH_EXPORT igraph_error_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 IGRAPH_EXPORT igraph_error_t igraph_full_multipartite(igraph_t *graph, igraph_vector_int_t *types, const igraph_vector_int_t *n,
@@ -94,6 +96,8 @@ IGRAPH_EXPORT igraph_error_t igraph_realize_degree_sequence(igraph_t *graph,
                                                  const igraph_vector_int_t *outdeg, const igraph_vector_int_t *indeg,
                                                  igraph_edge_type_sw_t allowed_edge_types,
                                                  igraph_realize_degseq_t method);
+IGRAPH_EXPORT igraph_error_t igraph_triangular_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual);
+IGRAPH_EXPORT igraph_error_t igraph_hexagonal_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual);
 
 __END_DECLS
 

@@ -26,7 +26,7 @@
 #include "test_utilities.h"
 
 /* How many "true" elements in the Boolean vector? */
-long vector_bool_count(const igraph_vector_bool_t *vec) {
+igraph_integer_t vector_bool_count(const igraph_vector_bool_t *vec) {
     igraph_integer_t i, n = igraph_vector_bool_size(vec), cnt = 0;
 
     for (i=0; i < n; ++i) {

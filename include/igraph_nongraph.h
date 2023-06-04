@@ -53,7 +53,7 @@ typedef void igraph_vector_function_t(const igraph_vector_t *var,
 
 /**
  * \struct igraph_plfit_result_t
- * \brief Result of fitting a power-law distribution to a vector
+ * \brief Result of fitting a power-law distribution to a vector.
  *
  * This data structure contains the result of \ref igraph_power_law_fit(),
  * which tries to fit a power-law distribution to a vector of numbers. The

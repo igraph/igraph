@@ -66,6 +66,7 @@ typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
  * </para><para>The original paper where this reduction was conceived is
  * Shimon Even and R. Endre Tarjan: Network Flow and Testing Graph
  * Connectivity, SIAM J. Comput., 4(4), 507–518.
+ * https://doi.org/10.1137/0204043
  *
  * \param graph A graph. Although directness is not checked, this function
  *        is commonly used only on directed graphs.
@@ -376,7 +377,7 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
 
 /**
  * \function igraph_dominator_tree
- * Calculates the dominator tree of a flowgraph
+ * \brief Calculates the dominator tree of a flowgraph.
  *
  * A flowgraph is a directed graph with a distinguished start (or
  * root) vertex r, such that for any vertex v, there is a path from r
@@ -393,24 +394,27 @@ static igraph_integer_t igraph_i_dominator_EVAL(igraph_integer_t v,
  * please see Thomas Lengauer, Robert Endre Tarjan: A fast algorithm
  * for finding dominators in a flowgraph, ACM Transactions on
  * Programming Languages and Systems (TOPLAS) I/1, 121--141, 1979.
+ * https://doi.org/10.1145/357062.357071
  *
  * \param graph A directed graph. If it is not a flowgraph, and it
  *        contains some vertices not reachable from the root vertex,
- *        then these vertices will be collected in the \c leftout
+ *        then these vertices will be collected in the \p leftout
  *        vector.
- * \param root The id of the root (or source) vertex, this will be the
+ * \param root The ID of the root (or source) vertex, this will be the
  *        root of the tree.
  * \param dom Pointer to an initialized vector or a null pointer. If
  *        not a null pointer, then the immediate dominator of each
  *        vertex will be stored here. For vertices that are not
- *        reachable from the root, -2 is stored here. For
- *        the root vertex itself, -1 is added.
- * \param domtree Pointer to an uninitialized igraph_t, or NULL. If
- *        not a null pointer, then the dominator tree is returned
- *        here. The graph contains the vertices that are unreachable
+ *        reachable from the root, <code>-2</code> is stored here. For
+ *        the root vertex itself, <code>-1</code> is added.
+ * \param domtree Pointer to an \em uninitialized <type>igraph_t</type>,
+ *        or \c NULL. If not a null pointer, then the dominator tree
+ *        is returned here. The graph contains the vertices that are unreachable
  *        from the root (if any), these will be isolates.
- * \param leftout Pointer to an initialized vector object, or NULL. If
- *        not NULL, then the IDs of the vertices that are unreachable
+ *        Graph and vertex attributes are preserved, but edge attributes
+ *        are discarded.
+ * \param leftout Pointer to an initialized vector object, or \c NULL. If
+ *        not \c NULL, then the IDs of the vertices that are unreachable
  *        from the root vertex (and thus not part of the dominator
  *        tree) are stored here.
  * \param mode Constant, must be \c IGRAPH_IN or \c IGRAPH_OUT. If it
@@ -445,24 +449,22 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     igraph_neimode_t invmode = IGRAPH_REVERSE_MODE(mode);
 
-    igraph_integer_t i;
-
     igraph_vector_int_t vdom, *mydom = dom;
 
     igraph_integer_t component_size = 0;
 
     if (root < 0 || root >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid root vertex ID for dominator tree",
-                     IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid root vertex ID for dominator tree.",
+                     IGRAPH_EINVVID);
     }
 
     if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("Dominator tree of an undirected graph requested",
+        IGRAPH_ERROR("Dominator tree of an undirected graph requested.",
                      IGRAPH_EINVAL);
     }
 
     if (mode == IGRAPH_ALL) {
-        IGRAPH_ERROR("Invalid neighbor mode for dominator tree",
+        IGRAPH_ERROR("Invalid neighbor mode for dominator tree.",
                      IGRAPH_EINVAL);
     }
 
@@ -489,13 +491,13 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* DFS first, to set semi, vertex and parent, step 1 */
 
-    IGRAPH_CHECK(igraph_dfs(graph, root, mode, /*unreachable=*/ 0,
+    IGRAPH_CHECK(igraph_dfs(graph, root, mode, /*unreachable=*/ false,
                             /*order=*/ &vertex,
-                            /*order_out=*/ 0, /*father=*/ &parent,
-                            /*dist=*/ 0, /*in_callback=*/ 0,
-                            /*out_callback=*/ 0, /*extra=*/ 0));
+                            /*order_out=*/ NULL, /*parents=*/ &parent,
+                            /*dist=*/ NULL, /*in_callback=*/ NULL,
+                            /*out_callback=*/ NULL, /*extra=*/ NULL));
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(vertex)[i] >= 0) {
             igraph_integer_t t = VECTOR(vertex)[i];
             VECTOR(semi)[t] = component_size + 1;
@@ -516,10 +518,10 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* We need to go over 'pred' because it should contain only the
        edges towards the target vertex. */
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *v = igraph_adjlist_get(&pred, i);
-        igraph_integer_t j, n = igraph_vector_int_size(v);
-        for (j = 0; j < n; ) {
+        igraph_integer_t n = igraph_vector_int_size(v);
+        for (igraph_integer_t j = 0; j < n; ) {
             igraph_integer_t v2 = VECTOR(*v)[j];
             if (VECTOR(parent)[v2] >= -1) {
                 j++;
@@ -533,7 +535,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* Now comes the main algorithm, steps 2 & 3 */
 
-    for (i = component_size - 1; i > 0; i--) {
+    for (igraph_integer_t i = component_size - 1; i > 0; i--) {
         igraph_integer_t w = VECTOR(vertex)[i] - 1;
         igraph_vector_int_t *predw = igraph_adjlist_get(&pred, w);
         igraph_integer_t j, n = igraph_vector_int_size(predw);
@@ -556,7 +558,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
 
     /* Finally, step 4 */
 
-    for (i = 1; i < component_size; i++) {
+    for (igraph_integer_t i = 1; i < component_size; i++) {
         igraph_integer_t w = VECTOR(vertex)[i] - 1;
         if (VECTOR(*mydom)[w] != VECTOR(vertex)[VECTOR(semi)[w] - 1] - 1) {
             VECTOR(*mydom)[w] = VECTOR(*mydom)[VECTOR(*mydom)[w]];
@@ -578,7 +580,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         igraph_vector_int_t edges;
         igraph_integer_t ptr = 0;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, component_size * 2 - 2);
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             if (i != root && VECTOR(*mydom)[i] >= 0) {
                 if (mode == IGRAPH_OUT) {
                     VECTOR(edges)[ptr++] = VECTOR(*mydom)[i];
@@ -595,8 +597,8 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
 
         IGRAPH_I_ATTRIBUTE_DESTROY(domtree);
-        IGRAPH_I_ATTRIBUTE_COPY(domtree, graph, /*graph=*/ 1, /*vertex=*/ 1,
-                                /*edge=*/ 0);
+        IGRAPH_I_ATTRIBUTE_COPY(domtree, graph,
+                                /*graph=*/ true, /*vertex=*/ true, /*edge=*/ false);
     }
 
     if (!dom) {
@@ -698,12 +700,11 @@ static igraph_error_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
        one as non-minimal. */
 
     IGRAPH_CHECK(igraph_dfs(domtree, root, IGRAPH_IN,
-                            /*unreachable=*/ 0, /*order=*/ 0,
-                            /*order_out=*/ 0, /*father=*/ 0,
-                            /*dist=*/ 0, /*in_callback=*/
-                            igraph_i_all_st_cuts_minimal_dfs_incb,
-                            /*out_callback=*/
-                            igraph_i_all_st_cuts_minimal_dfs_outcb,
+                            /*unreachable=*/ false, /*order=*/ NULL,
+                            /*order_out=*/ NULL, /*parents=*/ NULL,
+                            /*dist=*/ NULL,
+                            /*in_callback=*/ igraph_i_all_st_cuts_minimal_dfs_incb,
+                            /*out_callback=*/ igraph_i_all_st_cuts_minimal_dfs_outcb,
                             /*extra=*/ &data));
 
     igraph_vector_int_clear(minimal);
@@ -843,10 +844,10 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
         igraph_integer_t min = VECTOR(Sbar_map)[ VECTOR(M)[i] ] - 1;
         igraph_integer_t nuvsize, isvlen, j;
         IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN,
-                                /*unreachable=*/ 0, /*order=*/ &Nuv,
-                                /*order_out=*/ 0, /*father=*/ 0, /*dist=*/ 0,
-                                /*in_callback=*/ 0, /*out_callback=*/ 0,
-                                /*extra=*/ 0));
+                                /*unreachable=*/ NULL, /*order=*/ &Nuv,
+                                /*order_out=*/ NULL, /*parents=*/ NULL, /*dist=*/ NULL,
+                                /*in_callback=*/ NULL, /*out_callback=*/ NULL,
+                                /*extra=*/ NULL));
         /* Remove the negative values from the end of the vector */
         for (nuvsize = 0; nuvsize < Sbar_size; nuvsize++) {
             igraph_integer_t t = VECTOR(Nuv)[nuvsize];
@@ -863,11 +864,11 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
            I(S,v) contains all vertices that are in Nu(v) and that are
            reachable from Gamma(S) via a path in Nu(v). */
         IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ -1, /*roots=*/ &GammaS_vec,
-                                /*mode=*/ IGRAPH_OUT, /*unreachable=*/ 0,
+                                /*mode=*/ IGRAPH_OUT, /*unreachable=*/ false,
                                 /*restricted=*/ &Nuv,
-                                /*order=*/ &Isv_min, /*rank=*/ 0,
-                                /*father=*/ 0, /*pred=*/ 0, /*succ=*/ 0,
-                                /*dist=*/ 0, /*callback=*/ 0, /*extra=*/ 0));
+                                /*order=*/ &Isv_min, /*rank=*/ NULL,
+                                /*parents=*/ NULL, /*pred=*/ NULL, /*succ=*/ NULL,
+                                /*dist=*/ NULL, /*callback=*/ NULL, /*extra=*/ NULL));
         for (isvlen = 0; isvlen < no_of_nodes; isvlen++) {
             if (VECTOR(Isv_min)[isvlen] < 0) {
                 break;
@@ -891,11 +892,11 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
             /* Calculate real Isv */
             IGRAPH_CHECK(igraph_vector_int_append(&Nuv, &leftout));
             IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,
-                                    /*roots=*/ 0, /*mode=*/ IGRAPH_OUT,
-                                    /*unreachable=*/ 0, /*restricted=*/ &Nuv,
-                                    /*order=*/ &Isv_min, /*rank=*/ 0,
-                                    /*father=*/ 0, /*pred=*/ 0, /*succ=*/ 0,
-                                    /*dist=*/ 0, /*callback=*/ 0, /*extra=*/ 0));
+                                    /*roots=*/ NULL, /*mode=*/ IGRAPH_OUT,
+                                    /*unreachable=*/ false, /*restricted=*/ &Nuv,
+                                    /*order=*/ &Isv_min, /*rank=*/ NULL,
+                                    /*parents=*/ NULL, /*pred=*/ NULL, /*succ=*/ NULL,
+                                    /*dist=*/ NULL, /*callback=*/ NULL, /*extra=*/ NULL));
             for (isvlen = 0; isvlen < no_of_nodes; isvlen++) {
                 if (VECTOR(Isv_min)[isvlen] < 0) {
                     break;
@@ -927,61 +928,77 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
 
 /* TODO: This is a temporary recursive version */
 
-igraph_error_t igraph_provan_shier_list(
+static igraph_error_t igraph_i_provan_shier_list_recursive(
+    const igraph_t *graph, igraph_marked_queue_int_t *S,
+    igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
+    igraph_vector_int_list_t *result, igraph_provan_shier_pivot_t *pivot,
+    igraph_vector_int_t *Isv, void *pivot_arg
+) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t v = 0;
+    igraph_integer_t i, n;
+
+    pivot(graph, S, T, source, target, &v, Isv, pivot_arg);
+
+    if (igraph_vector_int_empty(Isv)) {
+        if (igraph_marked_queue_int_size(S) != 0 && igraph_marked_queue_int_size(S) != no_of_nodes) {
+            igraph_vector_int_t *vec;
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_new(result, &vec));
+            IGRAPH_CHECK(igraph_marked_queue_int_as_vector(S, vec));
+        }
+    } else {
+        /* Add Isv to S */
+        IGRAPH_CHECK(igraph_marked_queue_int_start_batch(S));
+        n = igraph_vector_int_size(Isv);
+        for (i = 0; i < n; i++) {
+            if (!igraph_marked_queue_int_iselement(S, VECTOR(*Isv)[i])) {
+                IGRAPH_CHECK(igraph_marked_queue_int_push(S, VECTOR(*Isv)[i]));
+            }
+        }
+        igraph_vector_int_clear(Isv);
+
+        /* Go down right in the search tree */
+        IGRAPH_CHECK(igraph_i_provan_shier_list_recursive(
+            graph, S, T, source, target, result, pivot, Isv, pivot_arg));
+
+        /* Take out Isv from S */
+        igraph_marked_queue_int_pop_back_batch(S);
+
+        /* Put v into T */
+        IGRAPH_CHECK(igraph_estack_push(T, v));
+
+        /* Go down left in the search tree */
+        IGRAPH_CHECK(igraph_i_provan_shier_list_recursive(
+            graph, S, T, source, target, result, pivot, Isv, pivot_arg));
+
+        /* Take out v from T */
+        igraph_estack_pop(T);
+
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+static igraph_error_t igraph_provan_shier_list(
     const igraph_t *graph, igraph_marked_queue_int_t *S,
     igraph_estack_t *T, igraph_integer_t source, igraph_integer_t target,
     igraph_vector_int_list_t *result, igraph_provan_shier_pivot_t *pivot,
     void *pivot_arg
 ) {
-
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t Isv;
-    igraph_vector_int_t vec;
-    igraph_integer_t v = 0;
-    igraph_integer_t i, n;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
 
-    pivot(graph, S, T, source, target, &v, &Isv, pivot_arg);
+    IGRAPH_CHECK(igraph_i_provan_shier_list_recursive(
+        graph, S, T, source, target, result, pivot, &Isv, pivot_arg
+    ));
 
-    if (igraph_vector_int_empty(&Isv)) {
-        if (igraph_marked_queue_int_size(S) != 0 && igraph_marked_queue_int_size(S) != no_of_nodes) {
-            IGRAPH_CHECK(igraph_marked_queue_int_as_vector(S, &vec));
-            IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(result, &vec));
-        }
-    } else {
-        /* Put v into T */
-        IGRAPH_CHECK(igraph_estack_push(T, v));
+    /* Reverse the result to stay compatible with versions before 0.10.3 */
+    IGRAPH_CHECK(igraph_vector_int_list_reverse(result));
 
-        /* Go down left in the search tree */
-        IGRAPH_CHECK(igraph_provan_shier_list(
-            graph, S, T, source, target, result, pivot, pivot_arg));
-
-        /* Take out v from T */
-        igraph_estack_pop(T);
-
-        /* Add Isv to S */
-        IGRAPH_CHECK(igraph_marked_queue_int_start_batch(S));
-        n = igraph_vector_int_size(&Isv);
-        for (i = 0; i < n; i++) {
-            if (!igraph_marked_queue_int_iselement(S, VECTOR(Isv)[i])) {
-                IGRAPH_CHECK(igraph_marked_queue_int_push(S, VECTOR(Isv)[i]));
-            }
-        }
-
-        /* Go down right in the search tree */
-
-        IGRAPH_CHECK(igraph_provan_shier_list(
-            graph, S, T, source, target, result, pivot, pivot_arg));
-
-        /* Take out Isv from S */
-        igraph_marked_queue_int_pop_back_batch(S);
-    }
-
-    igraph_vector_int_destroy(&vec);
     igraph_vector_int_destroy(&Isv);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -1262,12 +1279,12 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&Isv_min, 0);
         *v = VECTOR(Sbar_invmap)[ VECTOR(M)[i] ];
         /* TODO: restricted == keep ? */
-        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ 0,
-                                /*mode=*/ IGRAPH_IN, /*unreachable=*/ 0,
+        IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v,/*roots=*/ NULL,
+                                /*mode=*/ IGRAPH_IN, /*unreachable=*/ false,
                                 /*restricted=*/ &keep, /*order=*/ &Isv_min,
-                                /*rank=*/ 0, /*father=*/ 0, /*pred=*/ 0,
-                                /*succ=*/ 0, /*dist=*/ 0, /*callback=*/ 0,
-                                /*extra=*/ 0));
+                                /*rank=*/ NULL, /*parents=*/ NULL, /*pred=*/ NULL,
+                                /*succ=*/ NULL, /*dist=*/ NULL, /*callback=*/ NULL,
+                                /*extra=*/ NULL));
         for (j = 0; j < no_of_nodes; j++) {
             igraph_integer_t u = VECTOR(Isv_min)[j];
             if (u < 0) {
@@ -1293,7 +1310,7 @@ static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
 
 /**
  * \function igraph_all_st_mincuts
- * All minimum s-t cuts of a directed graph
+ * \brief All minimum s-t cuts of a directed graph.
  *
  * This function lists all edge cuts between two vertices, in a directed graph,
  * with minimum total capacity. Possibly, multiple cuts may have the same total
@@ -1354,8 +1371,6 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_estack_t T;
     igraph_i_all_st_mincuts_data_t pivot_data;
     igraph_vector_bool_t VE1bool;
-    igraph_vector_t VE1;
-    igraph_integer_t VE1size = 0;
     igraph_integer_t i, nocuts;
     igraph_integer_t proj_nodes;
     igraph_vector_t revmap_ptr, revmap_next;
@@ -1366,20 +1381,21 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* -------------------------------------------------------------------- */
     /* Error checks */
     if (!igraph_is_directed(graph)) {
-        IGRAPH_ERROR("S-t cuts can only be listed in directed graphs",
-                     IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("s-t cuts can only be listed in directed graphs.", IGRAPH_UNIMPLEMENTED);
     }
     if (source < 0 || source >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid `source' vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid source vertex.", IGRAPH_EINVVID);
     }
     if (target < 0 || target >= no_of_nodes) {
-        IGRAPH_ERROR("Invalid `target' vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid target vertex.", IGRAPH_EINVVID);
     }
     if (source == target) {
-        IGRAPH_ERROR("`source' and 'target' are the same vertex", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
     }
-    if (capacity != NULL && igraph_vector_min(capacity) <= 0)
-    {
+    if (capacity && igraph_vector_size(capacity) != no_of_edges) {
+        IGRAPH_ERROR("Capacity vector length must agree with number of edges.", IGRAPH_EINVAL);
+    }
+    if (capacity && no_of_edges > 0 && igraph_vector_min(capacity) <= 0) {
         IGRAPH_ERROR("Not all capacities are strictly positive.", IGRAPH_EINVAL);
     }
 
@@ -1392,28 +1408,25 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     /* -------------------------------------------------------------------- */
     /* We need to calculate the maximum flow first */
     IGRAPH_VECTOR_INIT_FINALLY(&flow, 0);
-    IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ 0,
-                                /*partition1=*/ 0, /*partition2=*/ 0,
+    IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ NULL,
+                                /*partition1=*/ NULL, /*partition2=*/ NULL,
                                 /*source=*/ source, /*target=*/ target,
                                 capacity, &stats));
 
     /* -------------------------------------------------------------------- */
     /* Then we need the reverse residual graph */
-    IGRAPH_CHECK(igraph_reverse_residual_graph(graph, capacity, &residual,
-                 &flow));
+    IGRAPH_CHECK(igraph_reverse_residual_graph(graph, capacity, &residual, &flow));
     IGRAPH_FINALLY(igraph_destroy, &residual);
 
     /* -------------------------------------------------------------------- */
     /* We shrink it to its strongly connected components */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&NtoL, 0);
     IGRAPH_CHECK(igraph_connected_components(
-        &residual, /*membership=*/ &NtoL, /*csize=*/ 0,
+        &residual, /*membership=*/ &NtoL, /*csize=*/ NULL,
         /*no=*/ &proj_nodes, IGRAPH_STRONG
     ));
-    IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL,
-                                          /*vertex_comb=*/ 0));
-    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true,
-                                 /*edge_comb=*/ NULL));
+    IGRAPH_CHECK(igraph_contract_vertices(&residual, /*mapping=*/ &NtoL, /*vertex_comb=*/ NULL));
+    IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ true, /*loops=*/ true, /*edge_comb=*/ NULL));
 
     newsource = VECTOR(NtoL)[source];
     newtarget = VECTOR(NtoL)[target];
@@ -1422,7 +1435,6 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     /* -------------------------------------------------------------------- */
     /* Determine the active vertices in the projection */
-    IGRAPH_VECTOR_INIT_FINALLY(&VE1, 0);
     IGRAPH_CHECK(igraph_vector_bool_init(&VE1bool, proj_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &VE1bool);
     for (i = 0; i < no_of_edges; i++) {
@@ -1432,19 +1444,11 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
             igraph_integer_t pfrom = VECTOR(NtoL)[from];
             igraph_integer_t pto = VECTOR(NtoL)[to];
             if (!VECTOR(VE1bool)[pfrom]) {
-                VECTOR(VE1bool)[pfrom] = 1;
-                VE1size++;
+                VECTOR(VE1bool)[pfrom] = true;
             }
             if (!VECTOR(VE1bool)[pto]) {
-                VECTOR(VE1bool)[pto] = 1;
-                VE1size++;
+                VECTOR(VE1bool)[pto] = true;
             }
-        }
-    }
-    IGRAPH_CHECK(igraph_vector_reserve(&VE1, VE1size));
-    for (i = 0; i < proj_nodes; i++) {
-        if (VECTOR(VE1bool)[i]) {
-            igraph_vector_push_back(&VE1, i);
         }
     }
 
@@ -1548,11 +1552,10 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_estack_destroy(&T);
     igraph_marked_queue_int_destroy(&S);
     igraph_vector_bool_destroy(&VE1bool);
-    igraph_vector_destroy(&VE1);
     igraph_vector_int_destroy(&NtoL);
     igraph_destroy(&residual);
     igraph_vector_destroy(&flow);
-    IGRAPH_FINALLY_CLEAN(8);
+    IGRAPH_FINALLY_CLEAN(7);
 
     if (!partition1s) {
         igraph_vector_int_list_destroy(mypartition1s);

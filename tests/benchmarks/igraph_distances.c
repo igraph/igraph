@@ -38,26 +38,38 @@ int main(void) {
           REPEAT(igraph_distances_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
     );
     BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall, " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, NULL, IGRAPH_OUT), REP)
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
     );
-    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
+    );
+    BENCH(" 5 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
+    );
+    BENCH(" 6 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
     RNG_BEGIN();
     for (igraph_integer_t i=0; i < trunc(0.005 * igraph_ecount(&g)); i++) {
-        VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = RNG_UNIF(-0.05, 0);
+        /* For reproducibility, do not write two RNG_...() calls on the same line
+         * as the C language does not guarantee any evaluation order between them. */
+        igraph_real_t w = RNG_UNIF(-0.05, 0);
+        VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = w;
     }
     RNG_END();
 
-    BENCH(" 5 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
+    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
     );
-    BENCH(" 6 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Johnson (negative), " TOSTR(REP) "x",
+    BENCH(" 8 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Johnson (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_johnson(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights), REP)
     );
-    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    BENCH(" 9 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
+    );
+    BENCH(" 10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
     igraph_destroy(&g);
@@ -89,26 +101,38 @@ int main(void) {
           REPEAT(igraph_distances_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
     );
     BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall, " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, NULL, IGRAPH_OUT), REP)
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
     );
-    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
+    );
+    BENCH(" 5 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
+    );
+    BENCH(" 6 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
     RNG_BEGIN();
     for (igraph_integer_t i=0; i < trunc(0.002 * igraph_ecount(&g)); i++) {
-        VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = RNG_UNIF(-0.02, 0);
+        /* For reproducibility, do not write two RNG_...() calls on the same line
+         * as the C language does not guarantee any evaluation order between them. */
+        igraph_real_t w = RNG_UNIF(-0.02, 0);
+        VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = w;
     }
     RNG_END();
 
-    BENCH(" 5 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
+    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
     );
-    BENCH(" 6 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Johnson (negative), " TOSTR(REP) "x",
+    BENCH(" 8 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Johnson (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_johnson(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights), REP)
     );
-    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    BENCH(" 9 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
+    );
+    BENCH(" 10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
     igraph_destroy(&g);
@@ -140,26 +164,38 @@ int main(void) {
           REPEAT(igraph_distances_dijkstra(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
     );
     BENCH(" 3 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall, " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, NULL, IGRAPH_OUT), REP)
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
     );
-    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    BENCH(" 4 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Unweighted Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
+    );
+    BENCH(" 5 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
+    );
+    BENCH(" 6 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup, " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
     RNG_BEGIN();
     for (igraph_integer_t i=0; i < trunc(0.01 * igraph_ecount(&g)); i++) {
-        VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = RNG_UNIF(-0.02, 0);
+        /* For reproducibility, do not write two RNG_...() calls on the same line
+         * as the C language does not guarantee any evaluation order between them. */
+        igraph_real_t w = RNG_UNIF(-0.02, 0);
+        VECTOR(weights)[RNG_INTEGER(0, igraph_ecount(&g)-1)] = w;
     }
     RNG_END();
 
-    BENCH(" 5 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
+    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Bellman-Ford (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT), REP)
     );
-    BENCH(" 6 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Johnson (negative), " TOSTR(REP) "x",
+    BENCH(" 8 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Johnson (negative), " TOSTR(REP) "x",
           REPEAT(igraph_distances_johnson(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights), REP)
     );
-    BENCH(" 7 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
-          REPEAT(igraph_distances_floyd_warshall(&g, &res, &weights, IGRAPH_OUT), REP)
+    BENCH(" 9 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_ORIGINAL), REP)
+    );
+    BENCH(" 10 vcount=" TOSTR(VCOUNT) ", p=" TOSTR(DENS) ", Floyd-Warshall-tree-speedup (negative), " TOSTR(REP) "x",
+          REPEAT(igraph_distances_floyd_warshall(&g, &res, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_OUT, IGRAPH_FLOYD_WARSHALL_TREE), REP)
     );
 
     igraph_destroy(&g);

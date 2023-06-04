@@ -23,6 +23,8 @@
 */
 
 #include "igraph_arpack.h"
+
+#include "core/interruption.h"
 #include "linalg/arpack_internal.h"
 
 #include "igraph_memory.h"
@@ -164,7 +166,7 @@ static IGRAPH_THREAD_LOCAL igraph_arpack_options_t igraph_i_arpack_options_defau
 
 /**
  * \function igraph_arpack_options_init
- * Initialize ARPACK options
+ * \brief Initialize ARPACK options.
  *
  * Initializes ARPACK options, set them to default values.
  * You can always pass the initialized \ref igraph_arpack_options_t
@@ -173,10 +175,12 @@ static IGRAPH_THREAD_LOCAL igraph_arpack_options_t igraph_i_arpack_options_defau
  * calculation, e.g. \ref igraph_pagerank() always searches for the
  * eigenvalue with the largest magnitude, regardless of the supplied
  * value.
+ *
  * </para><para>
  * If you want to implement your own function involving eigenvalue
  * calculation using ARPACK, however, you will likely need to set up
  * the fields for yourself.
+ *
  * \param o The \ref igraph_arpack_options_t object to initialize.
  *
  * Time complexity: O(1).
@@ -229,7 +233,7 @@ igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
 
 /**
  * \function igraph_arpack_storage_init
- * Initialize ARPACK storage
+ * \brief Initialize ARPACK storage.
  *
  * You only need this function if you want to run multiple eigenvalue
  * calculations using ARPACK, and want to spare the memory
@@ -238,9 +242,10 @@ igraph_arpack_options_t* igraph_arpack_options_get_default(void) {
  * igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() to make
  * memory allocated and deallocated automatically.
  *
- * </para><para>Don't forget to call the \ref
- * igraph_arpack_storage_destroy() function on the storage object if
- * you don't need it any more.
+ * </para><para>
+ * Don't forget to call the \ref igraph_arpack_storage_destroy()
+ * function on the storage object if you don't need it any more.
+ *
  * \param s The \ref igraph_arpack_storage_t object to initialize.
  * \param maxn The maximum order of the matrices.
  * \param maxncv The maximum NCV parameter intended to use.
@@ -304,7 +309,7 @@ igraph_error_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_int
 
 /**
  * \function igraph_arpack_storage_destroy
- * Deallocate ARPACK storage
+ * \brief Deallocate ARPACK storage.
  *
  * \param s The \ref igraph_arpack_storage_t object for which the
  *    memory will be deallocated.
@@ -1051,6 +1056,8 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     while (1) {
         igraph_real_t *from, *to;
 
+        IGRAPH_ALLOW_INTERRUPTION();
+
 #ifdef HAVE_GFORTRAN
         igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1065,6 +1072,9 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                       options->iparam, options->ipntr,
                       workd, workl, &options->lworkl, &options->info);
 #endif
+        /* When there is a non-zero error code in options->info, we expect that
+         * ARPACK requests a termination of the iteration by setting ido=99. */
+        IGRAPH_ASSERT(ido == 99 || options->info == 0);
 
         if (ido == -1 || ido == 1) {
             from = workd + options->ipntr[0] - 1;
@@ -1326,6 +1336,8 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     while (1) {
         igraph_real_t *from, *to;
 
+        IGRAPH_ALLOW_INTERRUPTION();
+
 #ifdef HAVE_GFORTRAN
         igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
                       &options->nev, &options->tol,
@@ -1340,6 +1352,9 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                       options->iparam, options->ipntr,
                       workd, workl, &options->lworkl, &options->info);
 #endif
+        /* When there is a non-zero error code in options->info, we expect that
+         * ARPACK requests a termination of the iteration by setting ido=99. */
+        IGRAPH_ASSERT(ido == 99 || options->info == 0);
 
         if (ido == -1 || ido == 1) {
             from = workd + options->ipntr[0] - 1;

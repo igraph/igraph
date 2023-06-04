@@ -33,11 +33,11 @@
  * \function igraph_growing_random_game
  * \brief Generates a growing random graph.
  *
- * </para><para>
  * This function simulates a growing random graph. We start out with
  * one vertex. In each step a new vertex is added and a number of new
  * edges are also added. These graphs are known to be different
  * from standard (not growing) random graphs.
+ *
  * \param graph Uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of edges to add in a time step (i.e. after
