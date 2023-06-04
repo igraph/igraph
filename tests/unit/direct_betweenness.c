@@ -141,8 +141,11 @@ igraph_error_t igraph_direct_betweenness_cutoff(
 
     igraph_vector_int_list_destroy(&vertices);
     igraph_vit_destroy(&vit);
+    igraph_vit_destroy(&vit_sources);
+    igraph_vit_destroy(&vit_sources2);
+    igraph_vit_destroy(&vit_targets);
 
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
 }
@@ -180,6 +183,8 @@ void compare_directed(igraph_t *graph, igraph_bool_t directed) {
     compare_directed_subset(graph, directed, igraph_vss_range(0, 2), igraph_vss_range(2,4));
     printf("two sources, same two targets:\n");
     compare_directed_subset(graph, directed, igraph_vss_range(0,2), igraph_vss_range(0,2));
+    printf("one source, one different target:\n");
+    compare_directed_subset(graph, directed, igraph_vss_range(0, 1), igraph_vss_range(2,3));
 }
 
 void compare(igraph_t *graph) {
@@ -191,12 +196,15 @@ void compare(igraph_t *graph) {
 
 int main() {
     igraph_t graph;
+    printf("\nundirected line\n");
+    igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
+    compare(&graph);
+    igraph_destroy(&graph);
 
     printf("\nundirected star\n");
     igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0,4, 1,4, 2,4, 3,4, -1);
     compare(&graph);
     igraph_destroy(&graph);
-    exit(0);
 
     printf("five vertices, 0 connected to 1 and 2, undirected\n");
     igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0,1, 0,2, -1);
