@@ -68,6 +68,18 @@ igraph_error_t igraph_simplify(igraph_t *graph,
     igraph_vector_int_t mergeinto;
     igraph_integer_t actedge;
 
+    /* if we already know there are no multi-edges, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_MULTI) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_MULTI)) {
+        multiple = false;
+    }
+
+    /* if we already know there are no loops, they don't need to be removed */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_HAS_LOOP) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_HAS_LOOP)) {
+        loops = false;
+    }
+
     if (!multiple && !loops)
         /* nothing to do */
     {
@@ -106,6 +118,8 @@ igraph_error_t igraph_simplify(igraph_t *graph,
         igraph_vector_int_destroy(&edges_to_delete);
         IGRAPH_FINALLY_CLEAN(1);
 
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+
         return IGRAPH_SUCCESS;
     }
 
@@ -137,8 +151,8 @@ igraph_error_t igraph_simplify(igraph_t *graph,
             }
         } else {
             /* Edge to be kept */
-            igraph_vector_int_push_back(&edges, from);
-            igraph_vector_int_push_back(&edges, to);
+            igraph_vector_int_push_back(&edges, from);  /* reserved */
+            igraph_vector_int_push_back(&edges, to);  /* reserved */
             if (attr) {
                 actedge++;
                 VECTOR(mergeinto)[edge] = actedge;
@@ -176,6 +190,18 @@ igraph_error_t igraph_simplify(igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
     igraph_destroy(graph);
     *graph = res;
+
+    if (loops) {
+        /* Loop edges were removed so we know for sure that there aren't any
+         * loop edges now */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+    }
+
+    if (multiple) {
+        /* Multi-edges were removed so we know for sure that there aren't any
+         * multi-edges now */
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
+    }
 
     return IGRAPH_SUCCESS;
 }
