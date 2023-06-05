@@ -6,6 +6,7 @@
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
  - `igraph_isomorphic()` now supports multigraphs.
+ - Shortest path related functions now consistently ignore edges with positive infinite weights.
 
 ### Fixed
 
