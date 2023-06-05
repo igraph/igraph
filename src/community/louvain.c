@@ -414,7 +414,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
             new_id = old_id;
 
             /* Update old community */
-            igraph_vector_int_set(communities.membership, ni, -1);
+            VECTOR(*communities.membership)[ni] = -1;
             communities.item[old_id].size--;
             if (communities.item[old_id].size == 0) {
                 communities.communities_no--;
@@ -447,7 +447,7 @@ static igraph_error_t igraph_i_community_multilevel_step(
             /* debug("Added vertex %ld to community %ld (gain %lf).\n", ni, new_id, (double) max_q_gain); */
 
             /* Add vertex to "new" community and update it */
-            igraph_vector_int_set(communities.membership, ni, new_id);
+            VECTOR(*communities.membership)[ni] = new_id;
             if (communities.item[new_id].size == 0) {
                 communities.communities_no++;
             }

@@ -63,13 +63,16 @@ int main(void) {
     printf("Same graph, weighted:\n");
     call_and_print(&g_lmu, 1, &weights, IGRAPH_IN);
 
-    printf("Same graph, weighted, but using scan_1_ecount directly:\n");
-    igraph_local_scan_1_ecount(&g_lmu, &result, &weights, IGRAPH_IN);
-
-    call_and_print(&g_lmu, 1, &weights, IGRAPH_IN);
     printf("Checking if calling igraph_local_scan_1_ecount properly redirects:\n");
     igraph_vector_clear(&result);
-    IGRAPH_ASSERT(igraph_local_scan_1_ecount(&g_lmu, &result, NULL, IGRAPH_IN) == IGRAPH_SUCCESS);
+    printf("Directed, IN: ");
+    IGRAPH_ASSERT(igraph_local_scan_1_ecount(&g_lm, &result, NULL, IGRAPH_IN) == IGRAPH_SUCCESS);
+    print_vector(&result);
+    printf("Directed, ALL: ");
+    IGRAPH_ASSERT(igraph_local_scan_1_ecount(&g_lm, &result, NULL, IGRAPH_ALL) == IGRAPH_SUCCESS);
+    print_vector(&result);
+    printf("Undirected, with weights: ");
+    IGRAPH_ASSERT(igraph_local_scan_1_ecount(&g_lmu, &result, &weights, IGRAPH_IN) == IGRAPH_SUCCESS);
     print_vector(&result);
     printf("\n");
 
