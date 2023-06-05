@@ -29,6 +29,7 @@
 ### Other
 
  - Improved performance for `igraph_vertex_connectivity()`.
+ - `igraph_simplify()` makes use of the cache, and avoids simplification when the graph is already known to be simple.
  - Documentation improvements.
 
 ## [0.10.4] - 2023-01-26
