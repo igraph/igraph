@@ -58,7 +58,8 @@
  *    non-negative for Dijkstra's algorithm to work. Additionally, no
  *    edge weight may be NaN. If either case does not hold, an error
  *    is returned. If this is a null pointer, then the unweighted
- *    version, \ref igraph_distances() is called.
+ *    version, \ref igraph_distances() is called. Edges with positive infinite
+ *    weights are ignored.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -212,7 +213,9 @@ igraph_error_t igraph_distances_dijkstra_cutoff(const igraph_t *graph,
                 igraph_real_t weight = VECTOR(*weights)[edge];
 
                 /* Optimization: do not follow infinite-weight edges. */
-                if (weight == IGRAPH_INFINITY) continue;
+                if (weight == IGRAPH_INFINITY) {
+                    continue;
+                }
 
                 igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + weight;

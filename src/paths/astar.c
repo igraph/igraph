@@ -71,7 +71,7 @@ static igraph_error_t null_heuristic(
  * \param weights Optional edge weights. Supply \c NULL for unweighted graphs.
  *        All edge weights must be non-negative. Additionally, no
  *        edge weight may be NaN. If either case does not hold, an error
- *        is returned.
+ *        is returned. Edges with positive infinite weights are ignored.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. \c IGRAPH_OUT follows edge
  *        directions, \c IGRAPH_IN follows the opposite directions,
@@ -194,9 +194,9 @@ igraph_error_t igraph_get_shortest_path_astar(const igraph_t *graph,
             igraph_real_t altdist; /* candidate from -> v distance */
             if (weights) {
                 igraph_real_t weight = VECTOR(*weights)[edge];
-                /* TODO: Should infinite-weight edges be skipped?
-                 * See https://github.com/igraph/igraph/issues/2222 */
-                if (weight == IGRAPH_INFINITY) continue;
+                if (weight == IGRAPH_INFINITY) {
+                    continue;
+                }
                 altdist = VECTOR(dists)[u] + weight;
             } else {
                 altdist = VECTOR(dists)[u] + 1;

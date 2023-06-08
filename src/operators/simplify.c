@@ -191,6 +191,9 @@ igraph_error_t igraph_simplify(igraph_t *graph,
     igraph_destroy(graph);
     *graph = res;
 
+    /* The cache must be set as the very last step, only after all functions that can
+     * potentially return with an error have finished. */
+
     if (loops) {
         /* Loop edges were removed so we know for sure that there aren't any
          * loop edges now */
