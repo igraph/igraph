@@ -262,6 +262,29 @@ igraph_integer_t igraph_vector_ptr_size(const igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_capacity
+ * \brief Returns the allocated capacity of the pointer vector.
+ *
+ * Note that this might be different from the size of the vector (as
+ * queried by \ref igraph_vector_ptr_size()), and specifies how many elements
+ * the vector can hold, without reallocation.
+ *
+ * \param v Pointer to the (previously initialized) pointer vector object to query.
+ * \return The allocated capacity.
+ *
+ * \sa \ref igraph_vector_ptr_size().
+ *
+ * Time complexity: O(1).
+ */
+
+igraph_integer_t igraph_vector_ptr_capacity(const igraph_vector_ptr_t* v) {
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    return v->stor_end - v->stor_begin;
+}
+
+/**
+ * \ingroup vectorptr
  * \function igraph_vector_ptr_clear
  * \brief Removes all elements from a pointer vector.
  *
@@ -797,6 +820,21 @@ igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_ve
 
     igraph_vector_ptr_destroy(&v_copy);
     IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_vector_ptr_index(
+    const igraph_vector_ptr_t *v, igraph_vector_ptr_t *newv,
+    const igraph_vector_int_t *idx
+) {
+    igraph_integer_t i, j, newlen = igraph_vector_int_size(idx);
+    IGRAPH_CHECK(igraph_vector_ptr_resize(newv, newlen));
+
+    for (i = 0; i < newlen; i++) {
+        j = VECTOR(*idx)[i];
+        VECTOR(*newv)[i] = VECTOR(*v)[j];
+    }
 
     return IGRAPH_SUCCESS;
 }

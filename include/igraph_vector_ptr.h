@@ -62,6 +62,7 @@ IGRAPH_EXPORT void igraph_vector_ptr_destroy_all(igraph_vector_ptr_t* v);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_reserve(igraph_vector_ptr_t* v, igraph_integer_t capacity);
 IGRAPH_EXPORT igraph_bool_t igraph_vector_ptr_empty(const igraph_vector_ptr_t* v);
 IGRAPH_EXPORT igraph_integer_t igraph_vector_ptr_size(const igraph_vector_ptr_t* v);
+IGRAPH_EXPORT igraph_integer_t igraph_vector_ptr_capacity(const igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_clear(igraph_vector_ptr_t* v);
 IGRAPH_EXPORT void igraph_vector_ptr_null(igraph_vector_ptr_t* v);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_push_back(igraph_vector_ptr_t* v, void* e);
@@ -74,6 +75,10 @@ IGRAPH_EXPORT void* igraph_vector_ptr_get(const igraph_vector_ptr_t* v, igraph_i
 IGRAPH_EXPORT void igraph_vector_ptr_set(igraph_vector_ptr_t* v, igraph_integer_t pos, void* value);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_integer_t newsize);
 IGRAPH_EXPORT void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
+IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_index(
+    const igraph_vector_ptr_t *v, igraph_vector_ptr_t *newv,
+    const igraph_vector_int_t *idx
+);
 IGRAPH_EXPORT igraph_error_t igraph_vector_ptr_permute(igraph_vector_ptr_t* v, const igraph_vector_int_t* index);
 IGRAPH_EXPORT void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_integer_t pos);
 IGRAPH_EXPORT void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));

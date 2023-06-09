@@ -120,6 +120,8 @@ __BEGIN_DECLS
  * \enumval IGRAPH_ATTRIBUTE_BOOLEAN Logical values, true or false.
  * \enumval IGRAPH_ATTRIBUTE_STRING Attribute that can be converted to
  *   a string.
+ * \enumval IGRAPH_ATTRIBUTE_POINTER Attribute holding a pointer to some memory
+ *   location, without asserting ownership.
  * \enumval IGRAPH_ATTRIBUTE_OBJECT Custom attribute type, to be
  *   used for special data types by client applications. The R and
  *   Python interfaces use this for attributes that hold R or Python
@@ -130,6 +132,7 @@ typedef enum { IGRAPH_ATTRIBUTE_UNSPECIFIED = 0,
                IGRAPH_ATTRIBUTE_NUMERIC = 1,
                IGRAPH_ATTRIBUTE_BOOLEAN = 2,
                IGRAPH_ATTRIBUTE_STRING = 3,
+               IGRAPH_ATTRIBUTE_POINTER = 4,
                IGRAPH_ATTRIBUTE_OBJECT = 127
              } igraph_attribute_type_t;
 
@@ -265,17 +268,24 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  * \member get_bool_graph_attr Query a boolean graph attribute. The
  *    value should be placed as the first element of the \p value
  *    boolean vector.
+ * \member get_pointer_graph_attr Query a pointer graph attribute. The
+ *    value should be placed as the first element of the \p value
+ *    pointer vector.
  * \member get_numeric_vertex_attr Query a numeric vertex attribute,
  *    for the vertices included in \p vs.
  * \member get_string_vertex_attr Query a string vertex attribute,
  *    for the vertices included in \p vs.
  * \member get_bool_vertex_attr Query a boolean vertex attribute,
  *    for the vertices included in \p vs.
+ * \member get_pointer_vertex_attr Query a pointer vertex attribute,
+ *    for the vertices included in \p vs.
  * \member get_numeric_edge_attr Query a numeric edge attribute, for
  *    the edges included in \p es.
  * \member get_string_edge_attr Query a string edge attribute, for the
  *    edges included in \p es.
  * \member get_bool_edge_attr Query a boolean edge attribute, for the
+ *    edges included in \p es.
+ * \member get_pointer_edge_attr Query a pointer edge attribute, for the
  *    edges included in \p es.
  *
  * Note that the <function>get_*_*_attr</function> are allowed to
@@ -339,6 +349,14 @@ typedef struct igraph_attribute_table_t {
     igraph_error_t (*get_bool_edge_attr)(const igraph_t *graph, const char *name,
                                          igraph_es_t es,
                                          igraph_vector_bool_t *value);
+    igraph_error_t (*get_pointer_graph_attr)(const igraph_t *igraph, const char *name,
+                                             igraph_vector_ptr_t *value);
+    igraph_error_t (*get_pointer_vertex_attr)(const igraph_t *graph, const char *name,
+                                              igraph_vs_t vs,
+                                              igraph_vector_ptr_t *value);
+    igraph_error_t (*get_pointer_edge_attr)(const igraph_t *graph, const char *name,
+                                            igraph_es_t es,
+                                            igraph_vector_ptr_t *value);
 } igraph_attribute_table_t;
 
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
@@ -353,18 +371,23 @@ IGRAPH_EXPORT extern const igraph_attribute_table_t igraph_cattribute_table;
 IGRAPH_EXPORT igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name);
 IGRAPH_EXPORT igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name);
 IGRAPH_EXPORT const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name);
+IGRAPH_EXPORT void* igraph_cattribute_GAP(const igraph_t *graph, const char *name);
 IGRAPH_EXPORT igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
                                                   igraph_integer_t vid);
 IGRAPH_EXPORT igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
                                                   igraph_integer_t vid);
 IGRAPH_EXPORT const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
                                                 igraph_integer_t vid);
+IGRAPH_EXPORT void* igraph_cattribute_VAP(const igraph_t *graph, const char *name,
+                                          igraph_integer_t vid);
 IGRAPH_EXPORT igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
                                                   igraph_integer_t eid);
 IGRAPH_EXPORT igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
                                                   igraph_integer_t eid);
 IGRAPH_EXPORT const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
                                                 igraph_integer_t eid);
+IGRAPH_EXPORT void* igraph_cattribute_EAP(const igraph_t *graph, const char *name,
+                                          igraph_integer_t eid);
 
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VANV(const igraph_t *graph, const char *name,
                                          igraph_vs_t vids, igraph_vector_t *result);
@@ -372,12 +395,16 @@ IGRAPH_EXPORT igraph_error_t igraph_cattribute_EANV(const igraph_t *graph, const
                                          igraph_es_t eids, igraph_vector_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VASV(const igraph_t *graph, const char *name,
                                          igraph_vs_t vids, igraph_strvector_t *result);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAPV(const igraph_t *graph, const char *name,
+                                         igraph_vs_t vids, igraph_vector_ptr_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EASV(const igraph_t *graph, const char *name,
                                          igraph_es_t eids, igraph_strvector_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VABV(const igraph_t *graph, const char *name,
                                          igraph_vs_t vids, igraph_vector_bool_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EABV(const igraph_t *graph, const char *name,
                                          igraph_es_t eids, igraph_vector_bool_t *result);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAPV(const igraph_t *graph, const char *name,
+                                         igraph_es_t eids, igraph_vector_ptr_t *result);
 
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_list(const igraph_t *graph,
                                          igraph_strvector_t *gnames, igraph_vector_int_t *gtypes,
@@ -393,18 +420,24 @@ IGRAPH_EXPORT igraph_error_t igraph_cattribute_GAB_set(igraph_t *graph, const ch
                                             igraph_bool_t value);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
                                             const char *value);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_GAP_set(igraph_t *graph, const char *name,
+                                            void *value);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
                                             igraph_integer_t vid, igraph_real_t value);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAB_set(igraph_t *graph, const char *name,
                                             igraph_integer_t vid, igraph_bool_t value);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
                                             igraph_integer_t vid, const char *value);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAP_set(igraph_t *graph, const char *name,
+                                            igraph_integer_t vid, void *value);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
                                             igraph_integer_t eid, igraph_real_t value);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAB_set(igraph_t *graph, const char *name,
                                             igraph_integer_t eid, igraph_bool_t value);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
                                             igraph_integer_t eid, const char *value);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAP_set(igraph_t *graph, const char *name,
+                                            igraph_integer_t eid, void *value);
 
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
                                              const igraph_vector_t *v);
@@ -412,12 +445,16 @@ IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAB_setv(igraph_t *graph, const c
                                              const igraph_vector_bool_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
                                              const igraph_strvector_t *sv);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_VAP_setv(igraph_t *graph, const char *name,
+                                             const igraph_vector_ptr_t *pv);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
                                              const igraph_vector_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
                                              const igraph_vector_bool_t *v);
 IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
                                              const igraph_strvector_t *sv);
+IGRAPH_EXPORT igraph_error_t igraph_cattribute_EAP_setv(igraph_t *graph, const char *name,
+                                             const igraph_vector_ptr_t *pv);
 
 IGRAPH_EXPORT void igraph_cattribute_remove_g(igraph_t *graph, const char *name);
 IGRAPH_EXPORT void igraph_cattribute_remove_v(igraph_t *graph, const char *name);
@@ -456,6 +493,16 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  */
 #define GAS(graph,n) (igraph_cattribute_GAS((graph), (n)))
 /**
+ * \define GAP
+ * Query a pointer graph attribute.
+ *
+ * This is shorthand for \ref igraph_cattribute_GAP().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \return The value of the attribute.
+ */
+#define GAP(graph,n) (igraph_cattribute_GAP((graph), (n)))
+/**
  * \define VAN
  * Query a numeric vertex attribute.
  *
@@ -488,6 +535,17 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  * \return The value of the attribute.
  */
 #define VAS(graph,n,v) (igraph_cattribute_VAS((graph), (n), (v)))
+/**
+ * \define VAP
+ * Query a pointer vertex attribute.
+ *
+ * This is shorthand for \ref igraph_cattribute_VAP().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v The id of the vertex.
+ * \return The value of the attribute.
+ */
+#define VAP(graph,n,v) (igraph_cattribute_VAP((graph), (n), (v)))
 /**
  * \define VANV
  * Query a numeric vertex attribute for all vertices.
@@ -528,6 +586,19 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define VASV(graph,n,vec) (igraph_cattribute_VASV((graph),(n), \
                            igraph_vss_all(), (vec)))
 /**
+ * \define VAPV
+ * Query a pointer vertex attribute for all vertices.
+ *
+ * This is a shorthand for \ref igraph_cattribute_VAPV().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vec Pointer to an initialized pointer vector, the result is
+ *        stored here. It will be resized, if needed.
+ * \return Error code.
+ */
+#define VAPV(graph,n,vec) (igraph_cattribute_VAPV((graph),(n), \
+                           igraph_vss_all(), (vec)))
+/**
  * \define EAN
  * Query a numeric edge attribute.
  *
@@ -561,6 +632,17 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  */
 #define EAS(graph,n,e) (igraph_cattribute_EAS((graph), (n), (e)))
 /**
+ * \define EAP
+ * Query a pointer edge attribute.
+ *
+ * This is shorthand for \ref igraph_cattribute_EAP().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param e The id of the edge.
+ * \return The value of the attribute.
+ */
+#define EAP(graph,n,e) (igraph_cattribute_EAP((graph), (n), (e)))
+/**
  * \define EANV
  * Query a numeric edge attribute for all edges.
  *
@@ -586,7 +668,6 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  */
 #define EABV(graph,n,vec) (igraph_cattribute_EABV((graph),(n), \
                            igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
-
 /**
  * \define EASV
  * Query a string edge attribute for all edges.
@@ -599,6 +680,19 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  * \return Error code.
  */
 #define EASV(graph,n,vec) (igraph_cattribute_EASV((graph),(n), \
+                           igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
+/**
+ * \define EAPV
+ * Query a pointer edge attribute for all edges.
+ *
+ * This is a shorthand for \ref igraph_cattribute_EAPV().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vec Pointer to an initialized pointer vector, the result is
+ *        stored here. It will be resized, if needed.
+ * \return Error code.
+ */
+#define EAPV(graph,n,vec) (igraph_cattribute_EAPV((graph),(n), \
                            igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 /**
  * \define SETGAN
@@ -633,6 +727,17 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  * \return Error code.
  */
 #define SETGAS(graph,n,value) (igraph_cattribute_GAS_set((graph),(n),(value)))
+/**
+ * \define SETGAP
+ * Set a pointer graph attribute
+ *
+ * This is a shorthand for \ref igraph_cattribute_GAP_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param value The new value of the attribute.
+ * \return Error code.
+ */
+#define SETGAP(graph,n,value) (igraph_cattribute_GAP_set((graph),(n),(value)))
 /**
  * \define SETVAN
  * Set a numeric vertex attribute
@@ -670,6 +775,18 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  */
 #define SETVAS(graph,n,vid,value) (igraph_cattribute_VAS_set((graph),(n),(vid),(value)))
 /**
+ * \define SETVAP
+ * Set a pointer vertex attribute
+ *
+ * This is a shorthand for \ref igraph_cattribute_VAP_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vid Ids of the vertices to set.
+ * \param value The new value of the attribute.
+ * \return Error code.
+ */
+#define SETVAP(graph,n,vid,value) (igraph_cattribute_VAP_set((graph),(n),(vid),(value)))
+/**
  * \define SETEAN
  * Set a numeric edge attribute
  *
@@ -705,10 +822,22 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  * \return Error code.
  */
 #define SETEAS(graph,n,eid,value) (igraph_cattribute_EAS_set((graph),(n),(eid),(value)))
+/**
+ * \define SETEAP
+ * Set a pointer edge attribute
+ *
+ * This is a shorthand for \ref igraph_cattribute_EAP_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param eid Ids of the edges to set.
+ * \param value The new value of the attribute.
+ * \return Error code.
+ */
+#define SETEAP(graph,n,eid,value) (igraph_cattribute_EAP_set((graph),(n),(eid),(value)))
 
 /**
  * \define SETVANV
- *  Set a numeric vertex attribute for all vertices
+ * Set a numeric vertex attribute for all vertices
  *
  * This is a shorthand for \ref igraph_cattribute_VAN_setv().
  * \param graph The graph.
@@ -719,7 +848,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETVANV(graph,n,v) (igraph_cattribute_VAN_setv((graph),(n),(v)))
 /**
  * \define SETVABV
- *  Set a boolean vertex attribute for all vertices
+ * Set a boolean vertex attribute for all vertices
  *
  * This is a shorthand for \ref igraph_cattribute_VAB_setv().
  * \param graph The graph.
@@ -730,7 +859,7 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
 #define SETVABV(graph,n,v) (igraph_cattribute_VAB_setv((graph),(n),(v)))
 /**
  * \define SETVASV
- *  Set a string vertex attribute for all vertices
+ * Set a string vertex attribute for all vertices
  *
  * This is a shorthand for \ref igraph_cattribute_VAS_setv().
  * \param graph The graph.
@@ -740,8 +869,19 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  */
 #define SETVASV(graph,n,v) (igraph_cattribute_VAS_setv((graph),(n),(v)))
 /**
+ * \define SETVAPV
+ * Set a pointer vertex attribute for all vertices
+ *
+ * This is a shorthand for \ref igraph_cattribute_VAS_setv().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v Vector containing the new values of the attributes.
+ * \return Error code.
+ */
+#define SETVAPV(graph,n,v) (igraph_cattribute_VAP_setv((graph),(n),(v)))
+/**
  * \define SETEANV
- *  Set a numeric edge attribute for all edges
+ * Set a numeric edge attribute for all edges
  *
  * This is a shorthand for \ref igraph_cattribute_EAN_setv().
  * \param graph The graph.
@@ -769,6 +909,16 @@ IGRAPH_EXPORT void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g
  * \param v Vector containing the new values of the attributes.
  */
 #define SETEASV(graph,n,v) (igraph_cattribute_EAS_setv((graph),(n),(v)))
+/**
+ * \define SETEAPV
+ *  Set a pointer edge attribute for all edges
+ *
+ * This is a shorthand for \ref igraph_cattribute_EAP_setv().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v Vector containing the new values of the attributes.
+ */
+#define SETEAPV(graph,n,v) (igraph_cattribute_EAP_setv((graph),(n),(v)))
 
 /**
  * \define DELGA

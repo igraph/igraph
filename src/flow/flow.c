@@ -246,6 +246,7 @@ static igraph_error_t igraph_i_maxflow_undirected(const igraph_t *graph,
 #define RELABEL(v)     (igraph_i_mf_relabel((v), no_of_nodes, distance,       \
                         first, rescap, to, current,       \
                         stats, nrelabelsince))
+#undef GAP   /* from igraph_attributes.h */
 #define GAP(b)         (igraph_i_mf_gap((b), stats, buckets, ibuckets,        \
                                         no_of_nodes, distance))
 #define BFS()          (igraph_i_mf_bfs(&bfsq, source, target, no_of_nodes,   \
