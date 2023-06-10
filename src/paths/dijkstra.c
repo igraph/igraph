@@ -447,12 +447,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra_cutoff(const igraph_t *graph,
     igraph_integer_t i, to_reach;
 
     if (!weights) {
-        if (cutoff == -1) {
-            return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
-                    parents, inbound_edges);
-        } else {
-            IGRAPH_ERROR("Unweighted shortest paths with cutoff not implemented.", IGRAPH_UNIMPLEMENTED);
-        }
+        return igraph_get_shortest_paths_cutoff(graph, vertices, edges, from, to, mode,
+                    parents, inbound_edges, cutoff);
     }
 
     if (from < 0 || from >= no_of_nodes) {

@@ -150,6 +150,13 @@ IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                                             igraph_neimode_t mode,
                                             igraph_vector_int_t *parents,
                                             igraph_vector_int_t *inbound_edges);
+IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_cutoff(const igraph_t *graph,
+                                            igraph_vector_int_list_t *vertices,
+                                            igraph_vector_int_list_t *edges,
+                                            igraph_integer_t from, const igraph_vs_t to,
+                                            igraph_neimode_t mode,
+                                            igraph_vector_int_t *parents,
+                                            igraph_vector_int_t *inbound_edges, igraph_integer_t cutoff);
 IGRAPH_EXPORT igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
                                                       igraph_vector_int_list_t *vertices,
                                                       igraph_vector_int_list_t *edges,
