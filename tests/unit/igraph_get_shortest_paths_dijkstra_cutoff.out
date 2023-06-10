@@ -1,0 +1,21 @@
+Simple ring graph without weights:
+0
+0 1
+0 1 2 3
+0 1 2 3 4 5
+0 1 2
+0 1
+Same ring, but with weights:
+0
+0 1
+0 1 2 3
+0 9 8 7 6 5
+0 1 2
+0 1
+Same ring, same weights, cutoff 2:
+0
+0 1
+
+
+
+0 1

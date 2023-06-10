@@ -315,6 +315,18 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
     return igraph_distances_dijkstra(graph, res, from, to, weights, mode);
 }
 
+igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
+                                       igraph_vector_int_list_t *vertices,
+                                       igraph_vector_int_list_t *edges,
+                                       igraph_integer_t from,
+                                       igraph_vs_t to,
+                                       const igraph_vector_t *weights,
+                                       igraph_neimode_t mode,
+                                       igraph_vector_int_t *parents,
+                                       igraph_vector_int_t *inbound_edges) {
+    return igraph_get_shortest_paths_dijkstra_cutoff(
+            graph, vertices, edges, from, to, weights, mode, parents, inbound_edges, -1);
+}
 /**
  * \ingroup structural
  * \function igraph_get_shortest_paths_dijkstra
@@ -395,7 +407,7 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *
  * \example examples/simple/igraph_get_shortest_paths_dijkstra.c
  */
-igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_paths_dijkstra_cutoff(const igraph_t *graph,
                                        igraph_vector_int_list_t *vertices,
                                        igraph_vector_int_list_t *edges,
                                        igraph_integer_t from,
@@ -403,7 +415,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode,
                                        igraph_vector_int_t *parents,
-                                       igraph_vector_int_t *inbound_edges) {
+                                       igraph_vector_int_t *inbound_edges,
+                                       igraph_real_t cutoff) {
     /* Implementation details. This is the basic Dijkstra algorithm,
        with a binary heap. The heap is indexed, i.e. it stores not only
        the distances, but also which vertex they belong to. The other
@@ -434,8 +447,12 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_integer_t i, to_reach;
 
     if (!weights) {
-        return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
-                                         parents, inbound_edges);
+        if (cutoff == -1) {
+            return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
+                    parents, inbound_edges);
+        } else {
+            IGRAPH_ERROR("Unweighted shortest paths with cutoff not implemented.", IGRAPH_UNIMPLEMENTED);
+        }
     }
 
     if (from < 0 || from >= no_of_nodes) {
@@ -518,9 +535,11 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
             igraph_real_t curdist = VECTOR(dists)[tto];
             if (curdist < 0) {
                 /* This is the first finite distance */
-                VECTOR(dists)[tto] = altdist;
-                parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                if (cutoff == -1.0 || altdist <= cutoff) {
+                    VECTOR(dists)[tto] = altdist;
+                    parent_eids[tto] = edge + 1;
+                    IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                }
             } else if (altdist < curdist) {
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
