@@ -148,6 +148,15 @@ int main(void) {
 
     checks_and_print(&g, &vecs, &evecs, &parents, &inbound);
 
+    printf("Same ring with cutoff 3:\n");
+    igraph_get_shortest_paths_dijkstra_cutoff(&g, /*vertices=*/ &vecs,
+                                       /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs,
+                                       /*weights=*/ 0, /*mode=*/ IGRAPH_OUT,
+                                       &parents,
+                                       /*inbound_edges=*/ &inbound,
+                                       3);
+
+    checks_and_print(&g, &vecs, &evecs, &parents, &inbound);
     printf("Same ring, but with weights:\n");
 
     igraph_vector_view(&weights_vec, weights, sizeof(weights) / sizeof(weights[0]));
