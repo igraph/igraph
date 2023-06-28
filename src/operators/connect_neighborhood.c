@@ -168,25 +168,26 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
 
 /**
  * \function igraph_graph_power
- * \brief Connect each vertex to its neighborhood.
+ * \brief The kth power of a graph.
  *
  * \experimental
  *
- * This function adds new edges to the input graph. Each vertex is connected
- * to all vertices reachable by at most \p order steps from it
- * (unless a connection already existed).  In other words, the \p order power of
- * the graph is computed.
+ * The kth power of a graph G is a simple undirected graph where a pair of vertices
+ * is connected by a single edge if they are reachable from each other in G within
+ * at most k steps. The zeroth power of a graph has no edges, by convention. The first
+ * power is identical to the original graph, except that multiple edges and self-loops
+ * are removed.
  *
- * </para><para> For undirected graphs reachability is always
- * symmetric: if vertex A can be reached from vertex B in at
- * most \p order steps, then the opposite is also true. Only one
- * undirected (A,B) edge will be added in this case.
+ * <para></para>
+ * Graph and vertex attributes are preserved, but edge attributes are discarded.
  *
- * \param graph The input graph.
- * \param res The resulting graph.
- * \param order Integer constant, it gives the distance within which
- *    the vertices will be connected to the source vertex.
+ * \param graph The input graph. Edge directions are ignored.
+ * \param res The graph power of the given \p order.
+ * \param order Non-negative integer, the power to raise the graph to.
+ *    In other words, vertices within a distance \p order will be connected.
  * \return Error code.
+ *
+ * \sa \ref igraph_connect_neighborhood()
  *
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
  * graph, d is the average degree and k is the \p order argument.
@@ -203,7 +204,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
     igraph_adjlist_t al;
 
     if (order < 0) {
-        IGRAPH_ERRORF("Order cannot be negative, found %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Order must not be negative, found %" IGRAPH_PRId ".",
                 IGRAPH_EINVAL, order);
     }
 
