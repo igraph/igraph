@@ -192,9 +192,7 @@ static igraph_error_t igraph_i_random_walk_inclist(
                 igraph_integer_t j;
 
                 *cd = IGRAPH_CALLOC(1, igraph_vector_t);
-                if (*cd == NULL) {
-                    IGRAPH_ERROR("Random walk failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                }
+                IGRAPH_CHECK_OOM(*cd, "Insufficient memory for random walk.");
                 IGRAPH_CHECK(igraph_vector_init(*cd, degree));
 
                 IGRAPH_CHECK(igraph_vector_resize(&weight_temp, degree));

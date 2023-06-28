@@ -30,12 +30,16 @@
 </section>
 
 <section id="conversion-to-and-from-igraph-graphs"><title>Conversion to and from igraph graphs</title>
-<!-- doxrox-include igraph_hrg_dendrogram -->
+<!-- doxrox-include igraph_from_hrg_dendrogram -->
 <!-- doxrox-include igraph_hrg_create -->
 </section>
 
 <section id="predicting-missing-edges"><title>Predicting missing edges</title>
 <!-- doxrox-include igraph_hrg_predict -->
+</section>
+
+<section id="hrg-deprecated"><title>Deprecated functions</title>
+<!-- doxrox-include igraph_hrg_dendrogram -->
 </section>
 
 </chapter>

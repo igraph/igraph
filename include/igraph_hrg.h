@@ -98,8 +98,9 @@ IGRAPH_EXPORT igraph_error_t igraph_hrg_game(
     igraph_t *graph, const igraph_hrg_t *hrg
 );
 
-IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
-                                        const igraph_hrg_t *hrg);
+IGRAPH_EXPORT igraph_error_t igraph_from_hrg_dendrogram(
+    igraph_t *graph, const igraph_hrg_t *hrg, igraph_vector_t *prob
+);
 
 IGRAPH_EXPORT igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
                                        igraph_vector_int_t *parents,
@@ -119,6 +120,12 @@ IGRAPH_EXPORT igraph_error_t igraph_hrg_predict(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                                     const igraph_t *graph,
                                     const igraph_vector_t *prob);
+
+/* Deprecated functions: */
+
+IGRAPH_DEPRECATED IGRAPH_EXPORT igraph_error_t igraph_hrg_dendrogram(
+    igraph_t *graph, const igraph_hrg_t *hrg
+);
 
 __END_DECLS
 

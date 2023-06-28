@@ -240,7 +240,9 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
                 igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
-                if (!has) {
+                if (altdist == IGRAPH_INFINITY) {
+                    /* Ignore edges with positive infinite weight */
+                } else if (!has) {
                     /* This is the first non-infinite distance */
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
@@ -342,7 +344,8 @@ igraph_error_t igraph_average_path_length(const igraph_t *graph,
  *       non-negative for Dijkstra's algorithm to work. Additionally, no
  *       edge weight may be NaN. If either case does not hold, an error
  *       is returned. If this is a null pointer, then the unweighted
- *       version, \ref igraph_average_path_length() is called.
+ *       version, \ref igraph_average_path_length() is called. Edges with positive
+ *       infinite weight are ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param unconn If \c true, only those pairs are considered for the calculation
@@ -399,7 +402,8 @@ igraph_error_t igraph_average_path_length_dijkstra(const igraph_t *graph,
  *       edge weight may be NaN. If either case does not hold, an error
  *       is returned. If this is a null pointer, then the unweighted
  *       version, \ref igraph_average_path_length() is used in calculating
- *       the global efficiency.
+ *       the global efficiency. Edges with positive infinite weights are
+ *       ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \return Error code:
@@ -674,7 +678,8 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
  *       non-negative. Additionally, no edge weight may be NaN. If either
  *       case does not hold, an error is returned. If this is a null
  *       pointer, then the unweighted version,
- *       \ref igraph_average_path_length() is called.
+ *       \ref igraph_average_path_length() is called. Edges with positive
+ *       infinite weights are ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param mode How to determine the local neighborhood of each vertex
@@ -828,7 +833,8 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
  * \param weights The edge weights. They must be all non-negative.
- *    If a null pointer is given, all weights are assumed to be 1.
+ *    If a null pointer is given, all weights are assumed to be 1. Edges
+ *    with positive infinite weight are ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param mode How to determine the local neighborhood of each vertex
@@ -1073,7 +1079,7 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
  *
  * \param graph The input graph, can be directed or undirected.
  * \param weights The edge weights of the graph. Can be \c NULL for an
- *        unweighted graph.
+ *        unweighted graph. Edges with positive infinite weight are ignored.
  * \param res Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
  * \param from Pointer to an integer, if not \c NULL it will be set to the

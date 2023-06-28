@@ -38,8 +38,9 @@ __BEGIN_DECLS
  * \enumval IGRAPH_COLORING_GREEDY_DSATUR
  *    Choose the vertex with largest number of unique colors in its neighborhood, i.e. its
  *    "saturation degree". When multiple vertices have the same saturation degree, choose
- *    the one with the most not yet colored neighbors. This heuristic is known as "DSatur",
- *    and was introduced in Daniel Brélaz: New methods to color the vertices of a graph,
+ *    the one with the most not yet colored neighbors. Added in igraph 0.10.4. This heuristic
+ *    is known as "DSatur", and was proposed in
+ *    Daniel Brélaz: New methods to color the vertices of a graph,
  *    Commun. ACM 22, 4 (1979), 251–256. https://doi.org/10.1145/359094.359101
  */
 typedef enum {

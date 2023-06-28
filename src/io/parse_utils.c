@@ -28,7 +28,7 @@
  *     igraph_i_trim_whitespace(str, strlen(str), &res, &len);
  *
  * This does not carry a performance penalty, as the end of the string would need to be
- * determinted anyway.
+ * determined anyway.
  */
 void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res, size_t *res_len) {
     const char *beg = str, *end = str + str_len;
@@ -43,7 +43,7 @@ void igraph_i_trim_whitespace(const char *str, size_t str_len, const char **res,
 
 /* Converts a string to an integer. Throws an error if the result is not representable.
  *
- * The input is a not-necesarily-null-terminated string that must contain only the number.
+ * The input is a not-necessarily-null-terminated string that must contain only the number.
  * Any additional characters at the end of the string, such as whitespace, will trigger
  * a parsing error.
  *
@@ -64,9 +64,7 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
 
     if (dynamic_alloc) {
         tmp = IGRAPH_CALLOC(length+1, char);
-        if (tmp == NULL) {
-            IGRAPH_ERROR("Failed to parse integer.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(tmp, "Failed to parse integer.");
     } else {
         tmp = buffer;
     }
@@ -106,7 +104,7 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
 
 /* Converts a string to a real number. Throws an error if the result is not representable.
  *
- * The input is a not-necesarily-null-terminated string that must contain only the number.
+ * The input is a not-necessarily-null-terminated string that must contain only the number.
  * Any additional characters at the end of the string, such as whitespace, will trigger
  * a parsing error.
  *
@@ -126,9 +124,7 @@ igraph_error_t igraph_i_parse_real(const char *str, size_t length, igraph_real_t
 
     if (dynamic_alloc) {
         tmp = IGRAPH_CALLOC(length+1, char);
-        if (tmp == NULL) {
-            IGRAPH_ERROR("Failed to parse real number.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(tmp, "Failed to parse real number.");
     } else {
         tmp = buffer;
     }
@@ -279,7 +275,7 @@ igraph_error_t igraph_i_fget_real(FILE *file, igraph_real_t *value) {
  * numbers uses a decimal point instead of a comma.
  *
  * These functions attempt to set the locale only for the current thread on a best-effort
- * basis. On some platforms this is not possible, so the global locale will be changes.
+ * basis. On some platforms this is not possible, so the global locale will be changed.
  * This is not safe to do in multi-threaded programs (not even if igraph runs only in
  * a single thread).
  */
@@ -304,7 +300,7 @@ struct igraph_safelocale_s {
  *
  * igraph's foreign format readers and writers require a locale that uses a
  * decimal point instead of a decimal comma. This is a convenience function
- * that temporarily sets the C locale so that readers and writer would work
+ * that temporarily sets the C locale so that readers and writers would work
  * correctly. It \em must be paired with a call to \ref igraph_exit_safelocale(),
  * otherwise a memory leak will occur.
  *
@@ -343,9 +339,7 @@ igraph_error_t igraph_enter_safelocale(igraph_safelocale_t *loc) {
     l->original_locale = uselocale(l->c_locale);
 #else
     l->original_locale = strdup(setlocale(LC_NUMERIC, NULL));
-    if (! l->original_locale) {
-        IGRAPH_ERROR("Not enough memory.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(l->original_locale, "Not enough memory.");
 # ifdef HAVE__CONFIGTHREADLOCALE
     /* On Windows, we can enable per-thread locale */
     l->per_thread_locale = _configthreadlocale(0);
