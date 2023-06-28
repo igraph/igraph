@@ -172,19 +172,25 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  *
  * \experimental
  *
- * The kth power of a graph G is a simple undirected graph where a pair of vertices
- * is connected by a single edge if they are reachable from each other in G within
- * at most k steps. The zeroth power of a graph has no edges, by convention. The first
- * power is identical to the original graph, except that multiple edges and self-loops
+ * The kth power of a graph G is a simple graph where vertex \c u is connected to
+ * \c v by a single edge if \c v is reachable from \c u in G within at most k steps.
+ * By convention, the zeroth power of a graph has no edges. The first power is
+ * identical to the original graph, except that multiple edges and self-loops
  * are removed.
+ *
+ * <para></para>
+ * Graph power is usually defined only for undirected graphs. igraph extends the concept
+ * to directed graphs. To ignore edge directions in the input, set the \p directed
+ * parameter to \c false. In this case, the result will be an undirected graph.
  *
  * <para></para>
  * Graph and vertex attributes are preserved, but edge attributes are discarded.
  *
- * \param graph The input graph. Edge directions are ignored.
+ * \param graph The input graph.
  * \param res The graph power of the given \p order.
  * \param order Non-negative integer, the power to raise the graph to.
  *    In other words, vertices within a distance \p order will be connected.
+ * \param directed Logical, whether to take edge directions into account.
  * \return Error code.
  *
  * \sa \ref igraph_connect_neighborhood()
@@ -209,10 +215,8 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
     }
 
     IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
-    if (igraph_has_attribute_table()) {
-        IGRAPH_I_ATTRIBUTE_DESTROY(res);
-        IGRAPH_I_ATTRIBUTE_COPY(res, graph, 1, 1, 0);
-    }
+    IGRAPH_I_ATTRIBUTE_DESTROY(res);
+    IGRAPH_I_ATTRIBUTE_COPY(res, graph, /* graph */ true, /* vertex */ true, /* edge */ false);
     if (order == 0) {
         return IGRAPH_SUCCESS;
     }
