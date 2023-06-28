@@ -309,15 +309,11 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to find motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     subg = IGRAPH_CALLOC(no_of_nodes, char);
-    if (subg == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(subg, "Insufficient memory to find motifs.");
     IGRAPH_FINALLY(igraph_free, subg);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
@@ -504,32 +500,26 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
  * \function igraph_motifs_randesu_estimate
  * \brief Estimate the total number of motifs in a graph.
  *
- * This function estimates the total number of weakly connected induced
- * subgraphs, called motifs, of a fixed number of vertices. For
- * example, an undirected complete graph on \c n vertices
- * will have one motif of size \c n, and \c n motifs
+ * This function estimates the total number of (weakly) connected induced
+ * subgraphs on \p size vertices. For example, an undirected complete graph
+ * on \c n vertices will have one motif of size \c n, and \c n motifs
  * of \p size <code>n - 1</code>. As another example, one triangle
  * and a separate vertex will have zero motifs of size four.
  *
  * </para><para>
  * This function is useful for large graphs for which it is not
- * feasible to count all the different motifs, because there are very
+ * feasible to count all connected subgraphs, as there are too
  * many of them.
  *
  * </para><para>
- * The total number of motifs is estimated by taking a sample of
- * vertices and counts all motifs in which these vertices are
- * included. (There is also a \p cut_prob parameter which gives the
- * probabilities to cut a branch of the search tree.)
- *
- * </para><para>
- * Directed motifs will be counted in directed graphs and undirected
- * motifs in undirected graphs.
+ * The estimate is made by taking a sample of vertices and counting all
+ * connected subgraphs in which these vertices are included. There is also
+ * a \p cut_prob parameter which gives the probabilities to cut a branch of
+ * the search tree.
  *
  * \param graph The graph object to study.
- * \param est Pointer to an integer type, the result will be stored
- *        here.
- * \param size The size of the motifs to look for.
+ * \param est Pointer to an integer, the result will be stored here.
+ * \param size The size of the subgraphs to look for.
  * \param cut_prob Vector giving the probabilities to cut a branch of
  *        the search tree and omit counting the motifs in that branch.
  *        It contains a probability for each level. Supply \p size
@@ -543,6 +533,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
  *        argument is used to create a sample of vertices drawn with
  *        uniform probability.
  * \return Error code.
+ *
  * \sa \ref igraph_motifs_randesu(), \ref igraph_motifs_randesu_no().
  *
  * Time complexity: TODO.
@@ -584,9 +575,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to count motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
@@ -597,9 +586,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 
     if (parsample == NULL) {
         sample = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (sample == NULL) {
-            IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(sample, "Insufficient memory to count motifs.");
         IGRAPH_FINALLY(igraph_free, sample);
         IGRAPH_VECTOR_INT_INIT_FINALLY(sample, 0);
         IGRAPH_CHECK(igraph_random_sample(sample, 0, no_of_nodes - 1, sample_size));
@@ -744,10 +731,9 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
  * \function igraph_motifs_randesu_no
  * \brief Count the total number of motifs in a graph.
  *
- * </para><para>
- * This function counts the total number of motifs in a graph,
- * i.e. the number of of (weakly) connected triplets or quadruplets,
- * without assigning isomorphism classes to them.
+ * This function counts the total number of (weakly) connected
+ * induced subgraphs on \p size vertices, without assigning isomorphism
+ * classes to them. Arbitrarily large motif sizes are supported.
  *
  * \param graph The graph object to study.
  * \param no Pointer to an integer type, the result will be stored
@@ -784,9 +770,7 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to count motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);

@@ -171,9 +171,10 @@ On most systems, the executable can be run by simply typing its name like this:
 ./igraph_test
 </programlisting>
 If you use dynamic linking and the <command>igraph</command>
-library is not in a standard place, you may need to add its location to the
+library is not installed in a standard place, you may need to add its location to the
 <envar>LD_LIBRARY_PATH</envar> (Linux), <envar>DYLD_LIBRARY_PATH</envar> (macOS)
-or <envar>PATH</envar> (Windows) environment variables.
+or <envar>PATH</envar> (Windows) environment variables. This is typically necessary
+on Windows systems.
 </para>
 
 </section>

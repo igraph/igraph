@@ -10,6 +10,7 @@
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
  - `igraph_isomorphic()` now supports multigraphs.
+ - Shortest path related functions now consistently ignore edges with positive infinite weights.
 
 ### Fixed
 
@@ -28,10 +29,12 @@
 - `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
 - `igraph_hub_score()` and `igraph_authority_score()` are now deprecated. Use `igraph_hub_and_authority_scores()` instead.
 - `igraph_get_incidence()` is now deprecated; its new name is `igraph_get_biadjacency()` to reflect that the returned matrix is an _adjacency_ matrix between pairs of vertices and not an _incidence_ matrix between vertices and edges. The new name is kept available until at least igraph 0.11. We plan to re-use the name in later versions to provide a proper incidence matrix where the rows are vertices and the columns are edges.
+- `igraph_hrg_dendrogram()` is deprecated because it requires an attribute handler and it goes against the convention of returning attributes in vectors where possible. Use `igraph_from_hrg_dendrogram()` instead, which constructs the dendrogram as an igraph graph _and_ returns the associated probabilities in a vector.
 
 ### Other
 
  - Improved performance for `igraph_vertex_connectivity()`.
+ - `igraph_simplify()` makes use of the cache, and avoids simplification when the graph is already known to be simple.
  - Documentation improvements.
 
 ## [0.10.4] - 2023-01-26
@@ -39,7 +42,7 @@
 ### Added
 
  - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
- - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics through `IGRAPH_COLORING_GREEDY_DSATUR` (#2284, thanks to @professorcode1).
 
 ### Changed
 

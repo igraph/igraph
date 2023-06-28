@@ -31,13 +31,12 @@ int main(void) {
     igraph_t full, tree;
     igraph_hrg_t hrg;
     igraph_t dendrogram;
+    igraph_vector_t prob;
+
     // int i, j;
     // igraph_vector_int_t neis;
 
     igraph_rng_seed(igraph_rng_default(), 42);
-
-    // We need attributes
-    igraph_set_attribute_table(&igraph_cattribute_table);
 
     igraph_full(&full, 10, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     igraph_kary_tree(&tree, 15, /*children=*/ 2, /*type=*/ IGRAPH_TREE_UNDIRECTED);
@@ -52,7 +51,8 @@ int main(void) {
     igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 0);
 
     // Create a graph from it
-    igraph_hrg_dendrogram(&dendrogram, &hrg);
+    igraph_vector_init(&prob, 0);
+    igraph_from_hrg_dendrogram(&dendrogram, &hrg, &prob);
 
     // Print the tree, with labels
     // igraph_vector_int_init(&neis, 0);
@@ -66,17 +66,18 @@ int main(void) {
     // }
     // igraph_vector_int_destroy(&neis);
 
+    igraph_vector_destroy(&prob);
     igraph_destroy(&dendrogram);
     igraph_hrg_destroy(&hrg);
     igraph_destroy(&graph);
 
-    // test small graph
+    // test small graph, omit probabilities
     igraph_small(&graph, 3, IGRAPH_UNDIRECTED,
                  0,1,
                  -1);
     igraph_hrg_init(&hrg, igraph_vcount(&graph));
     igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 0);
-    igraph_hrg_dendrogram(&dendrogram, &hrg);
+    igraph_from_hrg_dendrogram(&dendrogram, &hrg, NULL);
     igraph_destroy(&dendrogram);
     igraph_hrg_destroy(&hrg);
     igraph_destroy(&graph);

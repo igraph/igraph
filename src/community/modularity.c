@@ -97,7 +97,7 @@
  *                   It does not have to be consecutive, i.e. empty communities
  *                   are allowed.
  * \param weights    Weight vector or \c NULL if no weights are specified.
- * \param resolution The resolutin parameter \c γ. Must not be negative.
+ * \param resolution The resolution parameter \c γ. Must not be negative.
  *                   Set it to 1 to use the classical definition of modularity.
  * \param directed   Whether to use the directed or undirected version of modularity.
  *                   Ignored for undirected graphs.
