@@ -199,36 +199,38 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * graph, d is the average degree and k is the \p order argument.
  */
 igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
-                                  igraph_integer_t order) {
+                                  igraph_integer_t order, igraph_bool_t directed) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_int_t q;
     igraph_vector_int_t edges;
-    igraph_integer_t i, j, in;
+    igraph_integer_t in;
     igraph_integer_t *added;
     igraph_vector_int_t neis;
     igraph_adjlist_t al;
+    igraph_bool_t dir = igraph_is_directed(graph) && directed;
 
     if (order < 0) {
         IGRAPH_ERRORF("Order must not be negative, found %" IGRAPH_PRId ".",
                 IGRAPH_EINVAL, order);
     }
 
-    IGRAPH_CHECK(igraph_empty(res, igraph_vcount(graph), igraph_is_directed(graph)));
+    IGRAPH_CHECK(igraph_empty(res, no_of_nodes, dir));
     IGRAPH_I_ATTRIBUTE_DESTROY(res);
     IGRAPH_I_ATTRIBUTE_COPY(res, graph, /* graph */ true, /* vertex */ true, /* edge */ false);
     if (order == 0) {
         return IGRAPH_SUCCESS;
     }
 
-    /* initialize res with a copy of the graph, but with multi-edges and loops removed */
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT, IGRAPH_NO_LOOPS, false));
+    /* Initialize res with a copy of the graph, but with with multi-edges and self-loops removed.
+     * Also convert the graph to udirected if this is requested. */
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, dir ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *tmp = igraph_adjlist_get(&al, i);
-        for (j = 0; j < igraph_vector_int_size(tmp); j++) {
-            if (igraph_is_directed(graph) || i < VECTOR(*tmp)[j]) {
+        for (igraph_integer_t j = 0; j < igraph_vector_int_size(tmp); j++) {
+            if (dir || i < VECTOR(*tmp)[j]) {
                 igraph_vector_int_push_back(&edges, i);
                 igraph_vector_int_push_back(&edges, VECTOR(*tmp)[j]);
             }
@@ -242,21 +244,21 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
         return IGRAPH_SUCCESS;
     }
 
-    /*Order > 1, so add more edges */
+    /* order > 1, so add more edges. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(added, "Cannot take the graph power.");
+    IGRAPH_CHECK_OOM(added, "Insufficient memory for graph power.");
 
     IGRAPH_FINALLY(igraph_free, added);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         added[i] = i + 1;
         IGRAPH_CHECK(igraph_neighbors(res, &neis, i, IGRAPH_OUT));
         in = igraph_vector_int_size(&neis);
         if (order > 1) {
-            for (j = 0; j < in; j++) {
+            for (igraph_integer_t j = 0; j < in; j++) {
                 igraph_integer_t nei = VECTOR(neis)[j];
                 added[nei] = i + 1;
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
@@ -272,7 +274,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
             n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {
-                for (j = 0; j < n; j++) {
+                for (igraph_integer_t j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
@@ -285,7 +287,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
                     }
                 }
             } else {
-                for (j = 0; j < n; j++) {
+                for (igraph_integer_t j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;

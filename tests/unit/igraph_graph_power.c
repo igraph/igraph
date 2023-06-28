@@ -20,7 +20,7 @@
 
 void print_result(igraph_t *g, igraph_integer_t order) {
     igraph_t res;
-    igraph_graph_power(g, &res, order);
+    igraph_graph_power(g, &res, order, IGRAPH_DIRECTED);
     print_graph_canon(&res);
     if ((order == 0 || order == 1) && igraph_has_attribute_table()) {
         print_attributes(&res);
@@ -96,7 +96,7 @@ int main(void) {
     VERIFY_FINALLY_STACK();
 
     printf("Check negative order error.\n");
-    CHECK_ERROR(igraph_graph_power(&g, NULL, -1), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_graph_power(&g, NULL, -1, IGRAPH_DIRECTED), IGRAPH_EINVAL);
     igraph_destroy(&g);
 
     return 0;
