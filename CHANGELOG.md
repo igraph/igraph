@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
+
 ### Changes
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
