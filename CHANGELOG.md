@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_graph_power()` computes the kth power of a graph.
+
 ### Changes
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
