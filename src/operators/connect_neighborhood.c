@@ -202,11 +202,8 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
                                   igraph_integer_t order, igraph_bool_t directed) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_dqueue_int_t q;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t edges;
-    igraph_integer_t in;
-    igraph_integer_t *added;
-    igraph_vector_int_t neis;
     igraph_adjlist_t al;
     igraph_bool_t dir = igraph_is_directed(graph) && directed;
     igraph_neimode_t mode = dir ? IGRAPH_OUT : IGRAPH_ALL;
@@ -226,8 +223,12 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
     /* Initialize res with a copy of the graph, but with with multi-edges and self-loops removed.
      * Also convert the graph to udirected if this is requested. */
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+
+    /* Reserve initial space for no_of_edges. */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges);
+    igraph_vector_int_clear(&edges);
+
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         igraph_vector_int_t *tmp = igraph_adjlist_get(&al, i);
         for (igraph_integer_t j = 0; j < igraph_vector_int_size(tmp); j++) {
@@ -237,77 +238,76 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
             }
         }
     }
-    IGRAPH_CHECK(igraph_add_edges(res, &edges, NULL));
-    igraph_adjlist_destroy(&al);
-    igraph_vector_int_destroy(&edges);
-    IGRAPH_FINALLY_CLEAN(2);
-    if (order == 1) {
-        return IGRAPH_SUCCESS;
-    }
 
-    /* order > 1, so add more edges. */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+    if (order > 1) {
+        /* order > 1, so add more edges. */
 
-    added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    IGRAPH_CHECK_OOM(added, "Insufficient memory for graph power.");
-    IGRAPH_FINALLY(igraph_free, added);
+        igraph_integer_t d_i, d_actnode;
+        igraph_integer_t *added;
+        const igraph_vector_int_t *neis;
+        igraph_dqueue_int_t q;
 
-    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
+        added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
+        IGRAPH_CHECK_OOM(added, "Insufficient memory for graph power.");
+        IGRAPH_FINALLY(igraph_free, added);
 
-    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
-        added[i] = i + 1;
-        IGRAPH_CHECK(igraph_neighbors(res, &neis, i, mode));
-        in = igraph_vector_int_size(&neis);
-        if (order > 1) {
-            for (igraph_integer_t j = 0; j < in; j++) {
-                igraph_integer_t nei = VECTOR(neis)[j];
+        IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
+
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+            added[i] = i + 1;
+            neis = igraph_adjlist_get(&al, i);
+            d_i = igraph_vector_int_size(neis);
+
+            for (igraph_integer_t j = 0; j < d_i; j++) {
+                igraph_integer_t nei = VECTOR(*neis)[j];
                 added[nei] = i + 1;
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
                 IGRAPH_CHECK(igraph_dqueue_int_push(&q, 1));
             }
-        }
 
-        while (!igraph_dqueue_int_empty(&q)) {
-            igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
-            igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
-            igraph_integer_t n;
-            IGRAPH_CHECK(igraph_neighbors(res, &neis, actnode, mode));
-            n = igraph_vector_int_size(&neis);
+            while (!igraph_dqueue_int_empty(&q)) {
+                igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
+                igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
 
-            if (actdist < order - 1) {
-                for (igraph_integer_t j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neis)[j];
-                    if (added[nei] != i + 1) {
-                        added[nei] = i + 1;
-                        IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
-                        IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
-                        if (igraph_is_directed(res) || i < nei) {
-                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
+                neis = igraph_adjlist_get(&al, actnode);
+                d_actnode = igraph_vector_int_size(neis);
+
+                if (actdist < order - 1) {
+                    for (igraph_integer_t j = 0; j < d_actnode; j++) {
+                        igraph_integer_t nei = VECTOR(*neis)[j];
+                        if (added[nei] != i + 1) {
+                            added[nei] = i + 1;
+                            IGRAPH_CHECK(igraph_dqueue_int_push(&q, nei));
+                            IGRAPH_CHECK(igraph_dqueue_int_push(&q, actdist + 1));
+                            if (dir || i < nei) {
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
+                            }
+                        }
+                    }
+                } else {
+                    for (igraph_integer_t j = 0; j < d_actnode; j++) {
+                        igraph_integer_t nei = VECTOR(*neis)[j];
+                        if (added[nei] != i + 1) {
+                            added[nei] = i + 1;
+                            if (dir || i < nei) {
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
+                                IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
+                            }
                         }
                     }
                 }
-            } else {
-                for (igraph_integer_t j = 0; j < n; j++) {
-                    igraph_integer_t nei = VECTOR(neis)[j];
-                    if (added[nei] != i + 1) {
-                        added[nei] = i + 1;
-                        if (igraph_is_directed(res) || i < nei) {
-                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
-                            IGRAPH_CHECK(igraph_vector_int_push_back(&edges, nei));
-                        }
-                    }
-                }
-            }
 
-        } /* while q not empty */
-    } /* for i < no_of_nodes */
+            } /* while q not empty */
+        } /* for i < no_of_nodes */
 
-    igraph_vector_int_destroy(&neis);
-    igraph_dqueue_int_destroy(&q);
-    igraph_free(added);
-    IGRAPH_FINALLY_CLEAN(3);
+        igraph_dqueue_int_destroy(&q);
+        igraph_free(added);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_add_edges(res, &edges, 0));
 
