@@ -32,22 +32,24 @@
 
 /**
  * \function igraph_connect_neighborhood
- * \brief Graph power: connect each vertex to its neighborhood.
+ * \brief Connects each vertex to its neighborhood.
  *
  * This function adds new edges to the input graph. Each vertex is connected
  * to all vertices reachable by at most \p order steps from it
- * (unless a connection already existed).  In other words, the \p order power of
- * the graph is computed.
+ * (unless a connection already existed).
  *
- * </para><para> Note that the input graph is modified in place, no
+ * </para><para>
+ * Note that the input graph is modified in place, no
  * new graph is created. Call \ref igraph_copy() if you want to keep
  * the original graph as well.
  *
- * </para><para> For undirected graphs reachability is always
+ * </para><para>
+ * For undirected graphs reachability is always
  * symmetric: if vertex A can be reached from vertex B in at
  * most \p order steps, then the opposite is also true. Only one
  * undirected (A,B) edge will be added in this case.
- * \param graph The input graph, this is the output graph as well.
+ *
+ * \param graph The input graph. It will be modified in-place.
  * \param order Integer constant, it gives the distance within which
  *    the vertices will be connected to the source vertex.
  * \param mode Constant, it specifies how the neighborhood search is
@@ -57,7 +59,8 @@
  *    considered as an undirected one.
  * \return Error code.
  *
- * \sa \ref igraph_square_lattice() uses this function to connect the
+ * \sa \ref igraph_graph_power() to compute the kth power of a graph;
+ * \ref igraph_square_lattice() uses this function to connect the
  * neighborhood of the vertices.
  *
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
@@ -74,12 +77,12 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
     igraph_vector_int_t neis;
 
     if (order < 0) {
-        IGRAPH_ERRORF("Order can not be negative, found %" IGRAPH_PRId ".",
+        IGRAPH_ERRORF("Order must not be negative, found %" IGRAPH_PRId ".",
                 IGRAPH_EINVAL, order);
     }
 
     if (order < 2) {
-        IGRAPH_WARNING("Order smaller than two, graph will be unchanged");
+        IGRAPH_WARNING("Order smaller than two, graph will be unchanged.");
     }
 
     if (!igraph_is_directed(graph)) {
@@ -158,7 +161,7 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
     igraph_free(added);
     IGRAPH_FINALLY_CLEAN(3);
 
-    IGRAPH_CHECK(igraph_add_edges(graph, &edges, 0));
+    IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -193,7 +196,8 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * \param directed Logical, whether to take edge directions into account.
  * \return Error code.
  *
- * \sa \ref igraph_connect_neighborhood()
+ * \sa \ref igraph_connect_neighborhood() to connect each vertex to its
+ * neighborhood, modifying a graph in-place.
  *
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
  * graph, d is the average degree and k is the \p order argument.
