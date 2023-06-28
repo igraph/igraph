@@ -168,6 +168,7 @@ add_library(
   community/spinglass/NetDataTypes.cpp
   community/spinglass/NetRoutines.cpp
   community/spinglass/pottsmodel_2.cpp
+  community/voronoi.c
   community/walktrap/walktrap_communities.cpp
   community/walktrap/walktrap_graph.cpp
   community/walktrap/walktrap_heap.cpp
