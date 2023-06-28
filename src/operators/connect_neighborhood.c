@@ -181,12 +181,12 @@ igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t ord
  * identical to the original graph, except that multiple edges and self-loops
  * are removed.
  *
- * <para></para>
+ * </para><para>
  * Graph power is usually defined only for undirected graphs. igraph extends the concept
  * to directed graphs. To ignore edge directions in the input, set the \p directed
  * parameter to \c false. In this case, the result will be an undirected graph.
  *
- * <para></para>
+ * </para><para>
  * Graph and vertex attributes are preserved, but edge attributes are discarded.
  *
  * \param graph The input graph.
