@@ -1,8 +1,14 @@
-Graph with no vertices:
+Directed graph with no vertices:
+directed: true
+vcount: 0
+edges: {
+}
+Ignore edge directions:
 directed: false
 vcount: 0
 edges: {
 }
+
 Basic example, A->B->C, directed, order 2:
 directed: true
 vcount: 3
@@ -11,6 +17,15 @@ edges: {
 0 2
 1 2
 }
+Ignore edge directions:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 2
+1 2
+}
+
 Basic example, A->B->C, undirected, order 2:
 directed: false
 vcount: 3
@@ -19,6 +34,7 @@ edges: {
 0 2
 1 2
 }
+
 Basic example, A->B<-C, directed, order 2:
 directed: true
 vcount: 3
@@ -26,6 +42,15 @@ edges: {
 0 1
 2 1
 }
+Ignore edge directions:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 2
+1 2
+}
+
 Basic example, A<-B<-C, directed, order 2:
 directed: true
 vcount: 3
@@ -34,6 +59,15 @@ edges: {
 2 0
 2 1
 }
+Ignore edge directions:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 2
+1 2
+}
+
 Basic example, A->B->C->A, directed, order 2:
 directed: true
 vcount: 3
@@ -45,11 +79,13 @@ edges: {
 2 0
 2 1
 }
+
 Directed graph with loops and multiple edges, order 0:
 directed: true
 vcount: 6
 edges: {
 }
+
 Directed graph with loops and multiple edges, order 0, with attributes set:
 directed: true
 vcount: 6
@@ -141,4 +177,5 @@ edges: {
 2 4
 3 4
 }
+
 Check negative order error.

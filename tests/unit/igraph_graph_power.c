@@ -18,9 +18,9 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void print_result(igraph_t *g, igraph_integer_t order) {
+void print_result(igraph_t *g, igraph_integer_t order, igraph_bool_t directed) {
     igraph_t res;
-    igraph_graph_power(g, &res, order, IGRAPH_DIRECTED);
+    igraph_graph_power(g, &res, order, directed);
     print_graph_canon(&res);
     if ((order == 0 || order == 1) && igraph_has_attribute_table()) {
         print_attributes(&res);
@@ -32,70 +32,78 @@ int main(void) {
     igraph_t g;
 
 
-    printf("Graph with no vertices:\n");
-    igraph_small(&g, IGRAPH_UNDIRECTED, 0, -1);
-    print_result(&g, 10);
+    printf("Directed graph with no vertices:\n");
+    igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
+    print_result(&g, 10, IGRAPH_DIRECTED);
+    printf("Ignore edge directions:\n");
+    print_result(&g, 10, IGRAPH_UNDIRECTED);
     igraph_destroy(&g);
 
-    printf("Basic example, A->B->C, directed, order 2:\n");
+    printf("\nBasic example, A->B->C, directed, order 2:\n");
     igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, -1);
-    print_result(&g, 2);
+    print_result(&g, 2, IGRAPH_DIRECTED);
+    printf("Ignore edge directions:\n");
+    print_result(&g, 2, IGRAPH_UNDIRECTED);
     igraph_destroy(&g);
 
-    printf("Basic example, A->B->C, undirected, order 2:\n");
+    printf("\nBasic example, A->B->C, undirected, order 2:\n");
     igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, -1);
-    print_result(&g, 2);
+    print_result(&g, 2, IGRAPH_DIRECTED);
     igraph_destroy(&g);
 
-    printf("Basic example, A->B<-C, directed, order 2:\n");
+    printf("\nBasic example, A->B<-C, directed, order 2:\n");
     igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 2,1, -1);
-    print_result(&g, 2);
+    print_result(&g, 2, IGRAPH_DIRECTED);
+    printf("Ignore edge directions:\n");
+    print_result(&g, 2, IGRAPH_UNDIRECTED);
     igraph_destroy(&g);
 
-    printf("Basic example, A<-B<-C, directed, order 2:\n");
+    printf("\nBasic example, A<-B<-C, directed, order 2:\n");
     igraph_small(&g, 3, IGRAPH_DIRECTED, 1,0, 2,1, -1);
-    print_result(&g, 2);
+    print_result(&g, 2, IGRAPH_DIRECTED);
+    printf("Ignore edge directions:\n");
+    print_result(&g, 2, IGRAPH_UNDIRECTED);
     igraph_destroy(&g);
 
-    printf("Basic example, A->B->C->A, directed, order 2:\n");
+    printf("\nBasic example, A->B->C->A, directed, order 2:\n");
     igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, -1);
-    print_result(&g, 2);
+    print_result(&g, 2, IGRAPH_DIRECTED);
     igraph_destroy(&g);
 
-    printf("Directed graph with loops and multiple edges, order 0:\n");
+    printf("\nDirected graph with loops and multiple edges, order 0:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    print_result(&g, 0);
+    print_result(&g, 0, IGRAPH_DIRECTED);
     igraph_destroy(&g);
 
-    printf("Directed graph with loops and multiple edges, order 0, with attributes set:\n");
+    printf("\nDirected graph with loops and multiple edges, order 0, with attributes set:\n");
     igraph_set_attribute_table(&igraph_cattribute_table);
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
     SETGAB(&g, "bool_graph_attr", 1);
     SETEAB(&g, "bool_edge_attr", 0, 1);
     SETVAB(&g, "bool_vertex_attr", 0, 1);
 
-    print_result(&g, 0);
+    print_result(&g, 0, IGRAPH_DIRECTED);
 
     printf("Same graph, order 1:\n");
-    print_result(&g, 1);
+    print_result(&g, 1, IGRAPH_DIRECTED);
 
     printf("Same starting graph, order 2:\n");
-    print_result(&g, 2);
+    print_result(&g, 2, IGRAPH_DIRECTED);
 
     printf("Same starting graph, order 3:\n");
-    print_result(&g, 3);
+    print_result(&g, 3, IGRAPH_DIRECTED);
 
     printf("Same starting graph, order 12:\n");
-    print_result(&g, 12);
+    print_result(&g, 12, IGRAPH_DIRECTED);
 
     printf("Same starting graph, but undirected, order 2:\n");
     igraph_destroy(&g);
     igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    print_result(&g, 2);
+    print_result(&g, 2, IGRAPH_DIRECTED);
 
     VERIFY_FINALLY_STACK();
 
-    printf("Check negative order error.\n");
+    printf("\nCheck negative order error.\n");
     CHECK_ERROR(igraph_graph_power(&g, NULL, -1, IGRAPH_DIRECTED), IGRAPH_EINVAL);
     igraph_destroy(&g);
 
