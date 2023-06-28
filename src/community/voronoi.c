@@ -472,6 +472,10 @@ static igraph_error_t get_modularity(igraph_real_t r, igraph_real_t *modularity,
  * New Journal of Physics 16, 063007 (2014)
  * https://doi.org/10.1088/1367-2630/16/6/063007
  *
+ * </para><para>
+ * Molnár et al, Community Detection in Directed Weighted Networks using Voronoi Partitioning,
+ * https://arxiv.org/abs/2304.12389
+ *
  * \param graph The input graph. It must be simple.
  * \param membership If not \c NULL, the membership of each vertex is returned here.
  * \param generators If not \c NULL, the generator points used for Voronoi partitioning are returned here.
@@ -529,7 +533,8 @@ igraph_error_t igraph_community_voronoi(
          * mutual edges are effectively multi-edges. */
         IGRAPH_CHECK(igraph_has_mutual(graph, &has_mutual, false));
         if (has_mutual) {
-            IGRAPH_ERROR("The graph must be simple for Voronoi communities. Mutual directed edges are effectively multi-edges when ignoring edge directions.",
+            IGRAPH_ERROR("The graph must be simple for Voronoi communities. "
+                         "Mutual directed edges are effectively multi-edges when ignoring edge directions.",
                          IGRAPH_EINVAL);
         }
     }
