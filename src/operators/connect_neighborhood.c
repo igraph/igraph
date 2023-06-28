@@ -209,6 +209,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
     igraph_vector_int_t neis;
     igraph_adjlist_t al;
     igraph_bool_t dir = igraph_is_directed(graph) && directed;
+    igraph_neimode_t mode = dir ? IGRAPH_OUT : IGRAPH_ALL;
 
     if (order < 0) {
         IGRAPH_ERRORF("Order must not be negative, found %" IGRAPH_PRId ".",
@@ -224,7 +225,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
 
     /* Initialize res with a copy of the graph, but with with multi-edges and self-loops removed.
      * Also convert the graph to udirected if this is requested. */
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, dir ? IGRAPH_OUT : IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
@@ -246,16 +247,17 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
 
     /* order > 1, so add more edges. */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
+
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
     IGRAPH_CHECK_OOM(added, "Insufficient memory for graph power.");
-
     IGRAPH_FINALLY(igraph_free, added);
+
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         added[i] = i + 1;
-        IGRAPH_CHECK(igraph_neighbors(res, &neis, i, IGRAPH_OUT));
+        IGRAPH_CHECK(igraph_neighbors(res, &neis, i, mode));
         in = igraph_vector_int_size(&neis);
         if (order > 1) {
             for (igraph_integer_t j = 0; j < in; j++) {
@@ -270,7 +272,7 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
             igraph_integer_t actnode = igraph_dqueue_int_pop(&q);
             igraph_integer_t actdist = igraph_dqueue_int_pop(&q);
             igraph_integer_t n;
-            IGRAPH_CHECK(igraph_neighbors(res, &neis, actnode, IGRAPH_OUT));
+            IGRAPH_CHECK(igraph_neighbors(res, &neis, actnode, mode));
             n = igraph_vector_int_size(&neis);
 
             if (actdist < order - 1) {

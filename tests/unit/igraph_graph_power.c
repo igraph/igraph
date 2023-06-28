@@ -68,6 +68,15 @@ int main(void) {
     printf("\nBasic example, A->B->C->A, directed, order 2:\n");
     igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, 2,0, -1);
     print_result(&g, 2, IGRAPH_DIRECTED);
+    printf("Ignore edge directions:\n");
+    print_result(&g, 2, IGRAPH_UNDIRECTED);
+    igraph_destroy(&g);
+
+    printf("\nBasic example, A->B<->C->A, directed, order 2:\n");
+    igraph_small(&g, 3, IGRAPH_DIRECTED, 0,1, 1,2, 2,1, 2,0, -1);
+    print_result(&g, 2, IGRAPH_DIRECTED);
+    printf("Ignore edge directions:\n");
+    print_result(&g, 2, IGRAPH_UNDIRECTED);
     igraph_destroy(&g);
 
     printf("\nDirected graph with loops and multiple edges, order 0:\n");

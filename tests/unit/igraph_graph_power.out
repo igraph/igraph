@@ -79,6 +79,35 @@ edges: {
 2 0
 2 1
 }
+Ignore edge directions:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 2
+1 2
+}
+
+Basic example, A->B<->C->A, directed, order 2:
+directed: true
+vcount: 3
+edges: {
+0 1
+0 2
+1 0
+1 2
+2 0
+2 1
+}
+Ignore edge directions:
+directed: false
+vcount: 3
+edges: {
+0 1
+0 2
+1 2
+1 2
+}
 
 Directed graph with loops and multiple edges, order 0:
 directed: true
