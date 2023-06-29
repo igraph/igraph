@@ -4,6 +4,7 @@
 
 ### Added
 
+ - `igraph_graph_power()` computes the kth power of a graph (experimental function).
  - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
 
 ### Changes
