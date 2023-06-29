@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - Compatibility with libxml2 2.11
+
 ## [0.10.5] - 2023-06-29
 
 ### Added
@@ -9,7 +13,7 @@
  - `igraph_graph_power()` computes the kth power of a graph (experimental function).
  - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
 
-### Changes
+### Changed
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
  - `igraph_isomorphic()` now supports multigraphs.
