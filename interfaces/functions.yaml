@@ -1674,7 +1674,7 @@ igraph_community_voronoi:
         OPTIONAL OUT VECTOR_INT membership,
         OPTIONAL OUT VERTEX_INDICES generators,
         OPTIONAL OUT REAL modularity,
-        OPTIONAL EDGE_LENGTH lengths, OPTIONAL EDGEWEIGHTS weights,
+        OPTIONAL EDGE_LENGTHS lengths, OPTIONAL EDGEWEIGHTS weights,
         NEIMODE mode=OUT, REAL radius=-1
     DEPS: generators ON graph, weights ON graph, lengths ON graph
 
