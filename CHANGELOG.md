@@ -22,6 +22,13 @@
 
 ## [master]
 
+## [0.10.5] - 2023-06-29
+
+### Added
+
+ - `igraph_graph_power()` computes the kth power of a graph (experimental function).
+ - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
+
 ### Changes
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
@@ -1189,7 +1196,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.4..master
+[master]: https://github.com/igraph/igraph/compare/0.10.5..master
+[0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5
 [0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
 [0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2

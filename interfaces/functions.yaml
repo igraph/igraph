@@ -164,6 +164,9 @@ igraph_extended_chordal_ring:
 igraph_connect_neighborhood:
     PARAMS: INOUT GRAPH graph, INTEGER order=2, NEIMODE mode=ALL
 
+igraph_graph_power:
+    PARAMS: IN GRAPH graph, OUT GRAPH res, INTEGER order, BOOLEAN directed=false
+
 igraph_linegraph:
     PARAMS: GRAPH graph, OUT GRAPH linegraph
 
@@ -1664,6 +1667,16 @@ igraph_community_infomap:
         VERTEX_WEIGHTS v_weights=NULL, INTEGER nb_trials=10,
         OUT VECTOR_INT membership, OUT REAL codelength
     DEPS: e_weights ON graph, v_weights ON graph
+
+igraph_community_voronoi:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VECTOR_INT membership,
+        OPTIONAL OUT VERTEX_INDICES generators,
+        OPTIONAL OUT REAL modularity,
+        OPTIONAL EDGEWEIGHTS weights, OPTIONAL VECTOR lengths,
+        NEIMODE mode=OUT, REAL radius=-1
+    DEPS: generators ON graph, weights ON graph, lengths ON graph
 
 #######################################
 # Graphlets
