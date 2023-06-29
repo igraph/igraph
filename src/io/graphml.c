@@ -45,26 +45,33 @@
 
 xmlEntity blankEntityStruct = {
 #ifndef XML_WITHOUT_CORBA
-    0,
+    NULL, /* _private */
 #endif
-    XML_ENTITY_DECL,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    XML_EXTERNAL_GENERAL_PARSED_ENTITY,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1
+    XML_ENTITY_DECL, /* type */
+    NULL, /* name */
+    NULL, /* children */
+    NULL, /* last */
+    NULL, /* parent */
+    NULL, /* next */
+    NULL, /* prev */
+    NULL, /* doc */
+
+    NULL, /* orig */
+    NULL, /* content */
+    0,    /* length */
+    XML_EXTERNAL_GENERAL_PARSED_ENTITY, /* etype */
+    NULL, /* ExternalID */
+    NULL, /* SystemID */
+
+    NULL, /* nexte */
+    NULL, /* URI */
+    0,    /* owner */
+#if LIBXML_VERSION < 21100   /* Versions < 2.11.0: */
+    1     /* checked */
+#else                        /* Starting with verson 2.11.0: */
+    1,    /* flags */
+    0     /* expandedSize */
+#endif
 };
 
 xmlEntityPtr blankEntity = &blankEntityStruct;
