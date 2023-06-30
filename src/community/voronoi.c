@@ -341,16 +341,23 @@ static igraph_error_t brent_opt(optfun_t *f, igraph_real_t x1, igraph_real_t x2,
     }
 
     /* It sometimes happens in disconnected graphs that the maximum is reached at or near the
-     * top of the radius range. If so, we bisect the (f3, f2) interval to search for a configuration
+     * top of the radius range. If so, we bisect the (x3, x2) interval to search for a configuration
      * where f3 >= f2. */
     if (f2 > f3) {
-        /* Limit iterations to 20 */
-        for (int i=0; i < 20; ++i) {
-            x1 = x2; f1 = f2;
+        /* Limit iterations to niter=20 */
+        const int niter = 20;
+        int i;
+        for (i=0; i < niter; ++i) {
+            x1 = x3; f1 = f3;
             x3 = 0.5 * (x1 + x2);
             IGRAPH_CHECK(f(x3, &f3, extra));
 
             if (f3 >= f2) break;
+        }
+        /* If no maximum was found in 'niter' bisections, just take the upper end of the range. */
+        if (i == niter) {
+            IGRAPH_CHECK(f(x2, &f2, extra));
+            return IGRAPH_SUCCESS;
         }
     }
 
