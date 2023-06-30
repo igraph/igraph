@@ -4,7 +4,8 @@
 
 ### Fixed
 
- - Compatibility with libxml2 2.11
+ - Compatibility with libxml2 2.11.
+ - Fixed some converge failures in `igraph_community_voronoi()`.
 
 ## [0.10.5] - 2023-06-29
 
