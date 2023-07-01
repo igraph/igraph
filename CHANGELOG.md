@@ -6,6 +6,7 @@
 
  - Compatibility with libxml2 2.11.
  - Fixed some converge failures in `igraph_community_voronoi()`.
+ - `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` now check for overflow.
 
 ## [0.10.5] - 2023-06-29
 
