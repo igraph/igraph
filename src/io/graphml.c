@@ -788,9 +788,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         igraph_strvector_t *strvec;
     case IGRAPH_ATTRIBUTE_BOOLEAN:
         boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-        if (boolvec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for Boolean attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(boolvec, "Cannot allocate value vector for Boolean attribute.");
         IGRAPH_FINALLY(igraph_free, boolvec);
         IGRAPH_CHECK(igraph_vector_bool_init(boolvec, 0));
         rec->record.value = boolvec;
@@ -798,9 +796,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         break;
     case IGRAPH_ATTRIBUTE_NUMERIC:
         vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (vec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for numeric attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(vec, "Cannot allocate value vector for numeric attribute.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_init(vec, 0));
         rec->record.value = vec;
@@ -808,9 +804,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         break;
     case IGRAPH_ATTRIBUTE_STRING:
         strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
-        if (strvec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for string attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(strvec, "Cannot allocate value vector for string attribute.");
         IGRAPH_FINALLY(igraph_free, strvec);
         IGRAPH_CHECK(igraph_strvector_init(strvec, 0));
         rec->record.value = strvec;
@@ -884,7 +878,7 @@ static igraph_error_t igraph_i_graphml_append_to_data_char(
         new_data_char = IGRAPH_CALLOC((size_t) len + 1, char);
     }
 
-    if (new_data_char == 0) {
+    if (new_data_char == NULL) {
         /* state->data_char is left untouched here so that's good */
         return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
     }
