@@ -620,7 +620,6 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     xmlChar **it;
     xmlChar *localname;
     xmlChar *xmlStr;
-    char *str;
     igraph_trie_t *trie = NULL;
     igraph_vector_ptr_t *ptrvector = NULL;
     igraph_integer_t id;
@@ -670,14 +669,11 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
                 rec->record.type = IGRAPH_ATTRIBUTE_BOOLEAN;
                 rec->default_value.as_boolean = 0;
             } else if (!xmlStrncmp(toXmlChar("string"), XML_ATTR_VALUE(it))) {
-                str = strdup("");
-                if (!str) {
-                    IGRAPH_ERROR("Cannot allocate new empty string.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                }
+                char *str = strdup("");
+                IGRAPH_CHECK_OOM(str, "Cannot allocate new empty string.");
                 rec->type = I_GRAPHML_STRING;
                 rec->record.type = IGRAPH_ATTRIBUTE_STRING;
                 rec->default_value.as_string = str;
-                str = NULL;
             } else if (!xmlStrncmp(toXmlChar("float"), XML_ATTR_VALUE(it))) {
                 rec->type = I_GRAPHML_FLOAT;
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
