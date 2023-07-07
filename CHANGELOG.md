@@ -7,6 +7,7 @@
  - Compatibility with libxml2 2.11.
  - Fixed some converge failures in `igraph_community_voronoi()`.
  - `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` now check for overflow.
+ - CMake packages created with the `install` target of the CMake build system are now relocatable, i.e. the generated `igraph-targets.cmake` file does not contain abdsolute paths any more.
 
 ## [0.10.5] - 2023-06-29
 
