@@ -48,7 +48,7 @@ __BEGIN_DECLS
  * Any other use-case of overriding igraph's bool type is completely
  * unsupported.
  */
-#define IGRAPH_BOOL_TYPE bool
+#define IGRAPH_BOOL_TYPE int
 
 __END_DECLS
 
