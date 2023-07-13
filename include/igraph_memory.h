@@ -24,14 +24,20 @@
 #ifndef IGRAPH_MEMORY_H
 #define IGRAPH_MEMORY_H
 
-#include <stdlib.h>
 #include "igraph_decls.h"
+
+#include <stdint.h>
+#include <stdlib.h>
 
 __BEGIN_DECLS
 
-#define IGRAPH_CALLOC(n,t)    (t*) calloc( (n) > 0 ? (size_t)((n)*sizeof(t)) : (size_t)1, 1 )
-#define IGRAPH_MALLOC(n)      malloc( (n) > 0 ? (size_t)((n)) : (size_t)1 )
-#define IGRAPH_REALLOC(p,n,t) (t*) realloc((void*)(p), (n) > 0 ? (size_t)((n)*sizeof(t)) : (size_t)1)
+/* Helper macto to check if n*sizeof(t) overflows in IGRAPH_CALLOC and IGRAPH_REALLOC */
+#define IGRAPH_I_ALLOC_CHECK_OVERFLOW(n,t,expr) \
+    (t*) (((n) > SIZE_MAX / sizeof(t)) ? NULL : (expr))
+
+#define IGRAPH_CALLOC(n,t)    IGRAPH_I_ALLOC_CHECK_OVERFLOW(n, t, calloc(sizeof(t) * ((n) > 0 ? (n) : 1), 1))
+#define IGRAPH_MALLOC(n)      malloc( (size_t) ((n) > 0 ? (n) : 1) )
+#define IGRAPH_REALLOC(p,n,t) IGRAPH_I_ALLOC_CHECK_OVERFLOW(n, t, realloc((void*)(p), sizeof(t) * ((n) > 0 ? (n) : 1)))
 #define IGRAPH_FREE(p)        (free( (void *)(p) ), (p) = NULL)
 
 /* These are deprecated and scheduled for removal in 0.11 */

@@ -168,6 +168,7 @@ add_library(
   community/spinglass/NetDataTypes.cpp
   community/spinglass/NetRoutines.cpp
   community/spinglass/pottsmodel_2.cpp
+  community/voronoi.c
   community/walktrap/walktrap_communities.cpp
   community/walktrap/walktrap_graph.cpp
   community/walktrap/walktrap_heap.cpp
@@ -325,7 +326,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.0.0")
+set_target_properties(igraph PROPERTIES VERSION "3.1.0")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
@@ -371,7 +372,7 @@ target_include_directories(
 )
 
 if(MATH_LIBRARY)
-  target_link_libraries(igraph PRIVATE ${MATH_LIBRARY})
+  target_link_libraries(igraph PUBLIC ${MATH_LIBRARY})
 endif()
 
 if(ARPACK_LIBRARIES)
