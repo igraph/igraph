@@ -7,15 +7,15 @@ K_7 graph:
 Total Steiner tree weight: 5
 
 K_7 Non Complete graph-1:
-( 0 4 9 )
+( 0 1 2 )
 Total Steiner tree weight: 6
 
 K_7 Non Complete graph-2:
-( 0 5 10 )
+( 0 1 2 )
 Total Steiner tree weight: 6
 
 K_7_Unit graph:
-( 0 6 11 )
+( 0 1 2 )
 Total Steiner tree weight: 3
 
 K_7_Real graph:
@@ -35,7 +35,7 @@ K_7 graph with self loop:
 Total Steiner tree weight: 5
 
 A graph with n-1 terminals:
-0 9 17 24 30 35 39 42
+0 1 2 3 4 5 6 7
 value: 8.000000
 
 A graph with 1 terminal:
@@ -54,3 +54,18 @@ A graph:
 Tree edges:
 0 1 2 3 4 5 6 7
 value: 8.000000
+
+A graph with 8 terminals:
+Tree edges:
+1 2 3 4 5 6 7
+value: 7.000000
+
+A graph with 7 terminals and 2 removed to test if it forces it to go through:
+Tree edges:
+1 2 3 4 5 6 7
+value: 7.000000
+
+A graph with different structure that previous
+Tree edges:
+0 1 2 4 6 7
+value: 6.000000
