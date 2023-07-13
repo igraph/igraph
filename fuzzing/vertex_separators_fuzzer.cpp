@@ -21,8 +21,8 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(int err) {
-    if (err)
+inline void check_err(igraph_error_t err) {
+    if (err != IGRAPH_SUCCESS)
         abort();
 }
 
@@ -49,7 +49,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         VECTOR(edges)[j++] = Data[i] % 16;
     }
 
-    if (! igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED)) {
+    if (igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
         {
             igraph_vector_int_list_t separators;
             check_err(igraph_vector_int_list_init(&separators, 0));

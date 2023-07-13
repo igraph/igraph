@@ -30,6 +30,15 @@
 
 ## [master]
 
+## [0.10.6] - 2023-07-13
+
+### Fixed
+
+ - Compatibility with libxml2 2.11.
+ - Fixed some converge failures in `igraph_community_voronoi()`.
+ - `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` now check for overflow.
+ - CMake packages created with the `install` target of the CMake build system are now relocatable, i.e. the generated `igraph-targets.cmake` file does not contain absolute paths any more.
+
 ## [0.10.5] - 2023-06-29
 
 ### Added
@@ -37,7 +46,7 @@
  - `igraph_graph_power()` computes the kth power of a graph (experimental function).
  - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
 
-### Changes
+### Changed
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
  - `igraph_isomorphic()` now supports multigraphs.
@@ -1203,7 +1212,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.5..master
+[master]: https://github.com/igraph/igraph/compare/0.10.6..master
+[0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
 [0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5
 [0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
 [0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3

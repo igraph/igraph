@@ -27,15 +27,6 @@ if (BUILD_SHARED_LIBS)
   set_property(TARGET bliss PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
-# If we are linking igraph to GMP, then Bliss will use GMP for bignums
-if(NOT GMP_IS_VENDORED)
-  target_link_libraries(
-    bliss
-    PRIVATE
-    ${GMP_LIBRARY}
-  )
-endif()
-
 # Since these are included as object files, they should call the
 # function as is (without visibility specification)
 target_compile_definitions(bliss PRIVATE IGRAPH_STATIC)

@@ -316,6 +316,9 @@ static igraph_real_t peakx(
 static igraph_error_t brent_opt(optfun_t *f, igraph_real_t x1, igraph_real_t x2, void *extra) {
     igraph_real_t lo = x1, hi = x2;
 
+    IGRAPH_ASSERT(isfinite(lo));
+    IGRAPH_ASSERT(isfinite(hi));
+
     /* We choose the initial x3 point to be closer to x1 than x2.
      * This is so that if f1 == f2, the next computed point (newx)
      * would not coincide with x3. */
@@ -341,16 +344,23 @@ static igraph_error_t brent_opt(optfun_t *f, igraph_real_t x1, igraph_real_t x2,
     }
 
     /* It sometimes happens in disconnected graphs that the maximum is reached at or near the
-     * top of the radius range. If so, we bisect the (f3, f2) interval to search for a configuration
+     * top of the radius range. If so, we bisect the (x3, x2) interval to search for a configuration
      * where f3 >= f2. */
     if (f2 > f3) {
-        /* Limit iterations to 20 */
-        for (int i=0; i < 20; ++i) {
-            x1 = x2; f1 = f2;
+        /* Limit iterations to 'maxiter'. */
+        const int maxiter = 10;
+        int i;
+        for (i=0; i < maxiter; ++i) {
+            x1 = x3; f1 = f3;
             x3 = 0.5 * (x1 + x2);
             IGRAPH_CHECK(f(x3, &f3, extra));
 
             if (f3 >= f2) break;
+        }
+        /* If no maximum was found in 'maxiter' bisections, just take the upper end of the range. */
+        if (i == maxiter) {
+            IGRAPH_CHECK(f(x2, &f2, extra));
+            return IGRAPH_SUCCESS;
         }
     }
 

@@ -21,8 +21,8 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(int err) {
-    if (err)
+inline void check_err(igraph_error_t err) {
+    if (err != IGRAPH_SUCCESS)
         abort();
 }
 
@@ -43,7 +43,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
 
     /* Undirected */
-    if (! igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED)) {
+    if (igraph_create(&graph, &edges, 0, IGRAPH_UNDIRECTED) == IGRAPH_SUCCESS) {
         igraph_bool_t multi;
 
         check_err(igraph_has_multiple(&graph, &multi));
@@ -62,7 +62,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     }
 
     /* Directed */
-    if (! igraph_create(&graph, &edges, 0, IGRAPH_DIRECTED)) {
+    if (igraph_create(&graph, &edges, 0, IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_bool_t multi;
 
         check_err(igraph_has_multiple(&graph, &multi));

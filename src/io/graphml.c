@@ -48,26 +48,33 @@
 
 xmlEntity blankEntityStruct = {
 #ifndef XML_WITHOUT_CORBA
-    0,
+    NULL, /* _private */
 #endif
-    XML_ENTITY_DECL,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    XML_EXTERNAL_GENERAL_PARSED_ENTITY,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1
+    XML_ENTITY_DECL, /* type */
+    NULL, /* name */
+    NULL, /* children */
+    NULL, /* last */
+    NULL, /* parent */
+    NULL, /* next */
+    NULL, /* prev */
+    NULL, /* doc */
+
+    NULL, /* orig */
+    NULL, /* content */
+    0,    /* length */
+    XML_EXTERNAL_GENERAL_PARSED_ENTITY, /* etype */
+    NULL, /* ExternalID */
+    NULL, /* SystemID */
+
+    NULL, /* nexte */
+    NULL, /* URI */
+    0,    /* owner */
+#if LIBXML_VERSION < 21100   /* Versions < 2.11.0: */
+    1     /* checked */
+#else                        /* Starting with verson 2.11.0: */
+    1,    /* flags */
+    0     /* expandedSize */
+#endif
 };
 
 xmlEntityPtr blankEntity = &blankEntityStruct;
@@ -613,7 +620,6 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     xmlChar **it;
     xmlChar *localname;
     xmlChar *xmlStr;
-    char *str;
     igraph_trie_t *trie = NULL;
     igraph_vector_ptr_t *ptrvector = NULL;
     igraph_integer_t id;
@@ -663,14 +669,11 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
                 rec->record.type = IGRAPH_ATTRIBUTE_BOOLEAN;
                 rec->default_value.as_boolean = 0;
             } else if (!xmlStrncmp(toXmlChar("string"), XML_ATTR_VALUE(it))) {
-                str = strdup("");
-                if (!str) {
-                    IGRAPH_ERROR("Cannot allocate new empty string.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-                }
+                char *str = strdup("");
+                IGRAPH_CHECK_OOM(str, "Cannot allocate new empty string.");
                 rec->type = I_GRAPHML_STRING;
                 rec->record.type = IGRAPH_ATTRIBUTE_STRING;
                 rec->default_value.as_string = str;
-                str = NULL;
             } else if (!xmlStrncmp(toXmlChar("float"), XML_ATTR_VALUE(it))) {
                 rec->type = I_GRAPHML_FLOAT;
                 rec->record.type = IGRAPH_ATTRIBUTE_NUMERIC;
@@ -785,9 +788,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         igraph_strvector_t *strvec;
     case IGRAPH_ATTRIBUTE_BOOLEAN:
         boolvec = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-        if (boolvec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for Boolean attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(boolvec, "Cannot allocate value vector for Boolean attribute.");
         IGRAPH_FINALLY(igraph_free, boolvec);
         IGRAPH_CHECK(igraph_vector_bool_init(boolvec, 0));
         rec->record.value = boolvec;
@@ -795,9 +796,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         break;
     case IGRAPH_ATTRIBUTE_NUMERIC:
         vec = IGRAPH_CALLOC(1, igraph_vector_t);
-        if (vec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for numeric attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(vec, "Cannot allocate value vector for numeric attribute.");
         IGRAPH_FINALLY(igraph_free, vec);
         IGRAPH_CHECK(igraph_vector_init(vec, 0));
         rec->record.value = vec;
@@ -805,9 +804,7 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         break;
     case IGRAPH_ATTRIBUTE_STRING:
         strvec = IGRAPH_CALLOC(1, igraph_strvector_t);
-        if (strvec == 0) {
-            IGRAPH_ERROR("Cannot allocate value vector for string attribute.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(strvec, "Cannot allocate value vector for string attribute.");
         IGRAPH_FINALLY(igraph_free, strvec);
         IGRAPH_CHECK(igraph_strvector_init(strvec, 0));
         rec->record.value = strvec;
@@ -881,7 +878,7 @@ static igraph_error_t igraph_i_graphml_append_to_data_char(
         new_data_char = IGRAPH_CALLOC((size_t) len + 1, char);
     }
 
-    if (new_data_char == 0) {
+    if (new_data_char == NULL) {
         /* state->data_char is left untouched here so that's good */
         return IGRAPH_ENOMEM; /* LCOV_EXCL_LINE */
     }
