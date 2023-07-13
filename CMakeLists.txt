@@ -45,6 +45,7 @@ include(compilers)
 # Detect is certain attributes are supported by the compiler
 include(attribute_support)
 
+
 # Set default symbol visibility to hidden
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -61,6 +62,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 # Add switches to use sanitizers and debugging helpers if needed
 include(debugging)
 include(sanitizers)
+
 
 # Add version information
 configure_file(

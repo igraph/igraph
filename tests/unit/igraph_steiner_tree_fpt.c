@@ -345,7 +345,52 @@ int main(void) {
     igraph_vector_int_destroy(&tree_edges_new);
     igraph_vector_int_destroy(&terminals_new);
 
+    printf("\nA graph with 8 terminals:\n");
+    igraph_vector_int_init_int(&terminals_new, 8, 0, 2, 3, 4, 5, 6, 7, 8);
+    igraph_vector_int_init(&tree_edges_new, 0);
+    igraph_steiner_dreyfus_wagner(&g_new, &terminals_new, NULL, &value_new, &tree_edges_new);
+    printf("Tree edges:\n");
+    igraph_vector_int_print(&tree_edges_new);
+    printf("value: %f\n", value_new);
+
+    igraph_vector_int_destroy(&tree_edges_new);
+    igraph_vector_int_destroy(&terminals_new);
+
+    printf("\nA graph with 7 terminals and 2 removed to test if it forces it to go through:\n");
+    igraph_vector_int_init_int(&terminals_new, 7, 0, 3, 4, 5, 6, 7, 8);
+    igraph_vector_int_init(&tree_edges_new, 0);
+    igraph_steiner_dreyfus_wagner(&g_new, &terminals_new, NULL, &value_new, &tree_edges_new);
+    printf("Tree edges:\n");
+    igraph_vector_int_print(&tree_edges_new);
+    printf("value: %f\n", value_new);
+
+    igraph_vector_int_destroy(&tree_edges_new);
+    igraph_vector_int_destroy(&terminals_new);
+
+    printf("\nA graph with different structure that previous\n");
+    igraph_t g_new_1;
+    igraph_real_t value_new_1;
+    igraph_small(&g_new_1, 9, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 0, 6,
+                 2, 7, 2, 9,
+                 3, 4,
+                 4, 5,
+                 7, 8,
+                 -1
+                );
+    igraph_vector_int_init_int(&terminals_new, 7, 0, 1, 2, 3, 4, 5, 7);
+    igraph_vector_int_init(&tree_edges_new, 0);
+    igraph_steiner_dreyfus_wagner(&g_new_1, &terminals_new, NULL, &value_new_1, &tree_edges_new);
+    printf("Tree edges:\n");
+    igraph_vector_int_print(&tree_edges_new);
+    printf("value: %f\n", value_new_1);
+
+
+
     igraph_destroy(&g_new);
+    igraph_destroy(&g_new_1);
+    igraph_vector_int_destroy(&tree_edges_new);
+    igraph_vector_int_destroy(&terminals_new);
 
 
 
