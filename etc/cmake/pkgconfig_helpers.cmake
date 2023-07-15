@@ -68,6 +68,11 @@ endif()
 
 join_paths(PKGCONFIG_LIBDIR "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
 join_paths(PKGCONFIG_INCLUDEDIR "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
+join_paths(PKGCONFIG_CFLAGS_ONLY_I "-I\${includedir}" "igraph")
+if(CMAKE_LIBRARY_ARCHITECTURE)
+  join_paths(PKGCONFIG_CFLAGS_ONLY_I_ARCH "-I\${includedir}" "${CMAKE_LIBRARY_ARCHITECTURE}" "igraph")
+  set(PKGCONFIG_CFLAGS_ONLY_I "${PKGCONFIG_CFLAGS_ONLY_I_ARCH} ${PKGCONFIG_CFLAGS_ONLY_I}")
+endif()
 configure_file(
   ${PROJECT_SOURCE_DIR}/igraph.pc.in
   ${PROJECT_BINARY_DIR}/igraph.pc

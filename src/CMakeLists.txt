@@ -425,6 +425,11 @@ use_all_warnings(igraph)
 # GNUInstallDirs be included before generating the pkgconfig file, as it defines
 # CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_INCLUDEDIR variables.
 include(GNUInstallDirs)
+if(CMAKE_LIBRARY_ARCHITECTURE)
+  set(CMAKE_INSTALL_INCLUDEDIR_ARCHITECTURE "${CMAKE_INSTALL_INCLUDEDIR}/${CMAKE_LIBRARY_ARCHITECTURE}")
+else()
+  set(CMAKE_INSTALL_INCLUDEDIR_ARCHITECTURE "${CMAKE_INSTALL_INCLUDEDIR}")
+endif()
 
 # Generate pkgconfig file
 include(pkgconfig_helpers)
@@ -468,7 +473,7 @@ install(
 )
 install(
   DIRECTORY ${PROJECT_BINARY_DIR}/include/
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/igraph
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR_ARCHITECTURE}/igraph
   FILES_MATCHING PATTERN "*.h"
 )
 install(

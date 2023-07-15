@@ -10,4 +10,4 @@ URL: @PROJECT_HOMEPAGE_URL@
 Libs: -L${libdir} -ligraph
 Libs.private: @PKGCONFIG_LIBS_PRIVATE@
 Requires.private: @PKGCONFIG_REQUIRES_PRIVATE@
-Cflags: -I${includedir}/igraph
+Cflags: @PKGCONFIG_CFLAGS_ONLY_I@
