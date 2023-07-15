@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Other
+
+ - Documentation improvements.
+
 ## [0.10.6] - 2023-07-13
 
 ### Fixed
