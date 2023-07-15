@@ -282,6 +282,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
+  all_shortest_paths_cutoff
   assortativity
   coreness
   efficiency
