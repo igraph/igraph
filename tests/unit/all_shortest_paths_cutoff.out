@@ -1,0 +1,77 @@
+Singleton graph
+Vertex paths:
+{
+  0: ( 0 )
+}
+
+Singleton graph, weighted
+Vertex paths:
+{
+  0: ( 0 )
+}
+
+No paths
+Vertex paths:
+{
+}
+Edge paths:
+{
+}
+
+Unweighted
+Vertex paths:
+{
+  0: ( 0 1 2 5 4 )
+  1: ( 0 1 2 5 4 )
+  2: ( 0 1 2 3 4 )
+  3: ( 0 1 2 3 4 )
+}
+Edge paths:
+{
+  0: ( 4 1 5 6 )
+  1: ( 0 1 5 6 )
+  2: ( 4 1 2 3 )
+  3: ( 0 1 2 3 )
+}
+
+Weighted, uniform weights
+Vertex paths:
+{
+}
+Edge paths:
+{
+}
+
+Weighted, multiple weighted shortest paths
+Vertex paths:
+{
+  0: ( 0 1 2 3 4 )
+  1: ( 0 1 6 7 3 4 )
+  2: ( 0 1 2 5 4 )
+}
+Edge paths:
+{
+  0: ( 0 1 2 3 )
+  1: ( 0 7 8 9 3 )
+  2: ( 0 1 5 6 )
+}
+
+Weighted, multiple weighted shortest paths, testing tolerances
+From: 6, to: all.
+Vertex paths:
+{
+  0: ( 6 5 3 )
+  1: ( 6 5 )
+  2: ( 6 )
+  3: ( 6 7 )
+  4: ( 6 7 15 )
+}
+Edge paths:
+{
+  0: ( 6 5 )
+  1: ( 6 )
+  2: ( )
+  3: ( 7 )
+  4: ( 7 15 )
+}
+nrgeo: ( 1 2 2 1 2 1 1 1 2 2 2 1 2 2 2 1 )

@@ -788,13 +788,13 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  *
  * \example examples/simple/igraph_get_all_shortest_paths_dijkstra.c
  */
-igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_get_all_shortest_paths_dijkstra_cutoff(const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
         igraph_vector_int_t *nrgeo,
         igraph_integer_t from, igraph_vs_t to,
         const igraph_vector_t *weights,
-        igraph_neimode_t mode) {
+        igraph_neimode_t mode, igraph_real_t cutoff) {
     /* Implementation details: see igraph_get_shortest_paths_dijkstra,
        it's basically the same.
     */
@@ -939,14 +939,16 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             cmp_result = igraph_cmp_epsilon(curdist, altdist, eps);
             if (curdist < 0) {
                 /* This is the first non-infinite distance */
-                VECTOR(dists)[tto] = altdist;
+                if (cutoff == -1.0 || altdist <= cutoff) {
+                    VECTOR(dists)[tto] = altdist;
 
-                parent_vec = (igraph_vector_int_t*)VECTOR(parents)[tto];
-                IGRAPH_CHECK(igraph_vector_int_push_back(parent_vec, minnei));
-                parent_edge_vec = (igraph_vector_int_t*)VECTOR(parents_edge)[tto];
-                IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
+                    parent_vec = (igraph_vector_int_t*)VECTOR(parents)[tto];
+                    IGRAPH_CHECK(igraph_vector_int_push_back(parent_vec, minnei));
+                    parent_edge_vec = (igraph_vector_int_t*)VECTOR(parents_edge)[tto];
+                    IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
 
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                    IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                }
             } else if (cmp_result == 0 /* altdist == curdist */ && VECTOR(*weights)[edge] > 0) {
                 /* This is an alternative path with exactly the same length.
                  * Note that we consider this case only if the edge via which we
@@ -1231,4 +1233,15 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
+}
+
+igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_vector_int_t *nrgeo,
+        igraph_integer_t from, igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode) {
+    return igraph_get_all_shortest_paths_dijkstra_cutoff(graph, vertices, edges, nrgeo, from,
+            to, weights, mode, -1);
 }
