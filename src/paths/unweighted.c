@@ -271,8 +271,8 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
 
 /**
  * \ingroup structural
- * \function igraph_get_shortest_paths
- * \brief Shortest paths from a vertex.
+ * \function igraph_get_shortest_paths_cutoff
+ * \brief Shortest paths from a vertex with a cutoff.
  *
  * </para><para>
  * If there is more than one geodesic between two vertices, this
@@ -337,7 +337,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  * |E| the number of edges in the
  * graph.
  *
- * \sa \ref igraph_distances() if you only need the path lengths but
+ * \sa \ref igraph_distances_cutoff() if you only need the path lengths but
  * not the paths themselves.
  *
  * \example examples/simple/igraph_get_shortest_paths.c
@@ -548,6 +548,18 @@ igraph_error_t igraph_get_shortest_paths_cutoff(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup structural
+ * \function igraph_get_shortest_paths
+ * \brief Shortest paths from a vertex.
+ *
+ * \ref igraph_get_shortest_paths_cutoff without a cutoff.
+ *
+ * \sa \ref igraph_distances() if you only need the path lengths but
+ * not the paths themselves.
+ *
+ * \example examples/simple/igraph_get_shortest_paths.c
+ */
 igraph_error_t igraph_get_shortest_paths(const igraph_t *graph,
                               igraph_vector_int_list_t *vertices,
                               igraph_vector_int_list_t *edges,
