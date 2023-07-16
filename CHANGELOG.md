@@ -228,6 +228,10 @@
 
  - Documentation improvements.
 
+### Added
+
+ - Added cutoff versions of shortest path functions: `igraph_get_shortest_paths_cutoff()`, `igraph_get_all_shortest_paths_cutoff()`, `igraph_get_shortest_paths_dijkstra_cutoff()`, `igraph_get_all_shortest_paths_dijkstra_cutoff()`
+
 ## [0.10.6] - 2023-07-13
 
 ### Fixed
