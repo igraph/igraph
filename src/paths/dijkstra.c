@@ -342,7 +342,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 }
 /**
  * \ingroup structural
- * \function igraph_get_shortest_paths_dijkstra cutoff
+ * \function igraph_get_shortest_paths_dijkstra_cutoff
  * \brief Weighted shortest paths from a vertex with a cutoff.
  *
  * </para><para>
