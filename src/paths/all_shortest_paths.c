@@ -79,6 +79,8 @@
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -208,7 +210,7 @@ igraph_error_t igraph_get_all_shortest_paths_cutoff(const igraph_t *graph,
             }
         }
 
-        if (cutoff != -1 && actdist >= cutoff) {
+        if (cutoff >= 0 && actdist >= cutoff) {
             continue;
         }
 

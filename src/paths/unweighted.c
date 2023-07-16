@@ -321,6 +321,8 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  *        during the search will have -1 in the corresponding entry of the
  *        vector. Note that the search terminates if all the vertices in
  *        \p to are reached.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  *
  * \return Error code:
  *        \clist
@@ -443,7 +445,7 @@ igraph_error_t igraph_get_shortest_paths_cutoff(const igraph_t *graph,
                 new_nodes_this_round++;
             }
         }
-        if (cutoff == -1) continue;
+        if (cutoff < 0) continue;
         nodes_until_next_round--;
         if (nodes_until_next_round == 0) {
             distance++;

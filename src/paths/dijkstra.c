@@ -398,8 +398,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  *        during the search will have -1 in the corresponding entry of the
  *        vector. Note that the search terminates if all the vertices in
  *        \c to are reached.
- * \param cutoff Paths longer than this cutoff will not be included in the results.
- *               This can be used if the running time is too long.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -546,7 +546,7 @@ igraph_error_t igraph_get_shortest_paths_dijkstra_cutoff(const igraph_t *graph,
             igraph_real_t curdist = VECTOR(dists)[tto];
             if (curdist < 0) {
                 /* This is the first finite distance */
-                if (cutoff == -1.0 || altdist <= cutoff) {
+                if (cutoff < 0 || altdist <= cutoff) {
                     VECTOR(dists)[tto] = altdist;
                     parent_eids[tto] = edge + 1;
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
@@ -784,8 +784,8 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param cutoff Paths longer than this cutoff will not be included in the results.
- *               This can be used if the running time is too long.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -956,7 +956,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra_cutoff(const igraph_t *gra
             cmp_result = igraph_cmp_epsilon(curdist, altdist, eps);
             if (curdist < 0) {
                 /* This is the first non-infinite distance */
-                if (cutoff == -1.0 || altdist <= cutoff) {
+                if (cutoff < 0 || altdist <= cutoff) {
                     VECTOR(dists)[tto] = altdist;
 
                     parent_vec = (igraph_vector_int_t*)VECTOR(parents)[tto];
