@@ -1063,25 +1063,25 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
  * contain the counts of these in the following order:
  *
  * \clist
- * \cli &nbsp;0: 003
+ * \cli &#xa0;0: 003
  *      A, B, C, the empty graph.
- * \cli &nbsp;1: 012
+ * \cli &#xa0;1: 012
  *      A->B, C, a graph with a single directed edge.
- * \cli &nbsp;2: 102
+ * \cli &#xa0;2: 102
  *      A&lt;->B, C, a graph with a mutual connection between two vertices.
- * \cli &nbsp;3: 021D
+ * \cli &#xa0;3: 021D
  *      A&lt;-B->C, the binary out-tree.
- * \cli &nbsp;4: 021U
+ * \cli &#xa0;4: 021U
  *      A->B&lt;-C, the binary in-tree.
- * \cli &nbsp;5: 021C
+ * \cli &#xa0;5: 021C
  *      A->B->C, the directed line.
- * \cli &nbsp;6: 111D
+ * \cli &#xa0;6: 111D
  *      A&lt;->B&lt;-C.
- * \cli &nbsp;7: 111U
+ * \cli &#xa0;7: 111U
  *      A&lt;->B->C.
- * \cli &nbsp;8: 030T
+ * \cli &#xa0;8: 030T
  *      A->B&lt;-C, A->C.
- * \cli &nbsp;9: 030C
+ * \cli &#xa0;9: 030C
  *      A&lt;-B&lt;-C, A->C.
  * \cli 10: 201
  *      A&lt;->B&lt;->C.
