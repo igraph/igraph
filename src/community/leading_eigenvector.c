@@ -248,10 +248,12 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * \param merges The result of the algorithm, a matrix containing the
  *    information about the splits performed. The matrix is built in
  *    the opposite way however, it is like the result of an
- *    agglomerative algorithm. If at the end of the algorithm (after
- *    \p steps steps was done) there are <quote>p</quote> communities,
- *    then these are numbered from zero to <quote>p-1</quote>. The
- *    first line of the matrix contains the first <quote>merge</quote>
+ *    agglomerative algorithm. Unlike with most other hierarchicaly
+ *    community detection functions in igraph, the integers in this matrix
+ *    represent community indices, not vertex indices. If at the end of
+ *    the algorithm (after \p steps steps was done) there are <quote>p</quote>
+ *    communities, then these are numbered from zero to <quote>p-1</quote>.
+ *    The first line of the matrix contains the first <quote>merge</quote>
  *    (which is in reality the last split) of two communities into
  *    community <quote>p</quote>, the merge in the second line forms
  *    community <quote>p+1</quote>, etc. The matrix should be
@@ -753,21 +755,21 @@ igraph_error_t igraph_community_leading_eigenvector(
 
 /**
  * \function igraph_le_community_to_membership
- * Vertex membership from the leading eigenvector community structure
+ * \brief Vertex membership from the leading eigenvector community structure.
  *
  * This function creates a membership vector from the
- * result of \ref igraph_community_leading_eigenvector(),
- * It takes \c membership
- * and performs \c steps merges, according to the supplied
- * \c merges matrix.
- * \param merges The two-column matrix containing the merge
- *    operations. See \ref igraph_community_walktrap() for the
+ * result of \ref igraph_community_leading_eigenvector().
+ * It takes \c membership and performs \c steps merges,
+ * according to the supplied \c merges matrix.
+ *
+ * \param merges The two-column matrix containing the merge operations.
+ *    See \ref igraph_community_leading_eigenvector() for the
  *    detailed syntax. This is usually from the output of the
  *    leading eigenvector community structure detection routines.
  * \param steps The number of steps to make according to \c merges.
  * \param membership Initially the starting membership vector,
  *     on output the resulting membership vector, after performing \c steps merges.
- * \param csize Optionally the sizes of the communities is stored here,
+ * \param csize Optionally the sizes of the communities are stored here,
  *     if this is not a null pointer, but an initialized vector.
  * \return Error code.
  *
@@ -834,5 +836,6 @@ igraph_error_t igraph_le_community_to_membership(const igraph_matrix_int_t *merg
 
     igraph_vector_int_destroy(&fake_memb);
     IGRAPH_FINALLY_CLEAN(1);
+
     return IGRAPH_SUCCESS;
 }

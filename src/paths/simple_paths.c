@@ -69,7 +69,8 @@ igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vit_t vit;
     igraph_bool_t toall = igraph_vs_is_all(&to);
     igraph_lazy_adjlist_t adjlist;
-    igraph_vector_int_t stack, dist;
+    igraph_vector_int_t stack, dist; /* used as a stack, but represented as a vector,
+                                        in order to be appendable to other vectors */
     igraph_vector_bool_t markto, added;
     igraph_vector_int_t nptr;
     int iteration = 0;

@@ -66,7 +66,7 @@
  *   vertex twice or more.
  * \param weights Optional edge weights. If it is a null-pointer, then
  *   the unweighted breadth-first search based \ref igraph_distances() will
- *   be called.
+ *   be called. Edges with positive infinite weights are ignored.
  * \return Error code.
  *
  * Time complexity: O(s|V|log|V|+|V||E|), |V| and |E| are the number

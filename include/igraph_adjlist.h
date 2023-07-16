@@ -134,7 +134,7 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_adjlist_size(const igraph_lazy_adjlis
  *
  * Time complexity: O(1).
  */
-#define igraph_lazy_adjlist_has(al,no) ((igraph_bool_t) (al)->adjs[(igraph_integer_t)(no)])
+#define igraph_lazy_adjlist_has(al,no) ((al)->adjs[(igraph_integer_t)(no)] != NULL)
 
 /**
  * \define igraph_lazy_adjlist_get
@@ -190,7 +190,7 @@ IGRAPH_EXPORT igraph_integer_t igraph_lazy_inclist_size(const igraph_lazy_inclis
  *
  * Time complexity: O(1).
  */
-#define igraph_lazy_inclist_has(il,no) ((igraph_bool_t) (il)->incs[(igraph_integer_t)(no)])
+#define igraph_lazy_inclist_has(il,no) ((il)->incs[(igraph_integer_t)(no)] != NULL)
 
 /**
  * \define igraph_lazy_inclist_get

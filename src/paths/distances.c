@@ -171,7 +171,10 @@ static igraph_error_t igraph_i_eccentricity_dijkstra(
             igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
             igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
             igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
-            if (!has) {
+
+            if (altdist == IGRAPH_INFINITY) {
+                /* Ignore edges with positive infinite weights */
+            } else if (!has) {
                 /* This is the first non-infinite distance */
                 IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
             } else if (altdist < curdist) {
@@ -288,7 +291,8 @@ igraph_error_t igraph_eccentricity(const igraph_t *graph,
  *    non-negative for Dijkstra's algorithm to work. Additionally, no
  *    edge weight may be NaN. If either case does not hold, an error
  *    is returned. If this is a null pointer, then the unweighted
- *    version, \ref igraph_eccentricity() is called.
+ *    version, \ref igraph_eccentricity() is called. Edges with positive
+ *    infinite weights are ignored.
  * \param res Pointer to an initialized vector, the result is stored
  *    here.
  * \param vids The vertices for which the eccentricity is calculated.
@@ -644,7 +648,8 @@ igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
  *
  * \param graph The input graph, can be directed or undirected.
  * \param weights The edge weights of the graph. Can be \c NULL for an
- *        unweighted graph. All weights should be non-negative.
+ *        unweighted graph. All weights should be non-negative. Edges with
+ *        positive infinite weights are ignored.
  * \param diameter This will contain the weighted pseudo-diameter.
  * \param vid_start Id of the starting vertex. If this is negative, a
  *        random starting vertex is chosen.

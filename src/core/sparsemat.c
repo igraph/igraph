@@ -780,9 +780,12 @@ igraph_error_t igraph_sparsemat_is_symmetric(const igraph_sparsemat_t *A, igraph
 
 igraph_error_t igraph_sparsemat_dupl(igraph_sparsemat_t *A) {
 
+    if (! igraph_sparsemat_is_cc(A)) {
+        IGRAPH_ERROR("Sparse matrix must be in compressed format in order to remove duplicates.", IGRAPH_EINVAL);
+    }
+
     if (!cs_dupl(A->cs)) {
-        IGRAPH_ERROR("Cannot remove duplicates from sparse matrix",
-                     IGRAPH_FAILURE);
+        IGRAPH_ERROR("Cannot remove duplicates from sparse matrix.", IGRAPH_FAILURE);
     }
 
     return IGRAPH_SUCCESS;

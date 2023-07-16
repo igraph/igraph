@@ -237,6 +237,7 @@ static igraph_error_t igraph_distances_floyd_warshall_tree(
  * \param to The target vertices.
  * \param weights The edge weights. If \c NULL, all weights are assumed to be 1.
  *   Negative weights are allowed, but the graph must not contain negative cycles.
+ *   Edges with positive infinite weights are ignored.
  * \param mode The type of shortest paths to be use for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -329,6 +330,9 @@ igraph_error_t igraph_distances_floyd_warshall(
                               "while calculating distances with Floyd-Warshall.",
                               IGRAPH_ENEGLOOP, w);
             }
+        } else if (w == IGRAPH_INFINITY) {
+            /* Ignore edges with infinite weight */
+            continue;
         }
 
         if (out && MATRIX(*res, from, to) > w) {

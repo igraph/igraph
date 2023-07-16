@@ -335,7 +335,7 @@ igraph_error_t FUNCTION(igraph_dqueue, push)(TYPE(igraph_dqueue)* q, BASE elem) 
         bigger = IGRAPH_CALLOC(new_capacity, BASE);
         IGRAPH_CHECK_OOM(bigger, "Cannot push to dqueue.");
 
-        if (q->stor_end - q->begin) {
+        if (q->stor_end - q->begin > 0) {
             memcpy(bigger, q->begin,
                    (size_t)(q->stor_end - q->begin) * sizeof(BASE));
         }

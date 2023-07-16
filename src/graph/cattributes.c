@@ -518,7 +518,7 @@ static void igraph_i_attribute_permutation_work_area_release_stored_strvectors(
 ) {
     if (work_area->strings != NULL) {
         igraph_vector_ptr_destroy_all(work_area->strings);
-        igraph_Free(work_area->strings);
+        IGRAPH_FREE(work_area->strings);
         work_area->strings = NULL;
     }
 }
@@ -529,12 +529,12 @@ static void igraph_i_attribute_permutation_work_area_destroy(
     igraph_i_attribute_permutation_work_area_release_stored_strvectors(work_area);
     if (work_area->numeric != NULL) {
         igraph_vector_destroy(work_area->numeric);
-        igraph_Free(work_area->numeric);
+        IGRAPH_FREE(work_area->numeric);
         work_area->numeric = NULL;
     }
     if (work_area->boolean != NULL) {
         igraph_vector_bool_destroy(work_area->boolean);
-        igraph_Free(work_area->boolean);
+        IGRAPH_FREE(work_area->boolean);
         work_area->boolean = NULL;
     }
 }

@@ -844,7 +844,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
         igraph_integer_t min = VECTOR(Sbar_map)[ VECTOR(M)[i] ] - 1;
         igraph_integer_t nuvsize, isvlen, j;
         IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN,
-                                /*unreachable=*/ NULL, /*order=*/ &Nuv,
+                                /*unreachable=*/ false, /*order=*/ &Nuv,
                                 /*order_out=*/ NULL, /*parents=*/ NULL, /*dist=*/ NULL,
                                 /*in_callback=*/ NULL, /*out_callback=*/ NULL,
                                 /*extra=*/ NULL));

@@ -187,6 +187,11 @@ EDGE_COLOR:
     CTYPE: igraph_vector_int_t
     FLAGS: BY_REF
 
+EDGE_LENGTHS:
+    # A vector containing edge lengths
+    CTYPE: igraph_vector_t
+    FLAGS: BY_REF
+
 EDGEWEIGHTS:
     # A vector containing edge weights
     CTYPE: igraph_vector_t

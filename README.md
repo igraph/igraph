@@ -21,3 +21,11 @@ igraph is a collaborative work of many people from all around the world —
 see the [list of contributors here](./CONTRIBUTORS.md). If you would like
 to contribute yourself, [click here to see how you can
 help](./CONTRIBUTING.md).
+
+Citation
+--------
+
+If you use igraph in your research, please cite
+
+> Csardi, G., & Nepusz, T. (2006). The igraph software package for complex network research. InterJournal, Complex Systems, 1695.
+

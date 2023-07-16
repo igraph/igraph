@@ -2,10 +2,31 @@
 
 ## [master]
 
-### Changes
+### Other
+
+ - Documentation improvements.
+
+## [0.10.6] - 2023-07-13
+
+### Fixed
+
+ - Compatibility with libxml2 2.11.
+ - Fixed some converge failures in `igraph_community_voronoi()`.
+ - `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` now check for overflow.
+ - CMake packages created with the `install` target of the CMake build system are now relocatable, i.e. the generated `igraph-targets.cmake` file does not contain absolute paths any more.
+
+## [0.10.5] - 2023-06-29
+
+### Added
+
+ - `igraph_graph_power()` computes the kth power of a graph (experimental function).
+ - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
+
+### Changed
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
  - `igraph_isomorphic()` now supports multigraphs.
+ - Shortest path related functions now consistently ignore edges with positive infinite weights.
 
 ### Fixed
 
@@ -29,6 +50,7 @@
 ### Other
 
  - Improved performance for `igraph_vertex_connectivity()`.
+ - `igraph_simplify()` makes use of the cache, and avoids simplification when the graph is already known to be simple.
  - Documentation improvements.
 
 ## [0.10.4] - 2023-01-26
@@ -1165,7 +1187,9 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.4..master
+[master]: https://github.com/igraph/igraph/compare/0.10.6..master
+[0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
+[0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5
 [0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
 [0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2

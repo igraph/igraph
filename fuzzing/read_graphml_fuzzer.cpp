@@ -41,7 +41,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // Read input file
     FILE *ifile;
     ifile = fopen("/tmp/libfuzzer.graphml", "r");
-    if(ifile == 0){
+    if (!ifile) {
         remove(filename);
         return 0;
     }
