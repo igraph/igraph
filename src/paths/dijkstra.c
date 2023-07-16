@@ -1257,7 +1257,7 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra_cutoff(const igraph_t *gra
  * \function igraph_get_all_shortest_paths_dijkstra
  * \brief All weighted shortest paths (geodesics) from a vertex.
  *
- * This is igraph_get_all_shortest_paths_dijkstra_cutoff without the cutoff
+ * This is \ref igraph_get_all_shortest_paths_dijkstra_cutoff() without the cutoff
  *
  * \sa \ref igraph_distances_dijkstra() if you only need the path
  * length but not the paths themselves, \ref igraph_get_all_shortest_paths()

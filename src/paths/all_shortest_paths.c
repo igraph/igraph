@@ -32,8 +32,8 @@
 #include <string.h>  /* memset */
 
 /**
- * \function igraph_get_all_shortest_paths
- * \brief All shortest paths (geodesics) from a vertex.
+ * \function igraph_get_all_shortest_paths_cutoff
+ * \brief All shortest paths (geodesics) from a vertex, with cutoff.
  *
  * When there is more than one shortest path between two vertices,
  * all of them will be returned. Every edge is considered separately,
@@ -343,6 +343,12 @@ igraph_error_t igraph_get_all_shortest_paths_cutoff(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_get_all_shortest_paths
+ * \brief All shortest paths (geodesics) from a vertex.
+ *
+ * \ref igraph_get_all_shortest_paths() without a cutoff.
+ */
 igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
                                   igraph_vector_int_list_t *vertices,
                                   igraph_vector_int_list_t *edges,
