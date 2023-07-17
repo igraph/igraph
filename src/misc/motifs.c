@@ -1055,49 +1055,51 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
  * \function igraph_triad_census
  * \brief Triad census, as defined by Davis and Leinhardt.
  *
- * </para><para>
  * Calculating the triad census means classifying every triple of
- * vertices in a directed graph. A triple can be in one of 16 states:
+ * vertices in a directed graph based on the type of pairwise
+ * connections it contains, i.e. mutual, asymmetric or no connection.
+ * A triple can be in one of 16 states, commonly described using
+ * Davis and Leinhardt's "MAN labels". The \p res vector will
+ * contain the counts of these in the following order:
+ *
  * \clist
- * \cli 003
+ * \cli &#xa0;0: 003
  *      A, B, C, the empty graph.
- * \cli 012
+ * \cli &#xa0;1: 012
  *      A->B, C, a graph with a single directed edge.
- * \cli 102
+ * \cli &#xa0;2: 102
  *      A&lt;->B, C, a graph with a mutual connection between two vertices.
- * \cli 021D
+ * \cli &#xa0;3: 021D
  *      A&lt;-B->C, the binary out-tree.
- * \cli 021U
+ * \cli &#xa0;4: 021U
  *      A->B&lt;-C, the binary in-tree.
- * \cli 021C
+ * \cli &#xa0;5: 021C
  *      A->B->C, the directed line.
- * \cli 111D
+ * \cli &#xa0;6: 111D
  *      A&lt;->B&lt;-C.
- * \cli 111U
+ * \cli &#xa0;7: 111U
  *      A&lt;->B->C.
- * \cli 030T
+ * \cli &#xa0;8: 030T
  *      A->B&lt;-C, A->C.
- * \cli 030C
+ * \cli &#xa0;9: 030C
  *      A&lt;-B&lt;-C, A->C.
- * \cli 201
+ * \cli 10: 201
  *      A&lt;->B&lt;->C.
- * \cli 120D
+ * \cli 11: 120D
  *      A&lt;-B->C, A&lt;->C.
- * \cli 120U
+ * \cli 12: 120U
  *      A->B&lt;-C, A&lt;->C.
- * \cli 120C
+ * \cli 13: 120C
  *      A->B->C, A&lt;->C.
- * \cli 210
+ * \cli 14: 210
  *      A->B&lt;->C, A&lt;->C.
- * \cli 300
+ * \cli 15: 300
  *      A&lt;->B&lt;->C, A&lt;->C, the complete graph.
  * \endclist
  *
  * </para><para>
- * See also Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
- * Positive Interpersonal Relations in Small Groups.  In J. Berger
- * (Ed.), Sociological Theories in Progress, Volume 2, 218-251.
- * Boston: Houghton Mifflin.
+ * This function is intended for directed graphs. If the input is undirected,
+ * a warning is shown, and undirected edges will be interpreted as mutual.
  *
  * </para><para>
  * This function calls \ref igraph_motifs_randesu() which is an
@@ -1106,8 +1108,16 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
  * triads is not the same for \ref igraph_triad_census() and \ref
  * igraph_motifs_randesu().
  *
- * \param graph The input graph. A warning is given for undirected
- *   graphs, as the result is undefined for those.
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
+ * Positive Interpersonal Relations in Small Groups.  In J. Berger
+ * (Ed.), Sociological Theories in Progress, Volume 2, 218-251.
+ * Boston: Houghton Mifflin.
+ *
+ * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
  *   here in the same order as given in the list above. Note that this
  *   order is different than the one used by \ref igraph_motifs_randesu().
@@ -1127,7 +1137,7 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) 
     igraph_real_t total;
 
     if (!igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Triad census called on an undirected graph");
+        IGRAPH_WARNING("Triad census called on an undirected graph. All connections will be treated as mutual.");
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);

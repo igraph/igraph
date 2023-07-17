@@ -165,7 +165,7 @@ igraph_connect_neighborhood:
     PARAMS: INOUT GRAPH graph, INTEGER order=2, NEIMODE mode=ALL
 
 igraph_graph_power:
-    PARAMS: IN GRAPH graph, OUT GRAPH res, INTEGER order, BOOLEAN directed=false
+    PARAMS: IN GRAPH graph, OUT GRAPH res, INTEGER order, BOOLEAN directed=False
 
 igraph_linegraph:
     PARAMS: GRAPH graph, OUT GRAPH linegraph
