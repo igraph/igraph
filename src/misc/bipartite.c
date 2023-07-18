@@ -28,7 +28,6 @@
 #include "igraph_constructors.h"
 #include "igraph_dqueue.h"
 #include "igraph_random.h"
-#include "igraph_nongraph.h"
 
 #include "graph/attributes.h"
 #include "math/safe_intop.h"
@@ -966,7 +965,7 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
         IGRAPH_CHECK(igraph_vector_bool_resize(types, n1 + n2));
         igraph_vector_bool_null(types);
         for (i = n1; i < n1 + n2; i++) {
-            VECTOR(*types)[i] = 1;
+            VECTOR(*types)[i] = true;
         }
     }
 
@@ -1067,7 +1066,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
         IGRAPH_CHECK(igraph_vector_bool_resize(types, n1 + n2));
         igraph_vector_bool_null(types);
         for (i = n1; i < n1 + n2; i++) {
-            VECTOR(*types)[i] = 1;
+            VECTOR(*types)[i] = true;
         }
     }
 
