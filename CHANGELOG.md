@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - `igraph_full_bipartite()` now checks for overflow.
+
 ### Other
 
  - Documentation improvements.

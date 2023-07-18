@@ -425,48 +425,55 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
                           igraph_bool_t directed,
                           igraph_neimode_t mode) {
 
-    igraph_integer_t nn1 = n1, nn2 = n2;
-    igraph_integer_t no_of_nodes = nn1 + nn2;
+    igraph_integer_t no_of_nodes, no_of_edges;
     igraph_vector_int_t edges;
-    igraph_integer_t no_of_edges;
-    igraph_integer_t ptr = 0;
-    igraph_integer_t i, j;
+    igraph_integer_t ptr;
+
+    IGRAPH_SAFE_ADD(n1, n2, &no_of_nodes);
 
     if (!directed) {
-        no_of_edges = nn1 * nn2;
+        IGRAPH_SAFE_MULT(n1, n2, &no_of_edges);
     } else if (mode == IGRAPH_OUT || mode == IGRAPH_IN) {
-        no_of_edges = nn1 * nn2;
+        IGRAPH_SAFE_MULT(n1, n2, &no_of_edges);
     } else { /* mode==IGRAPH_ALL */
-        no_of_edges = nn1 * nn2 * 2;
+        IGRAPH_SAFE_MULT(n1, n2, &no_of_edges);
+        IGRAPH_SAFE_MULT(no_of_edges, 2, &no_of_edges);
+    }
+
+    /* To ensure the size of the edges vector will not overflow. */
+    if (no_of_edges > IGRAPH_ECOUNT_MAX) {
+        IGRAPH_ERROR("Overflow in number of edges.", IGRAPH_EOVERFLOW);
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
+    ptr = 0;
+
     if (!directed || mode == IGRAPH_OUT) {
 
-        for (i = 0; i < nn1; i++) {
-            for (j = 0; j < nn2; j++) {
+        for (igraph_integer_t i = 0; i < n1; i++) {
+            for (igraph_integer_t j = 0; j < n2; j++) {
                 VECTOR(edges)[ptr++] = i;
-                VECTOR(edges)[ptr++] = nn1 + j;
+                VECTOR(edges)[ptr++] = n1 + j;
             }
         }
 
     } else if (mode == IGRAPH_IN) {
 
-        for (i = 0; i < nn1; i++) {
-            for (j = 0; j < nn2; j++) {
-                VECTOR(edges)[ptr++] = nn1 + j;
+        for (igraph_integer_t i = 0; i < n1; i++) {
+            for (igraph_integer_t j = 0; j < n2; j++) {
+                VECTOR(edges)[ptr++] = n1 + j;
                 VECTOR(edges)[ptr++] = i;
             }
         }
 
     } else {
 
-        for (i = 0; i < nn1; i++) {
-            for (j = 0; j < nn2; j++) {
+        for (igraph_integer_t i = 0; i < n1; i++) {
+            for (igraph_integer_t j = 0; j < n2; j++) {
                 VECTOR(edges)[ptr++] = i;
-                VECTOR(edges)[ptr++] = nn1 + j;
-                VECTOR(edges)[ptr++] = nn1 + j;
+                VECTOR(edges)[ptr++] = n1 + j;
+                VECTOR(edges)[ptr++] = n1 + j;
                 VECTOR(edges)[ptr++] = i;
             }
         }
@@ -480,8 +487,8 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
     if (types) {
         IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
         igraph_vector_bool_null(types);
-        for (i = nn1; i < no_of_nodes; i++) {
-            VECTOR(*types)[i] = 1;
+        for (igraph_integer_t i = n1; i < no_of_nodes; i++) {
+            VECTOR(*types)[i] = true;
         }
     }
 
