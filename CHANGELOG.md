@@ -5,6 +5,7 @@
 ### Fixed
 
  - `igraph_full_bipartite()` now checks for overflow.
+ - `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` are now more robust to overflow.
  - Bipartite graph creation functions now check input arguments.
 
 ### Other
