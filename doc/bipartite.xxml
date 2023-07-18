@@ -15,6 +15,8 @@
 <!-- doxrox-include igraph_create_bipartite -->
 <!-- doxrox-include igraph_full_bipartite -->
 <!-- doxrox-include igraph_bipartite_game -->
+<!-- doxrox-include igraph_bipartite_game_gnm -->
+<!-- doxrox-include igraph_bipartite_game_gnp -->
 </section>
 
 <section id="bipartite-adjacency-matrices"><title>Bipartite adjacency matrices</title>
