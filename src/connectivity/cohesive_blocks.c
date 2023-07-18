@@ -289,7 +289,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
     VECTOR(Qparent)[0] = -1;  /* Has no parent */
     IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /*checks=*/ true));
     VECTOR(Qcohesion)[0] = conn;
-    VECTOR(Qcheck)[0] = 0;
+    VECTOR(Qcheck)[0] = false;
 
     /* Then work until the queue is empty */
     while (Qptr < igraph_vector_ptr_size(&Q)) {
@@ -334,7 +334,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
            but only if there is at least one vertex not included in any
            separator. */
         if (nsepv != mynodes) {
-            addedsep = 1;
+            addedsep = true;
             for (i = 0; i < mynodes; i++) {
                 if (VECTOR(marked)[i]) {
                     IGRAPH_CHECK(igraph_vector_int_push_back(&components, i));
@@ -424,7 +424,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                 p = VECTOR(Qparent)[p];
             }
             if (VECTOR(Qcohesion)[p] >= VECTOR(Qcohesion)[i]) {
-                VECTOR(removed)[i] = 1;
+                VECTOR(removed)[i] = true;
                 badblocks++;
             }
         }
@@ -469,7 +469,7 @@ igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                 jc = VECTOR(Qcohesion)[j];
                 if (igraph_i_cb_isin(ivec, jvec) && jc >= ic) {
                     badblocks++;
-                    VECTOR(removed)[i] = 1;
+                    VECTOR(removed)[i] = true;
                     break;
                 }
             }
