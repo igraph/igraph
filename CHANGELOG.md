@@ -5,6 +5,7 @@
 ### Fixed
 
  - `igraph_full_bipartite()` now checks for overflow.
+ - Bipartite graph creation functions now check input arguments.
 
 ### Other
 

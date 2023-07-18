@@ -429,6 +429,10 @@ igraph_error_t igraph_full_bipartite(igraph_t *graph,
     igraph_vector_int_t edges;
     igraph_integer_t ptr;
 
+    if (n1 < 0 || n2 < 0) {
+        IGRAPH_ERROR("Invalid number of vertices for bipartite graph.", IGRAPH_EINVAL);
+    }
+
     IGRAPH_SAFE_ADD(n1, n2, &no_of_nodes);
 
     if (!directed) {
@@ -950,8 +954,12 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
     igraph_vector_int_t edges, s;
     igraph_integer_t i;
 
+    if (n1 < 0 || n2 < 0) {
+        IGRAPH_ERROR("Invalid number of vertices for bipartite graph.", IGRAPH_EINVAL);
+    }
+
     if (p < 0.0 || p > 1.0) {
-        IGRAPH_ERROR("Invalid connection probability", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid connection probability.", IGRAPH_EINVAL);
     }
 
     if (types) {
@@ -1048,7 +1056,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
     igraph_vector_int_t s;
 
     if (n1 < 0 || n2 < 0) {
-        IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid number of vertices for bipartite graph.", IGRAPH_EINVAL);
     }
     if (m < 0) {
         IGRAPH_ERROR("Invalid number of edges.", IGRAPH_EINVAL);
@@ -1192,10 +1200,6 @@ igraph_error_t igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *type
                           igraph_integer_t n1, igraph_integer_t n2,
                           igraph_real_t p, igraph_integer_t m,
                           igraph_bool_t directed, igraph_neimode_t mode) {
-
-    if (n1 < 0 || n2 < 0) {
-        IGRAPH_ERROR("Invalid number of vertices for bipartite game.", IGRAPH_EINVAL);
-    }
 
     if (type == IGRAPH_ERDOS_RENYI_GNP) {
         return igraph_bipartite_game_gnp(graph, types, n1, n2, p, directed, mode);
