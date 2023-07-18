@@ -8,6 +8,10 @@
  - `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` are now more robust to overflow.
  - Bipartite graph creation functions now check input arguments.
 
+### Deprecated
+
+ - `igraph_bipartite_game()` is now deprecated; use `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` instead.
+
 ### Other
 
  - Documentation improvements.

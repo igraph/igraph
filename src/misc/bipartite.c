@@ -1218,12 +1218,8 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
  * \function igraph_bipartite_game
  * \brief Generate a bipartite random graph (similar to Erdős-Rényi).
  *
- * Similarly to unipartite (one-mode) networks, we can define the
- * G(n,p), and G(n,m) graph classes for bipartite graphs, via their
- * generating process. In G(n,p) every possible edge between top and
- * bottom vertices is realized with probability p, independently of the
- * rest of the edges. In G(n,m), we uniformly choose m edges to
- * realize.
+ * This function is deprecated; use \ref igraph_bipartite_game_gnm() or
+ * \ref igraph_bipartite_game_gnp() instead.
  *
  * \param graph Pointer to an uninitialized igraph graph, the result
  *    is stored here.
