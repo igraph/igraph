@@ -113,6 +113,88 @@ int main(void) {
         igraph_destroy(&graph);
     }
 
+
+    /* G(n,m) Multi-edge */
+
+    /* undirected */
+
+    n1 = 10; n2 = 20; m = 120;
+    igraph_bipartite_game_gnm(&graph, &types,
+                          n1, n2, m,
+                          IGRAPH_UNDIRECTED, IGRAPH_ALL,
+                          IGRAPH_MULTIPLE);
+
+    igraph_is_bipartite(&graph, &bipartite, NULL);
+
+    IGRAPH_ASSERT(bipartite);
+    IGRAPH_ASSERT(! igraph_is_directed(&graph));
+    IGRAPH_ASSERT(igraph_vcount(&graph) == n1 + n2);
+    IGRAPH_ASSERT(igraph_ecount(&graph) == m);
+
+    check_partitions(&graph, &types, IGRAPH_ALL);
+
+    igraph_destroy(&graph);
+
+    /* Large number of edges */
+
+    n1 = 5; n2 = 6; m = 70;
+    igraph_bipartite_game_gnm(&graph, &types,
+                              n1, n2, m,
+                              IGRAPH_UNDIRECTED, IGRAPH_ALL,
+                              IGRAPH_MULTIPLE);
+
+    igraph_is_bipartite(&graph, &bipartite, NULL);
+
+    IGRAPH_ASSERT(bipartite);
+    IGRAPH_ASSERT(! igraph_is_directed(&graph));
+    IGRAPH_ASSERT(igraph_vcount(&graph) == n1 + n2);
+    IGRAPH_ASSERT(igraph_ecount(&graph) == m);
+
+    check_partitions(&graph, &types, IGRAPH_ALL);
+
+    igraph_destroy(&graph);
+
+    /* empty graph */
+
+    n1 = 5; n2 = 6; m = 0;
+    igraph_bipartite_game_gnm(&graph, &types,
+                              n1, n2, m,
+                              IGRAPH_UNDIRECTED, IGRAPH_ALL,
+                              IGRAPH_MULTIPLE);
+
+    igraph_is_bipartite(&graph, &bipartite, NULL);
+
+    IGRAPH_ASSERT(bipartite);
+    IGRAPH_ASSERT(! igraph_is_directed(&graph));
+    IGRAPH_ASSERT(igraph_vcount(&graph) == n1 + n2);
+    IGRAPH_ASSERT(igraph_ecount(&graph) == m);
+
+    check_partitions(&graph, &types, IGRAPH_ALL);
+
+    igraph_destroy(&graph);
+
+    /* directed */
+
+    m = 35;
+
+    for (int i=0; i < sizeof(modes) / sizeof(modes[0]); i++) {
+        igraph_bipartite_game_gnm(&graph, &types,
+                                  n1, n2, m,
+                                  IGRAPH_DIRECTED, modes[i],
+                                  IGRAPH_MULTIPLE);
+
+        igraph_is_bipartite(&graph, &bipartite, NULL);
+
+        IGRAPH_ASSERT(bipartite);
+        IGRAPH_ASSERT(igraph_is_directed(&graph));
+        IGRAPH_ASSERT(igraph_vcount(&graph) == n1 + n2);
+        IGRAPH_ASSERT(igraph_ecount(&graph) == m);
+
+        check_partitions(&graph, &types, modes[i]);
+
+        igraph_destroy(&graph);
+    }
+
     /* G(n,p) */
 
     /* undirected */
