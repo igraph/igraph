@@ -77,12 +77,6 @@ IGRAPH_EXPORT igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                                       igraph_bool_t *res,
                                       igraph_vector_bool_t *types);
 
-IGRAPH_EXPORT igraph_error_t igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
-                                        igraph_erdos_renyi_t type,
-                                        igraph_integer_t n1, igraph_integer_t n2,
-                                        igraph_real_t p, igraph_integer_t m,
-                                        igraph_bool_t directed, igraph_neimode_t mode);
-
 IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
                                             igraph_integer_t n1, igraph_integer_t n2,
                                             igraph_real_t p, igraph_bool_t directed,
@@ -103,6 +97,14 @@ IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_incidence(
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t igraph_get_incidence(
    const igraph_t *graph, const igraph_vector_bool_t *types, igraph_matrix_t *res,
    igraph_vector_int_t *row_ids, igraph_vector_int_t *col_ids
+);
+
+IGRAPH_EXPORT IGRAPH_DEPRECATED  igraph_error_t igraph_bipartite_game(
+    igraph_t *graph, igraph_vector_bool_t *types,
+    igraph_erdos_renyi_t type,
+    igraph_integer_t n1, igraph_integer_t n2,
+    igraph_real_t p, igraph_integer_t m,
+    igraph_bool_t directed, igraph_neimode_t mode
 );
 
 __END_DECLS

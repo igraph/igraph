@@ -618,8 +618,8 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
  * \ingroup vector
  * \section igraph_vector_accessing_elements Accessing elements
  *
- * <para>The simplest way to access an element of a vector is to use the
- * \ref VECTOR macro. This macro can be used both for querying and setting
+ * <para>The simplest and most performant way to access an element of a vector is
+ * to use the \ref VECTOR macro. This macro can be used both for querying and setting
  * \type igraph_vector_t elements. If you need a function, \ref
  * igraph_vector_get() queries and \ref igraph_vector_set() sets an element of a
  * vector. \ref igraph_vector_get_ptr() returns the address of an element.</para>
@@ -634,6 +634,9 @@ igraph_error_t FUNCTION(igraph_vector, insert)(
  * \ingroup vector
  * \function igraph_vector_get
  * \brief Access an element of a vector.
+ *
+ * Unless you need a function, consider using the \ref VECTOR
+ * macro instead for better performance.
  *
  * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the index of the first
@@ -654,6 +657,9 @@ BASE FUNCTION(igraph_vector, get)(const TYPE(igraph_vector)* v, igraph_integer_t
  * \ingroup vector
  * \function igraph_vector_get_ptr
  * \brief Get the address of an element of a vector.
+ *
+ * Unless you need a function, consider using the \ref VECTOR
+ * macro instead for better performance.
  *
  * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the position of the first
@@ -704,6 +710,9 @@ BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, igraph_inte
  * \ingroup vector
  * \function igraph_vector_set
  * \brief Assignment to an element of a vector.
+ *
+ * Unless you need a function, consider using the \ref VECTOR
+ * macro instead for better performance.
  *
  * \param v The \type igraph_vector_t element.
  * \param pos Position of the element to set.

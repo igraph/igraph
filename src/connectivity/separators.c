@@ -57,13 +57,13 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
             igraph_integer_t v = IGRAPH_VIT_GET(*vit);
             if (!VECTOR(hit)[v]) {
                 nohit++;
-                VECTOR(hit)[v] = 1;
+                VECTOR(hit)[v] = true;
             }
         }
         igraph_vector_bool_destroy(&hit);
         IGRAPH_FINALLY_CLEAN(1);
         if (nohit >= no_of_nodes - 1) {
-            *res = 0;
+            *res = false;
             return IGRAPH_SUCCESS;
         }
     }
@@ -75,7 +75,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
         for (IGRAPH_VIT_RESET(*vit);
              !IGRAPH_VIT_END(*vit);
              IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = 1;
+            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = true;
         }
     } else {
         /* There is an exception */
@@ -83,12 +83,12 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
         for (i = 0, IGRAPH_VIT_RESET(*vit);
              i < except;
              i++, IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = 1;
+            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = true;
         }
         for (IGRAPH_VIT_NEXT(*vit);
              !IGRAPH_VIT_END(*vit);
              IGRAPH_VIT_NEXT(*vit)) {
-            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = 1;
+            VECTOR(*removed)[ IGRAPH_VIT_GET(*vit) ] = true;
         }
     }
 
@@ -103,7 +103,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_dqueue_int_push(Q, start));
-    VECTOR(*removed)[start] = 1;
+    VECTOR(*removed)[start] = true;
     while (!igraph_dqueue_int_empty(Q)) {
         igraph_integer_t node = igraph_dqueue_int_pop(Q);
         igraph_integer_t j, n;
@@ -113,7 +113,7 @@ static igraph_error_t igraph_i_is_separator(const igraph_t *graph,
             igraph_integer_t nei = VECTOR(*neis)[j];
             if (!VECTOR(*removed)[nei]) {
                 IGRAPH_CHECK(igraph_dqueue_int_push(Q, nei));
-                VECTOR(*removed)[nei] = 1;
+                VECTOR(*removed)[nei] = true;
             }
         }
     }
@@ -238,12 +238,12 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
          * separator.
          */
         igraph_integer_t i;
-        for (i = 0, *res = 0; i < candsize && (!*res); i++) {
+        for (i = 0, *res = false; i < candsize && (!*res); i++) {
             igraph_vector_bool_null(&removed);
             IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, i, res, &removed,
                                                &Q, &neis, no_of_nodes));
         }
-        (*res) = (*res) ? 0 : 1;    /* opposite */
+        (*res) = ! (*res);    /* opposite */
     }
 
     igraph_vector_int_destroy(&neis);
@@ -257,12 +257,12 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
 
 /* --------------------------------------------------------------------*/
 
-#define UPDATEMARK() do {                              \
-        (*mark)++;                         \
-        if (!(*mark)) {                    \
-            igraph_vector_int_null(leaveout);                \
-            (*mark)=1;                       \
-        }                                                  \
+#define UPDATEMARK() do { \
+        (*mark)++; \
+        if (!(*mark)) { \
+            igraph_vector_int_null(leaveout); \
+            (*mark)=1; \
+        } \
     } while (0)
 
 static igraph_error_t igraph_i_connected_components_leaveout(const igraph_adjlist_t *adjlist,
@@ -439,14 +439,11 @@ igraph_error_t igraph_all_minimal_st_separators(
      * This facilitates the comparison of the separators when we find a
      * potential new candidate.
      *
-     * To keep track of which separator we already used as a basis, we
-     * keep a boolean vector (already_tried). The try_next pointer show
-     * the next separator to try as a basis.
+     * The try_next pointer show the next separator to try as a basis.
      */
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t leaveout;
-    igraph_vector_bool_t already_tried;
     igraph_integer_t try_next = 0;
     igraph_integer_t mark = 1;
     igraph_integer_t v;
@@ -459,8 +456,6 @@ igraph_error_t igraph_all_minimal_st_separators(
     igraph_vector_int_list_clear(separators);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&leaveout, no_of_nodes);
-    IGRAPH_CHECK(igraph_vector_bool_init(&already_tried, 0));
-    IGRAPH_FINALLY(igraph_vector_bool_destroy, &already_tried);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&components, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&components, no_of_nodes * 2));
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
@@ -542,9 +537,8 @@ igraph_error_t igraph_all_minimal_st_separators(
     igraph_dqueue_int_destroy(&Q);
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&components);
-    igraph_vector_bool_destroy(&already_tried);
     igraph_vector_int_destroy(&leaveout);
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
 }
@@ -594,8 +588,7 @@ static igraph_error_t igraph_i_minimum_size_separators_topkdeg(
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&order, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL,
-                               /*loops=*/ 0));
+    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
     IGRAPH_CHECK(igraph_vector_int_order1(&deg, &order, no_of_nodes));
     IGRAPH_CHECK(igraph_vector_int_resize(res, k));
@@ -739,8 +732,8 @@ igraph_error_t igraph_minimum_size_separators(
             /* --------------------------------------------------------------- */
             /* 4 Compute a maximum flow phi in Gbar from x[i] to v[j].
             If |phi|=k, then */
-            IGRAPH_CHECK(igraph_maxflow(&Gbar, &phivalue, &phi, /*cut=*/ 0,
-                                        /*partition=*/ 0, /*partition2=*/ 0,
+            IGRAPH_CHECK(igraph_maxflow(&Gbar, &phivalue, &phi, /*cut=*/ NULL,
+                                        /*partition=*/ NULL, /*partition2=*/ NULL,
                                         /* source= */ ii + no_of_nodes,
                                         /* target= */ j,
                                         &capacity, &stats));
@@ -751,9 +744,9 @@ igraph_error_t igraph_minimum_size_separators(
                 /* 5-6-7. Find all k-sets separating x[i] and v[j]. */
                 igraph_vector_int_list_t stcuts;
                 IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&stcuts, 0);
-                IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ 0,
+                IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ NULL,
                                                    /*cuts=*/ &stcuts,
-                                                   /*partition1s=*/ 0,
+                                                   /*partition1s=*/ NULL,
                                                    /*source=*/ ii + no_of_nodes,
                                                    /*target=*/ j,
                                                    /*capacity=*/ &capacity));

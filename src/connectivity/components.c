@@ -1112,7 +1112,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                         if (articulation_points && !VECTOR(found)[prev]
                             && prev != i /* the root */) {
                             IGRAPH_CHECK(igraph_vector_int_push_back(articulation_points, prev));
-                            VECTOR(found)[prev] = 1;
+                            VECTOR(found)[prev] = true;
                         }
                         if (no) {
                             *no += 1;
@@ -1274,7 +1274,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
                 if (i == 0) {
                     /* We are at the first step of visiting vertex u. */
 
-                    VECTOR(visited)[u] = 1;
+                    VECTOR(visited)[u] = true;
 
                     time += 1;
 

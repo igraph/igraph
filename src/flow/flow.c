@@ -1177,9 +1177,9 @@ igraph_error_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
                      igraph_integer_t source, igraph_integer_t target,
                      const igraph_vector_t *capacity) {
 
-    return igraph_maxflow(graph, value, /*flow=*/ 0,
+    return igraph_maxflow(graph, value, /*flow=*/ NULL,
                           cut, partition, partition2,
-                          source, target, capacity, 0);
+                          source, target, capacity, NULL);
 }
 
 /*
@@ -1493,9 +1493,9 @@ static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
     }
 
     for (i = 1; i < no_of_nodes; i++) {
-        IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
+        IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ NULL,
                                     pcut, ppartition, ppartition2, /*source=*/ 0,
-                                    /*target=*/ i, capacity, 0));
+                                    /*target=*/ i, capacity, NULL));
         if (flow < minmaxflow) {
             minmaxflow = flow;
             if (cut) {
@@ -1512,10 +1512,10 @@ static igraph_error_t igraph_i_mincut_directed(const igraph_t *graph,
                 break;
             }
         }
-        IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
+        IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ NULL,
                                     pcut, ppartition, ppartition2,
                                     /*source=*/ i,
-                                    /*target=*/ 0, capacity, 0));
+                                    /*target=*/ 0, capacity, NULL));
         if (flow < minmaxflow) {
             minmaxflow = flow;
             if (cut) {
@@ -2140,7 +2140,7 @@ igraph_error_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_
     /* Are we done yet? */
     if (!ret) {
         if (igraph_is_directed(graph)) {
-            IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(graph, res, /* all_edges_are_mutual = */ 0));
+            IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(graph, res, /* all_edges_are_mutual = */ false));
         } else {
             IGRAPH_CHECK(igraph_i_vertex_connectivity_undirected(graph, res));
         }
@@ -2526,7 +2526,7 @@ igraph_error_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         target = VECTOR(neighbors)[source];
 
         /* Find the maximum flow between source and target */
-        IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, 0, 0, &partition, &partition2,
+        IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, NULL, NULL, &partition, &partition2,
                                     source, target, capacity, 0));
 
         /* Store the maximum flow */

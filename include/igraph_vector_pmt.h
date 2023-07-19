@@ -60,8 +60,7 @@ IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igra
  * \verbatim VECTOR(v)[10]=5; \endverbatim
  *
  * Note that there are no range checks right now.
- * This functionality might be redefined later as a real function
- * instead of a <code>#define</code>.
+ *
  * \param v The vector object.
  *
  * Time complexity: O(1).
