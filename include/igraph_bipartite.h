@@ -85,7 +85,7 @@ IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_v
 IGRAPH_EXPORT igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
                                             igraph_integer_t n1, igraph_integer_t n2,
                                             igraph_integer_t m, igraph_bool_t directed,
-                                            igraph_neimode_t mode);
+                                            igraph_neimode_t mode, igraph_bool_t multiple);
 
 /* Deprecated functions: */
 

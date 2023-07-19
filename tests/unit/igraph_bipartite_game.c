@@ -41,7 +41,8 @@ int main(void) {
     n1 = 10; n2 = 20; m = 80;
     igraph_bipartite_game_gnm(&graph, &types,
                           n1, n2, m,
-                          IGRAPH_UNDIRECTED, IGRAPH_ALL);
+                          IGRAPH_UNDIRECTED, IGRAPH_ALL,
+                          IGRAPH_NO_MULTIPLE);
 
     igraph_is_bipartite(&graph, &bipartite, NULL);
 
@@ -59,7 +60,8 @@ int main(void) {
     n1 = 5; n2 = 6; m = 30;
     igraph_bipartite_game_gnm(&graph, &types,
                               n1, n2, m,
-                              IGRAPH_UNDIRECTED, IGRAPH_ALL);
+                              IGRAPH_UNDIRECTED, IGRAPH_ALL,
+                              IGRAPH_NO_MULTIPLE);
 
     igraph_is_bipartite(&graph, &bipartite, NULL);
 
@@ -77,7 +79,8 @@ int main(void) {
     n1 = 5; n2 = 6; m = 0;
     igraph_bipartite_game_gnm(&graph, &types,
                               n1, n2, m,
-                              IGRAPH_UNDIRECTED, IGRAPH_ALL);
+                              IGRAPH_UNDIRECTED, IGRAPH_ALL,
+                              IGRAPH_NO_MULTIPLE);
 
     igraph_is_bipartite(&graph, &bipartite, NULL);
 
@@ -95,7 +98,8 @@ int main(void) {
     for (int i=0; i < sizeof(modes) / sizeof(modes[0]); i++) {
         igraph_bipartite_game_gnm(&graph, &types,
                                   n1, n2, m,
-                                  IGRAPH_DIRECTED, modes[i]);
+                                  IGRAPH_DIRECTED, modes[i],
+                                  IGRAPH_NO_MULTIPLE);
 
         igraph_is_bipartite(&graph, &bipartite, NULL);
 
@@ -150,10 +154,10 @@ int main(void) {
 
     VERIFY_FINALLY_STACK();
 
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, 10, 201, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, -1, 20, IGRAPH_DIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 0, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, 10, 201, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, -1, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_bipartite_game_gnm(&graph, NULL, 10, -1, 20, IGRAPH_DIRECTED, IGRAPH_ALL, IGRAPH_NO_MULTIPLE), IGRAPH_EINVAL);
 
     CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, -1, 10, 0.1, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
     CHECK_ERROR(igraph_bipartite_game_gnp(&graph, NULL, 10, -1, 0.9, IGRAPH_UNDIRECTED, IGRAPH_ALL), IGRAPH_EINVAL);
