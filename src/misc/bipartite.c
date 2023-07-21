@@ -1143,7 +1143,7 @@ igraph_error_t igraph_bipartite_game_gnm_multi(igraph_t *graph, igraph_vector_bo
             igraph_vector_int_push_back(&edges, to);
             igraph_vector_int_push_back(&edges, from);
         }
-        else{
+        else {
             igraph_vector_int_push_back(&edges, from);
             igraph_vector_int_push_back(&edges, to);
         }
