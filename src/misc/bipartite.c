@@ -1133,7 +1133,7 @@ igraph_error_t igraph_bipartite_game_gnm_multi(igraph_t *graph, igraph_vector_bo
     IGRAPH_CHECK(igraph_vector_int_reserve(&edges, m * 2));
 
     RNG_BEGIN();
-    for (i = 0; i < m; i++) {
+    for (igraph_integer_t i = 0; i < m; i++) {
         igraph_integer_t to, from;
 
         to = RNG_INTEGER(n1, n - 1);
