@@ -648,31 +648,35 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         }
     }
 
+
+    std::set<int_set> E_subsets = std::set<int_set>();
+    int_set C_prime;
+    int_set C;
+    igraph_integer_t C_1 = igraph_vector_int_get(&steiner_terminals_copy,0);
+    for (int i = 0 ; i < igraph_vector_int_size(&steiner_terminals_copy) ; i++){
+        C.insert(igraph_vector_int_get(&steiner_terminals_copy,i));
+        if (i!=0)   
+            C_prime.insert(igraph_vector_int_get(&steiner_terminals_copy,i));
+    }
+    generateD_E(C_1, C_prime, E_subsets);
+
     igraph_real_t distance2 = IGRAPH_INFINITY;
 
     for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
         igraph_real_t distance1 = IGRAPH_INFINITY;
         IGRAPH_ALLOW_INTERRUPTION();
-        for (igraph_integer_t subset_C_iterator = 0; subset_C_iterator < steiner_terminals_copy_size; subset_C_iterator++) {
-            igraph_integer_t F = VECTOR(steiner_terminals_copy)[subset_C_iterator];
-            igraph_real_t distanceFJ = MATRIX(distance, F, j);
+        for (auto E : E_subsets) {
+            igraph_integer_t indexE = (E.size() == 1) ? *E.begin() : fetchIndexofMapofSets(E,subsetMap);
+            int_set CMinusE;
+            std::set_difference(C.begin(),C.end(),E.begin(),E.end(),std::inserter(CMinusE,CMinusE.end()));
+            igraph_integer_t indexC_E = (CMinusE.size() == 1) ? *CMinusE.begin() : fetchIndexofMapofSets(CMinusE,subsetMap);
+            igraph_real_t distanceFJ = MATRIX(dp_cache,indexE,j);
 
-            int_set CMinusF;
 
-            for (igraph_integer_t k = 0; k < steiner_terminals_copy_size; k++) {
 
-                if (VECTOR(steiner_terminals_copy)[k] != F) {
-                    CMinusF.insert(VECTOR(steiner_terminals_copy)[k]);
-                }
+            if (((distanceFJ + (MATRIX(dp_cache, indexC_E, j))) < distance1)) {
+                distance1 = distanceFJ + (MATRIX(dp_cache, indexC_E, j));
             }
-
-            igraph_integer_t indexOfSubsetCMinusF = fetchIndexofMapofSets(CMinusF, subsetMap);
-
-            if (((distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j))) < distance1)) {
-                distance1 = distanceFJ + (MATRIX(dp_cache, indexOfSubsetCMinusF, j));
-            }
-
-            int_set x = fetchSetsBasedonIndex(indexOfSubsetCMinusF, subsetMap);
         }
 
         if ((MATRIX(distance, q, j) + distance1) < distance2) {
