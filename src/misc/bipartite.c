@@ -1229,7 +1229,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
     } else {
 
-        if (multiple){
+        if (multiple) {
             return igraph_bipartite_game_gnm_multi(graph, types, n1, n2, m, directed, mode);
         }
 
