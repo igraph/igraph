@@ -1124,7 +1124,7 @@ igraph_error_t igraph_bipartite_game_gnm_multi(igraph_t *graph, igraph_vector_bo
                               igraph_integer_t m, igraph_bool_t directed,
                               igraph_neimode_t mode) {
 
-    igraph_integer_t n, i;
+    igraph_integer_t n;
     igraph_vector_int_t edges;
 
     IGRAPH_SAFE_ADD(n1, n2, &n);
