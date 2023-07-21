@@ -76,13 +76,20 @@ static igraph_error_t generateSubsets(const igraph_vector_int_t *steinerTerminal
     return IGRAPH_SUCCESS;
 }
 
-static void generateD_E(int D1, const int_set &D, std::set<int_set> &allSubsets) {
+static void generateD_E(const int_set &D, std::set<int_set> &allSubsets, igraph_integer_t D1 = -1) {
+    /*
+    D1 is the element that is always going to be there in all the subsets that we generate
+    D has elements for which we are creating subsets
+    allSubsets is the container to store all
+    */
     int n = D.size();
     igraph_integer_t count = ((igraph_integer_t)1 << n);
 
     for (igraph_integer_t i = 0; i < count - 1; i++) {
         int_set newSubset;
-        newSubset.insert(D1);
+        if (D1 != (igraph_integer_t) -1) {
+            newSubset.insert(D1);
+        }
         for (igraph_integer_t j = 0; j < n; j++) {
             if ((i & ((igraph_integer_t)1 << j)) > 0) {
                 auto it = D.begin();
@@ -199,25 +206,17 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
     igraph_integer_t m = q;
     int_set D = C;
     std::set<igraph_integer_t> edgelist_all_set;
-
     while (D.size() > 1) {
-
         std::set<igraph_integer_t>::iterator itr;
-
-
         indexD = fetchIndexofMapofSets(D, subsetMap);
 
         // Finding the bridge vertex from m to subset D which is part of shortest path.
         igraph_integer_t k = findMinimumK(dp_cache, indexD, m, subsetMap);
 
-        igraph_vector_int_t vectorlist;
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist, 0);
-
         igraph_vector_int_t edgelist;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, 0);
 
-        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist, &edgelist, m, k, weights, IGRAPH_ALL));
-
+        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, nullptr, &edgelist, m, k, weights, IGRAPH_ALL));
 
         for (int i = 0; i < igraph_vector_int_size(&edgelist); i++) {
             edgelist_all_set.insert(VECTOR(edgelist)[i]);
@@ -253,21 +252,17 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
                 }
             }
 
-            igraph_vector_int_t vectorlist_1;
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_1, 0);
-
             igraph_vector_int_t edgelist_1;
             IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist_1, 0);
 
-            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, nullptr, &edgelist_1, k, min_E_value, weights, IGRAPH_ALL));
 
             for (int i = 0; i < igraph_vector_int_size(&edgelist_1); i++) {
                 edgelist_all_set.insert(VECTOR(edgelist_1)[i]);
             }
 
-            igraph_vector_int_destroy(&vectorlist_1);
             igraph_vector_int_destroy(&edgelist_1);
-            IGRAPH_FINALLY_CLEAN(2);
+            IGRAPH_FINALLY_CLEAN(1);
         } else {
             /*
                 If the size of subset is 2 then just shortest path from
@@ -278,21 +273,16 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
             E1 = *D.begin();
             F1 = *next(D.begin(), 1);
 
-            igraph_vector_int_t vectorlist_1;
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_1, 0);
 
             igraph_vector_int_t edgelist_1;
             IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist_1, 0);
 
-            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_1, &edgelist_1, k, E1, weights, IGRAPH_ALL));
-
-            igraph_vector_int_t vectorlist_2;
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&vectorlist_2, 0);
+            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, nullptr, &edgelist_1, k, E1, weights, IGRAPH_ALL));
 
             igraph_vector_int_t edgelist_2;
             IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist_2, 0);
 
-            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vectorlist_2, &edgelist_2, k, F1, weights, IGRAPH_ALL));
+            IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, nullptr, &edgelist_2, k, F1, weights, IGRAPH_ALL));
 
             for (int i = 0; i < igraph_vector_int_size(&edgelist_1); i++) {
                 edgelist_all_set.insert(VECTOR(edgelist_1)[i]);
@@ -302,13 +292,11 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
                 edgelist_all_set.insert(VECTOR(edgelist_2)[i]);
             }
 
-            igraph_vector_int_destroy(&vectorlist_2);
-            igraph_vector_int_destroy(&vectorlist_1);
 
             igraph_vector_int_destroy(&edgelist_1);
             igraph_vector_int_destroy(&edgelist_2);
 
-            IGRAPH_FINALLY_CLEAN(4);
+            IGRAPH_FINALLY_CLEAN(2);
 
             min_F.insert(F1);
         }
@@ -316,10 +304,9 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
         m = k;
         D = min_F;
 
-        igraph_vector_int_destroy(&vectorlist);
         igraph_vector_int_destroy(&edgelist);
 
-        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     for (auto i : edgelist_all_set) {
@@ -328,6 +315,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
 
     return IGRAPH_SUCCESS;
 }
+
 
 /**
  * \function  igraph_steiner_dreyfus_wagner
@@ -360,7 +348,7 @@ static igraph_error_t generate_steiner_tree_exact(const igraph_t *graph, const i
  *    that are part of Steiner tree.
  * \return Error code.
  *
- * Time complexity: O( 3^k ∗ V + 2^k ∗ V^2 + V∗(V+E) ∗ log(V) )
+ * Time complexity: O( 3^k ∗ V + 2^k ∗ V^2 + V∗(V+E) ∗ log(V) ) = O(3^k)
  * where V and E are the number of vertices and edges
  * and k is the number of Steiner terminals.
  * It is recommended that V &lt;= 50 and k &lt; 11.
@@ -630,34 +618,24 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                 int_set D_prime = D;
                 D_prime.erase(*D.begin());
 
-                std::set<int_set> Subsets = std::set<int_set>();;
-                generateD_E(*D.begin(), D_prime, Subsets);
-
+                std::set<int_set> Subsets = std::set<int_set>();
+                ;
+                generateD_E(D_prime, Subsets, *D.begin());
+                // E are subsets of D such that D[1] is in E
                 for (auto E : Subsets) {
 
-                    igraph_integer_t indexOfSubsetE;
-                    if (E.size() == 1) {
-                        indexOfSubsetE = *E.begin();
-                    } else {
-                        indexOfSubsetE = fetchIndexofMapofSets(E, subsetMap);
-                    }
+                    igraph_integer_t indexOfSubsetE = (E.size() == 1) ? *E.begin() : fetchIndexofMapofSets(E, subsetMap);
 
                     igraph_real_t distanceEJ = MATRIX(dp_cache, indexOfSubsetE, j);
-
 
                     int_set DMinusE = D;
 
                     for (auto elem : E) {
+                        // can be modified with a set difference function as we did in tree generation
                         DMinusE.erase(elem);
                     }
 
-
-                    igraph_integer_t indexOfSubsetDMinusE;
-                    if (DMinusE.size() == 1) {
-                        indexOfSubsetDMinusE = *DMinusE.begin();
-                    } else {
-                        indexOfSubsetDMinusE = fetchIndexofMapofSets(DMinusE, subsetMap);
-                    }
+                    igraph_integer_t indexOfSubsetDMinusE = (DMinusE.size() == 1) ? *DMinusE.begin() : fetchIndexofMapofSets(DMinusE, subsetMap);
 
                     distance1 = std::min(distance1, distanceEJ + MATRIX(dp_cache, indexOfSubsetDMinusE, j));
                 }
@@ -679,7 +657,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         if (i!=0)   
             C_prime.insert(igraph_vector_int_get(&steiner_terminals_copy,i));
     }
-    generateD_E(C_1, C_prime, E_subsets);
+    generateD_E(C_prime, E_subsets,C_1);
 
     igraph_real_t distance2 = IGRAPH_INFINITY;
 
@@ -712,7 +690,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         newSet.insert(VECTOR(steiner_terminals_copy)[i]);
     }
     igraph_integer_t indexD = fetchIndexofMapofSets(newSet, subsetMap);
-
 
     igraph_vector_int_clear(res_tree);
     IGRAPH_CHECK(generate_steiner_tree_exact(graph, pweights, &dp_cache, indexD, q, res_tree, subsetMap));
