@@ -1139,7 +1139,7 @@ igraph_error_t igraph_bipartite_game_gnm_multi(igraph_t *graph, igraph_vector_bo
         to = RNG_INTEGER(n1, n - 1);
         from = RNG_INTEGER(0, n1 - 1);
 
-        if (mode == IGRAPH_IN || (mode == IGRAPH_ALL && RNG_INTEGER(0,1) == 1)) {   //Flip with probability 0.5 for IGRAPH_ALL
+        if (mode == IGRAPH_IN || (mode == IGRAPH_ALL && RNG_INTEGER(0,1) == 1)) { /* flip with probability 0.5 for IGRAPH_ALL */
             igraph_vector_int_push_back(&edges, to);
             igraph_vector_int_push_back(&edges, from);
         }
