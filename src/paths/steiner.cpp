@@ -405,6 +405,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             for (int k = 0 ; k < igraph_vector_int_size(&edgelist) ; k++) {
                 distance_matrix[i][j].insert(igraph_vector_int_get(&edgelist, k));
             }
+            igraph_vector_int_destroy(&edgelist);
             IGRAPH_FINALLY_CLEAN(1);
         }
     }
