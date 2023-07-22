@@ -385,6 +385,9 @@ int main(void) {
     igraph_vector_int_print(&tree_edges_new);
     printf("value: %f\n", value_new_1);
 
+    igraph_vector_int_destroy(&tree_edges_new);
+    igraph_vector_int_destroy(&terminals_new);
+
     printf("\nA simple square graph with few more edges outside the square\n");
     igraph_t g_new_2;
     igraph_real_t value_new_2;
@@ -404,11 +407,36 @@ int main(void) {
     printf("value: %f\n", value_new_2);
 
 
+    igraph_vector_int_destroy(&tree_edges_new);
+    igraph_vector_int_destroy(&terminals_new);
+
+    printf("\nA 3 vertices square graph with weights\n");
+    igraph_t g_new_3;
+    igraph_vector_t weights;
+    igraph_vector_init(&weights, 12);
+    igraph_vector_fill(&weights, 100);
+    igraph_small(&g_new_3, 9, IGRAPH_UNDIRECTED,
+                 0, 1, 1, 2,
+                 0, 3, 1, 4, 2, 5,
+                 3, 4, 4, 5,
+                 3, 6, 4, 7, 5, 8,
+                 6, 7, 7, 8,
+                 -1);
+    igraph_vector_int_init_int_end(&terminals_new, -1, 0, 4, 2, 8, -1);
+    igraph_vector_int_init(&tree_edges_new, 0);
+    igraph_steiner_dreyfus_wagner(&g_new_3, &terminals_new, &weights, &value_new, &tree_edges_new);
+    printf("Tree edges:\n");
+    igraph_vector_int_print(&tree_edges_new);
+    printf("value: %f\n", value_new);
+
+
     igraph_destroy(&g_new);
     igraph_destroy(&g_new_1);
     igraph_destroy(&g_new_2);
+    igraph_destroy(&g_new_3);
     igraph_vector_int_destroy(&tree_edges_new);
     igraph_vector_int_destroy(&terminals_new);
+    igraph_vector_destroy(&weights);
 
     VERIFY_FINALLY_STACK();
 
