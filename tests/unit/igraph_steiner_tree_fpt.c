@@ -385,15 +385,30 @@ int main(void) {
     igraph_vector_int_print(&tree_edges_new);
     printf("value: %f\n", value_new_1);
 
+    printf("\nA simple square graph with few more edges outside the square\n");
+    igraph_t g_new_2;
+    igraph_real_t value_new_2;
+    igraph_small(&g_new_2, 6, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 1, 2, 1, 3,
+                 3, 4,
+                 2, 4,
+                 4, 5,
+                 -1
+                );
+    igraph_vector_int_init_int(&terminals_new, 4, 0, 3, 4, 5);
+    igraph_vector_int_init(&tree_edges_new, 0);
+    igraph_steiner_dreyfus_wagner(&g_new_2, &terminals_new, NULL, &value_new_2, &tree_edges_new);
+    printf("Tree edges:\n");
+    igraph_vector_int_print(&tree_edges_new);
+    printf("value: %f\n", value_new_2);
 
 
     igraph_destroy(&g_new);
     igraph_destroy(&g_new_1);
+    igraph_destroy(&g_new_2);
     igraph_vector_int_destroy(&tree_edges_new);
     igraph_vector_int_destroy(&terminals_new);
-
-
-
 
     VERIFY_FINALLY_STACK();
 
