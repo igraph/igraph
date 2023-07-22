@@ -88,13 +88,15 @@ int main(void) {
     from = 0; to = 4;
 
     printf("\nUnweighted\n");
-    igraph_get_all_shortest_paths_cutoff(&graph, &paths, &paths_edge, &nrgeo, from, igraph_vss_1(to), IGRAPH_ALL, 4);
+    igraph_vs_t vs;
+    igraph_vs_vector_small(&vs, 1, 4, -1);
+    igraph_get_all_shortest_paths_cutoff(&graph, &paths, &paths_edge, &nrgeo, from, vs, IGRAPH_ALL, 4);
+    igraph_vs_destroy(&vs);
 
     printf("Vertex paths:\n");
     print_vector_int_list(&paths);
     printf("Edge paths:\n");
     print_vector_int_list(&paths_edge);
-    IGRAPH_ASSERT(igraph_vector_int_list_size(&paths) == VECTOR(nrgeo)[to]);
 
     printf("\nWeighted, uniform weights\n");
     igraph_vector_resize(&weights, igraph_ecount(&graph));
