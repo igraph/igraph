@@ -1119,11 +1119,12 @@ igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *
  * edges.
  */
 
-static igraph_error_t igraph_bipartite_game_gnm_multi(igraph_t *graph, igraph_vector_bool_t *types,
-                              igraph_integer_t n1, igraph_integer_t n2,
-                              igraph_integer_t m, igraph_bool_t directed,
-                              igraph_neimode_t mode) {
-
+static igraph_error_t igraph_i_bipartite_game_gnm_multi(
+    igraph_t *graph, igraph_vector_bool_t *types,
+    igraph_integer_t n1, igraph_integer_t n2,
+    igraph_integer_t m, igraph_bool_t directed,
+    igraph_neimode_t mode
+) {
     igraph_integer_t n;
     igraph_vector_int_t edges;
 
@@ -1139,11 +1140,12 @@ static igraph_error_t igraph_bipartite_game_gnm_multi(igraph_t *graph, igraph_ve
         to = RNG_INTEGER(n1, n - 1);
         from = RNG_INTEGER(0, n1 - 1);
 
-        if (mode == IGRAPH_IN || (mode == IGRAPH_ALL && RNG_INTEGER(0,1) == 1)) { /* flip with probability 0.5 for IGRAPH_ALL */
+        /* flip unconditionally for IGRAPH_IN, or with probability 0.5 for
+         * IGRAPH_ALL */
+        if (mode == IGRAPH_IN || (mode == IGRAPH_ALL && RNG_UNIF01() < 0.5)) {
             igraph_vector_int_push_back(&edges, to);
             igraph_vector_int_push_back(&edges, from);
-        }
-        else {
+        } else {
             igraph_vector_int_push_back(&edges, from);
             igraph_vector_int_push_back(&edges, to);
         }
