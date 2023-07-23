@@ -1232,7 +1232,7 @@ igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *
     } else {
 
         if (multiple) {
-            return igraph_bipartite_game_gnm_multi(graph, types, n1, n2, m, directed, mode);
+            return igraph_i_bipartite_game_gnm_multi(graph, types, n1, n2, m, directed, mode);
         }
 
         igraph_integer_t i;
