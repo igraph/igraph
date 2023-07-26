@@ -1,5 +1,9 @@
 include(CheckCCompilerFlag)
 
+# Enable POSIX features
+add_compile_definitions(_GNU_SOURCE)
+add_compile_definitions(_POSIX_C_SOURCE=200809L)
+
 if(MSVC)
   add_compile_options(/FS)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS) # necessary to compile for UWP
