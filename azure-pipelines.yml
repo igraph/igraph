@@ -82,7 +82,6 @@ jobs:
     steps:
       - script: |
           sudo apt-get install ninja-build ccache -y
-          sudo apt-get remove python3-lldb-x.y
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 17
