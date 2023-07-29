@@ -21,6 +21,31 @@
 
 #include "test_utilities.h"
 
+void test_undirected2(void) {
+    //TODO remove
+    igraph_t graph;
+    igraph_matrix_t m;
+    igraph_vs_t from;
+    igraph_vs_t to;
+
+    igraph_small(&graph, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
+    igraph_matrix_init(&m, 3, 3);
+
+    igraph_vs_vector_small(&from, 0, 1, 2, -1);
+    igraph_vs_vector_small(&to, 0, 1, -1);
+
+    printf("Undirected, unweighted, no loops:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, from, to, NULL, IGRAPH_NO_LOOPS);
+    igraph_matrix_print(&m);
+
+    igraph_matrix_destroy(&m);
+    igraph_destroy(&graph);
+    igraph_vs_destroy(&from);
+    igraph_vs_destroy(&to);
+
+    VERIFY_FINALLY_STACK();
+}
+
 void test_undirected(void) {
     igraph_t graph;
     igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
@@ -32,93 +57,33 @@ void test_undirected(void) {
 
     igraph_matrix_init(&m, 2, 2);
 
-    printf("Undirected, unweighted, upper, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_NO_LOOPS);
+    printf("Undirected, unweighted, no loops:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_NO_LOOPS);
     igraph_matrix_print(&m);
     printf("========\n");
 
-    printf("Undirected, unweighted, upper, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_ONCE);
+    printf("Undirected, unweighted, loops once:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_ONCE);
     igraph_matrix_print(&m);
     printf("========\n");
 
-    printf("Undirected, unweighted, upper, loops twice:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_TWICE);
+    printf("Undirected, unweighted, loops twice:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_TWICE);
     igraph_matrix_print(&m);
     printf("========\n");
 
-    printf("Undirected, unweighted, lower, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_NO_LOOPS);
+    printf("Undirected, weighted, no loops:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_NO_LOOPS);
     igraph_matrix_print(&m);
     printf("========\n");
 
-    printf("Undirected, unweighted, lower, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_ONCE);
+    printf("Undirected, weighted, loops once:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_ONCE);
     igraph_matrix_print(&m);
     printf("========\n");
 
-    printf("Undirected, unweighted, lower, loops twice:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_TWICE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, unweighted, both, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_NO_LOOPS);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, unweighted, both, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_ONCE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, unweighted, both, loops twice:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_TWICE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, upper, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_NO_LOOPS);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, upper, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_ONCE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, upper, loops twice:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_UPPER, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_TWICE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, lower, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_NO_LOOPS);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, lower, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_ONCE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, lower, loops twice:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_LOWER, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_TWICE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, both, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_NO_LOOPS);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, both, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_ONCE);
-    igraph_matrix_print(&m);
-    printf("========\n");
-
-    printf("Undirected, weighted, both, loops twice:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_TWICE);
+    printf("Undirected, weighted, loops twice:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_TWICE);
     igraph_matrix_print(&m);
     printf("========\n");
 
@@ -140,49 +105,34 @@ void test_directed(void) {
     igraph_matrix_init(&m, 2, 2);
 
     printf("Directed, unweighted, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_NO_LOOPS);
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_NO_LOOPS);
     igraph_matrix_print(&m);
     printf("========\n");
 
     printf("Directed, unweighted, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_ONCE);
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_ONCE);
     igraph_matrix_print(&m);
     printf("========\n");
 
     printf("Directed, unweighted, loops twice (same as once):\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_TWICE);
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_TWICE);
     igraph_matrix_print(&m);
     printf("========\n");
 
     printf("Directed, weighted, no loops:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_NO_LOOPS);
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_NO_LOOPS);
     igraph_matrix_print(&m);
     printf("========\n");
 
     printf("Directed, weighted, loops once:\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_ONCE);
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_ONCE);
     igraph_matrix_print(&m);
     printf("========\n");
 
     printf("Directed, weighted, loops twice (same as once):\n");
-    igraph_get_adjacency_submatrix(&graph, &m, IGRAPH_GET_ADJACENCY_BOTH, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_TWICE);
+    igraph_get_adjacency_submatrix(&graph, &m, igraph_vss_all(), igraph_vss_all(), &weights, IGRAPH_LOOPS_TWICE);
     igraph_matrix_print(&m);
     printf("========\n");
-
-    igraph_matrix_destroy(&m);
-    igraph_destroy(&graph);
-
-    VERIFY_FINALLY_STACK();
-}
-
-void test_errors(void) {
-    igraph_t graph;
-    igraph_matrix_t m;
-
-    igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 3, 2, 2, 0, 1, -1);
-    igraph_matrix_init(&m, 2, 2);
-
-    CHECK_ERROR(igraph_get_adjacency_submatrix(&graph, &m, (igraph_get_adjacency_t) 42, igraph_vss_all(), igraph_vss_all(), NULL, IGRAPH_LOOPS_ONCE), IGRAPH_EINVAL);
 
     igraph_matrix_destroy(&m);
     igraph_destroy(&graph);
@@ -193,8 +143,8 @@ void test_errors(void) {
 int main(void) {
 
     test_undirected();
+    //test_undirected2();
     test_directed();
-    test_errors();
 
     return 0;
 }
