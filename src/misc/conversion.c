@@ -31,10 +31,10 @@
 #include "igraph_structural.h"
 #include "igraph_sparsemat.h"
 #include "igraph_random.h"
+#include "igraph_vector_list.h"
 
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
-#include "igraph_vector_list.h"
 #include "math/safe_intop.h"
 
 #define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
@@ -188,7 +188,7 @@ igraph_error_t igraph_get_adjacency_submatrix(
 
     if (directed) {
         for (igraph_integer_t i=0; ! IGRAPH_VIT_END(row); IGRAPH_VIT_NEXT(row), i++) {
-                IGRAPH_VIT_RESET(col);
+            IGRAPH_VIT_RESET(col);
             for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
                 from = IGRAPH_VIT_GET(row);
                 to = IGRAPH_VIT_GET(col);
