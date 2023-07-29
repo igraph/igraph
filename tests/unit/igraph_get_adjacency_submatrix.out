@@ -1,0 +1,168 @@
+Undirected, unweighted, upper, no loops:
+0 2 0 1 1
+0 0 1 0 0
+0 0 0 1 0
+0 0 0 0 1
+0 0 0 0 0
+========
+Undirected, unweighted, upper, loops once:
+0 2 0 1 1
+0 0 1 0 0
+0 0 1 1 0
+0 0 0 0 1
+0 0 0 0 0
+========
+Undirected, unweighted, upper, loops twice:
+0 2 0 1 1
+0 0 1 0 0
+0 0 2 1 0
+0 0 0 0 1
+0 0 0 0 0
+========
+Undirected, unweighted, lower, no loops:
+0 0 0 0 0
+2 0 0 0 0
+0 1 0 0 0
+1 0 1 0 0
+1 0 0 1 0
+========
+Undirected, unweighted, lower, loops once:
+0 0 0 0 0
+2 0 0 0 0
+0 1 1 0 0
+1 0 1 0 0
+1 0 0 1 0
+========
+Undirected, unweighted, lower, loops twice:
+0 0 0 0 0
+2 0 0 0 0
+0 1 2 0 0
+1 0 1 0 0
+1 0 0 1 0
+========
+Undirected, unweighted, both, no loops:
+0 2 0 1 1
+2 0 1 0 0
+0 1 0 1 0
+1 0 1 0 1
+1 0 0 1 0
+========
+Undirected, unweighted, both, loops once:
+0 2 0 1 1
+2 0 1 0 0
+0 1 1 1 0
+1 0 1 0 1
+1 0 0 1 0
+========
+Undirected, unweighted, both, loops twice:
+0 2 0 1 1
+2 0 1 0 0
+0 1 2 1 0
+1 0 1 0 1
+1 0 0 1 0
+========
+Undirected, weighted, upper, no loops:
+0 7 0 6 1
+0 0 4 0 0
+0 0 0 3 0
+0 0 0 0 2
+0 0 0 0 0
+========
+Undirected, weighted, upper, loops once:
+0 7 0 6 1
+0 0 4 0 0
+0 0 3 3 0
+0 0 0 0 2
+0 0 0 0 0
+========
+Undirected, weighted, upper, loops twice:
+0 7 0 6 1
+0 0 4 0 0
+0 0 6 3 0
+0 0 0 0 2
+0 0 0 0 0
+========
+Undirected, weighted, lower, no loops:
+0 0 0 0 0
+7 0 0 0 0
+0 4 0 0 0
+6 0 3 0 0
+1 0 0 2 0
+========
+Undirected, weighted, lower, loops once:
+0 0 0 0 0
+7 0 0 0 0
+0 4 3 0 0
+6 0 3 0 0
+1 0 0 2 0
+========
+Undirected, weighted, lower, loops twice:
+0 0 0 0 0
+7 0 0 0 0
+0 4 6 0 0
+6 0 3 0 0
+1 0 0 2 0
+========
+Undirected, weighted, both, no loops:
+0 7 0 6 1
+7 0 4 0 0
+0 4 0 3 0
+6 0 3 0 2
+1 0 0 2 0
+========
+Undirected, weighted, both, loops once:
+0 7 0 6 1
+7 0 4 0 0
+0 4 3 3 0
+6 0 3 0 2
+1 0 0 2 0
+========
+Undirected, weighted, both, loops twice:
+0 7 0 6 1
+7 0 4 0 0
+0 4 6 3 0
+6 0 3 0 2
+1 0 0 2 0
+========
+Directed, unweighted, no loops:
+0 2 0 1 0
+0 0 1 0 0
+0 0 0 1 0
+0 0 0 0 1
+1 0 0 0 0
+========
+Directed, unweighted, loops once:
+0 2 0 1 0
+0 0 1 0 0
+0 0 1 1 0
+0 0 0 0 1
+1 0 0 0 0
+========
+Directed, unweighted, loops twice (same as once):
+0 2 0 1 0
+0 0 1 0 0
+0 0 1 1 0
+0 0 0 0 1
+1 0 0 0 0
+========
+Directed, weighted, no loops:
+0 7 0 6 0
+0 0 4 0 0
+0 0 0 3 0
+0 0 0 0 2
+1 0 0 0 0
+========
+Directed, weighted, loops once:
+0 7 0 6 0
+0 0 4 0 0
+0 0 3 3 0
+0 0 0 0 2
+1 0 0 0 0
+========
+Directed, weighted, loops twice (same as once):
+0 7 0 6 0
+0 0 4 0 0
+0 0 3 3 0
+0 0 0 0 2
+1 0 0 0 0
+========
