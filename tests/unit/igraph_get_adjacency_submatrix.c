@@ -21,29 +21,60 @@
 
 #include "test_utilities.h"
 
-void test_undirected2(void) {
-    //TODO remove
+void test_undirected_with_subsets(void) {
+
+
     igraph_t graph;
+    igraph_real_t weights_array[] = { 5, 4, 3, 2, 1, 6, 3, 2 };
+    igraph_vector_t weights;
     igraph_matrix_t m;
     igraph_vs_t from;
     igraph_vs_t to;
 
-    igraph_small(&graph, 3, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,2, -1);
-    igraph_matrix_init(&m, 3, 3);
-
+    igraph_small(&graph, 5, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 3, 2, 2, 0, 1, -1);
+    igraph_vector_view(&weights, weights_array, igraph_ecount(&graph));
     igraph_vs_vector_small(&from, 0, 1, 2, -1);
-    igraph_vs_vector_small(&to, 0, 1, -1);
+    igraph_vs_vector_small(&to, 0, 2, -1);
 
-    printf("Undirected, unweighted, no loops:\n");
+    igraph_matrix_init(&m, 2, 2);
+
+    printf("Undirected, unweighted, no loops, from [0,1,2] to [0,2]:\n");
     igraph_get_adjacency_submatrix(&graph, &m, from, to, NULL, IGRAPH_NO_LOOPS);
     igraph_matrix_print(&m);
+    printf("========\n");
+
+    printf("Undirected, unweighted, loops once, from [0,1,2] to [0,2]:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, from, to, NULL, IGRAPH_LOOPS_ONCE);
+    igraph_matrix_print(&m);
+    printf("========\n");
+
+    printf("Undirected, unweighted, loops twice, from [0,1,2] to [0,2]:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, from, to, NULL, IGRAPH_LOOPS_TWICE);
+    igraph_matrix_print(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, no loops, from [0,1,2] to [0,2]:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, from, to, &weights, IGRAPH_NO_LOOPS);
+    igraph_matrix_print(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, loops once, from [0,1,2] to [0,2]:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, from, to, &weights, IGRAPH_LOOPS_ONCE);
+    igraph_matrix_print(&m);
+    printf("========\n");
+
+    printf("Undirected, weighted, loops twice, from [0,1,2] to [0,2]:\n");
+    igraph_get_adjacency_submatrix(&graph, &m, from, to, &weights, IGRAPH_LOOPS_TWICE);
+    igraph_matrix_print(&m);
+    printf("========\n");
 
     igraph_matrix_destroy(&m);
-    igraph_destroy(&graph);
-    igraph_vs_destroy(&from);
     igraph_vs_destroy(&to);
+    igraph_vs_destroy(&from);
+    igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
+
 }
 
 void test_undirected(void) {
@@ -143,7 +174,7 @@ void test_directed(void) {
 int main(void) {
 
     test_undirected();
-    //test_undirected2();
+    test_undirected_with_subsets();
     test_directed();
 
     return 0;
