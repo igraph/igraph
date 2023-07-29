@@ -193,7 +193,7 @@ igraph_error_t igraph_get_adjacency_submatrix(
                 from = IGRAPH_VIT_GET(row);
                 to = IGRAPH_VIT_GET(col);
                 if (from != to || loops != IGRAPH_NO_LOOPS) {
-                    igraph_get_all_eids_between(graph, &eids, from, to, directed);
+                    IGRAPH_CHECK(igraph_get_all_eids_between(graph, &eids, from, to, directed));
                     for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
                         MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
                     }
@@ -206,7 +206,7 @@ igraph_error_t igraph_get_adjacency_submatrix(
             for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
                 from = IGRAPH_VIT_GET(row);
                 to = IGRAPH_VIT_GET(col);
-                igraph_get_all_eids_between(graph, &eids, from, to, directed);
+                IGRAPH_CHECK(igraph_get_all_eids_between(graph, &eids, from, to, directed));
                 for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
                     if (to != from || loops == IGRAPH_LOOPS_TWICE) {
                         MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
