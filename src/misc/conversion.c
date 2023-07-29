@@ -23,6 +23,7 @@
 
 #include "igraph_conversion.h"
 
+#include "igraph_error.h"
 #include "igraph_iterators.h"
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
@@ -33,6 +34,7 @@
 
 #include "core/fixed_vectorlist.h"
 #include "graph/attributes.h"
+#include "igraph_vector_list.h"
 #include "math/safe_intop.h"
 
 #define WEIGHT_OF(eid) (weights ? VECTOR(*weights)[eid] : 1)
@@ -159,6 +161,118 @@ igraph_error_t igraph_get_adjacency(
 
     return IGRAPH_SUCCESS;
 }
+
+igraph_error_t igraph_get_adjacency_submatrix(
+    const igraph_t *graph, igraph_matrix_t *res, igraph_get_adjacency_t type,
+    const igraph_vs_t rows, const igraph_vs_t cols,
+    const igraph_vector_t *weights, igraph_loops_t loops
+) {
+    igraph_bool_t directed = igraph_is_directed(graph);
+    igraph_integer_t from, to;
+    igraph_integer_t nr_rows, nr_cols;
+    igraph_vit_t row, col;
+    igraph_vector_int_t eids;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 0);
+
+    IGRAPH_CHECK(igraph_vs_size(graph, &rows, &nr_rows));
+    IGRAPH_CHECK(igraph_vs_size(graph, &cols, &nr_cols));
+
+    IGRAPH_CHECK(igraph_matrix_resize(res, nr_rows, nr_cols));
+    igraph_matrix_null(res);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, rows, &row));
+    IGRAPH_FINALLY(igraph_vit_destroy, &row);
+
+    IGRAPH_CHECK(igraph_vit_create(graph, cols, &col));
+    IGRAPH_FINALLY(igraph_vit_destroy, &col);
+
+    if (directed) {
+        for (igraph_integer_t i=0; ! IGRAPH_VIT_END(row); IGRAPH_VIT_NEXT(row), i++) {
+                IGRAPH_VIT_RESET(col);
+            for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
+                from = IGRAPH_VIT_GET(row);
+                to = IGRAPH_VIT_GET(col);
+                if (from != to || loops != IGRAPH_NO_LOOPS) {
+                    igraph_get_all_eids_between(graph, &eids, from, to, directed);
+                    for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
+                        MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                }
+            }
+        }
+    } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
+        for (igraph_integer_t i=0; ! IGRAPH_VIT_END(row); IGRAPH_VIT_NEXT(row), i++) {
+            IGRAPH_VIT_RESET(col);
+            for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
+                from = IGRAPH_VIT_GET(row);
+                to = IGRAPH_VIT_GET(col);
+                igraph_get_all_eids_between(graph, &eids, from, to, directed);
+                for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
+                    if (to < from) {
+                        MATRIX(*res, j, i) += WEIGHT_OF(VECTOR(eids)[k]);
+                    } else {
+                        MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                    if (to == from && loops == IGRAPH_LOOPS_TWICE) {
+                        MATRIX(*res, i, i) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                }
+            }
+        }
+    } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
+        for (igraph_integer_t i=0; ! IGRAPH_VIT_END(row); IGRAPH_VIT_NEXT(row), i++) {
+            IGRAPH_VIT_RESET(col);
+            for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
+                from = IGRAPH_VIT_GET(row);
+                to = IGRAPH_VIT_GET(col);
+                igraph_get_all_eids_between(graph, &eids, from, to, directed);
+                for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
+                    if (to < from) {
+                        MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    } else {
+                        MATRIX(*res, j, i) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                    if (to == from && loops == IGRAPH_LOOPS_TWICE) {
+                        MATRIX(*res, i, i) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                }
+            }
+        }
+    } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
+        for (igraph_integer_t i=0; ! IGRAPH_VIT_END(row); IGRAPH_VIT_NEXT(row), i++) {
+            IGRAPH_VIT_RESET(col);
+            for (igraph_integer_t j=0; ! IGRAPH_VIT_END(col); IGRAPH_VIT_NEXT(col), j++) {
+                from = IGRAPH_VIT_GET(row);
+                to = IGRAPH_VIT_GET(col);
+                igraph_get_all_eids_between(graph, &eids, from, to, directed);
+                for (igraph_integer_t k = 0; k < igraph_vector_int_size(&eids); k++) {
+                    MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    if (to != from || loops == IGRAPH_LOOPS_TWICE) {
+                        MATRIX(*res, i, j) += WEIGHT_OF(VECTOR(eids)[k]);
+                    }
+                }
+            }
+        }
+    } else {
+        IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
+    }
+
+    /* Erase the diagonal if we don't need loop edges */
+    /* TODO this doesn't work */
+    /* if (loops == IGRAPH_NO_LOOPS) { */
+    /*     for (igraph_integer_t i = 0; i < no_of_nodes; i++) { */
+    /*         MATRIX(*res, i, i) = 0; */
+    /*     } */
+    /* } */
+
+    igraph_vit_destroy(&col);
+    igraph_vit_destroy(&row);
+    igraph_vector_int_destroy(&eids);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
+}
+
 
 /**
  * \function igraph_get_adjacency_sparse
