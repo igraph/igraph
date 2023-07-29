@@ -24,10 +24,6 @@
 #ifndef IGRAPH_H
 #define IGRAPH_H
 
-#ifndef _GNU_SOURCE
-    #define _GNU_SOURCE 1
-#endif
-
 #include "igraph_version.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"

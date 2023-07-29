@@ -19,14 +19,12 @@
 #ifndef IGRAPH_CORE_MATH_H
 #define IGRAPH_CORE_MATH_H
 
-/* Use math constants with MSVC */
-#if defined(_MSC_VER) && !defined(_USE_MATH_DEFINES)
-#define _USE_MATH_DEFINES
-#endif
-
 #include <math.h>
 
 /* Math constants are not part of standard C */
+
+/* The following definitions contain enough precision for
+ * an IEEE-754 quadruple-precision floating point format. */
 
 #ifndef M_E
 #define M_E         2.71828182845904523536028747135266250

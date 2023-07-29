@@ -28,6 +28,11 @@
 
 #include "config.h"
 
+/* The CMake feature test looks for strcasecmp/strncasecmp in strings.h */
+#if defined(HAVE_STRCASECMP) || defined(HAVE_STRNCASECMP)
+#include <strings.h>
+#endif
+
 #include <stdlib.h>
 
 __BEGIN_DECLS
