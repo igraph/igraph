@@ -34,10 +34,6 @@
 
 __BEGIN_DECLS
 
-/* Don't include igraph_types.h here, because that includes stdio.h, and that
- * in turn breaks f2c with Clang 17 due to us messing around with src/f2c.h */
-typedef double igraph_real_t;
-
 #ifndef INTERNAL_BLAS
     #define igraphdaxpy_    daxpy_
     #define igraphdger_     dger_
@@ -69,9 +65,9 @@ typedef double igraph_real_t;
  * Derived with "gfortran -fc-prototypes-external", applied on the original
  * Fortran sources of these functions. */
 
-void igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
-                 igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
-                 igraph_real_t *beta, igraph_real_t *y, int *incy, long int trans_len);
+void igraphdgemv_(char *trans, int *m, int *n, double *alpha,
+                 double *a, int *lda, double *x, int *incx,
+                 double *beta, double *y, int *incy, long int trans_len);
 
 void igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
                  double *alpha, double *a, int *lda, double *b, int *ldb,
@@ -79,9 +75,9 @@ void igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
 
 #else
 
-int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
-                 igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
-                 igraph_real_t *beta, igraph_real_t *y, int *incy);
+int igraphdgemv_(char *trans, int *m, int *n, double *alpha,
+                 double *a, int *lda, double *x, int *incx,
+                 double *beta, double *y, int *incy);
 
 int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
                  double *alpha, double *a, int *lda, double *b, int *ldb,
