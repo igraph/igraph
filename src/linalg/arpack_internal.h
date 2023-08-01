@@ -29,10 +29,13 @@
 */
 
 #include "igraph_decls.h"
-#include "igraph_types.h"
 #include "config.h"
 
 __BEGIN_DECLS
+
+/* Don't include igraph_types.h here, because that includes stdio.h, and that
+ * in turn breaks f2c with Clang 17 due to us messing around with src/f2c.h */
+typedef double igraph_real_t;
 
 #ifndef INTERNAL_ARPACK
     #define igraphdsaupd_   dsaupd_
