@@ -580,7 +580,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
     igraph_integer_t v1, v2, v3, c, j, k;
     igraph_vector_int_t *neis1, *neis2;
     igraph_bool_t f;
-    igraph_integer_t it_state;
+    igraph_set_iterator_t it_state;
     igraph_vector_int_t vec;
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -689,7 +689,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
                 j++;
             }
 
-            it_state = 0;
+            igraph_set_iterator_init(&clqdata->buckets[v1], &it_state);
             while (igraph_set_iterate(&clqdata->buckets[v1], &it_state, &j)) {
                 v2 = VECTOR(*neis1)[j];
                 neis2 = igraph_adjlist_get(&clqdata->adj_list, v2);
@@ -700,7 +700,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
                     k++;
                 }
             }
-            igraph_set_clear(&clqdata->buckets[v1]);
+            igraph_set_destroy(&clqdata->buckets[v1]);
         }
     }
 
@@ -787,7 +787,7 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
     for (i = 0; i < no_of_nodes; i++) {
-        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
+        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i]));
     }
 
     igraph_vector_int_list_clear(res);
@@ -866,7 +866,7 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
     for (i = 0; i < no_of_nodes; i++) {
-        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
+        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i]));
     }
 
     /* Do the show */
@@ -1028,7 +1028,7 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
 
     for (i = 0; i < no_of_nodes; i++) {
-        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
+        IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i]));
     }
 
     if (res) {
