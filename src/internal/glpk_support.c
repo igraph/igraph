@@ -163,7 +163,7 @@ igraph_error_t igraph_i_glpk_check(int retval, const char* message) {
 
 #else
 
-int igraph_glpk_dummy() {
+int igraph_glpk_dummy(void) {
     /* get rid of "ISO C requires a translation unit to contain at least one
      * declaration" warning */
     return 'd' + 'u' + 'm' + 'm' + 'y';
