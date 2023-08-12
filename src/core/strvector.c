@@ -691,7 +691,7 @@ igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
 
 /**
  * \ingroup strvector
- * \function igraph_strvector_set
+ * \function igraph_strvector_index
  * \brief Takes elements at given positions from a string vector.
  *
  * \param sv   The string vector.
