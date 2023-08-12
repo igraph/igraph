@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "f2c.h"
+#include "igraph_error.h"
 
 #ifdef KR_headers
 extern void f_exit();

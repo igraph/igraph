@@ -28,10 +28,6 @@
 
 __BEGIN_DECLS
 
-#ifndef _GNU_SOURCE
-    #define _GNU_SOURCE 1
-#endif
-
 #ifdef __cplusplus
     #define __STDC_FORMAT_MACROS   /* needed for PRId32 and PRId64 from inttypes.h on Linux */
 #endif

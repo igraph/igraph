@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include "f2c.h"
+#include "igraph_error.h"
 #define PAUSESIG 15
 
 #include "signal1.h"
