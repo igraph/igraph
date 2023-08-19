@@ -33,7 +33,7 @@
  * This function generates networks with the small-world property
  * based on a variant of the Watts-Strogatz model. The network is obtained
  * by first creating a periodic undirected lattice, then rewiring both
- * endpoints of each edge with probability \param p, while avoiding the
+ * endpoints of each edge with probability \p p, while avoiding the
  * creation of multi-edges.
  *
  * </para><para>
@@ -43,7 +43,7 @@
  * same number of vertices and edges as the original lattice. In comparison,
  * the original Watts-Strogatz model only rewires a single endpoint of each edge,
  * thus the network does not become fully random even for <code>p=1</code>.
- * For appropriate choices of \param p, both models exhibit the property of
+ * For appropriate choices of \p p, both models exhibit the property of
  * simultaneously having short path lengths and high clustering.
  *
  * </para><para>
