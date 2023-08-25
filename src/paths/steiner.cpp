@@ -207,13 +207,13 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         }
     }
 
-    igraph_integer_t flag_terminals = 0;
+    igraph_bool_t flag_terminals = false;
     /* Handle the cases of the null graph and no terminals. */
     if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
 
         igraph_vector_int_clear(res_tree);
         *res = 0.0;
-        flag_terminals = 1;
+        flag_terminals = true;
     } else if (no_of_terminals == 2) {
         igraph_vector_int_t vertices;
         igraph_real_t tree_weight = 0.0;
@@ -236,10 +236,10 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         igraph_vector_int_destroy(&edges_res);
         IGRAPH_FINALLY_CLEAN(2);
 
-        flag_terminals = 1;
+        flag_terminals = true;
     }
 
-    if (flag_terminals == 1) {
+    if (flag_terminals == true) {
         if (!weights) {
             igraph_vector_destroy(&iweights);
             IGRAPH_FINALLY_CLEAN(1);
@@ -305,72 +305,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy, terminals));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &steiner_terminals_copy);
     igraph_vector_int_sort(&steiner_terminals_copy);
-
-    /*
-        Case - Tree when number of terminals are 3.
-        Say, q,t2,t3 are terminals then Steiner Tree = min( distance(q,t1)+ distance(q,t2), distance(t1,t2) + distance(q,t1), distance(t1,t2) + distance(q,t2) )
-
-    */
-    if (no_of_terminals == 3) {
-
-        igraph_integer_t steiner_terminals_copy_size = igraph_vector_int_size(&steiner_terminals_copy);
-        igraph_real_t min_steiner_tree_dist = IGRAPH_INFINITY;
-        for (igraph_integer_t i = 0; i < steiner_terminals_copy_size; i++) {
-
-            igraph_integer_t ter_node = VECTOR(steiner_terminals_copy)[i];
-            igraph_real_t weight_inter = 0.0;
-            igraph_vector_int_t edges_inter;
-            IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_inter, 0);
-
-            for (igraph_integer_t j = 0; j < steiner_terminals_copy_size; j++) {
-                if (VECTOR(steiner_terminals_copy)[j] != ter_node) {
-                    igraph_vector_int_t vertices_2;
-                    igraph_real_t tree_weight = 0.0;
-                    igraph_vector_int_t edges;
-
-                    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertices_2, 0);
-                    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
-
-                    IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vertices_2, &edges, ter_node, VECTOR(steiner_terminals_copy)[j], pweights, IGRAPH_ALL));
-                    igraph_integer_t tree_size = igraph_vector_int_size(&edges);
-
-                    for (igraph_integer_t k = 0; k < tree_size; k++) {
-                        tree_weight += VECTOR(*pweights)[VECTOR(vertices_2)[k]];
-                    }
-                    weight_inter += tree_weight;
-                    IGRAPH_CHECK(igraph_vector_int_append(&edges_inter, &edges));
-
-                    igraph_vector_int_destroy(&vertices_2);
-                    igraph_vector_int_destroy(&edges);
-                    IGRAPH_FINALLY_CLEAN(2);
-                }
-            }
-            if (weight_inter < min_steiner_tree_dist) {
-                igraph_vector_int_update(res_tree, &edges_inter);
-                *res = weight_inter;
-                min_steiner_tree_dist = weight_inter;
-            }
-
-            igraph_vector_int_destroy(&edges_inter);
-
-            IGRAPH_FINALLY_CLEAN(1);
-        }
-
-        igraph_matrix_destroy(&distance);
-        igraph_vector_int_destroy(&steiner_terminals_copy);
-        IGRAPH_FINALLY_CLEAN(2);
-        flag_terminals = 1;
-    }
-
-    if (flag_terminals == 1) {
-
-        if (!weights) {
-            igraph_vector_destroy(&iweights);
-            IGRAPH_FINALLY_CLEAN(1);
-        }
-
-        return IGRAPH_SUCCESS;
-    }
 
     q = VECTOR(steiner_terminals_copy)[0];
 
