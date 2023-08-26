@@ -431,8 +431,10 @@ int main(void) {
 
     igraph_vector_destroy(&weights);
     igraph_vector_int_destroy(&tree_edges_new);
+    igraph_vector_int_destroy(&terminals_new);
 
     igraph_t g_new_4;
+    
     printf("\nA different graph than before with floating point weights\n");
     igraph_vector_init_real(&weights, 8, 0.218959, 0.383502, 0.5297, 0.417486, 0.526929, 0.910321, 0.328234, 0.247039);
     igraph_small(&g_new_4, 6, IGRAPH_UNDIRECTED,
@@ -451,15 +453,17 @@ int main(void) {
     printf("Tree edges:\n");
     igraph_vector_int_print(&tree_edges_new);
     printf("value: %f\n", value_new);
+    igraph_vector_destroy(&weights);
+    igraph_vector_int_destroy(&tree_edges_new);
 
     igraph_destroy(&g_new);
     igraph_destroy(&g_new_1);
     igraph_destroy(&g_new_2);
     igraph_destroy(&g_new_3);
     igraph_destroy(&g_new_4);
-    igraph_vector_int_destroy(&tree_edges_new);
+    
     igraph_vector_int_destroy(&terminals_new);
-    igraph_vector_destroy(&weights);
+    
 
     VERIFY_FINALLY_STACK();
 
