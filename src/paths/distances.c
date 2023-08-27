@@ -866,8 +866,8 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
  *
  * The central vertices of a graph are calculated by finding the vertices
  * with the minimum eccentricity. This concept is typically applied to
- * connected graphs. In undirected disconnected graphs, the calculation
- * is effectively done per connected component.
+ * (strongly) connected graphs. In disconnected graphs, the smallest
+ * eccentricity is taken across all components.
  *
  * \param graph The input graph, it can be directed or undirected.
  * \param res Pointer to an initialized vector, the result is stored
@@ -902,7 +902,7 @@ igraph_error_t igraph_graph_center(
     /* igraph_eccentricity() does not return infinity or NaN, and the null graph
      * case was handled above, therefore calling vector_min() is safe. */
     igraph_real_t min_eccentricity = igraph_vector_min(&ecc);
-    igraph_real_t n = igraph_vector_size(&ecc);
+    igraph_integer_t n = igraph_vector_size(&ecc);
     for (igraph_integer_t i = 0; i < n; i++) {
         if (VECTOR(ecc)[i] == min_eccentricity) {
             IGRAPH_CHECK(igraph_vector_int_push_back(res, i));
