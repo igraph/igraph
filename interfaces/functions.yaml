@@ -1016,6 +1016,10 @@ igraph_graph_center:
 igraph_radius:
     PARAMS: GRAPH graph, OUT REAL radius, NEIMODE mode=ALL
 
+igraph_radius_dijkstra:
+    PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT REAL radius, NEIMODE mode=ALL
+    DEPS: weights ON graph
+
 igraph_pseudo_diameter:
     NAME-R: pseudo_diameter
     PARAMS: |-

@@ -303,6 +303,9 @@ igraph_error_t igraph_eccentricity(const igraph_t *graph,
  *    is ignored for undirected graphs.
  * \return Error code.
  *
+ * Time complexity: O(|V| |E| log|V| + |V|), where |V| is the number of
+ * vertices, |E| the number of edges.
+ *
  */
 
 igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
@@ -373,13 +376,15 @@ igraph_error_t igraph_eccentricity_dijkstra(const igraph_t *graph,
  * Time complexity: O(|V|(|V|+|E|)), where |V| is the number of
  * vertices and |E| is the number of edges.
  *
- * \sa \ref igraph_eccentricity().
+ * \sa \ref igraph_radius_dijkstra() for the weighted version,
+ * \ref igraph_diameter() for the maximum eccentricity,
+ * \ref igraph_eccentricity() for the eccentricities of all vertices.
  *
  * \example examples/simple/igraph_radius.c
  */
 
 igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
-                  igraph_neimode_t mode) {
+                             igraph_neimode_t mode) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
@@ -390,6 +395,63 @@ igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
         IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
         IGRAPH_CHECK(igraph_eccentricity(graph, &ecc, igraph_vss_all(),
                                          mode));
+        *radius = igraph_vector_min(&ecc);
+        igraph_vector_destroy(&ecc);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_radius_dijkstra
+ * \brief Radius of a graph, using weighted edges.
+ *
+ * \experimental
+ *
+ * The radius of a graph is the defined as the minimum eccentricity of
+ * its vertices, see \ref igraph_eccentricity().
+ *
+ * \param graph The input graph, it can be directed or undirected.
+ * \param weights The edge weights. All edge weights must be
+ *    non-negative for Dijkstra's algorithm to work. Additionally, no
+ *    edge weight may be NaN. If either case does not hold, an error
+ *    is returned. If this is a null pointer, then the unweighted
+ *    version, \ref igraph_radius() is called. Edges with positive
+ *    infinite weights are ignored.
+ * \param radius Pointer to a real variable, the result is stored
+ *   here.
+ * \param mode What kind of paths to consider for the calculation:
+ *    \c IGRAPH_OUT, paths that follow edge directions;
+ *    \c IGRAPH_IN, paths that follow the opposite directions; and
+ *    \c IGRAPH_ALL, paths that ignore edge directions. This argument
+ *    is ignored for undirected graphs.
+ * \return Error code.
+ *
+ * Time complexity: O(|V| |E| log|V| + |V|), where |V| is the number of
+ * vertices, |E| the number of edges.
+ *
+ * \sa \ref igraph_radius() for the unweighted version,
+ * \ref igraph_diameter_dijkstra() for the maximum weighted eccentricity,
+ * \ref igraph_eccentricity_dijkstra() for weighted eccentricities of
+ * all vertices.
+ */
+
+igraph_error_t igraph_radius_dijkstra(const igraph_t *graph, const igraph_vector_t *weights,
+                                      igraph_real_t *radius, igraph_neimode_t mode) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+
+    if (weights == NULL) {
+        return igraph_radius(graph, radius, mode);
+    }
+
+    if (no_of_nodes == 0) {
+        *radius = IGRAPH_NAN;
+    } else {
+        igraph_vector_t ecc;
+        IGRAPH_VECTOR_INIT_FINALLY(&ecc, igraph_vcount(graph));
+        IGRAPH_CHECK(igraph_eccentricity_dijkstra(graph, weights, &ecc, igraph_vss_all(), mode));
         *radius = igraph_vector_min(&ecc);
         igraph_vector_destroy(&ecc);
         IGRAPH_FINALLY_CLEAN(1);
@@ -882,7 +944,7 @@ igraph_error_t igraph_pseudo_diameter_dijkstra(const igraph_t *graph,
  * Time complexity: O(|V| (|V|+|E|)), where |V| is the number of
  * vertices and |E| is the number of edges.
  *
- * \sa \ref igraph_eccentricity().
+ * \sa \ref igraph_eccentricity(), \ref igraph_radius()
  *
  */
 igraph_error_t igraph_graph_center(

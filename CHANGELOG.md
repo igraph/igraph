@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Added
+
+ - `igraph_radius_dijkstra()` computes the graph radius with weighted edges (experimental function).
+
 ### Fixed
 
  - `igraph_full_bipartite()` now checks for overflow.
