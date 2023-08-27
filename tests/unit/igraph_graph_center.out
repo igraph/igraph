@@ -1,29 +1,98 @@
+UNWEIGHTED
+
 Null graph:
 ( )
 
 Singleton graph:
 ( 0 )
+Radius: 0
 
 Path with isolated vertex:
 ( 1 )
+Radius: 0
 
-Disconnected graph:
+Four isolated vertices:
 ( 0 1 2 3 )
+Radius: 0
 
-Undirected path graph:
+Undirected path graph P_5:
 ( 2 )
+Radius: 2
 
-Undirected Graph
+Undirected graph
 ( 0 1 2 )
+Radius: 2
 
-Directed path graph:
+Directed path graph P_5:
 ( 4 )
+Radius: 0
 
-Undirected star:
+Undirected star S_10:
 ( 0 )
+Radius: 1
 
-Out-star:
-( 0 )
-
-In-star:
+Out-star S_10:
 ( 1 2 3 4 5 6 7 8 9 )
+Radius: 0
+
+Out-star S_10, undirected mode:
+( 0 )
+Radius: 1
+
+In-star S_10:
+( 1 2 3 4 5 6 7 8 9 )
+Radius: 0
+
+
+WEIGHTED
+
+Null graph:
+( )
+
+Singleton graph:
+( 0 )
+Radius: 0
+
+Path with isolated vertex:
+( 1 )
+Radius: 0
+
+Four isolated vertices:
+( 0 1 2 3 )
+Radius: 0
+
+Undirected path graph P_5:
+( 2 3 )
+Radius: 9
+
+Undirected graph
+( 2 )
+Radius: 9
+
+Directed path graph P_5:
+( 4 )
+Radius: 0
+
+Undirected star S_10:
+( 0 )
+Radius: 10
+
+Out-star S_10:
+( 1 2 3 4 5 6 7 8 9 )
+Radius: 0
+
+Out-star S_10, undirected mode:
+( 0 )
+Radius: 10
+
+In-star S_10:
+( 1 2 3 4 5 6 7 8 9 )
+Radius: 0
+
+Directed cycle C_5
+( 0 )
+Radius: 14
+
+Directed cycle C_5, mode=IN
+( 4 )
+Radius: 14
