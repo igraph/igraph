@@ -5,6 +5,7 @@
 ### Added
 
  - `igraph_radius_dijkstra()` computes the graph radius with weighted edges (experimental function).
+ - `igraph_graph_center_dijkstra()` computes the graph center, i.e. the set of minimum eccentricity vertices, with weighted edges (experimental function).
 
 ### Fixed
 

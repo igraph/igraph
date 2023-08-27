@@ -256,6 +256,10 @@ IGRAPH_EXPORT igraph_error_t igraph_graph_center(const igraph_t *graph,
                                  igraph_vector_int_t *res,
                                  igraph_neimode_t mode);
 
+IGRAPH_EXPORT igraph_error_t igraph_graph_center_dijkstra(
+    const igraph_t *graph, const igraph_vector_t *weights,
+    igraph_vector_int_t *res, igraph_neimode_t mode);
+
 IGRAPH_EXPORT igraph_error_t igraph_pseudo_diameter(const igraph_t *graph,
                                          igraph_real_t *diameter,
                                          igraph_integer_t vid_start,

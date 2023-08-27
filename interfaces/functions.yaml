@@ -1013,6 +1013,11 @@ igraph_graph_center:
         GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
     DEPS: res ON graph
 
+igraph_graph_center_dijkstra:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEX_INDICES res, NEIMODE mode=ALL
+    DEPS: weights ON graph, res ON graph
+
 igraph_radius:
     PARAMS: GRAPH graph, OUT REAL radius, NEIMODE mode=ALL
 
