@@ -564,16 +564,15 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
     igraph_vector_int_t *neis1, *neis2;
     igraph_bool_t f;
     igraph_integer_t it_state;
-    igraph_vector_int_t vec;
 
     IGRAPH_ALLOW_INTERRUPTION();
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-
     if (level >= clqdata->matrix_size - 1) {
         igraph_integer_t size = 0;
+
         if (res) {
-            igraph_vector_int_clear(&vec);
+            igraph_vector_int_t vec;
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
 
             for (v1 = 0; v1 < clqdata->matrix_size; v1++) {
                 if (clqdata->IS[v1] == 0) {
@@ -594,6 +593,9 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
                     IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &vec));
                 }
             }
+
+            igraph_vector_int_destroy(&vec);
+            IGRAPH_FINALLY_CLEAN(1);
         } else {
             for (v1 = 0, size = 0; v1 < clqdata->matrix_size; v1++) {
                 if (clqdata->IS[v1] == 0) {
@@ -686,9 +688,6 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
             igraph_set_clear(&clqdata->buckets[v1]);
         }
     }
-
-    igraph_vector_int_destroy(&vec);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
