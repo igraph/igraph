@@ -8,6 +8,7 @@
  - `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` are now more robust to overflow.
  - Bipartite graph creation functions now check input arguments.
  - `igraph_write_graph_dot()` now quotes real numbers written in exponential notation as necessary.
+ - Independent vertex set finding functions could trigger the fatal error "Finally stack too large" when called on large graphs.
 
 ### Deprecated
 
