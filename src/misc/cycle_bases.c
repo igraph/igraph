@@ -346,7 +346,7 @@ static igraph_error_t gaussian_elimination(igraph_vector_int_list_t *reduced_mat
                 IGRAPH_FINALLY_CLEAN(2);
                 return IGRAPH_SUCCESS;
             }
-            IGRAPH_CHECK(igraph_vector_int_swap(&work, &tmp));
+            igraph_vector_int_swap(&work, &tmp);
         } else { /* VECTOR(*row)[0] > VECTOR(work)[0] */
             break;
         }

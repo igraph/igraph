@@ -2567,20 +2567,17 @@ igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
  *
  * \param v1 The first vector.
  * \param v2 The second vector.
- * \return Error code.
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
+void FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
 
     TYPE(igraph_vector) tmp;
 
     tmp = *v1;
     *v1 = *v2;
     *v2 = tmp;
-
-    return IGRAPH_SUCCESS;
 }
 
 /**

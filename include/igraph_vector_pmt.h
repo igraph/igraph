@@ -103,7 +103,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector)
                                                   const TYPE(igraph_vector) *from);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
                                                   const TYPE(igraph_vector) *from);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2);
+IGRAPH_EXPORT void FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2);
 
 /*-----------------------*/
 /* Exchanging elements   */

@@ -1117,12 +1117,11 @@ igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
  * The contents of the two matrices will be swapped.
  * \param m1 The first matrix.
  * \param m2 The second matrix.
- * \return Error code.
  *
  * Time complexity: O(1).
  */
 
-igraph_error_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
+void FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
     igraph_integer_t tmp;
 
     tmp = m1->nrow;
@@ -1133,9 +1132,7 @@ igraph_error_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igrap
     m1->ncol = m2->ncol;
     m2->ncol = tmp;
 
-    IGRAPH_CHECK(FUNCTION(igraph_vector, swap)(&m1->data, &m2->data));
-
-    return IGRAPH_SUCCESS;
+    FUNCTION(igraph_vector, swap)(&m1->data, &m2->data);
 }
 
 /**
