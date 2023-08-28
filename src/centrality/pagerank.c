@@ -246,7 +246,9 @@ static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -320,7 +322,9 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -409,7 +413,9 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
