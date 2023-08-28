@@ -571,7 +571,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
         igraph_integer_t size = 0;
 
         if (res) {
-            igraph_vector_int_t vec;
+            igraph_vector_int_t vec, *newvec;
             IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
 
             for (v1 = 0; v1 < clqdata->matrix_size; v1++) {
@@ -581,16 +581,23 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
             }
 
             size = igraph_vector_int_size(&vec);
+
+            /* Trick for efficient insertion of a new vector into a vector list:
+             * Instead of copying the vector contents, we add an empty vector to
+             * the list, then swap it with the vector to-be-added in O(1) time. */
             if (!clqdata->keep_only_largest) {
-                IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &vec));
+                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                igraph_vector_int_swap(newvec, &vec);
             } else {
                 if (size > clqdata->largest_set_size) {
                     /* We are keeping only the largest sets, and we've found one that's
                      * larger than all previous sets, so we have to clear the list */
                     igraph_vector_int_list_clear(res);
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &vec));
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                    igraph_vector_int_swap(newvec, &vec);
                 } else if (size == clqdata->largest_set_size) {
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &vec));
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                    igraph_vector_int_swap(newvec, &vec);
                 }
             }
 
