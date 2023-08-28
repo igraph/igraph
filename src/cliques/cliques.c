@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2005-2023 The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,25 +14,19 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_cliques.h"
 
 #include "igraph_error.h"
 #include "igraph_memory.h"
-#include "igraph_constants.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 
 #include "cliques/cliquer_internal.h"
 #include "core/interruption.h"
 #include "core/set.h"
-
-#include <string.h>    /* memset */
 
 static igraph_error_t igraph_i_find_k_indsets(
         const igraph_t *graph,
@@ -44,7 +37,7 @@ static igraph_error_t igraph_i_find_k_indsets(
         igraph_integer_t *new_count,
         igraph_vector_int_t *neis) {
 
-    igraph_integer_t j, k, l, m, n, new_member_storage_size;
+    igraph_integer_t l, m, n, new_member_storage_size;
     const igraph_integer_t *c1, *c2;
     igraph_integer_t v1, v2;
     igraph_bool_t ok;
@@ -53,7 +46,7 @@ static igraph_error_t igraph_i_find_k_indsets(
     *new_member_storage = IGRAPH_REALLOC(*new_member_storage,
                                          (size_t) (size * old_count),
                                          igraph_integer_t);
-    IGRAPH_CHECK_OOM(*new_member_storage, "igraph_independent_vertex_sets failed");
+    IGRAPH_CHECK_OOM(*new_member_storage, "Insufficient memory for independent vertex sets.");
 
     new_member_storage_size = size * old_count;
     IGRAPH_FINALLY(igraph_free, *new_member_storage);
@@ -61,8 +54,8 @@ static igraph_error_t igraph_i_find_k_indsets(
     m = n = 0;
 
     /* Now consider all pairs of i-1-indsets and see if they can be merged */
-    for (j = 0; j < old_count; j++) {
-        for (k = j + 1; k < old_count; k++) {
+    for (igraph_integer_t j = 0; j < old_count; j++) {
+        for (igraph_integer_t k = j + 1; k < old_count; k++) {
             IGRAPH_ALLOW_INTERRUPTION();
 
             /* Since indsets are represented by their vertex indices in increasing
@@ -92,11 +85,11 @@ static igraph_error_t igraph_i_find_k_indsets(
                 *    differ in more than one place. The larger will be stored in
                 *    the dummy variable again.
                 */
-            ok = 1;
+            ok = true;
             for (; l < size - 1; l++) {
                 if (c1[l] == c2[l]) {
                     (*new_member_storage)[m++] = c1[l];
-                    ok = 0;
+                    ok = false;
                 } else if (ok) {
                     if (c1[l] < c2[l]) {
                         if (c1[l] == v1) {
@@ -384,13 +377,6 @@ igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
     }
 }
 
-typedef igraph_error_t(*igraph_i_maximal_clique_func_t)(const igraph_vector_int_t*, void*, igraph_bool_t*);
-typedef struct {
-    igraph_vector_int_list_t* result;
-    igraph_integer_t min_size;
-    igraph_integer_t max_size;
-} igraph_i_maximal_clique_data_t;
-
 static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(
         const igraph_t *graph,
         igraph_vector_int_list_t *res,
@@ -439,12 +425,12 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
                                    igraph_integer_t max_size) {
     igraph_integer_t no_of_nodes;
     igraph_vector_int_t neis, *indset;
-    igraph_integer_t *member_storage = 0, *new_member_storage, *c1;
+    igraph_integer_t *member_storage, *new_member_storage, *c1;
     igraph_vector_int_t new_member_storage_view;
-    igraph_integer_t i, j, k, indset_count, old_indset_count;
+    igraph_integer_t indset_count, old_indset_count;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
+        IGRAPH_WARNING("Edge directions are ignored during independent vertex set calculations.");
     }
 
     no_of_nodes = igraph_vcount(graph);
@@ -462,19 +448,15 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
     /* Will be resized later, if needed. */
     member_storage = IGRAPH_CALLOC(1, igraph_integer_t);
-    if (member_storage == 0) {
-        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(member_storage, "Insufficient memory for independent vertex set calculation.");
     IGRAPH_FINALLY(igraph_free, member_storage);
 
     /* Find all 1-cliques: every vertex will be a clique */
     new_member_storage = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (new_member_storage == 0) {
-        IGRAPH_ERROR("igraph_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(new_member_storage, "Insufficient memory for independent vertex set calculation.");
     IGRAPH_FINALLY(igraph_free, new_member_storage);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         new_member_storage[i] = i;
     }
     indset_count = no_of_nodes;
@@ -483,13 +465,13 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
     /* Add size 1 indsets if requested */
     if (min_size <= 1) {
         IGRAPH_CHECK(igraph_vector_int_list_resize(res, no_of_nodes));
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             indset = igraph_vector_int_list_get_ptr(res, i);
             IGRAPH_CHECK(igraph_vector_int_push_back(indset, i));
         }
     }
 
-    for (i = 2; i <= max_size && indset_count > 1; i++) {
+    for (igraph_integer_t i = 2; i <= max_size && indset_count > 1; i++) {
 
         /* Here new_member_storage contains the independent vertex sets found in
            the previous iteration. Save this into member_storage, might be needed later  */
@@ -514,7 +496,7 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
         /* Add the cliques just found to the result if requested */
         if (i >= min_size && i <= max_size) {
-            for (j = 0, k = 0; j < indset_count; j++, k += i) {
+            for (igraph_integer_t j = 0, k = 0; j < indset_count; j++, k += i) {
                 igraph_vector_int_view(&new_member_storage_view, new_member_storage + k, i);
                 IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &new_member_storage_view));
             }
@@ -522,8 +504,8 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
     } /* i <= max_size && clique_count != 0 */
 
-    igraph_free(member_storage);
-    igraph_free(new_member_storage);
+    IGRAPH_FREE(new_member_storage);
+    IGRAPH_FREE(member_storage);
     igraph_vector_int_destroy(&neis);
     IGRAPH_FINALLY_CLEAN(3);
 
@@ -577,20 +559,20 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
         igraph_vector_int_list_t *res,
         igraph_i_max_ind_vsets_data_t *clqdata,
         igraph_integer_t level) {
+
     igraph_integer_t v1, v2, v3, c, j, k;
     igraph_vector_int_t *neis1, *neis2;
     igraph_bool_t f;
     igraph_integer_t it_state;
-    igraph_vector_int_t vec;
 
     IGRAPH_ALLOW_INTERRUPTION();
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
-
     if (level >= clqdata->matrix_size - 1) {
         igraph_integer_t size = 0;
+
         if (res) {
-            igraph_vector_int_clear(&vec);
+            igraph_vector_int_t vec, *newvec;
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&vec, 0);
 
             for (v1 = 0; v1 < clqdata->matrix_size; v1++) {
                 if (clqdata->IS[v1] == 0) {
@@ -599,18 +581,28 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
             }
 
             size = igraph_vector_int_size(&vec);
+
+            /* Trick for efficient insertion of a new vector into a vector list:
+             * Instead of copying the vector contents, we add an empty vector to
+             * the list, then swap it with the vector to-be-added in O(1) time. */
             if (!clqdata->keep_only_largest) {
-                IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &vec));
+                IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                igraph_vector_int_swap(newvec, &vec);
             } else {
                 if (size > clqdata->largest_set_size) {
                     /* We are keeping only the largest sets, and we've found one that's
                      * larger than all previous sets, so we have to clear the list */
                     igraph_vector_int_list_clear(res);
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &vec));
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                    igraph_vector_int_swap(newvec, &vec);
                 } else if (size == clqdata->largest_set_size) {
-                    IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(res, &vec));
+                    IGRAPH_CHECK(igraph_vector_int_list_push_back_new(res, &newvec));
+                    igraph_vector_int_swap(newvec, &vec);
                 }
             }
+
+            igraph_vector_int_destroy(&vec);
+            IGRAPH_FINALLY_CLEAN(1);
         } else {
             for (v1 = 0, size = 0; v1 < clqdata->matrix_size; v1++) {
                 if (clqdata->IS[v1] == 0) {
@@ -657,7 +649,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
             IGRAPH_CHECK(igraph_i_maximal_independent_vertex_sets_backtrack(graph, res, clqdata, v1));
             clqdata->IS[v1] = 0;
 
-            f = 1;
+            f = true;
             j = 0;
             while (j < VECTOR(clqdata->deg)[v1] &&
                    (v2 = VECTOR(*neis1)[j]) <= level) {
@@ -669,7 +661,7 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
                            (v3 = VECTOR(*neis2)[k]) <= level) {
                         clqdata->IS[v3]--;
                         if (clqdata->IS[v3] == 0) {
-                            f = 0;
+                            f = false;
                         }
                         k++;
                     }
@@ -704,17 +696,31 @@ static igraph_error_t igraph_i_maximal_independent_vertex_sets_backtrack(
         }
     }
 
-    igraph_vector_int_destroy(&vec);
-    IGRAPH_FINALLY_CLEAN(1);
-
     return IGRAPH_SUCCESS;
 }
 
-static void igraph_i_free_set_array(igraph_set_t* array) {
+/* TODO (ugly hack):
+ *
+ * This version does not know the length of the array, and is safe to use
+ * ONLY on arrays which have not been completely filled out and were
+ * originally initialized to zero. It relies on igraph_set_inited()
+ * returning false when igraph_set_t is all-zero-bytes.
+ * This function is meant for use with IGRAPH_FINALLY.
+ *
+ * Should probably be replaced with a proper igraph_vector_ptr_t.
+ */
+static void free_set_array_incomplete(igraph_set_t *array) {
     igraph_integer_t i = 0;
     while (igraph_set_inited(array + i)) {
         igraph_set_destroy(array + i);
         i++;
+    }
+    IGRAPH_FREE(array);
+}
+
+static void free_set_array(igraph_set_t *array, igraph_integer_t n) {
+    for (igraph_integer_t i=0; i < n; i++) {
+        igraph_set_destroy(&array[i]);
     }
     IGRAPH_FREE(array);
 }
@@ -755,14 +761,14 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
 igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
         igraph_vector_int_list_t *res) {
     igraph_i_max_ind_vsets_data_t clqdata;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
+        IGRAPH_WARNING("Edge directions are ignored during independent vertex set calculations.");
     }
 
     clqdata.matrix_size = no_of_nodes;
-    clqdata.keep_only_largest = 0;
+    clqdata.keep_only_largest = false;
 
     IGRAPH_CHECK(igraph_adjlist_init(
         graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
@@ -770,23 +776,19 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
     clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (clqdata.IS == 0) {
-        IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(clqdata.IS, "Insufficient memory for maximal independent vertex sets.");
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
     clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
-    if (clqdata.buckets == 0) {
-        IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
+    IGRAPH_CHECK_OOM(clqdata.buckets, "Insufficient memory for maximal independent vertex sets.");
+    IGRAPH_FINALLY(free_set_array_incomplete, clqdata.buckets);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
     }
 
@@ -797,14 +799,12 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
     IGRAPH_CHECK(igraph_i_maximal_independent_vertex_sets_backtrack(graph, res, &clqdata, 0));
 
     /* Cleanup */
-    for (i = 0; i < no_of_nodes; i++) {
-        igraph_set_destroy(&clqdata.buckets[i]);
-    }
-    igraph_adjlist_destroy(&clqdata.adj_list);
+    free_set_array(clqdata.buckets, no_of_nodes);
     igraph_vector_int_destroy(&clqdata.deg);
-    igraph_free(clqdata.IS);
-    igraph_free(clqdata.buckets);
+    IGRAPH_FREE(clqdata.IS);
+    igraph_adjlist_destroy(&clqdata.adj_list);
     IGRAPH_FINALLY_CLEAN(4);
+
     return IGRAPH_SUCCESS;
 }
 
@@ -834,14 +834,14 @@ igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
  */
 igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
     igraph_i_max_ind_vsets_data_t clqdata;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
+        IGRAPH_WARNING("Edge directions are ignored during independence number calculations.");
     }
 
     clqdata.matrix_size = no_of_nodes;
-    clqdata.keep_only_largest = 0;
+    clqdata.keep_only_largest = false;
 
     IGRAPH_CHECK(igraph_adjlist_init(
         graph, &clqdata.adj_list, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE
@@ -849,23 +849,19 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
     clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (clqdata.IS == 0) {
-        IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(clqdata.IS, "Insufficient memory for independence number calculation.");
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
     clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
-    if (clqdata.buckets == 0) {
-        IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
+    IGRAPH_CHECK_OOM(clqdata.buckets, "Insufficient memory for independence number calculation.");
+    IGRAPH_FINALLY(free_set_array_incomplete, clqdata.buckets);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
     }
 
@@ -875,13 +871,10 @@ igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_integer_
     *no = clqdata.largest_set_size;
 
     /* Cleanup */
-    for (i = 0; i < no_of_nodes; i++) {
-        igraph_set_destroy(&clqdata.buckets[i]);
-    }
-    igraph_adjlist_destroy(&clqdata.adj_list);
+    free_set_array(clqdata.buckets, no_of_nodes);
     igraph_vector_int_destroy(&clqdata.deg);
-    igraph_free(clqdata.IS);
-    igraph_free(clqdata.buckets);
+    IGRAPH_FREE(clqdata.IS);
+    igraph_adjlist_destroy(&clqdata.adj_list);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
@@ -991,11 +984,12 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
         igraph_integer_t *clique_number,
         igraph_bool_t keep_only_largest,
         igraph_bool_t complementer) {
+
     igraph_i_max_ind_vsets_data_t clqdata;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph), i;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
+        IGRAPH_WARNING("Edge directions are ignored for largest independent vertex set or clique calculations.");
     }
 
     clqdata.matrix_size = no_of_nodes;
@@ -1011,23 +1005,19 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
     clqdata.IS = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (clqdata.IS == 0) {
-        IGRAPH_ERROR("igraph_i_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(clqdata.IS, "Insufficient memory for largest independent sets or cliques.");
     IGRAPH_FINALLY(igraph_free, clqdata.IS);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&clqdata.deg, no_of_nodes);
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         VECTOR(clqdata.deg)[i] = igraph_vector_int_size(igraph_adjlist_get(&clqdata.adj_list, i));
     }
 
     clqdata.buckets = IGRAPH_CALLOC(no_of_nodes + 1, igraph_set_t);
-    if (clqdata.buckets == 0) {
-        IGRAPH_ERROR("igraph_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
-    IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
+    IGRAPH_CHECK_OOM(clqdata.buckets, "Insufficient memory for largest independent sets or cliques.");
+    IGRAPH_FINALLY(free_set_array_incomplete, clqdata.buckets);
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_set_init(&clqdata.buckets[i], 0));
     }
 
@@ -1040,17 +1030,15 @@ static igraph_error_t igraph_i_maximal_or_largest_cliques_or_indsets(const igrap
     IGRAPH_CHECK(igraph_i_maximal_independent_vertex_sets_backtrack(graph, res, &clqdata, 0));
 
     /* Cleanup */
-    for (i = 0; i < no_of_nodes; i++) {
-        igraph_set_destroy(&clqdata.buckets[i]);
-    }
-    igraph_adjlist_destroy(&clqdata.adj_list);
+    free_set_array(clqdata.buckets, no_of_nodes);
     igraph_vector_int_destroy(&clqdata.deg);
     igraph_free(clqdata.IS);
-    igraph_free(clqdata.buckets);
+    igraph_adjlist_destroy(&clqdata.adj_list);
     IGRAPH_FINALLY_CLEAN(4);
 
     if (clique_number) {
         *clique_number = clqdata.largest_set_size;
     }
+
     return IGRAPH_SUCCESS;
 }

@@ -29,6 +29,8 @@ int main(void) {
     /* Set vertex attributes */
     SETVAN(&g, "VAN", 0, -1);
     SETVAN(&g, "VAN", 1, 2.1);
+    SETVAN(&g, "VAN", 2, 1.23e-6);
+    SETVAN(&g, "VAN", 3, 1e7);
 
     SETVAS(&g, "VAS", 0, "foo");
     SETVAS(&g, "VAS", 1, "bar");
