@@ -88,7 +88,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) 
                                                  const TYPE(igraph_matrix) *from);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
                                                  const TYPE(igraph_matrix) *from);
-IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2);
+IGRAPH_EXPORT void FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2);
 
 /*--------------------------*/
 /* Copying rows and columns */

@@ -580,12 +580,12 @@ igraph_error_t igraph_get_shortest_path_bellman_ford(const igraph_t *graph,
     /* We use the constant time vector_swap() instead of the linear-time vector_update() to move the
        result to the output parameter. */
     if (edges) {
-        IGRAPH_CHECK(igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0)));
+        igraph_vector_int_swap(edges, igraph_vector_int_list_get_ptr(&edges2, 0));
         igraph_vector_int_list_destroy(&edges2);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (vertices) {
-        IGRAPH_CHECK(igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0)));
+        igraph_vector_int_swap(vertices, igraph_vector_int_list_get_ptr(&vertices2, 0));
         igraph_vector_int_list_destroy(&vertices2);
         IGRAPH_FINALLY_CLEAN(1);
     }
