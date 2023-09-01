@@ -130,7 +130,6 @@ igraph_error_t igraph_read_graph_dimacs_flow(
     igraph_integer_t tsource = -1;
     igraph_integer_t ttarget = -1;
     char prob[21];
-    char c;
     enum {
         PROBLEM_NONE,
         PROBLEM_EDGE,
@@ -277,7 +276,7 @@ igraph_error_t igraph_read_graph_dimacs_flow(
         }
 
         /* Go to next line */
-        while (!feof(instream) && (c = (char) getc(instream)) != '\n') ;
+        while (!feof(instream) && getc(instream) != '\n') ;
     }
 
     if (source) {
