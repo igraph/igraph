@@ -121,7 +121,7 @@ struct igraph_i_graphml_parser_state {
     igraph_vector_int_t edgelist;
     igraph_vector_int_t prev_state_stack;
     unsigned int unknown_depth;
-    int index;
+    igraph_integer_t index;
     igraph_bool_t successful;
     igraph_bool_t edges_directed;
     igraph_trie_t v_names;
@@ -247,7 +247,7 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
     }
 }
 
-static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, int index) {
+static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, igraph_integer_t index) {
     memset(state, 0, sizeof(struct igraph_i_graphml_parser_state));
 
     state->g = graph;
