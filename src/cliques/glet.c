@@ -312,7 +312,6 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t subv;
     igraph_t subg;
-    igraph_integer_t i, j, nocliques;
     igraph_t *newgraphs = NULL;
     igraph_vector_t *newweights = NULL;
     igraph_vector_int_t *newids = NULL;
@@ -323,7 +322,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&subv, 0);
 
     /* We start by finding cliques at the lowest threshold */
-    for (i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         if (VECTOR(*weights)[i] >= startthr) {
             IGRAPH_CHECK(igraph_vector_int_push_back(&subv, i));
         }
@@ -335,7 +334,7 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     igraph_vector_int_destroy(&subv);
     IGRAPH_FINALLY_CLEAN(2);
 
-    nocliques = igraph_vector_int_list_size(&mycliques);
+    const igraph_integer_t nocliques = igraph_vector_int_list_size(&mycliques);
 
     /* Get the next cliques and thresholds */
     IGRAPH_VECTOR_INIT_FINALLY(&next_thr, 0);
@@ -353,9 +352,14 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_i_subclique_next_free, &freedata);
 
     /* Store cliques at the current level */
+
     IGRAPH_CHECK(igraph_vector_append(thresholds, &clique_thr));
+
+    igraph_vector_destroy(&clique_thr);
+    IGRAPH_FINALLY_CLEAN(1);
+
     IGRAPH_CHECK(igraph_vector_ptr_resize(cliques, igraph_vector_ptr_size(cliques) + nocliques));
-    for (i = 0, j = igraph_vector_ptr_size(cliques) - 1; i < nocliques; i++, j--) {
+    for (igraph_integer_t i = 0, j = igraph_vector_ptr_size(cliques) - 1; i < nocliques; i++, j--) {
         igraph_vector_int_t *cl = IGRAPH_CALLOC(1, igraph_vector_int_t);
         IGRAPH_CHECK_OOM(cl, "Cannot find graphlets.");
         IGRAPH_FINALLY(igraph_free, cl);
@@ -367,16 +371,19 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
         VECTOR(*cliques)[j] = cl;
         IGRAPH_FINALLY_CLEAN(1);
 
-        igraph_integer_t k, n = igraph_vector_int_size(cl);
-        for (k = 0; k < n; k++) {
+        const igraph_integer_t n = igraph_vector_int_size(cl);
+        for (igraph_integer_t k = 0; k < n; k++) {
             igraph_integer_t node = VECTOR(*cl)[k];
             VECTOR(*cl)[k] = VECTOR(*ids)[node];
         }
         igraph_vector_int_sort(cl);
     }
 
+    igraph_vector_int_list_destroy(&mycliques); /* contents was copied over to `cliques' */
+    IGRAPH_FINALLY_CLEAN(1);
+
     /* Recursive calls for cliques found */
-    for (i = 0; i < nocliques; i++) {
+    for (igraph_integer_t i = 0; i < nocliques; i++) {
         igraph_t *g = newgraphs + i;
         if (igraph_vcount(g) > 1) {
             igraph_vector_t *w_sub = newweights + i;
@@ -385,11 +392,9 @@ static igraph_error_t igraph_i_graphlets(const igraph_t *graph,
         }
     }
 
-    igraph_vector_destroy(&clique_thr);
     igraph_vector_destroy(&next_thr);
     igraph_i_subclique_next_free(&freedata);
-    igraph_vector_int_list_destroy(&mycliques); /* contents was copied over to `cliques' */
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
