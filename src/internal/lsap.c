@@ -1,27 +1,34 @@
 
 #include "igraph_lsap.h"
+
 #include "igraph_error.h"
+#include "igraph_memory.h"
 
 /* #include <stdio.h> */
 #include <stdlib.h>
-#include <limits.h>     /* INT_MAX */
 #include <float.h>      /* DBL_MAX */
-#include <time.h>
 
 /* constants used for improving readability of code */
 
-#define COVERED       1
-#define UNCOVERED     0
-#define ASSIGNED      1
-#define UNASSIGNED    0
-#define TRUE          1
-#define FALSE         0
+typedef enum covered_t {
+    COVERED = 1,
+    UNCOVERED = 0
+} covered_t;
 
-#define MARKED        1
-#define UNMARKED      0
+typedef enum assigned_t {
+    ASSIGNED = 1,
+    UNASSIGNED = 0
+} assigned_t;
 
-#define REDUCE        1
-#define NOREDUCE      0
+typedef enum marked_t {
+    MARKED = 1,
+    UNMARKED = 0
+} marked_t;
+
+typedef enum reduce_t {
+    REDUCE = 1,
+    NOREDUCE = 0
+} reduce_t;
 
 typedef struct {
     igraph_integer_t    n;            /* order of problem             */
@@ -32,22 +39,21 @@ typedef struct {
     igraph_integer_t   na;            /* number of assigned items;    */
     igraph_integer_t runs;            /* number of iterations     */
     double           cost;            /* minimum cost         */
-    time_t          rtime;            /* time                         */
 } AP;
 
 /* public interface */
 
 /* constructors and destructor */
-static AP     *ap_create_problem(double *t, igraph_integer_t n);
+static igraph_error_t ap_create_problem(AP **problem, const double *t, const igraph_integer_t n);
 /* static AP     *ap_create_problem_from_matrix(double **t, int n); */
 /* static AP     *ap_read_problem(char *file); */
 static void    ap_free(AP *p);
 
-static igraph_integer_t ap_assignment(AP *p, igraph_integer_t *res);
+static igraph_integer_t ap_get_result(AP *p, igraph_integer_t *res);
 /* static int     ap_costmatrix(AP *p, double **m); */
 /* static int     ap_datamatrix(AP *p, double **m); */
 /* static int     ap_iterations(AP *p); */
-static igraph_error_t     ap_hungarian(AP *p);
+static igraph_error_t ap_hungarian(AP *p);
 /* static double  ap_mincost(AP *p); */
 /* static void    ap_print_solution(AP *p); */
 /* static void    ap_show_data(AP *p); */
@@ -59,52 +65,52 @@ static igraph_error_t     ap_hungarian(AP *p);
 
 /* private functions */
 static void    preprocess(AP *p);
-static void    preassign(AP *p);
-static int     cover(AP *p, igraph_integer_t *ri, igraph_integer_t *ci);
-static void    reduce(AP *p, igraph_integer_t *ri, igraph_integer_t *ci);
+static igraph_error_t preassign(AP *p);
+static igraph_error_t cover(AP *p, covered_t *ri, covered_t *ci, reduce_t *res);
+static void    reduce(AP *p, const covered_t *ri, const covered_t *ci);
+
+/* Error message used on memory allocation failure. */
+static const char *memerr = "Insufficient memory for LSAP.";
 
 igraph_error_t ap_hungarian(AP *p) {
-    igraph_integer_t   n;  /* size of problem */
-    igraph_integer_t *ri;  /* covered rows    */
-    igraph_integer_t *ci;  /* covered columns */
-    time_t start, end;     /* timer           */
-    igraph_integer_t i, j;
-    igraph_integer_t ok;
+    covered_t *ri;  /* covered rows    */
+    covered_t *ci;  /* covered columns */
 
-    start = time(0);
-
-    n = p->n;
+    const igraph_integer_t n = p->n; /* size of problem */
     p->runs = 0;
 
     /* allocate memory */
-    p->s = calloc(1 + n, sizeof(igraph_integer_t));
-    p->f = calloc(1 + n, sizeof(igraph_integer_t));
+    /* Note: p is already on the finally stack here. */
+    p->s = IGRAPH_CALLOC(1 + n, igraph_integer_t);
+    IGRAPH_CHECK_OOM(p->s, memerr);
 
-    ri = calloc(1 + n, sizeof(igraph_integer_t));
-    ci = calloc(1 + n, sizeof(igraph_integer_t));
+    p->f = IGRAPH_CALLOC(1 + n, igraph_integer_t);
+    IGRAPH_CHECK_OOM(p->f, memerr);
 
-    if (ri == NULL || ci == NULL || p->s == NULL || p->f == NULL) {
-        IGRAPH_ERROR("ap_hungarian: could not allocate memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    ri = IGRAPH_CALLOC(1 + n, covered_t);
+    IGRAPH_CHECK_OOM(ri, memerr);
+    IGRAPH_FINALLY(igraph_free, ri);
+
+    ci = IGRAPH_CALLOC(1 + n, covered_t);
+    IGRAPH_CHECK_OOM(ci, memerr);
+    IGRAPH_FINALLY(igraph_free, ci);
 
     preprocess(p);
-    preassign(p);
+    IGRAPH_CHECK(preassign(p));
 
     while (p->na < n) {
-        if (REDUCE == cover(p, ri, ci)) {
+        reduce_t res;
+        IGRAPH_CHECK(cover(p, ri, ci, &res));
+        if (REDUCE == res) {
             reduce(p, ri, ci);
         }
         ++p->runs;
     }
 
-    end = time(0);
-
-    p->rtime = end - start;
-
     /* check if assignment is a permutation of (1..n) */
-    for (i = 1; i <= n; i++) {
-        ok = 0;
-        for (j = 1; j <= n; j++)
+    for (igraph_integer_t i = 1; i <= n; i++) {
+        igraph_integer_t ok = 0;
+        for (igraph_integer_t j = 1; j <= n; j++)
             if (p->s[j] == i) {
                 ++ok;
             }
@@ -115,32 +121,27 @@ igraph_error_t ap_hungarian(AP *p) {
 
     /* calculate cost of assignment */
     p->cost = 0;
-    for (i = 1; i <= n; i++) {
+    for (igraph_integer_t i = 1; i <= n; i++) {
         p->cost += p->C[i][p->s[i]];
     }
 
     /* reset result back to base-0 indexing */
-    for (i = 1; i <= n; i++) {
+    for (igraph_integer_t i = 1; i <= n; i++) {
         p->s[i - 1] = p->s[i] - 1;
     }
 
     /* free memory */
 
-    free(ri);
-    free(ci);
+    IGRAPH_FREE(ri);
+    IGRAPH_FREE(ci);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
 
 /* abbreviated interface */
-igraph_integer_t ap_assignment(AP *p, igraph_integer_t *res) {
-    igraph_integer_t i;
-
-    if (p->s == NULL) {
-        ap_hungarian(p);
-    }
-
-    for (i = 0; i < p->n; i++) {
+igraph_integer_t ap_get_result(AP *p, igraph_integer_t *res) {
+    for (igraph_integer_t i = 0; i < p->n; i++) {
         res[i] = p->s[i];
     }
 
@@ -283,58 +284,56 @@ AP     *ap_create_problem_from_matrix(double **t, int n) {
 #endif
 
 /* read data from vector */
-AP *ap_create_problem(double *t, igraph_integer_t n) {
-    igraph_integer_t i, j;
-    AP *p;
+igraph_error_t ap_create_problem(AP **problem, const double *t, const igraph_integer_t n) {
+    *problem = IGRAPH_CALLOC(1, AP);
+    IGRAPH_CHECK_OOM(*problem, memerr);
+    IGRAPH_FINALLY(ap_free, *problem);
 
-    p = (AP*) malloc(sizeof(AP));
-    if (p == NULL) {
-        return NULL;
-    }
+    AP *p = *problem;
 
     p->n = n;
 
-    p->C  = (double **) malloc((n + 1) * sizeof(double *));
-    p->c  = (double **) malloc((n + 1) * sizeof(double *));
-    if (p->C == NULL || p->c == NULL) {
-        return NULL;
+    p->C = IGRAPH_CALLOC(n+1, double *);
+    IGRAPH_CHECK_OOM(p->C, memerr);
+
+    p->c = IGRAPH_CALLOC(n+1, double *);
+    IGRAPH_CHECK_OOM(p->c, memerr);
+
+    for (igraph_integer_t i = 1; i <= n; i++) {
+        p->C[i] = IGRAPH_CALLOC(n+1, double);
+        IGRAPH_CHECK_OOM(p->C[i], memerr);
+        p->c[i] = IGRAPH_CALLOC(n+1, double);
+        IGRAPH_CHECK_OOM(p->c[i], memerr);
     }
 
-    for (i = 1; i <= n; i++) {
-        p->C[i] = (double *) calloc(n + 1, sizeof(double));
-        p->c[i] = (double *) calloc(n + 1, sizeof(double));
-        if (p->C[i] == NULL || p->c[i] == NULL) {
-            return NULL;
-        }
-    }
-
-
-    for (i = 1; i <= n; i++)
-        for ( j = 1; j <= n; j++) {
+    for (igraph_integer_t i = 1; i <= n; i++) {
+        for (igraph_integer_t j = 1; j <= n; j++) {
             p->C[i][j] = t[n * (j - 1) + i - 1];
             p->c[i][j] = t[n * (j - 1) + i - 1];
         }
+    }
     p->cost = 0;
     p->s = NULL;
     p->f = NULL;
-    return p;
+
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
 
 /* destructor */
 void ap_free(AP *p) {
-    igraph_integer_t i;
+    IGRAPH_FREE(p->s);
+    IGRAPH_FREE(p->f);
 
-    free(p->s);
-    free(p->f);
-
-    for (i = 1; i <= p->n; i++) {
-        free(p->C[i]);
-        free(p->c[i]);
+    for (igraph_integer_t i = 1; i <= p->n; i++) {
+        IGRAPH_FREE(p->C[i]);
+        IGRAPH_FREE(p->c[i]);
     }
 
-    free(p->C);
-    free(p->c);
-    free(p);
+    IGRAPH_FREE(p->C);
+    IGRAPH_FREE(p->c);
+    IGRAPH_FREE(p);
 }
 
 /* set + get functions */
@@ -421,15 +420,17 @@ void ap_error(char *message)
 /* by ap_hungarian                                           */
 /*************************************************************/
 
-int cover(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
-    igraph_integer_t *mr, i, r;
-    igraph_integer_t n;
+igraph_error_t cover(AP *p, covered_t *ri, covered_t *ci, reduce_t *res) {
+    marked_t *mr;
+    igraph_integer_t r;
 
-    n = p->n;
-    mr = calloc(1 + p->n, sizeof(igraph_integer_t));
+    const igraph_integer_t n = p->n;
+
+    mr = IGRAPH_CALLOC(1 + p->n, marked_t);
+    IGRAPH_CHECK_OOM(mr, memerr);
 
     /* reset cover indices */
-    for (i = 1; i <= n; i++) {
+    for (igraph_integer_t i = 1; i <= n; i++) {
         if (p->s[i] == UNASSIGNED) {
             ri[i] = UNCOVERED;
             mr[i] = MARKED;
@@ -439,10 +440,10 @@ int cover(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
         ci[i] = UNCOVERED;
     }
 
-    while (TRUE) {
+    while (true) {
         /* find marked row */
         r = 0;
-        for (i = 1; i <= n; i++)
+        for (igraph_integer_t i = 1; i <= n; i++)
             if (mr[i] == MARKED) {
                 r = i;
                 break;
@@ -451,7 +452,7 @@ int cover(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
         if (r == 0) {
             break;
         }
-        for (i = 1; i <= n; i++)
+        for (igraph_integer_t i = 1; i <= n; i++)
             if (p->c[r][i] == 0 && ci[i] == UNCOVERED) {
                 if (p->f[i]) {
                     ri[p->f[i]] = UNCOVERED;
@@ -466,26 +467,27 @@ int cover(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
                     p->f[i] = r;
                     p->s[r] = i;
 
-                    free(mr);
-                    return NOREDUCE;
+                    IGRAPH_FREE(mr);
+                    *res = NOREDUCE;
+                    return IGRAPH_SUCCESS;
                 }
             }
         mr[r] = UNMARKED;
     }
-    free(mr);
-    return REDUCE;
+
+    IGRAPH_FREE(mr);
+    *res = REDUCE;
+    return IGRAPH_SUCCESS;
 }
 
-void reduce(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
-    igraph_integer_t i, j, n;
+void reduce(AP *p, const covered_t *ri, const covered_t *ci) {
     double min;
-
-    n = p->n;
+    const igraph_integer_t n = p->n;
 
     /* find minimum in uncovered c-matrix */
     min = DBL_MAX;
-    for (i = 1; i <= n; i++)
-        for (j = 1; j <= n; j++)
+    for (igraph_integer_t i = 1; i <= n; i++)
+        for (igraph_integer_t j = 1; j <= n; j++)
             if (ri[i] == UNCOVERED && ci[j] == UNCOVERED) {
                 if (p->c[i][j] < min) {
                     min = p->c[i][j];
@@ -494,8 +496,8 @@ void reduce(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
 
     /* subtract min from each uncovered element and add it to each element */
     /* which is covered twice                                              */
-    for (i = 1; i <= n; i++)
-        for (j = 1; j <= n; j++) {
+    for (igraph_integer_t i = 1; i <= n; i++)
+        for (igraph_integer_t j = 1; j <= n; j++) {
             if (ri[i] == UNCOVERED && ci[j] == UNCOVERED) {
                 p->c[i][j] -= min;
             }
@@ -505,44 +507,55 @@ void reduce(AP *p, igraph_integer_t *ri, igraph_integer_t *ci) {
         }
 }
 
-void preassign(AP *p) {
-    igraph_integer_t i, j, min, r, c, n, count;
-    igraph_integer_t *ri, *ci, *rz, *cz;
+igraph_error_t preassign(AP *p) {
+    igraph_integer_t min, r, c, n, count;
+    assigned_t *ri, *ci;
+    igraph_integer_t *rz, *cz;
 
     n = p->n;
     p->na = 0;
 
     /* row and column markers */
-    ri = calloc(1 + n, sizeof(igraph_integer_t));
-    ci = calloc(1 + n, sizeof(igraph_integer_t));
+    ri = IGRAPH_CALLOC(1 + n, assigned_t);
+    IGRAPH_CHECK_OOM(ri, memerr);
+    IGRAPH_FINALLY(igraph_free, ri);
+
+    ci = IGRAPH_CALLOC(1 + n, assigned_t);
+    IGRAPH_CHECK_OOM(ci, memerr);
+    IGRAPH_FINALLY(igraph_free, ci);
 
     /* row and column counts of zeroes */
-    rz = calloc(1 + n, sizeof(igraph_integer_t));
-    cz = calloc(1 + n, sizeof(igraph_integer_t));
+    rz = IGRAPH_CALLOC(1 + n, igraph_integer_t);
+    IGRAPH_CHECK_OOM(rz, memerr);
+    IGRAPH_FINALLY(igraph_free, rz);
 
-    for (i = 1; i <= n; i++) {
+    cz = IGRAPH_CALLOC(1 + n, igraph_integer_t);
+    IGRAPH_CHECK_OOM(cz, memerr);
+    IGRAPH_FINALLY(igraph_free, cz);
+
+    for (igraph_integer_t i = 1; i <= n; i++) {
         count = 0;
-        for (j = 1; j <= n; j++)
+        for (igraph_integer_t j = 1; j <= n; j++)
             if (p->c[i][j] == 0) {
                 ++count;
             }
         rz[i] = count;
     }
 
-    for (i = 1; i <= n; i++) {
+    for (igraph_integer_t i = 1; i <= n; i++) {
         count = 0;
-        for (j = 1; j <= n; j++)
+        for (igraph_integer_t j = 1; j <= n; j++)
             if (p->c[j][i] == 0) {
                 ++count;
             }
         cz[i] = count;
     }
 
-    while (TRUE) {
+    while (true) {
         /* find unassigned row with least number of zeroes > 0 */
         min = IGRAPH_INTEGER_MAX;
         r = 0;
-        for (i = 1; i <= n; i++)
+        for (igraph_integer_t i = 1; i <= n; i++)
             if (rz[i] > 0 && rz[i] < min && ri[i] == UNASSIGNED) {
                 min = rz[i];
                 r = i;
@@ -555,7 +568,7 @@ void preassign(AP *p) {
         /* find unassigned column in row r with least number of zeroes */
         c = 0;
         min = IGRAPH_INTEGER_MAX;
-        for (i = 1; i <= n; i++)
+        for (igraph_integer_t i = 1; i <= n; i++)
             if (p->c[r][i] == 0 && cz[i] < min && ci[i] == UNASSIGNED) {
                 min = cz[i];
                 c = i;
@@ -571,7 +584,7 @@ void preassign(AP *p) {
 
             /* adjust zero counts */
             cz[c] = 0;
-            for (i = 1; i <= n; i++)
+            for (igraph_integer_t i = 1; i <= n; i++)
                 if (p->c[i][c] == 0) {
                     --rz[i];
                 }
@@ -579,38 +592,39 @@ void preassign(AP *p) {
     }
 
     /* free memory */
-    free(ri);
-    free(ci);
-    free(rz);
-    free(cz);
+    IGRAPH_FREE(ri);
+    IGRAPH_FREE(ci);
+    IGRAPH_FREE(rz);
+    IGRAPH_FREE(cz);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    return IGRAPH_SUCCESS;
 }
 
 void preprocess(AP *p) {
-    igraph_integer_t i, j, n;
     double min;
-
-    n = p->n;
+    const igraph_integer_t n = p->n;
 
     /* subtract column minima in each row */
-    for (i = 1; i <= n; i++) {
+    for (igraph_integer_t i = 1; i <= n; i++) {
         min = p->c[i][1];
-        for (j = 2; j <= n; j++)
+        for (igraph_integer_t j = 2; j <= n; j++)
             if (p->c[i][j] < min) {
                 min = p->c[i][j];
             }
-        for (j = 1; j <= n; j++) {
+        for (igraph_integer_t j = 1; j <= n; j++) {
             p->c[i][j] -= min;
         }
     }
 
     /* subtract row minima in each column */
-    for (i = 1; i <= n; i++) {
+    for (igraph_integer_t i = 1; i <= n; i++) {
         min = p->c[1][i];
-        for (j = 2; j <= n; j++)
+        for (igraph_integer_t j = 2; j <= n; j++)
             if (p->c[j][i] < min) {
                 min = p->c[j][i];
             }
-        for (j = 1; j <= n; j++) {
+        for (igraph_integer_t j = 1; j <= n; j++) {
             p->c[j][i] -= min;
         }
     }
@@ -664,10 +678,12 @@ igraph_error_t igraph_solve_lsap(const igraph_matrix_t *c, igraph_integer_t n,
     IGRAPH_CHECK(igraph_vector_int_resize(p, n));
     igraph_vector_int_null(p);
 
-    ap = ap_create_problem(&MATRIX(*c, 0, 0), n);
-    ap_hungarian(ap);
-    ap_assignment(ap, VECTOR(*p));
+    IGRAPH_CHECK(ap_create_problem(&ap, &MATRIX(*c, 0, 0), n));
+    IGRAPH_FINALLY(ap_free, ap);
+    IGRAPH_CHECK(ap_hungarian(ap));
+    ap_get_result(ap, VECTOR(*p));
     ap_free(ap);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

@@ -4,10 +4,28 @@
 
 ### Fixed
 
+ - `igraph_full_bipartite()` now checks for overflow.
+ - `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` are now more robust to overflow.
+ - Bipartite graph creation functions now check input arguments.
+ - `igraph_write_graph_dot()` now quotes real numbers written in exponential notation as necessary.
+ - Independent vertex set finding functions could trigger the fatal error "Finally stack too large" when called on large graphs.
+
+### Deprecated
+
+ - `igraph_bipartite_game()` is now deprecated; use `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` instead.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.6] - 2023-07-13
+
+### Fixed
+
  - Compatibility with libxml2 2.11.
  - Fixed some converge failures in `igraph_community_voronoi()`.
  - `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` now check for overflow.
- - CMake packages created with the `install` target of the CMake build system are now relocatable, i.e. the generated `igraph-targets.cmake` file does not contain abdsolute paths any more.
+ - CMake packages created with the `install` target of the CMake build system are now relocatable, i.e. the generated `igraph-targets.cmake` file does not contain absolute paths any more.
 
 ## [0.10.5] - 2023-06-29
 
@@ -1181,7 +1199,8 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.5..master
+[master]: https://github.com/igraph/igraph/compare/0.10.6..master
+[0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
 [0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5
 [0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
 [0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3

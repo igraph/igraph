@@ -30,13 +30,14 @@
 
 #include "graph/attributes.h"
 #include "internal/hacks.h" /* strcasecmp & strdup */
+#include "math/safe_intop.h" /* IGRAPH_MAX_EXACT_REAL */
 
 #include <ctype.h>
 #include <string.h>
 
 #define CHECK(cmd) do { int ret=cmd; if (ret<0) IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_EFILE); } while (0)
 
-static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
+static igraph_error_t dot_escape(const char *orig, char **result) {
     /* do we have to escape the string at all? */
     igraph_integer_t i, j, len = strlen(orig), newlen = 0;
     igraph_bool_t need_quote = false, is_number = true;
@@ -82,14 +83,10 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
 
     if (is_number || !need_quote) {
         *result = strdup(orig);
-        if (!*result) {
-            IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(*result, "Insufficient memory for writing DOT format.");
     } else {
         *result = IGRAPH_CALLOC(newlen + 3, char);
-        if (!*result) {
-            IGRAPH_ERROR("Writing DOT format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(*result, "Insufficient memory for writing DOT format.");
         (*result)[0] = '"';
         (*result)[newlen + 1] = '"';
         (*result)[newlen + 2] = '\0';
@@ -111,6 +108,29 @@ static igraph_error_t igraph_i_dot_escape(const char *orig, char **result) {
         }
     }
 
+    return IGRAPH_SUCCESS;
+}
+
+/* Writes exactly representable integral values in standard integer notation, without decimal points or e-notation.
+ * Floating point values that are written with e-notation are quoted, otherwise the Graphviz parser cannot handle them.
+ */
+static igraph_error_t fprint_integral_or_precise(FILE *file, igraph_real_t x) {
+    if (fabs(x) <= IGRAPH_MAX_EXACT_REAL && floor(x) == x) {
+        /* write exactly representable integral values in standard integer notation;
+         * the above conditional skips +-Inf and NaN */
+        CHECK(fprintf(file, "%.f", x));
+    } else {
+        /* write as precise float and quote if necessary */
+        char str[50]; /* large enough to hold any precisely printed real */
+        char *str2;
+
+        CHECK(igraph_real_snprintf_precise(str, sizeof(str) / sizeof(str[0]), x));
+        IGRAPH_CHECK(dot_escape(str, &str2));
+        IGRAPH_FINALLY(igraph_free, str2);
+        CHECK(fputs(str2, file));
+        IGRAPH_FREE(str2);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
     return IGRAPH_SUCCESS;
 }
 
@@ -179,25 +199,23 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
             const char *name;
             char *newname;
             name = igraph_strvector_get(&gnames, i);
-            IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
+            IGRAPH_CHECK(dot_escape(name, &newname));
             IGRAPH_FINALLY(igraph_free, newname);
             if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
-                if (VECTOR(numv)[0] == (igraph_integer_t)VECTOR(numv)[0]) {
-                    CHECK(fprintf(outstream, "    %s=%" IGRAPH_PRId "\n", newname, (igraph_integer_t)VECTOR(numv)[0]));
-                } else {
-                    CHECK(fprintf(outstream, "    %s=", newname));
-                    CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
-                    CHECK(fputc('\n', outstream));
-                }
+                CHECK(fprintf(outstream, "    %s=", newname));
+                IGRAPH_CHECK(fprint_integral_or_precise(outstream, VECTOR(numv)[0]));
+                CHECK(fputc('\n', outstream));
             } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
                 const char *s;
                 char *news;
                 IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
                 s = igraph_strvector_get(&strv, 0);
-                IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
+                IGRAPH_CHECK(dot_escape(s, &news));
+                IGRAPH_FINALLY(igraph_free, news);
                 CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
                 IGRAPH_FREE(news);
+                IGRAPH_FINALLY_CLEAN(1);
             } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                 IGRAPH_CHECK(igraph_i_attribute_get_bool_graph_attr(graph, name, &boolv));
                 CHECK(fprintf(outstream, "    %s=%d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
@@ -219,26 +237,23 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 const char *name;
                 char *newname;
                 name = igraph_strvector_get(&vnames, j);
-                IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
+                IGRAPH_CHECK(dot_escape(name, &newname));
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name, igraph_vss_1(i), &numv));
-                    if (VECTOR(numv)[0] == floor(VECTOR(numv)[0])) {
-                        CHECK(fprintf(outstream, "    %s=%g\n", newname, VECTOR(numv)[0]));
-                    } else {
-                        CHECK(fprintf(outstream, "    %s=", newname));
-                        CHECK(igraph_real_fprintf_precise(outstream,
-                                                          VECTOR(numv)[0]));
-                        CHECK(fputc('\n', outstream));
-                    }
+                    CHECK(fprintf(outstream, "    %s=", newname));
+                    IGRAPH_CHECK(fprint_integral_or_precise(outstream, VECTOR(numv)[0]));
+                    CHECK(fputc('\n', outstream));
                 } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
                     const char *s;
                     char *news;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name, igraph_vss_1(i), &strv));
                     s = igraph_strvector_get(&strv, 0);
-                    IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
+                    IGRAPH_CHECK(dot_escape(s, &news));
+                    IGRAPH_FINALLY(igraph_free, news);
                     CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
                     IGRAPH_FREE(news);
+                    IGRAPH_FINALLY_CLEAN(1);
                 } else if (VECTOR(vtypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_vertex_attr(graph, name, igraph_vss_1(i), &boolv));
                     CHECK(fprintf(outstream, "    %s=%d\n", newname, VECTOR(boolv)[0] ? 1 : 0));
@@ -268,27 +283,25 @@ igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
                 const char *name;
                 char *newname;
                 name = igraph_strvector_get(&enames, j);
-                IGRAPH_CHECK(igraph_i_dot_escape(name, &newname));
+                IGRAPH_CHECK(dot_escape(name, &newname));
                 IGRAPH_FINALLY(igraph_free, newname);
                 if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
                     IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph,
                                  name, igraph_ess_1(i), &numv));
-                    if (VECTOR(numv)[0] == floor(VECTOR(numv)[0])) {
-                        CHECK(fprintf(outstream, "    %s=%g\n", newname, VECTOR(numv)[0]));
-                    } else {
-                        CHECK(fprintf(outstream, "    %s=", newname));
-                        CHECK(igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]));
-                        CHECK(fputc('\n', outstream));
-                    }
+                    CHECK(fprintf(outstream, "    %s=", newname));
+                    IGRAPH_CHECK(fprint_integral_or_precise(outstream, VECTOR(numv)[0]));
+                    CHECK(fputc('\n', outstream));
                 } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_STRING) {
                     const char *s;
                     char *news;
                     IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph,
                                  name, igraph_ess_1(i), &strv));
                     s = igraph_strvector_get(&strv, 0);
-                    IGRAPH_CHECK(igraph_i_dot_escape(s, &news));
+                    IGRAPH_CHECK(dot_escape(s, &news));
+                    IGRAPH_FINALLY(igraph_free, news);
                     CHECK(fprintf(outstream, "    %s=%s\n", newname, news));
                     IGRAPH_FREE(news);
+                    IGRAPH_FINALLY_CLEAN(1);
                 } else if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_BOOLEAN) {
                     IGRAPH_CHECK(igraph_i_attribute_get_bool_edge_attr(graph,
                                  name, igraph_ess_1(i), &boolv));

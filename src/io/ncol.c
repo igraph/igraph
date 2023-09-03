@@ -287,7 +287,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
     /* Check if we have the names attribute */
     if (names && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
             names)) {
-        IGRAPH_WARNINGF("Names attribute '%s' does not exists.", names);
+        IGRAPH_WARNINGF("Names attribute '%s' does not exist.", names);
         names = NULL;
     }
     if (names) {
@@ -302,7 +302,7 @@ igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
 
     /* Check the weights as well */
     if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, weights)) {
-        IGRAPH_WARNINGF("Weights attribute '%s' does not exists.", weights);
+        IGRAPH_WARNINGF("Weights attribute '%s' does not exist.", weights);
         weights = NULL;
     }
     if (weights) {

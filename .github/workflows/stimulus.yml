@@ -5,7 +5,7 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     env:
-      STIMULUS_VERSION: "0.11.0"
+      STIMULUS_VERSION: "0.14.0"
     steps:
       # Use Clang for more informative error messages
       - name: Install Clang
