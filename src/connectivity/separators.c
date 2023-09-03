@@ -227,7 +227,7 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
     /* Is it a separator at all? */
     IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, -1, res, &removed,
                                        &Q, &neis, no_of_nodes));
-    if (!(*res)) {
+    if (! *res) {
         /* Not a separator at all, nothing to do, *res is already set */
     } else if (candsize == 0) {
         /* Nothing to do, minimal, *res is already set */
@@ -237,13 +237,13 @@ igraph_error_t igraph_is_minimal_separator(const igraph_t *graph,
          * false for all vertices, then 'candidate' is a minimal
          * separator.
          */
-        igraph_integer_t i;
-        for (i = 0, *res = false; i < candsize && (!*res); i++) {
+        *res = false;
+        for (igraph_integer_t i=0; i < candsize && (! *res); i++) {
             igraph_vector_bool_null(&removed);
             IGRAPH_CHECK(igraph_i_is_separator(graph, &vit, i, res, &removed,
                                                &Q, &neis, no_of_nodes));
         }
-        (*res) = ! (*res);    /* opposite */
+        *res = ! *res; /* opposite */
     }
 
     igraph_vector_int_destroy(&neis);

@@ -89,8 +89,8 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     /* If the graph turned out to be simple, we can cache that it has no loop
      * and no multiple edges */
     if (*res) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, 0);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, 0);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
     }
 
     return IGRAPH_SUCCESS;

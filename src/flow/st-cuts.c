@@ -307,7 +307,7 @@ static igraph_error_t igraph_i_dbucket_insert(igraph_i_dbucket_t *buck, igraph_i
     return IGRAPH_SUCCESS;
 }
 
-static igraph_integer_t igraph_i_dbucket_empty(const igraph_i_dbucket_t *buck,
+static igraph_bool_t igraph_i_dbucket_empty(const igraph_i_dbucket_t *buck,
                                        igraph_integer_t bid) {
     return VECTOR(buck->head)[bid] == 0;
 }
@@ -635,7 +635,7 @@ static igraph_error_t igraph_i_all_st_cuts_minimal_dfs_incb(
     if (VECTOR(*GammaX)[realvid]) {
         if (!igraph_stack_int_empty(stack)) {
             igraph_integer_t top = igraph_stack_int_top(stack);
-            VECTOR(*nomark)[top] = 1; /* we just found a smaller one */
+            VECTOR(*nomark)[top] = true; /* we just found a smaller one */
         }
         IGRAPH_CHECK(igraph_stack_int_push(stack, realvid));
     }
@@ -786,7 +786,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     IGRAPH_CHECK(igraph_vector_bool_init(&GammaS, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &GammaS);
     if (igraph_marked_queue_int_size(S) == 0) {
-        VECTOR(GammaS)[VECTOR(Sbar_map)[source] - 1] = 1;
+        VECTOR(GammaS)[VECTOR(Sbar_map)[source] - 1] = true;
     } else {
         for (i = 0; i < no_of_nodes; i++) {
             if (igraph_marked_queue_int_iselement(S, i)) {
@@ -799,7 +799,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
                 for (j = 0; j < n; j++) {
                     igraph_integer_t nei = VECTOR(neis)[j];
                     if (!igraph_marked_queue_int_iselement(S, nei)) {
-                        VECTOR(GammaS)[nei] = 1;
+                        VECTOR(GammaS)[nei] = true;
                     }
                 }
                 igraph_vector_int_destroy(&neis);
@@ -815,7 +815,7 @@ igraph_error_t igraph_i_all_st_cuts_pivot(
     n = igraph_vector_int_size(&leftout);
     for (i = 0; i < n; i++) {
         VECTOR(leftout)[i] = VECTOR(Sbar_invmap)[VECTOR(leftout)[i]];
-        VECTOR(GammaS)[VECTOR(leftout)[i]] = 0;
+        VECTOR(GammaS)[VECTOR(leftout)[i]] = false;
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&M, 0);

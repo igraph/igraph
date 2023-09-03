@@ -347,7 +347,7 @@ static igraph_error_t igraph_i_connected_components_strong(
     /* Update cache */
     igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_clusters == 1);
     if (no_of_clusters == 1) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, 1);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
 
     return IGRAPH_SUCCESS;

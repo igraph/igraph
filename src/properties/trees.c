@@ -373,8 +373,8 @@ success:
         /* For undirected graphs (or directed graphs that are treated as
          * undirected in this calculation), a tree is weakly connected and is
          * a forest, so we can cache this */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, 1);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, 1);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
 
     return IGRAPH_SUCCESS;
@@ -414,7 +414,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
             *visited_count += 1;
         }
         else {
-            *res = 0;
+            *res = false;
             break;
         }
 
@@ -441,7 +441,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
                 }
                 /* To check for a self-loop in undirected graph */
                 else if (v == u) {
-                    *res = 0;
+                    *res = false;
                     break;
                 }
             }

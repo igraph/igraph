@@ -538,7 +538,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                               igraph_gml_tree_line(gtree, i));
             }
             node = igraph_gml_tree_get_tree(gtree, i);
-            hasid = 0;
+            hasid = false;
             for (igraph_integer_t j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *name = igraph_gml_tree_name(node, j);
                 igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, j);
@@ -566,7 +566,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         IGRAPH_ERRORF("Duplicate node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
-                    hasid = 1;
+                    hasid = true;
                 }
             }
             if (!hasid) {

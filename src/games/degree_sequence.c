@@ -171,12 +171,12 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
 
     /* Outer loop; this will try to construct a graph several times from scratch
      * until it finally succeeds. */
-    finished = 0;
+    finished = false;
     while (!finished) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Be optimistic :) */
-        failed = 0;
+        failed = false;
 
         /* Clear the adjacency list to get rid of the previous attempt (if any) */
         igraph_adjlist_clear(&al);
@@ -231,7 +231,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
                  * is done by enumerating all possible pairs and checking whether at
                  * least one feasible pair is found. */
                 i = 0;
-                failed = 1;
+                failed = true;
                 while (failed && igraph_set_iterate(&incomplete_vertices, &i, &from)) {
                     j = 0;
                     while (igraph_set_iterate(&incomplete_vertices, &j, &to)) {
@@ -245,7 +245,7 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_undirected(
                         neis = igraph_adjlist_get(&al, from);
                         if (!igraph_vector_int_binsearch(neis, to, 0)) {
                             /* Found a suitable pair, so we can continue */
-                            failed = 0;
+                            failed = false;
                             break;
                         }
                     }
@@ -319,12 +319,12 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
 
     /* Outer loop; this will try to construct a graph several times from scratch
      * until it finally succeeds. */
-    finished = 0;
+    finished = false;
     while (!finished) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* Be optimistic :) */
-        failed = 0;
+        failed = false;
 
         /* Clear the adjacency list to get rid of the previous attempt (if any) */
         igraph_adjlist_clear(&al);
@@ -383,14 +383,14 @@ static igraph_error_t igraph_i_degree_sequence_game_fast_heur_directed(igraph_t 
                  * is done by enumerating all possible pairs and checking whether at
                  * least one feasible pair is found. */
                 i = 0;
-                failed = 1;
+                failed = true;
                 while (failed && igraph_set_iterate(&incomplete_out_vertices, &i, &from)) {
                     j = 0;
                     while (igraph_set_iterate(&incomplete_in_vertices, &j, &to)) {
                         neis = igraph_adjlist_get(&al, from);
                         if (from != to && !igraph_vector_int_binsearch(neis, to, 0)) {
                             /* Found a suitable pair, so we can continue */
-                            failed = 0;
+                            failed = false;
                             break;
                         }
                     }

@@ -209,7 +209,7 @@ static igraph_error_t igraph_i_maximal_cliques_select_pivot(
                 break;
             }
             if (unv == vcand) {
-                nei = 1;
+                nei = true;
                 break;
             }
         }

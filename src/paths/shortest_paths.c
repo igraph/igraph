@@ -1593,11 +1593,11 @@ igraph_error_t igraph_get_k_shortest_paths(
                 IGRAPH_CHECK(igraph_vector_int_update(&path_total, &path_root));
                 IGRAPH_CHECK(igraph_vector_int_append(&path_total, &path_spur));
 
-                already_in_potential_paths = 0;
+                already_in_potential_paths = false;
                 n = igraph_vector_int_list_size(&paths_pot);
                 for (i = 0; i < n; i++) {
                     if (igraph_vector_int_all_e(&path_total, igraph_vector_int_list_get_ptr(&paths_pot, i))) {
-                        already_in_potential_paths = 1;
+                        already_in_potential_paths = true;
                         break;
                     }
                 }

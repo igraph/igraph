@@ -540,7 +540,7 @@ igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
 
 igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
         igraph_vector_int_list_t *res) {
-    return igraph_i_maximal_or_largest_cliques_or_indsets(graph, res, 0, 1, 0);
+    return igraph_i_maximal_or_largest_cliques_or_indsets(graph, res, 0, true, false);
 }
 
 typedef struct igraph_i_max_ind_vsets_data_t {

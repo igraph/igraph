@@ -81,7 +81,7 @@ igraph_error_t igraph_i_parse_integer(const char *str, size_t length, igraph_int
     *value = (igraph_integer_t) val;
     last_char = *end;
     if (*value != val) {
-        out_of_range = 1;
+        out_of_range = true;
     }
 
     /* Free memory before raising any errors. */
