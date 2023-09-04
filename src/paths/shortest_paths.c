@@ -900,8 +900,9 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
  * \function igraph_diameter
  * \brief Calculates the diameter of a graph (longest geodesic).
  *
- * The diameter of a graph is the length of the longest shortest path it has.
- * This function computes both the diameter, as well as the corresponding path.
+ * The diameter of a graph is the length of the longest shortest path it has,
+ * i.e. the maximum eccentricity of the graph's vertices.
+ * This function computes both the diameter, as well as a corresponding path.
  * The diameter of the null graph is considered be infinity by convention.
  *
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
@@ -933,7 +934,8 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
  * Time complexity: O(|V||E|), the
  * number of vertices times the number of edges.
  *
- * \sa \ref igraph_diameter_dijkstra()
+ * \sa \ref igraph_diameter_dijkstra() for the weighted version,
+ * \ref igraph_radius() for the minimum eccentricity.
  *
  * \example examples/simple/igraph_diameter.c
  */
@@ -1073,7 +1075,10 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
  * \function igraph_diameter_dijkstra
  * \brief Calculates the weighted diameter of a graph using Dijkstra's algorithm.
  *
- * This function computes the weighted diameter of a graph.
+ * This function computes the weighted diameter of a graph, defined as the longest
+ * weighted shortest path, or the maximum weighted eccentricity of the graph's
+ * vertices. A corresponding shortest path, as well as its endpoints,
+ * can also be optionally computed.
  *
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
  *
@@ -1105,7 +1110,8 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
  * Time complexity: O(|V||E|*log|E|), |V| is the number of vertices,
  * |E| is the number of edges.
  *
- * \sa \ref igraph_diameter()
+ * \sa \ref igraph_diameter() for the unweighted version,
+ * \ref igraph_radius_dijkstra() for the minimum weighted eccentricity.
  */
 
 
