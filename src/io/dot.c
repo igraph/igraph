@@ -61,24 +61,24 @@ static igraph_error_t dot_escape(const char *orig, char **result) {
             if (is_number) {
                 newlen++;
             } else {
-                need_quote = 1;
+                need_quote = true;
                 newlen++;
             }
         } else if (orig[i] == '_') {
-            is_number = 0; newlen++;
+            is_number = false; newlen++;
         } else if (orig[i] == '\\' || orig[i] == '"' || orig[i] == '\n') {
-            need_quote = 1; is_number = 0; newlen += 2; /* will be escaped */
+            need_quote = true; is_number = false; newlen += 2; /* will be escaped */
         } else if (isalpha(orig[i])) {
-            is_number = 0; newlen++;
+            is_number = false; newlen++;
         } else {
-            is_number = 0; need_quote = 1; newlen++;
+            is_number = false; need_quote = true; newlen++;
         }
     }
     if (is_number && len > 0 && orig[len - 1] == '.') {
-        is_number = 0;
+        is_number = false;
     }
     if (!is_number && isdigit(orig[0])) {
-        need_quote = 1;
+        need_quote = true;
     }
 
     if (is_number || !need_quote) {

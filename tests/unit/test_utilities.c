@@ -278,7 +278,7 @@ void print_graph_canon(const igraph_t *graph) {
     printf("edges: {\n");
 
     igraph_vector_int_init(&edges, 0);
-    igraph_get_edgelist(graph, &edges, 0);
+    igraph_get_edgelist(graph, &edges, false);
 
     /* If the graph is undirected, we make sure that the first vertex of undirected edges
      * is always the one with the lower ID. */

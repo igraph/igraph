@@ -429,7 +429,7 @@ igraph_error_t igraph_static_power_law_game(igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         IGRAPH_CHECK(igraph_static_fitness_game(graph, no_of_edges,
-                                                &fitness_out, 0, loops, multiple));
+                                                &fitness_out, NULL, loops, multiple));
     }
 
     igraph_vector_destroy(&fitness_out);

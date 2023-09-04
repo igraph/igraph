@@ -135,7 +135,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         if (min < 0) {
             /* When there are negative weights, the eigenvalue and the eigenvector are no
              * longer guaranteed to be non-negative. */
-            negative_weights = 1;
+            negative_weights = true;
             IGRAPH_WARNING("Negative weight in graph. The largest eigenvalue "
                            "will be selected, but it may not be the largest in magnitude.");
         }

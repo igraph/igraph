@@ -33,7 +33,7 @@ __BEGIN_DECLS
 
 /* Helper macto to check if n*sizeof(t) overflows in IGRAPH_CALLOC and IGRAPH_REALLOC */
 #define IGRAPH_I_ALLOC_CHECK_OVERFLOW(n,t,expr) \
-    (t*) (((n) > SIZE_MAX / sizeof(t)) ? NULL : (expr))
+    (t*) ((0 <= (n) && ((size_t)(n)) <= SIZE_MAX / sizeof(t)) ? (expr) : NULL)
 
 #define IGRAPH_CALLOC(n,t)    IGRAPH_I_ALLOC_CHECK_OVERFLOW(n, t, calloc(sizeof(t) * ((n) > 0 ? (n) : 1), 1))
 #define IGRAPH_MALLOC(n)      malloc( (size_t) ((n) > 0 ? (n) : 1) )

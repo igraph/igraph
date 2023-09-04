@@ -749,7 +749,7 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         /* Initialize the backward distances, with a breadth-first search
            from the source */
         igraph_dqueue_int_t Q;
-        igraph_vector_int_t added;
+        igraph_vector_int_t added; /* uses more than two values, cannot be bool */
         igraph_integer_t j, k, l;
         igraph_t flow_graph;
         igraph_vector_int_t flow_edges;
@@ -1734,7 +1734,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t eid;
     igraph_bool_t conn;
-    *done = 1;
+    *done = true;
     *no_conn = 0;
 
     if (source == target) {
@@ -1776,7 +1776,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_check_errors(const igraph_
         IGRAPH_ERROR("Unknown `igraph_vconn_nei_t'.", IGRAPH_EINVAL);
         break;
     }
-    *done = 0;
+    *done = false;
     return IGRAPH_SUCCESS;
 }
 
@@ -2053,18 +2053,18 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
                                         igraph_integer_t *res,
                                         igraph_bool_t *found) {
     igraph_bool_t conn;
-    *found = 0;
+    *found = false;
 
     if (igraph_vcount(graph) == 0) {
         *res = 0;
-        *found = 1;
+        *found = true;
         return IGRAPH_SUCCESS;
     }
 
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_STRONG));
     if (!conn) {
         *res = 0;
-        *found = 1;
+        *found = true;
     } else {
         igraph_vector_int_t degree;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, 0);
@@ -2073,7 +2073,7 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
                                        IGRAPH_OUT, IGRAPH_LOOPS));
             if (igraph_vector_int_min(&degree) == 1) {
                 *res = 1;
-                *found = 1;
+                *found = true;
             }
         } else {
             /* directed, check both in- & out-degree */
@@ -2081,13 +2081,13 @@ static igraph_error_t igraph_i_connectivity_checks(const igraph_t *graph,
                                        IGRAPH_OUT, IGRAPH_LOOPS));
             if (igraph_vector_int_min(&degree) == 1) {
                 *res = 1;
-                *found = 1;
+                *found = true;
             } else {
                 IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
                                            IGRAPH_IN, IGRAPH_LOOPS));
                 if (igraph_vector_int_min(&degree) == 1) {
                     *res = 1;
-                    *found = 1;
+                    *found = true;
                 }
             }
         }

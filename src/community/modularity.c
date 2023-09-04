@@ -321,7 +321,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     }
 
     if (!igraph_is_directed(graph)) {
-        directed = 0;
+        directed = false;
     }
     IGRAPH_CHECK(igraph_i_modularity_matrix_get_adjacency(graph, modmat, weights, directed));
 

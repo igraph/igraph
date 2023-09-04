@@ -260,7 +260,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
 igraph_error_t igraph_rng_seed(igraph_rng_t *rng, igraph_uint_t seed) {
     const igraph_rng_type_t *type = rng->type;
     IGRAPH_CHECK(type->seed(rng->state, seed));
-    rng->is_seeded = 1;
+    rng->is_seeded = true;
     return IGRAPH_SUCCESS;
 }
 
@@ -1506,7 +1506,7 @@ static double igraph_i_norm_rand(igraph_rng_t *rng) {
         r = igraph_rng_get_unif01(rng);
     } while (r == 0.0);
 
-    return igraph_i_qnorm5(r, 0.0, 1.0, 1, 0);
+    return igraph_i_qnorm5(r, 0.0, 1.0, true, false);
 }
 
 /*

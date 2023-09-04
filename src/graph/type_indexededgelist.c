@@ -1710,7 +1710,7 @@ igraph_error_t igraph_i_incident(const igraph_t *graph, igraph_vector_int_t *eid
         igraph_integer_t i2 = VECTOR(graph->is)[node];
         igraph_integer_t eid1, eid2;
         igraph_integer_t n1, n2;
-        igraph_bool_t seen_loop_edge = 0;
+        igraph_bool_t seen_loop_edge = false;
 
         while (i1 < j1 && i2 < j2) {
             eid1 = VECTOR(graph->oi)[i1];
@@ -1805,7 +1805,7 @@ igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *grap
     igraph_integer_t ne2 = igraph_ecount(graph2);
     igraph_integer_t i, eid1, eid2;
 
-    *res = 0; /* Assume that the graphs differ */
+    *res = false; /* Assume that the graphs differ */
 
     /* Check for same number of vertices/edges */
     if ((nv1 != nv2) || (ne1 != ne2)) {
@@ -1843,7 +1843,7 @@ igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *grap
         }
     }
 
-    *res = 1; /* No difference was found, graphs are the same */
+    *res = true; /* No difference was found, graphs are the same */
     return IGRAPH_SUCCESS;
 }
 

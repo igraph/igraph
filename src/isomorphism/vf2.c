@@ -749,7 +749,7 @@ static igraph_error_t igraph_i_isomorphic_vf2_cb(
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
-    *iso = 1;
+    *iso = true;
     return IGRAPH_STOP;
 }
 
@@ -822,7 +822,7 @@ igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *gra
     igraph_i_iso_cb_data_t data = { node_compat_fn, edge_compat_fn, iso, arg };
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
-    *iso = 0;
+    *iso = false;
     IGRAPH_CHECK(igraph_get_isomorphisms_vf2_callback(graph1, graph2,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,
@@ -1541,7 +1541,7 @@ static igraph_error_t igraph_i_subisomorphic_vf2_cb(
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
-    *iso = 1;
+    *iso = true;
     return IGRAPH_STOP;
 }
 
@@ -1623,7 +1623,7 @@ igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *
     igraph_isocompat_t *ncb = node_compat_fn ? igraph_i_isocompat_node_cb : 0;
     igraph_isocompat_t *ecb = edge_compat_fn ? igraph_i_isocompat_edge_cb : 0;
 
-    *iso = 0;
+    *iso = false;
     IGRAPH_CHECK(igraph_get_subisomorphisms_vf2_callback(graph1, graph2,
                  vertex_color1, vertex_color2,
                  edge_color1, edge_color2,

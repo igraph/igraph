@@ -52,9 +52,9 @@ igraph_bool_t igraph_complex_eq_tol(igraph_complex_t z1,
                                     igraph_real_t tol) {
     if (fabs(IGRAPH_REAL(z1) - IGRAPH_REAL(z2)) > tol ||
         fabs(IGRAPH_IMAG(z1) - IGRAPH_IMAG(z2)) > tol) {
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 igraph_real_t igraph_complex_arg(igraph_complex_t z) {

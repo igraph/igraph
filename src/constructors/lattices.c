@@ -460,7 +460,7 @@ static igraph_error_t hexagonal_lattice_rectangle_shape(
     igraph_bool_t is_first_row, is_last_row, is_start_odd;
 
     for (i = 0; i < row_count; i++) {
-        is_first_row = !i;
+        is_first_row = (i == 0);
         is_last_row = i == row_count - 1;
         is_start_odd = (row_count - i - 1) % 2;
         VECTOR(row_lengths_vector)[i] = actual_size_y - (is_first_row || is_last_row ? 1 : 0);

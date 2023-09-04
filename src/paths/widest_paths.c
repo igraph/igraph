@@ -135,7 +135,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_vector_t widths;
     igraph_integer_t *parent_eids;
-    igraph_bool_t *is_target;
+    bool *is_target;
     igraph_integer_t i, to_reach;
 
     if (!weights) {
@@ -171,21 +171,18 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     igraph_vector_fill(&widths, my_neginfinity);
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parent_eids == 0) {
-        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for widest paths.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
-    is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
-    if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
-    }
+
+    is_target = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(is_target, "Insufficient memory for widest paths.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         if (!is_target[ IGRAPH_VIT_GET(vit) ]) {
-            is_target[ IGRAPH_VIT_GET(vit) ] = 1;
+            is_target[ IGRAPH_VIT_GET(vit) ] = true;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
@@ -203,7 +200,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (is_target[maxnei]) {
-            is_target[maxnei] = 0;
+            is_target[maxnei] = false;
             to_reach--;
         }
 

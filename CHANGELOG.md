@@ -33,6 +33,13 @@
 
 ## [master]
 
+## [0.10.7] - 2023-09-04
+
+### Added
+
+ - `igraph_radius_dijkstra()` computes the graph radius with weighted edges (experimental function).
+ - `igraph_graph_center_dijkstra()` computes the graph center, i.e. the set of minimum eccentricity vertices, with weighted edges (experimental function).
+
 ### Fixed
 
  - `igraph_full_bipartite()` now checks for overflow.
@@ -1231,7 +1238,8 @@ Some of the highlights are:
  - Provided integer versions of `dqueue` and `stack` data types.
 
 [develop]: https://github.com/igraph/igraph/compare/master..develop
-[master]: https://github.com/igraph/igraph/compare/0.10.6..master
+[master]: https://github.com/igraph/igraph/compare/0.10.7..master
+[0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7
 [0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
 [0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5
 [0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4

@@ -121,7 +121,7 @@ struct igraph_i_graphml_parser_state {
     igraph_vector_int_t edgelist;
     igraph_vector_int_t prev_state_stack;
     unsigned int unknown_depth;
-    int index;
+    igraph_integer_t index;
     igraph_bool_t successful;
     igraph_bool_t edges_directed;
     igraph_trie_t v_names;
@@ -247,7 +247,7 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
     }
 }
 
-static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, int index) {
+static igraph_error_t igraph_i_graphml_parser_state_init(struct igraph_i_graphml_parser_state* state, igraph_t* graph, igraph_integer_t index) {
     memset(state, 0, sizeof(struct igraph_i_graphml_parser_state));
 
     state->g = graph;
@@ -1804,6 +1804,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         const char *name; char *name_escaped;
         name = igraph_strvector_get(&gnames, i);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
+        IGRAPH_FINALLY(igraph_free, name_escaped);
         if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"graph\" attr.name=\"%s\" attr.type=\"string\"/>\n", gprefix, name_escaped, name_escaped);
             if (ret < 0) {
@@ -1821,6 +1822,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             }
         }
         IGRAPH_FREE(name_escaped);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     /* vertex attributes */
@@ -1828,6 +1830,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         const char *name; char *name_escaped;
         name = igraph_strvector_get(&vnames, i);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
+        IGRAPH_FINALLY(igraph_free, name_escaped);
         if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"node\" attr.name=\"%s\" attr.type=\"string\"/>\n", vprefix, name_escaped, name_escaped);
             if (ret < 0) {
@@ -1845,6 +1848,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             }
         }
         IGRAPH_FREE(name_escaped);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     /* edge attributes */
@@ -1852,6 +1856,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
         const char *name; char *name_escaped;
         name = igraph_strvector_get(&enames, i);
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
+        IGRAPH_FINALLY(igraph_free, name_escaped);
         if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
             ret = fprintf(outstream, "  <key id=\"%s%s\" for=\"edge\" attr.name=\"%s\" attr.type=\"string\"/>\n", eprefix, name_escaped, name_escaped);
             if (ret < 0) {
@@ -1869,6 +1874,7 @@ igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream
             }
         }
         IGRAPH_FREE(name_escaped);
+        IGRAPH_FINALLY_CLEAN(1);
     }
 
     ret = fprintf(outstream, "  <graph id=\"G\" edgedefault=\"%s\">\n", (igraph_is_directed(graph) ? "directed" : "undirected"));
