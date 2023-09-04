@@ -130,14 +130,14 @@ jobs:
 
   - job: windows_static
     pool:
-       vmImage: windows-2019
+       vmImage: windows-2022
 
     steps:
       - template: .azure/build-win.yml
 
   - job: windows_shared
     pool:
-       vmImage: windows-2019
+       vmImage: windows-2022
 
     steps:
       - template: .azure/build-win.yml
