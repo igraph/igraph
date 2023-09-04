@@ -85,6 +85,7 @@ int main(void) {
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     IGRAPH_ASSERT(igraph_graph_center(&g, &center, IGRAPH_OUT) == IGRAPH_SUCCESS);
     print_vector_int(&center);
+    check_radius(&g, &center, IGRAPH_OUT);
     igraph_destroy(&g);
 
     printf("\nSingleton graph:\n");
