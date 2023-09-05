@@ -5,6 +5,7 @@
 ### Other
 
  - Updated vendored mini-gmp to 6.3.0.
+ - Documentation improvements.
 
 ## [0.10.7] - 2023-09-04
 
