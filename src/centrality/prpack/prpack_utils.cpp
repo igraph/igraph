@@ -7,7 +7,11 @@
 #include <stdlib.h>
 #include "prpack_utils.h"
 #include <cassert>
+
+#ifndef PRPACK_IGRAPH_SUPPORT
 #include <iostream>
+#endif
+
 #include <string>
 using namespace prpack;
 using namespace std;
