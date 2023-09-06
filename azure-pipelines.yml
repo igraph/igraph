@@ -143,7 +143,7 @@ jobs:
       - template: .azure/build-win.yml
         parameters:
           build_shared: true
-          vsver: '14.30' # use VS2022
+          vsver: '14.29' # use VS 2019 instead of 2017
           vcpkg_target_triplet: x64-windows
 
   - job: documentation
