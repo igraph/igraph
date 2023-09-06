@@ -143,6 +143,7 @@ jobs:
       - template: .azure/build-win.yml
         parameters:
           build_shared: true
+          vsver: '14.36' # use VS2022
           vcpkg_target_triplet: x64-windows
 
   - job: documentation
