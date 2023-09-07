@@ -55,7 +55,7 @@
  *        times.
  * \param weights The edge weights. Edge weights can be negative. If this
  *        is a null pointer or if any edge weight is NaN, then an error
- *        is returned.
+ *        is returned. Edges with positive infinite weight are ignored.
  * \param mode The type of widest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -135,7 +135,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     igraph_lazy_inclist_t inclist;
     igraph_vector_t widths;
     igraph_integer_t *parent_eids;
-    igraph_bool_t *is_target;
+    bool *is_target;
     igraph_integer_t i, to_reach;
 
     if (!weights) {
@@ -171,21 +171,18 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
     igraph_vector_fill(&widths, my_neginfinity);
 
     parent_eids = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (parent_eids == 0) {
-        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
-    }
+    IGRAPH_CHECK_OOM(parent_eids, "Insufficient memory for widest paths.");
     IGRAPH_FINALLY(igraph_free, parent_eids);
-    is_target = IGRAPH_CALLOC(no_of_nodes, igraph_bool_t);
-    if (is_target == 0) {
-        IGRAPH_ERROR("Can't calculate widest paths.", IGRAPH_ENOMEM);
-    }
+
+    is_target = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(is_target, "Insufficient memory for widest paths.");
     IGRAPH_FINALLY(igraph_free, is_target);
 
     /* Mark the vertices we need to reach */
     to_reach = IGRAPH_VIT_SIZE(vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
         if (!is_target[ IGRAPH_VIT_GET(vit) ]) {
-            is_target[ IGRAPH_VIT_GET(vit) ] = 1;
+            is_target[ IGRAPH_VIT_GET(vit) ] = true;
         } else {
             to_reach--;       /* this node was given multiple times */
         }
@@ -203,7 +200,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         if (is_target[maxnei]) {
-            is_target[maxnei] = 0;
+            is_target[maxnei] = false;
             to_reach--;
         }
 
@@ -217,7 +214,9 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
             igraph_real_t edgewidth = VECTOR(*weights)[edge];
             igraph_real_t altwidth = maxwidth < edgewidth ? maxwidth : edgewidth;
             igraph_real_t curwidth = VECTOR(widths)[tto];
-            if (curwidth < 0) {
+            if (edgewidth == IGRAPH_INFINITY) {
+                /* Ignore edges with infinite weight */
+            } else if (curwidth < 0) {
                 /* This is the first assigning a width to this vertex */
                 VECTOR(widths)[tto] = altwidth;
                 parent_eids[tto] = edge + 1;
@@ -348,7 +347,7 @@ igraph_error_t igraph_get_widest_paths(const igraph_t *graph,
  * \param to The id of the target vertex.
  * \param weights The edge weights. Edge weights can be negative. If this
  *        is a null pointer or if any edge weight is NaN, then an error
- *        is returned.
+ *        is returned. Edges with positive infinite weight are ignored.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. \c IGRAPH_OUT follows edge
  *        directions, \c IGRAPH_IN follows the opposite directions,
@@ -432,7 +431,7 @@ igraph_error_t igraph_get_widest_path(const igraph_t *graph,
  * \param to The target vertices.
  * \param weights The edge weights. Edge weights can be negative. If this
  *        is a null pointer or if any edge weight is NaN, then an error
- *        is returned.
+ *        is returned. Edges with positive infinite weight are ignored.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -510,6 +509,11 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
         igraph_integer_t to = IGRAPH_TO(graph, edge);
         igraph_real_t w = VECTOR(*weights)[edge];
 
+        if (w == IGRAPH_INFINITY) {
+            /* Ignore edges with infinite weight */
+            continue;
+        }
+
         if (out && MATRIX(*res, from, to) < w) MATRIX(*res, from, to) = w;
         if (in  && MATRIX(*res, to, from) < w) MATRIX(*res, to, from) = w;
     }
@@ -568,7 +572,7 @@ igraph_error_t igraph_widest_path_widths_floyd_warshall(const igraph_t *graph,
  *    vertex twice or more.
  * \param weights The edge weights. Edge weights can be negative. If this
  *        is a null pointer or if any edge weight is NaN, then an error
- *        is returned.
+ *        is returned. Edges with positive infinite weight are ignored.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -699,7 +703,9 @@ igraph_error_t igraph_widest_path_widths_dijkstra(const igraph_t *graph,
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
                 igraph_real_t curwidth = active ? igraph_2wheap_get(&Q, tto) : IGRAPH_POSINFINITY;
-                if (!has) {
+                if (edgewidth == IGRAPH_INFINITY) {
+                    /* Ignore edges with infinite weight */
+                } else if (!has) {
                     /* This is the first time assigning a width to this vertex */
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, altwidth));
                 } else if (altwidth > curwidth) {

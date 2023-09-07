@@ -202,7 +202,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                             IGRAPH_FINALLY(igraph_vector_bool_destroy, fixed_copy);
                         }
 
-                        VECTOR(*fixed_copy)[i] = 0;
+                        VECTOR(*fixed_copy)[i] = false;
                     } else {
                         no_of_not_fixed_nodes--;
                     }

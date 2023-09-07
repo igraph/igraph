@@ -11,12 +11,12 @@ graph {
     VAB=0
   ];
   2 [
-    VAN=NaN
+    VAN="1.23e-06"
     VAS=""
     VAB=0
   ];
   3 [
-    VAN=NaN
+    VAN=10000000
     VAS=""
     VAB=0
   ];

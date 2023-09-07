@@ -168,6 +168,7 @@ add_library(
   community/spinglass/NetDataTypes.cpp
   community/spinglass/NetRoutines.cpp
   community/spinglass/pottsmodel_2.cpp
+  community/voronoi.c
   community/walktrap/walktrap_communities.cpp
   community/walktrap/walktrap_graph.cpp
   community/walktrap/walktrap_heap.cpp
@@ -325,7 +326,7 @@ add_library(
 add_dependencies(igraph parsersources)
 
 # Set soname for the library
-set_target_properties(igraph PROPERTIES VERSION "3.0.0")
+set_target_properties(igraph PROPERTIES VERSION "3.1.2")
 set_target_properties(igraph PROPERTIES SOVERSION 3)
 
 # Add extra compiler definitions if needed
@@ -375,31 +376,31 @@ if(MATH_LIBRARY)
 endif()
 
 if(ARPACK_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${ARPACK_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${ARPACK_LIBRARIES})
 endif()
 
-if(BLAS_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${BLAS_LIBRARIES})
+if(BLAS_FOUND)
+  target_link_libraries(igraph PRIVATE ${BLAS_LIBRARIES})
 endif()
 
 if(GLPK_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${GLPK_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${GLPK_LIBRARIES})
 endif()
 
 if(GMP_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${GMP_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${GMP_LIBRARIES})
 endif()
 
 if(LAPACK_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${LAPACK_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${LAPACK_LIBRARIES})
 endif()
 
 if(LIBXML2_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${LIBXML2_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${LIBXML2_LIBRARIES})
 endif()
 
 if(PLFIT_LIBRARIES)
-  target_link_libraries(igraph PUBLIC ${PLFIT_LIBRARIES})
+  target_link_libraries(igraph PRIVATE ${PLFIT_LIBRARIES})
 endif()
 
 # Link igraph statically to some of the libraries from the subdirectories

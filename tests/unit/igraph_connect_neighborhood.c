@@ -18,56 +18,50 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
+void print_and_destroy(igraph_t *g, igraph_integer_t order, igraph_neimode_t mode) {
+    igraph_connect_neighborhood(g, order, mode);
+    print_graph_canon(g);
+    igraph_destroy(g);
+}
+
 int main(void) {
     igraph_t g;
 
     printf("Graph with no vertices:\n");
     igraph_small(&g, IGRAPH_UNDIRECTED, 0, -1);
-    igraph_connect_neighborhood(&g, 10, IGRAPH_ALL);
-    print_graph(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&g, 10, IGRAPH_ALL);
 
     printf("Directed graph with loops and multiple edges, order 0, IGRAPH_OUT:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    igraph_connect_neighborhood(&g, 0, IGRAPH_OUT);
-    print_graph(&g);
+    print_and_destroy(&g, 0, IGRAPH_OUT);
+
     printf("Same graph, order 1:\n");
-    igraph_connect_neighborhood(&g, 1, IGRAPH_OUT);
-    print_graph(&g);
+    igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
+    print_and_destroy(&g, 1, IGRAPH_OUT);
+
     printf("Same graph, order 2:\n");
-    igraph_connect_neighborhood(&g, 2, IGRAPH_OUT);
-    print_graph(&g);
-    igraph_destroy(&g);
+    igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
+    print_and_destroy(&g, 2, IGRAPH_OUT);
 
     printf("Same starting graph, order 2, IGRAPH_IN:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    igraph_connect_neighborhood(&g, 2, IGRAPH_IN);
-    print_graph(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&g, 2, IGRAPH_IN);
 
     printf("Same starting graph, order 2, IGRAPH_ALL:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    igraph_connect_neighborhood(&g, 2, IGRAPH_ALL);
-    print_graph(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&g, 2, IGRAPH_ALL);
 
     printf("Same starting graph, order 3, IGRAPH_OUT:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    igraph_connect_neighborhood(&g, 3, IGRAPH_OUT);
-    print_graph(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&g, 3, IGRAPH_OUT);
 
     printf("Same starting graph, order 12, IGRAPH_IN:\n");
     igraph_small(&g, 6, IGRAPH_DIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    igraph_connect_neighborhood(&g, 12, IGRAPH_IN);
-    print_graph(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&g, 12, IGRAPH_IN);
 
-    printf("Same starting graph, but undirected, order 3, IGRAPH_OUT:\n");
+    printf("Same starting graph, but undirected, order 2, IGRAPH_OUT:\n");
     igraph_small(&g, 6, IGRAPH_UNDIRECTED, 0,1, 0,2, 1,1, 1,3, 2,3, 3,4, 3,4, -1);
-    igraph_connect_neighborhood(&g, 2, IGRAPH_OUT);
-    print_graph(&g);
-    igraph_destroy(&g);
+    print_and_destroy(&g, 2, IGRAPH_OUT);
 
     VERIFY_FINALLY_STACK();
 

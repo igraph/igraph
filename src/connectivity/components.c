@@ -347,7 +347,7 @@ static igraph_error_t igraph_i_connected_components_strong(
     /* Update cache */
     igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED, no_of_clusters == 1);
     if (no_of_clusters == 1) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, 1);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
 
     return IGRAPH_SUCCESS;
@@ -1109,7 +1109,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
                         if (articulation_points && !VECTOR(found)[prev]
                             && prev != i /* the root */) {
                             IGRAPH_CHECK(igraph_vector_int_push_back(articulation_points, prev));
-                            VECTOR(found)[prev] = 1;
+                            VECTOR(found)[prev] = true;
                         }
                         if (no) {
                             *no += 1;
@@ -1271,7 +1271,7 @@ igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridge
                 if (i == 0) {
                     /* We are at the first step of visiting vertex u. */
 
-                    VECTOR(visited)[u] = 1;
+                    VECTOR(visited)[u] = true;
 
                     time += 1;
 

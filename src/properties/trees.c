@@ -183,7 +183,7 @@ static igraph_error_t igraph_i_is_tree_visitor(const igraph_t *graph, igraph_int
         /* take a vertex from the stack, mark it as visited */
         u = igraph_stack_int_pop(&stack);
         if (IGRAPH_LIKELY(! VECTOR(visited)[u])) {
-            VECTOR(visited)[u] = 1;
+            VECTOR(visited)[u] = true;
             *visited_count += 1;
         }
 
@@ -319,7 +319,7 @@ igraph_error_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_
         IGRAPH_CHECK(igraph_vector_int_init(&degree, 0));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
 
-        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, /* loops = */ 1));
+        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, IGRAPH_LOOPS));
 
         for (i = 0; i < vcount; ++i) {
             if (VECTOR(degree)[i] == 0) {
@@ -373,8 +373,8 @@ success:
         /* For undirected graphs (or directed graphs that are treated as
          * undirected in this calculation), a tree is weakly connected and is
          * a forest, so we can cache this */
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, 1);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, 1);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, true);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
     }
 
     return IGRAPH_SUCCESS;
@@ -414,7 +414,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
             *visited_count += 1;
         }
         else {
-            *res = 0;
+            *res = false;
             break;
         }
 
@@ -441,7 +441,7 @@ static igraph_error_t igraph_i_is_forest_visitor(
                 }
                 /* To check for a self-loop in undirected graph */
                 else if (v == u) {
-                    *res = 0;
+                    *res = false;
                     break;
                 }
             }

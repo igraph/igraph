@@ -21,8 +21,8 @@
 #include <igraph.h>
 #include <cstdlib>
 
-inline void check_err(int err) {
-    if (err)
+inline void check_err(igraph_error_t err) {
+    if (err != IGRAPH_SUCCESS)
         abort();
 }
 
@@ -42,7 +42,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         VECTOR(edges)[i] = Data[i];
     }
 
-    if (! igraph_create(&graph, &edges, 0, IGRAPH_DIRECTED)) {
+    if (igraph_create(&graph, &edges, 0, IGRAPH_DIRECTED) == IGRAPH_SUCCESS) {
         igraph_integer_t conn;
 
         /* Enable connectivity checks in order to try to force the fuzzer

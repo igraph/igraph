@@ -9,6 +9,7 @@
  */
 
 #include "f2c.h"
+#include "igraph_error.h"
 #undef abs
 #undef min
 #undef max

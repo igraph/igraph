@@ -71,7 +71,7 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
     }
 
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&shift_seen, n);
-    VECTOR(shift_seen)[0] = 1; /* do not allow self loops */
+    VECTOR(shift_seen)[0] = true; /* do not allow self loops */
 
     for (i = 0; i < shift_size; i++) {
         /* simplify the shift */
@@ -97,7 +97,7 @@ igraph_error_t igraph_circulant(igraph_t *graph, igraph_integer_t n, const igrap
                 IGRAPH_CHECK(igraph_vector_int_push_back(&edges, (j + shift) % n));
             }
 
-            VECTOR(shift_seen)[shift] = 1;
+            VECTOR(shift_seen)[shift] = true;
         }
     }
 

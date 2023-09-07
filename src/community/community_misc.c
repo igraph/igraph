@@ -107,7 +107,7 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
         /* we need a membership vector to calculate 'csize' but the user did
          * not provide one; let's allocate one ourselves */
         IGRAPH_VECTOR_INT_INIT_FINALLY(&own_membership, no_of_nodes);
-        using_own_membership = 1;
+        using_own_membership = true;
         membership = &own_membership;
     }
 
@@ -128,12 +128,12 @@ igraph_error_t igraph_community_to_membership(const igraph_matrix_int_t *merges,
         igraph_integer_t c2 = MATRIX(*merges, i, 1);
 
         if (VECTOR(already_merged)[c1] == 0) {
-            VECTOR(already_merged)[c1] = 1;
+            VECTOR(already_merged)[c1] = true;
         } else {
             IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c1);
         }
         if (VECTOR(already_merged)[c2] == 0) {
-            VECTOR(already_merged)[c2] = 1;
+            VECTOR(already_merged)[c2] = true;
         } else {
             IGRAPH_ERRORF("Merges matrix contains multiple merges of cluster %" IGRAPH_PRId ".", IGRAPH_EINVAL, c2);
         }

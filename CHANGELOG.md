@@ -2,10 +2,55 @@
 
 ## [master]
 
-### Changes
+### Other
+
+ - Updated vendored mini-gmp to 6.3.0.
+ - Documentation improvements.
+
+## [0.10.7] - 2023-09-04
+
+### Added
+
+ - `igraph_radius_dijkstra()` computes the graph radius with weighted edges (experimental function).
+ - `igraph_graph_center_dijkstra()` computes the graph center, i.e. the set of minimum eccentricity vertices, with weighted edges (experimental function).
+
+### Fixed
+
+ - `igraph_full_bipartite()` now checks for overflow.
+ - `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` are now more robust to overflow.
+ - Bipartite graph creation functions now check input arguments.
+ - `igraph_write_graph_dot()` now quotes real numbers written in exponential notation as necessary.
+ - Independent vertex set finding functions could trigger the fatal error "Finally stack too large" when called on large graphs.
+
+### Deprecated
+
+ - `igraph_bipartite_game()` is now deprecated; use `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` instead.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.6] - 2023-07-13
+
+### Fixed
+
+ - Compatibility with libxml2 2.11.
+ - Fixed some converge failures in `igraph_community_voronoi()`.
+ - `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` now check for overflow.
+ - CMake packages created with the `install` target of the CMake build system are now relocatable, i.e. the generated `igraph-targets.cmake` file does not contain absolute paths any more.
+
+## [0.10.5] - 2023-06-29
+
+### Added
+
+ - `igraph_graph_power()` computes the kth power of a graph (experimental function).
+ - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
+
+### Changed
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
  - `igraph_isomorphic()` now supports multigraphs.
+ - Shortest path related functions now consistently ignore edges with positive infinite weights.
 
 ### Fixed
 
@@ -17,16 +62,19 @@
  - HRG functions now require a graph with at least 3 vertices; previous versions crashed with smaller graphs.
  - `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, i.e. the ARPACK interface in igraph, are now interruptible. As a result, several other functions that rely on ARPACK (eigenvector centrality, hub and authority scores, etc.) also became interruptible.
  - `igraph_get_shortest_paths_dijkstra()`, `igraph_get_all_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` now validate the `from` vertex.
+ - Fixed bugs in `igraph_local_scan_1_ecount()` for weighted undirected graphs which would miscount loops and multi-edges.
 
 ### Deprecated
 
 - `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
 - `igraph_hub_score()` and `igraph_authority_score()` are now deprecated. Use `igraph_hub_and_authority_scores()` instead.
 - `igraph_get_incidence()` is now deprecated; its new name is `igraph_get_biadjacency()` to reflect that the returned matrix is an _adjacency_ matrix between pairs of vertices and not an _incidence_ matrix between vertices and edges. The new name is kept available until at least igraph 0.11. We plan to re-use the name in later versions to provide a proper incidence matrix where the rows are vertices and the columns are edges.
+- `igraph_hrg_dendrogram()` is deprecated because it requires an attribute handler and it goes against the convention of returning attributes in vectors where possible. Use `igraph_from_hrg_dendrogram()` instead, which constructs the dendrogram as an igraph graph _and_ returns the associated probabilities in a vector.
 
 ### Other
 
  - Improved performance for `igraph_vertex_connectivity()`.
+ - `igraph_simplify()` makes use of the cache, and avoids simplification when the graph is already known to be simple.
  - Documentation improvements.
 
 ## [0.10.4] - 2023-01-26
@@ -34,7 +82,7 @@
 ### Added
 
  - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
- - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics through `IGRAPH_COLORING_GREEDY_DSATUR` (#2284, thanks to @professorcode1).
 
 ### Changed
 
@@ -1163,7 +1211,10 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.4..master
+[master]: https://github.com/igraph/igraph/compare/0.10.7..master
+[0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7
+[0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
+[0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5
 [0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
 [0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2

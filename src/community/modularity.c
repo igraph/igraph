@@ -97,7 +97,7 @@
  *                   It does not have to be consecutive, i.e. empty communities
  *                   are allowed.
  * \param weights    Weight vector or \c NULL if no weights are specified.
- * \param resolution The resolutin parameter \c γ. Must not be negative.
+ * \param resolution The resolution parameter \c γ. Must not be negative.
  *                   Set it to 1 to use the classical definition of modularity.
  * \param directed   Whether to use the directed or undirected version of modularity.
  *                   Ignored for undirected graphs.
@@ -321,7 +321,7 @@ igraph_error_t igraph_modularity_matrix(const igraph_t *graph,
     }
 
     if (!igraph_is_directed(graph)) {
-        directed = 0;
+        directed = false;
     }
     IGRAPH_CHECK(igraph_i_modularity_matrix_get_adjacency(graph, modmat, weights, directed));
 

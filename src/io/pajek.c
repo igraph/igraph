@@ -343,13 +343,13 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     char *d;
     for (s = src; *s; s++, destlen++) {
         if (*s == '\\') {
-            need_escape = 1;
+            need_escape = true;
             destlen++;
         } else if (*s == '"') {
-            need_escape = 1;
+            need_escape = true;
             destlen++;
         } else if (!isalnum(*s)) {
-            need_escape = 1;
+            need_escape = true;
         }
     }
 
@@ -536,7 +536,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX, "type"));
         if (type_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
             igraph_integer_t bptr = 0, tptr = 0;
-            bipartite = 1; write_vertex_attrs = 1;
+            bipartite = true; write_vertex_attrs = true;
             /* Count top and bottom vertices, we go over them twice,
             because we want to keep their original order */
             IGRAPH_CHECK(igraph_vector_int_init(&bip_index, no_of_nodes));
@@ -590,7 +590,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vnames[i])) {
             IGRAPH_CHECK(igraph_i_attribute_gettype(
                              graph, &vtypes[i], IGRAPH_ATTRIBUTE_VERTEX, vnames[i]));
-            write_vertex_attrs = 1;
+            write_vertex_attrs = true;
         } else {
             vtypes[i] = (igraph_attribute_type_t) -1;
         }

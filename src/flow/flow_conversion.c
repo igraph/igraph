@@ -56,8 +56,8 @@
  * halves of the vertices and the remaining \em n vertices will correspond to
  * the \em input halves, in the same order as in the original graph.
  *
- * @param graph the input graph
- * @param result an uninitialized graph object; the result will be returned here
+ * \param graph the input graph
+ * \param result an uninitialized graph object; the result will be returned here
  */
 igraph_error_t igraph_i_split_vertices(const igraph_t* graph, igraph_t* result) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);

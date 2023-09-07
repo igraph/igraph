@@ -30,12 +30,27 @@
  * \function igraph_watts_strogatz_game
  * \brief The Watts-Strogatz small-world model.
  *
- * This function generates a graph according to the Watts-Strogatz
- * model of small-world networks. The graph is obtained by creating a
- * circular undirected lattice and then rewire the edges randomly with
- * a constant probability.
+ * This function generates networks with the small-world property
+ * based on a variant of the Watts-Strogatz model. The network is obtained
+ * by first creating a periodic undirected lattice, then rewiring both
+ * endpoints of each edge with probability \p p, while avoiding the
+ * creation of multi-edges.
  *
- * </para><para>See also: Duncan J Watts and Steven H Strogatz:
+ * </para><para>
+ * This process differs from the original model of Watts and Strogatz
+ * (see reference) in that it rewires \em both endpoints of edges. Thus in
+ * the limit of <code>p=1</code>, we obtain a G(n,m) random graph with the
+ * same number of vertices and edges as the original lattice. In comparison,
+ * the original Watts-Strogatz model only rewires a single endpoint of each edge,
+ * thus the network does not become fully random even for <code>p=1</code>.
+ * For appropriate choices of \p p, both models exhibit the property of
+ * simultaneously having short path lengths and high clustering.
+ *
+ * </para><para>
+ * Reference:
+ *
+ * </para><para>
+ * Duncan J Watts and Steven H Strogatz:
  * Collective dynamics of <quote>small world</quote> networks, Nature
  * 393, 440-442, 1998.
  *

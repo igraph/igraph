@@ -78,7 +78,7 @@ static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool
     for (i = 0; i < children_size; i++) {
         igraph_trie_node_t *child = VECTOR(t->children)[i];
         if (child != 0) {
-            igraph_i_trie_destroy_node_helper(child, 1);
+            igraph_i_trie_destroy_node_helper(child, true);
         }
     }
     igraph_vector_ptr_destroy(&t->children);
@@ -90,7 +90,7 @@ static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool
 
 /* Deallocates a trie node. */
 static void igraph_i_trie_destroy_node(igraph_trie_node_t *t) {
-    igraph_i_trie_destroy_node_helper(t, 0);
+    igraph_i_trie_destroy_node_helper(t, false);
 }
 
 /**

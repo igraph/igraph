@@ -1,4 +1,5 @@
 #include "f2c.h"
+#undef abs
 #include <math.h>
 
 #ifdef __cplusplus

@@ -164,6 +164,9 @@ igraph_extended_chordal_ring:
 igraph_connect_neighborhood:
     PARAMS: INOUT GRAPH graph, INTEGER order=2, NEIMODE mode=ALL
 
+igraph_graph_power:
+    PARAMS: IN GRAPH graph, OUT GRAPH res, INTEGER order, BOOLEAN directed=False
+
 igraph_linegraph:
     PARAMS: GRAPH graph, OUT GRAPH linegraph
 
@@ -1010,8 +1013,17 @@ igraph_graph_center:
         GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
     DEPS: res ON graph
 
+igraph_graph_center_dijkstra:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEX_INDICES res, NEIMODE mode=ALL
+    DEPS: weights ON graph, res ON graph
+
 igraph_radius:
     PARAMS: GRAPH graph, OUT REAL radius, NEIMODE mode=ALL
+
+igraph_radius_dijkstra:
+    PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT REAL radius, NEIMODE mode=ALL
+    DEPS: weights ON graph
 
 igraph_pseudo_diameter:
     NAME-R: pseudo_diameter
@@ -1665,6 +1677,16 @@ igraph_community_infomap:
         OUT VECTOR_INT membership, OUT REAL codelength
     DEPS: e_weights ON graph, v_weights ON graph
 
+igraph_community_voronoi:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VECTOR_INT membership,
+        OPTIONAL OUT VERTEX_INDICES generators,
+        OPTIONAL OUT REAL modularity,
+        OPTIONAL EDGE_LENGTHS lengths, OPTIONAL EDGEWEIGHTS weights,
+        NEIMODE mode=OUT, REAL radius=-1
+    DEPS: generators ON graph, weights ON graph, lengths ON graph
+
 #######################################
 # Graphlets
 #######################################
@@ -1706,9 +1728,6 @@ igraph_hrg_sample_many:
 igraph_hrg_game:
     PARAMS: OUT GRAPH graph, HRG hrg
 
-igraph_hrg_dendrogram:
-    PARAMS: OUT GRAPH graph, HRG hrg
-
 igraph_hrg_consensus:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT parents, OUT VECTOR weights,
@@ -1732,6 +1751,9 @@ igraph_hrg_resize:
 igraph_hrg_size:
     PARAMS: HRG hrg
     RETURN: INTEGER
+
+igraph_from_hrg_dendrogram:
+    PARAMS: OUT GRAPH graph, HRG hrg, OUT VECTOR prob
 
 #######################################
 # Conversion

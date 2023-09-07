@@ -22,11 +22,10 @@ Same graph with loop, k=1, undirected:
 Same graph, weighted:
 ( 0.3 0.2 0.7 1.8 1.1 0 )
 
-Same graph, weighted, but using scan_1_ecount directly:
-( 0.3 0.2 0.7 1.8 1.1 0 )
-
 Checking if calling igraph_local_scan_1_ecount properly redirects:
-( 4 3 3 5 2 0 )
+Directed, IN: ( 2 2 2 3 2 0 )
+Directed, ALL: ( 4 3 3 5 2 0 )
+Undirected, with weights: ( 0.3 0.2 0.7 1.8 1.1 0 )
 
 Same graph, directed, k=2:
 ( 2 4 2 6 5 0 )

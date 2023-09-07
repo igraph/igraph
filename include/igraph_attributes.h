@@ -227,30 +227,47 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    graph, before adding the vertices themselves.
  *    The number of vertices to add is supplied as an
  *    argument. Expected to return an error code.
- * \member permute_vertices Typically called when a new graph is
- *    created based on an existing one, e.g. if vertices are removed
- *    from a graph. The supplied index vector defines which old vertex
+ * \member permute_vertices Called when a new graph is created based on an
+ *    existing one such that there is a mapping from the vertices of the new
+ *    graph back to the vertices of the old graph (e.g. if vertices are removed
+ *    from a graph). The supplied index vector defines which old vertex
  *    a new vertex corresponds to. Its length must be the same as the
- *    number of vertices in the new graph.
+ *    number of vertices in the new graph. Note that the old and the new graph
+ *    may be the same. If the two graph instances are \em not the same, implementors
+ *    may safely assume that the new graph has no vertex attributes yet (but it
+ *    may already have graph or edge attributes by the time this function is
+ *    called).
  * \member combine_vertices This function is called when the creation
  *    of a new graph involves a merge (contraction, etc.) of vertices
  *    from another graph. The function is after the new graph was created.
  *    An argument specifies how several vertices from the old graph map to a
- *    single vertex in the new graph.
+ *    single vertex in the new graph. It is guaranteed that the old and the
+ *    new graph instances are different when this callback is called.
+ *    Implementors may safely assume that the new graph has no vertex attributes
+ *    yet (but it may already have graph or edge attributes by the time this
+ *    function is called).
  * \member add_edges Called when new edges have been added. The number
  *    of new edges are supplied as well. It is expected to return an
  *    error code.
- * \member permute_edges Typically called when a new graph is created and
+ * \member permute_edges Called when a new graph is created and
  *    some of the new edges should carry the attributes of some of the
  *    old edges. The idx vector shows the mapping between the old edges and
  *    the new ones. Its length is the same as the number of edges in the new
- *    graph, and for each edge it gives the id of the old edge (the edge in
- *    the old graph).
+ *    graph, and for each edge it gives the ID of the old edge (the edge in
+ *    the old graph). Note that the old and the new graph instances \em may
+ *    be the same. If the two graph instances are \em not the same, implementors
+ *    may safely assume that the new graph has no edge attributes yet (but it
+ *    may already have graph or vertex attributes by the time this function is
+ *    called).
  * \member combine_edges This function is called when the creation
  *    of a new graph involves a merge (contraction, etc.) of edges
  *    from another graph. The function is after the new graph was created.
  *    An argument specifies how several edges from the old graph map to a
- *    single edge in the new graph.
+ *    single edge in the new graph. It is guaranteed that the old and the
+ *    new graph instances are different when this callback is called.
+ *    Implementors may safely assume that the new graph has no edge attributes
+ *    yet (but it may already have graph or vertex attributes by the time this
+ *    function is called).
  * \member get_info Query the attributes of a graph, the names and
  *    types should be returned.
  * \member has_attr Check whether a graph has the named

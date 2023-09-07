@@ -43,7 +43,7 @@
  * \param graph The input graph. It will be modified in-place.
  * \param mapping A vector giving the mapping. For each
  *        vertex in the original graph, it should contain
- *        its desired ID in the result graph. In order to create
+ *        its desired ID in the result graph. In order not to create
  *        "orphan vertices" that have no corresponding vertices
  *        in the original graph, ensure that the IDs are consecutive
  *        integers starting from zero.
@@ -66,7 +66,7 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t vattr = vertex_comb && igraph_has_attribute_table();
     igraph_t res;
-    igraph_integer_t e, last = -1;
+    igraph_integer_t last;
     igraph_integer_t no_new_vertices;
 
     if (igraph_vector_int_size(mapping) != no_of_nodes) {
@@ -80,11 +80,15 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
 
     if (no_of_nodes > 0) {
         last = igraph_vector_int_max(mapping);
+    } else {
+        /* Ensure that no_new_vertices will be zero
+         * when the input graph has no vertices. */
+        last = -1;
     }
 
-    for (e = 0; e < no_of_edges; e++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e);
-        igraph_integer_t to = IGRAPH_TO(graph, e);
+    for (igraph_integer_t edge = 0; edge < no_of_edges; edge++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_integer_t to = IGRAPH_TO(graph, edge);
 
         igraph_integer_t nfrom = VECTOR(*mapping)[from];
         igraph_integer_t nto = VECTOR(*mapping)[to];
@@ -111,18 +115,16 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
     IGRAPH_FINALLY(igraph_destroy, &res);
 
     IGRAPH_I_ATTRIBUTE_DESTROY(&res);
-    IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ 1,
-                            /*vertex=*/ 0, /*edge=*/ 1);
+    IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ true, /*vertex=*/ false, /*edge=*/ true);
 
     if (vattr) {
-        igraph_integer_t i;
         igraph_vector_int_list_t merges;
         igraph_vector_int_t sizes;
 
         IGRAPH_VECTOR_INT_LIST_INIT_FINALLY(&merges, no_new_vertices);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&sizes, no_new_vertices);
 
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             igraph_integer_t to = VECTOR(*mapping)[i];
             igraph_vector_int_t *v = igraph_vector_int_list_get_ptr(&merges, to);
             VECTOR(sizes)[to] += 1;

@@ -83,7 +83,7 @@ static igraph_error_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer
     igraph_integer_t bagsize, start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
-        outpref = 1;
+        outpref = true;
     }
 
     start_nodes = start_from ? igraph_vcount(start_from) : 1;
@@ -204,7 +204,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     igraph_integer_t start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
-        outpref = 1;
+        outpref = true;
     }
 
     start_nodes = start_from ? igraph_vcount(start_from) : 1;
@@ -324,7 +324,7 @@ static igraph_error_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
     igraph_integer_t start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
-        outpref = 1;
+        outpref = true;
     }
 
     start_nodes = start_from ? igraph_vcount(start_from) : 1;
