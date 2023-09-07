@@ -30,7 +30,6 @@
 */
 
 #include "igraph_decls.h"
-#include "igraph_types.h"
 #include "config.h"
 
 __BEGIN_DECLS
@@ -66,9 +65,9 @@ __BEGIN_DECLS
  * Derived with "gfortran -fc-prototypes-external", applied on the original
  * Fortran sources of these functions. */
 
-void igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
-                 igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
-                 igraph_real_t *beta, igraph_real_t *y, int *incy, long int trans_len);
+void igraphdgemv_(char *trans, int *m, int *n, double *alpha,
+                 double *a, int *lda, double *x, int *incx,
+                 double *beta, double *y, int *incy, long int trans_len);
 
 void igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
                  double *alpha, double *a, int *lda, double *b, int *ldb,
@@ -76,9 +75,9 @@ void igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
 
 #else
 
-int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
-                 igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
-                 igraph_real_t *beta, igraph_real_t *y, int *incy);
+int igraphdgemv_(char *trans, int *m, int *n, double *alpha,
+                 double *a, int *lda, double *x, int *incx,
+                 double *beta, double *y, int *incy);
 
 int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
                  double *alpha, double *a, int *lda, double *b, int *ldb,

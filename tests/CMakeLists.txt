@@ -530,6 +530,7 @@ set_property(TEST example::igraph_power_law_fit APPEND PROPERTY ENVIRONMENT "OMP
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_almost_e
+  cmp_epsilon
   igraph_almost_equals
   igraph_convex_hull
   igraph_power_law_fit
@@ -555,6 +556,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_contract_vertices
   igraph_connect_neighborhood
+  igraph_graph_power
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_induced_subgraph_edges
@@ -653,6 +655,7 @@ add_legacy_tests(
   igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
+  igraph_community_voronoi
   igraph_compare_communities
   igraph_le_community_to_membership
   igraph_modularity

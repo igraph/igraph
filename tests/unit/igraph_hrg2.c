@@ -72,7 +72,7 @@ int main(void) {
     /* We do some simple validity tests on the results only; the exact results
      * are different on i386 vs other platforms due to numerical inaccuracies */
     if (igraph_vector_size(&weights) + igraph_vcount(&karate) != igraph_vector_int_size(&parents)) {
-        printf("Vector length mismatch: %" IGRAPH_PRId " + %" IGRAPH_PRId " != %" IGRAPH_PRId "\n",
+        fprintf(stderr, "Vector length mismatch: %" IGRAPH_PRId " + %" IGRAPH_PRId " != %" IGRAPH_PRId "\n",
             igraph_vector_size(&weights), igraph_vcount(&karate),
             igraph_vector_int_size(&parents)
         );
@@ -82,8 +82,8 @@ int main(void) {
     n = igraph_vector_int_size(&parents);
     for (i = 0; i < n; i++) {
         if (VECTOR(parents)[i] < -1 || VECTOR(parents)[i] >= igraph_vcount(&karate) + igraph_vector_size(&weights)) {
-            printf("Invalid parents vector:\n");
-            igraph_vector_int_print(&parents);
+            fprintf(stderr, "Invalid parents vector:\n");
+            igraph_vector_int_fprint(&parents, stderr);
             abort();
         }
     }

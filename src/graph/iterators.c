@@ -678,7 +678,7 @@ igraph_error_t igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         for (i = 0; i < vec_len; i++) {
             if (!seen[ VECTOR(vec)[i] ]) {
                 (*result)--;
-                seen[ VECTOR(vec)[i] ] = 1;
+                seen[ VECTOR(vec)[i] ] = true;
             }
         }
         igraph_free(seen);
@@ -782,7 +782,7 @@ igraph_error_t igraph_vit_create(const igraph_t *graph, igraph_vs_t vs, igraph_v
         for (i = 0; i < vec_len; i++) {
             if (! seen [ VECTOR(vec)[i] ] ) {
                 n--;
-                seen[ VECTOR(vec)[i] ] = 1;
+                seen[ VECTOR(vec)[i] ] = true;
             }
         }
         IGRAPH_CHECK(igraph_vector_int_resize(vec_int, n));
@@ -1734,39 +1734,37 @@ static igraph_error_t igraph_i_eit_create_allfromto(const igraph_t *graph,
     igraph_vector_int_t *vec;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i, j, length;
 
     vec = IGRAPH_CALLOC(1, igraph_vector_int_t);
     IGRAPH_CHECK_OOM(vec, "Cannot create edge iterator.");
     IGRAPH_FINALLY(igraph_free, vec);
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(vec, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(vec, no_of_edges));
 
     if (igraph_is_directed(graph)) {
         igraph_vector_int_t adj;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             IGRAPH_CHECK(igraph_incident(graph, &adj, i, mode));
             igraph_vector_int_append(vec, &adj);  /* reserved */
         }
         igraph_vector_int_destroy(&adj);
         IGRAPH_FINALLY_CLEAN(1);
-
     } else {
-
         igraph_vector_int_t adj;
         igraph_bool_t *added;
         IGRAPH_VECTOR_INT_INIT_FINALLY(&adj, 0);
         added = IGRAPH_CALLOC(no_of_edges, igraph_bool_t);
         IGRAPH_CHECK_OOM(added, "Cannot create edge iterator.");
         IGRAPH_FINALLY(igraph_free, added);
-        for (i = 0; i < no_of_nodes; i++) {
+        for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
             IGRAPH_CHECK(igraph_incident(graph, &adj, i, IGRAPH_ALL));
-            length = igraph_vector_int_size(&adj);
-            for (j = 0; j < length; j++) {
+            const igraph_integer_t length = igraph_vector_int_size(&adj);
+            for (igraph_integer_t j = 0; j < length; j++) {
                 if (!added[ VECTOR(adj)[j] ]) {
                     igraph_vector_int_push_back(vec, VECTOR(adj)[j]);  /* reserved */
-                    added[ VECTOR(adj)[j] ] += 1;
+                    added[ VECTOR(adj)[j] ] = true;
                 }
             }
         }

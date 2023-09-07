@@ -40,14 +40,14 @@ void igraph_estack_destroy(igraph_estack_t *s) {
 igraph_error_t igraph_estack_push(igraph_estack_t *s,  igraph_integer_t elem) {
     if ( !VECTOR(s->isin)[elem] ) {
         IGRAPH_CHECK(igraph_stack_int_push(&s->stack, elem));
-        VECTOR(s->isin)[elem] = 1;
+        VECTOR(s->isin)[elem] = true;
     }
     return IGRAPH_SUCCESS;
 }
 
 igraph_integer_t igraph_estack_pop(igraph_estack_t *s) {
     igraph_integer_t elem = igraph_stack_int_pop(&s->stack);
-    VECTOR(s->isin)[elem] = 0;
+    VECTOR(s->isin)[elem] = false;
     return elem;
 }
 

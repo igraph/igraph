@@ -374,7 +374,7 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
 
     IGRAPH_CHECK(igraph_vector_int_reserve(res, igraph_vector_int_size(res) + comp_size - 1));
 
-    VECTOR(*visited)[start] = 1;
+    VECTOR(*visited)[start] = true;
     visited_count = 1;
 
     RNG_BEGIN();
@@ -395,7 +395,7 @@ static igraph_error_t igraph_i_lerw(const igraph_t *graph, igraph_vector_int_t *
         /* if the next vertex hasn't been visited yet, register the edge we just traversed */
         if (! VECTOR(*visited)[start]) {
             IGRAPH_CHECK(igraph_vector_int_push_back(res, edge));
-            VECTOR(*visited)[start] = 1;
+            VECTOR(*visited)[start] = true;
             visited_count++;
         }
 

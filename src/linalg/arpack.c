@@ -994,7 +994,7 @@ igraph_error_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
     } else {
         /* Storage not provided */
-        free_them = 1;
+        free_them = true;
 
 #define CHECKMEM(x) \
     if (!x) { \
@@ -1273,7 +1273,7 @@ igraph_error_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
     } else {
         /* Storage not provided */
-        free_them = 1;
+        free_them = true;
 
 #define CHECKMEM(x) \
     if (!x) { \

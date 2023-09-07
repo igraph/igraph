@@ -121,7 +121,7 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
     */
 
     i = RNG_INTEGER(0, n - 1);
-    VECTOR(visited)[i] = 1;
+    VECTOR(visited)[i] = true;
     SWAP_INT_ELEM(vertices, 0, i);
 
     for (k = 1; k < n; ++k) {
@@ -130,7 +130,7 @@ static igraph_error_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph
             i = VECTOR(vertices)[j];
             j = RNG_INTEGER(k, n - 1);
         }
-        VECTOR(visited)[VECTOR(vertices)[j]] = 1;
+        VECTOR(visited)[VECTOR(vertices)[j]] = true;
         SWAP_INT_ELEM(vertices, k, j);
         VECTOR(edges)[2 * k - 2] = i;
         i = VECTOR(vertices)[k];

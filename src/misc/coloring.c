@@ -148,9 +148,15 @@ static int dsatur_t_compare(const void *left, const void *right) {
     const dsatur_t *left_d  = left;
     const dsatur_t *right_d = right;
     if (left_d->saturation_degree == right_d->saturation_degree) {
-        return left_d->edge_degree - right_d->edge_degree;
+        if (left_d->edge_degree == right_d->edge_degree) {
+            return 0;
+        } else if (left_d->edge_degree > right_d->edge_degree) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
-    return left_d->saturation_degree - right_d->saturation_degree;
+    return left_d->saturation_degree > right_d->saturation_degree ? 1 : -1;
 }
 
 static igraph_bool_t dsatur_is_color_used_by_neighbour(

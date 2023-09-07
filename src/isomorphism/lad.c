@@ -365,7 +365,7 @@ static igraph_error_t igraph_i_lad_removeValue(igraph_integer_t u, igraph_intege
 
 static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vector_int_t* toBeMatched,
                                bool induced, Tdomain* D, Tgraph* Gp,
-                               Tgraph* Gt, igraph_integer_t *invalid) {
+                               Tgraph* Gt, igraph_bool_t *invalid) {
     /* for each u in toBeMatched[0..nb-1], match u to
        D->val[D->firstVal[u] and filter domains of other non matched
        vertices wrt FC(Edges) and FC(diff) (this is not mandatory, as
@@ -388,7 +388,7 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
                 if (igraph_i_lad_isInD(u2, v, D)) {
                     IGRAPH_CHECK(igraph_i_lad_removeValue(u2, v, D, Gp, Gt, &result));
                     if (!result) {
-                        *invalid = 1;
+                        *invalid = true;
                         return IGRAPH_SUCCESS;
                     }
                 }
@@ -401,7 +401,7 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
                         } else {
                             IGRAPH_CHECK(igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, Gp, Gt, &result));
                             if (!result) {
-                                *invalid = 1;
+                                *invalid = true;
                                 return IGRAPH_SUCCESS;
                             }
                         }
@@ -416,7 +416,7 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
                             } else {
                                 IGRAPH_CHECK(igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, Gp, Gt, &result));
                                 if (!result) {
-                                    *invalid = 1;
+                                    *invalid = true;
                                     return IGRAPH_SUCCESS;
                                 }
                             }
@@ -426,7 +426,7 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
                             if (igraph_i_lad_isInD(u2, VECTOR(*vneis)[j], D)) {
                                 IGRAPH_CHECK(igraph_i_lad_removeValue(u2, VECTOR(*vneis)[j], D, Gp, Gt, &result));
                                 if (!result) {
-                                    *invalid = 1;
+                                    *invalid = true;
                                     return IGRAPH_SUCCESS;
                                 }
                             }
@@ -434,7 +434,7 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
                     }
                 }
                 if (VECTOR(D->nbVal)[u2] == 0) {
-                    *invalid = 1; /* D[u2] is empty */
+                    *invalid = true; /* D[u2] is empty */
                     return IGRAPH_SUCCESS;
                 }
                 if ((VECTOR(D->nbVal)[u2] == 1) && (oldNbVal > 1)) {
@@ -443,14 +443,14 @@ static igraph_error_t igraph_i_lad_matchVertices(igraph_integer_t nb, igraph_vec
             }
         }
     }
-    *invalid = 0;
+    *invalid = false;
     return IGRAPH_SUCCESS;
 }
 
 
 static bool igraph_i_lad_matchVertex(igraph_integer_t u, bool induced, Tdomain* D, Tgraph* Gp,
                               Tgraph *Gt) {
-    igraph_integer_t invalid;
+    igraph_bool_t invalid;
     /* match u to D->val[D->firstVal[u]] and filter domains of other non
        matched vertices wrt FC(Edges) and FC(diff) (this is not
        mandatory, as LAD is stronger than FC(Edges) and GAC(allDiff)
@@ -465,7 +465,7 @@ static bool igraph_i_lad_matchVertex(igraph_integer_t u, bool induced, Tdomain* 
     igraph_vector_int_destroy(&toBeMatched);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return invalid ? false : true;
+    return ! invalid;
 }
 
 
@@ -499,7 +499,7 @@ static bool igraph_i_lad_compare(igraph_integer_t size_mu, igraph_integer_t* mu,
 
 static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
                                     const igraph_vector_int_list_t *domains, Tdomain *D,
-                                    const Tgraph *Gp, const Tgraph *Gt, igraph_integer_t *empty) {
+                                    const Tgraph *Gp, const Tgraph *Gt, igraph_bool_t *empty) {
     /* for every pattern node u, initialize D(u) with every vertex v
        such that for every neighbor u' of u there exists a different
        neighbor v' of v such that degree(u) <= degree(v)
@@ -601,7 +601,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
             }
         }
         if (VECTOR(D->nbVal)[u] == 0) {
-            *empty = 1;  /* empty domain */
+            *empty = true;  /* empty domain */
 
             igraph_free(val);
             igraph_free(dom);
@@ -626,7 +626,7 @@ static igraph_error_t igraph_i_lad_initDomains(bool initialDomains,
     D->nextOutToFilter = 0;
     D->lastInToFilter = Gp->nbVertices - 1;
 
-    *empty = 0;
+    *empty = false;
 
     igraph_free(val);
     igraph_free(dom);
@@ -673,7 +673,7 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
                                 igraph_vector_int_t *firstAdj,
                                 igraph_vector_int_t *adj,
                                 igraph_vector_int_t * matchedWithU,
-                                igraph_integer_t *invalid) {
+                                igraph_bool_t *invalid) {
     /* input:
        sizeOfU = number of vertices in U
        sizeOfV = number of vertices in V
@@ -712,7 +712,7 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
     igraph_vector_int_t path;
 
     if (sizeOfU > sizeOfV) {
-        *invalid = 1; /* trivial case of infeasibility */
+        *invalid = true; /* trivial case of infeasibility */
         return IGRAPH_SUCCESS;
     }
 
@@ -820,7 +820,7 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
             }
         }
         if (nbV == 0) {
-            *invalid = 1;
+            *invalid = true;
             /* I know it's ugly. */
             goto cleanup;
         }
@@ -897,7 +897,7 @@ static igraph_error_t igraph_i_lad_updateMatching(igraph_integer_t sizeOfU, igra
             }
         }
     }
-    *invalid = 0;
+    *invalid = false;
 
 cleanup:
     /* Free the allocated arrays */
@@ -1023,7 +1023,7 @@ static igraph_error_t igraph_i_lad_SCC(igraph_integer_t nbU, igraph_integer_t nb
 
 
 static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
-                                  Tdomain* D, igraph_integer_t *invalid) {
+                                  Tdomain* D, igraph_bool_t *invalid) {
     /* precondition: D->globalMatchingP is an all different matching of
        the pattern vertices
        postcondition: filter domains wrt GAC(allDiff)
@@ -1112,14 +1112,14 @@ static igraph_error_t igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tg
                 (VECTOR(D->globalMatchingP)[u] != v)) {
                 IGRAPH_CHECK(igraph_i_lad_removeValue(u, v, D, Gp, Gt, &result));
                 if (!result) {
-                    *invalid = 1;
+                    *invalid = true;
                     /* Yes, this is ugly. */
                     goto cleanup;
                 }
             }
         }
         if (VECTOR(D->nbVal)[u] == 0) {
-            *invalid = 1;
+            *invalid = true;
             /* Yes, this is ugly. */
             goto cleanup;
         }
@@ -1164,7 +1164,7 @@ static igraph_error_t igraph_i_lad_checkLAD(igraph_integer_t u, igraph_integer_t
     igraph_integer_t nbNum = 0;
     igraph_integer_t posInComp = 0;
     igraph_vector_int_t matchedWithU;
-    igraph_integer_t invalid;
+    igraph_bool_t invalid;
 
     /* special case when u has only 1 adjacent node => no need to call
        Hopcroft and Karp */
@@ -1306,7 +1306,7 @@ static igraph_error_t igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, 
        GAC(allDiff)
        return false if some domain becomes empty; true otherwise */
     igraph_integer_t u, v, i, oldNbVal;
-    igraph_integer_t invalid;
+    igraph_bool_t invalid;
     bool result2;
     while (!igraph_i_lad_toFilterEmpty(D)) {
         while (!igraph_i_lad_toFilterEmpty(D)) {
@@ -1352,7 +1352,7 @@ static igraph_error_t igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, 
 
 static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstSol, bool induced,
                        Tdomain* D, Tgraph* Gp, Tgraph* Gt,
-                       igraph_integer_t *invalid, igraph_bool_t *iso,
+                       igraph_bool_t *invalid, igraph_bool_t *iso,
                        igraph_vector_int_t *vec, igraph_vector_int_t *map, igraph_vector_int_list_t *maps,
                        igraph_integer_t *nbNodes, igraph_integer_t *nbFail, igraph_integer_t *nbSol,
                        clock_t *begin, igraph_vector_ptr_t *alloc_history) {
@@ -1385,7 +1385,7 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
         /* filtering has detected an inconsistency */
         (*nbFail)++;
         igraph_i_lad_resetToFilter(D);
-        *invalid = 0;
+        *invalid = false;
         goto cleanup;
     }
 
@@ -1421,7 +1421,7 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
             IGRAPH_CHECK(igraph_vector_int_list_push_back_copy(maps, vec));
         }
         igraph_i_lad_resetToFilter(D);
-        *invalid = 0;
+        *invalid = false;
         goto cleanup;
     }
 
@@ -1454,7 +1454,7 @@ static igraph_error_t igraph_i_lad_solve(igraph_integer_t timeLimit, bool firstS
             VECTOR(D->globalMatchingT)[globalMatching[u]] = u;
         }
     }
-    *invalid = 0;
+    *invalid = false;
 
     igraph_free(val);
     igraph_vector_ptr_pop_back(alloc_history);
@@ -1547,7 +1547,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     bool initialDomains = domains != 0;
     Tgraph Gp, Gt;
     Tdomain D;
-    igraph_integer_t invalidDomain;
+    igraph_bool_t invalidDomain;
     igraph_integer_t u, nbToMatch = 0;
     igraph_vector_int_t toMatch;
     /* Helper vector in which we build the current subisomorphism mapping */

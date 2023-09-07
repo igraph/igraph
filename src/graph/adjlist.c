@@ -977,7 +977,7 @@ static igraph_error_t igraph_i_simplify_sorted_int_adjacency_vector_in_place(
                 VECTOR(*v)[p] = VECTOR(*v)[i];
                 p++;
             } else {
-                *has_multiple = 1;
+                *has_multiple = true;
                 /* Current item is the same as the next one, but if it is a
                  * loop edge, then the first one or two items are okay. We need
                  * to keep one if mode == IGRAPH_IN or mode == IGRAPH_OUT,

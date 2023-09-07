@@ -561,6 +561,70 @@ igraph_error_t igraph_hrg_game(igraph_t *graph,
 }
 
 /**
+ * \function igraph_from_hrg_dendrogram
+ * \brief Create a graph representation of the dendrogram of a hierarchical random graph model.
+ *
+ * Creates the igraph graph equivalent of the dendrogram encoded in an
+ * \ref igraph_hrg_t data structure. The probabilities associated to the
+ * nodes are returned in a vector so this function works without an
+ * attribute handler.
+ *
+ * \param graph Pointer to an uninitialized graph, the result is
+ *   stored here.
+ * \param hrg The hierarchical random graph to convert.
+ * \param prob Pointer to an \em initialized vector; the probabilities
+ *   associated to the nodes of the dendrogram will be stored here. Leaf nodes
+ *   will have an associated probability of \c IGRAPH_NAN .
+ *   You may set this to \c NULL if you do not need the probabilities.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of vertices in the graph.
+ */
+
+igraph_error_t igraph_from_hrg_dendrogram(
+    igraph_t *graph, const igraph_hrg_t *hrg, igraph_vector_t *prob
+) {
+    igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
+    igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
+    igraph_integer_t no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
+    igraph_vector_int_t edges;
+    igraph_integer_t i, idx = 0;
+
+    // Probability labels, for leaf nodes they are IGRAPH_NAN
+    if (prob) {
+        IGRAPH_CHECK(igraph_vector_resize(prob, no_of_nodes));
+        for (i = 0; i < orig_nodes; i++) {
+            VECTOR(*prob)[i] = IGRAPH_NAN;
+        }
+        for (i = 0; i < orig_nodes - 1; i++) {
+            VECTOR(*prob)[orig_nodes + i] = VECTOR(hrg->prob)[i];
+        }
+    }
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
+
+    for (i = 0; i < orig_nodes - 1; i++) {
+        igraph_integer_t left = VECTOR(hrg->left)[i];
+        igraph_integer_t right = VECTOR(hrg->right)[i];
+
+        VECTOR(edges)[idx++] = orig_nodes + i;
+        VECTOR(edges)[idx++] = left < 0 ? orig_nodes - left - 1 : left;
+        VECTOR(edges)[idx++] = orig_nodes + i;
+        VECTOR(edges)[idx++] = right < 0 ? orig_nodes - right - 1 : right;
+    }
+
+    IGRAPH_CHECK(igraph_empty(graph, 0, IGRAPH_DIRECTED));
+    IGRAPH_FINALLY(igraph_destroy, graph);
+    IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, NULL));
+    IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(2);  // + 1 for graph
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
  * \function igraph_hrg_dendrogram
  * \brief Create a dendrogram from a hierarchical random graph.
  *
@@ -573,13 +637,11 @@ igraph_error_t igraph_hrg_game(igraph_t *graph,
  * \return Error code.
  *
  * Time complexity: O(n), the number of vertices in the graph.
+ *
+ * \deprecated-by igraph_hrg_dendrogram 0.10.5
  */
-
-igraph_error_t igraph_hrg_dendrogram(
-    igraph_t *graph, const igraph_hrg_t *hrg
-) {
-
-    igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
+igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
+   igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
     igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
     igraph_integer_t no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     igraph_vector_int_t edges;

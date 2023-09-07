@@ -18,7 +18,7 @@ jobs:
       run: sudo apt-get install bison flex libarpack2-dev libglpk-dev libgmp-dev libxml2-dev
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 

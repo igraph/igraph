@@ -240,7 +240,9 @@ static igraph_error_t igraph_i_average_path_length_dijkstra(
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
                 igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
-                if (!has) {
+                if (altdist == IGRAPH_INFINITY) {
+                    /* Ignore edges with positive infinite weight */
+                } else if (!has) {
                     /* This is the first non-infinite distance */
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
                 } else if (altdist < curdist) {
@@ -342,7 +344,8 @@ igraph_error_t igraph_average_path_length(const igraph_t *graph,
  *       non-negative for Dijkstra's algorithm to work. Additionally, no
  *       edge weight may be NaN. If either case does not hold, an error
  *       is returned. If this is a null pointer, then the unweighted
- *       version, \ref igraph_average_path_length() is called.
+ *       version, \ref igraph_average_path_length() is called. Edges with positive
+ *       infinite weight are ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param unconn If \c true, only those pairs are considered for the calculation
@@ -399,7 +402,8 @@ igraph_error_t igraph_average_path_length_dijkstra(const igraph_t *graph,
  *       edge weight may be NaN. If either case does not hold, an error
  *       is returned. If this is a null pointer, then the unweighted
  *       version, \ref igraph_average_path_length() is used in calculating
- *       the global efficiency.
+ *       the global efficiency. Edges with positive infinite weights are
+ *       ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \return Error code:
@@ -674,7 +678,8 @@ static igraph_error_t igraph_i_local_efficiency_dijkstra(
  *       non-negative. Additionally, no edge weight may be NaN. If either
  *       case does not hold, an error is returned. If this is a null
  *       pointer, then the unweighted version,
- *       \ref igraph_average_path_length() is called.
+ *       \ref igraph_average_path_length() is called. Edges with positive
+ *       infinite weights are ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param mode How to determine the local neighborhood of each vertex
@@ -828,7 +833,8 @@ igraph_error_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *r
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
  * \param weights The edge weights. They must be all non-negative.
- *    If a null pointer is given, all weights are assumed to be 1.
+ *    If a null pointer is given, all weights are assumed to be 1. Edges
+ *    with positive infinite weight are ignored.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param mode How to determine the local neighborhood of each vertex
@@ -894,8 +900,9 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
  * \function igraph_diameter
  * \brief Calculates the diameter of a graph (longest geodesic).
  *
- * The diameter of a graph is the length of the longest shortest path it has.
- * This function computes both the diameter, as well as the corresponding path.
+ * The diameter of a graph is the length of the longest shortest path it has,
+ * i.e. the maximum eccentricity of the graph's vertices.
+ * This function computes both the diameter, as well as a corresponding path.
  * The diameter of the null graph is considered be infinity by convention.
  *
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
@@ -927,7 +934,8 @@ igraph_error_t igraph_average_local_efficiency(const igraph_t *graph, igraph_rea
  * Time complexity: O(|V||E|), the
  * number of vertices times the number of edges.
  *
- * \sa \ref igraph_diameter_dijkstra()
+ * \sa \ref igraph_diameter_dijkstra() for the weighted version,
+ * \ref igraph_radius() for the minimum eccentricity.
  *
  * \example examples/simple/igraph_diameter.c
  */
@@ -1067,13 +1075,16 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
  * \function igraph_diameter_dijkstra
  * \brief Calculates the weighted diameter of a graph using Dijkstra's algorithm.
  *
- * This function computes the weighted diameter of a graph.
+ * This function computes the weighted diameter of a graph, defined as the longest
+ * weighted shortest path, or the maximum weighted eccentricity of the graph's
+ * vertices. A corresponding shortest path, as well as its endpoints,
+ * can also be optionally computed.
  *
  * If the graph has no vertices, \c IGRAPH_NAN is returned.
  *
  * \param graph The input graph, can be directed or undirected.
  * \param weights The edge weights of the graph. Can be \c NULL for an
- *        unweighted graph.
+ *        unweighted graph. Edges with positive infinite weight are ignored.
  * \param res Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
  * \param from Pointer to an integer, if not \c NULL it will be set to the
@@ -1099,7 +1110,8 @@ igraph_error_t igraph_diameter(const igraph_t *graph, igraph_real_t *res,
  * Time complexity: O(|V||E|*log|E|), |V| is the number of vertices,
  * |E| is the number of edges.
  *
- * \sa \ref igraph_diameter()
+ * \sa \ref igraph_diameter() for the unweighted version,
+ * \ref igraph_radius_dijkstra() for the minimum weighted eccentricity.
  */
 
 
@@ -1587,11 +1599,11 @@ igraph_error_t igraph_get_k_shortest_paths(
                 IGRAPH_CHECK(igraph_vector_int_update(&path_total, &path_root));
                 IGRAPH_CHECK(igraph_vector_int_append(&path_total, &path_spur));
 
-                already_in_potential_paths = 0;
+                already_in_potential_paths = false;
                 n = igraph_vector_int_list_size(&paths_pot);
                 for (i = 0; i < n; i++) {
                     if (igraph_vector_int_all_e(&path_total, igraph_vector_int_list_get_ptr(&paths_pot, i))) {
-                        already_in_potential_paths = 1;
+                        already_in_potential_paths = true;
                         break;
                     }
                 }

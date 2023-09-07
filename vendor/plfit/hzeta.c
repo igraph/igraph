@@ -58,10 +58,15 @@
 #define GSL_LOG_DBL_MAX 7.0978271289338397e+02
 #define GSL_DBL_EPSILON 2.2204460492503131e-16
 
-/* imported from gsl_math.h */
+/* Math constants are not part of standard C.
+ * The following are borrowed from igraph/src/core/math.h */
 
 #ifndef M_LOG2E
-#define M_LOG2E    1.44269504088896340735992468100      /* log_2 (e) */
+#define M_LOG2E     1.44269504088896340735992468100189214
+#endif
+
+#ifndef M_LN2
+#define M_LN2       0.693147180559945309417232121458176568
 #endif
 
 /* imported from gsl_sf_result.h */

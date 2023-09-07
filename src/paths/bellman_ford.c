@@ -264,6 +264,7 @@ igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  *    us to decrease the weight of any path containing at least a single
  *    vertex of this loop infinitely). If this is a null pointer, then the
  *    unweighted version, \ref igraph_get_shortest_paths() is called.
+ *    Edges with positive infinite weights are ignored.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -396,6 +397,11 @@ igraph_error_t igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
             igraph_integer_t nei = VECTOR(*neis)[k];
             igraph_integer_t target = IGRAPH_OTHER(graph, nei, j);
             igraph_real_t altdist = VECTOR(dist)[j] + VECTOR(*weights)[nei];
+
+            /* infinite weights are handled correctly here; if an edge has
+             * infinite weight, altdist will also be infinite so the condition
+             * will never be true as if the edge was ignored */
+
             if (VECTOR(dist)[target] > altdist) {
                 /* relax the edge */
                 VECTOR(dist)[target] = altdist;
