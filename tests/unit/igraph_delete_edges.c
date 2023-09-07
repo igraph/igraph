@@ -58,6 +58,10 @@ int main(void) {
     // igraph_vector_destroy(&values);
     igraph_cattribute_EAN_set(&g, "test", 2, 9);
     igraph_delete_edges(&g, igraph_ess_1(0)); // CHECK_NO_ERROR
+    igraph_attribute_combination_t comb;
+    igraph_attribute_combination_init(&comb);
+    igraph_simplify(&g, true, true, &comb);
+    igraph_attribute_combination_destroy(&comb);
     igraph_delete_edges(&g, igraph_ess_1(1)); // CHECK_NO_ERROR
     if (igraph_ecount(&g) != 1) {
         return 9;
@@ -102,10 +106,10 @@ int main(void) {
     igraph_cattribute_EAN_setv(&g2, "type", &values);
     igraph_vector_destroy(&values);
     igraph_delete_edges(&g2, igraph_ess_1(0)); // CHECK_NO_ERROR
-    igraph_attribute_combination_t comb;
-    igraph_attribute_combination_init(&comb);
-    igraph_simplify(&g2, true, true, &comb);
-    igraph_attribute_combination_destroy(&comb);
+    igraph_attribute_combination_t comb2;
+    igraph_attribute_combination_init(&comb2);
+    igraph_simplify(&g2, true, true, &comb2);
+    igraph_attribute_combination_destroy(&comb2);
     igraph_delete_edges(&g2, igraph_ess_1(1)); // CHECK_NO_ERROR
     if (igraph_ecount(&g2) != 5) {
         return 11;
