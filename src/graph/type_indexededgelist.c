@@ -1204,7 +1204,8 @@ igraph_error_t igraph_degree_1(const igraph_t *graph, igraph_integer_t *deg,
  *
  * \sa \ref igraph_strength() for the version that takes into account
  * edge weights; \ref igraph_degree_1() to efficiently compute the
- * degree of a single vertex.
+ * degree of a single vertex; \ref igraph_maxdegree() if you only need
+ * the largest degree.
  *
  * \example examples/simple/igraph_degree.c
  */
