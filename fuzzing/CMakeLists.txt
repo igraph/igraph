@@ -5,6 +5,7 @@ add_custom_target(build_fuzzers)
 # Add fuzz targets
 add_fuzzer(bliss)
 add_fuzzer(edge_connectivity)
+add_fuzzer(read_dimacs_flow)
 add_fuzzer(read_dl)
 add_fuzzer(read_edgelist)
 add_fuzzer(read_gml)

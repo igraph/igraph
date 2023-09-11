@@ -25,23 +25,35 @@ make -j$(nproc)
 
 
 # Create seed corpus
+zip $OUT/read_edgelist_seed_corpus.zip \
+        $SRC/igraph/fuzzing/test_inputs/*.el
+
+zip $OUT/read_dimacs_flow_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.max \
+        $SRC/igraph/tests/unit/*.max \
+        $SRC/igraph/fuzzing/test_inputs/*.max
+
+zip $OUT/read_dl_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.dl \
+        $SRC/igraph/tests/unit/*.dl \
+        $SRC/igraph/fuzzing/test_inputs/*.dl
+
 zip $OUT/read_gml_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.gml \
         $SRC/igraph/tests/regression/*.gml \
         $SRC/igraph/tests/unit/*.gml \
         $SRC/igraph/fuzzing/test_inputs/*.gml
 
-zip $OUT/read_pajek_seed_corpus.zip \
-        $SRC/igraph/examples/simple/links.net \
-        $SRC/igraph/tests/unit/bipartite.net \
-        $SRC/igraph/tests/unit/pajek*.net \
-        $SRC/igraph/tests/regression/*.net \
-        $SRC/igraph/fuzzing/test_inputs/*.net
-
-zip $OUT/read_dl_seed_corpus.zip \
-        $SRC/igraph/examples/simple/*.dl \
-        $SRC/igraph/tests/unit/*.dl \
-        $SRC/igraph/fuzzing/test_inputs/*.dl
+zip $OUT/read_graphdb_seed_corpus.zip \
+        $SRC/igraph/fuzzing/test_inputs/*.A?? \
+        $SRC/igraph/fuzzing/test_inputs/*.B?? \
+        $SRC/igraph/examples/simple/*.A??
+        
+zip $OUT/read_graphml_seed_corpus.zip \
+        $SRC/igraph/examples/simple/*.graphml \
+        $SRC/igraph/tests/unit/*.graphml \
+        $SRC/igraph/tests/regression/*.graphml \
+        $SRC/igraph/fuzzing/test_inputs/*.graphml
 
 zip $OUT/read_lgl_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.lgl \
@@ -53,26 +65,19 @@ zip $OUT/read_ncol_seed_corpus.zip \
         $SRC/igraph/tests/unit/*.ncol \
         $SRC/igraph/fuzzing/test_inputs/*.ncol
 
-zip $OUT/read_graphml_seed_corpus.zip \
-        $SRC/igraph/examples/simple/*.graphml \
-        $SRC/igraph/tests/unit/*.graphml \
-        $SRC/igraph/tests/regression/*.graphml \
-        $SRC/igraph/fuzzing/test_inputs/*.graphml
-
-zip $OUT/read_edgelist_seed_corpus.zip \
-        $SRC/igraph/fuzzing/test_inputs/*.el
-
-zip $OUT/read_graphdb_seed_corpus.zip \
-        $SRC/igraph/fuzzing/test_inputs/*.A?? \
-        $SRC/igraph/fuzzing/test_inputs/*.B?? \
-        $SRC/igraph/examples/simple/*.A??
+zip $OUT/read_pajek_seed_corpus.zip \
+        $SRC/igraph/examples/simple/links.net \
+        $SRC/igraph/tests/unit/bipartite.net \
+        $SRC/igraph/tests/unit/pajek*.net \
+        $SRC/igraph/tests/regression/*.net \
+        $SRC/igraph/fuzzing/test_inputs/*.net
 
 cd $SRC/igraph
 
 XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 
 # disabled:  vertex_connectivity
-for TARGET in read_gml read_pajek read_dl read_lgl read_ncol read_graphml read_edgelist read_graphdb bliss edge_connectivity vertex_separators
+for TARGET in read_edgelist read_dimacs_flow read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators
 do
   $CXX $CXXFLAGS -I$SRC/igraph/build/include -I$SRC/igraph/include -o $TARGET.o -c ./fuzzing/$TARGET.cpp
   $CXX $CXXFLAGS $LIB_FUZZING_ENGINE $TARGET.o -o $OUT/$TARGET ./build/src/libigraph.a $XML2_FLAGS
