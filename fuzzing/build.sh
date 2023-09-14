@@ -78,10 +78,18 @@ XML2_FLAGS=`$DEPS_PATH/bin/xml2-config --cflags --libs`
 
 # disabled:
 #  - vertex_connectivity, too slow
+# disabled for UBSan:
 #  - read_dimacs_flow, needs a complete rewrite, see https://github.com/igraph/igraph/issues/1924
-for TARGET in read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators
+TARGETS="read_edgelist read_dl read_gml read_graphdb read_graphml read_lgl read_ncol read_pajek bliss edge_connectivity vertex_separators"
+if [ "$SANITIZER" == "undefined"]
+then
+  TARGETS="$TARGETS read_dimacs_flow"
+fi
+
+for TARGET in $TARGETS
 do
   if [ -e ./fuzzing/$TARGET.dict ]
+  then
     cp ./fuzzing/$TARGET.dict $OUT
   fi
   $CXX $CXXFLAGS -I$SRC/igraph/build/include -I$SRC/igraph/include -o $TARGET.o -c ./fuzzing/$TARGET.cpp
