@@ -53,6 +53,8 @@
  * Time complexity: O(v) if \p loops is \c true, and O(v*d) otherwise. v is the number
  * of vertices for which the degree will be calculated, and d is their
  * (average) degree.
+ *
+ * \sa \ref igraph_degree() to retrieve the degrees for several vertices.
  */
 igraph_error_t igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
                      igraph_vs_t vids, igraph_neimode_t mode,

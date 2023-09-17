@@ -5,7 +5,7 @@
 #  * SKIP_REGULAR_EXPRESSION to handle skipped tests properly (3.16)
 #  * CheckLinkerFlag for HAVE_NEW_DTAGS test (3.18)
 #  * cmake -E cat (3.18)
-cmake_minimum_required(VERSION 3.18...3.25)
+cmake_minimum_required(VERSION 3.18...3.27)
 
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
@@ -61,6 +61,16 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 # Add switches to use sanitizers and debugging helpers if needed
 include(debugging)
 include(sanitizers)
+
+# Enable fuzzer instrumentation if needed
+# FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION is a conventional
+# macro used to adapt code for fuzzability, for example by
+# reducing largest allowed graph sizes when reading various
+# file formats.
+if(BUILD_FUZZING)
+  add_compile_options(-fsanitize=fuzzer-no-link)
+  add_compile_definitions(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
+endif()
 
 # Add version information
 configure_file(
@@ -156,6 +166,9 @@ add_subdirectory(src)
 add_subdirectory(interfaces)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
+endif()
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_FUZZING)
+  add_subdirectory(fuzzing)
 endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   add_subdirectory(doc)

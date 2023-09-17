@@ -268,11 +268,13 @@ igraph_error_t igraph_cliques_callback(const igraph_t *graph,
  * The weight of a clique is the sum of the weights
  * of individual vertices within the clique.
  *
- * </para><para>The current implementation of this function
+ * </para><para>
+ * Only positive integer vertex weights are supported.
+ *
+ * </para><para>
+ * The current implementation of this function
  * uses version 1.21 of the Cliquer library by Sampo Niskanen and
  * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
- *
- * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
  * \param vertex_weights A vector of vertex weights. The current implementation
@@ -309,14 +311,16 @@ igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
  * \function igraph_largest_weighted_cliques
  * \brief Finds the largest weight clique(s) in a graph.
  *
- * </para><para>
- * Finds the clique(s) having the largest weight in the graph.
+ * The weight of a clique is the sum of the weights of its vertices.
+ * This function finds the clique(s) having the largest weight in the graph.
  *
- * </para><para>The current implementation of this function
+ * </para><para>
+ * Only positive integer vertex weights are supported.
+ *
+ * </para><para>
+ * The current implementation of this function
  * uses version 1.21 of the Cliquer library by Sampo Niskanen and
  * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
- *
- * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
  * \param vertex_weights A vector of vertex weights. The current implementation
@@ -344,11 +348,16 @@ igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
  * \function igraph_weighted_clique_number
  * \brief Finds the weight of the largest weight clique in the graph.
  *
- * </para><para>The current implementation of this function
+ * The weight of a clique is the sum of the weights of its vertices.
+ * This function finds the weight of the largest weight clique.
+ *
+ * </para><para>
+ * Only positive integer vertex weights are supported.
+ *
+ * </para><para>
+ * The current implementation of this function
  * uses version 1.21 of the Cliquer library by Sampo Niskanen and
  * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
- *
- * Only positive integer vertex weights are supported.
  *
  * \param graph The input graph.
  * \param vertex_weights A vector of vertex weights. The current implementation
