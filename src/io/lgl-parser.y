@@ -141,4 +141,3 @@ int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context,
            locp->first_line, s);
   return 0;
 }
-

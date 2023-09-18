@@ -48,7 +48,7 @@ zip $OUT/read_graphdb_seed_corpus.zip \
         $SRC/igraph/fuzzing/test_inputs/*.A?? \
         $SRC/igraph/fuzzing/test_inputs/*.B?? \
         $SRC/igraph/examples/simple/*.A??
-        
+
 zip $OUT/read_graphml_seed_corpus.zip \
         $SRC/igraph/examples/simple/*.graphml \
         $SRC/igraph/tests/unit/*.graphml \

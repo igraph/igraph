@@ -71,7 +71,7 @@ k = n (n - 1) / 2
 (*classedges*)
 
 
-classedges = 
+classedges =
   Module[{mat = vec2matUtri[n][Range[k]], pos},
     pos = Position[mat, _?Positive];
     KeySort@AssociationThread[Extract[mat,pos],pos]

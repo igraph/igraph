@@ -109,7 +109,7 @@ static igraph_error_t igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_
 %token LISTOPEN         "["
 %token LISTCLOSE        "]"
 /* The following ensures that the special $end token is shown with a friendly name
- * even in older Bison versions. 
+ * even in older Bison versions.
  * See https://www.gnu.org/software/bison/manual/bison.html#Token-I18n for more details. */
 %token END 0            "end of file" /* friendly name for $end */
 %token ERROR
