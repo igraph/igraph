@@ -12,10 +12,12 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${PROJECT_SOURCE_DIR}/${FOLDER}/${NAME}.c)
   use_all_warnings(${TARGET_NAME})
   add_dependencies(build_tests ${TARGET_NAME})
-  target_link_libraries(${TARGET_NAME} PRIVATE igraph)
+  # Specify linking with test_utilities *before* linking with igraph, to avoid
+  # duplicating libigraph.a. See https://github.com/igraph/igraph/issues/2394
   if (NAMESPACE STREQUAL "test")
     target_link_libraries(${TARGET_NAME} PRIVATE test_utilities)
   endif()
+  target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
   if (NOT BUILD_SHARED_LIBS)
     # Add a compiler definition required to compile igraph in static mode
