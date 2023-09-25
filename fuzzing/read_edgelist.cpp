@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2022  The igraph development team
+   Copyright (C) 2022-2023  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,19 +27,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_set_warning_handler(igraph_warning_handler_ignore);
 
-    // Create input file
-    char filename[256];
-    sprintf(filename, "/tmp/libfuzzer.el");
-    FILE *fp = fopen(filename, "wb");
-    if (!fp) return 0;
-    fwrite(data, size, 1, fp);
-    fclose(fp);
-
     // Read input file
-    FILE *ifile;
-    ifile = fopen("/tmp/libfuzzer.el", "r");
+    FILE *ifile = fmemopen((void*) data, size, "r");
     if (!ifile) {
-        remove(filename);
         return 0;
     }
 
@@ -54,7 +44,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     // error code as we don't have a valid graph object in that case
 
     fclose(ifile);
-    remove(filename);
 
     IGRAPH_ASSERT(IGRAPH_FINALLY_STACK_EMPTY);
 
