@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Fixed
+
+ - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
+
 ### Other
 
  - Updated vendored mini-gmp to 6.3.0.
