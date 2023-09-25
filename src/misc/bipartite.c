@@ -298,7 +298,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
  *
  * Creates one or both projections of a bipartite graph.
  *
- * <para></para>
+ * </para><para>
  * A graph is called bipartite if its vertices can be partitioned into
  * two sets, V1 and V2, so that connections only run between V1 and V2,
  * but not within V1 or within V2. The \p types parameter specifies
