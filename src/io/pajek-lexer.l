@@ -84,7 +84,7 @@ whitespace [ \t\v\f]
 %[^\n\r\0]*[\n\r]*  { } /* comments */
 \*net             { BEGIN(netline); return NETWORKLINE; }
 \*network         { BEGIN(netline); return NETWORKLINE; }
-<netline>{whitespace}({word}|{whitespace})* { 
+<netline>{whitespace}({word}|{whitespace})* {
    return NET_TITLE; }
 \*vertices        { return VERTICESLINE; }
 \*arcs            { return ARCSLINE; }

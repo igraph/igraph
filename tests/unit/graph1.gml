@@ -17,13 +17,13 @@ graph [
         d -Inf
         nan "foo"
     ]
-    edge [ 
-        source 5 target 1 
+    edge [
+        source 5 target 1
         weight -0.45
         label -0.45
         num1 NAN
     ]
-    node [ 
+    node [
         id 5
         c [ str "bar" ]
     ]
