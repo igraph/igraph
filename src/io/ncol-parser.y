@@ -97,7 +97,7 @@ input :    /* empty */
 edge :   edgeid edgeid NEWLINE        {
            IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
            IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2));
-           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 0.0));
+           IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 1.0));
        }
        | edgeid edgeid weight NEWLINE {
            IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));

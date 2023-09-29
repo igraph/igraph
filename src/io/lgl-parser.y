@@ -103,7 +103,7 @@ edges :   /* empty */ | edges edge ;
 edge :   edgeid NEWLINE             {
              IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actvertex));
              IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1));
-             IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 0));
+             IGRAPH_YY_CHECK(igraph_vector_push_back(context->weights, 1.0));
            }
        | edgeid weight NEWLINE      {
              IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actvertex));

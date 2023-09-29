@@ -81,10 +81,11 @@ void igraph_ncol_yylex_destroy_wrapper (void *scanner ) {
  *        graph as an edge attribute called \quote weight\endquote.
  *        \c IGRAPH_ADD_WEIGHTS_YES adds the weights (even if they
  *        are not present in the file, in this case they are assumed
- *        to be zero). \c IGRAPH_ADD_WEIGHTS_NO does not add any
+ *        to be 1). \c IGRAPH_ADD_WEIGHTS_NO does not add any
  *        edge attribute. \c IGRAPH_ADD_WEIGHTS_IF_PRESENT adds the
  *        attribute if and only if there is at least one explicit
- *        edge weight in the input file.
+ *        edge weight in the input file, and edges without an explicit
+ *        weight are assumed to have a weight of 1.
  * \param directed Whether to create a directed graph. As this format
  *        was originally used only for undirected graphs there is no
  *        information in the file about the directedness of the graph.
