@@ -140,11 +140,10 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
         }
     }
 
-    context.has_weights = 0;
+    context.has_weights = false;
     context.vector = &edges;
     context.weights = &ws;
     context.trie = &trie;
-    context.eof = 0;
     context.errmsg[0] = '\0';
     context.igraph_errno = IGRAPH_SUCCESS;
 
@@ -161,7 +160,7 @@ igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     case 0: /* success */
         break;
     case 1: /* parse error */
-        if (context.errmsg[0] != 0) {
+        if (context.errmsg[0] != '\0') {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
         } else if (context.igraph_errno != IGRAPH_SUCCESS) {
             IGRAPH_ERROR("", context.igraph_errno);
