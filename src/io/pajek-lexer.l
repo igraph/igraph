@@ -72,19 +72,28 @@
 %option yylineno
 %option caseless
 
-digit [0-9]
-word [a-z_]
 whitespace [ \t\v\f]
+digit [0-9]
+
+/* Anything except non-printable (00-1F), space (20), del (7F) and '*': */
+word [^\x00-\x20\x7f*]
 
 %x netline
+
+/* Notes:
+ *  - Pajek files do not allow empty lines (empty lines should signify the end of the file).
+ *  - Unquoted '*' characters may only appear at the start of a line-initial word.
+ *  - '*net' is not a valid network line, but earlier igraph versions supported it, so we keep it for now.
+ *  - Some Pajek files have parenthesized segments. We skip over these without interpreting them.
+ */
 
 %%
 <*>{whitespace}+  { }
 ^%[^\n\r\0]*[\n\r]*  { } /* comments */
 \*net             { BEGIN(netline); return NETWORKLINE; }
 \*network         { BEGIN(netline); return NETWORKLINE; }
-<netline>{whitespace}([^\n\r\0])* {
-   return NET_TITLE; }
+<netline>{whitespace}([^\n\r\0])* { return NET_TITLE; }
+
 \*vertices        { return VERTICESLINE; }
 \*arcs            { return ARCSLINE; }
 \*edges           { return EDGESLINE; }
