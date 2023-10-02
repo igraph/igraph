@@ -34,6 +34,11 @@
 
 ## [master]
 
+### Fixed
+
+ - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
+ - Fixed the handling of duplicate vertex IDs in `igraph_induced_subgraph()`.
+
 ### Other
 
  - Updated vendored mini-gmp to 6.3.0.

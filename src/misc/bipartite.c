@@ -172,7 +172,6 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                                          igraph_vector_int_t *multiplicity) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i, j, k;
     igraph_integer_t remaining_nodes = 0;
     igraph_vector_int_t vertex_perm, vertex_index;
     igraph_vector_int_t edges;
@@ -180,7 +179,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     igraph_vector_int_t *neis1, *neis2;
     igraph_integer_t neilen1, neilen2;
     igraph_vector_int_t added;
-    igraph_vector_t mult;
+    igraph_vector_int_t mult;
 
     if (which < 0) {
         return IGRAPH_SUCCESS;
@@ -198,33 +197,32 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
 
     /* we won't need the 'mult' vector if 'multiplicity' is NULL, but MSVC will
      * throw warnings in the compiler output if we initialize it conditionally */
-    IGRAPH_VECTOR_INIT_FINALLY(&mult, multiplicity ? no_of_nodes : 1);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&mult, multiplicity ? no_of_nodes : 1);
     if (multiplicity) {
         igraph_vector_int_clear(multiplicity);
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
             VECTOR(vertex_index)[i] = remaining_nodes++;
             igraph_vector_int_push_back(&vertex_perm, i);
         }
     }
 
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i] == which) {
             igraph_integer_t new_i = VECTOR(vertex_index)[i];
             igraph_integer_t iedges = 0;
             neis1 = igraph_adjlist_get(&adjlist, i);
             neilen1 = igraph_vector_int_size(neis1);
-            for (j = 0; j < neilen1; j++) {
+            for (igraph_integer_t j = 0; j < neilen1; j++) {
                 igraph_integer_t nei = VECTOR(*neis1)[j];
                 if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
-                    IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
-                                 IGRAPH_EINVAL);
+                    IGRAPH_ERROR("Non-bipartite edge found in bipartite projection.", IGRAPH_EINVAL);
                 }
                 neis2 = igraph_adjlist_get(&adjlist, nei);
                 neilen2 = igraph_vector_int_size(neis2);
-                for (k = 0; k < neilen2; k++) {
+                for (igraph_integer_t k = 0; k < neilen2; k++) {
                     igraph_integer_t nei2 = VECTOR(*neis2)[k], new_nei2;
                     if (nei2 <= i) {
                         continue;
@@ -257,7 +255,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
                    and check their multiplicity */
                 igraph_integer_t now = igraph_vector_int_size(&edges);
                 igraph_integer_t from = now - iedges * 2;
-                for (j = from; j < now; j += 2) {
+                for (igraph_integer_t j = from; j < now; j += 2) {
                     igraph_integer_t nei2 = VECTOR(edges)[j + 1];
                     igraph_integer_t new_nei2 = VECTOR(vertex_index)[nei2];
                     igraph_integer_t m = VECTOR(mult)[nei2];
@@ -268,23 +266,28 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
         } /* if VECTOR(*type)[i] == which */
     }
 
-    igraph_vector_destroy(&mult);
+    igraph_vector_int_destroy(&mult);
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&added);
     igraph_vector_int_destroy(&vertex_index);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes,
-                               /*directed=*/ 0));
+    IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes, IGRAPH_UNDIRECTED));
+
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
     IGRAPH_FINALLY(igraph_destroy, proj);
 
+    /* copy graph attributes */
     IGRAPH_I_ATTRIBUTE_DESTROY(proj);
-    IGRAPH_I_ATTRIBUTE_COPY(proj, graph, 1, 0, 0);
+    IGRAPH_I_ATTRIBUTE_COPY(proj, graph, /* graph */ true, /* vertex */ false, /* edge */ false);
+
+    /* copy vertex attributes */
     IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, proj, &vertex_perm));
+
     igraph_vector_int_destroy(&vertex_perm);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(2); /* +1 for proj1 */
 
     return IGRAPH_SUCCESS;
 }
@@ -294,6 +297,16 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
  * \brief Create one or both projections of a bipartite (two-mode) network.
  *
  * Creates one or both projections of a bipartite graph.
+ *
+ * </para><para>
+ * A graph is called bipartite if its vertices can be partitioned into
+ * two sets, V1 and V2, so that connections only run between V1 and V2,
+ * but not within V1 or within V2. The \p types parameter specifies
+ * which vertex should be considered a member of one or the other
+ * partition. The projection to V1 has vertex set V1, and two vertices
+ * are connected if they have at least one common neighbour in V2.
+ * The number of common neighbours is returned in \p multiplicity1,
+ * if requested.
  *
  * \param graph The bipartite input graph. Directedness of the edges
  *   is ignored.
@@ -345,15 +358,15 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
     int t1, t2;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid bipartite type vector size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid bipartite type vector length.", IGRAPH_EINVAL);
     }
 
     if (probe1 >= no_of_nodes) {
-        IGRAPH_ERROR("No such vertex to probe", IGRAPH_EINVAL);
+        IGRAPH_ERROR("No such vertex to probe.", IGRAPH_EINVAL);
     }
 
     if (probe1 >= 0 && !proj1) {
-        IGRAPH_ERROR("`probe1' given, but `proj1' is a null pointer", IGRAPH_EINVAL);
+        IGRAPH_ERROR("`probe1' given, but `proj1' is a null pointer.", IGRAPH_EINVAL);
     }
 
     if (probe1 >= 0) {
@@ -368,11 +381,19 @@ igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
         t2 = proj2 ? 1 : -1;
     }
 
-    IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj1, t1, multiplicity1));
-    IGRAPH_FINALLY(igraph_destroy, proj1);
-    IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj2, t2, multiplicity2));
+    if (proj1) {
+        IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj1, t1, multiplicity1));
+        IGRAPH_FINALLY(igraph_destroy, proj1);
+    }
 
-    IGRAPH_FINALLY_CLEAN(1);
+    if (proj2) {
+        IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj2, t2, multiplicity2));
+    }
+
+    if (proj1) {
+        IGRAPH_FINALLY_CLEAN(1); /* proj1 ownership change */
+    }
+
     return IGRAPH_SUCCESS;
 }
 

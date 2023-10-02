@@ -130,7 +130,7 @@ weight : ALNUM  {
                                         igraph_lgl_yyget_leng(scanner),
                                         &val));
     $$=val;
-} ;
+};
 
 %%
 
