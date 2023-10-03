@@ -76,10 +76,6 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * \function igraph_read_graph_pajek
  * \brief Reads a file in Pajek format.
  *
- * \param graph Pointer to an uninitialized graph object.
- * \param file An already opened file handler.
- * \return Error code.
- *
  * </para><para>
  * Only a subset of the Pajek format is implemented. This is partially
  * because this format is not very well documented, but also because
@@ -151,7 +147,10 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf for
  * information on the Pajek file format.
  *
- * </para><para>
+ * \param graph Pointer to an uninitialized graph object.
+ * \param file An already opened file handler.
+ * \return Error code.
+ *
  * Time complexity: O(|V|+|E|+|A|), |V| is the number of vertices, |E|
  * the number of edges, |A| the number of attributes (vertex + edge)
  * in the graph if there are attribute handlers installed.
@@ -399,6 +398,10 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
 /**
  * \function igraph_write_graph_pajek
  * \brief Writes a graph to a file in Pajek format.
+ *
+ * Writes files in the native format of the Pajek software. This format
+ * is not recommended for data exchange or archival. It is meant solely
+ * for interoperability with Pajek.
  *
  * </para><para>
  * The Pajek vertex and edge parameters (like color) are determined by
