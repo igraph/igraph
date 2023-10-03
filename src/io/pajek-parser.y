@@ -235,7 +235,7 @@ vertexline: NEWLINE |
             } vertexid vertexcoords shape params NEWLINE { }
 ;
 
-vertex: longint { $$=$1; context->mode=1; };
+vertex: longint { $$=$1; };
 
 vertexid: word {
   IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("id", $1.str, $1.len, context));
@@ -311,27 +311,22 @@ param:
      }
 ;
 
-vpword: VP_FONT { context->mode=3; } vpwordpar {
-         context->mode=1;
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("font", $3.str, $3.len, context));
+vpword: VP_FONT vpwordpar {
+         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("font", $2.str, $2.len, context));
      }
-     | VP_URL { context->mode=3; } vpwordpar {
-         context->mode=1;
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("url", $3.str, $3.len, context));
+     | VP_URL vpwordpar {
+         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("url", $2.str, $2.len, context));
      }
-     | VP_IC { context->mode=3; } vpwordpar {
-         context->mode=1;
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("color", $3.str, $3.len, context));
+     | VP_IC vpwordpar {
+         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("color", $2.str, $2.len, context));
      }
-     | VP_BC { context->mode=3; } vpwordpar {
-         context->mode=1;
+     | VP_BC vpwordpar {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("framecolor",
-                                                    $3.str, $3.len, context));
+                                                    $2.str, $2.len, context));
      }
-     | VP_LC { context->mode=3; } vpwordpar {
-         context->mode=1;
+     | VP_LC vpwordpar {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("labelcolor",
-                                                    $3.str, $3.len, context));
+                                                    $2.str, $2.len, context));
      }
 ;
 
@@ -345,8 +340,7 @@ arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=1; }
 arcsdefs: /* empty */ | arcsdefs arcsline;
 
 arcsline: NEWLINE |
-          arcfrom arcto { context->actedge++;
-                          context->mode=2; } weight edgeparams NEWLINE  {
+          arcfrom arcto { context->actedge++; } weight edgeparams NEWLINE  {
   if ($1 < 1) {
       IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
   }
@@ -367,8 +361,7 @@ edges:   EDGESLINE NEWLINE edgesdefs { context->directed=0; }
 edgesdefs: /* empty */ | edgesdefs edgesline;
 
 edgesline: NEWLINE |
-          edgefrom edgeto { context->actedge++;
-                            context->mode=2; } weight edgeparams NEWLINE {
+          edgefrom edgeto { context->actedge++; } weight edgeparams NEWLINE {
   if ($1 < 1) {
       IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
   }
@@ -443,29 +436,24 @@ edgeparam:
    }
 ;
 
-epword: EP_A { context->mode=4; } epwordpar {
-      context->mode=2;
-      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("arrowtype", $3.str, $3.len, context));
+epword: EP_A epwordpar {
+      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("arrowtype", $2.str, $2.len, context));
     }
-    | EP_P { context->mode=4; } epwordpar {
-      context->mode=2;
-      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("linepattern", $3.str, $3.len, context));
+    | EP_P epwordpar {
+      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("linepattern", $2.str, $2.len, context));
     }
-    | EP_L { context->mode=4; } epwordpar {
-      context->mode=2;
-      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("label", $3.str, $3.len, context));
+    | EP_L epwordpar {
+      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("label", $2.str, $2.len, context));
     }
-    | EP_LC { context->mode=4; } epwordpar {
-      context->mode=2;
-      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("labelcolor", $3.str, $3.len, context));
+    | EP_LC epwordpar {
+      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("labelcolor", $2.str, $2.len, context));
     }
-    | EP_C { context->mode=4; } epwordpar {
-      context->mode=2;
-      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("color", $3.str, $3.len, context));
+    | EP_C epwordpar {
+      IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("color", $2.str, $2.len, context));
     }
 ;
 
-epwordpar: word { context->mode=2; $$=$1; };
+epwordpar: word { $$=$1; };
 
 arcslist: ARCSLISTLINE NEWLINE arcslistlines { context->directed=1; };
 
@@ -475,7 +463,7 @@ arclistline: NEWLINE | arclistfrom arctolist NEWLINE;
 
 arctolist: /* empty */ | arctolist arclistto;
 
-arclistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
+arclistfrom: longint { context->actfrom=labs($1)-1; };
 
 arclistto: longint {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
@@ -490,7 +478,7 @@ edgelistline: NEWLINE | edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
-edgelistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
+edgelistfrom: longint { context->actfrom=labs($1)-1; };
 
 edgelistto: longint {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
