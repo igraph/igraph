@@ -41,7 +41,7 @@
 
 typedef struct {
     void *scanner;
-    int eof;
+    igraph_bool_t eof;
     char errmsg[300];
     igraph_error_t igraph_errno;
     igraph_vector_int_t *vector;
@@ -49,7 +49,6 @@ typedef struct {
     igraph_integer_t vcount, vcount2;
     igraph_integer_t actfrom;
     igraph_integer_t actto;
-    int mode; /* 0: general, 1: vertex, 2: edge */
     igraph_trie_t *vertex_attribute_names;
     igraph_vector_ptr_t *vertex_attributes;
     igraph_trie_t *edge_attribute_names;

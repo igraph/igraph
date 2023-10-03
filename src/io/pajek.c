@@ -183,7 +183,6 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     context.directed = false; /* assume undirected until an element implying directedness is encountered */
     context.vector = &edges;
-    context.mode = 0;
     context.vcount = -1;
     context.vertexid = 0;
     context.vertex_attribute_names = &vattrnames;
@@ -191,7 +190,7 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     context.edge_attribute_names = &eattrnames;
     context.edge_attributes = &eattrs;
     context.actedge = 0;
-    context.eof = 0;
+    context.eof = false;
     context.errmsg[0] = '\0';
     context.igraph_errno = IGRAPH_SUCCESS;
 
