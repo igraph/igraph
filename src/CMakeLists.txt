@@ -409,7 +409,7 @@ target_link_libraries(
 )
 
 if (NOT BUILD_SHARED_LIBS)
-  target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
+  target_compile_definitions(igraph PUBLIC IGRAPH_STATIC)
 else()
   target_compile_definitions(igraph PRIVATE igraph_EXPORTS)
 endif()
