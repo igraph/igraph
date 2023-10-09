@@ -19,11 +19,6 @@ function(add_legacy_test FOLDER NAME NAMESPACE)
   endif()
   target_link_libraries(${TARGET_NAME} PRIVATE igraph)
 
-  if (NOT BUILD_SHARED_LIBS)
-    # Add a compiler definition required to compile igraph in static mode
-    target_compile_definitions(${TARGET_NAME} PRIVATE IGRAPH_STATIC)
-  endif()
-
   # Some tests depend on internal igraph headers so we also have to add src/
   # to the include path even though it's not part of the public API
   target_include_directories(
