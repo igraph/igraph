@@ -1491,6 +1491,7 @@ int ios_add_row(glp_tree *tree, IOSPOOL *pool,
 IOSCUT *ios_find_row(IOSPOOL *pool, int i)
 {     /* find row (constraint) in the cut pool */
       xassert(0);
+      return 0;
 }
 #else
 IOSCUT *ios_find_row(IOSPOOL *pool, int i)
