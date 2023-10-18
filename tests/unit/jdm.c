@@ -1,21 +1,48 @@
-//
-// Created by Lara Holm on 11.10.2023.
-//
-//
-// Created by Lara Holm on 18.9.2023.
-//
+/*
+   IGraph library.
+   Copyright (C) 2023  The igraph development team <igraph@igraph.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <igraph.h>
 #include <stdio.h>
+#include "test_utilities.h"
 
 
 /**
- * Populates a Joint Degree Matrix. Works on directed and undirected graphs.
- * @param g_ptr A pointer to an initialized graph object.
- * @param jdm_ptr A pointer to a zero initialized integer matrix. The function writes the appropriate values here.
- * @param degrees_ptr A pointer to an initialized integer vector containing the degrees of the graph object.
- * @return 0
+ * \function igraph_construct_jdm
+ * \brief Constructs a joint degree matrix.
+ *
+ * The joint degree matrix of a graph contains the number of edges between vertices of degree i and degree j for every
+ * (i, j). The function populates a joint degree matrix and works on directed and undirected graphs.
+ *
+ * \param graph A pointer to an initialized graph object.
+ * \param jdm_ptr A pointer to a zero initialized integer matrix. The function writes the appropriate values here.
+ * \param degrees_ptr A pointer to an initialized integer vector containing the degrees of the graph object.
+ * \return Error code.
+ *
+ * TODO: Time complexity: O(V^2 d),
+ * where V is the number of vertices in the vertex iterator given, and d is the
+ * (maximum) degree of the vertices in the graph.
+ *
+ * \sa \ref igraph_similarity_jaccard(), a measure very similar to the Dice
+ *   coefficient.
+ *
+ * \example examples/simple/igraph_similarity.c
  */
-int construct_jdm(igraph_t* g_ptr, igraph_matrix_int_t* jdm_ptr, igraph_vector_int_t* degrees_ptr) {
+igraph_error_t igraph_construct_jdm(igraph_t* graph, igraph_matrix_int_t* jdm_ptr, igraph_vector_int_t* degrees_ptr) {
     // Get the edges
     igraph_eit_t eit;
     igraph_es_t es;
@@ -24,25 +51,39 @@ int construct_jdm(igraph_t* g_ptr, igraph_matrix_int_t* jdm_ptr, igraph_vector_i
     igraph_integer_t v2id;
     igraph_integer_t v1deg;
     igraph_integer_t v2deg;
+    igraph_vector_int_t degrees;
+    igraph_vector_int_t out_degrees;
+    igraph_vector_int_t in_degrees;
 
-    igraph_es_all(&es, IGRAPH_EDGEORDER_ID);
-    igraph_eit_create(g_ptr, es, &eit);
+    IGRAPH_CHECK(igraph_vector_int_init(&degrees, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&out_degrees, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&in_degrees, 0));
 
-    if (igraph_is_directed(g_ptr)) {
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false));
+    IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, false));
+    IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, false));
+
+    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+
+    if (igraph_is_directed(graph)) {
         printf("Directed\n");
 
         while (!IGRAPH_EIT_END(eit)) {
-            v1id = IGRAPH_FROM(g_ptr, IGRAPH_EIT_GET(eit));
-            v2id = IGRAPH_TO(g_ptr, IGRAPH_EIT_GET(eit));
             eid = IGRAPH_EIT_GET(eit);
-            igraph_degree_1(g_ptr, &v1deg, v1id, IGRAPH_OUT, false);
-            igraph_degree_1(g_ptr, &v2deg, v2id, IGRAPH_IN, false);
+            v1id = IGRAPH_FROM(graph, eid);
+            v2id = IGRAPH_TO(graph, eid);
+            //igraph_degree_1(graph, &v1deg, v1id, IGRAPH_OUT, false);
+            //igraph_degree_1(graph, &v2deg, v2id, IGRAPH_IN, false);
+            //
+            v1deg = igraph_vector_int_get(&out_degrees,v1id);
+            v2deg = igraph_vector_int_get(&in_degrees, v2id);
 
             // If the graph is directed, J out_degree, in_degree
             // MATRIX(m , i, j) = macro in igraph
-            MATRIX(*jdm_ptr, v1deg, v2deg) = MATRIX(*jdm_ptr, v1deg, v2deg) + 1;
+            MATRIX(*jdm_ptr, v1deg-1, v2deg-1)++; //= MATRIX(*jdm_ptr, v1deg, v2deg) + 1;
             // igraph_matrix_int_set(jdm_ptr, v1deg, v2deg, igraph_matrix_int_get(jdm_ptr, v1deg, v2deg) + 1);
-            printf("EdgeID: %" IGRAPH_PRId, IGRAPH_EIT_GET(eit));
+            printf("EdgeID: %" IGRAPH_PRId, eid);
             printf("\n");
             printf(" %" IGRAPH_PRId, v1id);
             printf(" Degree: %" IGRAPH_PRId, v1deg);
@@ -55,20 +96,25 @@ int construct_jdm(igraph_t* g_ptr, igraph_matrix_int_t* jdm_ptr, igraph_vector_i
         printf("\n");
     } else {
         printf("Undirected\n");
+
         while (!IGRAPH_EIT_END(eit)) {
-            v1id = IGRAPH_FROM(g_ptr, IGRAPH_EIT_GET(eit));
-            v2id = IGRAPH_TO(g_ptr, IGRAPH_EIT_GET(eit));
             eid = IGRAPH_EIT_GET(eit);
-            v1deg = igraph_vector_int_get(degrees_ptr, v1id);
-            v2deg = igraph_vector_int_get(degrees_ptr, v2id);
+            v1id = IGRAPH_FROM(graph, eid);
+            v2id = IGRAPH_TO(graph, eid);
+
+//            v1deg = igraph_vector_int_get(degrees_ptr, v1id);
+//            v2deg = igraph_vector_int_get(degrees_ptr, v2id);
+
+            v1deg = igraph_vector_int_get(&degrees, v1id);
+            v2deg = igraph_vector_int_get(&degrees, v2id);
 
             // If the graph is undirected, it is symmetrical and the sum of the entire matrix is 2x the number of edges.
             //igraph_matrix_int_set(jdm_ptr, v1deg, v2deg, igraph_matrix_int_get(jdm_ptr, v1deg, v2deg) + 1);
             //igraph_matrix_int_set(jdm_ptr, v2deg, v1deg, igraph_matrix_int_get(jdm_ptr, v2deg, v1deg) + 1);
-            MATRIX(*jdm_ptr, v1deg, v2deg) = MATRIX(*jdm_ptr, v1deg, v2deg) + 1;
-            MATRIX(*jdm_ptr, v2deg, v1deg) = MATRIX(*jdm_ptr, v2deg, v1deg) + 1;
+            MATRIX(*jdm_ptr, v1deg-1, v2deg-1)++; //= MATRIX(*jdm_ptr, v1deg, v2deg) + 1;
+            MATRIX(*jdm_ptr, v2deg-1, v1deg-1)++; //= MATRIX(*jdm_ptr, v2deg, v1deg) + 1;
 
-            printf("EdgeID: %" IGRAPH_PRId, IGRAPH_EIT_GET(eit));
+            printf("EdgeID: %" IGRAPH_PRId, eid);
             printf("\n");
             printf(" %" IGRAPH_PRId, v1id);
             printf(" Degree: %" IGRAPH_PRId, v1deg);
@@ -82,8 +128,12 @@ int construct_jdm(igraph_t* g_ptr, igraph_matrix_int_t* jdm_ptr, igraph_vector_i
     }
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);
+    igraph_vector_int_destroy(&degrees);
+    igraph_vector_int_destroy(&out_degrees);
+    igraph_vector_int_destroy(&in_degrees);
 
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
 
 int main (void) {
@@ -165,12 +215,12 @@ int main (void) {
     // Zero initialize a matrix
     // Note: +1 if 0 row col should be included. If removed, remember to subtract 1 from the indices in the while loops.
     // initialize outside of the function, igraph_matrix_resize
-    igraph_matrix_int_init(&jdm, g_max_degree + 1, g_max_degree + 1);
-    igraph_matrix_int_init(&jdm_dir, g_dir_max_out_degree+ 1, g_dir_max_in_degree + 1);
+    igraph_matrix_int_init(&jdm, g_max_degree, g_max_degree);
+    igraph_matrix_int_init(&jdm_dir, g_dir_max_out_degree, g_dir_max_in_degree);
 
 
-    construct_jdm(&g, &jdm, &g_degrees);
-    construct_jdm(&g_dir, &jdm_dir, &g_dir_degrees);
+    igraph_construct_jdm(&g, &jdm, &g_degrees);
+    igraph_construct_jdm(&g_dir, &jdm_dir, &g_dir_degrees);
 
     igraph_matrix_int_print(&jdm);
     igraph_matrix_int_print(&jdm_dir);
@@ -183,6 +233,8 @@ int main (void) {
 
     igraph_vector_int_destroy(&g_degrees);
     igraph_vector_int_destroy(&g_dir_degrees);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
