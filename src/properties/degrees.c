@@ -517,3 +517,102 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
     }
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_construct_jdm
+ * \brief Constructs a joint degree matrix.
+ *
+ * The joint degree matrix of a graph contains the number of edges between vertices of degree i and degree j for every
+ * (i, j). The function populates a joint degree matrix and works on directed and undirected graphs.
+ *
+ * \param graph A pointer to an initialized graph object.
+ * \param m A pointer to a zero initialized integer matrix that will be resized. The values will be written here.
+ * \param dout An integer for the dimension of the matrix. If \pdout and \pdin are greater than 0, the matrix will be
+ *        resized do dimensions (\pdout, \pdin).
+ * \param din An integer for the dimension of the matrix. If \pdout and \pdin are greater than 0, the matrix will be
+ *        resized do dimensions (\pdout, \pdin).
+ * \return Error code.
+ *
+ * Time complexity: O(E),
+ * where E is the number of edges in input graph.
+ */
+
+igraph_error_t igraph_construct_jdm(igraph_t* graph, igraph_matrix_int_t* m, igraph_integer_t dout, igraph_integer_t din) {
+    igraph_eit_t eit;
+    igraph_es_t es;
+    igraph_integer_t eid;
+    igraph_integer_t v1id;
+    igraph_integer_t v2id;
+    igraph_integer_t v1deg;
+    igraph_integer_t v2deg;
+    igraph_integer_t max_degree;
+    igraph_integer_t max_out_degree;
+    igraph_integer_t max_in_degree;
+    igraph_vector_int_t degrees;
+    igraph_vector_int_t out_degrees;
+    igraph_vector_int_t in_degrees;
+    igraph_bool_t is_directed;
+
+    is_directed = igraph_is_directed(graph);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&degrees, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&out_degrees, 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&in_degrees, 0));
+
+    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false));
+    IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, false));
+    IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, false));
+
+    IGRAPH_CHECK(igraph_maxdegree(graph, &max_degree, igraph_vss_all(), IGRAPH_ALL, false));
+    IGRAPH_CHECK(igraph_maxdegree(graph, &max_out_degree, igraph_vss_all(), IGRAPH_OUT, false));
+    IGRAPH_CHECK(igraph_maxdegree(graph, &max_in_degree, igraph_vss_all(), IGRAPH_IN, false));
+
+    if (dout > 0 && din > 0) {
+        IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
+    } else {
+        if (is_directed) {
+            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_out_degree, max_in_degree));
+        } else {
+            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_degree, max_degree));
+        }
+    }
+    // Set all elements to 0
+    igraph_matrix_int_null(m);
+
+    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+
+    if (is_directed) {
+        while (!IGRAPH_EIT_END(eit)) {
+            eid = IGRAPH_EIT_GET(eit);
+            v1id = IGRAPH_FROM(graph, eid);
+            v2id = IGRAPH_TO(graph, eid);
+            v1deg = igraph_vector_int_get(&out_degrees,v1id);
+            v2deg = igraph_vector_int_get(&in_degrees, v2id);
+            // If the graph is directed, i: out_degree, j: in_degree
+            MATRIX(*m, v1deg-1, v2deg-1)++;
+
+            IGRAPH_EIT_NEXT(eit);
+        }
+    } else {
+        while (!IGRAPH_EIT_END(eit)) {
+            eid = IGRAPH_EIT_GET(eit);
+            v1id = IGRAPH_FROM(graph, eid);
+            v2id = IGRAPH_TO(graph, eid);
+            v1deg = igraph_vector_int_get(&degrees, v1id);
+            v2deg = igraph_vector_int_get(&degrees, v2id);
+            // If the graph is undirected, it is symmetrical and the sum of the entire matrix is 2x the number of edges
+            MATRIX(*m, v1deg-1, v2deg-1)++;
+            MATRIX(*m, v2deg-1, v1deg-1)++;
+
+            IGRAPH_EIT_NEXT(eit);
+        }
+    }
+    igraph_eit_destroy(&eit);
+    igraph_es_destroy(&es);
+    igraph_vector_int_destroy(&degrees);
+    igraph_vector_int_destroy(&out_degrees);
+    igraph_vector_int_destroy(&in_degrees);
+
+    return IGRAPH_SUCCESS;
+}
