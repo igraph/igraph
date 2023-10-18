@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <igraph/igraph.h>
+#include <igraph.h>
 #include "test_utilities.h"
 
 int main (void) {
