@@ -527,10 +527,10 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
  *
  * \param graph A pointer to an initialized graph object.
  * \param m A pointer to a zero initialized integer matrix that will be resized. The values will be written here.
- * \param dout An integer for the dimension of the matrix. If \pdout and \pdin are greater than 0, the matrix will be
- *        resized do dimensions (\pdout, \pdin).
- * \param din An integer for the dimension of the matrix. If \pdout and \pdin are greater than 0, the matrix will be
- *        resized do dimensions (\pdout, \pdin).
+ * \param dout An integer for the dimension of the matrix. If \p dout and \p din are greater than 0, the matrix will be
+ *        resized do dimensions (\p dout, \p din).
+ * \param din An integer for the dimension of the matrix. If \p dout and \p din are greater than 0, the matrix will be
+ *        resized do dimensions (\p dout, \p din).
  * \return Error code.
  *
  * Time complexity: O(E),
