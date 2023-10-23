@@ -22,7 +22,7 @@
 */
 
 #include "igraph_structural.h"
-
+#include "igraph_mixing.h"
 #include "igraph_interface.h"
 
 /**
@@ -537,52 +537,69 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
  * where E is the number of edges in input graph.
  */
 
-igraph_error_t igraph_construct_jdm(igraph_t* graph, igraph_matrix_int_t* m, igraph_integer_t dout, igraph_integer_t din) {
+igraph_error_t igraph_construct_jdm(const igraph_t* graph,
+                                    igraph_matrix_int_t* m,
+                                    igraph_integer_t dout,
+                                    igraph_integer_t din,
+                                    const igraph_vector_int_t* weights) {
     igraph_eit_t eit;
     igraph_es_t es;
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t eid;
     igraph_integer_t v1id;
     igraph_integer_t v2id;
     igraph_integer_t v1deg;
     igraph_integer_t v2deg;
-    igraph_integer_t max_degree;
-    igraph_integer_t max_out_degree;
-    igraph_integer_t max_in_degree;
-    igraph_vector_int_t degrees;
-    igraph_vector_int_t out_degrees;
-    igraph_vector_int_t in_degrees;
+//    igraph_integer_t max_degree;
+//    igraph_integer_t max_out_degree;
+//    igraph_integer_t max_in_degree;
+//    igraph_vector_int_t degrees;
+//    igraph_vector_int_t out_degrees;
+//    igraph_vector_int_t in_degrees;
     igraph_bool_t is_directed;
 
     is_directed = igraph_is_directed(graph);
-
-    IGRAPH_CHECK(igraph_vector_int_init(&degrees, 0));
-    IGRAPH_CHECK(igraph_vector_int_init(&out_degrees, 0));
-    IGRAPH_CHECK(igraph_vector_int_init(&in_degrees, 0));
-
-    IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false));
-    IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, false));
-    IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, false));
-
-    IGRAPH_CHECK(igraph_maxdegree(graph, &max_degree, igraph_vss_all(), IGRAPH_ALL, false));
-    IGRAPH_CHECK(igraph_maxdegree(graph, &max_out_degree, igraph_vss_all(), IGRAPH_OUT, false));
-    IGRAPH_CHECK(igraph_maxdegree(graph, &max_in_degree, igraph_vss_all(), IGRAPH_IN, false));
-
-    if (dout > 0 && din > 0) {
-        IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
-    } else {
-        if (is_directed) {
-            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_out_degree, max_in_degree));
-        } else {
-            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_degree, max_degree));
-        }
+    // Current assumption is that the weights are integers
+    // Check the length of the weights, if the weights vector is passed
+    if (weights && igraph_vector_int_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_int_size(weights), no_of_edges);
     }
-    // Set all elements to 0
-    igraph_matrix_int_null(m);
-
-    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
-    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
-
+    // Check the contents of the weights, if the weights vector is passed
+//    if (weights && no_of_edges > 0) {
+//        igraph_integer_t min = igraph_vector_int_min(weights);
+//        // Should I check for negative edges?
+//        if (min < 0) {
+//            IGRAPH_ERRORF("Weights must not be negative, got %d.", IGRAPH_EINVAL, min);
+//        } else if (isnan(min)) {
+//            IGRAPH_ERROR("Weights must not contain NaN values.", IGRAPH_EINVAL);
+//        }
+//    }
     if (is_directed) {
+        igraph_vector_int_t out_degrees;
+        igraph_vector_int_t in_degrees;
+        igraph_integer_t max_out_degree;
+        igraph_integer_t max_in_degree;
+        // Compute max degrees
+        IGRAPH_CHECK(igraph_vector_int_init(&out_degrees, 0));
+        IGRAPH_CHECK(igraph_vector_int_init(&in_degrees, 0));
+        IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, false));
+        IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, false));
+        IGRAPH_CHECK(igraph_maxdegree(graph, &max_out_degree, igraph_vss_all(), IGRAPH_OUT, false));
+        IGRAPH_CHECK(igraph_maxdegree(graph, &max_in_degree, igraph_vss_all(), IGRAPH_IN, false));
+
+        if (dout > 0 && din > 0) {
+            IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
+        } else {
+            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_out_degree, max_in_degree));
+        }
+        // Set all elements to 0
+        igraph_matrix_int_null(m);
+
+        IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+        IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+
         while (!IGRAPH_EIT_END(eit)) {
             eid = IGRAPH_EIT_GET(eit);
             v1id = IGRAPH_FROM(graph, eid);
@@ -590,11 +607,38 @@ igraph_error_t igraph_construct_jdm(igraph_t* graph, igraph_matrix_int_t* m, igr
             v1deg = igraph_vector_int_get(&out_degrees,v1id);
             v2deg = igraph_vector_int_get(&in_degrees, v2id);
             // If the graph is directed, i: out_degree, j: in_degree
-            MATRIX(*m, v1deg-1, v2deg-1)++;
-
+            // Add weights, weights ? weights[eid] : 1;
+            // Closeness.c for example = compare len weights to the len of edges
+            if (!weights) {
+                MATRIX(*m, v1deg-1, v2deg-1)++;
+            } else {
+                MATRIX(*m, v1deg-1, v2deg-1) += VECTOR(*weights)[eid];
+            }
             IGRAPH_EIT_NEXT(eit);
         }
+
+        igraph_vector_int_destroy(&out_degrees);
+        igraph_vector_int_destroy(&in_degrees);
+
     } else {
+        igraph_vector_int_t degrees;
+        igraph_integer_t max_degree;
+        // Compute max degrees
+        IGRAPH_CHECK(igraph_vector_int_init(&degrees, 0));
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false));
+        IGRAPH_CHECK(igraph_maxdegree(graph, &max_degree, igraph_vss_all(), IGRAPH_ALL, false));
+
+        if (dout > 0 && din > 0) {
+            IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
+        } else {
+            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_degree, max_degree));
+        }
+        // Set all elements to 0
+        igraph_matrix_int_null(m);
+
+        IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+        IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+
         while (!IGRAPH_EIT_END(eit)) {
             eid = IGRAPH_EIT_GET(eit);
             v1id = IGRAPH_FROM(graph, eid);
@@ -602,17 +646,77 @@ igraph_error_t igraph_construct_jdm(igraph_t* graph, igraph_matrix_int_t* m, igr
             v1deg = igraph_vector_int_get(&degrees, v1id);
             v2deg = igraph_vector_int_get(&degrees, v2id);
             // If the graph is undirected, it is symmetrical and the sum of the entire matrix is 2x the number of edges
-            MATRIX(*m, v1deg-1, v2deg-1)++;
-            MATRIX(*m, v2deg-1, v1deg-1)++;
+            if (!weights) {
+                MATRIX(*m, v1deg - 1, v2deg - 1)++;
+                MATRIX(*m, v2deg - 1, v1deg - 1)++;
+            } else {
+                MATRIX(*m, v1deg - 1, v2deg - 1) += VECTOR(*weights)[eid];
+                MATRIX(*m, v2deg - 1, v1deg - 1) += VECTOR(*weights)[eid];
+            }
 
             IGRAPH_EIT_NEXT(eit);
         }
+
+        igraph_vector_int_destroy(&degrees);
     }
+        // TODO: Consider loops - note in docs that it counts self loops only once (i=j) change loops to true
+//    if (dout > 0 && din > 0) {
+//        IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
+//    } else {
+//        if (is_directed) {
+//            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_out_degree, max_in_degree));
+//        } else {
+//            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_degree, max_degree));
+//        }
+//    }
+
+    // Set all elements to 0
+//    igraph_matrix_int_null(m);
+//
+//    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+//    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+
+//    if (is_directed) {
+//        while (!IGRAPH_EIT_END(eit)) {
+//            eid = IGRAPH_EIT_GET(eit);
+//            v1id = IGRAPH_FROM(graph, eid);
+//            v2id = IGRAPH_TO(graph, eid);
+//            v1deg = igraph_vector_int_get(&out_degrees,v1id);
+//            v2deg = igraph_vector_int_get(&in_degrees, v2id);
+//            // If the graph is directed, i: out_degree, j: in_degree
+//            // Add weights, weights ? weights[eid] : 1;
+//            // Closeness.c for example = compare len weights to the len of edges
+//            if (!weights) {
+//                MATRIX(*m, v1deg-1, v2deg-1)++;
+//            } else {
+//                MATRIX(*m, v1deg-1, v2deg-1) += VECTOR(*weights)[eid];
+//            }
+//            IGRAPH_EIT_NEXT(eit);
+//        }
+//    } else {
+//        while (!IGRAPH_EIT_END(eit)) {
+//            eid = IGRAPH_EIT_GET(eit);
+//            v1id = IGRAPH_FROM(graph, eid);
+//            v2id = IGRAPH_TO(graph, eid);
+//            v1deg = igraph_vector_int_get(&degrees, v1id);
+//            v2deg = igraph_vector_int_get(&degrees, v2id);
+//            // If the graph is undirected, it is symmetrical and the sum of the entire matrix is 2x the number of edges
+//            if (!weights) {
+//                MATRIX(*m, v1deg-1, v2deg-1)++;
+//                MATRIX(*m, v2deg-1, v1deg-1)++;
+//            } else {
+//                MATRIX(*m, v1deg-1, v2deg-1) += VECTOR(*weights)[eid];
+//                MATRIX(*m, v2deg-1, v1deg-1) += VECTOR(*weights)[eid];
+//            }
+//
+//            IGRAPH_EIT_NEXT(eit);
+//        }
+//    }
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);
-    igraph_vector_int_destroy(&degrees);
-    igraph_vector_int_destroy(&out_degrees);
-    igraph_vector_int_destroy(&in_degrees);
+//    igraph_vector_int_destroy(&degrees);
+//    igraph_vector_int_destroy(&out_degrees);
+//    igraph_vector_int_destroy(&in_degrees);
 
     return IGRAPH_SUCCESS;
 }
