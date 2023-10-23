@@ -587,6 +587,11 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         IGRAPH_CHECK(igraph_maxdegree(graph, &max_in_degree, igraph_vss_all(), IGRAPH_IN, true));
 
         if (dout > 0 && din > 0) {
+            if (dout < max_out_degree || din < max_in_degree) {
+                IGRAPH_ERRORF("dout (%" IGRAPH_PRId ") or din (%" IGRAPH_PRId ") are smaller than the smallest required dimensions of the matrix (%" IGRAPH_PRId ", %" IGRAPH_PRId ")",
+                              IGRAPH_EINVAL,
+                              dout, din, max_out_degree, max_in_degree);
+            }
             IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
         } else {
             IGRAPH_CHECK(igraph_matrix_int_resize(m, max_out_degree, max_in_degree));
@@ -623,6 +628,11 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
         IGRAPH_CHECK(igraph_maxdegree(graph, &max_degree, igraph_vss_all(), IGRAPH_ALL, true));
         if (dout > 0 && din > 0) {
+            if (dout < max_degree || din < max_degree) {
+                IGRAPH_ERRORF("dout (%" IGRAPH_PRId ") or din (%" IGRAPH_PRId ") are smaller than the smallest required dimensions of the matrix (%" IGRAPH_PRId ", %" IGRAPH_PRId ")",
+                              IGRAPH_EINVAL,
+                              dout, din, max_degree, max_degree);
+            }
             IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
         } else {
             IGRAPH_CHECK(igraph_matrix_int_resize(m, max_degree, max_degree));
@@ -639,9 +649,6 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
             v2id = IGRAPH_TO(graph, eid);
             v1deg = igraph_vector_int_get(&degrees, v1id);
             v2deg = igraph_vector_int_get(&degrees, v2id);
-            if (v1id == v2id) {
-                printf("loop v deg: %d\n", (int)v1deg);
-            }
             // If the graph is undirected, it is symmetrical and the sum of the entire matrix is 2x the number of edges
             if (!weights) {
                 MATRIX(*m, v1deg - 1, v2deg - 1)++;
