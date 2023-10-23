@@ -2,6 +2,10 @@
 
 ## [master]
 
+### Changes
+
+ - The behaviour of the Pajek format reader is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret.
+
 ### Fixed
 
  - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
