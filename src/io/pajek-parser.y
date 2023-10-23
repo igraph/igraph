@@ -95,6 +95,9 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
 static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
 
 static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len);
+static igraph_bool_t is_standard_vattr(const char *attrname);
+static igraph_bool_t is_standard_eattr(const char *attrname);
+static igraph_error_t deconflict_attrname(char **attrname);
 
 #define scanner context->scanner
 
@@ -325,6 +328,12 @@ vpword: VP_FONT vpwordpar {
          char *attrname;
          IGRAPH_YY_CHECK(dupl_str_len(&attrname, $1.str, $1.len));
          IGRAPH_FINALLY(igraph_free, attrname);
+         if (is_standard_vattr(attrname)) {
+          IGRAPH_YY_CHECK(deconflict_attrname(&attrname));
+          /* update address on finally stack */
+          IGRAPH_FINALLY_CLEAN(1);
+          IGRAPH_FINALLY(igraph_free, attrname);
+         }
          IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute(
            attrname, $2.str, $2.len, context));
          IGRAPH_FREE(attrname);
@@ -450,6 +459,12 @@ epword: EP_A epwordpar {
         char *attrname;
         IGRAPH_YY_CHECK(dupl_str_len(&attrname, $1.str, $1.len));
         IGRAPH_FINALLY(igraph_free, attrname);
+        if (is_standard_eattr(attrname)) {
+          IGRAPH_YY_CHECK(deconflict_attrname(&attrname));
+          /* update address on finally stack */
+          IGRAPH_FINALLY_CLEAN(1);
+          IGRAPH_FINALLY(igraph_free, attrname);
+        }
         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute(
            attrname, $2.str, $2.len, context));
         IGRAPH_FREE(attrname);
@@ -775,5 +790,55 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
     }
   }
 
+  return IGRAPH_SUCCESS;
+}
+
+/* Check if attrname is a standard Pajek vertex attribute. */
+static igraph_bool_t is_standard_vattr(const char *attrname) {
+  const char *names[] = {
+    "id", // TODO remove for 0.11
+    "name", "x", "y", "z", "shape", "xfact", "yfact",
+    "labeldist", "labeldegree2", "framewidth",
+    "fontsize", "rotation", "radius",
+    "diamondratio", "labeldegree", "vertexsize",
+    "font", "url", "color", "framecolor",
+    "labelcolor"
+  };
+  for (size_t i=0; i < sizeof(names) / sizeof(names[0]); i++) {
+    if (strcmp(attrname, names[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* Check if attrname is a standard Pajek edge attribute. */
+static igraph_bool_t is_standard_eattr(const char *attrname) {
+  const char *names[] = {
+    "weight", 
+    "arrowsize", "edgewidth", "hook1", "hook2",
+    "angle1", "angle2", "velocity1", "velocity2",
+    "arrowpos", "labelpos", "labelangle",
+    "labelangle2", "labeldegree", "fontsize",
+    "arrowtype", "linepattern", "label", "labelcolor",
+    "color"
+  };
+  for (size_t i=0; i < sizeof(names) / sizeof(names[0]); i++) {
+    if (strcmp(attrname, names[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* Add a _ character at the end of an attribute name to avoid conflict
+ * with standard Pajek attributes. */
+static igraph_error_t deconflict_attrname(char **attrname) {
+  size_t len = strlen(*attrname);
+  char *tmp = IGRAPH_REALLOC(*attrname, len+2, char);
+  IGRAPH_CHECK_OOM(tmp, "Out of memory while parsing Pajek file.");
+  tmp[len] = '_';
+  tmp[len+1] = '\0';
+  *attrname = tmp;
   return IGRAPH_SUCCESS;
 }
