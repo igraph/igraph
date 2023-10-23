@@ -522,8 +522,9 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
  * \function igraph_construct_jdm
  * \brief Constructs a joint degree matrix.
  *
- * The joint degree matrix of a graph contains the number of edges between vertices of degree i and degree j for every
- * (i, j). The function populates a joint degree matrix and works on directed and undirected graphs.
+ * The joint degree matrix of a graph contains the number of edges, or the sum of the weights, between vertices of
+ * degree i and degree j for every (i, j). The function populates a joint degree matrix and works on directed
+ * and undirected graphs.
  *
  * \param graph A pointer to an initialized graph object.
  * \param m A pointer to a zero initialized integer matrix that will be resized. The values will be written here.
@@ -531,6 +532,8 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
  *        resized do dimensions (\p dout, \p din).
  * \param din An integer for the dimension of the matrix. If \p dout and \p din are greater than 0, the matrix will be
  *        resized do dimensions (\p dout, \p din).
+ * \param weights An initialized integer vector containing the weights of the edges. NULL if the JDM should sum
+ *        the number of edges rather than sum up the weights.
  * \return Error code.
  *
  * Time complexity: O(E),
@@ -550,12 +553,6 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
     igraph_integer_t v2id;
     igraph_integer_t v1deg;
     igraph_integer_t v2deg;
-//    igraph_integer_t max_degree;
-//    igraph_integer_t max_out_degree;
-//    igraph_integer_t max_in_degree;
-//    igraph_vector_int_t degrees;
-//    igraph_vector_int_t out_degrees;
-//    igraph_vector_int_t in_degrees;
     igraph_bool_t is_directed;
 
     is_directed = igraph_is_directed(graph);
@@ -607,8 +604,6 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
             v1deg = igraph_vector_int_get(&out_degrees,v1id);
             v2deg = igraph_vector_int_get(&in_degrees, v2id);
             // If the graph is directed, i: out_degree, j: in_degree
-            // Add weights, weights ? weights[eid] : 1;
-            // Closeness.c for example = compare len weights to the len of edges
             if (!weights) {
                 MATRIX(*m, v1deg-1, v2deg-1)++;
             } else {
@@ -660,63 +655,8 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         igraph_vector_int_destroy(&degrees);
     }
         // TODO: Consider loops - note in docs that it counts self loops only once (i=j) change loops to true
-//    if (dout > 0 && din > 0) {
-//        IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
-//    } else {
-//        if (is_directed) {
-//            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_out_degree, max_in_degree));
-//        } else {
-//            IGRAPH_CHECK(igraph_matrix_int_resize(m, max_degree, max_degree));
-//        }
-//    }
-
-    // Set all elements to 0
-//    igraph_matrix_int_null(m);
-//
-//    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
-//    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
-
-//    if (is_directed) {
-//        while (!IGRAPH_EIT_END(eit)) {
-//            eid = IGRAPH_EIT_GET(eit);
-//            v1id = IGRAPH_FROM(graph, eid);
-//            v2id = IGRAPH_TO(graph, eid);
-//            v1deg = igraph_vector_int_get(&out_degrees,v1id);
-//            v2deg = igraph_vector_int_get(&in_degrees, v2id);
-//            // If the graph is directed, i: out_degree, j: in_degree
-//            // Add weights, weights ? weights[eid] : 1;
-//            // Closeness.c for example = compare len weights to the len of edges
-//            if (!weights) {
-//                MATRIX(*m, v1deg-1, v2deg-1)++;
-//            } else {
-//                MATRIX(*m, v1deg-1, v2deg-1) += VECTOR(*weights)[eid];
-//            }
-//            IGRAPH_EIT_NEXT(eit);
-//        }
-//    } else {
-//        while (!IGRAPH_EIT_END(eit)) {
-//            eid = IGRAPH_EIT_GET(eit);
-//            v1id = IGRAPH_FROM(graph, eid);
-//            v2id = IGRAPH_TO(graph, eid);
-//            v1deg = igraph_vector_int_get(&degrees, v1id);
-//            v2deg = igraph_vector_int_get(&degrees, v2id);
-//            // If the graph is undirected, it is symmetrical and the sum of the entire matrix is 2x the number of edges
-//            if (!weights) {
-//                MATRIX(*m, v1deg-1, v2deg-1)++;
-//                MATRIX(*m, v2deg-1, v1deg-1)++;
-//            } else {
-//                MATRIX(*m, v1deg-1, v2deg-1) += VECTOR(*weights)[eid];
-//                MATRIX(*m, v2deg-1, v1deg-1) += VECTOR(*weights)[eid];
-//            }
-//
-//            IGRAPH_EIT_NEXT(eit);
-//        }
-//    }
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);
-//    igraph_vector_int_destroy(&degrees);
-//    igraph_vector_int_destroy(&out_degrees);
-//    igraph_vector_int_destroy(&in_degrees);
 
     return IGRAPH_SUCCESS;
 }
