@@ -578,11 +578,11 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     if (bipartite) {
         if (fprintf(outstream, "*Vertices %" IGRAPH_PRId " %" IGRAPH_PRId "%s", no_of_nodes, nobottom,
                     newline) < 0) {
-            IGRAPH_ERROR("Cannot write pajek file", IGRAPH_EFILE);
+            IGRAPH_ERROR("Cannot write pajek file.", IGRAPH_EFILE);
         }
     } else {
         if (fprintf(outstream, "*Vertices %" IGRAPH_PRId "%s", no_of_nodes, newline) < 0) {
-            IGRAPH_ERROR("Cannot write pajek file", IGRAPH_EFILE);
+            IGRAPH_ERROR("Cannot write pajek file.", IGRAPH_EFILE);
         }
     }
 
