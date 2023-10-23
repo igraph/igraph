@@ -187,7 +187,7 @@ static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len);
 input: nethead vertices edgeblock final_newlines {
   if (context->vcount2 > 0) { igraph_i_pajek_check_bipartite(context); }
   if (! context->eof) {
-    /* In Pajek files, an empty lines after *Vertices signified the end of network data.
+    /* In Pajek files, an empty line after *Vertices signifies the end of the network data.
      * If there is more data after one or more empty lines, we warn the user, as this
      * may indicate file corruption, for example a stray empty lines before *Edges. */
     IGRAPH_WARNINGF("Empty line encountered, ignoring rest of file after line %d.", @4.first_line);
@@ -564,7 +564,7 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
                                          igraph_vector_ptr_t *attrs,
                                          igraph_integer_t count,
                                          const char *attrname,
-                                         igraph_integer_t vid,
+                                         igraph_integer_t elem_id,
                                          igraph_real_t number) {
   igraph_integer_t attrsize = igraph_trie_size(names);
   igraph_integer_t id;
@@ -574,40 +574,39 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
     /* add a new attribute */
-    rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    if (! rec) {
-        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+    rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
+    IGRAPH_CHECK_OOM(rec, "Out of memory while parsing Pajek file.");
     IGRAPH_FINALLY(igraph_free, rec);
-    na=IGRAPH_CALLOC(1, igraph_vector_t);
-    if (! na) {
-        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    na = IGRAPH_CALLOC(1, igraph_vector_t);
+    IGRAPH_CHECK_OOM(na, "Out of memory while parsing Pajek file.");
     IGRAPH_FINALLY(igraph_free, na);
     IGRAPH_VECTOR_INIT_FINALLY(na, count);
-    rec->name=strdup(attrname);
-    if (! rec->name) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    rec->name = strdup(attrname);
+    IGRAPH_CHECK_OOM(rec->name, "Out of memory while parsing Pajek file.");
     IGRAPH_FINALLY(igraph_free, (void *) rec->name);
-    rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
-    rec->value=na;
+
+    rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
+    rec->value = na;
+
     IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
     IGRAPH_FINALLY_CLEAN(4); /* ownership of rec transferred to attrs */
   }
-  rec=VECTOR(*attrs)[id];
-  na=(igraph_vector_t*)rec->value;
-  if (igraph_vector_size(na) == vid) {
+
+  rec = VECTOR(*attrs)[id];
+  na = (igraph_vector_t *) rec->value;
+  if (igraph_vector_size(na) == elem_id) {
     IGRAPH_CHECK(igraph_vector_push_back(na, number));
-  } else if (igraph_vector_size(na) < vid) {
+  } else if (igraph_vector_size(na) < elem_id) {
     igraph_integer_t origsize=igraph_vector_size(na);
-    IGRAPH_CHECK(igraph_vector_resize(na, vid+1));
+    IGRAPH_CHECK(igraph_vector_resize(na, elem_id+1));
     for (;origsize<count; origsize++) {
       VECTOR(*na)[origsize] = IGRAPH_NAN;
     }
-    VECTOR(*na)[vid] = number;
+    VECTOR(*na)[elem_id] = number;
   } else {
-    VECTOR(*na)[vid] = number;
+    VECTOR(*na)[elem_id] = number;
   }
 
   return IGRAPH_SUCCESS;
@@ -617,7 +616,7 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
 
 static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len) {
   *dest = strndup(src, len);
-  IGRAPH_CHECK_OOM(*dest, "Insufficient memory to ead Pajek file.");
+  IGRAPH_CHECK_OOM(*dest, "Out of memory while parsing Pajek file.");
   return IGRAPH_SUCCESS;
 }
 
@@ -625,7 +624,7 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                                    igraph_vector_ptr_t *attrs,
                                                    igraph_integer_t count,
                                                    const char *attrname,
-                                                   igraph_integer_t vid,
+                                                   igraph_integer_t elem_id,
                                                    const char *str,
                                                    igraph_integer_t str_len) {
   igraph_integer_t attrsize=igraph_trie_size(names);
@@ -636,33 +635,32 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
     /* add a new attribute */
-    rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    if (! rec) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+    rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
+    IGRAPH_CHECK_OOM(rec, "Out of memory while parsing Pajek file.");
     IGRAPH_FINALLY(igraph_free, rec);
-    na=IGRAPH_CALLOC(1, igraph_strvector_t);
-    if (! na) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    na = IGRAPH_CALLOC(1, igraph_strvector_t);
+    IGRAPH_CHECK_OOM(na, "Out of memory while parsing Pajek file.");
     IGRAPH_FINALLY(igraph_free, na);
     IGRAPH_STRVECTOR_INIT_FINALLY(na, count);
-    rec->name=strdup(attrname);
-    if (! rec->name) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    rec->name = strdup(attrname);
+    IGRAPH_CHECK_OOM(rec->name, "Out of memory while parsing Pajek file.");
     IGRAPH_FINALLY(igraph_free, (char *) rec->name);
-    rec->type=IGRAPH_ATTRIBUTE_STRING;
-    rec->value=na;
+
+    rec->type = IGRAPH_ATTRIBUTE_STRING;
+    rec->value = na;
+
     IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
     IGRAPH_FINALLY_CLEAN(4); /* ownership of rec transferred to attrs */
   }
-  rec=VECTOR(*attrs)[id];
-  na=(igraph_strvector_t*)rec->value;
-  if (igraph_strvector_size(na) <= vid) {
-    IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
+
+  rec = VECTOR(*attrs)[id];
+  na = (igraph_strvector_t *) rec->value;
+  if (igraph_strvector_size(na) <= elem_id) {
+    IGRAPH_CHECK(igraph_strvector_resize(na, elem_id+1));
   }
-  IGRAPH_CHECK(igraph_strvector_set_len(na, vid, str, str_len));
+  IGRAPH_CHECK(igraph_strvector_set_len(na, elem_id, str, str_len));
 
   return IGRAPH_SUCCESS;
 }
@@ -671,7 +669,6 @@ static igraph_error_t igraph_i_pajek_add_string_vertex_attribute(const char *nam
                                                const char *value,
                                                size_t len,
                                                igraph_i_pajek_parsedata_t *context) {
-
 
   return igraph_i_pajek_add_string_attribute(context->vertex_attribute_names,
                                              context->vertex_attributes,
@@ -696,7 +693,7 @@ static igraph_error_t igraph_i_pajek_add_numeric_vertex_attribute(const char *na
                                                 igraph_real_t value,
                                                 igraph_i_pajek_parsedata_t *context) {
 
-  return     igraph_i_pajek_add_numeric_attribute(context->vertex_attribute_names,
+  return igraph_i_pajek_add_numeric_attribute(context->vertex_attribute_names,
                                                   context->vertex_attributes,
                                                   context->vcount,
                                                   name, context->actvertex-1,
@@ -719,7 +716,7 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
   const char *attrname="type";
   igraph_trie_t *names=context->vertex_attribute_names;
   igraph_vector_ptr_t *attrs=context->vertex_attributes;
-  igraph_integer_t i, n=context->vcount, n1=context->vcount2;
+  igraph_integer_t n=context->vcount, n1=context->vcount2;
   igraph_integer_t attrid, attrsize = igraph_trie_size(names);
   igraph_attribute_record_t *rec;
   igraph_vector_bool_t *na;
@@ -730,36 +727,35 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
   }
 
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &attrid));
+
   /* It should not be possible for the "type" attribute to be already
    * present at this point. */
   IGRAPH_ASSERT(attrid == attrsize);
 
   /* add a new attribute */
-  rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
-  if (! rec) {
-    IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-  }
+  rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
+  IGRAPH_CHECK_OOM(rec, "Out of memory while parsing Pajek file.");
   IGRAPH_FINALLY(igraph_free, rec);
-  na=IGRAPH_CALLOC(1, igraph_vector_bool_t);
-  if (! na) {
-    IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-  }
+
+  na = IGRAPH_CALLOC(1, igraph_vector_bool_t);
+  IGRAPH_CHECK_OOM(na, "Out of memory while parsing Pajek file.");
   IGRAPH_FINALLY(igraph_free, na);
   IGRAPH_VECTOR_BOOL_INIT_FINALLY(na, n);
-  rec->name=strdup(attrname);
-  if (! rec->name) {
-    IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-  }
+
+  rec->name = strdup(attrname);
+  IGRAPH_CHECK_OOM(rec->name, "Out of memory while parsing Pajek file.");
   IGRAPH_FINALLY(igraph_free, (char *) rec->name);
-  rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
-  rec->value=na;
+
+  rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
+  rec->value = na;
+
   IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
   IGRAPH_FINALLY_CLEAN(4); /* ownership of 'rec' transferred to 'attrs' */
 
-  for (i=0; i<n1; i++) {
+  for (igraph_integer_t i=0; i<n1; i++) {
     VECTOR(*na)[i] = 0;
   }
-  for (i=n1; i<n; i++) {
+  for (igraph_integer_t i=n1; i<n; i++) {
     VECTOR(*na)[i] = 1;
   }
 
@@ -768,10 +764,10 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
 
 static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
   const igraph_vector_int_t *edges=context->vector;
-  igraph_integer_t i, n1=context->vcount2;
+  igraph_integer_t n1=context->vcount2;
   igraph_integer_t ne=igraph_vector_int_size(edges);
 
-  for (i=0; i<ne; i+=2) {
+  for (igraph_integer_t i=0; i<ne; i+=2) {
     igraph_integer_t v1 = VECTOR(*edges)[i];
     igraph_integer_t v2 = VECTOR(*edges)[i+1];
     if ( (v1 < n1 && v2 < n1) || (v1 > n1 && v2 > n1) ) {
