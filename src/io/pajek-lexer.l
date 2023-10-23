@@ -125,7 +125,8 @@ any         {any_no_star}|\*
 
 {newline}          { yy_set_bol(true); return NEWLINE; }
 
-\"[^\"\0]*\"       { return QSTR; }
+ /* Newlines not allowed in strings. */
+\"[^\"\0\n\r]*\"   { return QSTR; }
 
 (\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 
