@@ -127,7 +127,9 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  *
  * </para><para>
  * Unknown vertex or edge parameters are read as string vertex
- * or edge attributes.
+ * or edge attributes. If the parameter name conflicts with one
+ * the standard attribute names mentioned above, a <code>_</code>
+ * character is appended to it to avoid conflict.
  *
  * </para><para>
  * In addition the following vertex attributes might be added: \c id
