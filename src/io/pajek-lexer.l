@@ -82,10 +82,10 @@ digit [0-9]
    after *Vertices" convention. */
 newline (\n|\r|\r\n|\n\r) 
 
-/* Anything except non-printable (00-1F), space (20), del (7F) and '*'. */
-word [^\x00-\x20\x7f*]
+/* Anything except non-printable (00-1F), space (20), del (7F), '"' and '*'. */
+word [^\x00-\x20\x7f"*]
 
-any_no_star {word}|{whitespace}
+any_no_star {word}|\"|{whitespace}
 any         {any_no_star}|\*
 
 /* 'unknown' skips text at the beginning of the file, lines below an unknown *Word
