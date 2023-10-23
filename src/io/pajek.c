@@ -76,11 +76,10 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * \function igraph_read_graph_pajek
  * \brief Reads a file in Pajek format.
  *
- * </para><para>
  * Only a subset of the Pajek format is implemented. This is partially
- * because this format is not very well documented, but also because
+ * because this format is not fully documented, but also because
  * <command>igraph</command> does not support some Pajek features, like
- * multigraphs.
+ * mixed graphs.
  *
  * </para><para>
  * Starting from version 0.6.1 igraph reads bipartite (two-mode)
@@ -92,45 +91,43 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * The list of the current limitations:
  * \olist
  * \oli Only <filename>.net</filename> files are supported, Pajek
- * project files (<filename>.paj</filename>) are not. These might be
- * supported in the future if there is need for it.
+ * project files (<filename>.paj</filename>) are not.
  * \oli Time events networks are not supported.
  * \oli Hypergraphs (i.e. graphs with non-binary edges) are not
  * supported.
  * \oli Graphs with both directed and non-directed edges are not
- * supported, are they cannot be represented in
- * <command>igraph</command>.
- * \oli Only Pajek networks are supported, permutations, hierarchies,
+ * supported, as they cannot be represented in <command>igraph</command>.
+ * \oli Only Pajek networks are supported; permutations, hierarchies,
  * clusters and vectors are not.
  * \oli Graphs with multiple edge sets are not supported.
  * \endolist
  *
  * </para><para>
- * If there are attribute handlers installed,
+ * If an attribute handler is installed,
  * <command>igraph</command> also reads the vertex and edge attributes
  * from the file. Most attributes are renamed to be more informative:
  * \c color instead of \c c, \c xfact instead of \c x_fact,
  * \c yfact instead of y_fact, \c labeldist instead of \c lr,
  * \c labeldegree2 instead of \c lphi, \c framewidth instead of \c bw,
- * \c fontsize
- * instead of \c fos, \c rotation instead of \c phi, \c radius instead
- * of \c r,
- * \c diamondratio instead of \c q, \c labeldegree instead of \c la,
- * \c vertexsize
- * instead of \c size, \c color instead of \c ic, \c framecolor instead of
- * \c bc, \c labelcolor instead of \c lc, these belong to vertices.
+ * \c fontsize instead of \c fos, \c rotation instead of \c phi,
+ * \c radius instead of \c r, \c diamondratio instead of \c q,
+ * \c labeldegree instead of \c la, \c vertexsize instead of \c size,
+ * \c color instead of \c ic, \c framecolor instead of \c bc,
+ * \c labelcolor instead of \c lc; these belong to vertices.
  *
  * </para><para>
- * Edge attributes are also renamed, \c s to \c arrowsize, \c w
- * to \c edgewidth, \c h1 to \c hook1, \c h2 to \c hook2,
+ * Edge attributes are also renamed, \c s to \c arrowsize,
+ * \c w to \c edgewidth, \c h1 to \c hook1, \c h2 to \c hook2,
  * \c a1 to \c angle1, \c a2 to \c angle2, \c k1 to
- * \c velocity1, \c k2 to \c velocity2, \c ap to \c
- * arrowpos, \c lp to \c labelpos, \c lr to
- * \c labelangle, \c lphi to \c labelangle2, \c la to \c
- * labeldegree, \c fos to
- * \c fontsize, \c a to \c arrowtype, \c p to \c
- * linepattern, \c l to \c label, \c lc to
- * \c labelcolor, \c c to \c color.
+ * \c velocity1, \c k2 to \c velocity2, \c ap to \c arrowpos,
+ * \c lp to \c labelpos, \c lr to \c labelangle,
+ * \c lphi to \c labelangle2, \c la to \c labeldegree,
+ * \c fos to \c fontsize, \c a to \c arrowtype, \c p to \c linepattern,
+ * \c l to \c label, \c lc to \c labelcolor, \c c to \c color.
+ *
+ * </para><para>
+ * Unknown vertex or edge parameters are read as string vertex
+ * or edge attributes.
  *
  * </para><para>
  * In addition the following vertex attributes might be added: \c id
@@ -141,11 +138,12 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * added if there are edge weights present.
  *
  * </para><para>
- * See the pajek homepage:
+ * See the Pajek homepage:
  * http://vlado.fmf.uni-lj.si/pub/networks/pajek/ for more info on
- * Pajek and the Pajek manual:
- * http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf for
- * information on the Pajek file format.
+ * Pajek. The Pajek manual,
+ * http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf,
+ * and http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm
+ * have information on the Pajek file format.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param file An already opened file handler.
