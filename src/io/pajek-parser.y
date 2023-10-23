@@ -94,6 +94,8 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
 static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
 
+static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len);
+
 #define scanner context->scanner
 
 %}
@@ -117,7 +119,7 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
   } string;
 }
 
-%type <intnum>   longint;
+%type <intnum>   integer;
 %type <intnum>   arcfrom;
 %type <intnum>   arcto;
 %type <intnum>   edgefrom;
@@ -132,9 +134,7 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
 %token NUM           "number"
 %token ALNUM
 %token QSTR
-%token PSTR
 %token NETWORKLINE   "*network line"
-%token NET_TITLE
 %token VERTICESLINE  "*vertices line"
 %token ARCSLINE      "*arcs line"
 %token EDGESLINE     "*edges line"
@@ -184,15 +184,24 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
 
 %%
 
-input: nethead vertices edgeblock {
+input: nethead vertices edgeblock final_newlines {
   if (context->vcount2 > 0) { igraph_i_pajek_check_bipartite(context); }
+  if (! context->eof) {
+    /* In Pajek files, an empty lines after *Vertices signified the end of network data.
+     * If there is more data after one or more empty lines, we warn the user, as this
+     * may indicate file corruption, for example a stray empty lines before *Edges. */
+    IGRAPH_WARNINGF("Empty line encountered, ignoring rest of file after line %d.", @4.first_line);
+  }
+  YYACCEPT; /* stop parsing even if there is more data in the file. */
  };
 
-nethead: /* empty */ | NETWORKLINE NEWLINE | NETWORKLINE NET_TITLE NEWLINE ;
+final_newlines: /* empty */ | NEWLINE final_newlines ;
+
+nethead: /* empty */ | NETWORKLINE ;
 
 vertices: verticeshead NEWLINE vertdefs;
 
-verticeshead: VERTICESLINE longint {
+verticeshead: VERTICESLINE integer {
   context->vcount=$2;
   context->vcount2=0;
   if (context->vcount < 0) {
@@ -202,7 +211,7 @@ verticeshead: VERTICESLINE longint {
     IGRAPH_YY_ERRORF("Vertex count too large in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount);
   }
             }
-            | VERTICESLINE longint longint {
+            | VERTICESLINE integer integer {
   context->vcount=$2;
   context->vcount2=$3;
   if (context->vcount < 0) {
@@ -222,8 +231,7 @@ verticeshead: VERTICESLINE longint {
 
 vertdefs: /* empty */  | vertdefs vertexline;
 
-vertexline: NEWLINE |
-            vertex NEWLINE |
+vertexline: vertex NEWLINE |
             vertex {
               context->actvertex=$1;
               if (context->actvertex < 1 || context->actvertex > context->vcount) {
@@ -235,7 +243,7 @@ vertexline: NEWLINE |
             } vertexid vertexcoords shape params NEWLINE { }
 ;
 
-vertex: longint { $$=$1; };
+vertex: integer { $$=$1; };
 
 vertexid: word {
   IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("id", $1.str, $1.len, context));
@@ -266,21 +274,6 @@ param:
        }
      | VP_Y_FACT number {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("yfact", $2, context));
-       }
-     | VP_IC number number number { /* RGB color */
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("color-red", $2, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("color-green", $3, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("color-blue", $4, context));
-       }
-     | VP_BC number number number {
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("framecolor-red", $2, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("framecolor-green", $3, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("framecolor-blue", $4, context));
-       }
-     | VP_LC number number number {
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labelcolor-red", $2, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labelcolor-green", $3, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labelcolor-blue", $4, context));
        }
      | VP_LR number {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labeldist", $2, context));
@@ -328,19 +321,27 @@ vpword: VP_FONT vpwordpar {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("labelcolor",
                                                     $2.str, $2.len, context));
      }
+     | word vpwordpar {
+         char *attrname;
+         IGRAPH_YY_CHECK(dupl_str_len(&attrname, $1.str, $1.len));
+         IGRAPH_FINALLY(igraph_free, attrname);
+         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute(
+           attrname, $2.str, $2.len, context));
+         IGRAPH_FREE(attrname);
+         IGRAPH_FINALLY_CLEAN(1);
+     }
 ;
 
 vpwordpar: word { $$=$1; };
 
 edgeblock: /* empty */ | edgeblock arcs | edgeblock edges | edgeblock arcslist | edgeblock edgeslist | edgeblock adjmatrix;
 
-arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=1; }
-      | ARCSLINE number NEWLINE arcsdefs { context->directed=1; };
+arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=true; }
+      | ARCSLINE number NEWLINE arcsdefs { context->directed=true; };
 
 arcsdefs: /* empty */ | arcsdefs arcsline;
 
-arcsline: NEWLINE |
-          arcfrom arcto { context->actedge++; } weight edgeparams NEWLINE  {
+arcsline: arcfrom arcto { context->actedge++; } weight edgeparams NEWLINE  {
   if ($1 < 1) {
       IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
   }
@@ -351,17 +352,16 @@ arcsline: NEWLINE |
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;
 
-arcfrom: longint;
+arcfrom: integer;
 
-arcto: longint;
+arcto: integer;
 
 edges:   EDGESLINE NEWLINE edgesdefs { context->directed=0; }
        | EDGESLINE number NEWLINE edgesdefs { context->directed=0; }
 
 edgesdefs: /* empty */ | edgesdefs edgesline;
 
-edgesline: NEWLINE |
-          edgefrom edgeto { context->actedge++; } weight edgeparams NEWLINE {
+edgesline: edgefrom edgeto { context->actedge++; } weight edgeparams NEWLINE {
   if ($1 < 1) {
       IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
   }
@@ -372,9 +372,9 @@ edgesline: NEWLINE |
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;
 
-edgefrom: longint;
+edgefrom: integer;
 
-edgeto: longint;
+edgeto: integer;
 
 weight: /* empty */ | number {
   IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context));
@@ -384,11 +384,6 @@ edgeparams: /* empty */ | edgeparams edgeparam;
 
 edgeparam:
      epword
-   | EP_C number number number {
-       IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("color-red", $2, context));
-       IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("color-green", $3, context));
-       IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("color-blue", $4, context));
-   }
    | EP_S number {
        IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("arrowsize", $2, context));
    }
@@ -451,6 +446,15 @@ epword: EP_A epwordpar {
     | EP_C epwordpar {
       IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("color", $2.str, $2.len, context));
     }
+    | word epwordpar {
+        char *attrname;
+        IGRAPH_YY_CHECK(dupl_str_len(&attrname, $1.str, $1.len));
+        IGRAPH_FINALLY(igraph_free, attrname);
+        IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute(
+           attrname, $2.str, $2.len, context));
+        IGRAPH_FREE(attrname);
+        IGRAPH_FINALLY_CLEAN(1);
+     }
 ;
 
 epwordpar: word { $$=$1; };
@@ -459,13 +463,13 @@ arcslist: ARCSLISTLINE NEWLINE arcslistlines { context->directed=1; };
 
 arcslistlines: /* empty */ | arcslistlines arclistline;
 
-arclistline: NEWLINE | arclistfrom arctolist NEWLINE;
+arclistline: arclistfrom arctolist NEWLINE;
 
 arctolist: /* empty */ | arctolist arclistto;
 
-arclistfrom: longint { context->actfrom=labs($1)-1; };
+arclistfrom: integer { context->actfrom=labs($1)-1; };
 
-arclistto: longint {
+arclistto: integer {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
 };
@@ -474,13 +478,13 @@ edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
 
 edgelistlines: /* empty */ | edgelistlines edgelistline;
 
-edgelistline: NEWLINE | edgelistfrom edgetolist NEWLINE;
+edgelistline: edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
-edgelistfrom: longint { context->actfrom=labs($1)-1; };
+edgelistfrom: integer { context->actfrom=labs($1)-1; };
 
-edgelistto: longint {
+edgelistto: integer {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
 };
@@ -520,7 +524,7 @@ adjmatrixentry: number {
 
 /* -----------------------------------------------------*/
 
-longint: NUM {
+integer: NUM {
   igraph_integer_t val;
   IGRAPH_YY_CHECK(igraph_i_parse_integer(igraph_pajek_yyget_text(scanner),
                                          igraph_pajek_yyget_leng(scanner),
@@ -610,6 +614,12 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
 }
 
 /* TODO: NA's */
+
+static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len) {
+  *dest = strndup(src, len);
+  IGRAPH_CHECK_OOM(*dest, "Insufficient memory to ead Pajek file.");
+  return IGRAPH_SUCCESS;
+}
 
 static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                                    igraph_vector_ptr_t *attrs,
