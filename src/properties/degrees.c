@@ -524,7 +524,7 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
  *
  * The joint degree matrix of a graph contains the number of edges, or the sum of the weights, between vertices of
  * degree i and degree j for every (i, j). The function populates a joint degree matrix and works on directed
- * and undirected graphs.
+ * and undirected graphs. Self loops are only counted once.
  *
  * \param graph A pointer to an initialized graph object.
  * \param m A pointer to a zero initialized integer matrix that will be resized. The values will be written here.
@@ -581,10 +581,10 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         // Compute max degrees
         IGRAPH_CHECK(igraph_vector_int_init(&out_degrees, 0));
         IGRAPH_CHECK(igraph_vector_int_init(&in_degrees, 0));
-        IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, false));
-        IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, false));
-        IGRAPH_CHECK(igraph_maxdegree(graph, &max_out_degree, igraph_vss_all(), IGRAPH_OUT, false));
-        IGRAPH_CHECK(igraph_maxdegree(graph, &max_in_degree, igraph_vss_all(), IGRAPH_IN, false));
+        IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, true));
+        IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, true));
+        IGRAPH_CHECK(igraph_maxdegree(graph, &max_out_degree, igraph_vss_all(), IGRAPH_OUT, true));
+        IGRAPH_CHECK(igraph_maxdegree(graph, &max_in_degree, igraph_vss_all(), IGRAPH_IN, true));
 
         if (dout > 0 && din > 0) {
             IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
@@ -620,9 +620,8 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         igraph_integer_t max_degree;
         // Compute max degrees
         IGRAPH_CHECK(igraph_vector_int_init(&degrees, 0));
-        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false));
-        IGRAPH_CHECK(igraph_maxdegree(graph, &max_degree, igraph_vss_all(), IGRAPH_ALL, false));
-
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
+        IGRAPH_CHECK(igraph_maxdegree(graph, &max_degree, igraph_vss_all(), IGRAPH_ALL, true));
         if (dout > 0 && din > 0) {
             IGRAPH_CHECK(igraph_matrix_int_resize(m, dout, din));
         } else {
@@ -640,6 +639,9 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
             v2id = IGRAPH_TO(graph, eid);
             v1deg = igraph_vector_int_get(&degrees, v1id);
             v2deg = igraph_vector_int_get(&degrees, v2id);
+            if (v1id == v2id) {
+                printf("loop v deg: %d\n", (int)v1deg);
+            }
             // If the graph is undirected, it is symmetrical and the sum of the entire matrix is 2x the number of edges
             if (!weights) {
                 MATRIX(*m, v1deg - 1, v2deg - 1)++;
@@ -654,7 +656,6 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
 
         igraph_vector_int_destroy(&degrees);
     }
-        // TODO: Consider loops - note in docs that it counts self loops only once (i=j) change loops to true
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);
 
