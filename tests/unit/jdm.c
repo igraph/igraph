@@ -21,7 +21,6 @@
 
 void print_and_destroy(igraph_t* g, igraph_matrix_int_t* jdm, igraph_vector_int_t* weights) {
       igraph_matrix_int_print(jdm);
-      printf("\n");
 
       igraph_destroy(g);
       igraph_matrix_int_destroy(jdm);
@@ -31,7 +30,6 @@ void print_and_destroy(igraph_t* g, igraph_matrix_int_t* jdm, igraph_vector_int_
 }
 
 int main (void) {
-    // TODO: output file
     igraph_t g;
     igraph_matrix_int_t jdm;
     igraph_vector_int_t weights;
