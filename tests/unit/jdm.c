@@ -19,17 +19,19 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void print_and_destroy(igraph_t* g, igraph_matrix_int_t* jdm) {
+void print_and_destroy(igraph_t* g, igraph_matrix_int_t* jdm, igraph_vector_int_t* weights) {
       igraph_matrix_int_print(jdm);
       printf("\n");
 
       igraph_destroy(g);
       igraph_matrix_int_destroy(jdm);
+      if (weights) {
+          igraph_vector_int_destroy(weights);
+      }
 }
 
 int main (void) {
-    // TODO: Structure tests and output file
-    // Structures that need to be destroyed
+    // TODO: output file
     igraph_t g;
     igraph_matrix_int_t jdm;
     igraph_vector_int_t weights;
@@ -38,8 +40,7 @@ int main (void) {
     igraph_small(&g, 0, false, -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, -1, 0, NULL);
-//    igraph_matrix_int_print(&jdm);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Simple, undirected graph\n");
     igraph_small(&g, 5, false,
@@ -50,7 +51,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, -1, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Simple, directed graph\n");
     igraph_small(&g, 5, true,
@@ -61,7 +62,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected, self-loops, no multiedges\n");
     igraph_small(&g, 5, false,
@@ -72,7 +73,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed, self-loops, no multiedges\n");
     igraph_small(&g, 5, true,
@@ -83,7 +84,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected multigraph, no self-loops\n");
     igraph_small(&g, 5, false,
@@ -94,7 +95,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed multigraph, no self-loops\n");
     igraph_small(&g, 5, true,
@@ -105,7 +106,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected multigraph with self-loops\n");
     igraph_small(&g, 5, false,
@@ -116,7 +117,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed multigraph with self-loops\n");
     igraph_small(&g, 5, true,
@@ -127,13 +128,104 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
-    // TODO: Weights tests
-    // Initialize weight vector
-    igraph_vector_int_init(&weights, 0);
-    igraph_vector_int_print(&weights);
+    // Weight tests
+    printf("Weighted, simple, undirected graph\n");
+    igraph_small(&g, 5, false,
+                 0, 1, 0, 2, 0, 4,
+                 1, 4,
+                 2, 3, 2, 4,
+                 3, 4,
+                 -1);
+    igraph_vector_int_init_range(&weights, -1,6);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, -1, &weights);
+    print_and_destroy(&g, &jdm, &weights);
 
+    printf("Weighted, simple, directed graph\n");
+    igraph_small(&g, 5, true,
+                 0, 1, 0, 2, 0, 4,
+                 1, 0,
+                 3, 2, 3, 4,
+                 4, 0, 4, 1, 4, 2, 4, 3,
+                 -1);
+    igraph_vector_int_init_range(&weights, -2,8);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
+    print_and_destroy(&g, &jdm, &weights);
+
+    printf("Weighted, undirected, self-loops, no multiedges\n");
+    igraph_small(&g, 5, false,
+                 0, 1, 0, 2, 0, 4,
+                 1, 1, 1, 4,
+                 2, 3, 2, 4,
+                 3, 4,
+                 -1);
+    igraph_vector_int_init_range(&weights, 1,9);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
+    print_and_destroy(&g, &jdm, &weights);
+
+    printf("Weighted, directed, self-loops, no multiedges\n");
+    igraph_small(&g, 5, true,
+                 0, 1, 0, 2, 0, 4,
+                 1, 1, 1, 0,
+                 3, 2, 3, 4,
+                 4, 0, 4, 1, 4, 2, 4, 3,
+                 -1);
+    igraph_vector_int_init_range(&weights, 1,12);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
+    print_and_destroy(&g, &jdm, &weights);
+
+    printf("Weighted, undirected multigraph, no self-loops\n");
+    igraph_small(&g, 5, false,
+                 0, 1, 0, 2, 0, 4,
+                 1, 4, 1, 4,
+                 2, 3, 2, 4,
+                 3, 4,
+                 -1);
+    igraph_vector_int_init_range(&weights, 1,9);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
+    print_and_destroy(&g, &jdm, &weights);
+
+    printf("Weighted, directed multigraph, no self-loops\n");
+    igraph_small(&g, 5, true,
+                 0, 1, 0, 2, 0, 4,
+                 1, 0,
+                 3, 2, 3, 4,
+                 4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
+                 -1);
+    igraph_vector_int_init_range(&weights, 1,12);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
+    print_and_destroy(&g, &jdm, &weights);
+
+    printf("Weighted, undirected multigraph with self-loops\n");
+    igraph_small(&g, 5, false,
+                 0, 1, 0, 2, 0, 4,
+                 1, 1, 1, 4, 1, 4,
+                 2, 3, 2, 4,
+                 3, 4,
+                 -1);
+    igraph_vector_int_init_range(&weights, 1,10);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
+    print_and_destroy(&g, &jdm, &weights);
+
+    printf("Weighted, directed multigraph with self-loops\n");
+    igraph_small(&g, 5, true,
+                 0, 1, 0, 2, 0, 4,
+                 1, 1, 1, 0,
+                 3, 2, 3, 4,
+                 4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
+                 -1);
+    igraph_vector_int_init_range(&weights, 1,13);
+    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
+    print_and_destroy(&g, &jdm, &weights);
 
     // dout din tests
     // Directed
@@ -172,7 +264,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, -1, 2, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Valid dout and din\n");
     igraph_small(&g, 5, true,
@@ -183,7 +275,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 5, 5, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     // Undirected
     // Erroneous calls
@@ -221,7 +313,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, -1, -1, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     printf("Valid dout and din\n");
     igraph_small(&g, 5, false,
@@ -232,7 +324,7 @@ int main (void) {
                  -1);
     igraph_matrix_int_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 5, 5, NULL);
-    print_and_destroy(&g, &jdm);
+    print_and_destroy(&g, &jdm, NULL);
 
     // Clean up
     igraph_destroy(&g);
