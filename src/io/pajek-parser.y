@@ -135,15 +135,15 @@ static igraph_error_t deconflict_attrname(char **attrname);
 
 %token NEWLINE       "end of line"
 %token NUM           "number"
-%token ALNUM
-%token QSTR
-%token NETWORKLINE   "*network line"
-%token VERTICESLINE  "*vertices line"
-%token ARCSLINE      "*arcs line"
-%token EDGESLINE     "*edges line"
-%token ARCSLISTLINE  "*arcslist line"
-%token EDGESLISTLINE "*edgeslist line"
-%token MATRIXLINE    "*matrix line"
+%token ALNUM         "word"
+%token QSTR          "quoted string"
+%token NETWORKLINE   "*Network line"
+%token VERTICESLINE  "*Vertices line"
+%token ARCSLINE      "*Arcs line"
+%token EDGESLINE     "*Edges line"
+%token ARCSLISTLINE  "*Arcslist line"
+%token EDGESLISTLINE "*Edgeslist line"
+%token MATRIXLINE    "*Matrix line"
 %token END 0         "end of file" /* friendly name for $end */
 %token ERROR
 
@@ -590,16 +590,16 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
   if (id == attrsize) {
     /* add a new attribute */
     rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    IGRAPH_CHECK_OOM(rec, "Out of memory while parsing Pajek file.");
+    CHECK_OOM_RP(rec);
     IGRAPH_FINALLY(igraph_free, rec);
 
     na = IGRAPH_CALLOC(1, igraph_vector_t);
-    IGRAPH_CHECK_OOM(na, "Out of memory while parsing Pajek file.");
+    CHECK_OOM_RP(na);
     IGRAPH_FINALLY(igraph_free, na);
     IGRAPH_VECTOR_INIT_FINALLY(na, count);
 
     rec->name = strdup(attrname);
-    IGRAPH_CHECK_OOM(rec->name, "Out of memory while parsing Pajek file.");
+    CHECK_OOM_RP(rec->name);
     IGRAPH_FINALLY(igraph_free, (void *) rec->name);
 
     rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
@@ -631,7 +631,7 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
 
 static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len) {
   *dest = strndup(src, len);
-  IGRAPH_CHECK_OOM(*dest, "Out of memory while parsing Pajek file.");
+  CHECK_OOM_RP(*dest);
   return IGRAPH_SUCCESS;
 }
 
@@ -651,16 +651,16 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   if (id == attrsize) {
     /* add a new attribute */
     rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    IGRAPH_CHECK_OOM(rec, "Out of memory while parsing Pajek file.");
+    CHECK_OOM_RP(rec);
     IGRAPH_FINALLY(igraph_free, rec);
 
     na = IGRAPH_CALLOC(1, igraph_strvector_t);
-    IGRAPH_CHECK_OOM(na, "Out of memory while parsing Pajek file.");
+    CHECK_OOM_RP(na);
     IGRAPH_FINALLY(igraph_free, na);
     IGRAPH_STRVECTOR_INIT_FINALLY(na, count);
 
     rec->name = strdup(attrname);
-    IGRAPH_CHECK_OOM(rec->name, "Out of memory while parsing Pajek file.");
+    CHECK_OOM_RP(rec->name);
     IGRAPH_FINALLY(igraph_free, (char *) rec->name);
 
     rec->type = IGRAPH_ATTRIBUTE_STRING;
@@ -749,16 +749,16 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
 
   /* add a new attribute */
   rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-  IGRAPH_CHECK_OOM(rec, "Out of memory while parsing Pajek file.");
+  CHECK_OOM_RP(rec);
   IGRAPH_FINALLY(igraph_free, rec);
 
   na = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-  IGRAPH_CHECK_OOM(na, "Out of memory while parsing Pajek file.");
+  CHECK_OOM_RP(na);
   IGRAPH_FINALLY(igraph_free, na);
   IGRAPH_VECTOR_BOOL_INIT_FINALLY(na, n);
 
   rec->name = strdup(attrname);
-  IGRAPH_CHECK_OOM(rec->name, "Out of memory while parsing Pajek file.");
+  CHECK_OOM_RP(rec->name);
   IGRAPH_FINALLY(igraph_free, (char *) rec->name);
 
   rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
@@ -836,7 +836,7 @@ static igraph_bool_t is_standard_eattr(const char *attrname) {
 static igraph_error_t deconflict_attrname(char **attrname) {
   size_t len = strlen(*attrname);
   char *tmp = IGRAPH_REALLOC(*attrname, len+2, char);
-  IGRAPH_CHECK_OOM(tmp, "Out of memory while parsing Pajek file.");
+  CHECK_OOM_RP(tmp);
   tmp[len] = '_';
   tmp[len+1] = '\0';
   *attrname = tmp;

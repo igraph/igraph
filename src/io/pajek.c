@@ -274,6 +274,8 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     return IGRAPH_SUCCESS;
 }
 
+/***** Writing Pajek files *****/
+
 /* Order matters here! */
 #define V_ID                0
 #define V_X                 1
@@ -359,9 +361,7 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
          * have to be quoted as well.
          */
         *dest = IGRAPH_CALLOC(destlen + 3, char);
-        if (!*dest) {
-            IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        CHECK_OOM_WP(*dest);
 
         d = *dest;
         strcpy(d + 1, src);
@@ -371,9 +371,7 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     }
 
     *dest = IGRAPH_CALLOC(destlen + 3, char);
-    if (!*dest) {
-        IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    CHECK_OOM_WP(*dest);
 
     d = *dest;
     *d = '"'; d++;
