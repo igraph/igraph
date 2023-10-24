@@ -342,10 +342,7 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     const char *s;
     char *d;
     for (s = src; *s; s++, destlen++) {
-        if (*s == '\\') {
-            need_escape = true;
-            destlen++;
-        } else if (*s == '"') {
+        if (*s == '\\' || *s == '"' || *s == '\n' || *s == '\r') {
             need_escape = true;
             destlen++;
         } else if (!isalnum(*s)) {
@@ -383,6 +380,11 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
             *d = '\\'; d++;
             *d = *s;
             break;
+        /* Convert both CR and LF to "\n", as neither should apear in a quoted string. */
+        case '\n':
+        case '\r':
+            *d = '\\'; d++;
+            *d = 'n';
         default:
             *d = *s;
         }
