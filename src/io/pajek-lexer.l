@@ -52,6 +52,7 @@
 #define YY_EXTRA_TYPE igraph_i_pajek_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 #define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in Pajek parser: " # msg)
+#define YY_USER_INIT BEGIN(bom) /* we start in the 'bom' start condition */
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
 #ifdef stdout
@@ -72,42 +73,65 @@
 %option yylineno
 %option caseless
 
-whitespace [ \t\v\f]
+whitespace [ \t]
 digit [0-9]
 
-/* Anything except non-printable (00-1F), space (20), del (7F) and '*': */
-word [^\x00-\x20\x7f*]
+/* Any use of {newline} below must use yy_set_bol(true) in order to mark the character
+   following a single \r as the first on a new line, and allow the ^ pattern to match. 
+   This pattern must match single newlines only, in order to follow Pajek's "no newline
+   after *Vertices" convention. */
+newline (\n|\r|\r\n|\n\r) 
 
-%x netline
+/* Anything except non-printable (00-1F), space (20), del (7F), '"' and '*'. */
+word [^\x00-\x20\x7f"*]
+
+any_no_star {word}|\"|{whitespace}
+any         {any_no_star}|\*
+
+/* 'unknown' skips text at the beginning of the file, lines below an unknown *Word
+ * 'unknown_line' skips the rest of the line after an unknown *Word. */
+%x unknown unknown_line
+%x bom
 %s vert edge
 
 /* Notes:
- *  - Pajek files do not allow empty lines (empty lines should signify the end of the file).
- *  - Unquoted '*' characters may only appear at the start of a line-initial word.
- *  - '*net' is not a valid network line, but earlier igraph versions supported it, so we keep it for now.
- *  - Some Pajek files have parenthesized segments. These are tokenized as PSTR but not handled at this time.
- */
+  *  - Unquoted '*' characters may only appear at the start of a line-initial word.
+  *  - Both LF and CR LF line endings are allowed.
+  *  - Pajek files do not allow empty lines after *Vertices (empty lines should signify the end of the file),
+  *    therefore we are careful not to skip newlines in the lexer.
+  */
 
 %%
-<*>{whitespace}+  { }
-^%[^\n\r\0]*[\n\r]*  { } /* comments */
 
-\*net             { BEGIN(netline); return NETWORKLINE; }
-\*network         { BEGIN(netline); return NETWORKLINE; }
-<netline>{whitespace}([^\n\r\0])* { return NET_TITLE; }
-<netline>[\n\r]+                  { 
-                    BEGIN(INITIAL); return NEWLINE; }
+ /* Skip a UTF-8 BOM at the very beginning of the file, if present, then immediately switch to 'unknown'. */
+<bom>^\xef\xbb\xbf               { }
+<bom>(.|\n)                      { BEGIN(unknown); yyless(0); yy_set_bol(true); }
 
-\*vertices        { BEGIN(vert); return VERTICESLINE; }
-\*arcs            { BEGIN(edge); return ARCSLINE; }
-\*edges           { BEGIN(edge); return EDGESLINE; }
-\*arcslist        { BEGIN(INITIAL); return ARCSLISTLINE; }
-\*edgeslist       { BEGIN(INITIAL);return EDGESLISTLINE; }
-\*matrix          { BEGIN(INITIAL); return MATRIXLINE; }
-[\n\r]+           { return NEWLINE; }
+ /* Skip all text until the next *Word at the beginning of a line. */
+<unknown>^\*                     { BEGIN(INITIAL); yyless(0); yy_set_bol(true); }
+<unknown>{any_no_star}{any}*     { } /* match cannot start with a * in order not to take precedence over ^\* above */
+<unknown,unknown_line>{newline}  { yy_set_bol(true); }
+<unknown_line>{any}*             { BEGIN(unknown); }
 
-\"[^\"\0]*\"      { return QSTR; }
-\([^\)\0]*\)      { return PSTR; }
+^%({any})*{newline}        { yy_set_bol(true); } /* comments */
+
+<*>{whitespace}+   { }
+
+^\*network         { BEGIN(unknown_line); return NETWORKLINE; }
+
+^\*vertices        { BEGIN(vert); return VERTICESLINE; }
+^\*arcs            { BEGIN(edge); return ARCSLINE; }
+^\*edges           { BEGIN(edge); return EDGESLINE; }
+^\*arcslist        { BEGIN(INITIAL); return ARCSLISTLINE; }
+^\*edgeslist       { BEGIN(INITIAL);return EDGESLISTLINE; }
+^\*matrix          { BEGIN(INITIAL); return MATRIXLINE; }
+
+^\*[a-z]+          { BEGIN(unknown_line); IGRAPH_WARNINGF("Skipping unknown section '%s' on line %d.", yytext, yylineno); }
+
+{newline}          { yy_set_bol(true); return NEWLINE; }
+
+ /* Newlines not allowed in strings. */
+\"[^\"\0\n\r]*\"   { return QSTR; }
 
 (\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 

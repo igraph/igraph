@@ -39,6 +39,9 @@
 #define IGRAPH_PAJEK_MAX_VERTEX_COUNT INT32_MAX
 #endif
 
+#define CHECK_OOM_RP(p) IGRAPH_CHECK_OOM((p), "Not enough memory to read Pajek format.")
+#define CHECK_OOM_WP(p) IGRAPH_CHECK_OOM((p), "Not enough memory to write Pajek format.")
+
 typedef struct {
     void *scanner;
     igraph_bool_t eof;

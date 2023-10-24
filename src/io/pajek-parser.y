@@ -94,6 +94,11 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
 static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context);
 
+static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len);
+static igraph_bool_t is_standard_vattr(const char *attrname);
+static igraph_bool_t is_standard_eattr(const char *attrname);
+static igraph_error_t deconflict_attrname(char **attrname);
+
 #define scanner context->scanner
 
 %}
@@ -117,7 +122,7 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
   } string;
 }
 
-%type <intnum>   longint;
+%type <intnum>   integer;
 %type <intnum>   arcfrom;
 %type <intnum>   arcto;
 %type <intnum>   edgefrom;
@@ -130,17 +135,15 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
 
 %token NEWLINE       "end of line"
 %token NUM           "number"
-%token ALNUM
-%token QSTR
-%token PSTR
-%token NETWORKLINE   "*network line"
-%token NET_TITLE
-%token VERTICESLINE  "*vertices line"
-%token ARCSLINE      "*arcs line"
-%token EDGESLINE     "*edges line"
-%token ARCSLISTLINE  "*arcslist line"
-%token EDGESLISTLINE "*edgeslist line"
-%token MATRIXLINE    "*matrix line"
+%token ALNUM         "word"
+%token QSTR          "quoted string"
+%token NETWORKLINE   "*Network line"
+%token VERTICESLINE  "*Vertices line"
+%token ARCSLINE      "*Arcs line"
+%token EDGESLINE     "*Edges line"
+%token ARCSLISTLINE  "*Arcslist line"
+%token EDGESLISTLINE "*Edgeslist line"
+%token MATRIXLINE    "*Matrix line"
 %token END 0         "end of file" /* friendly name for $end */
 %token ERROR
 
@@ -184,15 +187,24 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
 
 %%
 
-input: nethead vertices edgeblock {
+input: nethead vertices edgeblock final_newlines {
   if (context->vcount2 > 0) { igraph_i_pajek_check_bipartite(context); }
+  if (! context->eof) {
+    /* In Pajek files, an empty line after *Vertices signifies the end of the network data.
+     * If there is more data after one or more empty lines, we warn the user, as this
+     * may indicate file corruption, for example a stray empty lines before *Edges. */
+    IGRAPH_WARNINGF("Empty line encountered, ignoring rest of file after line %d.", @4.first_line);
+  }
+  YYACCEPT; /* stop parsing even if there is more data in the file. */
  };
 
-nethead: /* empty */ | NETWORKLINE NEWLINE | NETWORKLINE NET_TITLE NEWLINE ;
+final_newlines: /* empty */ | NEWLINE final_newlines ;
+
+nethead: /* empty */ | NETWORKLINE ;
 
 vertices: verticeshead NEWLINE vertdefs;
 
-verticeshead: VERTICESLINE longint {
+verticeshead: VERTICESLINE integer {
   context->vcount=$2;
   context->vcount2=0;
   if (context->vcount < 0) {
@@ -202,7 +214,7 @@ verticeshead: VERTICESLINE longint {
     IGRAPH_YY_ERRORF("Vertex count too large in Pajek file (%" IGRAPH_PRId ").", IGRAPH_EINVAL, context->vcount);
   }
             }
-            | VERTICESLINE longint longint {
+            | VERTICESLINE integer integer {
   context->vcount=$2;
   context->vcount2=$3;
   if (context->vcount < 0) {
@@ -222,8 +234,7 @@ verticeshead: VERTICESLINE longint {
 
 vertdefs: /* empty */  | vertdefs vertexline;
 
-vertexline: NEWLINE |
-            vertex NEWLINE |
+vertexline: vertex NEWLINE |
             vertex {
               context->actvertex=$1;
               if (context->actvertex < 1 || context->actvertex > context->vcount) {
@@ -235,7 +246,7 @@ vertexline: NEWLINE |
             } vertexid vertexcoords shape params NEWLINE { }
 ;
 
-vertex: longint { $$=$1; };
+vertex: integer { $$=$1; };
 
 vertexid: word {
   IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("id", $1.str, $1.len, context));
@@ -266,21 +277,6 @@ param:
        }
      | VP_Y_FACT number {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("yfact", $2, context));
-       }
-     | VP_IC number number number { /* RGB color */
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("color-red", $2, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("color-green", $3, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("color-blue", $4, context));
-       }
-     | VP_BC number number number {
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("framecolor-red", $2, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("framecolor-green", $3, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("framecolor-blue", $4, context));
-       }
-     | VP_LC number number number {
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labelcolor-red", $2, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labelcolor-green", $3, context));
-         IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labelcolor-blue", $4, context));
        }
      | VP_LR number {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_vertex_attribute("labeldist", $2, context));
@@ -328,19 +324,33 @@ vpword: VP_FONT vpwordpar {
          IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute("labelcolor",
                                                     $2.str, $2.len, context));
      }
+     | word vpwordpar {
+         char *attrname;
+         IGRAPH_YY_CHECK(dupl_str_len(&attrname, $1.str, $1.len));
+         IGRAPH_FINALLY(igraph_free, attrname);
+         if (is_standard_vattr(attrname)) {
+          IGRAPH_YY_CHECK(deconflict_attrname(&attrname));
+          /* update address on finally stack */
+          IGRAPH_FINALLY_CLEAN(1);
+          IGRAPH_FINALLY(igraph_free, attrname);
+         }
+         IGRAPH_YY_CHECK(igraph_i_pajek_add_string_vertex_attribute(
+           attrname, $2.str, $2.len, context));
+         IGRAPH_FREE(attrname);
+         IGRAPH_FINALLY_CLEAN(1);
+     }
 ;
 
 vpwordpar: word { $$=$1; };
 
 edgeblock: /* empty */ | edgeblock arcs | edgeblock edges | edgeblock arcslist | edgeblock edgeslist | edgeblock adjmatrix;
 
-arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=1; }
-      | ARCSLINE number NEWLINE arcsdefs { context->directed=1; };
+arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=true; }
+      | ARCSLINE number NEWLINE arcsdefs { context->directed=true; };
 
 arcsdefs: /* empty */ | arcsdefs arcsline;
 
-arcsline: NEWLINE |
-          arcfrom arcto { context->actedge++; } weight edgeparams NEWLINE  {
+arcsline: arcfrom arcto { context->actedge++; } weight edgeparams NEWLINE  {
   if ($1 < 1) {
       IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
   }
@@ -351,17 +361,16 @@ arcsline: NEWLINE |
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;
 
-arcfrom: longint;
+arcfrom: integer;
 
-arcto: longint;
+arcto: integer;
 
 edges:   EDGESLINE NEWLINE edgesdefs { context->directed=0; }
        | EDGESLINE number NEWLINE edgesdefs { context->directed=0; }
 
 edgesdefs: /* empty */ | edgesdefs edgesline;
 
-edgesline: NEWLINE |
-          edgefrom edgeto { context->actedge++; } weight edgeparams NEWLINE {
+edgesline: edgefrom edgeto { context->actedge++; } weight edgeparams NEWLINE {
   if ($1 < 1) {
       IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
   }
@@ -372,9 +381,9 @@ edgesline: NEWLINE |
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;
 
-edgefrom: longint;
+edgefrom: integer;
 
-edgeto: longint;
+edgeto: integer;
 
 weight: /* empty */ | number {
   IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context));
@@ -384,11 +393,6 @@ edgeparams: /* empty */ | edgeparams edgeparam;
 
 edgeparam:
      epword
-   | EP_C number number number {
-       IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("color-red", $2, context));
-       IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("color-green", $3, context));
-       IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("color-blue", $4, context));
-   }
    | EP_S number {
        IGRAPH_YY_CHECK(igraph_i_pajek_add_numeric_edge_attribute("arrowsize", $2, context));
    }
@@ -451,6 +455,21 @@ epword: EP_A epwordpar {
     | EP_C epwordpar {
       IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute("color", $2.str, $2.len, context));
     }
+    | word epwordpar {
+        char *attrname;
+        IGRAPH_YY_CHECK(dupl_str_len(&attrname, $1.str, $1.len));
+        IGRAPH_FINALLY(igraph_free, attrname);
+        if (is_standard_eattr(attrname)) {
+          IGRAPH_YY_CHECK(deconflict_attrname(&attrname));
+          /* update address on finally stack */
+          IGRAPH_FINALLY_CLEAN(1);
+          IGRAPH_FINALLY(igraph_free, attrname);
+        }
+        IGRAPH_YY_CHECK(igraph_i_pajek_add_string_edge_attribute(
+           attrname, $2.str, $2.len, context));
+        IGRAPH_FREE(attrname);
+        IGRAPH_FINALLY_CLEAN(1);
+     }
 ;
 
 epwordpar: word { $$=$1; };
@@ -459,13 +478,13 @@ arcslist: ARCSLISTLINE NEWLINE arcslistlines { context->directed=1; };
 
 arcslistlines: /* empty */ | arcslistlines arclistline;
 
-arclistline: NEWLINE | arclistfrom arctolist NEWLINE;
+arclistline: arclistfrom arctolist NEWLINE;
 
 arctolist: /* empty */ | arctolist arclistto;
 
-arclistfrom: longint { context->actfrom=labs($1)-1; };
+arclistfrom: integer { context->actfrom=labs($1)-1; };
 
-arclistto: longint {
+arclistto: integer {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
 };
@@ -474,13 +493,13 @@ edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
 
 edgelistlines: /* empty */ | edgelistlines edgelistline;
 
-edgelistline: NEWLINE | edgelistfrom edgetolist NEWLINE;
+edgelistline: edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
-edgelistfrom: longint { context->actfrom=labs($1)-1; };
+edgelistfrom: integer { context->actfrom=labs($1)-1; };
 
-edgelistto: longint {
+edgelistto: integer {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, context->actfrom));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, labs($1)-1));
 };
@@ -520,7 +539,7 @@ adjmatrixentry: number {
 
 /* -----------------------------------------------------*/
 
-longint: NUM {
+integer: NUM {
   igraph_integer_t val;
   IGRAPH_YY_CHECK(igraph_i_parse_integer(igraph_pajek_yyget_text(scanner),
                                          igraph_pajek_yyget_leng(scanner),
@@ -560,7 +579,7 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
                                          igraph_vector_ptr_t *attrs,
                                          igraph_integer_t count,
                                          const char *attrname,
-                                         igraph_integer_t vid,
+                                         igraph_integer_t elem_id,
                                          igraph_real_t number) {
   igraph_integer_t attrsize = igraph_trie_size(names);
   igraph_integer_t id;
@@ -570,40 +589,39 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
     /* add a new attribute */
-    rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    if (! rec) {
-        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+    rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
+    CHECK_OOM_RP(rec);
     IGRAPH_FINALLY(igraph_free, rec);
-    na=IGRAPH_CALLOC(1, igraph_vector_t);
-    if (! na) {
-        IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    na = IGRAPH_CALLOC(1, igraph_vector_t);
+    CHECK_OOM_RP(na);
     IGRAPH_FINALLY(igraph_free, na);
     IGRAPH_VECTOR_INIT_FINALLY(na, count);
-    rec->name=strdup(attrname);
-    if (! rec->name) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    rec->name = strdup(attrname);
+    CHECK_OOM_RP(rec->name);
     IGRAPH_FINALLY(igraph_free, (void *) rec->name);
-    rec->type=IGRAPH_ATTRIBUTE_NUMERIC;
-    rec->value=na;
+
+    rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
+    rec->value = na;
+
     IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
     IGRAPH_FINALLY_CLEAN(4); /* ownership of rec transferred to attrs */
   }
-  rec=VECTOR(*attrs)[id];
-  na=(igraph_vector_t*)rec->value;
-  if (igraph_vector_size(na) == vid) {
+
+  rec = VECTOR(*attrs)[id];
+  na = (igraph_vector_t *) rec->value;
+  if (igraph_vector_size(na) == elem_id) {
     IGRAPH_CHECK(igraph_vector_push_back(na, number));
-  } else if (igraph_vector_size(na) < vid) {
+  } else if (igraph_vector_size(na) < elem_id) {
     igraph_integer_t origsize=igraph_vector_size(na);
-    IGRAPH_CHECK(igraph_vector_resize(na, vid+1));
+    IGRAPH_CHECK(igraph_vector_resize(na, elem_id+1));
     for (;origsize<count; origsize++) {
       VECTOR(*na)[origsize] = IGRAPH_NAN;
     }
-    VECTOR(*na)[vid] = number;
+    VECTOR(*na)[elem_id] = number;
   } else {
-    VECTOR(*na)[vid] = number;
+    VECTOR(*na)[elem_id] = number;
   }
 
   return IGRAPH_SUCCESS;
@@ -611,11 +629,17 @@ static igraph_error_t igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
 
 /* TODO: NA's */
 
+static igraph_error_t dupl_str_len(char **dest, const char *src, size_t len) {
+  *dest = strndup(src, len);
+  CHECK_OOM_RP(*dest);
+  return IGRAPH_SUCCESS;
+}
+
 static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
                                                    igraph_vector_ptr_t *attrs,
                                                    igraph_integer_t count,
                                                    const char *attrname,
-                                                   igraph_integer_t vid,
+                                                   igraph_integer_t elem_id,
                                                    const char *str,
                                                    igraph_integer_t str_len) {
   igraph_integer_t attrsize=igraph_trie_size(names);
@@ -626,33 +650,32 @@ static igraph_error_t igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
     /* add a new attribute */
-    rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    if (! rec) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+    rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
+    CHECK_OOM_RP(rec);
     IGRAPH_FINALLY(igraph_free, rec);
-    na=IGRAPH_CALLOC(1, igraph_strvector_t);
-    if (! na) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    na = IGRAPH_CALLOC(1, igraph_strvector_t);
+    CHECK_OOM_RP(na);
     IGRAPH_FINALLY(igraph_free, na);
     IGRAPH_STRVECTOR_INIT_FINALLY(na, count);
-    rec->name=strdup(attrname);
-    if (! rec->name) {
-      IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-    }
+
+    rec->name = strdup(attrname);
+    CHECK_OOM_RP(rec->name);
     IGRAPH_FINALLY(igraph_free, (char *) rec->name);
-    rec->type=IGRAPH_ATTRIBUTE_STRING;
-    rec->value=na;
+
+    rec->type = IGRAPH_ATTRIBUTE_STRING;
+    rec->value = na;
+
     IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
     IGRAPH_FINALLY_CLEAN(4); /* ownership of rec transferred to attrs */
   }
-  rec=VECTOR(*attrs)[id];
-  na=(igraph_strvector_t*)rec->value;
-  if (igraph_strvector_size(na) <= vid) {
-    IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
+
+  rec = VECTOR(*attrs)[id];
+  na = (igraph_strvector_t *) rec->value;
+  if (igraph_strvector_size(na) <= elem_id) {
+    IGRAPH_CHECK(igraph_strvector_resize(na, elem_id+1));
   }
-  IGRAPH_CHECK(igraph_strvector_set_len(na, vid, str, str_len));
+  IGRAPH_CHECK(igraph_strvector_set_len(na, elem_id, str, str_len));
 
   return IGRAPH_SUCCESS;
 }
@@ -661,7 +684,6 @@ static igraph_error_t igraph_i_pajek_add_string_vertex_attribute(const char *nam
                                                const char *value,
                                                size_t len,
                                                igraph_i_pajek_parsedata_t *context) {
-
 
   return igraph_i_pajek_add_string_attribute(context->vertex_attribute_names,
                                              context->vertex_attributes,
@@ -686,7 +708,7 @@ static igraph_error_t igraph_i_pajek_add_numeric_vertex_attribute(const char *na
                                                 igraph_real_t value,
                                                 igraph_i_pajek_parsedata_t *context) {
 
-  return     igraph_i_pajek_add_numeric_attribute(context->vertex_attribute_names,
+  return igraph_i_pajek_add_numeric_attribute(context->vertex_attribute_names,
                                                   context->vertex_attributes,
                                                   context->vcount,
                                                   name, context->actvertex-1,
@@ -709,7 +731,7 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
   const char *attrname="type";
   igraph_trie_t *names=context->vertex_attribute_names;
   igraph_vector_ptr_t *attrs=context->vertex_attributes;
-  igraph_integer_t i, n=context->vcount, n1=context->vcount2;
+  igraph_integer_t n=context->vcount, n1=context->vcount2;
   igraph_integer_t attrid, attrsize = igraph_trie_size(names);
   igraph_attribute_record_t *rec;
   igraph_vector_bool_t *na;
@@ -720,36 +742,35 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
   }
 
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &attrid));
+
   /* It should not be possible for the "type" attribute to be already
    * present at this point. */
   IGRAPH_ASSERT(attrid == attrsize);
 
   /* add a new attribute */
-  rec=IGRAPH_CALLOC(1, igraph_attribute_record_t);
-  if (! rec) {
-    IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-  }
+  rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
+  CHECK_OOM_RP(rec);
   IGRAPH_FINALLY(igraph_free, rec);
-  na=IGRAPH_CALLOC(1, igraph_vector_bool_t);
-  if (! na) {
-    IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-  }
+
+  na = IGRAPH_CALLOC(1, igraph_vector_bool_t);
+  CHECK_OOM_RP(na);
   IGRAPH_FINALLY(igraph_free, na);
   IGRAPH_VECTOR_BOOL_INIT_FINALLY(na, n);
-  rec->name=strdup(attrname);
-  if (! rec->name) {
-    IGRAPH_ERROR("Out of memory while parsing Pajek file.", IGRAPH_ENOMEM);
-  }
+
+  rec->name = strdup(attrname);
+  CHECK_OOM_RP(rec->name);
   IGRAPH_FINALLY(igraph_free, (char *) rec->name);
-  rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
-  rec->value=na;
+
+  rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
+  rec->value = na;
+
   IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
   IGRAPH_FINALLY_CLEAN(4); /* ownership of 'rec' transferred to 'attrs' */
 
-  for (i=0; i<n1; i++) {
+  for (igraph_integer_t i=0; i<n1; i++) {
     VECTOR(*na)[i] = 0;
   }
-  for (i=n1; i<n; i++) {
+  for (igraph_integer_t i=n1; i<n; i++) {
     VECTOR(*na)[i] = 1;
   }
 
@@ -758,10 +779,10 @@ static igraph_error_t igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata
 
 static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
   const igraph_vector_int_t *edges=context->vector;
-  igraph_integer_t i, n1=context->vcount2;
+  igraph_integer_t n1=context->vcount2;
   igraph_integer_t ne=igraph_vector_int_size(edges);
 
-  for (i=0; i<ne; i+=2) {
+  for (igraph_integer_t i=0; i<ne; i+=2) {
     igraph_integer_t v1 = VECTOR(*edges)[i];
     igraph_integer_t v2 = VECTOR(*edges)[i+1];
     if ( (v1 < n1 && v2 < n1) || (v1 > n1 && v2 > n1) ) {
@@ -769,5 +790,55 @@ static igraph_error_t igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t 
     }
   }
 
+  return IGRAPH_SUCCESS;
+}
+
+/* Check if attrname is a standard Pajek vertex attribute. */
+static igraph_bool_t is_standard_vattr(const char *attrname) {
+  const char *names[] = {
+    "id", // TODO remove for 0.11
+    "name", "x", "y", "z", "shape", "xfact", "yfact",
+    "labeldist", "labeldegree2", "framewidth",
+    "fontsize", "rotation", "radius",
+    "diamondratio", "labeldegree", "vertexsize",
+    "font", "url", "color", "framecolor",
+    "labelcolor"
+  };
+  for (size_t i=0; i < sizeof(names) / sizeof(names[0]); i++) {
+    if (strcmp(attrname, names[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* Check if attrname is a standard Pajek edge attribute. */
+static igraph_bool_t is_standard_eattr(const char *attrname) {
+  const char *names[] = {
+    "weight", 
+    "arrowsize", "edgewidth", "hook1", "hook2",
+    "angle1", "angle2", "velocity1", "velocity2",
+    "arrowpos", "labelpos", "labelangle",
+    "labelangle2", "labeldegree", "fontsize",
+    "arrowtype", "linepattern", "label", "labelcolor",
+    "color"
+  };
+  for (size_t i=0; i < sizeof(names) / sizeof(names[0]); i++) {
+    if (strcmp(attrname, names[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* Add a _ character at the end of an attribute name to avoid conflict
+ * with standard Pajek attributes. */
+static igraph_error_t deconflict_attrname(char **attrname) {
+  size_t len = strlen(*attrname);
+  char *tmp = IGRAPH_REALLOC(*attrname, len+2, char);
+  CHECK_OOM_RP(tmp);
+  tmp[len] = '_';
+  tmp[len+1] = '\0';
+  *attrname = tmp;
   return IGRAPH_SUCCESS;
 }
