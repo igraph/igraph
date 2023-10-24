@@ -1403,6 +1403,7 @@ igraph_error_t FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
  * \brief Smallest element of a matrix.
  *
  * The matrix must be non-empty.
+ *
  * \param m The input matrix.
  * \return The smallest element of \p m, or NaN if any element is NaN.
  *
