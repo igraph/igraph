@@ -28,9 +28,9 @@ void print_and_destroy(igraph_t *g, igraph_vector_t *weights)
     igraph_real_t value;
 
     igraph_vector_init(&v, 0);
-    igraph_eigenvector_centrality(g, &v, &value, /*directed*/1,
-                                  /*scale=*/1, weights,
-                                  /*options*/NULL);
+    igraph_eigenvector_centrality(g, &v, &value, /* directed */ true,
+                                  /* scale */ true, weights,
+                                  /* options */ NULL);
 
     printf("Eigenvalue: %g\n", value);
     printf("Eigenvector:\n");
@@ -63,22 +63,22 @@ int main(void) {
     print_and_destroy(&g, NULL);
 
     printf("Undirected full graph:\n");
-    igraph_full(&g, 5, IGRAPH_UNDIRECTED, /*loops*/0);
+    igraph_full(&g, 5, IGRAPH_UNDIRECTED, /* loops */ false);
     print_and_destroy(&g, NULL);
 
     printf("Directed full graph:\n");
-    igraph_full(&g, 5, IGRAPH_DIRECTED, /*loops*/0);
+    igraph_full(&g, 5, IGRAPH_DIRECTED, /* loops */ false);
     print_and_destroy(&g, NULL);
 
     printf("Undirected full graph with weights:\n");
     igraph_vector_init(&weights, 10);
     igraph_vector_fill(&weights, 1);
-    igraph_full(&g, 5, IGRAPH_UNDIRECTED, /*loops*/0);
+    igraph_full(&g, 5, IGRAPH_UNDIRECTED, /* loops */ false);
     print_and_destroy(&g, &weights);
     igraph_vector_destroy(&weights);
 
     printf("Directed full graph with weights:\n");
-    igraph_full(&g, 5, IGRAPH_DIRECTED, /*loops*/0);
+    igraph_full(&g, 5, IGRAPH_DIRECTED, /* loops */ false);
     igraph_vector_init(&weights, 20);
     igraph_vector_fill(&weights, 1);
     print_and_destroy(&g, &weights);
@@ -103,13 +103,13 @@ int main(void) {
     printf("Check handling of wrong number of weights.\n");
     igraph_vector_init(&weights, 2);
     igraph_vector_fill(&weights, 1);
-    igraph_full(&g, 5, IGRAPH_DIRECTED, /*loops*/0);
-    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /*directed*/1,
-                                  /*scale=*/1, &weights,
-                                  /*options*/NULL), IGRAPH_EINVAL);
-    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /*directed*/0,
-                                  /*scale=*/1, &weights,
-                                  /*options*/NULL), IGRAPH_EINVAL);
+    igraph_full(&g, 5, IGRAPH_DIRECTED, /* loops */ false);
+    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* directed */ true,
+                                  /* scale */ true, &weights,
+                                  /* options */ NULL), IGRAPH_EINVAL);
+    CHECK_ERROR(igraph_eigenvector_centrality(&g, NULL, NULL, /* directed */ false,
+                                  /* scale */ true, &weights,
+                                  /* options */ NULL), IGRAPH_EINVAL);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
