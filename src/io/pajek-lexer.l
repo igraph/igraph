@@ -103,8 +103,8 @@ any         {any_no_star}|\*
 
 %%
 
- /* Skip a UTF-8 BOM at the start of the file, if present. */
-<bom>\xef\xbb\xbf                { }
+ /* Skip a UTF-8 BOM at the very beginning of the file, if present, then immediately switch to 'unknown'. */
+<bom>^\xef\xbb\xbf               { }
 <bom>(.|\n)                      { BEGIN(unknown); yyless(0); yy_set_bol(true); }
 
  /* Skip all text until the next *Word at the beginning of a line. */
