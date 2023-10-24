@@ -52,7 +52,7 @@
 #define YY_EXTRA_TYPE igraph_i_pajek_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 #define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in Pajek parser: " # msg)
-#define YY_USER_INIT BEGIN(unknown) /* we start in the 'unknown' start condition */
+#define YY_USER_INIT BEGIN(bom) /* we start in the 'bom' start condition */
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
 #ifdef stdout
@@ -91,6 +91,7 @@ any         {any_no_star}|\*
 /* 'unknown' skips text at the beginning of the file, lines below an unknown *Word
  * 'unknown_line' skips the rest of the line after an unknown *Word. */
 %x unknown unknown_line
+%x bom
 %s vert edge
 
 /* Notes:
@@ -101,6 +102,10 @@ any         {any_no_star}|\*
   */
 
 %%
+
+ /* Skip a UTF-8 BOM at the start of the file, if present. */
+<bom>\xef\xbb\xbf                { }
+<bom>(.|\n)                      { BEGIN(unknown); yyless(0); yy_set_bol(true); }
 
  /* Skip all text until the next *Word at the beginning of a line. */
 <unknown>^\*                     { BEGIN(INITIAL); yyless(0); yy_set_bol(true); }
