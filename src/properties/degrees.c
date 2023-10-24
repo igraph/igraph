@@ -548,6 +548,7 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
                                     const igraph_vector_int_t* weights) {
     igraph_eit_t eit;
     igraph_es_t es;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t eid;
     igraph_integer_t v1id;
