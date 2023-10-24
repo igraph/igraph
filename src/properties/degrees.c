@@ -568,12 +568,21 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         igraph_integer_t max_out_degree;
         igraph_integer_t max_in_degree;
 
-        IGRAPH_CHECK(igraph_vector_int_init(&out_degrees, 0));
-        IGRAPH_CHECK(igraph_vector_int_init(&in_degrees, 0));
+        // Compute max degrees
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degrees, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, true));
         IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, true));
-        IGRAPH_CHECK(igraph_maxdegree(graph, &max_out_degree, igraph_vss_all(), IGRAPH_OUT, true));
-        IGRAPH_CHECK(igraph_maxdegree(graph, &max_in_degree, igraph_vss_all(), IGRAPH_IN, true));
+        if (igraph_vector_int_size(&out_degrees) == 0) {
+            max_out_degree = 0;
+        } else {
+            max_out_degree = igraph_vector_int_max(&out_degrees);
+        }
+        if (igraph_vector_int_size(&in_degrees) == 0) {
+            max_in_degree = 0;
+        } else {
+            max_in_degree = igraph_vector_int_max(&in_degrees);
+        }
 
         if (dout > 0 && din > 0) {
             if (dout < max_out_degree || din < max_in_degree) {
@@ -585,9 +594,7 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         } else {
             IGRAPH_CHECK(igraph_matrix_int_resize(jdm, max_out_degree, max_in_degree));
         }
-        // Set all elements to 0
         igraph_matrix_int_null(jdm);
-
         IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
         IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
 
@@ -607,14 +614,19 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
 
         igraph_vector_int_destroy(&out_degrees);
         igraph_vector_int_destroy(&in_degrees);
+        IGRAPH_FINALLY_CLEAN(2);
 
     } else {
         igraph_vector_int_t degrees;
         igraph_integer_t max_degree;
         // Compute max degrees
-        IGRAPH_CHECK(igraph_vector_int_init(&degrees, 0));
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
-        IGRAPH_CHECK(igraph_maxdegree(graph, &max_degree, igraph_vss_all(), IGRAPH_ALL, true));
+        if (igraph_vector_int_size(&degrees) == 0) {
+            max_degree = 0;
+        } else {
+            max_degree = igraph_vector_int_max(&degrees);
+        }
         if (dout > 0 && din > 0) {
             if (dout < max_degree || din < max_degree) {
                 IGRAPH_ERRORF("dout (%" IGRAPH_PRId ") or din (%" IGRAPH_PRId ") are smaller than the smallest required dimensions of the matrix (%" IGRAPH_PRId ", %" IGRAPH_PRId ")",
@@ -647,6 +659,7 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         }
 
         igraph_vector_int_destroy(&degrees);
+        IGRAPH_FINALLY_CLEAN(1);
     }
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);
