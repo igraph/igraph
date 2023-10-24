@@ -1320,9 +1320,8 @@ void FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
  * \function igraph_vector_max
  * \brief Largest element of a vector.
  *
- * </para><para>
- * If the size of the vector is zero, an arbitrary number is
- * returned.
+ * The vector must not be empty.
+ *
  * \param v The vector object.
  * \return The maximum element of \p v, or NaN if any element is NaN.
  *
@@ -1358,11 +1357,11 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
  * \function igraph_vector_which_max
  * \brief Gives the index of the maximum element of the vector.
  *
- * </para><para>
  * If the size of the vector is zero, -1 is returned. If the largest
  * element is not unique, then the index of the first is returned.
  * If the vector contains NaN values, the index of the first NaN value
  * is returned.
+ *
  * \param v The vector object.
  * \return The index of the first maximum element.
  *
@@ -1401,7 +1400,8 @@ igraph_integer_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v
  * \function igraph_vector_min
  * \brief Smallest element of a vector.
  *
- * The vector must be non-empty.
+ * The vector must not be empty.
+ *
  * \param v The input vector.
  * \return The smallest element of \p v, or NaN if any element is NaN.
  *
@@ -1438,10 +1438,10 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
  * \function igraph_vector_which_min
  * \brief Index of the smallest element.
  *
- * </para><para>
- * The vector must be non-empty. If the smallest element is not unique,
- * then the index of the first is returned. If the vector contains NaN
- * values, the index of the first NaN value is returned.
+ * If the size of the vector is zero, -1 is returned. If the smallest element
+ * is not unique, then the index of the first is returned. If the vector
+ * contains NaN values, the index of the first NaN value is returned.
+ *
  * \param v The input vector.
  * \return Index of the smallest element.
  *
