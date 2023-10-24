@@ -524,7 +524,7 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
  *
  * The joint degree matrix of a graph contains the number of edges, or the sum of the weights, between vertices of
  * degree i and degree j for every (i, j). The function populates a joint degree matrix and works on directed
- * and undirected graphs. Self loops are only counted once. If either \p dout or \p din are <= 0, the JDM
+ * and undirected graphs. Self loops are only counted once. If either \p dout or \p din are &lt;= 0, the JDM
  * will be resized automatically in the dimensions of the max degree of the vertices in the graph.
  *
  * \param graph A pointer to an initialized graph object.
