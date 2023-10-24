@@ -6,6 +6,7 @@
 
  - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
  - Fixed the handling of duplicate vertex IDs in `igraph_induced_subgraph()`.
+ - `igraph_vector_which_min()` and `igraph_vector_which_max()` no longer allow zero-length input, which makes them consistent with other similar functions, and was the originally intended behaviour. Passing zero-length input is invalid use and currently triggers an assertion failure.
 
 ### Other
 
