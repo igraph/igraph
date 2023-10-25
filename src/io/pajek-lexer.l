@@ -126,7 +126,7 @@ any         {any_no_star}|\*
 ^\*edgeslist       { BEGIN(INITIAL);return EDGESLISTLINE; }
 ^\*matrix          { BEGIN(INITIAL); return MATRIXLINE; }
 
-^\*[a-z]+          { BEGIN(unknown_line); IGRAPH_WARNINGF("Skipping unknown section '%s' on line %d.", yytext, yylineno); }
+^\*{word}+         { BEGIN(unknown_line); IGRAPH_WARNINGF("Skipping unknown section '%s' on line %d.", yytext, yylineno); }
 
 {newline}          { yy_set_bol(true); return NEWLINE; }
 
