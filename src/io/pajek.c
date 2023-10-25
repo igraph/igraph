@@ -433,10 +433,7 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
  * from the command line).
  *
  * \param graph The graph object to write.
- * \param outstream The file to write to. It should be opened and
- * writable. Make sure that you open the file in binary format if you use MS Windows,
- * otherwise end of line characters will be messed up. (igraph will be able
- * to read back these messed up files, but Pajek won't.)
+ * \param outstream The file to write to. It should be opened and writable.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|+|A|), |V| is the number of vertices, |E|
