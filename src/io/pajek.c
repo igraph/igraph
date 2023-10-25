@@ -334,6 +334,8 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 #define E_COLOR            22
 #define E_LAST             23
 
+/* Pajek encodes newlines as \n, and any unicode character can be encoded
+ * in the form &#hhhh;. Therefore we encode quotation marks as &#34; */
 static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     igraph_integer_t destlen = 0;
     igraph_bool_t need_escape = false;
@@ -342,9 +344,12 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
     const char *s;
     char *d;
     for (s = src; *s; s++, destlen++) {
-        if (*s == '\\' || *s == '"' || *s == '\n' || *s == '\r') {
+        if (*s == '\n' || *s == '\r') {
             need_escape = true;
             destlen++;
+        } else if (*s == '"') {
+            need_escape = true;
+            destlen += 4;
         } else if (!isalnum(*s)) {
             need_escape = true;
         }
@@ -352,7 +357,7 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
 
     if (!need_escape) {
         /* At this point, we know that the string does not contain any chars
-         * that would warrant escaping. Therefore, we simply quote it and
+         * that would warrant encoding. Therefore, we simply quote it and
          * return the quoted string. This is necessary because Pajek uses some
          * reserved words in its format (like 'c' standing for color) and they
          * have to be quoted as well.
@@ -375,10 +380,8 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
 
     for (s = src; *s; s++, d++) {
         switch (*s) {
-        case '\\':
         case '"':
-            *d = '\\'; d++;
-            *d = *s;
+            strcpy(d, "&#34;"); d += 4; break;
             break;
         /* Convert both CR and LF to "\n", as neither should apear in a quoted string. */
         case '\n':
