@@ -99,7 +99,7 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * clusters and vectors are not.
  * \oli Multi-relational networks (i.e. networks with multiple edge
  * types) are not supported.
- * \oli Unicode characters encoded as <code>&#dddd;</code>, or newlines
+ * \oli Unicode characters encoded as <code>&amp;#dddd;</code>, or newlines
  * encoded as <code>\n</code> will not be decoded.
  * \endolist
  *
