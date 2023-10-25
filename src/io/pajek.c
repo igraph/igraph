@@ -77,14 +77,14 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * \brief Reads a file in Pajek format.
  *
  * Only a subset of the Pajek format is implemented. This is partially
- * because this format is not fully documented, but also because
+ * because there is no formal specification for this format, but also because
  * <command>igraph</command> does not support some Pajek features, like
  * mixed graphs.
  *
  * </para><para>
  * Starting from version 0.6.1 igraph reads bipartite (two-mode)
- * graphs from Pajek files and add the \c type vertex attribute for them.
- * Warnings are given for invalid edges, i.e. edges connecting
+ * graphs from Pajek files and adds the \c type Boolean vertex attribute for
+ * them. Warnings are given for invalid edges, i.e. edges connecting
  * vertices of the same type.
  *
  * </para><para>
@@ -92,14 +92,15 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * \olist
  * \oli Only <filename>.net</filename> files are supported, Pajek
  * project files (<filename>.paj</filename>) are not.
- * \oli Time events networks are not supported.
- * \oli Hypergraphs (i.e. graphs with non-binary edges) are not
- * supported.
+ * \oli Temporal networks (i.e. with time events) are not supported.
  * \oli Graphs with both directed and non-directed edges are not
  * supported, as they cannot be represented in <command>igraph</command>.
  * \oli Only Pajek networks are supported; permutations, hierarchies,
  * clusters and vectors are not.
- * \oli Graphs with multiple edge sets are not supported.
+ * \oli Multi-relational networks (i.e. networks with multiple edge
+ * types) are not supported.
+ * \oli Unicode characters encoded as <code>&#dddd;</code>, or newlines
+ * encoded as <code>\n</code> will not be decoded.
  * \endolist
  *
  * </para><para>
@@ -133,11 +134,13 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  *
  * </para><para>
  * In addition the following vertex attributes might be added: \c id
- * if there are vertex IDs in the file, \c x and \c y or \c x
- * and \c y and \c z if there are vertex coordinates in the file.
+ * and \c name are added (with the same value) if there are vertex IDs in the
+ * file. \c id is deprecated in favour of \c name and will no longer be used
+ * by future versions of igraph. \c x and \c y, and potentially \c z if there
+ * are vertex coordinates in the file.
  *
- * </para><para>The \c weight edge attribute might be
- * added if there are edge weights present.
+ * </para><para>
+ * The \c weight edge attribute will be added if there are edge weights present.
  *
  * </para><para>
  * See the Pajek homepage:
@@ -145,7 +148,9 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * Pajek. The Pajek manual,
  * http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf,
  * and http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm
- * have information on the Pajek file format.
+ * have information on the Pajek file format. There is additional
+ * useful information and sample files at
+ * http://mrvar.fdv.uni-lj.si/pajek/history.htm
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param file An already opened file handler.
@@ -408,11 +413,15 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
  *
  * </para><para>
  * The Pajek vertex and edge parameters (like color) are determined by
- * the attributes of the vertices and edges, of course this requires
+ * the attributes of the vertices and edges. Of course this requires
  * an attribute handler to be installed. The names of the
  * corresponding vertex and edge attributes are listed at \ref
  * igraph_read_graph_pajek(), e.g. the \c color vertex attributes
  * determines the color (\c c in Pajek) parameter.
+ *
+ * </para><para>
+ * Vertex and edge attributes that do not correspond to any documented
+ * Pajek parameter are discarded.
  *
  * </para><para>
  * As of version 0.6.1 igraph writes bipartite graphs into Pajek files
