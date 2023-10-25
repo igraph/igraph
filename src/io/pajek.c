@@ -385,6 +385,7 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
         case '\r':
             *d = '\\'; d++;
             *d = 'n';
+            break;
         default:
             *d = *s;
         }
