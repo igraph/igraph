@@ -5,6 +5,7 @@
 ### Changes
 
  - The behaviour of the Pajek format reader is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret.
+ - The Pajek format writer now encodes newline and quotation mark characters in a Pajek-compatible manner (`\n` and `&#34;`, respectively).
 
 ### Fixed
 
