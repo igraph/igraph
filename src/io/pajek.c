@@ -299,13 +299,12 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 #define V_RADIUS           12
 #define V_DIAMONDRATIO     13
 #define V_LABELDEGREE      14
-#define V_VERTEXSIZE       15
-#define V_FONT             16
-#define V_URL              17
-#define V_COLOR            18
-#define V_FRAMECOLOR       19
-#define V_LABELCOLOR       20
-#define V_LAST             21
+#define V_FONT             15
+#define V_URL              16
+#define V_COLOR            17
+#define V_FRAMECOLOR       18
+#define V_LABELCOLOR       19
+#define V_LAST             20
 
 #define E_WEIGHT            0
 #define E_LAST              1
@@ -449,7 +448,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     const char *vnames[] = { "id", "x", "y", "z", "shape", "xfact", "yfact",
         "labeldist", "labeldegree2", "framewidth",
         "fontsize", "rotation", "radius",
-        "diamondratio", "labeldegree", "vertexsize",
+        "diamondratio", "labeldegree",
         "font", "url", "color", "framecolor",
         "labelcolor"
     };
