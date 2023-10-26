@@ -138,8 +138,8 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * In addition the following vertex attributes might be added: \c id
  * and \c name are added (with the same value) if there are vertex IDs in the
  * file. \c id is deprecated in favour of \c name and will no longer be used
- * by future versions of igraph. \c x and \c y, and potentially \c z if there
- * are vertex coordinates in the file.
+ * by future versions of igraph. \c x and \c y, and potentially \c z are also
+ * added if there are vertex coordinates in the file.
  *
  * </para><para>
  * The \c weight edge attribute will be added if there are edge weights present.
@@ -340,10 +340,13 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
 
     for (s = src; *s; s++, d++) {
         switch (*s) {
+        /* Encode quotation marks as &#34;, as they would otherwise signify
+           the end/beginning of a string. */
         case '"':
             strcpy(d, "&#34;"); d += 4; break;
             break;
-        /* Convert both CR and LF to "\n", as neither should apear in a quoted string. */
+        /* Encode both CR and LF as \n, as neither should apear in a quoted string.
+           \n is the _only_ escape sequence Pajek understands. */
         case '\n':
         case '\r':
             *d = '\\'; d++;
@@ -398,6 +401,12 @@ static igraph_error_t igraph_i_pajek_escape(const char* src, char** dest) {
  * problems reading files written by igraph on a Windows machine, convert the
  * line endings manually with a text editor or with \c unix2dos or \c iconv
  * from the command line).
+ *
+ * </para><para>
+ * Pajek will only interpret UTF-8 encoded files if they contain a byte-order
+ * mark (BOM) at the beginning. igraph is agnostic of string attribute encodings
+ * and therefore it will never write a BOM. You need to add this manually
+ * if/when necessary.
  *
  * \param graph The graph object to write.
  * \param outstream The file to write to. It should be opened and writable.
