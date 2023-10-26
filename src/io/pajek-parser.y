@@ -772,7 +772,7 @@ static igraph_bool_t is_standard_vattr(const char *attrname) {
     "name", "x", "y", "z", "shape", "xfact", "yfact",
     "labeldist", "labeldegree2", "framewidth",
     "fontsize", "rotation", "radius",
-    "diamondratio", "labeldegree", "vertexsize",
+    "diamondratio", "labeldegree",
     "font", "url", "color", "framecolor",
     "labelcolor"
   };
@@ -791,7 +791,7 @@ static igraph_bool_t is_standard_eattr(const char *attrname) {
     "arrowsize", "edgewidth", "hook1", "hook2",
     "angle1", "angle2", "velocity1", "velocity2",
     "arrowpos", "labelpos", "labelangle",
-    "labelangle2", "labeldegree", "fontsize",
+    "labelangle2", "labeldegree", "fontsize", "font",
     "arrowtype", "linepattern", "label", "labelcolor",
     "color"
   };

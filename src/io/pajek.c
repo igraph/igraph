@@ -114,7 +114,7 @@ void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
  * \c labeldegree2 instead of \c lphi, \c framewidth instead of \c bw,
  * \c fontsize instead of \c fos, \c rotation instead of \c phi,
  * \c radius instead of \c r, \c diamondratio instead of \c q,
- * \c labeldegree instead of \c la, \c vertexsize instead of \c size,
+ * \c labeldegree instead of \c la,
  * \c color instead of \c ic, \c framecolor instead of \c bc,
  * \c labelcolor instead of \c lc; these belong to vertices.
  *
