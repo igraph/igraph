@@ -429,10 +429,10 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     const char *vnumnames[] = { "xfact", "yfact", "labeldist",
                                 "labeldegree2", "framewidth", "fontsize",
                                 "rotation", "radius", "diamondratio",
-                                "labeldegree", "vertexsize"
+                                "labeldegree"
                               };
     const char *vnumnames2[] = { "x_fact", "y_fact", "lr", "lphi", "bw",
-                                 "fos", "phi", "r", "q", "la", "size"
+                                 "fos", "phi", "r", "q", "la"
                                };
     IGRAPH_STATIC_ASSERT(sizeof(vnumnames) == sizeof(vnumnames2));
 

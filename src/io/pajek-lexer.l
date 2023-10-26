@@ -153,8 +153,6 @@ fos     { return VP_FOS; }
 font    { return VP_FONT; }
  /* http://mrvar.fdv.uni-lj.si/pajek/history.htm */
 url     { return VP_URL; }
- /* TODO: remove? */
-size    { return VP_SIZE; }
 }
 
 <edge>{

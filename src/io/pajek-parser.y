@@ -161,7 +161,6 @@ static igraph_error_t deconflict_attrname(char **attrname);
 %token VP_FOS
 %token VP_FONT
 %token VP_URL
-%token VP_SIZE /* TODO: remove? */
 
 %token EP_H1
 %token EP_H2
@@ -301,9 +300,6 @@ vertparam:
      }
      | VP_LA number {
          IGRAPH_YY_CHECK(add_numeric_vertex_attribute("labeldegree", $2, context));
-     }
-     | VP_SIZE number {
-         IGRAPH_YY_CHECK(add_numeric_vertex_attribute("vertexsize", $2, context));
      }
 ;
 
