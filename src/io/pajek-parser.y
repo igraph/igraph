@@ -148,41 +148,41 @@ static igraph_error_t deconflict_attrname(char **attrname);
 
 %token VP_X_FACT
 %token VP_Y_FACT
-%token VP_IC
-%token VP_BC
-%token VP_LC
-%token VP_LR
-%token VP_LPHI
-%token VP_BW
-%token VP_FOS
 %token VP_PHI
 %token VP_R
 %token VP_Q
+%token VP_IC
+%token VP_BC
+%token VP_BW
+%token VP_LC
 %token VP_LA
+%token VP_LR
+%token VP_LPHI
+%token VP_FOS
 %token VP_FONT
 %token VP_URL
-%token VP_SIZE
+%token VP_SIZE /* TODO: remove? */
 
-%token EP_C
-%token EP_S
-%token EP_A
-%token EP_W
 %token EP_H1
 %token EP_H2
+%token EP_W
+%token EP_C
+%token EP_P
+%token EP_A
+%token EP_S
 %token EP_A1
-%token EP_A2
 %token EP_K1
+%token EP_A2
 %token EP_K2
 %token EP_AP
-%token EP_P
 %token EP_L
 %token EP_LP
 %token EP_LR
 %token EP_LPHI
 %token EP_LC
 %token EP_LA
-%token EP_SIZE
 %token EP_FOS
+%token EP_FONT
 
 %%
 
@@ -406,9 +406,6 @@ edgeparam:
    | EP_LA number {
        IGRAPH_YY_CHECK(add_numeric_edge_attribute("labeldegree", $2, context));
    }
-   | EP_SIZE number { /* what is this??? */
-       IGRAPH_YY_CHECK(add_numeric_edge_attribute("arrowsize", $2, context));
-   }
    | EP_FOS number {
        IGRAPH_YY_CHECK(add_numeric_edge_attribute("fontsize", $2, context));
    }
@@ -428,6 +425,9 @@ epword: EP_A parstrval {
     }
     | EP_C parstrval {
       IGRAPH_YY_CHECK(add_string_edge_attribute("color", $2.str, $2.len, context));
+    }
+    | EP_FONT parstrval {
+      IGRAPH_YY_CHECK(add_string_edge_attribute("font", $2.str, $2.len, context));
     }
     | parname parstrval {
         IGRAPH_FINALLY(igraph_free, $1);
