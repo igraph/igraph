@@ -65,9 +65,11 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
 
 static igraph_error_t add_string_vertex_attribute(const char *name,
                                                const char *value,
+                                               size_t len,
                                                igraph_i_pajek_parsedata_t *context);
 static igraph_error_t add_string_edge_attribute(const char *name,
                                              const char *value,
+                                             size_t len,
                                              igraph_i_pajek_parsedata_t *context);
 static igraph_error_t add_numeric_vertex_attribute(const char *name,
                                                 igraph_real_t value,
@@ -86,12 +88,13 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
                                         igraph_integer_t count,
                                         const char *attrname,
                                         igraph_integer_t vid,
-                                        const char *str);
+                                        const char *str,
+                                        igraph_integer_t str_len);
 
 static igraph_error_t add_bipartite_type(igraph_i_pajek_parsedata_t *context);
 static igraph_error_t check_bipartite(igraph_i_pajek_parsedata_t *context);
 
-static igraph_error_t make_string(const char *s, size_t len, char **res);
+static igraph_error_t make_dynstr(const char *src, size_t len, char **res);
 static igraph_bool_t is_standard_vattr(const char *attrname);
 static igraph_bool_t is_standard_eattr(const char *attrname);
 static igraph_error_t deconflict_attrname(char **attrname);
@@ -113,7 +116,11 @@ static igraph_error_t deconflict_attrname(char **attrname);
 %union {
   igraph_integer_t intnum;
   igraph_real_t    realnum;
-  char *string;
+  struct {
+    char *str;
+    size_t len;
+  } string;
+  char *dynstr;
 }
 
 %type <intnum>   integer;
@@ -125,9 +132,10 @@ static igraph_error_t deconflict_attrname(char **attrname);
 %type <string>   word;
 %type <string>   vpwordpar;
 %type <string>   epwordpar;
+%type <dynstr>   parname;
 %type <intnum>   vertex;
 
-%destructor { free($$); } word vpwordpar epwordpar;
+%destructor { free($$); } parname;
 
 %token NEWLINE       "end of line"
 %token NUM           "number"
@@ -198,7 +206,11 @@ final_newlines: /* empty */ | NEWLINE final_newlines ;
 
 nethead: /* empty */ | NETWORKLINE ;
 
-vertices: verticeshead NEWLINE vertdefs;
+parname: word {
+  IGRAPH_YY_CHECK(make_dynstr($1.str, $1.len, &$$));
+} ;
+
+vertices: verticeshead NEWLINE vertdefs ;
 
 verticeshead: VERTICESLINE integer {
   context->vcount=$2;
@@ -245,8 +257,8 @@ vertexline: vertex NEWLINE |
 vertex: integer { $$=$1; };
 
 vertexid: word {
-  IGRAPH_YY_CHECK(add_string_vertex_attribute("id", $1, context));
-  IGRAPH_YY_CHECK(add_string_vertex_attribute("name", $1, context));
+  IGRAPH_YY_CHECK(add_string_vertex_attribute("id", $1.str, $1.len, context));
+  IGRAPH_YY_CHECK(add_string_vertex_attribute("name", $1.str, $1.len, context));
 };
 
 vertexcoords: /* empty */
@@ -261,7 +273,7 @@ vertexcoords: /* empty */
             };
 
 shape: /* empty */ | word {
-  IGRAPH_YY_CHECK(add_string_vertex_attribute("shape", $1, context));
+  IGRAPH_YY_CHECK(add_string_vertex_attribute("shape", $1.str, $1.len, context));
 };
 
 params: /* empty */ | params param;
@@ -304,25 +316,32 @@ param:
 ;
 
 vpword: VP_FONT vpwordpar {
-         IGRAPH_YY_CHECK(add_string_vertex_attribute("font", $2, context));
+         IGRAPH_YY_CHECK(add_string_vertex_attribute("font", $2.str, $2.len, context));
      }
      | VP_URL vpwordpar {
-         IGRAPH_YY_CHECK(add_string_vertex_attribute("url", $2, context));
+         IGRAPH_YY_CHECK(add_string_vertex_attribute("url", $2.str, $2.len, context));
      }
      | VP_IC vpwordpar {
-         IGRAPH_YY_CHECK(add_string_vertex_attribute("color", $2, context));
+         IGRAPH_YY_CHECK(add_string_vertex_attribute("color", $2.str, $2.len, context));
      }
      | VP_BC vpwordpar {
-         IGRAPH_YY_CHECK(add_string_vertex_attribute("framecolor", $2, context));
+         IGRAPH_YY_CHECK(add_string_vertex_attribute("framecolor", $2.str, $2.len, context));
      }
      | VP_LC vpwordpar {
-         IGRAPH_YY_CHECK(add_string_vertex_attribute("labelcolor", $2, context));
+         IGRAPH_YY_CHECK(add_string_vertex_attribute("labelcolor", $2.str, $2.len, context));
      }
-     | word vpwordpar {
-        if (is_standard_vattr($1)) {
+     | parname vpwordpar {
+         IGRAPH_FINALLY(igraph_free, $1);
+         if (is_standard_vattr($1)) {
           IGRAPH_YY_CHECK(deconflict_attrname(&$1));
-        }
-         IGRAPH_YY_CHECK(add_string_vertex_attribute($1, $2, context));
+          /* update address on finally stack */
+          IGRAPH_FINALLY_CLEAN(1);
+          IGRAPH_FINALLY(igraph_free, $1);
+         }
+         IGRAPH_YY_CHECK(add_string_vertex_attribute(
+           $1, $2.str, $2.len, context));
+         IGRAPH_FREE($1);
+         IGRAPH_FINALLY_CLEAN(1);
      }
 ;
 
@@ -426,25 +445,32 @@ edgeparam:
 ;
 
 epword: EP_A epwordpar {
-      IGRAPH_YY_CHECK(add_string_edge_attribute("arrowtype", $2, context));
+      IGRAPH_YY_CHECK(add_string_edge_attribute("arrowtype", $2.str, $2.len, context));
     }
     | EP_P epwordpar {
-      IGRAPH_YY_CHECK(add_string_edge_attribute("linepattern", $2, context));
+      IGRAPH_YY_CHECK(add_string_edge_attribute("linepattern", $2.str, $2.len, context));
     }
     | EP_L epwordpar {
-      IGRAPH_YY_CHECK(add_string_edge_attribute("label", $2, context));
+      IGRAPH_YY_CHECK(add_string_edge_attribute("label", $2.str, $2.len, context));
     }
     | EP_LC epwordpar {
-      IGRAPH_YY_CHECK(add_string_edge_attribute("labelcolor", $2, context));
+      IGRAPH_YY_CHECK(add_string_edge_attribute("labelcolor", $2.str, $2.len, context));
     }
     | EP_C epwordpar {
-      IGRAPH_YY_CHECK(add_string_edge_attribute("color", $2, context));
+      IGRAPH_YY_CHECK(add_string_edge_attribute("color", $2.str, $2.len, context));
     }
-    | word epwordpar {
+    | parname epwordpar {
+        IGRAPH_FINALLY(igraph_free, $1);
         if (is_standard_eattr($1)) {
           IGRAPH_YY_CHECK(deconflict_attrname(&$1));
+          /* update address on finally stack */
+          IGRAPH_FINALLY_CLEAN(1);
+          IGRAPH_FINALLY(igraph_free, $1);
         }
-        IGRAPH_YY_CHECK(add_string_edge_attribute($1, $2, context));
+        IGRAPH_YY_CHECK(add_string_edge_attribute(
+           $1, $2.str, $2.len, context));
+        IGRAPH_FREE($1);
+        IGRAPH_FINALLY_CLEAN(1);
      }
 ;
 
@@ -531,12 +557,12 @@ number: NUM  {
   $$=val;
 };
 
-word: ALNUM { make_string(igraph_pajek_yyget_text(scanner), 
-                          igraph_pajek_yyget_leng(scanner), &$$); }
-      | NUM { make_string(igraph_pajek_yyget_text(scanner), 
-                          igraph_pajek_yyget_leng(scanner), &$$); }
-      | QSTR { make_string(igraph_pajek_yyget_text(scanner)+1, 
-                           igraph_pajek_yyget_leng(scanner)-2, &$$); };
+word: ALNUM { $$.str=igraph_pajek_yyget_text(scanner);
+              $$.len=igraph_pajek_yyget_leng(scanner); }
+      | NUM { $$.str=igraph_pajek_yyget_text(scanner);
+              $$.len=igraph_pajek_yyget_leng(scanner); }
+      | QSTR { $$.str=igraph_pajek_yyget_text(scanner)+1;
+               $$.len=igraph_pajek_yyget_leng(scanner)-2; };
 
 %%
 
@@ -549,11 +575,7 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
   return 0;
 }
 
-static igraph_error_t make_string(const char *s, size_t len, char **res) {
-  *res = strndup(s, len);
-  CHECK_OOM_RP(*res);
-  return IGRAPH_SUCCESS;
-}
+/* TODO: NA's */
 
 static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
                                             igraph_vector_ptr_t *attrs,
@@ -579,7 +601,7 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
     IGRAPH_VECTOR_INIT_FINALLY(na, count);
 
     rec->name = strdup(attrname);
-    CHECK_OOM_RP(rec->name); 
+    CHECK_OOM_RP(rec->name);
     IGRAPH_FINALLY(igraph_free, (void *) rec->name);
 
     rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
@@ -609,12 +631,19 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
 
 /* TODO: NA's */
 
+static igraph_error_t make_dynstr(const char *src, size_t len, char **res) {
+  *res = strndup(src, len);
+  CHECK_OOM_RP(*res);
+  return IGRAPH_SUCCESS;
+}
+
 static igraph_error_t add_string_attribute(igraph_trie_t *names,
                                            igraph_vector_ptr_t *attrs,
                                            igraph_integer_t count,
                                            const char *attrname,
                                            igraph_integer_t elem_id,
-                                           const char *str) {
+                                           const char *str,
+                                           igraph_integer_t str_len) {
   igraph_integer_t attrsize=igraph_trie_size(names);
   igraph_integer_t id;
   igraph_strvector_t *na;
@@ -648,31 +677,33 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
   if (igraph_strvector_size(na) <= elem_id) {
     IGRAPH_CHECK(igraph_strvector_resize(na, elem_id+1));
   }
-  IGRAPH_CHECK(igraph_strvector_set(na, elem_id, str));
+  IGRAPH_CHECK(igraph_strvector_set_len(na, elem_id, str, str_len));
 
   return IGRAPH_SUCCESS;
 }
 
 static igraph_error_t add_string_vertex_attribute(const char *name,
                                                   const char *value,
+                                                  size_t len,
                                                   igraph_i_pajek_parsedata_t *context) {
 
   return add_string_attribute(context->vertex_attribute_names,
                               context->vertex_attributes,
                               context->vcount,
                               name, context->actvertex-1,
-                              value);
+                              value, len);
 }
 
 static igraph_error_t add_string_edge_attribute(const char *name,
                                                 const char *value,
+                                                size_t len,
                                                 igraph_i_pajek_parsedata_t *context) {
 
   return add_string_attribute(context->edge_attribute_names,
                               context->edge_attributes,
                               context->actedge,
                               name, context->actedge-1,
-                              value);
+                              value, len);
 }
 
 static igraph_error_t add_numeric_vertex_attribute(const char *name,
@@ -786,7 +817,7 @@ static igraph_bool_t is_standard_vattr(const char *attrname) {
 /* Check if attrname is a standard Pajek edge attribute. */
 static igraph_bool_t is_standard_eattr(const char *attrname) {
   const char *names[] = {
-    "weight", 
+    "weight",
     "arrowsize", "edgewidth", "hook1", "hook2",
     "angle1", "angle2", "velocity1", "velocity2",
     "arrowpos", "labelpos", "labelangle",
