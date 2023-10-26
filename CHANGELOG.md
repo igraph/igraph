@@ -4,7 +4,7 @@
 
 ### Changes
 
- - The behaviour of the Pajek format reader is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret.
+ - The behaviour of the Pajek format reader and writer is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret. Only those vertex and edge parameters are treated as valid which Pajek itself understands, therefore support for `size` is now dropped, and support for the `font` edge parameter is added. See http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm for more information. Invalid/unrecognized parameters are now converted to igraph attributes by the reader, but just as before, they are not output by the writer.
  - The Pajek format writer now encodes newline and quotation mark characters in a Pajek-compatible manner (`\n` and `&#34;`, respectively).
 
 ### Fixed
