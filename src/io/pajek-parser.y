@@ -124,16 +124,11 @@ static igraph_error_t deconflict_attrname(char **attrname);
 }
 
 %type <intnum>   integer;
-%type <intnum>   arcfrom;
-%type <intnum>   arcto;
-%type <intnum>   edgefrom;
-%type <intnum>   edgeto;
+%type <intnum>   vertex;
 %type <realnum>  number;
 %type <string>   word;
-%type <string>   vpwordpar;
-%type <string>   epwordpar;
+%type <string>   parstrval;
 %type <dynstr>   parname;
-%type <intnum>   vertex;
 
 %destructor { free($$); } parname;
 
@@ -206,10 +201,6 @@ final_newlines: /* empty */ | NEWLINE final_newlines ;
 
 nethead: /* empty */ | NETWORKLINE ;
 
-parname: word {
-  IGRAPH_YY_CHECK(make_dynstr($1.str, $1.len, &$$));
-} ;
-
 vertices: verticeshead NEWLINE vertdefs ;
 
 verticeshead: VERTICESLINE integer {
@@ -243,18 +234,19 @@ verticeshead: VERTICESLINE integer {
 vertdefs: /* empty */  | vertdefs vertexline;
 
 vertexline: vertex NEWLINE |
-            vertex {
-              context->actvertex=$1;
-              if (context->actvertex < 1 || context->actvertex > context->vcount) {
-                  IGRAPH_YY_ERRORF(
-                              "Invalid vertex id (%" IGRAPH_PRId ") in Pajek file. "
-                              "The number of vertices is %" IGRAPH_PRId ".",
-                              IGRAPH_EINVAL, context->actvertex, context->vcount);
-              }
-            } vertexid vertexcoords shape params NEWLINE { }
+            vertex { context->actvertex=$1; } vertexid vertexcoords shape vertparams NEWLINE { }
 ;
 
-vertex: integer { $$=$1; };
+vertex: integer {
+  igraph_integer_t v = $1;
+  if (v < 1 || v > context->vcount) {
+      IGRAPH_YY_ERRORF(
+                  "Invalid vertex id (%" IGRAPH_PRId ") in Pajek file. "
+                  "The number of vertices is %" IGRAPH_PRId ".",
+                  IGRAPH_EINVAL, v, context->vcount);
+  }
+  $$ = v;
+};
 
 vertexid: word {
   IGRAPH_YY_CHECK(add_string_vertex_attribute("id", $1.str, $1.len, context));
@@ -276,9 +268,9 @@ shape: /* empty */ | word {
   IGRAPH_YY_CHECK(add_string_vertex_attribute("shape", $1.str, $1.len, context));
 };
 
-params: /* empty */ | params param;
+vertparams: /* empty */ | vertparams vertparam;
 
-param:
+vertparam:
        vpword
      | VP_X_FACT number {
          IGRAPH_YY_CHECK(add_numeric_vertex_attribute("xfact", $2, context));
@@ -315,22 +307,22 @@ param:
      }
 ;
 
-vpword: VP_FONT vpwordpar {
+vpword: VP_FONT parstrval {
          IGRAPH_YY_CHECK(add_string_vertex_attribute("font", $2.str, $2.len, context));
      }
-     | VP_URL vpwordpar {
+     | VP_URL parstrval {
          IGRAPH_YY_CHECK(add_string_vertex_attribute("url", $2.str, $2.len, context));
      }
-     | VP_IC vpwordpar {
+     | VP_IC parstrval {
          IGRAPH_YY_CHECK(add_string_vertex_attribute("color", $2.str, $2.len, context));
      }
-     | VP_BC vpwordpar {
+     | VP_BC parstrval {
          IGRAPH_YY_CHECK(add_string_vertex_attribute("framecolor", $2.str, $2.len, context));
      }
-     | VP_LC vpwordpar {
+     | VP_LC parstrval {
          IGRAPH_YY_CHECK(add_string_vertex_attribute("labelcolor", $2.str, $2.len, context));
      }
-     | parname vpwordpar {
+     | parname parstrval {
          IGRAPH_FINALLY(igraph_free, $1);
          if (is_standard_vattr($1)) {
           IGRAPH_YY_CHECK(deconflict_attrname(&$1));
@@ -345,8 +337,6 @@ vpword: VP_FONT vpwordpar {
      }
 ;
 
-vpwordpar: word { $$=$1; };
-
 edgeblock: /* empty */ | edgeblock arcs | edgeblock edges | edgeblock arcslist | edgeblock edgeslist | edgeblock adjmatrix;
 
 arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=true; }
@@ -354,40 +344,20 @@ arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=true; }
 
 arcsdefs: /* empty */ | arcsdefs arcsline;
 
-arcsline: arcfrom arcto { context->actedge++; } weight edgeparams NEWLINE  {
-  if ($1 < 1) {
-      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
-  }
-  if ($2 < 1) {
-      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $2);
-  }
+arcsline: vertex vertex { context->actedge++; } weight edgeparams NEWLINE  {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;
-
-arcfrom: integer;
-
-arcto: integer;
 
 edges:   EDGESLINE NEWLINE edgesdefs { context->directed=0; }
        | EDGESLINE number NEWLINE edgesdefs { context->directed=0; }
 
 edgesdefs: /* empty */ | edgesdefs edgesline;
 
-edgesline: edgefrom edgeto { context->actedge++; } weight edgeparams NEWLINE {
-  if ($1 < 1) {
-      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $1);
-  }
-  if ($2 < 1) {
-      IGRAPH_YY_ERRORF("Non-positive vertex ID (%" IGRAPH_PRId ") while reading Pajek file.", IGRAPH_EINVAL, $2);
-  }
+edgesline: vertex vertex { context->actedge++; } weight edgeparams NEWLINE {
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $1-1));
   IGRAPH_YY_CHECK(igraph_vector_int_push_back(context->vector, $2-1)); }
 ;
-
-edgefrom: integer;
-
-edgeto: integer;
 
 weight: /* empty */ | number {
   IGRAPH_YY_CHECK(add_numeric_edge_attribute("weight", $1, context));
@@ -444,22 +414,22 @@ edgeparam:
    }
 ;
 
-epword: EP_A epwordpar {
+epword: EP_A parstrval {
       IGRAPH_YY_CHECK(add_string_edge_attribute("arrowtype", $2.str, $2.len, context));
     }
-    | EP_P epwordpar {
+    | EP_P parstrval {
       IGRAPH_YY_CHECK(add_string_edge_attribute("linepattern", $2.str, $2.len, context));
     }
-    | EP_L epwordpar {
+    | EP_L parstrval {
       IGRAPH_YY_CHECK(add_string_edge_attribute("label", $2.str, $2.len, context));
     }
-    | EP_LC epwordpar {
+    | EP_LC parstrval {
       IGRAPH_YY_CHECK(add_string_edge_attribute("labelcolor", $2.str, $2.len, context));
     }
-    | EP_C epwordpar {
+    | EP_C parstrval {
       IGRAPH_YY_CHECK(add_string_edge_attribute("color", $2.str, $2.len, context));
     }
-    | parname epwordpar {
+    | parname parstrval {
         IGRAPH_FINALLY(igraph_free, $1);
         if (is_standard_eattr($1)) {
           IGRAPH_YY_CHECK(deconflict_attrname(&$1));
@@ -473,8 +443,6 @@ epword: EP_A epwordpar {
         IGRAPH_FINALLY_CLEAN(1);
      }
 ;
-
-epwordpar: word { $$=$1; };
 
 arcslist: ARCSLISTLINE NEWLINE arcslistlines { context->directed=true; };
 
@@ -556,6 +524,12 @@ number: NUM  {
                                       &val));
   $$=val;
 };
+
+parname: word {
+  IGRAPH_YY_CHECK(make_dynstr($1.str, $1.len, &$$));
+};
+
+parstrval: word { $$=$1; };
 
 word: ALNUM { $$.str=igraph_pajek_yyget_text(scanner);
               $$.len=igraph_pajek_yyget_leng(scanner); }
