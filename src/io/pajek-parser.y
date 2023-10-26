@@ -768,8 +768,12 @@ static igraph_error_t check_bipartite(igraph_i_pajek_parsedata_t *context) {
 /* Check if attrname is a standard Pajek vertex attribute. */
 static igraph_bool_t is_standard_vattr(const char *attrname) {
   const char *names[] = {
-    "id", // TODO remove for 0.11
-    "name", "x", "y", "z", "shape", "xfact", "yfact",
+    /* vertex names: */
+    "id", /* TODO: remove for 0.11 */ "name",
+    /* other vertex attributes: */
+    "type", "x", "y", "z",
+    /* vertex parameters: */
+    "xfact", "yfact",
     "labeldist", "labeldegree2", "framewidth",
     "fontsize", "rotation", "radius",
     "diamondratio", "labeldegree",
@@ -787,7 +791,9 @@ static igraph_bool_t is_standard_vattr(const char *attrname) {
 /* Check if attrname is a standard Pajek edge attribute. */
 static igraph_bool_t is_standard_eattr(const char *attrname) {
   const char *names[] = {
+    /* other edge attributes: */
     "weight",
+    /* edge parameters: */
     "arrowsize", "edgewidth", "hook1", "hook2",
     "angle1", "angle2", "velocity1", "velocity2",
     "arrowpos", "labelpos", "labelangle",
