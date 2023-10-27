@@ -50,11 +50,11 @@ IGRAPH_EXPORT igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
                                               igraph_real_t *res,
                                               igraph_bool_t directed);
 
-IGRAPH_EXPORT igraph_error_t igraph_construct_jdm(const igraph_t *graph,
-                                                  igraph_matrix_t *m,
-                                                  igraph_integer_t dout,
-                                                  igraph_integer_t din,
-                                                  const igraph_vector_t *weights);
+IGRAPH_EXPORT igraph_error_t igraph_jdm(const igraph_t *graph,
+                                        igraph_matrix_t *m,
+                                        igraph_integer_t dout,
+                                        igraph_integer_t din,
+                                        const igraph_vector_t *weights);
 
 __END_DECLS
 
