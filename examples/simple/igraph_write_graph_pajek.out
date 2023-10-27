@@ -40,9 +40,9 @@
 5 "E" "escaping spaces"
 6 "F" "square"
 7 "G" "square"
-8 "H" "escaping \\backslashes\\"
+8 "H" "escaping\nnewline"
 9 "I" "square"
-10 "J" "escaping \"quotes\""
+10 "J" "encoding &#34;quotes&#34;"
 *Arcs
 1 2
 2 3

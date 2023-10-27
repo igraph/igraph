@@ -31,7 +31,7 @@ int main(void) {
     igraph_set_attribute_table(&igraph_cattribute_table);
 
     /* save a simple ring graph */
-    igraph_ring(&g, 10, IGRAPH_DIRECTED, 0 /* mutual */, 1 /* circular */);
+    igraph_ring(&g, 10, IGRAPH_DIRECTED, false /* mutual */, true /* circular */);
     igraph_write_graph_pajek(&g, stdout);
 
     /* add some vertex attributes */
@@ -60,9 +60,9 @@ int main(void) {
     igraph_strvector_push_back(&names, "escaping spaces");
     igraph_strvector_push_back(&names, "square");
     igraph_strvector_push_back(&names, "square");
-    igraph_strvector_push_back(&names, "escaping \\backslashes\\");
+    igraph_strvector_push_back(&names, "escaping\nnewline");
     igraph_strvector_push_back(&names, "square");
-    igraph_strvector_push_back(&names, "escaping \"quotes\"");
+    igraph_strvector_push_back(&names, "encoding \"quotes\"");
     SETVASV(&g, "shape", &names);
     igraph_strvector_destroy(&names);
 

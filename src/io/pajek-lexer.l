@@ -126,7 +126,7 @@ any         {any_no_star}|\*
 ^\*edgeslist       { BEGIN(INITIAL);return EDGESLISTLINE; }
 ^\*matrix          { BEGIN(INITIAL); return MATRIXLINE; }
 
-^\*[a-z]+          { BEGIN(unknown_line); IGRAPH_WARNINGF("Skipping unknown section '%s' on line %d.", yytext, yylineno); }
+^\*{word}+         { BEGIN(unknown_line); IGRAPH_WARNINGF("Skipping unknown section '%s' on line %d.", yytext, yylineno); }
 
 {newline}          { yy_set_bol(true); return NEWLINE; }
 
@@ -136,47 +136,47 @@ any         {any_no_star}|\*
 (\+|\-)?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
 
 <vert>{
+ /* http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm */
 x_fact  { return VP_X_FACT; }
 y_fact  { return VP_Y_FACT; }
-ic      { return VP_IC; }
-bc      { return VP_BC; }
-bw      { return VP_BW; }
 phi     { return VP_PHI; }
 r       { return VP_R; }
 q       { return VP_Q; }
-font    { return VP_FONT; }
-url     { return VP_URL; }
-
-lphi    { return VP_LPHI; }
+ic      { return VP_IC; }
+bc      { return VP_BC; }
+bw      { return VP_BW; }
 lc      { return VP_LC; }
-lr      { return VP_LR; }
 la      { return VP_LA; }
-size    { return VP_SIZE; }
+lr      { return VP_LR; }
+lphi    { return VP_LPHI; }
 fos     { return VP_FOS; }
+font    { return VP_FONT; }
+ /* http://mrvar.fdv.uni-lj.si/pajek/history.htm */
+url     { return VP_URL; }
 }
 
 <edge>{
-c       { return EP_C; }
-p       { return EP_P; }
-s       { return EP_S; }
-a       { return EP_A; }
-w       { return EP_W; }
+ /* http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm */
 h1      { return EP_H1; }
 h2      { return EP_H2; }
+w       { return EP_W; }
+c       { return EP_C; }
+p       { return EP_P; }
+a       { return EP_A; }
+s       { return EP_S; }
 a1      { return EP_A1; }
-a2      { return EP_A2; }
 k1      { return EP_K1; }
+a2      { return EP_A2; }
 k2      { return EP_K2; }
 ap      { return EP_AP; }
 l       { return EP_L; }
 lp      { return EP_LP; }
-
+lr      { return EP_LR; }
 lphi    { return EP_LPHI; }
 lc      { return EP_LC; }
-lr      { return EP_LR; }
 la      { return EP_LA; }
-size    { return EP_SIZE; }
 fos     { return EP_FOS; }
+font    { return EP_FONT; }
 }
 
 {word}+           { return ALNUM; }
