@@ -416,12 +416,12 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
 }
 
 /**
- * \function igraph_jdm
+ * \function igraph_joint_degree_matrix
  * \brief The joint degree matrix of a graph.
  *
  * \experimental
  *
- * This function constructs the joint degree matrix of the graph \p jdm.
+ * This function constructs the joint degree matrix of a graph, \p jdm.
  * <code>jdm[i-1, j-1]</code> will contain the number of edges (or sum of edge
  * weights) between vertices of degrees <code>i-1</code> and <code>j-1</code>.
  * Self loops in undirected graphs are only counted once.
@@ -443,7 +443,7 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * where E is the number of edges in input graph.
  */
 
-igraph_error_t igraph_jdm(const igraph_t* graph,
+igraph_error_t igraph_joint_degree_matrix(const igraph_t* graph,
                           igraph_matrix_t* jdm,
                           igraph_integer_t max_out_degree,
                           igraph_integer_t max_in_degree,
