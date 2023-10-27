@@ -97,11 +97,11 @@ Directed: din is small, cropped JDM (4, 2)
          0        1
          0        2
          1        2 ]
-Directed: Automatic resize, dout or din < 0 (4x3)
-[        0        1        0
-         0        1        1
-         0        2        1
-         1        2        1 ]
+Directed: Automatic resize, dout < 0 (4x2)
+[        0        1
+         0        1
+         0        2
+         1        2 ]
 Directed: Valid dout and din (5x5)
 [        0        1        0        0        0
          0        1        1        0        0

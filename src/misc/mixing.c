@@ -442,11 +442,10 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
 
 igraph_error_t igraph_construct_jdm(const igraph_t* graph,
                                     igraph_matrix_t* jdm,
-                                    igraph_integer_t dout,
-                                    igraph_integer_t din,
+                                    igraph_integer_t max_out_degree,
+                                    igraph_integer_t max_in_degree,
                                     const igraph_vector_t* weights) {
     igraph_eit_t eit;
-    igraph_es_t es;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t eid;
@@ -464,105 +463,88 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
     if (igraph_is_directed(graph)) {
         igraph_vector_int_t out_degrees;
         igraph_vector_int_t in_degrees;
-        igraph_integer_t max_out_degree;
-        igraph_integer_t max_in_degree;
 
         // Compute max degrees
         IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degrees, no_of_nodes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, true));
         IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, true));
-        if (igraph_vector_int_size(&out_degrees) == 0) {
-            max_out_degree = 0;
-        } else {
-            max_out_degree = igraph_vector_int_max(&out_degrees);
-        }
-        if (igraph_vector_int_size(&in_degrees) == 0) {
-            max_in_degree = 0;
-        } else {
-            max_in_degree = igraph_vector_int_max(&in_degrees);
+
+        if (max_out_degree <= 0) {
+            max_out_degree = no_of_nodes > 0 ? igraph_vector_int_max(&out_degrees) : 0;
         }
 
-        if (dout > 0 && din > 0) {
-            IGRAPH_CHECK(igraph_matrix_resize(jdm, dout, din));
-        } else {
-            IGRAPH_CHECK(igraph_matrix_resize(jdm, max_out_degree, max_in_degree));
+        if (max_in_degree <= 0) {
+            max_in_degree = no_of_nodes > 0 ? igraph_vector_int_max(&in_degrees) : 0;
         }
+
+        IGRAPH_CHECK(igraph_matrix_resize(jdm, max_out_degree, max_in_degree));
         igraph_matrix_null(jdm);
-        IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
-        IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
 
-        while (!IGRAPH_EIT_END(eit)) {
+        IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit));
+        IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+        for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
             eid = IGRAPH_EIT_GET(eit);
             v1id = IGRAPH_FROM(graph, eid);
             v2id = IGRAPH_TO(graph, eid);
-            v1deg = igraph_vector_int_get(&out_degrees,v1id);
-            v2deg = igraph_vector_int_get(&in_degrees, v2id);
-            if (!(dout > 0 && din > 0 && (v1deg > dout || v2deg > din))) {
-                if (!weights) {
-                    MATRIX(*jdm, v1deg-1, v2deg-1)++;
-                } else {
-                    MATRIX(*jdm, v1deg-1, v2deg-1) += VECTOR(*weights)[eid];
-                }
+            v1deg = VECTOR(out_degrees)[v1id];
+            v2deg = VECTOR(in_degrees)[v2id];
+            if (v1deg <= max_out_degree && v2deg <= max_in_degree) {
+                MATRIX(*jdm, v1deg-1, v2deg-1) += weights ? VECTOR(*weights)[eid] : 1;
             }
-            IGRAPH_EIT_NEXT(eit);
         }
 
-        igraph_vector_int_destroy(&out_degrees);
+        igraph_eit_destroy(&eit);
         igraph_vector_int_destroy(&in_degrees);
-        IGRAPH_FINALLY_CLEAN(2);
+        igraph_vector_int_destroy(&out_degrees);
+        IGRAPH_FINALLY_CLEAN(3);
 
     } else {
         igraph_vector_int_t degrees;
-        igraph_integer_t max_degree;
-        // Compute max degrees
+        igraph_integer_t maxdeg;
+
         IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
         IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
-        if (igraph_vector_int_size(&degrees) == 0) {
-            max_degree = 0;
-        } else {
-            max_degree = igraph_vector_int_max(&degrees);
-        }
-        if (dout > 0 && din > 0) {
-            IGRAPH_CHECK(igraph_matrix_resize(jdm, dout, din));
-        } else {
-            IGRAPH_CHECK(igraph_matrix_resize(jdm, max_degree, max_degree));
-        }
-        igraph_matrix_null(jdm);
-        IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
-        IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
 
+        // Compute max degree of the graph only if needed
+        if (max_out_degree <= 0 || max_in_degree <= 0) {
+            maxdeg = no_of_nodes > 0 ? igraph_vector_int_max(&degrees) : 0;
+        }
+
+        if (max_out_degree <= 0) {
+            max_out_degree = maxdeg;
+        }
+        if (max_in_degree <= 0) {
+            max_in_degree = maxdeg;
+        }
+
+        IGRAPH_CHECK(igraph_matrix_resize(jdm, max_out_degree, max_in_degree));
+        igraph_matrix_null(jdm);
+
+        IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit));
+        IGRAPH_FINALLY(igraph_eit_destroy, &eit);
         while (!IGRAPH_EIT_END(eit)) {
             eid = IGRAPH_EIT_GET(eit);
             v1id = IGRAPH_FROM(graph, eid);
             v2id = IGRAPH_TO(graph, eid);
-            v1deg = igraph_vector_int_get(&degrees, v1id);
-            v2deg = igraph_vector_int_get(&degrees, v2id);
+            v1deg = VECTOR(degrees)[v1id];
+            v2deg = VECTOR(degrees)[v2id];
+
             // Undirected JDMs are symmetrical, needs to be accounted for this when indexing.
-            if (!weights) {
-                if (!(dout > 0 && din > 0 && (v1deg > dout || v2deg > din))) {
-                    MATRIX(*jdm, v1deg - 1, v2deg - 1)++;
-                }
-                if (!(dout > 0 && din > 0 && (v2deg > dout || v1deg > din))) {
-                    MATRIX(*jdm, v2deg - 1, v1deg - 1)++;
-                }
-            } else {
-                if (!(dout > 0 && din > 0 && (v1deg > dout || v2deg > din))) {
-                    MATRIX(*jdm, v1deg - 1, v2deg - 1) += VECTOR(*weights)[eid];
-                }
-                if (!(dout > 0 && din > 0 && (v2deg > dout || v1deg > din))) {
-                    MATRIX(*jdm, v2deg - 1, v1deg - 1) += VECTOR(*weights)[eid];
-                }
+            if (v1deg <= max_out_degree && v2deg <= max_in_degree) {
+                MATRIX(*jdm, v1deg-1, v2deg-1) += weights ? VECTOR(*weights)[eid] : 1;
+            }
+            if (v2deg <= max_out_degree && v1deg <= max_in_degree) {
+                MATRIX(*jdm, v2deg-1, v1deg-1) += weights ? VECTOR(*weights)[eid] : 1;
             }
 
             IGRAPH_EIT_NEXT(eit);
         }
 
+        igraph_eit_destroy(&eit);
         igraph_vector_int_destroy(&degrees);
-        IGRAPH_FINALLY_CLEAN(1);
+        IGRAPH_FINALLY_CLEAN(2);
     }
-    igraph_eit_destroy(&eit);
-    igraph_es_destroy(&es);
 
     return IGRAPH_SUCCESS;
 }

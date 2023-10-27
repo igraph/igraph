@@ -250,7 +250,7 @@ int main (void) {
     igraph_construct_jdm(&g, &jdm, 4, 2, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
-    printf("Directed: Automatic resize, dout or din < 0 (4x3)\n");
+    printf("Directed: Automatic resize, dout < 0 (4x2)\n");
     igraph_small(&g, 5, true,
                  0, 1, 0, 2, 0, 4,
                  1, 0,
