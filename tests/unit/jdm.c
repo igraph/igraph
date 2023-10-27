@@ -19,24 +19,24 @@
 #include <igraph.h>
 #include "test_utilities.h"
 
-void print_and_destroy(igraph_t* g, igraph_matrix_int_t* jdm, igraph_vector_int_t* weights) {
-      igraph_matrix_int_print(jdm);
+void print_and_destroy(igraph_t* g, igraph_matrix_t* jdm, igraph_vector_t* weights) {
+      print_matrix(jdm);
 
       igraph_destroy(g);
-      igraph_matrix_int_destroy(jdm);
+      igraph_matrix_destroy(jdm);
       if (weights) {
-          igraph_vector_int_destroy(weights);
+          igraph_vector_destroy(weights);
       }
 }
 
 int main (void) {
     igraph_t g;
-    igraph_matrix_int_t jdm;
-    igraph_vector_int_t weights;
+    igraph_matrix_t jdm;
+    igraph_vector_t weights;
 
     printf("Graph with no vertices\n");
     igraph_small(&g, 0, false, -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, -1, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -47,7 +47,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -58,7 +58,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -69,7 +69,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -80,7 +80,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -91,7 +91,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -102,7 +102,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -113,7 +113,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -124,7 +124,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -136,8 +136,8 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_vector_int_init_range(&weights, -1,6);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, -1,6);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -148,8 +148,8 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_vector_int_init_range(&weights, -2,8);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, -2,8);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -160,8 +160,8 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_vector_int_init_range(&weights, 1,9);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, 1,9);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -172,8 +172,8 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_vector_int_init_range(&weights, 1,12);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, 1,12);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -184,8 +184,8 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_vector_int_init_range(&weights, 1,9);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, 1,9);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -196,8 +196,8 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_vector_int_init_range(&weights, 1,12);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, 1,12);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -208,8 +208,8 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_vector_int_init_range(&weights, 1,10);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, 1,10);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -220,114 +220,107 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_vector_int_init_range(&weights, 1,13);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_vector_init_range(&weights, 1,13);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 0, 0, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
     // dout din tests
+
     // Directed
-    // Erroneous calls
+    printf("Directed: dout is small, cropped JDM (3x3)\n");
+    igraph_small(&g, 5, true,
+                 0, 1, 0, 2, 0, 4,
+                 1, 0,
+                 3, 2, 3, 4,
+                 4, 0, 4, 1, 4, 2, 4, 3,
+                 -1);
+    igraph_matrix_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 3, 3, NULL);
+    print_and_destroy(&g, &jdm, NULL);
 
-    // dout is too small
+    printf("Directed: din is small, cropped JDM (4, 2)\n");
     igraph_small(&g, 5, true,
                  0, 1, 0, 2, 0, 4,
                  1, 0,
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
-    CHECK_ERROR(igraph_construct_jdm(&g, &jdm, 3, 3, NULL), IGRAPH_EINVAL);
-    igraph_destroy(&g);
-    igraph_matrix_int_destroy(&jdm);
-    // din is too small
-    igraph_small(&g, 5, true,
-                 0, 1, 0, 2, 0, 4,
-                 1, 0,
-                 3, 2, 3, 4,
-                 4, 0, 4, 1, 4, 2, 4, 3,
-                 -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
-    CHECK_ERROR(igraph_construct_jdm(&g, &jdm, 4, 2, NULL), IGRAPH_EINVAL);
-    igraph_destroy(&g);
-    igraph_matrix_int_destroy(&jdm);
+    igraph_matrix_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 4, 2, NULL);
+    print_and_destroy(&g, &jdm, NULL);
 
-    // Successful calls
-    printf("Automatic resize, dout or din < 0\n");
+    printf("Directed: Automatic resize, dout or din < 0 (4x3)\n");
     igraph_small(&g, 5, true,
                  0, 1, 0, 2, 0, 4,
                  1, 0,
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, -1, 2, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
-    printf("Valid dout and din\n");
+    printf("Directed: Valid dout and din (5x5)\n");
     igraph_small(&g, 5, true,
                  0, 1, 0, 2, 0, 4,
                  1, 0,
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 5, 5, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
     // Undirected
-    // Erroneous calls
+    printf("Undirected: dout is small, cropped JDM (3x4)\n");
+    igraph_small(&g, 5, false,
+                 0, 1, 0, 2, 0, 4,
+                 1, 4,
+                 2, 3, 2, 4,
+                 3, 4,
+                 -1);
+    igraph_matrix_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 3, 4, NULL);
+    print_and_destroy(&g, &jdm, NULL);
 
-    // dout is too small -> Throw error
+    printf("Undirected: din is small, cropped JDM (4x3)\n");
     igraph_small(&g, 5, false,
                  0, 1, 0, 2, 0, 4,
                  1, 4,
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
-    CHECK_ERROR(igraph_construct_jdm(&g, &jdm, 3, 4, NULL), IGRAPH_EINVAL);
-    igraph_destroy(&g);
-    igraph_matrix_int_destroy(&jdm);
-    // din is too small -> Throw error
-    igraph_small(&g, 5, false,
-                 0, 1, 0, 2, 0, 4,
-                 1, 4,
-                 2, 3, 2, 4,
-                 3, 4,
-                 -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
-    CHECK_ERROR(igraph_construct_jdm(&g, &jdm, 4, 3, NULL), IGRAPH_EINVAL);
-    igraph_destroy(&g);
-    igraph_matrix_int_destroy(&jdm);
+    igraph_matrix_init(&jdm, 1, 1);
+    igraph_construct_jdm(&g, &jdm, 4, 3, NULL);
+    print_and_destroy(&g, &jdm, NULL);
 
-    // Successful calls
-    printf("Automatic resize, dout or din < 0\n");
+    printf("Undirected: Automatic resize, dout or din < 0 (4x4)\n");
     igraph_small(&g, 5, false,
                  0, 1, 0, 2, 0, 4,
                  1, 4,
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
-    printf("Valid dout and din\n");
+    printf("Undirected: Valid dout and din (5x5)\n");
     igraph_small(&g, 5, false,
                  0, 1, 0, 2, 0, 4,
                  1, 4,
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_int_init(&jdm, 1, 1);
+    igraph_matrix_init(&jdm, 1, 1);
     igraph_construct_jdm(&g, &jdm, 5, 5, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
     // Clean up
     igraph_destroy(&g);
-    igraph_matrix_int_destroy(&jdm);
-    igraph_vector_int_destroy(&weights);
+    igraph_matrix_destroy(&jdm);
+    igraph_vector_destroy(&weights);
     VERIFY_FINALLY_STACK();
 
     return 0;

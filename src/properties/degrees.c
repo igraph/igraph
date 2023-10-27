@@ -544,10 +544,10 @@ igraph_error_t igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
  */
 
 igraph_error_t igraph_construct_jdm(const igraph_t* graph,
-                                    igraph_matrix_int_t* jdm,
+                                    igraph_matrix_t* jdm,
                                     igraph_integer_t dout,
                                     igraph_integer_t din,
-                                    const igraph_vector_int_t* weights) {
+                                    const igraph_vector_t* weights) {
     igraph_eit_t eit;
     igraph_es_t es;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -558,10 +558,10 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
     igraph_integer_t v1deg;
     igraph_integer_t v2deg;
 
-    if (weights && igraph_vector_int_size(weights) != no_of_edges) {
+    if (weights && igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
                       IGRAPH_EINVAL,
-                      igraph_vector_int_size(weights), no_of_edges);
+                      igraph_vector_size(weights), no_of_edges);
     }
 
     if (igraph_is_directed(graph)) {
@@ -592,11 +592,11 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
                               IGRAPH_EINVAL,
                               dout, din, max_out_degree, max_in_degree);
             }
-            IGRAPH_CHECK(igraph_matrix_int_resize(jdm, dout, din));
+            IGRAPH_CHECK(igraph_matrix_resize(jdm, dout, din));
         } else {
-            IGRAPH_CHECK(igraph_matrix_int_resize(jdm, max_out_degree, max_in_degree));
+            IGRAPH_CHECK(igraph_matrix_resize(jdm, max_out_degree, max_in_degree));
         }
-        igraph_matrix_int_null(jdm);
+        igraph_matrix_null(jdm);
         IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
         IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
 
@@ -635,11 +635,11 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
                               IGRAPH_EINVAL,
                               dout, din, max_degree, max_degree);
             }
-            IGRAPH_CHECK(igraph_matrix_int_resize(jdm, dout, din));
+            IGRAPH_CHECK(igraph_matrix_resize(jdm, dout, din));
         } else {
-            IGRAPH_CHECK(igraph_matrix_int_resize(jdm, max_degree, max_degree));
+            IGRAPH_CHECK(igraph_matrix_resize(jdm, max_degree, max_degree));
         }
-        igraph_matrix_int_null(jdm);
+        igraph_matrix_null(jdm);
         IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
         IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
 
