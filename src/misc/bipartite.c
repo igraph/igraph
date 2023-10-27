@@ -636,7 +636,7 @@ igraph_error_t igraph_incidence(
  *   second kind (corresponding to columns); if \c
  *   IGRAPH_IN, then the opposite direction is realized; if \c
  *   IGRAPH_ALL, then mutual edges will be created.
- * \param multiple How to interpret the matrix elements. See details below.
+ * \param multiple How to interpret the matrix elements. See details above.
  * \return Error code.
  *
  * Time complexity: O(n*m), the size of the bipartite adjacency matrix.
