@@ -534,7 +534,8 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
             if (v1deg <= max_out_degree && v2deg <= max_in_degree) {
                 MATRIX(*jdm, v1deg-1, v2deg-1) += weights ? VECTOR(*weights)[eid] : 1;
             }
-            if (v2deg <= max_out_degree && v1deg <= max_in_degree) {
+            // Do not double-count connections between same-degree vertices.
+            if (v1deg != v2deg && v2deg <= max_out_degree && v1deg <= max_in_degree) {
                 MATRIX(*jdm, v2deg-1, v1deg-1) += weights ? VECTOR(*weights)[eid] : 1;
             }
 
