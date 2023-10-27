@@ -121,9 +121,11 @@ static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_inte
      */
     const igraph_real_t int_max_plus_1 = 2.0 * (IGRAPH_INTEGER_MAX / 2 + 1);
     const igraph_real_t int_min = (igraph_real_t) IGRAPH_INTEGER_MIN;
-    if (int_min <= value && value < int_max_plus_1) {
+    if (IGRAPH_LIKELY(int_min <= value && value < int_max_plus_1)) {
         *result = (igraph_integer_t) value;
         return IGRAPH_SUCCESS;
+    } else if (isnan(value)) {
+        IGRAPH_ERROR("NaN cannot be converted to an integer.", IGRAPH_EINVAL);
     } else {
         /* %.f ensures exact printing, %g would not */
         IGRAPH_ERRORF("Cannot convert %.f to integer, outside of representable range.", IGRAPH_EOVERFLOW, value);
