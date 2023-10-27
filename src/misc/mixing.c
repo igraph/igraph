@@ -421,19 +421,22 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  *
  * \experimental
  *
- * The joint degree matrix of a graph contains the number of edges, or the sum of the weights, between vertices of
- * degree i and degree j for every (i, j). The function populates a joint degree matrix and works on directed
- * and undirected graphs. Self loops are only counted once. If either \p dout or \p din are &lt;= 0, the JDM
- * will be resized automatically in the dimensions of the max degree of the vertices in the graph.
+ * This function constructs the joint degree matrix of the graph \p jdm.
+ * <code>jdm[i-1, j-1]</code> will contains the number of edges (or sum of edge
+ * weights) between vertices of degrees <code>i-1</code> and <code>j-1</code>.
+ * Self loops are only counted once.
  *
  * \param graph A pointer to an initialized graph object.
- * \param jdm A pointer to an initialized matrix that will be resized. The values will be written here.
- * \param dout An integer for the dimension of the matrix. If \p dout and \p din are greater than 0, the matrix will be
- *        resized do dimensions (\p dout, \p din).
- * \param din An integer for the dimension of the matrix. If \p dout and \p din are greater than 0, the matrix will be
- *        resized do dimensions (\p dout, \p din).
- * \param weights An initialized vector containing the weights of the edges. NULL if the JDM should sum
- *        the number of edges rather than sum up the weights.
+ * \param jdm A pointer to an initialized matrix that will be resized. The values
+ *        will be written here.
+ * \param max_out_degree Number of rows in the result, i.e. the largest (out-)degree
+ *        to consider. If negative, the largest (out-)degree of the graph will
+ *        be used.
+ * \param max_in_degree Number of columns in the result, i.e. the largest (in-)degree
+ *        to consider. If negative, the largest (in-)degree of the graph will
+ *        be used.
+ * \param weights A vector containing the weights of the edges. If passing a
+ *        \c NULL pointer, edges will be assumed to have unit weights.
  * \return Error code.
  *
  * Time complexity: O(E),
