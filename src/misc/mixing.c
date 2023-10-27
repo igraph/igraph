@@ -473,11 +473,11 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, true));
         IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, true));
 
-        if (max_out_degree <= 0) {
+        if (max_out_degree < 0) {
             max_out_degree = no_of_nodes > 0 ? igraph_vector_int_max(&out_degrees) : 0;
         }
 
-        if (max_in_degree <= 0) {
+        if (max_in_degree < 0) {
             max_in_degree = no_of_nodes > 0 ? igraph_vector_int_max(&in_degrees) : 0;
         }
 
@@ -510,14 +510,14 @@ igraph_error_t igraph_construct_jdm(const igraph_t* graph,
         IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
 
         // Compute max degree of the graph only if needed
-        if (max_out_degree <= 0 || max_in_degree <= 0) {
+        if (max_out_degree < 0 || max_in_degree < 0) {
             maxdeg = no_of_nodes > 0 ? igraph_vector_int_max(&degrees) : 0;
         }
 
-        if (max_out_degree <= 0) {
+        if (max_out_degree < 0) {
             max_out_degree = maxdeg;
         }
-        if (max_in_degree <= 0) {
+        if (max_in_degree < 0) {
             max_in_degree = maxdeg;
         }
 
