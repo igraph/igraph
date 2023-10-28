@@ -196,7 +196,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
 
 /**
  * \function igraph_avg_nearest_neighbor_degree
- * Average neighbor degree.
+ * \brief Average neighbor degree.
  *
  * Calculates the average degree of the neighbors for each vertex (\p knn), and
  * optionally, the same quantity as a function of the vertex degree (\p knnk).
@@ -266,13 +266,12 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t neis;
-    igraph_integer_t i, j, no_vids;
+    igraph_integer_t no_vids;
     igraph_vit_t vit;
     igraph_vector_t my_knn_v, *my_knn = knn;
     igraph_vector_int_t deg;
     igraph_integer_t maxdeg;
     igraph_vector_int_t deghist;
-    igraph_real_t mynan = IGRAPH_NAN;
     igraph_bool_t simple;
 
     IGRAPH_CHECK(igraph_is_simple(graph, &simple));
@@ -310,20 +309,20 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
         IGRAPH_VECTOR_INT_INIT_FINALLY(&deghist, maxdeg);
     }
 
-    for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    for (igraph_integer_t i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_real_t sum = 0.0;
         igraph_integer_t v = IGRAPH_VIT_GET(vit);
         igraph_integer_t nv;
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, mode));
         nv = igraph_vector_int_size(&neis);
-        for (j = 0; j < nv; j++) {
+        for (igraph_integer_t j = 0; j < nv; j++) {
             igraph_integer_t nei = VECTOR(neis)[j];
             sum += VECTOR(deg)[nei];
         }
         if (nv != 0) {
             VECTOR(*my_knn)[i] = sum / nv;
         } else {
-            VECTOR(*my_knn)[i] = mynan;
+            VECTOR(*my_knn)[i] = IGRAPH_NAN;
         }
         if (knnk && nv > 0) {
             VECTOR(*knnk)[nv - 1] += VECTOR(*my_knn)[i];
@@ -332,12 +331,12 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     }
 
     if (knnk) {
-        for (i = 0; i < maxdeg; i++) {
+        for (igraph_integer_t i = 0; i < maxdeg; i++) {
             igraph_integer_t dh = VECTOR(deghist)[i];
             if (dh != 0) {
                 VECTOR(*knnk)[i] /= dh;
             } else {
-                VECTOR(*knnk)[i] = mynan;
+                VECTOR(*knnk)[i] = IGRAPH_NAN;
             }
         }
         igraph_vector_int_destroy(&deghist);
