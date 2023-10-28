@@ -94,7 +94,6 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
     igraph_vector_int_t deg;
     igraph_integer_t maxdeg;
     igraph_vector_int_t deghist;
-    igraph_real_t mynan = IGRAPH_NAN;
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector size", IGRAPH_EINVAL);
@@ -153,7 +152,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
         if (str != 0.0) {
             VECTOR(*my_knn)[i] = sum / str;
         } else {
-            VECTOR(*my_knn)[i] = mynan;
+            VECTOR(*my_knn)[i] = IGRAPH_NAN;
         }
         if (knnk && nv > 0) {
             VECTOR(*knnk)[nv - 1] += VECTOR(*my_knn)[i];
@@ -171,7 +170,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
             if (dh != 0) {
                 VECTOR(*knnk)[i] /= dh;
             } else {
-                VECTOR(*knnk)[i] = mynan;
+                VECTOR(*knnk)[i] = IGRAPH_NAN;
             }
         }
 
