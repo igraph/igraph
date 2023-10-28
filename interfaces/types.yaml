@@ -549,10 +549,6 @@ LEVCFUNC:
 # Miscellaneous
 ###############################################################################
 
-ARPACKFUNC:
-    # ARPACK matrix multiplication function.
-    CTYPE: igraph_arpack_function_t
-
 ARPACKOPT:
     # Structure that contains the options of the ARPACK eigensolver.
     CTYPE: igraph_arpack_options_t
