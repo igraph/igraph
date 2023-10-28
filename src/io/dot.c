@@ -138,12 +138,18 @@ static igraph_error_t fprint_integral_or_precise(FILE *file, igraph_real_t x) {
  * \function igraph_write_graph_dot
  * \brief Write the graph to a stream in DOT format.
  *
+ * </para><para>
  * DOT is the format used by the widely known GraphViz software, see
  * http://www.graphviz.org for details. The grammar of the DOT format
  * can be found here: http://www.graphviz.org/doc/info/lang.html
  *
- * </para><para>This is only a preliminary implementation, no visualization
+ * </para><para>
+ * This is only a preliminary implementation, no visualization
  * information is written.
+ *
+ * </para><para>
+ * This format is meant solely for interoperability with Graphviz.
+ * It is not recommended for data exchange or archival.
  *
  * \param graph The graph to write to the stream.
  * \param outstream The stream to write the file to.

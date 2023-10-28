@@ -1,0 +1,18 @@
+﻿*Vertices 10
+  1 "Vlado"         0.4682    0.4841    0.5000 ellipse foo bar
+  2 "Андреј"        0.7125    0.8376    0.5000 ellipse foo baz
+  3 "Žnidaršič"     0.3346    0.7739    0.5000 ellipse foo 123
+  4 "Đurđić"        0.2455    0.8725    0.5000 ellipse foo 电脑
+  5 "Jürgen Müller" 0.6361    0.6373    0.5000 ellipse foo "a b c"
+  6 "∰∈∀≋∞⊚"       0.5153    0.6935    0.5000 ellipse foo "þæð"
+  7 "⑤⑨④②⑦"      0.8053    0.4917    0.5000 ellipse foo 123.456
+  8 "♔♕♖♗♘♙"        0.4173    0.6161    0.5000 ellipse foo xxx
+  9 "焹焓燝牕犫獨"    0.5623    0.5539    0.5000 ellipse x -1
+ 10 "ανδρει"        0.3690    0.3202    0.5000 ellipse y 1
+*Edges
+  2   3 1  l "焹焓燝牕犫獨"
+  3   4 1
+  2   6 1
+  3   6 1
+  5   6 1
+  2   7 1

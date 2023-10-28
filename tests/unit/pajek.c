@@ -54,6 +54,19 @@ int main(void) {
 
     igraph_destroy(&g);
 
+    /* This file starts with a UTF-8 BOM, which Pajek itself supports.
+     * It also contains some custom attributes. */
+    ifile = fopen("utf8_with_bom.net", "r");
+    IGRAPH_ASSERT(ifile != NULL);
+
+    igraph_read_graph_pajek(&g, ifile);
+    fclose(ifile);
+
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 6);
+
+    igraph_destroy(&g);
+
     VERIFY_FINALLY_STACK();
 
     return 0;

@@ -29,7 +29,6 @@
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
 #include "igraph_random.h"
-#include "igraph_statusbar.h"
 #include "igraph_structural.h"
 
 #include "core/interruption.h"
@@ -99,7 +98,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector(
         int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
-    igraph_integer_t j, k, nlen, size = n;
+    igraph_integer_t size = n;
     igraph_vector_int_t *idx = data->idx;
     igraph_vector_int_t *idx2 = data->idx2;
     igraph_vector_t *tmp = data->tmp;
@@ -110,13 +109,13 @@ static igraph_error_t igraph_i_community_leading_eigenvector(
     igraph_integer_t comm = data->comm;
 
     /* Ax */
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         igraph_integer_t oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
-        nlen = igraph_vector_int_size(neis);
+        igraph_integer_t nlen = igraph_vector_int_size(neis);
         to[j] = 0.0;
         VECTOR(*tmp)[j] = 0.0;
-        for (k = 0; k < nlen; k++) {
+        for (igraph_integer_t k = 0; k < nlen; k++) {
             igraph_integer_t nei = VECTOR(*neis)[k];
             igraph_integer_t neimemb = VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
@@ -128,7 +127,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector(
 
     /* Now calculate k^Tx/2m */
     ktx = 0.0; ktx2 = 0.0;
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         igraph_integer_t oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         igraph_integer_t degree = igraph_vector_int_size(neis);
@@ -139,7 +138,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector(
     ktx2 = ktx2 / no_of_edges / 2.0;
 
     /* Now calculate Bx */
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         igraph_integer_t oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
         igraph_real_t degree = igraph_vector_int_size(neis);
@@ -148,7 +147,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector(
     }
 
     /* -d_ij summa l in G B_il */
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         to[j] -= VECTOR(*tmp)[j] * from[j];
     }
 
@@ -161,7 +160,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
         int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
-    igraph_integer_t j, k, nlen, size = n;
+    igraph_integer_t size = n;
     igraph_vector_int_t *idx = data->idx;
     igraph_vector_int_t *idx2 = data->idx2;
     igraph_vector_t *tmp = data->tmp;
@@ -175,13 +174,13 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
     igraph_real_t sw = data->sumweights;
 
     /* Ax */
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         igraph_integer_t oldid = VECTOR(*idx)[j];
         igraph_vector_int_t *inc = igraph_inclist_get(inclist, oldid);
-        nlen = igraph_vector_int_size(inc);
+        igraph_integer_t nlen = igraph_vector_int_size(inc);
         to[j] = 0.0;
         VECTOR(*tmp)[j] = 0.0;
-        for (k = 0; k < nlen; k++) {
+        for (igraph_integer_t k = 0; k < nlen; k++) {
             igraph_integer_t edge = VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
             igraph_integer_t nei = IGRAPH_OTHER(graph, edge, oldid);
@@ -195,7 +194,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
 
     /* k^Tx/2m */
     ktx = 0.0; ktx2 = 0.0;
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         igraph_integer_t oldid = VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
         ktx += from[j] * str;
@@ -205,7 +204,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
     ktx2 = ktx2 / sw / 2.0;
 
     /* Bx */
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         igraph_integer_t oldid = VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
         to[j] = to[j] - ktx * str;
@@ -213,7 +212,7 @@ static igraph_error_t igraph_i_community_leading_eigenvector_weighted(
     }
 
     /* -d_ij summa l in G B_il */
-    for (j = 0; j < size; j++) {
+    for (igraph_integer_t j = 0; j < size; j++) {
         to[j] -= VECTOR(*tmp)[j] * from[j];
     }
 
@@ -241,8 +240,9 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * regarding the original network, see MEJ Newman: Finding community
  * structure in networks using the eigenvectors of matrices,
  * Phys Rev E 74:036104 (2006).
+ * https://doi.org/10.1103/PhysRevE.74.036104
  *
- * \param graph The undirected input graph.
+ * \param graph The input graph. Edge directions will be ignored.
  * \param weights The weights of the edges, or a null pointer for
  *    unweighted graphs.
  * \param merges The result of the algorithm, a matrix containing the
@@ -367,30 +367,29 @@ igraph_error_t igraph_community_leading_eigenvector(
     igraph_real_t sumweights = 0.0;
 
     if (no_of_nodes > INT_MAX) {
-        IGRAPH_ERROR("Graph too large for ARPACK", IGRAPH_EOVERFLOW);
+        IGRAPH_ERROR("Graph too large for ARPACK.", IGRAPH_EOVERFLOW);
     }
 
     if (weights && no_of_edges != igraph_vector_size(weights)) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Weight vector length does not match number of edges.", IGRAPH_EINVAL);
     }
 
     if (start && !membership) {
-        IGRAPH_ERROR("Cannot start from given configuration if memberships "
-                     "missing", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot start from given configuration if memberships missing.", IGRAPH_EINVAL);
     }
 
     if (start && membership &&
         igraph_vector_int_size(membership) != no_of_nodes) {
-        IGRAPH_ERROR("Wrong length for vector of predefined memberships",
+        IGRAPH_ERROR("Supplied memberhsip vector length does not match number of vertices.",
                      IGRAPH_EINVAL);
     }
 
     if (start && membership && igraph_vector_int_max(membership) >= no_of_nodes) {
-        IGRAPH_WARNING("Too many communities in membership start vector");
+        IGRAPH_WARNING("Too many communities in membership start vector.");
     }
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("This method was developed for undirected graphs");
+        IGRAPH_WARNING("Directed graph supplied, edge directions will be ignored.");
     }
 
     if (steps < 0 || steps > no_of_nodes - 1) {
@@ -479,7 +478,7 @@ igraph_error_t igraph_community_leading_eigenvector(
         sumweights = igraph_vector_sum(weights);
     }
 
-    if (options == 0) {
+    if (options == NULL) {
         options = igraph_arpack_options_get_default();
     }
 
@@ -527,9 +526,9 @@ igraph_error_t igraph_community_leading_eigenvector(
         options->info = 0;
         options->nev = 1;
         options->ldv = 0;
-        options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
+        options->ncv = 0; /* 0 means "automatic" in igraph_arpack_rssolve */
         options->nconv = 0;
-        options->lworkl = 0;        /* we surely have enough space */
+        options->lworkl = 0; /* we surely have enough space */
         extra.comm = comm;
 
         /* Use a random start vector, but don't let ARPACK generate the
@@ -742,7 +741,7 @@ igraph_error_t igraph_community_leading_eigenvector(
     if (modularity) {
         IGRAPH_CHECK(igraph_modularity(graph, mymembership, weights,
                                        /* resolution */ 1,
-                                       /* only undirected */ 0, modularity));
+                                       IGRAPH_UNDIRECTED, modularity));
     }
 
     if (!membership) {

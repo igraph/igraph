@@ -42,11 +42,11 @@
  */
 
 igraph_error_t has_mutual_nonloop_edge(const igraph_t* graph, igraph_bool_t* result) {
-    return igraph_has_mutual(graph, result, /* loops = */ 0);
+    return igraph_has_mutual(graph, result, /* loops = */ false);
 }
 
 igraph_error_t has_mutual_edge(const igraph_t* graph, igraph_bool_t* result) {
-    return igraph_has_mutual(graph, result, /* loops = */ 1);
+    return igraph_has_mutual(graph, result, /* loops = */ true);
 }
 
 igraph_error_t is_weakly_connected(const igraph_t* graph, igraph_bool_t* result) {
@@ -58,7 +58,7 @@ igraph_error_t is_strongly_connected(const igraph_t* graph, igraph_bool_t* resul
 }
 
 igraph_error_t is_forest(const igraph_t* graph, igraph_bool_t* result) {
-    return igraph_is_forest(graph, result, /* roots = */ 0, IGRAPH_ALL);
+    return igraph_is_forest(graph, result, /* roots = */ NULL, IGRAPH_ALL);
 }
 
 void validate_properties(const igraph_t* graph) {
