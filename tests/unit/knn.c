@@ -69,6 +69,8 @@ void check(const igraph_t *g, igraph_neimode_t mode1, igraph_neimode_t mode2) {
     igraph_vector_destroy(&knnk2);
     igraph_vector_destroy(&knnk1);
     igraph_vector_destroy(&knn);
+
+    printf("\n");
 }
 
 int main(void) {
@@ -76,11 +78,11 @@ int main(void) {
 
 
     igraph_small(&ug, 10, IGRAPH_UNDIRECTED,
-                 0, 4, 1, 2, 1, 8, 2, 3, 2, 6, 3, 5, 3, 6, 3, 7, 4, 7, 7, 8,
+                 0, 4, 1, 2, 1, 2, 1, 8, 2, 3, 2, 6, 3, 5, 3, 6, 3, 7, 4, 7, 7, 8, 7, 8, 7, 8,
                  -1);
 
     igraph_small(&dg, 10, IGRAPH_DIRECTED,
-                 0, 2, 1, 2, 1, 4, 2, 1, 3, 2, 3, 4, 4, 1, 4, 3,
+                 0, 2, 1, 2, 1, 4, 2, 1, 3, 2, 3, 4, 4, 1, 4, 3, 4, 3,
                  -1);
 
     check(&ug, IGRAPH_ALL, IGRAPH_ALL);
