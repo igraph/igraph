@@ -271,13 +271,6 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     igraph_vector_int_t deg;
     igraph_integer_t maxdeg;
     igraph_vector_int_t deghist;
-    igraph_bool_t has_loop;
-
-    IGRAPH_CHECK(igraph_has_loop(graph, &has_loop));
-    if (has_loop) {
-        IGRAPH_ERROR("Average nearest neighbor degree does not work with graphs that contain self-loops.",
-                     IGRAPH_EINVAL);
-    }
 
     if (weights) {
         return igraph_i_avg_nearest_neighbor_degree_weighted(graph, vids,
