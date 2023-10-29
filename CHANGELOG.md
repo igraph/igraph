@@ -5,11 +5,13 @@
 ### Added
 
  - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_knnk()` computes the degree correlation function and its various directed generalizations.
 
-### Changes
+### Changed
 
  - The behaviour of the Pajek format reader and writer is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret. Only those vertex and edge parameters are treated as valid which Pajek itself understands, therefore support for `size` is now dropped, and support for the `font` edge parameter is added. See http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm for more information. Invalid/unrecognized parameters are now converted to igraph attributes by the reader, but just as before, they are not output by the writer.
  - The Pajek format writer now encodes newline and quotation mark characters in a Pajek-compatible manner (`\n` and `&#34;`, respectively).
+ - `igraph_avg_nearest_neighbor_degree()` now supports non-simple graphs.
 
 ### Fixed
 
@@ -19,6 +21,7 @@
  - `igraph_erdos_renyi_game_gnm()` and `igraph_erdos_renyi_game_gnp()` are now interruptible.
  - `igraph_de_bruijn()` and `igraph_kautz()` are now interruptible.
  - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
+ - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
 
 ### Other
 
