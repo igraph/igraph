@@ -913,6 +913,13 @@ igraph_avg_nearest_neighbor_degree:
         EDGEWEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
+igraph_knnk:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR knnk, EDGEWEIGHTS weights=NULL,
+        NEIMODE mode_from=OUT, NEIMODE mode_to=IN,
+        BOOLEAN directed_neighbors=True
+    DEPS: weights ON graph
+
 igraph_strength:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
