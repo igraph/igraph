@@ -1,5 +1,14 @@
 Graph with no vertices
 [ 0-by-0 ]
+3-cycle
+[        0        0
+         0        3 ]
+Three self-loops
+[        0        0
+         0        3 ]
+One self-loop and two parallel edges
+[        0        0
+         0        3 ]
 Simple, undirected graph
 [        0        0        0        0
          0        0        2        2

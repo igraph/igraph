@@ -23,7 +23,6 @@ void print_and_destroy(igraph_t* g, igraph_matrix_t* jdm, igraph_vector_t* weigh
       print_matrix(jdm);
 
       igraph_destroy(g);
-      igraph_matrix_destroy(jdm);
       if (weights) {
           igraph_vector_destroy(weights);
       }
@@ -34,9 +33,30 @@ int main (void) {
     igraph_matrix_t jdm;
     igraph_vector_t weights;
 
+    // This matrix will be re-used throughout the test
+    igraph_matrix_init(&jdm, 0, 0);
+
     printf("Graph with no vertices\n");
     igraph_small(&g, 0, false, -1);
-    igraph_matrix_init(&jdm, 1, 1);
+    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    print_and_destroy(&g, &jdm, NULL);
+
+    printf("3-cycle\n");
+    igraph_ring(&g, 3, IGRAPH_UNDIRECTED, false, true);
+    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    print_and_destroy(&g, &jdm, NULL);
+
+    printf("Three self-loops\n");
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED,
+                 0,0, 1,1, 2,2,
+                 -1);
+    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    print_and_destroy(&g, &jdm, NULL);
+
+    printf("One self-loop and two parallel edges\n");
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED,
+                 0,0, 1,2, 1,2,
+                 -1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -47,7 +67,6 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -58,7 +77,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -69,7 +87,6 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -80,7 +97,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -91,7 +107,6 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -102,7 +117,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -113,7 +127,6 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -124,7 +137,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -137,7 +149,6 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, -1,6);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -149,7 +160,6 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, -2,8);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -161,7 +171,6 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, 1,9);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -173,7 +182,6 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, 1,12);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -185,7 +193,6 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, 1,9);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -197,7 +204,6 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, 1,12);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -209,7 +215,6 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, 1,10);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -221,7 +226,6 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, 1,13);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
     print_and_destroy(&g, &jdm, &weights);
 
@@ -235,7 +239,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, 3, 3, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -246,7 +249,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, 4, 2, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -257,7 +259,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, 2, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -268,7 +269,6 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, 5, 5, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -280,7 +280,6 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, 3, 4, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -291,7 +290,6 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, 4, 3, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -302,7 +300,6 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
@@ -313,14 +310,12 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_matrix_init(&jdm, 1, 1);
     igraph_joint_degree_matrix(&g, &jdm, 5, 5, NULL);
     print_and_destroy(&g, &jdm, NULL);
 
     // Clean up
-    igraph_destroy(&g);
     igraph_matrix_destroy(&jdm);
-    igraph_vector_destroy(&weights);
+
     VERIFY_FINALLY_STACK();
 
     return 0;
