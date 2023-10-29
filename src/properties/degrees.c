@@ -356,6 +356,137 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 }
 
 /**
+ * \function igraph_knnk
+ * \brief Degree correlation function.
+ *
+ * Computes the degree correlation function <code>k_nn(k)</code>, defined as the
+ * mean degree of vertices \c v that are connected to by vertices \c u of degree \c k:
+ * <code>u --> v</code>.
+ *
+ * </param><param>
+ * In undirected graphs, edges are treated as if they were a pair of reciprocal directed
+ * ones.
+ *
+ * \param graph The input graph.
+ * \param knnk The result will be written here. <code>knnk[d]</code> is the mean degree
+ *    of vertices connected to by vertices of degree \c d. Note that in contrast to
+ *    \ref \ref igraph_avg_nearest_neighbor_degree(), <code>d=0</code> is also
+ *    considered.
+ * \param weights An optional weight vector. If not \c NULL, weighted averages will be computed.
+ * \param mode_from How to compute the degree of \c u? Can be \c IGRAPH_OUT for out-degree,
+ *    \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree. Ignored in undirected graphs.
+ * \param mode_from How to compute the degree of \c v? Can be \c IGRAPH_OUT for out-degree,
+ *    \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree. Ignored in undirected graphs.
+ * \param directed_neighbors Whether to consider the  <code>u --> v</code> connection to be
+ *    directed. Undirected connections are treated as reciprocal directed ones, i.e. both
+ *    <code>u --> v</code> and <code>v --> u</code> will be considered. Ignored in undirected
+ *    graphs.
+ * \returns Error code.
+ *
+ * \sa \ref igraph_avg_nearest_neighbor_degree() for computing the average neighbour degree of
+ * a set of vertices.
+ *
+ * Time complexity: O(|E| + |V|)
+ */
+igraph_error_t igraph_knnk(const igraph_t *graph, igraph_vector_t *knnk, const igraph_vector_t *weights,
+                           igraph_neimode_t mode_from, igraph_neimode_t mode_to,
+                           igraph_bool_t directed_neighbors) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t maxdeg;
+    igraph_vector_t weight_sums;
+    igraph_vector_int_t *deg_from, *deg_to, deg_out, deg_in, deg_all;
+
+    if (! igraph_is_directed(graph)) {
+        mode_from = mode_to = IGRAPH_ALL;
+        directed_neighbors = false;
+    }
+
+    igraph_bool_t have_out = mode_from == IGRAPH_OUT || mode_to == IGRAPH_OUT;
+    igraph_bool_t have_in  = mode_from == IGRAPH_IN  || mode_to == IGRAPH_IN;
+    igraph_bool_t have_all = mode_from == IGRAPH_ALL || mode_to == IGRAPH_ALL;
+
+    if (have_out) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_out, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /* loops */ true));
+    }
+
+    if (have_in) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_in, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /* loops */ true));
+    }
+
+    if (have_all) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_all, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_all, igraph_vss_all(), IGRAPH_ALL, /* loops */ true));
+    }
+
+    switch (mode_from) {
+    case IGRAPH_OUT: deg_from = &deg_out; break;
+    case IGRAPH_IN:  deg_from = &deg_in;  break;
+    case IGRAPH_ALL: deg_from = &deg_all; break;
+    default:
+        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+    }
+
+    switch (mode_to) {
+    case IGRAPH_OUT: deg_to = &deg_out; break;
+    case IGRAPH_IN:  deg_to = &deg_in;  break;
+    case IGRAPH_ALL: deg_to = &deg_all; break;
+    default:
+        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+    }
+
+    maxdeg = no_of_edges > 0 ? igraph_vector_int_max(deg_from) : 0;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&weight_sums, maxdeg+1);
+
+    IGRAPH_CHECK(igraph_vector_resize(knnk, maxdeg+1));
+    igraph_vector_null(knnk);
+
+    for (igraph_integer_t eid=0; eid < no_of_edges; eid++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, eid);
+        igraph_integer_t to   = IGRAPH_TO(graph, eid);
+        igraph_integer_t fromdeg = VECTOR(*deg_from)[from];
+        igraph_integer_t todeg   = VECTOR(*deg_to)[to];
+        igraph_real_t w = weights ? VECTOR(*weights)[eid] : 1;
+
+        VECTOR(weight_sums)[fromdeg] += w;
+        VECTOR(*knnk)[fromdeg] += w * todeg;
+
+        /* Treat undirected edges as reciprocal directed ones */
+        if (! directed_neighbors) {
+            VECTOR(weight_sums)[todeg] += w;
+            VECTOR(*knnk)[todeg] += w * fromdeg;
+        }
+    }
+
+    IGRAPH_CHECK(igraph_vector_div(knnk, &weight_sums));
+
+    igraph_vector_destroy(&weight_sums);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* In reverse order of initialization: */
+
+    if (have_all) {
+        igraph_vector_int_destroy(&deg_all);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (have_in) {
+        igraph_vector_int_destroy(&deg_in);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (have_out) {
+        igraph_vector_int_destroy(&deg_out);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
  * \function igraph_strength
  * \brief Strength of the vertices, also called weighted vertex degree.
  *
