@@ -287,6 +287,7 @@ add_legacy_tests(
   coreness
   efficiency
   global_transitivity
+  harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
@@ -351,11 +352,10 @@ add_legacy_tests(
   igraph_unfold_tree
   igraph_voronoi
   igraph_widest_paths
-  harmonic_centrality
+  igraph_spanner
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
-  igraph_spanner
 )
 
 add_legacy_tests(
