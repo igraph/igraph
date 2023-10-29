@@ -353,6 +353,7 @@ add_legacy_tests(
   igraph_voronoi
   igraph_widest_paths
   igraph_spanner
+  knn
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
