@@ -253,7 +253,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  *
- * \example examples/simple/igraph_knn.c
+ * \example examples/simple/igraph_avg_nearest_neighbor_degree.c
  */
 igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
                                        igraph_vs_t vids,

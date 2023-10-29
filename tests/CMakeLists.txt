@@ -268,7 +268,7 @@ add_examples(
   igraph_is_loop
   igraph_is_multiple
   igraph_list_triangles
-  igraph_knn
+  igraph_avg_nearest_neighbor_degree
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
