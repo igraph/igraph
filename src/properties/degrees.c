@@ -87,16 +87,16 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t neis, edge_neis;
-    igraph_integer_t i, j, no_vids;
+    igraph_integer_t no_vids;
     igraph_vit_t vit;
     igraph_vector_t my_knn_v, *my_knn = knn;
     igraph_vector_t strength;
     igraph_vector_int_t deg;
     igraph_integer_t maxdeg;
-    igraph_vector_int_t deghist;
+    igraph_vector_t deghist;
 
     if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-        IGRAPH_ERROR("Invalid weight vector size", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector size.", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -131,10 +131,10 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
     if (knnk) {
         IGRAPH_CHECK(igraph_vector_resize(knnk, maxdeg));
         igraph_vector_null(knnk);
-        IGRAPH_VECTOR_INT_INIT_FINALLY(&deghist, maxdeg);
+        IGRAPH_VECTOR_INIT_FINALLY(&deghist, maxdeg);
     }
 
-    for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    for (igraph_integer_t i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_real_t sum = 0.0;
         igraph_integer_t v = IGRAPH_VIT_GET(vit);
         igraph_integer_t nv;
@@ -143,7 +143,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, mode));
         IGRAPH_CHECK(igraph_incident(graph, &edge_neis, v, mode));
         nv = igraph_vector_int_size(&neis);
-        for (j = 0; j < nv; j++) {
+        for (igraph_integer_t j = 0; j < nv; j++) {
             igraph_integer_t nei = VECTOR(neis)[j];
             igraph_integer_t e = VECTOR(edge_neis)[j];
             igraph_real_t w = VECTOR(*weights)[e];
@@ -155,8 +155,8 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
             VECTOR(*my_knn)[i] = IGRAPH_NAN;
         }
         if (knnk && nv > 0) {
-            VECTOR(*knnk)[nv - 1] += VECTOR(*my_knn)[i];
-            VECTOR(deghist)[nv - 1] += 1;
+            VECTOR(*knnk)[nv - 1] += sum;
+            VECTOR(deghist)[nv - 1] += str;
         }
     }
 
@@ -165,8 +165,8 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
     IGRAPH_FINALLY_CLEAN(2);
 
     if (knnk) {
-        for (i = 0; i < maxdeg; i++) {
-            igraph_integer_t dh = VECTOR(deghist)[i];
+        for (igraph_integer_t i = 0; i < maxdeg; i++) {
+            igraph_real_t dh = VECTOR(deghist)[i];
             if (dh != 0) {
                 VECTOR(*knnk)[i] /= dh;
             } else {
@@ -174,7 +174,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
             }
         }
 
-        igraph_vector_int_destroy(&deghist);
+        igraph_vector_destroy(&deghist);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
