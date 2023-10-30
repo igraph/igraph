@@ -916,7 +916,7 @@ igraph_avg_nearest_neighbor_degree:
 igraph_knnk:
     PARAMS: |-
         GRAPH graph, OUT VECTOR knnk, EDGEWEIGHTS weights=NULL,
-        NEIMODE mode_from=OUT, NEIMODE mode_to=IN,
+        NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
         BOOLEAN directed_neighbors=True
     DEPS: weights ON graph
 
