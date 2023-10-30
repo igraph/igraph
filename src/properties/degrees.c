@@ -353,8 +353,8 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * \brief Degree correlation function.
  *
  * Computes the degree correlation function <code>k_nn(k)</code>, defined as the
- * mean degree of vertices \c v that are connected to by vertices \c u of degree \c k:
- * <code>u --> v</code>.
+ * mean degree of the targets of directed edges whose source has degree \c k.
+ * The averaging is done over directed edges.
  *
  * </param><param>
  * In undirected graphs, edges are treated as if they were a pair of reciprocal directed
@@ -366,14 +366,16 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *    \ref \ref igraph_avg_nearest_neighbor_degree(), <code>d=0</code> is also
  *    considered.
  * \param weights An optional weight vector. If not \c NULL, weighted averages will be computed.
- * \param mode_from How to compute the degree of \c u? Can be \c IGRAPH_OUT for out-degree,
- *    \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree. Ignored in undirected graphs.
- * \param mode_from How to compute the degree of \c v? Can be \c IGRAPH_OUT for out-degree,
- *    \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree. Ignored in undirected graphs.
- * \param directed_neighbors Whether to consider the  <code>u --> v</code> connection to be
- *    directed. Undirected connections are treated as reciprocal directed ones, i.e. both
- *    <code>u --> v</code> and <code>v --> u</code> will be considered. Ignored in undirected
- *    graphs.
+ * \param from_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
+ *    Ignored in undirected graphs.
+ * \param to_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
+ *    Ignored in undirected graphs.
+ * \param directed_neighbors Whether to consider <code>u -> v</code> connections
+ *    to be directed. Undirected connections are treated as reciprocal directed ones,
+ *    i.e. both <code>u -> v</code> and <code>v -> u</code> will be considered.
+ *    Ignored in undirected graphs.
  * \returns Error code.
  *
  * \sa \ref igraph_avg_nearest_neighbor_degree() for computing the average neighbour degree of
@@ -382,7 +384,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * Time complexity: O(|E| + |V|)
  */
 igraph_error_t igraph_knnk(const igraph_t *graph, igraph_vector_t *knnk, const igraph_vector_t *weights,
-                           igraph_neimode_t mode_from, igraph_neimode_t mode_to,
+                           igraph_neimode_t from_mode, igraph_neimode_t to_mode,
                            igraph_bool_t directed_neighbors) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
@@ -391,13 +393,13 @@ igraph_error_t igraph_knnk(const igraph_t *graph, igraph_vector_t *knnk, const i
     igraph_vector_int_t *deg_from, *deg_to, deg_out, deg_in, deg_all;
 
     if (! igraph_is_directed(graph)) {
-        mode_from = mode_to = IGRAPH_ALL;
+        from_mode = to_mode = IGRAPH_ALL;
         directed_neighbors = false;
     }
 
-    igraph_bool_t have_out = mode_from == IGRAPH_OUT || mode_to == IGRAPH_OUT;
-    igraph_bool_t have_in  = mode_from == IGRAPH_IN  || mode_to == IGRAPH_IN;
-    igraph_bool_t have_all = mode_from == IGRAPH_ALL || mode_to == IGRAPH_ALL;
+    igraph_bool_t have_out = from_mode == IGRAPH_OUT || to_mode == IGRAPH_OUT;
+    igraph_bool_t have_in  = from_mode == IGRAPH_IN  || to_mode == IGRAPH_IN;
+    igraph_bool_t have_all = from_mode == IGRAPH_ALL || to_mode == IGRAPH_ALL;
 
     if (have_out) {
         IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_out, no_of_nodes);
@@ -414,7 +416,7 @@ igraph_error_t igraph_knnk(const igraph_t *graph, igraph_vector_t *knnk, const i
         IGRAPH_CHECK(igraph_degree(graph, &deg_all, igraph_vss_all(), IGRAPH_ALL, /* loops */ true));
     }
 
-    switch (mode_from) {
+    switch (from_mode) {
     case IGRAPH_OUT: deg_from = &deg_out; break;
     case IGRAPH_IN:  deg_from = &deg_in;  break;
     case IGRAPH_ALL: deg_from = &deg_all; break;
@@ -422,7 +424,7 @@ igraph_error_t igraph_knnk(const igraph_t *graph, igraph_vector_t *knnk, const i
         IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
     }
 
-    switch (mode_to) {
+    switch (to_mode) {
     case IGRAPH_OUT: deg_to = &deg_out; break;
     case IGRAPH_IN:  deg_to = &deg_in;  break;
     case IGRAPH_ALL: deg_to = &deg_all; break;
