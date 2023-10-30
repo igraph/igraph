@@ -2025,33 +2025,17 @@ igraph_maxflow_value:
         OPTIONAL EDGE_CAPACITY capacity, OPTIONAL OUT MAXFLOW_STATS stats
     DEPS: source ON graph, target ON graph, capacity ON graph
 
-igraph_mincut_value:
-    PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_CAPACITY capacity
-    DEPS:
-        capacity ON graph
-
-igraph_st_mincut:
-    PARAMS: |-
-        GRAPH graph, OUT REAL value, OUT EDGE_INDICES cut,
-        OUT VERTEX_INDICES partition1, OUT VERTEX_INDICES partition2,
-        VERTEX source, VERTEX target,
-        OPTIONAL EDGE_CAPACITY capacity
-    DEPS: |-
-        source ON graph, target ON graph, capacity ON graph,
-        partition1 ON graph, partition2 ON graph, cut ON graph
-
-igraph_st_mincut_value:
-    PARAMS: |-
-        GRAPH graph, OUT REAL res, VERTEX source, VERTEX target,
-        OPTIONAL EDGE_CAPACITY capacity
-    DEPS: source ON graph, target ON graph, capacity ON graph
-
 igraph_mincut:
     PARAMS: |-
         GRAPH graph, OUT REAL value, OUT VERTEX_INDICES partition1,
         OUT VERTEX_INDICES partition2, OUT EDGE_INDICES cut,
         OPTIONAL EDGE_CAPACITY capacity
     DEPS: capacity ON graph, partition1 ON graph, partition2 ON graph, cut ON graph
+
+igraph_mincut_value:
+    PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_CAPACITY capacity
+    DEPS:
+        capacity ON graph
 
 igraph_residual_graph:
     PARAMS: |-
@@ -2074,6 +2058,12 @@ igraph_st_mincut:
     DEPS: |-
         capacity ON graph, source ON graph, target ON graph,
         partition1 ON graph, partition2 ON graph, cut ON graph
+
+igraph_st_mincut_value:
+    PARAMS: |-
+        GRAPH graph, OUT REAL res, VERTEX source, VERTEX target,
+        OPTIONAL EDGE_CAPACITY capacity
+    DEPS: source ON graph, target ON graph, capacity ON graph
 
 igraph_st_vertex_connectivity:
     PARAMS: |-
@@ -2517,12 +2507,6 @@ igraph_vertex_coloring_greedy:
 igraph_deterministic_optimal_imitation:
     PARAMS: |-
         GRAPH graph, VERTEX vid, OPTIMALITY optimality=MAXIMUM, VERTEX_QTY quantities,
-        INOUT VECTOR_INT strategies, NEIMODE mode=OUT
-    DEPS: vid ON graph, quantities ON graph, strategies ON graph
-
-igraph_stochastic_imitation:
-    PARAMS: |-
-        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
 

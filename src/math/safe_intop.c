@@ -154,7 +154,20 @@ igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t *result
  * Converts an igraph_real_t into an igraph_integer_t with range checks to
  * protect from undefined behaviour. The input value is converted into an
  * integer with round().
+ *
+ * This is typically the slowest of this set of functions.
  */
 igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result) {
+    return igraph_i_safe_real_to_int(round(value), result);
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with trunc().
+ *
+* This is typically the fastest of this set of functions.
+ */
+igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_integer_t* result) {
     return igraph_i_safe_real_to_int(round(value), result);
 }
