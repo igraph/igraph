@@ -116,13 +116,6 @@ static igraph_error_t igraph_i_connected_components_weak(
     igraph_integer_t i;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
 
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for calculating weakly connected components.");
-    IGRAPH_FINALLY(igraph_free, already_added);
-
-    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes / 10);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
-
     /* Memory for result, csize is dynamically allocated */
     if (membership) {
         IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
@@ -130,6 +123,35 @@ static igraph_error_t igraph_i_connected_components_weak(
     if (csize) {
         igraph_vector_int_clear(csize);
     }
+
+    /* Try to make use of cached information. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+        /* If we know that the graph is weakly connected from the cache,
+         * we can return the result right away. We keep in mind that
+         * the null graph is considered disconnected, therefore any connected
+         * graph has precisely one component. */
+        if (membership) {
+            /* All vertices are members of the same component. */
+            igraph_vector_int_fill(membership, 0);
+        }
+        if (csize) {
+            /* The size of the single component is the same as the vertex count. */
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, no_of_nodes));
+        }
+        if (no) {
+            /* There is one component. */
+            *no = 1;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for calculating weakly connected components.");
+    IGRAPH_FINALLY(igraph_free, already_added);
+
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes / 10);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     /* The algorithm */
 
@@ -206,21 +228,43 @@ static igraph_error_t igraph_i_connected_components_strong(
 
     igraph_adjlist_t adjlist;
 
+    /* Memory for result, csize is dynamically allocated */
+    if (membership) {
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+    }
+    if (csize) {
+        igraph_vector_int_clear(csize);
+    }
+
+    /* Try to make use of cached information. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED)) {
+        /* If we know that the graph is strongly connected from the cache,
+         * we can return the result right away. We keep in mind that
+         * the null graph is considered disconnected, therefore any connected
+         * graph has precisely one component. */
+        if (membership) {
+            /* All vertices are members of the same component. */
+            igraph_vector_int_fill(membership, 0);
+        }
+        if (csize) {
+            /* The size of the single component is the same as the vertex count. */
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, no_of_nodes));
+        }
+        if (no) {
+            /* There is one component. */
+            *no = 1;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
     /* The result */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&next_nei, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&out, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
-    if (membership) {
-        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-    }
     IGRAPH_CHECK(igraph_vector_int_reserve(&out, no_of_nodes));
-
-    igraph_vector_int_null(&out);
-    if (csize) {
-        igraph_vector_int_clear(csize);
-    }
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
