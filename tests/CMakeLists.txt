@@ -283,6 +283,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  components
   coreness
   efficiency
   global_transitivity
