@@ -421,10 +421,11 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  *
  * \experimental
  *
- * The joint degree matrix \c J_ij of a graph gives the number of edges, or
- * sum of edge weights, between vertices of degree \c i and degree \c j.
- * This function stores \c J_ij into <code>jdm[i-1, j-1]</code>.
- * Each edge, including self-loops, is counted once.
+ * In graph theory, the joint degree matrix \c J_ij of a graph gives the number
+ * of edges, or sum of edge weights, between vertices of degree \c i and degree
+ * \c j. This function stores \c J_ij into <code>jdm[i-1, j-1]</code>.
+ * Each edge, including self-loops, is counted precisely once, both in undirected
+ * and directed graphs.
  *
  * </para><para>
  * <code>sum_(i,j) J_ij</code> is the total number of edges (or total edge weight)
@@ -432,6 +433,22 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * pairs in directed and undirected graphs, respectively. Thus <code>J_ij / m</code>
  * is the probability that an edge chosen at random (with probability proportional
  * to its weight) connects vertices with degrees \c i and \c j.
+ *
+ * </para><para>
+ * Note that \c J_ij is similar, but not identical to the joint degree
+ * \em distribution, which is defined for \em ordered <code>(i, j)</code> degree
+ * pairs even in the undirected case. When considering undirected graphs, the
+ * diagonal of the joint degree distribution is twice that of the joint
+ * degree matrix.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Isabelle Stanton and Ali Pinar:
+ * Constructing and sampling graphs with a prescribed joint degree distribution.
+ * ACM J. Exp. Algorithmics 17, Article 3.5 (2012).
+ * https://doi.org/10.1145/2133803.2330086
  *
  * \param graph A pointer to an initialized graph object.
  * \param jdm A pointer to an initialized matrix that will be resized. The values
