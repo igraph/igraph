@@ -1005,6 +1005,25 @@ igraph_joint_degree_matrix:
         INTEGER max_out_degree=-1, INTEGER max_in_degree=-1
     DEPS: weights ON graph
 
+igraph_joint_degree_distribution:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX p,
+        NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
+        BOOLEAN directed_neighbors=True,
+        BOOLEAN normalized=True,
+        INTEGER max_from_degree=-1, INTEGER max_to_degree=-1
+    DEPS: weights ON graph
+
+igraph_joint_type_distribution:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX p,
+        INDEX_VECTOR from_types, INDEX_VECTOR to_types=NULL,
+        BOOLEAN directed=True,
+        BOOLEAN normalized=True
+    DEPS: weights ON graph
+
 igraph_contract_vertices:
     PARAMS: |-
         INOUT GRAPH graph, INDEX_VECTOR mapping,
