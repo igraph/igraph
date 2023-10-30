@@ -204,6 +204,7 @@
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_joint_degree_matrix -->
 </section>
 
 <section id="k-cores"><title>K-cores and k-trusses</title>
