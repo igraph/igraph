@@ -16,6 +16,7 @@
 ### Other
 
  - Updated vendored mini-gmp to 6.3.0.
+ - `igraph_connected_components()` makes better use of the cache, improving overall performance.
  - Documentation improvements.
 
 ## [0.10.7] - 2023-09-04
