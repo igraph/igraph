@@ -25,6 +25,7 @@
 
 #include "test_utilities.h"
 
+/* Check vector equality with tolerances. Consider NaN values equal. */
 igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
     igraph_integer_t na = igraph_vector_size(a);
     igraph_integer_t nb = igraph_vector_size(b);
@@ -42,7 +43,8 @@ igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
     return true;
 }
 
-void check(const igraph_t *g, igraph_neimode_t mode1, igraph_neimode_t mode2, const igraph_vector_t *weights) {
+/* Compare results from igraph_avg_nearest_neighbor_degree() and igraph_knnk() */
+void compare_implementations(const igraph_t *g, igraph_neimode_t mode1, igraph_neimode_t mode2, const igraph_vector_t *weights) {
     igraph_vector_t knn, knnk1, knnk2;
 
     igraph_vector_init(&knn, 0);
@@ -74,8 +76,49 @@ void check(const igraph_t *g, igraph_neimode_t mode1, igraph_neimode_t mode2, co
     printf("\n");
 }
 
+/* Check that undirected graphs are treated as a directed ones with all-reciprocal edges.
+ * This helps verify non-simple graphs, especially those with self-loops. */
+void check_dir_undir_equiv(const igraph_t *ug) {
+    igraph_t rg;
+    igraph_vector_t knn1, knn2, knnk1, knnk2;
+
+    igraph_vector_init(&knn1, 0);
+    igraph_vector_init(&knn2, 0);
+    igraph_vector_init(&knnk1, 0);
+    igraph_vector_init(&knnk2, 0);
+
+    igraph_copy(&rg, ug);
+    igraph_to_directed(&rg, IGRAPH_TO_DIRECTED_MUTUAL);
+
+    igraph_avg_nearest_neighbor_degree(ug, igraph_vss_all(), IGRAPH_ALL, IGRAPH_ALL, &knn1, &knnk1, NULL);
+    igraph_avg_nearest_neighbor_degree(&rg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_OUT, &knn2, &knnk2, NULL);
+
+    IGRAPH_ASSERT(vector_eq(&knn1, &knn2));
+    IGRAPH_ASSERT(vector_eq(&knnk1, &knnk2));
+
+    igraph_avg_nearest_neighbor_degree(&rg, igraph_vss_all(), IGRAPH_IN, IGRAPH_IN, &knn2, &knnk2, NULL);
+
+    IGRAPH_ASSERT(vector_eq(&knn1, &knn2));
+    IGRAPH_ASSERT(vector_eq(&knnk1, &knnk2));
+
+    igraph_vector_null(&knnk1);
+    igraph_vector_null(&knnk2);
+
+    igraph_knnk(ug, &knnk1, NULL, IGRAPH_ALL, IGRAPH_ALL, false);
+    igraph_knnk(&rg, &knnk2, NULL, IGRAPH_OUT, IGRAPH_OUT, false);
+
+    IGRAPH_ASSERT(vector_eq(&knnk1, &knnk2));
+
+    igraph_destroy(&rg);
+
+    igraph_vector_destroy(&knnk2);
+    igraph_vector_destroy(&knnk1);
+    igraph_vector_destroy(&knn2);
+    igraph_vector_destroy(&knn1);
+}
+
 int main(void) {
-    igraph_t ug, dg;
+    igraph_t ug, dg, g;
     igraph_vector_t uweights, dweights;
 
     igraph_small(&ug, 10, IGRAPH_UNDIRECTED,
@@ -96,35 +139,54 @@ int main(void) {
 
     printf("UNWEIGHTED\n\n");
     printf("Undirected\n");
-    check(&ug, IGRAPH_ALL, IGRAPH_ALL, NULL);
+    compare_implementations(&ug, IGRAPH_ALL, IGRAPH_ALL, NULL);
 
     printf("Directed treated as undirected\n");
-    check(&dg, IGRAPH_ALL, IGRAPH_ALL, NULL);
+    compare_implementations(&dg, IGRAPH_ALL, IGRAPH_ALL, NULL);
 
     printf("Directed: out, all\n");
-    check(&dg, IGRAPH_OUT, IGRAPH_ALL, NULL);
+    compare_implementations(&dg, IGRAPH_OUT, IGRAPH_ALL, NULL);
 
     printf("Directed: out, in\n");
-    check(&dg, IGRAPH_OUT, IGRAPH_IN, NULL);
+    compare_implementations(&dg, IGRAPH_OUT, IGRAPH_IN, NULL);
 
     printf("Directed: out, out\n");
-    check(&dg, IGRAPH_OUT, IGRAPH_OUT, NULL);
+    compare_implementations(&dg, IGRAPH_OUT, IGRAPH_OUT, NULL);
 
     printf("\nWEIGHTED\n\n");
     printf("Undirected\n");
-    check(&ug, IGRAPH_ALL, IGRAPH_ALL, &uweights);
+    compare_implementations(&ug, IGRAPH_ALL, IGRAPH_ALL, &uweights);
 
     printf("Directed treated as undirected\n");
-    check(&dg, IGRAPH_ALL, IGRAPH_ALL, &dweights);
+    compare_implementations(&dg, IGRAPH_ALL, IGRAPH_ALL, &dweights);
 
     printf("Directed: out, all\n");
-    check(&dg, IGRAPH_OUT, IGRAPH_ALL, &dweights);
+    compare_implementations(&dg, IGRAPH_OUT, IGRAPH_ALL, &dweights);
 
     printf("Directed: out, in\n");
-    check(&dg, IGRAPH_OUT, IGRAPH_IN, &dweights);
+    compare_implementations(&dg, IGRAPH_OUT, IGRAPH_IN, &dweights);
 
     printf("Directed: out, out\n");
-    check(&dg, IGRAPH_OUT, IGRAPH_OUT, &dweights);
+    compare_implementations(&dg, IGRAPH_OUT, IGRAPH_OUT, &dweights);
+
+    printf("\nSPECIAL CASES\n\n");
+    printf("Null graph\n");
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    compare_implementations(&g, IGRAPH_ALL, IGRAPH_ALL, NULL);
+    igraph_destroy(&g);
+
+    printf("Singleton with loop\n");
+    igraph_small(&g, 1, IGRAPH_UNDIRECTED, 0,0, -1);
+    compare_implementations(&g, IGRAPH_ALL, IGRAPH_ALL, NULL);
+    igraph_destroy(&g);
+
+    printf("Two isolated vertices\n");
+    igraph_empty(&g, 2, IGRAPH_UNDIRECTED);
+    compare_implementations(&g, IGRAPH_ALL, IGRAPH_ALL, NULL);
+    igraph_destroy(&g);
+
+    printf("Check directed/undirected equivalence principle\n");
+    check_dir_undir_equiv(&ug);
 
     igraph_vector_destroy(&dweights);
     igraph_destroy(&dg);
