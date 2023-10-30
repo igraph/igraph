@@ -204,6 +204,7 @@
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_joint_degree_distribution -->
 <!-- doxrox-include igraph_joint_degree_matrix -->
 </section>
 

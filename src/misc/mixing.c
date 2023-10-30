@@ -576,3 +576,209 @@ igraph_error_t igraph_joint_degree_matrix(const igraph_t* graph,
 
     return IGRAPH_SUCCESS;
 }
+
+
+/**
+ * \function igraph_joint_degree_distribution
+ * \brief The joint degree distribution of a graph.
+ *
+ * \experimental
+ *
+ * Computes the joint degree distribution \c P_ij of a graph, used in the
+ * study of degree correlations. \c P_ij is the probability that a randomly
+ * chosen ordered pair of \em connected vertices have degrees \c i and \c j.
+ *
+ * </para><para>
+ * In directed graphs, directionally connected <code>u -> v</code> pairs
+ * are considered. The joint degree distribution of an undirected graph is the
+ * same as that of the corresponding directed graph in which all connection are
+ * bidirectional, assuming that \p from_mode is \c IGRAPH_OUT, \p to_mode is
+ * \c IGRAPH_IN and \p directed_neighbors is true.
+ *
+ * </para><para>
+ * When \p normalized is false, <code>sum_ij P_ij</code> gives the total
+ * number of connections in a directed graph, or twice that value in an
+ * undirected graph. The sum is taken over ordered <code>(i,j)</code> degree
+ * pairs.
+ *
+ * </para><para>
+ * The joint degree distribution relates to other concepts used in the study of
+ * degree correlations. If \c P_ij is normalized then the degree correlation
+ * function <code>k_nn(k)</code> is obtained as
+ *
+ * </para><para>
+ * <code>k_nn(k) = sum_k j P_kj</code>.
+ *
+ * </para><para>
+ * The non-normalized degree assortativity is obtained as
+ *
+ * </para><para>
+ * <code>a = sum_ij i j (P_ij - q_i r_j)</code>,
+ *
+ * </para><para>
+ * where <code>q_i = sum_k P_ik</code> and <code>r_j = sum_k P_kj</code>.
+ *
+ * </para><para>
+ * Note that the joint degree distribution \c P_ij is similar, but not identical
+ * to the joint degree matix \c J_ij computed by \ref igraph_joint_degree_matrix().
+ * If the graph is undirected, then the diagonal entries of an unnormalized \c P_ij
+ * are double that of \c J_ij, as any undirected connection between same-degree vertices
+ * is counted in both directions. In contrast to \ref igraph_joint_degree_matrix(),
+ * this function returns matrices which include the row and column corresponding
+ * to zero degrees. In directed graphs, this row and column is not necessarily
+ * zero when \p from_mode is different from \c IGRAPH_OUT or \p to_mode is different
+ * from \c IGRAPH_IN.
+ *
+ * \param graph A pointer to an initialized graph object.
+ * \param p A pointer to an initialized matrix that will be resized. The \c P_ij
+ *    value will be written into <code>p[i,j]</code>.
+ * \param max_from_degree The largest source vertex degree to consider. If negative,
+ *    the largest source degree will be used. The row count of the result matrix
+ *    is one larger than this value.
+ * \param max_to_degree The largest target vertex degree to consider. If negative,
+ *    the largest target degree will be used. The column count of the result matrix
+ *    is one larger than this value.
+ * \param from_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
+ *    Ignored in undirected graphs.
+ * \param to_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
+ *    Ignored in undirected graphs.
+ * \param directed_neighbors Whether to consider <code>u -> v</code> connections
+ *    to be directed. Undirected connections are treated as reciprocal directed ones,
+ *    i.e. both <code>u -> v</code> and <code>v -> u</code> will be considered.
+ *    Ignored in undirected graphs.
+ * \param normalized Whether to normalize the matrix so that entries sum to 1.0.
+ *    If false, matrix entries will be connection counts.
+ * \param weights A vector containing the weights of the edges. If passing a
+ *    \c NULL pointer, edges will be assumed to have unit weights.
+ * \return Error code.
+ *
+ * \sa \ref igraph_joint_degree_matrix() for computing the joint degree matrix;
+ * \ref igraph_assortativity_degree() and \ref igraph_assortativity() for
+ * degree correlations coefficients, and \ref igraph_avg_nearest_neighbor_degree()
+ * for the degree correlation function.
+ *
+ * Time complexity: O(E), where E is the number of edges in the input graph.
+ */
+igraph_error_t igraph_joint_degree_distribution(
+    const igraph_t *graph,
+    igraph_matrix_t *p,
+    igraph_integer_t max_from_degree, igraph_integer_t max_to_degree,
+    igraph_neimode_t from_mode, igraph_neimode_t to_mode, igraph_bool_t directed_neighbors,
+    igraph_bool_t normalized,
+    const igraph_vector_t *weights) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_vector_int_t *deg_from, *deg_to, deg_out, deg_in, deg_all;
+    igraph_real_t sum;
+    igraph_bool_t negative_weight;
+
+    if (no_of_nodes == 0) {
+        /* Special case: Produce an empty matrix for null graph. */
+        IGRAPH_CHECK(igraph_matrix_resize(p, 0, 0));
+        return IGRAPH_SUCCESS;
+    }
+
+    if (! igraph_is_directed(graph)) {
+        from_mode = to_mode = IGRAPH_ALL;
+        directed_neighbors = false;
+    }
+
+    igraph_bool_t have_out = from_mode == IGRAPH_OUT || to_mode == IGRAPH_OUT;
+    igraph_bool_t have_in  = from_mode == IGRAPH_IN  || to_mode == IGRAPH_IN;
+    igraph_bool_t have_all = from_mode == IGRAPH_ALL || to_mode == IGRAPH_ALL;
+
+    if (have_out) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_out, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /* loops */ true));
+    }
+
+    if (have_in) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_in, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /* loops */ true));
+    }
+
+    if (have_all) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_all, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_all, igraph_vss_all(), IGRAPH_ALL, /* loops */ true));
+    }
+
+    switch (from_mode) {
+    case IGRAPH_OUT: deg_from = &deg_out; break;
+    case IGRAPH_IN:  deg_from = &deg_in;  break;
+    case IGRAPH_ALL: deg_from = &deg_all; break;
+    default:
+        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+    }
+
+    switch (to_mode) {
+    case IGRAPH_OUT: deg_to = &deg_out; break;
+    case IGRAPH_IN:  deg_to = &deg_in;  break;
+    case IGRAPH_ALL: deg_to = &deg_all; break;
+    default:
+        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+    }
+
+    if (max_from_degree < 0) {
+        max_from_degree = no_of_edges > 0 ? igraph_vector_int_max(deg_from) : 0;
+    }
+
+    if (max_to_degree < 0) {
+        max_to_degree = no_of_edges > 0 ? igraph_vector_int_max(deg_to) : 0;
+    }
+
+    IGRAPH_CHECK(igraph_matrix_resize(p, max_from_degree+1, max_to_degree+1));
+    igraph_matrix_null(p);
+
+    sum = 0;
+    negative_weight = false;
+    for (igraph_integer_t eid=0; eid < no_of_edges; eid++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, eid);
+        igraph_integer_t to   = IGRAPH_TO(graph, eid);
+        igraph_integer_t fromdeg = VECTOR(*deg_from)[from];
+        igraph_integer_t todeg   = VECTOR(*deg_to)[to];
+        igraph_real_t w = weights ? VECTOR(*weights)[eid] : 1;
+
+        MATRIX(*p, fromdeg, todeg) += w;
+        sum += w;
+
+        if (! directed_neighbors) {
+            MATRIX(*p, todeg, fromdeg) += w;
+            sum += w;
+        }
+
+        if (w < 0) {
+            negative_weight = true;
+        }
+    }
+
+    if (normalized) {
+        if (negative_weight) {
+            /* When some edge weights are negative, they cannot be interpreted as probabilities,
+             * and the sum of weights may be zero, leading to Inf/NaN results. */
+            IGRAPH_WARNING("Negative edge weights are present. Normalization may not be meaningful.");
+        }
+        if (no_of_edges > 0) {
+            igraph_matrix_scale(p, 1.0 / sum);
+        }
+    }
+
+    if (have_all) {
+        igraph_vector_int_destroy(&deg_all);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (have_in) {
+        igraph_vector_int_destroy(&deg_in);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (have_out) {
+        igraph_vector_int_destroy(&deg_out);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
