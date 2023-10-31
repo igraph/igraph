@@ -201,9 +201,8 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  * optionally, the same quantity as a function of the vertex degree (\p knnk).
  *
  * </para><para>
- * For isolated vertices \p knn is set to NaN.
- * The same is done in \p knnk for vertex degrees that
- * don't appear in the graph.
+ * For isolated vertices \p knn is set to NaN. The same is done in \p knnk for
+ * vertex degrees that don't appear in the graph.
  *
  * </para><para>
  * The weighted version computes a weighted average of the neighbor degrees as
@@ -218,6 +217,11 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  * as indicated by \p mode. <code>w_uv</code> denotes the weighted adjacency matrix
  * and <code>k_v</code> is the neighbors' degree, specified by \p neighbor_degree_mode.
  * This is equation (6) in the reference below.
+ *
+ * </para><para>
+ * When only the <code>k_nn(k)</code> degree correlation function is needed,
+ * \ref igraph_knnk() can be used as well. This function provides more flexible
+ * control over how degree at each end of directed edges are computed.
  *
  * </para><para>
  * Reference:
@@ -239,16 +243,20 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  * \param vids The vertices for which the calculation is performed.
  * \param knn Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed. Supply a \c NULL pointer
- *   here, if you only want to calculate \c knnk.
+ *   here if you only want to calculate \c knnk.
  * \param knnk Pointer to an initialized vector, the average
  *   neighbor degree as a function of the vertex degree is stored
- *   here. The first (zeroth) element is for degree one vertices,
- *   etc. Supply a \c NULL pointer here if you don't want to calculate
- *   this.
+ *   here. This is sometimes referred to as the <coed>k_nn(k)</code>
+ *   degree correlation function. The first (zeroth) element is for degree
+ *   one vertices, etc. The calculation is done based only on the vertices
+ *   \p vids. Supply a \c NULL pointer here if you don't want to calculate this.
  * \param weights Optional edge weights. Supply a null pointer here
  *   for the non-weighted version.
  *
  * \return Error code.
+ *
+ * \sa \ref igraph_knnk() for computing only the degee correlation function,
+ * with more flexible control over degree computations.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
@@ -354,11 +362,39 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *
  * Computes the degree correlation function <code>k_nn(k)</code>, defined as the
  * mean degree of the targets of directed edges whose source has degree \c k.
- * The averaging is done over directed edges.
+ * The averaging is done over all directed edges. The \p from_mode and \p to_mode
+ * parameters control how the source and target vertex degrees are computes.
+ * This way the out-in, out-out, in-in and in-out degree correlation functions
+ * can all be computes.
  *
  * </param><param>
  * In undirected graphs, edges are treated as if they were a pair of reciprocal directed
  * ones.
+ *
+ * </param><param>
+ * If P_ij is the joint degree distribution of the graph, then
+ * <code>k_nn(k) = sum_k j P_kj</code>
+ *
+ * </param><param>
+ * References:
+ *
+ * </param><param>
+ * R. Pastor-Satorras, A. Vazquez, A. Vespignani:
+ * Dynamical and Correlation Properties of the Internet,
+ * Phys. Rev. Lett., vol. 87, pp. 258701 (2001).
+ * https://doi.org/10.1103/PhysRevLett.87.258701
+ *
+ * </param><param>
+ * A. Vazquez, R. Pastor-Satorras, A. Vespignani:
+ * Large-scale topological and dynamical properties of the Internet,
+ * Phys. Rev. E, vol. 65, pp. 066130 (2002).
+ * https://doi.org/10.1103/PhysRevE.65.066130
+ *
+ * </param><param>
+ * A. Barrat, M. Barthélemy, R. Pastor-Satorras, and A. Vespignani,
+ * The architecture of complex weighted networks,
+ * Proc. Natl. Acad. Sci. USA 101, 3747 (2004).
+ * https://dx.doi.org/10.1073/pnas.0400087101
  *
  * \param graph The input graph.
  * \param knnk The result will be written here. <code>knnk[d]</code> is the mean degree
