@@ -33,6 +33,16 @@
 "lc"
 "lr"
 "la"
-"size"
 "fos"
+
 "%"
+
+"x"
+"y"
+"z"
+"type"
+"shape"
+"weight"
+"labeldist"
+"rotation"
+"arrowtype"

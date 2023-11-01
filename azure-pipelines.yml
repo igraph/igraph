@@ -6,7 +6,7 @@ variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   CCACHE_MAXSIZE: 256M
   ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
-  UBSAN_OTIONS: print_stacktrace=1:color=always
+  UBSAN_OPTIONS: print_stacktrace=1:color=always
   OMP_NUM_THREADS: 1
 
 jobs:

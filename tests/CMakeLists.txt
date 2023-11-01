@@ -283,6 +283,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  components
   coreness
   efficiency
   global_transitivity
@@ -1004,6 +1005,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        jdm
 )
 
 add_legacy_tests(

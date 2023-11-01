@@ -123,6 +123,7 @@ __BEGIN_DECLS
 igraph_error_t igraph_i_safe_ceil(igraph_real_t value, igraph_integer_t* result);
 igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t* result);
 igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result);
+igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_integer_t* result);
 
 igraph_error_t igraph_i_safe_next_pow_2(igraph_integer_t k, igraph_integer_t *res);
 igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res);

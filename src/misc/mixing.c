@@ -414,3 +414,165 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \function igraph_joint_degree_matrix
+ * \brief The joint degree matrix of a graph.
+ *
+ * \experimental
+ *
+ * In graph theory, the joint degree matrix \c J_ij of a graph gives the number
+ * of edges, or sum of edge weights, between vertices of degree \c i and degree
+ * \c j. This function stores \c J_ij into <code>jdm[i-1, j-1]</code>.
+ * Each edge, including self-loops, is counted precisely once, both in undirected
+ * and directed graphs.
+ *
+ * </para><para>
+ * <code>sum_(i,j) J_ij</code> is the total number of edges (or total edge weight)
+ * \c m in the graph, where <code>(i,j)</code> refers to ordered or unordered
+ * pairs in directed and undirected graphs, respectively. Thus <code>J_ij / m</code>
+ * is the probability that an edge chosen at random (with probability proportional
+ * to its weight) connects vertices with degrees \c i and \c j.
+ *
+ * </para><para>
+ * Note that \c J_ij is similar, but not identical to the joint degree
+ * \em distribution, which is defined for \em ordered <code>(i, j)</code> degree
+ * pairs even in the undirected case. When considering undirected graphs, the
+ * diagonal of the joint degree distribution is twice that of the joint
+ * degree matrix.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Isabelle Stanton and Ali Pinar:
+ * Constructing and sampling graphs with a prescribed joint degree distribution.
+ * ACM J. Exp. Algorithmics 17, Article 3.5 (2012).
+ * https://doi.org/10.1145/2133803.2330086
+ *
+ * \param graph A pointer to an initialized graph object.
+ * \param jdm A pointer to an initialized matrix that will be resized. The values
+ *        will be written here.
+ * \param max_out_degree Number of rows in the result, i.e. the largest (out-)degree
+ *        to consider. If negative, the largest (out-)degree of the graph will
+ *        be used.
+ * \param max_in_degree Number of columns in the result, i.e. the largest (in-)degree
+ *        to consider. If negative, the largest (in-)degree of the graph will
+ *        be used.
+ * \param weights A vector containing the weights of the edges. If passing a
+ *        \c NULL pointer, edges will be assumed to have unit weights, i.e.
+ *        the matrix entries will be connection counts.
+ * \return Error code.
+ *
+ * Time complexity: O(E), where E is the number of edges in input graph.
+ */
+
+igraph_error_t igraph_joint_degree_matrix(const igraph_t* graph,
+                          igraph_matrix_t* jdm,
+                          igraph_integer_t max_out_degree,
+                          igraph_integer_t max_in_degree,
+                          const igraph_vector_t* weights) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_eit_t eit;
+    igraph_integer_t eid;
+    igraph_integer_t v1id;
+    igraph_integer_t v2id;
+    igraph_integer_t v1deg;
+    igraph_integer_t v2deg;
+
+    if (weights && igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
+    if (igraph_is_directed(graph)) {
+        igraph_vector_int_t out_degrees;
+        igraph_vector_int_t in_degrees;
+
+        // Compute max degrees
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&out_degrees, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&in_degrees, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &out_degrees, igraph_vss_all(), IGRAPH_OUT, true));
+        IGRAPH_CHECK(igraph_degree(graph, &in_degrees, igraph_vss_all(), IGRAPH_IN, true));
+
+        if (max_out_degree < 0) {
+            max_out_degree = no_of_nodes > 0 ? igraph_vector_int_max(&out_degrees) : 0;
+        }
+
+        if (max_in_degree < 0) {
+            max_in_degree = no_of_nodes > 0 ? igraph_vector_int_max(&in_degrees) : 0;
+        }
+
+        IGRAPH_CHECK(igraph_matrix_resize(jdm, max_out_degree, max_in_degree));
+        igraph_matrix_null(jdm);
+
+        IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit));
+        IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+        for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+            eid = IGRAPH_EIT_GET(eit);
+            v1id = IGRAPH_FROM(graph, eid);
+            v2id = IGRAPH_TO(graph, eid);
+            v1deg = VECTOR(out_degrees)[v1id];
+            v2deg = VECTOR(in_degrees)[v2id];
+            if (v1deg <= max_out_degree && v2deg <= max_in_degree) {
+                MATRIX(*jdm, v1deg-1, v2deg-1) += weights ? VECTOR(*weights)[eid] : 1;
+            }
+        }
+
+        igraph_eit_destroy(&eit);
+        igraph_vector_int_destroy(&in_degrees);
+        igraph_vector_int_destroy(&out_degrees);
+        IGRAPH_FINALLY_CLEAN(3);
+
+    } else {
+        igraph_vector_int_t degrees;
+        igraph_integer_t maxdeg;
+
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&degrees, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true));
+
+        // Compute max degree of the graph only if needed
+        if (max_out_degree < 0 || max_in_degree < 0) {
+            maxdeg = no_of_nodes > 0 ? igraph_vector_int_max(&degrees) : 0;
+        }
+
+        if (max_out_degree < 0) {
+            max_out_degree = maxdeg;
+        }
+        if (max_in_degree < 0) {
+            max_in_degree = maxdeg;
+        }
+
+        IGRAPH_CHECK(igraph_matrix_resize(jdm, max_out_degree, max_in_degree));
+        igraph_matrix_null(jdm);
+
+        IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit));
+        IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+        while (!IGRAPH_EIT_END(eit)) {
+            eid = IGRAPH_EIT_GET(eit);
+            v1id = IGRAPH_FROM(graph, eid);
+            v2id = IGRAPH_TO(graph, eid);
+            v1deg = VECTOR(degrees)[v1id];
+            v2deg = VECTOR(degrees)[v2id];
+
+            // Undirected JDMs are symmetrical, needs to be accounted for this when indexing.
+            if (v1deg <= max_out_degree && v2deg <= max_in_degree) {
+                MATRIX(*jdm, v1deg-1, v2deg-1) += weights ? VECTOR(*weights)[eid] : 1;
+            }
+            // Do not double-count connections between same-degree vertices.
+            if (v1deg != v2deg && v2deg <= max_out_degree && v1deg <= max_in_degree) {
+                MATRIX(*jdm, v2deg-1, v1deg-1) += weights ? VECTOR(*weights)[eid] : 1;
+            }
+
+            IGRAPH_EIT_NEXT(eit);
+        }
+
+        igraph_eit_destroy(&eit);
+        igraph_vector_int_destroy(&degrees);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+
+    return IGRAPH_SUCCESS;
+}

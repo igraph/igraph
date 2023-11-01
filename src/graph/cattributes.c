@@ -899,7 +899,6 @@ static igraph_error_t igraph_i_cattributes_cn_min(const igraph_attribute_record_
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
     igraph_integer_t i;
-    igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
         IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -910,7 +909,7 @@ static igraph_error_t igraph_i_cattributes_cn_min(const igraph_attribute_record_
     for (i = 0; i < newlen; i++) {
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
         igraph_integer_t j, n = igraph_vector_int_size(idx);
-        igraph_real_t m = n > 0 ? VECTOR(*oldv)[ VECTOR(*idx)[0] ] : nan;
+        igraph_real_t m = n > 0 ? VECTOR(*oldv)[ VECTOR(*idx)[0] ] : IGRAPH_NAN;
         for (j = 1; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
             igraph_real_t val = VECTOR(*oldv)[x];
@@ -934,7 +933,6 @@ static igraph_error_t igraph_i_cattributes_cn_max(const igraph_attribute_record_
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
     igraph_integer_t i;
-    igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
         IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -945,7 +943,7 @@ static igraph_error_t igraph_i_cattributes_cn_max(const igraph_attribute_record_
     for (i = 0; i < newlen; i++) {
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
         igraph_integer_t j, n = igraph_vector_int_size(idx);
-        igraph_real_t m = n > 0 ? VECTOR(*oldv)[ VECTOR(*idx)[0] ] : nan;
+        igraph_real_t m = n > 0 ? VECTOR(*oldv)[ VECTOR(*idx)[0] ] : IGRAPH_NAN;
         for (j = 1; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
             igraph_real_t val = VECTOR(*oldv)[x];
@@ -970,7 +968,6 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
     igraph_integer_t i;
-    igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
         IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -984,7 +981,7 @@ static igraph_error_t igraph_i_cattributes_cn_random(const igraph_attribute_reco
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
         igraph_integer_t n = igraph_vector_int_size(idx);
         if (n == 0) {
-            VECTOR(*newv)[i] = nan;
+            VECTOR(*newv)[i] = IGRAPH_NAN;
         } else if (n == 1) {
             VECTOR(*newv)[i] = VECTOR(*oldv)[ VECTOR(*idx)[0] ];
         } else {
@@ -1009,7 +1006,6 @@ static igraph_error_t igraph_i_cattributes_cn_first(const igraph_attribute_recor
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
     igraph_integer_t i;
-    igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
         IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -1021,7 +1017,7 @@ static igraph_error_t igraph_i_cattributes_cn_first(const igraph_attribute_recor
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
         igraph_integer_t n = igraph_vector_int_size(idx);
         if (n == 0) {
-            VECTOR(*newv)[i] = nan;
+            VECTOR(*newv)[i] = IGRAPH_NAN;
         } else {
             VECTOR(*newv)[i] = VECTOR(*oldv)[ VECTOR(*idx)[0] ];
         }
@@ -1041,7 +1037,6 @@ static igraph_error_t igraph_i_cattributes_cn_last(const igraph_attribute_record
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
     igraph_integer_t i;
-    igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
         IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -1053,7 +1048,7 @@ static igraph_error_t igraph_i_cattributes_cn_last(const igraph_attribute_record
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
         igraph_integer_t n = igraph_vector_int_size(idx);
         if (n == 0) {
-            VECTOR(*newv)[i] = nan;
+            VECTOR(*newv)[i] = IGRAPH_NAN;
         } else {
             VECTOR(*newv)[i] = VECTOR(*oldv)[ VECTOR(*idx)[n - 1] ];
         }
@@ -1072,7 +1067,6 @@ static igraph_error_t igraph_i_cattributes_cn_mean(const igraph_attribute_record
     igraph_vector_t *newv = IGRAPH_CALLOC(1, igraph_vector_t);
     igraph_integer_t newlen = igraph_vector_int_list_size(merges);
     igraph_integer_t i;
-    igraph_real_t nan = IGRAPH_NAN;
 
     if (!newv) {
         IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
@@ -1083,7 +1077,7 @@ static igraph_error_t igraph_i_cattributes_cn_mean(const igraph_attribute_record
     for (i = 0; i < newlen; i++) {
         igraph_vector_int_t *idx = igraph_vector_int_list_get_ptr(merges, i);;
         igraph_integer_t j, n = igraph_vector_int_size(idx);
-        igraph_real_t s = n > 0 ? 0.0 : nan;
+        igraph_real_t s = n > 0 ? 0.0 : IGRAPH_NAN;
         for (j = 0; j < n; j++) {
             igraph_integer_t x = VECTOR(*idx)[j];
             s += VECTOR(*oldv)[x];
