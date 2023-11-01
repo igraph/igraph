@@ -1862,9 +1862,9 @@ igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m, FIL
                 fputc(' ', file);
             }
 #ifdef FPRINTFUNC_ALIGNED
-            FPRINTFUNC_ALIGNED(file, VECTOR(column_width)[j], MATRIX(*m, i, j));
+            FPRINTFUNC_ALIGNED(file, (int) VECTOR(column_width)[j], MATRIX(*m, i, j));
 #else
-            fprintf(file, format, VECTOR(column_width)[j], MATRIX(*m, i, j));
+            fprintf(file, format, (int) VECTOR(column_width)[j], MATRIX(*m, i, j));
 #endif
         }
         fprintf(file, "\n");
