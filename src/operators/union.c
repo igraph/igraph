@@ -112,11 +112,8 @@ igraph_error_t igraph_union(igraph_t *res,
  * igraph_intersection_many(), \ref igraph_intersection() and \ref
  * igraph_difference for other operators.
  *
- *
  * Time complexity: O(|V|+|E|), |V| is the number of vertices
  * in largest graph and |E| is the number of edges in the result graph.
- *
- * \example examples/simple/igraph_union.c
  */
 igraph_error_t igraph_union_many(
     igraph_t *res, const igraph_vector_ptr_t *graphs,
