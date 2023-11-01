@@ -27,8 +27,15 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
-#include "random/random_internal.h"
+#include "core/interruption.h"
 #include "math/safe_intop.h"
+#include "random/random_internal.h"
+
+#define ALLOW_INTERRUPTION() \
+    if (++iter >= (1 << 14)) { \
+        IGRAPH_ALLOW_INTERRUPTION(); \
+        iter = 0; \
+    }
 
 /**
  * \section about_games
@@ -49,7 +56,7 @@
  * \param n The number of vertices in the graph.
  * \param p The probability of the existence of an edge in the graph.
  * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate loops (self) edges.
+ * \param loops Logical, whether to generate self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p p parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -76,6 +83,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
     igraph_integer_t vsize;
+    int iter = 0;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
@@ -90,7 +98,6 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         IGRAPH_CHECK(igraph_full(graph, n, directed, loops));
     } else {
 
-        igraph_integer_t i;
         igraph_real_t maxedges = n, last;
         igraph_integer_t maxedges_int;
 
@@ -118,6 +125,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             last += RNG_GEOM(p);
             last += 1;
+            ALLOW_INTERRUPTION();
         }
 
         RNG_END();
@@ -125,16 +133,18 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
         IGRAPH_CHECK(igraph_vector_int_reserve(&edges, igraph_vector_size(&s) * 2));
 
+        iter = 0;
         vsize = igraph_vector_size(&s);
         if (directed && loops) {
-            for (i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < vsize; i++) {
                 igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
                 igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
+                ALLOW_INTERRUPTION();
             }
         } else if (directed && !loops) {
-            for (i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < vsize; i++) {
                 igraph_integer_t to = floor(VECTOR(s)[i] / no_of_nodes_real);
                 igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 if (from == to) {
@@ -142,20 +152,23 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 }
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
+                ALLOW_INTERRUPTION();
             }
         } else if (!directed && loops) {
-            for (i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < vsize; i++) {
                 igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
                 igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
+                ALLOW_INTERRUPTION();
             }
         } else { /* !directed && !loops */
-            for (i = 0; i < vsize; i++) {
+            for (igraph_integer_t i = 0; i < vsize; i++) {
                 igraph_integer_t to = floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
                 igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
+                ALLOW_INTERRUPTION();
             }
         }
 
@@ -181,7 +194,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
  * \param n The number of vertices in the graph.
  * \param m The number of edges in the graph.
  * \param directed Logical, whether to generate a directed graph.
- * \param loops Logical, whether to generate loops (self) edges.
+ * \param loops Logical, whether to generate self-loops.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n or \p m parameter.
  *         \c IGRAPH_ENOMEM: there is not enough memory for the operation.
@@ -209,6 +222,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
     igraph_real_t no_of_nodes_real = (igraph_real_t) no_of_nodes;   /* for divisions below */
     igraph_vector_int_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
+    int iter = 0;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices.", IGRAPH_EINVAL);
@@ -256,6 +270,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
+                    ALLOW_INTERRUPTION();
                 }
             } else if (directed && !loops) {
                 for (i = 0; i < slen; i++) {
@@ -266,6 +281,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     }
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
+                    ALLOW_INTERRUPTION();
                 }
             } else if (!directed && loops) {
                 for (i = 0; i < slen; i++) {
@@ -273,6 +289,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
+                    ALLOW_INTERRUPTION();
                 }
             } else { /* !directed && !loops */
                 for (i = 0; i < slen; i++) {
@@ -280,6 +297,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
+                    ALLOW_INTERRUPTION();
                 }
             }
 
