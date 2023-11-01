@@ -834,10 +834,7 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(const igraph_vector_int_
                 if (vertices2.size() < size_t(vd_src.degree)) {
                     IGRAPH_ERROR("Not enough remaining vertices to connect delta.", IGRAPH_EINVAL);
                 }
-    //            std::vector<vd_pair> prev_vds;
-    //            if (!multiedges) {
-    //                vertices2.reserve(vd_src.degree);
-    //            }
+
                 // Connect to the opposite partition
                 for (igraph_integer_t i=0;i < vd_src.degree; i++) {
                     // decrement the degree of the delta largest vertices in the opposite partition
@@ -930,7 +927,6 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(const igraph_vector_int_
             }
         }
     }
-
 
     return IGRAPH_SUCCESS;
 }
