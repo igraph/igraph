@@ -220,8 +220,8 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  *
  * </para><para>
  * When only the <code>k_nn(k)</code> degree correlation function is needed,
- * \ref igraph_knnk() can be used as well. This function provides more flexible
- * control over how degree at each end of directed edges are computed.
+ * \ref igraph_degree_correlation_vector() can be used as well. This function provides
+ * more flexible control over how degree at each end of directed edges are computed.
  *
  * </para><para>
  * Reference:
@@ -246,7 +246,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  *   here if you only want to calculate \c knnk.
  * \param knnk Pointer to an initialized vector, the average
  *   neighbor degree as a function of the vertex degree is stored
- *   here. This is sometimes referred to as the <coed>k_nn(k)</code>
+ *   here. This is sometimes referred to as the <code>k_nn(k)</code>
  *   degree correlation function. The first (zeroth) element is for degree
  *   one vertices, etc. The calculation is done based only on the vertices
  *   \p vids. Supply a \c NULL pointer here if you don't want to calculate this.
@@ -255,7 +255,7 @@ static igraph_error_t igraph_i_avg_nearest_neighbor_degree_weighted(const igraph
  *
  * \return Error code.
  *
- * \sa \ref igraph_knnk() for computing only the degee correlation function,
+ * \sa \ref igraph_degree_correlation_vector() for computing only the degree correlation function,
  * with more flexible control over degree computations.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -357,50 +357,58 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 }
 
 /**
- * \function igraph_knnk
+ * \function igraph_degree_correlation_vector
  * \brief Degree correlation function.
  *
  * Computes the degree correlation function <code>k_nn(k)</code>, defined as the
  * mean degree of the targets of directed edges whose source has degree \c k.
  * The averaging is done over all directed edges. The \p from_mode and \p to_mode
- * parameters control how the source and target vertex degrees are computes.
+ * parameters control how the source and target vertex degrees are computed.
  * This way the out-in, out-out, in-in and in-out degree correlation functions
- * can all be computes.
+ * can all be computed.
  *
- * </param><param>
+ * </para><para>
  * In undirected graphs, edges are treated as if they were a pair of reciprocal directed
  * ones.
  *
- * </param><param>
+ * </para><para>
  * If P_ij is the joint degree distribution of the graph, then
- * <code>k_nn(k) = sum_k j P_kj</code>
+ * <code>k_nn(k) = sum_k j P_kj</code>.
  *
- * </param><param>
+ * </para><para>
+ * The function \ref igraph_avg_nearest_neighbor_degree(), whose main purpose is to
+ * calculate the average neighbor degree for each vertex separately, can also compute
+ * <code>k_nn(k)</code>. It differs from this function in that it can take a subset
+ * of vertices to base the calculation on, but it does not allow the same fine-grained
+ * control over how degrees are computed.
+ *
+ * </para><para>
  * References:
  *
- * </param><param>
+ * </para><para>
  * R. Pastor-Satorras, A. Vazquez, A. Vespignani:
  * Dynamical and Correlation Properties of the Internet,
  * Phys. Rev. Lett., vol. 87, pp. 258701 (2001).
  * https://doi.org/10.1103/PhysRevLett.87.258701
  *
- * </param><param>
+ * </para><para>
  * A. Vazquez, R. Pastor-Satorras, A. Vespignani:
  * Large-scale topological and dynamical properties of the Internet,
  * Phys. Rev. E, vol. 65, pp. 066130 (2002).
  * https://doi.org/10.1103/PhysRevE.65.066130
  *
- * </param><param>
+ * </para><para>
  * A. Barrat, M. Barthélemy, R. Pastor-Satorras, and A. Vespignani,
  * The architecture of complex weighted networks,
  * Proc. Natl. Acad. Sci. USA 101, 3747 (2004).
  * https://dx.doi.org/10.1073/pnas.0400087101
  *
  * \param graph The input graph.
- * \param knnk The result will be written here. <code>knnk[d]</code> is the mean degree
- *    of vertices connected to by vertices of degree \c d. Note that in contrast to
- *    \ref \ref igraph_avg_nearest_neighbor_degree(), <code>d=0</code> is also
- *    considered.
+ * \param knnk An initialized vector, the result will be written here.
+ *    <code>knnk[d]</code> will contain the mean degree of vertices connected to
+ *    by vertices of degree \c d. Note that in contrast to
+ *    \ref igraph_avg_nearest_neighbor_degree(), <code>d=0</code> is also
+ *    included.
  * \param weights An optional weight vector. If not \c NULL, weighted averages will be computed.
  * \param from_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
  *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
@@ -419,9 +427,9 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *
  * Time complexity: O(|E| + |V|)
  */
-igraph_error_t igraph_knnk(const igraph_t *graph, igraph_vector_t *knnk, const igraph_vector_t *weights,
-                           igraph_neimode_t from_mode, igraph_neimode_t to_mode,
-                           igraph_bool_t directed_neighbors) {
+igraph_error_t igraph_degree_correlation_vector(const igraph_t *graph, igraph_vector_t *knnk, const igraph_vector_t *weights,
+                                                igraph_neimode_t from_mode, igraph_neimode_t to_mode,
+                                                igraph_bool_t directed_neighbors) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t maxdeg;

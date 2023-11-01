@@ -913,7 +913,7 @@ igraph_avg_nearest_neighbor_degree:
         EDGEWEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
-igraph_knnk:
+igraph_degree_correlation_vector:
     PARAMS: |-
         GRAPH graph, OUT VECTOR knnk, EDGEWEIGHTS weights=NULL,
         NEIMODE from_mode=OUT, NEIMODE to_mode=IN,

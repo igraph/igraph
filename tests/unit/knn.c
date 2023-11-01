@@ -43,7 +43,7 @@ igraph_bool_t vector_eq(const igraph_vector_t *a, const igraph_vector_t *b) {
     return true;
 }
 
-/* Compare results from igraph_avg_nearest_neighbor_degree() and igraph_knnk() */
+/* Compare results from igraph_avg_nearest_neighbor_degree() and igraph_degree_correlation_vector() */
 void compare_implementations(const igraph_t *g, igraph_neimode_t mode1, igraph_neimode_t mode2, const igraph_vector_t *weights) {
     igraph_vector_t knn, knnk1, knnk2;
 
@@ -58,7 +58,7 @@ void compare_implementations(const igraph_t *g, igraph_neimode_t mode1, igraph_n
     printf("k_nn_i: ");
     print_vector(&knn);
 
-    igraph_knnk(g, &knnk2, weights, mode1, mode2, mode1 == IGRAPH_ALL ? false : true);
+    igraph_degree_correlation_vector(g, &knnk2, weights, mode1, mode2, mode1 == IGRAPH_ALL ? false : true);
 
     printf("k_nn(k): ");
     print_vector(&knnk2);
@@ -104,8 +104,8 @@ void check_dir_undir_equiv(const igraph_t *ug) {
     igraph_vector_null(&knnk1);
     igraph_vector_null(&knnk2);
 
-    igraph_knnk(ug, &knnk1, NULL, IGRAPH_ALL, IGRAPH_ALL, false);
-    igraph_knnk(&rg, &knnk2, NULL, IGRAPH_OUT, IGRAPH_OUT, false);
+    igraph_degree_correlation_vector(ug, &knnk1, NULL, IGRAPH_ALL, IGRAPH_ALL, false);
+    igraph_degree_correlation_vector(&rg, &knnk2, NULL, IGRAPH_OUT, IGRAPH_OUT, false);
 
     IGRAPH_ASSERT(vector_eq(&knnk1, &knnk2));
 
