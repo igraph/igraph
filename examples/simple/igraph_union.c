@@ -44,5 +44,8 @@ int main(void) {
     igraph_destroy(&left);
     igraph_destroy(&right);
 
+    igraph_vector_int_destroy(&edge_map2);
+    igraph_vector_int_destroy(&edge_map1);
+
     return 0;
 }
