@@ -13,7 +13,10 @@ int main(void) {
     igraph_vector_int_t edges;
     igraph_integer_t ds1_sum;
     igraph_integer_t ds2_sum;
+    igraph_bool_t is_connected;
+    igraph_bool_t is_bipartite;
 
+    // Simple undirected bipartite graph.
     igraph_integer_t deg1[] = {2, 3, 2, 1};
     igraph_integer_t deg2[] = {3, 1, 2, 1, 1};
 
@@ -33,17 +36,42 @@ int main(void) {
 
     igraph_create(&g, &edges, 9, false);
 
-    igraph_bool_t is_connected;
     igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
+    igraph_is_bipartite(&g, &is_bipartite, NULL);
     igraph_vector_int_destroy(&ds1);
     igraph_vector_int_destroy(&ds2);
     igraph_vector_int_destroy(&edges);
     igraph_destroy(&g);
-
     printf("Connected: %d\n", is_connected);
+    printf("Bipartite: %d\n", is_bipartite);
 
+    // undirected bipartite multigraph.
+    igraph_integer_t deg1m[] = {2, 3, 1};
+    igraph_integer_t deg2m[]= {4, 2};
 
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_int_init_array(&ds1, deg1m, 3);
+    igraph_vector_int_init_array(&ds2, deg2m, 2);
+
+    igraph_i_safe_vector_int_sum(&ds1, &ds1_sum);
+    igraph_i_safe_vector_int_sum(&ds2, &ds2_sum);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ds1_sum+ds2_sum);
+
+    igraph_realize_bipartite_degree_sequence(&ds1, &ds2, &edges, true);
+
+    igraph_vector_int_print(&edges);
+
+    igraph_create(&g, &edges, 5, false);
+
+    igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
+    igraph_is_bipartite(&g, &is_bipartite, NULL);
+    igraph_vector_int_destroy(&ds1);
+    igraph_vector_int_destroy(&ds2);
+    igraph_vector_int_destroy(&edges);
+    igraph_destroy(&g);
+    printf("Connected: %d\n", is_connected);
+    printf("Bipartite: %d\n", is_bipartite);
+
+    IGRAPH_FINALLY_CLEAN(2);
     VERIFY_FINALLY_STACK();
     return 0;
 }

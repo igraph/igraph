@@ -789,6 +789,7 @@ igraph_error_t igraph_realize_degree_sequence(
     }
 }
 
+// TODO: Docs
 igraph_error_t igraph_realize_bipartite_degree_sequence(const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_vector_int_t *edges, igraph_bool_t multiedges) {
     igraph_integer_t ec = 0; // The number of edges added so far
     igraph_integer_t n1 = igraph_vector_int_size(deg1);
