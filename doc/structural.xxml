@@ -239,6 +239,7 @@
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
+<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->

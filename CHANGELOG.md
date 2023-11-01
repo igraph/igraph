@@ -5,7 +5,7 @@
 ### Added
 
  - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
- - `igraph_knnk()` computes the degree correlation function and its various directed generalizations.
+ - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
 
 ### Changed
 
