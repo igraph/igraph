@@ -103,7 +103,7 @@ int main(void) {
     igraph_vector_ptr_init(&glist, 10);
     for (i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = calloc(1, sizeof(igraph_t));
-        igraph_vector_int_init_int_end(&v, -1, i, i + 1, 1, 0, -1);
+        igraph_vector_int_init_int_end(&v, -1, (int) i, (int) i + 1, 1, 0, -1);
         igraph_create(VECTOR(glist)[i], &v, 0, IGRAPH_DIRECTED);
         igraph_vector_int_destroy(&v);
     }
@@ -123,7 +123,7 @@ int main(void) {
     igraph_vector_ptr_init(&glist, 10);
     for (i = 0; i < igraph_vector_ptr_size(&glist); i++) {
         VECTOR(glist)[i] = calloc(1, sizeof(igraph_t));
-        igraph_vector_int_init_int_end(&v, -1, i, i + 1, 1, 0, -1);
+        igraph_vector_int_init_int_end(&v, -1, (int) i, (int) i + 1, 1, 0, -1);
         igraph_create(VECTOR(glist)[i], &v, 0, IGRAPH_UNDIRECTED);
         igraph_vector_int_destroy(&v);
     }
