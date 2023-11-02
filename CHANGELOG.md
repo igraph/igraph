@@ -22,6 +22,7 @@
  - `igraph_de_bruijn()` and `igraph_kautz()` are now interruptible.
  - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
  - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
+ - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
 
 ### Other
 
