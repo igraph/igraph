@@ -121,7 +121,7 @@ igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_int_t *edges,
  *          The graph to be created will be \em undirected.
  *        \endclist
  * \param ... The additional arguments giving the edges of the graph,
- *        and \em must be of type <type>int</type. Don't forget to supply an
+ *        and \em must be of type <type>int</type>. Don't forget to supply an
  *        additional <code>-1</code> after the last (meaningful) argument. The
  *        \p first parameter is present for technical reasons and represents
  *        the first variadic argument.
