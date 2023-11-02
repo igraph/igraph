@@ -360,6 +360,8 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * \function igraph_degree_correlation_vector
  * \brief Degree correlation function.
  *
+ * \experimental
+ *
  * Computes the degree correlation function <code>k_nn(k)</code>, defined as the
  * mean degree of the targets of directed edges whose source has degree \c k.
  * The averaging is done over all directed edges. The \p from_mode and \p to_mode
@@ -427,9 +429,11 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *
  * Time complexity: O(|E| + |V|)
  */
-igraph_error_t igraph_degree_correlation_vector(const igraph_t *graph, igraph_vector_t *knnk, const igraph_vector_t *weights,
-                                                igraph_neimode_t from_mode, igraph_neimode_t to_mode,
-                                                igraph_bool_t directed_neighbors) {
+igraph_error_t igraph_degree_correlation_vector(
+    const igraph_t *graph, igraph_vector_t *knnk, const igraph_vector_t *weights,
+    igraph_neimode_t from_mode, igraph_neimode_t to_mode,
+    igraph_bool_t directed_neighbors) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t maxdeg;
