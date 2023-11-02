@@ -54,7 +54,7 @@ __BEGIN_DECLS
 #if defined(__GNUC__)
 /* Compilers that support the GNU C syntax. Use __noreturn__ instead of 'noreturn' as the latter is a macro in C11. */
 #define IGRAPH_FUNCATTR_NORETURN __attribute__((__noreturn__))
-#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first) __attribute__((format(printf, string, first)))
+#define IGRAPH_FUNCATTR_PRINTFLIKE(string, first) __attribute__((__format__(printf, string, first)))
 #elif defined(_MSC_VER)
 /* Compilers that support the MSVC syntax. */
 #define IGRAPH_FUNCATTR_NORETURN __declspec(noreturn)
