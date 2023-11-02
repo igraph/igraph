@@ -206,6 +206,7 @@ static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
 ) {
 
     igraph_vector_int_t edges;
+    int iter = 0;
 
     /* No need for checking n or m here; it has already been done in
      * igraph_erdos_renyi_game_gnm() */
@@ -227,6 +228,7 @@ static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
         }
         igraph_vector_int_push_back(&edges, from); /* reserved */
         igraph_vector_int_push_back(&edges, to); /* reserved */
+        ALLOW_INTERRUPTION();
     }
     RNG_END();
 
