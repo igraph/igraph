@@ -204,6 +204,7 @@
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_joint_degree_matrix -->
 </section>
 
 <section id="k-cores"><title>K-cores and k-trusses</title>
@@ -238,6 +239,7 @@
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
+<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->

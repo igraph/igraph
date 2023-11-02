@@ -34,20 +34,32 @@
 
 ## [master]
 
-### Changes
+### Added
+
+ - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
+
+### Changed
 
  - The behaviour of the Pajek format reader and writer is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret. Only those vertex and edge parameters are treated as valid which Pajek itself understands, therefore support for `size` is now dropped, and support for the `font` edge parameter is added. See http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm for more information. Invalid/unrecognized parameters are now converted to igraph attributes by the reader, but just as before, they are not output by the writer.
  - The Pajek format writer now encodes newline and quotation mark characters in a Pajek-compatible manner (`\n` and `&#34;`, respectively).
+ - `igraph_avg_nearest_neighbor_degree()` now supports non-simple graphs.
 
 ### Fixed
 
  - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
  - Fixed the handling of duplicate vertex IDs in `igraph_induced_subgraph()`.
  - `igraph_vector_which_min()` and `igraph_vector_which_max()` no longer allow zero-length input, which makes them consistent with other similar functions, and was the originally intended behaviour. Passing zero-length input is invalid use and currently triggers an assertion failure.
+ - `igraph_erdos_renyi_game_gnm()` and `igraph_erdos_renyi_game_gnp()` are now interruptible.
+ - `igraph_de_bruijn()` and `igraph_kautz()` are now interruptible.
+ - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
+ - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
+ - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
 
 ### Other
 
  - Updated vendored mini-gmp to 6.3.0.
+ - `igraph_connected_components()` makes better use of the cache, improving overall performance.
  - Documentation improvements.
 
 ## [0.10.7] - 2023-09-04

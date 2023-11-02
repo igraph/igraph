@@ -41,7 +41,7 @@ IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_vector, copy)(
         TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_vector, destroy)(TYPE(igraph_vector)* v);
 
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
 
 /*--------------------*/
 /* Accessing elements */
@@ -179,8 +179,8 @@ IGRAPH_EXPORT void FUNCTION(igraph_vector, which_minmax)(
 /* Vector properties */
 /*-------------------*/
 
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, empty)(const TYPE(igraph_vector)* v);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_vector, size)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_vector, empty)(const TYPE(igraph_vector)* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_vector, size)(const TYPE(igraph_vector)* v);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v);
 IGRAPH_EXPORT BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v);
 IGRAPH_EXPORT igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v);

@@ -29,6 +29,7 @@
 #include "igraph_datatype.h"
 #include "igraph_error.h"
 #include "igraph_vector.h"
+#include "igraph_matrix.h"
 
 __BEGIN_DECLS
 
@@ -48,6 +49,12 @@ IGRAPH_EXPORT igraph_error_t igraph_assortativity(const igraph_t *graph,
 IGRAPH_EXPORT igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
                                               igraph_real_t *res,
                                               igraph_bool_t directed);
+
+IGRAPH_EXPORT igraph_error_t igraph_joint_degree_matrix(const igraph_t *graph,
+                                        igraph_matrix_t *m,
+                                        igraph_integer_t dout,
+                                        igraph_integer_t din,
+                                        const igraph_vector_t *weights);
 
 __END_DECLS
 

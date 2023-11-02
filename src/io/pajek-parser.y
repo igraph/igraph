@@ -626,6 +626,15 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
 
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+    /* There are 21 standard vertex attributes and 21 standard edge attributes.
+     * We refuse to allow more to reduce memory usage when fuzzing. */
+    if (attrsize > 21) {
+      IGRAPH_ERROR("Too many attributes in Pajek file.", IGRAPH_PARSEERROR);
+    }
+#endif
+
     /* add a new attribute */
     rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
     CHECK_OOM_RP(rec);

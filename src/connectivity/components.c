@@ -108,20 +108,10 @@ static igraph_error_t igraph_i_connected_components_weak(
 ) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_clusters;
     bool *already_added;
-    igraph_integer_t first_node, act_cluster_size = 0, no_of_clusters = 0;
-
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
-
-    igraph_integer_t i;
     igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
-
-    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
-    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for calculating weakly connected components.");
-    IGRAPH_FINALLY(igraph_free, already_added);
-
-    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes / 10);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
 
     /* Memory for result, csize is dynamically allocated */
     if (membership) {
@@ -131,9 +121,41 @@ static igraph_error_t igraph_i_connected_components_weak(
         igraph_vector_int_clear(csize);
     }
 
+    /* Try to make use of cached information. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) {
+        /* If we know that the graph is weakly connected from the cache,
+         * we can return the result right away. We keep in mind that
+         * the null graph is considered disconnected, therefore any connected
+         * graph has precisely one component. */
+        if (membership) {
+            /* All vertices are members of the same component. */
+            igraph_vector_int_fill(membership, 0);
+        }
+        if (csize) {
+            /* The size of the single component is the same as the vertex count. */
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, no_of_nodes));
+        }
+        if (no) {
+            /* There is one component. */
+            *no = 1;
+        }
+        return IGRAPH_SUCCESS;
+    }
+
+    already_added = IGRAPH_CALLOC(no_of_nodes, bool);
+    IGRAPH_CHECK_OOM(already_added, "Insufficient memory for calculating weakly connected components.");
+    IGRAPH_FINALLY(igraph_free, already_added);
+
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes / 10);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
+
     /* The algorithm */
 
-    for (first_node = 0; first_node < no_of_nodes; ++first_node) {
+    no_of_clusters = 0;
+    for (igraph_integer_t first_node = 0; first_node < no_of_nodes; ++first_node) {
+        igraph_integer_t act_cluster_size;
+
         if (already_added[first_node]) {
             continue;
         }
@@ -150,7 +172,7 @@ static igraph_error_t igraph_i_connected_components_weak(
             igraph_integer_t act_node = igraph_dqueue_int_pop(&q);
             IGRAPH_CHECK(igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL));
             igraph_integer_t nei_count = igraph_vector_int_size(&neis);
-            for (i = 0; i < nei_count; i++) {
+            for (igraph_integer_t i = 0; i < nei_count; i++) {
                 igraph_integer_t neighbor = VECTOR(neis)[i];
                 if (already_added[neighbor]) {
                     continue;
@@ -194,17 +216,41 @@ static igraph_error_t igraph_i_connected_components_strong(
 ) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_int_t next_nei = IGRAPH_VECTOR_NULL;
-
-    igraph_integer_t i, n, num_seen;
+    igraph_integer_t num_seen;
     igraph_dqueue_int_t q = IGRAPH_DQUEUE_NULL;
-
     igraph_integer_t no_of_clusters = 0;
-    igraph_integer_t act_cluster_size;
-
     igraph_vector_int_t out = IGRAPH_VECTOR_NULL;
-    const igraph_vector_int_t* tmp;
-
     igraph_adjlist_t adjlist;
+
+    /* Memory for result, csize is dynamically allocated */
+    if (membership) {
+        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
+    }
+    if (csize) {
+        igraph_vector_int_clear(csize);
+    }
+
+    /* Try to make use of cached information. */
+    if (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_STRONGLY_CONNECTED)) {
+        /* If we know that the graph is strongly connected from the cache,
+         * we can return the result right away. We keep in mind that
+         * the null graph is considered disconnected, therefore any connected
+         * graph has precisely one component. */
+        if (membership) {
+            /* All vertices are members of the same component. */
+            igraph_vector_int_fill(membership, 0);
+        }
+        if (csize) {
+            /* The size of the single component is the same as the vertex count. */
+            IGRAPH_CHECK(igraph_vector_int_push_back(csize, no_of_nodes));
+        }
+        if (no) {
+            /* There is one component. */
+            *no = 1;
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     /* The result */
 
@@ -212,21 +258,15 @@ static igraph_error_t igraph_i_connected_components_strong(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&out, 0);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
-    if (membership) {
-        IGRAPH_CHECK(igraph_vector_int_resize(membership, no_of_nodes));
-    }
     IGRAPH_CHECK(igraph_vector_int_reserve(&out, no_of_nodes));
-
-    igraph_vector_int_null(&out);
-    if (csize) {
-        igraph_vector_int_clear(csize);
-    }
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     num_seen = 0;
-    for (i = 0; i < no_of_nodes; i++) {
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+        const igraph_vector_int_t *tmp;
+
         IGRAPH_ALLOW_INTERRUPTION();
 
         tmp = igraph_adjlist_get(&adjlist, i);
@@ -279,6 +319,7 @@ static igraph_error_t igraph_i_connected_components_strong(
     num_seen = 0;
 
     while (!igraph_vector_int_empty(&out)) {
+        igraph_integer_t act_cluster_size;
         igraph_integer_t grandfather = igraph_vector_int_pop_back(&out);
 
         if (VECTOR(next_nei)[grandfather] != 0) {
@@ -301,9 +342,9 @@ static igraph_error_t igraph_i_connected_components_strong(
 
         while (!igraph_dqueue_int_empty(&q)) {
             igraph_integer_t act_node = igraph_dqueue_int_pop_back(&q);
-            tmp = igraph_adjlist_get(&adjlist, act_node);
-            n = igraph_vector_int_size(tmp);
-            for (i = 0; i < n; i++) {
+            const igraph_vector_int_t *tmp = igraph_adjlist_get(&adjlist, act_node);
+            const igraph_integer_t n = igraph_vector_int_size(tmp);
+            for (igraph_integer_t i = 0; i < n; i++) {
                 igraph_integer_t neighbor = VECTOR(*tmp)[i];
                 if (VECTOR(next_nei)[neighbor] != 0) {
                     continue;

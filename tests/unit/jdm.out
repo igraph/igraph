@@ -1,0 +1,139 @@
+Graph with no vertices
+[ 0-by-0 ]
+3-cycle
+[        0        0
+         0        3 ]
+Three self-loops
+[        0        0
+         0        3 ]
+One self-loop and two parallel edges
+[        0        0
+         0        3 ]
+Simple, undirected graph
+[        0        0        0        0
+         0        0        2        2
+         0        2        1        2
+         0        2        2        0 ]
+Simple, directed graph
+[        0        1        0
+         0        1        1
+         0        2        1
+         1        2        1 ]
+Undirected, self-loops, no multiedges
+[        0        0        0        0
+         0        0        1        1
+         0        1        1        3
+         0        1        3        2 ]
+Directed, self-loops, no multiedges
+[        0        0        0
+         0        2        2
+         0        1        2
+         1        1        2 ]
+Undirected multigraph, no self-loops
+[        0        0        0        0        0
+         0        0        1        0        1
+         0        1        2        0        4
+         0        0        0        0        0
+         0        1        4        0        0 ]
+Directed multigraph, no self-loops
+[        0        1        0
+         0        1        1
+         0        2        1
+         0        0        0
+         0        4        1 ]
+Undirected multigraph with self-loops
+[        0        0        0        0        0
+         0        0        1        0        1
+         0        1        1        0        3
+         0        0        0        0        0
+         0        1        3        0        3 ]
+Directed multigraph with self-loops
+[        0        0        0
+         0        2        2
+         0        1        2
+         0        0        0
+         0        3        2 ]
+Weighted, simple, undirected graph
+[        0        0        0        0
+         0        0        2        7
+         0        2        0        5
+         0        7        5        0 ]
+Weighted, simple, directed graph
+[        0        1        0
+         0        3        2
+         0       -2       -1
+         7        9        6 ]
+Weighted, undirected, self-loops, no multiedges
+[        0        0        0        0
+         0        0        6        8
+         0        6        2       11
+         0        8       11        9 ]
+Weighted, directed, self-loops, no multiedges
+[        0        0        0
+         0       12       10
+         0        3        3
+        11        8       19 ]
+Weighted, undirected multigraph, no self-loops
+[        0        0        0        0        0
+         0        0        6        0        8
+         0        6        3        0       19
+         0        0        0        0        0
+         0        8       19        0        0 ]
+Weighted, directed multigraph, no self-loops
+[        0        4        0
+         0        6        5
+         0        4        2
+         0        0        0
+         0       36        9 ]
+Weighted, undirected multigraph with self-loops
+[        0        0        0        0        0
+         0        0        7        0        9
+         0        7        2        0       12
+         0        0        0        0        0
+         0        9       12        0       15 ]
+Weighted, directed multigraph with self-loops
+[        0        0        0
+         0       12       10
+         0        3        3
+         0        0        0
+         0       31       19 ]
+Directed: dout is small, cropped JDM (3x3)
+[        0        1        0
+         0        1        1
+         0        2        1 ]
+Directed: din is small, cropped JDM (4, 2)
+[        0        1
+         0        1
+         0        2
+         1        2 ]
+Directed: Automatic resize, dout < 0 (4x2)
+[        0        1
+         0        1
+         0        2
+         1        2 ]
+Directed: Valid dout and din (5x5)
+[        0        1        0        0        0
+         0        1        1        0        0
+         0        2        1        0        0
+         1        2        1        0        0
+         0        0        0        0        0 ]
+Undirected: dout is small, cropped JDM (3x4)
+[        0        0        0        0
+         0        0        2        2
+         0        2        1        2 ]
+Undirected: din is small, cropped JDM (4x3)
+[        0        0        0
+         0        0        2
+         0        2        1
+         0        2        2 ]
+Undirected: Automatic resize, dout or din < 0 (4x4)
+[        0        0        0        0
+         0        0        2        2
+         0        2        1        2
+         0        2        2        0 ]
+Undirected: Valid dout and din (5x5)
+[        0        0        0        0        0
+         0        0        2        2        0
+         0        2        1        2        0
+         0        2        2        0        0
+         0        0        0        0        0 ]

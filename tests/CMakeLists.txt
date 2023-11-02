@@ -268,7 +268,7 @@ add_examples(
   igraph_is_loop
   igraph_is_multiple
   igraph_list_triangles
-  igraph_knn
+  igraph_avg_nearest_neighbor_degree
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
@@ -283,9 +283,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  components
   coreness
   efficiency
   global_transitivity
+  harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
@@ -350,11 +352,11 @@ add_legacy_tests(
   igraph_unfold_tree
   igraph_voronoi
   igraph_widest_paths
-  harmonic_centrality
+  igraph_spanner
+  knn
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
-  igraph_spanner
 )
 
 add_legacy_tests(
@@ -564,6 +566,7 @@ add_legacy_tests(
   igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
+  igraph_union
 )
 
 # conversion.at
@@ -1004,4 +1007,9 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        jdm
 )

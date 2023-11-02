@@ -913,6 +913,13 @@ igraph_avg_nearest_neighbor_degree:
         EDGE_WEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
+igraph_degree_correlation_vector:
+    PARAMS: |-
+        GRAPH graph, OUT VECTOR knnk, EDGEWEIGHTS weights=NULL,
+        NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
+        BOOLEAN directed_neighbors=True
+    DEPS: weights ON graph
+
 igraph_strength:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTYS res, VERTEX_SELECTOR vids=ALL,
@@ -989,6 +996,13 @@ igraph_assortativity:
 
 igraph_assortativity_degree:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN directed=True
+
+igraph_joint_degree_matrix:
+    PARAMS: |-
+        GRAPH graph, OUT MATRIX jdm,
+        INTEGER max_out_degree=-1, INTEGER max_in_degree=-1,
+        EDGEWEIGHTS weights=NULL
+    DEPS: weights ON graph
 
 igraph_contract_vertices:
     PARAMS: |-

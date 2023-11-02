@@ -37,7 +37,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init_array)(
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_matrix, init_copy)(
     TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
 IGRAPH_EXPORT void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m);
 
 IGRAPH_EXPORT IGRAPH_DEPRECATED igraph_error_t FUNCTION(igraph_matrix, copy)(
     TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
@@ -177,10 +177,10 @@ IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, all_ge)(const TYPE(igraph_ma
 /*-------------------*/
 
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, isnull)(const TYPE(igraph_matrix) *m);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, empty)(const TYPE(igraph_matrix) *m);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_matrix, size)(const TYPE(igraph_matrix) *m);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_matrix, nrow)(const TYPE(igraph_matrix) *m);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_matrix, ncol)(const TYPE(igraph_matrix) *m);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(igraph_matrix, empty)(const TYPE(igraph_matrix) *m);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_matrix, size)(const TYPE(igraph_matrix) *m);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_matrix, nrow)(const TYPE(igraph_matrix) *m);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_matrix, ncol)(const TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, sum)(const TYPE(igraph_matrix) *m);
 IGRAPH_EXPORT BASE FUNCTION(igraph_matrix, prod)(const TYPE(igraph_matrix) *m);
