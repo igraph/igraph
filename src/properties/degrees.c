@@ -154,8 +154,8 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
             VECTOR(*my_knn)[i] = mynan;
         }
         if (knnk && nv > 0) {
-            VECTOR(*knnk)[nv - 1] += VECTOR(*my_knn)[i];
-            VECTOR(deghist)[nv - 1] += 1;
+            VECTOR(*knnk)[nv - 1] += sum;
+            VECTOR(deghist)[nv - 1] += str;
         }
     }
 
