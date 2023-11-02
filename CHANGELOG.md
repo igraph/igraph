@@ -711,6 +711,7 @@ Some of the highlights are:
    incorrect (it was always zero). This is now fixed.
  - `igraph_correlated_game()` would return incorrect results, or exhaust the memory,
     for most input graphs that were not generated with `igraph_erdos_renyi_game_gnp()`.
+ - `igraph_community_label_propagation` incorrectly did not result in all labels being dominant (issue #1963, fixed in PR #1966).
 
 ### Other
 
