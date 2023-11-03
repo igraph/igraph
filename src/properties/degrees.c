@@ -422,7 +422,7 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *    to be directed. Undirected connections are treated as reciprocal directed ones,
  *    i.e. both <code>u -> v</code> and <code>v -> u</code> will be considered.
  *    Ignored in undirected graphs.
- * \returns Error code.
+ * \return Error code.
  *
  * \sa \ref igraph_avg_nearest_neighbor_degree() for computing the average neighbour degree of
  * a set of vertices.
