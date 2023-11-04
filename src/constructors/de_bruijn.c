@@ -102,10 +102,7 @@ igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_inte
             igraph_vector_int_push_back(&edges, i);
             igraph_vector_int_push_back(&edges, basis + j);
         }
-        if (++iter >= (1 << 10)) {
-            iter = 0;
-            IGRAPH_ALLOW_INTERRUPTION();
-        }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
