@@ -38,26 +38,26 @@ int main (void) {
 
     printf("Graph with no vertices\n");
     igraph_small(&g, 0, false, -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("3-cycle\n");
     igraph_ring(&g, 3, IGRAPH_UNDIRECTED, false, true);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Three self-loops\n");
     igraph_small(&g, 3, IGRAPH_UNDIRECTED,
                  0,0, 1,1, 2,2,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("One self-loop and two parallel edges\n");
     igraph_small(&g, 3, IGRAPH_UNDIRECTED,
                  0,0, 1,2, 1,2,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Simple, undirected graph\n");
@@ -67,7 +67,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Simple, directed graph\n");
@@ -77,7 +77,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected, self-loops, no multiedges\n");
@@ -87,7 +87,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed, self-loops, no multiedges\n");
@@ -97,7 +97,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected multigraph, no self-loops\n");
@@ -107,7 +107,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed multigraph, no self-loops\n");
@@ -117,7 +117,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected multigraph with self-loops\n");
@@ -127,7 +127,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed multigraph with self-loops\n");
@@ -137,7 +137,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     // Weight tests
@@ -149,7 +149,7 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, -1,6);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     printf("Weighted, simple, directed graph\n");
@@ -160,7 +160,7 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, -2,8);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     printf("Weighted, undirected, self-loops, no multiedges\n");
@@ -171,7 +171,7 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, 1,9);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     printf("Weighted, directed, self-loops, no multiedges\n");
@@ -182,7 +182,7 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, 1,12);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     printf("Weighted, undirected multigraph, no self-loops\n");
@@ -193,7 +193,7 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, 1,9);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     printf("Weighted, directed multigraph, no self-loops\n");
@@ -204,7 +204,7 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, 1,12);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     printf("Weighted, undirected multigraph with self-loops\n");
@@ -215,7 +215,7 @@ int main (void) {
                  3, 4,
                  -1);
     igraph_vector_init_range(&weights, 1,10);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     printf("Weighted, directed multigraph with self-loops\n");
@@ -226,7 +226,7 @@ int main (void) {
                  4, 0, 4, 1, 4, 2, 4, 3, 4, 3,
                  -1);
     igraph_vector_init_range(&weights, 1,13);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, &weights);
+    igraph_joint_degree_matrix(&g, &weights, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, &weights);
 
     // dout din tests
@@ -239,7 +239,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, 3, 3, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, 3, 3);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed: din is small, cropped JDM (4, 2)\n");
@@ -249,7 +249,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, 4, 2, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, 4, 2);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed: Automatic resize, dout < 0 (4x2)\n");
@@ -259,7 +259,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, 2, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, 2);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Directed: Valid dout and din (5x5)\n");
@@ -269,7 +269,7 @@ int main (void) {
                  3, 2, 3, 4,
                  4, 0, 4, 1, 4, 2, 4, 3,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, 5, 5, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, 5, 5);
     print_and_destroy(&g, &jdm, NULL);
 
     // Undirected
@@ -280,7 +280,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, 3, 4, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, 3, 4);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected: din is small, cropped JDM (4x3)\n");
@@ -290,7 +290,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, 4, 3, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, 4, 3);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected: Automatic resize, dout or din < 0 (4x4)\n");
@@ -300,7 +300,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, -1, -1, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, -1, -1);
     print_and_destroy(&g, &jdm, NULL);
 
     printf("Undirected: Valid dout and din (5x5)\n");
@@ -310,7 +310,7 @@ int main (void) {
                  2, 3, 2, 4,
                  3, 4,
                  -1);
-    igraph_joint_degree_matrix(&g, &jdm, 5, 5, NULL);
+    igraph_joint_degree_matrix(&g, NULL, &jdm, 5, 5);
     print_and_destroy(&g, &jdm, NULL);
 
     // Clean up
