@@ -94,6 +94,7 @@
  * \sa \ref igraph_assortativity() for computing the assortativity
  * based on continuous vertex values instead of discrete categories.
  * \ref igraph_modularity() to compute generalized modularity.
+ * \ref igraph_joint_type_distribution() to obtain the mixing matrix.
  *
  * \example examples/simple/igraph_assortativity_nominal.c
  */
@@ -379,7 +380,9 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  * the number of vertices.
  *
  * \sa \ref igraph_assortativity() for the general function
- * calculating assortativity for any kind of numeric vertex values.
+ * calculating assortativity for any kind of numeric vertex values,
+ * and \ref igraph_joint_degree_distribution() to get the complete
+ * joint degree distribution.
  *
  * \example examples/simple/igraph_assortativity_degree.c
  */
@@ -436,7 +439,8 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  *
  * </para><para>
  * Note that \c J_ij is similar, but not identical to the joint degree
- * \em distribution, which is defined for \em ordered <code>(i, j)</code> degree
+ * \em distribution, computed by \ref igraph_joint_degree_distribution(),
+ * which is defined for \em ordered <code>(i, j)</code> degree
  * pairs even in the undirected case. When considering undirected graphs, the
  * diagonal of the joint degree distribution is twice that of the joint
  * degree matrix.
@@ -463,6 +467,9 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  *        to consider. If negative, the largest (in-)degree of the graph will
  *        be used.
  * \return Error code.
+ *
+ * \sa \ref igraph_joint_degree_distribution() to count ordered vertex pairs instead of
+ * edges, or to obtain a normalized matrix.
  *
  * Time complexity: O(E), where E is the number of edges in input graph.
  */

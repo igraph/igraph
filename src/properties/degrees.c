@@ -374,8 +374,9 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * ones.
  *
  * </para><para>
- * If P_ij is the joint degree distribution of the graph, then
- * <code>k_nn(k) = sum_k j P_kj</code>.
+ * If P_ij is the joint degree distribution of the graph, computable with
+ * \ref igraph_joint_degree_distribution(), then
+ * <code>k_nn(k) = (sum_j j P_kj) / (sum_j P_kj)</code>.
  *
  * </para><para>
  * The function \ref igraph_avg_nearest_neighbor_degree(), whose main purpose is to
@@ -424,8 +425,10 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  *    Ignored in undirected graphs.
  * \return Error code.
  *
- * \sa \ref igraph_avg_nearest_neighbor_degree() for computing the average neighbour degree of
- * a set of vertices.
+ * \sa \ref igraph_avg_nearest_neighbor_degree() for computing the average neighbour
+ * degree of a set of vertices, \ref igraph_joint_degree_distribution() to get the
+ * complete joint degree distribution, and \ref igraph_assortativity_degree()
+ * to compute the degree assortativity.
  *
  * Time complexity: O(|E| + |V|)
  */
