@@ -617,6 +617,12 @@ static igraph_error_t mixing_matrix(
         IGRAPH_ERROR("Length of 'to' type vector must agree with vertex count.", IGRAPH_EINVAL);
     }
 
+    if (weights && igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
     if (max_from_type < 0) {
         if (no_of_nodes == 0) {
             nrow = 0;

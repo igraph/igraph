@@ -444,6 +444,12 @@ igraph_error_t igraph_degree_correlation_vector(
     igraph_vector_t weight_sums;
     igraph_vector_int_t *deg_from, *deg_to, deg_out, deg_in, deg_all;
 
+    if (weights && igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
     if (! igraph_is_directed(graph)) {
         from_mode = to_mode = IGRAPH_ALL;
         directed_neighbors = false;
@@ -473,7 +479,7 @@ igraph_error_t igraph_degree_correlation_vector(
     case IGRAPH_IN:  deg_from = &deg_in;  break;
     case IGRAPH_ALL: deg_from = &deg_all; break;
     default:
-        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'from' mode.", IGRAPH_EINVAL);
     }
 
     switch (to_mode) {
@@ -481,7 +487,7 @@ igraph_error_t igraph_degree_correlation_vector(
     case IGRAPH_IN:  deg_to = &deg_in;  break;
     case IGRAPH_ALL: deg_to = &deg_all; break;
     default:
-        IGRAPH_ERROR("Invalid mode.", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid 'to' mode.", IGRAPH_EINVAL);
     }
 
     maxdeg = no_of_edges > 0 ? igraph_vector_int_max(deg_from) : 0;
