@@ -915,7 +915,8 @@ igraph_avg_nearest_neighbor_degree:
 
 igraph_degree_correlation_vector:
     PARAMS: |-
-        GRAPH graph, OUT VECTOR knnk, EDGE_WEIGHTS weights=NULL,
+        GRAPH graph, EDGE_WEIGHTS weights=NULL,
+        OUT VECTOR knnk,
         NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
         BOOLEAN directed_neighbors=True
     DEPS: weights ON graph
@@ -999,9 +1000,9 @@ igraph_assortativity_degree:
 
 igraph_joint_degree_matrix:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX jdm,
-        INTEGER max_out_degree=-1, INTEGER max_in_degree=-1,
-        EDGE_WEIGHTS weights=NULL
+        GRAPH graph, EDGE_WEIGHTS weights=NULL,
+        OUT MATRIX jdm,
+        INTEGER max_out_degree=-1, INTEGER max_in_degree=-1
     DEPS: weights ON graph
 
 igraph_contract_vertices:
