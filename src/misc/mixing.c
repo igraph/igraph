@@ -451,6 +451,9 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * https://doi.org/10.1145/2133803.2330086
  *
  * \param graph A pointer to an initialized graph object.
+ * \param weights A vector containing the weights of the edges. If passing a
+ *        \c NULL pointer, edges will be assumed to have unit weights, i.e.
+ *        the matrix entries will be connection counts.
  * \param jdm A pointer to an initialized matrix that will be resized. The values
  *        will be written here.
  * \param max_out_degree Number of rows in the result, i.e. the largest (out-)degree
@@ -459,19 +462,16 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * \param max_in_degree Number of columns in the result, i.e. the largest (in-)degree
  *        to consider. If negative, the largest (in-)degree of the graph will
  *        be used.
- * \param weights A vector containing the weights of the edges. If passing a
- *        \c NULL pointer, edges will be assumed to have unit weights, i.e.
- *        the matrix entries will be connection counts.
  * \return Error code.
  *
  * Time complexity: O(E), where E is the number of edges in input graph.
  */
 
-igraph_error_t igraph_joint_degree_matrix(const igraph_t* graph,
-                          igraph_matrix_t* jdm,
-                          igraph_integer_t max_out_degree,
-                          igraph_integer_t max_in_degree,
-                          const igraph_vector_t* weights) {
+igraph_error_t igraph_joint_degree_matrix(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_matrix_t *jdm,
+        igraph_integer_t max_out_degree, igraph_integer_t max_in_degree) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t eit;

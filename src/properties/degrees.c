@@ -406,12 +406,12 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * https://dx.doi.org/10.1073/pnas.0400087101
  *
  * \param graph The input graph.
+ * \param weights An optional weight vector. If not \c NULL, weighted averages will be computed.
  * \param knnk An initialized vector, the result will be written here.
  *    <code>knnk[d]</code> will contain the mean degree of vertices connected to
  *    by vertices of degree \c d. Note that in contrast to
  *    \ref igraph_avg_nearest_neighbor_degree(), <code>d=0</code> is also
  *    included.
- * \param weights An optional weight vector. If not \c NULL, weighted averages will be computed.
  * \param from_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
  *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
  *    Ignored in undirected graphs.
@@ -430,9 +430,10 @@ igraph_error_t igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
  * Time complexity: O(|E| + |V|)
  */
 igraph_error_t igraph_degree_correlation_vector(
-    const igraph_t *graph, igraph_vector_t *knnk, const igraph_vector_t *weights,
-    igraph_neimode_t from_mode, igraph_neimode_t to_mode,
-    igraph_bool_t directed_neighbors) {
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_vector_t *knnk,
+        igraph_neimode_t from_mode, igraph_neimode_t to_mode,
+        igraph_bool_t directed_neighbors) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
