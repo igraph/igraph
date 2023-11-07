@@ -55,6 +55,19 @@ IGRAPH_EXPORT igraph_error_t igraph_joint_degree_matrix(
         igraph_matrix_t *jdm,
         igraph_integer_t dout, igraph_integer_t din);
 
+IGRAPH_EXPORT igraph_error_t igraph_joint_degree_distribution(
+        const igraph_t *graph, const igraph_vector_t *weights, igraph_matrix_t *p,
+        igraph_neimode_t from_mode, igraph_neimode_t to_mode,
+        igraph_bool_t directed_neighbors,
+        igraph_bool_t normalized,
+        igraph_integer_t max_from_degree, igraph_integer_t max_to_degree);
+
+IGRAPH_EXPORT igraph_error_t igraph_joint_type_distribution(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_matrix_t *p,
+        const igraph_vector_int_t *from_types, const igraph_vector_int_t *to_types,
+        igraph_bool_t directed, igraph_bool_t normalized);
+
 __END_DECLS
 
 #endif
