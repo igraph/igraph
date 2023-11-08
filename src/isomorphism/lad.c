@@ -1589,7 +1589,7 @@ igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t 
     if (igraph_vcount(pattern) == 0) {
         /* Special case for null patterns */
         if (maps) {
-            igraph_vector_int_list_push_back_new(maps, NULL);
+            IGRAPH_CHECK(igraph_vector_int_list_push_back_new(maps, NULL));
         }
         return IGRAPH_SUCCESS;
     }
