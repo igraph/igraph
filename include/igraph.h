@@ -81,6 +81,7 @@
 #include "igraph_mixing.h"
 #include "igraph_separators.h"
 #include "igraph_cohesive_blocks.h"
+#include "igraph_dispersion.h"
 #include "igraph_eigen.h"
 #include "igraph_hrg.h"
 #include "igraph_threading.h"

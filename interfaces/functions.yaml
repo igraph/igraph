@@ -2180,6 +2180,11 @@ igraph_cohesive_blocks:
         OUT GRAPH blockTree
     DEPS: blocks ON graph
 
+igraph_dispersion:
+    PARAMS: |-
+        GRAPH graph, U source node, V target node
+    DEPS: disperson value ON pairwise vertices
+
 #######################################
 # K-Cores
 #######################################
