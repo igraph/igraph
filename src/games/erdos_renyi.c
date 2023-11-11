@@ -222,7 +222,7 @@ static igraph_error_t igraph_i_erdos_renyi_game_gnm_multi(
         }
         igraph_vector_int_push_back(&edges, from); /* reserved */
         igraph_vector_int_push_back(&edges, to); /* reserved */
-        ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
     }
     RNG_END();
 

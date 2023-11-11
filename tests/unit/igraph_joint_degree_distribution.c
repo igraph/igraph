@@ -252,7 +252,7 @@ int main(void) {
     check_knnk(&dg, NULL);
     igraph_destroy(&dg);
 
-    igraph_erdos_renyi_game_gnm(&dg, 10, 30, IGRAPH_DIRECTED, /*loops*/ true);
+    igraph_erdos_renyi_game_gnm(&dg, 10, 30, IGRAPH_DIRECTED, /*loops*/ true, /* multiple */ false);
     check_jdm(&dg, NULL);
     check_assort(&dg);
     check_knnk(&dg, NULL);
@@ -286,7 +286,7 @@ int main(void) {
     check_knnk(&ug, NULL);
     igraph_destroy(&ug);
 
-    igraph_erdos_renyi_game_gnm(&ug, 10, 30, IGRAPH_UNDIRECTED, /*loops*/ true);
+    igraph_erdos_renyi_game_gnm(&ug, 10, 30, IGRAPH_UNDIRECTED, /*loops*/ true, /* multiple */ false);
     check_jdm(&ug, NULL);
     check_assort(&ug);
     check_knnk(&ug, NULL);
