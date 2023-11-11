@@ -609,7 +609,7 @@ int plfit_continuous(const double* xs, size_t n, const plfit_continuous_options_
     /* Create an array containing pointers to the unique elements of the input. From
      * each block of unique elements, we add the pointer to the first one. */
     uniques = unique_element_pointers(opt_data.begin, opt_data.end, &num_uniques);
-    if (uniques == 0) {
+    if (uniques == NULL) {
         free(opt_data.begin);
         PLFIT_ERROR("cannot fit continuous power-law", PLFIT_ENOMEM);
     }
@@ -645,7 +645,13 @@ int plfit_continuous(const double* xs, size_t n, const plfit_continuous_options_
                  * area around it more thoroughly. */
                 const size_t subdivision_length = 10;
                 size_t num_strata = num_uniques / subdivision_length;
-                double **strata = calloc(num_strata, sizeof(double*));
+
+                strata = calloc(num_strata, sizeof(double*));
+                if (strata == NULL) {
+                    free(uniques);
+                    free(opt_data.begin);
+                    PLFIT_ERROR("cannot fit continuous power-law", PLFIT_ENOMEM);
+                }
 
                 for (i = 0; i < num_strata; i++) {
                     strata[i] = uniques[i * subdivision_length];
@@ -735,12 +741,9 @@ int plfit_continuous(const double* xs, size_t n, const plfit_continuous_options_
     }
 
 cleanup:
-    if (strata) {
-        free(strata);
-    }
-    if (uniques) {
-        free(uniques);
-    }
+    /* It is safe to call free() on NULL */
+    free(strata);
+    free(uniques);
     free(opt_data.begin);
 
     return retval;
