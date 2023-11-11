@@ -83,9 +83,6 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         igraph_real_t coolfact,
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma,
-        /* igraph_matrix_t *adhesion, */
-        /* igraph_matrix_t *normalised_adhesion, */
-        /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus);
 
 /**
@@ -474,7 +471,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         /* initialize the random number generator */
         RNG_BEGIN();
 
-        /* to be exected, if we want to find the community around a particular node*/
+        /* to be expected, if we want to find the community around a particular node*/
         /* the initial conf is needed, because otherwise,
            the degree of the nodes is not in the weight property, stupid!!! */
         pm.assign_initial_conf(-1);
@@ -502,9 +499,6 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         igraph_real_t coolfact,
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma,
-        /* igraph_matrix_t *adhesion, */
-        /* igraph_matrix_t *normalised_adhesion, */
-        /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);

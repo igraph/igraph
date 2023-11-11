@@ -68,7 +68,7 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, 0 /* rowwise */));
 
     for (ii = 0; ii < no_of_nodes; ii++) {
-        net->node_list->Push(new NNode(ii, 0, net->link_list, empty, states));
+        net->node_list->Push(new NNode(ii, 0, net->link_list, empty));
     }
 
     for (ii = 0; ii < no_of_edges; ii++) {
@@ -114,16 +114,7 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
         av_k += node1->Get_Degree();
         node1 = iter.Next();
     }
-    net->av_k = av_k / double(net->node_list->Size());
     net->sum_weights = sum_weight;
-    net->av_weight = sum_weight / double(net->link_list->Size());
-    net->min_k = min_k;
-    net->max_k = max_k;
-    net->min_weight = min_weight;
-    net->max_weight = max_weight;
-    net->sum_bids = 0;
-    net->min_bids = 0;
-    net->max_bids = 0;
 
     return IGRAPH_SUCCESS;
 }
@@ -187,42 +178,6 @@ void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *fil
     reduce_cliques(global_cluster_list, file);
 
 }
-//##################################################################################
-void reduce_cliques2(network *net, bool only_double, long marker) {
-    unsigned long size;
-    ClusterList<NNode*> *c_cur, *largest_c = nullptr;
-    DLList_Iter<ClusterList<NNode*>*> c_iter;
-    do {
-        //wir suchen den groessten, nicht markierten Cluster
-        size = 0;
-        c_cur = c_iter.First(net->cluster_list);
-        while (!(c_iter.End())) {
-            if ((c_cur->Size() > size) && (c_cur->Get_Marker() != marker)) {
-                size = c_cur->Size();
-                largest_c = c_cur;
-            }
-            c_cur = c_iter.Next();
-        }
-        // printf("Groesster Cluster hat %u Elemente.\n",largest_c->Size());
-        //Schauen, ob es Teilmengen gibt, die ebenfalls gefunden wurden
-        c_cur = c_iter.First(net->cluster_list);
-        while (!(c_iter.End())) {
-            if (((!only_double && (*c_cur < *largest_c)) || (*c_cur == *largest_c)) && (c_cur != largest_c)) { //alle echten Teilcluster von largest_c und die doppelten
-                net->cluster_list->fDelete(c_cur);
-                while (c_cur->Get_Candidates()->Size()) {
-                    c_cur->Get_Candidates()->Pop();
-                }
-                while (c_cur->Size()) {
-                    c_cur->Pop();    // die knoten aber nicht loeschen!!
-                }
-                delete c_cur;    // nicht vergessen, die global geloeschte Clusterliste zu loeschen
-            }
-            c_cur = c_iter.Next();
-        }
-        //Schliesslich markieren wir noch den eben gefundenen groessten Cluster
-        largest_c->Set_Marker(marker);
-    } while (size);
-}
 
 //##################################################################################################
 unsigned long iterate_nsf_hierarchy(NNode *parent, unsigned long depth, FILE *file) {
@@ -259,13 +214,3 @@ unsigned long iterate_nsf_hierarchy(NNode *parent, unsigned long depth, FILE *fi
     return maxdepth;
 }
 
-//################################################################
-void clear_all_markers(network *net) {
-    DLList_Iter<NNode*> iter;
-    NNode *n_cur;
-    n_cur = iter.First(net->node_list);
-    while (!iter.End()) {
-        n_cur->Set_Marker(0);
-        n_cur = iter.Next();
-    }
-}

@@ -124,7 +124,6 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
     IGRAPH_UNUSED(av_k_squared); /* We mark it as unused to prevent warnings about unused-but-set-variables. */
     IGRAPH_UNUSED(av_k);         /* We mark it as unused to prevent warnings about unused-but-set-variables. */
 
-//   printf("Assigning initial configuration...\n");
     // initialize colorfield
     for (unsigned long i = 0; i <= q; i++) {
         color_field[i] = 0.0;
@@ -163,40 +162,10 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
     }
     av_k_squared /= double(net->node_list->Size());
     av_k /= double(net->node_list->Size());
-    // total_degree_sum-=av_k_squared/av_k;
-//   printf("Total Degree Sum=2M=%f\n",total_degree_sum);
+
     return net->node_list->Size();
 }
-//#####################################################################
-//If I ever manage to write a decent LookUp function, it will be here
-//#####################################################################
-unsigned long PottsModel::initialize_lookup(double kT, double gamma) {
-    IGRAPH_UNUSED(kT);
-    IGRAPH_UNUSED(gamma);
-    /*
-    double beta;
-    // the look-up table contains all entries of exp(-beta(-neighbours+gamma*h))
-    // as needed in the HeatBath algorithm
-    beta=1.0/kT;
-    for (long w=0; w<=k_max+num_of_nodes; w++)
-    {
-       neg_lookup[w]=exp(-beta*-w
-    }
-    delta_ij[0]=1.0;
-    for (long w=-num_of_nodes-k_max; w<=k_max+num_of_nodes; w++)
-    {
 
-    }
-
-    // wenn wir spaeter exp(-1/kT*gamma*(nk+1-nj) fuer eine spin-flip von j nach k benoetigen schauen wir nur noch hier nach
-    for (unsigned long n=1; n<=num_of_nodes; n++)
-    {
-      gamma_term[n]=exp(-double(n)/kT*gamma);
-    }
-    gamma_term[0]=1.0;
-    */
-    return 1;
-}
 //#####################################################################
 // Q denotes the modularity of the network
 // This function calculates it initially
@@ -254,42 +223,7 @@ double PottsModel::calculate_Q() {
     Q /= double(2.0 * net->sum_weights);
     return Q;
 }
-double PottsModel::calculate_genQ(double gamma) {
-    double Q = 0.0;
-    for (unsigned long i = 0; i <= q; i++) {
-        Q += Qmatrix[i][i] - gamma * Qa[i] * Qa[i] / double(2.0 * net->sum_weights);
-        if ((Qa[i] < 0.0) || Qmatrix[i][i] < 0.0) {
-//         printf("Negatives Qa oder Qii\n\n\n");
-            //printf("Press any key to continue\n\n");
-            //cin >> Q;
-        }
-    }
-    Q /= double(2.0 * net->sum_weights);
-    return Q;
-}
-//#######################################################################
-// This function calculates the Energy for the standard Hamiltonian
-// given a particular value of gamma and the current spin states
-// #####################################################################
-double PottsModel::calculate_energy(double gamma) {
-    double e = 0.0;
-    DLList_Iter<NLink*> l_iter;
-    NLink *l_cur;
-    l_cur = l_iter.First(net->link_list);
-    //every in-cluster edge contributes -1
-    while (!l_iter.End()) {
-        if (l_cur->Get_Start()->Get_ClusterIndex() == l_cur->Get_End()->Get_ClusterIndex()) {
-            e--;
-        }
-        l_cur = l_iter.Next();
-    }
-    //and the penalty term contributes according to cluster sizes
-    for (unsigned long i = 1; i <= q; i++) {
-        e += gamma * 0.5 * double(color_field[i]) * double((color_field[i] - 1));
-    }
-    energy = e;
-    return e;
-}
+
 //##########################################################################
 // We would like to start from a temperature with at least 95 of all proposed
 // spin changes accepted in 50 sweeps over the network
@@ -307,13 +241,9 @@ double PottsModel::FindStartTemp(double gamma, double prob, double ts) {
     // state is with prob. 1/q the old state.
     while (acceptance < (1.0 - 1.0 / double(q)) * 0.95) { //want 95% acceptance
         kT = kT * 1.1;
-        // if I ever have a lookup table, it will need initialization for every kT
-        //initialize_lookup(kT,k_max,net->node_list->Size());
         HeatBathParallelLookup(gamma, prob, kT, 50);
-//        printf("kT=%f acceptance=%f\n", kT, acceptance);
     }
     kT *= 1.1; // just to be sure...
-//   printf("Starting with acceptance ratio: %1.6f bei kT=%2.4f\n",acceptance,kT);
     return kT;
 }
 
@@ -356,7 +286,6 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
             //Loop over all links (=neighbours)
             l_cur = l_iter.First(node->Get_Links());
             while (!l_iter.End()) {
-                //printf("%s %s\n",node->Get_Name(),n_cur->Get_Name());
                 w = l_cur->Get_Weight();
                 if (node == l_cur->Get_Start()) {
                     n_cur = l_cur->Get_End();
@@ -1010,14 +939,12 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
             aff_r = kir - gamma / total_degree_sum * (Kr - degree) * degree;
             aff_s = kis - gamma / total_degree_sum * Ks * degree;
             delta_aff_add = aff_r - aff_s;
-            //  if (aff_s>=aff_r && delta_aff_add<=max_delta_aff) {
             if (delta_aff_add <= max_delta_aff) {
                 node->Set_Affinity(aff_s);
                 max_delta_aff = delta_aff_add;
                 max_aff_node = node;
                 add = true;
             }
-            //printf("%s in to_do list with affinity %f\n",node->Get_Name(),node->Get_Affinity());
             node = iter.Next();
         }
         //################
@@ -1157,24 +1084,10 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
                                igraph_vector_int_t *membership,
                                double kT, double gamma) {
     NNode *n_cur, *n_cur2;
-    /*
-    double a1,a2,a3,p,p1,p2;
-    long n,N,lin,lout;
-    */
     DLList_Iter<NNode*> iter, iter2;
     HugeArray<int> inner_links;
     HugeArray<int> outer_links;
     HugeArray<int> nodes;
-
-    //den Header schreiben
-//   p=2.0*double(num_of_links)/double(num_of_nodes)/double(num_of_nodes-1);
-//   fprintf(file,"      Nodes=\t%lu\n",num_of_nodes);
-//   fprintf(file,"      Links=\t%lu\n",num_of_links);
-//   fprintf(file,"          q=\t%d\n",q);
-//   fprintf(file,"          p=\t%f\n",p);
-//   fprintf(file," Modularity=\t%f\n",calculate_Q());
-//   fprintf(file,"Temperature=\t%f\n", kT);
-//   fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\t<Ln(#comm.)>\n");
 
     if (temperature) {
         *temperature = kT;
@@ -1221,35 +1134,9 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
         for (unsigned long spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {
                 inner_links[spin] /= 2;
-                //    fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\n");
-                /*
-                N=num_of_nodes;
-                n=nodes[spin];
-                lin=inner_links[spin];
-                lout=outer_links[spin];
-                a1=N*log((double)N)-n*log((double)n)*(N-n)*log((double)N-n);
-                if ((lin==long(n*(n-1)*0.5+0.5)) || (n==1)) a2=0.0;
-                else a2=(n*(n-1)*0.5    )*log((double)n*(n-1)*0.5    )-(n*(n-1)*0.5    )-
-                   (n*(n-1)*0.5-lin)*log((double)n*(n-1)*0.5-lin)+(n*(n-1)*0.5-lin)-
-                   lin*log((double)lin            )+lin;
-                */
-
-                /*
-                if ((lout==n*(N-n)) || n==N) a3=0.0;
-                else a3=(n*(N-n)     )*log((double)n*(N-n)     )-(n*(N-n))-
-                   (n*(N-n)-lout)*log((double)n*(N-n)-lout)+(n*(N-n)-lout)-
-                   lout*log((double)lout        )+lout;
-                */
-
-                /*
-                p1=(lin+lout)*log((double)p);
-                p2=(0.5*n*(n-1)-lin + n*(N-n)-lout)*log((double)1.0-p);
-                */
-                //       fprintf(file,"%d\t%d\t%d\t%d\t%f\t%f\t%f\n",spin,nodes[spin], inner_links[spin], outer_links[spin], p_in, p_out,log_num_exp);
                 IGRAPH_CHECK(igraph_vector_int_push_back(csize, nodes[spin]));
             }
         }
-        //   fprintf(file,"\n");
     }
 
     //die Elemente der Cluster
@@ -1273,284 +1160,6 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 
     return num_of_nodes;
 }
-//################################################################################################
-//This function writes the soft clusters after a gamma sweep
-//that is, it groups every node together that was found in
-// more than threshold percent together with the other node
-// in the same cluster
-//################################################################################################
-// Does not work at the moment !!!
-//################################################################################################
-// long PottsModel::WriteSoftClusters(char *filename, double threshold)
-// {
-//   FILE *file;
-//   NNode *n_cur, *n_cur2;
-//   DLList_Iter<NNode*> iter, iter2;
-//   DL_Indexed_List<ClusterList<NNode*>*> *cl_list, *old_clusterlist;
-//   ClusterList<NNode*> *cl_cur;
-
-//   double max;
-
-//   file=fopen(filename,"w");
-//   if (!file) {
-//     printf("Could not open %s for writing.\n",filename);
-//     return -1;
-//   }
-
-//   max=correlation[0]->Get(0);
-//   //printf("max=%f\n",max);
-//   cl_list=new DL_Indexed_List<ClusterList<NNode*>*>();
-
-//   n_cur=iter.First(net->node_list);
-//   while (!iter.End())
-//   {
-//     cl_cur=new ClusterList<NNode*>();
-//     cl_list->Push(cl_cur);
-//     n_cur2=iter2.First(net->node_list);
-//     while (!iter2.End())
-//     {
-//       if (double(correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()))/max>threshold)
-//         cl_cur->Push(n_cur2);
-//       n_cur2=iter2.Next();
-//     }
-//     n_cur=iter.Next();
-//   }
-//   old_clusterlist=net->cluster_list;
-//   net->cluster_list=cl_list;
-//   clear_all_markers(net);
-//   //printf("Es gibt %d Cluster\n",cl_list->Size());
-//   reduce_cliques2(net, false, 15);
-//   //printf("Davon bleiben %d Cluster uebrig\n",cl_list->Size());
-//   clear_all_markers(net);
-//   while (net->cluster_list->Size()){
-//     cl_cur=net->cluster_list->Pop();
-//     while (cl_cur->Size())
-//     {
-//       n_cur=cl_cur->Pop();
-//       fprintf(file,"%s\n",n_cur->Get_Name());
-//       //printf("%s\n",n_cur->Get_Name());
-//     }
-//     fprintf(file,"\n");
-//   }
-//   net->cluster_list=old_clusterlist;
-//   fclose(file);
-
-//   return 1;
-// }
-//#############################################################################
-// Performs a gamma sweep
-//#############################################################################
-double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel, int repetitions) {
-    double stepsize;
-    double kT = 0.5, kT_start;
-    long changes;
-    double gamma, acc;
-    NNode *n_cur, *n_cur2;
-    DLList_Iter<NNode*> iter, iter2;
-
-    stepsize = (gamma_stop - gamma_start) / double(steps);
-
-    n_cur = iter.First(net->node_list);
-    while (!iter.End()) {
-        correlation[n_cur->Get_Index()] = new HugeArray<double>();
-        n_cur2 = iter2.First(net->node_list);
-        while (!iter2.End()) {
-            correlation[n_cur->Get_Index()]->Set(n_cur->Get_Index()) = 0.0;
-            n_cur2 = iter2.Next();
-        }
-        n_cur = iter.Next();
-    }
-
-    for (unsigned int n = 0; n <= steps; n++) {
-        assign_initial_conf(-1);
-        initialize_Qmatrix();
-        gamma = gamma_start + stepsize * n;
-        kT = 0.5;
-        acceptance = 0.5;
-        while (acceptance < (1.0 - 1.0 / double(q)) * 0.95) { //wollen 95% Acceptance
-            kT *= 1.1;
-            //initialize_lookup(kT,kmax,net->node_list->Size());
-            if (!non_parallel) {
-                HeatBathParallelLookup(gamma, prob, kT, 25);
-            } else {
-                HeatBathLookup(gamma, prob, kT, 25);
-            }
-            // printf("kT=%f acceptance=%f\n", kT, acceptance);
-        }
-        // printf("Starting with gamma=%f\n", gamma);
-        kT_start = kT;
-
-        for (int i = 0; i < repetitions; i++) {
-            changes = 1;
-            kT = kT_start;
-            assign_initial_conf(-1);
-            initialize_Qmatrix();
-            while ((changes > 0) && (kT > 0.01)) {
-                kT = kT * 0.99;
-                //initialize_lookup(kT,kmax,net->node_list->Size());
-                if (!non_parallel) {
-                    changes = HeatBathParallelLookup(gamma, prob, kT, 50);
-                    // printf("kT: %f   \t Changes %li\n",kT, changes);
-                } else {
-                    acc = HeatBathLookup(gamma, prob, kT, 50);
-                    if (acc > (1.0 - 1.0 / double(q)) * 0.01) {
-                        changes = 1;
-                    } else {
-                        changes = 0;
-                    }
-                    // printf("kT: %f   Acceptance: %f\n",kT, acc);
-                }
-            }
-            // printf("Finisched with acceptance: %1.6f bei kT=%2.4f und gamma=%2.4f\n",acceptance,kT, gamma);
-//      fprintf(file,"%f\t%f\n",gamma_,acceptance);
-//      fprintf(file2,"%f\t%f\n",gamma_,kT);
-            //   fprintf(file3,"%f\t%d\n",gamma_,count_clusters(5));
-
-            //Die Correlation berechnen
-            n_cur = iter.First(net->node_list);
-            while (!iter.End()) {
-                n_cur2 = iter2.First(net->node_list);
-                while (!iter2.End()) {
-                    if (n_cur->Get_ClusterIndex() == n_cur2->Get_ClusterIndex()) {
-                        correlation[n_cur->Get_Index()]->Set(n_cur2->Get_Index()) += 0.5;
-                    }
-                    n_cur2 = iter2.Next();
-                }
-                n_cur = iter.Next();
-            }
-        } // for i
-    } //for n
-    return kT;
-}
-//#############################################################################
-//Performs a Gamma sweep at zero T
-//#############################################################################
-double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel, int repetitions) {
-    double stepsize;
-    long changes;
-    double gamma = gamma_start, acc;
-    long runs;
-    NNode *n_cur, *n_cur2;
-    DLList_Iter<NNode*> iter, iter2;
-
-    stepsize = (gamma_stop - gamma_start) / double(steps);
-
-    n_cur = iter.First(net->node_list);
-    while (!iter.End()) {
-        correlation[n_cur->Get_Index()] = new HugeArray<double>();
-        n_cur2 = iter2.First(net->node_list);
-        while (!iter2.End()) {
-            correlation[n_cur->Get_Index()]->Set(n_cur->Get_Index()) = 0.0;
-            n_cur2 = iter2.Next();
-        }
-        n_cur = iter.Next();
-    }
-
-    for (unsigned int n = 0; n <= steps; n++) {
-        assign_initial_conf(-1);
-        initialize_Qmatrix();
-        gamma = gamma_start + stepsize * n;
-        // printf("Starting with gamma=%f\n", gamma);
-        for (int i = 0; i < repetitions; i++) {
-            changes = 1;
-            assign_initial_conf(-1);
-            initialize_Qmatrix();
-            runs = 0;
-            while (changes > 0 && runs < 250) {
-                //initialize_lookup(kT,kmax,net->node_list->Size());
-                if (!non_parallel) {
-                    changes = HeatBathParallelLookupZeroTemp(gamma, prob, 1);
-                    // printf("Changes %li\n", changes);
-                } else {
-                    acc = HeatBathLookupZeroTemp(gamma, prob, 1);
-                    if (acc > (1.0 - 1.0 / double(q)) * 0.01) {
-                        changes = 1;
-                    } else {
-                        changes = 0;
-                    }
-                    // printf("Acceptance: %f\n", acc);
-                }
-                runs++;
-            }
-            // printf("Finisched with Modularity: %1.6f bei Gamma=%1.6f\n",calculate_Q(), gamma);
-//      fprintf(file,"%f\t%f\n",gamma_,acceptance);
-//      fprintf(file2,"%f\t%f\n",gamma_,kT);
-            //   fprintf(file3,"%f\t%d\n",gamma_,count_clusters(5));
-
-            //Die Correlation berechnen
-            n_cur = iter.First(net->node_list);
-            while (!iter.End()) {
-                n_cur2 = iter2.First(net->node_list);
-                while (!iter2.End()) {
-                    if (n_cur->Get_ClusterIndex() == n_cur2->Get_ClusterIndex()) {
-                        correlation[n_cur->Get_Index()]->Set(n_cur2->Get_Index()) += 0.5;
-                        correlation[n_cur2->Get_Index()]->Set(n_cur->Get_Index()) += 0.5;
-                    }
-                    n_cur2 = iter2.Next();
-                }
-                n_cur = iter.Next();
-            }
-        } // for i
-    } //for n
-    return gamma;
-}
-//#######################################################################
-//-----------------------------------------------------------------------
-//#######################################################################
-// This function writes the Correlation Matrix that results from a
-// Gamma-Sweep, this matrix is used to make ps files of it.
-// ######################################################################
-// long PottsModel::WriteCorrelationMatrix(char *filename)
-// {
-//   FILE *file, *file2;
-//   char filename2[255];
-//   NNode *n_cur, *n_cur2;
-//   DLList_Iter<NNode*> iter, iter2;
-
-//   sprintf(filename2,"%s.mat",filename);
-//   file=fopen(filename,"w");
-//   if (!file) {
-//     printf("Could not open %s for writing.\n",filename);
-//     return -1;
-//   }
-//   file2=fopen(filename2,"w");
-//   if (!file2) {
-//     printf("Could not open %s for writing.\n",filename2);
-//     return -1;
-//   }
-//   //write the header in one line
-//   n_cur=iter.First(net->node_list);
-//   while (!iter.End())
-//   {
-//       fprintf(file, "\t%s",n_cur->Get_Name());
-//       n_cur=iter.Next();
-//   }
-//   fprintf(file, "\n");
-
-//   //fprintf(file, "%d\t%d\n",net->node_list->Size(),net->node_list->Size());
-
-//   long r=0,c=0;
-//   n_cur=iter.First(net->node_list);
-//   while (!iter.End())
-//   {
-//     fprintf(file, "%s",n_cur->Get_Name());
-//     r++;
-//     n_cur2=iter2.First(net->node_list);
-//     while (!iter2.End())
-//     {
-//       c++;
-//       fprintf(file,"\t%f",correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
-//       fprintf(file2,"%li\t%li\t%f\n",r,c,correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
-//       n_cur2=iter2.Next();
-//     }
-//     fprintf(file,"\n");
-//     n_cur=iter.Next();
-//   }
-//   fclose(file);
-//   fclose(file2);
-//   return 1;
-// }
-//##############################################################################
 
 //#################################################################################################
 PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) :
@@ -1679,11 +1288,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
     //correctly store it in the bookkeeping
 
     double sum_weight_pos_in, sum_weight_pos_out, sum_weight_neg_in, sum_weight_neg_out;
-    //double av_w = 0.0, av_k=0.0;
-    //int l = 0;
-#ifdef SPINGLASS_DEBUG
-    printf("Visiting each node.\n");
-#endif
+
     for (unsigned long v = 0; v < num_nodes; v++) {
         if (init_spins) {
             s = RNG_INTEGER(1, q);  //The new spin s
@@ -1731,8 +1336,6 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
             sum_weight_neg_out   = sum_weight_neg;
             sum_weight_neg_in    = sum_weight_neg;
         }
-
-        //av_k = (av_k*l + sum_weight_pos_in)/(l+1); //Average k
 
         if (init_spins) {
             //Set the degrees correctly

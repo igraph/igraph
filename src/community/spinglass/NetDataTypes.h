@@ -89,7 +89,6 @@ private:
     DLItem *next;
     DLItem(L_DATA i, unsigned long ind);
     DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n);
-    ~DLItem();
 public:
     void del() {
         delete item;
@@ -133,7 +132,6 @@ private:
     unsigned long last_index;
 public:
     DL_Indexed_List();
-    ~DL_Indexed_List();
     L_DATA Push(L_DATA);
     L_DATA Pop();
     L_DATA Get(unsigned long);
@@ -175,13 +173,6 @@ public:
 };
 
 //#####################################################################################################
-struct RGBcolor {
-    unsigned int red;
-    unsigned int green;
-    unsigned int blue;
-    char pajek_c[20];
-};
-//-------------------------------------------------------------------------------
 
 class NLink;
 
@@ -190,22 +181,17 @@ class NNode {
 private :
     unsigned long index;
     unsigned long cluster_index;
-    unsigned long marker, affiliations;
-    unsigned long *state_history;
-    unsigned int max_states;
-    long distance;
-    double clustering;
-    double weight;
-    double affinity;
-//    double old_weight;
+    unsigned long marker = 0;
+    double clustering = 0.0;
+    double weight = 0.0;
+    double affinity = 0.0;
 
     DLList<NNode*> *neighbours;    //list with pointers to neighbours
     DLList<NLink*> *n_links;
     DLList<NLink*> *global_link_list;
     char name[255];
-    RGBcolor color;
 public :
-    NNode(unsigned long, unsigned long, DLList<NLink*>*, const char*, int);
+    NNode(unsigned long, unsigned long, DLList<NLink *> *, const char *);
     ~NNode();
     unsigned long Get_Index() const {
         return index;
@@ -218,12 +204,6 @@ public :
     }
     void Set_Marker(unsigned long m) {
         marker = m;
-    }
-    unsigned long Get_Affiliations() const {
-        return affiliations;
-    }
-    void Set_Affiliations(unsigned long m) {
-        affiliations = m;
     }
     void Set_ClusterIndex(unsigned long ci) {
         cluster_index = ci;
@@ -248,24 +228,12 @@ public :
     double Get_Affinity() const {
         return affinity;
     }
-    unsigned long *Get_StateHistory() {
-        return state_history;
-    }
-    void Add_StateHistory(unsigned int q);
-    //  double Get_OldWeight() {return old_weight;}
+
     void Set_Weight(double w) {
         weight = w;
     }
     void Set_Affinity(double w) {
         affinity = w;
-    }
-
-    //  void Set_OldWeight(double w) {old_weight=w;}
-    long Get_Distance() const {
-        return distance;
-    }
-    void Set_Distance(long d) {
-        distance = d;
     }
     int  Connect_To(NNode*, double);
     DLList<NNode*> *Get_Neighbours() {
@@ -277,10 +245,6 @@ public :
     int  Disconnect_From(NNode*);
     int  Disconnect_From_All();
     bool Is_Linked_To(NNode*);
-    RGBcolor Get_Color() const {
-        return color;
-    }
-    void Set_Color(RGBcolor c);
     NLink *Get_LinkToNeighbour(NNode *neighbour);
 };
 
@@ -292,47 +256,28 @@ private :
     NNode *start;
     NNode *end;
     double weight;
-    double old_weight;
     unsigned long index;
     unsigned long marker;
 public :
     NLink( NNode*, NNode*, double);
     ~NLink();
     unsigned long Get_Start_Index() const {
-        return (start->Get_Index());
+        return start->Get_Index();
     }
     unsigned long Get_End_Index() const {
-        return (end->Get_Index());
+        return end->Get_Index();
     }
     NNode *Get_Start() {
-        return (start);
+        return start;
     }
     NNode *Get_End() {
-        return (end);
+        return end;
     }
     double Get_Weight() const {
         return weight;
     }
     void Set_Weight(double w) {
         weight = w;
-    }
-    double Get_OldWeight() const {
-        return old_weight;
-    }
-    void Set_OldWeight(double w) {
-        old_weight = w;
-    }
-    unsigned long Get_Marker() const {
-        return marker;
-    }
-    void Set_Marker(unsigned long m) {
-        marker = m;
-    }
-    unsigned long Get_Index() const {
-        return index;
-    }
-    void Set_Index(unsigned long i) {
-        index = i;
     }
 };
 
@@ -341,17 +286,17 @@ public :
 template <class L_DATA>  class ClusterList : public DLList<L_DATA> {
     friend class DLList_Iter<L_DATA>;
 private:
-    long links_out_of_cluster;
-    unsigned long links_inside_cluster;
-    unsigned long frequency;
-    double cluster_energy;
+    long links_out_of_cluster = 0;
+    unsigned long links_inside_cluster = 0;
+    unsigned long frequency = 1;
+    double cluster_energy = 1e30;
     DLList<L_DATA> *candidates;
-    long marker;
+    long marker = 0;
 public:
     ClusterList();
     ~ClusterList();
     long Get_Links_OOC() {
-        return (links_out_of_cluster);
+        return links_out_of_cluster;
     }
     void Set_Links_OOC(long looc) {
         links_out_of_cluster = looc;
@@ -379,12 +324,7 @@ public:
     }
     bool operator<(ClusterList<L_DATA> &b);
     bool operator==(ClusterList <L_DATA> &b);
-    long Get_Marker() {
-        return marker;
-    }
-    void Set_Marker(long m) {
-        marker = m;
-    }
+
 };
 //#####################################################################################################
 template <class L_DATA>
@@ -394,7 +334,6 @@ private:
     DLItem<L_DATA> *pInsert(NNode*, DLItem<NNode*>*);
     NNode* pDelete(DLItem<NNode*>*);
     HugeArray<DLItem<NNode*>*> array;
-    unsigned long last_index;
 public:
     DL_Node_List();
     ~DL_Node_List();
@@ -407,32 +346,12 @@ public:
 //#####################################################################################################
 
 
-
-struct cluster_join_move {
-    ClusterList<NNode*> *c1;
-    ClusterList<NNode*> *c2;
-    double joint_energy;
-    long joint_looc;
-    unsigned long joint_lic;
-} ;
-
 struct network {
     DL_Indexed_List<NNode*> *node_list;
     DL_Indexed_List<NLink*> *link_list;
     DL_Indexed_List<ClusterList<NNode*>*> *cluster_list;
-    // DL_Indexed_List<cluster_join_move*> *moveset;
-    unsigned long max_k;
-    unsigned long min_k;
     unsigned long diameter;
-    double av_weight;
-    double max_weight;
-    double min_weight;
     double sum_weights;
-    double av_k;
-    double av_bids;
-    unsigned long max_bids;
-    unsigned long min_bids;
-    unsigned long sum_bids;
 
     network() {
         node_list   = new DL_Indexed_List<NNode*>();
@@ -461,16 +380,6 @@ struct network {
         delete cluster_list;
     }
 };
-
-/*
-struct network
-{
-  DLList<NNode*> *node_list;
-  DLList<NLink*> *link_list;
-  DLList<ClusterList<NNode*>*> *cluster_list;
-  DLList<cluster_join_move*> *moveset;
-} ;
-*/
 
 template <class DATA>
 HugeArray<DATA>::HugeArray() {
@@ -561,14 +470,6 @@ template <class L_DATA>
 DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n) : item(i), index(ind), previous(p), next(n) {
 }
 
-template <class L_DATA>
-DLItem<L_DATA>::~DLItem() {
-//delete item;      //eigentlich muessten wir pruefen, ob item ueberhaupt ein Pointer ist...
-//previous=NULL;
-//next=NULL;
-}
-
-
 //######################################################################################################################
 template <class L_DATA>
 DLList<L_DATA>::DLList() {
@@ -578,10 +479,10 @@ DLList<L_DATA>::DLList() {
     tail = new DLItem<L_DATA>(NULL, 0);
     if ( !head || !tail ) {
         if (head) {
-            delete (head);
+            delete head;
         }
         if (tail) {
-            delete (tail);
+            delete tail;
         }
         return;
     }  else {
@@ -595,11 +496,10 @@ DLList<L_DATA>::~DLList() {
     DLItem<L_DATA> *cur = head, *next;
     while (cur) {
         next = cur->next;
-        delete (cur);
+        delete cur;
         cur = next;
     }
     number_of_items = 0;
-    //  printf("Liste Zerstoert!\n");
 }
 
 template <class L_DATA>
@@ -633,10 +533,9 @@ L_DATA DLList<L_DATA>::pDelete(DLItem<L_DATA> *i) {
     L_DATA data = i->item;
     i->previous->next = i->next;
     i->next->previous = i->previous;
-//  array[i->index]=0;
-    delete (i);
+    delete i;
     number_of_items--;
-    return (data);
+    return data;
 }
 //oeffentliches Insert
 template <class L_DATA>
@@ -728,7 +627,7 @@ unsigned long DLList<L_DATA>::Is_In_List(L_DATA data) {
     while (cur) {
         next = cur->next;
         if (cur->item == data) {
-            return (pos) ;
+            return pos ;
         }
         cur = next;
         pos++;
@@ -752,9 +651,9 @@ DLItem<L_DATA> *DL_Indexed_List<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *po
         this->number_of_items++;
         array[last_index] = i;
         last_index++;
-        return (i);
+        return i;
     } else {
-        return (0);
+        return 0;
     }
 }
 //privates delete
@@ -765,9 +664,9 @@ L_DATA DL_Indexed_List<L_DATA>::pDelete(DLItem<L_DATA> *i) {
     i->next->previous = i->previous;
     array[i->index] = 0;
     last_index = i->index;
-    delete (i);
+    delete i;
     this->number_of_items--;
-    return (data);
+    return data;
 }
 template <class L_DATA>
 L_DATA DL_Indexed_List<L_DATA>::Push(L_DATA data) {
@@ -781,13 +680,13 @@ L_DATA DL_Indexed_List<L_DATA>::Push(L_DATA data) {
 
 template <class L_DATA>
 L_DATA DL_Indexed_List<L_DATA>::Pop() {
-    return (pDelete(this->tail->previous));
+    return pDelete(this->tail->previous);
 }
 
 template <class L_DATA>
 L_DATA DL_Indexed_List<L_DATA>::Get(unsigned long pos) {
     if (pos > this->number_of_items - 1) {
-        return (0);
+        return 0;
     }
     return (array[pos]->item);
 }
@@ -797,12 +696,7 @@ L_DATA DL_Indexed_List<L_DATA>::Get(unsigned long pos) {
 //************************************************************************************************************
 template <class L_DATA>
 ClusterList<L_DATA>::ClusterList() : DLList<L_DATA>() {
-    links_out_of_cluster = 0;
-    links_inside_cluster = 0;
-    frequency = 1;
-    cluster_energy = 1e30;
     candidates = new DLList<L_DATA>();
-    marker = 0;
 }
 
 template <class L_DATA>
