@@ -1180,7 +1180,7 @@ int plfit_discrete(const double* xs, size_t n, const plfit_discrete_options_t* o
     plfit_result_t best_result;
     double *xs_copy, *px, *end, *end_xmin, prev_x;
     size_t best_n;
-    int m;
+    size_t m;
 
     if (!options)
         options = &plfit_discrete_default_options;
