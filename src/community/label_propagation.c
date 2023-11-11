@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2007-2020 The igraph development team
+   Copyright (C) 2007-2022  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_community.h"
@@ -133,7 +130,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
     igraph_bool_t unlabelled_left;
     igraph_neimode_t reversed_mode;
 
-    igraph_vector_t label_counters;
+    igraph_vector_t label_counters; /* real type, stores weight sums */
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
 
     /* We make a copy of 'fixed' as a pointer into 'fixed_copy' after casting
