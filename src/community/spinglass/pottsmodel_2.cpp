@@ -57,7 +57,7 @@ PottsModel::PottsModel(network *n, unsigned long qvalue, int m) :
         net(n), q(qvalue), operation_mode(m), Qmatrix(qvalue+1)
 {
     DLList_Iter<NNode*> iter;
-    NNode *n_cur;
+    const NNode *n_cur;
     unsigned long *i_ptr;
     //needed in calculating modularity
     Qa     = new double[q + 1];
@@ -535,9 +535,9 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
                 prob = degree / total_degree_sum;
                 delta = degree;
                 break;
+            }
             default:
                 IGRAPH_FATAL("Must not reach here.");
-            }
             }
             spin_opt = old_spin;
             beta = 1.0 / kT * prefac;
@@ -777,8 +777,9 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
 //###############################################################################################
 //# Here we try to minimize the affinity to the rest of the network
 //###############################################################################################
-double PottsModel::FindCommunityFromStart(double gamma,
-        char *nodename,
+double PottsModel::FindCommunityFromStart(
+        double gamma,
+        const char *nodename,
         igraph_vector_int_t *result,
         igraph_real_t *cohesion,
         igraph_real_t *adhesion,
@@ -1087,17 +1088,9 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 }
 
 //#################################################################################################
-PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) {
-    //Set internal variable
-    net = n;
-    q   = num_communities;
-
-    is_directed = directed;
-
-    is_init = false;
-
-    num_nodes   = net->node_list->Size();
-}
+PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) :
+    net(n), q(num_communities), num_nodes(net->node_list->Size()), is_directed(directed)
+{ }
 //#######################################################
 //Destructor of PottsModel
 //########################################################
@@ -1224,8 +1217,6 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 
         while (!l_iter.End()) {
             double w = l_cur->Get_Weight();
-            //av_w = (av_w*l + w)/(l+1); //Average weight
-            //l++;
             if (l_cur->Get_Start() == n_cur) //From this to other, so outgoing link
                 if (w > 0) {
                     sum_weight_pos_out += w;    //Increase positive outgoing weight
@@ -1306,7 +1297,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
     //weight of edge
     double w;
 
-    double beta = 1 / t; //Weight for probabilities
+    double beta = 1.0 / t; //Weight for probabilities
     double r = 0.0; //random number used for assigning new spin
 
     double maxweight = 0.0;
@@ -1412,7 +1403,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
             sum_weights = 0.0;
             for (spin_opt = 1; spin_opt <= q; spin_opt++) { // all possible new spins
                 weights[spin_opt] -= maxweight;  //subtract maxweight for numerical stability (otherwise overflow).
-                weights[spin_opt]  = exp((double)(beta * weights[spin_opt]));
+                weights[spin_opt]  = exp(beta * weights[spin_opt]);
                 sum_weights   += weights[spin_opt];
             }   // for spin
             /*******************************************/
@@ -1423,11 +1414,9 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
             r = RNG_UNIF(0, sum_weights);
             new_spin = 1;
 
-            bool found = false;
-            while (!found && new_spin <= q) {
+            while (new_spin <= q) {
                 if (r <= weights[new_spin]) {
                     spin_opt = new_spin; //We have found are new spin
-                    found = true;
                     break;
                 } else {
                     r -= weights[new_spin];    //Perhaps the next spin is the one we want
@@ -1435,14 +1424,6 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
 
                 new_spin++;
             }
-
-            //Some weird thing happened. We haven't found a new spin
-            //while that shouldn't be the case. Numerical problems?
-            /*
-            if (!found) {
-                problemcount++;
-            }
-            */
 
             new_spin = spin_opt;
             //If there wasn't a problem we should have found
@@ -1515,16 +1496,13 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
                                 igraph_real_t *polarization,
                                 double t,
                                 double d_p,
-                                double d_n,
-                                double gamma,
-                                double lambda) {
-    IGRAPH_UNUSED(gamma);
-    IGRAPH_UNUSED(lambda);
+                                double d_n) {
+
 #ifdef SPINGLASS_DEBUG
     printf("Start writing clusters.\n");
 #endif
     //Reassign each community so that we retrieve a community assignment 1 through num_communities
-    unsigned long *cluster_assign = new unsigned long[q + 1];
+    auto *cluster_assign = new unsigned long[q + 1];
     for (unsigned long i = 0; i <= q; i++) {
         cluster_assign[i] = 0;
     }
@@ -1543,13 +1521,6 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         }
     }
 
-
-    /*
-    DLList_Iter<NNode*> iter;
-    NNode *n_cur=iter.First(net->node_list);
-    n_cur = iter.First(net->node_list);
-    */
-
     //And now assign each node to its new community
     q = num_clusters;
     for (unsigned long i = 0; i < num_nodes; i++) {
@@ -1564,7 +1535,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
     }
     assign_initial_conf(false);
 
-    delete[] cluster_assign;
+    delete [] cluster_assign;
 
     if (temperature) {
         *temperature = t;
@@ -1592,8 +1563,8 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         IGRAPH_CHECK(igraph_matrix_resize(adhesion, q, q));
         IGRAPH_CHECK(igraph_matrix_resize(normalised_adhesion, q, q));
 
-        double **num_links_pos = NULL;
-        double **num_links_neg = NULL;
+        double **num_links_pos = nullptr;
+        double **num_links_neg = nullptr;
         //memory allocated for elements of rows.
         num_links_pos = new double *[q + 1] ;
         num_links_neg = new double *[q + 1] ;
@@ -1691,8 +1662,6 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
                 else
                     max_expected    = (degree_community_pos_out[i] + u_p) * (degree_community_pos_in[j] + u_p) / ((m_p + u_p) == 0 ? 1 : m_p + u_p)
                                       - (degree_community_neg_out[i] - u_n) * (degree_community_neg_in[j] + u_n) / ((m_n + u_n) == 0 ? 1 : m_n + u_n);
-                //printf("%f/%f %d/%d\t", num_links_pos[i][j], num_links_neg[i][j], csize[i], csize[j]);
-                //printf("%f/%f - %f(%f)\t", u_p, u_n, expected, max_expected);
                 max_a           = ((num_links_pos[i][j] + u_p) - (num_links_neg[i][j] + u_n)) - max_expected;
 
 

@@ -498,7 +498,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         igraph_real_t gamma_minus) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    unsigned long changes, runs;
+    unsigned long runs;
     igraph_bool_t use_weights = false;
     bool zeroT;
     double kT, acc;
@@ -604,21 +604,15 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     pm.assign_initial_conf(true);
 
     runs = 0;
-    changes = 1;
-    acc = 0;
-    while (changes > 0 && (kT / stoptemp > 1.0 || (zeroT && runs < 150))) {
-
+    while (kT / stoptemp > 1.0 || (zeroT && runs < 150)) {
         IGRAPH_ALLOW_INTERRUPTION();
 
         runs++;
         kT = kT * coolfact;
         acc = pm.HeatBathLookup(gamma, gamma_minus, kT, 50);
         if (acc < (1.0 - 1.0 / double(spins)) * 0.001) {
-            changes = 0;
-        } else {
-            changes = 1;
+            break;
         }
-
     } /* while loop */
 
     /* These are needed, otherwise 'modularity' is not calculated */
@@ -628,7 +622,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     IGRAPH_MATRIX_INIT_FINALLY(&normalized_adhesion, 0, 0);
     pm.WriteClusters(modularity, temperature, csize, membership,
                       &adhesion, &normalized_adhesion, &polarization,
-                      kT, d_p, d_n, gamma, gamma_minus);
+                      kT, d_p, d_n);
     igraph_matrix_destroy(&normalized_adhesion);
     igraph_matrix_destroy(&adhesion);
     IGRAPH_FINALLY_CLEAN(2);

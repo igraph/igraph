@@ -84,7 +84,7 @@ int NNode::Connect_To(NNode* neighbour, double weight_) {
     return 0;
 }
 
-NLink *NNode::Get_LinkToNeighbour(NNode* neighbour) {
+NLink *NNode::Get_LinkToNeighbour(const NNode* neighbour) {
     DLList_Iter<NLink*> iter;
     NLink *l_cur, *link = nullptr;
     bool found = false;

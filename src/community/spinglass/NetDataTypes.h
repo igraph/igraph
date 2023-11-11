@@ -66,6 +66,7 @@ public:
     DATA Get(unsigned long);
     HugeArray();
     HugeArray(const HugeArray &) = delete;
+    HugeArray & operator = (const HugeArray &) = delete;
     ~HugeArray();
     DATA &operator[](unsigned long);
     unsigned long Size() const {
@@ -83,7 +84,7 @@ class DLItem {
     friend class DLList<L_DATA> ;
     friend class DL_Indexed_List<L_DATA>;
     friend class DLList_Iter<L_DATA>;
-private:
+
     L_DATA  item;
     unsigned long index;
     DLItem *previous;
@@ -108,6 +109,7 @@ protected:
 public:
     DLList();
     DLList(const DLList &) = delete;
+    DLList & operator = (const DLList &) = delete;
     ~DLList();
     unsigned long Size() const {
         return number_of_items;
@@ -121,7 +123,7 @@ public:
 };
 
 template <class L_DATA>
-class DL_Indexed_List : virtual public DLList<L_DATA> {
+class DL_Indexed_List : public DLList<L_DATA> {
     DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*);
     L_DATA pDelete(DLItem<L_DATA>*);
     HugeArray<DLItem<L_DATA>*> array;
@@ -213,7 +215,7 @@ public :
     }
     int  Disconnect_From(NNode*);
     int  Disconnect_From_All();
-    NLink *Get_LinkToNeighbour(NNode *neighbour);
+    NLink *Get_LinkToNeighbour(const NNode *neighbour);
 };
 
 //#####################################################################################################
@@ -243,16 +245,13 @@ public :
 //#####################################################################################################
 
 template <class L_DATA>  class ClusterList : public DLList<L_DATA> {
-    double cluster_energy = 1e30;
     DLList<L_DATA> *candidates;
     long marker = 0;
 public:
     ClusterList();
+    ClusterList(const ClusterList &) = delete;
+    ClusterList & operator = (const ClusterList &) = delete;
     ~ClusterList();
-
-    double Get_Energy() {
-        return cluster_energy;
-    }
 
     bool operator<(ClusterList<L_DATA> &b);
     bool operator==(ClusterList <L_DATA> &b);
@@ -264,7 +263,6 @@ struct network {
     DL_Indexed_List<NNode*> *node_list;
     DL_Indexed_List<NLink*> *link_list;
     DL_Indexed_List<ClusterList<NNode*>*> *cluster_list;
-    unsigned long diameter;
     double sum_weights;
 
     network() {
@@ -272,6 +270,8 @@ struct network {
         link_list   = new DL_Indexed_List<NLink*>();
         cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
     }
+    network (const network &) = delete;
+    network & operator = (const network &) = delete;
 
     ~network() {
         ClusterList<NNode*> *cl_cur;
@@ -448,7 +448,7 @@ L_DATA DLList<L_DATA>::pDelete(DLItem<L_DATA> *i) {
 template <class L_DATA>
 int DLList<L_DATA>::fDelete(L_DATA data) {
     if ((number_of_items == 0) || (!data)) {
-        return (0);
+        return 0;
     }
     DLItem<L_DATA> *cur;
     cur = head->next;
@@ -458,7 +458,7 @@ int DLList<L_DATA>::fDelete(L_DATA data) {
     if (cur != tail) {
         return (pDelete(cur) != 0);
     }
-    return (0);
+    return 0;
 }
 
 template <class L_DATA>
@@ -468,19 +468,19 @@ L_DATA DLList<L_DATA>::Push(L_DATA data) {
     if (tmp) {
         return (tmp->item);
     }
-    return (0);
+    return 0;
 }
 
 template <class L_DATA>
 L_DATA DLList<L_DATA>::Pop() {
-    return (pDelete(tail->previous));
+    return pDelete(tail->previous);
 }
 
 
 template <class L_DATA>
 L_DATA DLList<L_DATA>::Get(unsigned long pos) {
     if ((pos < 1) || (pos > (number_of_items + 1))) {
-        return (0);
+        return 0;
     }
     DLItem<L_DATA> *cur = head;
     while (pos--) {
@@ -502,7 +502,7 @@ unsigned long DLList<L_DATA>::Is_In_List(L_DATA data) {
         cur = next;
         pos++;
     }
-    return (0);
+    return 0;
 }
 
 //######################################################################################################################
@@ -514,7 +514,7 @@ DL_Indexed_List<L_DATA>::DL_Indexed_List() : DLList<L_DATA>() {
 //privates Insert
 template <class L_DATA>
 DLItem<L_DATA> *DL_Indexed_List<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos) {
-    DLItem<L_DATA> *i = new DLItem<L_DATA>(data, last_index, pos->previous, pos);
+    auto *i = new DLItem<L_DATA>(data, last_index, pos->previous, pos);
     if (i) {
         pos->previous->next = i;
         pos->previous = i;
@@ -603,7 +603,7 @@ bool ClusterList<L_DATA>::operator==(ClusterList<L_DATA> &b) {
         }
         n_cur = a_iter.Next();
     }
-    return (found);
+    return found;
 }
 //A<B ist Wahr, wenn A echte Teilmenge von B ist
 template <class L_DATA>
@@ -630,7 +630,7 @@ bool ClusterList<L_DATA>::operator<(ClusterList<L_DATA> &b) {
         }
         n_cur = a_iter.Next();
     }
-    return (found);
+    return found;
 }
 
 //#####################################################################################

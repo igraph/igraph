@@ -104,7 +104,7 @@ public:
                          igraph_vector_int_t *csize, igraph_vector_int_t *membership,
                          double kT, double gamma);
 
-    double FindCommunityFromStart(double gamma, char *nodename,
+    double FindCommunityFromStart(double gamma, const char *nodename,
                                   igraph_vector_int_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,
@@ -124,7 +124,7 @@ private:
     unsigned long num_nodes; //number of nodes
     bool is_directed;
 
-    bool is_init;
+    bool is_init = false;
 
     double *degree_pos_in = nullptr; //Postive indegree of the nodes (or sum of weights)
     double *degree_neg_in = nullptr; //Negative indegree of the nodes (or sum of weights)
@@ -157,9 +157,7 @@ public:
                        igraph_real_t *polarization,
                        double t,
                        double d_p,
-                       double d_n,
-                       double gamma,
-                       double lambda);
+                       double d_n);
 };
 
 #endif
