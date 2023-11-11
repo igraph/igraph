@@ -909,7 +909,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
     DLList_Iter<NLink*> l_iter;
     DLList<NNode*>* to_do;
     DLList<NNode*>* community;
-    NNode *start_node = NULL, *n_cur, *neighbor, *max_aff_node, *node;
+    NNode *start_node = nullptr, *n_cur, *neighbor, *max_aff_node, *node;
     NLink *l_cur;
     bool found = false, add = false, remove = false;
     double degree, delta_aff_add, delta_aff_rem, max_delta_aff, Ks = 0.0, Kr = 0, kis, kir, w;
@@ -983,7 +983,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
         IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
 
         max_delta_aff = 0.0;
-        max_aff_node = NULL;
+        max_aff_node = nullptr;
         add = false;
         node = iter.First(to_do);
         while (!iter.End()) {
@@ -1554,11 +1554,11 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
 
 //#################################################################################################
 PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) :
-    degree_pos_in(NULL), degree_neg_in(NULL),
-    degree_pos_out(NULL), degree_neg_out(NULL),
-    degree_community_pos_in(NULL), degree_community_neg_in(NULL),
-    degree_community_pos_out(NULL), degree_community_neg_out(NULL),
-    csize(NULL), spin(NULL), neighbours(NULL), weights(NULL)
+    degree_pos_in(nullptr), degree_neg_in(nullptr),
+    degree_pos_out(nullptr), degree_neg_out(nullptr),
+    degree_community_pos_in(nullptr), degree_community_neg_in(nullptr),
+    degree_community_pos_out(nullptr), degree_community_neg_out(nullptr),
+    csize(nullptr), spin(nullptr), neighbours(nullptr), weights(nullptr)
 {
     //Set internal variable
     net = n;

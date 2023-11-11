@@ -131,7 +131,7 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
 //###############################################################################################################
 void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *file) {
     unsigned long size;
-    ClusterList<NNode*> *c_cur, *largest_c = NULL;
+    ClusterList<NNode*> *c_cur, *largest_c = nullptr;
     DLList<ClusterList<NNode*>*> *subsets;
     DLList_Iter<ClusterList<NNode*>*> c_iter, sub_iter;
     DLList_Iter<NNode*> iter;
@@ -190,7 +190,7 @@ void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *fil
 //##################################################################################
 void reduce_cliques2(network *net, bool only_double, long marker) {
     unsigned long size;
-    ClusterList<NNode*> *c_cur, *largest_c = NULL;
+    ClusterList<NNode*> *c_cur, *largest_c = nullptr;
     DLList_Iter<ClusterList<NNode*>*> c_iter;
     do {
         //wir suchen den groessten, nicht markierten Cluster

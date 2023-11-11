@@ -61,13 +61,13 @@ private:
     DATA *data;
     DATA *fields[32];
 public:
-    HUGE_INDEX get_huge_index(unsigned long);
+    HUGE_INDEX get_huge_index(unsigned long) const;
     DATA &Set(unsigned long);
     DATA Get(unsigned long);
     HugeArray();
     ~HugeArray();
     DATA &operator[](unsigned long);
-    unsigned long Size() {
+    unsigned long Size() const {
         return max_index;
     }
 } ;
@@ -108,7 +108,7 @@ protected:
 public:
     DLList();
     ~DLList();
-    unsigned long Size() {
+    unsigned long Size() const {
         return number_of_items;
     }
     int Insert(L_DATA, unsigned long);
@@ -155,7 +155,7 @@ public:
     L_DATA Previous();
     L_DATA First(DLList<L_DATA> *l);
     L_DATA Last(DLList<L_DATA> *l);
-    bool End() {
+    bool End() const {
         return end_reached;
     }
     DLItem<L_DATA> *Get_Current() {
@@ -207,19 +207,19 @@ private :
 public :
     NNode(unsigned long, unsigned long, DLList<NLink*>*, const char*, int);
     ~NNode();
-    unsigned long Get_Index()  {
-        return (index);
+    unsigned long Get_Index() const {
+        return index;
     }
-    unsigned long Get_ClusterIndex() {
-        return (cluster_index);
+    unsigned long Get_ClusterIndex() const {
+        return cluster_index;
     }
-    unsigned long Get_Marker() {
+    unsigned long Get_Marker() const {
         return marker;
     }
     void Set_Marker(unsigned long m) {
         marker = m;
     }
-    unsigned long Get_Affiliations() {
+    unsigned long Get_Affiliations() const {
         return affiliations;
     }
     void Set_Affiliations(unsigned long m) {
@@ -231,21 +231,21 @@ public :
     void Set_Index(unsigned long i) {
         index = i;
     }
-    unsigned long Get_Degree() {
+    unsigned long Get_Degree() const {
         return (neighbours->Size());
     }
     char *Get_Name() {
         return name;
     }
-    void Set_Name(char* n) {
+    void Set_Name(const char *n) {
         strcpy(name, n);
     }
     double Get_Links_Among_Neigbours();
     double Get_Clustering();
-    double Get_Weight() {
+    double Get_Weight() const {
         return weight;
     }
-    double Get_Affinity() {
+    double Get_Affinity() const {
         return affinity;
     }
     unsigned long *Get_StateHistory() {
@@ -261,7 +261,7 @@ public :
     }
 
     //  void Set_OldWeight(double w) {old_weight=w;}
-    long Get_Distance() {
+    long Get_Distance() const {
         return distance;
     }
     void Set_Distance(long d) {
@@ -277,7 +277,7 @@ public :
     int  Disconnect_From(NNode*);
     int  Disconnect_From_All();
     bool Is_Linked_To(NNode*);
-    RGBcolor Get_Color() {
+    RGBcolor Get_Color() const {
         return color;
     }
     void Set_Color(RGBcolor c);
@@ -298,10 +298,10 @@ private :
 public :
     NLink( NNode*, NNode*, double);
     ~NLink();
-    unsigned long Get_Start_Index()  {
+    unsigned long Get_Start_Index() const {
         return (start->Get_Index());
     }
-    unsigned long Get_End_Index()    {
+    unsigned long Get_End_Index() const {
         return (end->Get_Index());
     }
     NNode *Get_Start() {
@@ -310,25 +310,25 @@ public :
     NNode *Get_End() {
         return (end);
     }
-    double Get_Weight() {
+    double Get_Weight() const {
         return weight;
     }
     void Set_Weight(double w) {
         weight = w;
     }
-    double Get_OldWeight() {
+    double Get_OldWeight() const {
         return old_weight;
     }
     void Set_OldWeight(double w) {
         old_weight = w;
     }
-    unsigned long Get_Marker() {
+    unsigned long Get_Marker() const {
         return marker;
     }
     void Set_Marker(unsigned long m) {
         marker = m;
     }
-    unsigned long Get_Index() {
+    unsigned long Get_Index() const {
         return index;
     }
     void Set_Index(unsigned long i) {
@@ -357,10 +357,10 @@ public:
         links_out_of_cluster = looc;
     }
     unsigned long Get_Links_IC() {
-        return (links_inside_cluster);
+        return links_inside_cluster;
     }
     unsigned long Get_Frequency() {
-        return (frequency);
+        return frequency;
     }
     void IncreaseFrequency() {
         frequency++;
@@ -369,7 +369,7 @@ public:
         links_inside_cluster = lic;
     }
     double Get_Energy() {
-        return (cluster_energy);
+        return cluster_energy;
     }
     void Set_Energy(double e) {
         cluster_energy = e;
@@ -482,7 +482,7 @@ HugeArray<DATA>::HugeArray() {
     data[0] = 0;
     data[1] = 0;
     for (int i = 0; i < 32; i++) {
-        fields[i] = NULL;
+        fields[i] = nullptr;
     }
     fields[highest_field_index] = data;
 }
@@ -495,7 +495,7 @@ template <class DATA> HugeArray<DATA>::~HugeArray() {
 }
 
 template <class DATA>
-HUGE_INDEX HugeArray<DATA>::get_huge_index(unsigned long index) {
+HUGE_INDEX HugeArray<DATA>::get_huge_index(unsigned long index) const {
     HUGE_INDEX h_index;
     unsigned int shift_index = 0;
     unsigned long help_index;
@@ -554,7 +554,7 @@ DATA &HugeArray<DATA>::operator[](unsigned long index) {
 
 //###############################################################################
 template <class L_DATA>
-DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind) : item(i), index(ind), previous(0), next(0) {
+DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind) : item(i), index(ind), previous(nullptr), next(nullptr) {
 }
 
 template <class L_DATA>
@@ -572,7 +572,7 @@ DLItem<L_DATA>::~DLItem() {
 //######################################################################################################################
 template <class L_DATA>
 DLList<L_DATA>::DLList() {
-    head = tail = NULL;
+    head = tail = nullptr;
     number_of_items = 0;
     head = new DLItem<L_DATA>(NULL, 0); //fuer head und Tail gibt es das gleiche Array-Element!! Vorsicht!!
     tail = new DLItem<L_DATA>(NULL, 0);
@@ -641,8 +641,8 @@ L_DATA DLList<L_DATA>::pDelete(DLItem<L_DATA> *i) {
 //oeffentliches Insert
 template <class L_DATA>
 int DLList<L_DATA>::Insert(L_DATA data, unsigned long pos) {
-    if ((pos < 0) || (pos > (number_of_items))) {
-        return (0);
+    if ((pos < 0) || (pos > number_of_items)) {
+        return 0;
     }
     DLItem<L_DATA> *cur = head;
     while (pos--) {

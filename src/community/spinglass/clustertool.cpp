@@ -243,7 +243,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
             IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
         }
-        use_weights = 1;
+        use_weights = true;
         if (igraph_vector_min(weights) < 0) {
             IGRAPH_ERROR("Weights must not be negative when using the original implementation of spinglass communities. Select the implementation meant for negative weights.", IGRAPH_EINVAL);
         }
@@ -267,7 +267,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
             igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+            IGRAPH_CHECK(igraph_modularity(graph, membership, nullptr, 1, igraph_is_directed(graph), modularity));
         }
         if (temperature) {
             *temperature = stoptemp;
@@ -533,7 +533,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
             IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
         }
-        use_weights = 1;
+        use_weights = true;
     }
     if (coolfact < 0 || coolfact >= 1.0) {
         IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
@@ -554,7 +554,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
             igraph_vector_int_fill(membership, 0);
         }
         if (modularity) {
-            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+            IGRAPH_CHECK(igraph_modularity(graph, membership, nullptr, 1, igraph_is_directed(graph), modularity));
         }
         if (temperature) {
             *temperature = stoptemp;

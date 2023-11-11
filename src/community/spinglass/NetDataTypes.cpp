@@ -74,9 +74,9 @@ NNode::~NNode() {
     delete neighbours;
     delete n_links;
     delete [] state_history;
-    neighbours = NULL;
-    n_links = NULL;
-    state_history = NULL;
+    neighbours = nullptr;
+    n_links = nullptr;
+    state_history = nullptr;
 }
 
 void NNode::Add_StateHistory(unsigned int state) {
@@ -112,7 +112,7 @@ int NNode::Connect_To(NNode* neighbour, double weight_) {
 
 NLink *NNode::Get_LinkToNeighbour(NNode* neighbour) {
     DLList_Iter<NLink*> iter;
-    NLink *l_cur, *link = NULL;
+    NLink *l_cur, *link = nullptr;
     bool found = false;
     // finde einen bestimmten Link aus der Liste der links eines Knotens
     l_cur = iter.First(n_links);
@@ -126,7 +126,7 @@ NLink *NNode::Get_LinkToNeighbour(NNode* neighbour) {
     if (found) {
         return link;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
