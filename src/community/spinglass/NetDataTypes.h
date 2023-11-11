@@ -742,21 +742,6 @@ DL_Indexed_List<L_DATA>::DL_Indexed_List() : DLList<L_DATA>() {
     last_index = 0;
 }
 
-template <class L_DATA>
-DL_Indexed_List<L_DATA>::~DL_Indexed_List() {
-    /* This is already done by the DLList destructor */
-    /*   DLItem<L_DATA> *cur, *next; */
-    /*   cur=this->head; */
-    /*   while (cur) */
-    /*     { */
-    /*       next=cur->next; */
-    /*       delete(cur); */
-    /*       cur=next; */
-    /*     } */
-    /*     this->number_of_items=0; */
-    //  printf("Liste Zerstoert!\n");
-}
-
 //privates Insert
 template <class L_DATA>
 DLItem<L_DATA> *DL_Indexed_List<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos) {
