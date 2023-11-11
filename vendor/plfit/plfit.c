@@ -168,7 +168,7 @@ static double** unique_element_pointers(double* begin, double* end, size_t* resu
 
     /* Allocate initial result array, including the guard element */
     result = calloc(num_elts+1, sizeof(double*));
-    if (result == 0)
+    if (result == NULL)
         return 0;
 
     prev_x = *begin;
@@ -182,10 +182,14 @@ static double** unique_element_pointers(double* begin, double* end, size_t* resu
         /* New block found */
         if (used_elts >= num_elts) {
             /* Array full; allocate a new chunk */
+            double** tmp;
             num_elts = num_elts*2 + 1;
-            result = realloc(result, sizeof(double*) * (num_elts+1));
-            if (result == 0)
+            tmp = realloc(result, sizeof(double*) * (num_elts+1));
+            if (tmp == NULL) {
+                free(result);
                 return 0;
+            }
+            result = tmp;
         }
 
         /* Store the new element */
