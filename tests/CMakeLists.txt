@@ -330,6 +330,8 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_joint_degree_distribution
+  igraph_joint_type_distribution
   igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount

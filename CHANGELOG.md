@@ -37,6 +37,8 @@
 ### Added
 
  - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
+ - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
  - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
 
 ### Changed
@@ -55,6 +57,7 @@
  - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
  - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
  - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
+ - `igraph_subisomorphic_lad()` now returns a single null map when the pattern is the null graph.
 
 ### Other
 
