@@ -1007,7 +1007,7 @@ igraph_joint_degree_matrix:
 
 igraph_joint_degree_distribution:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        GRAPH graph, EDGE_WEIGHTS weights=NULL,
         OUT MATRIX p,
         NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
         BOOLEAN directed_neighbors=True,
@@ -1017,7 +1017,7 @@ igraph_joint_degree_distribution:
 
 igraph_joint_type_distribution:
     PARAMS: |-
-        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        GRAPH graph, EDGE_WEIGHTS weights=NULL,
         OUT MATRIX p,
         INDEX_VECTOR from_types, INDEX_VECTOR to_types=NULL,
         BOOLEAN directed=True,
