@@ -114,7 +114,7 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
     DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
     NNode *n_cur;
-    NLink *l_cur;
+    const NLink *l_cur;
     double sum_weight;
 
     // initialize colorfield
@@ -181,7 +181,6 @@ double PottsModel::initialize_Qmatrix() {
     while (!l_iter.End()) {
         i = l_cur->Get_Start()->Get_ClusterIndex();
         j = l_cur->Get_End()->Get_ClusterIndex();
-        //printf("%d %d\n",i,j);
         Qmatrix[i][j] += l_cur->Get_Weight();
         Qmatrix[j][i] += l_cur->Get_Weight();
 
@@ -203,11 +202,6 @@ double PottsModel::calculate_Q() {
     double Q = 0.0;
     for (unsigned long i = 0; i <= q; i++) {
         Q += Qmatrix[i][i] - Qa[i] * Qa[i] / double(2.0 * net->sum_weights);
-        if ((Qa[i] < 0.0) || Qmatrix[i][i] < 0.0) {
-//         printf("Negatives Qa oder Qii\n\n\n");
-            //printf("Press any key to continue\n\n");
-            //cin >> Q;
-        }
     }
     Q /= double(2.0 * net->sum_weights);
     return Q;
@@ -249,11 +243,9 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
     NNode *node, *n_cur;
     NLink *l_cur;
     unsigned int sweep;
-    unsigned long *SPIN, *P_SPIN, old_spin, spin, new_spin, spin_opt;
-    // long h; // degree;
+    unsigned long *SPIN, *P_SPIN, old_spin, new_spin, spin_opt;
     unsigned long changes;
     double h, delta = 0, deltaE, deltaEmin, w, degree;
-    //HugeArray<double> neighbours;
     bool cyclic = false;
 
     sweep = 0;
@@ -286,7 +278,6 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
             }
             //Search optimal Spin
             old_spin = node->Get_ClusterIndex();
-            //degree=node->Get_Degree();
             switch (operation_mode) {
             case 0: {
                 delta = 1.0;
@@ -297,12 +288,14 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
                 delta = degree;
                 break;
             }
+            default:
+                IGRAPH_FATAL("Must not reach here.");
             }
 
 
             spin_opt = old_spin;
             deltaEmin = 0.0;
-            for (spin = 1; spin <= q; spin++) { // all possible spin states
+            for (unsigned long spin = 1; spin <= q; spin++) { // all possible spin states
                 if (spin != old_spin) {
                     h = color_field[spin] + delta - color_field[old_spin];
                     deltaE = double(neighbours[old_spin] - neighbours[spin]) + gamma * prob * double(h);
@@ -367,7 +360,6 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
 
     // In case of a cyclic attractor, we want to interrupt
     if (cyclic)  {
-//       printf("Cyclic attractor!\n");
         acceptance = 0.0;
         return 0;
     } else {
@@ -383,12 +375,11 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
     DLList_Iter<NLink*> l_iter;
     NNode *node, *n_cur;
     NLink *l_cur;
-    unsigned long new_spin, spin_opt, old_spin, spin;
+    unsigned long new_spin, spin_opt, old_spin;
     unsigned int sweep;
-    long r;// degree;
+    long r;
     unsigned long changes;
     double delta = 0, h, deltaE, deltaEmin, w, degree;
-    //HugeArray<int> neighbours;
 
     sweep = 0;
     changes = 0;
@@ -400,7 +391,6 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
             while ((r < 0) || (r > (long)num_of_nodes - 1)) {
                 r = RNG_INTEGER(0, num_of_nodes - 1);
             }
-            /* r=long(double(num_of_nodes*double(rand())/double(RAND_MAX+1.0)));*/
             node = net->node_list->Get(r);
             // Wir zaehlen, wieviele Nachbarn von jedem spin vorhanden sind
             // erst mal alles Null setzen
@@ -411,7 +401,6 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
             //Loop over all links (=neighbours)
             l_cur = l_iter.First(node->Get_Links());
             while (!l_iter.End()) {
-                //printf("%s %s\n",node->Get_Name(),n_cur->Get_Name());
                 w = l_cur->Get_Weight();
                 if (node == l_cur->Get_Start()) {
                     n_cur = l_cur->Get_End();
@@ -423,7 +412,6 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
             }
             //Search optimal Spin
             old_spin = node->Get_ClusterIndex();
-            //degree=node->Get_Degree();
             switch (operation_mode) {
             case 0: {
                 delta = 1.0;
@@ -434,12 +422,14 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
                 delta = degree;
                 break;
             }
+            default:
+                IGRAPH_FATAL("Must not reach here.");
             }
 
 
             spin_opt = old_spin;
             deltaEmin = 0.0;
-            for (spin = 1; spin <= q; spin++) { // alle moeglichen Spins
+            for (unsigned long spin = 1; spin <= q; spin++) { // alle moeglichen Spins
                 if (spin != old_spin) {
                     h = color_field[spin] + delta - color_field[old_spin];
                     deltaE = double(neighbours[old_spin] - neighbours[spin]) + gamma * prob * double(h);
@@ -497,8 +487,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
     unsigned long *SPIN, *P_SPIN;
     unsigned int sweep;
     long max_q;
-    unsigned long changes/*, degree, problemcount */;
-    //HugeArray<int> neighbours;
+    unsigned long changes;
     double h, delta = 0, norm, r, beta, minweight, prefac = 0, w, degree;
     bool cyclic = false/*, found*/;
     unsigned long number_of_nodes;
@@ -515,7 +504,6 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
         SPIN = i_iter.First(new_spins);
         while (!net_iter.End()) {
             // Initialize neighbours and weights
-            // problemcount = 0;
             for (unsigned long i = 0; i <= q; i++) {
                 neighbours[i] = 0;
                 weights[i] = 0;
@@ -525,7 +513,6 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
             //Loop over all links (=neighbours)
             l_cur = l_iter.First(node->Get_Links());
             while (!l_iter.End()) {
-                //printf("%s %s\n",node->Get_Name(),n_cur->Get_Name());
                 w = l_cur->Get_Weight();
                 if (node == l_cur->Get_Start()) {
                     n_cur = l_cur->Get_End();
@@ -537,7 +524,6 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
             }
             //Search optimal Spin
             old_spin = node->Get_ClusterIndex();
-            //degree=node->Get_Degree();
             switch (operation_mode) {
             case 0: {
                 prefac = 1.0;
@@ -549,6 +535,8 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
                 prob = degree / total_degree_sum;
                 delta = degree;
                 break;
+            default:
+                IGRAPH_FATAL("Must not reach here.");
             }
             }
             spin_opt = old_spin;
@@ -573,25 +561,16 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
 
             //now choose a new spin
             r = RNG_UNIF(0, norm);
-            /* norm*double(rand())/double(RAND_MAX + 1.0); */
             new_spin = 1;
-            //found = false;
             while (/*!found &&*/ new_spin <= q) {
                 if (r <= weights[new_spin]) {
                     spin_opt = new_spin;
-                    // found = true;
                     break;
                 } else {
                     r -= weights[new_spin];
                 }
                 new_spin++;
             }
-            /*
-            if (!found) {
-                printf(".");
-                problemcount++;
-            }
-            */
             //Put new spin on list
             *SPIN = spin_opt;
 
@@ -649,7 +628,6 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
 
     //again, we would not like to end up in cyclic attractors
     if (cyclic && changes)  {
-//       printf("Cyclic attractor!\n");
         acceptance = double(changes) / double(number_of_nodes);
         return 0;
     } else {
@@ -668,11 +646,9 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     unsigned long new_spin, spin_opt, old_spin;
     unsigned int sweep;
     long max_q, rn;
-    unsigned long changes/*, degree, problemcount*/;
+    unsigned long changes;
     double degree, w, delta = 0, h;
-    //HugeArray<int> neighbours;
     double norm, r, beta, minweight, prefac = 0;
-    //bool found;
     igraph_integer_t number_of_nodes;
     sweep = 0;
     changes = 0;
@@ -685,11 +661,9 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
             while ((rn < 0) || (rn > number_of_nodes - 1)) {
                 rn = RNG_INTEGER(0, number_of_nodes - 1);
             }
-            /* rn=long(double(number_of_nodes*double(rand())/double(RAND_MAX+1.0))); */
 
             node = net->node_list->Get(rn);
             // initialize the neighbours and the weights
-            // problemcount = 0;
             for (unsigned long i = 0; i <= q; i++) {
                 neighbours[i] = 0.0;
                 weights[i] = 0.0;
@@ -699,7 +673,6 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
             //Loop over all links (=neighbours)
             l_cur = l_iter.First(node->Get_Links());
             while (!l_iter.End()) {
-                //printf("%s %s\n",node->Get_Name(),n_cur->Get_Name());
                 w = l_cur->Get_Weight();
                 if (node == l_cur->Get_Start()) {
                     n_cur = l_cur->Get_End();
@@ -713,7 +686,6 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
             //Look for optimal spin
 
             old_spin = node->Get_ClusterIndex();
-            //degree=node->Get_Degree();
             switch (operation_mode) {
             case 0: {
                 prefac = 1.0;
@@ -726,6 +698,8 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
                 delta = degree;
                 break;
             }
+            default:
+                IGRAPH_FATAL("Must not reach here.");
             }
             spin_opt = old_spin;
             beta = 1.0 / kT * prefac;
@@ -749,26 +723,17 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
 
 
             //choose a new spin
-            /*      r = norm*double(rand())/double(RAND_MAX + 1.0); */
             r = RNG_UNIF(0, norm);
             new_spin = 1;
-            //found = false;
             while (/*!found &&*/ new_spin <= q) {
                 if (r <= weights[new_spin]) {
                     spin_opt = new_spin;
-                    //found = true;
                     break;
                 } else {
                     r -= weights[new_spin];
                 }
                 new_spin++;
             }
-            /*
-            if (!found) {
-                printf(".");
-                problemcount++;
-            }
-            */
             //-------------------------------
             //now set the new spin
             new_spin = spin_opt;
@@ -1111,7 +1076,6 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
             n_cur = iter.First(net->node_list);
             while (!iter.End()) {
                 if (n_cur->Get_ClusterIndex() == spin) {
-                    //         fprintf(file,"%d\t%s\n",spin,n_cur->Get_Name());
                     VECTOR(*membership)[ n_cur->Get_Index() ] = no;
                 }
                 n_cur = iter.Next();
@@ -1123,13 +1087,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 }
 
 //#################################################################################################
-PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) :
-    degree_pos_in(nullptr), degree_neg_in(nullptr),
-    degree_pos_out(nullptr), degree_neg_out(nullptr),
-    degree_community_pos_in(nullptr), degree_community_neg_in(nullptr),
-    degree_community_pos_out(nullptr), degree_community_neg_out(nullptr),
-    csize(nullptr), spin(nullptr), neighbours(nullptr), weights(nullptr)
-{
+PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) {
     //Set internal variable
     net = n;
     q   = num_communities;

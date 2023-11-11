@@ -83,10 +83,11 @@ private:
     unsigned long k_max = 0;
     double acceptance = 0;
     double *neighbours;
+    double* color_field;
 public:
     PottsModel(network *net, unsigned long q, int norm_by_degree);
     ~PottsModel();
-    double* color_field;
+
     unsigned long assign_initial_conf(igraph_integer_t spin);
 
     double initialize_Qmatrix();
@@ -125,21 +126,21 @@ private:
 
     bool is_init;
 
-    double *degree_pos_in; //Postive indegree of the nodes (or sum of weights)
-    double *degree_neg_in; //Negative indegree of the nodes (or sum of weights)
-    double *degree_pos_out; //Postive outdegree of the nodes (or sum of weights)
-    double *degree_neg_out; //Negative outdegree of the nodes (or sum of weights)
+    double *degree_pos_in = nullptr; //Postive indegree of the nodes (or sum of weights)
+    double *degree_neg_in = nullptr; //Negative indegree of the nodes (or sum of weights)
+    double *degree_pos_out = nullptr; //Postive outdegree of the nodes (or sum of weights)
+    double *degree_neg_out = nullptr; //Negative outdegree of the nodes (or sum of weights)
 
-    double *degree_community_pos_in; //Positive sum of indegree for communities
-    double *degree_community_neg_in; //Negative sum of indegree for communities
-    double *degree_community_pos_out; //Positive sum of outegree for communities
-    double *degree_community_neg_out; //Negative sum of outdegree for communities
+    double *degree_community_pos_in = nullptr; //Positive sum of indegree for communities
+    double *degree_community_neg_in = nullptr; //Negative sum of indegree for communities
+    double *degree_community_pos_out = nullptr; //Positive sum of outegree for communities
+    double *degree_community_neg_out = nullptr; //Negative sum of outdegree for communities
 
-    unsigned long *csize; //The number of nodes in each community
-    unsigned long *spin; //The membership of each node
+    unsigned long *csize = nullptr; //The number of nodes in each community
+    unsigned long *spin = nullptr; //The membership of each node
 
-    double *neighbours; //Array of neighbours of a vertex in each community
-    double *weights; //Weights of all possible transitions to another community
+    double *neighbours = nullptr; //Array of neighbours of a vertex in each community
+    double *weights = nullptr; //Weights of all possible transitions to another community
 
 public:
     PottsModelN(network *n, unsigned long num_communities, bool directed);

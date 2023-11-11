@@ -48,9 +48,7 @@
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 
-igraph_error_t
-igraph_i_read_network(const igraph_t *graph, const igraph_vector_t *weights, network *net, igraph_bool_t use_weights);
-
-void reduce_cliques(DLList<ClusterList<NNode*>*>*, FILE *file);
+igraph_error_t igraph_i_read_network(
+        const igraph_t *graph, const igraph_vector_t *weights, network *net, igraph_bool_t use_weights);
 
 #endif

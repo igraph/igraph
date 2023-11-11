@@ -100,9 +100,9 @@ template <class L_DATA >
 class DLList {
     friend class DLList_Iter<L_DATA>;
 protected:
-    DLItem<L_DATA>  *head;
-    DLItem<L_DATA>  *tail;
-    unsigned long number_of_items;
+    DLItem<L_DATA> *head;
+    DLItem<L_DATA> *tail;
+    unsigned long number_of_items = 0;
     DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*);
     L_DATA pDelete(DLItem<L_DATA>*);
 public:
@@ -385,8 +385,6 @@ DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_
 //######################################################################################################################
 template <class L_DATA>
 DLList<L_DATA>::DLList() {
-    head = tail = nullptr;
-    number_of_items = 0;
     head = new DLItem<L_DATA>(NULL, 0); //fuer head und Tail gibt es das gleiche Array-Element!! Vorsicht!!
     tail = new DLItem<L_DATA>(NULL, 0);
     if ( !head || !tail ) {
