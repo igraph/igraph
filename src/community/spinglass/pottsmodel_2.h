@@ -58,6 +58,7 @@ class SimpleMatrix {
 
 public:
     explicit SimpleMatrix(size_t n_) : n(n_) { data = new double[n*n]; }
+    SimpleMatrix(const SimpleMatrix &) = delete;
     ~SimpleMatrix() { delete [] data; }
 
     // Return a pointer to the i'th column, which can be indexed into using a second [] operator.
@@ -79,8 +80,8 @@ private:
     double total_degree_sum;
     unsigned long num_of_nodes;
     unsigned long num_of_links;
-    unsigned long k_max;
-    double acceptance;
+    unsigned long k_max = 0;
+    double acceptance = 0;
     double *neighbours;
 public:
     PottsModel(network *net, unsigned long q, int norm_by_degree);
@@ -102,7 +103,7 @@ public:
                          igraph_vector_int_t *csize, igraph_vector_int_t *membership,
                          double kT, double gamma);
 
-    double FindCommunityFromStart(double gamma, double prob, char *nodename,
+    double FindCommunityFromStart(double gamma, char *nodename,
                                   igraph_vector_int_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,

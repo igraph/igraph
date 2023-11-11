@@ -59,8 +59,8 @@ NNode::NNode(unsigned long ind, unsigned long c_ind, DLList<NLink *> *ll, const 
 NNode::~NNode() {
     Disconnect_From_All();
     delete neighbours;
-    delete n_links;
     neighbours = nullptr;
+    delete n_links;
     n_links = nullptr;
 }
 
@@ -125,43 +125,8 @@ int NNode::Disconnect_From_All() {
     return number_of_neighbours ;
 }
 
-double NNode::Get_Links_Among_Neigbours() {
-    double lam = 0;
-    DLList_Iter<NNode*> iter1, iter2;
-    NNode *step1, *step2;
-    step1 = iter1.First(neighbours);
-    while (!iter1.End()) {
-        step2 = iter2.First(step1->Get_Neighbours());
-        while (!iter2.End()) {
-            if (step2->Get_Neighbours()->Is_In_List(this)) {
-                lam++;
-            }
-            step2 = iter2.Next();
-        }
-        step1 = iter1.Next();
-    }
-    return (lam / 2.0);
-}
 
-
-double NNode::Get_Clustering() {
-    double c;
-    unsigned long k;
-    k = neighbours->Size();
-    if (k <= 1) {
-        return 0;
-    }
-    c = 2.0 * Get_Links_Among_Neigbours() / double(k * k - k);
-    return c;
-}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//Constructor
-NLink::NLink(NNode *s, NNode *e, double w) {
-    start = s;
-    end = e;
-    weight = w;
-}
 
 //Destructor
 NLink::~NLink() {

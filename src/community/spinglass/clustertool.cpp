@@ -288,7 +288,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
 
     /* Transform the igraph_t */
     IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                       &net, use_weights, 0));
+                                       &net, use_weights));
 
     prob = 2.0 * net.sum_weights / double(net.node_list->Size())
            / double(net.node_list->Size() - 1);
@@ -425,7 +425,6 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                       igraph_real_t gamma) {
     IGRAPH_HANDLE_EXCEPTIONS(
         igraph_bool_t use_weights = false;
-        double prob;
         char startnode[255];
 
         /* Check arguments */
@@ -461,10 +460,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
 
         /* Transform the igraph_t */
         IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                           &net, use_weights, 0));
-
-        prob = 2.0 * net.sum_weights / double(net.node_list->Size())
-               / double(net.node_list->Size() - 1);
+                                           &net, use_weights));
 
         PottsModel pm(&net, (unsigned int)spins, update_rule);
 
@@ -476,7 +472,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
            the degree of the nodes is not in the weight property, stupid!!! */
         pm.assign_initial_conf(-1);
         snprintf(startnode, 255, "%" IGRAPH_PRId "", vertex + 1);
-        pm.FindCommunityFromStart(gamma, prob, startnode, community,
+        pm.FindCommunityFromStart(gamma, startnode, community,
                                    cohesion, adhesion, inner_links, outer_links);
 
         RNG_END();
@@ -586,7 +582,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
 
     /* Transform the igraph_t */
     IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                       &net, use_weights, 0));
+                                       &net, use_weights));
 
     bool directed = igraph_is_directed(graph);
 

@@ -48,12 +48,10 @@
 #include "igraph_interface.h"
 #include "igraph_conversion.h"
 
-igraph_error_t igraph_i_read_network(const igraph_t *graph,
-                          const igraph_vector_t *weights,
-                          network *net, igraph_bool_t use_weights,
-                          unsigned int states) {
+igraph_error_t igraph_i_read_network(
+        const igraph_t *graph, const igraph_vector_t *weights, network *net, igraph_bool_t use_weights) {
 
-    double av_k = 0.0, sum_weight = 0.0, min_weight = 1e60, max_weight = -1e60;
+    double sum_weight = 0.0, min_weight = 1e60, max_weight = -1e60;
     unsigned long min_k = 999999999, max_k = 0;
     char name[255];
     NNode *node1, *node2;
@@ -111,7 +109,6 @@ igraph_error_t igraph_i_read_network(const igraph_t *graph,
         if (node1->Get_Degree() < min_k) {
             min_k = node1->Get_Degree();
         }
-        av_k += node1->Get_Degree();
         node1 = iter.Next();
     }
     net->sum_weights = sum_weight;
@@ -124,7 +121,7 @@ void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *fil
     unsigned long size;
     ClusterList<NNode*> *c_cur, *largest_c = nullptr;
     DLList<ClusterList<NNode*>*> *subsets;
-    DLList_Iter<ClusterList<NNode*>*> c_iter, sub_iter;
+    DLList_Iter<ClusterList<NNode*>*> c_iter;
     DLList_Iter<NNode*> iter;
     NNode *n_cur;
 

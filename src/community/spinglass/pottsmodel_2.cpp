@@ -53,15 +53,12 @@
 using namespace std;
 
 //#################################################################################################
-PottsModel::PottsModel(network *n, unsigned long qvalue, int m) : Qmatrix(qvalue+1), acceptance(0)
+PottsModel::PottsModel(network *n, unsigned long qvalue, int m) :
+        net(n), q(qvalue), operation_mode(m), Qmatrix(qvalue+1)
 {
     DLList_Iter<NNode*> iter;
     NNode *n_cur;
     unsigned long *i_ptr;
-    net = n;
-    q = qvalue;
-    operation_mode = m;
-    k_max = 0;
     //needed in calculating modularity
     Qa     = new double[q + 1];
     //weights for each spin state needed in Monte Carlo process
@@ -119,10 +116,6 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
     NNode *n_cur;
     NLink *l_cur;
     double sum_weight;
-    double av_k_squared = 0.0;
-    double av_k = 0.0;
-    IGRAPH_UNUSED(av_k_squared); /* We mark it as unused to prevent warnings about unused-but-set-variables. */
-    IGRAPH_UNUSED(av_k);         /* We mark it as unused to prevent warnings about unused-but-set-variables. */
 
     // initialize colorfield
     for (unsigned long i = 0; i <= q; i++) {
@@ -147,8 +140,6 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
         // we set the sum of the weights or the degree as the weight of the node, this way
         // we do not have to calculate it again.
         n_cur->Set_Weight(sum_weight);
-        av_k_squared += sum_weight * sum_weight;
-        av_k += sum_weight;
 
         // in case we want all links to be contribute equally - parameter gamm=fixed
         if (operation_mode == 0) {
@@ -160,8 +151,6 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
         total_degree_sum += sum_weight;
         n_cur = iter.Next();
     }
-    av_k_squared /= double(net->node_list->Size());
-    av_k /= double(net->node_list->Size());
 
     return net->node_list->Size();
 }
@@ -254,7 +243,7 @@ double PottsModel::FindStartTemp(double gamma, double prob, double ts) {
 //if it does not converge earlier
 //##############################################################
 long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps) {
-    DLList_Iter<NNode*> iter, net_iter;
+    DLList_Iter<NNode *> net_iter;
     DLList_Iter<NLink*> l_iter;
     DLList_Iter<unsigned long*> i_iter, i_iter2;
     NNode *node, *n_cur;
@@ -391,9 +380,7 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
 //randomly
 //###################################################################################
 double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps) {
-    DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
-    DLList_Iter<unsigned int*> i_iter, i_iter2;
     NNode *node, *n_cur;
     NLink *l_cur;
     unsigned long new_spin, spin_opt, old_spin, spin;
@@ -501,7 +488,7 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
 //This function performs a parallel update at Terperature T
 //#####################################################################################
 long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, unsigned int max_sweeps) {
-    DLList_Iter<NNode*> iter, net_iter;
+    DLList_Iter<NNode*> net_iter;
     DLList_Iter<NLink*> l_iter;
     DLList_Iter<unsigned long*> i_iter, i_iter2;
     NNode *node, *n_cur;
@@ -675,9 +662,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
 // as the parallel update has its flaws, due to the cyclic attractors
 //##############################################################
 double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned int max_sweeps) {
-    DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
-    DLList_Iter<unsigned long*> i_iter, i_iter2;
     NNode *node, *n_cur;
     NLink *l_cur;
     unsigned long new_spin, spin_opt, old_spin;
@@ -827,7 +812,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
 //###############################################################################################
 //# Here we try to minimize the affinity to the rest of the network
 //###############################################################################################
-double PottsModel::FindCommunityFromStart(double gamma, double prob,
+double PottsModel::FindCommunityFromStart(double gamma,
         char *nodename,
         igraph_vector_int_t *result,
         igraph_real_t *cohesion,
@@ -846,8 +831,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
     long to_do_marker = 10;
     double inner_links = 0, outer_links = 0, aff_r, aff_s;
 
-    IGRAPH_UNUSED(prob);
-
     to_do = new DLList<NNode*>;
     community = new DLList<NNode*>;
 
@@ -857,7 +840,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
         if (0 == strcmp(n_cur->Get_Name(), nodename)) {
             start_node = n_cur;
             found = true;
-            start_node->Set_Affinity(0.0);
             community->Push(start_node);
             start_node->Set_Marker(community_marker);
             Ks = start_node->Get_Weight();
@@ -866,8 +848,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
         n_cur = iter.Next();
     }
     if (!found) {
-//      printf("%s not found found. Aborting.\n",nodename);
-//      fprintf(file,"%s not found found. Aborting.\n",nodename);
         delete to_do;
         delete community;
         return -1;
@@ -877,7 +857,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
     //#############################
     neighbor = iter.First(start_node->Get_Neighbours());
     while (!iter.End()) {
-//     printf("Adding node %s to comunity.\n",neighbor->Get_Name());
         community->Push(neighbor);
         neighbor->Set_Marker(community_marker);
         Ks += neighbor->Get_Weight();
@@ -892,7 +871,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
             if ((long)neighbor->Get_Marker() != community_marker && (long)neighbor->Get_Marker() != to_do_marker) {
                 to_do->Push(neighbor);
                 neighbor->Set_Marker(to_do_marker);
-//  printf("Adding node %s to to_do list.\n",neighbor->Get_Name());
             }
             neighbor = iter2.Next();
         }
@@ -940,7 +918,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
             aff_s = kis - gamma / total_degree_sum * Ks * degree;
             delta_aff_add = aff_r - aff_s;
             if (delta_aff_add <= max_delta_aff) {
-                node->Set_Affinity(aff_s);
                 max_delta_aff = delta_aff_add;
                 max_aff_node = node;
                 add = true;
@@ -977,11 +954,9 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
                 }
                 l_cur = l_iter.Next();
             }
-//  if (kir+kis!=degree) {  printf("error kir=%f\tkis=%f\tk=%f\n",kir,kis,degree); }
             aff_r = kir - gamma / total_degree_sum * Kr * degree;
             aff_s = kis - gamma / total_degree_sum * (Ks - degree) * degree;
             delta_aff_rem = aff_s - aff_r;
-            node->Set_Affinity(aff_s);
             // we should not remove the nodes, we have just added
             if (delta_aff_rem < max_delta_aff) {
                 max_delta_aff = delta_aff_rem ;
@@ -989,7 +964,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
                 remove = true;
                 add = false;
             }
-            //printf("%s in to_do list with affinity %f\n",node->Get_Name(),node->Get_Affinity());
             node = iter.Next();
         }
         inner_links = inner_links * 0.5;
@@ -1007,7 +981,6 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
             //update the sum of degrees in the community
             Ks += max_aff_node->Get_Weight();
             Kr -= max_aff_node->Get_Weight();
-//  printf("Adding node %s to community with affinity of %f delta_aff: %f.\n",max_aff_node->Get_Name(), max_aff_node->Get_Affinity(),max_delta_aff);
             //now add all neighbors of this node, that are not already
             //in the to_do list or in the community
             neighbor = iter.First(max_aff_node->Get_Neighbours());
@@ -1031,20 +1004,12 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
             Kr += max_aff_node->Get_Weight();
             //add the node to to_do again
             to_do->Push(max_aff_node);
-//  printf("Removing node %s from community with affinity of %f delta_aff: %f.\n",max_aff_node->Get_Name(), max_aff_node->Get_Affinity(),max_delta_aff);
         }
         IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
     }
     //###################
     //write the node in the community to a file
     //###################
-    // TODO return this instead of writing it
-//   fprintf(file,"Number_of_nodes:\t%d\n",community->Size());
-//   fprintf(file,"Inner_Links:\t%f\n",inner_links);
-//   fprintf(file,"Outer_Links:\t%f\n",Ks-2*inner_links);
-//   fprintf(file,"Cohesion:\t%f\n",inner_links-gamma/total_degree_sum*Ks*Ks*0.5);
-//   fprintf(file,"Adhesion:\t%f\n",outer_links-gamma/total_degree_sum*Ks*Kr);
-//   fprintf(file,"\n");
     if (cohesion) {
         *cohesion = inner_links - gamma / total_degree_sum * Ks * Ks * 0.5;
     }
@@ -1061,14 +1026,10 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
         node = iter.First(community);
         igraph_vector_int_clear(result);
         while (!iter.End()) {
-            // printf("%s in community.\n",node->Get_Name());
-            // fprintf(file,"%s\t%f\n",node->Get_Name(),node->Get_Affinity());
             IGRAPH_CHECK(igraph_vector_int_push_back(result, node->Get_Index()));
             node = iter.Next();
         }
     }
-//   printf("%d nodes in community around %s\n",community->Size(),start_node->Get_Name());
-//   fclose(file);
     unsigned long size = community->Size();
     delete to_do;
     delete community;
@@ -1201,20 +1162,13 @@ PottsModelN::~PottsModelN() {
 }
 
 void PottsModelN::assign_initial_conf(bool init_spins) {
-#ifdef SPINGLASS_DEBUG
-    printf("Start assigning.\n");
-#endif
     unsigned long s;
-    DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
     NNode *n_cur;
     NLink *l_cur;
 
 
     if (init_spins) {
-#ifdef SPINGLASS_DEBUG
-        printf("Initializing spin.\n");
-#endif
         // Free the arrays before (re-)allocating them
         // These arrays are initialized to NULL, so it is safe to delete even before allocation
         delete [] degree_pos_in;
@@ -1371,9 +1325,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
 #ifdef SPINGLASS_DEBUG
     printf("Starting sweep at temperature %f.\n", t);
 #endif
-    DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
-    DLList_Iter<unsigned long*> i_iter, i_iter2;
     NNode *node, *n_cur;
     NLink *l_cur;
     /* The new_spin contains the spin to which we will update,
