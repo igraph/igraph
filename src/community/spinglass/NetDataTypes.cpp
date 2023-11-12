@@ -50,18 +50,12 @@
 NNode::NNode(unsigned long ind, unsigned long c_ind, DLList<NLink *> *ll, const char *n) :
     index(ind), cluster_index(c_ind), global_link_list(ll)
 {
-    neighbours = new DLList<NNode*>();
-    n_links = new DLList<NLink*>();
     strcpy(name, n);
 }
 
 //Destructor
 NNode::~NNode() {
     Disconnect_From_All();
-    delete neighbours;
-    neighbours = nullptr;
-    delete n_links;
-    n_links = nullptr;
 }
 
 int NNode::Connect_To(NNode* neighbour, double weight_) {
@@ -70,14 +64,14 @@ int NNode::Connect_To(NNode* neighbour, double weight_) {
     if (!neighbour) {
         return 0;
     }
-    if (!(neighbours->Is_In_List(neighbour)) && (neighbour != this)) {
-        neighbours->Push(neighbour);        // nachbar hier eintragen
-        neighbour->neighbours->Push(this); // diesen knoten beim nachbarn eintragen
+    if (!(neighbours.Is_In_List(neighbour)) && (neighbour != this)) {
+        neighbours.Push(neighbour);        // nachbar hier eintragen
+        neighbour->neighbours.Push(this); // diesen knoten beim nachbarn eintragen
 
         link = new NLink(this, neighbour, weight_);     //link erzeugen
         global_link_list->Push(link);                        // in globaler liste eintragen
-        n_links->Push(link);                                   // bei diesem Knoten eintragen
-        neighbour->n_links->Push(link);                  // beim nachbarn eintragen
+        n_links.Push(link);                                   // bei diesem Knoten eintragen
+        neighbour->n_links.Push(link);                  // beim nachbarn eintragen
 
         return 1;
     }
@@ -89,7 +83,7 @@ NLink *NNode::Get_LinkToNeighbour(const NNode* neighbour) {
     NLink *l_cur, *link = nullptr;
     bool found = false;
     // finde einen bestimmten Link aus der Liste der links eines Knotens
-    l_cur = iter.First(n_links);
+    l_cur = iter.First(&n_links);
     while (!iter.End() && !found) {
         if (((l_cur->Get_Start() == this) && (l_cur->Get_End() == neighbour)) || ((l_cur->Get_End() == this) && (l_cur->Get_Start() == neighbour))) {
             found = true;
@@ -106,20 +100,17 @@ NLink *NNode::Get_LinkToNeighbour(const NNode* neighbour) {
 
 int NNode::Disconnect_From(NNode* neighbour) {
     //sollen doppelte Links erlaubt sein??  s.o.
-    if (!neighbours) {
-        return 0;
-    }
-    neighbours->fDelete(neighbour);
-    n_links->fDelete(Get_LinkToNeighbour(neighbour));
-    neighbour->n_links->fDelete(neighbour->Get_LinkToNeighbour(this));
-    neighbour->neighbours->fDelete(this);
+    neighbours.fDelete(neighbour);
+    n_links.fDelete(Get_LinkToNeighbour(neighbour));
+    neighbour->n_links.fDelete(neighbour->Get_LinkToNeighbour(this));
+    neighbour->neighbours.fDelete(this);
     return 1;
 }
 
 int NNode::Disconnect_From_All() {
     int number_of_neighbours = 0;
-    while (neighbours->Size()) {
-        Disconnect_From(neighbours->Pop());
+    while (neighbours.Size()) {
+        Disconnect_From(neighbours.Pop());
         number_of_neighbours++;
     }
     return number_of_neighbours ;

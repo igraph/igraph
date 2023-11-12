@@ -139,15 +139,15 @@ public:
 //#####################################################################################################
 
 template <class L_DATA> class DLList_Iter {
-    DLList<L_DATA> *list = nullptr;
-    DLItem<L_DATA> *current = nullptr;
+    const DLList<L_DATA> *list = nullptr;
+    const DLItem<L_DATA> *current = nullptr;
     bool end_reached = true;
 
 public:
     L_DATA Next();
     L_DATA Previous();
-    L_DATA First(DLList<L_DATA> *l);
-    L_DATA Last(DLList<L_DATA> *l);
+    L_DATA First(const DLList<L_DATA> *l);
+    L_DATA Last(const DLList<L_DATA> *l);
     bool End() const {
         return end_reached;
     }
@@ -166,8 +166,8 @@ class NNode {
     unsigned long marker = 0;
     double weight = 0.0;
 
-    DLList<NNode*> *neighbours;    //list with pointers to neighbours
-    DLList<NLink*> *n_links;
+    DLList<NNode*> neighbours;    //list with pointers to neighbours
+    DLList<NLink*> n_links;
     DLList<NLink*> *global_link_list;
     char name[255];
 public :
@@ -190,7 +190,7 @@ public :
     }
 
     unsigned long Get_Degree() const {
-        return (neighbours->Size());
+        return (neighbours.Size());
     }
     char *Get_Name() {
         return name;
@@ -207,11 +207,11 @@ public :
         weight = w;
     }
     int  Connect_To(NNode*, double);
-    DLList<NNode*> *Get_Neighbours() {
-        return neighbours;
+    const DLList<NNode*> *Get_Neighbours() const {
+        return &neighbours;
     }
-    DLList<NLink*> *Get_Links() {
-        return n_links;
+    const DLList<NLink*> *Get_Links() const {
+        return &n_links;
     }
     int  Disconnect_From(NNode*);
     int  Disconnect_From_All();
@@ -650,7 +650,7 @@ L_DATA DLList_Iter<L_DATA>::Previous() {
 }
 
 template <class L_DATA>
-L_DATA DLList_Iter<L_DATA>::First(DLList<L_DATA> *l) {
+L_DATA DLList_Iter<L_DATA>::First(const DLList<L_DATA> *l) {
     list = l;
     current = list->head->next;
     if (current == (list->tail)) {
@@ -662,7 +662,7 @@ L_DATA DLList_Iter<L_DATA>::First(DLList<L_DATA> *l) {
 }
 
 template <class L_DATA>
-L_DATA DLList_Iter<L_DATA>::Last(DLList<L_DATA> *l) {
+L_DATA DLList_Iter<L_DATA>::Last(const DLList<L_DATA> *l) {
     list = l;
     current = list->tail->previous;
     if (current == (list->head)) {

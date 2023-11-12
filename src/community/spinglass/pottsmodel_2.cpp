@@ -787,8 +787,8 @@ double PottsModel::FindCommunityFromStart(
         igraph_integer_t *my_outer_links) {
     DLList_Iter<NNode*> iter, iter2;
     DLList_Iter<NLink*> l_iter;
-    DLList<NNode*>* to_do;
-    DLList<NNode*>* community;
+    DLList<NNode*> to_do;
+    DLList<NNode*> community;
     NNode *start_node = nullptr, *n_cur, *neighbor, *max_aff_node, *node;
     NLink *l_cur;
     bool found = false, add = false, remove = false;
@@ -797,16 +797,13 @@ double PottsModel::FindCommunityFromStart(
     long to_do_marker = 10;
     double inner_links = 0, outer_links = 0, aff_r, aff_s;
 
-    to_do = new DLList<NNode*>;
-    community = new DLList<NNode*>;
-
     // find the node in the network
     n_cur = iter.First(net->node_list);
     while (!found && !iter.End()) {
         if (0 == strcmp(n_cur->Get_Name(), nodename)) {
             start_node = n_cur;
             found = true;
-            community->Push(start_node);
+            community.Push(start_node);
             start_node->Set_Marker(community_marker);
             Ks = start_node->Get_Weight();
             Kr = total_degree_sum - start_node->Get_Weight();
@@ -814,8 +811,6 @@ double PottsModel::FindCommunityFromStart(
         n_cur = iter.Next();
     }
     if (!found) {
-        delete to_do;
-        delete community;
         return -1;
     }
     //#############################
@@ -823,19 +818,19 @@ double PottsModel::FindCommunityFromStart(
     //#############################
     neighbor = iter.First(start_node->Get_Neighbours());
     while (!iter.End()) {
-        community->Push(neighbor);
+        community.Push(neighbor);
         neighbor->Set_Marker(community_marker);
         Ks += neighbor->Get_Weight();
         Kr -= neighbor->Get_Weight();
         neighbor = iter.Next();
     }
-    node = iter.First(community);
+    node = iter.First(&community);
     while (!iter.End()) {
         //now add at the second neighbors to the to_do list
         neighbor = iter2.First(node->Get_Neighbours());
         while (!iter2.End()) {
             if ((long)neighbor->Get_Marker() != community_marker && (long)neighbor->Get_Marker() != to_do_marker) {
-                to_do->Push(neighbor);
+                to_do.Push(neighbor);
                 neighbor->Set_Marker(to_do_marker);
             }
             neighbor = iter2.Next();
@@ -858,7 +853,7 @@ double PottsModel::FindCommunityFromStart(
         max_delta_aff = 0.0;
         max_aff_node = nullptr;
         add = false;
-        node = iter.First(to_do);
+        node = iter.First(&to_do);
         while (!iter.End()) {
             //printf("Checking Links of %s\n",node->Get_Name());
             degree = node->Get_Weight();
@@ -896,7 +891,7 @@ double PottsModel::FindCommunityFromStart(
         inner_links = 0;
         outer_links = 0;
         remove = false;
-        node = iter.First(community);
+        node = iter.First(&community);
         while (!iter.End()) {
             //printf("Checking Links of %s\n",node->Get_Name());
             degree = node->Get_Weight();
@@ -940,10 +935,10 @@ double PottsModel::FindCommunityFromStart(
             //################
             //add the node of maximum affinity to the community
             //###############
-            community->Push(max_aff_node);
+            community.Push(max_aff_node);
             max_aff_node->Set_Marker(community_marker);
             //delete node from to_do
-            to_do->fDelete(max_aff_node);
+            to_do.fDelete(max_aff_node);
             //update the sum of degrees in the community
             Ks += max_aff_node->Get_Weight();
             Kr -= max_aff_node->Get_Weight();
@@ -952,7 +947,7 @@ double PottsModel::FindCommunityFromStart(
             neighbor = iter.First(max_aff_node->Get_Neighbours());
             while (!iter.End()) {
                 if ((long)neighbor->Get_Marker() != community_marker && (long)neighbor->Get_Marker() != to_do_marker) {
-                    to_do->Push(neighbor);
+                    to_do.Push(neighbor);
                     neighbor->Set_Marker(to_do_marker);
                     //printf("Adding node %s to to_do list.\n",neighbor->Get_Name());
                 }
@@ -963,13 +958,13 @@ double PottsModel::FindCommunityFromStart(
             //################
             //remove those with negative affinities
             //################
-            community->fDelete(max_aff_node);
+            community.fDelete(max_aff_node);
             max_aff_node->Set_Marker(to_do_marker);
             //update the sum of degrees in the community
             Ks -= max_aff_node->Get_Weight();
             Kr += max_aff_node->Get_Weight();
             //add the node to to_do again
-            to_do->Push(max_aff_node);
+            to_do.Push(max_aff_node);
         }
         IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
     }
@@ -989,16 +984,14 @@ double PottsModel::FindCommunityFromStart(
         *my_outer_links = outer_links;
     }
     if (result) {
-        node = iter.First(community);
+        node = iter.First(&community);
         igraph_vector_int_clear(result);
         while (!iter.End()) {
             IGRAPH_CHECK(igraph_vector_int_push_back(result, node->Get_Index()));
             node = iter.Next();
         }
     }
-    unsigned long size = community->Size();
-    delete to_do;
-    delete community;
+    unsigned long size = community.Size();
     return size;
 }
 
