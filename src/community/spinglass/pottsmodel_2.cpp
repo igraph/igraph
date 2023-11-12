@@ -382,10 +382,7 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
         sweep++;
         //ueber alle Knoten im Netz
         for (igraph_integer_t n = 0; n < num_of_nodes; n++) {
-            r = -1;
-            while ((r < 0) || (r > num_of_nodes - 1)) {
-                r = RNG_INTEGER(0, num_of_nodes - 1);
-            }
+            r = RNG_INTEGER(0, num_of_nodes - 1);
             node = net->node_list.Get(r);
             // Wir zaehlen, wieviele Nachbarn von jedem spin vorhanden sind
             // erst mal alles Null setzen
@@ -538,7 +535,7 @@ igraph_integer_t PottsModel::HeatBathParallelLookup(double gamma, double prob, d
             beta = 1.0 / kT * prefac;
             minweight = 0.0;
             weights[old_spin] = 0.0;
-            for (unsigned spin = 1; spin <= q; spin++) { // loop over all possible new spins
+            for (igraph_integer_t spin = 1; spin <= q; spin++) { // loop over all possible new spins
                 if (spin != old_spin) { // only if we have a different than old spin!
                     h = color_field[spin] + delta - color_field[old_spin];
                     weights[spin] = double(neighbours[old_spin] - neighbours[spin]) + gamma * prob * double(h);
@@ -547,7 +544,7 @@ igraph_integer_t PottsModel::HeatBathParallelLookup(double gamma, double prob, d
                     }
                 }
             }   // for spin
-            for (unsigned spin = 1; spin <= q; spin++) { // loop over all possibe spins
+            for (igraph_integer_t spin = 1; spin <= q; spin++) { // loop over all possibe spins
                 weights[spin] -= minweight;       // subtract minweight
                 // to avoid numerical problems with large exponents
                 weights[spin] = exp(-beta * weights[spin]);
@@ -557,7 +554,7 @@ igraph_integer_t PottsModel::HeatBathParallelLookup(double gamma, double prob, d
             //now choose a new spin
             r = RNG_UNIF(0, norm);
             new_spin = 1;
-            while (/*!found &&*/ new_spin <= q) {
+            while (new_spin <= q) {
                 if (r <= weights[new_spin]) {
                     spin_opt = new_spin;
                     break;
@@ -698,7 +695,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
             beta = 1.0 / kT * prefac;
             minweight = 0.0;
             weights[old_spin] = 0.0;
-            for (unsigned spin = 1; spin <= q; spin++) { // all possible new spins
+            for (igraph_integer_t spin = 1; spin <= q; spin++) { // all possible new spins
                 if (spin != old_spin) { // except the old one!
                     h = color_field[spin] - (color_field[old_spin] - delta);
                     weights[spin] = neighbours[old_spin] - neighbours[spin] + gamma * prob * h;
@@ -707,7 +704,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
                     }
                 }
             }   // for spin
-            for (unsigned spin = 1; spin <= q; spin++) { // all possible new spins
+            for (igraph_integer_t spin = 1; spin <= q; spin++) { // all possible new spins
                 weights[spin] -= minweight;       // subtract minweigt
                 // for numerical stability
                 weights[spin] = exp(-beta * weights[spin]);
@@ -718,7 +715,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
             //choose a new spin
             r = RNG_UNIF(0, norm);
             new_spin = 1;
-            while (/*!found &&*/ new_spin <= q) {
+            while (new_spin <= q) {
                 if (r <= weights[new_spin]) {
                     spin_opt = new_spin;
                     break;
@@ -1182,7 +1179,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
     for (igraph_integer_t v = 0; v < num_nodes; v++) {
         if (init_spins) {
             s = RNG_INTEGER(1, q);  //The new spin s
-            spin[v] = (unsigned int)s;
+            spin[v] = s;
         } else {
             s = spin[v];
         }
