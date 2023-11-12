@@ -46,66 +46,35 @@
 
 #include "igraph_types.h"
 #include "igraph_interface.h"
-#include "igraph_conversion.h"
 
 igraph_error_t igraph_i_read_network_spinglass(
     const igraph_t *graph, const igraph_vector_t *weights,
     network *net, igraph_bool_t use_weights) {
 
-    double sum_weight = 0.0, min_weight = IGRAPH_POSINFINITY, max_weight = IGRAPH_NEGINFINITY;
-    igraph_integer_t min_k = IGRAPH_INTEGER_MAX, max_k = 0;
-    char name[255];
-    NNode *node1, *node2;
-    DLList_Iter<NNode*> iter;
-    igraph_vector_int_t edgelist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    const char *empty = "";
+    double sum_weight;
 
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, no_of_edges * 2);
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, false /* rowwise */));
-
-    for (igraph_integer_t ii = 0; ii < no_of_nodes; ii++) {
-        net->node_list.Push(new NNode(ii, 0, &net->link_list, empty));
+    for (igraph_integer_t vid = 0; vid < no_of_nodes; vid++) {
+        char name[255];
+        snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", vid+1);
+        net->node_list.Push(new NNode(vid, 0, &net->link_list, name));
     }
 
-    for (igraph_integer_t ii = 0; ii < no_of_edges; ii++) {
-        igraph_integer_t i1 = VECTOR(edgelist)[2 * ii];
-        igraph_integer_t i2 = VECTOR(edgelist)[2 * ii + 1];
-        igraph_real_t Links = use_weights ? VECTOR(*weights)[ii] : 1.0;
+    sum_weight = 0.0;
+    for (igraph_integer_t eid = 0; eid < no_of_edges; eid++) {
+        igraph_integer_t v1 = IGRAPH_FROM(graph, eid);
+        igraph_integer_t v2 = IGRAPH_TO(graph, eid);
+        igraph_real_t w = use_weights ? VECTOR(*weights)[eid] : 1.0;
 
-        node1 = net->node_list.Get(i1);
-        snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", i1+1);
-        node1->Set_Name(name);
+        NNode *node1 = net->node_list.Get(v1);
+        NNode *node2 = net->node_list.Get(v2);
 
-        node2 = net->node_list.Get(i2);
-        snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", i2+1);
-        node2->Set_Name(name);
+        node1->Connect_To(node2, w);
 
-        node1->Connect_To(node2, Links);
-
-        if (Links < min_weight) {
-            min_weight = Links;
-        }
-        if (Links > max_weight) {
-            max_weight = Links;
-        }
-        sum_weight += Links;
+        sum_weight += w;
     }
 
-    IGRAPH_FINALLY_CLEAN(1);
-    igraph_vector_int_destroy(&edgelist);
-
-    node1 = iter.First(&net->node_list);
-    while (!iter.End()) {
-        if (node1->Get_Degree() > max_k) {
-            max_k = node1->Get_Degree();
-        }
-        if (node1->Get_Degree() < min_k) {
-            min_k = node1->Get_Degree();
-        }
-        node1 = iter.Next();
-    }
     net->sum_weights = sum_weight;
 
     return IGRAPH_SUCCESS;

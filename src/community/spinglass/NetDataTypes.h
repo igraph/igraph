@@ -198,7 +198,7 @@ public :
     igraph_integer_t Get_Degree() const {
         return (neighbours.Size());
     }
-    char *Get_Name() {
+    const char *Get_Name() {
         return name;
     }
     void Set_Name(const char *n) {
