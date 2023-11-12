@@ -54,10 +54,10 @@ struct HUGE_INDEX {
 
 template <class DATA>
 class HugeArray {
-    unsigned long int size;
-    unsigned int highest_field_index;
-    unsigned long max_bit_left;
-    unsigned long max_index;
+    unsigned long int size = 2;
+    unsigned int highest_field_index = 0;
+    unsigned long max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
+    unsigned long max_index = 0;
     DATA *data;
     DATA *fields[32];
 public:
@@ -297,10 +297,6 @@ struct network {
 
 template <class DATA>
 HugeArray<DATA>::HugeArray() {
-    max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
-    size = 2;
-    max_index = 0;
-    highest_field_index = 0;
     data = new DATA[2]; //ein extra Platz fuer das Nullelement
     data[0] = 0;
     data[1] = 0;
@@ -358,18 +354,18 @@ DATA &HugeArray<DATA>::Set(unsigned long int index) {
     if (max_index < index) {
         max_index = index;
     }
-    return (data[h_index.in_field_index]);
+    return data[h_index.in_field_index];
 }
 
 template <class DATA>
 DATA HugeArray<DATA>::Get(unsigned long index) {
-    return (Set(index));
+    return Set(index);
 }
 
 
 template <class DATA>
 DATA &HugeArray<DATA>::operator[](unsigned long index) {
-    return (Set(index));
+    return Set(index);
 }
 
 
@@ -430,7 +426,7 @@ DLItem<L_DATA> *DLList<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos) {
         number_of_items++;
         return i;
     } else {
-        return 0;
+        return nullptr;
     }
 }
 //privates delete
@@ -523,7 +519,7 @@ DLItem<L_DATA> *DL_Indexed_List<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *po
         last_index++;
         return i;
     } else {
-        return 0;
+        return nullptr;
     }
 }
 //privates delete

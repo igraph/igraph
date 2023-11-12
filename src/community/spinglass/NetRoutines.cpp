@@ -61,25 +61,19 @@ igraph_error_t igraph_i_read_network(
     igraph_vector_int_t edgelist;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t ii;
     const char *empty = "";
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, no_of_edges * 2);
-    IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, 0 /* rowwise */));
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, false /* rowwise */));
 
-    for (ii = 0; ii < no_of_nodes; ii++) {
+    for (igraph_integer_t ii = 0; ii < no_of_nodes; ii++) {
         net->node_list->Push(new NNode(ii, 0, net->link_list, empty));
     }
 
-    for (ii = 0; ii < no_of_edges; ii++) {
+    for (igraph_integer_t ii = 0; ii < no_of_edges; ii++) {
         igraph_integer_t i1 = VECTOR(edgelist)[2 * ii];
         igraph_integer_t i2 = VECTOR(edgelist)[2 * ii + 1];
-        igraph_real_t Links;
-        if (use_weights) {
-            Links = VECTOR(*weights)[ii];
-        } else {
-            Links = 1.0;
-        }
+        igraph_real_t Links = use_weights ? VECTOR(*weights)[ii] : 1.0;
 
         node1 = net->node_list->Get(i1);
         snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", i1+1);
