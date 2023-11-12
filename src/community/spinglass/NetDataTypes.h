@@ -56,27 +56,26 @@ template <class DATA>
 class HugeArray {
     unsigned long int size = 2;
     unsigned int highest_field_index = 0;
-    unsigned long max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
+    const unsigned long max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
     unsigned long max_index = 0;
     DATA *data;
     DATA *fields[32];
 public:
-    HUGE_INDEX get_huge_index(unsigned long) const;
-    DATA &Set(unsigned long);
-    DATA Get(unsigned long);
     HugeArray();
     HugeArray(const HugeArray &) = delete;
     HugeArray & operator = (const HugeArray &) = delete;
     ~HugeArray();
-    DATA &operator[](unsigned long);
-    unsigned long Size() const {
-        return max_index;
-    }
+    HUGE_INDEX get_huge_index(unsigned long) const;
+    DATA &Set(unsigned long index);
+    DATA Get(unsigned long index) { return Set(index); }
+    DATA &operator[](unsigned long index) { return Set(index); }
+    unsigned long Size() const { return max_index; }
 } ;
+
 //###############################################################################################
 template <class L_DATA > class DLList;
 template <class L_DATA > class DL_Indexed_List;
-template <class L_DATA > class ClusterList;
+template <class L_DATA > using ClusterList= DLList<L_DATA>;
 template <class L_DATA > class DLList_Iter;
 
 template <class L_DATA>
@@ -159,8 +158,6 @@ public:
 class NLink;
 
 class NNode {
-    friend class NLink;
-
     unsigned long index;
     unsigned long cluster_index;
     unsigned long marker = 0;
@@ -171,8 +168,15 @@ class NNode {
     DLList<NLink*> *global_link_list;
     char name[255];
 public :
-    NNode(unsigned long, unsigned long, DLList<NLink *> *, const char *);
-    ~NNode();
+    NNode(unsigned long ind, unsigned long c_ind, DLList<NLink *> *ll, const char *n) :
+            index(ind), cluster_index(c_ind), global_link_list(ll)
+    {
+        strcpy(name, n);
+    }
+    NNode(const NNode &) = delete;
+    NNode &operator=(const NNode &) = delete;
+    ~NNode() { Disconnect_From_All(); }
+
     unsigned long Get_Index() const {
         return index;
     }
@@ -188,7 +192,6 @@ public :
     void Set_ClusterIndex(unsigned long ci) {
         cluster_index = ci;
     }
-
     unsigned long Get_Degree() const {
         return (neighbours.Size());
     }
@@ -198,11 +201,9 @@ public :
     void Set_Name(const char *n) {
         strcpy(name, n);
     }
-
     double Get_Weight() const {
         return weight;
     }
-
     void Set_Weight(double w) {
         weight = w;
     }
@@ -221,7 +222,6 @@ public :
 //#####################################################################################################
 
 class NLink {
-    friend class NNode;
 
     NNode *start;
     NNode *end;
@@ -229,69 +229,46 @@ class NLink {
 
 public :
     NLink(NNode *s, NNode *e, double w) : start(s), end(e), weight(w) { }
-    ~NLink();
+    NLink(const NLink &) = delete;
+    NLink & operator = (const NLink &) = delete;
+    ~NLink() { start->Disconnect_From(end); }
 
-    NNode *Get_Start() {
-        return start;
-    }
-    NNode *Get_End() {
-        return end;
-    }
-    double Get_Weight() const {
-        return weight;
-    }
+    NNode *Get_Start() { return start; }
+    NNode *Get_End() { return end; }
+    const NNode *Get_Start() const { return start; }
+    const NNode *Get_End() const { return end; }
+
+    double Get_Weight() const { return weight; }
 };
 
-//#####################################################################################################
-
-template <class L_DATA>  class ClusterList : public DLList<L_DATA> {
-    DLList<L_DATA> *candidates;
-    long marker = 0;
-public:
-    ClusterList();
-    ClusterList(const ClusterList &) = delete;
-    ClusterList & operator = (const ClusterList &) = delete;
-    ~ClusterList();
-
-    bool operator<(ClusterList<L_DATA> &b);
-    bool operator==(ClusterList <L_DATA> &b);
-
-};
 //#####################################################################################################
 
 struct network {
-    DL_Indexed_List<NNode*> *node_list;
-    DL_Indexed_List<NLink*> *link_list;
-    DL_Indexed_List<ClusterList<NNode*>*> *cluster_list;
+    DL_Indexed_List<NNode*> node_list;
+    DL_Indexed_List<NLink*> link_list;
+    DL_Indexed_List<ClusterList<NNode*>*> cluster_list;
     double sum_weights;
 
-    network() {
-        node_list   = new DL_Indexed_List<NNode*>();
-        link_list   = new DL_Indexed_List<NLink*>();
-        cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
-    }
+    network() = default;
     network (const network &) = delete;
     network & operator = (const network &) = delete;
 
     ~network() {
         ClusterList<NNode*> *cl_cur;
 
-        while (link_list->Size()) {
-            delete link_list->Pop();
+        while (link_list.Size()) {
+            delete link_list.Pop();
         }
-        while (node_list->Size()) {
-            delete node_list->Pop();
+        while (node_list.Size()) {
+            delete node_list.Pop();
         }
-        while (cluster_list->Size()) {
-            cl_cur = cluster_list->Pop();
+        while (cluster_list.Size()) {
+            cl_cur = cluster_list.Pop();
             while (cl_cur->Size()) {
                 cl_cur->Pop();
             }
             delete cl_cur;
         }
-        delete link_list;
-        delete node_list;
-        delete cluster_list;
     }
 };
 
@@ -336,7 +313,7 @@ HUGE_INDEX HugeArray<DATA>::get_huge_index(unsigned long index) const {
 }
 
 template <class DATA>
-DATA &HugeArray<DATA>::Set(unsigned long int index) {
+DATA &HugeArray<DATA>::Set(unsigned long index) {
     HUGE_INDEX h_index;
     unsigned long data_size;
     while (size < index + 1) {
@@ -357,26 +334,15 @@ DATA &HugeArray<DATA>::Set(unsigned long int index) {
     return data[h_index.in_field_index];
 }
 
-template <class DATA>
-DATA HugeArray<DATA>::Get(unsigned long index) {
-    return Set(index);
-}
-
-
-template <class DATA>
-DATA &HugeArray<DATA>::operator[](unsigned long index) {
-    return Set(index);
-}
-
 
 //###############################################################################
 template <class L_DATA>
-DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind) : item(i), index(ind), previous(nullptr), next(nullptr) {
-}
+DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind) :
+    item(i), index(ind), previous(nullptr), next(nullptr) { }
 
 template <class L_DATA>
-DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n) : item(i), index(ind), previous(p), next(n) {
-}
+DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n) :
+    item(i), index(ind), previous(p), next(n) { }
 
 //######################################################################################################################
 template <class L_DATA>
@@ -555,78 +521,6 @@ L_DATA DL_Indexed_List<L_DATA>::Get(unsigned long pos) {
         return 0;
     }
     return array[pos]->item;
-}
-
-//#######################################################################################
-
-//************************************************************************************************************
-template <class L_DATA>
-ClusterList<L_DATA>::ClusterList() : DLList<L_DATA>() {
-    candidates = new DLList<L_DATA>();
-}
-
-template <class L_DATA>
-ClusterList<L_DATA>::~ClusterList() {
-    while (candidates->Size()) {
-        candidates->Pop();
-    }
-    delete candidates;
-}
-
-
-template <class L_DATA>
-bool ClusterList<L_DATA>::operator==(ClusterList<L_DATA> &b) {
-    bool found = false;
-    L_DATA n_cur, n_cur_b;
-    DLList_Iter<L_DATA> a_iter, b_iter;
-
-    if (this->Size() != b.Size()) {
-        return false;
-    }
-
-    n_cur = a_iter.First(this);
-    while (!(a_iter.End())) {
-        found = false;
-        n_cur_b = b_iter.First(&b);
-        while (!(b_iter.End()) && !found) {
-            if (n_cur == n_cur_b) {
-                found = true;
-            }
-            n_cur_b = b_iter.Next();
-        }
-        if (!found) {
-            return false;
-        }
-        n_cur = a_iter.Next();
-    }
-    return found;
-}
-//A<B ist Wahr, wenn A echte Teilmenge von B ist
-template <class L_DATA>
-bool ClusterList<L_DATA>::operator<(ClusterList<L_DATA> &b) {
-    bool found = false;
-    L_DATA n_cur, n_cur_b;
-    DLList_Iter<L_DATA> a_iter, b_iter;
-
-    if (this->Size() >= b.Size()) {
-        return false;
-    }
-    n_cur = a_iter.First(this);
-    while (!(a_iter.End())) {
-        found = false;
-        n_cur_b = b_iter.First(&b);
-        while (!(b_iter.End()) && !found) {
-            if (n_cur == n_cur_b) {
-                found = true;
-            }
-            n_cur_b = b_iter.Next();
-        }
-        if (!found) {
-            return false;
-        }
-        n_cur = a_iter.Next();
-    }
-    return found;
 }
 
 //#####################################################################################

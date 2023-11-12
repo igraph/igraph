@@ -51,7 +51,8 @@
 #include <climits>
 
 igraph_error_t igraph_i_read_network(
-        const igraph_t *graph, const igraph_vector_t *weights, network *net, igraph_bool_t use_weights) {
+    const igraph_t *graph, const igraph_vector_t *weights,
+    network *net, igraph_bool_t use_weights) {
 
     double sum_weight = 0.0, min_weight = IGRAPH_POSINFINITY, max_weight = IGRAPH_NEGINFINITY;
     unsigned long min_k = ULONG_MAX, max_k = 0;
@@ -67,7 +68,7 @@ igraph_error_t igraph_i_read_network(
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, false /* rowwise */));
 
     for (igraph_integer_t ii = 0; ii < no_of_nodes; ii++) {
-        net->node_list->Push(new NNode(ii, 0, net->link_list, empty));
+        net->node_list.Push(new NNode(ii, 0, &net->link_list, empty));
     }
 
     for (igraph_integer_t ii = 0; ii < no_of_edges; ii++) {
@@ -75,11 +76,11 @@ igraph_error_t igraph_i_read_network(
         igraph_integer_t i2 = VECTOR(edgelist)[2 * ii + 1];
         igraph_real_t Links = use_weights ? VECTOR(*weights)[ii] : 1.0;
 
-        node1 = net->node_list->Get(i1);
+        node1 = net->node_list.Get(i1);
         snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", i1+1);
         node1->Set_Name(name);
 
-        node2 = net->node_list->Get(i2);
+        node2 = net->node_list.Get(i2);
         snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", i2+1);
         node2->Set_Name(name);
 
@@ -97,7 +98,7 @@ igraph_error_t igraph_i_read_network(
     IGRAPH_FINALLY_CLEAN(1);
     igraph_vector_int_destroy(&edgelist);
 
-    node1 = iter.First(net->node_list);
+    node1 = iter.First(&net->node_list);
     while (!iter.End()) {
         if (node1->Get_Degree() > max_k) {
             max_k = node1->Get_Degree();

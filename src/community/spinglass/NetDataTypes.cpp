@@ -44,19 +44,6 @@
 #include "NetDataTypes.h"
 #include <cstring>
 
-//#################################################################################
-//###############################################################################
-//Constructor
-NNode::NNode(unsigned long ind, unsigned long c_ind, DLList<NLink *> *ll, const char *n) :
-    index(ind), cluster_index(c_ind), global_link_list(ll)
-{
-    strcpy(name, n);
-}
-
-//Destructor
-NNode::~NNode() {
-    Disconnect_From_All();
-}
 
 int NNode::Connect_To(NNode* neighbour, double weight_) {
     NLink *link;
@@ -114,14 +101,4 @@ int NNode::Disconnect_From_All() {
         number_of_neighbours++;
     }
     return number_of_neighbours ;
-}
-
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//Destructor
-NLink::~NLink() {
-    if (start && end) {
-        start->Disconnect_From(end);
-    }
 }

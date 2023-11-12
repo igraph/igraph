@@ -290,8 +290,8 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     IGRAPH_CHECK(igraph_i_read_network(graph, weights,
                                        &net, use_weights));
 
-    prob = 2.0 * net.sum_weights / double(net.node_list->Size())
-           / double(net.node_list->Size() - 1);
+    prob = 2.0 * net.sum_weights / double(net.node_list.Size())
+           / double(net.node_list.Size() - 1);
 
     PottsModel pm(&net, (unsigned int)spins, update_rule);
 

@@ -49,6 +49,7 @@
 #include "igraph_datatype.h"
 
 igraph_error_t igraph_i_read_network(
-        const igraph_t *graph, const igraph_vector_t *weights, network *net, igraph_bool_t use_weights);
+    const igraph_t *graph, const igraph_vector_t *weights,
+    network *net, igraph_bool_t use_weights);
 
 #endif

@@ -67,23 +67,20 @@ PottsModel::PottsModel(network *n, unsigned long qvalue, int m) :
     color_field = new double[q + 1];
     neighbours = new double[q + 1];
 
-    num_of_nodes = net->node_list->Size();
-    num_of_links = net->link_list->Size();
+    num_of_nodes = net->node_list.Size();
+    num_of_links = net->link_list.Size();
 
-    n_cur = iter.First(net->node_list);
-    //these lists are needed to keep track of spin states for parallel update mode
-    new_spins = new DL_Indexed_List<unsigned long*>();
-    previous_spins = new DL_Indexed_List<unsigned long*>();
+    n_cur = iter.First(&net->node_list);
     while (!iter.End()) {
         if (k_max < n_cur->Get_Degree()) {
             k_max = n_cur->Get_Degree();
         }
         i_ptr = new unsigned long;
         *i_ptr = 0;
-        new_spins->Push(i_ptr);
+        new_spins.Push(i_ptr);
         i_ptr = new unsigned long;
         *i_ptr = 0;
-        previous_spins->Push(i_ptr);
+        previous_spins.Push(i_ptr);
         n_cur = iter.Next();
     }
 }
@@ -94,10 +91,8 @@ PottsModel::~PottsModel() {
     /* The DLItem destructor does not delete its item currently,
        because of some bad design. As a workaround, we delete them here
        by hand */
-    new_spins->delete_items();
-    previous_spins->delete_items();
-    delete new_spins;
-    delete previous_spins;
+    new_spins.delete_items();
+    previous_spins.delete_items();
     delete [] Qa;
     delete [] weights;
     delete [] color_field;
@@ -123,7 +118,7 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
     }
     //
     total_degree_sum = 0.0;
-    n_cur = iter.First(net->node_list);
+    n_cur = iter.First(&net->node_list);
     while (!iter.End()) {
         if (spin < 0) {
             s = RNG_INTEGER(1, q);
@@ -152,7 +147,7 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
         n_cur = iter.Next();
     }
 
-    return net->node_list->Size();
+    return net->node_list.Size();
 }
 
 //#####################################################################
@@ -167,7 +162,7 @@ double PottsModel::initialize_Qmatrix() {
     NLink *l_cur;
     unsigned long i, j;
     //initialize with zeros
-    num_of_links = net->link_list->Size();
+    num_of_links = net->link_list.Size();
     for (i = 0; i <= q; i++) {
         Qa[i] = 0.0;
         for (j = i; j <= q; j++) {
@@ -177,7 +172,7 @@ double PottsModel::initialize_Qmatrix() {
     }
     //go over all links and make corresponding entries in Q matrix
     //An edge connecting state i wiht state j will get an entry in Qij and Qji
-    l_cur = l_iter.First(net->link_list);
+    l_cur = l_iter.First(&net->link_list);
     while (!l_iter.End()) {
         i = l_cur->Get_Start()->Get_ClusterIndex();
         j = l_cur->Get_End()->Get_ClusterIndex();
@@ -255,8 +250,8 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
         sweep++;
         changes = 0;
         //Loop over all nodes
-        node = net_iter.First(net->node_list);
-        SPIN = i_iter.First(new_spins);
+        node = net_iter.First(&net->node_list);
+        SPIN = i_iter.First(&new_spins);
         while (!net_iter.End()) {
             // How many neighbors of each type?
             // set them all zero
@@ -314,9 +309,9 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
 
         //-------------------------------
         //Now set all spins to new values
-        node = net_iter.First(net->node_list);
-        SPIN = i_iter.First(new_spins);
-        P_SPIN = i_iter2.First(previous_spins);
+        node = net_iter.First(&net->node_list);
+        SPIN = i_iter.First(&new_spins);
+        P_SPIN = i_iter2.First(&previous_spins);
         while (!net_iter.End()) {
             old_spin = node->Get_ClusterIndex();
             new_spin = *SPIN;
@@ -391,7 +386,7 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
             while ((r < 0) || (r > (long)num_of_nodes - 1)) {
                 r = RNG_INTEGER(0, num_of_nodes - 1);
             }
-            node = net->node_list->Get(r);
+            node = net->node_list.Get(r);
             // Wir zaehlen, wieviele Nachbarn von jedem spin vorhanden sind
             // erst mal alles Null setzen
             for (unsigned long i = 0; i <= q; i++) {
@@ -494,14 +489,14 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
 
     sweep = 0;
     changes = 1;
-    number_of_nodes = net->node_list->Size();
+    number_of_nodes = net->node_list.Size();
     while (sweep < max_sweeps && changes) {
         cyclic = true;
         sweep++;
         changes = 0;
         //Loop over all nodes
-        node = net_iter.First(net->node_list);
-        SPIN = i_iter.First(new_spins);
+        node = net_iter.First(&net->node_list);
+        SPIN = i_iter.First(&new_spins);
         while (!net_iter.End()) {
             // Initialize neighbours and weights
             for (unsigned long i = 0; i <= q; i++) {
@@ -580,9 +575,9 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
 
         //-------------------------------
         //now update all spins
-        node = net_iter.First(net->node_list);
-        SPIN = i_iter.First(new_spins);
-        P_SPIN = i_iter2.First(previous_spins);
+        node = net_iter.First(&net->node_list);
+        SPIN = i_iter.First(&new_spins);
+        P_SPIN = i_iter2.First(&previous_spins);
         while (!net_iter.End()) {
             old_spin = node->Get_ClusterIndex();
             new_spin = *SPIN;
@@ -645,24 +640,22 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     NLink *l_cur;
     unsigned long new_spin, spin_opt, old_spin;
     unsigned int sweep;
-    long max_q, rn;
+    long max_q;
+    igraph_integer_t rn;
     unsigned long changes;
     double degree, w, delta = 0, h;
     double norm, r, beta, minweight, prefac = 0;
     igraph_integer_t number_of_nodes;
     sweep = 0;
     changes = 0;
-    number_of_nodes = net->node_list->Size();
+    number_of_nodes = net->node_list.Size();
     while (sweep < max_sweeps) {
         sweep++;
         //loop over all nodes in network
-        for (long n = 0; n < number_of_nodes; n++) {
-            rn = -1;
-            while ((rn < 0) || (rn > number_of_nodes - 1)) {
-                rn = RNG_INTEGER(0, number_of_nodes - 1);
-            }
+        for (igraph_integer_t n = 0; n < number_of_nodes; n++) {
+            rn = RNG_INTEGER(0, number_of_nodes - 1);
 
-            node = net->node_list->Get(rn);
+            node = net->node_list.Get(rn);
             // initialize the neighbours and the weights
             for (unsigned long i = 0; i <= q; i++) {
                 neighbours[i] = 0.0;
@@ -784,7 +777,7 @@ double PottsModel::FindCommunityFromStart(
         igraph_real_t *cohesion,
         igraph_real_t *adhesion,
         igraph_integer_t *my_inner_links,
-        igraph_integer_t *my_outer_links) {
+        igraph_integer_t *my_outer_links) const {
     DLList_Iter<NNode*> iter, iter2;
     DLList_Iter<NLink*> l_iter;
     DLList<NNode*> to_do;
@@ -798,7 +791,7 @@ double PottsModel::FindCommunityFromStart(
     double inner_links = 0, outer_links = 0, aff_r, aff_s;
 
     // find the node in the network
-    n_cur = iter.First(net->node_list);
+    n_cur = iter.First(&net->node_list);
     while (!found && !iter.End()) {
         if (0 == strcmp(n_cur->Get_Name(), nodename)) {
             start_node = n_cur;
@@ -1002,8 +995,8 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
                                igraph_real_t *temperature,
                                igraph_vector_int_t *csize,
                                igraph_vector_int_t *membership,
-                               double kT, double gamma) {
-    NNode *n_cur, *n_cur2;
+                               double kT, double gamma) const {
+    const NNode *n_cur, *n_cur2;
     DLList_Iter<NNode*> iter, iter2;
     HugeArray<int> inner_links;
     HugeArray<int> outer_links;
@@ -1019,7 +1012,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
             inner_links[spin] = 0;
             outer_links[spin] = 0;
             nodes[spin] = 0;
-            n_cur = iter.First(net->node_list);
+            n_cur = iter.First(&net->node_list);
             while (!iter.End()) {
                 if (n_cur->Get_ClusterIndex() == spin) {
                     nodes[spin]++;
@@ -1067,7 +1060,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
             if (nodes[spin] > 0) {
                 no++;
             }
-            n_cur = iter.First(net->node_list);
+            n_cur = iter.First(&net->node_list);
             while (!iter.End()) {
                 if (n_cur->Get_ClusterIndex() == spin) {
                     VECTOR(*membership)[ n_cur->Get_Index() ] = no;
@@ -1082,7 +1075,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 
 //#################################################################################################
 PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) :
-    net(n), q(num_communities), num_nodes(net->node_list->Size()), is_directed(directed)
+    net(n), q(num_communities), num_nodes(net->node_list.Size()), is_directed(directed)
 { }
 //#######################################################
 //Destructor of PottsModel
@@ -1108,9 +1101,8 @@ PottsModelN::~PottsModelN() {
 void PottsModelN::assign_initial_conf(bool init_spins) {
     unsigned long s;
     DLList_Iter<NLink*> l_iter;
-    NNode *n_cur;
-    NLink *l_cur;
-
+    const NNode *n_cur;
+    const NLink *l_cur;
 
     if (init_spins) {
         // Free the arrays before (re-)allocating them
@@ -1199,7 +1191,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
         printf("Spin %d assigned to node %d.\n", s, v);
 #endif
 
-        n_cur               =  net->node_list->Get(v);
+        n_cur               =  net->node_list.Get(v);
 
         l_cur               = l_iter.First(n_cur->Get_Links());
 
@@ -1268,8 +1260,8 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
     printf("Starting sweep at temperature %f.\n", t);
 #endif
     DLList_Iter<NLink*> l_iter;
-    NNode *node, *n_cur;
-    NLink *l_cur;
+    const NNode *node, *n_cur;
+    const NLink *l_cur;
     /* The new_spin contains the spin to which we will update,
      * the spin_opt is the optional spin we will consider and
      * the old_spin is the spin of the node we are currently
@@ -1317,7 +1309,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
             v = RNG_INTEGER(0, num_nodes - 1);
             //We will be investigating node v
 
-            node = net->node_list->Get(v);
+            node = net->node_list.Get(v);
 
             /*******************************************/
             // initialize the neighbours and the weights
@@ -1579,7 +1571,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         }
 
         DLList_Iter<NLink*> iter_l;
-        NLink *l_cur = iter_l.First(net->link_list);
+        const NLink *l_cur = iter_l.First(&net->link_list);
 
         double w = 0.0;
 

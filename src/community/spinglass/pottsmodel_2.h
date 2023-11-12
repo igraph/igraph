@@ -68,8 +68,10 @@ public:
 
 class PottsModel {
 private:
-    DL_Indexed_List<unsigned long*> *new_spins;
-    DL_Indexed_List<unsigned long*> *previous_spins;
+    //these lists are needed to keep track of spin states for parallel update mode
+    DL_Indexed_List<unsigned long*> new_spins;
+    DL_Indexed_List<unsigned long*> previous_spins;
+
     HugeArray<HugeArray<double>*> correlation;
     network *net;
     unsigned long q;
@@ -82,7 +84,7 @@ private:
     unsigned long num_of_links;
     unsigned long k_max = 0;
     double acceptance = 0;
-    double *neighbours;
+    double* neighbours;
     double* color_field;
 public:
     PottsModel(network *net, unsigned long q, int norm_by_degree);
@@ -102,14 +104,14 @@ public:
     long   WriteClusters(igraph_real_t *modularity,
                          igraph_real_t *temperature,
                          igraph_vector_int_t *csize, igraph_vector_int_t *membership,
-                         double kT, double gamma);
+                         double kT, double gamma) const;
 
     double FindCommunityFromStart(double gamma, const char *nodename,
                                   igraph_vector_int_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,
                                   igraph_integer_t *inner_links,
-                                  igraph_integer_t *outer_links);
+                                  igraph_integer_t *outer_links) const;
 };
 
 
