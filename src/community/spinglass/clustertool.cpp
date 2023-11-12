@@ -200,7 +200,7 @@ igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                     gamma_minus);
             break;
         default:
-            IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
+            IGRAPH_ERROR("Unknown implementation in spinglass community detection.",
                          IGRAPH_EINVAL);
         }
     );
@@ -230,30 +230,39 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     /* Check arguments */
 
     if (spins < 2) {
-        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of spins must be at least 2.", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
-        IGRAPH_ERROR("Invalid update rule", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid update rule for spinglass community detection.", IGRAPH_EINVAL);
     }
     if (weights) {
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
         }
         use_weights = true;
         if (igraph_vector_min(weights) < 0) {
-            IGRAPH_ERROR("Weights must not be negative when using the original implementation of spinglass communities. Select the implementation meant for negative weights.", IGRAPH_EINVAL);
+            IGRAPH_ERROR(
+                "Weights must not be negative when using the original implementation of spinglass communities. "
+                "Select the implementation meant for negative weights.",
+                IGRAPH_EINVAL);
         }
     }
     if (coolfact < 0 || coolfact >= 1.0) {
-        IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cooling factor must be positive and strictly smaller than 1.", IGRAPH_EINVAL);
     }
     if (gamma < 0.0) {
-        IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Gamma value must not be negative.", IGRAPH_EINVAL);
     }
-    if (starttemp / stoptemp < 1.0) {
-        IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
-                     IGRAPH_EINVAL);
+    if ( !(starttemp == 0 && stoptemp == 0) ) {
+        if (! (starttemp > 0 && stoptemp > 0)) {
+            IGRAPH_ERROR("Starting and stopping temperatures must be both positive or both zero.",
+                         IGRAPH_EINVAL);
+        }
+        if (starttemp <= stoptemp) {
+            IGRAPH_ERROR("The starting temperature must be larger than the stopping temperature.",
+                         IGRAPH_EINVAL);
+        }
     }
 
     /* The spinglass algorithm does not handle the trivial cases of the
@@ -281,7 +290,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     igraph_bool_t conn;
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot work with unconnected graph.", IGRAPH_EINVAL);
     }
 
     network net;
@@ -508,32 +517,38 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     /* Check arguments */
 
     if (parupdate) {
-        IGRAPH_ERROR("Parallel spin update not implemented with "
-                     "negative gamma", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Parallel spin update not implemented with negative weights.",
+                     IGRAPH_UNIMPLEMENTED);
     }
 
     if (spins < 2) {
-        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Number of spins must be at least 2.", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
-        IGRAPH_ERROR("Invalid update rule", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid update rule for spinglass community detection.", IGRAPH_EINVAL);
     }
     if (weights) {
         if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
         }
         use_weights = true;
     }
     if (coolfact < 0 || coolfact >= 1.0) {
-        IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cooling factor must be positive and strictly smaller than 1.", IGRAPH_EINVAL);
     }
     if (gamma < 0.0) {
-        IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Gamma value must not be negative.", IGRAPH_EINVAL);
     }
-    if (starttemp / stoptemp < 1.0) {
-        IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
-                     IGRAPH_EINVAL);
+    if ( !(starttemp == 0 && stoptemp == 0) ) {
+        if (! (starttemp > 0 && stoptemp > 0)) {
+            IGRAPH_ERROR("Starting and stopping temperatures must be both positive or both zero.",
+                         IGRAPH_EINVAL);
+        }
+        if (starttemp <= stoptemp) {
+            IGRAPH_ERROR("The starting temperature must be larger than the stopping temperature.",
+                         IGRAPH_EINVAL);
+        }
     }
 
     /* The spinglass algorithm does not handle the trivial cases of the
@@ -561,7 +576,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     igraph_bool_t conn;
     IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
     if (!conn) {
-        IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot work with unconnected graph.", IGRAPH_EINVAL);
     }
 
     if (weights && igraph_vector_size(weights) > 0) {
