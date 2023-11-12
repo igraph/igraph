@@ -389,10 +389,11 @@ static igraph_error_t igraph_i_community_spinglass_orig(
  * \param adhesion Pointer to a real variable, if not \c NULL the
  *     adhesion index of the community will be stored here.
  * \param inner_links Pointer to an integer, if not \c NULL the
- *     number of edges within the community is stored here.
+ *     number of edges within the community (or the sum of their weights)
+ *     is stored here.
  * \param outer_links Pointer to an integer, if not \c NULL the
  *     number of edges between the community and the rest of the graph
- *     will be stored here.
+ *     (or the sum of their weights) will be stored here.
  * \param spins The number of spins to use, this can be higher than
  *    the actual number of clusters in the network, in which case some
  *    clusters will contain zero vertices.
@@ -427,8 +428,8 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                       igraph_vector_int_t *community,
                                       igraph_real_t *cohesion,
                                       igraph_real_t *adhesion,
-                                      igraph_integer_t *inner_links,
-                                      igraph_integer_t *outer_links,
+                                      igraph_real_t *inner_links,
+                                      igraph_real_t *outer_links,
                                       igraph_integer_t spins,
                                       igraph_spincomm_update_t update_rule,
                                       igraph_real_t gamma) {

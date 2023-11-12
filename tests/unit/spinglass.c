@@ -25,10 +25,8 @@ int main(void) {
     igraph_t g;
     igraph_real_t  modularity, temperature;
     igraph_vector_int_t membership, csize;
-    /* igraph_integer_t i; */
     igraph_real_t cohesion, adhesion;
-    igraph_integer_t inner_links;
-    igraph_integer_t outer_links;
+    igraph_real_t inner_links, outer_links;
 
     igraph_rng_seed(igraph_rng_default(), 137);
 

@@ -24,6 +24,10 @@
 
  - The Pajek format reader and writer now map vertex labels to the `name` vertex attribute in igraph. The `id` attribute is no longer used.
 
+### Fixed
+
+ - `igraph_community_spinglass_single()` now uses `igraph_real_t` for its `inner_links` and `outer_links` output parameters, as these return not simply edge counts, but the sum of the weights of some edges.
+
 ### Removed
 
  - Removed `igraph_Calloc()`, `igraph_Realloc()` and `igraph_Free()`. Use `IGRAPH_CALLOC()`, `IGRAPH_REALLOC()` and `IGRAPH_FREE()` instead.
