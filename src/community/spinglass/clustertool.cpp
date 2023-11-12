@@ -287,13 +287,13 @@ static igraph_error_t igraph_i_community_spinglass_orig(
     network net;
 
     /* Transform the igraph_t */
-    IGRAPH_CHECK(igraph_i_read_network(graph, weights,
+    IGRAPH_CHECK(igraph_i_read_network_spinglass(graph, weights,
                                        &net, use_weights));
 
     prob = 2.0 * net.sum_weights / double(net.node_list.Size())
            / double(net.node_list.Size() - 1);
 
-    PottsModel pm(&net, (unsigned int)spins, update_rule);
+    PottsModel pm(&net, spins, update_rule);
 
     /* initialize the random number generator */
     RNG_BEGIN();
@@ -459,10 +459,10 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         network net;
 
         /* Transform the igraph_t */
-        IGRAPH_CHECK(igraph_i_read_network(graph, weights,
+        IGRAPH_CHECK(igraph_i_read_network_spinglass(graph, weights,
                                            &net, use_weights));
 
-        PottsModel pm(&net, (unsigned int)spins, update_rule);
+        PottsModel pm(&net, spins, update_rule);
 
         /* initialize the random number generator */
         RNG_BEGIN();
@@ -581,12 +581,12 @@ static igraph_error_t igraph_i_community_spinglass_negative(
     network net;
 
     /* Transform the igraph_t */
-    IGRAPH_CHECK(igraph_i_read_network(graph, weights,
+    IGRAPH_CHECK(igraph_i_read_network_spinglass(graph, weights,
                                        &net, use_weights));
 
     bool directed = igraph_is_directed(graph);
 
-    PottsModelN pm(&net, (unsigned int)spins, directed);
+    PottsModelN pm(&net, spins, directed);
 
     /* initialize the random number generator */
     RNG_BEGIN();
