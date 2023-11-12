@@ -43,6 +43,7 @@
 #ifndef NETDATATYPES_H
 #define NETDATATYPES_H
 
+#include <cassert>
 #include <cstring>
 
 //###########################################################################################
@@ -103,36 +104,36 @@ protected:
     DLItem<L_DATA> *head;
     DLItem<L_DATA> *tail;
     unsigned long number_of_items = 0;
-    DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*);
-    L_DATA pDelete(DLItem<L_DATA>*);
+    virtual DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*);
+    virtual L_DATA pDelete(DLItem<L_DATA>*);
 public:
     DLList();
     DLList(const DLList &) = delete;
     DLList & operator = (const DLList &) = delete;
-    ~DLList();
+    virtual ~DLList();
     unsigned long Size() const {
         return number_of_items;
     }
     int fDelete(L_DATA);
-    L_DATA Push(L_DATA);
-    L_DATA Pop();
-    L_DATA Get(unsigned long);
+    virtual L_DATA Push(L_DATA);
+    virtual L_DATA Pop();
+    virtual L_DATA Get(unsigned long);
     unsigned long Is_In_List(L_DATA);
     void delete_items();
 };
 
 template <class L_DATA>
 class DL_Indexed_List : public DLList<L_DATA> {
-    DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*);
-    L_DATA pDelete(DLItem<L_DATA>*);
+    DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*) final;
+    L_DATA pDelete(DLItem<L_DATA>*) final;
     HugeArray<DLItem<L_DATA>*> array;
-    unsigned long last_index;
+    unsigned long last_index = 0;
 
 public:
-    DL_Indexed_List();
-    L_DATA Push(L_DATA);
-    L_DATA Pop();
-    L_DATA Get(unsigned long);
+    DL_Indexed_List() = default;
+    L_DATA Push(L_DATA) final;
+    L_DATA Pop() final;
+    L_DATA Get(unsigned long) final;
 };
 
 //#####################################################################################################
@@ -314,7 +315,6 @@ HUGE_INDEX HugeArray<DATA>::get_huge_index(unsigned long index) const {
 
 template <class DATA>
 DATA &HugeArray<DATA>::Set(unsigned long index) {
-    HUGE_INDEX h_index;
     unsigned long data_size;
     while (size < index + 1) {
         highest_field_index++;
@@ -326,7 +326,7 @@ DATA &HugeArray<DATA>::Set(unsigned long index) {
         size = size + data_size; //overflow noch abfangen
         fields[highest_field_index] = data;
     }
-    h_index = get_huge_index(index);
+    HUGE_INDEX h_index = get_huge_index(index);
     data = fields[h_index.field_index];
     if (max_index < index) {
         max_index = index;
@@ -349,14 +349,9 @@ template <class L_DATA>
 DLList<L_DATA>::DLList() {
     head = new DLItem<L_DATA>(NULL, 0); //fuer head und Tail gibt es das gleiche Array-Element!! Vorsicht!!
     tail = new DLItem<L_DATA>(NULL, 0);
-    if ( !head || !tail ) {
-        delete head;
-        delete tail;
-        return;
-    }  else {
-        head->next = tail;
-        tail->previous = head;
-    }
+
+    head->next = tail;
+    tail->previous = head;
 }
 
 template <class L_DATA>
@@ -386,18 +381,15 @@ void DLList<L_DATA>::delete_items() {
 template <class L_DATA>
 DLItem<L_DATA> *DLList<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos) {
     auto *i = new DLItem<L_DATA>(data, number_of_items + 1, pos->previous, pos);
-    if (i) {
-        pos->previous->next = i;
-        pos->previous = i;
-        number_of_items++;
-        return i;
-    } else {
-        return nullptr;
-    }
+    pos->previous->next = i;
+    pos->previous = i;
+    number_of_items++;
+    return i;
 }
 //privates delete
 template <class L_DATA>
 L_DATA DLList<L_DATA>::pDelete(DLItem<L_DATA> *i) {
+    assert(number_of_items > 0);
     L_DATA data = i->item;
     i->previous->next = i->next;
     i->next->previous = i->previous;
@@ -425,12 +417,8 @@ int DLList<L_DATA>::fDelete(L_DATA data) {
 
 template <class L_DATA>
 L_DATA DLList<L_DATA>::Push(L_DATA data) {
-    DLItem<L_DATA> *tmp;
-    tmp = pInsert(data, tail);
-    if (tmp) {
-        return (tmp->item);
-    }
-    return 0;
+    DLItem<L_DATA> *tmp = pInsert(data, tail);
+    return tmp->item;
 }
 
 template <class L_DATA>
@@ -468,29 +456,22 @@ unsigned long DLList<L_DATA>::Is_In_List(L_DATA data) {
 }
 
 //######################################################################################################################
-template <class L_DATA>
-DL_Indexed_List<L_DATA>::DL_Indexed_List() : DLList<L_DATA>() {
-    last_index = 0;
-}
 
 //privates Insert
 template <class L_DATA>
 DLItem<L_DATA> *DL_Indexed_List<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos) {
     auto *i = new DLItem<L_DATA>(data, last_index, pos->previous, pos);
-    if (i) {
-        pos->previous->next = i;
-        pos->previous = i;
-        this->number_of_items++;
-        array[last_index] = i;
-        last_index++;
-        return i;
-    } else {
-        return nullptr;
-    }
+    pos->previous->next = i;
+    pos->previous = i;
+    this->number_of_items++;
+    array[last_index] = i;
+    last_index++;
+    return i;
 }
 //privates delete
 template <class L_DATA>
 L_DATA DL_Indexed_List<L_DATA>::pDelete(DLItem<L_DATA> *i) {
+    assert(this->number_of_items > 0);
     L_DATA data = i->item;
     i->previous->next = i->next;
     i->next->previous = i->previous;
@@ -504,10 +485,7 @@ template <class L_DATA>
 L_DATA DL_Indexed_List<L_DATA>::Push(L_DATA data) {
     DLItem<L_DATA> *tmp;
     tmp = pInsert(data, this->tail);
-    if (tmp) {
-        return (tmp->item);
-    }
-    return 0;
+    return tmp->item;
 }
 
 template <class L_DATA>
