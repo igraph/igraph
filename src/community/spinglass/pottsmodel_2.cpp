@@ -53,12 +53,12 @@
 using namespace std;
 
 //#################################################################################################
-PottsModel::PottsModel(network *n, unsigned long qvalue, int m) :
+PottsModel::PottsModel(network *n, igraph_integer_t qvalue, int m) :
         net(n), q(qvalue), operation_mode(m), Qmatrix(qvalue+1)
 {
     DLList_Iter<NNode*> iter;
     const NNode *n_cur;
-    unsigned long *i_ptr;
+    igraph_integer_t *i_ptr;
     //needed in calculating modularity
     Qa     = new double[q + 1];
     //weights for each spin state needed in Monte Carlo process
@@ -75,10 +75,10 @@ PottsModel::PottsModel(network *n, unsigned long qvalue, int m) :
         if (k_max < n_cur->Get_Degree()) {
             k_max = n_cur->Get_Degree();
         }
-        i_ptr = new unsigned long;
+        i_ptr = new igraph_integer_t;
         *i_ptr = 0;
         new_spins.Push(i_ptr);
-        i_ptr = new unsigned long;
+        i_ptr = new igraph_integer_t;
         *i_ptr = 0;
         previous_spins.Push(i_ptr);
         n_cur = iter.Next();
@@ -104,7 +104,7 @@ PottsModel::~PottsModel() {
 //when called with positve one.
 //This may be handy, if you want to warm up the network.
 //####################################################
-unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
+igraph_integer_t PottsModel::assign_initial_conf(igraph_integer_t spin) {
     igraph_integer_t s;
     DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
@@ -113,7 +113,7 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
     double sum_weight;
 
     // initialize colorfield
-    for (unsigned long i = 0; i <= q; i++) {
+    for (igraph_integer_t i = 0; i <= q; i++) {
         color_field[i] = 0.0;
     }
     //
@@ -160,7 +160,7 @@ unsigned long PottsModel::assign_initial_conf(igraph_integer_t spin) {
 double PottsModel::initialize_Qmatrix() {
     DLList_Iter<NLink*> l_iter;
     NLink *l_cur;
-    unsigned long i, j;
+    igraph_integer_t i, j;
     //initialize with zeros
     num_of_links = net->link_list.Size();
     for (i = 0; i <= q; i++) {
@@ -195,7 +195,7 @@ double PottsModel::initialize_Qmatrix() {
 //####################################################################
 double PottsModel::calculate_Q() {
     double Q = 0.0;
-    for (unsigned long i = 0; i <= q; i++) {
+    for (igraph_integer_t i = 0; i <= q; i++) {
         Q += Qmatrix[i][i] - Qa[i] * Qa[i] / double(2.0 * net->sum_weights);
     }
     Q /= double(2.0 * net->sum_weights);
@@ -231,15 +231,15 @@ double PottsModel::FindStartTemp(double gamma, double prob, double ts) {
 //max sweeps is the maximum number of sweeps it should perform,
 //if it does not converge earlier
 //##############################################################
-long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps) {
+igraph_integer_t PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps) {
     DLList_Iter<NNode *> net_iter;
     DLList_Iter<NLink*> l_iter;
-    DLList_Iter<unsigned long*> i_iter, i_iter2;
+    DLList_Iter<igraph_integer_t*> i_iter, i_iter2;
     NNode *node, *n_cur;
     NLink *l_cur;
     unsigned int sweep;
-    unsigned long *SPIN, *P_SPIN, old_spin, new_spin, spin_opt;
-    unsigned long changes;
+    igraph_integer_t *SPIN, *P_SPIN, old_spin, new_spin, spin_opt;
+    igraph_integer_t changes;
     double h, delta = 0, deltaE, deltaEmin, w, degree;
     bool cyclic = false;
 
@@ -255,7 +255,7 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
         while (!net_iter.End()) {
             // How many neighbors of each type?
             // set them all zero
-            for (unsigned long i = 0; i <= q; i++) {
+            for (igraph_integer_t i = 0; i <= q; i++) {
                 neighbours[i] = 0;
             }
             degree = node->Get_Weight();
@@ -290,7 +290,7 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
 
             spin_opt = old_spin;
             deltaEmin = 0.0;
-            for (unsigned long spin = 1; spin <= q; spin++) { // all possible spin states
+            for (igraph_integer_t spin = 1; spin <= q; spin++) { // all possible spin states
                 if (spin != old_spin) {
                     h = color_field[spin] + delta - color_field[old_spin];
                     deltaE = double(neighbours[old_spin] - neighbours[spin]) + gamma * prob * double(h);
@@ -370,10 +370,10 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
     DLList_Iter<NLink*> l_iter;
     NNode *node, *n_cur;
     NLink *l_cur;
-    unsigned long new_spin, spin_opt, old_spin;
+    igraph_integer_t new_spin, spin_opt, old_spin;
     unsigned int sweep;
-    long r;
-    unsigned long changes;
+    igraph_integer_t r;
+    igraph_integer_t changes;
     double delta = 0, h, deltaE, deltaEmin, w, degree;
 
     sweep = 0;
@@ -381,15 +381,15 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
     while (sweep < max_sweeps) {
         sweep++;
         //ueber alle Knoten im Netz
-        for (unsigned long n = 0; n < num_of_nodes; n++) {
+        for (igraph_integer_t n = 0; n < num_of_nodes; n++) {
             r = -1;
-            while ((r < 0) || (r > (long)num_of_nodes - 1)) {
+            while ((r < 0) || (r > num_of_nodes - 1)) {
                 r = RNG_INTEGER(0, num_of_nodes - 1);
             }
             node = net->node_list.Get(r);
             // Wir zaehlen, wieviele Nachbarn von jedem spin vorhanden sind
             // erst mal alles Null setzen
-            for (unsigned long i = 0; i <= q; i++) {
+            for (igraph_integer_t i = 0; i <= q; i++) {
                 neighbours[i] = 0;
             }
             degree = node->Get_Weight();
@@ -424,7 +424,7 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
 
             spin_opt = old_spin;
             deltaEmin = 0.0;
-            for (unsigned long spin = 1; spin <= q; spin++) { // alle moeglichen Spins
+            for (igraph_integer_t spin = 1; spin <= q; spin++) { // alle moeglichen Spins
                 if (spin != old_spin) {
                     h = color_field[spin] + delta - color_field[old_spin];
                     deltaE = double(neighbours[old_spin] - neighbours[spin]) + gamma * prob * double(h);
@@ -472,20 +472,20 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
 //#####################################################################################
 //This function performs a parallel update at Terperature T
 //#####################################################################################
-long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, unsigned int max_sweeps) {
+igraph_integer_t PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, unsigned int max_sweeps) {
     DLList_Iter<NNode*> net_iter;
     DLList_Iter<NLink*> l_iter;
-    DLList_Iter<unsigned long*> i_iter, i_iter2;
+    DLList_Iter<igraph_integer_t*> i_iter, i_iter2;
     NNode *node, *n_cur;
     NLink *l_cur;
-    unsigned long new_spin, spin_opt, old_spin;
-    unsigned long *SPIN, *P_SPIN;
+    igraph_integer_t new_spin, spin_opt, old_spin;
+    igraph_integer_t *SPIN, *P_SPIN;
     unsigned int sweep;
-    long max_q;
-    unsigned long changes;
+    igraph_integer_t max_q;
+    igraph_integer_t changes;
     double h, delta = 0, norm, r, beta, minweight, prefac = 0, w, degree;
     bool cyclic = false/*, found*/;
-    unsigned long number_of_nodes;
+    igraph_integer_t number_of_nodes;
 
     sweep = 0;
     changes = 1;
@@ -499,7 +499,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
         SPIN = i_iter.First(&new_spins);
         while (!net_iter.End()) {
             // Initialize neighbours and weights
-            for (unsigned long i = 0; i <= q; i++) {
+            for (igraph_integer_t i = 0; i <= q; i++) {
                 neighbours[i] = 0;
                 weights[i] = 0;
             }
@@ -617,8 +617,8 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
 
     }  // while markov
     max_q = 0;
-    for (unsigned long i = 1; i <= q; i++) if (color_field[i] > max_q) {
-            max_q = long(color_field[i]);
+    for (igraph_integer_t i = 1; i <= q; i++) if (color_field[i] > max_q) {
+            max_q = igraph_integer_t(color_field[i]);
         }
 
     //again, we would not like to end up in cyclic attractors
@@ -638,11 +638,11 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     DLList_Iter<NLink*> l_iter;
     NNode *node, *n_cur;
     NLink *l_cur;
-    unsigned long new_spin, spin_opt, old_spin;
+    igraph_integer_t new_spin, spin_opt, old_spin;
     unsigned int sweep;
-    long max_q;
+    igraph_integer_t max_q;
     igraph_integer_t rn;
-    unsigned long changes;
+    igraph_integer_t changes;
     double degree, w, delta = 0, h;
     double norm, r, beta, minweight, prefac = 0;
     igraph_integer_t number_of_nodes;
@@ -657,7 +657,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
 
             node = net->node_list.Get(rn);
             // initialize the neighbours and the weights
-            for (unsigned long i = 0; i <= q; i++) {
+            for (igraph_integer_t i = 0; i <= q; i++) {
                 neighbours[i] = 0.0;
                 weights[i] = 0.0;
             }
@@ -759,8 +759,8 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     }  // while markov
     max_q = 0;
 
-    for (unsigned long i = 1; i <= q; i++) if (color_field[i] > max_q) {
-            max_q = long(color_field[i] + 0.5);
+    for (igraph_integer_t i = 1; i <= q; i++) if (color_field[i] > max_q) {
+            max_q = igraph_integer_t(color_field[i] + 0.5);
         }
 
     acceptance = double(changes) / double(number_of_nodes) / double(sweep);
@@ -786,8 +786,8 @@ double PottsModel::FindCommunityFromStart(
     NLink *l_cur;
     bool found = false, add = false, remove = false;
     double degree, delta_aff_add, delta_aff_rem, max_delta_aff, Ks = 0.0, Kr = 0, kis, kir, w;
-    long community_marker = 5;
-    long to_do_marker = 10;
+    igraph_integer_t community_marker = 5;
+    igraph_integer_t to_do_marker = 10;
     double inner_links = 0, outer_links = 0, aff_r, aff_s;
 
     // find the node in the network
@@ -822,7 +822,7 @@ double PottsModel::FindCommunityFromStart(
         //now add at the second neighbors to the to_do list
         neighbor = iter2.First(node->Get_Neighbours());
         while (!iter2.End()) {
-            if ((long)neighbor->Get_Marker() != community_marker && (long)neighbor->Get_Marker() != to_do_marker) {
+            if (neighbor->Get_Marker() != community_marker && neighbor->Get_Marker() != to_do_marker) {
                 to_do.Push(neighbor);
                 neighbor->Set_Marker(to_do_marker);
             }
@@ -861,7 +861,7 @@ double PottsModel::FindCommunityFromStart(
                 } else {
                     n_cur = l_cur->Get_Start();
                 }
-                if ((long)n_cur->Get_Marker() == community_marker) {
+                if (n_cur->Get_Marker() == community_marker) {
                     kis += w; //the weight/number of links to the community
                 } else {
                     kir += w; //the weight/number of links to the rest of the network
@@ -899,7 +899,7 @@ double PottsModel::FindCommunityFromStart(
                 } else {
                     n_cur = l_cur->Get_Start();
                 }
-                if ((long)n_cur->Get_Marker() == community_marker) {
+                if (n_cur->Get_Marker() == community_marker) {
                     kis += w;
                     inner_links += w; //summing all w gives twice the number of inner links(weights)
                 } else {
@@ -939,7 +939,7 @@ double PottsModel::FindCommunityFromStart(
             //in the to_do list or in the community
             neighbor = iter.First(max_aff_node->Get_Neighbours());
             while (!iter.End()) {
-                if ((long)neighbor->Get_Marker() != community_marker && (long)neighbor->Get_Marker() != to_do_marker) {
+                if (neighbor->Get_Marker() != community_marker && neighbor->Get_Marker() != to_do_marker) {
                     to_do.Push(neighbor);
                     neighbor->Set_Marker(to_do_marker);
                     //printf("Adding node %s to to_do list.\n",neighbor->Get_Name());
@@ -984,14 +984,14 @@ double PottsModel::FindCommunityFromStart(
             node = iter.Next();
         }
     }
-    unsigned long size = community.Size();
+    igraph_integer_t size = community.Size();
     return size;
 }
 
 //################################################################################################
 // this Function writes the clusters to disk
 //################################################################################################
-long PottsModel::WriteClusters(igraph_real_t *modularity,
+igraph_integer_t PottsModel::WriteClusters(igraph_real_t *modularity,
                                igraph_real_t *temperature,
                                igraph_vector_int_t *csize,
                                igraph_vector_int_t *membership,
@@ -1008,7 +1008,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 
     if (csize || membership || modularity) {
         // TODO: count the number of clusters
-        for (unsigned long spin = 1; spin <= q; spin++) {
+        for (igraph_integer_t spin = 1; spin <= q; spin++) {
             inner_links[spin] = 0;
             outer_links[spin] = 0;
             nodes[spin] = 0;
@@ -1032,7 +1032,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
     }
     if (modularity) {
         *modularity = 0.0;
-        for (unsigned long spin = 1; spin <= q; spin++) {
+        for (igraph_integer_t spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {
                 double t1 = inner_links[spin] / net->sum_weights / 2.0;
                 double t2 = (inner_links[spin] + outer_links[spin]) /
@@ -1044,7 +1044,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
     }
     if (csize) {
         igraph_vector_int_clear(csize);
-        for (unsigned long spin = 1; spin <= q; spin++) {
+        for (igraph_integer_t spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {
                 inner_links[spin] /= 2;
                 IGRAPH_CHECK(igraph_vector_int_push_back(csize, nodes[spin]));
@@ -1056,7 +1056,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
     if (membership) {
         igraph_integer_t no = -1;
         IGRAPH_CHECK(igraph_vector_int_resize(membership, num_of_nodes));
-        for (unsigned long spin = 1; spin <= q; spin++) {
+        for (igraph_integer_t spin = 1; spin <= q; spin++) {
             if (nodes[spin] > 0) {
                 no++;
             }
@@ -1074,7 +1074,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 }
 
 //#################################################################################################
-PottsModelN::PottsModelN(network *n, unsigned long num_communities, bool directed) :
+PottsModelN::PottsModelN(network *n, igraph_integer_t num_communities, bool directed) :
     net(n), q(num_communities), num_nodes(net->node_list.Size()), is_directed(directed)
 { }
 //#######################################################
@@ -1099,7 +1099,7 @@ PottsModelN::~PottsModelN() {
 }
 
 void PottsModelN::assign_initial_conf(bool init_spins) {
-    unsigned long s;
+    igraph_integer_t s;
     DLList_Iter<NLink*> l_iter;
     const NNode *n_cur;
     const NLink *l_cur;
@@ -1120,7 +1120,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
         degree_pos_out  = new double[num_nodes]; //Postive outdegree of the nodes (or sum of weights)
         degree_neg_out  = new double[num_nodes]; //Negative outdegree of the nodes (or sum of weights)
 
-        spin            = new unsigned long[num_nodes]; //The spin state of each node
+        spin            = new igraph_integer_t[num_nodes]; //The spin state of each node
     }
 
     if (is_init) {
@@ -1145,11 +1145,11 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
     //...and of weights and neighbours for in the HeathBathLookup
     weights                     = new double[q + 1]; //The weights for changing to another spin state
     neighbours                  = new double[q + 1]; //The number of neighbours (or weights) in different spin states
-    csize                       = new unsigned long[q + 1]; //The number of nodes in each community
+    csize                       = new igraph_integer_t[q + 1]; //The number of nodes in each community
 
 
     //Initialize communities
-    for (unsigned long i = 0; i <= q; i++) {
+    for (igraph_integer_t i = 0; i <= q; i++) {
         degree_community_pos_in[i]  = 0.0;
         degree_community_neg_in[i]  = 0.0;
         degree_community_pos_out[i] = 0.0;
@@ -1160,7 +1160,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 
     //Initialize vectors
     if (init_spins) {
-        for (unsigned long i = 0; i < num_nodes; i++) {
+        for (igraph_integer_t i = 0; i < num_nodes; i++) {
             degree_pos_in[i]    = 0.0;
             degree_neg_in[i]    = 0.0;
             degree_pos_out[i]   = 0.0;
@@ -1179,7 +1179,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 
     double sum_weight_pos_in, sum_weight_pos_out, sum_weight_neg_in, sum_weight_neg_out;
 
-    for (unsigned long v = 0; v < num_nodes; v++) {
+    for (igraph_integer_t v = 0; v < num_nodes; v++) {
         if (init_spins) {
             s = RNG_INTEGER(1, q);  //The new spin s
             spin[v] = (unsigned int)s;
@@ -1267,13 +1267,13 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
      * the old_spin is the spin of the node we are currently
      * changing.
      */
-    unsigned long new_spin, spin_opt, old_spin;
+    igraph_integer_t new_spin, spin_opt, old_spin;
     unsigned int sweep; //current sweep
-    unsigned long changes/*, problemcount*/; //Number of changes and number of problems encountered
+    igraph_integer_t changes/*, problemcount*/; //Number of changes and number of problems encountered
 
     double exp_old_spin; //The expectation value for the old spin
     double exp_spin; //The expectation value for the other spin(s)
-    long v; //The node we will be investigating
+    igraph_integer_t v; //The node we will be investigating
 
     //The variables required for the calculations
     double delta_pos_out, delta_pos_in, delta_neg_out, delta_neg_in;
@@ -1304,7 +1304,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
     while (sweep < max_sweeps) {
         sweep++;
         //loop over all nodes in network
-        for (unsigned long n = 0; n < num_nodes; n++) {
+        for (igraph_integer_t n = 0; n < num_nodes; n++) {
             //Look for a random node
             v = RNG_INTEGER(0, num_nodes - 1);
             //We will be investigating node v
@@ -1314,7 +1314,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
             /*******************************************/
             // initialize the neighbours and the weights
             // problemcount = 0;
-            for (unsigned long i = 0; i <= q; i++) {
+            for (igraph_integer_t i = 0; i <= q; i++) {
                 neighbours[i] = 0.0;
                 weights[i] = 0.0;
             }
@@ -1472,7 +1472,7 @@ double PottsModelN::FindStartTemp(double gamma, double lambda, double ts) {
     return kT;
 }
 
-long PottsModelN::WriteClusters(igraph_real_t *modularity,
+igraph_integer_t PottsModelN::WriteClusters(igraph_real_t *modularity,
                                 igraph_real_t *temperature,
                                 igraph_vector_int_t *community_size,
                                 igraph_vector_int_t *membership,
@@ -1487,16 +1487,16 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
     printf("Start writing clusters.\n");
 #endif
     //Reassign each community so that we retrieve a community assignment 1 through num_communities
-    auto *cluster_assign = new unsigned long[q + 1];
-    for (unsigned long i = 0; i <= q; i++) {
+    auto *cluster_assign = new igraph_integer_t[q + 1];
+    for (igraph_integer_t i = 0; i <= q; i++) {
         cluster_assign[i] = 0;
     }
 
-    long num_clusters = 0;
+    igraph_integer_t num_clusters = 0;
 
     //Find out what the new communities will be
-    for (unsigned long i = 0; i < num_nodes; i++) {
-        unsigned long s = spin[i];
+    for (igraph_integer_t i = 0; i < num_nodes; i++) {
+        igraph_integer_t s = spin[i];
         if (cluster_assign[s] == 0) {
             num_clusters++;
             cluster_assign[s] = num_clusters;
@@ -1508,11 +1508,11 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 
     //And now assign each node to its new community
     q = num_clusters;
-    for (unsigned long i = 0; i < num_nodes; i++) {
+    for (igraph_integer_t i = 0; i < num_nodes; i++) {
 #ifdef SPINGLASS_DEBUG
         printf("Setting node %d to %d.\n", i, cluster_assign[spin[i]]);
 #endif
-        unsigned long s = cluster_assign[spin[i]];
+        igraph_integer_t s = cluster_assign[spin[i]];
         spin[i] = s;
 #ifdef SPINGLASS_DEBUG
         printf("Have set node %d to %d.\n", i, s);
@@ -1529,7 +1529,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
     if (community_size) {
         //Initialize the vector
         IGRAPH_CHECK(igraph_vector_int_resize(community_size, q));
-        for (unsigned long spin_opt = 1; spin_opt <= q; spin_opt++) {
+        for (igraph_integer_t spin_opt = 1; spin_opt <= q; spin_opt++) {
             //Set the community size
             VECTOR(*community_size)[spin_opt - 1] = csize[spin_opt];
         }
@@ -1538,7 +1538,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
     //Set the membership
     if (membership) {
         IGRAPH_CHECK(igraph_vector_int_resize(membership, num_nodes));
-        for (unsigned long i = 0; i < num_nodes; i++) {
+        for (igraph_integer_t i = 0; i < num_nodes; i++) {
             VECTOR(*membership)[ i ] = spin[i] - 1;
         }
     }
@@ -1555,7 +1555,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         num_links_neg = new double *[q + 1] ;
 
         //memory allocated for  elements of each column.
-        for ( unsigned long i = 0 ; i < q + 1 ; i++) {
+        for ( igraph_integer_t i = 0 ; i < q + 1 ; i++) {
             num_links_pos[i] = new double[q + 1];
             num_links_neg[i] = new double[q + 1];
         }
@@ -1563,8 +1563,8 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 
 
         //Init num_links
-        for (unsigned long i = 0; i <= q; i++) {
-            for (unsigned long j = 0; j <= q; j++) {
+        for (igraph_integer_t i = 0; i <= q; i++) {
+            for (igraph_integer_t j = 0; j <= q; j++) {
                 num_links_pos[i][j] = 0.0;
                 num_links_neg[i][j] = 0.0;
             }
@@ -1577,8 +1577,8 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 
         while (!iter_l.End()) {
             w = l_cur->Get_Weight();
-            unsigned long a = spin[l_cur->Get_Start()->Get_Index()];
-            unsigned long b = spin[l_cur->Get_End()->Get_Index()];
+            igraph_integer_t a = spin[l_cur->Get_Start()->Get_Index()];
+            igraph_integer_t b = spin[l_cur->Get_End()->Get_Index()];
             if (w > 0) {
                 num_links_pos[a][b] += w;
                 if (!is_directed && a != b) { //Only one edge is defined in case it is undirected
@@ -1609,8 +1609,8 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         //We don't take into account the lambda or gamma for
         //computing the modularity and adhesion, since they
         //are then incomparable to other definitions.
-        for (unsigned long i = 1; i <= q; i++) {
-            for (unsigned long j = 1; j <= q; j++) {
+        for (igraph_integer_t i = 1; i <= q; i++) {
+            for (igraph_integer_t j = 1; j <= q; j++) {
                 if (!is_directed && i == j)
                     expected    = degree_community_pos_out[i] * degree_community_pos_in[j] / (m_p == 0 ? 1 : 2 * m_p)
                                   - degree_community_neg_out[i] * degree_community_neg_in[j] / (m_n == 0 ? 1 : 2 * m_n);
@@ -1675,7 +1675,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         } //for i
 
         //free the allocated memory
-        for ( unsigned long i = 0 ; i < q + 1 ; i++ ) {
+        for ( igraph_integer_t i = 0 ; i < q + 1 ; i++ ) {
             delete [] num_links_pos[i] ;
             delete [] num_links_neg[i];
         }
@@ -1694,8 +1694,8 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 
     if (polarization) {
         double sum_ad = 0.0;
-        for (unsigned long i = 0; i < q; i++) {
-            for (unsigned long j = 0; j < q; j++) {
+        for (igraph_integer_t i = 0; i < q; i++) {
+            for (igraph_integer_t j = 0; j < q; j++) {
                 if (i != j) {
                     sum_ad -= MATRIX(*normalised_adhesion, i, j);
                 }

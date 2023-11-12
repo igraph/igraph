@@ -48,14 +48,12 @@
 #include "igraph_interface.h"
 #include "igraph_conversion.h"
 
-#include <climits>
-
 igraph_error_t igraph_i_read_network(
     const igraph_t *graph, const igraph_vector_t *weights,
     network *net, igraph_bool_t use_weights) {
 
     double sum_weight = 0.0, min_weight = IGRAPH_POSINFINITY, max_weight = IGRAPH_NEGINFINITY;
-    unsigned long min_k = ULONG_MAX, max_k = 0;
+    igraph_integer_t min_k = IGRAPH_INTEGER_MAX, max_k = 0;
     char name[255];
     NNode *node1, *node2;
     DLList_Iter<NNode*> iter;

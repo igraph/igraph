@@ -222,7 +222,7 @@ static igraph_error_t igraph_i_community_spinglass_orig(
         igraph_real_t gamma) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    unsigned long changes, runs;
+    igraph_integer_t changes, runs;
     igraph_bool_t use_weights = false;
     bool zeroT;
     double kT, acc, prob;
@@ -498,7 +498,7 @@ static igraph_error_t igraph_i_community_spinglass_negative(
         igraph_real_t gamma_minus) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    unsigned long runs;
+    igraph_integer_t runs;
     igraph_bool_t use_weights = false;
     bool zeroT;
     double kT, acc;
