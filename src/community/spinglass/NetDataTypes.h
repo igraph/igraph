@@ -48,6 +48,11 @@
 #include <cassert>
 #include <cstring>
 
+// In igraph, we set node names to be a string representation of the one-based
+// vertex ID. This takes at most 20 characters. Add one for a potential sign
+// (should not happen) and one more for the null terminator.
+#define SPINGLASS_MAX_NAME_LEN 22
+
 //###########################################################################################
 
 struct HUGE_INDEX {
@@ -169,7 +174,7 @@ class NNode {
     DLList<NNode*> neighbours;    //list with pointers to neighbours
     DLList<NLink*> n_links;
     DLList<NLink*> *global_link_list;
-    char name[255];
+    char name[SPINGLASS_MAX_NAME_LEN];
 public :
     NNode(igraph_integer_t ind, igraph_integer_t c_ind, DLList<NLink *> *ll, const char *n) :
             index(ind), cluster_index(c_ind), global_link_list(ll)

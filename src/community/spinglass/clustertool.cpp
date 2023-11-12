@@ -434,7 +434,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                       igraph_real_t gamma) {
     IGRAPH_HANDLE_EXCEPTIONS(
         igraph_bool_t use_weights = false;
-        char startnode[255];
+        char startnode[SPINGLASS_MAX_NAME_LEN];
 
         /* Check arguments */
 
@@ -480,7 +480,7 @@ igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
         /* the initial conf is needed, because otherwise,
            the degree of the nodes is not in the weight property, stupid!!! */
         pm.assign_initial_conf(-1);
-        snprintf(startnode, 255, "%" IGRAPH_PRId "", vertex + 1);
+        snprintf(startnode, sizeof(startnode) / sizeof(startnode[0]), "%" IGRAPH_PRId "", vertex + 1);
         pm.FindCommunityFromStart(gamma, startnode, community,
                                    cohesion, adhesion, inner_links, outer_links);
 
