@@ -58,6 +58,7 @@
  - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
  - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
  - `igraph_subisomorphic_lad()` now returns a single null map when the pattern is the null graph.
+ - `igraph_community_spinglass()` now checks its parameters more carefully.
 
 ### Other
 
