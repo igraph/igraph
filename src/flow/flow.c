@@ -2287,7 +2287,8 @@ igraph_error_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_
     igraph_real_t flow;
 
     if (source == target) {
-        IGRAPH_ERROR("Not implemented when the source and target are the same.", IGRAPH_UNIMPLEMENTED);
+        IGRAPH_ERROR("Not implemented when the source and target are the same.",
+                     IGRAPH_UNIMPLEMENTED);
     }
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
