@@ -1099,8 +1099,8 @@ igraph_error_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
  *
  * </para><para> The minimum s-t cut in a weighted (=valued) graph is the
  * total minimum edge weight needed to remove from the graph to
- * eliminate all paths from a given vertex (\c source) to
- * another vertex (\c target). Directed paths are considered in
+ * eliminate all paths from a given vertex (\p source) to
+ * another vertex (\p target). Directed paths are considered in
  * directed graphs, and undirected paths in undirected graphs.  </para>
  *
  * <para> The minimum s-t cut between two vertices is known to be same
@@ -1872,9 +1872,9 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
  * \function igraph_st_vertex_connectivity
  * \brief The vertex connectivity of a pair of vertices.
  *
- * The vertex connectivity of two vertices (\c source and
- * \c target) is the minimum number of vertices that must be
- * deleted to eliminate all paths from \c source to \c
+ * The vertex connectivity of two vertices (\p source and
+ * \p target) is the minimum number of vertices that must be
+ * deleted to eliminate all paths from \p source to \p
  * target. Directed paths are considered in directed graphs.
  *
  * </para><para>
@@ -2156,9 +2156,9 @@ igraph_error_t igraph_vertex_connectivity(
  * \function igraph_st_edge_connectivity
  * \brief Edge connectivity of a pair of vertices.
  *
- * The edge connectivity of two vertices (\c source and \c target) is the
+ * The edge connectivity of two vertices (\p source and \p target) is the
  * minimum number of edges that have to be deleted from the graph to eliminate
- * all paths from \c source to \c target.
+ * all paths from \p source to \p target.
  *
  * </para><para>This function uses the maximum flow algorithm to calculate
  * the edge connectivity.
