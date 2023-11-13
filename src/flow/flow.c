@@ -1898,7 +1898,7 @@ static igraph_error_t igraph_i_st_vertex_connectivity_undirected(const igraph_t 
  *     \c IGRAPH_VCONN_NEI_IGNORE, ignore the fact that the two vertices
  *        are connected and calculate the number of vertices needed
  *        to eliminate all paths except for the trivial (direct) paths
- *        between \p source and \p vertex. TODO: what about neighbors?
+ *        between \p source and \p vertex.
  * \return Error code.
  *
  * Time complexity: O(|V|^3), but see the discussion at \ref
@@ -2331,58 +2331,30 @@ igraph_error_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_intege
                                  igraph_integer_t source,
                                  igraph_integer_t target) {
 
-    igraph_bool_t conn;
+    igraph_vector_int_t eids;
 
     if (source == target) {
         IGRAPH_ERROR("Not implemented when the source and target are the same.",
                      IGRAPH_UNIMPLEMENTED);
     }
 
-    IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
-    if (conn) {
-        /* We need to remove every (possibly directed) edge between source
-           and target and calculate the disjoint paths on the new
-           graph. Finally, we add 1 for each removed connection.  */
-        igraph_es_t es;
-        igraph_t newgraph;
-        igraph_integer_t num_removed_edges;
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&eids, 4);
+    IGRAPH_CHECK(igraph_get_all_eids_between(graph, &eids, source, target, /*directed*/ true));
 
-        IGRAPH_CHECK(igraph_es_all_between(&es, source, target, IGRAPH_DIRECTED));
-        IGRAPH_FINALLY(igraph_es_destroy, &es);
-
-        IGRAPH_CHECK(igraph_copy(&newgraph, graph));
-        IGRAPH_FINALLY(igraph_destroy, &newgraph);
-        IGRAPH_CHECK(igraph_delete_edges(&newgraph, es));
-        num_removed_edges = igraph_ecount(graph) - igraph_ecount(&newgraph);
-
-        if (igraph_is_directed(graph)) {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(&newgraph, res,
-                         source, target,
-                         IGRAPH_VCONN_NEI_IGNORE));
-        } else {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(&newgraph, res,
-                         source, target,
-                         IGRAPH_VCONN_NEI_IGNORE));
-        }
-
-        if (res) {
-            *res += num_removed_edges;
-        }
-
-        IGRAPH_FINALLY_CLEAN(2);
-        igraph_destroy(&newgraph);
-        igraph_es_destroy(&es);
+    if (igraph_is_directed(graph)) {
+        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
+                        source, target,
+                        IGRAPH_VCONN_NEI_IGNORE));
     } else {
-        if (igraph_is_directed(graph)) {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
+        IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
                         source, target,
                         IGRAPH_VCONN_NEI_IGNORE));
-        } else {
-            IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
-                        source, target,
-                        IGRAPH_VCONN_NEI_IGNORE));
-        }
     }
+
+    *res += igraph_vector_int_size(&eids);
+
+    igraph_vector_int_destroy(&eids);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
