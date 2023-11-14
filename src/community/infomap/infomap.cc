@@ -151,25 +151,17 @@ static igraph_error_t infomap_partition(FlowGraph &fgraph, bool rcall) {
 
             oldCodeLength = greedy.codeLength;
             bool moved = true;
-            //igraph_integer_t count = 0;
             double inner_oldCodeLength = 1000;
 
             while (moved) { // main greedy optimizing loop
                 inner_oldCodeLength = greedy.codeLength;
                 moved = greedy.optimize();
 
-                //count++;
-
                 if (fabs(greedy.codeLength - inner_oldCodeLength) < 1.0e-10)
                     // if the move does'n reduce the codelenght -> exit !
                 {
                     moved = false;
                 }
-
-                //if (count == 10) {
-                //  greedy->tune();
-                //  count = 0;
-                //}
             }
 
             // transform the network to network of modules:
@@ -320,7 +312,7 @@ igraph_error_t igraph_community_infomap(const igraph_t * graph,
         }
     }
 
-    *codelength = (igraph_real_t) shortestCodeLength / log(2.0);
+    *codelength = shortestCodeLength / log(2.0);
 
     IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, NULL));
 
