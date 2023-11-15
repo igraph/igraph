@@ -224,8 +224,8 @@ igraph_error_t igraph_graph_power(const igraph_t *graph, igraph_t *res,
         return IGRAPH_SUCCESS;
     }
 
-    /* Initialize res with a copy of the graph, but with with multi-edges and self-loops removed.
-     * Also convert the graph to udirected if this is requested. */
+    /* Initialize res with a copy of the graph, but with multi-edges and self-loops removed.
+     * Also convert the graph to undirected if this is requested. */
     IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 

@@ -55,7 +55,7 @@ igraph_error_t igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_in
 
     VECTOR(edges)[0] = from;
     VECTOR(edges)[1] = to;
-    IGRAPH_CHECK(igraph_add_edges(graph, &edges, 0));
+    IGRAPH_CHECK(igraph_add_edges(graph, &edges, NULL));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
