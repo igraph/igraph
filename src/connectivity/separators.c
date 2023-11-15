@@ -553,7 +553,6 @@ static igraph_error_t igraph_i_minimum_size_separators_append(
     igraph_integer_t j;
 
     while (!igraph_vector_int_list_empty(new)) {
-        igraph_vector_int_t *oldvec;
         igraph_vector_int_t *newvec = igraph_vector_int_list_tail_ptr(new);
 
         /* Check whether the separator is already in `old' */
@@ -568,6 +567,7 @@ static igraph_error_t igraph_i_minimum_size_separators_append(
             /* We have found a new separator, append it to `old'. We do it by
              * extending it with an empty vector and then swapping it with
              * the new vector to be appended */
+            igraph_vector_int_t *oldvec;
             IGRAPH_CHECK(igraph_vector_int_list_push_back_new(old, &oldvec));
             igraph_vector_int_swap(oldvec, newvec);
             olen++;

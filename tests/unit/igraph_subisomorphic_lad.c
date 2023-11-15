@@ -162,15 +162,11 @@ int main(void) {
     igraph_small(&pattern, 0, IGRAPH_UNDIRECTED, -1);
     igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ NULL, &iso, &map, &maps,
                              /*induced=*/ false, /*time_limit=*/ 0);
-    if (!iso) {
-        return 5;
-    }
-    if (igraph_vector_int_size(&map) != 0) {
-        return 6;
-    }
-    if (igraph_vector_int_list_size(&maps) != 0) {
-        return 7;
-    }
+
+    IGRAPH_ASSERT(iso);
+    IGRAPH_ASSERT(igraph_vector_int_size(&map) == 0);
+    IGRAPH_ASSERT(igraph_vector_int_list_size(&maps) == 1);
+    IGRAPH_ASSERT(igraph_vector_int_size(igraph_vector_int_list_get_ptr(&maps, 0)) == 0);
 
     igraph_destroy(&pattern);
     igraph_destroy(&target);

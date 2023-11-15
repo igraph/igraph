@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   Copyright (C) 2009-2023  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,10 +14,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "igraph_mixing.h"
@@ -94,6 +90,7 @@
  * \sa \ref igraph_assortativity() for computing the assortativity
  * based on continuous vertex values instead of discrete categories.
  * \ref igraph_modularity() to compute generalized modularity.
+ * \ref igraph_joint_type_distribution() to obtain the mixing matrix.
  *
  * \example examples/simple/igraph_assortativity_nominal.c
  */
@@ -379,7 +376,9 @@ igraph_error_t igraph_assortativity(const igraph_t *graph,
  * the number of vertices.
  *
  * \sa \ref igraph_assortativity() for the general function
- * calculating assortativity for any kind of numeric vertex values.
+ * calculating assortativity for any kind of numeric vertex values,
+ * and \ref igraph_joint_degree_distribution() to get the complete
+ * joint degree distribution.
  *
  * \example examples/simple/igraph_assortativity_degree.c
  */
@@ -436,7 +435,8 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  *
  * </para><para>
  * Note that \c J_ij is similar, but not identical to the joint degree
- * \em distribution, which is defined for \em ordered <code>(i, j)</code> degree
+ * \em distribution, computed by \ref igraph_joint_degree_distribution(),
+ * which is defined for \em ordered <code>(i, j)</code> degree
  * pairs even in the undirected case. When considering undirected graphs, the
  * diagonal of the joint degree distribution is twice that of the joint
  * degree matrix.
@@ -451,6 +451,9 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * https://doi.org/10.1145/2133803.2330086
  *
  * \param graph A pointer to an initialized graph object.
+ * \param weights A vector containing the weights of the edges. If passing a
+ *        \c NULL pointer, edges will be assumed to have unit weights, i.e.
+ *        the matrix entries will be connection counts.
  * \param jdm A pointer to an initialized matrix that will be resized. The values
  *        will be written here.
  * \param max_out_degree Number of rows in the result, i.e. the largest (out-)degree
@@ -459,19 +462,19 @@ igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
  * \param max_in_degree Number of columns in the result, i.e. the largest (in-)degree
  *        to consider. If negative, the largest (in-)degree of the graph will
  *        be used.
- * \param weights A vector containing the weights of the edges. If passing a
- *        \c NULL pointer, edges will be assumed to have unit weights, i.e.
- *        the matrix entries will be connection counts.
  * \return Error code.
+ *
+ * \sa \ref igraph_joint_degree_distribution() to count ordered vertex pairs instead of
+ * edges, or to obtain a normalized matrix.
  *
  * Time complexity: O(E), where E is the number of edges in input graph.
  */
 
-igraph_error_t igraph_joint_degree_matrix(const igraph_t* graph,
-                          igraph_matrix_t* jdm,
-                          igraph_integer_t max_out_degree,
-                          igraph_integer_t max_in_degree,
-                          const igraph_vector_t* weights) {
+igraph_error_t igraph_joint_degree_matrix(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_matrix_t *jdm,
+        igraph_integer_t max_out_degree, igraph_integer_t max_in_degree) {
+
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t eit;
@@ -575,4 +578,380 @@ igraph_error_t igraph_joint_degree_matrix(const igraph_t* graph,
     }
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * Common implementation for igraph_joint_type_distribution() and igraph_joint_degree_distribution()
+ *
+ * For the max_from/to_type parameters, negative values mean "automatic". These are used
+ * only with igraph_joint_degree_distribution().
+ *
+ * check_types controls whether types should be validated to be non-negative. Validation
+ * is only necessary with igraph_joint_type_distribution() but not with igraph_joint_degree_distribution().
+ *
+ * directed_neighbors must NOT be true when the graph is undirected.
+ */
+static igraph_error_t mixing_matrix(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_matrix_t *p,
+        const igraph_vector_int_t *from_types, const igraph_vector_int_t *to_types,
+        igraph_bool_t directed_neighbors, igraph_bool_t normalized,
+        igraph_integer_t max_from_type, igraph_integer_t max_to_type,
+        igraph_bool_t check_types) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t nrow, ncol;
+    igraph_real_t sum;
+    igraph_bool_t negative_weight;
+
+    if (igraph_vector_int_size(from_types) != no_of_nodes) {
+        IGRAPH_ERROR("Length of 'from' type vector must agree with vertex count.", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_int_size(to_types) != no_of_nodes) {
+        IGRAPH_ERROR("Length of 'to' type vector must agree with vertex count.", IGRAPH_EINVAL);
+    }
+
+    if (weights && igraph_vector_size(weights) != no_of_edges) {
+        IGRAPH_ERRORF("Weight vector length (%" IGRAPH_PRId ") does not match number of edges (%" IGRAPH_PRId ").",
+                      IGRAPH_EINVAL,
+                      igraph_vector_size(weights), no_of_edges);
+    }
+
+    if (max_from_type < 0) {
+        if (no_of_nodes == 0) {
+            nrow = 0;
+        } else {
+            nrow = igraph_vector_int_max(from_types) + 1;
+        }
+    } else {
+        nrow = max_from_type + 1;
+    }
+
+    if (max_to_type < 0) {
+        if (no_of_nodes == 0) {
+            ncol = 0;
+        } else if (to_types == from_types) {
+            /* Avoid computing the maximum again if target vertex types
+             * are the same as source vertex types. */
+            ncol = nrow;
+        } else {
+            ncol = igraph_vector_int_max(to_types) + 1;
+        }
+    } else {
+        ncol = max_to_type + 1;
+    }
+
+    if (check_types && no_of_nodes > 0) {
+        igraph_integer_t min;
+
+        min = igraph_vector_int_min(from_types);
+        if (min < 0) {
+            IGRAPH_ERROR("Invalid source vertex type.", IGRAPH_EINVAL);
+        }
+
+        if (to_types != from_types) {
+            min = igraph_vector_int_min(from_types);
+            if (min < 0) {
+                IGRAPH_ERROR("Invalid target vertex type.", IGRAPH_EINVAL);
+            }
+        }
+    }
+
+    IGRAPH_CHECK(igraph_matrix_resize(p, nrow, ncol));
+    igraph_matrix_null(p);
+
+    sum = 0;
+    negative_weight = false;
+    for (igraph_integer_t eid=0; eid < no_of_edges; eid++) {
+        igraph_integer_t from = IGRAPH_FROM(graph, eid);
+        igraph_integer_t to   = IGRAPH_TO(graph, eid);
+        igraph_integer_t from_type = VECTOR(*from_types)[from];
+        igraph_integer_t to_type   = VECTOR(*to_types)[to];
+        igraph_real_t w = weights ? VECTOR(*weights)[eid] : 1;
+
+        if (from_type >= nrow || to_type >= ncol) {
+            continue;
+        }
+
+        MATRIX(*p, from_type, to_type) += w;
+        sum += w;
+
+        if (! directed_neighbors) {
+            MATRIX(*p, to_type, from_type) += w;
+            sum += w;
+        }
+
+        if (w < 0) {
+            negative_weight = true;
+        }
+    }
+
+    if (normalized) {
+        if (negative_weight) {
+            /* When some edge weights are negative, they cannot be interpreted as sampling weights,
+             * and the sum of weights may be zero, potentially leading to Inf/NaN results. */
+            IGRAPH_WARNING("Negative edge weights are present. Normalization may not be meaningful.");
+        }
+        if (no_of_edges > 0) {
+            /* Scale only when there are some edges, thus 'sum' can be non-zero. */
+            igraph_matrix_scale(p, 1.0 / sum);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_joint_degree_distribution
+ * \brief The joint degree distribution of a graph.
+ *
+ * \experimental
+ *
+ * Computes the joint degree distribution \c P_ij of a graph, used in the
+ * study of degree correlations. \c P_ij is the probability that a randomly
+ * chosen ordered pair of \em connected vertices have degrees \c i and \c j.
+ *
+ * </para><para>
+ * In directed graphs, directionally connected <code>u -> v</code> pairs
+ * are considered. The joint degree distribution of an undirected graph is the
+ * same as that of the corresponding directed graph in which all connection are
+ * bidirectional, assuming that \p from_mode is \c IGRAPH_OUT, \p to_mode is
+ * \c IGRAPH_IN and \p directed_neighbors is true.
+ *
+ * </para><para>
+ * When \p normalized is false, <code>sum_ij P_ij</code> gives the total
+ * number of connections in a directed graph, or twice that value in an
+ * undirected graph. The sum is taken over ordered <code>(i,j)</code> degree
+ * pairs.
+ *
+ * </para><para>
+ * The joint degree distribution relates to other concepts used in the study of
+ * degree correlations. If \c P_ij is normalized then the degree correlation
+ * function <code>k_nn(k)</code> is obtained as
+ *
+ * </para><para>
+ * <code>k_nn(k) = (sum_j j P_kj) / (sum_j P_kj)</code>.
+ *
+ * </para><para>
+ * The non-normalized degree assortativity is obtained as
+ *
+ * </para><para>
+ * <code>a = sum_ij i j (P_ij - q_i r_j)</code>,
+ *
+ * </para><para>
+ * where <code>q_i = sum_k P_ik</code> and <code>r_j = sum_k P_kj</code>.
+ *
+ * </para><para>
+ * Note that the joint degree distribution \c P_ij is similar, but not identical
+ * to the joint degree matrix \c J_ij computed by \ref igraph_joint_degree_matrix().
+ * If the graph is undirected, then the diagonal entries of an unnormalized \c P_ij
+ * are double that of \c J_ij, as any undirected connection between same-degree vertices
+ * is counted in both directions. In contrast to \ref igraph_joint_degree_matrix(),
+ * this function returns matrices which include the row and column corresponding
+ * to zero degrees. In directed graphs, this row and column is not necessarily
+ * zero when \p from_mode is different from \c IGRAPH_OUT or \p to_mode is different
+ * from \c IGRAPH_IN.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * M. E. J. Newman: Mixing patterns in networks,
+ * Phys. Rev. E 67, 026126 (2003)
+ * https://doi.org/10.1103/PhysRevE.67.026126.
+ *
+ * \param graph A pointer to an initialized graph object.
+ * \param weights A vector containing the weights of the edges. If passing a
+ *    \c NULL pointer, edges will be assumed to have unit weights.
+ * \param p A pointer to an initialized matrix that will be resized. The \c P_ij
+ *    value will be written into <code>p[i,j]</code>.
+ * \param from_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
+ *    Ignored in undirected graphs.
+ * \param to_mode How to compute the degree of sources? Can be \c IGRAPH_OUT
+ *    for out-degree, \c IGRAPH_IN for in-degree, or \c IGRAPH_ALL for total degree.
+ *    Ignored in undirected graphs.
+ * \param directed_neighbors Whether to consider <code>u -> v</code> connections
+ *    to be directed. Undirected connections are treated as reciprocal directed ones,
+ *    i.e. both <code>u -> v</code> and <code>v -> u</code> will be considered.
+ *    Ignored in undirected graphs.
+ * \param normalized Whether to normalize the matrix so that entries sum to 1.0.
+ *    If false, matrix entries will be connection counts. Normalization is not
+ *    meaningful if some edge weights are negative.
+ * \param max_from_degree The largest source vertex degree to consider. If negative,
+ *    the largest source degree will be used. The row count of the result matrix
+ *    is one larger than this value.
+ * \param max_to_degree The largest target vertex degree to consider. If negative,
+ *    the largest target degree will be used. The column count of the result matrix
+ *    is one larger than this value.
+ * \return Error code.
+ *
+ * \sa \ref igraph_joint_degree_matrix() for computing the joint degree matrix;
+ * \ref igraph_assortativity_degree() and \ref igraph_assortativity() for
+ * degree correlations coefficients, and \ref igraph_degree_correlation_vector()
+ * for the degree correlation function.
+ *
+ * Time complexity: O(E), where E is the number of edges in the input graph.
+ */
+igraph_error_t igraph_joint_degree_distribution(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_matrix_t *p,
+        igraph_neimode_t from_mode, igraph_neimode_t to_mode,
+        igraph_bool_t directed_neighbors,
+        igraph_bool_t normalized,
+        igraph_integer_t max_from_degree, igraph_integer_t max_to_degree) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t *deg_from, *deg_to, deg_out, deg_in, deg_all;
+
+    /* Make sure directionality parameters are consistent for undirected graphs. */
+    if (! igraph_is_directed(graph)) {
+        from_mode = to_mode = IGRAPH_ALL;
+        directed_neighbors = false;
+    }
+
+    igraph_bool_t have_out = from_mode == IGRAPH_OUT || to_mode == IGRAPH_OUT;
+    igraph_bool_t have_in  = from_mode == IGRAPH_IN  || to_mode == IGRAPH_IN;
+    igraph_bool_t have_all = from_mode == IGRAPH_ALL || to_mode == IGRAPH_ALL;
+
+    if (have_out) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_out, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /* loops */ true));
+    }
+
+    if (have_in) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_in, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /* loops */ true));
+    }
+
+    if (have_all) {
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&deg_all, no_of_nodes);
+        IGRAPH_CHECK(igraph_degree(graph, &deg_all, igraph_vss_all(), IGRAPH_ALL, /* loops */ true));
+    }
+
+    switch (from_mode) {
+    case IGRAPH_OUT: deg_from = &deg_out; break;
+    case IGRAPH_IN:  deg_from = &deg_in;  break;
+    case IGRAPH_ALL: deg_from = &deg_all; break;
+    default:
+        IGRAPH_ERROR("Invalid 'from' degree mode.", IGRAPH_EINVAL);
+    }
+
+    switch (to_mode) {
+    case IGRAPH_OUT: deg_to = &deg_out; break;
+    case IGRAPH_IN:  deg_to = &deg_in;  break;
+    case IGRAPH_ALL: deg_to = &deg_all; break;
+    default:
+        IGRAPH_ERROR("Invalid 'to' degree mode.", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_CHECK(mixing_matrix(graph,
+                               weights, p,
+                               deg_from, deg_to,
+                               directed_neighbors, normalized,
+                               max_from_degree, max_to_degree,
+                               /*check_types=*/ false));
+
+    if (have_all) {
+        igraph_vector_int_destroy(&deg_all);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (have_in) {
+        igraph_vector_int_destroy(&deg_in);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    if (have_out) {
+        igraph_vector_int_destroy(&deg_out);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \function igraph_joint_type_distribution
+ * \brief Mixing matrix for vertex categories.
+ *
+ * \experimental
+ *
+ * Computes the mixing matrix M_ij, i.e. the joint distribution of vertex types
+ * at the endpoints directed of edges. Categories are represented by non-negative integer
+ * indices, passed in \p from_types and \p to_types. The row and column counts of \p m
+ * will be one larger than the largest source and target type, respectively. Re-index type
+ * vectors using \ref igraph_reindex_membership() if they are not contiguous integers,
+ * to avoid producing a very large matrix.
+ *
+ * </para><para>
+ * M_ij is proportional to the probability that a randomly chosen ordered pair of vertices
+ * have types \c i and \c j.
+ *
+ * </para><para>
+ * When there is a single categorization of vertices, i.e. \p from_types and \p to_types
+ * are the same, M_ij is related to the modularity (\ref igraph_modularity()) and nominal
+ * assortativity (\ref igraph_assortativity_nominal()). Let <code>a_i = sum_j M_ij</code> and
+ * <code>b_j = sum_i M_ij</code>. If M_ij is normalized, i.e. <code>sum_ij M_ij = 1</code>,
+ * and the types represent membership in vertex partitions, then the modularity of the
+ * partitioning can be computed as
+ *
+ * </para><para>
+ * <code>Q = sum_ii M_ii - sum_i a_i b_i</code>
+ *
+ * </para><para>
+ * The normalized nominal assortativity is
+ *
+ * </para><para>
+ * <code>Q / (1 - sum_i a_i b_i)</code>
+ *
+ * </para><para>
+ * \ref igraph_joint_degree_distribution() is a special case of this function, with
+ * categories consisting vertices of the same degree.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * M. E. J. Newman: Mixing patterns in networks,
+ * Phys. Rev. E 67, 026126 (2003)
+ * https://doi.org/10.1103/PhysRevE.67.026126.
+ *
+ * \param graph The input graph.
+ * \param p The mixing matrix M_ij will be stored here.
+ * \param weights A vector containing the weights of the edges. If passing a
+ *    \c NULL pointer, edges will be assumed to have unit weights.
+ * \param from_types Vertex types for source vertices. These must be non-negative integers.
+ * \param to_types Vertex types for target vertices. These must be non-negative integers.
+ *    If \c NULL, it is assumed to be the same as \p from_types.
+ * \param directed Whether to treat edges are directed. Ignored for undirected graphs.
+ * \param normalized Whether to normalize the matrix so that entries sum to 1.0.
+ *    If false, matrix entries will be connection counts. Normalization is not
+ *    meaningful if some edge weights are negative.
+ * \return Error code.
+ *
+ * \sa \ref igraph_joint_degree_distribution() to compute the joint distribution
+ * of vertex degrees; \ref igraph_modularity() to compute the modularity of
+ * a vertex partitioning; \ref igraph_assortativity_nominal() to compute
+ * assortativity based on vertex categories.
+ *
+ * Time complexity: O(E), where E is the number of edges in the input graph.
+ */
+igraph_error_t igraph_joint_type_distribution(
+        const igraph_t *graph, const igraph_vector_t *weights,
+        igraph_matrix_t *p,
+        const igraph_vector_int_t *from_types, const igraph_vector_int_t *to_types,
+        igraph_bool_t directed, igraph_bool_t normalized) {
+
+    IGRAPH_ASSERT(from_types != NULL);
+    if (to_types == NULL) {
+        to_types = from_types;
+    }
+    if (! igraph_is_directed(graph)) {
+        directed = false;
+    }
+    return mixing_matrix(graph, weights, p, from_types, to_types, directed, normalized, -1, -1, true);
 }

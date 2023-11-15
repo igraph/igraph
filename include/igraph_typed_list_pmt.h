@@ -65,9 +65,9 @@ IGRAPH_EXPORT ITEM_TYPE* FUNCTION(tail_ptr)(const TYPE *v);
 /* List properties */
 /*-----------------*/
 
-IGRAPH_EXPORT igraph_integer_t FUNCTION(capacity)(const TYPE* v);
-IGRAPH_EXPORT igraph_bool_t FUNCTION(empty)(const TYPE* v);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(size)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(capacity)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t FUNCTION(empty)(const TYPE* v);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(size)(const TYPE* v);
 
 /*------------------------*/
 /* Resizing operations    */

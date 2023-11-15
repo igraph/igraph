@@ -913,6 +913,14 @@ igraph_avg_nearest_neighbor_degree:
         EDGEWEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
+igraph_degree_correlation_vector:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT VECTOR knnk,
+        NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
+        BOOLEAN directed_neighbors=True
+    DEPS: weights ON graph
+
 igraph_strength:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
@@ -992,9 +1000,28 @@ igraph_assortativity_degree:
 
 igraph_joint_degree_matrix:
     PARAMS: |-
-        GRAPH graph, OUT MATRIX jdm,
-        INTEGER max_out_degree=-1, INTEGER max_in_degree=-1,
-        EDGEWEIGHTS weights=NULL
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX jdm,
+        INTEGER max_out_degree=-1, INTEGER max_in_degree=-1
+    DEPS: weights ON graph
+
+igraph_joint_degree_distribution:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX p,
+        NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
+        BOOLEAN directed_neighbors=True,
+        BOOLEAN normalized=True,
+        INTEGER max_from_degree=-1, INTEGER max_to_degree=-1
+    DEPS: weights ON graph
+
+igraph_joint_type_distribution:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX p,
+        INDEX_VECTOR from_types, INDEX_VECTOR to_types=NULL,
+        BOOLEAN directed=True,
+        BOOLEAN normalized=True
     DEPS: weights ON graph
 
 igraph_contract_vertices:

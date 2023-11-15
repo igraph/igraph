@@ -140,7 +140,7 @@ f__canseek(FILE *f) /*SYSDEP*/
 	if (S_ISBLK(x.st_mode))
 		return(1);
 #else
-	Help! How does fstat work on this system?
+#error "Help! How does fstat work on this system?"
 #endif
 #endif
 	return(0);	/* who knows what it is? */

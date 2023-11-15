@@ -40,7 +40,7 @@ IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_array3, init)(
     TYPE(igraph_array3) *a, igraph_integer_t n1, igraph_integer_t n2,
     igraph_integer_t n3);
 IGRAPH_EXPORT void FUNCTION(igraph_array3, destroy)(TYPE(igraph_array3) *a);
-IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_array3, size)(const TYPE(igraph_array3) *a);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_array3, size)(const TYPE(igraph_array3) *a);
 IGRAPH_EXPORT igraph_integer_t FUNCTION(igraph_array3, n)(
     const TYPE(igraph_array3) *a, igraph_integer_t idx);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_array3, resize)(

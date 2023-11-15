@@ -31,7 +31,9 @@
  * \function igraph_are_connected
  * \brief Decides whether two vertices are connected.
  *
- * This function is of course symmetric for undirected graphs.
+ * Decides whether there are any edges that have \p v1 and \p v2
+ * as endpoints. This function is of course symmetric for undirected
+ * graphs.
  *
  * \param graph The graph object.
  * \param v1 The first vertex.

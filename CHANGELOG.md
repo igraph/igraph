@@ -5,11 +5,15 @@
 ### Added
 
  - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
+ - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
+ - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
 
-### Changes
+### Changed
 
  - The behaviour of the Pajek format reader and writer is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret. Only those vertex and edge parameters are treated as valid which Pajek itself understands, therefore support for `size` is now dropped, and support for the `font` edge parameter is added. See http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm for more information. Invalid/unrecognized parameters are now converted to igraph attributes by the reader, but just as before, they are not output by the writer.
  - The Pajek format writer now encodes newline and quotation mark characters in a Pajek-compatible manner (`\n` and `&#34;`, respectively).
+ - `igraph_avg_nearest_neighbor_degree()` now supports non-simple graphs.
 
 ### Fixed
 
@@ -19,6 +23,10 @@
  - `igraph_erdos_renyi_game_gnm()` and `igraph_erdos_renyi_game_gnp()` are now interruptible.
  - `igraph_de_bruijn()` and `igraph_kautz()` are now interruptible.
  - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
+ - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
+ - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
+ - `igraph_subisomorphic_lad()` now returns a single null map when the pattern is the null graph.
+ - `igraph_community_spinglass()` now checks its parameters more carefully.
 
 ### Other
 
@@ -707,6 +715,7 @@ Some of the highlights are:
    incorrect (it was always zero). This is now fixed.
  - `igraph_correlated_game()` would return incorrect results, or exhaust the memory,
     for most input graphs that were not generated with `igraph_erdos_renyi_game_gnp()`.
+ - `igraph_community_label_propagation` incorrectly did not result in all labels being dominant (issue #1963, fixed in PR #1966).
 
 ### Other
 

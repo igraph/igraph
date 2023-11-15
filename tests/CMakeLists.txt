@@ -268,7 +268,7 @@ add_examples(
   igraph_is_loop
   igraph_is_multiple
   igraph_list_triangles
-  igraph_knn
+  igraph_avg_nearest_neighbor_degree
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
@@ -287,6 +287,7 @@ add_legacy_tests(
   coreness
   efficiency
   global_transitivity
+  harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
@@ -329,6 +330,8 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_joint_degree_distribution
+  igraph_joint_type_distribution
   igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount
@@ -351,11 +354,11 @@ add_legacy_tests(
   igraph_unfold_tree
   igraph_voronoi
   igraph_widest_paths
-  harmonic_centrality
+  igraph_spanner
+  knn
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
-  igraph_spanner
 )
 
 add_legacy_tests(

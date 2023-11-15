@@ -31,12 +31,6 @@
 #include "math/safe_intop.h"
 #include "random/random_internal.h"
 
-#define ALLOW_INTERRUPTION() \
-    if (++iter >= (1 << 14)) { \
-        IGRAPH_ALLOW_INTERRUPTION(); \
-        iter = 0; \
-    }
-
 /**
  * \section about_games
  *
@@ -125,7 +119,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             last += RNG_GEOM(p);
             last += 1;
-            ALLOW_INTERRUPTION();
+            IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
         }
 
         RNG_END();
@@ -141,7 +135,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
-                ALLOW_INTERRUPTION();
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         } else if (directed && !loops) {
             for (igraph_integer_t i = 0; i < vsize; i++) {
@@ -152,7 +146,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 }
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
-                ALLOW_INTERRUPTION();
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         } else if (!directed && loops) {
             for (igraph_integer_t i = 0; i < vsize; i++) {
@@ -160,7 +154,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
-                ALLOW_INTERRUPTION();
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         } else { /* !directed && !loops */
             for (igraph_integer_t i = 0; i < vsize; i++) {
@@ -168,7 +162,7 @@ igraph_error_t igraph_erdos_renyi_game_gnp(
                 igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                 igraph_vector_int_push_back(&edges, from);
                 igraph_vector_int_push_back(&edges, to);
-                ALLOW_INTERRUPTION();
+                IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
             }
         }
 
@@ -270,7 +264,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     igraph_integer_t from = VECTOR(s)[i] - to * no_of_nodes_real;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
-                    ALLOW_INTERRUPTION();
+                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
                 }
             } else if (directed && !loops) {
                 for (i = 0; i < slen; i++) {
@@ -281,7 +275,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     }
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
-                    ALLOW_INTERRUPTION();
+                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
                 }
             } else if (!directed && loops) {
                 for (i = 0; i < slen; i++) {
@@ -289,7 +283,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
-                    ALLOW_INTERRUPTION();
+                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
                 }
             } else { /* !directed && !loops */
                 for (i = 0; i < slen; i++) {
@@ -297,7 +291,7 @@ igraph_error_t igraph_erdos_renyi_game_gnm(
                     igraph_integer_t from = VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2;
                     igraph_vector_int_push_back(&edges, from);
                     igraph_vector_int_push_back(&edges, to);
-                    ALLOW_INTERRUPTION();
+                    IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 14);
                 }
             }
 

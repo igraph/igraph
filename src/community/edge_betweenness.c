@@ -39,11 +39,11 @@
 
 static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *membership) {
     const igraph_integer_t no = igraph_vector_int_max(membership) + 1;
-    igraph_vector_t idx;
+    igraph_vector_int_t idx;
     igraph_integer_t realno = 0;
     const igraph_integer_t len = igraph_vector_int_size(membership);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&idx, no);
     for (igraph_integer_t i = 0; i < len; i++) {
         const igraph_integer_t t = VECTOR(*membership)[i];
         if (VECTOR(idx)[t]) {
@@ -53,7 +53,7 @@ static igraph_error_t igraph_i_rewrite_membership_vector(igraph_vector_int_t *me
             VECTOR(*membership)[i] = VECTOR(idx)[t] - 1;
         }
     }
-    igraph_vector_destroy(&idx);
+    igraph_vector_int_destroy(&idx);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
