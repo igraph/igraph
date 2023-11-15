@@ -790,10 +790,25 @@ igraph_error_t igraph_realize_degree_sequence(
 }
 
 // TODO: Docs
-igraph_error_t igraph_realize_bipartite_degree_sequence(const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_vector_int_t *edges, igraph_bool_t multiedges) {
+igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_bool_t multiedges) {
     igraph_integer_t ec = 0; // The number of edges added so far
     igraph_integer_t n1 = igraph_vector_int_size(deg1);
     igraph_integer_t n2 = igraph_vector_int_size(deg2);
+    igraph_vector_int_t edges;
+    igraph_integer_t ds1_sum;
+    igraph_integer_t ds2_sum;
+    igraph_bool_t is_bigraphical;
+
+    // Checks if the degree sequences are bigraphical
+    if (!multiedges) {
+        IGRAPH_CHECK(igraph_is_bigraphical(deg1, deg2, IGRAPH_SIMPLE_SW, &is_bigraphical));
+    } else {
+        IGRAPH_CHECK(igraph_is_bigraphical(deg1, deg2, IGRAPH_MULTI_SW, &is_bigraphical));
+    }
+
+    if (!is_bigraphical) {
+        IGRAPH_ERROR("Degree sequences of input partitions cannot be realized as a bipartite graph.", IGRAPH_EINVAL);
+    }
 
     std::vector<vd_pair> vertices1;
     vertices1.reserve(n1);
@@ -807,11 +822,17 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(const igraph_vector_int_
         vertices2.push_back(vd_pair(i+n1, VECTOR(*deg2)[i]));
     }
 
+    igraph_i_safe_vector_int_sum(deg1, &ds1_sum);
+    igraph_i_safe_vector_int_sum(deg2, &ds2_sum);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ds1_sum+ds2_sum);
+
 //    for (vd_pair i: vertices1)
 //        printf("%d, %d\n", (int)i.vertex, (int)i.degree);
 //    printf("\n");
 //    for (vd_pair i: vertices2)
 //        printf("%d, %d\n", (int)i.vertex, (int)i.degree);
+    std::vector<vd_pair> *min_vs;
+    std::vector<vd_pair> *max_vs;
 
     while (!vertices1.empty() && !vertices2.empty()) {
         // Sort in non-increasing order.
@@ -820,113 +841,69 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(const igraph_vector_int_
         vd_pair min1 = vertices1.back();
         vd_pair min2 = vertices2.back();
 
-        if (!multiedges) {
-            // The smallest degrees are the last elements of each vertex
-            if (min1.degree <= min2.degree) {
-                // The smallest degree is in the back, and we know it is in vertices1
-                vd_pair vd_src = vertices1.back();
-                vertices1.pop_back();
-
-                if (vd_src.degree == 0) {
-                    continue;
-                }
-
-                if (vertices2.size() < size_t(vd_src.degree)) {
-                    IGRAPH_ERROR("Not enough remaining vertices to connect delta.", IGRAPH_EINVAL);
-                }
-
-                // Connect to the opposite partition
-                for (igraph_integer_t i=0;i < vd_src.degree; i++) {
-                    // decrement the degree of the delta largest vertices in the opposite partition
-                        vertices2[i].degree--;
-
-                        VECTOR(*edges)[2*(ec + i)] = vd_src.vertex;
-                        VECTOR(*edges)[2*(ec + i) + 1] = vertices2[i].vertex;
-                    }
-                ec += vd_src.degree;
-            }
-            else {
-                std::stable_sort(vertices1.begin(), vertices1.end(), degree_greater<vd_pair>);
-                std::stable_sort(vertices2.begin(), vertices2.end(), degree_greater<vd_pair>);
-                // The smallest degree is in the back, and we know it is in vertices2
-                vd_pair vd_src = vertices2.back();
-                vertices2.pop_back();
-
-                if (vd_src.degree == 0) {
-                    continue;
-                }
-
-                if (vertices1.size() < size_t(vd_src.degree)) {
-                    IGRAPH_ERROR("Not enough remaining vertices to connect delta.", IGRAPH_EINVAL);
-                }
-                for (igraph_integer_t i=0;i < vd_src.degree; i++) {
-                    // decrement the degree of the delta largest vertices in the opposite partition
-                     vertices1[i].degree--;
-
-                     VECTOR(*edges)[2*(ec + i)] = vd_src.vertex;
-                     VECTOR(*edges)[2*(ec + i) + 1] = vertices1[i].vertex;
-                    }
-                ec += vd_src.degree;
-            }
+        if (min1.degree <= min2.degree) {
+            min_vs = &vertices1;
+            max_vs = &vertices2;
         } else {
-            // If we want multi-edges, we need to calculate the global min for each edge we create. That is, we only create one edge in each step.
-            if (min1.degree <= min2.degree) {
-                // The smallest degree is in the back, and we know it is in vertices1
-                vd_pair vd_src = vertices1.back();
-                // If this is the last edge to be created from this vertex, we remove it.
-                if (vertices1.back().degree <= 1) {
-                    vertices1.pop_back();
-                } else {
-                    // Otherwise we decrement its degrees by 1 for the edge we are about to create.
-                    vertices1.back().degree--;
-                }
+            min_vs = &vertices2;
+            max_vs = &vertices1;
+        }
 
-                if (vd_src.degree == 0) {
-                    continue;
-                }
+        if (!multiedges) {
+            vd_pair vd_src = (*min_vs).back();
+            (*min_vs).pop_back();
 
-                if (vertices2.size() < size_t(1)) {
-                    IGRAPH_ERROR("Not enough remaining vertices to connect delta.", IGRAPH_EINVAL);
-                }
-
-                // Connect to the opposite partition
-                vertices2[0].degree--;
-
-                VECTOR(*edges)[2*ec] = vd_src.vertex;
-                VECTOR(*edges)[2*ec + 1] = vertices2[0].vertex;
-                ec++;
+            if (vd_src.degree == 0) {
+                continue;
             }
-            else {
-                std::stable_sort(vertices1.begin(), vertices1.end(), degree_greater<vd_pair>);
-                std::stable_sort(vertices2.begin(), vertices2.end(), degree_greater<vd_pair>);
-                // The smallest degree is in the back, and we know it is in vertices2
-                vd_pair vd_src = vertices2.back();
-
-                // If this is the last edge to be created from this vertex, we remove it.
-                if (vertices2.back().degree <= 1) {
-                    vertices2.pop_back();
-                } else {
-                    // Otherwise we decrement its degrees by 1 for the edge we are about to create.
-                    vertices2.back().degree--;
-                }
-
-                if (vd_src.degree == 0) {
-                    continue;
-                }
-
-                if (vertices1.size() < size_t(1)) {
-                    IGRAPH_ERROR("Not enough remaining vertices to connect delta.", IGRAPH_EINVAL);
-                }
-
+            if ((*max_vs).size() < size_t(vd_src.degree)) {
+                IGRAPH_ERROR("Not enough remaining vertices to connect delta.", IGRAPH_EINVAL);
+            }
+            for (igraph_integer_t i=0;i < vd_src.degree; i++) {
                 // decrement the degree of the delta largest vertices in the opposite partition
-                vertices1[0].degree--;
+                if (vertices2[i].degree - 1 < 0) {
+                    IGRAPH_ERROR("Decrementing below 0", IGRAPH_EINVAL);
+                }
 
-                VECTOR(*edges)[2*ec] = vd_src.vertex;
-                VECTOR(*edges)[2*ec + 1] = vertices1[0].vertex;
-                ec++;
+                (*max_vs)[i].degree--;
+
+                VECTOR(edges)[2*(ec + i)] = vd_src.vertex;
+                VECTOR(edges)[2*(ec + i) + 1] = (*max_vs)[i].vertex;
             }
+            ec += vd_src.degree;
+        }
+        // If we want multiedges...
+        else {
+            // The smallest degree is in the back, and we know it is in vertices1
+            vd_pair vd_src = (*min_vs).back();
+            // If this is the last edge to be created from this vertex, we remove it.
+            if ((*min_vs).back().degree <= 1) {
+                (*min_vs).pop_back();
+            } else {
+                // Otherwise we decrement its degrees by 1 for the edge we are about to create.
+                (*min_vs).back().degree--;
+            }
+
+            if (vd_src.degree == 0) {
+                continue;
+            }
+
+            if ((*max_vs).size() < size_t(1)) {
+                IGRAPH_ERROR("Not enough remaining vertices to connect delta.", IGRAPH_EINVAL);
+            }
+
+            // Connect to the opposite partition
+            (*max_vs)[0].degree--;
+
+            VECTOR(edges)[2 * ec] = vd_src.vertex;
+            VECTOR(edges)[2 * ec + 1] = (*max_vs)[0].vertex;
+            ec++;
         }
     }
 
+    IGRAPH_CHECK(igraph_create(graph, &edges, n1+n1, false));
+
+    igraph_vector_int_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
 }

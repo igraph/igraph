@@ -98,7 +98,7 @@ IGRAPH_EXPORT igraph_error_t igraph_realize_degree_sequence(igraph_t *graph,
                                                  igraph_realize_degseq_t method);
 IGRAPH_EXPORT igraph_error_t igraph_triangular_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual);
 IGRAPH_EXPORT igraph_error_t igraph_hexagonal_lattice(igraph_t *graph, const igraph_vector_int_t *dims, igraph_bool_t directed, igraph_bool_t mutual);
-IGRAPH_EXPORT igraph_error_t igraph_realize_bipartite_degree_sequence(const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_vector_int_t *edges, igraph_bool_t multiedges);
+IGRAPH_EXPORT igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_bool_t multiedges);
 
 __END_DECLS
 
