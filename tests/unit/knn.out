@@ -1,0 +1,61 @@
+UNWEIGHTED
+
+Undirected
+k_nn_i: ( 2 4.4 4.5 3.5 3 4 4 3.6 5 NaN )
+k_nn(k): ( NaN 3 3 NaN 4.25 4 )
+
+Directed treated as undirected
+k_nn_i: ( 6.42857 6.85714 6.6 6.25 6.66667 NaN )
+k_nn(k): ( NaN NaN NaN 6.66667 NaN 6.6 NaN 6.64286 6.25 )
+
+Directed: out, all
+k_nn_i: ( 6.5 6.8 7.5 6.5 6.5 NaN )
+k_nn(k): ( NaN NaN 6.83333 NaN 6.5 6.8 )
+
+Directed: out, in
+k_nn_i: ( 2.5 4.4 4.5 4.5 4.5 NaN )
+k_nn(k): ( NaN NaN 4.5 NaN 2.5 4.4 )
+
+Directed: out, out
+k_nn_i: ( 4 2.4 3 2 2 NaN )
+k_nn(k): ( NaN NaN 2.33333 NaN 4 2.4 )
+
+
+WEIGHTED
+
+Undirected
+k_nn_i: ( NaN 4.18182 4.3125 3.58621 5 4 4 3.63636 5 NaN )
+k_nn(k): ( NaN 4 5 NaN 4.25984 3.72727 )
+
+Directed treated as undirected
+k_nn_i: ( 6.33333 7.21154 6.24242 6.25333 6.65385 NaN )
+k_nn(k): ( NaN NaN NaN 6.65385 NaN 6.24242 NaN 6.93421 6.25333 )
+
+Directed: out, all
+k_nn_i: ( 6.73333 7.28205 7.53846 6.58824 6.57143 NaN )
+k_nn(k): ( NaN NaN 6.82353 NaN 6.73333 7.28205 )
+
+Directed: out, in
+k_nn_i: ( 2.13333 5.12821 4.61538 4.58824 4.57143 NaN )
+k_nn(k): ( NaN NaN 4.58824 NaN 2.13333 5.12821 )
+
+Directed: out, out
+k_nn_i: ( 4.6 2.15385 2.92308 2 2 NaN )
+k_nn(k): ( NaN NaN 2.23529 NaN 4.6 2.15385 )
+
+
+SPECIAL CASES
+
+Null graph
+k_nn_i: ( )
+k_nn(k): ( NaN )
+
+Singleton with loop
+k_nn_i: ( 2 )
+k_nn(k): ( NaN NaN 2 )
+
+Two isolated vertices
+k_nn_i: ( NaN NaN )
+k_nn(k): ( NaN )
+
+Check directed/undirected equivalence principle

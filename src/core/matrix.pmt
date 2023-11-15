@@ -842,12 +842,8 @@ FUNCTION(igraph_matrix, all_ge)(const TYPE(igraph_matrix) *lhs,
 
 igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2) {
-    igraph_integer_t col1 = FUNCTION(igraph_matrix, ncol)(m1);
-    igraph_integer_t col2 = FUNCTION(igraph_matrix, ncol)(m2);
-    igraph_integer_t row1 = FUNCTION(igraph_matrix, nrow)(m1);
-    igraph_integer_t row2 = FUNCTION(igraph_matrix, nrow)(m2);
-    if (col1 != col2 || row1 != row2) {
-        IGRAPH_WARNING("Comparing non-conformant matrices");
+    if (m1->ncol != m2->ncol || m1->nrow != m2->nrow) {
+        IGRAPH_WARNING("Comparing non-conformant matrices.");
     }
     return FUNCTION(igraph_vector, maxdifference)(&m1->data, &m2->data);
 }
@@ -1186,16 +1182,15 @@ igraph_error_t FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
 
 igraph_error_t FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
                                      const TYPE(igraph_vector) *v, igraph_integer_t index) {
-    igraph_integer_t rows = m->nrow, cols = m->ncol;
-    igraph_integer_t i, j;
+    const igraph_integer_t rows = m->nrow, cols = m->ncol;
 
     if (index >= rows) {
-        IGRAPH_ERROR("Index out of range for selecting matrix row", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Index out of range for selecting matrix row.", IGRAPH_EINVAL);
     }
     if (FUNCTION(igraph_vector, size)(v) != cols) {
-        IGRAPH_ERROR("Cannot set matrix row, invalid vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot set matrix row, invalid vector length.", IGRAPH_EINVAL);
     }
-    for (i = index, j = 0; j < cols; i += rows, j++) {
+    for (igraph_integer_t i = index, j = 0; j < cols; i += rows, j++) {
         VECTOR(m->data)[i] = VECTOR(*v)[j];
     }
     return IGRAPH_SUCCESS;
@@ -1219,16 +1214,15 @@ igraph_error_t FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
 
 igraph_error_t FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
                                      const TYPE(igraph_vector) *v, igraph_integer_t index) {
-    igraph_integer_t rows = m->nrow, cols = m->ncol;
-    igraph_integer_t i, j;
+    const igraph_integer_t rows = m->nrow, cols = m->ncol;
 
     if (index >= cols) {
-        IGRAPH_ERROR("Index out of range for setting matrix column", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Index out of range for setting matrix column.", IGRAPH_EINVAL);
     }
     if (FUNCTION(igraph_vector, size)(v) != rows) {
-        IGRAPH_ERROR("Cannot set matrix column, invalid vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot set matrix column, invalid vector length.", IGRAPH_EINVAL);
     }
-    for (i = index * rows, j = 0; j < rows; i++, j++) {
+    for (igraph_integer_t i = index * rows, j = 0; j < rows; i++, j++) {
         VECTOR(m->data)[i] = VECTOR(*v)[j];
     }
     return IGRAPH_SUCCESS;
@@ -1249,16 +1243,16 @@ igraph_error_t FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
 
 igraph_error_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
                                        igraph_integer_t i, igraph_integer_t j) {
-    igraph_integer_t ncol = m->ncol, nrow = m->nrow;
-    igraph_integer_t n = nrow * ncol;
-    igraph_integer_t index1, index2;
+    const igraph_integer_t ncol = m->ncol, nrow = m->nrow;
+    const igraph_integer_t n = nrow * ncol;
+
     if (i >= nrow || j >= nrow) {
         IGRAPH_ERROR("Cannot swap rows, index out of range", IGRAPH_EINVAL);
     }
     if (i == j) {
         return IGRAPH_SUCCESS;
     }
-    for (index1 = i, index2 = j; index1 < n; index1 += nrow, index2 += nrow) {
+    for (igraph_integer_t index1 = i, index2 = j; index1 < n; index1 += nrow, index2 += nrow) {
         BASE tmp;
         tmp = VECTOR(m->data)[index1];
         VECTOR(m->data)[index1] = VECTOR(m->data)[index2];
@@ -1282,15 +1276,15 @@ igraph_error_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
 
 igraph_error_t FUNCTION(igraph_matrix, swap_cols)(TYPE(igraph_matrix) *m,
                                        igraph_integer_t i, igraph_integer_t j) {
-    igraph_integer_t ncol = m->ncol, nrow = m->nrow;
-    igraph_integer_t k, index1, index2;
+    const igraph_integer_t ncol = m->ncol, nrow = m->nrow;
+
     if (i >= ncol || j >= ncol) {
-        IGRAPH_ERROR("Cannot swap columns, index out of range", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot swap columns, index out of range.", IGRAPH_EINVAL);
     }
     if (i == j) {
         return IGRAPH_SUCCESS;
     }
-    for (index1 = i * nrow, index2 = j * nrow, k = 0; k < nrow; k++, index1++, index2++) {
+    for (igraph_integer_t index1 = i * nrow, index2 = j * nrow, k = 0; k < nrow; k++, index1++, index2++) {
         BASE tmp = VECTOR(m->data)[index1];
         VECTOR(m->data)[index1] = VECTOR(m->data)[index2];
         VECTOR(m->data)[index2] = tmp;
@@ -1356,10 +1350,11 @@ igraph_error_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
 
 /**
  * \function igraph_matrix_mul_elements
- * Elementwise multiplication.
+ * \brief Elementwise matrix multiplication.
  *
  * Multiply \p m1 by \p m2 elementwise and store the result in \p m1.
  * The dimensions of the two matrices must match.
+ *
  * \param m1 The first matrix; the result is stored here.
  * \param m2 The second matrix; it is left unchanged.
  * \return Error code.
@@ -1370,7 +1365,7 @@ igraph_error_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
 igraph_error_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
-        IGRAPH_ERROR("Cannot multiply non-conformant matrices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot multiply elements of non-conformant matrices.", IGRAPH_EINVAL);
     }
     return FUNCTION(igraph_vector, mul)(&m1->data, &m2->data);
 }
@@ -1391,7 +1386,7 @@ igraph_error_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
 igraph_error_t FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
-        IGRAPH_ERROR("Cannot divide non-conformant matrices", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Cannot divide non-conformant matrices.", IGRAPH_EINVAL);
     }
     return FUNCTION(igraph_vector, div)(&m1->data, &m2->data);
 }
@@ -1521,9 +1516,10 @@ void FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_isnull
- * Check for a null matrix.
+ * \brief Checks for a null matrix.
  *
  * Checks whether all elements are zero.
+ *
  * \param m The input matrix.
  * \return Boolean, \c true is \p m contains only zeros and \c false
  *   otherwise.
@@ -1537,10 +1533,11 @@ igraph_bool_t FUNCTION(igraph_matrix, isnull)(const TYPE(igraph_matrix) *m) {
 
 /**
  * \function igraph_matrix_empty
- * Check for an empty matrix.
+ * \brief Is the matrix empty?
  *
  * It is possible to have a matrix with zero rows or zero columns, or
  * even both. This functions checks for these.
+ *
  * \param m The input matrix.
  * \return Boolean, \c true if the matrix contains zero elements, and
  *    \c false otherwise.
@@ -1554,9 +1551,10 @@ igraph_bool_t FUNCTION(igraph_matrix, empty)(const TYPE(igraph_matrix) *m) {
 
 /**
  * \function igraph_matrix_is_symmetric
- * Check for symmetric matrix.
+ * \brief Is the matrix symmetric?
  *
  * A non-square matrix is not symmetric by definition.
+ *
  * \param m The input matrix.
  * \return Boolean, \c true if the matrix is square and symmetric, \c
  *    false otherwise.
@@ -1567,13 +1565,12 @@ igraph_bool_t FUNCTION(igraph_matrix, empty)(const TYPE(igraph_matrix) *m) {
 
 igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m) {
 
-    igraph_integer_t n = m->nrow;
-    igraph_integer_t r, c;
+    const igraph_integer_t n = m->nrow;
     if (m->ncol != n) {
         return false;
     }
-    for (r = 1; r < n; r++) {
-        for (c = 0; c < r; c++) {
+    for (igraph_integer_t r = 1; r < n; r++) {
+        for (igraph_integer_t c = 0; c < r; c++) {
             BASE a1 = MATRIX(*m, r, c);
             BASE a2 = MATRIX(*m, c, r);
 #ifdef EQ
@@ -1592,10 +1589,11 @@ igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m
 
 /**
  * \function igraph_matrix_prod
- * Product of the elements.
+ * \brief Product of all matrix elements.
  *
- * Note this function can result in overflow easily, even for not too
- * big matrices.
+ * Note that this function can result in overflow easily, even for not too
+ * big matrices. Overflow is not checked.
+ *
  * \param m The input matrix.
  * \return The product of the elements.
  *
@@ -1608,9 +1606,10 @@ BASE FUNCTION(igraph_matrix, prod)(const TYPE(igraph_matrix) *m) {
 
 /**
  * \function igraph_matrix_rowsum
- * Rowwise sum.
+ * \brief Rowwise sum.
  *
  * Calculate the sum of the elements in each row.
+ *
  * \param m The input matrix.
  * \param res Pointer to an initialized vector; the result is stored
  *   here. It will be resized if necessary.
@@ -1621,12 +1620,11 @@ BASE FUNCTION(igraph_matrix, prod)(const TYPE(igraph_matrix) *m) {
 
 igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
-    igraph_integer_t nrow = m->nrow, ncol = m->ncol;
-    igraph_integer_t r, c;
+    const igraph_integer_t nrow = m->nrow, ncol = m->ncol;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, nrow));
-    for (r = 0; r < nrow; r++) {
+    for (igraph_integer_t r = 0; r < nrow; r++) {
         BASE sum = ZERO;
-        for (c = 0; c < ncol; c++) {
+        for (igraph_integer_t c = 0; c < ncol; c++) {
 #ifdef SUM
             SUM(sum, sum, MATRIX(*m, r, c));
 #else
@@ -1640,9 +1638,10 @@ igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_colsum
- * Columnwise sum.
+ * \brief Columnwise sum.
  *
  * Calculate the sum of the elements in each column.
+ *
  * \param m The input matrix.
  * \param res Pointer to an initialized vector; the result is stored
  *   here. It will be resized if necessary.
@@ -1653,12 +1652,11 @@ igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
 
 igraph_error_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
-    igraph_integer_t nrow = m->nrow, ncol = m->ncol;
-    igraph_integer_t r, c;
+    const igraph_integer_t nrow = m->nrow, ncol = m->ncol;
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, ncol));
-    for (c = 0; c < ncol; c++) {
+    for (igraph_integer_t c = 0; c < ncol; c++) {
         BASE sum = ZERO;
-        for (r = 0; r < nrow; r++) {
+        for (igraph_integer_t r = 0; r < nrow; r++) {
 #ifdef SUM
             SUM(sum, sum, MATRIX(*m, r, c));
 #else

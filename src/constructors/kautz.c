@@ -151,7 +151,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
         }
 
         /* not yet, we need a valid prefix now */
-        while (1) {
+        while (true) {
             /* try to increase digits at position actb */
             igraph_integer_t next = VECTOR(digits)[actb] + 1;
             if (actb != 0 && VECTOR(digits)[actb - 1] == next) {
@@ -194,9 +194,7 @@ igraph_error_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, i));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to));
         }
-        if (++iter >= (1 << 10)) {
-            IGRAPH_ALLOW_INTERRUPTION();
-        }
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
     }
 
     igraph_vector_int_destroy(&index2);
