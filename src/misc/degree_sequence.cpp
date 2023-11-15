@@ -838,10 +838,9 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
         vertices2.push_back(vd_pair(i+n1, VECTOR(*deg2)[i]));
     }
 
-    igraph_i_safe_vector_int_sum(deg1, &ds1_sum);
-    igraph_i_safe_vector_int_sum(deg2, &ds2_sum);
-    //IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, ds1_sum+ds2_sum);
-    igraph_vector_int_init(&edges, ds1_sum+ds2_sum);
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg1, &ds1_sum));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg2, &ds2_sum));
+    IGRAPH_CHECK(igraph_vector_int_init(&edges, ds1_sum+ds2_sum));
 
 
     std::vector<vd_pair> *min_vs;
