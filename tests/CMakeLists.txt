@@ -1018,5 +1018,5 @@ add_legacy_tests(
 
 add_legacy_tests(
         FOLDER tests/unit NAMES
-        bipartite_havel_hakimi
+        igraph_realize_bipartite_degree_sequence
 )
