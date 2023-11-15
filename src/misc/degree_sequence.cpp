@@ -789,7 +789,23 @@ igraph_error_t igraph_realize_degree_sequence(
     }
 }
 
-// TODO: Docs
+/**
+ * \function igraph_realize_bipartite_degree_sequence
+ * \brief Generates an undirected, connected, bipartite graph with the given degree sequences.
+ *
+ * This function generates an undirected, connected, bipartite graph with given degree sequences, where the first
+ * degree sequence is the degree sequence of the first partition, while the second degree sequence is the degree
+ * sequence of the second partition. The function ensures that the graphs are connected only if and only if the
+ * input degree sequences are potentially connected. The function does not support directed graphs.
+ *
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param deg1 The degree sequence of the first partition.
+ * \param deg2 The degree sequence of the second partition.
+ * \param multiedges A boolean indicating whether multiedges are allowed during graph construction.
+ * \return Error code.
+ */
+
 igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_bool_t multiedges) {
     igraph_integer_t ec = 0; // The number of edges added so far
     igraph_integer_t n1 = igraph_vector_int_size(deg1);

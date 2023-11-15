@@ -28,14 +28,11 @@ int main(void) {
     igraph_realize_bipartite_degree_sequence(&g, &ds1, &ds2, false);
 
     igraph_is_simple(&g, &is_simple);
+    // TODO: Verify it is connected if the degree sequences were potentially connected (helper function maybe?)
     igraph_is_connected(&g, &is_connected, IGRAPH_STRONG);
     igraph_is_bipartite(&g, &is_bipartite, NULL);
     // TODO: Check the degrees of the graph - are they the same
-    // Verify that there is a graph, and that it is simple, bipartite and connected if it was potentially connected
-    // igraph_has_multiple - returns a bool if it has a multiedge or igraph_is_simple for both self loops and multiedges
-    // helper function to check if the initial dss are potentially connected for the tests
-    // should we get simple graph
-    // random dss
+    // TODO: Verify that there is a graph
 
     printf("Simple: %d\n", is_simple);
     printf("Connected: %d\n", is_connected);
@@ -45,6 +42,7 @@ int main(void) {
     igraph_vector_int_destroy(&ds2);
     igraph_destroy(&g);
 
+    // TODO: Test with random degree sequences
 
     // undirected bipartite multigraph.
     igraph_bool_t has_multi;
@@ -77,6 +75,9 @@ int main(void) {
     igraph_vector_int_destroy(&ds1);
     igraph_vector_int_destroy(&ds2);
     igraph_destroy(&g);
+
+    // TODO: Test with random degree sequences
+
 
     VERIFY_FINALLY_STACK();
     return 0;
