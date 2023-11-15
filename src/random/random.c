@@ -29,6 +29,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
+#include "core/interruption.h"
 #include "core/math.h"
 #include "math/safe_intop.h"
 #include "random/random_internal.h"
@@ -1111,6 +1112,7 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
     igraph_real_t negalphainv = -13;
     igraph_real_t threshold = -negalphainv * n;
     igraph_real_t S;
+    int iter = 0;
 
     /* getting back some sense of sanity */
     if (l > h) {
@@ -1203,6 +1205,11 @@ igraph_error_t igraph_random_sample_real(igraph_vector_t *res, igraph_real_t l,
         n = -1 + n;   nreal = -1.0 + nreal; ninv = nmin1inv;
         qu1 = -S + qu1; qu1real = negSreal + qu1real;
         threshold = threshold + negalphainv;
+
+        if (++iter >= (1 << 14)) {
+            iter = 0;
+            IGRAPH_ALLOW_INTERRUPTION();
+        }
     }
 
     if (n > 1) {

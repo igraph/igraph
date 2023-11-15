@@ -16,6 +16,9 @@
  - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
  - Fixed the handling of duplicate vertex IDs in `igraph_induced_subgraph()`.
  - `igraph_vector_which_min()` and `igraph_vector_which_max()` no longer allow zero-length input, which makes them consistent with other similar functions, and was the originally intended behaviour. Passing zero-length input is invalid use and currently triggers an assertion failure.
+ - `igraph_erdos_renyi_game_gnm()` and `igraph_erdos_renyi_game_gnp()` are now interruptible.
+ - `igraph_de_bruijn()` and `igraph_kautz()` are now interruptible.
+ - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
 
 ### Other
 
