@@ -474,7 +474,7 @@ static igraph_error_t igraph_i_mf_bfs(igraph_dqueue_int_t *bfsq,
  * \c hi_pr implementation discussed in
  * B. V. Cherkassky and A. V. Goldberg: On implementing the
  * push-relabel method for the maximum flow problem, (Algorithmica,
- * 19:390--410, 1997) on all the graph classes i've tried.
+ * 19:390--410, 1997) on all the graph classes I've tried.
  *
  * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for
@@ -525,6 +525,9 @@ igraph_error_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     }
     if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
         IGRAPH_ERROR("Invalid source or target vertex.", IGRAPH_EINVVID);
+    }
+    if (source == target) {
+        IGRAPH_ERROR("Source and target vertices are the same.", IGRAPH_EINVAL);
     }
 
     stats->nopush = stats->norelabel = stats->nogap = stats->nogapnodes =
