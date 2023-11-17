@@ -63,6 +63,8 @@
  - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
  - `igraph_subisomorphic_lad()` now returns a single null map when the pattern is the null graph.
  - `igraph_community_spinglass()` now checks its parameters more carefully.
+ - `igraph_similarity_dice_pairs()` and `igraph_similarity_jaccard_pairs()` now validate vertex IDs.
+ - `igraph_maxflow()` now returns an error code if the source and target vertices are the same. It used to get stuck in an infinite loop in earlier versions when the `flow` argument was non-NULL.
 
 ### Other
 
