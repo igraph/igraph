@@ -40,17 +40,18 @@
  * The density of a graph is simply the ratio of the actual number of its
  * edges and the largest possible number of edges it could have.
  * The maximum number of edges depends on interpretation: are vertices
- * allowed to have a connected to themselves? This is controlled by the
+ * allowed to have a connection to themselves? This is controlled by the
  * \p loops parameter.
  *
  * </para><para>
  * Note that density is ill-defined for graphs which have multiple edges
  * between some pairs of vertices. Consider calling \ref igraph_simplify()
- * on such graphs.
+ * on such graphs. This function does not check whether the graph has
+ * parallel edges. The result it returns for such graphs is not meaningful.
  *
  * \param graph The input graph object.
  * \param res Pointer to a real number, the result will be stored
- *   here.
+ *   here. It must not have parallel edges.
  * \param loops Logical constant, whether to include self-loops in the
  *   calculation. If this constant is \c true then
  *   loop edges are thought to be possible in the graph (this does not

@@ -1373,7 +1373,7 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
     igraph_vector_bool_t VE1bool;
     igraph_integer_t i, nocuts;
     igraph_integer_t proj_nodes;
-    igraph_vector_t revmap_ptr, revmap_next;
+    igraph_vector_int_t revmap_ptr, revmap_next;
     igraph_vector_int_list_t closedsets;
     igraph_vector_int_list_t *mypartition1s = partition1s, vpartition1s;
     igraph_maxflow_stats_t stats;
@@ -1478,8 +1478,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
 
     /* Convert the closed sets in the contracted graphs to cutsets in the
        original graph */
-    IGRAPH_VECTOR_INIT_FINALLY(&revmap_ptr, igraph_vcount(&residual));
-    IGRAPH_VECTOR_INIT_FINALLY(&revmap_next, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&revmap_ptr, igraph_vcount(&residual));
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&revmap_next, no_of_nodes);
     for (i = 0; i < no_of_nodes; i++) {
         igraph_integer_t id = VECTOR(NtoL)[i];
         VECTOR(revmap_next)[i] = VECTOR(revmap_ptr)[id];
@@ -1510,8 +1510,8 @@ igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value
         /* TODO: we could already reclaim the memory taken by 'supercut' here */
     }
 
-    igraph_vector_destroy(&revmap_next);
-    igraph_vector_destroy(&revmap_ptr);
+    igraph_vector_int_destroy(&revmap_next);
+    igraph_vector_int_destroy(&revmap_ptr);
     igraph_vector_int_list_destroy(&closedsets);
     IGRAPH_FINALLY_CLEAN(3);
 

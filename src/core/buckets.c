@@ -21,8 +21,6 @@
 
 */
 
-#include "igraph_types.h"
-
 #include "core/buckets.h"
 
 /* The igraph_buckets_t data structure can store at most 'size'

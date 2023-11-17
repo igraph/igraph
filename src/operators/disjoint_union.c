@@ -100,7 +100,7 @@ igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
 
 /**
  * \function igraph_disjoint_union_many
- * \brief The disjint union of many graphs.
+ * \brief The disjoint union of many graphs.
  *
  * First the vertices in the graphs will be relabeled with new vertex
  * IDs to have pairwise disjoint vertex ID sets and then the union of

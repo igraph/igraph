@@ -56,7 +56,7 @@ igraph_error_t igraph_i_read_network_spinglass(
     double sum_weight;
 
     for (igraph_integer_t vid = 0; vid < no_of_nodes; vid++) {
-        char name[255];
+        char name[SPINGLASS_MAX_NAME_LEN];
         snprintf(name, sizeof(name) / sizeof(name[0]), "%" IGRAPH_PRId "", vid+1);
         net->node_list.Push(new NNode(vid, 0, &net->link_list, name));
     }
