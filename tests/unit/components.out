@@ -1,0 +1,90 @@
+
+Null graph (not connected)
+Mode: strong
+( )
+( )
+No. of components: 0
+Mode: strong
+( )
+( )
+No. of components: 0
+Mode: weak
+( )
+( )
+No. of components: 0
+Mode: weak
+( )
+( )
+No. of components: 0
+
+Singleton graph (connected)
+Mode: strong
+( 0 )
+( 1 )
+No. of components: 1
+Mode: strong
+( 0 )
+( 1 )
+No. of components: 1
+Mode: weak
+( 0 )
+( 1 )
+No. of components: 1
+Mode: weak
+( 0 )
+( 1 )
+No. of components: 1
+
+Kautz graph (connected)
+Mode: strong
+( 0 0 0 0 0 0 0 0 0 0 0 0 )
+( 12 )
+No. of components: 1
+Mode: strong
+( 0 0 0 0 0 0 0 0 0 0 0 0 )
+( 12 )
+No. of components: 1
+Mode: weak
+( 0 0 0 0 0 0 0 0 0 0 0 0 )
+( 12 )
+No. of components: 1
+Mode: weak
+( 0 0 0 0 0 0 0 0 0 0 0 0 )
+( 12 )
+No. of components: 1
+
+Directed 2-path
+Mode: strong
+( 0 1 )
+( 1 1 )
+No. of components: 2
+Mode: strong
+( 0 1 )
+( 1 1 )
+No. of components: 2
+Mode: weak
+( 0 0 )
+( 2 )
+No. of components: 1
+Mode: weak
+( 0 0 )
+( 2 )
+No. of components: 1
+
+Two disjoint 3-cycles
+Mode: strong
+( 0 0 0 1 1 1 )
+( 3 3 )
+No. of components: 2
+Mode: strong
+( 0 0 0 1 1 1 )
+( 3 3 )
+No. of components: 2
+Mode: weak
+( 0 0 0 1 1 1 )
+( 3 3 )
+No. of components: 2
+Mode: weak
+( 0 0 0 1 1 1 )
+( 3 3 )
+No. of components: 2

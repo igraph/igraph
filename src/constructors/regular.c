@@ -362,6 +362,7 @@ igraph_error_t igraph_square_lattice(
     igraph_integer_t *coords, *weights;
     igraph_integer_t i, j;
     int carry, pos;
+    int iter;
 
     if (igraph_vector_int_any_smaller(dimvector, 0)) {
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
@@ -410,7 +411,7 @@ igraph_error_t igraph_square_lattice(
 #define IS_PERIODIC(dim) ((periodic && VECTOR(*periodic)[dim]))
 
     for (i = 0; i < no_of_nodes; i++) {
-        IGRAPH_ALLOW_INTERRUPTION();
+        IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, 1 << 10);
 
         /* Connect the current node to the "next" node along each dimension */
         for (j = 0; j < dims; j++) {

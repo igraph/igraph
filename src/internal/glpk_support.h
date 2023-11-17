@@ -38,13 +38,14 @@
 
 #include <glpk.h>
 #include <setjmp.h>
+#include <stdbool.h>
 
 __BEGIN_DECLS
 
 typedef struct igraph_i_glpk_error_info_s {
     jmp_buf jmp;            /* used for bailing when there is a GLPK error */
-    int     is_interrupted; /* Boolean; true if there was an interruption */
-    int     is_error;       /* Boolean; true if the error hook was called */
+    bool    is_interrupted; /* Boolean; true if there was an interruption */
+    bool    is_error;       /* Boolean; true if the error hook was called */
     char    msg[4096];      /* GLPK error messages are collected here */
     char   *msg_ptr;        /* Points to the end (null terminator) of msg */
 } igraph_i_glpk_error_info_t;
@@ -117,8 +118,8 @@ void igraph_i_glp_delete_prob(glp_prob *p);
     do { \
         glp_error_hook(igraph_i_glpk_error_hook, NULL); \
         glp_term_hook(igraph_i_glpk_terminal_hook, NULL); \
-        igraph_i_glpk_error_info.is_interrupted = 0; \
-        igraph_i_glpk_error_info.is_error = 0; \
+        igraph_i_glpk_error_info.is_interrupted = false; \
+        igraph_i_glpk_error_info.is_error = false; \
         igraph_i_glpk_error_info.msg_ptr = igraph_i_glpk_error_info.msg; \
         if (setjmp(igraph_i_glpk_error_info.jmp)) { \
             if (igraph_i_glpk_error_info.is_interrupted) { \

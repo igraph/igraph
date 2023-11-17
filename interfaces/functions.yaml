@@ -164,6 +164,9 @@ igraph_extended_chordal_ring:
 igraph_connect_neighborhood:
     PARAMS: INOUT GRAPH graph, INTEGER order=2, NEIMODE mode=ALL
 
+igraph_graph_power:
+    PARAMS: IN GRAPH graph, OUT GRAPH res, INTEGER order, BOOLEAN directed=False
+
 igraph_linegraph:
     PARAMS: GRAPH graph, OUT GRAPH linegraph
 
@@ -223,11 +226,6 @@ igraph_barabasi_game:
         OPTIONAL VECTOR_INT outseq, BOOLEAN outpref=False, REAL A=1.0,
         BOOLEAN directed=True, BARABASI_ALGORITHM algo=BAG,
         OPTIONAL GRAPH start_from
-
-igraph_erdos_renyi_game:
-    PARAMS: |-
-        OUT GRAPH graph, ERDOS_RENYI_TYPE type, INTEGER n, REAL p_or_m,
-        BOOLEAN directed=False, BOOLEAN loops=False
 
 igraph_erdos_renyi_game_gnp:
     PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
@@ -915,6 +913,14 @@ igraph_avg_nearest_neighbor_degree:
         EDGEWEIGHTS weights=NULL
     DEPS: vids ON graph, weights ON graph, knn ON graph vids
 
+igraph_degree_correlation_vector:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT VECTOR knnk,
+        NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
+        BOOLEAN directed_neighbors=True
+    DEPS: weights ON graph
+
 igraph_strength:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY res, VERTEX_SELECTOR vids=ALL,
@@ -992,6 +998,32 @@ igraph_assortativity:
 igraph_assortativity_degree:
     PARAMS: GRAPH graph, OUT REAL res, BOOLEAN directed=True
 
+igraph_joint_degree_matrix:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX jdm,
+        INTEGER max_out_degree=-1, INTEGER max_in_degree=-1
+    DEPS: weights ON graph
+
+igraph_joint_degree_distribution:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX p,
+        NEIMODE from_mode=OUT, NEIMODE to_mode=IN,
+        BOOLEAN directed_neighbors=True,
+        BOOLEAN normalized=True,
+        INTEGER max_from_degree=-1, INTEGER max_to_degree=-1
+    DEPS: weights ON graph
+
+igraph_joint_type_distribution:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL,
+        OUT MATRIX p,
+        INDEX_VECTOR from_types, INDEX_VECTOR to_types=NULL,
+        BOOLEAN directed=True,
+        BOOLEAN normalized=True
+    DEPS: weights ON graph
+
 igraph_contract_vertices:
     PARAMS: |-
         INOUT GRAPH graph, INDEX_VECTOR mapping,
@@ -1015,8 +1047,17 @@ igraph_graph_center:
         GRAPH graph, OUT VERTEX_INDICES res, NEIMODE mode=ALL
     DEPS: res ON graph
 
+igraph_graph_center_dijkstra:
+    PARAMS: |-
+        GRAPH graph, EDGEWEIGHTS weights=NULL, OUT VERTEX_INDICES res, NEIMODE mode=ALL
+    DEPS: weights ON graph, res ON graph
+
 igraph_radius:
     PARAMS: GRAPH graph, OUT REAL radius, NEIMODE mode=ALL
+
+igraph_radius_dijkstra:
+    PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, OUT REAL radius, NEIMODE mode=ALL
+    DEPS: weights ON graph
 
 igraph_pseudo_diameter:
     NAME-R: pseudo_diameter
@@ -1141,13 +1182,13 @@ igraph_create_bipartite:
         OUT GRAPH graph, IN BIPARTITE_TYPES types,
         VECTOR_INT edges, BOOLEAN directed=False
 
-igraph_incidence:
+igraph_biadjacency:
     PARAMS: |-
         OUT GRAPH graph, OUT BIPARTITE_TYPES types, MATRIX incidence,
         BOOLEAN directed=False, NEIMODE mode=ALL,
         BOOLEAN multiple=False
 
-igraph_get_incidence:
+igraph_get_biadjacency:
     PARAMS: |-
         GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res,
         OPTIONAL OUT INDEX_VECTOR row_ids, OPTIONAL OUT INDEX_VECTOR col_ids
@@ -1670,6 +1711,16 @@ igraph_community_infomap:
         OUT VECTOR_INT membership, OUT REAL codelength
     DEPS: e_weights ON graph, v_weights ON graph
 
+igraph_community_voronoi:
+    PARAMS: |-
+        GRAPH graph,
+        OPTIONAL OUT VECTOR_INT membership,
+        OPTIONAL OUT VERTEX_INDICES generators,
+        OPTIONAL OUT REAL modularity,
+        OPTIONAL EDGE_LENGTHS lengths, OPTIONAL EDGEWEIGHTS weights,
+        NEIMODE mode=OUT, REAL radius=-1
+    DEPS: generators ON graph, weights ON graph, lengths ON graph
+
 #######################################
 # Graphlets
 #######################################
@@ -1711,9 +1762,6 @@ igraph_hrg_sample_many:
 igraph_hrg_game:
     PARAMS: OUT GRAPH graph, HRG hrg
 
-igraph_hrg_dendrogram:
-    PARAMS: OUT GRAPH graph, HRG hrg
-
 igraph_hrg_consensus:
     PARAMS: |-
         GRAPH graph, OUT VECTOR_INT parents, OUT VECTOR weights,
@@ -1737,6 +1785,9 @@ igraph_hrg_resize:
 igraph_hrg_size:
     PARAMS: HRG hrg
     RETURN: INTEGER
+
+igraph_from_hrg_dendrogram:
+    PARAMS: OUT GRAPH graph, HRG hrg, OUT VECTOR prob
 
 #######################################
 # Conversion
@@ -2001,33 +2052,17 @@ igraph_maxflow_value:
         OPTIONAL EDGE_CAPACITY capacity, OPTIONAL OUT MAXFLOW_STATS stats
     DEPS: source ON graph, target ON graph, capacity ON graph
 
-igraph_mincut_value:
-    PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_CAPACITY capacity
-    DEPS:
-        capacity ON graph
-
-igraph_st_mincut:
-    PARAMS: |-
-        GRAPH graph, OUT REAL value, OUT EDGE_INDICES cut,
-        OUT VERTEX_INDICES partition1, OUT VERTEX_INDICES partition2,
-        VERTEX source, VERTEX target,
-        OPTIONAL EDGE_CAPACITY capacity
-    DEPS: |-
-        source ON graph, target ON graph, capacity ON graph,
-        partition1 ON graph, partition2 ON graph, cut ON graph
-
-igraph_st_mincut_value:
-    PARAMS: |-
-        GRAPH graph, OUT REAL res, VERTEX source, VERTEX target,
-        OPTIONAL EDGE_CAPACITY capacity
-    DEPS: source ON graph, target ON graph, capacity ON graph
-
 igraph_mincut:
     PARAMS: |-
         GRAPH graph, OUT REAL value, OUT VERTEX_INDICES partition1,
         OUT VERTEX_INDICES partition2, OUT EDGE_INDICES cut,
         OPTIONAL EDGE_CAPACITY capacity
     DEPS: capacity ON graph, partition1 ON graph, partition2 ON graph, cut ON graph
+
+igraph_mincut_value:
+    PARAMS: GRAPH graph, OUT REAL res, OPTIONAL EDGE_CAPACITY capacity
+    DEPS:
+        capacity ON graph
 
 igraph_residual_graph:
     PARAMS: |-
@@ -2050,6 +2085,12 @@ igraph_st_mincut:
     DEPS: |-
         capacity ON graph, source ON graph, target ON graph,
         partition1 ON graph, partition2 ON graph, cut ON graph
+
+igraph_st_mincut_value:
+    PARAMS: |-
+        GRAPH graph, OUT REAL res, VERTEX source, VERTEX target,
+        OPTIONAL EDGE_CAPACITY capacity
+    DEPS: source ON graph, target ON graph, capacity ON graph
 
 igraph_st_vertex_connectivity:
     PARAMS: |-
@@ -2493,12 +2534,6 @@ igraph_vertex_coloring_greedy:
 igraph_deterministic_optimal_imitation:
     PARAMS: |-
         GRAPH graph, VERTEX vid, OPTIMALITY optimality=MAXIMUM, VERTEX_QTY quantities,
-        INOUT VECTOR_INT strategies, NEIMODE mode=OUT
-    DEPS: vid ON graph, quantities ON graph, strategies ON graph
-
-igraph_stochastic_imitation:
-    PARAMS: |-
-        GRAPH graph, VERTEX vid, IMITATE_ALGORITHM algo, VERTEX_QTY quantities,
         INOUT VECTOR_INT strategies, NEIMODE mode=OUT
     DEPS: vid ON graph, quantities ON graph, strategies ON graph
 

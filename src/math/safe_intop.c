@@ -111,17 +111,21 @@ igraph_error_t igraph_i_safe_exp2(igraph_integer_t k, igraph_integer_t *res) {
 static igraph_error_t igraph_i_safe_real_to_int(igraph_real_t value, igraph_integer_t *result) {
     /* IGRAPH_INTEGER_MAX is one less than a power of 2, and may not be representable as
      * a floating point number. Thus we cannot safely check that value <= IGRAPH_INTEGER_MAX,
-     * as this would convert IGRAPH_INTEGER_MAX to floating point, potentially chaning its value.
+     * as this would convert IGRAPH_INTEGER_MAX to floating point, potentially changing its value.
      * Instead, we compute int_max_plus_1 = IGRAPH_INTEGER_MAX + 1, which is exactly representable
      * since it is a power of 2, and check that value < int_max_plus_1.
      *
-     * IGRAPH_INTEGER_MIN is a negative power of 2, so there is no such issue.
+     * IGRAPH_INTEGER_MIN is a power of 2 (with negative sign), so there is no such issue.
+     *
+     * NaNs and infinities are correctly rejected.
      */
     const igraph_real_t int_max_plus_1 = 2.0 * (IGRAPH_INTEGER_MAX / 2 + 1);
     const igraph_real_t int_min = (igraph_real_t) IGRAPH_INTEGER_MIN;
-    if (int_min <= value && value < int_max_plus_1) {
+    if (IGRAPH_LIKELY(int_min <= value && value < int_max_plus_1)) {
         *result = (igraph_integer_t) value;
         return IGRAPH_SUCCESS;
+    } else if (isnan(value)) {
+        IGRAPH_ERROR("NaN cannot be converted to an integer.", IGRAPH_EINVAL);
     } else {
         /* %.f ensures exact printing, %g would not */
         IGRAPH_ERRORF("Cannot convert %.f to integer, outside of representable range.", IGRAPH_EOVERFLOW, value);
@@ -150,7 +154,20 @@ igraph_error_t igraph_i_safe_floor(igraph_real_t value, igraph_integer_t *result
  * Converts an igraph_real_t into an igraph_integer_t with range checks to
  * protect from undefined behaviour. The input value is converted into an
  * integer with round().
+ *
+ * This is typically the slowest of this set of functions.
  */
 igraph_error_t igraph_i_safe_round(igraph_real_t value, igraph_integer_t* result) {
+    return igraph_i_safe_real_to_int(round(value), result);
+}
+
+/**
+ * Converts an igraph_real_t into an igraph_integer_t with range checks to
+ * protect from undefined behaviour. The input value is converted into an
+ * integer with trunc().
+ *
+* This is typically the fastest of this set of functions.
+ */
+igraph_error_t igraph_i_safe_trunc(igraph_real_t value, igraph_integer_t* result) {
     return igraph_i_safe_real_to_int(round(value), result);
 }

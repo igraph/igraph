@@ -162,12 +162,11 @@ static igraph_error_t entity_decode(const char *src, char **dest, igraph_bool_t 
 }
 
 static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
-    igraph_integer_t i;
+
     igraph_vector_ptr_t *vec;
-    for (i = 0; i < 3; i++) {
-        igraph_integer_t j;
+    for (igraph_integer_t i = 0; i < 3; i++) {
         vec = ptr[i];
-        for (j = 0; j < igraph_vector_ptr_size(vec); j++) {
+        for (igraph_integer_t j = 0; j < igraph_vector_ptr_size(vec); j++) {
             igraph_attribute_record_t *atrec = VECTOR(*vec)[j];
             if (atrec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 igraph_vector_t *value = (igraph_vector_t*)atrec->value;
@@ -241,8 +240,8 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_integer
 
 igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t *context) {
     context->depth = 0;
-    context->scanner = 0;
-    context->tree = 0;
+    context->scanner = NULL;
+    context->tree = NULL;
     context->errmsg[0] = '\0';
     context->igraph_errno = IGRAPH_SUCCESS;
 
@@ -250,14 +249,14 @@ igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t *context) {
 }
 
 void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t *context) {
-    if (context->tree != 0) {
+    if (context->tree != NULL) {
         igraph_gml_tree_destroy(context->tree);
-        context->tree = 0;
+        context->tree = NULL;
     }
 
-    if (context->scanner != 0) {
+    if (context->scanner != NULL) {
         (void) igraph_gml_yylex_destroy(context->scanner);
-        context->scanner = 0;
+        context->scanner = NULL;
     }
 }
 
@@ -457,7 +456,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     case 0: /* success */
         break;
     case 1: /* parse error */
-        if (context.errmsg[0] != 0) {
+        if (context.errmsg[0] != '\0') {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
         } else if (context.igraph_errno != IGRAPH_SUCCESS) {
             IGRAPH_ERROR("", context.igraph_errno);
@@ -538,7 +537,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                               igraph_gml_tree_line(gtree, i));
             }
             node = igraph_gml_tree_get_tree(gtree, i);
-            hasid = 0;
+            hasid = false;
             for (igraph_integer_t j = 0; j < igraph_gml_tree_length(node); j++) {
                 const char *name = igraph_gml_tree_name(node, j);
                 igraph_i_gml_tree_type_t type = igraph_gml_tree_type(node, j);
@@ -566,7 +565,7 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         IGRAPH_ERRORF("Duplicate node id in GML file, line %" IGRAPH_PRId ".", IGRAPH_PARSEERROR,
                                       igraph_gml_tree_line(node, j));
                     }
-                    hasid = 1;
+                    hasid = true;
                 }
             }
             if (!hasid) {

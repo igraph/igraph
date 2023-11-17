@@ -29,7 +29,7 @@ int main(void) {
     /*No edges, should just return the same graph*/
     igraph_small(&g, 5, IGRAPH_DIRECTED, -1);
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 0.1,
-                                               /*loops*/ 0, /*mode*/ IGRAPH_ALL)
+                                               /*loops*/ false, /*mode*/ IGRAPH_ALL)
                   == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_ecount(&g) == 0);
     IGRAPH_ASSERT(igraph_vcount(&g) == 5);
@@ -39,14 +39,14 @@ int main(void) {
     igraph_small(&g, 10, IGRAPH_DIRECTED, 0,1, 0,3, 5,4, 4,8, 9,2, 9,3, 9,7, 7,7, 7,8, -1);
     igraph_copy(&g_copy, &g);
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 0.0,
-                                               /*loops*/ 0, /*mode*/ IGRAPH_ALL)
+                                               /*loops*/ false, /*mode*/ IGRAPH_ALL)
                   == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_copy, &same) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(same);
 
     /*Rewire*/
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 0.5,
-                                               /*loops*/ 1, /*mode*/ IGRAPH_ALL)
+                                               /*loops*/ true, /*mode*/ IGRAPH_ALL)
                   == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_copy, &same) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(!same); /*guaranteed for this seed*/
@@ -58,7 +58,7 @@ int main(void) {
     /*Out-star remains out-star if outs are moved*/
     igraph_small(&g, 10, IGRAPH_DIRECTED, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7, 0,8, 0,9, -1);
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 1.0,
-                                               /*loops*/ 0, /*mode*/ IGRAPH_OUT)
+                                               /*loops*/ false, /*mode*/ IGRAPH_OUT)
                   == IGRAPH_SUCCESS);
     igraph_vector_int_init(&degrees, 0);
     igraph_vs_1(&vertices, 0);
@@ -71,7 +71,7 @@ int main(void) {
     /*Check if multiple edges are created when using mode == IGRAPH_ALL*/
     igraph_small(&g, 5, IGRAPH_DIRECTED, 0,1, 0,2, 0,3, 0,4, 1,2, 1,3, 1,4, 2,3, 2,4, 3,4, -1);
     IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 1.0,
-                                               /*loops*/ 0, /*mode*/ IGRAPH_ALL)
+                                               /*loops*/ false, /*mode*/ IGRAPH_ALL)
                   == IGRAPH_SUCCESS);
     print_graph_canon(&g);
 
@@ -79,8 +79,8 @@ int main(void) {
     VERIFY_FINALLY_STACK();
     igraph_set_error_handler(igraph_error_handler_ignore);
 
-    IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ -0.1, /*loops*/ 0, /*mode*/ IGRAPH_ALL) == IGRAPH_EINVAL);
-    IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 1.1, /*loops*/ 0, /*mode*/ IGRAPH_ALL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ -0.1, /*loops*/ false, /*mode*/ IGRAPH_ALL) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_rewire_directed_edges(&g, /*probability*/ 1.1, /*loops*/ false, /*mode*/ IGRAPH_ALL) == IGRAPH_EINVAL);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

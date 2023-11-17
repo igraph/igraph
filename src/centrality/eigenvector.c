@@ -30,7 +30,8 @@
 
 #include <limits.h>
 
-static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
+/* Multiplies vector 'from' by the unweighted adjacency matrix and stores the result in 'to'. */
+static igraph_error_t adjmat_mul_unweighted(igraph_real_t *to, const igraph_real_t *from,
                                            int n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
     igraph_vector_int_t *neis;
@@ -46,7 +47,6 @@ static igraph_error_t igraph_i_eigenvector_centrality(igraph_real_t *to, const i
         }
     }
 
-
     return IGRAPH_SUCCESS;
 }
 
@@ -56,7 +56,8 @@ typedef struct igraph_i_eigenvector_centrality_t {
     const igraph_vector_t *weights;
 } igraph_i_eigenvector_centrality_t;
 
-static igraph_error_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
+/* Multiplies vector 'from' by the weighted adjacency matrix and stores the result in 'to'. */
+static igraph_error_t adjmat_mul_weighted(igraph_real_t *to, const igraph_real_t *from,
                                             int n, void *extra) {
 
     igraph_i_eigenvector_centrality_t *data = extra;
@@ -134,7 +135,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         if (min < 0) {
             /* When there are negative weights, the eigenvalue and the eigenvector are no
              * longer guaranteed to be non-negative. */
-            negative_weights = 1;
+            negative_weights = true;
             IGRAPH_WARNING("Negative weight in graph. The largest eigenvalue "
                            "will be selected, but it may not be the largest in magnitude.");
         }
@@ -171,7 +172,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
+        IGRAPH_CHECK(igraph_arpack_rssolve(adjmat_mul_unweighted,
                                            &adjlist, options, 0, &values, &vectors));
 
         igraph_adjlist_destroy(&adjlist);
@@ -189,7 +190,7 @@ static igraph_error_t igraph_i_eigenvector_centrality_undirected(const igraph_t 
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_LOOPS_TWICE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
+        IGRAPH_CHECK(igraph_arpack_rssolve(adjmat_mul_weighted,
                                            &data, options, 0, &values, &vectors));
 
         igraph_inclist_destroy(&inclist);
@@ -361,8 +362,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN, IGRAPH_LOOPS_ONCE, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality,
-                                           &adjlist, options, 0, &values,
+        IGRAPH_CHECK(igraph_arpack_rnsolve(adjmat_mul_unweighted,
+                                           &adjlist, options, NULL, &values,
                                            &vectors));
 
         igraph_adjlist_destroy(&adjlist);
@@ -378,8 +379,8 @@ static igraph_error_t igraph_i_eigenvector_centrality_directed(const igraph_t *g
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN, IGRAPH_LOOPS_ONCE));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality2,
-                                           &data, options, 0, &values, &vectors));
+        IGRAPH_CHECK(igraph_arpack_rnsolve(adjmat_mul_weighted,
+                                           &data, options, NULL, &values, &vectors));
 
         igraph_inclist_destroy(&inclist);
         IGRAPH_FINALLY_CLEAN(1);

@@ -119,11 +119,10 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
     IGRAPH_TRIE_INIT_FINALLY(&trie, names);
 
-    context.has_weights = 0;
+    context.has_weights = false;
     context.vector = &edges;
     context.weights = &ws;
     context.trie = &trie;
-    context.eof = 0;
     context.errmsg[0] = '\0';
     context.igraph_errno = IGRAPH_SUCCESS;
 
@@ -140,7 +139,7 @@ igraph_error_t igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     case 0: /* success */
         break;
     case 1: /* parse error */
-        if (context.errmsg[0] != 0) {
+        if (context.errmsg[0] != '\0') {
             IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
         } else if (context.igraph_errno != IGRAPH_SUCCESS) {
             IGRAPH_ERROR("", context.igraph_errno);
@@ -256,7 +255,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     /* Check if we have the names attribute */
     if (names && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX,
             names)) {
-        IGRAPH_WARNINGF("Names attribute '%s' does not exists.", names);
+        IGRAPH_WARNINGF("Names attribute '%s' does not exist.", names);
         names = NULL;
     }
     if (names) {
@@ -270,7 +269,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 
     /* Check the weights as well */
     if (weights && !igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, weights)) {
-        IGRAPH_WARNINGF("Weights attribute '%s' does not exists.", weights);
+        IGRAPH_WARNINGF("Weights attribute '%s' does not exist.", weights);
         weights = NULL;
     }
     if (weights) {

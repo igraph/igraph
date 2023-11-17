@@ -52,6 +52,30 @@ extern IGRAPH_THREAD_LOCAL igraph_interruption_handler_t *igraph_i_interruption_
         } \
     } while (0)
 
+/**
+ * \define IGRAPH_ALLOW_INTERRUPTION_LIMITED
+ *
+ * This is a variant of IGRAPH_ALLOW_INTERRUPTION() that checks for interruption
+ * only on every 'skips' call. The 'iter' macro parameter is the name of a variable,
+ * usually of type 'int', that is used to count calls to this macto. It must be declared
+ * separately, outside of the loop where IGRAPH_ALLOW_INTERRUPTION_LIMITED() is called,
+ * and initialized to 0. Example:
+ *
+ * int myiter = 0;
+ * for (igraph_integer_t i=0; i < n; i++) {
+ *     // Allow for interruption every 1000th iteration
+ *     IGRAPH_ALLOW_INTERRUPTION_LIMITED(myiter, 1000);
+ * }
+ *
+ */
+#define IGRAPH_ALLOW_INTERRUPTION_LIMITED(iter, skips) \
+    do { \
+        if (++iter >= skips) { \
+            IGRAPH_ALLOW_INTERRUPTION(); \
+            iter = 0; \
+        } \
+    } while (0)
+
 __END_DECLS
 
 #endif

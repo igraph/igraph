@@ -25,8 +25,7 @@ int main(void) {
     igraph_graph_list_clear(&complist);
 
     /* Random graph with a giant component */
-    igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100, 4.0 / 100,
-                            IGRAPH_UNDIRECTED, 0);
+    igraph_erdos_renyi_game_gnp(&g, 100, 4.0 / 100, IGRAPH_UNDIRECTED, 0);
     igraph_decompose(&g, &complist, IGRAPH_WEAK, -1, 20);
     if (igraph_graph_list_size(&complist) != 1) {
         return 1;

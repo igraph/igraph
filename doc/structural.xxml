@@ -45,9 +45,12 @@
 <!-- doxrox-include igraph_girth -->
 <!-- doxrox-include igraph_eccentricity -->
 <!-- doxrox-include igraph_eccentricity_dijkstra -->
-<!-- doxrox-include igraph_graph_center -->
 <!-- doxrox-include igraph_radius -->
+<!-- doxrox-include igraph_radius_dijkstra -->
+<!-- doxrox-include igraph_graph_center -->
+<!-- doxrox-include igraph_graph_center_dijkstra -->
 <!-- doxrox-include igraph_pseudo_diameter -->
+<!-- doxrox-include igraph_pseudo_diameter_dijkstra -->
 <!-- doxrox-include igraph_voronoi -->
 <!-- doxrox-include igraph_vertex_path_from_edge_path -->
 </section>
@@ -120,8 +123,6 @@
 <!-- doxrox-include igraph_strength -->
 <!-- doxrox-include igraph_eigenvector_centrality -->
 <!-- doxrox-include igraph_hub_and_authority_scores -->
-<!-- doxrox-include igraph_hub_score -->
-<!-- doxrox-include igraph_authority_score -->
 <!-- doxrox-include igraph_convergence_degree -->
 </section>
 
@@ -203,6 +204,9 @@
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
+<!-- doxrox-include igraph_joint_type_distribution -->
+<!-- doxrox-include igraph_joint_degree_distribution -->
+<!-- doxrox-include igraph_joint_degree_matrix -->
 </section>
 
 <section id="k-cores"><title>K-cores and k-trusses</title>
@@ -237,6 +241,7 @@
 <!-- doxrox-include igraph_diversity -->
 <!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
+<!-- doxrox-include igraph_degree_correlation_vector -->
 <!-- doxrox-include igraph_get_adjacency -->
 <!-- doxrox-include igraph_get_adjacency_sparse -->
 <!-- doxrox-include igraph_get_stochastic -->
@@ -253,6 +258,8 @@
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_laplacian -->
+<!-- doxrox-include igraph_hub_score -->
+<!-- doxrox-include igraph_authority_score -->
 </section>
 
 </chapter>

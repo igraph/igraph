@@ -1,0 +1,7 @@
+undirected star graph:
+degree centralization: 1
+betweenness centralization: 1
+closeness centralization: 1
+
+graph with single edge:
+eigenvector centralization: 1

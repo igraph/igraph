@@ -168,7 +168,7 @@ void PutRNGstate(void);
 #define RNG_BEGIN() \
     do { if (!igraph_rng_default()->is_seeded) { \
         igraph_rng_seed(igraph_rng_default(), time(0)); \
-        igraph_rng_default()->is_seeded = 1; \
+        igraph_rng_default()->is_seeded = true; \
     } } while (0)
 #define RNG_END() \
     do { /* nothing */ } while (0)

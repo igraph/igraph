@@ -37,16 +37,16 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
                                                  const igraph_vector_t *weights,
                                                  igraph_arpack_options_t *options);
 
-typedef struct igraph_i_pagerank_data_t {
+typedef struct {
     const igraph_t *graph;
     igraph_adjlist_t *adjlist;
     igraph_real_t damping;
     igraph_vector_t *outdegree;
     igraph_vector_t *tmp;
     igraph_vector_t *reset;
-} igraph_i_pagerank_data_t;
+} pagerank_data_t;
 
-typedef struct igraph_i_pagerank_data2_t {
+typedef struct {
     const igraph_t *graph;
     igraph_inclist_t *inclist;
     const igraph_vector_t *weights;
@@ -54,12 +54,15 @@ typedef struct igraph_i_pagerank_data2_t {
     igraph_vector_t *outdegree;
     igraph_vector_t *tmp;
     igraph_vector_t *reset;
-} igraph_i_pagerank_data2_t;
+} pagerank_data_weighted_t;
 
-static igraph_error_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
+/* The two pagerank_operator functions below update the probabilities of a random walker
+ * being in each of the vertices after one step of the walk. */
+
+static igraph_error_t pagerank_operator_unweighted(igraph_real_t *to, const igraph_real_t *from,
                              int n, void *extra) {
 
-    igraph_i_pagerank_data_t *data = extra;
+    pagerank_data_t *data = extra;
     igraph_adjlist_t *adjlist = data->adjlist;
     igraph_vector_t *outdegree = data->outdegree;
     igraph_vector_t *tmp = data->tmp;
@@ -118,10 +121,10 @@ static igraph_error_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
+static igraph_error_t pagerank_operator_weighted(igraph_real_t *to, const igraph_real_t *from,
                               int n, void *extra) {
 
-    igraph_i_pagerank_data2_t *data = extra;
+    pagerank_data_weighted_t *data = extra;
     const igraph_t *graph = data->graph;
     igraph_inclist_t *inclist = data->inclist;
     const igraph_vector_t *weights = data->weights;
@@ -243,7 +246,9 @@ static igraph_error_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t 
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -317,7 +322,9 @@ igraph_error_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t alg
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -406,7 +413,9 @@ igraph_error_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  *    expected to be exactly one. Checking this value can be used to diagnose cases
  *    when ARPACK failed to converge to the leading eigenvector.
  *    When using \c IGRAPH_PAGERANK_ALGO_PRPACK, this is always set to 1.0.
- * \param vids The vertex IDs for which the PageRank is returned.
+ * \param vids The vertex IDs for which the PageRank is returned. This parameter
+ *    is only for convenience. Computing PageRank for fewer than all vertices will
+ *    not speed up the calculation.
  * \param directed Boolean, whether to consider the directedness of
  *    the edges. This is ignored for undirected graphs.
  * \param damping The damping factor ("d" in the original paper).
@@ -612,7 +621,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     if (!weights) {
 
         igraph_adjlist_t adjlist;
-        igraph_i_pagerank_data_t data;
+        pagerank_data_t data;
 
         data.graph = graph;
         data.adjlist = &adjlist;
@@ -624,7 +633,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
+        IGRAPH_CHECK(igraph_arpack_rnsolve(pagerank_operator_unweighted,
                                            &data, options, NULL, &values, &vectors));
 
         igraph_adjlist_destroy(&adjlist);
@@ -633,7 +642,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
     } else {
 
         igraph_inclist_t inclist;
-        igraph_i_pagerank_data2_t data;
+        pagerank_data_weighted_t data;
 
         data.graph = graph;
         data.inclist = &inclist;
@@ -646,7 +655,7 @@ static igraph_error_t igraph_i_personalized_pagerank_arpack(const igraph_t *grap
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode, IGRAPH_LOOPS));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
-        IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
+        IGRAPH_CHECK(igraph_arpack_rnsolve(pagerank_operator_weighted,
                                            &data, options, NULL, &values, &vectors));
 
         igraph_inclist_destroy(&inclist);

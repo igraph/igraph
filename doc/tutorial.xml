@@ -42,7 +42,7 @@ type.
 </para></listitem>
 <listitem><para>
 Fourth, the <link
-linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
+linkend="igraph_erdos_renyi_game_gnm"><function>igraph_erdos_renyi_game_gnm()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
 destroys it, i.e. deallocates the memory associated to it.
@@ -114,7 +114,7 @@ not enabled in the CMake project.</para>
 
 <para>C++ support is enabled by default when no languages are explicitly
 specified in CMake's <ulink url="https://cmake.org/cmake/help/latest/command/project.html"><code>project</code></ulink>
-command, e.g. <code>project(igraph_test)</code>. If you do specify some languages explicitly, 
+command, e.g. <code>project(igraph_test)</code>. If you do specify some languages explicitly,
 make sure to also include <code>CXX</code>, e.g. <code>project(igraph_test C CXX)</code>.
 </para>
 </note>
@@ -171,9 +171,10 @@ On most systems, the executable can be run by simply typing its name like this:
 ./igraph_test
 </programlisting>
 If you use dynamic linking and the <command>igraph</command>
-library is not in a standard place, you may need to add its location to the
+library is not installed in a standard place, you may need to add its location to the
 <envar>LD_LIBRARY_PATH</envar> (Linux), <envar>DYLD_LIBRARY_PATH</envar> (macOS)
-or <envar>PATH</envar> (Windows) environment variables.
+or <envar>PATH</envar> (Windows) environment variables. This is typically necessary
+on Windows systems.
 </para>
 
 </section>

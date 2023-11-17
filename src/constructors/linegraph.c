@@ -130,10 +130,10 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
  * L(G) has one vertex for each edge in G and two different vertices in L(G)
  * are connected by an edge if their corresponding edges share an end point.
  * In a multigraph, if two end points are shared, two edges are created.
- * The vertex of a loop is counted as two end points.
+ * The single vertex of an undirected self-loop is counted as two end points.
  *
  * </para><para>
- * The line graph L(G) of a G directed graph is slightly different,
+ * The line graph L(G) of a G directed graph is slightly different:
  * L(G) has one vertex for each edge in G and two vertices in L(G) are connected
  * by a directed edge if the target of the first vertex's corresponding edge
  * is the same as the source of the second vertex's corresponding edge.
@@ -145,6 +145,7 @@ static igraph_error_t igraph_i_linegraph_directed(const igraph_t *graph, igraph_
  * </para><para>
  * The first version of this function was contributed by Vincent Matossian,
  * thanks.
+ *
  * \param graph The input graph, may be directed or undirected.
  * \param linegraph Pointer to an uninitialized graph object, the
  *        result is stored here.

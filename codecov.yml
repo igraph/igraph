@@ -1,7 +1,7 @@
 # See https://docs.codecov.io/docs/codecov-yaml for documentation
 
 codecov:
-  require_ci_to_pass: yes
+  require_ci_to_pass: true
 
 coverage:
   precision: 2
@@ -23,7 +23,7 @@ parsers:
 comment:
   layout: "reach,diff,flags,files,footer"
   behavior: default
-  require_changes: no
+  require_changes: false
 
 ignore:
   - "tests"

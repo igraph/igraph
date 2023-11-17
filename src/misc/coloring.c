@@ -82,7 +82,7 @@ static igraph_error_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, 
         IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, vertex, IGRAPH_ALL));
         igraph_integer_t nei_count = igraph_vector_int_size(&neighbors);
 
-        /* Colour current vertex by finding smallest available non-0 color.
+        /* Colour current vertex by finding the smallest available non-0 color.
          * Note that self-loops are effectively skipped as they merely prevent
          * the current vertex from being colored with the color value it presently
          * has, which is 0 (meaning uncolored). */
@@ -148,9 +148,15 @@ static int dsatur_t_compare(const void *left, const void *right) {
     const dsatur_t *left_d  = left;
     const dsatur_t *right_d = right;
     if (left_d->saturation_degree == right_d->saturation_degree) {
-        return left_d->edge_degree - right_d->edge_degree;
+        if (left_d->edge_degree == right_d->edge_degree) {
+            return 0;
+        } else if (left_d->edge_degree > right_d->edge_degree) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
-    return left_d->saturation_degree - right_d->saturation_degree;
+    return left_d->saturation_degree > right_d->saturation_degree ? 1 : -1;
 }
 
 static igraph_bool_t dsatur_is_color_used_by_neighbour(

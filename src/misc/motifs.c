@@ -309,15 +309,11 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to find motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     subg = IGRAPH_CALLOC(no_of_nodes, char);
-    if (subg == 0) {
-        IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(subg, "Insufficient memory to find motifs.");
     IGRAPH_FINALLY(igraph_free, subg);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL, IGRAPH_LOOPS_TWICE, IGRAPH_MULTIPLE));
@@ -504,32 +500,26 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
  * \function igraph_motifs_randesu_estimate
  * \brief Estimate the total number of motifs in a graph.
  *
- * This function estimates the total number of weakly connected induced
- * subgraphs, called motifs, of a fixed number of vertices. For
- * example, an undirected complete graph on \c n vertices
- * will have one motif of size \c n, and \c n motifs
+ * This function estimates the total number of (weakly) connected induced
+ * subgraphs on \p size vertices. For example, an undirected complete graph
+ * on \c n vertices will have one motif of size \c n, and \c n motifs
  * of \p size <code>n - 1</code>. As another example, one triangle
  * and a separate vertex will have zero motifs of size four.
  *
  * </para><para>
  * This function is useful for large graphs for which it is not
- * feasible to count all the different motifs, because there are very
+ * feasible to count all connected subgraphs, as there are too
  * many of them.
  *
  * </para><para>
- * The total number of motifs is estimated by taking a sample of
- * vertices and counts all motifs in which these vertices are
- * included. (There is also a \p cut_prob parameter which gives the
- * probabilities to cut a branch of the search tree.)
- *
- * </para><para>
- * Directed motifs will be counted in directed graphs and undirected
- * motifs in undirected graphs.
+ * The estimate is made by taking a sample of vertices and counting all
+ * connected subgraphs in which these vertices are included. There is also
+ * a \p cut_prob parameter which gives the probabilities to cut a branch of
+ * the search tree.
  *
  * \param graph The graph object to study.
- * \param est Pointer to an integer type, the result will be stored
- *        here.
- * \param size The size of the motifs to look for.
+ * \param est Pointer to an integer, the result will be stored here.
+ * \param size The size of the subgraphs to look for.
  * \param cut_prob Vector giving the probabilities to cut a branch of
  *        the search tree and omit counting the motifs in that branch.
  *        It contains a probability for each level. Supply \p size
@@ -543,6 +533,7 @@ igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_inte
  *        argument is used to create a sample of vertices drawn with
  *        uniform probability.
  * \return Error code.
+ *
  * \sa \ref igraph_motifs_randesu(), \ref igraph_motifs_randesu_no().
  *
  * Time complexity: TODO.
@@ -584,9 +575,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
     }
 
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to count motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
@@ -597,9 +586,7 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
 
     if (parsample == NULL) {
         sample = IGRAPH_CALLOC(1, igraph_vector_int_t);
-        if (sample == NULL) {
-            IGRAPH_ERROR("Cannot estimate motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(sample, "Insufficient memory to count motifs.");
         IGRAPH_FINALLY(igraph_free, sample);
         IGRAPH_VECTOR_INT_INIT_FINALLY(sample, 0);
         IGRAPH_CHECK(igraph_random_sample(sample, 0, no_of_nodes - 1, sample_size));
@@ -744,10 +731,9 @@ igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_inte
  * \function igraph_motifs_randesu_no
  * \brief Count the total number of motifs in a graph.
  *
- * </para><para>
- * This function counts the total number of motifs in a graph,
- * i.e. the number of of (weakly) connected triplets or quadruplets,
- * without assigning isomorphism classes to them.
+ * This function counts the total number of (weakly) connected
+ * induced subgraphs on \p size vertices, without assigning isomorphism
+ * classes to them. Arbitrarily large motif sizes are supported.
  *
  * \param graph The graph object to study.
  * \param no Pointer to an integer type, the result will be stored
@@ -784,9 +770,7 @@ igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t 
                       IGRAPH_EINVAL, igraph_vector_size(cut_prob), size);
     }
     added = IGRAPH_CALLOC(no_of_nodes, igraph_integer_t);
-    if (added == 0) {
-        IGRAPH_ERROR("Cannot find motifs.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(added, "Insufficient memory to count motifs.");
     IGRAPH_FINALLY(igraph_free, added);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&vids, 0);
@@ -1071,49 +1055,51 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
  * \function igraph_triad_census
  * \brief Triad census, as defined by Davis and Leinhardt.
  *
- * </para><para>
  * Calculating the triad census means classifying every triple of
- * vertices in a directed graph. A triple can be in one of 16 states:
+ * vertices in a directed graph based on the type of pairwise
+ * connections it contains, i.e. mutual, asymmetric or no connection.
+ * A triple can be in one of 16 states, commonly described using
+ * Davis and Leinhardt's "MAN labels". The \p res vector will
+ * contain the counts of these in the following order:
+ *
  * \clist
- * \cli 003
+ * \cli &#xa0;0: 003
  *      A, B, C, the empty graph.
- * \cli 012
+ * \cli &#xa0;1: 012
  *      A->B, C, a graph with a single directed edge.
- * \cli 102
+ * \cli &#xa0;2: 102
  *      A&lt;->B, C, a graph with a mutual connection between two vertices.
- * \cli 021D
+ * \cli &#xa0;3: 021D
  *      A&lt;-B->C, the binary out-tree.
- * \cli 021U
+ * \cli &#xa0;4: 021U
  *      A->B&lt;-C, the binary in-tree.
- * \cli 021C
+ * \cli &#xa0;5: 021C
  *      A->B->C, the directed line.
- * \cli 111D
+ * \cli &#xa0;6: 111D
  *      A&lt;->B&lt;-C.
- * \cli 111U
+ * \cli &#xa0;7: 111U
  *      A&lt;->B->C.
- * \cli 030T
+ * \cli &#xa0;8: 030T
  *      A->B&lt;-C, A->C.
- * \cli 030C
+ * \cli &#xa0;9: 030C
  *      A&lt;-B&lt;-C, A->C.
- * \cli 201
+ * \cli 10: 201
  *      A&lt;->B&lt;->C.
- * \cli 120D
+ * \cli 11: 120D
  *      A&lt;-B->C, A&lt;->C.
- * \cli 120U
+ * \cli 12: 120U
  *      A->B&lt;-C, A&lt;->C.
- * \cli 120C
+ * \cli 13: 120C
  *      A->B->C, A&lt;->C.
- * \cli 210
+ * \cli 14: 210
  *      A->B&lt;->C, A&lt;->C.
- * \cli 300
+ * \cli 15: 300
  *      A&lt;->B&lt;->C, A&lt;->C, the complete graph.
  * \endclist
  *
  * </para><para>
- * See also Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
- * Positive Interpersonal Relations in Small Groups.  In J. Berger
- * (Ed.), Sociological Theories in Progress, Volume 2, 218-251.
- * Boston: Houghton Mifflin.
+ * This function is intended for directed graphs. If the input is undirected,
+ * a warning is shown, and undirected edges will be interpreted as mutual.
  *
  * </para><para>
  * This function calls \ref igraph_motifs_randesu() which is an
@@ -1122,8 +1108,16 @@ static igraph_error_t igraph_i_triad_census_24(const igraph_t *graph, igraph_rea
  * triads is not the same for \ref igraph_triad_census() and \ref
  * igraph_motifs_randesu().
  *
- * \param graph The input graph. A warning is given for undirected
- *   graphs, as the result is undefined for those.
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
+ * Positive Interpersonal Relations in Small Groups.  In J. Berger
+ * (Ed.), Sociological Theories in Progress, Volume 2, 218-251.
+ * Boston: Houghton Mifflin.
+ *
+ * \param graph The input graph.
  * \param res Pointer to an initialized vector, the result is stored
  *   here in the same order as given in the list above. Note that this
  *   order is different than the one used by \ref igraph_motifs_randesu().
@@ -1143,7 +1137,7 @@ igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) 
     igraph_real_t total;
 
     if (!igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Triad census called on an undirected graph");
+        IGRAPH_WARNING("Triad census called on an undirected graph. All connections will be treated as mutual.");
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);

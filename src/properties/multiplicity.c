@@ -89,8 +89,8 @@ igraph_error_t igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
     /* If the graph turned out to be simple, we can cache that it has no loop
      * and no multiple edges */
     if (*res) {
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, 0);
-        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, 0);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_LOOP, false);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_HAS_MULTI, false);
     }
 
     return IGRAPH_SUCCESS;
@@ -422,12 +422,13 @@ igraph_error_t igraph_is_mutual(const igraph_t *graph, igraph_vector_bool_t *res
  * is controlled by the \p loops parameter.
  *
  * </para><para>
- * An undirected graph only has mutual edges, by definition.
+ * In undirected graphs, all edges are considered mutual by definition.
+ * Thus for undirected graph, this function returns false only when there
+ * are no edges.
  *
  * </para><para>
- * Edge multiplicity is not considered here, e.g. if there are two
- * (A,B) edges and one (B,A) edge, then all three are considered to be
- * mutual.
+ * To check whether a graph is an oriented graph, use this function in
+ * conjunction with \ref igraph_is_directed().
  *
  * \param graph The input graph.
  * \param res Pointer to a boolean, the result will be stored here.

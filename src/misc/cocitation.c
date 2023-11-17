@@ -24,7 +24,6 @@
 
 #include "igraph_cocitation.h"
 
-#include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 
@@ -449,6 +448,7 @@ igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t 
  */
 igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
                                     const igraph_vector_int_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_lazy_adjlist_t al;
     igraph_integer_t u, v;
     igraph_integer_t len_union, len_intersection;
@@ -457,6 +457,9 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
     igraph_integer_t k = igraph_vector_int_size(pairs);
     if (k % 2 != 0) {
         IGRAPH_ERROR("Number of elements in `pairs' must be even.", IGRAPH_EINVAL);
+    }
+    if (!igraph_vector_int_isininterval(pairs, 0, no_of_nodes - 1)) {
+        IGRAPH_ERROR("Invalid vertex ID in pairs.", IGRAPH_EINVVID);
     }
     IGRAPH_CHECK(igraph_vector_resize(res, k / 2));
 
@@ -467,7 +470,7 @@ igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vec
         /* Add the loop edges */
 
         igraph_vector_bool_t seen;
-        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, igraph_vcount(graph));
+        IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen, no_of_nodes);
 
         for (igraph_integer_t i = 0; i < k; i++) {
             igraph_integer_t j = VECTOR(*pairs)[i];

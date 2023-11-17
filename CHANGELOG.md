@@ -2,9 +2,86 @@
 
 ## [master]
 
-### Changes
+## [0.10.8] - 2023-11-17
+
+### Added
+
+ - `igraph_joint_degree_matrix()` computes the joint degree matrix, i.e. counts connections between vertices of different degrees. (PR #2407 by Lára Margrét Hólmfríðardóttir @larah19)
+ - `igraph_joint_degree_distribution()` computes the joint distribution of degrees at either end of edges.
+ - `igraph_joint_type_distribution()` computes the joint distribution of vertex categories at either end of edges, i.e. the mixing matrix.
+ - `igraph_degree_correlation_vector()` computes the degree correlation function and its various directed generalizations.
+
+### Changed
+
+ - The behaviour of the Pajek format reader and writer is now more closely aligned with the Pajek software and the reader is more tolerant of input it cannot interpret. Only those vertex and edge parameters are treated as valid which Pajek itself understands, therefore support for `size` is now dropped, and support for the `font` edge parameter is added. See http://mrvar.fdv.uni-lj.si/pajek/DrawEPS.htm for more information. Invalid/unrecognized parameters are now converted to igraph attributes by the reader, but just as before, they are not output by the writer.
+ - The Pajek format writer now encodes newline and quotation mark characters in a Pajek-compatible manner (`\n` and `&#34;`, respectively).
+ - `igraph_avg_nearest_neighbor_degree()` now supports non-simple graphs.
+
+### Fixed
+
+ - Resolved "ignoring duplicate libraries" warning when building tests with Xcode 15 on macOS.
+ - Fixed the handling of duplicate vertex IDs in `igraph_induced_subgraph()`.
+ - `igraph_vector_which_min()` and `igraph_vector_which_max()` no longer allow zero-length input, which makes them consistent with other similar functions, and was the originally intended behaviour. Passing zero-length input is invalid use and currently triggers an assertion failure.
+ - `igraph_erdos_renyi_game_gnm()` and `igraph_erdos_renyi_game_gnp()` are now interruptible.
+ - `igraph_de_bruijn()` and `igraph_kautz()` are now interruptible.
+ - `igraph_full()`, `igraph_full_citation()`, `igraph_full_multipartite()` and `igraph_turan()` are now interruptible.
+ - `igraph_avg_nearest_neighbor_degree()` did not compute `knnk` correctly in the weighted case.
+ - Fixed variadic arguments of invalid types, which could cause incorrect behaviour with `igraph_matrix_print()`, as well as test suite failures, on some platforms. 32-bit x86 was affected when setting `IGRAPH_INTEGER_SIZE` to 64.
+ - `igraph_subisomorphic_lad()` now returns a single null map when the pattern is the null graph.
+ - `igraph_community_spinglass()` now checks its parameters more carefully.
+ - `igraph_similarity_dice_pairs()` and `igraph_similarity_jaccard_pairs()` now validate vertex IDs.
+ - `igraph_maxflow()` now returns an error code if the source and target vertices are the same. It used to get stuck in an infinite loop in earlier versions when the `flow` argument was non-NULL.
+
+### Other
+
+ - Updated vendored mini-gmp to 6.3.0.
+ - `igraph_connected_components()` makes better use of the cache, improving overall performance.
+ - Documentation improvements.
+
+## [0.10.7] - 2023-09-04
+
+### Added
+
+ - `igraph_radius_dijkstra()` computes the graph radius with weighted edges (experimental function).
+ - `igraph_graph_center_dijkstra()` computes the graph center, i.e. the set of minimum eccentricity vertices, with weighted edges (experimental function).
+
+### Fixed
+
+ - `igraph_full_bipartite()` now checks for overflow.
+ - `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` are now more robust to overflow.
+ - Bipartite graph creation functions now check input arguments.
+ - `igraph_write_graph_dot()` now quotes real numbers written in exponential notation as necessary.
+ - Independent vertex set finding functions could trigger the fatal error "Finally stack too large" when called on large graphs.
+
+### Deprecated
+
+ - `igraph_bipartite_game()` is now deprecated; use `igraph_bipartite_game_gnm()` and `igraph_bipartite_game_gnp()` instead.
+
+### Other
+
+ - Documentation improvements.
+
+## [0.10.6] - 2023-07-13
+
+### Fixed
+
+ - Compatibility with libxml2 2.11.
+ - Fixed some converge failures in `igraph_community_voronoi()`.
+ - `IGRAPH_CALLOC()` and `IGRAPH_REALLOC()` now check for overflow.
+ - CMake packages created with the `install` target of the CMake build system are now relocatable, i.e. the generated `igraph-targets.cmake` file does not contain absolute paths any more.
+
+## [0.10.5] - 2023-06-29
+
+### Added
+
+ - `igraph_graph_power()` computes the kth power of a graph (experimental function).
+ - `igraph_community_voronoi()` for detecting communities using Voronoi partitioning (experimental function).
+
+### Changed
 
  - `igraph_community_walktrap()` no longer requires `modularity` and `merges` to be non-NULL when `membership` is non-NULL.
+ - `igraph_isomorphic()` now supports multigraphs.
+ - Shortest path related functions now consistently ignore edges with positive infinite weights.
 
 ### Fixed
 
@@ -13,15 +90,22 @@
  - `igraph_minimum_spanning_tree()` and `igraph_minimum_spanning_tree_prim()` now check that edge weights are not NaN.
  - Fixed an initialization error in the string attribute combiner of the C attribute handler.
  - Fixed an issue with the weighted clique number calculation when all the weights were the same.
- - HRG functions now require a graph with at least vertices; previous versions crashed with smaller graphs.
+ - HRG functions now require a graph with at least 3 vertices; previous versions crashed with smaller graphs.
+ - `igraph_arpack_rssolve()` and `igraph_arpack_rnsolve()`, i.e. the ARPACK interface in igraph, are now interruptible. As a result, several other functions that rely on ARPACK (eigenvector centrality, hub and authority scores, etc.) also became interruptible.
+ - `igraph_get_shortest_paths_dijkstra()`, `igraph_get_all_shortest_paths_dijkstra()` and `igraph_get_shortest_paths_bellman_ford()` now validate the `from` vertex.
+ - Fixed bugs in `igraph_local_scan_1_ecount()` for weighted undirected graphs which would miscount loops and multi-edges.
 
 ### Deprecated
 
 - `igraph_automorphisms()` is now deprecated; its new name is `igraph_count_automorphisms()`. The old name is kept available until at least igraph 0.11.
+- `igraph_hub_score()` and `igraph_authority_score()` are now deprecated. Use `igraph_hub_and_authority_scores()` instead.
+- `igraph_get_incidence()` is now deprecated; its new name is `igraph_get_biadjacency()` to reflect that the returned matrix is an _adjacency_ matrix between pairs of vertices and not an _incidence_ matrix between vertices and edges. The new name is kept available until at least igraph 0.11. We plan to re-use the name in later versions to provide a proper incidence matrix where the rows are vertices and the columns are edges.
+- `igraph_hrg_dendrogram()` is deprecated because it requires an attribute handler and it goes against the convention of returning attributes in vectors where possible. Use `igraph_from_hrg_dendrogram()` instead, which constructs the dendrogram as an igraph graph _and_ returns the associated probabilities in a vector.
 
 ### Other
 
  - Improved performance for `igraph_vertex_connectivity()`.
+ - `igraph_simplify()` makes use of the cache, and avoids simplification when the graph is already known to be simple.
  - Documentation improvements.
 
 ## [0.10.4] - 2023-01-26
@@ -29,7 +113,7 @@
 ### Added
 
  - `igraph_get_shortest_path_astar()` finds a shortest path with the A* algorithm.
- - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics (#2284, thanks to @professorcode1).
+ - `igraph_vertex_coloring_greedy()` now supports the DSatur heuristics through `IGRAPH_COLORING_GREEDY_DSATUR` (#2284, thanks to @professorcode1).
 
 ### Changed
 
@@ -635,6 +719,7 @@ Some of the highlights are:
    incorrect (it was always zero). This is now fixed.
  - `igraph_correlated_game()` would return incorrect results, or exhaust the memory,
     for most input graphs that were not generated with `igraph_erdos_renyi_game_gnp()`.
+ - `igraph_community_label_propagation` incorrectly did not result in all labels being dominant (issue #1963, fixed in PR #1966).
 
 ### Other
 
@@ -1158,7 +1243,11 @@ Some of the highlights are:
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
 
-[master]: https://github.com/igraph/igraph/compare/0.10.4..master
+[master]: https://github.com/igraph/igraph/compare/0.10.8..master
+[0.10.8]: https://github.com/igraph/igraph/compare/0.10.7..0.10.8
+[0.10.7]: https://github.com/igraph/igraph/compare/0.10.6..0.10.7
+[0.10.6]: https://github.com/igraph/igraph/compare/0.10.5..0.10.6
+[0.10.5]: https://github.com/igraph/igraph/compare/0.10.4..0.10.5
 [0.10.4]: https://github.com/igraph/igraph/compare/0.10.3..0.10.4
 [0.10.3]: https://github.com/igraph/igraph/compare/0.10.2..0.10.3
 [0.10.2]: https://github.com/igraph/igraph/compare/0.10.1..0.10.2

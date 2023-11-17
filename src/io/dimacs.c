@@ -64,6 +64,13 @@ igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
         } \
     } while (0)
 
+#define CHECK_VID(vid) \
+    do { \
+        if (vid > IGRAPH_DIMACS_MAX_VERTEX_COUNT) { \
+            IGRAPH_ERRORF("Vertex ID %" IGRAPH_PRId " too large in DIMACS file.", IGRAPH_PARSEERROR, vid); \
+        } \
+    } while(0)
+
 /**
  * \function igraph_read_graph_dimacs_flow
  * \brief Read a graph in DIMACS format.
@@ -130,7 +137,6 @@ igraph_error_t igraph_read_graph_dimacs_flow(
     igraph_integer_t tsource = -1;
     igraph_integer_t ttarget = -1;
     char prob[21];
-    char c;
     enum {
         PROBLEM_NONE,
         PROBLEM_EDGE,
@@ -253,6 +259,8 @@ igraph_error_t igraph_read_graph_dimacs_flow(
             }
             read = fscanf(instream, "%" IGRAPH_PRId " %" IGRAPH_PRId " %lf", &from, &to, &cap);
             EXPECT(read, 3);
+            CHECK_VID(from);
+            CHECK_VID(to);
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from - 1));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to - 1));
             if (capacity) {
@@ -268,6 +276,8 @@ igraph_error_t igraph_read_graph_dimacs_flow(
             }
             read = fscanf(instream, "%" IGRAPH_PRId " %" IGRAPH_PRId "", &from, &to);
             EXPECT(read, 2);
+            CHECK_VID(from);
+            CHECK_VID(to);
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, from - 1));
             IGRAPH_CHECK(igraph_vector_int_push_back(&edges, to - 1));
             break;
@@ -277,7 +287,7 @@ igraph_error_t igraph_read_graph_dimacs_flow(
         }
 
         /* Go to next line */
-        while (!feof(instream) && (c = (char) getc(instream)) != '\n') ;
+        while (!feof(instream) && getc(instream) != '\n') ;
     }
 
     if (source) {
@@ -288,8 +298,8 @@ igraph_error_t igraph_read_graph_dimacs_flow(
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
-    igraph_vector_int_destroy(&edges);
 
+    igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;

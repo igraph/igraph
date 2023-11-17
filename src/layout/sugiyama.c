@@ -787,7 +787,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
                     layering, layer_index, IGRAPH_IN, layout, &barycenters);
 
 #ifdef SUGIYAMA_DEBUG
-            printf("Layer %ld, aligning to upper barycenters\n", layer_index);
+            printf("Layer %" IGRAPH_PRId ", aligning to upper barycenters\n", layer_index);
             printf("Vertices: "); igraph_vector_int_print(layer_members);
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
@@ -820,7 +820,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
                     layering, layer_index, IGRAPH_OUT, layout, &barycenters);
 
 #ifdef SUGIYAMA_DEBUG
-            printf("Layer %ld, aligning to lower barycenters\n", layer_index);
+            printf("Layer %" IGRAPH_PRId ", aligning to lower barycenters\n", layer_index);
             printf("Vertices: "); igraph_vector_int_print(layer_members);
             printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
@@ -845,7 +845,7 @@ static igraph_error_t igraph_i_layout_sugiyama_order_nodes_horizontally(const ig
         }
 
 #ifdef SUGIYAMA_DEBUG
-        printf("==== Finished iteration %ld\n", iter);
+        printf("==== Finished iteration %" IGRAPH_PRId "\n", iter);
 #endif
 
         iter++;
@@ -868,14 +868,14 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
         const igraph_i_layering_t* layering, const igraph_matrix_t* layout,
         const igraph_vector_bool_t* ignored_edges,
         igraph_bool_t reverse, igraph_bool_t align_right,
-        igraph_vector_t* roots, igraph_vector_t* align);
+        igraph_vector_int_t* roots, igraph_vector_int_t* align);
 static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igraph_t* graph,
-        const igraph_vector_t* vertex_to_the_left,
-        const igraph_vector_t* roots, const igraph_vector_t* align,
+        const igraph_vector_int_t* vertex_to_the_left,
+        const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_real_t hgap, igraph_vector_t* xs);
-static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_integer_t v,
-        const igraph_vector_t* vertex_to_the_left,
-        const igraph_vector_t* roots, const igraph_vector_t* align,
+static void igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_integer_t v,
+        const igraph_vector_int_t* vertex_to_the_left,
+        const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_vector_int_t* sinks, igraph_vector_t* shifts,
         igraph_real_t hgap, igraph_vector_t* xs);
 
@@ -889,8 +889,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_int_t neis1, neis2;
     igraph_vector_t xs[4];
-    igraph_vector_t roots, align;
-    igraph_vector_t vertex_to_the_left;
+    igraph_vector_int_t roots, align;
+    igraph_vector_int_t vertex_to_the_left;
     igraph_vector_bool_t ignored_edges;
 
     /*
@@ -912,7 +912,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     IGRAPH_CHECK(igraph_vector_bool_init(&ignored_edges, no_of_edges));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &ignored_edges);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&vertex_to_the_left, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&vertex_to_the_left, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis1, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&neis2, 0);
 
@@ -998,8 +998,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
         IGRAPH_VECTOR_INIT_FINALLY(&xs[i], no_of_nodes);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&roots, no_of_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&align, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&roots, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&align, no_of_nodes);
 
     for (i = 0; i < 4; i++) {
         IGRAPH_CHECK(igraph_i_layout_sugiyama_vertical_alignment(graph,
@@ -1051,8 +1051,8 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
                                      VECTOR(xs[2])[i], VECTOR(xs[3])[i]);
     }
 
-    igraph_vector_destroy(&roots);
-    igraph_vector_destroy(&align);
+    igraph_vector_int_destroy(&roots);
+    igraph_vector_int_destroy(&align);
     IGRAPH_FINALLY_CLEAN(2);
 
     for (i = 0; i < 4; i++) {
@@ -1060,7 +1060,7 @@ static igraph_error_t igraph_i_layout_sugiyama_place_nodes_horizontally(const ig
     }
     IGRAPH_FINALLY_CLEAN(4);
 
-    igraph_vector_destroy(&vertex_to_the_left);
+    igraph_vector_int_destroy(&vertex_to_the_left);
     IGRAPH_FINALLY_CLEAN(1);
 
     igraph_vector_bool_destroy(&ignored_edges);
@@ -1073,7 +1073,7 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
         const igraph_i_layering_t* layering, const igraph_matrix_t* layout,
         const igraph_vector_bool_t* ignored_edges,
         igraph_bool_t reverse, igraph_bool_t align_right,
-        igraph_vector_t* roots, igraph_vector_t* align) {
+        igraph_vector_int_t* roots, igraph_vector_int_t* align) {
     igraph_integer_t i, j, k, n, di, dj, i_limit, j_limit, r;
     igraph_integer_t no_of_layers = igraph_i_layering_num_layers(layering);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -1086,8 +1086,8 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
     IGRAPH_VECTOR_INIT_FINALLY(&xs, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&inds, 0);
 
-    IGRAPH_CHECK(igraph_vector_resize(roots, no_of_nodes));
-    IGRAPH_CHECK(igraph_vector_resize(align, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_resize(roots, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_int_resize(align, no_of_nodes));
 
     for (i = 0; i < no_of_nodes; i++) {
         VECTOR(*roots)[i] = VECTOR(*align)[i] = i;
@@ -1209,8 +1209,8 @@ static igraph_error_t igraph_i_layout_sugiyama_vertical_alignment(const igraph_t
  * `hgap` is the preferred horizontal gap between vertices.
  */
 static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igraph_t* graph,
-        const igraph_vector_t* vertex_to_the_left,
-        const igraph_vector_t* roots, const igraph_vector_t* align,
+        const igraph_vector_int_t* vertex_to_the_left,
+        const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_real_t hgap, igraph_vector_t* xs) {
     igraph_integer_t i;
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
@@ -1239,10 +1239,8 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igrap
      */
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*roots)[i] == i) {
-            IGRAPH_CHECK(
-                igraph_i_layout_sugiyama_horizontal_compaction_place_block(i,
-                        vertex_to_the_left, roots, align, &sinks, &shifts, hgap, xs)
-            );
+            igraph_i_layout_sugiyama_horizontal_compaction_place_block(i,
+                vertex_to_the_left, roots, align, &sinks, &shifts, hgap, xs);
         }
     }
 
@@ -1269,16 +1267,16 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction(const igrap
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_integer_t v,
-        const igraph_vector_t* vertex_to_the_left,
-        const igraph_vector_t* roots, const igraph_vector_t* align,
+static void igraph_i_layout_sugiyama_horizontal_compaction_place_block(igraph_integer_t v,
+        const igraph_vector_int_t* vertex_to_the_left,
+        const igraph_vector_int_t* roots, const igraph_vector_int_t* align,
         igraph_vector_int_t* sinks, igraph_vector_t* shifts,
         igraph_real_t hgap, igraph_vector_t* xs) {
     igraph_integer_t u, w;
     igraph_integer_t u_sink, v_sink;
 
     if (VECTOR(*xs)[v] >= 0) {
-        return IGRAPH_SUCCESS;
+        return;
     }
 
     VECTOR(*xs)[v] = 0;
@@ -1291,10 +1289,8 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction_place_block
             /* Get the root of u (proceeding all the way upwards in the block) */
             u = VECTOR(*roots)[u];
             /* Place the block of u recursively */
-            IGRAPH_CHECK(
-                igraph_i_layout_sugiyama_horizontal_compaction_place_block(u,
-                        vertex_to_the_left, roots, align, sinks, shifts, hgap, xs)
-            );
+            igraph_i_layout_sugiyama_horizontal_compaction_place_block(u,
+                    vertex_to_the_left, roots, align, sinks, shifts, hgap, xs);
 
             u_sink = VECTOR(*sinks)[u];
             v_sink = VECTOR(*sinks)[v];
@@ -1323,8 +1319,6 @@ static igraph_error_t igraph_i_layout_sugiyama_horizontal_compaction_place_block
         /* Follow the alignment */
         w = VECTOR(*align)[w];
     } while (w != v);
-
-    return IGRAPH_SUCCESS;
 }
 
 #undef IS_INNER_SEGMENT

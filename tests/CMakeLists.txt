@@ -176,7 +176,8 @@ add_examples(
   igraph_barabasi_game2
   igraph_create
   igraph_degree_sequence_game
-  igraph_erdos_renyi_game
+  igraph_erdos_renyi_game_gnm
+  igraph_erdos_renyi_game_gnp
   igraph_full
   igraph_grg_game
   igraph_kary_tree
@@ -193,7 +194,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   constructor-failure
-  erdos_renyi_game
+  erdos_renyi_game_gnm
   erdos_renyi_game_gnp
   full
   igraph_adjacency
@@ -267,7 +268,7 @@ add_examples(
   igraph_is_loop
   igraph_is_multiple
   igraph_list_triangles
-  igraph_knn
+  igraph_avg_nearest_neighbor_degree
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
@@ -282,9 +283,11 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   all_shortest_paths
   assortativity
+  components
   coreness
   efficiency
   global_transitivity
+  harmonic_centrality
   hub_and_authority
   igraph_adjacent_triangles
   igraph_are_connected
@@ -327,6 +330,8 @@ add_legacy_tests(
   igraph_is_tree
   igraph_is_forest
   igraph_is_forest2
+  igraph_joint_degree_distribution
+  igraph_joint_type_distribution
   igraph_is_acyclic
   igraph_list_triangles
   igraph_local_scan_k_ecount
@@ -349,11 +354,11 @@ add_legacy_tests(
   igraph_unfold_tree
   igraph_voronoi
   igraph_widest_paths
-  harmonic_centrality
+  igraph_spanner
+  knn
   random_spanning_tree
   single_target_shortest_path
   topological_sorting
-  igraph_spanner
 )
 
 add_legacy_tests(
@@ -447,6 +452,7 @@ add_legacy_tests(
   bliss_automorphisms
   igraph_get_isomorphisms_vf2
   igraph_get_subisomorphisms_vf2
+  igraph_isomorphic
   igraph_isomorphic_vf2
   igraph_subisomorphic
   igraph_subisomorphic_lad
@@ -528,6 +534,7 @@ set_property(TEST example::igraph_power_law_fit APPEND PROPERTY ENVIRONMENT "OMP
 add_legacy_tests(
   FOLDER tests/unit NAMES
   all_almost_e
+  cmp_epsilon
   igraph_almost_equals
   igraph_convex_hull
   igraph_power_law_fit
@@ -553,6 +560,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_contract_vertices
   igraph_connect_neighborhood
+  igraph_graph_power
   igraph_induced_subgraph
   igraph_induced_subgraph_map
   igraph_induced_subgraph_edges
@@ -560,6 +568,7 @@ add_legacy_tests(
   igraph_permute_vertices
   igraph_reverse_edges
   igraph_rewire_directed_edges
+  igraph_union
 )
 
 # conversion.at
@@ -599,6 +608,7 @@ add_examples(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_all_st_mincuts
   igraph_dominator_tree
   igraph_st_mincut_value
   igraph_vertex_disjoint_paths
@@ -650,6 +660,7 @@ add_legacy_tests(
   igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector2
+  igraph_community_voronoi
   igraph_compare_communities
   igraph_le_community_to_membership
   igraph_modularity
@@ -678,6 +689,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_clique_size_hist
+  igraph_maximal_cliques
   igraph_maximal_cliques2
   igraph_maximal_cliques3
   igraph_maximal_cliques4
@@ -758,8 +770,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
-  igraph_get_incidence
-  igraph_incidence
+  igraph_biadjacency
+  igraph_get_biadjacency
 )
 
 # centralization.at
@@ -794,6 +806,7 @@ add_examples(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_cohesive_blocks
+  igraph_minimum_size_separators
 )
 
 add_legacy_tests(
@@ -965,6 +978,7 @@ add_benchmarks(
   igraph_coloring
   igraph_decompose
   igraph_degree
+  igraph_degree_sequence_game
   igraph_distances
   igraph_ecc
   igraph_induced_subgraph_edges
@@ -995,4 +1009,9 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_triangular_lattice
   igraph_hexagonal_lattice
+)
+
+add_legacy_tests(
+        FOLDER tests/unit NAMES
+        jdm
 )

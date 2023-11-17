@@ -105,11 +105,10 @@
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(n|E|),
- * n is the number
- * of vertices for which the calculation is done and
- * |E| is the number
- * of edges in the graph.
+ * Time complexity: O(n|E|) for the unweighted case and O(n|E|log|V|+|V|)
+ * for the weighted case, where n is the number
+ * of vertices for which the calculation is done, |V| is the number of vertices
+ * and |E| is the number of edges in the graph.
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness(),
  *   \ref igraph_harmonic_centrality().
@@ -175,7 +174,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     }
 
     if (all_reachable) {
-        *all_reachable = 1; /* be optimistic */
+        *all_reachable = true; /* be optimistic */
     }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
@@ -251,7 +250,7 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
         if (all_reachable) {
             if (nodes_reached < no_of_nodes) {
-                *all_reachable = 0 /* false */;
+                *all_reachable = false;
             }
         }
     } /* !IGRAPH_VIT_END(vit) */
@@ -316,11 +315,11 @@ static igraph_error_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(n|E|),
- * n is the number
- * of vertices for which the calculation is done and
- * |E| is the number
- * of edges in the graph.
+ * Time complexity: At most O(n|E|) for the unweighted case and O(n|E|log|V|+|V|)
+ * for the weighted case, where n is the number
+ * of vertices for which the calculation is done, |V| is the number of vertices
+ * and |E| is the number of edges in the graph. The timing decreases with smaller
+ * cutoffs in a way that depends on the graph structure.
  *
  * \sa \ref igraph_closeness() to calculate the exact closeness centrality.
  */
@@ -361,7 +360,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
     }
 
     if (all_reachable) {
-        *all_reachable = 1; /* be optimistic */
+        *all_reachable = true; /* be optimistic */
     }
 
     if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
@@ -429,7 +428,7 @@ igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *r
 
         if (all_reachable) {
             if (nodes_reached < no_of_nodes) {
-                *all_reachable = 0 /* false */;
+                *all_reachable = false;
             }
         }
     }
@@ -455,7 +454,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
                                                    igraph_real_t cutoff) {
 
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t already_counted;
+    igraph_vector_int_t already_counted;
     igraph_vector_int_t *neis;
     igraph_integer_t i, j;
     igraph_adjlist_t allneis;
@@ -477,7 +476,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
         IGRAPH_ERROR("Invalid mode for harmonic centrality.", IGRAPH_EINVMODE);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&already_counted, no_of_nodes);
     IGRAPH_DQUEUE_INT_INIT_FINALLY(&q, 100);
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode, IGRAPH_LOOPS, IGRAPH_MULTIPLE));
@@ -536,7 +535,7 @@ static igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *gr
 
     /* Clean */
     igraph_dqueue_int_destroy(&q);
-    igraph_vector_destroy(&already_counted);
+    igraph_vector_int_destroy(&already_counted);
     igraph_vit_destroy(&vit);
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(4);
@@ -714,9 +713,11 @@ static igraph_error_t igraph_i_harmonic_centrality_weighted(const igraph_t *grap
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(n|E|), where
- * n is the number of vertices for which the calculation is done and
- * |E| is the number of edges in the graph.
+ * Time complexity: At most O(n|E|) for the unweighted case and O(n|E|log|V|+|V|)
+ * for the weighted case, where n is the number
+ * of vertices for which the calculation is done, |V| is the number of vertices
+ * and |E| is the number of edges in the graph. The timing decreases with smaller
+ * cutoffs in a way that depends on the graph structure.
  *
  * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_betweenness().
  */
@@ -791,9 +792,10 @@ igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_v
  *           invalid mode argument.
  *        \endclist
  *
- * Time complexity: O(n|E|), where
- * n is the numberof vertices for which the calculation is done and
- * |E| is the number of edges in the graph.
+ * Time complexity: O(n|E|) for the unweighted case and O(n*|E|log|V|+|V|)
+ * for the weighted case, where n is the number
+ * of vertices for which the calculation is done, |V| is the number of vertices
+ * and |E| is the number of edges in the graph.
  *
  * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_degree(), \ref igraph_betweenness().
  */

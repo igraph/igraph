@@ -29,7 +29,7 @@ int main(void) {
 
     // Bipartite
     //==========================================================
-    igraph_bipartite_game(&graph, NULL, IGRAPH_ERDOS_RENYI_GNM, 10, 10, 0, 20, IGRAPH_UNDIRECTED, IGRAPH_ALL);
+    igraph_bipartite_game_gnm(&graph, NULL, 10, 10, 20, IGRAPH_UNDIRECTED, IGRAPH_ALL);
     igraph_is_perfect(&graph, &is_perfect);
     IGRAPH_ASSERT(is_perfect);
     igraph_destroy(&graph);
@@ -123,7 +123,7 @@ int main(void) {
     igraph_destroy(&graph);
 
     // Test directed paths
-    igraph_bipartite_game(&graph, NULL, IGRAPH_ERDOS_RENYI_GNM, 10, 10, 0, 20, IGRAPH_DIRECTED, IGRAPH_ALL);
+    igraph_bipartite_game_gnm(&graph, NULL, 10, 10, 20, IGRAPH_DIRECTED, IGRAPH_ALL);
     ehandler = igraph_set_error_handler(igraph_error_handler_printignore);
     IGRAPH_ASSERT(igraph_is_perfect(&graph, &is_perfect) == IGRAPH_EINVAL);
     igraph_set_error_handler(ehandler);

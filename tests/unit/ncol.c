@@ -57,8 +57,7 @@ int main(void) {
      * but does not verify attributes. */
     igraph_is_same_graph(&g_in, &g_out, &same);
     if (!same) {
-        printf("Written and read graph are not the same.\n");
-        abort();
+        IGRAPH_FATAL("Written and read graph are not the same.");
     }
 
     print_attributes(&g_out);

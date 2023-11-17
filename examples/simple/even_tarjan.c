@@ -35,9 +35,9 @@ int main(void) {
     /* --------------------------------------------------- */
 
     igraph_famous(&g, "meredith");
-    igraph_even_tarjan_reduction(&g, &gbar, /*capacity=*/ 0);
+    igraph_even_tarjan_reduction(&g, &gbar, /*capacity=*/ NULL);
 
-    igraph_vertex_connectivity(&g, &k1, /* checks= */ 0);
+    igraph_vertex_connectivity(&g, &k1, /* checks= */ false);
 
     n = igraph_vcount(&g);
     for (i = 0; i < n; i++) {

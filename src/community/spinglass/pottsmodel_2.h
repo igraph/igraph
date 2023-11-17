@@ -54,10 +54,11 @@
 // Simple matrix class with heap allocation, allowing mat[i][j] indexing.
 class SimpleMatrix {
     double *data;
-    size_t n;
+    const size_t n;
 
 public:
     explicit SimpleMatrix(size_t n_) : n(n_) { data = new double[n*n]; }
+    SimpleMatrix(const SimpleMatrix &) = delete;
     ~SimpleMatrix() { delete [] data; }
 
     // Return a pointer to the i'th column, which can be indexed into using a second [] operator.
@@ -67,102 +68,89 @@ public:
 
 class PottsModel {
 private:
-    //  HugeArray<double> neg_gammalookup;
-    //  HugeArray<double> pos_gammalookup;
-    DL_Indexed_List<unsigned long*> *new_spins;
-    DL_Indexed_List<unsigned long*> *previous_spins;
+    //these lists are needed to keep track of spin states for parallel update mode
+    DL_Indexed_List<igraph_integer_t*> new_spins;
+    DL_Indexed_List<igraph_integer_t*> previous_spins;
+
     HugeArray<HugeArray<double>*> correlation;
     network *net;
-    unsigned long q;
+    igraph_integer_t q;
     unsigned int operation_mode;
-    // FILE *Qfile, *Magfile;
     SimpleMatrix Qmatrix;
     double* Qa;
     double* weights;
     double total_degree_sum;
-    unsigned long num_of_nodes;
-    unsigned long num_of_links;
-    unsigned long k_max;
-    double energy;
-    double acceptance;
-    double *neighbours;
-public:
-    PottsModel(network *net, unsigned long q, int norm_by_degree);
-    ~PottsModel();
+    igraph_integer_t num_of_nodes;
+    igraph_integer_t num_of_links;
+    igraph_integer_t k_max = 0;
+    double acceptance = 0;
+    double* neighbours;
     double* color_field;
-    unsigned long assign_initial_conf(igraph_integer_t spin);
-    unsigned long initialize_lookup(double kT, double gamma);
+public:
+    PottsModel(network *net, igraph_integer_t q, int norm_by_degree);
+    ~PottsModel();
+
+    igraph_integer_t assign_initial_conf(igraph_integer_t spin);
+
     double initialize_Qmatrix();
     double calculate_Q();
-    double calculate_genQ(double gamma);
+
     double FindStartTemp(double gamma, double prob,  double ts);
-    long   HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
+    igraph_integer_t HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
     double HeatBathLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
-    long   HeatBathParallelLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
+    igraph_integer_t HeatBathParallelLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
     double HeatBathLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
-    double GammaSweep(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel = true, int repetitions = 1);
-    double GammaSweepZeroTemp(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel = true, int repetitions = 1);
-    // long   WriteCorrelationMatrix(char *filename);
-    double calculate_energy(double gamma);
-    long   WriteClusters(igraph_real_t *modularity,
-                         igraph_real_t *temperature,
-                         igraph_vector_int_t *csize, igraph_vector_int_t *membership,
-                         double kT, double gamma);
-    // long   WriteSoftClusters(char *filename, double threshold);
-    double Get_Energy() const {
-        return energy;
-    }
-    double FindCommunityFromStart(double gamma, double prob, char *nodename,
+
+    igraph_integer_t WriteClusters(igraph_real_t *modularity,
+                                   igraph_real_t *temperature,
+                                   igraph_vector_int_t *csize, igraph_vector_int_t *membership,
+                                   double kT, double gamma) const;
+
+    double FindCommunityFromStart(double gamma, const char *nodename,
                                   igraph_vector_int_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,
                                   igraph_integer_t *inner_links,
-                                  igraph_integer_t *outer_links);
+                                  igraph_integer_t *outer_links) const;
 };
 
 
 class PottsModelN {
 private:
-    //  HugeArray<double> neg_gammalookup;
-    //  HugeArray<double> pos_gammalookup;
-    // DL_Indexed_List<unsigned int*> *new_spins;
-    // DL_Indexed_List<unsigned int*> *previous_spins;
     HugeArray<HugeArray<double>*> correlation;
     network *net;
 
-    unsigned long q; //number of communities
+    igraph_integer_t q; //number of communities
     double m_p; //number of positive ties (or sum of degrees), this equals the number of edges only if it is undirected and each edge has a weight of 1
     double m_n; //number of negative ties (or sum of degrees)
-    unsigned long num_nodes; //number of nodes
+    igraph_integer_t num_nodes; //number of nodes
     bool is_directed;
 
-    bool is_init;
+    bool is_init = false;
 
-    double *degree_pos_in; //Postive indegree of the nodes (or sum of weights)
-    double *degree_neg_in; //Negative indegree of the nodes (or sum of weights)
-    double *degree_pos_out; //Postive outdegree of the nodes (or sum of weights)
-    double *degree_neg_out; //Negative outdegree of the nodes (or sum of weights)
+    double *degree_pos_in = nullptr; //Postive indegree of the nodes (or sum of weights)
+    double *degree_neg_in = nullptr; //Negative indegree of the nodes (or sum of weights)
+    double *degree_pos_out = nullptr; //Postive outdegree of the nodes (or sum of weights)
+    double *degree_neg_out = nullptr; //Negative outdegree of the nodes (or sum of weights)
 
-    double *degree_community_pos_in; //Positive sum of indegree for communities
-    double *degree_community_neg_in; //Negative sum of indegree for communities
-    double *degree_community_pos_out; //Positive sum of outegree for communities
-    double *degree_community_neg_out; //Negative sum of outdegree for communities
+    double *degree_community_pos_in = nullptr; //Positive sum of indegree for communities
+    double *degree_community_neg_in = nullptr; //Negative sum of indegree for communities
+    double *degree_community_pos_out = nullptr; //Positive sum of outegree for communities
+    double *degree_community_neg_out = nullptr; //Negative sum of outdegree for communities
 
-    unsigned long *csize; //The number of nodes in each community
-    unsigned long *spin; //The membership of each node
+    igraph_integer_t *csize = nullptr; //The number of nodes in each community
+    igraph_integer_t *spin = nullptr; //The membership of each node
 
-    double *neighbours; //Array of neighbours of a vertex in each community
-    double *weights; //Weights of all possible transitions to another community
+    double *neighbours = nullptr; //Array of neighbours of a vertex in each community
+    double *weights = nullptr; //Weights of all possible transitions to another community
 
 public:
-    PottsModelN(network *n, unsigned long num_communities, bool directed);
+    PottsModelN(network *n, igraph_integer_t num_communities, bool directed);
     ~PottsModelN();
     void assign_initial_conf(bool init_spins);
     double FindStartTemp(double gamma, double lambda, double ts);
     double HeatBathLookup(double gamma, double lambda, double t, unsigned int max_sweeps);
-    // double HeatBathJoin(double gamma, double lambda);
-    // double HeatBathLookupZeroTemp(double gamma, double lambda, unsigned int max_sweeps);
-    long WriteClusters(igraph_real_t *modularity,
+    igraph_integer_t WriteClusters(igraph_real_t *modularity,
                        igraph_real_t *temperature,
                        igraph_vector_int_t *community_size,
                        igraph_vector_int_t *membership,
@@ -171,9 +159,7 @@ public:
                        igraph_real_t *polarization,
                        double t,
                        double d_p,
-                       double d_n,
-                       double gamma,
-                       double lambda);
+                       double d_n);
 };
 
 #endif

@@ -122,12 +122,10 @@ void vector_chop(igraph_vector_t *vec, igraph_real_t cutoff);
 
 #define VERIFY_FINALLY_STACK() \
     if (!IGRAPH_FINALLY_STACK_EMPTY) { \
-        printf( \
-          "%s:%d : " \
+        IGRAPH_FATALF( \
           "Finally stack is not empty (stack size is %d). " \
           "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n", \
-          IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_FINALLY_STACK_SIZE()); \
-        abort(); \
+          IGRAPH_FINALLY_STACK_SIZE()); \
     }
 
 /* Run a test in a separate function; return the return value of the function
@@ -161,12 +159,10 @@ void record_last_warning(const char *reason, const char *file, int line);
         IGRAPH_ASSERT(IGRAPH_SUCCESS == funcall); \
         igraph_set_warning_handler(handler); \
         if (expect_warning_ctx.observed == NULL) { \
-            printf("Expected this warning but none was raised:\n  %s\n", expected_warning); \
-            abort(); \
+            IGRAPH_FATALF("Expected this warning but none was raised:\n  %s\n", expected_warning); \
         } else if (strcmp(expect_warning_ctx.observed, expect_warning_ctx.expected)) { \
-            printf("Expected warning:\n  %s\ngot:\n  %s\n", expected_warning, expect_warning_ctx.observed); \
-            free(expect_warning_ctx.observed); \
-            abort(); \
+            IGRAPH_FATALF("Expected warning:\n  %s\ngot:\n  %s\n", expected_warning, expect_warning_ctx.observed); \
+            /* no need to free(expect_warning_ctx.observed); as previous line aborts immediately */ \
         } else { \
             free(expect_warning_ctx.observed); \
         } \

@@ -6,7 +6,7 @@ variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
   CCACHE_MAXSIZE: 256M
   ASAN_OPTIONS: detect_stack_use_after_return=1:color=always
-  UBSAN_OTIONS: print_stacktrace=1:color=always
+  UBSAN_OPTIONS: print_stacktrace=1:color=always
   OMP_NUM_THREADS: 1
 
 jobs:
@@ -76,7 +76,7 @@ jobs:
           extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
           build_shared: true
 
-  - job: linux_clang_15
+  - job: linux_clang_18
     pool:
       vmImage: 'ubuntu-22.04'
     steps:
@@ -84,13 +84,13 @@ jobs:
           sudo apt-get install ninja-build ccache -y
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 15
+          sudo ./llvm.sh 18
         displayName: Install dependencies
 
       - template: .azure/build.yml
         parameters:
           build_type: Debug
-          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-15  -DCMAKE_CXX_COMPILER=clang++-15'
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_CXX_FLAGS="-Og -fno-sanitize-recover=undefined -fno-sanitize=float-divide-by-zero" -DCMAKE_C_COMPILER=clang-18  -DCMAKE_CXX_COMPILER=clang++-18'
 
   - job: linux_x87
     steps:
@@ -129,19 +129,20 @@ jobs:
 
   - job: windows_static
     pool:
-       vmImage: windows-2019
+       vmImage: windows-2022
 
     steps:
       - template: .azure/build-win.yml
 
   - job: windows_shared
     pool:
-       vmImage: windows-2019
+       vmImage: windows-2022
 
     steps:
       - template: .azure/build-win.yml
         parameters:
           build_shared: true
+          vsver: '14.29' # use VS 2019 instead of 2017
           vcpkg_target_triplet: x64-windows
 
   - job: documentation

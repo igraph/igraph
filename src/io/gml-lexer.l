@@ -70,7 +70,8 @@
 %option yylineno
 
 digit       [0-9]
-whitespace  [ \r\n\t\v\f]
+whitespace  [ \t\v\f]
+newline     [\r\n]
 
 /* Use to parse inf/nan as number only when expecting a value, i.e. after a keyword.
  * Otherwise they are parsed as a keyword. */
@@ -97,7 +98,8 @@ whitespace  [ \r\n\t\v\f]
                           yyextra->depth--;
                           return LISTCLOSE;
                         }
-{whitespace}            { /* other whitespace ignored */ }
+{whitespace}+           { /* other whitespace ignored */ }
+{newline}+              { yy_set_bol(true); /* set "beginning of line" even after \r */ }
 
 .                       { return ERROR; }
 %%

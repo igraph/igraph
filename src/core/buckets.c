@@ -21,8 +21,6 @@
 
 */
 
-#include "igraph_types.h"
-
 #include "core/buckets.h"
 
 /* The igraph_buckets_t data structure can store at most 'size'
@@ -129,9 +127,8 @@ void igraph_dbuckets_clear(igraph_dbuckets_t *b) {
 }
 
 igraph_integer_t igraph_dbuckets_popmax(igraph_dbuckets_t *b) {
-    igraph_integer_t max;
-    while ( (max = VECTOR(b->bptr)[b->max]) == 0) {
-        b->max --;
+    while ( VECTOR(b->bptr)[b->max] == 0) {
+        b->max--;
     }
     return igraph_dbuckets_pop(b, b->max);
 }
