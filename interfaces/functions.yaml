@@ -1593,7 +1593,7 @@ igraph_community_spinglass_single:
     PARAMS: |-
         GRAPH graph, OPTIONAL EDGE_WEIGHTS weights, INTEGER vertex,
         OUT VECTOR_INT community, OUT REAL cohesion, OUT REAL adhesion,
-        OUT INTEGER inner_links, OUT INTEGER outer_links,
+        OUT REAL inner_links, OUT REAL outer_links,
         INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
     DEPS: weights ON graph
 
