@@ -33,6 +33,7 @@
 
 #include "core/exceptions.h"
 
+#include <memory>
 #include <climits>
 
 using namespace fitHRG;
@@ -224,9 +225,8 @@ static std::unique_ptr<simpleGraph> igraph_i_hrg_getsimplegraph(const igraph_t *
                                                                 dendro &d,
                                                                 igraph_integer_t num_bins) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(igraph);
-    igraph_integer_t no_of_edges = igraph_ecount(igraph);
-    igraph_integer_t i;
+    const igraph_integer_t no_of_nodes = igraph_vcount(igraph);
+    const igraph_integer_t no_of_edges = igraph_ecount(igraph);
 
     // TODO replace the following throw's with IGRAPH_ERROR
 
@@ -246,7 +246,7 @@ static std::unique_ptr<simpleGraph> igraph_i_hrg_getsimplegraph(const igraph_t *
 
     std::unique_ptr<simpleGraph> sg(new simpleGraph(no_of_nodes));
 
-    for (i = 0; i < no_of_edges; i++) {
+    for (igraph_integer_t i = 0; i < no_of_edges; i++) {
         int from = (int) IGRAPH_FROM(igraph, i);
         int to = (int) IGRAPH_TO(igraph, i);
         if (from == to) {

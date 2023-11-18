@@ -2798,23 +2798,15 @@ splittree::splittree() {
     leaf->parent   = root;
 
     root->left = leaf;
-    root->right    = leaf;
-    support = 0;
-    total_weight = 0.0;
-    total_count = 0;
+    root->right = leaf;
 }
 
 splittree::~splittree() {
     if (root != nullptr && (root->left != leaf || root->right != leaf)) {
         deleteSubTree(root); root = nullptr;
     }
-    support      = 0;
-    total_weight = 0.0;
-    total_count  = 0;
     delete root;
     delete leaf;
-    root    = nullptr;
-    leaf    = nullptr;
 }
 
 void splittree::deleteTree() {

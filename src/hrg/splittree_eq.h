@@ -68,39 +68,31 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-class slist {
-public:
-    std::string x;         // stored elementd in linked-list
-    slist* next;          // pointer to next elementd
-    slist(): x(""), next(nullptr) { }
+struct slist {
+    std::string x;          // stored elementd in linked-list
+    slist* next = nullptr;  // pointer to next elementd
 };
 
-class keyValuePairSplit {
-public:
-    std::string x;         // elementsp split (string)
-    double y;         // stored weight   (double)
-    int c;            // stored count    (int)
-    keyValuePairSplit* next;  // linked-list pointer
-    keyValuePairSplit(): x(""), y(0.0), c(0), next(nullptr) { }
+struct keyValuePairSplit {
+    std::string x;          // elementsp split (string)
+    double y = 0.0;         // stored weight   (double)
+    int c = 0;              // stored count    (int)
+    keyValuePairSplit* next = nullptr;  // linked-list pointer
 };
 
 // ******** Tree elementsp Class *****************************************
 
-class elementsp {
-public:
+struct elementsp {
     std::string split;             // split represented as a string
-    double weight;            // total weight of this split
-    int count;                // number of observations of this split
+    double weight = 0.0;            // total weight of this split
+    int count = 0;                // number of observations of this split
 
-    bool color;           // F: BLACK, T: RED
-    short int mark;       // marker
+    bool color = false;           // F: BLACK, T: RED
+    short int mark = 0;       // marker
 
-    elementsp *parent;        // pointer to parent node
-    elementsp *left;      // pointer for left subtree
-    elementsp *right;     // pointer for right subtree
-
-    elementsp(): split(""), weight(0.0), count(0), color(false), mark(0),
-        parent(nullptr), left(nullptr), right(nullptr) { }
+    elementsp *parent = nullptr;        // pointer to parent node
+    elementsp *left = nullptr;      // pointer for left subtree
+    elementsp *right = nullptr;     // pointer for right subtree
 };
 
 // ******** Red-Black Tree Class *****************************************
@@ -117,9 +109,9 @@ class splittree {
 private:
     elementsp* root;      // binary tree root
     elementsp* leaf;      // all leaf nodes
-    int support;          // number of nodes in the tree
-    double total_weight;      // total weight stored
-    int total_count;      // total number of observations stored
+    int support = 0;          // number of nodes in the tree
+    double total_weight = 0.0;      // total weight stored
+    int total_count = 0;      // total number of observations stored
 
     // left-rotation operator
     void rotateLeft(elementsp*);

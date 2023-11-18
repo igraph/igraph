@@ -128,7 +128,7 @@ public:
 class split {
 public:
     std::string s;           // partition assignment of leaf vertices
-    split(): s("") { }
+    split() = default;
     void initializeSplit(const int n) {
         s = "";
         for (int i = 0; i < n; i++) {
@@ -136,7 +136,7 @@ public:
         }
     }
     bool checkSplit() const {
-        if (s.empty() || s.find("-", 0) != std::string::npos) {
+        if (s.empty() || s.find('-', 0) != std::string::npos) {
             return false;
         } else {
             return true;

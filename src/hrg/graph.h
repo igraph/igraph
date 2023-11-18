@@ -74,11 +74,11 @@ namespace fitHRG {
 
 class edge {
 public:
-    int x;            // stored integer value  (edge terminator)
-    double* h;            // (histogram) weights of edge existence
-    double total_weight;      // (histogram) total weight observed
-    int obs_count;        // number of observations in histogram
-    edge* next;           // pointer to next elementd
+    int x = -1;            // stored integer value  (edge terminator)
+    double* h = nullptr;            // (histogram) weights of edge existence
+    double total_weight = 0.0;      // (histogram) total weight observed
+    int obs_count = 0;        // number of observations in histogram
+    edge* next = nullptr;           // pointer to next elementd
     edge(): x(-1), h(nullptr), total_weight(0.0), obs_count(0), next(nullptr)  { }
     ~edge() {
         delete [] h;
@@ -86,12 +86,9 @@ public:
     }
 };
 
-class vert {
-public:
+struct vert {
     std::string name;      // (external) name of vertex
-    int degree;            // degree of this vertex
-
-    vert(): name(""), degree(0) { }
+    int degree = 0;        // degree of this vertex
 };
 
 // ******** Graph Class with Edge Statistics *****************************
