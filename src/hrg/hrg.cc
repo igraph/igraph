@@ -939,7 +939,7 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     igraph_integer_t d0 = 0, d1 = 0, d2 = 0;
     igraph_integer_t ii = 0, il = 0;
     igraph_vector_int_t neis;
-    igraph_vector_t path;
+    igraph_vector_int_t path;
     igraph_bool_t simple;
 
     // --------------------------------------------------------
@@ -1061,18 +1061,18 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
     // Calculate the number of vertices and edges in each subtree
     igraph_vector_int_null(&hrg->edges);
     igraph_vector_int_null(&hrg->vertices);
-    IGRAPH_VECTOR_INIT_FINALLY(&path, 0);
-    IGRAPH_CHECK(igraph_vector_push_back(&path, VECTOR(idx)[root]));
-    while (!igraph_vector_empty(&path)) {
-        igraph_integer_t ri = igraph_vector_tail(&path);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&path, 0);
+    IGRAPH_CHECK(igraph_vector_int_push_back(&path, VECTOR(idx)[root]));
+    while (!igraph_vector_int_empty(&path)) {
+        igraph_integer_t ri = igraph_vector_int_tail(&path);
         igraph_integer_t lc = VECTOR(hrg->left)[-ri - 1];
         igraph_integer_t rc = VECTOR(hrg->right)[-ri - 1];
         if (lc < 0 && VECTOR(hrg->vertices)[-lc - 1] == 0) {
             // Go left
-            IGRAPH_CHECK(igraph_vector_push_back(&path, lc));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&path, lc));
         } else if (rc < 0 && VECTOR(hrg->vertices)[-rc - 1] == 0) {
             // Go right
-            IGRAPH_CHECK(igraph_vector_push_back(&path, rc));
+            IGRAPH_CHECK(igraph_vector_int_push_back(&path, rc));
         } else {
             // Subtrees are done, update node and go up
             VECTOR(hrg->vertices)[-ri - 1] +=
@@ -1081,11 +1081,11 @@ igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                 rc < 0 ? VECTOR(hrg->vertices)[-rc - 1] : 1;
             VECTOR(hrg->edges)[-ri - 1] += lc < 0 ? VECTOR(hrg->edges)[-lc - 1] + 1 : 1;
             VECTOR(hrg->edges)[-ri - 1] += rc < 0 ? VECTOR(hrg->edges)[-rc - 1] + 1 : 1;
-            igraph_vector_pop_back(&path);
+            igraph_vector_int_pop_back(&path);
         }
     }
 
-    igraph_vector_destroy(&path);
+    igraph_vector_int_destroy(&path);
     igraph_vector_int_destroy(&neis);
     igraph_vector_int_destroy(&idx);
     igraph_vector_int_destroy(&deg);
