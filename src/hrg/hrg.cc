@@ -627,7 +627,7 @@ igraph_error_t igraph_from_hrg_dendrogram(
  *
  * Time complexity: O(n), the number of vertices in the graph.
  *
- * \deprecated-by igraph_hrg_dendrogram 0.10.5
+ * \deprecated-by igraph_from_hrg_dendrogram 0.10.5
  */
 igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
    igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
