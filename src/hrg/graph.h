@@ -139,17 +139,17 @@ public:
     bool setName(int, const std::string &);
 
 private:
-    bool predict;      // do we need prediction?
-    vert* nodes;       // list of nodes
-    edge** nodeLink;   // linked list of neighbors to vertex
-    edge** nodeLinkTail;   // pointers to tail of neighbor list
-    double*** A;       // stochastic adjacency matrix for this graph
-    int obs_count;     // number of observations in A
-    double total_weight;   // total weight added to A
-    int n;         // number of vertices
-    int m;         // number of directed edges
-    int num_bins;      // number of bins in edge histograms
-    double bin_resolution; // width of histogram bin
+    bool predict;           // do we need prediction?
+    vert* nodes;            // list of nodes
+    edge** nodeLink;        // linked list of neighbors to vertex
+    edge** nodeLinkTail;    // pointers to tail of neighbor list
+    double*** A = nullptr;  // stochastic adjacency matrix for this graph
+    int obs_count;          // number of observations in A
+    double total_weight;    // total weight added to A
+    int n;                  // number of vertices
+    int m;                  // number of directed edges
+    int num_bins;           // number of bins in edge histograms
+    double bin_resolution;  // width of histogram bin
 };
 
 } // namespace fitHRG

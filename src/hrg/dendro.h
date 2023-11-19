@@ -113,10 +113,9 @@ struct cnode {
     cnode(const cnode &) = delete;
     cnode & operator = (const cnode &) = delete;
     ~cnode() {
-        child *curr, *prev;
-        curr = children;
+        child *curr = children;
         while (curr != nullptr) {
-            prev = curr;
+            child *prev = curr;
             curr = curr->next;
             delete prev;
         }
@@ -160,7 +159,6 @@ public:
 // partition defined by the split.
 
 class interns {
-private:
     ipair* edgelist;   // list of internal edges represented
     std::string* splitlist; // split representation of the internal edges
     int** indexLUT;    // table of indices of internal edges in edgelist
@@ -173,11 +171,11 @@ public:
     // add an internal edge, O(1)
     bool addEdge(int, int, short int);
     // returns the ith edge of edgelist, O(1)
-    ipair* getEdge(int);
+    ipair* getEdge(int) const;
     // returns a uniformly random internal edge, O(1)
-    ipair* getRandomEdge();
+    ipair* getRandomEdge() const;
     // returns the ith split of the splitlist, O(1)
-    std::string getSplit(int);
+    std::string getSplit(int) const;
     // replace an existing split, O(1)
     bool replaceSplit(int i, const std::string &sp);
     // swaps two edges, O(1)
@@ -206,7 +204,6 @@ struct elementd {
 // ******** Dendrogram Class *********************************************
 
 class dendro {
-private:
     elementd* root = nullptr;       // root of the dendrogram
     elementd* internal = nullptr;   // array of n-1 internal vertices (the dendrogram D)
     elementd* leaf = nullptr;       // array of n   leaf vertices (the graph G)
@@ -223,7 +220,7 @@ private:
     // insert node i according to binary search property
     void binarySearchInsert(elementd*, elementd*);
     // return path to root from leaf
-    list* binarySearchFind(double);
+    list* binarySearchFind(double) const;
     // build split for this internal edge
     std::string buildSplit(elementd*) const;
     // compute number of edges between two internal subtrees

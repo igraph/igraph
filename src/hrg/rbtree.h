@@ -94,7 +94,6 @@ struct elementrb {
 // cannot insert such an item. Beware of this limitation.
 
 class rbtree {
-private:
     elementrb* root;      // binary tree root
     elementrb* leaf;      // all leaf nodes
     int support;          // number of nodes in the tree

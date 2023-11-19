@@ -756,7 +756,7 @@ void dendro::binarySearchInsert(elementd* x, elementd* y) {
 
 // **********************************************************************
 
-list* dendro::binarySearchFind(const double v) {
+list* dendro::binarySearchFind(const double v) const {
     list *head = nullptr, *tail = nullptr, *newlist;
     elementd *current = root;
     bool flag_stopSearch = false;
@@ -1614,7 +1614,7 @@ void dendro::monteCarloMove(double &delta, bool &ftaken, const double T) {
     // probability we execute the move.
 
     elementd *temp;
-    ipair *tempPair;
+    const ipair *tempPair;
     int x, y, e_x, e_y, n_i, n_j, n_k, n_x, n_y;
     short int t;
     double p_x, p_y, L_x, L_y, dLogL;
@@ -2616,20 +2616,20 @@ interns::~interns() {
 // ***********************************************************************
 
 // NOTE: Returns an address to another object -- do not deallocate
-ipair* interns::getEdge(const int i) {
+ipair* interns::getEdge(const int i) const {
     return &edgelist[i];
 }
 
 // ***********************************************************************
 
 // NOTE: Returns an address to another object -- do not deallocate
-ipair* interns::getRandomEdge() {
-    return &edgelist[(int)(floor((double)(q) * RNG_UNIF01()))];
+ipair* interns::getRandomEdge() const {
+    return &edgelist[RNG_INTEGER(0, q-1)];
 }
 
 // ***********************************************************************
 
-string interns::getSplit(const int i) {
+string interns::getSplit(const int i) const {
     if (i >= 0 && i <= q) {
         return splitlist[i];
     } else {
@@ -2947,7 +2947,7 @@ slist* splittree::returnListOfKeys() {
 
 // pre-order traversal
 keyValuePairSplit* splittree::returnTreeAsList() {
-    keyValuePairSplit  *head, *tail;
+    keyValuePairSplit *head, *tail;
 
     head    = new keyValuePairSplit;
     head->x = root->split;
@@ -3607,38 +3607,18 @@ void simpleGraph::QsortMain (block* array, int left, int right) {
 
 int simpleGraph::QsortPartition (block* array, int left, int right,
                                  int index) {
-    block p_value, temp;
-    p_value.x = array[index].x;
-    p_value.y = array[index].y;
+    block p_value = array[index];
 
-    // swap(array[p_value], array[right])
-    temp.x = array[right].x;
-    temp.y = array[right].y;
-    array[right].x = array[index].x;
-    array[right].y = array[index].y;
-    array[index].x = temp.x;
-    array[index].y = temp.y;
+    std::swap(array[index], array[right]);
 
     int stored = left;
     for (int i = left; i < right; i++) {
         if (array[i].x <= p_value.x) {
-            // swap(array[stored], array[i])
-            temp.x = array[i].x;
-            temp.y = array[i].y;
-            array[i].x = array[stored].x;
-            array[i].y = array[stored].y;
-            array[stored].x = temp.x;
-            array[stored].y = temp.y;
+            std::swap(array[stored], array[i]);
             stored++;
         }
     }
-    // swap(array[right], array[stored])
-    temp.x = array[stored].x;
-    temp.y = array[stored].y;
-    array[stored].x = array[right].x;
-    array[stored].y = array[right].y;
-    array[right].x = temp.x;
-    array[right].y = temp.y;
+    std::swap(array[right], array[stored]);
 
     return stored;
 }

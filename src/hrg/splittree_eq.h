@@ -106,7 +106,6 @@ struct elementsp {
 //
 
 class splittree {
-private:
     elementsp* root;      // binary tree root
     elementsp* leaf;      // all leaf nodes
     int support = 0;          // number of nodes in the tree

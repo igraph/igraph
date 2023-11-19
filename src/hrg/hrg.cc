@@ -84,7 +84,7 @@ struct pblock {
 };
 }
 
-static void markovChainMonteCarlo(dendro &d, igraph_integer_t period,
+static void markovChainMonteCarlo(dendro &d, const igraph_integer_t period,
                           igraph_hrg_t *hrg) {
 
     igraph_real_t bestL = d.getLikelihood();
@@ -121,11 +121,13 @@ static void markovChainMonteCarlo(dendro &d, igraph_integer_t period,
     d.refreshLikelihood();
 }
 
-static void markovChainMonteCarlo2(dendro &d, int num_samples) {
+static void markovChainMonteCarlo2(dendro &d, const int num_samples) {
     bool flag_taken;
-    double dL, ptest = 1.0 / (50.0 * (double)(d.getGraph()->numNodes()));
+    double dL;
+    const double ptest = 1.0 / (50.0 * static_cast<double>(d.getGraph()->numNodes()));
     igraph_integer_t sample_num = 0;
-    int t = 1, thresh = 200 * d.getGraph()->numNodes();
+    int t = 1;
+    const int thresh = 200 * d.getGraph()->numNodes();
 
     // Since we're sampling uniformly at random over the equilibrium
     // walk, we just need to do a bunch of MCMC moves and let the
@@ -159,16 +161,15 @@ static void MCMCEquilibrium_Find(dendro &d, igraph_hrg_t *hrg) {
     // local convergence of the entropy measure of the MCMC.
 
     bool flag_taken;
-    igraph_real_t dL, Likeli;
-    igraph_real_t oldMeanL;
+    igraph_real_t dL;
     igraph_real_t newMeanL = -1e-49;
 
     while (true) {
-        oldMeanL = newMeanL;
+        const igraph_real_t oldMeanL = newMeanL;
         newMeanL = 0.0;
         for (int i = 0; i < 65536; i++) {
             d.monteCarloMove(dL, flag_taken, 1.0);
-            Likeli = d.getLikelihood();
+            const igraph_real_t Likeli = d.getLikelihood();
             newMeanL += Likeli;
         }
         // corrects floating-point errors O(n)
@@ -410,7 +411,7 @@ igraph_error_t igraph_hrg_fit(const igraph_t *graph,
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
     RNG_BEGIN();
 
@@ -573,9 +574,9 @@ igraph_error_t igraph_hrg_game(igraph_t *graph,
 igraph_error_t igraph_from_hrg_dendrogram(
     igraph_t *graph, const igraph_hrg_t *hrg, igraph_vector_t *prob
 ) {
-    igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
-    igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
-    igraph_integer_t no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
+    const igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
+    const igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
+    const igraph_integer_t no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     igraph_vector_int_t edges;
     igraph_integer_t i, idx = 0;
 
@@ -630,9 +631,9 @@ igraph_error_t igraph_from_hrg_dendrogram(
  * \deprecated-by igraph_from_hrg_dendrogram 0.10.5
  */
 igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
-   igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
-    igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
-    igraph_integer_t no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
+    const igraph_integer_t orig_nodes = igraph_hrg_size(hrg);
+    const igraph_integer_t no_of_nodes = orig_nodes * 2 - 1;
+    const igraph_integer_t no_of_edges = no_of_nodes > 0 ? no_of_nodes - 1 : 0;
     igraph_vector_int_t edges;
     igraph_integer_t i, idx = 0;
     igraph_vector_ptr_t vattrs;
