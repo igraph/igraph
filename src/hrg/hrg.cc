@@ -481,11 +481,8 @@ igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
  * \function igraph_hrg_sample_many
  * \brief Draw multiple samples from a hierarchical random graph model.
  *
- * This function draws multiple samples from a hierarchical random graph
- * ensemble. The ensemble can be given as a graph (\c input_graph), or as an
- * HRG object (\c hrg). If a graph is given, then first an MCMC optimization is
- * performed to find the optimal fitting model; then the MCMC is used to sample
- * the new graph.
+ * This function draws multiple samples from the hierarchical random graph
+ * ensemble \p hrg.
  *
  * \param hrg A HRG model to sample from
  * \param samples An initialized graph list that will contain the sampled
@@ -518,7 +515,7 @@ igraph_error_t igraph_hrg_sample_many(
 
     d.clearDendrograph();
     d.importDendrogramStructure(hrg);
-    while (num_samples > 0) {
+    while (num_samples-- > 0) {
         d.makeRandomGraph();
         IGRAPH_CHECK(d.recordGraphStructure(&g));
         IGRAPH_FINALLY(igraph_destroy, &g);
