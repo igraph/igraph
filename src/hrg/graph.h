@@ -72,14 +72,15 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-class edge {
-public:
-    int x = -1;            // stored integer value  (edge terminator)
-    double* h = nullptr;            // (histogram) weights of edge existence
-    double total_weight = 0.0;      // (histogram) total weight observed
-    int obs_count = 0;        // number of observations in histogram
-    edge* next = nullptr;           // pointer to next elementd
-    edge(): x(-1), h(nullptr), total_weight(0.0), obs_count(0), next(nullptr)  { }
+struct edge {
+    int x = -1;                 // stored integer value  (edge terminator)
+    double* h = nullptr;        // (histogram) weights of edge existence
+    double total_weight = 0.0;  // (histogram) total weight observed
+    int obs_count = 0;          // number of observations in histogram
+    edge* next = nullptr;       // pointer to next elementd
+    edge() = default;
+    edge(const edge &) = delete;
+    edge & operator = (const edge &) = delete;
     ~edge() {
         delete [] h;
         h = nullptr;

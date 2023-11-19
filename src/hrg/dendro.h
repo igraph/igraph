@@ -80,16 +80,19 @@ namespace fitHRG {
 // ******** Basic Structures *********************************************
 
 enum {DENDRO, GRAPH, LEFT, RIGHT};
+
 struct block {
     double x;
     int y;
 };
+
 struct ipair {
-    int    x;
+    int x;
     int y;
     short int t;
     std::string sp;
 };
+
 struct child {
     int index;
     short int type;
@@ -99,16 +102,16 @@ struct child {
 // ***********************************************************************
 // ******** Cnode Class **************************************************
 
-class cnode {
-public:
-    int index;            // array index of this node
-    int degree;           // number of children in list
-    int parent;           // index of parent node
-    double weight;        // sampled posterior weight
-    child* children;      // list of children (and their types)
-    child* lastChild;     // pointer to last child in list
-    cnode(): index(-1), degree(0), parent(-1), weight(0.0),
-        children(nullptr), lastChild(nullptr)  { }
+struct cnode {
+    int index = -1;             // array index of this node
+    int degree = 0;             // number of children in list
+    int parent = -1;            // index of parent node
+    double weight = 0.0;        // sampled posterior weight
+    child* children = nullptr;  // list of children (and their types)
+    child* lastChild = nullptr; // pointer to last child in list
+    cnode() = default;
+    cnode(const cnode &) = delete;
+    cnode & operator = (const cnode &) = delete;
     ~cnode() {
         child *curr, *prev;
         curr = children;
@@ -116,7 +119,6 @@ public:
             prev = curr;
             curr = curr->next;
             delete prev;
-            prev = nullptr;
         }
         lastChild = nullptr;
     }
@@ -185,23 +187,19 @@ public:
 // ***********************************************************************
 // ******** Tree elementd Class ******************************************
 
-class elementd {
-public:
-    short int type; // either DENDRO or GRAPH
-    double logL;    // log-likelihood contribution of this internal node
-    double p;       // probability p_i that an edge exists between L and
+struct elementd {
+    short int type = DENDRO;    // either DENDRO or GRAPH
+    double logL = 0.0;          // log-likelihood contribution of this internal node
+    double p = 0.0;             // probability p_i that an edge exists between L and
     // R subtrees
-    int e;      // number of edges between L and R subtrees
-    int n;      // number of leafs in subtree rooted here
-    int label;      // subtree label: smallest leaf index
-    int index;      // index in containing array
+    int e = 0;      // number of edges between L and R subtrees
+    int n = 0;      // number of leafs in subtree rooted here
+    int label = -1; // subtree label: smallest leaf index
+    int index = -1; // index in containing array
 
-    elementd *M;          // pointer to parent node
-    elementd *L;          // pointer for L subtree
-    elementd *R;          // pointer for R subtree
-
-    elementd(): type(DENDRO), logL(0.0), p(0.0), e(0), n(0),
-        label(-1), index(-1), M(nullptr), L(nullptr), R(nullptr) { }
+    elementd *M = nullptr;  // pointer to parent node
+    elementd *L = nullptr;  // pointer for L subtree
+    elementd *R = nullptr;  // pointer for R subtree
 };
 
 // ***********************************************************************

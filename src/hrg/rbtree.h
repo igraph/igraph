@@ -59,38 +59,29 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-class list {
-public:
-    int x;            // stored elementd in linked-list
-    list* next;           // pointer to next elementd
-    list(): x(-1), next(nullptr) { }
+struct list {
+    int x = -1;             // stored elementd in linked-list
+    list* next = nullptr;   // pointer to next elementd
 };
 
-class keyValuePair {
-public:
-    int x;            // elementrb key (int)
-    int y;            // stored value (int)
-    keyValuePair* next;       // linked-list pointer
-    keyValuePair(): x(-1), y(-1), next(nullptr) { }
+struct keyValuePair {
+    int x = -1;                     // elementrb key (int)
+    int y = -1;                     // stored value (int)
+    keyValuePair* next = nullptr;   // linked-list pointer
 };
 
 // ******** Tree elementrb Class *****************************************
 
-class elementrb {
-public:
-    int key;              // search key (int)
-    int value;            // stored value (int)
+struct elementrb {
+    int key = -1;               // search key (int)
+    int value = -1;             // stored value (int)
 
-    bool color;           // F: BLACK, T: RED
-    short int mark;       // marker
+    bool color = false;         // F: BLACK, T: RED
+    short int mark = 0;         // marker
 
-    elementrb *parent;    // pointer to parent node
-    elementrb *left;      // pointer for left subtree
-    elementrb *right;     // pointer for right subtree
-
-    elementrb() :
-        key(-1), value(-1), color(false), mark(0),
-        parent(nullptr), left(nullptr), right(nullptr) { }
+    elementrb *parent = nullptr;    // pointer to parent node
+    elementrb *left = nullptr;      // pointer for left subtree
+    elementrb *right = nullptr;     // pointer for right subtree
 };
 
 // ******** Red-Black Tree Class *****************************************
@@ -128,7 +119,7 @@ public:
     elementrb* findItem(int searchKey) const;
     // insert a new key with stored value
     void insertItem(int newKey, int newValue);
-    // selete a node with given key
+    // delete a node with given key
     void deleteItem(int killKey);
     // replace value of a node with given key
     void replaceItem(int key, int newValue);

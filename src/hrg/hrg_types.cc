@@ -2795,7 +2795,7 @@ splittree::splittree() {
     root = new elementsp;
     leaf = new elementsp;
 
-    leaf->parent   = root;
+    leaf->parent = root;
 
     root->left = leaf;
     root->right = leaf;
@@ -2826,8 +2826,6 @@ void splittree::deleteSubTree(elementsp *z) {
         z->right = nullptr;
     }
     delete z;
-    /* No point in setting z to nullptr here because z is passed by value */
-    /* z = nullptr; */
 }
 
 // ******** Reset Functions *********************************************
@@ -2881,7 +2879,7 @@ elementsp* splittree::findItem(const string &searchKey) {
 }
 
 double splittree::returnValue(const string &searchKey) {
-    elementsp* test = findItem(searchKey);
+    const elementsp* test = findItem(searchKey);
     if (test == nullptr) {
         return 0.0;
     } else {

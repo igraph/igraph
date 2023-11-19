@@ -72,29 +72,20 @@ namespace fitHRG {
 
 // ******** Basic Structures *********************************************
 
-class simpleEdge {
-public:
-    int x;            // index of edge terminator
-    simpleEdge* next;     // pointer to next elementd
-
-    simpleEdge(): x(-1), next(nullptr) { }
+struct simpleEdge {
+    int x = -1;                 // index of edge terminator
+    simpleEdge* next = nullptr; // pointer to next elementd
 };
 
-class simpleVert {
-public:
-    std::string name;          // (external) name of vertex
-    int degree;           // degree of this vertex
-    int group_true;       // index of vertex's true group
-
-    simpleVert(): name(""), degree(0), group_true(-1) { }
+struct simpleVert {
+    std::string name;       // (external) name of vertex
+    int degree = 0;         // degree of this vertex
+    int group_true = -1;    // index of vertex's true group
 };
 
-class twoEdge {
-public:
-    int o;            // index of edge originator
-    int x;            // index of edge terminator
-
-    twoEdge(): o(-1), x(-1) { }
+struct twoEdge {
+    int o = -1; // index of edge originator
+    int x = -1; // index of edge terminator
 };
 
 // ******** Graph Class with Edge Statistics *****************************
@@ -132,14 +123,14 @@ public:
     bool setName(int i, const std::string &text);
 
 private:
-    simpleVert* nodes;        // list of nodes
-    simpleEdge** nodeLink;    // linked list of neighbors to vertex
-    simpleEdge** nodeLinkTail;    // pointers to tail of neighbor list
-    double** A;           // adjacency matrix for this graph
-    twoEdge* E;           // list of all edges (array)
-    int n;            // number of vertices
-    int m;            // number of directed edges
-    int num_groups;       // number of bins in node histograms
+    simpleVert* nodes;          // list of nodes
+    simpleEdge** nodeLink;      // linked list of neighbors to vertex
+    simpleEdge** nodeLinkTail;  // pointers to tail of neighbor list
+    double** A;                 // adjacency matrix for this graph
+    twoEdge* E;                 // list of all edges (array)
+    int n;                      // number of vertices
+    int m;                      // number of directed edges
+    int num_groups;             // number of bins in node histograms
 
     // quicksort functions
     void QsortMain(block*, int, int);
