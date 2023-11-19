@@ -281,7 +281,7 @@ public:
     // record D structure
     void recordDendrogramStructure(igraph_hrg_t *hrg);
     // record G structure to igraph graph
-    void recordGraphStructure(igraph_t *graph);
+    igraph_error_t recordGraphStructure(igraph_t *graph);
     // force refresh of log-likelihood value
     void refreshLikelihood();
     // sample dendrogram edge likelihoods and update edge histograms

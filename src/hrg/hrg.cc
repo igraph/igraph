@@ -469,7 +469,7 @@ igraph_error_t igraph_hrg_sample(const igraph_hrg_t *hrg, igraph_t *sample) {
     d.clearDendrograph();
     d.importDendrogramStructure(hrg);
     d.makeRandomGraph();
-    d.recordGraphStructure(sample);
+    IGRAPH_CHECK(d.recordGraphStructure(sample));
 
     RNG_END();
 
@@ -520,7 +520,7 @@ igraph_error_t igraph_hrg_sample_many(
     d.importDendrogramStructure(hrg);
     while (num_samples > 0) {
         d.makeRandomGraph();
-        d.recordGraphStructure(&g);
+        IGRAPH_CHECK(d.recordGraphStructure(&g));
         IGRAPH_FINALLY(igraph_destroy, &g);
         IGRAPH_CHECK(igraph_graph_list_push_back(samples, &g));
         IGRAPH_FINALLY_CLEAN(1);

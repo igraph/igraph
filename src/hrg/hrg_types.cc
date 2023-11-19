@@ -2100,14 +2100,13 @@ void dendro::recordDendrogramStructure(igraph_hrg_t *hrg) {
     }
 }
 
-void dendro::recordGraphStructure(igraph_t *graph) {
+igraph_error_t dendro::recordGraphStructure(igraph_t *graph) {
     igraph_vector_int_t edges;
     int no_of_nodes = g->numNodes();
     int no_of_edges = g->numLinks() / 2;
     int idx = 0;
 
-    igraph_vector_int_init(&edges, no_of_edges * 2);
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, no_of_edges * 2);
 
     for (int i = 0; i < n; i++) {
         const edge *curr = g->getNeighborList(i);
@@ -2120,10 +2119,12 @@ void dendro::recordGraphStructure(igraph_t *graph) {
         }
     }
 
-    igraph_create(graph, &edges, no_of_nodes, /* directed= */ 0);
+    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, /* directed= */ false));
 
     igraph_vector_int_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
 
 // **********************************************************************
