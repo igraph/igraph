@@ -112,7 +112,7 @@ public:
     // returns name of vertex i
     std::string getName(int) const;
     // returns edge list of vertex i
-    const edge* getNeighborList(int) const;
+    const edge* getNeighborList(int) const noexcept;
     // return ptr to histogram of edge (i,j)
     double* getAdjacencyHist(int, int) const;
     // return average value of adjacency A(i,j)

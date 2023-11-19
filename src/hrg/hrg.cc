@@ -139,7 +139,7 @@ static void markovChainMonteCarlo2(dendro &d, int num_samples) {
         // different aspects of the dendrograph structure.
         if (t > thresh && RNG_UNIF01() < ptest) {
             sample_num++;
-            d.sampleSplitLikelihoods(sample_num);
+            d.sampleSplitLikelihoods();
         }
 
         t++;

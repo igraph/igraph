@@ -279,9 +279,9 @@ public:
     void recordConsensusTree(igraph_vector_int_t *parents,
                              igraph_vector_t *weights);
     // record D structure
-    void recordDendrogramStructure(igraph_hrg_t *hrg);
+    void recordDendrogramStructure(igraph_hrg_t *hrg) const noexcept;
     // record G structure to igraph graph
-    igraph_error_t recordGraphStructure(igraph_t *graph);
+    igraph_error_t recordGraphStructure(igraph_t *graph) const noexcept;
     // force refresh of log-likelihood value
     void refreshLikelihood();
     // sample dendrogram edge likelihoods and update edge histograms
@@ -289,7 +289,7 @@ public:
     // reset the dendrograph structures
     void resetDendrograph();
     // sample dendrogram's splits and update the split histogram
-    bool sampleSplitLikelihoods(igraph_integer_t &);
+    bool sampleSplitLikelihoods();
 };
 
 } // namespace fitHRG

@@ -2088,7 +2088,7 @@ void dendro::recordConsensusTree(igraph_vector_int_t *parents,
 
 // **********************************************************************
 
-void dendro::recordDendrogramStructure(igraph_hrg_t *hrg) {
+void dendro::recordDendrogramStructure(igraph_hrg_t *hrg) const noexcept {
     for (int i = 0; i < n - 1; i++) {
         int li = internal[i].L->index;
         int ri = internal[i].R->index;
@@ -2100,7 +2100,7 @@ void dendro::recordDendrogramStructure(igraph_hrg_t *hrg) {
     }
 }
 
-igraph_error_t dendro::recordGraphStructure(igraph_t *graph) {
+igraph_error_t dendro::recordGraphStructure(igraph_t *graph) const noexcept {
     igraph_vector_int_t edges;
     int no_of_nodes = g->numNodes();
     int no_of_edges = g->numLinks() / 2;
@@ -2154,7 +2154,7 @@ list* dendro::reversePathToRoot(const int leafIndex) {
 
 // ***********************************************************************
 
-bool dendro::sampleSplitLikelihoods(igraph_integer_t &sample_num) {
+bool dendro::sampleSplitLikelihoods() {
     // In order to compute the majority agreement dendrogram at
     // equilibrium, we need to calculate the leaf partition defined by
     // each split (internal edge) of the tree. Because splits are only
@@ -2162,8 +2162,6 @@ bool dendro::sampleSplitLikelihoods(igraph_integer_t &sample_num) {
     // default "--...--"  string for the root and the root's left
     // child. When tabulating the frequency of splits, one of these
     // needs to be excluded.
-
-    IGRAPH_UNUSED(sample_num);
 
     string* array;
     int     k;
@@ -2235,7 +2233,7 @@ void dendro::sampleAdjacencyLikelihoods() {
     if (L > 0.0) {
         L = 0.0;
     }
-    elementd* ancestor;
+    const elementd* ancestor;
     list *currL, *prevL;
     if (paths != nullptr) {
         for (int i = 0; i < n; i++) {
@@ -2270,7 +2268,7 @@ void dendro::sampleAdjacencyLikelihoods() {
         }
     }
 
-    // finish-up: upate total weight in histograms
+    // finish-up: update total weight in histograms
     g->addAdjacencyEnd();
 }
 
@@ -2349,9 +2347,9 @@ void dendro::resetDendrograph() {
 
 // ******** Constructor / Destructor *************************************
 
-graph::graph(const int size, bool predict) : predict(predict)  {
-    n = size;
-    m = 0;
+graph::graph(const int size, bool predict) :
+    predict(predict), n(size), m(0)
+{
     nodes = new vert  [n];
     nodeLink = new edge* [n];
     nodeLinkTail   = new edge* [n];
@@ -2498,7 +2496,7 @@ string graph::getName(const int i) const {
 }
 
 // NOTE: Returns address; deallocation of returned object is dangerous
-const edge* graph::getNeighborList(const int i) const {
+const edge* graph::getNeighborList(const int i) const noexcept {
     if (i >= 0 && i < n) {
         return nodeLink[i];
     } else {
