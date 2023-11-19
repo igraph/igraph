@@ -207,17 +207,17 @@ struct elementd {
 
 class dendro {
 private:
-    elementd* root;     // root of the dendrogram
-    elementd* internal; // array of n-1 internal vertices (the dendrogram D)
-    elementd* leaf;     // array of n   leaf vertices (the graph G)
-    int n;              // number of leaf vertices to allocate
-    interns* d;         // list of internal edges of dendrogram D
-    splittree* splithist;       // histogram of cumulative split weights
-    list** paths;       // array of path-lists from root to leaf
-    double L;           // log-likelihood of graph G given dendrogram D
-    rbtree subtreeL, subtreeR;  // trees for computeEdgeCount() function
-    cnode* ctree;       // (consensus tree) array of internal tree nodes
-    int* cancestor;     // (consensus tree) oldest ancetor's index for
+    elementd* root = nullptr;       // root of the dendrogram
+    elementd* internal = nullptr;   // array of n-1 internal vertices (the dendrogram D)
+    elementd* leaf = nullptr;       // array of n   leaf vertices (the graph G)
+    int n;                          // number of leaf vertices to allocate
+    interns* d = nullptr;           // list of internal edges of dendrogram D
+    splittree* splithist = nullptr; // histogram of cumulative split weights
+    list** paths = nullptr;         // array of path-lists from root to leaf
+    double L;                       // log-likelihood of graph G given dendrogram D
+    rbtree subtreeL, subtreeR;      // trees for computeEdgeCount() function
+    cnode* ctree = nullptr;         // (consensus tree) array of internal tree nodes
+    int* cancestor = nullptr;       // (consensus tree) oldest ancetor's index for
     // each leaf
 
     // insert node i according to binary search property
@@ -239,14 +239,14 @@ private:
     int QsortPartition(block*, int, int, int);
 
     // underlying G (dangerously accessible)
-    graph* g;
+    graph* g = nullptr;
 
 public:
 
     // constructor / destructor
-    dendro() :
-        root(nullptr), internal(nullptr), leaf(nullptr), d(nullptr), splithist(nullptr),
-        paths(nullptr), ctree(nullptr), cancestor(nullptr), g(nullptr) { }
+    dendro() = default;
+    dendro(const dendro &) = delete;
+    dendro & operator = (const dendro &) = delete;
     ~dendro();
 
     igraph_error_t setGraph(const igraph_t *igraph);
