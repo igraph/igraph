@@ -113,7 +113,7 @@ public:
     rbtree(); ~rbtree(); // default constructor/destructor
 
     // returns value associated with searchKey
-    int returnValue(int searchKey);
+    int returnValue(int searchKey) const;
     // returns T if searchKey found, and points foundNode at the
     // corresponding node
     elementrb* findItem(int searchKey) const;

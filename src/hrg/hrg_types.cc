@@ -41,12 +41,12 @@
 #include "hrg/splittree_eq.h"
 #include "hrg/graph_simp.h"
 
-using std::string;
-
 #include <stdexcept>
+#include <utility>
 #include <climits>
 
-using namespace std;
+using std::string;
+
 using namespace fitHRG;
 
 // ******** Red-Black Tree Methods ***************************************
@@ -133,7 +133,7 @@ elementrb* rbtree::findItem(const int searchKey) const {
     return nullptr;
 }
 
-int rbtree::returnValue(const int searchKey) {
+int rbtree::returnValue(const int searchKey) const {
     const elementrb* test = findItem(searchKey);
     if (!test) {
         return 0;
@@ -1102,8 +1102,6 @@ void dendro::buildDendrogram() {
     }
 
     // Dendrogram is now built
-
-    return;
 }
 
 // ***********************************************************************
@@ -1920,38 +1918,18 @@ void dendro::QsortMain (block* array, int left, int right) {
 }
 
 int dendro::QsortPartition (block* array, int left, int right, int index) {
-    block p_value, temp;
-    p_value.x = array[index].x;
-    p_value.y = array[index].y;
+    block p_value = array[index];
 
-    // swap(array[p_value], array[right])
-    temp.x = array[right].x;
-    temp.y = array[right].y;
-    array[right].x = array[index].x;
-    array[right].y = array[index].y;
-    array[index].x = temp.x;
-    array[index].y = temp.y;
+    std::swap(array[index], array[right]);
 
     int stored = left;
     for (int i = left; i < right; i++) {
         if (array[i].x <= p_value.x) {
-            // swap(array[stored], array[i])
-            temp.x = array[i].x;
-            temp.y = array[i].y;
-            array[i].x = array[stored].x;
-            array[i].y = array[stored].y;
-            array[stored].x = temp.x;
-            array[stored].y = temp.y;
+            std::swap(array[stored], array[i]);
             stored++;
         }
     }
-    // swap(array[right], array[stored])
-    temp.x = array[stored].x;
-    temp.y = array[stored].y;
-    array[stored].x = array[right].x;
-    array[stored].y = array[right].y;
-    array[right].x = temp.x;
-    array[right].y  = temp.y;
+    std::swap(array[right], array[stored]);
 
     return stored;
 }
