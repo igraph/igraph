@@ -2,6 +2,15 @@
 
 ## [master]
 
+### Fixed
+
+ - More robust error handling in HRG code.
+ - Fixed infinite loop in `igraph_hrg_sample_many()`.
+
+### Other
+
+ - Documentation improvements
+
 ## [0.10.8] - 2023-11-17
 
 ### Added
