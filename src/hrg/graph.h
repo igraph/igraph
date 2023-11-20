@@ -83,7 +83,6 @@ struct edge {
     edge & operator = (const edge &) = delete;
     ~edge() {
         delete [] h;
-        h = nullptr;
     }
 };
 
