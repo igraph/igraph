@@ -133,8 +133,8 @@ private:
     int num_groups;             // number of bins in node histograms
 
     // quicksort functions
-    void QsortMain(block*, int, int);
-    int QsortPartition(block*, int, int, int);
+    static void QsortMain(block*, int, int);
+    static int QsortPartition(block*, int, int, int);
 };
 
 } // namespace fitHRG

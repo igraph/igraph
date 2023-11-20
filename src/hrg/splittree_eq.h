@@ -160,7 +160,7 @@ public:
     // returns list of splits with given number of Ms
     keyValuePairSplit* returnTheseSplits(int);
     // returns sum of stored values
-    double returnTotal();
+    double returnTotal() const;
 };
 
 } // namespace fitHRG

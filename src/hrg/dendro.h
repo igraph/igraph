@@ -228,14 +228,14 @@ class dendro {
     // compute number of edges between two internal subtrees
     int computeEdgeCount(int, short int, int, short int);
     // (consensus tree) counts children
-    size_t countChildren(const string &s) const;
+    static size_t countChildren(const string &s);
     // find internal node of D that is common ancestor of i,j
     elementd* findCommonAncestor(list**, int, int);
     // return reverse of path to leaf from root
     list* reversePathToRoot(int);
     // quicksort functions
-    void QsortMain(block*, int, int);
-    int QsortPartition(block*, int, int, int);
+    static void QsortMain(block*, int, int);
+    static int QsortPartition(block*, int, int, int);
 
     // underlying G (dangerously accessible)
     graph* g = nullptr;

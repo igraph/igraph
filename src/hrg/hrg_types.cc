@@ -1267,7 +1267,7 @@ int dendro::computeEdgeCount(const int a, const short int atype,
 
 // ***********************************************************************
 
-size_t dendro::countChildren(const string &s) const {
+size_t dendro::countChildren(const string &s) {
     size_t len = s.size();
     size_t numC = 0;
     for (size_t i = 0; i < len; i++) {
@@ -3053,7 +3053,7 @@ keyValuePairSplit* splittree::returnTheseSplits(const int target) {
     return newhead;
 }
 
-double splittree::returnTotal() {
+double splittree::returnTotal() const {
     return total_weight;
 }
 
