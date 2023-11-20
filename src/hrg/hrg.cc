@@ -393,11 +393,11 @@ igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_integer_t newsize) {
  * \param hrg Pointer to an initialized HRG, the result of the fitting
  *   is stored here. It can also be used to pass a HRG to the
  *   function, that can be used as the starting point of the Markov
- *   Chain Monte Carlo fitting, if the \c start argument is true.
+ *   Chain Monte Carlo fitting, if the \p start argument is true.
  * \param start Logical, whether to start the fitting from the given
  *   HRG model.
  * \param steps Integer, the number of MCMC steps to take in the
- *   fitting procedure. If this is zero, then the fitting stop is a
+ *   fitting procedure. If this is zero, then the fitting stops if a
  *   convergence criteria is fulfilled.
  * \return Error code.
  *
@@ -684,8 +684,8 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
  * \function igraph_hrg_consensus
  * \brief Calculate a consensus tree for a HRG.
  *
- * The calculation can be started from the given HRG (\c hrg), or (if
- * \c start is false), a HRG is first fitted to the given graph.
+ * The calculation can be started from the given HRG (\p hrg), or (if
+ * \p start is false), a HRG is first fitted to the given graph.
  *
  * \param graph The input graph.
  * \param parents An initialized vector, the results are stored
@@ -695,11 +695,11 @@ igraph_error_t igraph_hrg_dendrogram(igraph_t *graph, const igraph_hrg_t *hrg) {
  *   the other IDs refer to vertex groups.
  * \param weights Numeric vector, counts the number of times a given
  *   tree split occured in the generated network samples, for each
- *   internal vertices. The order is the same as in \c parents.
+ *   internal vertices. The order is the same as in \p parents.
  * \param hrg A hierarchical random graph. It is used as a starting
- *   point for the sampling, if the \c start argument is true. It is
+ *   point for the sampling, if the \p start argument is true. It is
  *   modified along the MCMC.
- * \param start Logical, whether to use the supplied HRG (in \c hrg)
+ * \param start Logical, whether to use the supplied HRG (in \p hrg)
  *   as a starting point for the MCMC.
  * \param num_samples The number of samples to generate for creating
  *   the consensus tree.
