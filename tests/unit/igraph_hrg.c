@@ -71,11 +71,20 @@ int main(void) {
     igraph_small(&graph, 3, IGRAPH_UNDIRECTED,
                  0,1,
                  -1);
+
     igraph_hrg_init(&hrg, igraph_vcount(&graph));
     igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 0);
     igraph_from_hrg_dendrogram(&dendrogram, &hrg, NULL);
     igraph_destroy(&dendrogram);
     igraph_hrg_destroy(&hrg);
+
+    // test with a specific number of steps
+    igraph_hrg_init(&hrg, igraph_vcount(&graph));
+    igraph_hrg_fit(&graph, &hrg, /*start=*/ false, /*steps=*/ 10);
+    igraph_from_hrg_dendrogram(&dendrogram, &hrg, NULL);
+    igraph_destroy(&dendrogram);
+    igraph_hrg_destroy(&hrg);
+
     igraph_destroy(&graph);
 
     // graph must have at least 3 vertices at the moment
