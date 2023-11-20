@@ -777,7 +777,7 @@ static void MCMCEquilibrium_Sample(dendro &d, igraph_integer_t num_samples) {
     }
 }
 
-static int QsortPartition (pblock* array, igraph_integer_t left, igraph_integer_t right, igraph_integer_t index) {
+static igraph_integer_t QsortPartition (pblock* array, igraph_integer_t left, igraph_integer_t right, igraph_integer_t index) {
     pblock p_value = array[index];
 
     std::swap(array[right], array[index]);
@@ -803,7 +803,7 @@ static void QsortMain (pblock* array, igraph_integer_t left, igraph_integer_t ri
     }
 }
 
-static void rankCandidatesByProbability(simpleGraph &sg, dendro &d,
+static void rankCandidatesByProbability(const simpleGraph &sg, const dendro &d,
                                 pblock *br_list, int mk) {
     int mkk = 0;
     int n = sg.getNumNodes();
@@ -823,7 +823,7 @@ static void rankCandidatesByProbability(simpleGraph &sg, dendro &d,
     QsortMain(br_list, 0, mk - 1);
 }
 
-static igraph_error_t recordPredictions(pblock *br_list, igraph_vector_int_t *edges,
+static igraph_error_t recordPredictions(const pblock *br_list, igraph_vector_int_t *edges,
                       igraph_vector_t *prob, int mk) {
 
     IGRAPH_CHECK(igraph_vector_int_resize(edges, mk * 2));

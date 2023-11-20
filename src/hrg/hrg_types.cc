@@ -1267,7 +1267,7 @@ int dendro::computeEdgeCount(const int a, const short int atype,
 
 // ***********************************************************************
 
-size_t dendro::countChildren(const string &s) {
+size_t dendro::countChildren(const string &s) const {
     size_t len = s.size();
     size_t numC = 0;
     for (size_t i = 0; i < len; i++) {
@@ -1527,7 +1527,7 @@ void dendro::makeRandomGraph() {
     for (int i = 0; i < n; i++) {
         paths[i] = reversePathToRoot(i);
     }
-    
+
 // O((h+d)*n^2) - h: height of D; d: average degree in G
     for (int i = 0; i < n; i++) {
         // decide neighbors of v_i
@@ -2557,9 +2557,9 @@ bool graph::setName(const int i, const string &text) {
 
 // **********************************************************************
 
-interns::interns(const int n)  {
-    q         = n;
-    count     = 0;
+interns::interns(const int n) :
+    q(n), count(0)
+{
     edgelist  = new ipair  [q];
     splitlist = new string [q + 1];
     indexLUT  = new int*   [q + 1];
@@ -2721,7 +2721,7 @@ bool interns::swapEdges(const int one_x, const int one_y,
                 indexLUT[one_x][1] = index;
             } // add new
         } else {
-            ;
+            // do nothing
         } // else neither is internal
 
         return true;
@@ -3392,7 +3392,9 @@ void splittree::rotateRight(elementsp *y) {
 
 // ******** Constructor / Destructor *************************************
 
-simpleGraph::simpleGraph(const int size): n(size), m(0), num_groups(0) {
+simpleGraph::simpleGraph(const int size) :
+    n(size), m(0), num_groups(0)
+{
     nodes = new simpleVert  [n];
     nodeLink = new simpleEdge* [n];
     nodeLinkTail = new simpleEdge* [n];
