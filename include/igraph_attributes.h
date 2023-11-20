@@ -218,18 +218,23 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  *    created, right after it is created but before any vertices or
  *    edges are added. It is supposed to set the \c attr member of the \c
  *    igraph_t object, which is guaranteed to be set to a null pointer
- *    before this function is called. It is expected to return an error code.
+ *    before this function is called. It is expected to set the \c attr member
+ *    to a non-null value \em or return an error code. Leaving the \c attr
+ *    member at a null value while returning success is invalid and will trigger
+ *    an error in the C core of igraph itself.
  * \member destroy This function is called whenever the graph object
  *    is destroyed, right before freeing the allocated memory. It is supposed
  *    to do any cleanup operations that are need to dispose of the \c attr
  *    member of the \c igraph_t object properly. The caller will set the
  *    \c attr member to a null pointer after this function returns.
- * \member copy This function is called when copying a graph with \ref
- *    igraph_copy, after the structure of the graph has been already
- *    copied. It is supposed to populate the \c attr member of the target
- *    \c igraph_t object. The \c attr member of the target is guaranteed to be
- *    set to a null pointer before this function is called. It is expected to
- *    return an error code.
+ * \member copy This function is called when the C core wants to populate the
+ *    attributes of a graph from another graph. The struvture of the target
+ *    graph is already initialized by the time this function is called, and the
+ *    \c attr member of the graph is set to null pointer. The function is
+ *    supposed to populate the \c attr member of the target \c igraph_t object
+ *    to a non-null value \em or return an error code. Leaving the \c attr
+ *    member at a null value while returning success is invalid and will trigger
+ *    an error in the C core of igraph itself.
  * \member add_vertices Called when vertices are added to a
  *    graph, before adding the vertices themselves.
  *    The number of vertices to add is supplied as an

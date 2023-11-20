@@ -37,14 +37,16 @@ igraph_attribute_table_t *igraph_i_attribute_table = NULL;
 igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr) {
     graph->attr = NULL;
     if (igraph_i_attribute_table) {
-        return igraph_i_attribute_table->init(graph, attr);
-    } else {
-        return IGRAPH_SUCCESS;
+        IGRAPH_CHECK(igraph_i_attribute_table->init(graph, attr));
+        if (graph->attr == NULL) {
+            IGRAPH_ERROR("Attribute handler did not initialize attr pointer", IGRAPH_FAILURE);
+        }
     }
+    return IGRAPH_SUCCESS;
 }
 
 void igraph_i_attribute_destroy(igraph_t *graph) {
-    if (igraph_i_attribute_table) {
+    if (graph->attr && igraph_i_attribute_table) {
         igraph_i_attribute_table->destroy(graph);
     }
     graph->attr = NULL;
@@ -52,12 +54,14 @@ void igraph_i_attribute_destroy(igraph_t *graph) {
 
 igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
                             igraph_bool_t va, igraph_bool_t ea) {
-    to->attr = NULL;
-    if (igraph_i_attribute_table) {
-        return igraph_i_attribute_table->copy(to, from, ga, va, ea);
-    } else {
-        return IGRAPH_SUCCESS;
+    igraph_i_attribute_destroy(to);
+    if (from->attr && igraph_i_attribute_table) {
+        IGRAPH_CHECK(igraph_i_attribute_table->copy(to, from, ga, va, ea));
+        if (to->attr == NULL) {
+            IGRAPH_ERROR("Attribute handler did not initialize attr pointer", IGRAPH_FAILURE);
+        }
     }
+    return IGRAPH_SUCCESS;
 }
 
 igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {

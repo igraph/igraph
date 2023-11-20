@@ -242,7 +242,6 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
 
     /* Create the new graph */
     IGRAPH_CHECK(igraph_create(res, &new_edges, no_of_new_nodes, directed));
-    IGRAPH_I_ATTRIBUTE_DESTROY(res);
 
     /* Now we can also get rid of the new_edges vector */
     igraph_vector_int_destroy(&new_edges);
@@ -253,8 +252,7 @@ static igraph_error_t igraph_i_induced_subgraph_create_from_scratch(
     IGRAPH_FINALLY(igraph_destroy, res);
 
     /* Copy the graph attributes */
-    IGRAPH_CHECK(igraph_i_attribute_copy(res, graph,
-                                         /* ga = */ 1, /* va = */ 0, /* ea = */ 0));
+    IGRAPH_CHECK(igraph_i_attribute_copy(res, graph, true, /* vertex= */ false, /* edge= */ false));
 
     /* Copy the vertex attributes */
     IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, my_vids_new2old));

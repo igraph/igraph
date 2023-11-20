@@ -26,18 +26,6 @@
 
 __BEGIN_DECLS
 
-#define IGRAPH_I_ATTRIBUTE_DESTROY(graph) do { \
-        if ((graph)->attr) { \
-            igraph_i_attribute_destroy(graph); \
-        } \
-    } while(0)
-#define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
-        (to)->attr = NULL; \
-        if ((from)->attr) { \
-            IGRAPH_CHECK(igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
-        } \
-    } while(0)
-
 igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr);
 void igraph_i_attribute_destroy(igraph_t *graph);
 igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from,

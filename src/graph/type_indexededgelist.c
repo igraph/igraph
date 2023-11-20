@@ -101,6 +101,8 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
         IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
     }
 
+    memset(graph, 0, sizeof(igraph_t));
+
     graph->n = 0;
     graph->directed = directed;
     IGRAPH_VECTOR_INT_INIT_FINALLY(&graph->from, 0);
@@ -121,7 +123,6 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
     VECTOR(graph->is)[0] = 0;
 
     /* init attributes */
-    graph->attr = 0;
     IGRAPH_CHECK(igraph_i_attribute_init(graph, attr));
 
     /* add the vertices */
@@ -148,8 +149,7 @@ igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bo
  * Time complexity: operating system specific.
  */
 void igraph_destroy(igraph_t *graph) {
-
-    IGRAPH_I_ATTRIBUTE_DESTROY(graph);
+    igraph_i_attribute_destroy(graph);
 
     igraph_i_property_cache_destroy(graph->cache);
     IGRAPH_FREE(graph->cache);
@@ -189,6 +189,8 @@ void igraph_destroy(igraph_t *graph) {
  */
 
 igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
+    memset(to, 0, sizeof(igraph_t));
+
     to->n = from->n;
     to->directed = from->directed;
     IGRAPH_CHECK(igraph_vector_int_init_copy(&to->from, &from->from));
@@ -210,7 +212,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
     IGRAPH_CHECK(igraph_i_property_cache_copy(to->cache, from->cache));
     IGRAPH_FINALLY(igraph_i_property_cache_destroy, to->cache);
 
-    IGRAPH_I_ATTRIBUTE_COPY(to, from, true, true, true); /* does IGRAPH_CHECK */
+    IGRAPH_CHECK(igraph_i_attribute_copy(to, from, true, true, true));
 
     IGRAPH_FINALLY_CLEAN(8);
     return IGRAPH_SUCCESS;
@@ -687,6 +689,7 @@ igraph_error_t igraph_delete_vertices_map(
     }
 
     /* start creating the graph */
+    memset(&newgraph, 0, sizeof(igraph_t));
     newgraph.n = remaining_vertices;
     newgraph.directed = graph->directed;
 
@@ -727,8 +730,9 @@ igraph_error_t igraph_delete_vertices_map(
     IGRAPH_FINALLY(igraph_i_property_cache_destroy, newgraph.cache);
 
     /* attributes */
-    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph,
-                            /*graph=*/ 1, /*vertex=*/0, /*edge=*/0);
+    IGRAPH_CHECK(igraph_i_attribute_copy(
+        &newgraph, graph, /* graph= */ true, /* vertex= */ false, /* edge= */ false
+    ));
 
     /* at this point igraph_destroy can take over the responsibility of
      * deallocating the graph */
@@ -744,9 +748,7 @@ igraph_error_t igraph_delete_vertices_map(
                 VECTOR(iidx)[ jj ] = i;
             }
         }
-        IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph,
-                     &newgraph,
-                     &iidx));
+        IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, &newgraph, &iidx));
         IGRAPH_CHECK(igraph_vector_int_resize(&iidx, remaining_edges));
         for (i = 0; i < no_of_edges; i++) {
             igraph_integer_t jj = VECTOR(edge_recoding)[i];

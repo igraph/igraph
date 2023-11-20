@@ -171,8 +171,7 @@ igraph_error_t igraph_difference(igraph_t *res,
 
     /* Attributes */
     if (orig->attr) {
-        IGRAPH_I_ATTRIBUTE_DESTROY(res);
-        IGRAPH_I_ATTRIBUTE_COPY(res, orig, /*graph=*/ true, /*vertex=*/ true, /*edge=*/ false);
+        IGRAPH_CHECK(igraph_i_attribute_copy(res, orig, true, true, /* edge= */ false));
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(orig, res, &edge_ids));
     }
 

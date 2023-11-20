@@ -114,8 +114,7 @@ igraph_error_t igraph_contract_vertices(igraph_t *graph,
 
     IGRAPH_FINALLY(igraph_destroy, &res);
 
-    IGRAPH_I_ATTRIBUTE_DESTROY(&res);
-    IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ true, /*vertex=*/ false, /*edge=*/ true);
+    IGRAPH_CHECK(igraph_i_attribute_copy(&res, graph, true, /* vertex= */ false, true));
 
     if (vattr) {
         igraph_vector_int_list_t merges;

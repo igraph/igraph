@@ -274,8 +274,7 @@ igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
-    IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1, 1, 1);
+    IGRAPH_CHECK(igraph_i_attribute_copy(&newgraph, graph, true, true, true));
     IGRAPH_FINALLY_CLEAN(1);
     igraph_destroy(graph);
     *graph = newgraph;
@@ -381,8 +380,7 @@ igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
         IGRAPH_FINALLY_CLEAN(1);
 
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
-        IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-        IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1, 1, 1);
+        IGRAPH_CHECK(igraph_i_attribute_copy(&newgraph, graph, true, true, true));
         IGRAPH_FINALLY_CLEAN(1);
         igraph_destroy(graph);
         *graph = newgraph;

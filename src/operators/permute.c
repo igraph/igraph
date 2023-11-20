@@ -110,8 +110,7 @@ igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     /* Attributes */
     if (graph->attr) {
         igraph_vector_int_t vtypes;
-        IGRAPH_I_ATTRIBUTE_DESTROY(res);
-        IGRAPH_I_ATTRIBUTE_COPY(res, graph, /*graph=*/1, /*vertex=*/0, /*edge=*/1);
+        IGRAPH_CHECK(igraph_i_attribute_copy(res, graph, true, /* vertex= */ false, true));
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vtypes, 0);
         IGRAPH_CHECK(igraph_i_attribute_get_info(graph, 0, 0, 0, &vtypes, 0, 0));
         if (igraph_vector_int_size(&vtypes) != 0) {

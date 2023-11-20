@@ -280,8 +280,7 @@ static igraph_error_t igraph_i_bipartite_projection(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_destroy, proj);
 
     /* copy graph attributes */
-    IGRAPH_I_ATTRIBUTE_DESTROY(proj);
-    IGRAPH_I_ATTRIBUTE_COPY(proj, graph, /* graph */ true, /* vertex */ false, /* edge */ false);
+    IGRAPH_CHECK(igraph_i_attribute_copy(proj, graph, true, /* vertex= */ false, /* edge= */ false));
 
     /* copy vertex attributes */
     IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, proj, &vertex_perm));

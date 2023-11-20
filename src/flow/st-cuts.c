@@ -596,9 +596,7 @@ igraph_error_t igraph_dominator_tree(const igraph_t *graph,
         igraph_vector_int_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(1);
 
-        IGRAPH_I_ATTRIBUTE_DESTROY(domtree);
-        IGRAPH_I_ATTRIBUTE_COPY(domtree, graph,
-                                /*graph=*/ true, /*vertex=*/ true, /*edge=*/ false);
+        IGRAPH_CHECK(igraph_i_attribute_copy(domtree, graph, true, true, /*edges=*/ false));
     }
 
     if (!dom) {

@@ -172,8 +172,7 @@ igraph_error_t igraph_simplify(igraph_t *graph,
 
     IGRAPH_FINALLY(igraph_destroy, &res);
 
-    IGRAPH_I_ATTRIBUTE_DESTROY(&res);
-    IGRAPH_I_ATTRIBUTE_COPY(&res, graph, /*graph=*/ true, /*vertex=*/ true, /*edge=*/ false);
+    IGRAPH_CHECK(igraph_i_attribute_copy(&res, graph, true, true, /* edges= */ false));
 
     if (attr) {
         igraph_fixed_vectorlist_t vl;
