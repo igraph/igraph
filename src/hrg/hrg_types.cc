@@ -2588,7 +2588,7 @@ ipair* interns::getEdge(const int i) const {
 
 // NOTE: Returns an address to another object -- do not deallocate
 ipair* interns::getRandomEdge() const {
-    return &edgelist[RNG_INTEGER(0, q-1)];
+    return &edgelist[(int)(floor((double)(q) * RNG_UNIF01()))];
 }
 
 // ***********************************************************************
