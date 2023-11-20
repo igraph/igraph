@@ -1281,12 +1281,9 @@ size_t dendro::countChildren(const string &s) {
 // ***********************************************************************
 
 void dendro::cullSplitHist() {
-    string* array;
-    int tot, leng;
-
-    array = splithist->returnArrayOfKeys();
-    tot   = splithist->returnTotal();
-    leng  = splithist->returnNodecount();
+    string *array = splithist->returnArrayOfKeys();
+    double tot    = splithist->returnTotal();
+    int leng      = splithist->returnNodecount();
     for (int i = 0; i < leng; i++) {
         if ((splithist->returnValue(array[i]) / tot) < 0.5) {
             splithist->deleteItem(array[i]);
@@ -2850,9 +2847,13 @@ string* splittree::returnArrayOfKeys() {
             array[1] = root->left->split;
         }
     } else {
+        /* TODO: This is present in the original consensusHRG code,
+         * but it makes no sense to assign -1 to a string. */
+        /*
         for (int i = 0; i < support; i++) {
             array[i] = -1;
         }
+        */
         // non-recursive traversal of tree structure
         curr  = root;
         curr->mark = 1;
