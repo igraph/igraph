@@ -33,9 +33,6 @@ int main(void) {
     igraph_t dendrogram;
     igraph_vector_t prob;
 
-    // int i, j;
-    // igraph_vector_int_t neis;
-
     igraph_rng_seed(igraph_rng_default(), 42);
 
     igraph_full(&full, 10, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
@@ -55,16 +52,15 @@ int main(void) {
     igraph_from_hrg_dendrogram(&dendrogram, &hrg, &prob);
 
     // Print the tree, with labels
-    // igraph_vector_int_init(&neis, 0);
-    // for (i=0; i<igraph_vcount(&graph)-1; i++) {
-    //   printf("Vertex # %2i, ", (int) (i+igraph_vcount(&graph)));
-    //   igraph_neighbors(&dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT);
-    //   printf("left: # %2i, right: # %2i, ", (int) VECTOR(neis)[0],
-    //       (int) VECTOR(neis)[1]);
-    //   printf("prob: %6.2g\n",
-    //       VAN(&dendrogram, "probability", i+igraph_vcount(&graph)));
-    // }
-    // igraph_vector_int_destroy(&neis);
+    igraph_vector_int_t neis;
+    igraph_vector_int_init(&neis, 0);
+    for (igraph_integer_t i=0; i < igraph_vcount(&graph)-1; i++) {
+       printf("Vertex # %2" IGRAPH_PRId ", ", (i+igraph_vcount(&graph)));
+       igraph_neighbors(&dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT);
+       printf("left: # %2" IGRAPH_PRId ", right: # %2" IGRAPH_PRId ", ", VECTOR(neis)[0], VECTOR(neis)[1]);
+       printf("prob: %6.2g\n", VECTOR(prob)[i+igraph_vcount(&graph)]);
+    }
+    igraph_vector_int_destroy(&neis);
 
     igraph_vector_destroy(&prob);
     igraph_destroy(&dendrogram);
