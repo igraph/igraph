@@ -260,7 +260,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         names = NULL;
     }
     if (names) {
-        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
+        IGRAPH_CHECK(igraph_i_attribute_get_type(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
         if (nametype != IGRAPH_ATTRIBUTE_STRING) {
             IGRAPH_WARNINGF("Ignoring names attribute '%s', unknown attribute type.", names);
@@ -274,7 +274,7 @@ igraph_error_t igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
         weights = NULL;
     }
     if (weights) {
-        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
+        IGRAPH_CHECK(igraph_i_attribute_get_type(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
         if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
             IGRAPH_WARNINGF("Ignoring weights attribute '%s', unknown attribute type.", weights);

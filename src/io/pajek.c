@@ -526,7 +526,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     /* Check if graph is bipartite, i.e. whether it has a Boolean 'type' vertex attribute. */
     if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, "type")) {
         igraph_attribute_type_t type_type;
-        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX, "type"));
+        IGRAPH_CHECK(igraph_i_attribute_get_type(graph, &type_type, IGRAPH_ATTRIBUTE_VERTEX, "type"));
         if (type_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
             bipartite = true; write_vertex_attrs = true;
             /* Count top and bottom vertices, we go over them twice,
@@ -577,7 +577,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     memset(vtypes, 0, sizeof(vtypes[0])*V_LAST);
     for (igraph_integer_t i = 0; i < V_LAST; i++) {
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vnames[i])) {
-            IGRAPH_CHECK(igraph_i_attribute_gettype(
+            IGRAPH_CHECK(igraph_i_attribute_get_type(
                              graph, &vtypes[i], IGRAPH_ATTRIBUTE_VERTEX, vnames[i]));
             write_vertex_attrs = true;
         } else {
@@ -587,7 +587,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     for (igraph_integer_t i = 0; i < (igraph_integer_t) (sizeof(vnumnames) / sizeof(vnumnames[0])); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vnumnames[i])) {
-            IGRAPH_CHECK(igraph_i_attribute_gettype(
+            IGRAPH_CHECK(igraph_i_attribute_get_type(
                              graph, &type, IGRAPH_ATTRIBUTE_VERTEX, vnumnames[i]));
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&vx_numa, i));
@@ -597,7 +597,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     for (igraph_integer_t i = 0; i < (igraph_integer_t) (sizeof(vstrnames) / sizeof(vstrnames[0])); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, vstrnames[i])) {
-            IGRAPH_CHECK(igraph_i_attribute_gettype(
+            IGRAPH_CHECK(igraph_i_attribute_get_type(
                              graph, &type, IGRAPH_ATTRIBUTE_VERTEX, vstrnames[i]));
             if (type == IGRAPH_ATTRIBUTE_STRING) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&vx_stra, i));
@@ -699,7 +699,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     /* TODO: refactor and simplify since only "weight" is relevant */
     for (igraph_integer_t i = 0; i < E_LAST; i++) {
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, enames[i])) {
-            IGRAPH_CHECK(igraph_i_attribute_gettype(
+            IGRAPH_CHECK(igraph_i_attribute_get_type(
                              graph, &etypes[i], IGRAPH_ATTRIBUTE_EDGE, enames[i]));
         } else {
             etypes[i] = (igraph_attribute_type_t) -1;
@@ -708,7 +708,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     for (igraph_integer_t i = 0; i < (igraph_integer_t) (sizeof(enumnames) / sizeof(enumnames[0])); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, enumnames[i])) {
-            IGRAPH_CHECK(igraph_i_attribute_gettype(
+            IGRAPH_CHECK(igraph_i_attribute_get_type(
                              graph, &type, IGRAPH_ATTRIBUTE_EDGE, enumnames[i]));
             if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&ex_numa, i));
@@ -718,7 +718,7 @@ igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) 
     for (igraph_integer_t i = 0; i < (igraph_integer_t) (sizeof(estrnames) / sizeof(estrnames[0])); i++) {
         igraph_attribute_type_t type;
         if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, estrnames[i])) {
-            IGRAPH_CHECK(igraph_i_attribute_gettype(
+            IGRAPH_CHECK(igraph_i_attribute_get_type(
                              graph, &type, IGRAPH_ATTRIBUTE_EDGE, estrnames[i]));
             if (type == IGRAPH_ATTRIBUTE_STRING) {
                 IGRAPH_CHECK(igraph_vector_int_push_back(&ex_stra, i));

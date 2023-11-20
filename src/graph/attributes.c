@@ -167,7 +167,7 @@ igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph,
     }
 }
 
-igraph_error_t igraph_i_attribute_gettype(const igraph_t *graph,
+igraph_error_t igraph_i_attribute_get_type(const igraph_t *graph,
                                igraph_attribute_type_t *type,
                                igraph_attribute_elemtype_t elemtype,
                                const char *name) {

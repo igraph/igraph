@@ -84,7 +84,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         vertex_attr_name = NULL;
     }
     if (vertex_attr_name) {
-        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &vertex_attr_type,
+        IGRAPH_CHECK(igraph_i_attribute_get_type(graph, &vertex_attr_type,
                                                 IGRAPH_ATTRIBUTE_VERTEX, vertex_attr_name));
         if (vertex_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             vertex_attr_type != IGRAPH_ATTRIBUTE_STRING &&
@@ -104,7 +104,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         edge_attr_name = NULL;
     }
     if (edge_attr_name) {
-        IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &edge_attr_type,
+        IGRAPH_CHECK(igraph_i_attribute_get_type(graph, &edge_attr_type,
                                                 IGRAPH_ATTRIBUTE_EDGE, edge_attr_name));
         if (edge_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             edge_attr_type != IGRAPH_ATTRIBUTE_STRING &&
