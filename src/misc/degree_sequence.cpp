@@ -18,7 +18,6 @@
 */
 
 #include "igraph_constructors.h"
-#include "igraph_graphicality.h"
 
 #include "core/exceptions.h"
 #include "math/safe_intop.h"
@@ -27,7 +26,6 @@
 #include <list>
 #include <algorithm>
 #include <utility>
-#include <iostream>
 
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
@@ -810,6 +808,12 @@ static igraph_error_t igraph_i_realize_undirected_bipartite_index(igraph_t *grap
     if (ds1_sum != ds2_sum) {
         goto fail;
     }
+    // If both degree sequences are empty, it's bigraphical
+    if (!(n1 == 0 && n2 == 0)) {
+        if (igraph_vector_int_min(deg1) < 0 || igraph_vector_int_min(deg2) < 0){
+            goto fail;
+        }
+    }
 
     vertices1.reserve(n1);
     vertices2.reserve(n2);
@@ -912,9 +916,11 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     igraph_vector_int_t edges;
     igraph_integer_t ds1_sum;
     igraph_integer_t ds2_sum;
-    igraph_bool_t is_bigraphical;
     igraph_bool_t multiedges;
     igraph_bool_t largest;
+    std::vector<vd_pair> vertices1;
+    std::vector<vd_pair> vertices2;
+
 
     // Bipartite graphs can't have self loops, so we ignore those.
     if (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) {
@@ -941,33 +947,27 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     IGRAPH_HANDLE_EXCEPTIONS_END;
 
     // Checks if the degree sequences are bigraphical
-    if (!multiedges) {
-        IGRAPH_CHECK(igraph_is_bigraphical(deg1, deg2, IGRAPH_SIMPLE_SW, &is_bigraphical));
-    } else {
-        IGRAPH_CHECK(igraph_is_bigraphical(deg1, deg2, IGRAPH_MULTI_SW, &is_bigraphical));
-    }
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg1, &ds1_sum));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg2, &ds2_sum));
 
-    std::vector<vd_pair> vertices1;
-    vertices1.reserve(n1);
-    std::vector<vd_pair> vertices2;
-    vertices2.reserve(n2);
-
-    if (!is_bigraphical) {
+    if (ds1_sum != ds2_sum) {
         goto fail;
     }
+    // If both degree sequences are empty, it's bigraphical
+    if (!(n1 == 0 && n2 == 0)) {
+        if (igraph_vector_int_min(deg1) < 0 || igraph_vector_int_min(deg2) < 0){
+            goto fail;
+        }
+    }
+
+    vertices1.reserve(n1);
+    vertices2.reserve(n2);
 
     for (igraph_integer_t i = 0; i < n1; i++) {
         vertices1.push_back(vd_pair(i, VECTOR(*deg1)[i]));
     }
     for (igraph_integer_t i=0; i < n2; i++) {
         vertices2.push_back(vd_pair(i+n1, VECTOR(*deg2)[i]));
-    }
-
-    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg1, &ds1_sum));
-    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg2, &ds2_sum));
-
-    if (ds1_sum != ds2_sum) {
-        goto fail;
     }
 
     IGRAPH_CHECK(igraph_vector_int_init(&edges, ds1_sum+ds2_sum));
