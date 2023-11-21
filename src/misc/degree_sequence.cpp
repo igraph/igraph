@@ -789,6 +789,105 @@ igraph_error_t igraph_realize_degree_sequence(
     }
 }
 
+// Uses index order to construct an undirected bipartite graph. Deg1 is considered to range from index [0, len(deg1)[,
+// so for this implementation deg1 is always the source degree sequence and deg2 is always the dest degree sequence.
+static igraph_error_t igraph_i_realize_undirected_bipartite_index(igraph_t *graph, const igraph_vector_int_t *deg1, const igraph_vector_int_t *deg2, igraph_bool_t multiedges) {
+    igraph_integer_t ec = 0; // The number of edges added so far
+    igraph_integer_t n1 = igraph_vector_int_size(deg1);
+    igraph_integer_t n2 = igraph_vector_int_size(deg2);
+    igraph_vector_int_t edges;
+    igraph_integer_t ds1_sum;
+    igraph_integer_t ds2_sum;
+
+    std::vector<vd_pair> vertices1;
+    std::vector<vd_pair> vertices2;
+    std::vector<vd_pair> *src_vs = &vertices1;
+    std::vector<vd_pair> *dest_vs = &vertices2;
+
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg1, &ds1_sum));
+    IGRAPH_CHECK(igraph_i_safe_vector_int_sum(deg2, &ds2_sum));
+
+    if (ds1_sum != ds2_sum) {
+        goto fail;
+    }
+
+    vertices1.reserve(n1);
+    vertices2.reserve(n2);
+
+    for (igraph_integer_t i = 0; i < n1; i++) {
+        vertices1.push_back(vd_pair(i, VECTOR(*deg1)[i]));
+    }
+    for (igraph_integer_t i=0; i < n2; i++) {
+        vertices2.push_back(vd_pair(i+n1, VECTOR(*deg2)[i]));
+    }
+
+    IGRAPH_CHECK(igraph_vector_int_init(&edges, ds1_sum+ds2_sum));
+
+
+    while (!vertices1.empty() && !vertices2.empty()) {
+        // Go by index, so we start in ds1, so ds2 needs to be sorted.
+        std::stable_sort(vertices2.begin(), vertices2.end(), degree_greater<vd_pair>);
+        // No sorting of ds1 needed for index case
+        vd_pair vd_src = vertices1.front();
+        // No multiedges - Take the first vertex, connect to the largest delta in opposite partition
+        if (!multiedges) {
+            // Remove the source degrees
+            src_vs->erase(src_vs->begin());
+
+            if (vd_src.degree == 0) {
+                continue;
+            }
+
+            if (dest_vs->size() < size_t(vd_src.degree)) {
+                goto fail;
+            }
+
+            for (igraph_integer_t i=0;i<vd_src.degree;i++) {
+                IGRAPH_ASSERT((*dest_vs)[i].degree - 1 >= 0);
+
+                (*dest_vs)[i].degree--;
+
+                VECTOR(edges)[2*(ec + i)] = vd_src.vertex;
+                VECTOR(edges)[2*(ec + i) + 1] = (*dest_vs)[i].vertex;
+            }
+            ec += vd_src.degree;
+        }
+        // If multiedges are allowed
+        else {
+            // If this is the last edge to be created from this vertex, we remove it.
+            if (src_vs->front().degree <= 1) {
+                src_vs->erase(src_vs->begin());
+            } else {
+                src_vs->front().degree--;
+            }
+
+            if (vd_src.degree == 0) {
+                continue;
+            }
+
+            if (dest_vs->size() < size_t(1)) {
+                goto fail;
+            }
+            // We should never decrement below zero, but check just in case.
+            IGRAPH_ASSERT((*dest_vs)[0].degree - 1 >= 0);
+
+            // Connect to the opposite partition
+            (*dest_vs)[0].degree--;
+
+            VECTOR(edges)[2 * ec] = vd_src.vertex;
+            VECTOR(edges)[2 * ec + 1] = (*dest_vs)[0].vertex;
+            ec++;
+        }
+    }
+    IGRAPH_CHECK(igraph_create(graph, &edges, n1+n2, false));
+
+    igraph_vector_int_destroy(&edges);
+    return IGRAPH_SUCCESS;
+
+fail:
+    IGRAPH_ERROR("Degree sequences of input partitions cannot be realized as a bipartite graph.", IGRAPH_EINVAL);
+}
+
 /**
  * \function igraph_realize_bipartite_degree_sequence
  * \brief Generates an undirected, connected, bipartite graph with the given degree sequences.
@@ -815,7 +914,7 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     igraph_integer_t ds2_sum;
     igraph_bool_t is_bigraphical;
     igraph_bool_t multiedges;
-    igraph_integer_t method_t;
+    igraph_bool_t largest;
 
     // Bipartite graphs can't have self loops, so we ignore those.
     if (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) {
@@ -829,14 +928,13 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
         switch (method) {
             case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
-                method_t = 0;
+                largest = false;
                 break;
             case IGRAPH_REALIZE_DEGSEQ_LARGEST:
-                method_t = 1;
+                largest = true;
                 break;
             case IGRAPH_REALIZE_DEGSEQ_INDEX:
-                IGRAPH_ERROR("Not implemented", IGRAPH_EINVAL);
-                break;
+                return igraph_i_realize_undirected_bipartite_index(graph, deg1, deg2, multiedges);
             default:
                 IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
         }
@@ -887,7 +985,7 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
 
         vd_pair vd_src(-1, -1);
 
-        if (method_t == 0){
+        if (!largest){
             vd_pair min1 = vertices1.back();
             vd_pair min2 = vertices2.back();
             if (min1.degree <= min2.degree) {
@@ -918,9 +1016,8 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
         IGRAPH_ASSERT(vd_src.degree != -1);
 
         if (!multiedges) {
-            //vd_pair vd_src = src_vs->back();
             // Remove the smallest element
-            if (method_t == 0) {
+            if (!largest) {
                 src_vs->pop_back();
             } else {
                 // Remove the largest element.
@@ -949,9 +1046,8 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
         // If multiedges are allowed
         else {
             // The smallest degree is in the back, and we know it is in vertices1
-            //vd_pair vd_src = min_vs->back();
             // If this is the last edge to be created from this vertex, we remove it.
-            if (method_t == 0) {
+            if (!largest) {
                 if (src_vs->back().degree <= 1) {
                     src_vs->pop_back();
                 } else {
@@ -986,12 +1082,10 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     }
     IGRAPH_CHECK(igraph_create(graph, &edges, n1+n2, false));
 
-    //igraph_vector_int_print(&edges);
     igraph_vector_int_destroy(&edges);
     return IGRAPH_SUCCESS;
 
 fail:
     IGRAPH_ERROR("Degree sequences of input partitions cannot be realized as a bipartite graph.", IGRAPH_EINVAL);
-}
 
-// TODO: Include an implementation for where it picks vertices in order, no sorting (index order)
+}
