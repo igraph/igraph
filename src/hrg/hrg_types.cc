@@ -144,8 +144,8 @@ int rbtree::returnValue(const int searchKey) const {
 // ******** Return Item Functions ****************************************
 
 int* rbtree::returnArrayOfKeys() const {
-    int* array;
-    array = new int [support];
+    IGRAPH_ASSERT(support >= 0);
+    int* array = new int [support];
     bool flag_go = true;
     int index = 0;
     elementrb *curr;
@@ -2289,6 +2289,7 @@ void dendro::resetDendrograph() {
 graph::graph(const int size, bool predict) :
     predict(predict), n(size), m(0)
 {
+    IGRAPH_ASSERT(n >= 0);
     nodes = new vert [n];
     nodeLink = new edge* [n];
     nodeLinkTail = new edge* [n];
@@ -2557,7 +2558,9 @@ bool graph::setName(const int i, const string &text) {
 interns::interns(const int n) :
     q(n), count(0)
 {
+    IGRAPH_ASSERT(n >= 0);
     edgelist  = new ipair  [q];
+    IGRAPH_ASSUME(q >= 0); // work around false positive GCC warning
     splitlist = new string [q + 1];
     indexLUT  = new int*   [q + 1];
     for (int i = 0; i < (q + 1); i++) {
@@ -2831,8 +2834,8 @@ double splittree::returnValue(const string &searchKey) {
 // a linked list
 
 string* splittree::returnArrayOfKeys() {
-    string* array;
-    array = new string [support];
+    IGRAPH_ASSERT(support >= 0);
+    string* array = new string [support];
     bool flag_go = true;
     int index = 0;
     elementsp *curr;
@@ -3016,6 +3019,7 @@ elementsp* splittree::returnSuccessor(elementsp *z) {
 }
 
 int splittree::returnNodecount() {
+    IGRAPH_ASSERT(support > 0);
     return support;
 }
 
