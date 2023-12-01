@@ -6,6 +6,7 @@
 
  - More robust error handling in HRG code.
  - Fixed infinite loop in `igraph_hrg_sample_many()`.
+ - Compatibility with libxml2 version 2.12 and above.
 
 ### Other
 
