@@ -344,11 +344,7 @@ static void igraph_i_graphml_parser_state_set_error_from_varargs(
 }
 
 static void igraph_i_graphml_parser_state_set_error_from_xmlerror(
-#if LIBXML_VERSION >= 21200
     struct igraph_i_graphml_parser_state *state, const xmlError *error
-#else
-    struct igraph_i_graphml_parser_state *state, const xmlErrorPtr error
-#endif
 ) {
     const size_t max_error_message_length = 4096;
 
@@ -1534,10 +1530,10 @@ static void igraph_i_libxml_generic_error_handler(void* ctx, const char* msg, ..
     va_end(args);
 }
 
-#if LIBXML_VERSION >= 21200
-static void igraph_i_libxml_structured_error_handler(void* ctx, const xmlError *error) {
+#if LIBXML_VERSION < 21200
+static void igraph_i_libxml_structured_error_handler(void* ctx, xmlError *error) {
 #else
-static void igraph_i_libxml_structured_error_handler(void* ctx, xmlErrorPtr error) {
+static void igraph_i_libxml_structured_error_handler(void* ctx, const xmlError *error) {
 #endif
     struct igraph_i_graphml_parser_state* state = (struct igraph_i_graphml_parser_state*) ctx;
     igraph_i_graphml_parser_state_set_error_from_xmlerror(state, error);
