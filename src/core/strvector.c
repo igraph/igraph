@@ -73,20 +73,6 @@ igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t si
     sv->stor_begin = IGRAPH_CALLOC(size, char*);
     IGRAPH_CHECK_OOM(sv->stor_begin, "Cannot initialize string vector.");
 
-    for (igraph_integer_t i = 0; i < size; i++) {
-        sv->stor_begin[i] = IGRAPH_CALLOC(1, char);
-        if (sv->stor_begin[i] == NULL) {
-            /* LCOV_EXCL_START */
-            for (igraph_integer_t j = 0; j < i; j++) {
-                IGRAPH_FREE(sv->stor_begin[j]);
-            }
-            IGRAPH_FREE(sv->stor_begin);
-            IGRAPH_ERROR("Cannot initialize string vector.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            /* LCOV_EXCL_STOP */
-        }
-        sv->stor_begin[i][0] = '\0';
-    }
-
     sv->stor_end = sv->stor_begin + size;
     sv->end = sv->stor_end;
 
@@ -122,7 +108,7 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
  * \brief Retrieves an element of the string vector.
  *
  * Query an element of a string vector. See also the \ref STR macro
- * for an easier way.
+ * for an easier way. The returned string must not be modified.
  *
  * \param sv The input string vector.
  * \param idx The index of the element to query.
@@ -133,8 +119,7 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
 const char *igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx) {
     IGRAPH_ASSERT(sv != NULL);
     IGRAPH_ASSERT(sv->stor_begin != NULL);
-    IGRAPH_ASSERT(sv->stor_begin[idx] != NULL);
-    return sv->stor_begin[idx];
+    return sv->stor_begin[idx] ? sv->stor_begin[idx] : "";
 }
 
 /**
@@ -178,18 +163,20 @@ igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx
  */
 igraph_error_t igraph_strvector_set_len(igraph_strvector_t *sv, igraph_integer_t idx,
                           const char *value, size_t len) {
-    char *tmp;
-
     IGRAPH_ASSERT(sv != NULL);
     IGRAPH_ASSERT(sv->stor_begin != NULL);
-    IGRAPH_ASSERT(sv->stor_begin[idx] != NULL);
 
-    tmp = IGRAPH_REALLOC(sv->stor_begin[idx], len + 1, char);
-    IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for new item in string vector.");
+    if (sv->stor_begin[idx] == NULL) {
+        sv->stor_begin[idx] = strndup(value, len);
+        IGRAPH_CHECK_OOM(sv->stor_begin[idx], "Cannot reserve space for new item in string vector.");
+    } else {
+        char *tmp = IGRAPH_REALLOC(sv->stor_begin[idx], len + 1, char);
+        IGRAPH_CHECK_OOM(tmp, "Cannot reserve space for new item in string vector.");
 
-    sv->stor_begin[idx] = tmp;
-    memcpy(sv->stor_begin[idx], value, len * sizeof(char));
-    sv->stor_begin[idx][len] = '\0';
+        sv->stor_begin[idx] = tmp;
+        memcpy(sv->stor_begin[idx], value, len * sizeof(char));
+        sv->stor_begin[idx][len] = '\0';
+    }
 
     return IGRAPH_SUCCESS;
 }
@@ -436,19 +423,7 @@ igraph_error_t igraph_strvector_resize(igraph_strvector_t *sv, igraph_integer_t 
         sv->end = sv->stor_begin + newsize;
     } else if (newsize > oldsize) {
         IGRAPH_CHECK(igraph_strvector_reserve(sv, newsize));
-
-        for (igraph_integer_t i = 0; i < toadd; i++) {
-            sv->stor_begin[oldsize + i] = IGRAPH_CALLOC(1, char);
-            if (sv->stor_begin[oldsize + i] == NULL) {
-                /* LCOV_EXCL_START */
-                for (igraph_integer_t j = 0; j < i; j++) {
-                    IGRAPH_FREE(sv->stor_begin[oldsize + j]);
-                }
-                IGRAPH_ERROR("Cannot resize string vector.", IGRAPH_ENOMEM);
-                /* LCOV_EXCL_STOP */
-            }
-            sv->stor_begin[oldsize + i][0] = '\0';
-        }
+        memset(sv->stor_begin + oldsize, 0, toadd * sizeof(char *));
         sv->end = sv->stor_begin + newsize;
     }
 
