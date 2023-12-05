@@ -362,7 +362,7 @@ igraph_error_t igraph_square_lattice(
     igraph_integer_t *coords, *weights;
     igraph_integer_t i, j;
     int carry, pos;
-    int iter;
+    int iter = 0;
 
     if (igraph_vector_int_any_smaller(dimvector, 0)) {
         IGRAPH_ERROR("Invalid dimension vector.", IGRAPH_EINVAL);
