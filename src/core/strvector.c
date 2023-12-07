@@ -105,10 +105,9 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
 /**
  * \ingroup strvector
  * \function igraph_strvector_get
- * \brief Retrieves an element of the string vector.
+ * \brief Retrieves an element of a string vector.
  *
- * Query an element of a string vector. See also the \ref STR macro
- * for an easier way. The returned string must not be modified.
+ * Query an element of a string vector. The returned string must not be modified.
  *
  * \param sv The input string vector.
  * \param idx The index of the element to query.
@@ -656,10 +655,10 @@ igraph_error_t igraph_strvector_print(const igraph_strvector_t *sv, FILE *file,
 
     igraph_integer_t n = igraph_strvector_size(sv);
     if (n != 0) {
-        fprintf(file, "%s", STR(*sv, 0));
+        fprintf(file, "%s", igraph_strvector_get(sv, 0));
     }
     for (igraph_integer_t i = 1; i < n; i++) {
-        fprintf(file, "%s%s", sep, STR(*sv, i));
+        fprintf(file, "%s%s", sep, igraph_strvector_get(sv, i));
     }
     return IGRAPH_SUCCESS;
 }

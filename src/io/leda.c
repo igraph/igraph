@@ -180,7 +180,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                          graph, vertex_attr_name, igraph_vss_all(), &values));
 
         for (i = 0; i < no_of_nodes; i++) {
-            const char *str = STR(values, i);
+            const char *str = igraph_strvector_get(&values, i);
             if (strchr(str, '\n') != 0) {
                 IGRAPH_ERROR("Vertex attribute values cannot contain newline characters.",
                              IGRAPH_EINVAL);
@@ -245,7 +245,7 @@ igraph_error_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                          graph, edge_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
         while (!IGRAPH_EIT_END(it)) {
             igraph_integer_t eid = IGRAPH_EIT_GET(it);
-            const char *str = STR(values, eid);
+            const char *str = igraph_strvector_get(&values, eid);
             igraph_edge(graph, eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, IGRAPH_DIRECTED, false);
             if (rev == IGRAPH_EIT_GET(it)) {

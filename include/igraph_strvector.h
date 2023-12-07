@@ -47,15 +47,16 @@ typedef struct s_igraph_strvector {
  * \brief Indexing string vectors.
  *
  * This is a macro that allows to query the elements of a string vector, just
- * like \ref igraph_strvector_get(), but without the overhead of a function
- * call. Note this macro cannot be used to set an element. Use
- * \ref igraph_strvector_set() to set an element instead.
+ * like \ref igraph_strvector_get(). Note this macro cannot be used to set an
+ * element. Use \ref igraph_strvector_set() to set an element instead.
  *
  * \param sv The string vector
  * \param i The the index of the element.
  * \return The element at position \p i.
  *
  * Time complexity: O(1).
+ *
+ * \deprecated-by 0.10.9 igraph_strvector_get()
  */
 #define STR(sv,i) igraph_strvector_get(&sv, i)
 
