@@ -64,6 +64,16 @@ __BEGIN_DECLS
 #define IGRAPH_FUNCATTR_PRINTFLIKE(string, first)
 #endif
 
+/* IGRAPH_PREPROCESSOR_WARNING(reason) is a macro that evaluates to nothing
+ * but triggers a preprocessor warning with the given message, if the compiler
+ * supports this functionality.
+ */
+#if defined(__GNUC__)
+#define IGRAPH_PREPROCESSOR_WARNING(reason) _Pragma(IGRAPH_I_STRINGIFY(GCC warning reason))
+#else
+#define IGRAPH_PREPROCESSOR_WARNING(reason) /* empty */
+#endif
+
 /**
  * \section error_handling_basics Error handling basics
  *
