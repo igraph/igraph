@@ -58,7 +58,9 @@ typedef struct s_igraph_strvector {
  *
  * \deprecated-by igraph_strvector_get 0.10.9
  */
-#define STR(sv,i) igraph_strvector_get(&sv, i)
+#define STR(sv,i) \
+    (IGRAPH_PREPROCESSOR_WARNING("STR() is deprecated. Use igraph_strvector_get() instead.") \
+     igraph_strvector_get(&sv, i))
 
 #define IGRAPH_STRVECTOR_NULL { 0,0,0 }
 #define IGRAPH_STRVECTOR_INIT_FINALLY(sv, size) \
