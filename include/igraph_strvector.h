@@ -56,7 +56,7 @@ typedef struct s_igraph_strvector {
  *
  * Time complexity: O(1).
  *
- * \deprecated-by 0.10.9 igraph_strvector_get()
+ * \deprecated-by igraph_strvector_get 0.10.9
  */
 #define STR(sv,i) igraph_strvector_get(&sv, i)
 
