@@ -36,6 +36,7 @@ __BEGIN_DECLS
  */
 
 typedef struct s_igraph_strvector {
+    /* Empty strings "" are represented using NULL. */
     char **stor_begin;
     char **stor_end;
     char **end;
@@ -56,7 +57,7 @@ typedef struct s_igraph_strvector {
  *
  * Time complexity: O(1).
  */
-#define STR(sv,i) ((const char *)((sv).stor_begin[(i)]))
+#define STR(sv,i) igraph_strvector_get(&sv, i)
 
 #define IGRAPH_STRVECTOR_NULL { 0,0,0 }
 #define IGRAPH_STRVECTOR_INIT_FINALLY(sv, size) \
