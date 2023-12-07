@@ -69,7 +69,7 @@ IGRAPH_EXPORT igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igrap
 IGRAPH_EXPORT void igraph_strvector_destroy(igraph_strvector_t *sv);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_strvector_capacity(const igraph_strvector_t *sv);
-IGRAPH_EXPORT const char *igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE const char *igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_set(
     igraph_strvector_t *sv, igraph_integer_t idx, const char *value);
 IGRAPH_EXPORT igraph_error_t igraph_strvector_set_len(
