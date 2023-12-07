@@ -52,9 +52,7 @@
  */
 #ifdef DBL_DIG
     /* Use DBL_DIG to determine the maximum precision used for %g */
-    #define STRINGIFY_HELPER(x) #x
-    #define STRINGIFY(x) STRINGIFY_HELPER(x)
-    #define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%." STRINGIFY(DBL_DIG) "g"
+    #define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%." IGRAPH_I_STRINGIFY(DBL_DIG) "g"
 #else
     /* Assume a precision of 15 digits for %g, which is what IEEE-754 doubles require. */
     #define IGRAPH_REAL_PRINTF_PRECISE_FORMAT "%.15g"

@@ -40,6 +40,10 @@
 #  define IGRAPH_ASSUME(expr) /* empty */
 #endif
 
+/* IGRAPH_I_STRINGIFY(X) evaluates X and converts the result to a string. */
+#define IGRAPH_I_STRINGIFY_I(X) #X
+#define IGRAPH_I_STRINGIFY(X) IGRAPH_I_STRINGIFY_I(X)
+
 /* Include the definition of macros controlling symbol visibility */
 #include "igraph_export.h"
 
