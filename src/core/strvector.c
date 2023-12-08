@@ -320,14 +320,18 @@ igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
     IGRAPH_CHECK(igraph_strvector_reserve(to, newlen));
 
     for (igraph_integer_t i = 0; i < len2; i++) {
-        tmp = strdup(igraph_strvector_get(from, i));
-        if (!tmp) {
-            error = true;
-            break;
+        if (from->stor_begin[i] == NULL || from->stor_begin[i][0] == '\0') {
+            /* Represent empty strings as NULL. */
+            tmp = NULL;
         } else {
-            *(to->end) = tmp;
-            to->end++;
+            tmp = strdup(from->stor_begin[i]);
+            if (tmp == NULL) {
+                error = true;
+                break;
+            }
         }
+        *(to->end) = tmp;
+        to->end++;
     }
 
     if (error) {
