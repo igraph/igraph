@@ -6,10 +6,15 @@
 
  - More robust error handling in HRG code.
  - Fixed infinite loop in `igraph_hrg_sample_many()`.
- - Compatibility with libxml2 version 2.12 and above.
+ - Compatibility with libxml2 version 2.12.
+
+### Deprecated
+
+ - The macro `STR()` is deprecated; use the function `igraph_strvector_get()` instead.
 
 ### Other
 
+ - Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
  - Documentation improvements
 
 ## [0.10.8] - 2023-11-17
