@@ -163,13 +163,11 @@ igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
     igraph_vector_t weights;
     igraph_vector_int_t degrees;
-    igraph_neimode_t mode0;
+    igraph_neimode_t mode0 = IGRAPH_REVERSE_MODE(mode);
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
 
-    switch (mode) {
-    case IGRAPH_OUT: mode0 = IGRAPH_IN; break;
-    case IGRAPH_IN: mode0 = IGRAPH_OUT; break;
-    default: mode0 = IGRAPH_ALL;
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid neighbor mode.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
@@ -195,10 +193,10 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    const igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_vids;
-    igraph_integer_t from, i, j;
-    igraph_vector_int_t neis = IGRAPH_VECTOR_NULL;
+    igraph_integer_t i;
+    igraph_vector_int_t neis;
     igraph_vector_int_t vid_reverse_index;
     igraph_vit_t vit;
 
@@ -225,22 +223,18 @@ static igraph_error_t igraph_i_cocitation_real(const igraph_t *graph, igraph_mat
 
     /* The result */
 
-    for (from = 0; from < no_of_nodes; from++) {
-        igraph_real_t weight;
-
+    for (igraph_integer_t from = 0; from < no_of_nodes; from++) {
         IGRAPH_ALLOW_INTERRUPTION();
+
+        const igraph_real_t weight = weights ? VECTOR(*weights)[from] : 1;
+
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
-        igraph_integer_t nei_count = igraph_vector_int_size(&neis);
-        if (weights) {
-            weight = VECTOR(*weights)[from];
-        } else {
-            weight = 1;
-        }
+        const igraph_integer_t nei_count = igraph_vector_int_size(&neis);
 
         for (i = 0; i < nei_count - 1; i++) {
             igraph_integer_t u = VECTOR(neis)[i];
             igraph_integer_t k = VECTOR(vid_reverse_index)[u];
-            for (j = i + 1; j < nei_count; j++) {
+            for (igraph_integer_t j = i + 1; j < nei_count; j++) {
                 igraph_integer_t v = VECTOR(neis)[j];
                 igraph_integer_t l = VECTOR(vid_reverse_index)[v];
                 if (k != -1) {
