@@ -254,7 +254,12 @@ igraph_error_t igraph_strvector_init_copy(igraph_strvector_t *to,
     IGRAPH_CHECK_OOM(to->stor_begin, "Cannot copy string vector.");
 
     for (igraph_integer_t i = 0; i < from_size; i++) {
-        to->stor_begin[i] = strdup(igraph_strvector_get(from, i));
+        /* If the string in the 'from' vector is empty, we represent it as NULL.
+         * The NULL value was already set by IGRAPH_CALLOC(). */
+        if (from->stor_begin[i] == NULL || from->stor_begin[i][0] == '\0') {
+            continue;
+        }
+        to->stor_begin[i] = strdup(from->stor_begin[i]);
         if (to->stor_begin[i] == NULL) {
             /* LCOV_EXCL_START */
             for (igraph_integer_t j = 0; j < i; j++) {
