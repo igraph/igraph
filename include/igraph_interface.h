@@ -75,8 +75,8 @@ IGRAPH_EXPORT igraph_error_t igraph_incident(const igraph_t *graph, igraph_vecto
                                   igraph_neimode_t mode);
 IGRAPH_EXPORT igraph_error_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *igraph2, igraph_bool_t *res);
 
-IGRAPH_EXPORT igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop);
-IGRAPH_EXPORT igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_property_cache_get_bool(const igraph_t *graph, igraph_cached_property_t prop);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_bool_t igraph_i_property_cache_has(const igraph_t *graph, igraph_cached_property_t prop);
 IGRAPH_EXPORT void igraph_i_property_cache_set_bool(const igraph_t *cache, igraph_cached_property_t prop, igraph_bool_t value);
 IGRAPH_EXPORT void igraph_i_property_cache_invalidate(const igraph_t *graph, igraph_cached_property_t prop);
 IGRAPH_EXPORT void igraph_i_property_cache_invalidate_all(const igraph_t *graph);

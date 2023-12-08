@@ -42,6 +42,6 @@ IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t FUNCTION(igraph_stack, size)
 IGRAPH_EXPORT void FUNCTION(igraph_stack, clear)(TYPE(igraph_stack)* s);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem);
 IGRAPH_EXPORT BASE FUNCTION(igraph_stack, pop)(TYPE(igraph_stack)* s);
-IGRAPH_EXPORT BASE FUNCTION(igraph_stack, top)(const TYPE(igraph_stack)* s);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE BASE FUNCTION(igraph_stack, top)(const TYPE(igraph_stack)* s);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, print)(const TYPE(igraph_stack)* s);
 IGRAPH_EXPORT igraph_error_t FUNCTION(igraph_stack, fprint)(const TYPE(igraph_stack)* s, FILE *file);

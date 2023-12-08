@@ -39,13 +39,13 @@ typedef struct {
 IGRAPH_EXPORT igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_integer_t size);
 IGRAPH_EXPORT void igraph_psumtree_reset(igraph_psumtree_t *t);
 IGRAPH_EXPORT void igraph_psumtree_destroy(igraph_psumtree_t *t);
-IGRAPH_EXPORT igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, igraph_integer_t idx);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, igraph_integer_t idx);
 IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_integer_t igraph_psumtree_size(const igraph_psumtree_t *t);
 IGRAPH_EXPORT igraph_error_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_integer_t *idx,
                                          igraph_real_t elem);
 IGRAPH_EXPORT igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_integer_t idx,
                                          igraph_real_t new_value);
-IGRAPH_EXPORT igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
+IGRAPH_EXPORT IGRAPH_FUNCATTR_PURE igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
 
 __END_DECLS
 
