@@ -44,9 +44,14 @@ typedef std::map<std::set<igraph_integer_t>, igraph_integer_t> dictionary;
  *  Populates the subsetMap data structure as well.
  *
  */
-static igraph_error_t generateSubsets(const igraph_vector_int_t *steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize, dictionary &subsetMap, std::set<int_set> &allSubsets) {
+static igraph_error_t generateSubsets(
+        const igraph_vector_int_t *steinerTerminals, igraph_integer_t n, igraph_integer_t graphsize,
+        dictionary &subsetMap, std::set<int_set> &allSubsets)
+{
     if (n > sizeof(igraph_integer_t) * 8 - 2) {
-        IGRAPH_ERROR("igraph_integer_overflow detected. The given number of terminals is more than what the computer can handle.", IGRAPH_EINVAL);
+        IGRAPH_ERROR(
+                "igraph_integer_overflow detected. "
+                "The given number of terminals is more than what the computer can handle.", IGRAPH_EINVAL);
     }
     igraph_integer_t count = ((igraph_integer_t)1 << n);
     igraph_integer_t subsetIndex = graphsize;
@@ -163,7 +168,7 @@ static int_set fetchSetsBasedonIndex(igraph_integer_t index, const dictionary &s
  * Time complexity: O( 3^k ∗ V + 2^k ∗ V^2 + V∗(V+E) ∗ log(V) )
  * where V and E are the number of vertices and edges
  * and k is the number of Steiner terminals.
- * It is recommended that V &lt;= 50 and k &lt; 11.
+ * It is recommended that V <= 50 and k <= 11.
  *
  * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_spanner()
  */
@@ -222,7 +227,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         IGRAPH_VECTOR_INT_INIT_FINALLY(&vertices, 0);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&edges_res, 0);
 
-        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(graph, &vertices, &edges_res, VECTOR(*terminals)[0], VECTOR(*terminals)[1], pweights, IGRAPH_ALL));
+        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(
+                    graph, &vertices, &edges_res, VECTOR(*terminals)[0],
+                    VECTOR(*terminals)[1], pweights, IGRAPH_ALL));
         igraph_integer_t tree_size = igraph_vector_int_size(&edges_res);
 
         for (igraph_integer_t i = 0; i < tree_size; i++) {
@@ -261,7 +268,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             igraph_integer_t component_id = VECTOR(membership)[VECTOR(*terminals)[0]];
             for (igraph_integer_t i = 1; i < no_of_terminals; i++) {
                 if (VECTOR(membership)[VECTOR(*terminals)[i]] != component_id) {
-                    IGRAPH_ERROR("Not all Steiner terminals are in the same connected component.", IGRAPH_EINVAL);
+                    IGRAPH_ERROR(
+                            "Not all Steiner terminals are in the same connected component.",
+                            IGRAPH_EINVAL);
                 }
             }
         }
@@ -269,7 +278,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         igraph_vector_int_destroy(&membership);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    /* When every vertex is a Steiner terminal, the probably reduces to
+    /* When every vertex is a Steiner terminal, the problem reduces to
      * finding a minimum spanning tree.
      */
     if (no_of_terminals == no_of_nodes) {
@@ -291,16 +300,20 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_matrix_t distance;
 
     if (igraph_vector_size(pweights) != no_of_edges) {
-        IGRAPH_ERRORF("Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges.", IGRAPH_FAILURE, igraph_vector_size(weights), no_of_edges);
+        IGRAPH_ERRORF(
+                "Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges.",
+                IGRAPH_FAILURE, igraph_vector_size(weights), no_of_edges);
     }
     IGRAPH_CHECK(igraph_matrix_init(&distance, no_of_nodes, no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &distance);
 
     /*
-     * Compute distances between all pairs of vertices. The Dreyfus - Wagner algorithm needs complete graph information
+     * Compute distances between all pairs of vertices.
+     * The Dreyfus - Wagner algorithm needs complete graph information
      * hence this step is necessary.
      */
-    IGRAPH_CHECK(igraph_distances_dijkstra(graph, &distance, igraph_vss_all(), igraph_vss_all(), pweights, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_distances_dijkstra(
+                graph, &distance, igraph_vss_all(), igraph_vss_all(), pweights, IGRAPH_ALL));
 
     IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy, terminals));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &steiner_terminals_copy);
@@ -311,17 +324,27 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_vector_int_remove(&steiner_terminals_copy, 0);
 
     /*
-     * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1)
-     * 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1) is number of subsets.
-     * DP table with size number of vertices in the graph + 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1)
-     * 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1) is number of subsets.
+     * DP table with size number of vertices in the graph + number of subsets
+     * Number of subsets is 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1)
      */
 
-    IGRAPH_CHECK(igraph_matrix_init(&dp_cache, no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy)) - (igraph_vector_int_size(&steiner_terminals_copy) + 1), no_of_nodes));
+    IGRAPH_CHECK(
+            igraph_matrix_init(&dp_cache,
+                no_of_nodes +
+                    pow(2, igraph_vector_int_size(&steiner_terminals_copy))
+                    - (igraph_vector_int_size(&steiner_terminals_copy) + 1),
+                no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &dp_cache);
 
-    std::vector<std::vector<int_set> > distance_matrix = std::vector<std::vector<int_set> >(no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy)) - (igraph_vector_int_size(&steiner_terminals_copy) + 1), std::vector<int_set>(no_of_nodes,  int_set()));
-    /* Addition to the dp_cache where at the same indices of the matrix we are storing the set of edge ids that are the shortest path to it
+    std::vector<std::vector<int_set> > distance_matrix =
+        std::vector<std::vector<int_set> >
+        (
+         no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy)) -
+         (igraph_vector_int_size(&steiner_terminals_copy) + 1),
+         std::vector<int_set>(no_of_nodes,  int_set())
+         );
+    /* Addition to the dp_cache where at the same indices of the matrix we are storing
+       the set of edge ids that are the shortest path to it
     */
     igraph_matrix_fill(&dp_cache, IGRAPH_INFINITY);
     /*
@@ -349,7 +372,11 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
      * The index would be used in DP table.
      */
     dictionary subsetMap;
-    IGRAPH_CHECK(generateSubsets(&steiner_terminals_copy, igraph_vector_int_size(&steiner_terminals_copy), no_of_nodes, subsetMap, allSubsets));
+    IGRAPH_CHECK(
+            generateSubsets(
+                &steiner_terminals_copy,
+                igraph_vector_int_size(&steiner_terminals_copy),
+                no_of_nodes, subsetMap, allSubsets));
 
     int steiner_terminals_copy_size = igraph_vector_int_size(&steiner_terminals_copy);
     for (igraph_integer_t m = 2; m <= steiner_terminals_copy_size; m++) {
@@ -380,15 +407,23 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                 igraph_real_t distance1 = IGRAPH_INFINITY;
                 int_set set_u;
                 for (auto E : Subsets) {
-                    igraph_integer_t indexOfSubsetE = (E.size() == 1) ? *E.begin() : fetchIndexofMapofSets(E, subsetMap);
+                    igraph_integer_t indexOfSubsetE =
+                        (E.size() == 1)
+                            ? *E.begin()
+                            : fetchIndexofMapofSets(E, subsetMap);
 
                     igraph_real_t distanceEJ = MATRIX(dp_cache, indexOfSubsetE, j);
 
                     int_set DMinusE;
 
-                    std::set_difference(D.begin(), D.end(), E.begin(), E.end(), std::inserter(DMinusE, DMinusE.end()));
+                    std::set_difference(
+                            D.begin(), D.end(), E.begin(), E.end(),
+                            std::inserter(DMinusE, DMinusE.end()));
 
-                    igraph_integer_t indexOfSubsetDMinusE = (DMinusE.size() == 1) ? *DMinusE.begin() : fetchIndexofMapofSets(DMinusE, subsetMap);
+                    igraph_integer_t indexOfSubsetDMinusE =
+                        (DMinusE.size() == 1)
+                            ? *DMinusE.begin()
+                            : fetchIndexofMapofSets(DMinusE, subsetMap);
 
                     if ((distanceEJ + MATRIX(dp_cache, indexOfSubsetDMinusE, j)) < distance1) {
                         distance1 = distanceEJ + MATRIX(dp_cache, indexOfSubsetDMinusE, j);
@@ -397,7 +432,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                         auto& setEJ = distance_matrix[indexOfSubsetE][j];
                         auto& setDMinusEJ = distance_matrix[indexOfSubsetDMinusE][j];
                         set_u.clear();
-                        std::set_union(setEJ.begin(), setEJ.end(), setDMinusEJ.begin(), setDMinusEJ.end(), std::inserter(set_u, set_u.end()));
+                        std::set_union(
+                                setEJ.begin(), setEJ.end(), setDMinusEJ.begin(), setDMinusEJ.end(),
+                                std::inserter(set_u, set_u.end()));
                     }
                 }
 
@@ -408,7 +445,11 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                         //get the reference to this set and combine them
                         auto& setKJ = distance_matrix[k][j];
                         distance_matrix[indexOfSubsetD][k].clear();
-                        std::set_union(setKJ.begin(), setKJ.end(), set_u.begin(), set_u.end(), std::inserter(distance_matrix[indexOfSubsetD][k], distance_matrix[indexOfSubsetD][k].end()));
+                        std::set_union(
+                                setKJ.begin(), setKJ.end(), set_u.begin(), set_u.end(),
+                                std::inserter(
+                                    distance_matrix[indexOfSubsetD][k],
+                                    distance_matrix[indexOfSubsetD][k].end()));
 
                     }
                 }
@@ -427,7 +468,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             C_prime.insert(igraph_vector_int_get(&steiner_terminals_copy, i));
         }
     }
-    generateD_E(C_prime, E_subsets, C_1); // E are subsets of C such that C[1] is in E and E is subset of C where E != C
+    // E are subsets of C such that C[1] is in E and E is subset of C where E != C
+    generateD_E(C_prime, E_subsets, C_1);
 
 
     igraph_real_t distance2 = IGRAPH_INFINITY;
@@ -439,12 +481,20 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         int_set set_u;
 
         for (auto E : E_subsets) {
-            igraph_integer_t indexE = (E.size() == 1) ? *E.begin() : fetchIndexofMapofSets(E, subsetMap);
+            igraph_integer_t indexE =
+                (E.size() == 1)
+                ? *E.begin()
+                : fetchIndexofMapofSets(E, subsetMap);
 
             int_set CMinusE;
-            std::set_difference(C.begin(), C.end(), E.begin(), E.end(), std::inserter(CMinusE, CMinusE.end()));
+            std::set_difference(
+                    C.begin(), C.end(), E.begin(), E.end(),
+                    std::inserter(CMinusE, CMinusE.end()));
 
-            igraph_integer_t indexC_E = (CMinusE.size() == 1) ? *CMinusE.begin() : fetchIndexofMapofSets(CMinusE, subsetMap);
+            igraph_integer_t indexC_E =
+                (CMinusE.size() == 1)
+                ? *CMinusE.begin()
+                : fetchIndexofMapofSets(CMinusE, subsetMap);
 
             igraph_real_t distanceEJ = MATRIX(dp_cache, indexE, j);
             if (((distanceEJ + (MATRIX(dp_cache, indexC_E, j))) < distance1)) {
@@ -455,7 +505,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                 set_u.clear();
                 auto& setEJ = distance_matrix[indexE][j];
                 auto& setCMinusEJ = distance_matrix[indexC_E][j];
-                std::set_union(setEJ.begin(), setEJ.end(), setCMinusEJ.begin(), setCMinusEJ.end(), std::inserter(set_u, set_u.end()));
+                std::set_union(
+                        setEJ.begin(), setEJ.end(), setCMinusEJ.begin(), setCMinusEJ.end(),
+                        std::inserter(set_u, set_u.end()));
             }
         }
 
@@ -464,11 +516,14 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             //get the reference to this set and combine them
             final_set.clear();
             auto& setQJ = distance_matrix[q][j];
-            std::set_union(setQJ.begin(), setQJ.end(), set_u.begin(), set_u.end(), std::inserter(final_set, final_set.end()));
+            std::set_union(
+                    setQJ.begin(), setQJ.end(), set_u.begin(), set_u.end(),
+                    std::inserter(final_set, final_set.end()));
         }
     }
     *res = distance2;
-    //put the edges in the res_tree and move the final value to res which was stored in distance2 for the scope of this function
+    //put the edges in the res_tree and move the final value to res,
+    //which was stored in distance2 for the scope of this function
     igraph_vector_int_clear(res_tree);
     for (auto elem : final_set) {
         igraph_vector_int_push_back(res_tree, elem);
