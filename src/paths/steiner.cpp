@@ -335,11 +335,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
 
     int steiner_terminals_copy_size = igraph_vector_int_size(&steiner_terminals_copy);
     for (igraph_integer_t m = 2; m <= steiner_terminals_copy_size; m++) {
-        for (igraph_integer_t i = 0; i < (igraph_integer_t)allSubsets.size(); i++) {
-            auto it = allSubsets.begin();
-            std::advance(it, i);
-            int_set D = *it;
-
+        for (const int_set& D : allSubsets) {
             if (D.size() != m) {
                 continue;
             }
