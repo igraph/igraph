@@ -174,9 +174,9 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     }
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
-
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
+
     if (no_of_edges > 0 && weights) {
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight < 0) {
@@ -185,30 +185,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             /* TODO: can we support zero edge weights? */
             IGRAPH_ERROR("Weight vector contains zero weight.", IGRAPH_EINVAL);
         }
-    }
-
-    /* Handle the cases of the null graph and no terminals. */
-    if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
-
-        igraph_vector_int_clear(res_tree);
-        *res = 0.0;
-        return IGRAPH_SUCCESS;
-    } else if (no_of_terminals == 2) {
-        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(
-                    graph, NULL, res_tree, VECTOR(*terminals)[0],
-                    VECTOR(*terminals)[1], weights, IGRAPH_ALL));
-        igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
-
-        *res = 0.0;
-        if (weights) {
-            for (igraph_integer_t i = 0; i < tree_size; i++) {
-                *res += VECTOR(*weights)[VECTOR(*res_tree)[i]];
-            }
-        } else {
-            *res = tree_size;
-        }
-
-        return IGRAPH_SUCCESS;
     }
 
     /* Check whether all terminals are within the same connected component. */
@@ -234,22 +210,46 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         igraph_vector_int_destroy(&membership);
         IGRAPH_FINALLY_CLEAN(1);
     }
+
+    /* Handle the cases of the null graph and 0,1 or 2 terminals. */
+    if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
+
+        igraph_vector_int_clear(res_tree);
+        *res = 0.0;
+        return IGRAPH_SUCCESS;
+    } else if (no_of_terminals == 2) {
+        IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(
+                    graph, NULL, res_tree, VECTOR(*terminals)[0],
+                    VECTOR(*terminals)[1], weights, IGRAPH_ALL));
+        igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
+
+        *res = 0.0;
+        if (weights) {
+            for (igraph_integer_t i = 0; i < tree_size; i++) {
+                *res += VECTOR(*weights)[VECTOR(*res_tree)[i]];
+            }
+        } else {
+            *res = tree_size;
+        }
+
+        return IGRAPH_SUCCESS;
+    }
+
     /* When every vertex is a Steiner terminal, the problem reduces to
      * finding a minimum spanning tree.
      */
     if (no_of_terminals == no_of_nodes) {
         IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, res_tree, weights));
 
-        igraph_real_t tree_weight = 0.0;
         igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
         if (weights) {
+            *res = 0.0;
             for (igraph_integer_t i = 0; i < tree_size; i++) {
-                tree_weight += VECTOR(*weights)[VECTOR(*res_tree)[i]];
+                *res += VECTOR(*weights)[VECTOR(*res_tree)[i]];
             }
         } else {
-            tree_weight = tree_size;
+            *res = tree_size;
         }
-        *res = tree_weight;
         return IGRAPH_SUCCESS;
     }
 
