@@ -283,19 +283,19 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
      * Number of subsets is 2 ^ (number of steiner_terminals_copy) - (number of steiner_terminals_copy + 1)
      */
 
+    igraph_integer_t no_of_subsets =
+        pow(2, no_of_terminals - 1) - no_of_terminals;
+
     IGRAPH_CHECK(
             igraph_matrix_init(&dp_cache,
-                no_of_nodes +
-                    pow(2, igraph_vector_int_size(&steiner_terminals_copy))
-                    - (igraph_vector_int_size(&steiner_terminals_copy) + 1),
+                no_of_nodes + no_of_subsets,
                 no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &dp_cache);
 
     std::vector<std::vector<int_set> > distance_matrix =
         std::vector<std::vector<int_set> >
         (
-         no_of_nodes + pow(2, igraph_vector_int_size(&steiner_terminals_copy)) -
-         (igraph_vector_int_size(&steiner_terminals_copy) + 1),
+         no_of_nodes + no_of_subsets,
          std::vector<int_set>(no_of_nodes,  int_set())
          );
     /* Addition to the dp_cache where at the same indices of the matrix we are storing
