@@ -165,9 +165,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     igraph_real_t *res, igraph_vector_int_t *res_tree) {
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
 
-    const igraph_vector_t *pweights;
-    igraph_vector_t iweights; // Will be used when weights are NULL.
-
     igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_integer_t no_of_terminals = igraph_vector_int_size(terminals);
@@ -175,22 +172,13 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     if (!igraph_vector_int_isininterval(terminals, 0, no_of_nodes)) {
         IGRAPH_ERROR("Invalid vertex ID given as Steiner terminal.", IGRAPH_EINVVID);
     }
-    if (!weights) {
 
-        IGRAPH_CHECK(igraph_vector_init(&iweights, no_of_edges));
-        igraph_vector_fill(&iweights, 1);
-        pweights = &iweights;
-        IGRAPH_FINALLY(igraph_vector_destroy, &iweights);
-    } else {
-        pweights = weights;
-    }
-
-    if (igraph_vector_size(pweights) != no_of_edges) {
+    if (weights && igraph_vector_size(weights) != no_of_edges) {
 
         IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
-    if (no_of_edges > 0) {
-        igraph_real_t minweight = igraph_vector_min(pweights);
+    if (no_of_edges > 0 && weights) {
+        igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight < 0) {
             IGRAPH_ERRORF("Edge weights must be non-negative, got %g.", IGRAPH_EINVAL, minweight);
         } else if (minweight == 0) {
@@ -199,31 +187,25 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         }
     }
 
-    igraph_bool_t flag_terminals = false;
     /* Handle the cases of the null graph and no terminals. */
     if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
 
         igraph_vector_int_clear(res_tree);
         *res = 0.0;
-        flag_terminals = true;
+        return IGRAPH_SUCCESS;
     } else if (no_of_terminals == 2) {
         IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(
                     graph, NULL, res_tree, VECTOR(*terminals)[0],
-                    VECTOR(*terminals)[1], pweights, IGRAPH_ALL));
+                    VECTOR(*terminals)[1], weights, IGRAPH_ALL));
         igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
 
         *res = 0.0;
-        for (igraph_integer_t i = 0; i < tree_size; i++) {
-            *res += VECTOR(*pweights)[VECTOR(*res_tree)[i]];
-        }
-
-        flag_terminals = true;
-    }
-
-    if (flag_terminals == true) {
-        if (!weights) {
-            igraph_vector_destroy(&iweights);
-            IGRAPH_FINALLY_CLEAN(1);
+        if (weights) {
+            for (igraph_integer_t i = 0; i < tree_size; i++) {
+                *res += VECTOR(*weights)[VECTOR(*res_tree)[i]];
+            }
+        } else {
+            *res = tree_size;
         }
 
         return IGRAPH_SUCCESS;
@@ -256,12 +238,16 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
      * finding a minimum spanning tree.
      */
     if (no_of_terminals == no_of_nodes) {
-        IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, res_tree, pweights));
+        IGRAPH_CHECK(igraph_minimum_spanning_tree(graph, res_tree, weights));
 
         igraph_real_t tree_weight = 0.0;
         igraph_integer_t tree_size = igraph_vector_int_size(res_tree);
-        for (igraph_integer_t i = 0; i < tree_size; i++) {
-            tree_weight += VECTOR(*pweights)[VECTOR(*res_tree)[i]];
+        if (weights) {
+            for (igraph_integer_t i = 0; i < tree_size; i++) {
+                tree_weight += VECTOR(*weights)[VECTOR(*res_tree)[i]];
+            }
+        } else {
+            tree_weight = tree_size;
         }
         *res = tree_weight;
         return IGRAPH_SUCCESS;
@@ -273,11 +259,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
     std::set<int_set> allSubsets = std::set<int_set>();
     igraph_matrix_t distance;
 
-    if (igraph_vector_size(pweights) != no_of_edges) {
-        IGRAPH_ERRORF(
-                "Weight vector length does not match %" IGRAPH_PRId "vec size and %" IGRAPH_PRId "edges.",
-                IGRAPH_FAILURE, igraph_vector_size(weights), no_of_edges);
-    }
     IGRAPH_CHECK(igraph_matrix_init(&distance, no_of_nodes, no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_destroy, &distance);
 
@@ -287,7 +268,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
      * hence this step is necessary.
      */
     IGRAPH_CHECK(igraph_distances_dijkstra(
-                graph, &distance, igraph_vss_all(), igraph_vss_all(), pweights, IGRAPH_ALL));
+                graph, &distance, igraph_vss_all(), igraph_vss_all(), weights, IGRAPH_ALL));
 
     IGRAPH_CHECK(igraph_vector_int_init_copy(&steiner_terminals_copy, terminals));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &steiner_terminals_copy);
@@ -332,7 +313,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
             MATRIX(dp_cache, i, j) = MATRIX(distance, i, j);
             igraph_vector_int_t edgelist;
             IGRAPH_VECTOR_INT_INIT_FINALLY(&edgelist, 0);
-            igraph_get_shortest_path_dijkstra(graph, nullptr, &edgelist, i, j, pweights, IGRAPH_ALL);
+            igraph_get_shortest_path_dijkstra(graph, nullptr, &edgelist, i, j, weights, IGRAPH_ALL);
             for (int k = 0 ; k < igraph_vector_int_size(&edgelist) ; k++) {
                 distance_matrix[i][j].insert(igraph_vector_int_get(&edgelist, k));
             }
@@ -508,11 +489,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
 
     IGRAPH_FINALLY_CLEAN(3);
 
-    if (!weights) {
-        igraph_vector_destroy(&iweights);
-        IGRAPH_FINALLY_CLEAN(1);
-        return IGRAPH_SUCCESS;
-    }
     IGRAPH_HANDLE_EXCEPTIONS_END;
     return IGRAPH_SUCCESS;
 }
