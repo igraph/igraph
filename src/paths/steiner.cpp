@@ -121,19 +121,6 @@ static igraph_integer_t fetchIndexofMapofSets(const int_set &subset, const dicti
     IGRAPH_FATAL("The Subset's index that you tried to find doesn't exist. Hence the code won't run.");
 }
 
-/*
- * Purpose: Retriving the value of subset from given index.
- */
-static int_set fetchSetsBasedonIndex(igraph_integer_t index, const dictionary &subsetMap) {
-    for (const auto &kv : subsetMap) {
-        if (kv.second == index) {
-            return kv.first;
-        }
-    }
-    IGRAPH_FATAL("The index that you tried to find doesn't exist. Hence the code won't run.");
-}
-
-
 /**
  * \function  igraph_steiner_dreyfus_wagner
  * \brief Finds a Steiner tree on an undirected graph using the Dreyfus-Wagner algorithm.
