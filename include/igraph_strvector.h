@@ -37,9 +37,9 @@ __BEGIN_DECLS
 
 typedef struct s_igraph_strvector {
     /* Empty strings "" are represented using NULL. */
-    char **stor_begin;
-    char **stor_end;
-    char **end;
+    const char **stor_begin;
+    const char **stor_end;
+    const char **end;
 } igraph_strvector_t;
 
 /**
