@@ -30,6 +30,7 @@ macro(find_dependencies)
 
   # Declare minimum supported version for some dependencies
   set(GLPK_VERSION_MIN "4.57") # 4.57 is the first version providing glp_on_error()
+  set(LIBXML2_VERSION_MIN "2.7.4") # 2.7.4 is the first version providing xmlStructuredErrorContext
   set(PLFIT_VERSION_MIN "0.9.3")
 
   # Extend dependencies depending on whether we will be using the vendored
@@ -70,7 +71,7 @@ macro(find_dependencies)
 
   # GraphML support is treated separately because the library name is different
   if(IGRAPH_GRAPHML_SUPPORT STREQUAL "AUTO")
-    find_package(LibXml2 QUIET)
+    find_package(LibXml2 ${LIBXML2_VERSION_MIN} QUIET)
     if(LibXml2_FOUND)
       set(IGRAPH_GRAPHML_SUPPORT ON)
     else()

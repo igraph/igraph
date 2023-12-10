@@ -161,7 +161,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2.name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
     for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
-        IGRAPH_ASSERT(strcmp(STR(vec_a2, i), STR(svalues, i)) == 0);
+        IGRAPH_ASSERT(strcmp(igraph_strvector_get(&vec_a2, i), igraph_strvector_get(&svalues, i)) == 0);
     }
     IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3.name, vs3, &bvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_bool_all_e(&vec_a3, &bvalues));
@@ -173,7 +173,7 @@ int main(void) {
     IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2.name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
     for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
-        IGRAPH_ASSERT(strcmp(STR(vec_a2, i), STR(svalues, i)) == 0);
+        IGRAPH_ASSERT(strcmp(igraph_strvector_get(&vec_a2, i), igraph_strvector_get(&svalues, i)) == 0);
     }
     IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3.name, vs3, &bvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_bool_all_e(&vec_a3, &bvalues));

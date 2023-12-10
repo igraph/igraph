@@ -26,7 +26,7 @@
 void strvector_print(const igraph_strvector_t sv) {
     igraph_integer_t i, s = igraph_strvector_size(&sv);
     for (i = 0; i < s; i++) {
-        printf("---%s---\n", STR(sv, i));
+        printf("---%s---\n", igraph_strvector_get(&sv, i));
     }
     printf("\n");
 }

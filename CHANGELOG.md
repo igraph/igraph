@@ -36,6 +36,21 @@
 
 - `igraph_delete_vertices_idx()` is now deprecated in favour of `igraph_delete_vertices_map()`, which is functionally equivalent but has a name that is consistent with `igraph_induced_subgraph_map()`.
 
+### Fixed
+
+ - More robust error handling in HRG code.
+ - Fixed infinite loop in `igraph_hrg_sample_many()`.
+ - Compatibility with libxml2 version 2.12.
+
+### Deprecated
+
+ - The macro `STR()` is deprecated; use the function `igraph_strvector_get()` instead.
+
+### Other
+
+ - Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - Documentation improvements
+
 ## [0.10.8] - 2023-11-17
 
 ### Added

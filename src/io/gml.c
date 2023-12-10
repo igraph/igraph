@@ -296,15 +296,13 @@ static igraph_error_t create_or_update_attribute(const char *name,
     if (trieid == triesize) {
         /* new attribute */
         igraph_attribute_record_t *atrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-        if (!atrec) {
-            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(atrec, "Cannot read GML file.");
         IGRAPH_FINALLY(igraph_free, atrec);
+
         atrec->name = strdup(name);
-        if (! atrec->name) {
-            IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-        }
+        IGRAPH_CHECK_OOM(atrec->name, "Cannot read GML file.");
         IGRAPH_FINALLY(igraph_free, (char *) atrec->name);
+
         if (type == IGRAPH_I_GML_TREE_INTEGER || type == IGRAPH_I_GML_TREE_REAL) {
             atrec->type = IGRAPH_ATTRIBUTE_NUMERIC;
         } else if (type == IGRAPH_I_GML_TREE_STRING) {
@@ -345,9 +343,7 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
         igraph_attribute_type_t type = atrec->type;
         if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
             igraph_vector_t *p = IGRAPH_CALLOC(1, igraph_vector_t);
-            if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(p, "Cannot read GML file.");
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_vector_init(p, no_of_items));
             igraph_vector_fill(p, IGRAPH_NAN); /* use NaN as default */
@@ -355,9 +351,7 @@ static igraph_error_t allocate_attributes(igraph_vector_ptr_t *attrs,
             IGRAPH_FINALLY_CLEAN(1);
         } else if (type == IGRAPH_ATTRIBUTE_STRING) {
             igraph_strvector_t *p = IGRAPH_CALLOC(1, igraph_strvector_t);
-            if (! p) {
-                IGRAPH_ERROR("Cannot read GML file.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-            }
+            IGRAPH_CHECK_OOM(p, "Cannot read GML file.");
             IGRAPH_FINALLY(igraph_free, p);
             IGRAPH_CHECK(igraph_strvector_init(p, no_of_items));
             atrec->value = p;
@@ -839,9 +833,7 @@ static igraph_error_t igraph_i_gml_convert_to_key(const char *orig, char **key) 
         }
     }
     *key = IGRAPH_CALLOC(newlen + 1, char);
-    if (! *key) {
-        IGRAPH_ERROR("Writing GML format failed.", IGRAPH_ENOMEM); /* LCOV_EXCL_LINE */
-    }
+    IGRAPH_CHECK_OOM(*key, "Writing GML format failed.");
     memcpy(*key, strno, plen * sizeof(char));
     for (i = 0; i < len; i++) {
         if (isalnum(orig[i])) {
