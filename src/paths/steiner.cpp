@@ -340,8 +340,7 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
                 continue;
             }
 
-            igraph_integer_t indexOfSubsetD;
-            indexOfSubsetD = fetchIndexofMapofSets(D, subsetMap);
+            igraph_integer_t indexOfSubsetD = fetchIndexofMapofSets(D, subsetMap);
 
             IGRAPH_ALLOW_INTERRUPTION();
             for (igraph_integer_t j = 0; j < no_of_nodes; j++) {
