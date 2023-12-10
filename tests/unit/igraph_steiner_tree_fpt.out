@@ -35,52 +35,45 @@ K_7 graph with self loop:
 Total Steiner tree weight: 5
 
 A graph with n-1 terminals:
-0 1 2 3 4 5 6 7
-value: 8.000000
+( 0 1 2 3 4 5 6 7 )
+Total Steiner tree weight: 8
 
 A graph with 1 terminal:
-
-value: 0.000000
+( )
+Total Steiner tree weight: 0
 
 A graph with 2 terminals:
-12
-value: 1.000000
+( 12 )
+Total Steiner tree weight: 1
 
-A graph with 3 terminals:
-10 12
-value: 2.000000
+a graph with 3 terminals:
+( 10 12 )
+Total Steiner tree weight: 2
 
-A graph:
-Tree edges:
-0 1 2 3 4 5 6 7
-value: 8.000000
+a graph:
+( 0 1 2 3 4 5 6 7 )
+Total Steiner tree weight: 8
 
-A graph with 8 terminals:
-Tree edges:
-1 2 3 4 5 6 7
-value: 7.000000
+a graph with 8 terminals:
+( 1 2 3 4 5 6 7 )
+Total Steiner tree weight: 7
 
-A graph with 7 terminals and 2 removed to test if it forces it to go through:
-Tree edges:
-1 2 3 4 5 6 7
-value: 7.000000
+a graph with 7 nonconsecutive terminals:
+( 1 2 3 4 5 6 7 )
+Total Steiner tree weight: 7
 
-A graph with different structure that previous
-Tree edges:
-0 1 2 4 6 7
-value: 6.000000
+another graph with 7 terminals:
+( 0 1 2 4 6 7 )
+Total Steiner tree weight: 6
 
 A simple square graph with few more edges outside the square
-Tree edges:
-0 2 3 5
-value: 4.000000
+( 0 2 3 5 )
+Total Steiner tree weight: 4
 
 A 3 vertices square graph with weights
-Tree edges:
-0 1 3 8 11
-value: 500.000000
+( 0 1 3 8 11 )
+Total Steiner tree weight: 500
 
 A different graph than before with floating point weights
-Tree edges:
-2 6
-value: 0.857934
+( 2 6 )
+Total Steiner tree weight: 0.857934

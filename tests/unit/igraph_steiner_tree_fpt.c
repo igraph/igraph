@@ -34,13 +34,17 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     /* Check total tree weight. */
     igraph_real_t value2 = 0.0;
     igraph_integer_t tree_size = igraph_vector_int_size(&tree_edges);
-    for (igraph_integer_t i = 0; i < tree_size; i++) {
-        value2 += VECTOR(*weights)[VECTOR(tree_edges)[i]];
+    if (weights) {
+        for (igraph_integer_t i = 0; i < tree_size; i++) {
+            value2 += VECTOR(*weights)[VECTOR(tree_edges)[i]];
+        }
+    } else {
+        value2 = tree_size;
     }
     IGRAPH_ASSERT(value == value2);
 
     /* Check that the result is indeed a tree. */
-    if (igraph_vector_int_size(terminals) > 0) {
+    if (igraph_vector_int_size(terminals) > 1) {
         igraph_t tree;
         igraph_subgraph_from_edges(graph, &tree, igraph_ess_vector(&tree_edges), /* delete_vertices= */ true);
 
@@ -55,9 +59,9 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple, g_k1, g_k7_self_loop;
-    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real;
-    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple, weights_k7_loop;
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple, g_k1, g_k7_self_loop, g_10_9, g_new, g_new_1, g_new_2, g_new_3, g_new_4;
+    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real, terminals_10_9, terminals_1, terminals_2, terminals_3, terminals_8, terminals_7, terminals_7_special, terminals_square, terminals_square_2, terminals_fpw;
+    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple, weights_k7_loop, weights_square_2, weights_fp;
 
     /* Null graph */
     igraph_empty(&g_null, 0, 0);
@@ -202,6 +206,68 @@ int main(void) {
                            2, 1,
                            1);
 
+    igraph_full(&g_10_9, 10, IGRAPH_UNDIRECTED, 0);
+    igraph_vector_int_init_int(&terminals_10_9, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8);
+
+    igraph_vector_int_init_int(&terminals_1, 1, 0);
+    igraph_vector_int_init_int(&terminals_2, 2, 1, 5);
+    igraph_vector_int_init_int(&terminals_3, 3, 1, 3, 5);
+
+    igraph_small(&g_new, 10, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6,
+                 2, 7, 2, 8, 2, 9,
+                 -1);
+
+    igraph_vector_int_init_int(&terminals_8, 8, 0, 2, 3, 4, 5, 6, 7, 8);
+    igraph_vector_int_init_int(&terminals_7_special, 7, 0, 3, 4, 5, 6, 7, 8);
+    igraph_vector_int_init_int(&terminals_7, 7, 0, 1, 2, 3, 4, 5, 7);
+
+    igraph_small(&g_new_1, 9, IGRAPH_UNDIRECTED,
+                 0, 1, 0, 2, 0, 3, 0, 6,
+                 2, 7, 2, 9,
+                 3, 4,
+                 4, 5,
+                 7, 8,
+                 -1
+                );
+
+    igraph_small(&g_new_2, 6, IGRAPH_UNDIRECTED,
+                 0, 1,
+                 1, 2, 1, 3,
+                 3, 4,
+                 2, 4,
+                 4, 5,
+                 -1
+                );
+
+    igraph_vector_int_init_int(&terminals_square, 4, 0, 3, 4, 5);
+
+    igraph_small(&g_new_3, 9, IGRAPH_UNDIRECTED,
+                 0, 1, 1, 2,
+                 0, 3, 1, 4, 2, 5,
+                 3, 4, 4, 5,
+                 3, 6, 4, 7, 5, 8,
+                 6, 7, 7, 8,
+                 -1);
+
+    igraph_vector_init(&weights_square_2, 12);
+    igraph_vector_fill(&weights_square_2, 100);
+
+    igraph_vector_int_init_int_end(&terminals_square_2, -1, 0, 4, 2, 8, -1);
+
+    igraph_vector_init_real(&weights_fp, 8, 0.218959, 0.383502, 0.5297, 0.417486, 0.526929, 0.910321, 0.328234, 0.247039);
+    igraph_small(&g_new_4, 6, IGRAPH_UNDIRECTED,
+                 5, 2,
+                 5, 2,
+                 2, 0,
+                 4, 1,
+                 5, 3,
+                 2, 0,
+                 2, 1,
+                 3, 1,
+                 -1);
+    igraph_vector_int_init_int(&terminals_fpw, 3, 2, 0, 1);
+
     printf("Null graph:\n");
     check_graph(&g_null, &terminals_null, &weights_null);
 
@@ -245,6 +311,39 @@ int main(void) {
     printf("\nK_7 graph with self loop:\n");
     check_graph(&g_k7_self_loop, &terminals_k7, &weights_k7_loop);
 
+    printf("\nA graph with n-1 terminals:\n");
+    check_graph(&g_10_9, &terminals_10_9, NULL);
+
+    printf("\nA graph with 1 terminal:\n");
+    check_graph(&g_10_9, &terminals_1, NULL);
+
+    printf("\nA graph with 2 terminals:\n");
+    check_graph(&g_10_9, &terminals_2, NULL);
+
+    printf("\na graph with 3 terminals:\n");
+    check_graph(&g_10_9, &terminals_3, NULL);
+
+    printf("\na graph:\n");
+    check_graph(&g_new, &terminals_10_9, NULL);
+
+    printf("\na graph with 8 terminals:\n");
+    check_graph(&g_new, &terminals_8, NULL);
+
+    printf("\na graph with 7 nonconsecutive terminals:\n");
+    check_graph(&g_new, &terminals_7_special, NULL);
+
+    printf("\nanother graph with 7 terminals:\n");
+    check_graph(&g_new_1, &terminals_7, NULL);
+
+    printf("\nA simple square graph with few more edges outside the square\n");
+    check_graph(&g_new_2, &terminals_square, NULL);
+
+    printf("\nA 3 vertices square graph with weights\n");
+    check_graph(&g_new_3, &terminals_square_2, &weights_square_2);
+
+    printf("\nA different graph than before with floating point weights\n");
+    check_graph(&g_new_4, &terminals_fpw, &weights_fp);
+
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
@@ -254,6 +353,12 @@ int main(void) {
     igraph_destroy(&g_k7_non_simple);
     igraph_destroy(&g_k1);
     igraph_destroy(&g_k7_self_loop);
+    igraph_destroy(&g_10_9);
+    igraph_destroy(&g_new);
+    igraph_destroy(&g_new_1);
+    igraph_destroy(&g_new_2);
+    igraph_destroy(&g_new_3);
+    igraph_destroy(&g_new_4);
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
@@ -263,207 +368,24 @@ int main(void) {
     igraph_vector_destroy(&weights_k7_real);
     igraph_vector_destroy(&weights_k7_non_simple);
     igraph_vector_destroy(&weights_k7_loop);
+    igraph_vector_destroy(&weights_square_2);
+    igraph_vector_destroy(&weights_fp);
 
     igraph_vector_int_destroy(&terminals_k7);
     igraph_vector_int_destroy(&terminals_null);
     igraph_vector_int_destroy(&terminals_k6_k1);
     igraph_vector_int_destroy(&terminals_k7_real);
-
-    igraph_t g;
-    igraph_vector_int_t terminals;
-    igraph_full(&g, 10, IGRAPH_UNDIRECTED, 0);
-    printf("\nA graph with n-1 terminals:\n");
-    igraph_vector_int_init_int(&terminals, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8);
-    igraph_vector_int_init(&tree_edges, 0);
-    igraph_error_t x = igraph_steiner_dreyfus_wagner(&g, &terminals, NULL, &value, &tree_edges);
-    IGRAPH_ASSERT(x == IGRAPH_SUCCESS);
-    igraph_vector_int_print(&tree_edges);
-    printf("value: %f\n", value);
-
-    igraph_vector_int_destroy(&tree_edges);
-    igraph_vector_int_destroy(&terminals);
-
-
-    igraph_vector_int_t terminals_1;
-    printf("\nA graph with 1 terminal:\n");
-    igraph_vector_int_init_int(&terminals_1, 1, 0);
-    igraph_vector_int_init(&tree_edges, 0);
-    igraph_error_t x1 = igraph_steiner_dreyfus_wagner(&g, &terminals_1, NULL, &value, &tree_edges);
-    IGRAPH_ASSERT(x1 == IGRAPH_SUCCESS);
-    igraph_vector_int_print(&tree_edges);
-    printf("value: %f\n", value);
-
-    igraph_vector_int_destroy(&tree_edges);
+    igraph_vector_int_destroy(&terminals_10_9);
     igraph_vector_int_destroy(&terminals_1);
-
-    igraph_vector_int_t terminals_2;
-
-
-    printf("\nA graph with 2 terminals:\n");
-    igraph_vector_int_init_int(&terminals_2, 2, 1, 5);
-    igraph_vector_int_init(&tree_edges, 0);
-
-    igraph_error_t x2 = igraph_steiner_dreyfus_wagner(&g, &terminals_2, NULL, &value, &tree_edges);
-    IGRAPH_ASSERT(x2 == IGRAPH_SUCCESS);
-    igraph_vector_int_print(&tree_edges);
-    printf("value: %f\n", value);
-
-
-    igraph_vector_int_destroy(&tree_edges);
     igraph_vector_int_destroy(&terminals_2);
-
-    igraph_vector_int_t terminals_3;
-    printf("\nA graph with 3 terminals:\n");
-    igraph_vector_int_init_int(&terminals_3, 3, 1, 3, 5);
-    igraph_vector_int_init(&tree_edges, 0);
-    igraph_error_t x3 = igraph_steiner_dreyfus_wagner(&g, &terminals_3, NULL, &value, &tree_edges);
-    IGRAPH_ASSERT(x3 == IGRAPH_SUCCESS);
-    igraph_vector_int_print(&tree_edges);
-    printf("value: %f\n", value);
-
-    igraph_vector_int_destroy(&tree_edges);
     igraph_vector_int_destroy(&terminals_3);
+    igraph_vector_int_destroy(&terminals_8);
+    igraph_vector_int_destroy(&terminals_7);
+    igraph_vector_int_destroy(&terminals_7_special);
+    igraph_vector_int_destroy(&terminals_square);
+    igraph_vector_int_destroy(&terminals_square_2);
+    igraph_vector_int_destroy(&terminals_fpw);
 
-    igraph_destroy(&g);
-
-    printf("\nA graph:\n");
-    igraph_vector_int_t terminals_new;
-    igraph_vector_int_t tree_edges_new;
-    igraph_t g_new;
-    igraph_real_t value_new;
-    igraph_small(&g_new, 10, IGRAPH_UNDIRECTED,
-                 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6,
-                 2, 7, 2, 8, 2, 9,
-                 -1);
-    igraph_vector_int_init_int(&terminals_new, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8);
-    igraph_vector_int_init(&tree_edges_new, 0);
-    igraph_steiner_dreyfus_wagner(&g_new, &terminals_new, NULL, &value_new, &tree_edges_new);
-    printf("Tree edges:\n");
-    igraph_vector_int_print(&tree_edges_new);
-    printf("value: %f\n", value_new);
-
-    igraph_vector_int_destroy(&tree_edges_new);
-    igraph_vector_int_destroy(&terminals_new);
-
-    printf("\nA graph with 8 terminals:\n");
-    igraph_vector_int_init_int(&terminals_new, 8, 0, 2, 3, 4, 5, 6, 7, 8);
-    igraph_vector_int_init(&tree_edges_new, 0);
-    igraph_steiner_dreyfus_wagner(&g_new, &terminals_new, NULL, &value_new, &tree_edges_new);
-    printf("Tree edges:\n");
-    igraph_vector_int_print(&tree_edges_new);
-    printf("value: %f\n", value_new);
-
-    igraph_vector_int_destroy(&tree_edges_new);
-    igraph_vector_int_destroy(&terminals_new);
-
-    printf("\nA graph with 7 terminals and 2 removed to test if it forces it to go through:\n");
-    igraph_vector_int_init_int(&terminals_new, 7, 0, 3, 4, 5, 6, 7, 8);
-    igraph_vector_int_init(&tree_edges_new, 0);
-    igraph_steiner_dreyfus_wagner(&g_new, &terminals_new, NULL, &value_new, &tree_edges_new);
-    printf("Tree edges:\n");
-    igraph_vector_int_print(&tree_edges_new);
-    printf("value: %f\n", value_new);
-
-    igraph_vector_int_destroy(&tree_edges_new);
-    igraph_vector_int_destroy(&terminals_new);
-
-    printf("\nA graph with different structure that previous\n");
-    igraph_t g_new_1;
-    igraph_real_t value_new_1;
-    igraph_small(&g_new_1, 9, IGRAPH_UNDIRECTED,
-                 0, 1, 0, 2, 0, 3, 0, 6,
-                 2, 7, 2, 9,
-                 3, 4,
-                 4, 5,
-                 7, 8,
-                 -1
-                );
-    igraph_vector_int_init_int(&terminals_new, 7, 0, 1, 2, 3, 4, 5, 7);
-    igraph_vector_int_init(&tree_edges_new, 0);
-    igraph_steiner_dreyfus_wagner(&g_new_1, &terminals_new, NULL, &value_new_1, &tree_edges_new);
-    printf("Tree edges:\n");
-    igraph_vector_int_print(&tree_edges_new);
-    printf("value: %f\n", value_new_1);
-
-    igraph_vector_int_destroy(&tree_edges_new);
-    igraph_vector_int_destroy(&terminals_new);
-
-    printf("\nA simple square graph with few more edges outside the square\n");
-    igraph_t g_new_2;
-    igraph_real_t value_new_2;
-    igraph_small(&g_new_2, 6, IGRAPH_UNDIRECTED,
-                 0, 1,
-                 1, 2, 1, 3,
-                 3, 4,
-                 2, 4,
-                 4, 5,
-                 -1
-                );
-    igraph_vector_int_init_int(&terminals_new, 4, 0, 3, 4, 5);
-    igraph_vector_int_init(&tree_edges_new, 0);
-    igraph_steiner_dreyfus_wagner(&g_new_2, &terminals_new, NULL, &value_new_2, &tree_edges_new);
-    printf("Tree edges:\n");
-    igraph_vector_int_print(&tree_edges_new);
-    printf("value: %f\n", value_new_2);
-
-
-    igraph_vector_int_destroy(&tree_edges_new);
-    igraph_vector_int_destroy(&terminals_new);
-
-    printf("\nA 3 vertices square graph with weights\n");
-    igraph_t g_new_3;
-    igraph_vector_t weights;
-    igraph_vector_init(&weights, 12);
-    igraph_vector_fill(&weights, 100);
-    igraph_small(&g_new_3, 9, IGRAPH_UNDIRECTED,
-                 0, 1, 1, 2,
-                 0, 3, 1, 4, 2, 5,
-                 3, 4, 4, 5,
-                 3, 6, 4, 7, 5, 8,
-                 6, 7, 7, 8,
-                 -1);
-    igraph_vector_int_init_int_end(&terminals_new, -1, 0, 4, 2, 8, -1);
-    igraph_vector_int_init(&tree_edges_new, 0);
-    igraph_steiner_dreyfus_wagner(&g_new_3, &terminals_new, &weights, &value_new, &tree_edges_new);
-    printf("Tree edges:\n");
-    igraph_vector_int_print(&tree_edges_new);
-    printf("value: %f\n", value_new);
-
-    igraph_vector_destroy(&weights);
-    igraph_vector_int_destroy(&tree_edges_new);
-    igraph_vector_int_destroy(&terminals_new);
-
-    igraph_t g_new_4;
-    
-    printf("\nA different graph than before with floating point weights\n");
-    igraph_vector_init_real(&weights, 8, 0.218959, 0.383502, 0.5297, 0.417486, 0.526929, 0.910321, 0.328234, 0.247039);
-    igraph_small(&g_new_4, 6, IGRAPH_UNDIRECTED,
-                 5, 2,
-                 5, 2,
-                 2, 0,
-                 4, 1,
-                 5, 3,
-                 2, 0,
-                 2, 1,
-                 3, 1,
-                 -1);
-    igraph_vector_int_init_int(&terminals_new, 3, 2, 0, 1);
-    igraph_vector_int_init(&tree_edges_new, 0);
-    igraph_steiner_dreyfus_wagner(&g_new_4, &terminals_new, &weights, &value_new, &tree_edges_new);
-    printf("Tree edges:\n");
-    igraph_vector_int_print(&tree_edges_new);
-    printf("value: %f\n", value_new);
-    igraph_vector_destroy(&weights);
-    igraph_vector_int_destroy(&tree_edges_new);
-
-    igraph_destroy(&g_new);
-    igraph_destroy(&g_new_1);
-    igraph_destroy(&g_new_2);
-    igraph_destroy(&g_new_3);
-    igraph_destroy(&g_new_4);
-    
-    igraph_vector_int_destroy(&terminals_new);
-    
 
     VERIFY_FINALLY_STACK();
 
