@@ -45,7 +45,7 @@ __BEGIN_DECLS
  * callback function must be of type \c igraph_bfshandler_t. It has
  * the following arguments:
  *
- * \param graph The graph that that algorithm is working on. Of course
+ * \param graph The graph that the algorithm is working on. Of course
  *   this must not be modified.
  * \param vid The id of the vertex just found by the breadth-first
  *   search.
@@ -102,7 +102,7 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_int
  * completed. These callbacks must be of type \c
  * igraph_dfshandler_t. They have the following arguments:
  *
- * \param graph The graph that that algorithm is working on. Of course
+ * \param graph The graph that the algorithm is working on. Of course
  *   this must not be modified.
  * \param vid The id of the vertex just found by the depth-first
  *   search.
