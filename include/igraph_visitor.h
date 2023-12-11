@@ -66,7 +66,7 @@ __BEGIN_DECLS
  *    returning to the caller with the same error code. If a BFS is
  *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
- *    contain NaN.
+ *    contain negative values.
  *
  * \sa \ref igraph_bfs()
  */
@@ -113,10 +113,10 @@ IGRAPH_EXPORT igraph_error_t igraph_bfs_simple(const igraph_t *graph, igraph_int
  * \return \c IGRAPH_SUCCESS if the DFS should continue, \c IGRAPH_STOP
  *    if the DFS should stop and return to the caller normally. Any other
  *    value is treated as an igraph error code, terminating the search and
- *    returning to the caller with the same error code. If a BFS is
+ *    returning to the caller with the same error code. If a DFS is
  *    is terminated prematurely, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
- *    contain NaN.
+ *    contain negative values.
  *
  * \sa \ref igraph_dfs()
  */
