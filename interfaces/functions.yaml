@@ -2258,7 +2258,7 @@ igraph_subisomorphic_vf2:
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
 
-igraph_subisomorphic_function_vf2:
+igraph_get_subisomorphisms_vf2_callback:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLOR vertex_color1, OPTIONAL VERTEX_COLOR vertex_color2,
@@ -2310,7 +2310,7 @@ igraph_isomorphic_bliss:
         OPTIONAL OUT BLISSINFO info1, OPTIONAL OUT BLISSINFO info2
     DEPS: colors1 ON graph1, colors2 ON graph2
 
-igraph_automorphisms:
+igraph_count_automorphisms:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLOR colors, BLISSSH sh="fm", OUT BLISSINFO info
     DEPS: colors ON graph
