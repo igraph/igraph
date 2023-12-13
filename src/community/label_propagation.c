@@ -426,7 +426,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * algorithm described by Raghavan, Albert and Kumara (2007). This version extends
  * the original method by the ability to take edge weights into consideration
  * and also by allowing some labels to be fixed. In addition, it implements
- * the fast label propagation alternative introduced by Traag & Šubelj (2023).
+ * the fast label propagation alternative introduced by Traag and Šubelj (2023).
  *
  * </para><para>
  * Weights are taken into account as follows: when the new label of node
