@@ -123,6 +123,17 @@ igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * Self-similarities are not calculated.
  *
  * </para><para>
+ * Note that the presence of loop edges may yield counter-intuitive
+ * results. A node with a loop edge is considered to be a neighbor of itself
+ * \em twice (because there are two edge stems incident on the node). Adding a
+ * loop edge to a node may decrease its similarity to other nodes, but it may
+ * also \em increase it. For instance, if nodes A and B are connected but share
+ * no common neighbors, their similarity is zero. However, if a loop edge is
+ * added to B, then B itself becomes a common neighbor of A and B and thus the
+ * similarity of A and B will be increased. Consider removing loop edges
+ * explicitly before invoking this function using \ref igraph_simplify().
+ *
+ * </para><para>
  * See the following paper for more details: Lada A. Adamic and Eytan Adar:
  * Friends and neighbors on the Web. Social Networks, 25(3):211-230, 2003.
  * https://doi.org/10.1016/S0378-8733(03)00009-1
