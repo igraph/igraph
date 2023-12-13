@@ -126,7 +126,7 @@ int main(void) {
     VECTOR(weights)[1] = 1;
     VECTOR(weights)[2] = 2;
 
-    igraph_vector_init(&initial, 4);
+    igraph_vector_int_init(&initial, 4);
     VECTOR(initial)[0] = 0;
     VECTOR(initial)[1] = -1;
     VECTOR(initial)[2] = -1;
@@ -138,8 +138,8 @@ int main(void) {
     VECTOR(fixed)[2] = 0;
     VECTOR(fixed)[3] = 1;
 
-    igraph_community_label_propagation(&g, &membership, &weights,
-        &initial, &fixed, NULL, IGRAPH_LPA_DOMINANCE);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
+        &initial, &fixed, IGRAPH_LPA_DOMINANCE);
 
     igraph_vector_int_print(&membership);
     IGRAPH_ASSERT(VECTOR(membership)[0] == 0);
