@@ -85,7 +85,7 @@ int main(void) {
 
     igraph_vector_int_resize(&membership, 1);
 
-    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, IGRAPH_LPA_DOMINANCE);
 
     IGRAPH_ASSERT(igraph_vector_int_size(&membership) == 0);
 
