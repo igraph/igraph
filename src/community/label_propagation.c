@@ -205,7 +205,10 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
                     or an update iteration. */
                     if (control_iteration) {
                         /* Check if the _current_ label of the node is also dominant */
-                        if (VECTOR(label_counters)[VECTOR(*membership)[v1]] < max_count) {
+                        k = VECTOR(*membership)[v1];
+                        if (k < 0 ||                              /* No label assigned yet or */
+                            VECTOR(label_counters)[k] < max_count /* Label is not maximum */
+                            ) {
                             /* Nope, we need at least one more iteration */
                             running = true;
                         }
