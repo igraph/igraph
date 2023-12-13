@@ -459,7 +459,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * https://arxiv.org/abs/1709.05634
  *
  * </para><para>
- * Traag, V. A., & Šubelj, L.: Large network community detection by fast
+ * Traag, V. A., and Šubelj, L.: Large network community detection by fast
  * label propagation. Scientific Reports, 13:1, (2023).
  * https://doi.org/10.1038/s41598-023-29610-z
  * https://arxiv.org/abs/2209.13338
