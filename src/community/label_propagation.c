@@ -502,12 +502,12 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  *   different communities.
  * \param lpa_variant Which variant of label propagation algorithm to run.
  *   One of
- *   \enumval IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after
- *                                 each iteration
- *   \enumval IGRAPH_LPA_RETENTION Keep current label if among dominant labels,
- *                                 only check if labels changed
- *   \enumval IGRAPH_LPA_FAST Sample from dominant labels, only check neighbors
- *
+ *   \c IGRAPH_LPA_DOMINANCE Check for dominance of all nodes after each
+ *                           iteration.
+ *   \c IGRAPH_LPA_RETENTION Keep current label if among dominant labels,
+ *                           only check if labels changed.
+ *   \c IGRAPH_LPA_FAST      Sample from dominant labels, only check
+ *                           neighbors.
  * \return Error code.
  *
  * Time complexity: O(m+n)
