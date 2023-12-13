@@ -680,7 +680,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
             IGRAPH_FINALLY(igraph_vector_int_destroy, &node_order);
             no_of_not_fixed_nodes = no_of_nodes;
         }
-        /* Shuffle the node ordering vector if we are in the label updating iteration */
+        /* Shuffle the node ordering vector */
         igraph_vector_int_shuffle(&node_order);
 
         IGRAPH_VECTOR_INT_INIT_FINALLY(&neis, 0);
