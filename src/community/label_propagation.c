@@ -41,9 +41,9 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_bool_t running, control_iteration;
     igraph_vector_t label_counters;
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
-    igraph_neimode_t reversed_mode;
+    igraph_neimode_t reverse_mode;
 
-    reversed_mode = IGRAPH_REVERSE_MODE(mode);
+    reverse_mode = IGRAPH_REVERSE_MODE(mode);
 
     /* Create an adjacency/incidence list representation for efficiency.
     * For the unweighted case, the adjacency list is enough. For the
@@ -254,9 +254,9 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
     igraph_dqueue_t queue;
     igraph_vector_bool_t in_queue;
-    igraph_neimode_t reversed_mode;
+    igraph_neimode_t reverse_mode;
 
-    reversed_mode = IGRAPH_REVERSE_MODE(mode);
+    reverse_mode = IGRAPH_REVERSE_MODE(mode);
 
     if (weights) {
         IGRAPH_CHECK(igraph_inclist_init(graph, &il, reverse_mode, IGRAPH_LOOPS_ONCE));
