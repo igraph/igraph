@@ -57,7 +57,7 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     }
 
     /* Create storage space for counting distinct labels and dominant ones */
-    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes + 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dominant_labels, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nonzero_labels, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&dominant_labels, 2));
@@ -276,7 +276,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     }
 
     /* Create storage space for counting distinct labels and dominant ones */
-    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes + 1);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&dominant_labels, 0);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nonzero_labels, 0);
     IGRAPH_CHECK(igraph_vector_int_reserve(&dominant_labels, 2));
