@@ -412,9 +412,10 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * \brief Community detection based on label propagation.
  *
  * This function implements the label propagation-based community detection
- * algorithm described by Raghavan, Albert and Kumara. This version extends
+ * algorithm described by Raghavan, Albert and Kumara (2007). This version extends
  * the original method by the ability to take edge weights into consideration
- * and also by allowing some labels to be fixed.
+ * and also by allowing some labels to be fixed. In addition, it implements
+ * the fast label propagation alternative introduced by Traag & Šubelj (2023).
  *
  * </para><para>
  * Weights are taken into account as follows: when the new label of node
@@ -435,10 +436,9 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * References:
  *
  * </para><para>
- * Raghavan, U.N. and Albert, R. and Kumara, S.:
- * Near linear time algorithm to detect community structures in large-scale networks.
- * Phys Rev E 76, 036106 (2007).
- * https://doi.org/10.1103/PhysRevE.76.036106
+ * Raghavan, U.N. and Albert, R. and Kumara, S.: Near linear time algorithm to
+ * detect community structures in large-scale networks. Phys Rev E 76, 036106
+ * (2007). https://doi.org/10.1103/PhysRevE.76.036106
  *
  * </para><para>
  * Šubelj, L.: Label propagation for clustering. Chapter in "Advances in
@@ -446,6 +446,12 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
  * &amp; A. Ferligoj (Wiley, New York, 2018).
  * https://doi.org/10.1002/9781119483298.ch5
  * https://arxiv.org/abs/1709.05634
+ *
+ * </para><para>
+ * Traag, V. A., & Šubelj, L.: Large network community detection by fast
+ * label propagation. Scientific Reports, 13:1, (2023).
+ * https://doi.org/10.1038/s41598-023-29610-z
+ * https://arxiv.org/abs/2209.13338
  *
  * \param graph The input graph. Note that the algorithm wsa originally
  *    defined for undirected graphs. You are advised to set \p mode to
