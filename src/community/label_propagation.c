@@ -267,7 +267,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     /* real type, stores weight sums */
     igraph_vector_t label_counters;
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
-    igraph_dqueue_t queue;
+    igraph_dqueue_int_t queue;
     igraph_vector_bool_t in_queue;
     igraph_neimode_t reverse_mode;
 
@@ -290,8 +290,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     RNG_BEGIN();
 
     /* Initialize node ordering vector with only the not fixed nodes */
-    IGRAPH_CHECK(igraph_dqueue_init(&queue, no_of_nodes));
-    IGRAPH_FINALLY(igraph_dqueue_destroy, &queue);
+    IGRAPH_DQUEUE_INT_INIT_FINALLY(&queue, no_of_nodes);
     IGRAPH_VECTOR_BOOL_INIT_FINALLY(&in_queue, no_of_nodes);
 
     /* Initialize node ordering vector with only the not fixed nodes */
@@ -312,19 +311,19 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
 
     for (i = 0; i < no_of_not_fixed_nodes; i++)
     {
-        IGRAPH_CHECK(igraph_dqueue_push(&queue, VECTOR(node_order)[i]));
+        IGRAPH_CHECK(igraph_dqueue_int_push(&queue, VECTOR(node_order)[i]));
         VECTOR(in_queue)[VECTOR(node_order)[i]] = 1;
     }
     igraph_vector_int_destroy(&node_order);
     IGRAPH_FINALLY_CLEAN(1);
 
-    while (!igraph_dqueue_empty(&queue)) {
+    while (!igraph_dqueue_int_empty(&queue)) {
         igraph_integer_t v1, v2, e = -1, num_neis;
         igraph_real_t max_count;
         igraph_vector_int_t *neis;
         igraph_bool_t was_zero;
 
-        v1 = igraph_dqueue_pop(&queue);
+        v1 = igraph_dqueue_int_pop(&queue);
         VECTOR(in_queue)[v1] = 0;
 
         /* Count the weights corresponding to different labels */
@@ -389,7 +388,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
                         igraph_integer_t neigh_label = VECTOR(*membership)[v2]; /* neighbor community */
                         if (neigh_label != new_label && /* not in new community */
                                 (fixed == NULL || !VECTOR(*fixed)[v2]) ) /* not fixed */ {
-                            igraph_dqueue_push(&queue, v2);
+                            igraph_dqueue_int_push(&queue, v2);
                             VECTOR(in_queue)[v2] = 1;
                         }
                     }
@@ -414,7 +413,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     igraph_vector_bool_destroy(&in_queue);
-    igraph_dqueue_destroy(&queue);
+    igraph_dqueue_int_destroy(&queue);
     igraph_vector_destroy(&label_counters);
     igraph_vector_int_destroy(&dominant_labels);
     igraph_vector_int_destroy(&nonzero_labels);
