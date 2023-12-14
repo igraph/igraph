@@ -39,6 +39,8 @@ igraph_error_t igraph_i_community_label_propagation(const igraph_t *graph,
     igraph_adjlist_t al;
     igraph_inclist_t il;
     igraph_bool_t running, control_iteration;
+
+    /* real type, stores weight sums */
     igraph_vector_t label_counters;
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
     igraph_neimode_t reverse_mode;
@@ -262,6 +264,7 @@ igraph_error_t igraph_i_community_fast_label_propagation(const igraph_t *graph,
     igraph_inclist_t il;
     igraph_adjlist_t al;
 
+    /* real type, stores weight sums */
     igraph_vector_t label_counters;
     igraph_vector_int_t dominant_labels, nonzero_labels, node_order;
     igraph_dqueue_t queue;
