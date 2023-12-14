@@ -580,8 +580,8 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         }
         if (no_of_edges > 0) {
             igraph_real_t minweight = igraph_vector_min(weights);
-            if (minweight <= 0) {
-                IGRAPH_ERROR("Weights must be positive.", IGRAPH_EINVAL);
+            if (minweight < 0) {
+                IGRAPH_ERROR("Weights must not be negative.", IGRAPH_EINVAL);
             }
             if (isnan(minweight)) {
                 IGRAPH_ERROR("Weights must not be NaN.", IGRAPH_EINVAL);
