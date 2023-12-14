@@ -46,7 +46,7 @@ int main(void) {
         /* label propagation is a stochastic method */
         igraph_rng_seed(igraph_rng_default(), j);
 
-        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0, variant);
+        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, variant);
 
         for (i = 0; i < 3; i++)
           IGRAPH_ASSERT(VECTOR(membership)[i] == VECTOR(membership)[0]);
@@ -78,9 +78,9 @@ int main(void) {
                  31, 32, 31, 33, 32, 33,
                  -1);
 
-    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0, IGRAPH_LPA_DOMINANCE);
-    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0, IGRAPH_LPA_RETENTION);
-    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0, 0, 0, IGRAPH_LPA_FAST);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, IGRAPH_LPA_DOMINANCE);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, IGRAPH_LPA_RETENTION);
+    igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, IGRAPH_LPA_FAST);
 
     igraph_destroy(&g);
 
@@ -111,7 +111,7 @@ int main(void) {
      * while an initial configuration is given -- see bug
      * #570902 in Launchpad. This is a simple smoke test only. */
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-                                       &initial, 0, IGRAPH_LPA_DOMINANCE);
+                                       &initial, NULL, IGRAPH_LPA_DOMINANCE);
 
     igraph_vector_bool_destroy(&fixed);
     igraph_vector_destroy(&weights);
