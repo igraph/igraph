@@ -7,8 +7,7 @@
  */
 
 
-#include <stdio.h>
-#include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 #include "graph.h"
 
@@ -95,7 +94,7 @@ void graph_resize(graph_t *g, int size) {
 	}
 
 	/* Weights */
-	g->weights=realloc(g->weights,size * sizeof(int));
+	g->weights=realloc(g->weights, size * sizeof(int));
 	for (i=g->n; i<size; i++)
 		g->weights[i]=1;
 
