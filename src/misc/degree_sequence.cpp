@@ -921,7 +921,6 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     std::vector<vd_pair> vertices1;
     std::vector<vd_pair> vertices2;
 
-
     // Bipartite graphs can't have self loops, so we ignore those.
     if (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) {
         // Multiedges allowed
@@ -932,18 +931,18 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
     }
 
     IGRAPH_HANDLE_EXCEPTIONS_BEGIN;
-        switch (method) {
-            case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
-                largest = false;
-                break;
-            case IGRAPH_REALIZE_DEGSEQ_LARGEST:
-                largest = true;
-                break;
-            case IGRAPH_REALIZE_DEGSEQ_INDEX:
-                return igraph_i_realize_undirected_bipartite_index(graph, deg1, deg2, multiedges);
-            default:
-                IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
-        }
+    switch (method) {
+    case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
+        largest = false;
+        break;
+    case IGRAPH_REALIZE_DEGSEQ_LARGEST:
+        largest = true;
+        break;
+    case IGRAPH_REALIZE_DEGSEQ_INDEX:
+        return igraph_i_realize_undirected_bipartite_index(graph, deg1, deg2, multiedges);
+    default:
+        IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
+    }
     IGRAPH_HANDLE_EXCEPTIONS_END;
 
     // Checks if the degree sequences are bigraphical
@@ -985,7 +984,7 @@ igraph_error_t igraph_realize_bipartite_degree_sequence(igraph_t *graph, const i
 
         vd_pair vd_src(-1, -1);
 
-        if (!largest){
+        if (!largest) {
             vd_pair min1 = vertices1.back();
             vd_pair min2 = vertices2.back();
             if (min1.degree <= min2.degree) {
