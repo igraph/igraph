@@ -95,9 +95,14 @@ find_program(FOP_COMMAND fop)
 find_program(XMLLINT_COMMAND xmllint)
 find_program(XSLTPROC_COMMAND xsltproc)
 
-# GNU info documentation additionally requires docbook2x and makeinfo
-# (and xmllint as well)
-find_program(DOCBOOK2XTEXI_COMMAND docbook2x-texi)
+# GNU Texinfo documentation additionally requires the docbook2X package,
+# makeinfo (and xmllint as well). The docbook2texi command from docbook2X
+# is renamed to docbook2x-texi by many Linux distros to avoid conflict with
+# the a command of the same name from the incompatible docbook-tools package.
+# We look for both command names, and prefer docbook2x-texi if found.
+# At the moment we do not validate that docbook2texi is from docbook2X
+# instead of docbook-tools. Such validation will be possible with CMake >= 3.25.
+find_program(DOCBOOK2XTEXI_COMMAND NAMES docbook2x-texi docbook2texi)
 find_program(MAKEINFO_COMMAND makeinfo)
 
 if(Python3_FOUND AND SOURCE_HIGHLIGHT_COMMAND)

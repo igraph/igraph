@@ -471,8 +471,8 @@ $ cmake --build . --target html
     Building the HTML documentation requires Python 3, <literal>xmlto</literal>
     and <literal>source-highlight</literal>. Building the PDF documentation also
     requires <literal>xsltproc</literal>, <literal>xmllint</literal> and
-    <literal>fop</literal>. Building the Info documentation also requires
-    <literal>docbook2x</literal>, <literal>xmllint</literal> and
+    <literal>fop</literal>. Building the Texinfo documentation also requires
+    the docbook2X package, <literal>xmllint</literal> and
     <literal>makeinfo</literal>.
   </para>
 </section>
