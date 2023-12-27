@@ -341,7 +341,7 @@ if(DOC_BUILD_SUPPORTED)
       OUTPUT igraph-docs.texi
       COMMAND ${DOCBOOK2XTEXI_COMMAND}
       ARGS
-      --encoding=utf8//TRANSLIT
+      --encoding=utf-8//TRANSLIT
       --string-param output-file=igraph-docs
       --string-param directory-category=Libraries
       --string-param directory-description="A fast graph library \(C\)"
