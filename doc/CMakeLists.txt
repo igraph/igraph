@@ -95,6 +95,11 @@ find_program(FOP_COMMAND fop)
 find_program(XMLLINT_COMMAND xmllint)
 find_program(XSLTPROC_COMMAND xsltproc)
 
+# GNU info documentation additionally requires docbook2x and makeinfo
+# (and xmllint as well)
+find_program(DOCBOOK2XTEXI_COMMAND docbook2x-texi)
+find_program(MAKEINFO_COMMAND makeinfo)
+
 if(Python3_FOUND AND SOURCE_HIGHLIGHT_COMMAND)
   set(DOC_BUILD_SUPPORTED TRUE)
 else()
@@ -111,6 +116,12 @@ if(DOC_BUILD_SUPPORTED AND XMLLINT_COMMAND AND XSLTPROC_COMMAND AND FOP_COMMAND)
   set(PDF_DOC_BUILD_SUPPORTED TRUE)
 else()
   set(PDF_DOC_BUILD_SUPPORTED FALSE)
+endif()
+
+if(DOC_BUILD_SUPPORTED AND XMLLINT_COMMAND AND DOCBOOK2XTEXI_COMMAND AND MAKEINFO_COMMAND)
+  set(INFO_DOC_BUILD_SUPPORTED TRUE)
+else()
+  set(INFO_DOC_BUILD_SUPPORTED FALSE)
 endif()
 
 if(DOC_BUILD_SUPPORTED)
@@ -301,8 +312,60 @@ if(DOC_BUILD_SUPPORTED)
     set(PDF_TARGET pdf)
   endif()
 
-  add_custom_target(doc DEPENDS ${HTML_TARGET} ${PDF_TARGET})
+  if(INFO_DOC_BUILD_SUPPORTED)
+    add_custom_command(
+      OUTPUT igraph-docs-with-resolved-includes.xml
+      COMMAND ${XMLLINT_COMMAND}
+      ARGS
+      --xinclude
+      --output igraph-docs-with-resolved-includes-tmp.xml
+      igraph-docs.xml
+      COMMAND ${Python3_EXECUTABLE}
+      ARGS
+      ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
+      igraph-docs-with-resolved-includes-tmp.xml
+      igraph-docs-with-resolved-includes.xml
+      COMMAND ${CMAKE_COMMAND}
+      ARGS
+      -E remove igraph-docs-with-resolved-includes-tmp.xml
+      MAIN_DEPENDENCY igraph-docs.xml
+      # The DEPENDS clause below needs to list both the xmlstamp file and the
+      # target that creates it. The former is needed to make Ninja rebuild the
+      # Info file if the source is modified. The latter is needed to make the
+      # XCode build system happy.
+      DEPENDS ${DOCXML_STAMP} docxml
+      COMMENT "Resolving includes in DocBook XML source"
+    )
+
+    add_custom_command(
+      OUTPUT igraph-docs.texi
+      COMMAND ${DOCBOOK2XTEXI_COMMAND}
+      ARGS
+      --encoding=utf8//TRANSLIT
+      --string-param output-file=igraph-docs
+      --string-param directory-category=Libraries
+      --string-param directory-description="A fast graph library \(C\)"
+      igraph-docs-with-resolved-includes.xml
+      MAIN_DEPENDENCY igraph-docs-with-resolved-includes.xml
+      COMMENT "Converting DocBook XML to GNU Texinfo format"
+    )
+
+    add_custom_command(
+      OUTPUT igraph-docs.info
+      COMMAND ${MAKEINFO_COMMAND}
+      ARGS --no-split igraph-docs.texi
+      MAIN_DEPENDENCY igraph-docs.texi
+      COMMENT "Generating info documentation with GNU Makeinfo"
+    )
+
+    add_custom_target(info DEPENDS igraph-docs.info)
+    set(INFO_TARGET info)
+  endif()
+
+
+  add_custom_target(doc DEPENDS ${HTML_TARGET} ${PDF_TARGET} ${INFO_TARGET})
 endif()
 
 set(HTML_DOC_BUILD_SUPPORTED ${HTML_DOC_BUILD_SUPPORTED} PARENT_SCOPE)
 set(PDF_DOC_BUILD_SUPPORTED ${PDF_DOC_BUILD_SUPPORTED} PARENT_SCOPE)
+set(INFO_DOC_BUILD_SUPPORTED ${INFO_DOC_BUILD_SUPPORTED} PARENT_SCOPE)
