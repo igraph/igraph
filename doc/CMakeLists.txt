@@ -98,7 +98,7 @@ find_program(XSLTPROC_COMMAND xsltproc)
 # GNU Texinfo documentation additionally requires the docbook2X package,
 # makeinfo (and xmllint as well). The docbook2texi command from docbook2X
 # is renamed to docbook2x-texi by many Linux distros to avoid conflict with
-# the a command of the same name from the incompatible docbook-tools package.
+# a command of the same name from the incompatible docbook-tools package.
 # We look for both command names, and prefer docbook2x-texi if found.
 # At the moment we do not validate that docbook2texi is from docbook2X
 # instead of docbook-tools. Such validation will be possible with CMake >= 3.25.
