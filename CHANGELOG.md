@@ -15,6 +15,7 @@
 ### Other
 
  - Reduced memory usage and improved initialization performance for `igraph_strvector_t`.
+ - The documentation is now also generated in Texinfo format.
  - Documentation improvements
 
 ## [0.10.8] - 2023-11-17
