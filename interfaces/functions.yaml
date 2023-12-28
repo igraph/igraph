@@ -859,28 +859,28 @@ igraph_eigenvector_centrality:
         GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
         BOOLEAN directed=False, BOOLEAN scale=True,
         EDGEWEIGHTS weights=NULL,
-        INOUT ARPACKOPT options=arpack_defaults
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_hub_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
-        INOUT ARPACKOPT options=arpack_defaults
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_authority_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY vector, OUT REAL value,
         BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
-        INOUT ARPACKOPT options=arpack_defaults
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_hub_and_authority_scores:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTY hub_vector, OUT VERTEX_QTY authority_vector,
         OUT REAL value, BOOLEAN scale=True, EDGEWEIGHTS weights=NULL,
-        INOUT ARPACKOPT options=arpack_defaults
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS
 
 igraph_unfold_tree:
     PARAMS: |-
@@ -975,7 +975,7 @@ igraph_centralization_eigenvector_centrality:
     PARAMS: |-
         GRAPH graph, OUT VECTOR vector, OUT REAL value,
         BOOLEAN directed=False, BOOLEAN scale=True,
-        INOUT ARPACKOPT options=arpack_defaults,
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS,
         OUT REAL centralization, OUT REAL theoretical_max,
         BOOLEAN normalized=True
 
@@ -1659,7 +1659,7 @@ igraph_community_leading_eigenvector:
         GRAPH graph, EDGEWEIGHTS weights=NULL,
         OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT VECTOR_INT membership,
         INTEGER steps=-1,
-        INOUT ARPACKOPT options=arpack_defaults,
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS,
         OPTIONAL OUT REAL modularity, BOOLEAN start=False,
         OPTIONAL OUT VECTOR eigenvalues,
         OPTIONAL OUT VECTOR_LIST eigenvectors,
@@ -2372,7 +2372,7 @@ igraph_adjacency_spectral_embedding:
         EIGENWHICHPOS which=ASE, BOOLEAN scaled=True, OUT MATRIX X,
         OPTIONAL OUT MATRIX Y, OPTIONAL OUT VECTOR D,
         VECTOR cvec=AsmDefaultCvec,
-        INOUT ARPACKOPT options=igraph.arpack.default
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, cvec ON graph
 
 igraph_laplacian_spectral_embedding:
@@ -2381,7 +2381,7 @@ igraph_laplacian_spectral_embedding:
         EIGENWHICHPOS which=ASE,
         LSETYPE type=Default, BOOLEAN scaled=True, OUT MATRIX X,
         OPTIONAL OUT MATRIX Y, OPTIONAL OUT VECTOR D,
-        INOUT ARPACKOPT options=igraph.arpack.default
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS
     DEPS: weights ON graph, type ON graph
 
 #######################################
@@ -2392,7 +2392,7 @@ igraph_eigen_adjacency:
     PARAMS: |-
         GRAPH graph, EIGENALGO algorithm=ARPACK,
         EIGENWHICH which=Default,
-        INOUT ARPACKOPT options=arpack_defaults,
+        INOUT ARPACKOPT options=ARPACK_DEFAULTS,
         INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT MATRIX vectors,
         OUT VECTOR_COMPLEX cmplxvalues, OUT MATRIX_COMPLEX cmplxvectors
 
@@ -2441,13 +2441,13 @@ igraph_cmp_epsilon:
 igraph_eigen_matrix:
     PARAMS: |-
         MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
-        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=igraph.arpack.default,
+        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=ARPACK_DEFAULTS,
         INOUT ARPACKSTORAGE storage, OUT VECTOR_COMPLEX values, OUT MATRIX_COMPLEX vectors
 
 igraph_eigen_matrix_symmetric:
     PARAMS: |-
         MATRIX A, SPARSEMAT sA, ARPACKFUNC fun, INT n, EXTRA extra,
-        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=igraph.arpack.default,
+        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACKOPT options=ARPACK_DEFAULTS,
         INOUT ARPACKSTORAGE storage, OUT VECTOR values, OUT MATRIX vectors
 
 igraph_solve_lsap:
