@@ -658,7 +658,7 @@ igraph_edge_betweenness_cutoff:
 
 igraph_edge_betweenness_subset:
     PARAMS: |-
-        GRAPH graph, OUT VERTEX_QTY res, EDGE_SELECTOR eids=ALL,
+        GRAPH graph, OUT VECTOR res, EDGE_SELECTOR eids=ALL,
         BOOLEAN directed=True, VERTEX_SELECTOR sources=ALL, VERTEX_SELECTOR targets=ALL,
         EDGEWEIGHTS weights=NULL
     DEPS: |-
