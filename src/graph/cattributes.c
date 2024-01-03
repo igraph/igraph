@@ -166,7 +166,7 @@ static void igraph_i_attribute_list_destroy(igraph_vector_ptr_t *attrlist) {
     igraph_vector_ptr_destroy(attrlist);
 }
 
-static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
+static igraph_error_t igraph_i_cattribute_init(igraph_t *graph, const igraph_vector_ptr_t *attr) {
     igraph_attribute_record_t *attr_rec;
     igraph_integer_t i, n;
     igraph_i_cattributes_t *nattr;
@@ -283,8 +283,9 @@ static igraph_error_t igraph_i_cattribute_copy(igraph_t *to, const igraph_t *fro
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, igraph_integer_t nv,
-                                                         igraph_vector_ptr_t *nattr) {
+static igraph_error_t igraph_i_cattribute_add_vertices_inner(
+    igraph_t *graph, igraph_integer_t nv, const igraph_vector_ptr_t *nattr
+) {
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *val = &attr->val;
@@ -445,8 +446,9 @@ static igraph_error_t igraph_i_cattribute_add_vertices_inner(igraph_t *graph, ig
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_vertices(igraph_t *graph, igraph_integer_t nv,
-                                                       igraph_vector_ptr_t *nattr) {
+static igraph_error_t igraph_i_cattribute_add_vertices(
+    igraph_t *graph, igraph_integer_t nv, const igraph_vector_ptr_t *nattr
+) {
     /* Record information needed to restore attribute vector sizes */
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *val = &attr->val;
@@ -1824,8 +1826,9 @@ static igraph_error_t igraph_i_cattribute_combine_vertices(const igraph_t *graph
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const igraph_vector_int_t *edges,
-                                                      igraph_vector_ptr_t *nattr) {
+static igraph_error_t igraph_i_cattribute_add_edges_inner(
+    igraph_t *graph, const igraph_vector_int_t *edges, const igraph_vector_ptr_t *nattr
+) {
 
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *eal = &attr->eal;
@@ -1987,8 +1990,9 @@ static igraph_error_t igraph_i_cattribute_add_edges_inner(igraph_t *graph, const
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
-                                                    igraph_vector_ptr_t *nattr) {
+static igraph_error_t igraph_i_cattribute_add_edges(
+    igraph_t *graph, const igraph_vector_int_t *edges, const igraph_vector_ptr_t *nattr
+) {
     /* Record information needed to restore attribute vector sizes */
     igraph_i_cattributes_t *attr = graph->attr;
     igraph_vector_ptr_t *eal = &attr->eal;

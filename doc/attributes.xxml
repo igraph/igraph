@@ -15,6 +15,7 @@
 <!-- doxrox-include igraph_attribute_table_t -->
 <!-- doxrox-include igraph_set_attribute_table -->
 <!-- doxrox-include igraph_attribute_type_t -->
+<!-- doxrox-include igraph_attribute_record_t -->
 </section>
 
 <section id="attribute-combinations">

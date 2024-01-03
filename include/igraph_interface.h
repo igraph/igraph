@@ -27,6 +27,7 @@
 #include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
+#include "igraph_attributes.h"
 #include "igraph_error.h"
 #include "igraph_iterators.h"
 
@@ -37,13 +38,17 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 IGRAPH_EXPORT igraph_error_t igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
-IGRAPH_EXPORT igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr);
+IGRAPH_EXPORT igraph_error_t igraph_empty_attrs(
+    igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, const igraph_vector_ptr_t* attr
+);
 IGRAPH_EXPORT void igraph_destroy(igraph_t *graph);
 IGRAPH_EXPORT igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from);
-IGRAPH_EXPORT igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
-                                   void *attr);
-IGRAPH_EXPORT igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv,
-                                      void *attr);
+IGRAPH_EXPORT igraph_error_t igraph_add_edges(
+    igraph_t *graph, const igraph_vector_int_t *edges, const igraph_vector_ptr_t* attr
+);
+IGRAPH_EXPORT igraph_error_t igraph_add_vertices(
+    igraph_t *graph, igraph_integer_t nv, const igraph_vector_ptr_t* attr
+);
 IGRAPH_EXPORT igraph_error_t igraph_delete_edges(igraph_t *graph, igraph_es_t edges);
 IGRAPH_EXPORT igraph_error_t igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
 IGRAPH_EXPORT igraph_error_t igraph_delete_vertices_map(

@@ -104,45 +104,68 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_attribute_type_t
- * The possible types of the attributes.
+ * \brief The possible types of the attributes.
  *
- * Note that this is only the
- * type communicated by the attribute interface towards igraph
- * functions. E.g. in the R attribute handler, it is safe to say
- * that all complex R object attributes are strings, as long as this
- * interface is able to serialize them into strings. See also \ref
- * igraph_attribute_table_t.
+ * Values of this enum are used by the attribute interface to communicate the
+ * type of an attribute to igraph's C core. When igraph is integrated in a
+ * high-level language, the attribute type reported by the interface may not
+ * necessarily have to match the exact data type in the high-level language as
+ * long as the attribute interface can provide a conversion from the native
+ * high-level attribute value to one of the data types listed here. When the
+ * high-level data type is complex and has no suitable conversion to one of the
+ * atomic igraph attribute types (numeric, string or Boolean), the attribute
+ * interface should report the attribute as having an "object" type, which is
+ * ignored by the C core. See also \ref igraph_attribute_table_t.
+ *
  * \enumval IGRAPH_ATTRIBUTE_UNSPECIFIED Currently used internally
  *   as a "null value" or "placeholder value" in some algorithms.
  *   Attribute records with this type must not be passed to igraph
  *   functions.
  * \enumval IGRAPH_ATTRIBUTE_NUMERIC Numeric attribute.
  * \enumval IGRAPH_ATTRIBUTE_BOOLEAN Logical values, true or false.
- * \enumval IGRAPH_ATTRIBUTE_STRING Attribute that can be converted to
- *   a string.
+ * \enumval IGRAPH_ATTRIBUTE_STRING String attribute.
  * \enumval IGRAPH_ATTRIBUTE_OBJECT Custom attribute type, to be
  *   used for special data types by client applications. The R and
  *   Python interfaces use this for attributes that hold R or Python
  *   objects. Usually ignored by igraph functions.
  */
-typedef enum { IGRAPH_ATTRIBUTE_UNSPECIFIED = 0,
-               IGRAPH_ATTRIBUTE_DEFAULT IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_ATTRIBUTE_UNSPECIFIED,
-               IGRAPH_ATTRIBUTE_NUMERIC = 1,
-               IGRAPH_ATTRIBUTE_BOOLEAN = 2,
-               IGRAPH_ATTRIBUTE_STRING = 3,
-               IGRAPH_ATTRIBUTE_OBJECT = 127
-             } igraph_attribute_type_t;
+typedef enum {
+    IGRAPH_ATTRIBUTE_UNSPECIFIED = 0,
+    IGRAPH_ATTRIBUTE_DEFAULT IGRAPH_DEPRECATED_ENUMVAL = IGRAPH_ATTRIBUTE_UNSPECIFIED,
+    IGRAPH_ATTRIBUTE_NUMERIC = 1,
+    IGRAPH_ATTRIBUTE_BOOLEAN = 2,
+    IGRAPH_ATTRIBUTE_STRING = 3,
+    IGRAPH_ATTRIBUTE_OBJECT = 127
+} igraph_attribute_type_t;
 
+/**
+ * \typedef igraph_attribute_record_t
+ * \brief An attribute record holding the name, type and values of an attribute.
+ *
+ * This composite data type is used in the attribute interface to specify a
+ * name-type-value triplet where the name is the name of a graph, vertex or
+ * edge attribute, the type is the corresponding igraph type of the attribute
+ * and the value is a \em vector of attribute values. Note that for graph
+ * attributes we use a vector of length 1. The type of the vector depends on
+ * the attribute type: it is \ref igraph_vector_t for numeric attributes,
+ * \c igraph_strvector_t for string attributes and \c igraph_vector_bool_t
+ * for Boolean attributes.
+ *
+ * </para><para>
+ * The attribute record does \em not own the vector that it contains; it is the
+ * responsibility of the user to destroy and free the vector as needed.
+ */
 typedef struct igraph_attribute_record_t {
     const char *name;
     igraph_attribute_type_t type;
     const void *value;
 } igraph_attribute_record_t;
 
-typedef enum { IGRAPH_ATTRIBUTE_GRAPH = 0,
-               IGRAPH_ATTRIBUTE_VERTEX,
-               IGRAPH_ATTRIBUTE_EDGE
-             } igraph_attribute_elemtype_t;
+typedef enum {
+    IGRAPH_ATTRIBUTE_GRAPH = 0,
+    IGRAPH_ATTRIBUTE_VERTEX,
+    IGRAPH_ATTRIBUTE_EDGE
+} igraph_attribute_elemtype_t;
 
 /**
  * \typedef igraph_attribute_combination_type_t
@@ -316,11 +339,11 @@ IGRAPH_EXPORT igraph_error_t igraph_attribute_combination_query(const igraph_att
  */
 
 typedef struct igraph_attribute_table_t {
-    igraph_error_t (*init)(igraph_t *graph, igraph_vector_ptr_t *attr);
+    igraph_error_t (*init)(igraph_t *graph, const igraph_vector_ptr_t *attr);
     void           (*destroy)(igraph_t *graph);
     igraph_error_t (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
                            igraph_bool_t va, igraph_bool_t ea);
-    igraph_error_t (*add_vertices)(igraph_t *graph, igraph_integer_t nv, igraph_vector_ptr_t *attr);
+    igraph_error_t (*add_vertices)(igraph_t *graph, igraph_integer_t nv, const igraph_vector_ptr_t *attr);
     igraph_error_t (*permute_vertices)(const igraph_t *graph,
                                        igraph_t *newgraph,
                                        const igraph_vector_int_t *idx);
@@ -329,7 +352,7 @@ typedef struct igraph_attribute_table_t {
                                        const igraph_vector_int_list_t *merges,
                                        const igraph_attribute_combination_t *comb);
     igraph_error_t (*add_edges)(igraph_t *graph, const igraph_vector_int_t *edges,
-                                igraph_vector_ptr_t *attr);
+                                const igraph_vector_ptr_t *attr);
     igraph_error_t (*permute_edges)(const igraph_t *graph,
                                     igraph_t *newgraph, const igraph_vector_int_t *idx);
     igraph_error_t (*combine_edges)(const igraph_t *graph,

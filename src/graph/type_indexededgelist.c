@@ -95,7 +95,10 @@ static igraph_error_t igraph_i_create_start_vectors(
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
  */
-igraph_error_t igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr) {
+igraph_error_t igraph_empty_attrs(
+    igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+    const igraph_vector_ptr_t *attr
+) {
 
     if (n < 0) {
         IGRAPH_ERROR("Number of vertices must not be negative.", IGRAPH_EINVAL);
@@ -247,8 +250,10 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
  *
  * \example examples/simple/creation.c
  */
-igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edges,
-                     void *attr) {
+igraph_error_t igraph_add_edges(
+    igraph_t *graph, const igraph_vector_int_t *edges,
+    const igraph_vector_ptr_t *attr
+) {
     igraph_integer_t no_of_edges = igraph_vector_int_size(&graph->from);
     igraph_integer_t edges_to_add = igraph_vector_int_size(edges) / 2;
     igraph_integer_t new_no_of_edges;
@@ -380,7 +385,9 @@ igraph_error_t igraph_add_edges(igraph_t *graph, const igraph_vector_int_t *edge
  *
  * \example examples/simple/creation.c
  */
-igraph_error_t igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
+igraph_error_t igraph_add_vertices(
+    igraph_t *graph, igraph_integer_t nv, const igraph_vector_ptr_t *attr
+) {
     igraph_integer_t ec = igraph_ecount(graph);
     igraph_integer_t vc = igraph_vcount(graph);
     igraph_integer_t new_vc;

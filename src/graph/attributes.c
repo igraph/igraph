@@ -34,7 +34,7 @@
  * IGRAPH_THREAD_LOCAL to the following declaration and #include "config.h". */
 igraph_attribute_table_t *igraph_i_attribute_table = NULL;
 
-igraph_error_t igraph_i_attribute_init(igraph_t *graph, void *attr) {
+igraph_error_t igraph_i_attribute_init(igraph_t *graph, const igraph_vector_ptr_t *attr) {
     graph->attr = NULL;
     if (igraph_i_attribute_table) {
         IGRAPH_CHECK(igraph_i_attribute_table->init(graph, attr));
@@ -64,7 +64,9 @@ igraph_error_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igrap
     return IGRAPH_SUCCESS;
 }
 
-igraph_error_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
+igraph_error_t igraph_i_attribute_add_vertices(
+    igraph_t *graph, igraph_integer_t nv, const igraph_vector_ptr_t *attr
+) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_vertices(graph, nv, attr);
     } else {
@@ -102,8 +104,9 @@ igraph_error_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
     }
 }
 
-igraph_error_t igraph_i_attribute_add_edges(igraph_t *graph,
-                                 const igraph_vector_int_t *edges, void *attr) {
+igraph_error_t igraph_i_attribute_add_edges(
+    igraph_t *graph, const igraph_vector_int_t *edges, const igraph_vector_ptr_t *attr
+) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_edges(graph, edges, attr);
     } else {
