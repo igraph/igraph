@@ -349,7 +349,7 @@ if(DOC_BUILD_SUPPORTED)
       --encoding=utf-8//TRANSLIT
       --string-param output-file=igraph-docs
       --string-param directory-category=Libraries
-      --string-param directory-description="A fast graph library \(C\)"
+      --string-param directory-description='A fast graph library \(C\)'
       igraph-docs-with-resolved-includes.xml
       MAIN_DEPENDENCY igraph-docs-with-resolved-includes.xml
       COMMENT "Converting DocBook XML to GNU Texinfo format"
