@@ -97,7 +97,7 @@ int main(void) {
 
     igraph_vector_t vec_a1;
     igraph_vector_init_int(&vec_a1, 3, 1, 2, 3);
-    igraph_vector_swap(a1->value.as_vector, &vec_a1);
+    igraph_vector_update(a1->value.as_vector, &vec_a1);
 
     igraph_vs_t vs1;
     igraph_vs_vector_small(&vs1, 0, 1, 2, -1);
@@ -114,7 +114,7 @@ int main(void) {
     igraph_strvector_init(&vec_a2, 2);
     igraph_strvector_set(&vec_a2, 0, "one");
     igraph_strvector_set(&vec_a2, 1, "two");
-    igraph_strvector_swap(a2->value.as_strvector, &vec_a2);
+    igraph_strvector_update(a2->value.as_strvector, &vec_a2);
 
     /* attr3, boolean, 2 values */
     igraph_attribute_record_list_t attr3;
@@ -126,7 +126,7 @@ int main(void) {
 
     igraph_vector_bool_t vec_a3;
     igraph_vector_bool_init_int(&vec_a3, 2, 1, 0);
-    igraph_vector_bool_swap(a3->value.as_vector_bool, &vec_a3);
+    igraph_vector_bool_update(a3->value.as_vector_bool, &vec_a3);
 
     igraph_vs_t vs3;
     igraph_vs_vector_small(&vs3, 3, 4, -1);
