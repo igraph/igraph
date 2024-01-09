@@ -285,7 +285,7 @@ igraph_error_t igraph_attribute_record_check_type(
 }
 
 /**
- * \function igraph_attribute_record_resize
+ * \function igraph_attribute_record_size
  * \brief Returns the size of the value vector in an attribute record.
  *
  * \param attr      the attribute record to query
@@ -340,27 +340,19 @@ igraph_error_t igraph_attribute_record_resize(
 
         case IGRAPH_ATTRIBUTE_NUMERIC:
             vec = attr->value.as_vector;
-            if (attr->default_value.numeric == 0) {  /* NaN != 0 so this is OK */
-                IGRAPH_CHECK(igraph_vector_resize(vec, new_size));
-            } else {
-                i = igraph_vector_size(vec);
-                IGRAPH_CHECK(igraph_vector_resize(vec, new_size));
-                while (i < new_size) {
-                    VECTOR(*vec)[i++] = attr->default_value.numeric;
-                }
+            i = igraph_vector_size(vec);
+            IGRAPH_CHECK(igraph_vector_resize(vec, new_size));
+            while (i < new_size) {
+                VECTOR(*vec)[i++] = attr->default_value.numeric;
             }
             break;
 
         case IGRAPH_ATTRIBUTE_BOOLEAN:
             log = attr->value.as_vector_bool;
-            if (attr->default_value.boolean) {
-                i = igraph_vector_bool_size(log);
-                IGRAPH_CHECK(igraph_vector_bool_resize(log, new_size));
-                while (i < new_size) {
-                    VECTOR(*log)[i++] = attr->default_value.boolean;
-                }
-            } else {
-                IGRAPH_CHECK(igraph_vector_bool_resize(log, new_size));
+            i = igraph_vector_bool_size(log);
+            IGRAPH_CHECK(igraph_vector_bool_resize(log, new_size));
+            while (i < new_size) {
+                VECTOR(*log)[i++] = attr->default_value.boolean;
             }
             break;
 
