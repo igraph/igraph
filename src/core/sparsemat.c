@@ -1368,10 +1368,9 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
                               igraph_bool_t loops) {
 
     igraph_vector_int_t edges;
-    igraph_vector_t weights;
     CS_INT pot_edges = igraph_i_sparsemat_count_elements(A);
     const char* default_attr = "weight";
-    igraph_vector_ptr_t attr_vec;
+    igraph_attribute_record_list_t attrs;
     igraph_attribute_record_t attr_rec;
     CS_INT no_of_nodes = A->cs->m;
 
@@ -1380,37 +1379,43 @@ igraph_error_t igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat
     }
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, pot_edges * 2);
-    IGRAPH_VECTOR_INIT_FINALLY(&weights, pot_edges);
-    IGRAPH_VECTOR_PTR_INIT_FINALLY(&attr_vec, 1);
 
+    /* Prepare attribute record list */
+    IGRAPH_CHECK(igraph_attribute_record_list_init(&attrs, 0));
+    IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &attrs);
+
+    /* Prepare attribute record */
+    IGRAPH_CHECK(igraph_attribute_record_init(
+        &attr_rec, attr ? attr : default_attr, IGRAPH_ATTRIBUTE_NUMERIC
+    ));
+    IGRAPH_FINALLY(igraph_attribute_record_destroy, &attr_rec);
+
+    /* Convert sparse matrix, storing weights in the attribute record */
     if (igraph_sparsemat_is_cc(A)) {
         IGRAPH_CHECK(igraph_i_weighted_sparsemat_cc(A, directed, attr, loops,
-                     &edges, &weights));
+                     &edges, attr_rec.value.as_vector));
     } else {
         IGRAPH_CHECK(igraph_i_weighted_sparsemat_triplet(A, directed, attr,
                      loops, &edges,
-                     &weights));
+                     attr_rec.value.as_vector));
     }
 
-    /* Prepare attribute record */
-    attr_rec.name = attr ? attr : default_attr;
-    attr_rec.type = IGRAPH_ATTRIBUTE_NUMERIC;
-    attr_rec.value = &weights;
-    VECTOR(attr_vec)[0] = &attr_rec;
+    /* Transfer ownership of attribute record to attribute record list */
+    IGRAPH_CHECK(igraph_attribute_record_list_push_back(&attrs, &attr_rec));
+    IGRAPH_FINALLY_CLEAN(1);
 
     /* Create graph */
     IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
     if (igraph_vector_int_size(&edges) > 0) {
-        IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
+        IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attrs));
     }
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Cleanup */
+    igraph_attribute_record_list_destroy(&attrs);
     igraph_vector_int_destroy(&edges);
-    igraph_vector_destroy(&weights);
-    igraph_vector_ptr_destroy(&attr_vec);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }

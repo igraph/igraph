@@ -88,57 +88,48 @@ int main(void) {
     igraph_vector_int_init_int((igraph_vector_int_t *) &edges, 4, 0,1, 1,2);
 
     /* attr1, numeric, 3 values */
+    igraph_attribute_record_list_t attr1;
+    igraph_attribute_record_list_init(&attr1, 1);
 
-    igraph_vector_ptr_t attr1;
-    igraph_vector_ptr_init(&attr1, 1);
-
-    igraph_attribute_record_t a1;
-    a1.name = "foo";
-    a1.type = IGRAPH_ATTRIBUTE_NUMERIC;
+    igraph_attribute_record_t* a1 = igraph_attribute_record_list_get_ptr(&attr1, 0);
+    igraph_attribute_record_set_name(a1, "foo");
+    igraph_attribute_record_set_type(a1, IGRAPH_ATTRIBUTE_NUMERIC);
 
     igraph_vector_t vec_a1;
     igraph_vector_init_int(&vec_a1, 3, 1, 2, 3);
-    a1.value = &vec_a1;
+    igraph_vector_swap(a1->value.as_vector, &vec_a1);
 
     igraph_vs_t vs1;
     igraph_vs_vector_small(&vs1, 0, 1, 2, -1);
 
-    VECTOR(attr1)[0] = &a1;
-
     /* attr2, string, 2 values */
+    igraph_attribute_record_list_t attr2;
+    igraph_attribute_record_list_init(&attr2, 1);
 
-    igraph_vector_ptr_t attr2;
-    igraph_vector_ptr_init(&attr2, 1);
-
-    igraph_attribute_record_t a2;
-    a2.name = "bar";
-    a2.type = IGRAPH_ATTRIBUTE_STRING;
+    igraph_attribute_record_t* a2 = igraph_attribute_record_list_get_ptr(&attr2, 0);
+    igraph_attribute_record_set_name(a2, "bar");
+    igraph_attribute_record_set_type(a2, IGRAPH_ATTRIBUTE_STRING);
 
     igraph_strvector_t vec_a2;
     igraph_strvector_init(&vec_a2, 2);
     igraph_strvector_set(&vec_a2, 0, "one");
     igraph_strvector_set(&vec_a2, 1, "two");
-    a2.value = &vec_a2;
-
-    VECTOR(attr2)[0] = &a2;
+    igraph_strvector_swap(a2->value.as_strvector, &vec_a2);
 
     /* attr3, boolean, 2 values */
+    igraph_attribute_record_list_t attr3;
+    igraph_attribute_record_list_init(&attr3, 1);
 
-    igraph_vector_ptr_t attr3;
-    igraph_vector_ptr_init(&attr3, 1);
-
-    igraph_attribute_record_t a3;
-    a3.name = "baz";
-    a3.type = IGRAPH_ATTRIBUTE_BOOLEAN;
+    igraph_attribute_record_t* a3 = igraph_attribute_record_list_get_ptr(&attr3, 0);
+    igraph_attribute_record_set_name(a3, "baz");
+    igraph_attribute_record_set_type(a3, IGRAPH_ATTRIBUTE_BOOLEAN);
 
     igraph_vector_bool_t vec_a3;
     igraph_vector_bool_init_int(&vec_a3, 2, 1, 0);
-    a3.value = &vec_a3;
+    igraph_vector_bool_swap(a3->value.as_vector_bool, &vec_a3);
 
     igraph_vs_t vs3;
     igraph_vs_vector_small(&vs3, 3, 4, -1);
-
-    VECTOR(attr3)[0] = &a3;
 
     /* Perform tests */
 
@@ -156,45 +147,42 @@ int main(void) {
 
     CHECK1(igraph_add_vertices(&graph, 2, &attr1)); /* wrong number of vertices */
     /* Attribute handling still works and graph has correct attributes after failure to add vertices? */
-    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1.name, vs1, &nvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1->name, vs1, &nvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_all_e(&vec_a1, &nvalues));
-    IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2.name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2->name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
     for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
         IGRAPH_ASSERT(strcmp(igraph_strvector_get(&vec_a2, i), igraph_strvector_get(&svalues, i)) == 0);
     }
-    IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3.name, vs3, &bvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3->name, vs3, &bvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_bool_all_e(&vec_a3, &bvalues));
 
     CHECK1(igraph_add_edges(&graph, &edges, &attr1)); /* wrong number of edges */
     /* Attribute handling still works and graph has correct attributes after failure to add vertices? */
-    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1.name, vs1, &nvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_VANV(&graph, a1->name, vs1, &nvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_all_e(&vec_a1, &nvalues));
-    IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2.name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_EASV(&graph, a2->name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &svalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_strvector_size(&svalues) == igraph_strvector_size(&vec_a2));
     for (igraph_integer_t i=0; i < igraph_strvector_size(&svalues); ++i) {
         IGRAPH_ASSERT(strcmp(igraph_strvector_get(&vec_a2, i), igraph_strvector_get(&svalues, i)) == 0);
     }
-    IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3.name, vs3, &bvalues) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_cattribute_VABV(&graph, a3->name, vs3, &bvalues) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vector_bool_all_e(&vec_a3, &bvalues));
 
     igraph_destroy(&graph);
 
     /* Release attr1 */
 
-    igraph_vector_destroy(&vec_a1);
-    igraph_vector_ptr_destroy(&attr1);
+    igraph_attribute_record_list_destroy(&attr1);
     igraph_vs_destroy(&vs1);
 
     /* Release attr2 */
 
-    igraph_strvector_destroy(&vec_a2);
-    igraph_vector_ptr_destroy(&attr2);
+    igraph_attribute_record_list_destroy(&attr2);
 
     /* Release attr3 */
 
-    igraph_vector_bool_destroy(&vec_a3);
-    igraph_vector_ptr_destroy(&attr3);
+    igraph_attribute_record_list_destroy(&attr3);
     igraph_vs_destroy(&vs3);
 
     /* Release helpers */

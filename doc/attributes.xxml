@@ -10,12 +10,27 @@
 <!-- doxrox-include about_attributes -->
 
 <section id="attribute-handler-interface">
-<title>The Attribute Handler Interface</title>
+<title>The attribute handler interface</title>
 <!-- doxrox-include about_attribute_table -->
 <!-- doxrox-include igraph_attribute_table_t -->
 <!-- doxrox-include igraph_set_attribute_table -->
 <!-- doxrox-include igraph_attribute_type_t -->
+<!-- doxrox-include igraph_attribute_elemtype_t -->
+</section>
+
+<section id="attribute-records">
+<title>Attribute records</title>
+<!-- doxrox-include about_attribute_record -->
 <!-- doxrox-include igraph_attribute_record_t -->
+<!-- doxrox-include igraph_attribute_record_init -->
+<!-- doxrox-include igraph_attribute_record_init_copy -->
+<!-- doxrox-include igraph_attribute_record_resize -->
+<!-- doxrox-include igraph_attribute_record_set_name -->
+<!-- doxrox-include igraph_attribute_record_set_type -->
+<!-- doxrox-include igraph_attribute_record_set_default_numeric -->
+<!-- doxrox-include igraph_attribute_record_set_default_string -->
+<!-- doxrox-include igraph_attribute_record_set_default_boolean -->
+<!-- doxrox-include igraph_attribute_record_destroy -->
 </section>
 
 <section id="attribute-combinations">

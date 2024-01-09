@@ -51,6 +51,7 @@ typedef struct {
 /*--------------------*/
 
 IGRAPH_EXPORT igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size);
+IGRAPH_EXPORT igraph_error_t FUNCTION(init_copy)(TYPE* to, const TYPE* from);
 IGRAPH_EXPORT void FUNCTION(destroy)(TYPE* v);
 
 /*--------------------*/

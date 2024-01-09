@@ -567,7 +567,7 @@ ASTAR_HEURISTIC_FUNC:
 ATTRIBUTES:
     # A data structure specifying graph/vertex/edge attributes to add to a
     # graph in a low-level igraph C function
-    CTYPE: igraph_vector_ptr_t
+    CTYPE: igraph_attribute_record_list_t
     FLAGS: BY_REF
 
 BLISSINFO:

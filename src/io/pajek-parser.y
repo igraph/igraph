@@ -78,13 +78,13 @@ static igraph_error_t add_numeric_edge_attribute(const char *name,
                                               igraph_real_t value,
                                               igraph_i_pajek_parsedata_t *context);
 static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
-                                         igraph_vector_ptr_t *attrs,
+                                         igraph_attribute_record_list_t *attrs,
                                          igraph_integer_t count,
                                          const char *attrname,
                                          igraph_integer_t vid,
                                          igraph_real_t number);
 static igraph_error_t add_string_attribute(igraph_trie_t *names,
-                                        igraph_vector_ptr_t *attrs,
+                                        igraph_attribute_record_list_t *attrs,
                                         igraph_integer_t count,
                                         const char *attrname,
                                         igraph_integer_t vid,
@@ -547,7 +547,7 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
 /* TODO: NA's */
 
 static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
-                                            igraph_vector_ptr_t *attrs,
+                                            igraph_attribute_record_list_t *attrs,
                                             igraph_integer_t count,
                                             const char *attrname,
                                             igraph_integer_t elem_id,
@@ -561,35 +561,25 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
   if (id == attrsize) {
     /* add a new attribute */
     rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    CHECK_OOM_RP(rec);
+    IGRAPH_CHECK_OOM(rec, "Cannot allocate numeric attribute record.");
     IGRAPH_FINALLY(igraph_free, rec);
 
-    na = IGRAPH_CALLOC(1, igraph_vector_t);
-    CHECK_OOM_RP(na);
-    IGRAPH_FINALLY(igraph_free, na);
-    IGRAPH_VECTOR_INIT_FINALLY(na, count);
+    IGRAPH_CHECK(igraph_attribute_record_init(rec, attrname, IGRAPH_ATTRIBUTE_NUMERIC));
+    IGRAPH_FINALLY(igraph_attribute_record_destroy, rec);
 
-    rec->name = strdup(attrname);
-    CHECK_OOM_RP(rec->name);
-    IGRAPH_FINALLY(igraph_free, (void *) rec->name);
+    IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(rec, 0));
 
-    rec->type = IGRAPH_ATTRIBUTE_NUMERIC;
-    rec->value = na;
-
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
-    IGRAPH_FINALLY_CLEAN(4); /* ownership of rec transferred to attrs */
+    IGRAPH_CHECK(igraph_attribute_record_resize(rec, count));
+    IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, rec));
+    IGRAPH_FINALLY_CLEAN(2); /* ownership of rec transferred to attrs */
   }
 
-  rec = VECTOR(*attrs)[id];
-  na = (igraph_vector_t *) rec->value;
+  rec = igraph_attribute_record_list_get_ptr(attrs, id);
+  na = rec->value.as_vector;
   if (igraph_vector_size(na) == elem_id) {
     IGRAPH_CHECK(igraph_vector_push_back(na, number));
   } else if (igraph_vector_size(na) < elem_id) {
-    igraph_integer_t origsize=igraph_vector_size(na);
-    IGRAPH_CHECK(igraph_vector_resize(na, elem_id+1));
-    for (;origsize<count; origsize++) {
-      VECTOR(*na)[origsize] = IGRAPH_NAN;
-    }
+    IGRAPH_CHECK(igraph_attribute_record_resize(rec, elem_id+1));
     VECTOR(*na)[elem_id] = number;
   } else {
     VECTOR(*na)[elem_id] = number;
@@ -598,8 +588,6 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
   return IGRAPH_SUCCESS;
 }
 
-/* TODO: NA's */
-
 static igraph_error_t make_dynstr(const char *src, size_t len, char **res) {
   *res = strndup(src, len);
   CHECK_OOM_RP(*res);
@@ -607,7 +595,7 @@ static igraph_error_t make_dynstr(const char *src, size_t len, char **res) {
 }
 
 static igraph_error_t add_string_attribute(igraph_trie_t *names,
-                                           igraph_vector_ptr_t *attrs,
+                                           igraph_attribute_record_list_t *attrs,
                                            igraph_integer_t count,
                                            const char *attrname,
                                            igraph_integer_t elem_id,
@@ -635,29 +623,20 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
     }
 #endif
 
-    /* add a new attribute */
     rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    CHECK_OOM_RP(rec);
+    IGRAPH_CHECK_OOM(rec, "Cannot allocate string attribute record.");
     IGRAPH_FINALLY(igraph_free, rec);
 
-    na = IGRAPH_CALLOC(1, igraph_strvector_t);
-    CHECK_OOM_RP(na);
-    IGRAPH_FINALLY(igraph_free, na);
-    IGRAPH_STRVECTOR_INIT_FINALLY(na, count);
+    IGRAPH_CHECK(igraph_attribute_record_init(rec, attrname, IGRAPH_ATTRIBUTE_STRING));
+    IGRAPH_FINALLY(igraph_attribute_record_destroy, rec);
 
-    rec->name = strdup(attrname);
-    CHECK_OOM_RP(rec->name);
-    IGRAPH_FINALLY(igraph_free, (char *) rec->name);
-
-    rec->type = IGRAPH_ATTRIBUTE_STRING;
-    rec->value = na;
-
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
-    IGRAPH_FINALLY_CLEAN(4); /* ownership of rec transferred to attrs */
+    IGRAPH_CHECK(igraph_attribute_record_resize(rec, count));
+    IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, rec));
+    IGRAPH_FINALLY_CLEAN(2); /* ownership of rec transferred to attrs */
   }
 
-  rec = VECTOR(*attrs)[id];
-  na = (igraph_strvector_t *) rec->value;
+  rec = igraph_attribute_record_list_get_ptr(attrs, id);
+  na = rec->value.as_strvector;
   if (igraph_strvector_size(na) <= elem_id) {
     IGRAPH_CHECK(igraph_strvector_resize(na, elem_id+1));
   }
@@ -716,10 +695,10 @@ static igraph_error_t add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
 
   const char *attrname="type";
   igraph_trie_t *names=context->vertex_attribute_names;
-  igraph_vector_ptr_t *attrs=context->vertex_attributes;
+  igraph_attribute_record_list_t *attrs=context->vertex_attributes;
   igraph_integer_t n=context->vcount, n1=context->vcount2;
   igraph_integer_t attrid, attrsize = igraph_trie_size(names);
-  igraph_attribute_record_t *rec;
+  igraph_attribute_record_t* rec;
   igraph_vector_bool_t *na;
 
   if (n1 > n) {
@@ -734,28 +713,12 @@ static igraph_error_t add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
   IGRAPH_ASSERT(attrid == attrsize);
 
   /* add a new attribute */
-  rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-  CHECK_OOM_RP(rec);
-  IGRAPH_FINALLY(igraph_free, rec);
+  IGRAPH_CHECK(igraph_attribute_record_list_push_back_new(attrs, &rec));
+  IGRAPH_CHECK(igraph_attribute_record_set_name(rec, attrname));
+  IGRAPH_CHECK(igraph_attribute_record_set_type(rec, IGRAPH_ATTRIBUTE_BOOLEAN));
 
-  na = IGRAPH_CALLOC(1, igraph_vector_bool_t);
-  CHECK_OOM_RP(na);
-  IGRAPH_FINALLY(igraph_free, na);
-  IGRAPH_VECTOR_BOOL_INIT_FINALLY(na, n);
-
-  rec->name = strdup(attrname);
-  CHECK_OOM_RP(rec->name);
-  IGRAPH_FINALLY(igraph_free, (char *) rec->name);
-
-  rec->type = IGRAPH_ATTRIBUTE_BOOLEAN;
-  rec->value = na;
-
-  IGRAPH_CHECK(igraph_vector_ptr_push_back(attrs, rec));
-  IGRAPH_FINALLY_CLEAN(4); /* ownership of 'rec' transferred to 'attrs' */
-
-  for (igraph_integer_t i=0; i<n1; i++) {
-    VECTOR(*na)[i] = false;
-  }
+  na = rec->value.as_vector_bool;
+  IGRAPH_CHECK(igraph_vector_bool_resize(na, n));
   for (igraph_integer_t i=n1; i<n; i++) {
     VECTOR(*na)[i] = true;
   }
