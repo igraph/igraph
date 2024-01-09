@@ -4,7 +4,7 @@ set(CPACK_PACKAGE_VENDOR "The igraph development team")
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
 
-if(TARGET html AND TARGET info)
+if(TARGET html)
   # Alias "dist" to "package_source"
   add_custom_target(dist
     COMMAND "${CMAKE_COMMAND}"
@@ -14,13 +14,13 @@ if(TARGET html AND TARGET info)
     USES_TERMINAL
   )
 
-  # Add dependencies to "dist"
-  add_dependencies(dist html info)
+  # We want to include the HTML docs in the source package so add a dependency
+  add_dependencies(dist html)
 else()
   add_custom_target(dist
     COMMAND "${CMAKE_COMMAND}" -E false
     COMMENT
-      "Cannot build source tarball since the HTML or the Texinfo documentation was not built."
+      "Cannot build source tarball since the HTML documentation was not built."
     VERBATIM
     USES_TERMINAL
   )

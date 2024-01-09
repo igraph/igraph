@@ -79,9 +79,4 @@ if(CPACK_SOURCE_INSTALLED_DIRECTORIES)
         "${CPACK_PACKAGE_DIRECTORY}/doc/html"
         DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/doc"
     )
-    file(
-        INSTALL
-        "${CPACK_PACKAGE_DIRECTORY}/doc/igraph-docs.info"
-        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/doc"
-    )
 endif()
