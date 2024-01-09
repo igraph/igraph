@@ -24,6 +24,7 @@
 <!-- doxrox-include igraph_attribute_record_t -->
 <!-- doxrox-include igraph_attribute_record_init -->
 <!-- doxrox-include igraph_attribute_record_init_copy -->
+<!-- doxrox-include igraph_attribute_record_size -->
 <!-- doxrox-include igraph_attribute_record_resize -->
 <!-- doxrox-include igraph_attribute_record_set_name -->
 <!-- doxrox-include igraph_attribute_record_set_type -->
