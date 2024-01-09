@@ -86,6 +86,7 @@ message(STATUS " ")
 message(STATUS "--------[ Documentation ]-------")
 print_bool("HTML" HTML_DOC_BUILD_SUPPORTED)
 print_bool("PDF" PDF_DOC_BUILD_SUPPORTED)
+print_bool("INFO" INFO_DOC_BUILD_SUPPORTED)
 message(STATUS " ")
 
 set(MISSING_DEPENDENCIES)

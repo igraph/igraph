@@ -859,28 +859,28 @@ igraph_eigenvector_centrality:
         GRAPH graph, OUT VERTEX_QTYS vector, OUT REAL value,
         BOOLEAN directed=False, BOOLEAN scale=True,
         EDGE_WEIGHTS weights=NULL,
-        INOUT ARPACK_OPTIONS options=arpack_defaults
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_hub_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTYS vector, OUT REAL value,
         BOOLEAN scale=True, EDGE_WEIGHTS weights=NULL,
-        INOUT ARPACK_OPTIONS options=arpack_defaults
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_authority_score:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTYS vector, OUT REAL value,
         BOOLEAN scale=True, EDGE_WEIGHTS weights=NULL,
-        INOUT ARPACK_OPTIONS options=arpack_defaults
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, vector ON graph
 
 igraph_hub_and_authority_scores:
     PARAMS: |-
         GRAPH graph, OUT VERTEX_QTYS hub_vector, OUT VERTEX_QTYS authority_vector,
         OUT REAL value, BOOLEAN scale=True, EDGE_WEIGHTS weights=NULL,
-        INOUT ARPACK_OPTIONS options=arpack_defaults
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
 
 igraph_unfold_tree:
     PARAMS: |-
@@ -975,7 +975,7 @@ igraph_centralization_eigenvector_centrality:
     PARAMS: |-
         GRAPH graph, OUT VECTOR vector, OUT REAL value,
         BOOLEAN directed=False, BOOLEAN scale=True,
-        INOUT ARPACK_OPTIONS options=arpack_defaults,
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
         OUT REAL centralization, OUT REAL theoretical_max,
         BOOLEAN normalized=True
 
@@ -1659,7 +1659,7 @@ igraph_community_leading_eigenvector:
         GRAPH graph, EDGE_WEIGHTS weights=NULL,
         OPTIONAL OUT MATRIX_INT merges, OPTIONAL OUT VECTOR_INT membership,
         INTEGER steps=-1,
-        INOUT ARPACK_OPTIONS options=arpack_defaults,
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
         OPTIONAL OUT REAL modularity, BOOLEAN start=False,
         OPTIONAL OUT VECTOR eigenvalues,
         OPTIONAL OUT VECTOR_LIST eigenvectors,
@@ -2258,7 +2258,7 @@ igraph_subisomorphic_vf2:
         vertex_color1 ON graph1, vertex_color2 ON graph2,
         edge_color1 ON graph1, edge_color2 ON graph2
 
-igraph_subisomorphic_function_vf2:
+igraph_get_subisomorphisms_vf2_callback:
     PARAMS: |-
         GRAPH graph1, GRAPH graph2,
         OPTIONAL VERTEX_COLORS vertex_color1, OPTIONAL VERTEX_COLORS vertex_color2,
@@ -2310,7 +2310,7 @@ igraph_isomorphic_bliss:
         OPTIONAL OUT BLISSINFO info1, OPTIONAL OUT BLISSINFO info2
     DEPS: colors1 ON graph1, colors2 ON graph2
 
-igraph_automorphisms:
+igraph_count_automorphisms:
     PARAMS: |-
         GRAPH graph, OPTIONAL VERTEX_COLORS colors, BLISSSH sh="fm", OUT BLISSINFO info
     DEPS: colors ON graph
@@ -2372,7 +2372,7 @@ igraph_adjacency_spectral_embedding:
         EIGENWHICHPOS which=ASE, BOOLEAN scaled=True, OUT MATRIX X,
         OPTIONAL OUT MATRIX Y, OPTIONAL OUT VECTOR D,
         VECTOR cvec=AsmDefaultCvec,
-        INOUT ARPACK_OPTIONS options=igraph.arpack.default
+        INOUT ARPACK_OPTIONS options=RPACK_DEFAULTS
     DEPS: weights ON graph, cvec ON graph
 
 igraph_laplacian_spectral_embedding:
@@ -2381,7 +2381,7 @@ igraph_laplacian_spectral_embedding:
         EIGENWHICHPOS which=ASE,
         LSETYPE type=Default, BOOLEAN scaled=True, OUT MATRIX X,
         OPTIONAL OUT MATRIX Y, OPTIONAL OUT VECTOR D,
-        INOUT ARPACK_OPTIONS options=igraph.arpack.default
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS
     DEPS: weights ON graph, type ON graph
 
 #######################################
@@ -2392,7 +2392,7 @@ igraph_eigen_adjacency:
     PARAMS: |-
         GRAPH graph, EIGENALGO algorithm=ARPACK,
         EIGENWHICH which=Default,
-        INOUT ARPACK_OPTIONS options=arpack_defaults,
+        INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
         INOUT ARPACK_STORAGE storage, OUT VECTOR values, OUT MATRIX vectors,
         OUT VECTOR_COMPLEX cmplxvalues, OUT MATRIX_COMPLEX cmplxvectors
 
@@ -2441,13 +2441,13 @@ igraph_cmp_epsilon:
 igraph_eigen_matrix:
     PARAMS: |-
         MATRIX A, SPARSEMAT sA, ARPACK_FUNC fun, INT n, EXTRA extra,
-        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACK_OPTIONS options=igraph.arpack.default,
+        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
         INOUT ARPACK_STORAGE storage, OUT VECTOR_COMPLEX values, OUT MATRIX_COMPLEX vectors
 
 igraph_eigen_matrix_symmetric:
     PARAMS: |-
         MATRIX A, SPARSEMAT sA, ARPACK_FUNC fun, INT n, EXTRA extra,
-        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACK_OPTIONS options=igraph.arpack.default,
+        EIGENALGO algorithm, EIGENWHICH which, INOUT ARPACK_OPTIONS options=ARPACK_DEFAULTS,
         INOUT ARPACK_STORAGE storage, OUT VECTOR values, OUT MATRIX vectors
 
 igraph_solve_lsap:
