@@ -179,6 +179,11 @@ int main(void) {
      * providing a merge matrix or a modularity vector */
     igraph_community_fastgreedy(&g, 0, 0, 0, &membership);
     show_results(&g, 0, 0, &membership, stdout);
+
+    /* Regression test -- asking for modularity but nothing else */
+    igraph_community_fastgreedy(&g, 0, 0, &modularity, 0);
+    show_results(&g, &modularity, 0, 0, stdout);
+
     igraph_destroy(&g);
 
     igraph_vector_int_destroy(&membership);
