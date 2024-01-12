@@ -657,8 +657,11 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         break;
 
     case IGRAPH_LPA_DOMINANCE:
-    default:
         IGRAPH_CHECK(igraph_i_community_label_propagation(graph, membership, mode, weights, fixed_copy, /* retention */ false));
+        break;
+
+    default:
+        IGRAPH_ERROR("Invalid igraph_lpa_variant_t.", IGRAPH_EINVAL);
     }
 
 
