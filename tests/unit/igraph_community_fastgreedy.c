@@ -207,6 +207,8 @@ int main(void) {
     igraph_community_fastgreedy(&g, 0, 0, &modularity, 0);
     show_results(&g, &modularity, 0, 0, stdout);
 
+    igraph_destroy(&g);
+
     igraph_vector_int_destroy(&membership);
     igraph_vector_destroy(&modularity);
     igraph_vector_destroy(&weights);
