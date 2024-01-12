@@ -720,7 +720,7 @@ igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
         IGRAPH_CHECK(igraph_dqueue_int_init(&q, 0));
         IGRAPH_FINALLY(igraph_dqueue_int_destroy, &q);
 
-        for (i = 0; i < no_of_nodes; ++i) {
+        for (i = 0; i < no_of_not_fixed_nodes; ++i) {
             igraph_integer_t v = VECTOR(node_order)[i];
 
             /* Is this node unlabelled? */
