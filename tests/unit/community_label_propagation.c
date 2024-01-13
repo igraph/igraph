@@ -40,15 +40,16 @@ int main(void) {
 
     igraph_lpa_variant_t variants[3] = {IGRAPH_LPA_DOMINANCE, IGRAPH_LPA_RETENTION, IGRAPH_LPA_FAST};
     for (i = 0; i < 3; i++) {
-      for (j = 0; j < 100; j++) {
-        /* label propagation is a stochastic method */
-        igraph_rng_seed(igraph_rng_default(), j);
+        for (j = 0; j < 100; j++) {
+            /* label propagation is a stochastic method */
+            igraph_rng_seed(igraph_rng_default(), j);
 
-        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, variants[i]);
+            igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, NULL, NULL, NULL, variants[i]);
 
-        for (k = 0; k < 3; k++)
-          IGRAPH_ASSERT(VECTOR(membership)[k] == VECTOR(membership)[0]);
-      }
+            for (k = 0; k < 3; k++) {
+                IGRAPH_ASSERT(VECTOR(membership)[k] == VECTOR(membership)[0]);
+            }
+        }
     }
 
     igraph_destroy(&g);
@@ -93,23 +94,24 @@ int main(void) {
     VECTOR(fixed)[4] = 1;
     VECTOR(fixed)[5] = 1;
 
-    for (i = 0; i < 3; i++)
-    {
-      igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-                                         &initial, &fixed, variants[i]);
-      for (j = 0; j < igraph_vcount(&g); j++)
-        IGRAPH_ASSERT(VECTOR(membership)[j] == (j < 2 ? 0 : 1));
+    for (i = 0; i < 3; i++) {
+        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
+                                           &initial, &fixed, variants[i]);
+        for (j = 0; j < igraph_vcount(&g); j++) {
+            IGRAPH_ASSERT(VECTOR(membership)[j] == (j < 2 ? 0 : 1));
+        }
 
-      igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0,
-                                         &initial, &fixed, variants[i]);
-      for (j = 0; j < igraph_vcount(&g); j++)
-        IGRAPH_ASSERT(VECTOR(membership)[j] == 0);
+        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, 0,
+                                           &initial, &fixed, variants[i]);
+        for (j = 0; j < igraph_vcount(&g); j++) {
+            IGRAPH_ASSERT(VECTOR(membership)[j] == 0);
+        }
 
-      /* Check whether it works with no fixed vertices at all
-      * while an initial configuration is given -- see bug
-      * #570902 in Launchpad. This is a simple smoke test only. */
-      igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-                                        &initial, NULL, variants[i]);
+        /* Check whether it works with no fixed vertices at all
+        * while an initial configuration is given -- see bug
+        * #570902 in Launchpad. This is a simple smoke test only. */
+        igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
+                                           &initial, NULL, variants[i]);
     }
 
     igraph_vector_bool_destroy(&fixed);
@@ -118,7 +120,7 @@ int main(void) {
     igraph_destroy(&g);
 
     /* Test line graph with fixed and initial memberships */
-    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,3, -1);
+    igraph_small(&g, 3, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 3, -1);
 
     igraph_vector_init(&weights, 3);
     VECTOR(weights)[0] = 2;
@@ -138,7 +140,7 @@ int main(void) {
     VECTOR(fixed)[3] = 1;
 
     igraph_community_label_propagation(&g, &membership, IGRAPH_ALL, &weights,
-        &initial, &fixed, IGRAPH_LPA_DOMINANCE);
+                                       &initial, &fixed, IGRAPH_LPA_DOMINANCE);
 
     igraph_vector_int_print(&membership);
     IGRAPH_ASSERT(VECTOR(membership)[0] == 0);

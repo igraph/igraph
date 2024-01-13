@@ -31,7 +31,7 @@ int main(void) {
     /* Undirected graph with unlabelled components */
 
     igraph_small(&graph, 4, IGRAPH_UNDIRECTED,
-                 1,2, -1);
+                 1, 2, -1);
 
     igraph_vector_int_init(&membership, 0);
     igraph_vector_int_init(&initial_labels, igraph_vcount(&graph));
