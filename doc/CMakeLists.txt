@@ -268,31 +268,37 @@ if(DOC_BUILD_SUPPORTED)
     set(HTML_TARGET html)
   endif()
 
-  if(PDF_DOC_BUILD_SUPPORTED)
-    add_custom_command(
-      OUTPUT igraph-docs-with-resolved-includes.xml
-      COMMAND ${XMLLINT_COMMAND}
-      ARGS
-      --xinclude
-      --output igraph-docs-with-resolved-includes-tmp.xml
-      igraph-docs.xml
-      COMMAND ${Python3_EXECUTABLE}
-      ARGS
-      ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
-      igraph-docs-with-resolved-includes-tmp.xml
-      igraph-docs-with-resolved-includes.xml
-      COMMAND ${CMAKE_COMMAND}
-      ARGS
-      -E remove igraph-docs-with-resolved-includes-tmp.xml
-      MAIN_DEPENDENCY igraph-docs.xml
-      # The DEPENDS clause below needs to list both the xmlstamp file and the
-      # target that creates it. The former is needed to make Ninja rebuild the
-      # PDF file if the source is modified. The latter is needed to make the
-      # XCode build system happy.
-      DEPENDS ${DOCXML_STAMP} docxml
-      COMMENT "Resolving includes in DocBook XML source"
-    )
+  add_custom_command(
+    OUTPUT igraph-docs-with-resolved-includes.xml
+    COMMAND ${XMLLINT_COMMAND}
+    ARGS
+    --xinclude
+    --output igraph-docs-with-resolved-includes-tmp.xml
+    igraph-docs.xml
+    COMMAND ${Python3_EXECUTABLE}
+    ARGS
+    ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
+    igraph-docs-with-resolved-includes-tmp.xml
+    igraph-docs-with-resolved-includes.xml
+    COMMAND ${CMAKE_COMMAND}
+    ARGS
+    -E remove igraph-docs-with-resolved-includes-tmp.xml
+    MAIN_DEPENDENCY igraph-docs.xml
+    # The DEPENDS clause below needs to list both the xmlstamp file and the
+    # target that creates it. The former is needed to make Ninja rebuild the
+    # PDF file if the source is modified. The latter is needed to make the
+    # XCode build system happy.
+    DEPENDS ${DOCXML_STAMP} docxml
+  )
 
+  # Intermediate custom target because Xcode projects cannot have commands that
+  # depend on intermediate files from other commands
+  add_custom_target(
+    _generate-resolved-docbook-xml DEPENDS igraph-docs-with-resolved-includes.xml
+    COMMENT "Resolving includes in DocBook XML source"
+  )
+
+  if(PDF_DOC_BUILD_SUPPORTED)
     add_custom_command(
       OUTPUT igraph-docs.fo
       COMMAND ${XSLTPROC_COMMAND}
@@ -301,7 +307,7 @@ if(DOC_BUILD_SUPPORTED)
       --stringparam paper.type A4
       http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl
       igraph-docs-with-resolved-includes.xml
-      MAIN_DEPENDENCY igraph-docs-with-resolved-includes.xml
+      DEPENDS _generate-resolved-docbook-xml
       COMMENT "Converting DocBook XML to Apache FOP format"
     )
 
@@ -319,30 +325,6 @@ if(DOC_BUILD_SUPPORTED)
 
   if(INFO_DOC_BUILD_SUPPORTED)
     add_custom_command(
-      OUTPUT igraph-docs-with-resolved-includes.xml
-      COMMAND ${XMLLINT_COMMAND}
-      ARGS
-      --xinclude
-      --output igraph-docs-with-resolved-includes-tmp.xml
-      igraph-docs.xml
-      COMMAND ${Python3_EXECUTABLE}
-      ARGS
-      ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
-      igraph-docs-with-resolved-includes-tmp.xml
-      igraph-docs-with-resolved-includes.xml
-      COMMAND ${CMAKE_COMMAND}
-      ARGS
-      -E remove igraph-docs-with-resolved-includes-tmp.xml
-      MAIN_DEPENDENCY igraph-docs.xml
-      # The DEPENDS clause below needs to list both the xmlstamp file and the
-      # target that creates it. The former is needed to make Ninja rebuild the
-      # Info file if the source is modified. The latter is needed to make the
-      # XCode build system happy.
-      DEPENDS ${DOCXML_STAMP} docxml
-      COMMENT "Resolving includes in DocBook XML source"
-    )
-
-    add_custom_command(
       OUTPUT igraph-docs.texi
       COMMAND ${DOCBOOK2XTEXI_COMMAND}
       ARGS
@@ -351,7 +333,7 @@ if(DOC_BUILD_SUPPORTED)
       --string-param directory-category=Libraries
       --string-param directory-description='A fast graph library \(C\)'
       igraph-docs-with-resolved-includes.xml
-      MAIN_DEPENDENCY igraph-docs-with-resolved-includes.xml
+      DEPENDS _generate-resolved-docbook-xml
       COMMENT "Converting DocBook XML to GNU Texinfo format"
     )
 
