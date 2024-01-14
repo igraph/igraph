@@ -58,9 +58,19 @@ void check_graph(const igraph_t *graph, const igraph_vector_int_t *terminals, co
     igraph_vector_int_destroy(&tree_edges);
 }
 
+void check_error(igraph_t *graph, igraph_vector_int_t *terminals, igraph_vector_t *weights, igraph_error_t error) {
+    igraph_real_t value;
+    igraph_vector_int_t tree_edges;
+    igraph_vector_int_init(&tree_edges, 0);
+
+    CHECK_ERROR(igraph_steiner_dreyfus_wagner(graph, terminals, weights, &value, &tree_edges), error);
+
+    igraph_vector_int_destroy(&tree_edges);
+}
+
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple, g_k1, g_k7_self_loop, g_10_9, g_new, g_new_1, g_new_2, g_new_3, g_new_4;
-    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real, terminals_10_9, terminals_1, terminals_2, terminals_3, terminals_8, terminals_7, terminals_7_special, terminals_square, terminals_square_2, terminals_fpw;
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple, g_k1, g_k7_self_loop, g_10_9, g_new, g_new_1, g_new_2, g_new_3, g_new_4, g_2_unconn;
+    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real, terminals_10_9, terminals_1, terminals_2, terminals_3, terminals_8, terminals_7, terminals_7_special, terminals_square, terminals_square_2, terminals_fpw, terminals_2_unconn;
     igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple, weights_k7_loop, weights_square_2, weights_fp;
 
     /* Null graph */
@@ -268,6 +278,9 @@ int main(void) {
                  -1);
     igraph_vector_int_init_int(&terminals_fpw, 3, 2, 0, 1);
 
+    igraph_small(&g_2_unconn, 2, IGRAPH_UNDIRECTED, -1);
+    igraph_vector_int_init_int(&terminals_2_unconn, 2, 0, 1);
+
     printf("Null graph:\n");
     check_graph(&g_null, &terminals_null, &weights_null);
 
@@ -280,13 +293,6 @@ int main(void) {
     printf("\nK_7 Non Complete graph-2:\n");
     check_graph(&g_k7_n1, &terminals_k7, &weights_k7_n1);
 
-    igraph_real_t value;
-    igraph_vector_int_t tree_edges;
-    igraph_vector_int_init(&tree_edges, 0);
-
-    CHECK_ERROR(igraph_steiner_dreyfus_wagner(&g_k6_k1, &terminals_k6_k1, &weights_k6_k1, &value, &tree_edges), IGRAPH_EINVAL);
-
-    igraph_vector_int_destroy(&tree_edges);
 
     igraph_real_t value_unit;
     igraph_vector_int_t tree_edges_unit;
@@ -344,6 +350,18 @@ int main(void) {
     printf("\nA different graph than before with floating point weights\n");
     check_graph(&g_new_4, &terminals_fpw, &weights_fp);
 
+
+    printf("\nChecking errors:\n");
+
+    printf("Graph with 2 unconnected terminals\n");
+    check_error(&g_2_unconn, &terminals_2_unconn, NULL, IGRAPH_EINVAL);
+
+    printf("Unconnected graph with terminals in multiple components\n");
+    check_error(&g_k6_k1, &terminals_k6_k1, &weights_k6_k1, IGRAPH_EINVAL);
+
+    printf("Terminal not in graph\n");
+    check_error(&g_k7, &terminals_10_9, NULL, IGRAPH_EINVVID);
+
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
@@ -359,6 +377,7 @@ int main(void) {
     igraph_destroy(&g_new_2);
     igraph_destroy(&g_new_3);
     igraph_destroy(&g_new_4);
+    igraph_destroy(&g_2_unconn);
 
     igraph_vector_destroy(&weights_null);
     igraph_vector_destroy(&weights_k7);
@@ -385,6 +404,7 @@ int main(void) {
     igraph_vector_int_destroy(&terminals_square);
     igraph_vector_int_destroy(&terminals_square_2);
     igraph_vector_int_destroy(&terminals_fpw);
+    igraph_vector_int_destroy(&terminals_2_unconn);
 
 
     VERIFY_FINALLY_STACK();

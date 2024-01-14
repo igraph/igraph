@@ -187,6 +187,13 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         }
     }
 
+    if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
+
+        igraph_vector_int_clear(res_tree);
+        *res = 0.0;
+        return IGRAPH_SUCCESS;
+    }
+
     /* Check whether all terminals are within the same connected component. */
     {
         igraph_vector_int_t membership;
@@ -196,7 +203,6 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         IGRAPH_CHECK(igraph_connected_components(graph, &membership, NULL, &no_comps, IGRAPH_WEAK));
 
         if (no_comps > 1) {
-            /* The case of zero terminals was already handled above. */
             igraph_integer_t component_id = VECTOR(membership)[VECTOR(*terminals)[0]];
             for (igraph_integer_t i = 1; i < no_of_terminals; i++) {
                 if (VECTOR(membership)[VECTOR(*terminals)[i]] != component_id) {
@@ -211,13 +217,8 @@ igraph_error_t igraph_steiner_dreyfus_wagner(
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    /* Handle the cases of the null graph and 0,1 or 2 terminals. */
-    if (no_of_nodes == 0 || no_of_terminals == 0 || no_of_terminals == 1) {
-
-        igraph_vector_int_clear(res_tree);
-        *res = 0.0;
-        return IGRAPH_SUCCESS;
-    } else if (no_of_terminals == 2) {
+    /* Only 2 terminals means we can just take the shortest path. */
+    if (no_of_terminals == 2) {
         IGRAPH_CHECK(igraph_get_shortest_path_dijkstra(
                     graph, NULL, res_tree, VECTOR(*terminals)[0],
                     VECTOR(*terminals)[1], weights, IGRAPH_ALL));
