@@ -69,8 +69,8 @@ void check_error(igraph_t *graph, igraph_vector_int_t *terminals, igraph_vector_
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_real, g_k7_non_simple, g_k1, g_k7_self_loop, g_10_9, g_new, g_new_1, g_new_2, g_new_3, g_new_4, g_2_unconn;
-    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_k7_real, terminals_10_9, terminals_1, terminals_2, terminals_3, terminals_8, terminals_7, terminals_7_special, terminals_square, terminals_square_2, terminals_fpw, terminals_2_unconn;
+    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_non_simple, g_k1, g_k7_self_loop, g_10_9, g_new, g_new_1, g_new_2, g_new_3, g_new_4, g_2_unconn;
+    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_10_9, terminals_1, terminals_2, terminals_3, terminals_8, terminals_7, terminals_7_special, terminals_square, terminals_square_2, terminals_fpw, terminals_2_unconn;
     igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple, weights_k7_loop, weights_square_2, weights_fp;
 
     /* Null graph */
@@ -154,15 +154,6 @@ int main(void) {
     igraph_vector_int_init_int(&terminals_k6_k1, 4,
                                0, 1, 2, 6);
 
-    igraph_small(&g_k7_real, 7, IGRAPH_UNDIRECTED,
-                 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6,
-                 1, 2, 1, 3, 1, 4, 1, 5, 1, 6,
-                 2, 3, 2, 4, 2, 5, 2, 6,
-                 3, 4, 3, 5, 3, 6,
-                 4, 5, 4, 6,
-                 5, 6,
-                 -1);
-    // 1 , 1
     igraph_vector_init_real(&weights_k7_real, 21,
                             2.5, 2.5, 2.5, 0.5, 0.5, 2.5,
                             2.5, 2.5, 2.5, 0.5, 2.5,
@@ -170,9 +161,6 @@ int main(void) {
                             0.5, 2.5, 0.5,
                             2.5, 0.5,
                             0.5);
-
-    igraph_vector_int_init_int(&terminals_k7_real, 4,
-                               0, 1, 2, 3);
 
     /* K_7 complete graph with a specific edge ordering. */
     igraph_small(&g_k7_non_simple, 7, IGRAPH_UNDIRECTED,
@@ -297,7 +285,7 @@ int main(void) {
     check_graph(&g_k7_n1, &terminals_k7, &weights_k7_n1);
 
     printf("\nK_7_Real graph:\n");
-    check_graph(&g_k7_real, &terminals_k7_real, &weights_k7_real);
+    check_graph(&g_k7, &terminals_k7, &weights_k7_real);
 
     printf("\nK_7 graph with parallel edges:\n");
     check_graph(&g_k7_non_simple, &terminals_k7, &weights_k7_non_simple);
@@ -356,7 +344,6 @@ int main(void) {
     igraph_destroy(&g_null);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
-    igraph_destroy(&g_k7_real);
     igraph_destroy(&g_k7_n1);
     igraph_destroy(&g_k7_n);
     igraph_destroy(&g_k7_non_simple);
@@ -384,7 +371,6 @@ int main(void) {
     igraph_vector_int_destroy(&terminals_k7);
     igraph_vector_int_destroy(&terminals_null);
     igraph_vector_int_destroy(&terminals_k6_k1);
-    igraph_vector_int_destroy(&terminals_k7_real);
     igraph_vector_int_destroy(&terminals_10_9);
     igraph_vector_int_destroy(&terminals_1);
     igraph_vector_int_destroy(&terminals_2);
