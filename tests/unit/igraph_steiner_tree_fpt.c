@@ -284,26 +284,17 @@ int main(void) {
     printf("Null graph:\n");
     check_graph(&g_null, &terminals_null, &weights_null);
 
-    printf("\nK_7 graph:\n");
+    printf("\nweighted K_7 graph:\n");
     check_graph(&g_k7, &terminals_k7, &weights_k7);
+
+    printf("\nunweighted K_7 graph:\n");
+    check_graph(&g_k7, &terminals_k7, NULL);
 
     printf("\nK_7 Non Complete graph-1:\n");
     check_graph(&g_k7_n, &terminals_k7, &weights_k7_n);
 
     printf("\nK_7 Non Complete graph-2:\n");
     check_graph(&g_k7_n1, &terminals_k7, &weights_k7_n1);
-
-
-    igraph_real_t value_unit;
-    igraph_vector_int_t tree_edges_unit;
-    igraph_vector_int_init(&tree_edges_unit, 0);
-
-    printf("\nK_7_Unit graph:\n");
-    igraph_steiner_dreyfus_wagner(&g_k7, &terminals_k7, NULL, &value_unit, &tree_edges_unit);
-    print_vector_int(&tree_edges_unit);
-    printf("Total Steiner tree weight: %g\n", value_unit);
-
-    igraph_vector_int_destroy(&tree_edges_unit);
 
     printf("\nK_7_Real graph:\n");
     check_graph(&g_k7_real, &terminals_k7_real, &weights_k7_real);

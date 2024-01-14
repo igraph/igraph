@@ -2,9 +2,13 @@ Null graph:
 ( )
 Total Steiner tree weight: 0
 
-K_7 graph:
+weighted K_7 graph:
 ( 4 9 14 17 20 )
 Total Steiner tree weight: 5
+
+unweighted K_7 graph:
+( 0 1 2 )
+Total Steiner tree weight: 3
 
 K_7 Non Complete graph-1:
 ( 0 1 2 )
@@ -13,10 +17,6 @@ Total Steiner tree weight: 6
 K_7 Non Complete graph-2:
 ( 0 1 2 )
 Total Steiner tree weight: 6
-
-K_7_Unit graph:
-( 0 1 2 )
-Total Steiner tree weight: 3
 
 K_7_Real graph:
 ( 4 9 14 17 20 )
