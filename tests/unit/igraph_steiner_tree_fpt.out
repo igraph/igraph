@@ -77,3 +77,8 @@ Total Steiner tree weight: 500
 A different graph than before with floating point weights
 ( 2 6 )
 Total Steiner tree weight: 0.857934
+
+Checking errors:
+Graph with 2 unconnected terminals
+Unconnected graph with terminals in multiple components
+Terminal not in graph
