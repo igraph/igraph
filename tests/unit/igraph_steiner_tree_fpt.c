@@ -79,7 +79,6 @@ int main(void) {
     igraph_vector_int_init(&terminals_null, 0);
 
     igraph_small(&g_k2, 2, IGRAPH_UNDIRECTED, 0,1, -1);
-    igraph_vector_int_init_int(&terminals_2, 2, 0, 1);
 
     /* K_7 complete graph with a specific edge ordering. */
     igraph_small(&g_k7, 7, IGRAPH_UNDIRECTED,
