@@ -69,14 +69,17 @@ void check_error(igraph_t *graph, igraph_vector_int_t *terminals, igraph_vector_
 }
 
 int main(void) {
-    igraph_t g_null, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_non_simple, g_k1, g_k7_self_loop, g_10_9, g_new, g_new_1, g_new_2, g_new_3, g_new_4, g_2_unconn;
-    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_10_9, terminals_1, terminals_2, terminals_3, terminals_8, terminals_7, terminals_7_special, terminals_square, terminals_square_2, terminals_fpw, terminals_2_unconn;
-    igraph_vector_t weights_null, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple, weights_k7_loop, weights_square_2, weights_fp;
+    igraph_t g_null, g_k2, g_k7, g_k6_k1, g_k7_n, g_k7_n1, g_k7_non_simple, g_k1, g_k7_self_loop, g_10_9, g_new, g_new_1, g_new_2, g_new_3, g_new_4, g_2_unconn;
+    igraph_vector_int_t terminals_null, terminals_k7, terminals_k6_k1, terminals_10_9, terminals_1, terminals_2, terminals_3, terminals_8, terminals_7, terminals_7_special, terminals_square, terminals_square_2, terminals_fpw;
+    igraph_vector_t weights_null, weights_k2, weights_k7, weights_k6_k1, weights_k7_n, weights_k7_n1, weights_k7_real, weights_k7_non_simple, weights_k7_loop, weights_square_2, weights_fp;
 
     /* Null graph */
     igraph_empty(&g_null, 0, 0);
     igraph_vector_init(&weights_null, 0);
     igraph_vector_int_init(&terminals_null, 0);
+
+    igraph_small(&g_k2, 2, IGRAPH_UNDIRECTED, 0,1, -1);
+    igraph_vector_int_init_int(&terminals_2, 2, 0, 1);
 
     /* K_7 complete graph with a specific edge ordering. */
     igraph_small(&g_k7, 7, IGRAPH_UNDIRECTED,
@@ -208,7 +211,7 @@ int main(void) {
     igraph_vector_int_init_int(&terminals_10_9, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8);
 
     igraph_vector_int_init_int(&terminals_1, 1, 0);
-    igraph_vector_int_init_int(&terminals_2, 2, 1, 5);
+    igraph_vector_int_init_int(&terminals_2, 2, 0, 1);
     igraph_vector_int_init_int(&terminals_3, 3, 1, 3, 5);
 
     igraph_small(&g_new, 10, IGRAPH_UNDIRECTED,
@@ -267,10 +270,12 @@ int main(void) {
     igraph_vector_int_init_int(&terminals_fpw, 3, 2, 0, 1);
 
     igraph_small(&g_2_unconn, 2, IGRAPH_UNDIRECTED, -1);
-    igraph_vector_int_init_int(&terminals_2_unconn, 2, 0, 1);
 
     printf("Null graph:\n");
     check_graph(&g_null, &terminals_null, &weights_null);
+
+    printf("Graph with 2 vertices:\n");
+    check_graph(&g_k2, &terminals_2, NULL);
 
     printf("\nweighted K_7 graph:\n");
     check_graph(&g_k7, &terminals_k7, &weights_k7);
@@ -333,7 +338,7 @@ int main(void) {
     printf("\nChecking errors:\n");
 
     printf("Graph with 2 unconnected terminals\n");
-    check_error(&g_2_unconn, &terminals_2_unconn, NULL, IGRAPH_EINVAL);
+    check_error(&g_2_unconn, &terminals_2, NULL, IGRAPH_EINVAL);
 
     printf("Unconnected graph with terminals in multiple components\n");
     check_error(&g_k6_k1, &terminals_k6_k1, &weights_k6_k1, IGRAPH_EINVAL);
@@ -341,7 +346,21 @@ int main(void) {
     printf("Terminal not in graph\n");
     check_error(&g_k7, &terminals_10_9, NULL, IGRAPH_EINVVID);
 
+    printf("Incorrect number of weights\n");
+    check_error(&g_k7, &terminals_k7, &weights_k7_n1, IGRAPH_EINVAL);
+
+    printf("Zero weight\n");
+    igraph_real_t weight = 0;
+    igraph_vector_view(&weights_k2, &weight, 1);
+    check_error(&g_k2, &terminals_2, &weights_k2, IGRAPH_EINVAL);
+
+    printf("Negative weight\n");
+    weight = -1;
+    igraph_vector_view(&weights_k2, &weight, 1);
+    check_error(&g_k2, &terminals_2, &weights_k2, IGRAPH_EINVAL);
+
     igraph_destroy(&g_null);
+    igraph_destroy(&g_k2);
     igraph_destroy(&g_k7);
     igraph_destroy(&g_k6_k1);
     igraph_destroy(&g_k7_n1);
@@ -381,7 +400,6 @@ int main(void) {
     igraph_vector_int_destroy(&terminals_square);
     igraph_vector_int_destroy(&terminals_square_2);
     igraph_vector_int_destroy(&terminals_fpw);
-    igraph_vector_int_destroy(&terminals_2_unconn);
 
 
     VERIFY_FINALLY_STACK();

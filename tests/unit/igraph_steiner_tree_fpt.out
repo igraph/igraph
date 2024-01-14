@@ -1,6 +1,9 @@
 Null graph:
 ( )
 Total Steiner tree weight: 0
+Graph with 2 vertices:
+( 0 )
+Total Steiner tree weight: 1
 
 weighted K_7 graph:
 ( 4 9 14 17 20 )
@@ -43,7 +46,7 @@ A graph with 1 terminal:
 Total Steiner tree weight: 0
 
 A graph with 2 terminals:
-( 12 )
+( 0 )
 Total Steiner tree weight: 1
 
 a graph with 3 terminals:
@@ -82,3 +85,6 @@ Checking errors:
 Graph with 2 unconnected terminals
 Unconnected graph with terminals in multiple components
 Terminal not in graph
+Incorrect number of weights
+Zero weight
+Negative weight
