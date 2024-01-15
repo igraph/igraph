@@ -320,6 +320,31 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * \function igraph_get_shortest_paths_dijkstra
  * \brief Weighted shortest paths from a vertex.
  *
+ * \ref igraph_get_shortest_paths_dijkstra() without a cutoff.
+ *
+ * \sa \ref igraph_distances_dijkstra() if you only need the path length but
+ * not the paths themselves, \ref igraph_get_shortest_paths() if all edge
+ * weights are equal.
+ *
+ * \example examples/simple/igraph_get_shortest_paths_dijkstra.c
+ */
+igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
+                                       igraph_vector_int_list_t *vertices,
+                                       igraph_vector_int_list_t *edges,
+                                       igraph_integer_t from,
+                                       igraph_vs_t to,
+                                       const igraph_vector_t *weights,
+                                       igraph_neimode_t mode,
+                                       igraph_vector_int_t *parents,
+                                       igraph_vector_int_t *inbound_edges) {
+    return igraph_get_shortest_paths_dijkstra_cutoff(
+            graph, vertices, edges, from, to, weights, mode, parents, inbound_edges, -1);
+}
+/**
+ * \ingroup structural
+ * \function igraph_get_shortest_paths_dijkstra_cutoff
+ * \brief Weighted shortest paths from a vertex with a cutoff.
+ *
  * </para><para>
  * If there is more than one path with the smallest weight between two vertices, this
  * function gives only one of them.
@@ -370,6 +395,8 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  *        during the search will have -1 in the corresponding entry of the
  *        vector. Note that the search terminates if all the vertices in
  *        \c to are reached.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -383,13 +410,13 @@ igraph_error_t igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
- * \sa \ref igraph_distances_dijkstra() if you only need the path length but
- * not the paths themselves, \ref igraph_get_shortest_paths() if all edge
+ * \sa \ref igraph_distances_dijkstra_cutoff() if you only need the path length but
+ * not the paths themselves, \ref igraph_get_shortest_paths_cutoff() if all edge
  * weights are equal.
  *
  * \example examples/simple/igraph_get_shortest_paths_dijkstra.c
  */
-igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_get_shortest_paths_dijkstra_cutoff(const igraph_t *graph,
                                        igraph_vector_int_list_t *vertices,
                                        igraph_vector_int_list_t *edges,
                                        igraph_integer_t from,
@@ -397,7 +424,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode,
                                        igraph_vector_int_t *parents,
-                                       igraph_vector_int_t *inbound_edges) {
+                                       igraph_vector_int_t *inbound_edges,
+                                       igraph_real_t cutoff) {
     /* Implementation details. This is the basic Dijkstra algorithm,
        with a binary heap. The heap is indexed, i.e. it stores not only
        the distances, but also which vertex they belong to. The other
@@ -428,8 +456,8 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     igraph_integer_t i, to_reach;
 
     if (!weights) {
-        return igraph_get_shortest_paths(graph, vertices, edges, from, to, mode,
-                                         parents, inbound_edges);
+        return igraph_get_shortest_paths_cutoff(graph, vertices, edges, from, to, mode,
+                    parents, inbound_edges, cutoff);
     }
 
     if (from < 0 || from >= no_of_nodes) {
@@ -512,9 +540,11 @@ igraph_error_t igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
             igraph_real_t curdist = VECTOR(dists)[tto];
             if (curdist < 0) {
                 /* This is the first finite distance */
-                VECTOR(dists)[tto] = altdist;
-                parent_eids[tto] = edge + 1;
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                if (cutoff < 0 || altdist <= cutoff) {
+                    VECTOR(dists)[tto] = altdist;
+                    parent_eids[tto] = edge + 1;
+                    IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                }
             } else if (altdist < curdist) {
                 /* This is a shorter path */
                 VECTOR(dists)[tto] = altdist;
@@ -705,8 +735,8 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
 
 /**
  * \ingroup structural
- * \function igraph_get_all_shortest_paths_dijkstra
- * \brief All weighted shortest paths (geodesics) from a vertex.
+ * \function igraph_get_all_shortest_paths_dijkstra_cutoff
+ * \brief All weighted shortest paths (geodesics) from a vertex, with cutoff.
  *
  * \param graph The graph object.
  * \param vertices Pointer to an initialized integer vector list or NULL.
@@ -748,6 +778,8 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
+ * \param cutoff The maximal length of paths that will be considered.
+ *        Negative cutoffs are treated as infinity.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -761,19 +793,19 @@ igraph_error_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  * Time complexity: O(|E|log|V|+|V|), where |V| is the number of
  * vertices and |E| is the number of edges
  *
- * \sa \ref igraph_distances_dijkstra() if you only need the path
- * length but not the paths themselves, \ref igraph_get_all_shortest_paths()
+ * \sa \ref igraph_distances_dijkstra_cutoff() if you only need the path
+ * length but not the paths themselves, \ref igraph_get_all_shortest_paths_cutoff()
  * if all edge weights are equal.
  *
  * \example examples/simple/igraph_get_all_shortest_paths_dijkstra.c
  */
-igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
+igraph_error_t igraph_get_all_shortest_paths_dijkstra_cutoff(const igraph_t *graph,
         igraph_vector_int_list_t *vertices,
         igraph_vector_int_list_t *edges,
         igraph_vector_int_t *nrgeo,
         igraph_integer_t from, igraph_vs_t to,
         const igraph_vector_t *weights,
-        igraph_neimode_t mode) {
+        igraph_neimode_t mode, igraph_real_t cutoff) {
     /* Implementation details: see igraph_get_shortest_paths_dijkstra,
        it's basically the same.
     */
@@ -918,14 +950,16 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
             cmp_result = igraph_cmp_epsilon(curdist, altdist, eps);
             if (curdist < 0) {
                 /* This is the first non-infinite distance */
-                VECTOR(dists)[tto] = altdist;
+                if (cutoff < 0 || altdist <= cutoff) {
+                    VECTOR(dists)[tto] = altdist;
 
-                parent_vec = (igraph_vector_int_t*)VECTOR(parents)[tto];
-                IGRAPH_CHECK(igraph_vector_int_push_back(parent_vec, minnei));
-                parent_edge_vec = (igraph_vector_int_t*)VECTOR(parents_edge)[tto];
-                IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
+                    parent_vec = (igraph_vector_int_t*)VECTOR(parents)[tto];
+                    IGRAPH_CHECK(igraph_vector_int_push_back(parent_vec, minnei));
+                    parent_edge_vec = (igraph_vector_int_t*)VECTOR(parents_edge)[tto];
+                    IGRAPH_CHECK(igraph_vector_int_push_back(parent_edge_vec, edge));
 
-                IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                    IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+                }
             } else if (cmp_result == 0 /* altdist == curdist */ && VECTOR(*weights)[edge] > 0) {
                 /* This is an alternative path with exactly the same length.
                  * Note that we consider this case only if the edge via which we
@@ -1210,4 +1244,28 @@ igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(5);
 
     return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_get_all_shortest_paths_dijkstra
+ * \brief All weighted shortest paths (geodesics) from a vertex.
+ *
+ * This is \ref igraph_get_all_shortest_paths_dijkstra_cutoff() without the cutoff.
+ *
+ * \sa \ref igraph_distances_dijkstra() if you only need the path
+ * length but not the paths themselves, \ref igraph_get_all_shortest_paths()
+ * if all edge weights are equal.
+ *
+ * \example examples/simple/igraph_get_all_shortest_paths_dijkstra.c
+ */
+igraph_error_t igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
+        igraph_vector_int_list_t *vertices,
+        igraph_vector_int_list_t *edges,
+        igraph_vector_int_t *nrgeo,
+        igraph_integer_t from, igraph_vs_t to,
+        const igraph_vector_t *weights,
+        igraph_neimode_t mode) {
+    return igraph_get_all_shortest_paths_dijkstra_cutoff(graph, vertices, edges, nrgeo, from,
+            to, weights, mode, -1);
 }
