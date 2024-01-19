@@ -1334,7 +1334,7 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
 
     for (i = 0, j = 0; i < no_attrs; i++) {
         igraph_attribute_record_t *oldrec = igraph_attribute_record_list_get_ptr(attrs, i);
-        igraph_attribute_record_t *newrec;
+        igraph_attribute_record_t newrec;
         const char *name = oldrec->name;
         igraph_attribute_combination_todo_item_t todo_item = todo_items[i];
         igraph_attribute_type_t attr_type = oldrec->type;
@@ -1344,44 +1344,40 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
             continue;
         }
 
-        newrec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-        IGRAPH_CHECK_OOM(newrec, "Cannot combine attributes");
-        IGRAPH_FINALLY(igraph_free, newrec);
+        IGRAPH_CHECK(igraph_attribute_record_init(&newrec, name, attr_type));
+        IGRAPH_FINALLY(igraph_attribute_record_destroy, &newrec);
 
-        IGRAPH_CHECK(igraph_attribute_record_init(newrec, name, attr_type));
-        IGRAPH_FINALLY(igraph_attribute_record_destroy, newrec);
-
-        IGRAPH_CHECK(igraph_attribute_record_resize(newrec, igraph_vector_int_list_size(merges)));
+        IGRAPH_CHECK(igraph_attribute_record_resize(&newrec, igraph_vector_int_list_size(merges)));
 
         if (attr_type == IGRAPH_ATTRIBUTE_NUMERIC) {
             switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
+                IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, &newrec, merges,
                              todo_item.func.as_num));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_PROD:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_prod(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_prod(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MIN:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_min(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_min(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MAX:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_max(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_max(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_random(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_random(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_first(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_first(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_LAST:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_last(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_last(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
-                IGRAPH_CHECK(igraph_i_cattributes_cn_mean(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cn_mean(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
                 IGRAPH_ERROR("Median calculation not implemented",
@@ -1399,29 +1395,29 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
         } else if (attr_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
             switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
-                IGRAPH_CHECK(igraph_i_cattributes_cb_func(oldrec, newrec, merges,
+                IGRAPH_CHECK(igraph_i_cattributes_cb_func(oldrec, &newrec, merges,
                              todo_item.func.as_bool));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
             case IGRAPH_ATTRIBUTE_COMBINE_MAX:
-                IGRAPH_CHECK(igraph_i_cattributes_cb_any_is_true(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cb_any_is_true(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_PROD:
             case IGRAPH_ATTRIBUTE_COMBINE_MIN:
-                IGRAPH_CHECK(igraph_i_cattributes_cb_all_is_true(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cb_all_is_true(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
             case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
-                IGRAPH_CHECK(igraph_i_cattributes_cb_majority(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cb_majority(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
-                IGRAPH_CHECK(igraph_i_cattributes_cb_random(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cb_random(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
-                IGRAPH_CHECK(igraph_i_cattributes_cb_first(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cb_first(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_LAST:
-                IGRAPH_CHECK(igraph_i_cattributes_cb_last(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cb_last(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
                 IGRAPH_ERROR("Cannot calculate concatenation of Booleans",
@@ -1435,7 +1431,7 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
         } else if (attr_type == IGRAPH_ATTRIBUTE_STRING) {
             switch (todo_item.type) {
             case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
-                IGRAPH_CHECK(igraph_i_cattributes_cs_func(oldrec, newrec, merges,
+                IGRAPH_CHECK(igraph_i_cattributes_cs_func(oldrec, &newrec, merges,
                              todo_item.func.as_str));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_SUM:
@@ -1461,16 +1457,16 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                              IGRAPH_EATTRCOMBINE);
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
-                IGRAPH_CHECK(igraph_i_cattributes_sn_random(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_sn_random(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
-                IGRAPH_CHECK(igraph_i_cattributes_cs_first(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cs_first(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_LAST:
-                IGRAPH_CHECK(igraph_i_cattributes_cs_last(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cs_last(oldrec, &newrec, merges));
                 break;
             case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
-                IGRAPH_CHECK(igraph_i_cattributes_cs_concat(oldrec, newrec, merges));
+                IGRAPH_CHECK(igraph_i_cattributes_cs_concat(oldrec, &newrec, merges));
                 break;
             default:
                 IGRAPH_ERROR("Unknown attribute combination",
@@ -1482,8 +1478,8 @@ static igraph_error_t igraph_i_cattribute_combine_attribute_record_lists(
                          IGRAPH_UNIMPLEMENTED);
         }
 
-        IGRAPH_CHECK(igraph_attribute_record_list_push_back(new_attrs, newrec));
-        IGRAPH_FINALLY_CLEAN(2);  /* ownership of newrec transferred */
+        IGRAPH_CHECK(igraph_attribute_record_list_push_back(new_attrs, &newrec));
+        IGRAPH_FINALLY_CLEAN(1);  /* ownership of newrec transferred */
     }
 
     IGRAPH_FREE(todo_items);
