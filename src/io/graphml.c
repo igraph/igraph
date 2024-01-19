@@ -857,7 +857,6 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
     igraph_error_t result = IGRAPH_SUCCESS;
     igraph_real_t default_num;
     igraph_bool_t default_bool;
-    char* default_str;
 
     IGRAPH_ASSERT(state->current_attr_record != NULL);
 
@@ -877,12 +876,7 @@ static igraph_error_t igraph_i_graphml_attribute_default_value_finish(struct igr
         IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(rec, default_num));
         break;
     case IGRAPH_ATTRIBUTE_STRING:
-        default_str = strdup(state->data_char);
-        IGRAPH_CHECK_OOM(default_str, "Insufficient memory for string attribute.");
-        IGRAPH_FINALLY(free, default_str);
-        IGRAPH_CHECK(igraph_attribute_record_set_default_string(rec, default_str));
-        IGRAPH_FINALLY_CLEAN(1);
-        default_str = NULL;
+        IGRAPH_CHECK(igraph_attribute_record_set_default_string(rec, state->data_char));
         break;
     case IGRAPH_ATTRIBUTE_UNSPECIFIED:
         break;

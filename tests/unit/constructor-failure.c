@@ -187,6 +187,10 @@ int main(void) {
 
     /* Release helpers */
 
+    igraph_vector_destroy(&vec_a1);
+    igraph_strvector_destroy(&vec_a2);
+    igraph_vector_bool_destroy(&vec_a3);
+
     igraph_vector_int_destroy((igraph_vector_int_t *) &edges);
     igraph_strvector_destroy(&svalues);
     igraph_vector_destroy(&nvalues);
