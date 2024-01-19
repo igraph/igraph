@@ -729,10 +729,10 @@ static igraph_error_t add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
   IGRAPH_CHECK(igraph_attribute_record_list_push_back_new(attrs, &rec));
   IGRAPH_CHECK(igraph_attribute_record_set_name(rec, attrname));
   IGRAPH_CHECK(igraph_attribute_record_set_type(rec, IGRAPH_ATTRIBUTE_BOOLEAN));
+  IGRAPH_CHECK(igraph_attribute_record_resize(rec, n));
 
   na = rec->value.as_vector_bool;
-  IGRAPH_CHECK(igraph_vector_bool_resize(na, n));
-  for (igraph_integer_t i=n1; i<n; i++) {
+  for (igraph_integer_t i = n1; i < n; i++) {
     VECTOR(*na)[i] = true;
   }
 
