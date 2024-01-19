@@ -562,31 +562,29 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
   igraph_integer_t attrsize = igraph_trie_size(names);
   igraph_integer_t id;
   igraph_vector_t *na;
-  igraph_attribute_record_t *rec;
+  igraph_attribute_record_t *prec;
 
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
+    igraph_attribute_record_t rec;
+
     /* add a new attribute */
-    rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    IGRAPH_CHECK_OOM(rec, "Cannot allocate numeric attribute record.");
-    IGRAPH_FINALLY(igraph_free, rec);
+    IGRAPH_CHECK(igraph_attribute_record_init(&rec, attrname, IGRAPH_ATTRIBUTE_NUMERIC));
+    IGRAPH_FINALLY(igraph_attribute_record_destroy, &rec);
 
-    IGRAPH_CHECK(igraph_attribute_record_init(rec, attrname, IGRAPH_ATTRIBUTE_NUMERIC));
-    IGRAPH_FINALLY(igraph_attribute_record_destroy, rec);
+    IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(&rec, default_value));
 
-    IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(rec, default_value));
-
-    IGRAPH_CHECK(igraph_attribute_record_resize(rec, count));
-    IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, rec));
-    IGRAPH_FINALLY_CLEAN(2); /* ownership of rec transferred to attrs */
+    IGRAPH_CHECK(igraph_attribute_record_resize(&rec, count));
+    IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, &rec));
+    IGRAPH_FINALLY_CLEAN(1); /* ownership of rec transferred to attrs */
   }
 
-  rec = igraph_attribute_record_list_get_ptr(attrs, id);
-  na = rec->value.as_vector;
+  prec = igraph_attribute_record_list_get_ptr(attrs, id);
+  na = prec->value.as_vector;
   if (igraph_vector_size(na) == elem_id) {
     IGRAPH_CHECK(igraph_vector_push_back(na, number));
   } else if (igraph_vector_size(na) < elem_id) {
-    IGRAPH_CHECK(igraph_attribute_record_resize(rec, elem_id+1));
+    IGRAPH_CHECK(igraph_attribute_record_resize(prec, elem_id+1));
     VECTOR(*na)[elem_id] = number;
   } else {
     VECTOR(*na)[elem_id] = number;
@@ -612,7 +610,7 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
   igraph_integer_t attrsize=igraph_trie_size(names);
   igraph_integer_t id;
   igraph_strvector_t *na;
-  igraph_attribute_record_t *rec;
+  igraph_attribute_record_t *prec;
 
   if (attrname[0] == '\0') {
     /* This is relevant only for custom attributes, which are always of string type.
@@ -622,6 +620,7 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
 
   IGRAPH_CHECK(igraph_trie_get(names, attrname, &id));
   if (id == attrsize) {
+    igraph_attribute_record_t rec;
 
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
     /* There are 21 standard vertex attributes and 21 standard edge attributes.
@@ -631,22 +630,18 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
     }
 #endif
 
-    rec = IGRAPH_CALLOC(1, igraph_attribute_record_t);
-    IGRAPH_CHECK_OOM(rec, "Cannot allocate string attribute record.");
-    IGRAPH_FINALLY(igraph_free, rec);
+    IGRAPH_CHECK(igraph_attribute_record_init(&rec, attrname, IGRAPH_ATTRIBUTE_STRING));
+    IGRAPH_FINALLY(igraph_attribute_record_destroy, &rec);
 
-    IGRAPH_CHECK(igraph_attribute_record_init(rec, attrname, IGRAPH_ATTRIBUTE_STRING));
-    IGRAPH_FINALLY(igraph_attribute_record_destroy, rec);
+    IGRAPH_CHECK(igraph_attribute_record_set_default_string(&rec, default_value));
 
-    IGRAPH_CHECK(igraph_attribute_record_set_default_string(rec, default_value));
-
-    IGRAPH_CHECK(igraph_attribute_record_resize(rec, count));
-    IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, rec));
-    IGRAPH_FINALLY_CLEAN(2); /* ownership of rec transferred to attrs */
+    IGRAPH_CHECK(igraph_attribute_record_resize(&rec, count));
+    IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, &rec));
+    IGRAPH_FINALLY_CLEAN(1); /* ownership of rec transferred to attrs */
   }
 
-  rec = igraph_attribute_record_list_get_ptr(attrs, id);
-  na = rec->value.as_strvector;
+  prec = igraph_attribute_record_list_get_ptr(attrs, id);
+  na = prec->value.as_strvector;
   if (igraph_strvector_size(na) <= elem_id) {
     IGRAPH_CHECK(igraph_strvector_resize(na, elem_id+1));
   }
