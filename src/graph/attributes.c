@@ -160,15 +160,15 @@ igraph_error_t igraph_attribute_record_init_copy(
 
     switch (from->type) {
         case IGRAPH_ATTRIBUTE_NUMERIC:
-            IGRAPH_CHECK(igraph_vector_init_copy(to->value.as_vector, from->value.as_vector));
+            IGRAPH_CHECK(igraph_vector_update(to->value.as_vector, from->value.as_vector));
             break;
 
         case IGRAPH_ATTRIBUTE_STRING:
-            IGRAPH_CHECK(igraph_strvector_init_copy(to->value.as_strvector, from->value.as_strvector));
+            IGRAPH_CHECK(igraph_strvector_update(to->value.as_strvector, from->value.as_strvector));
             break;
 
         case IGRAPH_ATTRIBUTE_BOOLEAN:
-            IGRAPH_CHECK(igraph_vector_bool_init_copy(to->value.as_vector_bool, from->value.as_vector_bool));
+            IGRAPH_CHECK(igraph_vector_bool_update(to->value.as_vector_bool, from->value.as_vector_bool));
             break;
 
         case IGRAPH_ATTRIBUTE_UNSPECIFIED:
