@@ -81,12 +81,14 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
                                          igraph_attribute_record_list_t *attrs,
                                          igraph_integer_t count,
                                          const char *attrname,
+                                         igraph_real_t default_value,
                                          igraph_integer_t vid,
                                          igraph_real_t number);
 static igraph_error_t add_string_attribute(igraph_trie_t *names,
                                         igraph_attribute_record_list_t *attrs,
                                         igraph_integer_t count,
                                         const char *attrname,
+                                        const char *default_value,
                                         igraph_integer_t vid,
                                         const char *str,
                                         igraph_integer_t str_len);
@@ -98,6 +100,10 @@ static igraph_error_t make_dynstr(const char *src, size_t len, char **res);
 static igraph_bool_t is_standard_vattr(const char *attrname);
 static igraph_bool_t is_standard_eattr(const char *attrname);
 static igraph_error_t deconflict_attrname(char **attrname);
+static igraph_real_t get_default_value_for_numeric_vattr(const char *attrname);
+static igraph_real_t get_default_value_for_numeric_eattr(const char *attrname);
+static const char* get_default_value_for_string_vattr(const char *attrname);
+static const char* get_default_value_for_string_eattr(const char *attrname);
 
 #define scanner context->scanner
 
@@ -550,6 +556,7 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
                                             igraph_attribute_record_list_t *attrs,
                                             igraph_integer_t count,
                                             const char *attrname,
+                                            igraph_real_t default_value,
                                             igraph_integer_t elem_id,
                                             igraph_real_t number) {
   igraph_integer_t attrsize = igraph_trie_size(names);
@@ -567,7 +574,7 @@ static igraph_error_t add_numeric_attribute(igraph_trie_t *names,
     IGRAPH_CHECK(igraph_attribute_record_init(rec, attrname, IGRAPH_ATTRIBUTE_NUMERIC));
     IGRAPH_FINALLY(igraph_attribute_record_destroy, rec);
 
-    IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(rec, 0));
+    IGRAPH_CHECK(igraph_attribute_record_set_default_numeric(rec, default_value));
 
     IGRAPH_CHECK(igraph_attribute_record_resize(rec, count));
     IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, rec));
@@ -598,6 +605,7 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
                                            igraph_attribute_record_list_t *attrs,
                                            igraph_integer_t count,
                                            const char *attrname,
+                                           const char *default_value,
                                            igraph_integer_t elem_id,
                                            const char *str,
                                            igraph_integer_t str_len) {
@@ -630,6 +638,8 @@ static igraph_error_t add_string_attribute(igraph_trie_t *names,
     IGRAPH_CHECK(igraph_attribute_record_init(rec, attrname, IGRAPH_ATTRIBUTE_STRING));
     IGRAPH_FINALLY(igraph_attribute_record_destroy, rec);
 
+    IGRAPH_CHECK(igraph_attribute_record_set_default_string(rec, default_value));
+
     IGRAPH_CHECK(igraph_attribute_record_resize(rec, count));
     IGRAPH_CHECK(igraph_attribute_record_list_push_back(attrs, rec));
     IGRAPH_FINALLY_CLEAN(2); /* ownership of rec transferred to attrs */
@@ -653,7 +663,9 @@ static igraph_error_t add_string_vertex_attribute(const char *name,
   return add_string_attribute(context->vertex_attribute_names,
                               context->vertex_attributes,
                               context->vcount,
-                              name, context->actvertex-1,
+                              name,
+                              get_default_value_for_string_vattr(name),
+                              context->actvertex-1,
                               value, len);
 }
 
@@ -665,7 +677,9 @@ static igraph_error_t add_string_edge_attribute(const char *name,
   return add_string_attribute(context->edge_attribute_names,
                               context->edge_attributes,
                               context->actedge,
-                              name, context->actedge-1,
+                              name,
+                              get_default_value_for_string_eattr(name),
+                              context->actedge-1,
                               value, len);
 }
 
@@ -676,7 +690,9 @@ static igraph_error_t add_numeric_vertex_attribute(const char *name,
   return add_numeric_attribute(context->vertex_attribute_names,
                                context->vertex_attributes,
                                context->vcount,
-                               name, context->actvertex-1,
+                               name,
+                               get_default_value_for_numeric_vattr(name),
+                               context->actvertex-1,
                                value);
 }
 
@@ -687,7 +703,9 @@ static igraph_error_t add_numeric_edge_attribute(const char *name,
   return add_numeric_attribute(context->edge_attribute_names,
                                context->edge_attributes,
                                context->actedge,
-                               name, context->actedge-1,
+                               name,
+                               get_default_value_for_numeric_eattr(name),
+                               context->actedge-1,
                                value);
 }
 
@@ -759,7 +777,7 @@ static igraph_bool_t is_standard_vattr(const char *attrname) {
     "font", "url", "color", "framecolor",
     "labelcolor"
   };
-  for (size_t i=0; i < sizeof(names) / sizeof(names[0]); i++) {
+  for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++) {
     if (strcmp(attrname, names[i]) == 0) {
       return true;
     }
@@ -800,4 +818,109 @@ static igraph_error_t deconflict_attrname(char **attrname) {
   tmp[len+1] = '\0';
   *attrname = tmp;
   return IGRAPH_SUCCESS;
+}
+
+typedef struct {
+  const char* name;
+  igraph_real_t default_value;
+} attribute_numeric_defaults_t;
+
+typedef struct {
+  const char* name;
+  const char* default_value;
+} attribute_string_defaults_t;
+
+/* The defaults listed below are Pajek's built-in defaults unless the user
+ * overrides them.
+ *
+ * See: https://nascol.discourse.group/t/pajek-file-format-default-values-for-attributes/38/2
+ */
+
+const attribute_numeric_defaults_t vattr_numeric_defaults[] = {
+  { "xfact", 1 },
+  { "yfact", 1 },
+  { "labeldist", 20 },
+  { "labeldegree2", 285 },
+  { "framewidth", 1 },
+  { "fontsize", 15 },
+  { "rotation", 0 },
+  { "radius", 0 },
+  { "diamondratio", 0.01 },
+  { "labeldegree", 0 },
+  { 0 }
+};
+
+const attribute_string_defaults_t vattr_string_defaults[] = {
+  { "color", "LightOrange" },
+  { "framecolor", "Brown" },
+  { "labelcolor", "Maroon" },
+  { 0 }
+};
+
+const attribute_numeric_defaults_t eattr_numeric_defaults[] = {
+  { "arrowsize", 1 },
+  { "edgewidth", 2 },
+  { "hook1", 0 },
+  { "hook2", 0 },
+  { "angle1", 0 },
+  { "angle2", 0 },
+  { "velocity1", 1 },
+  { "velocity2", 1 },
+  { "arrowpos", 0 },
+  { "labelpos", 0.5 },
+  { "labelangle", 10 },
+  { "labelangle2", 90 },
+  { "labeldegree", 0 },
+  { "fontsize", 15 },
+  { 0 }
+};
+
+const attribute_string_defaults_t eattr_string_defaults[] = {
+  { "color", "MidnightBlue" },
+  { "labelcolor", "Black" },
+  { 0 }
+};
+
+static igraph_real_t get_default_value_for_numeric_attr(
+  const char *attrname, const attribute_numeric_defaults_t* table
+) {
+  const attribute_numeric_defaults_t* ptr;
+
+  for (ptr = table; ptr->name != 0; ptr++) {
+    if (!strcmp(attrname, ptr->name)) {
+      return ptr->default_value;
+    }
+  }
+
+  return IGRAPH_NAN;
+}
+
+static const char* get_default_value_for_string_attr(
+  const char *attrname, const attribute_string_defaults_t* table
+) {
+  const attribute_string_defaults_t* ptr;
+
+  for (ptr = table; ptr->name != 0; ptr++) {
+    if (!strcmp(attrname, ptr->name)) {
+      return ptr->default_value;
+    }
+  }
+
+  return "";
+}
+
+static igraph_real_t get_default_value_for_numeric_vattr(const char *attrname) {
+  return get_default_value_for_numeric_attr(attrname, vattr_numeric_defaults);
+}
+
+static igraph_real_t get_default_value_for_numeric_eattr(const char *attrname) {
+  return get_default_value_for_numeric_attr(attrname, eattr_numeric_defaults);
+}
+
+static const char* get_default_value_for_string_vattr(const char *attrname) {
+  return get_default_value_for_string_attr(attrname, vattr_string_defaults);
+}
+
+static const char* get_default_value_for_string_eattr(const char *attrname) {
+  return get_default_value_for_string_attr(attrname, eattr_string_defaults);
 }

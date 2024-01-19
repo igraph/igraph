@@ -247,10 +247,8 @@ static igraph_error_t prune_unknown_attributes(igraph_attribute_record_list_t *a
         }
     }
 
-    igraph_vector_int_reverse(&to_remove);
-
     n = igraph_vector_int_size(&to_remove);
-    for (i = 0; i < n; i++) {
+    for (i = n - 1; i >= 0; i--) {
         igraph_attribute_record_list_discard(attrs, VECTOR(to_remove)[i]);
     }
 
@@ -325,7 +323,15 @@ static igraph_error_t allocate_attributes(
     igraph_integer_t i, n = igraph_attribute_record_list_size(attrs);
     for (i = 0; i < n; i++) {
         igraph_attribute_record_t *atrec = igraph_attribute_record_list_get_ptr(attrs, i);
-        IGRAPH_CHECK(igraph_attribute_record_resize(atrec, no_of_items));
+
+        /* Ww have unspecified attribute types in the attribute record list at
+         * this point because we need to keep the same order in the attribute
+         * record list as it was in the trie that we use to look up an
+         * attribute record by name. However, we cannot reside unknown attributes
+         * so we need to take care of this */
+        if (atrec->type != IGRAPH_ATTRIBUTE_UNSPECIFIED) {
+            IGRAPH_CHECK(igraph_attribute_record_resize(atrec, no_of_items));
+        }
     }
     return IGRAPH_SUCCESS;
 }
@@ -620,11 +626,6 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
      * the preceding checks. */
     IGRAPH_ASSERT(igraph_trie_size(&trie) == no_of_nodes);
 
-    /* Remove composite attributes that we cannot represent in igraph */
-    IGRAPH_CHECK(prune_unknown_attributes(&vattrs));
-    IGRAPH_CHECK(prune_unknown_attributes(&eattrs));
-    IGRAPH_CHECK(prune_unknown_attributes(&gattrs));
-
     /* Now we allocate the vectors and strvectors for the attributes */
     IGRAPH_CHECK(allocate_attributes(&vattrs, no_of_nodes, "vertex"));
     IGRAPH_CHECK(allocate_attributes(&eattrs, no_of_edges, "edge"));
@@ -758,6 +759,11 @@ igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
             }
         }
     }
+
+    /* Remove composite attributes that we cannot represent in igraph */
+    IGRAPH_CHECK(prune_unknown_attributes(&vattrs));
+    IGRAPH_CHECK(prune_unknown_attributes(&eattrs));
+    IGRAPH_CHECK(prune_unknown_attributes(&gattrs));
 
     igraph_trie_destroy(&trie);
     igraph_trie_destroy(&gattrnames);
