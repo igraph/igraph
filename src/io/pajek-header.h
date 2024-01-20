@@ -20,6 +20,7 @@
 
 */
 
+#include "igraph_attributes.h"
 #include "igraph_error.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
@@ -53,9 +54,9 @@ typedef struct {
     igraph_integer_t actfrom;
     igraph_integer_t actto;
     igraph_trie_t *vertex_attribute_names;
-    igraph_vector_ptr_t *vertex_attributes;
+    igraph_attribute_record_list_t *vertex_attributes;
     igraph_trie_t *edge_attribute_names;
-    igraph_vector_ptr_t *edge_attributes;
+    igraph_attribute_record_list_t *edge_attributes;
     igraph_integer_t vertexid;
     igraph_integer_t actvertex;
     igraph_integer_t actedge;

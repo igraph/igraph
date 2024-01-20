@@ -65,6 +65,8 @@
     * _item_ in the vector */
     #if defined(BASE_GRAPH)
         #define ITEM_FUNCTION(f) CONCAT2x(igraph,f)
+    #elif defined(BASE_ATTRIBUTE_RECORD)
+        #define ITEM_FUNCTION(f) CONCAT2x(igraph_attribute_record,f)
     #endif
 #endif
 
@@ -113,6 +115,38 @@ igraph_error_t FUNCTION(init)(TYPE* v, igraph_integer_t size) {
     v->end = v->stor_begin + size;
 
     IGRAPH_CHECK(INTERNAL_FUNCTION(init_slice)(v, v->stor_begin, v->end));
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup vector_list
+ * \function igraph_vector_list_init_copy
+ * \brief Initializes a list of vectors from another list of vectors (constructor).
+ *
+ * </para><para>
+ * The contents of the existing list will be copied to the new one.
+ * \param to Pointer to a not yet initialized list of vectors.
+ * \param from The original list of vectors to copy.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
+ *
+ * Time complexity: operating system dependent, usually O(nm), n is the size of
+ * the list, m is the size of each element in the list, assuming that copying a
+ * single item takes O(m) time.
+ */
+
+igraph_error_t FUNCTION(init_copy)(TYPE* to, const TYPE* from) {
+    igraph_integer_t i, size = FUNCTION(size)(from);
+
+    IGRAPH_CHECK(FUNCTION(init)(to, 0));
+    IGRAPH_FINALLY(FUNCTION(destroy), to);
+
+    for (i = 0; i < size; i++) {
+        IGRAPH_CHECK(FUNCTION(push_back_copy)(to, FUNCTION(get_ptr)(from, i)));
+    }
+
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }

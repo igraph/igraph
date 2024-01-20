@@ -73,6 +73,20 @@ igraph_strvector_append
 "4"
 "5"
 
+igraph_strvector_swap
+===
+"3"
+"4"
+"5"
+
+===
+"0"
+"1"
+"2"
+"3"
+"4"
+"5"
+
 igraph_strvector_merge
 clear
 ""

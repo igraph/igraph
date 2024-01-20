@@ -48,32 +48,6 @@ void igraph_pajek_yylex_destroy_wrapper (void *scanner ) {
     (void) igraph_pajek_yylex_destroy(scanner);
 }
 
-void igraph_i_pajek_destroy_attr_vector(igraph_vector_ptr_t *attrs) {
-    const igraph_integer_t attr_count = igraph_vector_ptr_size(attrs);
-    for (igraph_integer_t i = 0; i < attr_count; i++) {
-        igraph_attribute_record_t *rec = VECTOR(*attrs)[i];
-        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *vec = (igraph_vector_t*) rec->value;
-            igraph_vector_destroy(vec);
-            IGRAPH_FREE(vec);
-        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            igraph_vector_bool_t *vec = (igraph_vector_bool_t*) rec->value;
-            igraph_vector_bool_destroy(vec);
-            IGRAPH_FREE(vec);
-        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *strvec = (igraph_strvector_t *)rec->value;
-            igraph_strvector_destroy(strvec);
-            IGRAPH_FREE(strvec);
-        } else {
-            /* Must never reach here */
-            IGRAPH_FATAL("Unknown attribute type encountered.");
-        }
-        IGRAPH_FREE(rec->name);
-        IGRAPH_FREE(rec);
-    }
-    igraph_vector_ptr_destroy(attrs);
-}
-
 /**
  * \function igraph_read_graph_pajek
  * \brief Reads a file in Pajek format.
@@ -171,21 +145,21 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     igraph_vector_int_t edges;
     igraph_trie_t vattrnames;
-    igraph_vector_ptr_t vattrs;
+    igraph_attribute_record_list_t vattrs;
     igraph_trie_t eattrnames;
-    igraph_vector_ptr_t eattrs;
-    igraph_integer_t i, j;
+    igraph_attribute_record_list_t eattrs;
+    igraph_integer_t i;
     igraph_i_pajek_parsedata_t context;
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&edges, 0);
 
     IGRAPH_TRIE_INIT_FINALLY(&vattrnames, 1);
-    IGRAPH_CHECK(igraph_vector_ptr_init(&vattrs, 0));
-    IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &vattrs);
+    IGRAPH_CHECK(igraph_attribute_record_list_init(&vattrs, 0));
+    IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &vattrs);
 
     IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 1);
-    IGRAPH_CHECK(igraph_vector_ptr_init(&eattrs, 0));
-    IGRAPH_FINALLY(igraph_i_pajek_destroy_attr_vector, &eattrs);
+    IGRAPH_CHECK(igraph_attribute_record_list_init(&eattrs, 0));
+    IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &eattrs);
 
     context.directed = false; /* assume undirected until an element implying directedness is encountered */
     context.vector = &edges;
@@ -234,33 +208,10 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     }
 
     /* Prepare attributes */
-    const igraph_integer_t eattr_count = igraph_vector_ptr_size(&eattrs);
+    const igraph_integer_t eattr_count = igraph_attribute_record_list_size(&eattrs);
     for (i = 0; i < eattr_count; i++) {
-        igraph_attribute_record_t *rec = VECTOR(eattrs)[i];
-        if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-            igraph_vector_t *vec = (igraph_vector_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_size(vec);
-            IGRAPH_CHECK(igraph_vector_resize(vec, context.actedge));
-            for (j = origsize; j < context.actedge; j++) {
-                VECTOR(*vec)[j] = IGRAPH_NAN;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
-            /* Boolean attributes are not currently added by the parser.
-             * This section is here for future-proofing. */
-            igraph_vector_bool_t *vec = (igraph_vector_bool_t*)rec->value;
-            igraph_integer_t origsize = igraph_vector_bool_size(vec);
-            IGRAPH_CHECK(igraph_vector_bool_resize(vec, context.actedge));
-            for (j = origsize; j < context.actedge; j++) {
-                VECTOR(*vec)[j] = 0;
-            }
-        } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-            igraph_strvector_t *strvec = (igraph_strvector_t*)rec->value;
-            /* strvector_resize() adds empty strings */
-            IGRAPH_CHECK(igraph_strvector_resize(strvec, context.actedge));
-        } else {
-            /* Must never reach here */
-            IGRAPH_FATAL("Unknown attribute type encountered.");
-        }
+        igraph_attribute_record_t *rec = igraph_attribute_record_list_get_ptr(&eattrs, i);
+        IGRAPH_CHECK(igraph_attribute_record_resize(rec, context.actedge));
     }
 
     /* Create graph */
@@ -270,9 +221,9 @@ igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
     igraph_vector_int_destroy(&edges);
-    igraph_i_pajek_destroy_attr_vector(&eattrs);
+    igraph_attribute_record_list_destroy(&eattrs);
     igraph_trie_destroy(&eattrnames);
-    igraph_i_pajek_destroy_attr_vector(&vattrs);
+    igraph_attribute_record_list_destroy(&vattrs);
     igraph_trie_destroy(&vattrnames);
     igraph_pajek_yylex_destroy(context.scanner);
     IGRAPH_FINALLY_CLEAN(7); /* +1 for 'graph' */

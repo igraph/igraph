@@ -97,7 +97,7 @@ static igraph_error_t igraph_i_create_start_vectors(
  */
 igraph_error_t igraph_empty_attrs(
     igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
-    const igraph_vector_ptr_t *attr
+    const igraph_attribute_record_list_t *attr
 ) {
 
     if (n < 0) {
@@ -252,7 +252,7 @@ igraph_error_t igraph_copy(igraph_t *to, const igraph_t *from) {
  */
 igraph_error_t igraph_add_edges(
     igraph_t *graph, const igraph_vector_int_t *edges,
-    const igraph_vector_ptr_t *attr
+    const igraph_attribute_record_list_t *attr
 ) {
     igraph_integer_t no_of_edges = igraph_vector_int_size(&graph->from);
     igraph_integer_t edges_to_add = igraph_vector_int_size(edges) / 2;
@@ -386,7 +386,7 @@ igraph_error_t igraph_add_edges(
  * \example examples/simple/creation.c
  */
 igraph_error_t igraph_add_vertices(
-    igraph_t *graph, igraph_integer_t nv, const igraph_vector_ptr_t *attr
+    igraph_t *graph, igraph_integer_t nv, const igraph_attribute_record_list_t *attr
 ) {
     igraph_integer_t ec = igraph_ecount(graph);
     igraph_integer_t vc = igraph_vcount(graph);

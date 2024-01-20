@@ -694,3 +694,42 @@ igraph_error_t igraph_strvector_index(const igraph_strvector_t *sv,
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_update
+ * \brief Updates a string vector from another one.
+ *
+ * After this operation the contents of \p to will be exactly the same
+ * as that of \p from. The vector \p to will be resized if it was originally
+ * shorter or longer than \p from.
+ *
+ * \param to The string vector to update.
+ * \param from The string vector to update from.
+ * \return Error code.
+ */
+igraph_error_t igraph_strvector_update(
+    igraph_strvector_t *to, const igraph_strvector_t *from
+) {
+    igraph_strvector_clear(to);
+    IGRAPH_CHECK(igraph_strvector_append(to, from));
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_swap
+ * \brief Swaps all elements of two string vectors.
+ *
+ * \param v1 The first string vector.
+ * \param v2 The second string vector.
+ *
+ * Time complexity: O(1).
+ */
+void igraph_strvector_swap(igraph_strvector_t *v1, igraph_strvector_t *v2) {
+    igraph_strvector_t tmp;
+
+    tmp = *v1;
+    *v1 = *v2;
+    *v2 = tmp;
+}

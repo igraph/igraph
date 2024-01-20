@@ -70,9 +70,10 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     igraph_integer_t n, n2;
     const igraph_strvector_t *namevec = 0;
-    igraph_vector_ptr_t name, weight;
-    igraph_vector_ptr_t *pname = 0, *pweight = 0;
-    igraph_attribute_record_t namerec, weightrec;
+    igraph_attribute_record_list_t name, weight;
+    igraph_attribute_record_list_t *pname = NULL;
+    igraph_attribute_record_list_t *pweight = NULL;
+    igraph_attribute_record_t *namerec, *weightrec;
     const char *namestr = "name", *weightstr = "weight";
     igraph_i_dl_parsedata_t context;
 
@@ -153,24 +154,28 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
         namevec = igraph_i_trie_borrow_keys(&context.trie);
     }
     if (namevec) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
+        IGRAPH_CHECK(igraph_attribute_record_list_init(&name, 1));
+        IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &name);
+
+        namerec = igraph_attribute_record_list_get_ptr(&name, 0);
+        IGRAPH_CHECK(igraph_attribute_record_set_name(namerec, namestr));
+        IGRAPH_CHECK(igraph_attribute_record_set_type(namerec, IGRAPH_ATTRIBUTE_STRING));
+        IGRAPH_CHECK(igraph_strvector_update(namerec->value.as_strvector, namevec));
+
         pname = &name;
-        namerec.name = namestr;
-        namerec.type = IGRAPH_ATTRIBUTE_STRING;
-        namerec.value = namevec;
-        VECTOR(name)[0] = &namerec;
     }
 
     /* Weights */
     if (igraph_vector_size(&context.weights) != 0) {
-        IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1));
-        IGRAPH_FINALLY(igraph_vector_ptr_destroy, &weight);
+        IGRAPH_CHECK(igraph_attribute_record_list_init(&weight, 1));
+        IGRAPH_FINALLY(igraph_attribute_record_list_destroy, &weight);
+
+        weightrec = igraph_attribute_record_list_get_ptr(&weight, 0);
+        IGRAPH_CHECK(igraph_attribute_record_set_name(weightrec, weightstr));
+        IGRAPH_CHECK(igraph_attribute_record_set_type(weightrec, IGRAPH_ATTRIBUTE_NUMERIC));
+        igraph_vector_swap(weightrec->value.as_vector, &context.weights);
+
         pweight = &weight;
-        weightrec.name = weightstr;
-        weightrec.type = IGRAPH_ATTRIBUTE_NUMERIC;
-        weightrec.value = &context.weights;
-        VECTOR(weight)[0] = &weightrec;
     }
 
     /* Create graph */
@@ -180,12 +185,12 @@ igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
     IGRAPH_CHECK(igraph_add_edges(graph, &context.edges, pweight));
 
     if (pweight) {
-        igraph_vector_ptr_destroy(pweight);
+        igraph_attribute_record_list_destroy(pweight);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
     if (pname) {
-        igraph_vector_ptr_destroy(pname);
+        igraph_attribute_record_list_destroy(pname);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
