@@ -95,7 +95,7 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
     } while (0)
 
 typedef struct igraph_i_graphml_attribute_record_t {
-    const char *id;           /* GraphML id */
+    char *id;           /* GraphML id */
     enum { I_GRAPHML_BOOLEAN, I_GRAPHML_INTEGER, I_GRAPHML_LONG,
            I_GRAPHML_FLOAT, I_GRAPHML_DOUBLE, I_GRAPHML_STRING,
            I_GRAPHML_UNKNOWN_TYPE
@@ -218,7 +218,7 @@ static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute
     }
 
     if (rec->id != NULL) {
-        xmlFree((void *) rec->id);
+        igraph_free(rec->id);
         rec->id = NULL;
     }
 
@@ -505,6 +505,34 @@ static igraph_error_t igraph_i_graphml_parser_state_finish_parsing(struct igraph
 #define XML_ATTR_VALUE(it) *(it+3), (int)((*(it+4))-(*(it+3)))
 #define XML_ATTR_VALUE_PF(it) (int)((*(it+4))-(*(it+3))), *(it+3) /* for use in printf-style function with "%.*s" */
 
+static igraph_error_t safely_convert_xml_attribute_to_string(xmlChar** it, char** str) {
+    /* This is quite convoluted but we need to go safely from xmlChar*-world
+     * to char*-world */
+    xmlChar *xml_str;
+    char *c_str;
+
+    xml_str = xmlStrndup(XML_ATTR_VALUE(it));
+    IGRAPH_CHECK_OOM(xml_str, "Insufficient memory to duplicate attribute value.");
+    IGRAPH_FINALLY(xmlFree, xml_str);
+
+    c_str = strdup(fromXmlChar(xml_str));
+    IGRAPH_CHECK_OOM(c_str, "Insufficient memory to duplicate attribute value.");
+
+    *str = c_str;
+
+    xmlFree(xml_str);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+static void safely_free_optional_string(char** str) {
+    if (*str != NULL) {
+        igraph_free(*str);
+        *str = NULL;
+    }
+}
+
 static igraph_error_t igraph_i_graphml_add_attribute_key(
     igraph_i_graphml_attribute_record_t** record,
     const xmlChar** attrs, int nb_attrs,
@@ -525,7 +553,6 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
 
     xmlChar **it;
     xmlChar *localname;
-    xmlChar *xmlStr;
     igraph_trie_t *trie = NULL;
     igraph_vector_ptr_t *ptrvector = NULL;
     igraph_integer_t id;
@@ -534,6 +561,9 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     char *attr_name;
     igraph_attribute_type_t igraph_attr_type;
     igraph_bool_t skip = false;
+
+    attr_name = NULL;
+    IGRAPH_FINALLY(safely_free_optional_string, &attr_name);
 
     if (!state->successful) {
         /* Parser is already in an error state */
@@ -546,7 +576,6 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     IGRAPH_FINALLY(igraph_i_graphml_attribute_record_destroy, rec);
     memset(rec, 0, sizeof(igraph_i_graphml_attribute_record_t));
 
-    attr_name = NULL;
     igraph_attr_type = IGRAPH_ATTRIBUTE_UNSPECIFIED;
 
     for (i = 0, it = (xmlChar**)attrs; i < nb_attrs; i++, it += 5) {
@@ -558,15 +587,10 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
         localname = XML_ATTR_LOCALNAME(it);
 
         if (xmlStrEqual(localname, toXmlChar("id"))) {
-            xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
-            IGRAPH_CHECK_OOM(xmlStr, "Insufficient memory to duplicate value of 'id' attribute.");
-            rec->id = fromXmlChar(xmlStr);
-            xmlStr = NULL;
+            IGRAPH_CHECK(safely_convert_xml_attribute_to_string(it, &rec->id));
         } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
-            xmlStr = xmlStrndup(XML_ATTR_VALUE(it));
-            IGRAPH_CHECK_OOM(xmlStr, "Insufficient memory to duplicate value of 'attr.name' attribute.");
-            attr_name = fromXmlChar(xmlStr);
-            xmlStr = NULL;
+            safely_free_optional_string(&attr_name);
+            IGRAPH_CHECK(safely_convert_xml_attribute_to_string(it, &attr_name));
         } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
             if (!xmlStrncmp(toXmlChar("boolean"), XML_ATTR_VALUE(it))) {
                 igraph_attr_type = IGRAPH_ATTRIBUTE_BOOLEAN;
@@ -681,9 +705,10 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
     /* create the attribute values */
     IGRAPH_CHECK(igraph_attribute_record_init(&rec->record, attr_name, igraph_attr_type));
 
-    igraph_free(attr_name);
-
 exit:
+    safely_free_optional_string(&attr_name);
+    IGRAPH_FINALLY_CLEAN(1);
+
     *record = rec;
     return IGRAPH_SUCCESS;
 }
