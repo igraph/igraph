@@ -131,6 +131,13 @@ int main(void) {
     igraph_strvector_append(&sv1, &sv2);
     strvector_print(&sv1);
 
+    printf("igraph_strvector_swap\n");
+    igraph_strvector_swap(&sv1, &sv2);
+    printf("===\n");
+    strvector_print(&sv1);
+    printf("===\n");
+    strvector_print(&sv2);
+
     igraph_strvector_destroy(&sv1);
     igraph_strvector_destroy(&sv2);
 
