@@ -655,6 +655,8 @@ static igraph_error_t igraph_i_graphml_add_attribute_key(
 
     /* in case of a missing attr.name attribute, use the id as the attribute name */
     if (attr_name == NULL) {
+        /* Allocation here is protected by safely_free_optional_string(&attr_name),
+         * which is already in the finally stack */
         attr_name = strdup(rec->id);
         IGRAPH_CHECK_OOM(attr_name, "Cannot duplicate attribute ID as name.");
     }
