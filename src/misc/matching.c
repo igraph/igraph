@@ -1018,17 +1018,267 @@ static igraph_error_t igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_maximum_matching
+ * \brief Calculates a maximum matching in a graph.
+ *
+ * A matching in a graph is a set of edges such that no endpoints are shared.
+ * The size (or cardinality) of a matching is the number of edges.
+ * A matching is a maximum matching if there exists no other matching with
+ * larger cardinality. For weighted graphs, a maximum matching is a matching
+ * whose edges have the largest possible total weight among all possible
+ * matchings.
+ *
+ * </para><para>
+ * Currently maximum weight matchings are not supported.
+ *
+ * </para><para>
+ * Maximum matchings in bipartite graphs are found by the push-relabel algorithm
+ * with greedy initialization and a global relabeling after every n/2 steps where
+ * n is the number of vertices in the graph.
+ *
+ * </para><para>
+ * References: Gabow H: The Weighted Matching Approach to Maximum Cardinality Matching.
+ * Fundamenta Informaticae, 2017.
+ *
+ * \param graph The input graph. It can be directed but the edge directions
+ *              will be ignored.
+ * \param matching_size The size of the matching (i.e. the number of matched
+ *                      vertex pairs will be returned here). It may be \c NULL
+ *                      if you don't need this.
+ * \param matching_weight The weight of the matching if the edges are weighted,
+ *                        or the size of the matching again if the edges are
+ *                        unweighted. It may be \c NULL if you don't need this.
+ * \param matching The matching itself. It must be a vector where element i
+ *                 contains the ID of the vertex that vertex i is matched to,
+ *                 or -1 if vertex i is unmatched.
+ * \param weights A null pointer (=no edge weights), or a vector giving the
+ *                weights of the edges. Currently ignored.
+ * \return Error code.
+ *
+ * Time complexity: O(sqrt(|V|) |E|) for unweighted graphs (according to Gabow(2017)).
+ *
+ * \example TODO: make an example
+ */
 igraph_error_t igraph_maximum_matching(const igraph_t *graph, igraph_integer_t *matching_size,
                             igraph_real_t *matching_weight, igraph_vector_int_t *matching,
                             const igraph_vector_t *weights) {
-    IGRAPH_UNUSED(graph);
-    IGRAPH_UNUSED(matching_size);
-    IGRAPH_UNUSED(matching_weight);
-    IGRAPH_UNUSED(matching);
-    IGRAPH_UNUSED(weights);
-    IGRAPH_ERROR("maximum matching on general graphs not implemented yet",
-                 IGRAPH_UNIMPLEMENTED);
+    /* Data Structures
+     ***********************
+     * collection of sets bridges(i), from which one bridge is pulled at a time, from the current phase set.
+     * Implement as array of queues?
+     *
+     * even level and odd level vectors associated with vertices
+     *
+     * predecessors and anomalies of each vertex, implement as vector for each vertex, list of vectors
+     *
+     * left and right markings for DDPS, integer or boolean vector will suffice
+     *
+     * erased vector for vertices that have already been in a augmenting path at this length, or have no remaining predecessors after those are removed.
+     *
+     * incremental tree set union of Gabow and Tarjan to track the blossom base* of a given vertex.
+     * base* is the base of the blossom a vertex is in or, if that blossom is embedded in another, the base of that blossom, continuing until we are not in an embedded blossom.
+     *
+     * arrays holding the peaks and base of each blossom
+     */
+
+
+    // Search(graph)
+    //******************************************
+    // (0) Initialize
+    // for each vertex
+    // evenlevel(v) = infinity
+    // oddlevel(v) = infinity
+    // blossom(v) = undefined
+    // predecessors(v) = empty set
+    // anomalies(v) = empty set
+    // v marked unvisited
+    //
+    // Every edge marked unused and unvisited
+    //
+    // bridges(i) = empty set
+    // i = -1
+    //
+    // exposed vertices have evenlevel set to 0
+    //
+    // (2)
+    // i = i+1
+    // if no more vertices have level i then halt
+    //
+    // if i is even
+    // for each v with evenlevel(v) = i find its unmatched, unused neighbors.
+    // for each neighbor u
+    // 	if evenlevel(u) is finite
+    // 		temp = (evenlevel(u) + evenlevel(v))/2
+    // 		add (u,v) to bridges(temp)
+    // 	else
+    // 		handle oddlevel
+    // 		if oddlevel(u) == infinity
+    // 			oddlevel(u) = i+1
+    // 		handle predecessors
+    // 		if oddlevel(u) == i+1
+    // 			add v to predecessors(u)
+    // 		handle anomalies
+    // 			add v to anomalies(u)
+    // for each edge (u,v) in bridges(i) call bloss_aug(u,v)
+    // if an augmentation occurred go to (0), otherwise go to (2)
+
+    return IGRAPH_SUCCESS
 }
+
+// BlossAug(w1, w2) w1, w2 are vertices
+//******************************************
+// Initialization
+// init flags pathFound, blossomFound, erased
+// check if path discovered, if yes flag path found
+// while path not found and blossom not found and not erased
+// 	if left tree should grow
+// 		init flags grown/backtracked, has ancestors
+// 		if vl has no unused ancestors
+// 			flag no ancestors
+// 			if f(vl) is undefined
+// 				flag blossom found
+// 			else //backtrack
+// 				vl = f(vl)
+// 		while left tree hasn't grown/backtraced and vr has unused ancestors and not erased and blossom not found
+// 			choose unused ancestor edge (vl,u)
+// 			if u is marked erased
+// 				delete u from predecessors(vl)
+// 				if vl has no unused ancestors
+// 					flag no ancestors
+// 					if vl==w1
+// 						flag erased
+// 					else
+// 						mark vl erased
+// 						vl = f(vl)
+// 						flag grown/backtracked
+// 			else
+// 				mark (vl,u) used
+// 				if u is in a blossom B
+// 					u = base*(B)
+// 				if u is unmarked 	// grow left tree
+// 					mark u "left"
+// 					f(u) = vl
+// 					vl = u
+// 					flag has grown/backtracked
+// 				else
+// 					if u == barrier or u == vr //left tree can't
+// 						flag grown/backtracked // rename this flag
+// 					else 		// steal from right tree
+// 						mark u "left"
+// 						vr = f(vr)
+// 						vl = u
+// 						DCV = u
+// 						flag has grown/backtracked
+// 	else right tree should grow
+// 		if vr has no unused ancestors
+// 			flag no ancestors
+// 			if vr == barrier 	// steal from left tree
+// 				vr = DCV
+// 				barrier = DCV
+// 				mark vr "right"
+// 				vl = f(vl)
+// 			else 			// backtrack
+// 				vr = f(vr)
+// 		while right tree hasn't grown/backtracked/intersect and vr has unused ancestors and not erased
+// 			choose unused ancestor edge (vr,u)
+// 			if u is marked erased
+// 				delete u from predecessors(vr)
+// 				if vr has no unused ancestor
+// 					flag no ancestors
+// 					if vr==w2
+// 						flag erased
+// 					else
+// 						mark vr erased
+// 						vr = f(vr)
+// 						flag grown/backtracked/intersect
+// 			else
+// 				mark (vr,u) used
+// 				if u is in a blossom B
+// 					u = base*(B)
+// 				if u is unmarked
+// 					mark u "right"
+// 					f(u) = vr
+// 					vr = u
+// 					flag has grown/backtracked/intersect
+// 				else			//mark encounter with left tree
+// 					if u == vl
+// 						DCV = u
+// 					flag has grown/backtracked/intersect
+// 	check if path discovered, if yes flag path found
+// if path found
+// 	run findPath()
+// 	augment matching, and erased path vertices
+// if blossom found
+// 	remove "right" mark from DCV
+// 	create new blossom set B, consisting of all vertices mark "left" or "right"
+// 	peakL(B) = w1, peakR(B) = w2, base(B) = DCV
+// 	for each u in B:
+// 		blossom(u) = B
+// 		if u is outer
+// 			oddlevel(u) = 2i + 1 - evenlevel(u)
+// 		if u is inner
+// 			evenlevel(u) = 2i + 1 - oddlevel(u)
+// 			for each v in anomalies(u)
+// 				temp = (evenlevel(u)+evenlevel(v))/2
+// 				add edge (u,v) to bridges(temp)
+// 				Mark (u,v) used
+
+
+// findPath(high, low, B, evenLevel, oddLevel, LR_marks, blossoms) high and low vertices, B is a blossom, levels and LR_marks are arrays, blossoms is three arrays storing left and right peaks and bases of blossoms
+//******************************************
+// Must be called with a path existing between high and low, with the corresponding data used by BlossAug() to find it, otherwise errors may occur
+// Note: open() from paper is combined with findPath to remove recursive calls
+// path represented as vertex list, linked list will be used to allow efficient insertion. TODO: check if this is necessary for time complexity
+// Initialize a stack, each entry holding high, low, B, insertionPoint, and reverse
+// 	high, low, and B integers, insertionPoint is linked list pointer, reverse is boolean
+// Initialize linked list path
+// push high, low, B, head of path, and false onto stack
+// while stack isn't empty
+// 	pop stack entry
+// 	init flags
+// 	while path not found
+// 		if v has no more unvisited predeccessor edges
+// 			v=f(v)
+// 		else
+// 			if blossom(v) = B
+// 				choose unvisited predecessor edge (v,u)
+// 				mark (v,u) visited
+// 			else
+// 				u = base(blossom(v))
+// 		if u==low
+// 			flag path found
+// 		if (u is visited) or (level(u) <= level(low)) or ((blossom(u)==B) and (u does not have the same left right mark as high))
+//
+// 		else
+// 			mark u visited
+// 			f(u) = v
+// 			v = u
+// 	init tempPath
+// 	until v==high
+// 		if reverse is false
+// 			insert v at begining of tempPath
+// 			v=f(v)
+// 		else
+// 			insert v at end of tempPath //TODO: double check end is correct
+// 			v=f(v)
+// 	let m be length of tempPath
+// 	insert temppath after insertionPoint
+// 	for j=(start of tempPath in path) to (that start + m-2)
+// 		if blossom(path(j)) != B
+// 			B = blossom(path(j))
+// 			if path(j) is outer
+// 				push path(j), path(j+1), B, pointer to path(j), false
+// 			else
+// 				let PeakL and PeakR be the peaks of B
+// 				if path(j) is marked left
+// 					// ordering is important to ensure the two paths are inserted in correct order
+// 					push PeakL, path(j), B, pointer to path(j), true
+// 					push PeakR, path(j+1), B, pointer to path(j), false
+// 				else
+// 					push PeakR, path(j), B, pointer to path(j), true
+// 					push PeakL, path(j+1), B, pointer to path(j), false
+// return path
 
 #ifdef MATCHING_DEBUG
     #undef MATCHING_DEBUG
