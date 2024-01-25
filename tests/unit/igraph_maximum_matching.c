@@ -27,6 +27,7 @@ int test_trivial_graphs() {
     igraph_integer_t matching_size;
 
     igraph_vector_int_init(&edges,0);
+    igraph_vector_int_init(&matching,0);
     //test null graph
     igraph_create(&graph, &edges, 0, 0);
     igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL);
@@ -41,6 +42,9 @@ int test_trivial_graphs() {
         printf("Singleton graph had %" IGRAPH_PRId " matching size.\n", matching_size);
         result = 2;
     }
+    igraph_vector_int_destroy(&edges);
+    igraph_vector_int_destroy(&matching);
+    igraph_destroy(&graph);
     return result;
 }
 
@@ -49,6 +53,7 @@ int test_path_graphs() {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_integer_t matching_size;
+    igraph_vector_int_init(&matching,0);
     //test path graphs lengths 1-3
     igraph_ring(&graph, 2, IGRAPH_UNDIRECTED, 0, 1);
     igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL);
@@ -68,6 +73,8 @@ int test_path_graphs() {
         printf("Length 3 path graph had %" IGRAPH_PRId " matching size.\n", matching_size);
         result = 3;
     }
+    igraph_vector_int_destroy(&matching);
+    igraph_destroy(&graph);
     return result;
 }
 
@@ -76,6 +83,7 @@ int test_bipartite_graphs() {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_integer_t matching_size;
+    igraph_vector_int_init(&matching,0);
     //test two bipartite graphs
     igraph_small(&graph, 9, IGRAPH_UNDIRECTED, 1,2, 2,3, 2,4, 2,5, 3,6, 4,7, 5,8, 6,9, -1);
     igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL);
@@ -89,6 +97,8 @@ int test_bipartite_graphs() {
         printf("Bipartite graph 2 had %" IGRAPH_PRId " matching size, expected 3.\n", matching_size);
         result = 2;
     }
+    igraph_vector_int_destroy(&matching);
+    igraph_destroy(&graph);
     return result;
 }
 
@@ -97,6 +107,7 @@ int test_general_graphs() {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_integer_t matching_size;
+    igraph_vector_int_init(&matching,0);
     //test two non-bipartite graphs
     igraph_small(&graph, 10, IGRAPH_UNDIRECTED, 1,2, 1,3, 2,9, 3,4, 3,5, 4,6, 5,7, 5,8, 7,8, 8,9, 8,10, -1);
     igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL);
@@ -110,6 +121,8 @@ int test_general_graphs() {
         printf("General graph 2 had %" IGRAPH_PRId " matching size, expected 3.\n", matching_size);
         result = 2;
     }
+    igraph_vector_int_destroy(&matching);
+    igraph_destroy(&graph);
     return result;
 }
 
@@ -118,6 +131,7 @@ int test_petersen_graph() {
     igraph_t graph;
     igraph_vector_int_t matching;
     igraph_integer_t matching_size;
+    igraph_vector_int_init(&matching,0);
     //test petersen graph
     igraph_famous(&graph, "Petersen");
     igraph_maximum_matching(&graph, &matching_size, NULL, &matching, NULL);
@@ -125,6 +139,8 @@ int test_petersen_graph() {
         printf("Petersen graph had %" IGRAPH_PRId " matching size, expected 5.\n", matching_size);
         result = 1;
     }
+    igraph_vector_int_destroy(&matching);
+    igraph_destroy(&graph);
     return result;
 }
 
