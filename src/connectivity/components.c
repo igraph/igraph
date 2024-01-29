@@ -394,7 +394,7 @@ static igraph_error_t igraph_i_connected_components_strong(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
+static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
 
 /**
  * \ingroup structural
@@ -468,7 +468,7 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     } else if (no_of_nodes == 1) {
         *res = true;
     } else if (mode == IGRAPH_WEAK) {
-        IGRAPH_CHECK(igraph_is_connected_weak(graph, res));
+        IGRAPH_CHECK(igraph_i_is_connected_weak(graph, res));
     } else {   /* mode == IGRAPH_STRONG */
         /* A strongly connected graph has at least as many edges as vertices,
          * except for the singleton graph, which is handled above. */
@@ -481,13 +481,13 @@ igraph_error_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
     }
 
     /* Cache updates are done in igraph_i_connected_components_strong() and
-     * igraph_is_connected_weak() because those might be called from other
+     * igraph_i_is_connected_weak() because those might be called from other
      * places and we want to make use of the caching if so */
 
     return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
+static igraph_error_t igraph_i_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
     igraph_integer_t no_of_nodes = igraph_vcount(graph), no_of_edges = igraph_ecount(graph);
     igraph_integer_t added_count;
     bool *already_added;
