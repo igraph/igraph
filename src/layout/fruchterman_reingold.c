@@ -56,8 +56,6 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
         C = no_nodes * sqrt(no_nodes);
     }
 
-    RNG_BEGIN();
-
     if (!use_seed) {
         igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
     }
@@ -65,6 +63,7 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&dispy, no_nodes);
 
+    RNG_BEGIN();
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
 
@@ -164,7 +163,6 @@ static igraph_error_t igraph_layout_i_fr(const igraph_t *graph,
 
         temp -= difftemp;
     }
-
     RNG_END();
 
     igraph_vector_destroy(&dispx);
@@ -193,8 +191,6 @@ static igraph_error_t igraph_layout_i_grid_fr(
     igraph_integer_t i;
     const igraph_real_t cellsize = 2.0;
 
-    RNG_BEGIN();
-
     if (!use_seed) {
         igraph_i_layout_random_bounded(graph, res, minx, maxx, miny, maxy);
     }
@@ -212,6 +208,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
     IGRAPH_VECTOR_INIT_FINALLY(&dispx, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&dispy, no_nodes);
 
+    RNG_BEGIN();
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
 
@@ -286,6 +283,7 @@ static igraph_error_t igraph_layout_i_grid_fr(
 
         temp -= difftemp;
     }
+    RNG_END();
 
     igraph_vector_destroy(&dispx);
     igraph_vector_destroy(&dispy);
@@ -554,8 +552,6 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         C = no_nodes * sqrt(no_nodes);
     }
 
-    RNG_BEGIN();
-
     if (!use_seed) {
         igraph_i_layout_random_bounded_3d(graph, res, minx, maxx, miny, maxy, minz, maxz);
     }
@@ -564,6 +560,7 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&dispy, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&dispz, no_nodes);
 
+    RNG_BEGIN();
     for (i = 0; i < niter; i++) {
         igraph_integer_t v, u, e;
 
@@ -684,7 +681,6 @@ igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
         temp -= difftemp;
     }
-
     RNG_END();
 
     igraph_vector_destroy(&dispx);

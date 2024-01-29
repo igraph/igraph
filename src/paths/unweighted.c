@@ -274,9 +274,11 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  * \function igraph_get_shortest_paths
  * \brief Shortest paths from a vertex.
  *
- * </para><para>
- * If there is more than one geodesic between two vertices, this
- * function gives only one of them.
+ * Finds unweighted shortest paths from a single source vertex to the specified
+ * sets of target vertices. If there is more than one geodesic between two vertices,
+ * this function gives only one of them. Use \ref igraph_get_all_shortest_paths()
+ * to find \em all shortest paths.
+ *
  * \param graph The graph object.
  * \param vertices The result, the IDs of the vertices along the paths.
  *        This is a list of integer vectors where each element is an
@@ -286,7 +288,7 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  *        This is a list of integer vectors where each element is an
  *        \ref igraph_vector_int_t object. The list will be resized as needed.
  *        Supply a null pointer here if you don't need these vectors.
- * \param from The id of the vertex from/to which the geodesics are
+ * \param from The ID of the vertex from/to which the geodesics are
  *        calculated.
  * \param to Vertex sequence with the IDs of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
@@ -302,23 +304,23 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
- * \param parents A pointer to an initialized igraph vector or null.
- *        If not null, a vector containing the parent of each vertex in
+ * \param parents A pointer to an initialized igraph vector or \c NULL.
+ *        If not \c NULL, a vector containing the parent of each vertex in
  *        the single source shortest path tree is returned here. The
- *        parent of vertex i in the tree is the vertex from which vertex i
- *        was reached. The parent of the start vertex (in the \c from
+ *        parent of vertex \c i in the tree is the vertex from which vertex \c i
+ *        was reached. The parent of the start vertex (in the \p from
  *        argument) is -1. If the parent is -2, it means
  *        that the given vertex was not reached from the source during the
  *        search. Note that the search terminates if all the vertices in
- *        \c to are reached.
- * \param inbound_edges A pointer to an initialized igraph vector or null.
- *        If not null, a vector containing the inbound edge of each vertex in
+ *        \p to are reached.
+ * \param inbound_edges A pointer to an initialized igraph vector or \c NULL.
+ *        If not \c NULL, a vector containing the inbound edge of each vertex in
  *        the single source shortest path tree is returned here. The
- *        inbound edge of vertex i in the tree is the edge via which vertex i
+ *        inbound edge of vertex \c i in the tree is the edge via which vertex \c i
  *        was reached. The start vertex and vertices that were not reached
  *        during the search will have -1 in the corresponding entry of the
  *        vector. Note that the search terminates if all the vertices in
- *        \c to are reached.
+ *        \p to are reached.
  *
  * \return Error code:
  *        \clist
@@ -336,7 +338,9 @@ igraph_error_t igraph_shortest_paths(const igraph_t *graph,
  * graph.
  *
  * \sa \ref igraph_distances() if you only need the path lengths but
- * not the paths themselves.
+ * not the paths themselves; \ref igraph_get_shortest_paths_dijkstra()
+ * for the weighted version; \ref igraph_get_all_shortest_paths() to
+ * return all shortest paths between (source, target) pairs.
  *
  * \example examples/simple/igraph_get_shortest_paths.c
  */
