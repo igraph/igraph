@@ -61,6 +61,7 @@ IGRAPH_EXPORT igraph_error_t igraph_biconnected_components(const igraph_t *graph
                                                 igraph_vector_int_list_t *component_edges,
                                                 igraph_vector_int_list_t *components,
                                                 igraph_vector_int_t *articulation_points);
+IGRAPH_EXPORT igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *result);
 IGRAPH_EXPORT igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges);
 
 /* Deprecated in igraph 0.10 when we switched to igraph_graph_list_t. Will be

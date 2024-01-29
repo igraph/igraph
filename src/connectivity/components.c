@@ -979,6 +979,11 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * A vertex is an articulation point if its removal increases
  * the number of (weakly) connected components in the graph.
  *
+ * </para><para>
+ * Use \ref igraph_is_biconnected() if you are only interested in whether the
+ * graph has at least one articulation point: if it is biconnected, it does not
+ * have any articulation points, otherwise it has at least one.
+ *
  * \param graph The input graph. It will be treated as undirected.
  * \param res Pointer to an initialized vector, the
  *    articulation points will be stored here.
@@ -1242,6 +1247,135 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
     igraph_vector_int_destroy(&num);
     igraph_vector_int_destroy(&nextptr);
     IGRAPH_FINALLY_CLEAN(8);
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_is_biconnected
+ * \brief Checks whether a graph is biconnected.
+ *
+ * A graph is biconnected if the removal of any single vertex (and
+ * its incident edges) does not disconnect it.
+ *
+ * </para><para>
+ * This function can be more efficient than \ref igraph_biconnected_components()
+ * or \ref igraph_articulation_points() if the graph is likely not to be
+ * biconnected as it can bail out early without counting all the biconnected
+ * components or finding all articulation points.
+ *
+ * </para><para>
+ * Note that some authors do not consider the graph consisting of
+ * two connected vertices as biconnected, however, igraph does.
+ *
+ * \param graph The input graph. It will be treated as undirected.
+ * \param result If not a NULL pointer, the result will be returned here.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
+ *
+ * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components().
+ *
+ * \example examples/simple/igraph_is_biconnected.c
+ */
+
+igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *result) {
+
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_vector_int_t nextptr;
+    igraph_vector_int_t num, low;
+    igraph_vector_int_t *neis;
+    igraph_stack_int_t path;
+    igraph_lazy_adjlist_t inclist;
+    igraph_integer_t counter, rootdfs = 0;
+    igraph_bool_t is_biconnected = true;
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
+
+    IGRAPH_STACK_INT_INIT_FINALLY(&path, 100);
+
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &inclist, IGRAPH_ALL, IGRAPH_NO_LOOPS, IGRAPH_NO_MULTIPLE));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &inclist);
+
+    for (igraph_integer_t i = 0; i < no_of_nodes; i++) {
+
+        if (VECTOR(low)[i] != 0) {
+            continue;    /* already visited */
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        IGRAPH_CHECK(igraph_stack_int_push(&path, i));
+        counter = 1;
+        rootdfs = 0;
+        VECTOR(low)[i] = VECTOR(num)[i] = counter++;
+        while (!igraph_stack_int_empty(&path)) {
+            igraph_integer_t n;
+            igraph_integer_t act = igraph_stack_int_top(&path);
+            igraph_integer_t actnext = VECTOR(nextptr)[act];
+
+            neis = igraph_lazy_adjlist_get(&inclist, act);
+            n = igraph_vector_int_size(neis);
+            if (actnext < n) {
+                /* Step down (maybe) */
+                igraph_integer_t nei = VECTOR(*neis)[actnext];
+                if (VECTOR(low)[nei] == 0) {
+                    if (act == i) {
+                        rootdfs++;
+                    }
+                    IGRAPH_CHECK(igraph_stack_int_push(&path, nei));
+                    VECTOR(low)[nei] = VECTOR(num)[nei] = counter++;
+                } else {
+                    /* Update low value if needed */
+                    if (VECTOR(num)[nei] < VECTOR(low)[act]) {
+                        VECTOR(low)[act] = VECTOR(num)[nei];
+                    }
+                }
+                VECTOR(nextptr)[act] += 1;
+            } else {
+                /* Step up */
+                igraph_stack_int_pop(&path);
+                if (!igraph_stack_int_empty(&path)) {
+                    igraph_integer_t prev = igraph_stack_int_top(&path);
+                    /* Update LOW value if needed */
+                    if (VECTOR(low)[act] < VECTOR(low)[prev]) {
+                        VECTOR(low)[prev] = VECTOR(low)[act];
+                    }
+                    /* Check for articulation point */
+                    if (VECTOR(low)[act] >= VECTOR(num)[prev]) {
+                        if (prev != i /* the root */) {
+                            /* Found an articulation point so the graph is not
+                             * biconnected */
+                            is_biconnected = false;
+                            goto cleanup;
+                        }
+                    }
+                } /* !igraph_stack_int_empty(&path) */
+            }
+
+        } /* !igraph_stack_int_empty(&path) */
+
+        if (rootdfs >= 2) {
+            is_biconnected = false;
+            goto cleanup;
+        }
+
+    } /* i < no_of_nodes */
+
+cleanup:
+
+    igraph_lazy_adjlist_destroy(&inclist);
+    igraph_stack_int_destroy(&path);
+    igraph_vector_int_destroy(&low);
+    igraph_vector_int_destroy(&num);
+    igraph_vector_int_destroy(&nextptr);
+    IGRAPH_FINALLY_CLEAN(5);
+
+    if (result) {
+        *result = is_biconnected;
+    }
 
     return IGRAPH_SUCCESS;
 }
