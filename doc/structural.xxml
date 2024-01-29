@@ -102,6 +102,7 @@
 <!-- doxrox-include igraph_biconnected_components -->
 <!-- doxrox-include igraph_articulation_points -->
 <!-- doxrox-include igraph_bridges -->
+<!-- doxrox-include igraph_is_biconnected -->
 </section>
 
 <section id="degree-sequences"><title>Degree sequences</title>
