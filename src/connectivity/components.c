@@ -1300,6 +1300,13 @@ igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *resul
         goto exit2;
     }
 
+    if (no_of_nodes == 0 || no_of_nodes == 1) {
+        /* The null graph is not connected, hence it is not biconnected either.
+         * The singleton graph is not biconnected. */
+        is_biconnected = false;
+        goto exit2;
+    }
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);

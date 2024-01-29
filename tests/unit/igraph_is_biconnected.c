@@ -29,6 +29,21 @@ int main(void) {
     igraph_t g;
     igraph_bool_t result;
 
+    igraph_small(&g, 0, 0, -1);
+    igraph_is_biconnected(&g, &result);
+    IGRAPH_ASSERT(!result);
+    igraph_destroy(&g);
+
+    igraph_small(&g, 1, 0, -1);
+    igraph_is_biconnected(&g, &result);
+    IGRAPH_ASSERT(!result);
+    igraph_destroy(&g);
+
+    igraph_small(&g, 2, 0, 0, 1, -1);
+    igraph_is_biconnected(&g, &result);
+    IGRAPH_ASSERT(result);
+    igraph_destroy(&g);
+
     igraph_small(&g, 7, 0, 0, 1, 1, 2, 2, 3, 3, 0, 2, 4, 4, 5, 2, 5, -1);
     igraph_is_biconnected(&g, &result);
     IGRAPH_ASSERT(!result);
