@@ -1290,6 +1290,16 @@ igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *resul
     igraph_integer_t counter, rootdfs = 0;
     igraph_bool_t is_biconnected = true;
 
+    if (
+        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED) &&
+        !igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED)) ||
+        (igraph_i_property_cache_has(graph, IGRAPH_PROP_IS_FOREST) &&
+        igraph_i_property_cache_get_bool(graph, IGRAPH_PROP_IS_FOREST))
+    ) {
+        is_biconnected = false;
+        goto exit2;
+    }
+
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nextptr, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num, no_of_nodes);
     IGRAPH_VECTOR_INT_INIT_FINALLY(&low, no_of_nodes);
@@ -1349,7 +1359,7 @@ igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *resul
                             /* Found an articulation point so the graph is not
                              * biconnected */
                             is_biconnected = false;
-                            goto cleanup;
+                            goto exit;
                         }
                     }
                 } /* !igraph_stack_int_empty(&path) */
@@ -1359,12 +1369,12 @@ igraph_error_t igraph_is_biconnected(const igraph_t *graph, igraph_bool_t *resul
 
         if (rootdfs >= 2) {
             is_biconnected = false;
-            goto cleanup;
+            goto exit;
         }
 
     } /* i < no_of_nodes */
 
-cleanup:
+exit:
 
     igraph_lazy_adjlist_destroy(&inclist);
     igraph_stack_int_destroy(&path);
@@ -1373,8 +1383,15 @@ cleanup:
     igraph_vector_int_destroy(&nextptr);
     IGRAPH_FINALLY_CLEAN(5);
 
+exit2:
+
     if (result) {
         *result = is_biconnected;
+    }
+
+    if (is_biconnected) {
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
+        igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
     }
 
     return IGRAPH_SUCCESS;
