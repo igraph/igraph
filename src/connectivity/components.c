@@ -977,17 +977,20 @@ static igraph_error_t igraph_i_decompose_strong(const igraph_t *graph,
  * the number of (weakly) connected components in the graph.
  *
  * </para><para>
- * Use \ref igraph_is_biconnected() if you are only interested in whether the
- * graph has precisely one biconnected component.
+ * Note that a graph without any articulation points is not necessarily
+ * biconnected. Counterexamples are the two-vertex complete graph as well
+ * as empty graphs. Use \ref igraph_is_biconnected() to check whether
+ * a graph is biconnected.
  *
  * \param graph The input graph. It will be treated as undirected.
- * \param res Pointer to an initialized vector, the
- *    articulation points will be stored here.
+ * \param res Pointer to an initialized vector, the articulation points will
+ *   be stored here.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
- * \sa \ref igraph_biconnected_components(), \ref igraph_clusters(), \ref igraph_bridges()
+ * \sa \ref igraph_biconnected_components(), \ref igraph_is_bipartite(),
+ * \ref igraph_connected_components(), \ref igraph_bridges()
  */
 
 igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_int_t *res) {
@@ -1005,19 +1008,21 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * </para><para>
  * A biconnected component of a graph is a maximal biconnected
  * subgraph of it. The biconnected components of a graph can be given
- * by the partition of its edges: every edge is a member of exactly
+ * by a partition of its edges: every edge is a member of exactly
  * one biconnected component. Note that this is not true for
  * vertices: the same vertex can be part of many biconnected
- * components.
+ * components, while isolated vertices are part of none at all.
  *
  * </para><para>
  * Note that some authors do not consider the graph consisting of
  * two connected vertices as biconnected, however, igraph does.
  *
  * </para><para>
- * Somewhat arbitrarily, igraph does not consider components containing
- * a single vertex only as being biconnected. Isolated vertices will
- * not be part of any of the biconnected components.
+ * igraph does not consider components containing a single vertex only as
+ * being biconnected. Isolated vertices will not be part of any of the
+ * biconnected components. This means that checking whether there is a single
+ * biconnected component is not sufficient for determining if a graph is
+ * biconnected. Use \ref igraph_is_biconnected() for this purpose.
  *
  * \param graph The input graph. It will be treated as undirected.
  * \param no If not a NULL pointer, the number of biconnected components will
@@ -1039,13 +1044,14 @@ igraph_error_t igraph_articulation_points(const igraph_t *graph, igraph_vector_i
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
- * edges, but only if you do not calculate \c components and
- * \c component_edges. If you calculate \c components, then it is
- * quadratic in the number of vertices. If you calculate \c
- * component_edges as well, then it is cubic in the number of
+ * edges, but only if you do not calculate \p components and
+ * \p component_edges. If you calculate \p components, then it is
+ * quadratic in the number of vertices. If you calculate
+ * \p component_edges as well, then it is cubic in the number of
  * vertices.
  *
- * \sa \ref igraph_articulation_points(), \ref igraph_clusters().
+ * \sa \ref igraph_articulation_points(), \ref igraph_is_biconnected(),
+ * \ref igraph_connected_components().
  *
  * \example examples/simple/igraph_biconnected_components.c
  */
@@ -1257,10 +1263,7 @@ igraph_error_t igraph_biconnected_components(const igraph_t *graph,
  * its incident edges) does not disconnect it.
  *
  * </para><para>
- * This function can be more efficient than \ref igraph_biconnected_components()
- * or \ref igraph_articulation_points() if the graph is likely not to be
- * biconnected as it can bail out early without counting all the biconnected
- * components or finding all articulation points.
+ * igraph does not consider single-vertex graphs biconnected.
  *
  * </para><para>
  * Note that some authors do not consider the graph consisting of
@@ -1419,7 +1422,8 @@ exit2:
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  *
- * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components(), \ref igraph_clusters()
+ * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components(),
+ * \ref igraph_connected_components()
  */
 
 igraph_error_t igraph_bridges(const igraph_t *graph, igraph_vector_int_t *bridges) {
