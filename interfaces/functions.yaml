@@ -1268,6 +1268,9 @@ igraph_bridges:
     PARAMS: GRAPH graph, OUT EDGE_INDICES res
     DEPS: res ON graph
 
+igraph_is_biconnected:
+    PARAMS: GRAPH graph, OUT BOOLEAN res
+
 #######################################
 # Cliques
 #######################################
