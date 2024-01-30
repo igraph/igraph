@@ -285,6 +285,7 @@ add_legacy_tests(
   assortativity
   components
   coreness
+  direct_betweenness
   efficiency
   global_transitivity
   harmonic_centrality
