@@ -1403,7 +1403,7 @@ exit2:
 
     /* We do not touch the cache for graphs with less than three nodes because
      * of all the edge cases. */
-    if (is_biconnected && no_of_nodes > 2) {
+    if (is_biconnected && no_of_nodes >= 3) {
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_WEAKLY_CONNECTED, true);
         igraph_i_property_cache_set_bool(graph, IGRAPH_PROP_IS_FOREST, false);
     }
